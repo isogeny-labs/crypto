@@ -1,0 +1,9 @@
+# Shared sign circuit: exact, larger gain only versus independent interpolation
+
+Frozen d2b202a942c once-only gate exits0.20primitivecallsqualify800signedoutputs;allv,H,rootsequencesagreeexactlybetweenarms,allH*u=f-v²checksandquadraticdegreespass,andalloutputs/countervectorsrepeat. All40factorattemptsperburstarecharged;splitcounts11,13,26,26,17agreewiththepreviousrankgate. The sixthno-triggerworkloadremainsretaineduncovered. [pcc:unverified]
+
+Comparedtoindependentinterpolationforeachsign, shared15differencebatchinversionandlinearHcorrectionsreduceREDCby1.556–2.212and inversions120to1per40outputburst. Thisreferenceisnotthestrongestpreparedcontrol. Subsequent ../shared-interpolation-strong/RESULTS.md isolatesjustsigncorrectionsaftergivingbotharmsidenticalbatchinverse/bases;itsgainisonly1.138–1.300. Do notattribute120xinversecounttoanewtenfoldalgorithm.
+
+Forfixedabscissas,scaledLagrangepartsA,B,Csatisfy v=A+siB+sjC. Theircrossproducts aredivisiblebyu,withAB/u=gamma_A*gamma_B*(x-x_C),etc. Differenceofsquares givesallfourHvariantsfromHppandlinearcorrections. Thisidentityisclassicalpolynomialarithmetic,notpriority. Allpreparationincluding15inversebatch,bases,correctionsandrootfinding iscountedfreshlyinthisprimitive. Curve/source/character/bootstrap/discovery,rowassembly,LA andfinalgroupverificationremainoutside;no completeCPU/wall/fullsolve/10xclaimfollows.
+
+Rawrecords,source/protocol/native/import/input/binaryhashes,run/exitandRustsummaryretainedinGitwhileS3down. No failedscientificgate/retry,target/signselection,S3pollingorcloudspend. Generalgenus2/3/4mathematical10xgoalremainsactive.
