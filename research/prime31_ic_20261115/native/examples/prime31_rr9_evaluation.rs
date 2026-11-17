@@ -1181,7 +1181,7 @@ fn rr9_b8_exceptional_fibre_audit(ar: &mut Arithmetic) -> Value {
 fn rr9_complete_seven_signed_leaves(
     ar: &mut Arithmetic, leaves: &[Point; 7], residual: Point,
 ) -> Result<Point, String> {
-    let (rx, _) = residual.ok_or("seven-anchor completion excludes R=O")?;
+    residual.ok_or("seven-anchor completion excludes R=O")?;
     if leaves.iter().any(|q| q.is_none()) {
         return Err("seven-anchor completion excludes supplied infinity".into());
     }
@@ -1205,7 +1205,8 @@ fn rr9_complete_seven_signed_leaves(
         return Err("RR9 norm does not leave an exact linear ninth-zero factor".into());
     }
     let x = fp_mul(fp_sub(0, quotient[0]), fp_pow(quotient[1], P - 2));
-    let y = ar.sqrt(ar.rhs(PRIME31, x), P)
+    let rhs = ar.rhs(PRIME31, x);
+    let y = ar.sqrt(rhs, P)
         .ok_or("ninth norm x-coordinate has no rational curve lift")?;
     if y == 0 { return Err("prime-order prime31 has no affine rational 2-torsion".into()); }
     let positive = Some((x, y));
