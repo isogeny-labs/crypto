@@ -53,7 +53,9 @@ pub struct WorkloadPlan {
     /// `planted` (the default: `Q = [k]G`, checked against `k`),
     /// `planted_shared` (the same `k` on every curve of one order, for
     /// paired quotient statistics) or `public` (`Q` hashed to the
-    /// subgroup, checked by `[d]G = Q`): what a `vs_rho` claim needs.
+    /// subgroup, checked by `[d]G = Q`): what a `vs_rho` claim needs;
+    /// `planted_hec_thread` reproduces the hyperelliptic thread's fixed
+    /// target on a `hec_thread` curve.
     /// Not serialised when planted, so a spec written before the field
     /// keeps its id.
     #[serde(default, skip_serializing_if = "TargetKind::is_plain_planted")]

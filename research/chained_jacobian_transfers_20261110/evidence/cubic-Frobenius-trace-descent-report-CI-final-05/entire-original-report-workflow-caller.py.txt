@@ -1,0 +1,108 @@
+"""Static report/diagram/CI inputs from frozen proof metadata, no crypto execution."""
+from pathlib import Path
+import hashlib,json,subprocess
+r=Path('/workspace/crypto');p=r/'research/chained_jacobian_transfers_20261110';g=p/'evidence/cubic-Frobenius-trace-descent-final-04'
+s=json.loads((g/'ACTUAL_CUBIC_TRACE_DESCENT_SCOPE.json').read_text());bindings=json.loads((g/'exact-seventeen-complete-statement-bindings.json').read_text());sha=s['sha256']
+md='''# Cubic additive trace and faithful cyclic descent
+
+`lean/CubicFrobeniusTraceDescent05.lean` derives explicit normalized-trace and cyclic-descent criteria on stated modules. Both unchanged original Lean4.35/4.34.1 gates pass17 named audited/0 failing/0 trusted under one worker/120s/original memory defaults. Seventeen statements have complete original-extractor bindings, data1421da. This is additive module trace; the multiplicative coefficient norm in full04 is a separate operation. Claims remain unsigned. [pcc:unverified]
+
+## Project onto the fixed part
+
+Write N(x)=x+F(x)+F²(x). The source states each required hypothesis explicitly: an IntModule, additive/scalar-linear F as needed, F³=id, an r-annihilator and integers u,v with3u+rv=1 for normalization. The r-annihilator belongs to the stated module or points; it is not an injectivity claim about an ambient geometric point group. [pcc:unverified]
+
+Trace preserves addition and integer scalars. Its fixed-image identities are F(Nx)=Nx and N(Fx)=Nx. If F(x)=x, then N(x)=3x. The local Bezout argument gives u(3x)=x for an r-annihilated x. Thus pi(x)=uN(x) satisfies pi(x)=x iff F(x)=x, and is idempotent on the stated r-annihilated module. The source derives the complete decomposition x=pi(x)+(x−pi(x)), with N(x−pi(x))=0. No ambient torsion cancellation is assumed. [pcc:unverified]
+
+## Faithful cyclic descent forces a fixed generator
+
+Suppose F(P)=lambda P and trace is faithful on scalar multiples of P: every relation aN(P)=bN(P) implies aP=bP. Scalar transport and N(FP)=N(P) give lambda N(P)=N(P). Apply faithfulness to lambda and1 to obtain lambda P=P and hence F(P)=P. This is a proved necessary condition for an F-stable cyclic subgroup; dropping stability or faithfulness changes the question. [pcc:unverified]
+
+For a fixed r-annihilated generator, normalized_fixed_input supplies the explicit left inverse uN(P)=P under3u+rv=1. This states the exact normalization available on the fixed part. It does not construct a new lower-field curve, Jacobian map or faster DLP algorithm. [pcc:unverified]
+
+## A covariant map to a fixed target kills a nonfixed eigenline
+
+Let f preserve integer scalars and satisfy f(Fx)=f(x), as follows for a covariant map into a Frobenius-fixed target. If F(P)=lambda P and rP=0, then r f(P)=0 and (lambda−1)f(P)=0. A supplied Bezout certificate u(lambda−1)+vr=1 gives f(P)=0 by the same local cancellation argument. The trace is a special case. The theorem does not replace invertibility by the weaker condition lambda!=1 over an arbitrary composite modulus. [pcc:unverified]
+
+The composition_covariance lemma proves that covariance is preserved through two composable maps; it can be reused along a chain. The actual geometric maps, their scalar linearity and covariance, and identification of a fixed target remain inputs. Maps lacking those hypotheses are outside this obstruction, so no general impossibility of prime-field descent or ECDLP transfers is asserted. [pcc:unverified]
+
+## Controls and exact bindings
+
+On the abstract coefficient module Fin109, multiplication by45 has cube identity and trace0. On the fixed action,73(x+x+x)=x. In Fin3,3=0 and there is no inverse3. These kernel-checked finite controls document the nonfixed and noninvertible cases;45 is not asserted to be the Frobenius eigenvalue of any F101 or223 curve in this project. No curve/LP population is enumerated. [pcc:unverified]
+
+| New declaration | Complete unsigned binding |
+| --- | --- |
+'''
+for x in bindings:md+=f"| `{x['theorem']}` | `{Path(x['claim']).stem}`. [pcc:unverified] |\n"
+md+='''
+Source SHA256`SOURCEHASH`; the actual original audits count17 named statements and no generated equations. Only propext,Classical.choice,Quot.sound occur. The local Bezout recovery argument reuses the earlier odd-subgroup method. Full04 sourcee804f278 and all earlier original modules/verifiers/keyring/policy remain unchanged. [pcc:unverified]
+
+Two rejected sources remain frozen. First07960c has redundant third rewrites and an eigenline automation generation/instance failure. Second82b8d6 repairs those but fails abstract scalar distribution. Both print sorryAx and are rejected. The accepted source uses original IntModule.sub_zsmul/one_zsmul/zsmul_add explicitly; no statement, hypothesis, tactic limit or original gate is weakened. [pcc:unverified]
+
+Sources checked: exact PartialFrobenius rational bridge, OddFieldDescent Hom sign descent, TargetFrobenius matching/conjugacy, FrobeniusPairings and odd-subgroup cancellation; full04 trace/norm scope; actual Lean4.34/4.35 module-law interfaces. Preregistration091010 states the competing possibility and controls before editing. KB status/exact/negative/theorem wrappers127, conductor unavailable and locked atlas unread; no novelty or absence inference. [pcc:unverified]
+
+Canonical chain.dot,cubic.dot and reports/prime-field-actual-04/psi.dot remain unchanged: this adds an abstract module criterion, not a new curve, Jacobian edge, actual Frobenius action or cost. Actual field/native/compiler/counter/global-map refinements, original full LP60/240/62/original360/witness/seven controls/feedback/post, runtime/admission and matched costs remain open. Current store403/startup failures115681 separately block normal merge; they are not mathematical counterexamples. [pcc:unverified]
+'''.replace('SOURCEHASH',sha)
+(p/'CUBIC_FROBENIUS_TRACE_DESCENT_05.md').write_text(md)
+out=p/'report-cubic-Frobenius-trace-descent-05';out.mkdir()
+(out/'fixed-and-kernel.dot').write_text('''digraph T {
+ graph [rankdir=LR,bgcolor="white",pad="0.2",ranksep="0.4"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4fb",color="#456987",fontname="DejaVu Sans",fontsize=12,margin="0.13,0.12"];
+ edge [color="#456987",fontname="DejaVu Sans",fontsize=10];
+ x [label="Stated r-annihilated module\nF³ = id, 3u + rv = 1"];
+ f [label="Fixed component\npi(x) = u N(x)",fillcolor="#eaf5ed"];
+ k [label="Trace-zero component\nx - pi(x)",fillcolor="#fff3e3"];
+ d [label="Faithful F-stable cyclic trace\nforces F(P) = P"];
+ x -> f [label="N = 1 + F + F²"];
+ x -> k;
+ f -> d;
+}'''+ '\n')
+subprocess.run(['dot','-Tsvg',str(out/'fixed-and-kernel.dot'),'-o',str(out/'fixed-and-kernel.svg')],check=True)
+f=out/'fixed-and-kernel.svg';f.write_text('\n'.join(x.rstrip()for x in f.read_text().splitlines()).rstrip()+'\n')
+(out/'report.typ').write_text('''#set page(paper: "a4", margin: 17mm)
+#set text(size: 10pt, font: "DejaVu Sans")
+#set par(justify: false, leading: 0.6em, spacing: 0.7em)
+#set heading(numbering: none)
+= Cubic trace and faithful cyclic descent
+#text("The additive trace has an explicit fixed-part projection and constraints on faithful cyclic descent. Both unchanged original Lean4.35/4.34.1 gates pass17 named audited/0 failing/0 trusted, with seventeen complete original-extractor bindings1421da. Claims remain unsigned. This additive module trace is distinct from the multiplicative coefficient norm04. [pcc:unverified]")
+
+== Stated module and normalization
+#text("Let N(x)=x+F(x)+F²(x). Each statement exposes its needed IntModule/additivity/scalar-linearity/cubic-action hypotheses. For normalization, r annihilates the stated module or point and3u+rv=1. This never assumes scalar injectivity on an ambient geometric point group. [pcc:unverified]")
+#table(columns: (34%,66%), inset: 6pt,
+ [Trace transport], [N(x+y)=N(x)+N(y); N(nx)=nN(x)],
+ [Fixed image], [F(Nx)=Nx and N(Fx)=Nx],
+ [Fixed input], [F(x)=x implies N(x)=3x],
+ [Normalized projection], [pi(x)=uN(x); pi²=pi; pi(x)=x iff F(x)=x],
+ [Complement], [x=pi(x)+(x−pi(x)); N(x−pi(x))=0],
+)
+#image("fixed-and-kernel.svg", width: 100%)
+
+== A faithful stable cyclic subgroup is fixed
+#text("Assume F(P)=lambda P. Faithfulness means aN(P)=bN(P) implies aP=bP. Scalar transport and N(FP)=N(P) give lambda N(P)=N(P). Faithfulness applied to lambda and1 yields lambda P=P, hence F(P)=P. This is a necessary condition with explicit stability/faithfulness assumptions. [pcc:unverified]")
+#text("For a fixed r-annihilated generator, normalized_fixed_input supplies the explicit left inverse uN(P)=P under3u+rv=1. These abstract identities construct no new lower-field curve/Jacobian map or faster DLP algorithm. [pcc:unverified]")
+
+#pagebreak()
+= Eigenline annihilation, controls and limits
+== A covariant map to a fixed target
+#text("Let f preserve integer scalars and satisfy f(Fx)=f(x). For F(P)=lambda P and rP=0, scalar transport gives r f(P)=0 and (lambda−1)f(P)=0. A supplied Bezout certificate u(lambda−1)+vr=1 forces f(P)=0. Trace is a special case. Mere lambda!=1 is not substituted for invertibility at an arbitrary composite modulus. [pcc:unverified]")
+#text("Composition covariance is proved for two composable maps and can be reused along a chain. Actual geometric maps/linearity/covariance and the fixed-target identification remain inputs. Maps lacking those hypotheses are outside this obstruction; no general impossibility of prime-field descent or ECDLP transfers is asserted. [pcc:unverified]")
+
+#table(columns: (36%,64%), inset: 6pt,
+ [Abstract control], [Kernel-checked scope],
+ [Fin109, scalar45], [F³=id and N=0 on every coefficient. This is not an actual curve Frobenius instance.],
+ [Fin109, fixed action], [73(x+x+x)=x, the inverse3 normalization.],
+ [Fin3 exception], [3=0 and no inverse3 exists.],
+)
+#text("All seventeen bindings are complete under the unchanged original extractor. The actual audits count17 named declarations and no generated equations; only propext,Classical.choice,Quot.sound occur. Source SHA256: SOURCEHASH. Each original gate uses one worker/120s/original memory defaults, no native decision or curve/LP population. [pcc:unverified]")
+
+== Rejected attempts and remaining bridges
+#text("First07960c fails redundant rewrite/eigenline automation; second82b8d6 fails abstract scalar distribution. Both complete sources/outputs print rejected sorryAx. Explicit original module laws repair derivations only; statements/hypotheses/gates stay unchanged. Full04e804 and all original modules/verifiers/keyring/policy remain immutable. [pcc:unverified]")
+#text("Sources: exact rational-bridge/Hom-sign/matching/odd-cancellation/full04 modules, actual Lean module laws. Preregistration091010 records competing hypotheses/controls; KB wrappers127, conductor unavailable, locked atlas unread, no novelty/absence inference. Canonical chain/cubic/F101 graphs unchanged: no geometric edge or cost added. [pcc:unverified]")
+#text("Actual field/native/compiler/counter/Jacobian maps, original full LP60/240/62/original360/witness/seven controls/feedback/post, runtime/admission and matched solving costs remain open. Current CI store403/startup failures115681 separately block merge. No native scientific run, benchmark, paid launch or signed standing. [pcc:unverified]")
+'''.replace('SOURCEHASH',sha))
+w=(r/'.github/workflows/chained-transfer-odd-subgroup-proof-01.yml').read_text()
+for a,b in [('Cleared chain odd subgroup original dual gates01','Cubic Frobenius trace descent original dual gates05'),('ClearedChainOddSubgroup01','CubicFrobeniusTraceDescent05'),('odd-subgroup-cancellation-final-04','cubic-Frobenius-trace-descent-final-04'),('chained-transfer-odd-subgroup-proof-01','chained-transfer-cubic-frobenius-trace-proof-05'),('odd-subgroup-proof-custody','cubic-frobenius-trace-proof-custody'),('odd-subgroup-original-gates','cubic-frobenius-trace-original-gates'),('ffd54023b7b5f1b26880d26c9feba6ae4c0de0cbe8d86c9f5e03fd9bb17ba002',sha)]:w=w.replace(a,b)
+# All old-source input paths must be replaced, retaining the original runner/gates.
+assert 'ClearedChainOddSubgroup01'not in w
+(r/'.github/workflows/chained-transfer-cubic-frobenius-trace-proof-05.yml').write_text(w)
+(out/'canonical-graph-scope.json').write_text(json.dumps(dict(graphs=[dict(path=str((p/f).relative_to(r)),sha256=hashlib.sha256((p/f).read_bytes()).hexdigest())for f in ['chain.dot','cubic.dot','reports/prime-field-actual-04/psi.dot']],decision='unchanged: abstract module trace criteria add no actual curve/Jacobian/Frobenius instance or cost',source=sha),indent=2)+'\n')
+print(sha)

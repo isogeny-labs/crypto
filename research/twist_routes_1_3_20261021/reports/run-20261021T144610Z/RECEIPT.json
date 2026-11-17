@@ -1,0 +1,93 @@
+{
+  "schema": "twist.identity-preflight-receipt/v1",
+  "source_commit": "66f2d617cc60160b7fece7a38759ca2c61f0bae2",
+  "started_utc": "2026-10-21T14:46:10Z",
+  "compiler": "rustc 1.90.0 (1159e78c4 2025-09-14)",
+  "isolation": "L0; correctness-only; no timings used",
+  "commands": [
+    "cargo build --release --locked --offline --manifest-path research/twist_routes_1_3_20261021/tools/Cargo.toml",
+    "cargo test --release --locked --offline --manifest-path research/twist_routes_1_3_20261021/tools/Cargo.toml",
+    "research/twist_routes_1_3_20261021/tools/target/release/twist-route-preflight issue research/twist_routes_1_3_20261021/reports/run-20261021T144610Z/certificates",
+    "research/twist_routes_1_3_20261021/tools/target/release/twist-route-preflight check research/twist_routes_1_3_20261021/reports/run-20261021T144610Z/certificates"
+  ],
+  "exit_codes": {
+    "build": 0,
+    "unit_tests": 0,
+    "issue": 0,
+    "check": 0
+  },
+  "source_hashes": {
+    "research/twist_routes_1_3_20261021/tools/src/main.rs": "b31c0eafd3a8836b5fb7b7c13b9809961fc77060e9b268ffb79a4b79627f2adf",
+    "research/twist_routes_1_3_20261021/tools/Cargo.toml": "1c33060ea42087b33349acd78d46ec59b86869a7ed291ba540680022f4fa62c2",
+    "research/twist_routes_1_3_20261021/tools/Cargo.lock": "11cdeff22917aaff5782d515da55b9c8fb1707cf74fe4dfe3b6aef52770f14fe",
+    "research/twist_routes_1_3_20261021/E00_PROTOCOL.md": "ccd5bdc0a6b8c064f93db86d4c034163e9cf30f9f7777babec515732020af7b5",
+    "src/cryptanalysis/identity_certificate.rs": "d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270",
+    "src/hash/sha256.rs": "2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf"
+  },
+  "binary_sha256": "ddd1375f15e8a702fe54346ff26ab651a51b5f250a924f743573b2851879dd80",
+  "identities": [
+    {
+      "additional_checker_points": 32,
+      "degree_bound": 4,
+      "exact_integer_coefficients_match": true,
+      "expanded_terms": 5,
+      "formal_proof_checked": false,
+      "id": "IDC1h4275fa8068385ce3",
+      "independent_host_replay": false,
+      "issuer_points": 32,
+      "name": "trace_quartic_discriminant",
+      "negative_controls_rejected": true
+    },
+    {
+      "additional_checker_points": 32,
+      "degree_bound": 4,
+      "exact_integer_coefficients_match": true,
+      "expanded_terms": 9,
+      "formal_proof_checked": false,
+      "id": "IDC1h57c015780fe88055",
+      "independent_host_replay": false,
+      "issuer_points": 32,
+      "name": "trace_chord_polynomial_division",
+      "negative_controls_rejected": true
+    },
+    {
+      "additional_checker_points": 32,
+      "degree_bound": 4,
+      "exact_integer_coefficients_match": true,
+      "expanded_terms": 3,
+      "formal_proof_checked": false,
+      "id": "IDC1h30c6f3a4043fe787",
+      "independent_host_replay": false,
+      "issuer_points": 32,
+      "name": "cover_complement_A_cleared",
+      "negative_controls_rejected": true
+    },
+    {
+      "additional_checker_points": 32,
+      "degree_bound": 6,
+      "exact_integer_coefficients_match": true,
+      "expanded_terms": 5,
+      "formal_proof_checked": false,
+      "id": "IDC1hdf7545f3ee4dca7c",
+      "independent_host_replay": false,
+      "issuer_points": 32,
+      "name": "cover_complement_B_cleared",
+      "negative_controls_rejected": true
+    },
+    {
+      "additional_checker_points": 32,
+      "degree_bound": 9,
+      "exact_integer_coefficients_match": true,
+      "expanded_terms": 31,
+      "formal_proof_checked": false,
+      "id": "IDC1h9293014287b4205c",
+      "independent_host_replay": false,
+      "issuer_points": 32,
+      "name": "cover_complement_change_of_variables",
+      "negative_controls_rejected": true
+    }
+  ],
+  "independent_host_replay": false,
+  "lean_proof_checked": false,
+  "scope": "Five polynomial arithmetic preconditions only; E01-E17 unperformed. No curve/group/map/solver/speed claim."
+}

@@ -43,7 +43,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/n83_dense_root_20261013
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/n83_dense_root_20261013 research/n83_factor_base_confirm_20261015 research/n83_factor_base_refine_20261014 research/n83_k3350_sparse_fresh_results_20261015
 
       - name: Fetch the executed source snapshot
         shell: bash

@@ -1,0 +1,15 @@
+   Compiling compact-speed-analysis v0.1.0 (/workspace/crypto-integrate/research/relation_degree_trace_20261115/rust-protocol)
+error[E0425]: cannot find value `x` in this scope
+   --> src/bin/aa-cost-trace.rs:355:14
+    |
+355 |             &x | chart_rows
+    |              ^ not found in this scope
+
+error[E0425]: cannot find value `x` in this scope
+   --> src/bin/aa-cost-trace.rs:356:22
+    |
+356 |                 .get(x.floor() as usize)
+    |                      ^ not found in this scope
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `compact-speed-analysis` (bin "aa-cost-trace" test) due to 2 previous errors

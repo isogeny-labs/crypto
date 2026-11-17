@@ -1,0 +1,182 @@
+{
+  "branch": "lane/vieta-coset-closeout",
+  "closed_utc": "2026-11-16T16:46:43+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--exit-code",
+        "9814b4bb5ca5949685be0f99bc992f6e1d0cc8bd",
+        "HEAD",
+        "--",
+        "src/cryptanalysis/vieta_coset.rs",
+        "research/vieta_coset_rust_20261115/native/poly_compare.rs",
+        "research/vieta_coset_rust_20261115/native/replay.rs",
+        "research/vieta_coset_rust_20261115/native/Cargo.lock"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T16:46:43+00:00",
+      "wall_s": 0.004
+    }
+  ],
+  "commit": "be2a6498acb576908b313cb7512520781988885e",
+  "commit_dirty": true,
+  "created_utc": "2026-11-16T16:46:00+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261116-vieta-polynomial-backends"
+  ],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "2b48a61969ab",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261116T1646Z-vieta-polynomial-registration",
+  "metrics": [
+    {
+      "baseline": 2509465297.0,
+      "better": "neutral",
+      "n": 3,
+      "name": "word62_m16384_karatsuba_fmul",
+      "note": "Retrospective pointer to existing frozen native summary; conditioned successful primary calls only; no new measurement. Producer unverified; query field counts only.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 1168899497.0
+    },
+    {
+      "baseline": 41002731.0,
+      "better": "neutral",
+      "n": 3,
+      "name": "p224_m2048_karatsuba_fmul",
+      "note": "Retrospective pointer to existing frozen native summary; conditioned successful primary calls only; no new measurement. Producer unverified; query field counts only.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 22039567.0
+    }
+  ],
+  "problem": "kernel:vieta_coset_polynomial_backends",
+  "raw": [
+    {
+      "bytes": 762,
+      "path": "research/vieta_coset_rust_20261115/continuation-20261116/run/main/driver.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c7/c705cba36e745282e707b918f232bd526ee0ec7593edfcc07ee3f0f9dc7ac2cb",
+      "sha256": "c705cba36e745282e707b918f232bd526ee0ec7593edfcc07ee3f0f9dc7ac2cb",
+      "uploaded": false
+    },
+    {
+      "bytes": 2359,
+      "path": "research/vieta_coset_rust_20261115/continuation-20261116/run/main/isolation.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c5/c583bc7e1805e93e2ced446cc1e2cf4ef4157a2a44159f8e04b3b0f934cc4d08",
+      "sha256": "c583bc7e1805e93e2ced446cc1e2cf4ef4157a2a44159f8e04b3b0f934cc4d08",
+      "uploaded": false
+    },
+    {
+      "bytes": 65149,
+      "path": "research/vieta_coset_rust_20261115/continuation-20261116/run/main/p224-m2048.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/62/62c70aef43aad064cd6a6d9d4b06644cb4b5a732705cb0e7ac27a449e49097e5",
+      "sha256": "62c70aef43aad064cd6a6d9d4b06644cb4b5a732705cb0e7ac27a449e49097e5",
+      "uploaded": false
+    },
+    {
+      "bytes": 64792,
+      "path": "research/vieta_coset_rust_20261115/continuation-20261116/run/main/p224-m512.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ad/adbeaaa080f43afe90c20abb3265bf7bb57094f352cf7b8867753334ed553a0c",
+      "sha256": "adbeaaa080f43afe90c20abb3265bf7bb57094f352cf7b8867753334ed553a0c",
+      "uploaded": false
+    },
+    {
+      "bytes": 17389,
+      "path": "research/vieta_coset_rust_20261115/continuation-20261116/run/main/p224-m8192.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0a/0a70e1ec3d04090849f376e677c22b017c6eec37b06a20215bab9854ecd4c750",
+      "sha256": "0a70e1ec3d04090849f376e677c22b017c6eec37b06a20215bab9854ecd4c750",
+      "uploaded": false
+    },
+    {
+      "bytes": 52516,
+      "path": "research/vieta_coset_rust_20261115/continuation-20261116/run/main/word62-m16384.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5a/5ab44ceedd88a1e00a63209152d3d31d1494f723be9c55462190d4df8a84e79d",
+      "sha256": "5ab44ceedd88a1e00a63209152d3d31d1494f723be9c55462190d4df8a84e79d",
+      "uploaded": false
+    },
+    {
+      "bytes": 52212,
+      "path": "research/vieta_coset_rust_20261115/continuation-20261116/run/main/word62-m8192.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e38a0931adff0d274a397ce7ab686b0b403013344817964e80a4c793a29bc6e9",
+      "sha256": "e38a0931adff0d274a397ce7ab686b0b403013344817964e80a4c793a29bc6e9",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/continuation-20261116/run/main/p224-m2048.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/continuation-20261116/run/main/p224-m512.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/continuation-20261116/run/main/p224-m8192.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/continuation-20261116/run/main/word62-m16384.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/continuation-20261116/run/main/word62-m8192.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 33355,
+      "path": "research/vieta_coset_rust_20261115/continuation-20261116/run/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f7/f75a40aac79c65f1a5e91824f25bcc9126150dc04fe9d3d36f634343c7cb7b91",
+      "sha256": "f75a40aac79c65f1a5e91824f25bcc9126150dc04fe9d3d36f634343c7cb7b91",
+      "uploaded": false
+    },
+    {
+      "bytes": 234,
+      "path": "research/vieta_coset_rust_20261115/continuation-20261116/run/replay.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/da/da08d0575c3c42822bcb280f64bf1e06715ac121984de9405a53ddd31774c9ff",
+      "sha256": "da08d0575c3c42822bcb280f64bf1e06715ac121984de9405a53ddd31774c9ff",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261116-vieta-polynomial-backends/report.pdf",
+    "png": [
+      "benchmarks/20261116-vieta-polynomial-backends/counts.png"
+    ],
+    "svg": [
+      "benchmarks/20261116-vieta-polynomial-backends/counts.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "vieta-polynomial-registration",
+  "status": "censored",
+  "summary": "Retrospective registration only: command is an unchanged-source audit, no new measurement or replay. Original closed record20261116T1553Z-vieta-polynomial-backends had empty raw/metrics and remains byte-identical. These14 unchanged evidence pointers and two precomputed native summary medians describe its source9814b4bb5c, protocols and16:01\u201316:16UTC interval, not this record creation HEAD/time. Primary192 successes; supplemental4 successes/8 deadlines. No S3 upload/availability, L2 timing, independent signed validation or canonical promotion [pcc:unverified].",
+  "validation": null
+}

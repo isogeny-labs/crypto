@@ -1,0 +1,30 @@
+{
+  "id": "C105-trace-normalized-sparse-predicate",
+  "hypothesis": "Exact trace-zero normalization and canonical field coordinates can produce sparser reusable local predicates than the measured dense coefficient bases.",
+  "derivation": "TRACE_NORMALIZATION_NEXT.md",
+  "experiments": [
+    {
+      "id": "trace-zero-oracles-next",
+      "test": "Prove/verify H(X+t) coefficient map and inverse across every small field tuple and all repeated-root strata; derive trace-zero relations and whole-mask certificates.",
+      "seconds": 90,
+      "memory_mb": 4096,
+      "cpu": 0
+    },
+    {
+      "id": "trace-zero-cold-compile-next",
+      "test": "Compile the SAME76parameter predicates from frozen canonical templates; measure full preprocessing/formulation/RSS, select only through a preregistered cost rule.",
+      "seconds": 90,
+      "memory_mb": 4096,
+      "cpu": 0
+    },
+    {
+      "id": "changed-hard-search-next",
+      "test": "Only after complete equivalence and improved formulation, freeze native binary/hash and45second total search including fresh compile; independently check every model/full support; unknown remains inconclusive.",
+      "seconds": 90,
+      "memory_mb": 4096,
+      "cpu": 0
+    }
+  ],
+  "falsifier": "No reduction in total native formulation cost or parity density; preserve all results and switch to factored algebraic blocks.",
+  "qualified_speedup": null
+}

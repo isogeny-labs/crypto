@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T08:07:48Z",
+ "id": "PCC-20261116-a5cfa1",
+ "kind": "measurement",
+ "producer": {
+  "commit": "369ab46e5076fa6daac76f5be4feecaa38652f2f",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/m31-development/tests-default-01.log",
+    "sha256": "302d3e78a941fdb37d558c47d10b2bc9b4c8cbd203b98484c35446c0c17b1de3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/m31-development/tests-scale-01.log",
+    "sha256": "aa454f6ee3b9ca6b6093e0d767211b427c56891aadadeaaa77fbbbaf3418febc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/m31-development/tests-counter-01.log",
+    "sha256": "c94b5be1a716d5fe4941f18a204932b845032d075d761af9cdea4d16418e1681"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/m31-development/clippy-01.log",
+    "sha256": "9aae760e84d3d15328f27fe211eb30aa86666761507fbef695696581f2caa07d"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Guarded M31 constructor kernel correctness: default45, scale46, scale+counter47 release tests plus strict all-target all-feature clippy pass. Includes boundary/fallback and65536-pair differential checks against original u128 remainder; no timing inference."
+}

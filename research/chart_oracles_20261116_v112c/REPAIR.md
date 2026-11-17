@@ -1,0 +1,1 @@
+Fresh oracle variant adds the missing pathlib.Path import before actual chart checks. Original source, partial toy result, inconclusive attempt and unexecuted dependent profile remain unchanged. No scientific assumption or output contract changes.

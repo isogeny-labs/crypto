@@ -1,0 +1,180 @@
+{
+  "schema": "prime-trace-weak-source-plan/v1",
+  "created": "2026-11-15T01:55:42.163740+00:00",
+  "formal": {
+    "project": "research/prime_trace_weak_bound_audit_20261115/lean",
+    "theorem": "PrimeTraceWeakBoundAudit.prime_trace_weak_bound_certificate",
+    "statement": "theorem prime_trace_weak_bound_certificate : (∀ (K : Type) [Field K] [Fintype K], 3 < Fintype.card K → ringChar K ≠ 2 → ∀ (W : WeierstrassCurve.Affine K), W.Δ ≠ 0 → 1 < Nat.card W.Point ∧ Nat.card W.Point < 2 * Fintype.card K + 1) ∧ (∀ (p : ℕ) [Fact p.Prime], 5 ≤ p → ∀ (W : WeierstrassCurve.Affine (ZMod p)), W.Δ ≠ 0 → (sourceSupersingular p W ↔ actualTrace W = 0) ∧ (sourceSupersingular p W → Nat.card W.Point = p + 1) ∧ (∀ (r : ℕ), 2 < r → r ∣ Nat.card W.Point → sourceSupersingular p W → orderOf (p : ZMod r) = 2 ∧ Module.finrank (ZMod p) (rootsField p r) = 2)) ∧ lowerThree.Δ ≠ 0 ∧ upperThree.Δ ≠ 0 ∧ Nat.card lowerThree.Point = 1 ∧ Nat.card upperThree.Point = 7 ∧ sourceSupersingular 3 lowerThree ∧ sourceSupersingular 3 upperThree ∧ actualTrace lowerThree = 3 ∧ actualTrace upperThree = -3 ∧ twoControl.Δ ≠ 0 ∧ sourceSupersingular 5 twoControl ∧ Nat.card twoControl.Point = 6 ∧ addOrderOf twoPoint = 2 ∧ Module.finrank (ZMod 5) (rootsField 5 (addOrderOf twoPoint)) = 1 ∧ ¬ Module.finrank (ZMod 5) (rootsField 5 (addOrderOf twoPoint)) = 2 ∧ eightControl.Δ ≠ 0 ∧ sourceSupersingular 7 eightControl ∧ Nat.card eightControl.Point = 8 ∧ addOrderOf eightPoint = 8 ∧ Module.finrank (ZMod 7) (rootsField 7 (addOrderOf eightPoint)) = 2",
+    "decl_sha256": "d190809525ceaf4787000e559cc18b79c39b86f3c811bddb94579290d7c2c638",
+    "scope": "FST2010 prime-field source clause using its exact p230 trace/gcd supersingularity definition: actual Mathlib nonsingular general Weierstrass models over every Fp, p>=5, sourceSS iff actual count-defined trace0, actual pointcountp+1, no Hasse/classification/count/trace-zero premise. Derived via actual degree3 polynomial Euler-power nonconstancy over every odd finite q>3: actual Xq-X vanishing divisibility, formal derivative identity and strict degree contradiction, not Hasse theorem. Actual general-Weierstrass completed-square/nonsingularPoint/fiber equivalence derives strict actual1<N<2q+1 and -q<t<q. Prime trace divisiblep from actual sourcegcd and strict weak bound forces0. Every integer r>2 dividing actual pointcount, composite permitted, has exact modularorder2 and actual cyclotomic extensiondegree2 for IntermediateField.adjoin Fp {z:AlgebraicClosureFp | z^r=1}. Primitive root existence/simple-extension algebraicity/finiteness and actual Frobenius square/nonidentity/order=finrank are derived, not supplied modular-order/field-degree identification or primitive-root/rank premise. Actual nonsingularF3 count1/7/sourceSS/trace3,-3 control deletingq>3 orp>=5; actualF5sourceSS count6/pointorder2/rootfielddegree1/directdegree2negation controlsr2; actualF7sourceSS count8/pointorder8/actualrootfielddegree2 positive composite control. Existing fiber/count/gcd/order/roots2/control and Frobenius arguments credited, originals unchanged. Exact FST2010 DOI10.1007/s00145-009-9048-z printed230/PDF7 and237/PDF14 fully text-read/visually inspected; primary723726bytes/57pages/SHA2acd937be8567abfb26bb3861e3aaf34312270c36df9a86f91cf9676c3caf785, not all57pages read. Pinned official Mathlib APIs and prior proofs read before approaches; fresh unavailable KB/Conductor127, bounded prior/primary/official fallback, no absence/novelty claim. Initial general-epsilon derivative sign error corrected separately before code; original protocol retained. This proves repaired prime-field clause under exact source definition, refutes literalr2 claim, does not prove alternate geometricSS/p-rank/Hasse-invariant/endomorphism equivalences, general Hasse bound, general nonprime-field at-most6 classification or full geometric torsion-field bridge. No canonical corpus promotion/full14 completion. Standard foundations/defaults/no holes/customaxioms/nativeproofeval/raisedlimits/globalflags/waivers/frozenedits/cryptoPython/new native crypto/spend/upload. Full written-header native processing procedural, not kernel parser/hash/physical-host execution refinement; signed standing unverified.",
+    "sources": [
+      {
+        "path": "research/prime_trace_weak_bound_audit_20261115/lean/ActualFibers.lean",
+        "bytes": 4868,
+        "sha256": "23fb7e225cf84f133f4fb5012439780735a079a642d1f0efedb2298711c2cbcf"
+      },
+      {
+        "path": "research/prime_trace_weak_bound_audit_20261115/lean/CubicCharacter.lean",
+        "bytes": 4440,
+        "sha256": "3338381cc5f49b2c7e88cbda3fe06c680c9e97e3e90cccc86ae2cac56372ae51"
+      },
+      {
+        "path": "research/prime_trace_weak_bound_audit_20261115/lean/CyclotomicDegree.lean",
+        "bytes": 4517,
+        "sha256": "58b8ee9072e2567c64fcb178e6fad1110fbd594a9446c1812f5a4a58c647db2b"
+      },
+      {
+        "path": "research/prime_trace_weak_bound_audit_20261115/lean/PrimeTrace.lean",
+        "bytes": 3428,
+        "sha256": "dabeab986bbf62a0f4d641ba738c5c3a7e410121c8b32bfe91abe96ceac5ffd6"
+      },
+      {
+        "path": "research/prime_trace_weak_bound_audit_20261115/lean/PrimeTraceCertificate.lean",
+        "bytes": 2881,
+        "sha256": "b316e3a1e3b58c593fc081c739763ac1ae06bf8b42d7cfd255f66a65efa82545"
+      },
+      {
+        "path": "research/prime_trace_weak_bound_audit_20261115/lean/SmallControls.lean",
+        "bytes": 4995,
+        "sha256": "1f1a273e2a971020adc3584b277a60fe9b7fa1555b285afe3d156b2723e131c7"
+      },
+      {
+        "path": "research/prime_trace_weak_bound_audit_20261115/lean/WeakCount.lean",
+        "bytes": 4171,
+        "sha256": "4504e88d05ddd3ef945d4dc57e3e25b97d660a65f8a1950b8f7a8209404b001a"
+      },
+      {
+        "path": "research/prime_trace_weak_bound_audit_20261115/lean/lakefile.toml",
+        "bytes": 422,
+        "sha256": "c80e40cfb1538db86ae09144e6f066782d4bb8c223d1c5c4b6b8576a1dac97ff"
+      },
+      {
+        "path": "research/prime_trace_weak_bound_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3179,
+        "sha256": "56e08fa0f8b0ca3c46be231a6d024774d4c4c59227cc1dd8e5a7869d41acdbb2"
+      },
+      {
+        "path": "research/prime_trace_weak_bound_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "ActualFibers",
+    "CubicCharacter",
+    "CyclotomicDegree",
+    "PrimeTrace",
+    "PrimeTraceCertificate",
+    "SmallControls",
+    "WeakCount"
+  ],
+  "artifacts": [
+    {
+      "path": "research/prime_trace_weak_bound_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 25832,
+      "sha256": "54926a6df4f3588d4023c6055e3e004f95084d00a3813a991119983534a3c70a"
+    },
+    {
+      "path": "research/prime_trace_weak_bound_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "5c9319f18b4ae29fbbdacd9501912c15603d6b599f2631609c81b559a7e2529f"
+    },
+    {
+      "path": "research/prime_trace_weak_bound_audit_20261115/evidence/attempts.json",
+      "bytes": 232,
+      "sha256": "5461b144348e54e252318c980f1aace41440c78d41c69b83cfb7e9afe90e6760"
+    },
+    {
+      "path": "research/prime_trace_weak_bound_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 1528,
+      "sha256": "26e05fc524011389372826553a373fd5978503b6ff07ab9a9eaa413272576501"
+    },
+    {
+      "path": "research/prime_trace_weak_bound_audit_20261115/evidence/gate.json",
+      "bytes": 1259,
+      "sha256": "37a251c2b6228749ff663e66b60da39086c9dace291c18e3bf7ddcd8b3d0606a"
+    },
+    {
+      "path": "research/prime_trace_weak_bound_audit_20261115/evidence/source-review.json",
+      "bytes": 3605,
+      "sha256": "1089d8aee78cbb55a5e994043b69522214b111051c3a105e734379364390df43"
+    },
+    {
+      "path": "research/prime_trace_weak_bound_audit_20261115/evidence/binding-check.json",
+      "bytes": 5589,
+      "sha256": "e188ccc7938a69422fc6b59b35443a1b748442f90b3fd6729fd5f5352fc6c2f9"
+    },
+    {
+      "path": "research/prime_trace_weak_bound_audit_20261115/proof-map.json",
+      "bytes": 5005,
+      "sha256": "79d60312890ed647df6fd88750362654656c6f416bf096c09ceb08d0a91009bd"
+    },
+    {
+      "path": "research/prime_trace_weak_bound_audit_20261115/render_report.py",
+      "bytes": 7396,
+      "sha256": "57623bb68e878f540ae53c73fc57b3dbf7140b483f6a177024460cdda7e8d339"
+    },
+    {
+      "path": "research/prime_trace_weak_bound_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/prime_trace_weak_bound_audit_20261115/export_binding_input.py",
+      "bytes": 1750,
+      "sha256": "dc7c5102769dc077447fe4984861d6ab9f8cc9ecbecc1c857cf2ff32d366603a"
+    },
+    {
+      "path": "research/prime_trace_weak_bound_audit_20261115/reports/layout.json",
+      "bytes": 242,
+      "sha256": "56a3f88b32965b274590d2cc26eef18d27e6f3dc39d5f95b331343d2e837e799"
+    },
+    {
+      "path": "research/prime_trace_weak_bound_audit_20261115/reports/prime-trace.svg",
+      "bytes": 1449,
+      "sha256": "8b79ee10f9ea542cdc0c9b6346653f94219effcc6831e5349b78bbf268fd1f5d"
+    },
+    {
+      "path": "research/prime_trace_weak_bound_audit_20261115/reports/report.pdf",
+      "bytes": 47699,
+      "sha256": "867cb966a4b4a48bd173109b6e8d3cf1300a2e1fc855e9fb4ae87babd7f045d9"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 56,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_log_advisories": 0,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_cubic_euler_nonconstancy_proved": true,
+    "actual_general_Weierstrass_fiber_equivalence_proved": true,
+    "actual_weak_point_and_trace_bounds_proved": true,
+    "source_primefield_trace_zero_count_and_degree_proved": true,
+    "actual_root_adjoin_finiteness_Frobenius_degree_derived": true,
+    "Hasse_or_trace_zero_premise": false,
+    "actual_q3_and_r2_countercontrols_proved": true,
+    "actual_composite_order8_degree2_control_proved": true,
+    "alternate_geometric_SS_comparison_proved": false,
+    "general_Hasse_bound_proved": false,
+    "general_nonprime_at_most6_proved": false,
+    "full_geometric_torsion_field_proved": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

@@ -3,38 +3,13 @@ name: Gröbner baseline re-benchmark
 # the in-house F4 / Gröbner engine code changes, compares against the
 # committed baseline, and regenerates the figures, REPORT.md and REPORT.pdf.
 #
-# - pull_request: measure, compare, publish the comparison as the job summary
-#   and an artifact (fails only if a cell's *answer* changed). Nothing is
-#   committed.
+# Research panel execution follows merge or explicit dispatch (AGENTS.md).
 # - push to main / manual dispatch: measure, regenerate the report, promote
 #   the new rows to the baseline, and open a refresh PR
 #   (`gb-baseline/refresh-<sha>`) with the images, report, PDF and baseline.
 #
 # The paths below mirror `python3 tools/gb_baseline.py paths`.
 on:
-  pull_request:
-    paths:
-      - 'src/cryptanalysis/groebner_f4.rs'
-      - 'src/cryptanalysis/groebner_cache.rs'
-      - 'src/cryptanalysis/f4_*.rs'
-      - 'src/cryptanalysis/inherited_f4.rs'
-      - 'src/cryptanalysis/inherited_f4/**'
-      - 'src/cryptanalysis/pq_f4_f2.rs'
-      - 'src/cryptanalysis/pq_groebner_f2.rs'
-      - 'src/cryptanalysis/matrix_f5_f2.rs'
-      - 'src/cryptanalysis/sig_fp_tower*.rs'
-      - 'src/cryptanalysis/koblitz_groebner.rs'
-      - 'src/cryptanalysis/koblitz_groebner/**'
-      - 'src/cryptanalysis/wide_groebner.rs'
-      - 'src/cryptanalysis/gf2_elim.rs'
-      - 'src/cryptanalysis/fp_backend*.rs'
-      - 'src/cryptanalysis/semaev_*.rs'
-      - 'src/cryptanalysis/binary_semaev*.rs'
-      - 'examples/groebner_stage_bench.rs'
-      - 'examples/pkm_tower_pilot.rs'
-      - 'benchmarks/gb-baseline/panel.json'
-      - 'tools/gb_baseline.py'
-      - '.github/workflows/gb-baseline-rebench.yml'
   push:
     branches: [main]
     paths:

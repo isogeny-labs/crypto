@@ -1,0 +1,95 @@
+{
+  "main": "StartInvariantRhoAudit.start_invariant_rho_certificate",
+  "binding": "67e5dab5404c635114f843a3257bb0556c706a3a6359d7ecffd69373015c65b7",
+  "custom_imports": {
+    "BoundedSteps": "research/rho_collision_audit_20261110/lean/BoundedSteps.lean",
+    "CollisionProbability": "research/general_two_step_collision_audit_20261114/lean/CollisionProbability.lean",
+    "Cylinder": "research/static_hash_collision_audit_20261114/lean/Cylinder.lean",
+    "ExpectedCollision": "research/general_two_step_collision_audit_20261114/lean/ExpectedCollision.lean",
+    "FiniteGraphs": "research/two_step_collision_audit_20261114/lean/FiniteGraphs.lean",
+    "FirstCollision": "research/rho_collision_audit_20261110/lean/FirstCollision.lean",
+    "GeneralCollisionCertificate": "research/general_two_step_collision_audit_20261114/lean/GeneralCollisionCertificate.lean",
+    "HashTranslation": "research/start_invariant_rho_audit_20261114/lean/HashTranslation.lean",
+    "LabelCoefficient": "research/two_step_collision_audit_20261114/lean/LabelCoefficient.lean",
+    "PairLabelEquiv": "research/general_two_step_collision_audit_20261114/lean/PairLabelEquiv.lean",
+    "QueryGeometry": "research/general_two_step_collision_audit_20261114/lean/QueryGeometry.lean",
+    "SidonCounterfamily": "research/sidon_rho_counterfamily_audit_20261114/lean/SidonCounterfamily.lean",
+    "SidonTable": "research/sidon_rho_counterfamily_audit_20261114/lean/SidonTable.lean",
+    "SlowCollision": "research/sidon_rho_counterfamily_audit_20261114/lean/SlowCollision.lean",
+    "UniformCollision": "research/rho_collision_audit_20261110/lean/UniformCollision.lean",
+    "UniformStartCounterfamily": "research/start_invariant_rho_audit_20261114/lean/UniformStartCounterfamily.lean",
+    "WalkBoundary": "research/walk_audit_20261109/lean/WalkBoundary.lean",
+    "WalkWeighted": "research/walk_audit_20261109/lean/WalkWeighted.lean",
+    "WalkWeightedGeneral": "research/walk_audit_20261109/lean/WalkWeightedGeneral.lean"
+  },
+  "claims": [
+    {
+      "declaration": "StartInvariantRhoAudit.weight_shift",
+      "hypotheses": "Finite additive commutative group, arbitrary real label weights",
+      "conclusion": "Actual translated hash has unchanged product weight."
+    },
+    {
+      "declaration": "StartInvariantRhoAudit.expectation_shift",
+      "hypotheses": "Finite state/label sets and actual translation equivalence",
+      "conclusion": "Every real hash observable has unchanged weighted expectation."
+    },
+    {
+      "declaration": "StartInvariantRhoAudit.firstCollision_translate",
+      "hypotheses": "Every nonzeroZ/q, actual step table/hash/start",
+      "conclusion": "Actual iterate conjugacy gives exact Nat.find leastrepeat equality."
+    },
+    {
+      "declaration": "StartInvariantRhoAudit.firstCollision_statistic_start",
+      "hypotheses": "Every real statistic and arbitrary finite label weights",
+      "conclusion": "Expected statistic of actual leastrepeat independent of start."
+    },
+    {
+      "declaration": "StartInvariantRhoAudit.joint_mean_eq",
+      "hypotheses": "Actual normalized nonnegative label PMF, any increments, nonzeroq",
+      "conclusion": "Mean under unchanged genuine hash/two-uniform-ordered-start PMF equals zero-start mean; actual mass/sums/cardinalities prove it."
+    },
+    {
+      "declaration": "StartInvariantRhoAudit.sidon_all_start_bounds",
+      "hypotheses": "Frozen actual20-step table, every hash/start/nonzeroq",
+      "conclusion": "Actual p<=951T and T<=p at every starting state."
+    },
+    {
+      "declaration": "StartInvariantRhoAudit.mean_under_same_local_law",
+      "hypotheses": "Exact frozen localLaw probability space",
+      "conclusion": "Actual firstcollision mean explicitly uses same genuine jointPMF as frozen local event."
+    },
+    {
+      "declaration": "StartInvariantRhoAudit.uniformMean_eq",
+      "hypotheses": "Same actual step/hash law",
+      "conclusion": "Actual uniform-start mean equals frozen zero-start mean."
+    },
+    {
+      "declaration": "StartInvariantRhoAudit.uniform_start_unbounded",
+      "hypotheses": "Every naturalC",
+      "conclusion": "Actual uniform-start E²/p unbounded over primes."
+    },
+    {
+      "declaration": "StartInvariantRhoAudit.uniform_start_bound_false",
+      "hypotheses": "Actual source DegreeTwoGeneric retained",
+      "conclusion": "Direct negation of a real uniform square-root bound under actual uniform-start sampler."
+    },
+    {
+      "declaration": "StartInvariantRhoAudit.concrete_uniform_ratio",
+      "hypotheses": "Actual samejointlaw at kernel-checkedprime10000019",
+      "conclusion": "Uniform-start E²>4p."
+    }
+  ],
+  "gate_declarations": 22,
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "qualified_random_table_refutation": false,
+  "infinite_greedy_sequence_proved": false,
+  "physicalhost_parser_hash_execution_refinement": false
+}

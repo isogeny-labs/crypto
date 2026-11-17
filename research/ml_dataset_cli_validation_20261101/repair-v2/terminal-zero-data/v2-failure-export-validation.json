@@ -1,0 +1,16 @@
+{
+  "checker_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+  "checker_commit": "37e193bf8b3e673e0942709794f44d28e6ab66fb",
+  "export_sha256": "6f36ca79ca48940567a63177109e731b4e03da318061d3ce09f96a4a61a5fa37",
+  "protocol_file_sha256": "fac5a1a21f5a1a542c5ef1efc1818d7a35eba4d15d768bd8b801260a60d7eda0",
+  "schema_findings": [],
+  "findings": [
+    "protocol arms with no run in the export: ['producer-source', 'verifier-replay']",
+    "export has 0 measured rows; the protocol plans 92 (arms x instances x replicates); 92 with warmups. A shortfall must be an infrastructure stop, never a choice",
+    "arm producer-source: measured 0 instances, expected 46",
+    "arm verifier-replay: measured 0 instances, expected 46"
+  ],
+  "accepted": false,
+  "method": "pinned official schema_errors plus lint_export(... verify_files=True)",
+  "scientific_execution": false
+}

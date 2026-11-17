@@ -353,7 +353,12 @@ fn curve_block(
         }
     }
     let floor_s = by_arm["rho-strong"][0].boundaries.floor_s;
-    let r_order = by_arm["rho-strong"][0].workload.curve.r;
+    let r_order = by_arm["rho-strong"][0]
+        .workload
+        .curve
+        .r
+        .checked_u128()
+        .expect("a u128 order");
     for r in by_arm.values().flatten() {
         if r.boundaries.floor_s != floor_s
             || r.boundaries.automorphisms_available != automorphisms

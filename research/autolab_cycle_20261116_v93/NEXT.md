@@ -1,0 +1,7 @@
+# Next bounded experiments
+
+1. Explicit pair certificates: for a unique (s,t), emit a checked left inverse/rank witness for the 83×53 coefficient matrix and either the complete constrained quadratic source fiber or a dual witness proving t outside its image. Verify with a separate implementation. Keep coefficient-fiber caps unresolved.
+2. Strong baseline preprocessing: extract pure linear relations by Gaussian elimination of quadratic monomial columns in the original 83 equations; substitute and retain the unchanged genuine F4/F5 engine for residual work. Compare all original source roots and charge preprocessing. This is a changed configuration, not a longer retry of the three-second timeout. Repair the wrapper to retain native streams and failed-child metrics before assertions. Preserve the original timeout.
+3. Odd-characteristic backend: S3 is quadratic in the third coordinate with discriminant 16f(x)f(y). Prove/cross-check cached square-class and batch-inversion recovery over small prime/odd extensions, including characteristic three and two-torsion, before all five NIST field profiles. This is a separate arithmetic backend, not a transfer of binary linearization.
+
+Initial 90-second components, 4 GiB, one core; at most three experiments per cycle. No repeated identical failed execution, timeout ratio or release claim. Main five-source chart mapping and the certified residue-cover search remain active streams.

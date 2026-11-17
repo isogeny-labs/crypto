@@ -1,0 +1,110 @@
+{
+  "schema": "ic-final-local-validation/v1",
+  "source_commit": "fc38d522f401485f8b8ede8acc119bcc6353fc8d",
+  "full_release_library": {
+    "passed": 4634,
+    "failed": 0,
+    "ignored": 119,
+    "source_tree_matches_control_commit": "c46089aed522b7f649b45675b3f99b17b47f1ad7",
+    "raw_log_in": "evidence/runs-wide-core-checked-20261025.tar.xz"
+  },
+  "touched_examples": {
+    "targets": 5,
+    "tests_passed": 20,
+    "failed": 0,
+    "prior_test_only_import_failure_fixed": true
+  },
+  "clippy": {
+    "status": "passed",
+    "unchanged_main_allowance": "clippy::manual_is_multiple_of",
+    "committed_lint_suppressions_added": false
+  },
+  "replays": {
+    "finite_chain_and_witness_rows": 2048,
+    "independent_point_rows": 2048,
+    "independent_hky_verdict_and_rank_rows": 158,
+    "wide_core_rungs": [
+      16,
+      17,
+      18
+    ],
+    "byte_identical": true,
+    "independent_solver_word_cost_recount": false
+  },
+  "lean": {
+    "checked_theorems": 6,
+    "trusted_native_theorems": 0,
+    "finite_field_irreducibility_bridge_formalized": false
+  },
+  "site": {
+    "tests": 49,
+    "passed": 46,
+    "failed": 3,
+    "same_known_base_failures": [
+      "test_every_scoreboard_panel_has_a_summary_and_the_index_cites_them_all (test_build.BuildTests.test_every_scoreboard_panel_has_a_summary_and_the_index_cites_them_all)",
+      "test_internal_links_resolve (test_build.BuildTests.test_internal_links_resolve)",
+      "test_research_evidence_is_linked_absolutely (test_build.BuildTests.test_research_evidence_is_linked_absolutely)"
+    ]
+  },
+  "curve_names": {
+    "global_check": "fails_outside_campaign_scope",
+    "campaign_issues": 0,
+    "full_log_sha256": "74d86bee06e33bda105b4805b550c7277fb239ee825159d76de3c5a809422498",
+    "full_log_retained_at": "/workspace/ic-final-curve-names-hydrated-20261025.log"
+  },
+  "browser": {
+    "status": "PASS_IC_DASHBOARD_BROWSER",
+    "chrome": "/workspace/ic-chromium-wrapper-20261025.sh",
+    "checks": [
+      "desktop: visible graphs, correct readiness, quiet evidence, search, retained fragment links",
+      "mobile 390: no page overflow; whole comparison graph fits; readiness scrolls within its panel",
+      "mobile 320: no page overflow; whole comparison graph fits; readiness scrolls within its panel",
+      "dark theme rendered",
+      "JavaScript disabled: static measurements, graphs, diagrams and native details remain available"
+    ],
+    "script_errors": [],
+    "external_requests": [],
+    "viewport_widths": [
+      1280,
+      390,
+      320
+    ],
+    "transport": "local HTTP preview",
+    "page_sha256": "8151fa9056a553c8e60e939d355172d6dd95d22d3225e341d7634710b1496c60"
+  },
+  "progress_metric_series": 34,
+  "inspected_reports": 27,
+  "inspected_pages": 30,
+  "artifact_dry_run": {
+    "files": 54,
+    "displayed_size": "8.4 MB",
+    "uploaded": false
+  },
+  "logs": {
+    "touched-examples.log": {
+      "sha256": "b5baa1b3a4fc16f928dfac8ea5061aee08247bf2f584d0afac36b69b0a43b4d1",
+      "bytes": 2828
+    },
+    "scoped-clippy.log": {
+      "sha256": "b172fc95225a6e9c10e64c1b1f7e63bd066d539699fda1cbc1f261d165d44f92",
+      "bytes": 126
+    },
+    "qualified-replay.log": {
+      "sha256": "db158797993fc391e21686ce7eddc3f5ff7cafb298d0381cb3cf2949acc47821",
+      "bytes": 382
+    },
+    "wide-core-replay.log": {
+      "sha256": "026fc104f25303341a0a3e6b26c0b6243c50e5a19e7aa28a4b924b082690b8a5",
+      "bytes": 396
+    },
+    "site.log": {
+      "sha256": "d95ac71cbcea1ee087fa7a7beefa1c67ab06540fa63a9f8b82f779a4ce4e7bbb",
+      "bytes": 9922
+    },
+    "browser.json": {
+      "sha256": "c8bac6ce00b70f5e280fd15e25761d5f9c53ad09be37b7537ba5cf60a5770352",
+      "bytes": 777
+    }
+  },
+  "scope": "Local validation only; no complete-price IC/rho, fastest-tool, full wide IC integration or green PR claim."
+}

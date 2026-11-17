@@ -1,0 +1,7 @@
+# First local epoch: invalid source custody
+
+Session `ECBS1h124a5b50bd9a` used frozen spec `ECS1h326f1843d687` on two public K13 workloads. It completed 48/48 verified answer records, and `ecbench verify --replay-all` reproduced all 32 measured deterministic executions with zero audit problems. The binary SHA-256 was `dba933709f466966dc13f069b9bf0e91def033284f8b1cb779b25c8c9b3448c1`.
+
+**Validity verdict: invalid for timing inference.** The executable was located at `/Volumes/SSD990-2/crypto/wt/codex-rootfind-k13-admission-20261115/target/release/ecbench`. ecbench's `host.rs::build_facts` takes the runtime Git commit from the worktree containing that executable. `session.json` therefore records `557f28efa880a07589dd806d42693697c0993411` with `git_commit_source=runtime_worktree`; the source branch at launch was `fb5fd632771b5b70df7803000c928d7905255695`. The session's source stamp does not bind the run to the repaired branch. Complete answer and replay checks do not repair that provenance gap.
+
+This session is preserved with its records, host/plan/spec/session documents, replay receipt, 48 work-pricing rows, command in its benchmark record, and source-custody diagram/PDF. It is excluded from all timing ratios and is not pooled with the planned location-correct repeat. The repeat keeps the exact spec, seeds, method parameters and binary bytes, but runs the executable under the source branch worktree with a clean tracked tree. It will be a custody repeat on the same targets, not a new holdout.

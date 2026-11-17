@@ -1,0 +1,24 @@
+digraph triples {
+  graph [rankdir=TB, bgcolor="white", label="Triple-sum collision rank screen (planned; no data)", labelloc=t, fontsize=18];
+  node [shape=box, style="rounded,filled", fillcolor="#eaf1f8", color="#456078", fontname="Helvetica", fontsize=14];
+  base [label="Pinned K13/K19/K23\nphysical factor base"];
+  seed [label="Verified pair collisions\n+ torsion row"];
+  triples [label="Distinct unordered triples\nK13 exhaustive; K19/K23 capped"];
+  cache [label="On-demand pair prefix\n+ one final addition"];
+  direct [label="Direct triple sum\ntwo additions"];
+  parity [label="Full-point parity\nevery unique triple", fillcolor="#fff0d5"];
+  key [label="Full point sum\nsigned canonical key"];
+  check [label="Re-add both triples\nverify group identity"];
+  rows [label="Folded homogeneous row\nzero / dependent / independent"];
+  replay [label="Decode every serialized row\ngeneral-curve arithmetic", fillcolor="#fff0d5"];
+  rank [label="Rank trajectory\nceiling C - 1"];
+  prefix [label="First ceiling prefix\nwork projection only", fillcolor="#fff0d5"];
+  gate [label="Later: G row + Q row\ncomplete-call comparison", fillcolor="#fff0d5"];
+  base -> seed -> rank;
+  base -> triples;
+  triples -> cache -> parity;
+  triples -> direct -> parity;
+  parity -> key -> check -> rows -> rank -> gate;
+  rows -> replay -> rank;
+  rank -> prefix;
+}

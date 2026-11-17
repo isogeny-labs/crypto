@@ -319,7 +319,28 @@ basis on every target. **Prediction (G2):** no gain over gauge-fixing unless
 combined with the `S_m` symmetry; record the negative. **Falsifier (G1):**
 a replayed trace giving a different basis on any target. **Class:**
 engineering; moves the algebraic frontier by rungs of `n`, not to 131.
-**Status 2026-10-11:** not implemented. `groebner_basis_f4` already exposes
+**Correction 2026-10-18 (G2 measured; the "no gain" prediction above was
+stale).** G2 was built and measured on 2026-10-14. The equivariant pass is
+bit-identical to the full `F₂` RREF at n = 7, 11, 13, 17. Its 44×, 58× and
+73× (n = 11, 13, 17) were against a naive kernel; against the crate's
+`gf2_elim` the figure is 2–3×
+(`research/ic_next10_20261014/README.md`, correction block;
+`research/ic_next10_20261014/06-equivariant-f4-m4/README.md`). As a
+decomposition oracle, relative to the pipeline's default solver on the
+gauge-fixed barrel system, the verdict is TRADES, not "no gain": 0.25× and
+0.17× at n = 5 and 7, 5.10× at n = 11, 15.5× at n = 13, all 48 targets
+passing the correctness gate. Most of that is not equivariance: adding the
+ordinary degree-fall rows alone gives 4.08× and 11.6×, and equivariance adds
+F/C = 1.25× and 1.34× at n = 11 and 13
+(`research/ic_improve_20261014/02-equivariant-oracle/README.md`). The step
+level fails its gate on all 37 targets (one linear consequence fewer). In
+production it is dead code: the pipeline never hands a `σ`-symmetric system
+to `reduce_system`. The fall-row part was gated and kept opt-in
+(`KIC_FALLROW_GATE=1`), where it ADVANCES on barrel systems (1.83×, 4.42×,
+11.9× at n = 9, 11, 13) and is a no-op on pipeline systems
+(`research/ic_improve_20261015/03-fallrow-gate/README.md`). G1 remains
+unimplemented.
+**Status 2026-10-11 (superseded for G2 by the correction above):** not implemented. `groebner_basis_f4` already exposes
 per-step statistics (`steps`, `pairs_reduced`, selection calls, matrix
 sizes) but no record of *which* pairs were selected and which rows
 reduced to zero; G1 is that record (per step: the multiplier–polynomial
@@ -472,7 +493,13 @@ stated with the phase it moves, the evidence, and the bar it must clear.
    the feasibility note names; nothing measured here changes that reading.
 
 What is **not** an opportunity, measured: cheaper canonicalisation (L2,
-≤ 4 %), residual matching (L3, birthday-bound), equivariant F4 over
-gauge-fixing (L7/G2), and any isogeny move away from `K_0` (L8: the floor
-curve loses `τ` and gains nothing).
+≤ 4 %), residual matching (L3, birthday-bound), and any isogeny move away
+from `K_0` (L8: the floor curve loses `τ` and gains nothing).
+
+Corrected 2026-10-18: this list used to include "equivariant F4 over
+gauge-fixing (L7/G2)" from a prediction. G2 was then measured: 2–3× against
+`gf2_elim` (the 44–73× was against a naive kernel), oracle-level verdict
+TRADES, and dead code in production because the pipeline never builds
+`σ`-symmetric systems. It is therefore neither an opportunity nor a
+disproved one; see the L7 correction above for the sources.
 

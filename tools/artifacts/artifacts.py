@@ -40,6 +40,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import unicodedata
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
@@ -144,10 +145,16 @@ def suffix(path: str) -> str:
     return os.path.splitext(name)[1]
 
 
+def control_filename(name: str) -> bool:
+    """Checkout metadata is never data, including common filesystem aliases."""
+    canonical = name.split(":", 1)[0].rstrip(" .").casefold()
+    return canonical in {".git", MANIFEST, ".gitignore", ".gitattributes"}
+
+
 def belongs_in_store(path: str, size: int, policy: dict) -> bool:
     """The policy: does a tracked file of this path and size belong in the store?"""
     name = path.rsplit("/", 1)[-1]
-    if name in (MANIFEST, ".gitignore", ".gitattributes") or path.startswith(".artifacts/"):
+    if control_filename(name) or path.startswith(".artifacts/"):
         return False
     if any(fnmatch.fnmatchcase(path, pat) for pat in policy.get("keep", [])):
         return False
@@ -193,13 +200,28 @@ def read_text_or_index(p: Path) -> str | None:
 
 def read_manifest(d: Path) -> dict[str, dict]:
     p = d / MANIFEST
+    if p.is_symlink():
+        die(f"{p}: invalid manifest entry source: symbolic link")
     text = read_text_or_index(p)
     if text is None:
         return {}
     data = json.loads(text)
-    if data.get("schema") != MANIFEST_SCHEMA:
-        die(f"{p}: unknown schema {data.get('schema')!r}")
-    return data["files"]
+    if not isinstance(data, dict) or data.get("schema") != MANIFEST_SCHEMA:
+        die(f"{p}: unknown manifest schema")
+    files = data.get("files")
+    if not isinstance(files, dict):
+        die(f"{p}: invalid manifest entry mapping")
+    for name, entry in files.items():
+        if (not isinstance(name, str) or name in ("", ".", "..") or Path(name).name != name
+                or any(c in name for c in ("/", "\\", "\0"))
+                or control_filename(name)
+                or not isinstance(entry, dict)
+                or not isinstance(entry.get("sha256"), str)
+                or len(entry["sha256"]) != 64
+                or any(c not in "0123456789abcdef" for c in entry["sha256"])
+                or type(entry.get("bytes")) is not int or entry["bytes"] < 0):
+            die(f"{p}: invalid manifest entry {name!r}")
+    return files
 
 
 def write_manifest(d: Path, files: dict[str, dict]) -> None:
@@ -259,6 +281,8 @@ def selected(root: Path, paths: list[Path]) -> list[tuple[Path, str, dict]]:
             die(f"{raw}: outside the repository")
     out = []
     for d in all_manifests(root):
+        if not d.resolve().is_relative_to(root.resolve()):
+            die(f"{d}: manifest directory outside the repository")
         drel = rel(root, d)
         # A manifest can only hold entries for a path at or below its directory,
         # or for a directory below a requested prefix.
@@ -332,8 +356,25 @@ class Remote:
                          "--metadata", f"sha256={digest}", "--no-progress", "--only-show-errors")
 
     def get_args(self, digest: str, dest: Path) -> list[str]:
-        return self._aws("s3", "cp", f"s3://{self.bucket}/{self.key(digest)}", str(dest),
-                         "--no-progress", "--only-show-errors")
+        # The object key is already exact. High-level `s3 cp` first issues a
+        # HEAD request, whose generic 403 hides S3's useful GetObject errors
+        # (notably AllAccessDisabled). Stream the object directly instead.
+        # ensure_cached still checks both SHA-256 and length before publishing.
+        return self._aws("s3api", "get-object", "--bucket", self.bucket,
+                         "--key", self.key(digest), str(dest))
+
+    def download_error(self, digest: str, stderr: str) -> str:
+        message = f"download {self.key(digest)} from {self.describe()}: {stderr.strip()}"
+        if "AllAccessDisabled" in stderr:
+            return message + ("; S3 has disabled access to this resource. The bucket owner must "
+                              "restore access or provide a verified replacement store "
+                              "(ARTIFACTS_REMOTE); changing IAM grants or retrying cannot repair it.")
+        if "NoSuchKey" in stderr or "(404)" in stderr:
+            return message + "; object is absent: restore the exact manifest SHA-256 bytes to the store."
+        if "AccessDenied" in stderr or "(403)" in stderr:
+            return message + ("; verify the remote and s3:GetObject permission. Without s3:ListBucket, "
+                              "S3 can also return 403 for a missing key; do not treat it as absence.")
+        return message
 
     def _run(self, argv: list[str]) -> subprocess.CompletedProcess:
         try:
@@ -416,7 +457,7 @@ class Remote:
         p = self._run(self.get_args(digest, dest))
         if p.returncode != 0:
             dest.unlink(missing_ok=True)
-            die(f"download {self.key(digest)}: {p.stderr.strip()}")
+            die(self.download_error(digest, p.stderr))
 
 
 # ---------------------------------------------------------------------------
@@ -511,6 +552,10 @@ def cmd_plan(cfg: Config, args) -> int:
 
 
 def cmd_push(cfg: Config, args) -> int:
+    # Offloading removes index entries. Never let that operation silently
+    # resolve a merge by deleting its base/ours/theirs stages.
+    if git(cfg.root, "ls-files", "--unmerged", "-z"):
+        die("unresolved Git index conflicts; resolve them before offloading")
     remote = None if args.dry_run else Remote(cfg)
     targets: list[tuple[str, int]] = []
     for raw in args.paths:
@@ -584,8 +629,25 @@ def cmd_push(cfg: Config, args) -> int:
     return 0
 
 
+def git_path_key(path: str) -> str:
+    """Portable source ownership across case and canonical Unicode aliases."""
+    return unicodedata.normalize("NFC", path).casefold()
+
+
 def cmd_pull(cfg: Config, args) -> int:
     items = selected(cfg.root, [Path(p) for p in args.paths])
+    # A manifest may retain an old object after the path returns to Git.
+    # Git's index is authoritative, including for omitted sparse files and
+    # staged additions: hydration must never restore the historical object
+    # over it. Do not infer ownership from the working file's presence.
+    # Treat ambiguous portable spellings as owned even when an omitted source
+    # has no inode to compare. This also keeps behavior stable across hosts.
+    tracked = {git_path_key(path) for path in
+               git(cfg.root, "ls-files", "-z").decode(errors="surrogateescape").split("\0")}
+    preserved = [item for item in items if git_path_key(rel(cfg.root, item[0] / item[1])) in tracked]
+    items = [item for item in items if git_path_key(rel(cfg.root, item[0] / item[1])) not in tracked]
+    if preserved:
+        print(f"preserved {len(preserved)} tracked files with historical store entries", file=sys.stderr)
     todo = []
     for d, name, e in items:
         f = d / name

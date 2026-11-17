@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "ROOTFIND-F456-BATCH-COMBINED-K13-20261115",
-  "version": 1,
+  "version": 3,
   "created": "2026-11-15",
   "repository": "crypto",
   "study_dir": "research/rootfind_f456_batch_combined_20261115",
@@ -720,7 +720,7 @@
   "analysis_plan": {
     "script": {
       "path": "research/rootfind_f456_batch_combined_20261115/analyze.py",
-      "sha256": "7ffb939619a470ab56cdb9e92f691c7271c3382553fc6b3b4f45949aecf98cc4"
+      "sha256": "96164aebfb626d9add02d0dfb1cecbd0f86644f3e6c229bc2336d60178825bc2"
     },
     "inputs": [
       "sessions/K13/records.jsonl",
@@ -787,12 +787,42 @@
       "verified_by": "Codex 2026-11-15"
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "A1-ANALYZER-ADMISSION",
+      "filed": "2026-11-16",
+      "filed_before_affected_data": true,
+      "reason": "A pre-run audit against existing ecbench K13 records found that NUMA node zero was rejected as missing and that eight arbitrary workloads could satisfy the row-count gate. Amend the admission script before generating any panel data.",
+      "changes": [
+        "Accept a NUMA node only when it is a nonnegative integer, including node zero.",
+        "Require the exact registered Koblitz E0 n13 curve UID, public target law, frozen target seed and indices zero through seven in every record.",
+        "Require one workload ID, SHA-256, target coordinate pair and target counter per target index across all arms and rounds.",
+        "Keep the ten arms, 560 planned executions, cold L2 wall metric, five comparisons, all-pair rule, A/A rule and target-cluster intervals unchanged."
+      ],
+      "supersedes_fields": [
+        "analysis_plan.script.sha256"
+      ]
+    },
+    {
+      "id": "A2-ANALYSIS-CUSTODY",
+      "filed": "2026-11-16",
+      "filed_before_affected_data": true,
+      "reason": "A pre-data synthetic control showed that the fixed-wall analyzer could report a complete passing panel with zero per-record work rows, and source inspection showed comparison-specific bootstrap seeds despite the protocol's single frozen seed.",
+      "changes": [
+        "Require exactly one ecbench work result for each of the 560 unique execution record IDs before the panel can be complete; retain Err work results as incomplete secondary work, not invalid wall timing.",
+        "Use the frozen bootstrap seed 202611151603 for A/A and each of the five comparisons, with unchanged target-cluster resampling and percentile endpoints.",
+        "Show nonnegative NUMA node zero in analysis output; keep all other fixed-panel inputs, metrics, decision thresholds and stopping rules unchanged."
+      ],
+      "supersedes_fields": [
+        "analysis_plan.script.sha256"
+      ]
+    }
+  ],
   "freeze": {
     "status": "frozen",
-    "protocol_sha256": "8a090e8c7ee70c6969ef652eaab0c0ade66cc4cba6794b5b9f281491c7c05b66",
-    "commit": "8d39d99377e5141ff36028de3ef27c9aa2f4e272",
-    "frozen_at": "2026-11-16T02:17:19Z",
+    "protocol_sha256": "b4631c0451d9647c3dfaa5d20ae6d56eeb37e1ab833d5ce22653a64991d8be2e",
+    "commit": "eaa7fd79d18b576076363cef16c16669dae99d6c",
+    "frozen_at": "2026-11-16T03:24:28Z",
     "filed_before_affected_data": true
   }
 }

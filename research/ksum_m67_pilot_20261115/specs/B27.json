@@ -1,0 +1,112 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ksum_m67_pilot_20261115 B27",
+ "description": "Sizing pilot, not data: ksum m = 6, 7 against the frozen ksum5 size. Public synthetic curve and targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "binary_explicit",
+    "n": 27,
+    "modulus": 134217767,
+    "a": 1,
+    "b": 8672354,
+    "group_order": 134205186,
+    "r": 22367531,
+    "gx": 72506017,
+    "gy": 18815364
+   }
+  ],
+  "targets_per_curve": 32,
+  "target_seed": 2026111567,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "ksum5-n12",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=12,mult=1",
+     "oracle": "ksum:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum6-n10",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=10,mult=1",
+     "oracle": "ksum:m=6",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum6-n11",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=11,mult=1",
+     "oracle": "ksum:m=6",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum7-n9",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=9,mult=1",
+     "oracle": "ksum:m=7",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum7-n10",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=10,mult=1",
+     "oracle": "ksum:m=7",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum7-n11",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=11,mult=1",
+     "oracle": "ksum:m=7",
+     "max_trials": "13528399621"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 2026111568,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

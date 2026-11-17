@@ -1,0 +1,103 @@
+name: Prime31 amortized complete mixed-base index calculus (Rust 1024Q)
+
+on:
+  push:
+    branches: [research/prime31-mixed-ic-amortized-20261117]
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_mixed_base_amortized_ic.rs
+      - research/prime31_ic_20261115/mixed_base/MIXED_AMORTIZED_IC_PROTOCOL_20261117.md
+      - .github/workflows/prime31-mixed-amortized-ic.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_mixed_base_amortized_ic.rs
+      - research/prime31_ic_20261115/mixed_base/MIXED_AMORTIZED_IC_PROTOCOL_20261117.md
+      - .github/workflows/prime31-mixed-amortized-ic.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mixed-ic-amortized:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      RAYON_NUM_THREADS: '1'
+      CARGO_BUILD_JOBS: '2'
+    steps:
+      - name: Checkout source-specific new Rust experiment
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples
+      - name: Checkout complete immutable previously-merged native Rust baseline
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: aps-pinned
+          persist-credentials: false
+          # Only the reusable self-contained native crate is required.
+          # Avoid the multi-GB unrelated root workspace and damaged sat.rs.
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Install example on original native crate without changing arithmetic
+        run: |
+          set -euo pipefail
+          test -f aps-pinned/research/prime31_ic_20261115/native/Cargo.lock
+          cp research/prime31_ic_20261115/native/examples/prime31_mixed_base_amortized_ic.rs \
+            aps-pinned/research/prime31_ic_20261115/native/examples/prime31_mixed_base_amortized_ic.rs
+      - name: Existing native Rust library and new exact precomputation tests
+        run: |
+          cargo +1.100.0 test --locked --release \
+            --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          cargo +1.100.0 test --locked --release \
+            --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_mixed_base_amortized_ic
+      - name: Execute all 1024 previously unseen public scalar targets
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release \
+            --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_mixed_base_amortized_ic > prime31-mixed-amortized-1024q.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open("prime31-mixed-amortized-1024q.json"))
+          assert d['schema']=='prime31.mixed_4p4_amortized_complete_ic.v1'
+          assert d['curve']['p']==2147483647 and d['curve']['n']==2147446831
+          assert d['setup_full'] and d['setup_rank']==61 and d['base_log_point_replays']==61
+          assert len(d['basis_logs'])==61
+          assert d['target_count']==1024 and len(d['targets'])==1024
+          assert d['completed_unknown_target_logs']==1024
+          assert [v['number_of_targets'] for v in d['full_cold_prefix_costs']]==[1,64,256,512,1024]
+          assert all(x['caller_check'] and x['solver']['status']=='complete'
+                     and x['solver']['target_log']==x['caller_only_scalar']
+                     and x['solver']['attempt_count']>=1 for x in d['targets'])
+          assert all(a['independent_group_replay'] and a['scalar_point_replay']
+                     for x in d['targets'] for a in x['solver']['attempts']
+                     if not a.get('no_mixed_half_sum'))
+          assert not d['solver_used_hidden_scalar']
+          assert not d['has_same_run_optimized_rho']
+          assert not d['is_nongeneric_s9_extraction']
+          setup=int(d['setup_ns'])
+          desc=int(d['descent_total_ns'])
+          assert setup>0 and desc>0
+          print('Verified prime31 complete index calculus: 1024/1024')
+          print('Charged basis precomp ms:',setup/1e6)
+          print('1024 descents ms:',desc/1e6)
+          print('Charged aggregate ms:',(setup+desc)/1e6)
+          print('Mean descent ms:',desc/1024/1e6)
+          print('Full-cost prefixes:',d['full_cold_prefix_costs'])
+          PY
+      - name: Preserve uncensored attempts, signed relations, costs, all scalar-point replays
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-mixed-amortized-1024q-raw
+          path: prime31-mixed-amortized-1024q.json
+          if-no-files-found: warn
+          retention-days: 30

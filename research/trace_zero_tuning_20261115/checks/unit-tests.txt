@@ -1,0 +1,55 @@
+    Updating crates.io index
+     Locking 30 packages to highest compatible versions
+      Adding num-bigint v0.4.8 (available: v0.5.1)
+   Compiling libc v0.2.191
+   Compiling proc-macro2 v1.0.107
+   Compiling zerocopy v0.8.63
+   Compiling quote v1.0.47
+   Compiling autocfg v1.5.1
+   Compiling unicode-ident v1.0.27
+   Compiling cfg-if v1.0.5
+   Compiling num-traits v0.2.19
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling syn v3.0.10
+   Compiling getrandom v0.2.17
+   Compiling rand_core v0.6.4
+   Compiling serde_json v1.0.154
+   Compiling serde v1.0.229
+   Compiling num-integer v0.1.47
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.19
+   Compiling hex v0.4.3
+   Compiling serde_derive v1.0.229
+   Compiling trace-zero-tuning v0.1.0 (/workspace/crypto-trace/research/trace_zero_tuning_20261115/native)
+   Compiling ppv-lite86 v0.2.21
+   Compiling rand_chacha v0.3.1
+   Compiling rand v0.8.8
+   Compiling num-bigint v0.4.8
+   Compiling full-trace-zero-backend v0.1.0 (/workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend)
+error[E0282]: type annotations needed for `Vec<std::option::Option<_>>`
+   --> /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_linearized.rs:673:9
+    |
+673 |     let mut pivots = vec![None; n as usize];
+    |         ^^^^^^^^^^
+...
+682 |                     v[i] ^= p[i];
+    |                             - type must be known at this point
+    |
+help: consider giving `pivots` an explicit type, where the placeholder `_` is specified
+    |
+673 |     let mut pivots: Vec<std::option::Option<T>> = vec![None; n as usize];
+    |                   +++++++++++++++++++++++++++++
+
+error[E0277]: the size for values of type `[u64]` cannot be known at compilation time
+   --> /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_linearized.rs:693:15
+    |
+693 |         .map(|w| F2mElement::from_words(&w, n))
+    |               ^ doesn't have a size known at compile-time
+    |
+    = help: the trait `Sized` is not implemented for `[u64]`
+    = note: all function arguments must have a statically known size
+
+Some errors have detailed explanations: E0277, E0282.
+For more information about an error, try `rustc --explain E0277`.
+error: could not compile `full-trace-zero-backend` (lib) due to 2 previous errors

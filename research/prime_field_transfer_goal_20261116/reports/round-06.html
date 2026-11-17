@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>CM cover transfer: modular kernel and growing public inputs</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="round-06.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">CM cover transfer: modular kernel and growing public
+inputs</h1>
+<p class="date">16 November 2026 — round six</p>
+</header>
+<p>The classical modular constructor supplies the previously missing
+<strong>order 127 Weber model</strong>, with exact global divisions and
+a good-prime coprimality check before acceptance. Fixed public-input
+qualification then recovers <strong>4/4 order 61 scalars at64/128 digits
+and3/4 order 127 scalars at32/64 digits</strong>. Constructor claim
+<strong>PCC-20261116-37e825</strong> and public claim
+<strong>PCC-20261116-e0d875</strong> are unsigned. [pcc:unverified]</p>
+<figure>
+<img src="round-06-route.svg"
+alt="The implemented route, with its class-valued output and recovery stage" />
+<figcaption aria-hidden="true">The implemented route, with its
+class-valued output and recovery stage</figcaption>
+</figure>
+<p>The new generated model is y²=x³+B with shared integer B=264925:
+source F3181 has reduced coefficient 902 and subgroup order
+127/cofactor25; the target over F127 has coefficient 3 and anomalous
+order 127. The Weber field has degree 21. Setup uses 18 CRT primes/115
+modulus bits; the final certificate prime is199 with roots 106 and 92.
+The old order 19/order 61 models and complete order 19 qualification
+bytes are reproduced unchanged. These are local development checks, with
+no timing or performance comparison. [pcc:unverified]</p>
+<figure>
+<img src="round-06-coverage.svg"
+alt="Completed checked rows only; no bar is assigned to unknown128-digit results" />
+<figcaption aria-hidden="true">Completed checked rows only; no bar is
+assigned to unknown128-digit results</figcaption>
+</figure>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Source → anomalous target</th>
+<th>N16</th>
+<th>N32</th>
+<th>N64</th>
+<th>N128</th>
+<th>Whole-process exits</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>F1531 → F61, four fixed public inputs</td>
+<td>1/4</td>
+<td>3/4</td>
+<td>4/4</td>
+<td>4/4</td>
+<td>four 0</td>
+</tr>
+<tr class="even">
+<td>F3181 → F127, four fixed public inputs</td>
+<td>1/4</td>
+<td>3/4</td>
+<td>3/4</td>
+<td>unknown</td>
+<td>four 124</td>
+</tr>
+</tbody>
+</table>
+<p>Version07 declares precisions16/32/64/128 and LLL step cap80000
+before calls; every point process retains 60 seconds. All four order 127
+processes time out during128-digit work, without completed128 rows.
+Their complete lower-precision rows remain evidence; raw partial final
+lines remain intact. The tested budget change is not a minimum-precision
+theorem or a causal comparison isolating precision from the step cap.
+[pcc:unverified]</p>
+<div class="pagebreak">
+
+</div>
+<h2 id="exact-scope-checks-and-formal-component">Exact scope, checks and
+formal component</h2>
+<p>Raw division-function numerators are constructed without intermediate
+exact rational-polynomial GCD normalization. Two conjugate split-prime
+GCDs give Eisenstein coefficient residues; CRT and rational
+reconstruction propose a monic degree-d factor. Acceptance requires
+exact division of both original numerators and degree-preserving
+coprimality of their quotient factors and the relevant denominators at a
+good prime. The torsion prime is excluded. This is classical modular-GCD
+construction; a modular fit alone does not accept. The written
+good-reduction bridge is not a formal native-code proof.
+[pcc:unverified]</p>
+<p>For public Q, the unchanged rational Padé recognizer takes model,Q,N,
+uses a 2d+2-dimensional integer lattice and exact LLL, and inspects only
+reduced rows. It checks C(β)=0 globally and the full source branch
+before specializing the same β. The output is a Weber class with sixfold
+CM-unit ambiguity. Target Smart solving and at most six OpenSSL source
+comparisons recover the scalar; this is not an oriented additive point
+map. Accepted completed rows retain global/source/chimera controls and
+target/source arithmetic checks. Both setup and every failed candidate
+remain costs of this route. [pcc:unverified]</p>
+<p>Twelve named Lean endpoints in <strong>SplitPrime199V1</strong>
+concern the actual final certificate prime: two roots of T²+T+1, the
+inverse matrices P=[[1,106],[1,92]] and D=[[164,36],[128,71]], vector
+round trips, injectivity/surjectivity, and four exact integer row
+identities. They apply Mathlib matrix and inverse-function laws after
+literal finite certificates. Four IDC1 records bind the integer row
+statements (ids in identity-run-01.stdout), with native producer
+issuance only; they are not an independent Rust replay. Gate01 audits77
+theorems with0 failures and0 trusted-native exceptions;
+PCC-20261116-cff31a is unsigned. Explicit axioms and statement-bound
+claims are in the receipts. All claims remain unsigned.
+[pcc:unverified]</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Requirement</th>
+<th>Status and remaining dependency</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Growing fixed CM setup and public inputs</td>
+<td>Native records retained; partial coverage and four timeouts
+reported</td>
+</tr>
+<tr class="even">
+<td>Finite split-prime formal component</td>
+<td>Checked Lean instance; gate and axioms retained, unsigned
+standing</td>
+</tr>
+<tr class="odd">
+<td>Full native construction and transfer theorem</td>
+<td>Partial: CRT reconstruction, exact-GCD bridge, CM kernel and
+specialization interfaces missing</td>
+</tr>
+<tr class="even">
+<td>Complete oriented evaluator / a priori precision</td>
+<td>Saved leads only; uniform-bound draft unproved, coordinate-ratio
+evaluator unimplemented</td>
+</tr>
+<tr class="odd">
+<td>Arbitrary-curve applicability and efficient complete costs</td>
+<td>Original goal remains active; this study uses selected CM
+fixtures</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Flow:</strong> three setup calls and two order 19 regressions
+complete; eight public processes are attempted, four complete and four
+time out. This is 13 recognizer processes, plus one separate fixed-row
+identity-issuer call. All earlier setup timeouts, compiler/preparation
+failures and old evidence remain preserved. No unchanged recognizer is
+rerun for report packaging. Original 109 published scientific input pins
+remain unchanged. [pcc:unverified]</p>
+<p><strong>Evidence and sources:</strong> <a
+href="../round-06/PROTOCOL.md">protocol</a>, <a
+href="../round-06/AMENDMENT-01.md">prospective amendment</a>, <a
+href="../round-06/PROOF-MAP.md">six-field proof map</a>, <a
+href="../receipts/round-06/">raw records / manifests / claim
+bindings</a>, <a href="../round-04/RESULT.md">round04 written scalar
+argument</a>. The original LLL1982 §§1–2, FLINT modular-GCD source and
+repository CT84 inform the established methods. KB and Conductor remain
+unavailable; Mathlib4.24 is pinned at
+f897ebcf72cd16f89ab4577d0c826cd14afaafc7. Every final PDF page is
+inspected; SVG and recorded plot sources accompany this report. Old
+canonical graphs remain historical because no performance/leaderboard
+result is promoted. No PNG preview or direct artifact upload is
+added.</p>
+</body>
+</html>

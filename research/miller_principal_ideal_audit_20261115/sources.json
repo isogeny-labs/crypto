@@ -1,0 +1,158 @@
+{
+  "schema": "miller-affine-ideal-source-plan/v1",
+  "created": "2026-11-15T04:15:19.690323+00:00",
+  "formal": {
+    "project": "research/miller_principal_ideal_audit_20261115/lean",
+    "theorem": "MillerPrincipalIdealAudit.miller_affine_ideal_certificate",
+    "statement": "theorem miller_affine_ideal_certificate : (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (x₁ x₂ y₁ y₂ : K) (_ : W.Nonsingular x₁ y₁) (_ : W.Nonsingular x₂ y₂), ¬ (x₁ = x₂ ∧ y₁ = W.negY x₂ y₂) → pointIdeal W x₁ y₁ * pointIdeal W x₂ y₂ * pointIdeal W (W.addX x₁ x₂ (W.slope x₁ x₂ y₁ y₂)) (W.negY (W.addX x₁ x₂ (W.slope x₁ x₂ y₁ y₂)) (W.addY x₁ x₂ y₁ (W.slope x₁ x₂ y₁ y₂))) = lineIdeal W x₁ y₁ (W.slope x₁ x₂ y₁ y₂)) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (x y : K) (hN : W.Nonsingular x y), (3 : ℕ) • Point.some x y hN = 0 → pointIdeal W x y ^ 3 = lineIdeal W x y (W.slope x x y y)) ∧ (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (x y slope : K), lineFunction W x y slope ≠ 0) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (_ : W.a₁ = 0) (_ : W.a₂ = 0) (_ : W.a₃ = 0) (x y xr yr : K) (hN : W.Nonsingular x y) (_ : (3 : ℕ) • Point.some x y hN = 0) (hR : W.Equation xr yr), pointEval W xr yr hR (lineClass W x y (W.slope x x y y)) = yr - y - ((3 * x ^ 2 + W.a₄) / (2 * y)) * (xr - x)) ∧ controlCurve.Δ ≠ 0 ∧ (3 : ℕ) • Point.some 0 1 control_positive_nonsingular = 0 ∧ pointIdeal controlCurve 0 1 ^ 3 = lineIdeal controlCurve 0 1 (controlCurve.slope 0 0 1 1) ∧ controlCurve.Nonsingular 2 2 ∧ (2 : F) ≠ controlCurve.negY 2 2 ∧ (3 : ℕ) • Point.some 2 2 control_negative_nonsingular ≠ 0 ∧ pointIdeal controlCurve 2 2 ^ 3 ≠ lineIdeal controlCurve 2 2 (controlCurve.slope 2 2 2 2)",
+    "decl_sha256": "d2b0fd734afc3313003d0373976189f696193cbf25807d2b3b20610645ef40ce",
+    "scope": "Actual affine coordinate-ring principal-ideal/function/evaluation bridge for Miller lines. Over every field/general Weierstrass model and nonsingular affine P,Q with nonvertical guard, actual I_P I_Q I_(-P-Q) equals the actual line principal ideal. Actual three-torsion implies tangent ideal I_P cubed; derive nonvertical guard from actual group law. Actual regular line class and its function-field image are nonzero. Actual point evaluation is a ring homomorphism and gives the numerical line expression, including the short-model three-torsion tangent slope. Actual nonsingular E/F5:y²=x³+1 positive (0,1) and negative (2,2) controls; the latter retains nonsingularity/nonverticalness but is not killed by3 and its tangent cube identity is false by actual evaluation. Four new modules import Mathlib and one another, no earlier custom proof modules. Completes only the affine ideal/function/evaluation bridge beyond previous polynomial identities; does not establish projective infinity valuation/canonical principal divisor/Weil-Tate identification/translation pullback/Weil reciprocity/isogeny/Lang/Cartier/Jacobian/MOV-FR/all14 completion. Same prover/Mathlib/host, not independent implementation/physical-host verification. No canonical promotion/novelty/signed-standing claim.",
+    "sources": [
+      {
+        "path": "research/miller_principal_ideal_audit_20261115/lean/GuardControls.lean",
+        "bytes": 2953,
+        "sha256": "d993b8a271d0b45b877f0f0c03ae970934500a70981549df266473b43d83d366"
+      },
+      {
+        "path": "research/miller_principal_ideal_audit_20261115/lean/LineEvaluation.lean",
+        "bytes": 2628,
+        "sha256": "59405f70efc92e408edb087790965f3dc7d8559dd3b55fe0deb122e859de49ef"
+      },
+      {
+        "path": "research/miller_principal_ideal_audit_20261115/lean/LineIdeals.lean",
+        "bytes": 5086,
+        "sha256": "f14f02c6998c132789cb332a5879cb57bb0ed6f17c1664bfd5fbabf98678d097"
+      },
+      {
+        "path": "research/miller_principal_ideal_audit_20261115/lean/MillerIdealCertificate.lean",
+        "bytes": 2898,
+        "sha256": "1678d55fc8e7e06834b4a1d3424c29bbeb65761a415219638fc252b18f2bcc87"
+      },
+      {
+        "path": "research/miller_principal_ideal_audit_20261115/lean/lakefile.toml",
+        "bytes": 376,
+        "sha256": "d4959f6eb54d24f8912c52f3833b3e1ee19a922f0af15ad5a91cd08d45e1129b"
+      },
+      {
+        "path": "research/miller_principal_ideal_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3179,
+        "sha256": "24aa990385d3efa7cb32b33104fb4ec7fcb57b54a4ef488d0d2ecfe4ed22ff1c"
+      },
+      {
+        "path": "research/miller_principal_ideal_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "GuardControls",
+    "LineEvaluation",
+    "LineIdeals",
+    "MillerIdealCertificate"
+  ],
+  "artifacts": [
+    {
+      "path": "research/miller_principal_ideal_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 63732,
+      "sha256": "3dbc71a8780b2f0fd0ee8d59ebb3569a20b11f0317ba4a1522c3048bd828f90e"
+    },
+    {
+      "path": "research/miller_principal_ideal_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "44b24069efada6d3ce51566bbff5a08dfc58725910ac521abbedd0be17399a03"
+    },
+    {
+      "path": "research/miller_principal_ideal_audit_20261115/evidence/attempts.json",
+      "bytes": 232,
+      "sha256": "d2a2798eb7d250037b6312877d0ebeb36ba243c6437d14c6455060e23ec9f72a"
+    },
+    {
+      "path": "research/miller_principal_ideal_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 1089,
+      "sha256": "e7aa0c30de384860e2c0d9343678ef4bc682a192c8bc8f5a44e48704e7aaa641"
+    },
+    {
+      "path": "research/miller_principal_ideal_audit_20261115/evidence/gate.json",
+      "bytes": 1309,
+      "sha256": "7e2fdf236ce5b8c96dec5f7bcd8fa881fa18aca420bf43e227bbf6217940f0ab"
+    },
+    {
+      "path": "research/miller_principal_ideal_audit_20261115/evidence/source-review.json",
+      "bytes": 3314,
+      "sha256": "73da57417d2d9faf8624f2900fb667ff2ff3e5a30586aed246b1fed25944bde4"
+    },
+    {
+      "path": "research/miller_principal_ideal_audit_20261115/evidence/binding-check.json",
+      "bytes": 6512,
+      "sha256": "75c0e8d47b44becc8ae3861364815c2b997e4d5f9f7c37a5a8d11d1b632be557"
+    },
+    {
+      "path": "research/miller_principal_ideal_audit_20261115/proof-map.json",
+      "bytes": 4028,
+      "sha256": "485a5e3ec5631e239ac30ff539f7a853aa74eae061d4aea57af0ec6c306c4104"
+    },
+    {
+      "path": "research/miller_principal_ideal_audit_20261115/render_report.py",
+      "bytes": 6731,
+      "sha256": "c1b0c0744953574c8754304e910c04b3ff182ce4fdbe8d159238b2e702f38611"
+    },
+    {
+      "path": "research/miller_principal_ideal_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/miller_principal_ideal_audit_20261115/export_binding_input.py",
+      "bytes": 1758,
+      "sha256": "3f0fea4dd8b43fc466431a7f4750578070be99c73eb090f47e2350bae3e83a11"
+    },
+    {
+      "path": "research/miller_principal_ideal_audit_20261115/reports/affine-bridge.svg",
+      "bytes": 1424,
+      "sha256": "c9db6e070b2ac554f77d0fda9288a4abe91d1726b1764722a37d61c6bb192731"
+    },
+    {
+      "path": "research/miller_principal_ideal_audit_20261115/reports/layout.json",
+      "bytes": 258,
+      "sha256": "608351215b88c706ca2321bdfcc68335cc824a1fb0141a19f46d094ed739500f"
+    },
+    {
+      "path": "research/miller_principal_ideal_audit_20261115/reports/report.pdf",
+      "bytes": 46797,
+      "sha256": "4da45c969fcbd86bdebc70c8cae999787eedf818624489e7e274a1a6e2e48206"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 25,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "no_prior_customproof_modules_imported": true,
+    "independent_implementation_or_physicalhost_validation": false,
+    "actual_affine_ideal_function_evaluation_bridge": true,
+    "actual_negative_guard_control": true,
+    "projective_infinity_or_canonical_divisor_bridge": false,
+    "canonical_pairing_identification": false,
+    "full14_completion": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

@@ -99,7 +99,7 @@ fn main() {
             let u_subst =
                 u_grid - grid_mults + consistent * grid_per_call + calls(grid) * (c_f4 + sys);
             let (g, u) = priced(rec);
-            let sqrt_r = (rec.workload.curve.r as f64).sqrt();
+            let sqrt_r = (rec.workload.curve.r.to_f64()).sqrt();
             let by_w: Vec<Value> = WEIGHTS
                 .iter()
                 .map(|&w| {

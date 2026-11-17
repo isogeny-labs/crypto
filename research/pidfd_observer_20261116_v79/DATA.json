@@ -1,0 +1,24 @@
+{
+  "poll_interval_seconds": 0.005,
+  "fidelity_delays_ms": [
+    0,
+    2,
+    10
+  ],
+  "fidelity_reps": 4,
+  "aa_cases": [
+    {
+      "name": "F65537",
+      "input": "research/signed_prime_power_20261116_v78/F65537_BATCH.json",
+      "pairs": 8
+    },
+    {
+      "name": "P521",
+      "input": "research/signed_prime_power_20261116_v78/P521_BATCH.json",
+      "pairs": 3
+    }
+  ],
+  "aa_threshold": 0.1,
+  "child_seconds": 8,
+  "scope": "observer fidelity and identical-reference A/A; no optimizer speed comparison"
+}

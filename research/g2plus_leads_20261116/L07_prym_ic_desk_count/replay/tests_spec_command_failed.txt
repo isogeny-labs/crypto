@@ -1,0 +1,16 @@
+src (unittest.loader._FailedTest.src) ... ERROR
+
+======================================================================
+ERROR: src (unittest.loader._FailedTest.src)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: src
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/unittest/loader.py", line 141, in loadTestsFromName
+    module = __import__(module_name)
+ModuleNotFoundError: No module named 'src'
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)

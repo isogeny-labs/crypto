@@ -1,0 +1,13 @@
+# Independent search V2 source and evidence review
+
+Verdict: ACCEPT the scoped V2 correction. The V1 local-native-cap blocker is resolved. No new blocking correctness or cumulative-accounting issue was found in the reviewed change. This accepts bounded Boolean search semantics, not original-source authentication or an ECDLP solve.
+
+The code retains the native attempt before classifying its result. Captured parent bridge failure is terminal and marks Stopped; non-Cap native failures are terminal too. Only native Err(Cap) without a parent bridge failure permits LocalCap continuation. A fresh pay against the same parent meter/deadline precedes any retained-basis use, so a local cap cannot mint parent allowance. NativeDisposition describes the native outcome; a subsequent parent failure can coexist with LocalCap but the overall result remains failure/Unknown.
+
+Only the committed native basis is inspected. A retained constant-one row may refute its exact conditional node even when the native queue is incomplete. Otherwise candidate extraction still evaluates both original and node equations exactly. Both-child construction and origin tracking are unchanged. A fully assigned invalid candidate after a local cap returns Cap/Unknown; it does not convert absence of a committed refutation into UNSAT. An exhausted search queue still requires actually refuted leaves, not capped leaves.
+
+The new controls cover a local batch cap retaining a unit row that yields an exact model; a degree2 cap for 1+x0*x1 that proceeds to real branch search; a local batch cap retaining a constant-one refutation; a sweep of parent-owner refusal points that remain Unknown and preserve cumulative charges; and a too-low degree1 case with no committed leaf contradiction that remains Unknown. Prior branch-origin, above128-variable, deadline and global-work controls remain. Scratch-loss/resumability limitations are now explicit in README.
+
+Evidence inspection: the retained receipt reports 18 passed, zero failed; tests-verified.log agrees. All receipt-bound source/harness/sparse/scheduler/binary SHA-256 values match the current files and both before/after maps. The review did not rerun or compile the harness. Earlier unsuccessful too-low-degree success assumptions remain preserved rather than relabeled as passing evidence.
+
+Remaining integration: independent BQI checks must bind conditional rows to node originals plus exact branch constraints. Actual CheckedMap/source ordering, genuine OriginalOwner, unchanged ledger/deadline, signed lift, full identity-pattern coverage and CLI/export delivery remain separate obligations. No full semantic replay or privacy proof is inferred.

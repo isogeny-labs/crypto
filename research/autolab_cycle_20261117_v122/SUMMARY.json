@@ -1,0 +1,139 @@
+{
+  "numeric": {
+    "out": {
+      "exhaustive_cubics": 33288,
+      "catalog_multisets": 6944,
+      "partial_root_rejections": 1850,
+      "random_cubics": 256,
+      "wide_planted_cases": 160,
+      "widths": [
+        4,
+        5,
+        17,
+        32,
+        64
+      ],
+      "original_complete": false
+    },
+    "error": null
+  },
+  "circuit": {
+    "out": {
+      "small_boolean_assignments": 33288,
+      "small_supported": 144,
+      "actual_controls": 32,
+      "actual_supported_controls": 0,
+      "original_complete": false,
+      "formulations": {
+        "candidate": {
+          "inputs": 63,
+          "variables": 77953,
+          "clauses": 278047,
+          "gate_kinds": {
+            "false": 1,
+            "true": 1,
+            "input": 63,
+            "not": 177,
+            "xor": 41721,
+            "and": 35992
+          },
+          "graph_sha256": "92264f64fff1821728233980c8f30858c1c1775dccf43ecb2d8739cf2c44c53f"
+        },
+        "control": {
+          "inputs": 63,
+          "variables": 101646,
+          "clauses": 364488,
+          "gate_kinds": {
+            "false": 1,
+            "true": 1,
+            "input": 63,
+            "not": 211,
+            "xor": 56857,
+            "and": 44515
+          },
+          "graph_sha256": "dd2571f19f390171f6482bb6261a44a3e5813aabb2bea47b7dd5a35ba73b61a2"
+        }
+      },
+      "total_seconds": 2.6332181280013174,
+      "scope": "exactALLfiveprefixsupport/recoveryforconditionalk3rawnormfamily;notoriginalchain/otherstrata/outerfamilies"
+    },
+    "error": null
+  },
+  "search": {
+    "out": {
+      "models": [],
+      "original_complete": false,
+      "original_exact_root_count": null,
+      "independent_unsat_certificate": false,
+      "scope": "conditional k3only,fixednecessarynormfamily;otherstrata/outerfamilies/source/Uunresolved",
+      "inputs": 63,
+      "variables": 77953,
+      "cold_compile_seconds": 0.22276074599358253,
+      "soft_total_target_seconds": 40,
+      "backend_configuration_readback": {
+        "threads": "1",
+        "cut": "true",
+        "cut.xor": "true",
+        "cut.aig": "true",
+        "cut.delay": "0",
+        "anf": "false"
+      },
+      "formulation_seconds": 5.087393691006582,
+      "version": "4.15.4",
+      "cpu_affinity": [
+        0
+      ],
+      "last_answer": "unknown",
+      "termination": "unknown",
+      "reason_unknown": "timeout",
+      "statistics": {
+        "sat mk clause 2ary": "293116",
+        "sat mk clause 3ary": "90967",
+        "sat mk clause nary": "461103",
+        "sat mk var": "155668",
+        "sat gc clause": "124386",
+        "sat del clause": "365332",
+        "sat conflicts": "159654",
+        "sat decisions": "178089",
+        "sat propagations 2ary": "30236298",
+        "sat propagations nary": "138387210",
+        "sat restarts": "17973",
+        "sat minimized lits": "1009681",
+        "sat subs resolution dyn": "29552",
+        "sat units": "34491",
+        "sat elim bool vars res": "32727",
+        "sat backjumps": "159654",
+        "sat elim clauses": "39488",
+        "sat elim literals": "14851",
+        "sat subsumed": "7651",
+        "sat subs resolution": "8056",
+        "sat bce": "159",
+        "sat ate": "232",
+        "sat scc elim vars": "64109",
+        "sat scc elim binary": "48",
+        "sat tr": "91",
+        "sat probing assigned": "1",
+        "sat-cut.eqs": "216",
+        "sat-cut.cuts": "104099",
+        "sat-cut.ands": "35992",
+        "sat-cut.xors": "41721",
+        "sat-cut.xands": "8383",
+        "sat-cut.xites": "9133",
+        "sat-cut.xxors": "17652",
+        "sat-cut.dc-reduce": "2941",
+        "rlimit count": "166524273",
+        "max memory": "584.86",
+        "memory": "320.2",
+        "num allocs": "33044104016.0",
+        "time": "36.188"
+      },
+      "engine_seconds": 41.27845496899681,
+      "soft_target_overshoot_seconds": 1.2784549689968117,
+      "complete": false,
+      "exact_root_count": null
+    },
+    "error": "nativeunknown"
+  },
+  "original_complete": false,
+  "qualified_speedup": null
+}

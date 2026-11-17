@@ -1,0 +1,142 @@
+{
+  "authors": [
+    "sparse-LA lane (claude session)"
+  ],
+  "blocked_on": [
+    "hw:a runner that can push the resume checkpoint to S3 (isolab-eks, or any session with AWS credentials); this container had none, so the stage run's checkpoint hook was bypassed by mistake and every later launcher refused",
+    "pr:3384 merged; this card follows its next-improvement section"
+  ],
+  "cairn": {
+    "env": {
+      "name": "crypto-rust",
+      "recipe": "cargo build --release at code.branch (the build argv of this card); toolchain: stable Rust, no other dependencies"
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 1024,
+      "publish": "runs/XP-20261104-sparse-la-pin-stage2048",
+      "sandbox": "auto",
+      "timeout_s": 14400
+    },
+    "funding": {
+      "rationale": "proposed by the authoring session; a few core-hours to decide predictions P3 and P4 of the frozen protocol and the stage trend past 1,024 columns; approval by the reviewer who merges the PR",
+      "units": 0
+    },
+    "mode": "lab-task",
+    "notes": "",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261104-sparse-la-pin-stage2048/shard-0",
+      "XP-20261104-sparse-la-pin-stage2048/shard-1",
+      "XP-20261104-sparse-la-pin-stage2048/shard-2"
+    ],
+    "ttl_s": 86400
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "code": {
+    "branch": "claude/sparse-la-target-pin-20261104",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--example",
+        "sparse_la_stage"
+      ]
+    ],
+    "commit": null,
+    "repo": "crypto"
+  },
+  "created": "2026-11-04",
+  "decision_value": "At 1,024 columns the filtered deferred solvers cost 0.05 to 0.37 of structured-gauss at weights 3 and 4 while needing about 2.2 times the relations. If the ratio keeps falling at 2,048 and 4,096 columns the next experiment is the genus-3 matrices, where linear algebra is 22 to 41 percent of the whole; if it flattens, the stage advantage is bounded and the sparse route is closed for relation matrices of this weight.",
+  "id": "XP-20261104-sparse-la-pin-stage2048",
+  "links": {
+    "lead": "research/sparse_la_target_pin_20261104/README.md",
+    "notes": [
+      "research/sparse_la_target_pin_20261104/PROTOCOL.md",
+      "research/sparse_la_target_pin_20261104/results/stage-a-summary.md"
+    ],
+    "prs": [
+      3384
+    ]
+  },
+  "outputs": {
+    "land": "research/sparse_la_target_pin_20261104/results/",
+    "result_schema": "sparse_la_stage/v1 JSON lines on stdout",
+    "verify": [
+      "target/release/examples/sparse_la_stage",
+      "--weights",
+      "2",
+      "--sizes",
+      "128",
+      "--seeds",
+      "1",
+      "--arms",
+      "structured-gauss"
+    ]
+  },
+  "owner_hint": "a session with the isolab-eks route",
+  "protocol": {
+    "blob": null,
+    "path": null
+  },
+  "question": "Does the counted linear-algebra advantage of the filtered deferred solvers over structured elimination at weights 3 and 4 keep growing past 1,024 columns, and where does the pin solver's cost curve go?",
+  "resources": {
+    "cpus": 1,
+    "disk_gb": 1,
+    "est_core_hours": 2,
+    "est_wall_hours": 2,
+    "gpu": null,
+    "notes": "Weights 2, 3, 4 at 2,048 columns, 3 seeds, 7 arms; the pin-wiedemann-every arm dominates the cost (about 170 times structured elimination's counted work at weight 4).",
+    "ram_gb": 4
+  },
+  "run": {
+    "argv": [
+      "target/release/examples/sparse_la_stage",
+      "--weights",
+      "{w}",
+      "--sizes",
+      "2048,4096",
+      "--seeds",
+      "3",
+      "--arms",
+      "structured-gauss,igfr,pin-wiedemann,sparse-cado,sparse-cado+counted,filter+lanczos+counted"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 14400
+  },
+  "schema": "backlog.card/v1",
+  "shards": {
+    "count": 3,
+    "params": {
+      "items": [
+        {
+          "name": "w2",
+          "vars": {
+            "w": "2"
+          }
+        },
+        {
+          "name": "w3",
+          "vars": {
+            "w": "3"
+          }
+        },
+        {
+          "name": "w4",
+          "vars": {
+            "w": "4"
+          }
+        }
+      ]
+    },
+    "scheme": "list",
+    "stop": "all"
+  },
+  "status": "blocked",
+  "status_note": "The 2,048-column cells of the frozen stage grid (weights 2, 3, 4) and optionally larger sizes; not run for want of a checkpoint-capable runner.",
+  "title": "Sparse solvers stage diagnostic at 2,048 columns and larger"
+}

@@ -1,0 +1,49 @@
+{
+  "schema": "experiment.export/v1",
+  "experiment_id": "KOBLITZ-R73-DEGREE-FIVE-FIBER-RESIDUES",
+  "claim_class": "exact_computation",
+  "protocols": [
+    {
+      "attempt": "degree-five73-01",
+      "path": "runs/degree-five73-01/protocol.json",
+      "sha256": "1e2464c580feb5261d49ca793a26ed8153f29f532f94d5f595ac324644c21645",
+      "frozen_revision": "fa14c504a6c1eb2d61a8a7d291ab66d7c031a75e"
+    },
+    {
+      "attempt": "degree-five73-02",
+      "path": "runs/degree-five73-02/protocol.json",
+      "sha256": "09c1864ac67a5bc1a6621b189192c44463d837a9442616bbf8dad32a7cfd6bb0",
+      "frozen_revision": "7b609b305e23339a19027675874fcdb27d7546a3"
+    },
+    {
+      "attempt": "degree-five-lean73-01",
+      "path": "runs/degree-five-lean73-01/LEAN-PROTOCOL.md",
+      "sha256": "20dac6a71a7385d83f0216d9b83b677a91065145760fecd84aa5457af7dff84d",
+      "frozen_revision": "d57b2e8e92972ea7420495816de2ed04fbd14bb7"
+    },
+    {
+      "attempt": "degree-five-lean73-02",
+      "path": "runs/degree-five-lean73-02/LEAN-PROTOCOL.md",
+      "sha256": "95afa1bec0918336d00f691a9ec5c68e106dfaee5bca0a13acb231794fc5c84f",
+      "frozen_revision": "ca30b953fac0b0a27c9877da9c08646df00b5dd6"
+    },
+    {
+      "attempt": "degree-five-lean73-03",
+      "path": "runs/degree-five-lean73-03/LEAN-PROTOCOL.md",
+      "sha256": "b9fc41b643d6f16d20ca04df7ede6638d514fc1238eb42122296a6ab070f4f1b",
+      "frozen_revision": "360e215f146f67d247b7ecad41ad95506e854280"
+    }
+  ],
+  "raw_archive": "runs.tar.xz; content address in .artifacts.json after custody publication",
+  "results": {
+    "path": "results.json",
+    "sha256": "6ab5d06a3275216bf39fd39e91a3597b60b4f8b3338fc2410bacfcf801610f1d"
+  },
+  "flow": {
+    "accepted": 2,
+    "rejected": 3,
+    "interrupted": 0
+  },
+  "canonical_schema_validation": "unavailable in selected Git index and disk; manual contract/source-byte checks only",
+  "notes": "Full degree-five F32 fiber: reduced relative dimension20, degrees 1x4,2,14; conditional Lean arithmetic proves degree14 branch unramified given weighted different budget. Ramification elsewhere and valuations separate."
+}

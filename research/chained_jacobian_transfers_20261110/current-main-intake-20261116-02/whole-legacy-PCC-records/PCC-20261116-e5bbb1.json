@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T20:03:06Z",
+ "id": "PCC-20261116-e5bbb1",
+ "kind": "statement",
+ "producer": {
+  "commit": "278339b4b8da4ab25654a3d4bea97e6116b066cb",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-first-simp-negative-02/ACTUAL_REJECTED_SOURCE_AND_SCOPE.json",
+    "sha256": "b8508f210938f2912d20860f691a43688ecf025f896c43558da2f47b5eefaef5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-first-simp-negative-02/entire-actual-source.lean.txt",
+    "sha256": "ad2bcd3849436e9b4b7663f5144019d2962bf50d67b0066d0ec99e77cbd8bd74"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-first-simp-negative-02/Root435/research_chained_jacobian_transfers_20261110_lean_CubicFiniteNorm22308_lean/build.log",
+    "sha256": "d47a7a1d7f08c222db19245f94d64837cd9b7b60c5ef51fc9b139de279f766a5"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "First finite norm08 source rejected original Root gate1 before Consumer: line185 simpa leaves a^3-9*a*0*0=0 rather than a^3=0; downstream printed sorryAx rejected. Entire first source/caller/all original logs/commands/pins/times preserved. Correct only simplification with explicit original Semiring.mul_zero; no statement/hypothesis/gate/resource/tactic-limit change or partial verified claim."
+}

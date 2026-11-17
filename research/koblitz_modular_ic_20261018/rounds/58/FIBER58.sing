@@ -1,0 +1,47 @@
+proc require58(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../56/runs/unit56-01/lambda-unit56.sing"));
+list sourceFactors58=factorize(norm56);ideal sourcePolys58=sourceFactors58[1];intvec sourceExponents58=sourceFactors58[2];
+require58(size(sourcePolys58)==5 && sourcePolys58[1]==1,"FIBER58_COMPLETE_FOUR_F2_COMPONENTS");
+poly product58=1;int i58;int j58;int k58;
+for(i58=2;i58<=5;i58++){require58(deg(sourcePolys58[i58])==20 && sourceExponents58[i58]==1,"FIBER58_F2_DEGREES_AND_MULTIPLICITIES");product58=product58*sourcePolys58[i58];}
+require58(product58==norm56 && gcd(norm56,diff(norm56,w))==1,"FIBER58_FULL_SQUAREFREE_SOURCE_QUOTIENT");
+ring fiberField58=(2,a),(w),dp;minpoly=a^5+a^2+1;short=0;
+map source58=lambdaUnit56,w;ideal pointNorms58=source58(sourcePolys58);poly lambda58=source58(lambda56);poly b58=source58(b56);poly V58=source58(V56);
+proc frobeniusCoefficient58(poly x){poly ans=0;int i;for(i=1;i<=size(x);i++){ans=ans+leadcoef(x[i])^2*w^deg(x[i]);}return(ans);}
+ideal quartics58;int count58=0;int conjugates58=0;list factors58;ideal fpolys58;intvec multiplicities58;ideal localGB58;poly factor58;poly orbit58;poly checkProduct58;int found58;
+for(i58=2;i58<=5;i58++){
+ factors58=factorize(pointNorms58[i58]);fpolys58=factors58[1];multiplicities58=factors58[2];
+ require58(size(fpolys58)==6 && fpolys58[1]==1,"FIBER58_FIVE_F32_POINTS_PER_COMPONENT");checkProduct58=1;
+ for(j58=2;j58<=6;j58++){
+  factor58=fpolys58[j58];require58(deg(factor58)==4 && multiplicities58[j58]==1,"FIBER58_ALL_TWENTY_IRREDUCIBLE_QUARTICS");
+  checkProduct58=checkProduct58*factor58;count58++;quartics58[count58]=factor58;localGB58=std(ideal(factor58));
+  require58(reduce(w^1024+w+1,localGB58)==0,"FIBER58_ALL_ACTUAL_FROB_SQUARED_SIGN_ON_W");
+  require58(reduce(lambda58^1024+lambda58,localGB58)==0 && reduce(b58^32+b58,localGB58)==0 && reduce(V58^32+V58,localGB58)==0,"FIBER58_ACTUAL_ALL_SOURCE_COORDINATE_BINDINGS");
+  require58(reduce((b58*w)^1024+b58*w+b58,localGB58)==0,"FIBER58_ACTUAL_NU_TRANSLATION");
+  require58(reduce(w^1024+w,localGB58)!=0,"FIBER58_CHANGED_SIGN_REJECTED");
+ }
+ require58(checkProduct58==pointNorms58[i58],"FIBER58_COMPLETE_FACTORIZATION_PRODUCT");
+ orbit58=fpolys58[2];
+ for(k58=1;k58<=5;k58++){
+  orbit58=frobeniusCoefficient58(orbit58);found58=0;
+  for(j58=2;j58<=6;j58++){if(orbit58==fpolys58[j58]){found58++;}}
+  require58(found58==1,"FIBER58_ALL_FIVE_COEFFICIENT_CONJUGATES");
+  if(k58<5){require58(orbit58!=fpolys58[2],"FIBER58_FULL_COEFFICIENT_ORBIT_LENGTH5");}conjugates58++;
+ }
+ require58(orbit58==fpolys58[2],"FIBER58_COEFFICIENT_ORBIT_CLOSURE");
+}
+require58(count58==20 && conjugates58==20,"FIBER58_COMPLETE_POINT_AND_CONJUGATE_COUNTS");
+int degree58;int inverse58;int quotientInteger58;int foundInverse58;intmat degreeUnits58[10][3];
+for(k58=1;k58<=10;k58++){
+ degree58=4*k58;foundInverse58=0;
+ for(j58=1;j58<=10;j58++){if((degree58*j58)%11==1){foundInverse58++;inverse58=j58;}}
+ require58(foundInverse58==1,"FIBER58_ALL_DEGREES_HAVE_UNIQUE_INVERSE_MOD11");
+ quotientInteger58=(1-degree58*inverse58) div 11;
+ require58(degree58*inverse58+11*quotientInteger58==1,"FIBER58_ALL_INTEGER_BEZOUT_CERTIFICATES");
+ degreeUnits58[k58,1]=degree58;degreeUnits58[k58,2]=inverse58;degreeUnits58[k58,3]=quotientInteger58;
+}
+link out58="ASCII:w finite-support58.sing";open(out58);write(out58,"ring finiteSupport58=(2,a),(w),dp;minpoly=a^5+a^2+1;short=0;ideal quartics58;intmat degreeUnits58[10][3];");
+for(i58=1;i58<=20;i58++){write(out58,"quartics58["+string(i58)+"]="+string(quartics58[i58])+";");}
+for(i58=1;i58<=10;i58++){for(j58=1;j58<=3;j58++){write(out58,"degreeUnits58["+string(i58)+","+string(j58)+"]="+string(degreeUnits58[i58,j58])+";");}}close(out58);
+print("FIBER58_RESULT F2_components=4 F2_degrees=20 F32_closed_points=20 residue_degree=4 all_coefficient_orbits_length=5 actual_frob_squared_sign_checks=20 possible_unramified_map_degrees=4,8,12,16,20,24,28,32,36,40 degree_units_mod11=10 changed_sign_rejected=20");
+print("FIBER58_ALL_CHECKS_PASS");quit;

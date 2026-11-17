@@ -1,0 +1,260 @@
+[
+  {
+    "theorem": "OrientationMoment.row_split",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem row_split (u x : \u2115) : (x:\u211a) = (rowResidue u x:\u211a)+(2:\u211a)^u*(rowQuotient u x:\u211a)",
+    "decl_sha256": "fdb67b68719b96274dbcc3dd0f0c2368c97553804c6c743d31becfb2254cdab8"
+  },
+  {
+    "theorem": "OrientationMoment.row_mod",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem row_mod (u x : \u2115) : x % 2^u = rowResidue u x % 2^u",
+    "decl_sha256": "3b57c56fa278fa04898d46def1ac4da58d8d3d767518a7e4b00cb0d9ceef9f39"
+  },
+  {
+    "theorem": "OrientationMoment.row_bound",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem row_bound (u x : \u2115) : rowResidue u x < 2^u",
+    "decl_sha256": "58115a814425e5e5abf693782f45a92fc1652d4bfed8e8d562fcc0b8013ddb59"
+  },
+  {
+    "theorem": "OrientationMoment.row_source_bound",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem row_source_bound (a u x : \u2115) (hu : u \u2264 a) : rowResidue u x < 2^a",
+    "decl_sha256": "4fe24796b1a4ec54e43087217ccb3435dbd16cf0f15f25ec308356e65625b825"
+  },
+  {
+    "theorem": "OrientationMoment.row_crossing",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem row_crossing (u i x y : \u2115) (hi : i < u) (hc : x.testBit i = y.testBit i) : (rowResidue u x).testBit i = y.testBit i",
+    "decl_sha256": "701e2cd8c181e64abc189e9f75696097e3717562c3d73ae67fa42922cc4d5521"
+  },
+  {
+    "theorem": "OrientationMoment.power_integral",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem power_integral (u : \u2115) : VBound (u:\u2124) ((2:\u211a)^u)",
+    "decl_sha256": "6d5faae224825b0da7ef8d503b63617ee16af782a4f6f4b57cc33e9ea640b44b"
+  },
+  {
+    "theorem": "OrientationMoment.anchor_slope_even",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem anchor_slope_even (u x y j : \u2115) (hj : j \u2208 mask u x y) : VBound 1 (slope u (rowResidue u x) y ((2:\u211a)^j))",
+    "decl_sha256": "373ffa2457425633847e23790241604914657e111ffdc068d73d258a756c0f4b"
+  },
+  {
+    "theorem": "OrientationMoment.pole_slope_even",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem pole_slope_even (u i x y : \u2115) (hi : i < u) (hc : x.testBit i = y.testBit i) : VBound 1 (slope u (rowResidue u x) y (poleQ i))",
+    "decl_sha256": "c5e02531482dab666b18541d821b1b588570cae7504d85e1b5cbaacf7944f62c"
+  },
+  {
+    "theorem": "OrientationMoment.denominator_inverse",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem denominator_inverse (u x y : \u2115) (q : \u211a) (hd : q-delta (rowResidue u x) y \u2260 0) : (q-delta (rowResidue u x) y)/(q-delta x y) = (1+slope u (rowResidue u x) y q*(rowQuotient u x:\u211a))\u207b\u00b9",
+    "decl_sha256": "58a008330a237987fe2e066878ff401dffdad23d3e91f439cf7fce00c9ea41c6"
+  },
+  {
+    "theorem": "OrientationMoment.comparison_reciprocal",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem comparison_reciprocal (u i x y : \u2115) (m : \u2115 \u2192 \u2115) (hi : i < u) (hc : x.testBit i = y.testBit i) : comparisonRatio u i x (rowResidue u x) y m = reciprocalProduct u i x y m",
+    "decl_sha256": "b6aa2c550b90feb516ad838170fb3e8501de94777ffcd1315f29b59ab83405c2"
+  },
+  {
+    "theorem": "OrientationMoment.actual_reciprocal_family",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem actual_reciprocal_family (a u i x y : \u2115) (m : \u2115 \u2192 \u2115) (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u \u2264 a) (hc : x.testBit i = y.testBit i) : firstJet a u i x y m/diagonalJet a u i m = (firstJet a u i (rowResidue u x) y m/diagonalJet a u i m)*reciprocalProduct u i x y m",
+    "decl_sha256": "a690c9bccec15f9a8b509a9c50cd5b8c4853f493671d05f005ccb96ce33c6982"
+  },
+  {
+    "theorem": "OrientationMoment.WeightedPolynomial.one",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem one : WeightedPolynomial (1:\u211a[X])",
+    "decl_sha256": "0042093f983c040dd00261ebb3cb0d3dd669857dce9ac8152f99f87db54c08b0"
+  },
+  {
+    "theorem": "OrientationMoment.WeightedPolynomial.mul",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem mul {P Q : \u211a[X]} (hP : WeightedPolynomial P) (hQ : WeightedPolynomial Q) : WeightedPolynomial (P*Q)",
+    "decl_sha256": "64e9ac05b5aed9f1868145c40772e75209a48a2a6ebec82f0ffae4527206cbeb"
+  },
+  {
+    "theorem": "OrientationMoment.WeightedPolynomial.pow",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem pow {P : \u211a[X]} (hP : WeightedPolynomial P) (n : \u2115) : WeightedPolynomial (P^n)",
+    "decl_sha256": "fd9527dd46a17d19aec9cacb6ea58225538b43c95138b29e5da388971728e00f"
+  },
+  {
+    "theorem": "OrientationMoment.WeightedPolynomial.prod",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem prod {\u03b9 : Type*} (S : Finset \u03b9) (P : \u03b9 \u2192 \u211a[X]) (hP : \u2200 j \u2208 S,WeightedPolynomial (P j)) : WeightedPolynomial (\u220f j \u2208 S,P j)",
+    "decl_sha256": "5dd92dd907858b708994441dd7eb4e10ec1eafcd75c89697966c6feaec23dd77"
+  },
+  {
+    "theorem": "OrientationMoment.weighted_linear",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem weighted_linear {e : \u211a} (he : VBound 1 e) : WeightedPolynomial (1+C e*X)",
+    "decl_sha256": "3d0159954c86bdb8d1969d50b17de38dceb7cec6c5450d19413481ea33ec695c"
+  },
+  {
+    "theorem": "OrientationMoment.actual_denominator_weighted",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem actual_denominator_weighted (u i x y : \u2115) (m : \u2115 \u2192 \u2115) (hi : i < u) (hc : x.testBit i = y.testBit i) : WeightedPolynomial (denominatorPolynomial u i x y m)",
+    "decl_sha256": "d787e06bc54db987cc9d693d7eb726f2e53a6d0da17bdcfa31ebd44b067ef2e7"
+  },
+  {
+    "theorem": "OrientationMoment.actual_denominator_constant",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem actual_denominator_constant (u i x y : \u2115) (m : \u2115 \u2192 \u2115) : (denominatorPolynomial u i x y m).coeff 0 = 1",
+    "decl_sha256": "17ffca783acc83e923f972953b4fc1adfb35e763c444d8a970d13dafc32badce"
+  },
+  {
+    "theorem": "OrientationMoment.actual_denominator_reciprocal",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem actual_denominator_reciprocal (u i x y : \u2115) (m : \u2115 \u2192 \u2115) : reciprocalProduct u i x y m = ((denominatorPolynomial u i x y m).eval (rowQuotient u x:\u211a))\u207b\u00b9",
+    "decl_sha256": "73ac857566ce04788b8afe85bb7d5b3eda9894ba51d43654dd1aefa95ea6f7b7"
+  },
+  {
+    "theorem": "OrientationMoment.weighted_inverse_coefficients",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem weighted_inverse_coefficients (P : \u211a[X]) (hP : WeightedPolynomial P) : \u2200 n : \u2115,VBound (n:\u2124) (PowerSeries.coeff n (inverseSeries P))",
+    "decl_sha256": "8a0305228a3bd41869b3c3e54466043c19cb5d5703eeab66af581015763240de"
+  },
+  {
+    "theorem": "OrientationMoment.inverse_series_identity",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem inverse_series_identity (P : \u211a[X]) (h0 : P.coeff 0=1) : P.toPowerSeries*inverseSeries P = 1",
+    "decl_sha256": "eaa63477beb83896d8e7e5cf5aed8fd9a7cc7a592c035476a1f191c69986027b"
+  },
+  {
+    "theorem": "OrientationMoment.WeightedPolynomial.sub",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem sub {P Q : \u211a[X]} (hP : WeightedPolynomial P) (hQ : WeightedPolynomial Q) : WeightedPolynomial (P-Q)",
+    "decl_sha256": "f1dc6fbff916f5dddf7a571f9f9b161c525c8dfcd7d800cc2fabd15f685a8c94"
+  },
+  {
+    "theorem": "OrientationMoment.inverse_trunc_weighted",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem inverse_trunc_weighted (P : \u211a[X]) (hP : WeightedPolynomial P) (k : \u2115) : WeightedPolynomial (inverseTrunc P k)",
+    "decl_sha256": "f767a9204da275a16aa56d8f0a1f66925fa99d4c672fd9ee9df7a20fda05f9d1"
+  },
+  {
+    "theorem": "OrientationMoment.inverse_trunc_low",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem inverse_trunc_low (P : \u211a[X]) (h0 : P.coeff 0=1) (k n : \u2115) (hn : n < k) : (P*inverseTrunc P k-1).coeff n = 0",
+    "decl_sha256": "164f22a98b86b821e4750800357ab4cb8e6752507847e4c65a97094c3cf2d1e4"
+  },
+  {
+    "theorem": "OrientationMoment.integral_power",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem integral_power {z : \u211a} (hz : VBound 0 z) (n : \u2115) : VBound 0 (z^n)",
+    "decl_sha256": "87ce8cfc08c144a64950209b9886871390caeb8cb4b1285c25c9b71171964d22"
+  },
+  {
+    "theorem": "OrientationMoment.eval_tail_bound",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem eval_tail_bound (P : \u211a[X]) (hP : WeightedPolynomial P) (k : \u2115) (hz : \u2200 n < k,P.coeff n=0) (z : \u2124) : VBound (k:\u2124) (P.eval (z:\u211a))",
+    "decl_sha256": "3f858cd95d74331a59c7eb77e6c1621434d567bdff638ff204868bba79f09ba3"
+  },
+  {
+    "theorem": "OrientationMoment.denominator_eval_one",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem denominator_eval_one (P : \u211a[X]) (hP : WeightedPolynomial P) (h0 : P.coeff 0=1) (z : \u2124) : OneModTwo (P.eval (z:\u211a))",
+    "decl_sha256": "ea79f58daab11b06440256e592fadb811f99d5b235bdc21ccef0589fc1c26a8d"
+  },
+  {
+    "theorem": "OrientationMoment.one_mod_two_ne_zero",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem one_mod_two_ne_zero {q : \u211a} (h : OneModTwo q) : q \u2260 0",
+    "decl_sha256": "05ade3669eadfdac90ac4dce6df8777a494b70e2f0688c7d226faf8482e678ff"
+  },
+  {
+    "theorem": "OrientationMoment.one_mod_two_valuation",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem one_mod_two_valuation {q : \u211a} (h : OneModTwo q) : padicValRat 2 q=0",
+    "decl_sha256": "ee2d3cbfb6566ef088d112570c8a5dc7ae1852e97895bbaa428d6a754b4dabba"
+  },
+  {
+    "theorem": "OrientationMoment.inverse_trunc_error",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem inverse_trunc_error (P : \u211a[X]) (hP : WeightedPolynomial P) (h0 : P.coeff 0=1) (k : \u2115) (z : \u2124) : VBound (k:\u2124) ((P.eval (z:\u211a))\u207b\u00b9-(inverseTrunc P k).eval (z:\u211a))",
+    "decl_sha256": "ee936db3918e006fb64a228a86586e198092d66204c58b4a636d2c170e9badbf"
+  },
+  {
+    "theorem": "OrientationMoment.denominator_row_class",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem denominator_row_class (u i x y : \u2115) (m : \u2115 \u2192 \u2115) : denominatorPolynomial u i x y m = denominatorPolynomial u i (rowResidue u x) y m",
+    "decl_sha256": "13cd0848f0066156b97631dddb64dea5a04fd19b75872c4faa71c10270709133"
+  },
+  {
+    "theorem": "OrientationMoment.actual_moment_error",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem actual_moment_error (a u i x y k : \u2115) (m : \u2115 \u2192 \u2115) (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u \u2264 a) (hm : \u2200 j < u,0 < m j) (hc : x.testBit i = y.testBit i) : VBound (k:\u2124) (firstJet a u i x y m/diagonalJet a u i m- (firstJet a u i (rowResidue u x) y m/diagonalJet a u i m)* (inverseTrunc (denominatorPolynomial u i (rowResidue u x) y m) k).eval (rowQuotient u x:\u211a))",
+    "decl_sha256": "65c59f25ce0463e09272d15b9f633eb800e95b1d9938a1acb067a4009cab08e5"
+  },
+  {
+    "theorem": "OrientationMoment.moment_left_weight",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem moment_left_weight (a u k : \u2115) (x : Ports a) (rb : MomentLabels u k) : VBound (rb.2.val:\u2124) (momentLeft a u k x rb)",
+    "decl_sha256": "8e1c064390f7d2abf6dcba5f73e3061796252a568ae98f910d1d98560ade8c5d"
+  },
+  {
+    "theorem": "OrientationMoment.moment_right_integral",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem moment_right_integral (a u i k : \u2115) (hu : u \u2264 a) (m : \u2115 \u2192 \u2115) (hi : i < u) (hm : \u2200 j < u,0 < m j) (rb : MomentLabels u k) (y : Ports a) : VBound 0 (momentRight a u i k hu m rb y)",
+    "decl_sha256": "7e5f756df5121dfe2093d8c5f89fddfa9155ae56fe98b9d3405848dc9e360317"
+  },
+  {
+    "theorem": "OrientationMoment.trunc_eval_moments",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem trunc_eval_moments (P : \u211a[X]) (k : \u2115) (h : \u211a) : (inverseTrunc P k).eval h = \u2211 b : Fin k,PowerSeries.coeff b.val (inverseSeries P)*h^b.val",
+    "decl_sha256": "b7dfd17b2e52a0842b07e0a634576d16aec038d02944cbf8494d961b6425b97b"
+  },
+  {
+    "theorem": "OrientationMoment.moment_product",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem moment_product (a u i k : \u2115) (hu : u \u2264 a) (m : \u2115 \u2192 \u2115) (x y : Ports a) : (momentLeft a u k*momentRight a u i k hu m) x y = normalizedCrossing a u i m (OrientationRank.classPort a u hu \u27e8rowResidue u x.val,row_bound u x.val\u27e9) y * (inverseTrunc (denominatorPolynomial u i (rowResidue u x.val) y.val m) k).eval (rowQuotient u x.val:\u211a)",
+    "decl_sha256": "3731d8deaeb8f294a8c30b9811a5026e19a267afcac7d13d05394129755f191b"
+  },
+  {
+    "theorem": "OrientationMoment.actual_moment_factorization",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem actual_moment_factorization (a u i k : \u2115) (hu : u \u2264 a) (m : \u2115 \u2192 \u2115) (hi : i < u) (hm : \u2200 j < u,0 < m j) (x y : Ports a) : VBound (k:\u2124) (normalizedCrossing a u i m x y- (momentLeft a u k*momentRight a u i k hu m) x y)",
+    "decl_sha256": "a954d021dbbf82afbcd76f6e89750803b6b506514508f0f2e8c43bfc5458ba47"
+  },
+  {
+    "theorem": "OrientationMoment.moment_label_count",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem moment_label_count (u k : \u2115) : Fintype.card (MomentLabels u k)=2^u*k",
+    "decl_sha256": "85fae07fb7d839a7905b47e8db9bb2073de3b798bfd4ab5a41ea322890064ea3"
+  },
+  {
+    "theorem": "OrientationMoment.moment_weighted_left_bound",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem moment_weighted_left_bound (a u i k : \u2115) (m : \u2115 \u2192 \u2115) (hi : i < u) (hu : u \u2264 a) (x : Ports a) (rb : MomentLabels u k) : VBound (jetWeight a u i m+rb.2.val) (momentWeightedLeft a u i k m x rb)",
+    "decl_sha256": "ec0ea166afc409c469ef8d826d84cae1b83dcd02d93f3d08729f715a85c9c15b"
+  },
+  {
+    "theorem": "OrientationMoment.moment_weighted_product",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem moment_weighted_product (a u i k : \u2115) (hu : u \u2264 a) (m : \u2115 \u2192 \u2115) (x y : Ports a) : (momentWeightedLeft a u i k m*momentRight a u i k hu m) x y = diagonalJet a u i m*(momentLeft a u k*momentRight a u i k hu m) x y",
+    "decl_sha256": "92b54e1ffeb5dc504c5c7c57d276ef4b1741b554150f61e734f6bf987e68ce7d"
+  },
+  {
+    "theorem": "OrientationMoment.actual_weighted_moment_factorization",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem actual_weighted_moment_factorization (a u i k : \u2115) (hu : u \u2264 a) (m : \u2115 \u2192 \u2115) (hi : i < u) (hm : \u2200 j < u,0 < m j) (x y : Ports a) : VBound (jetWeight a u i m+k) (crossingFirst a u i m x y- (momentWeightedLeft a u i k m*momentRight a u i k hu m) x y)",
+    "decl_sha256": "e3764984247fad6c58886d611741e0dec4ab355f8ba3d28020ae8c9ff991aecb"
+  },
+  {
+    "theorem": "OrientationMoment.moment_weighted_left_integral",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem moment_weighted_left_integral (a u i k : \u2115) (m : \u2115 \u2192 \u2115) (hi : i < u) (hu : u \u2264 a) (hg : 0 \u2264 schedule u i m) (x : Ports a) (rb : MomentLabels u k) : VBound 0 (momentWeightedLeft a u i k m x rb)",
+    "decl_sha256": "3d4daea78b500a26edf09e6cef4dd6a613691935872279d94ec3c06dad48b0e3"
+  },
+  {
+    "theorem": "OrientationMoment.moment_labels_le_row_refinement",
+    "source": "research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean",
+    "statement": "theorem moment_labels_le_row_refinement (u k : \u2115) (hk : 0 < k) : 2^u*k \u2264 2^(u+k-1)",
+    "decl_sha256": "4a4226361d91addaf0d8ce5937a2f9724a693530310f2e94e0771fdf07c71f80"
+  }
+]

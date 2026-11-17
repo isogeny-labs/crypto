@@ -1,6 +1,6 @@
 # Index calculus trails rho; three degree questions remain
 
-> **Correction 2026-10-20 (validation sweep B, verdict 108.1: contradicted).** The n=61 13.9x [9.8, 19.1], N83 18.5x and N83 54.1x (K3240; setup of 580-640 s excluded; ratio of means 44.09) online ratios below compare against rho with an empty distinguished-point table. They are superseded and are not improvements: Bernstein-Lange rho at equal advice is 53-317x faster online (`benchmarks/20261014-ic-next10-09-equal-advice`) and precomputed rho beats the N83 IC (`benchmarks/20261016-n83-precomputed-rho-control`). The cold conclusion (signed-Frobenius rho remains best) stands. The 120/168 replay-all is likewise superseded: 72/168 identical on current main, 96 mismatches in all four IC arms, an open regression (sweep D, PR #2290).
+> **Correction (2026-10-18).** All ten ranked next steps in this report ran on 2026-10-14 in [`research/ic_next10_20261014`](../research/ic_next10_20261014/README.md), so the statement below that they are unexecuted is stale. The current status of every lead, and the baseline and bookkeeping debt still open, is in [`research/ic_leads_review_20261018`](../research/ic_leads_review_20261018/README.md). The body below is unchanged from 2026-10-14.
 
 Across the four repositories (aburan28/crypto, cryptanalysis, crypto-autoresearcher and ml-cryptanalysis), **no index-calculus (IC) variant beats matched Pollard rho on any cold, one-target, setup-inclusive ECDLP solve**. The measured gap is 1.5x to 25,116x on binary and Koblitz curves, 29x to 141x on prime curves, and it widens with size at roughly #E^{1/6} for every linear-scan oracle. Every advertised IC "win" is one of three things: an online ratio that excludes about 600 s of setup, a stage-level speedup (root finding 10^2 to 10^5 times faster than F4), or a regime with intermediate fields (Joux–Vitse covers on E(F_{p^6}) at 0.012x rho; linear algebra alone on E(F_{p^4}) at 0.518x rho). The program has turned most of the map into rigorous, scoped barriers: generic-oracle bounds, an exact lattice LP, cyclotomic-coset and GHS classifications, transport-conservation and mixed-volume theorems. What remains open at the exponent level is narrow: whether the PKM tower's solving degree stays bounded on prime fields (stalled by memory at N ≥ 21), whether the m = 4 Weil-descent degree levels off for prime-degree binary fields (the "106-bit spread" for ECC2K-130), and whether any oracle that is not an elimination of the descended system exists (spectral, multi-polynomial lattice, or quasi-subfield bases). All ten next steps ranked below are unexecuted according to the notes, and the first one, an end-to-end E(F_{p^4}) ladder in ecbench, has been gated open since 2026-10-13 without being run. Before any new claim, the program also has integrity debt to pay down: an unaudited `s4_expr` harness bug, a failed 48-row replay audit, a benchmarks index with 16 rows covering about 50 directories (most IC negatives unindexed), and open-problem registers that contradict proved results.
 
@@ -21,7 +21,7 @@ The strongest established fact is empirical and consistent across repositories. 
 
 ![IC cost relative to matched rho across the repositories](figures/ic_vs_rho.svg)
 
-The only places where an IC number falls below rho are worth stating precisely, because each carries a qualifier that matters. The **online** Koblitz results are large: 13.9x [9.8, 19.1] at n = 61 over 64 unseen targets, and **54.1x [17.18, 58.90]** at N83 on 5 fresh points (both superseded 2026-10-20: empty-table rho comparison, see the banner). Both exclude a setup of 580–640 s and about 13.9 GiB peak RSS ([evidence note](<../research_notes/Index calculus leads next steps/crypto_autolab_ecbench_evidence.md>), citing `research/n83_tier1_final_results_20261014/RESULT.md`). The step-back note calculates that preprocessing rho with the same advice would need **3,000–6,000x fewer online operations** than IC at every rung, so these wins are precomputation trades, not attacks ([binary note](<../research_notes/Index calculus leads next steps/crypto_binary_koblitz_transfer_ic.md>), citing `RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md:127-141`). The autolab's toy panel shows IC at 0.721x rho in cold instruction counts, but cold native time is a statistical tie (rho/IC 0.968 [0.915, 1.027]) on an 8-column base at r ≈ 2^18, so instruction counts and time disagree at this scale (evidence note, citing `research/ic_candidate_tournament_20260915/goal_20260924/improvement/round3/README.md`). The C library's (Z/pZ)^* linear sieve does cross rho near 56 bits, but that is a finite-field DLP, not ECDLP ([cryptanalysis note](<../research_notes/Index calculus leads next steps/cryptanalysis_repo_ic.md>), citing `papers/ecdlp-constant/sec-indexcalc.tex`).
+The only places where an IC number falls below rho are worth stating precisely, because each carries a qualifier that matters. The **online** Koblitz results are large: 13.9x [9.8, 19.1] at n = 61 over 64 unseen targets, and **54.1x [17.18, 58.90]** at N83 on 5 fresh points. Both exclude a setup of 580–640 s and about 13.9 GiB peak RSS ([evidence note](<../research_notes/Index calculus leads next steps/crypto_autolab_ecbench_evidence.md>), citing `research/n83_tier1_final_results_20261014/RESULT.md`). The step-back note calculates that preprocessing rho with the same advice would need **3,000–6,000x fewer online operations** than IC at every rung, so these wins are precomputation trades, not attacks ([binary note](<../research_notes/Index calculus leads next steps/crypto_binary_koblitz_transfer_ic.md>), citing `RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md:127-141`). The autolab's toy panel shows IC at 0.721x rho in cold instruction counts, but cold native time is a statistical tie (rho/IC 0.968 [0.915, 1.027]) on an 8-column base at r ≈ 2^18, so instruction counts and time disagree at this scale (evidence note, citing `research/ic_candidate_tournament_20260915/goal_20260924/improvement/round3/README.md`). The C library's (Z/pZ)^* linear sieve does cross rho near 56 bits, but that is a finite-field DLP, not ECDLP ([cryptanalysis note](<../research_notes/Index calculus leads next steps/cryptanalysis_repo_ic.md>), citing `papers/ecdlp-constant/sec-indexcalc.tex`).
 
 The two genuinely sub-rho ECDLP regimes both rely on intermediate fields. The Joux–Vitse cover-decomposition on E(F_{p^6}) has S/rho falling as p^{−1.92 ± 0.12} and reaches **0.012–0.014x rho at ℓ = 2^{61.4}** with sieving ([prime note](<../research_notes/Index calculus leads next steps/crypto_prime_field_ic_docs.md>), citing `research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md`). This is a weak class and not a generic curve. On E(F_{p^4}), linear algebra alone runs at **r∞ = 0.518 ± 0.031 of rho** on eight verified curves. The D₄ = (Z/2)³ ⋊ S₄ symmetry cut the per-solve cost C₄ by **47.5–48.4x** (1.21·10^12 to 2.54·10^10 F_p multiplications) and moved the modelled crossover from 2^150 to about 2^135 (prime note, citing `research/notes/index-calculus/RESEARCH_RESIDUAL_WALKS.md` §11.19 and `research/gaudry_quartic_d4_20261013/README.md`). The step-back note draws the synthesis: every measured exponent gain lives on a field with a proper intermediate subfield, so prime p and prime n are one obstruction (prime note, citing `RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md` §7(d)).
 
@@ -48,16 +48,15 @@ The program has produced an unusual number of exact or proved results. Some are 
 
 **Exact lattice limit (rigorous for one family).** The W10 LP/min-cut optimiser over full-rank triangular single-polynomial lattices gives asymptotic reach δ* = 1/6, 1/24, 1/80 for S₃, S₄, S₅, with a family-wide ceiling of 1/(m·d). The m = 4 oracle needs about 1/5, so "the Coppersmith route to the m = 4 oracle is closed" for that family (prime note, citing `research/lit2026_w10_s5_coppersmith_20261011/README.md` §2, §6).
 
-**Exact negative for one function-field family; conditional obstruction for classic xedni.** EXP-XEDN-002 computed its frozen function-field lift probability exactly as 2p³·P_lift = 1 − 2/p + p^{−3}, so the limiting exponent is α = 3, far from the < 1/2 needed. Separately, Jacobson–Koblitz–Silverman–Stein–Teske derive a strong prime-field height obstruction under explicit height/discriminant and Lang assumptions ([JKSST 2000](https://pages.cpsc.ucalgary.ca/~jacobs/PDF/xedni.pdf)). These results are strong negative evidence at their stated scopes, not an unconditional closure theorem for every lift-selection strategy ([Lean audit](../research/jksst_xedni_audit_20261101/README.md); [autoresearcher experiments note](<../research_notes/Index calculus leads next steps/autoresearcher_experiments.md>); [literature note](<../research_notes/Index calculus leads next steps/literature_frontier.md>)).
+**Exact negative on lifting.** EXP-XEDN-002 computed the function-field lift probability exactly as 2p³·P_lift = 1 − 2/p + p^{−3}, so the limiting exponent is α = 3, far from the < 1/2 needed. Together with Jacobson–Koblitz–Silverman–Stein–Teske's height obstruction ([JKSST 2000](https://pages.cpsc.ucalgary.ca/~jacobs/PDF/xedni.pdf)), this makes lifting the most firmly closed direction ([autoresearcher experiments note](<../research_notes/Index calculus leads next steps/autoresearcher_experiments.md>); [literature note](<../research_notes/Index calculus leads next steps/literature_frontier.md>)).
 
 **What is dead, and the kind of evidence behind each kill.**
 
 | Lead | Status | Kill type | Primary repo path (via note) |
-|---|---|---|---|
 | Enumeration and pair-table oracles at any arity (prime and Koblitz) | dead for exponent | theorem (CGK/Shoup) | `RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md` §1 |
 | GGMP Frobenius-stable bases at n = 131 | dead | exact classification | `RESEARCH_KOBLITZ_INDEX_CALCULUS.md:244-267` |
 | GHS / JV covers for ECC2K-130 | dead | exact (genus 2^130) | `research/notes/ecc2k130/RESEARCH_ECC2K130_ROUTES.md:193-200` |
-| classic xedni and the frozen function-field lift family | conditionally obstructed / exact negative for that family | conditional theorem plus exact α = 3 | JKSST; `AR/experiments/EXP-XEDN-002` |
+| xedni and lifting | dead | theorem plus exact α = 3 | JKSST; `AR/experiments/EXP-XEDN-002` |
 | Isogeny transport and class choice | constant at most (prime fields) | proved lemma, measured 0.996x | `RESEARCH_ISOGENY_FIBERS_ECDLP.md` §17; cryptanalysis `README.md` |
 | BKK, jets, chord incidence, path algebra | dead | proved (autoresearcher) | `AR/ledger/DEC-20260722-003..006` |
 | Single-polynomial Coppersmith for S₅ | dead for that family | exact LP | `research/lit2026_w10_s5_coppersmith_20261011` |
@@ -274,7 +273,7 @@ The costs in this table and below are my estimates from the sizes and timings th
 
 **Why it is unexplored.** The step-back note says the preprocessing-rho control "has not yet been run" and "should be run before any further rung is landed". BOUNDARY_TARGETS still lists the Bernstein–Lange reference arm as next. E-3 is PENDING with no instrument built ([binary note](<../research_notes/Index calculus leads next steps/crypto_binary_koblitz_transfer_ic.md>), citing `RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md:143-195` and `research/pdp_preregistrations_20261007/PROTOCOL-E3-index-self-collisions.md`). The autoresearcher independently flags "the program has no measured Pollard-rho baseline" (H-ICEX-835c4f) ([autoresearcher ideas note](<../research_notes/Index calculus leads next steps/autoresearcher_ideas_claims.md>)).
 
-**Mechanism.** This does not move an exponent. It decides whether the program's most-cited numbers (13.9x, 18.5x and 54.1x online, all superseded 2026-10-20) survive a fair baseline. The calculation predicts preprocessing rho at about 490, 2,500, 9,600 and 2,600 online steps at n = 61, 71, 73 and 83. The free-relation census is predicted to give ≥ 500 verified relations at n = 61 and 83, which would cut the charged precomputation honestly.
+**Mechanism.** This does not move an exponent. It decides whether the program's most-cited numbers (13.9x, 18.5x and 54.1x online) survive a fair baseline. The calculation predicts preprocessing rho at about 490, 2,500, 9,600 and 2,600 online steps at n = 61, 71, 73 and 83. The free-relation census is predicted to give ≥ 500 verified relations at n = 61 and 83, which would cut the charged precomputation honestly.
 
 **First experiment.** Run preprocessing rho at n = 61 and 83 with 64 and 5 targets respectively, matching the IC sessions' points. Prime-curve Probe A already showed that the online and precomputation walks "must be identical maps" or the result sits 2–7x above the line. Sort the existing n = 61 and n = 83 K = 600 tables for self-collisions, then run rank checks.
 
@@ -304,10 +303,152 @@ The costs in this table and below are my estimates from the sizes and timings th
 
 Several cheaper or enabling items did not make the top ten but are worth doing alongside it. Wiring `koblitz_sparse_la`'s filter and block Wiedemann into `ic_framework` as a deferred-solve linear-algebra plug-in, and msolve as an F_p `SystemSolver`, is mostly glue around tested code. It is a prerequisite for items 1 and 3 at scale ([code map note](<../research_notes/Index calculus leads next steps/crypto_ic_code_map.md>)). The registered Magma F4 comparison (`research/magma_f4_comparison_20261013/`) already has its bundles and needs only the Magma side. Running ml-cryptanalysis's ready `fpn_decomposable` config takes about 10 CPU-minutes and would make "decomposability is not predictable from cheap target features" a citable negative with proper nulls. Its nullspace learner could recover the n = 3 degeneracy hypersurface (rate about 1/p) exactly, and the same tool should be aimed at the unexplained degenerate D₄ target ([ml note](<../research_notes/Index calculus leads next steps/ml_cryptanalysis_ic.md>)). Costing the certified tensor-train law χ(m) as an algorithm (H-TTN-806b84) is a one-day desk check. My reading is that a middle-cut rank ≥ 3 makes the zero test an orthogonal-vectors search rather than a hash match, so it will not beat the pair table, but the autoresearcher's review calls it the strongest uncosted structural positive. The last fall degree (Huang–Kosters–Yang–Yeo) is an order-independent instrument that could be cheaper than full Macaulay refutation in item 6 ([arXiv 1505.02532](https://arxiv.org/abs/1505.02532)). Learned F4 monomial and variable orderings (HATSolver-style, [ePrint 2025/2219](https://eprint.iacr.org/2025/2219)) on Semaev and PKM systems are an open literature gap but a constant-factor lever. SAT/XOR solving of PKM rational-map systems has likewise never been tried on prime fields ([literature note](<../research_notes/Index calculus leads next steps/literature_frontier.md>)). Re-porting crypto's newer Koblitz core (about 7k lines) into cryptanalysis, and its `f4_gf2` back into crypto, would end the code divergence.
 
-A long list of directions should be dropped. Further pair-table, k-sum or 6-sum S₄-tree engineering for ECC2K-130, and new rungs at n = 85 and 89, sit on the CGK line 2^25 or more above the generic bound. Classic xedni has JKSST's conditional height obstruction, while the frozen function-field family has exact α = 3; variants must identify and prove which premise changes. A p-adic variant does not obviously help either: by my reasoning (not a repository result), the formal-group logarithm linearises only the kernel of reduction, which is why it breaks anomalous curves and nothing else. Curve-level hardness prediction by ML, and isogeny-class or volcano curve choice (0.996x), are measured nulls. Further monodromy censuses are settled by the (Z/2)^{m−2} theorem. BKK and Newton-polytope elimination are settled by MV = Bézout. GGMP bases, Couveignes–Lercier periods and GHS at n = 131 are exact negatives. Record-and-replay of C₄ is capped at 2–7%. First-fall-degree measurements are flat at 3 and do not bound D. Sympy-Buchberger timing ladders measure overhead, not algebra. GPU kernels should wait until someone has a device. The autoresearcher's "source-lift" idea family has been rejected hundreds of times by exact no-go boundaries. Split-Jacobian "projected smoothness" (IDEA-002, G30-015) is only worth staffing if it explains how it escapes KN-FIND-61347e, which says a cross-genus Poincaré-factor embedding cannot beat rho on the embedded elliptic factor ([ml note](<../research_notes/Index calculus leads next steps/ml_cryptanalysis_ic.md>); [autoresearcher ideas note](<../research_notes/Index calculus leads next steps/autoresearcher_ideas_claims.md>)).
+A long list of directions should be dropped. Further pair-table, k-sum or 6-sum S₄-tree engineering for ECC2K-130, and new rungs at n = 85 and 89, sit on the CGK line 2^25 or more above the generic bound. xedni and lifting are closed by the height obstruction and the exact α = 3. A p-adic variant does not obviously help either: by my reasoning (not a repository result), the formal-group logarithm linearises only the kernel of reduction, which is why it breaks anomalous curves and nothing else. Curve-level hardness prediction by ML, and isogeny-class or volcano curve choice (0.996x), are measured nulls. Further monodromy censuses are settled by the (Z/2)^{m−2} theorem. BKK and Newton-polytope elimination are settled by MV = Bézout. GGMP bases, Couveignes–Lercier periods and GHS at n = 131 are exact negatives. Record-and-replay of C₄ is capped at 2–7%. First-fall-degree measurements are flat at 3 and do not bound D. Sympy-Buchberger timing ladders measure overhead, not algebra. GPU kernels should wait until someone has a device. The autoresearcher's "source-lift" idea family has been rejected hundreds of times by exact no-go boundaries. Split-Jacobian "projected smoothness" (IDEA-002, G30-015) is only worth staffing if it explains how it escapes KN-FIND-61347e, which says a cross-genus Poincaré-factor embedding cannot beat rho on the embedded elliptic factor ([ml note](<../research_notes/Index calculus leads next steps/ml_cryptanalysis_ic.md>); [autoresearcher ideas note](<../research_notes/Index calculus leads next steps/autoresearcher_ideas_claims.md>)).
 
 ## Conclusion
 
 The four repositories have moved the question from "can index calculus beat rho on ordinary curves?" to "do two specific solving degrees stay bounded, and does any non-elimination oracle exist?" On prime fields the generic theorem, the Coppersmith LP and the mixed-volume and monodromy results leave only the PKM degree plateau, the algebraic-base solution count, the Kummer spectrum and multi-polynomial lattices standing. Items 2 and 4 can kill all of these within a week, before items 3 and 5 spend real money. For prime-degree binary fields everything reduces to the m = 4 degree and the Torelli heuristic. The only regime where IC demonstrably wins in exponent, extension fields with intermediate subfields, has never been run end to end in the program's own harness. That makes item 1 the cheapest way to produce the first admissible IC bound.
 
 The second lesson concerns method. The program's largest errors were not in the mathematics but in baselines and bookkeeping: rho references that shifted a crossover by more than 20 bits, a 13x-optimistic symmetry heuristic, a construction that silently failed to realise a torsion quotient, a harness bug never audited, and registers that contradict proved theorems. Until the equal-advice control, the replay mismatch and the `s4_expr` audit are closed, the program cannot tell apart a positive result in any of the ten experiments and an accounting artefact. That makes them prerequisites for all ten experiments, not cleanup.
+
+> **Correction 2026-10-20 (validation sweep B, verdict 108.1: contradicted).** The n=61 13.9x [9.8, 19.1], N83 18.5x and N83 54.1x (K3240; setup of 580-640 s excluded; ratio of means 44.09) online ratios below compare against rho with an empty distinguished-point table. They are superseded and are not improvements: Bernstein-Lange rho at equal advice is 53-317x faster online (`benchmarks/20261014-ic-next10-09-equal-advice`) and precomputed rho beats the N83 IC (`benchmarks/20261016-n83-precomputed-rho-control`). The cold conclusion (signed-Frobenius rho remains best) stands. The 120/168 replay-all is likewise superseded: 72/168 identical on current main, 96 mismatches in all four IC arms, an open regression (sweep D, PR #2290).
+
+
+
+
+
+
+The only places where an IC number falls below rho are worth stating precisely, because each carries a qualifier that matters. The **online** Koblitz results are large: 13.9x [9.8, 19.1] at n = 61 over 64 unseen targets, and **54.1x [17.18, 58.90]** at N83 on 5 fresh points (both superseded 2026-10-20: empty-table rho comparison, see the banner). Both exclude a setup of 580–640 s and about 13.9 GiB peak RSS ([evidence note](<../research_notes/Index calculus leads next steps/crypto_autolab_ecbench_evidence.md>), citing `research/n83_tier1_final_results_20261014/RESULT.md`). The step-back note calculates that preprocessing rho with the same advice would need **3,000–6,000x fewer online operations** than IC at every rung, so these wins are precomputation trades, not attacks ([binary note](<../research_notes/Index calculus leads next steps/crypto_binary_koblitz_transfer_ic.md>), citing `RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md:127-141`). The autolab's toy panel shows IC at 0.721x rho in cold instruction counts, but cold native time is a statistical tie (rho/IC 0.968 [0.915, 1.027]) on an 8-column base at r ≈ 2^18, so instruction counts and time disagree at this scale (evidence note, citing `research/ic_candidate_tournament_20260915/goal_20260924/improvement/round3/README.md`). The C library's (Z/pZ)^* linear sieve does cross rho near 56 bits, but that is a finite-field DLP, not ECDLP ([cryptanalysis note](<../research_notes/Index calculus leads next steps/cryptanalysis_repo_ic.md>), citing `papers/ecdlp-constant/sec-indexcalc.tex`).
+
+
+
+
+
+
+
+
+
+
+**Exact negative for one function-field family; conditional obstruction for classic xedni.** EXP-XEDN-002 computed its frozen function-field lift probability exactly as 2p³·P_lift = 1 − 2/p + p^{−3}, so the limiting exponent is α = 3, far from the < 1/2 needed. Separately, Jacobson–Koblitz–Silverman–Stein–Teske derive a strong prime-field height obstruction under explicit height/discriminant and Lang assumptions ([JKSST 2000](https://pages.cpsc.ucalgary.ca/~jacobs/PDF/xedni.pdf)). These results are strong negative evidence at their stated scopes, not an unconditional closure theorem for every lift-selection strategy ([Lean audit](../research/jksst_xedni_audit_20261101/README.md); [autoresearcher experiments note](<../research_notes/Index calculus leads next steps/autoresearcher_experiments.md>); [literature note](<../research_notes/Index calculus leads next steps/literature_frontier.md>)).
+
+
+| classic xedni and the frozen function-field lift family | conditionally obstructed / exact negative for that family | conditional theorem plus exact α = 3 | JKSST; `AR/experiments/EXP-XEDN-002` |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+**Mechanism.** This does not move an exponent. It decides whether the program's most-cited numbers (13.9x, 18.5x and 54.1x online, all superseded 2026-10-20) survive a fair baseline. The calculation predicts preprocessing rho at about 490, 2,500, 9,600 and 2,600 online steps at n = 61, 71, 73 and 83. The free-relation census is predicted to give ≥ 500 verified relations at n = 61 and 83, which would cut the charged precomputation honestly.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+A long list of directions should be dropped. Further pair-table, k-sum or 6-sum S₄-tree engineering for ECC2K-130, and new rungs at n = 85 and 89, sit on the CGK line 2^25 or more above the generic bound. Classic xedni has JKSST's conditional height obstruction, while the frozen function-field family has exact α = 3; variants must identify and prove which premise changes. A p-adic variant does not obviously help either: by my reasoning (not a repository result), the formal-group logarithm linearises only the kernel of reduction, which is why it breaks anomalous curves and nothing else. Curve-level hardness prediction by ML, and isogeny-class or volcano curve choice (0.996x), are measured nulls. Further monodromy censuses are settled by the (Z/2)^{m−2} theorem. BKK and Newton-polytope elimination are settled by MV = Bézout. GGMP bases, Couveignes–Lercier periods and GHS at n = 131 are exact negatives. Record-and-replay of C₄ is capped at 2–7%. First-fall-degree measurements are flat at 3 and do not bound D. Sympy-Buchberger timing ladders measure overhead, not algebra. GPU kernels should wait until someone has a device. The autoresearcher's "source-lift" idea family has been rejected hundreds of times by exact no-go boundaries. Split-Jacobian "projected smoothness" (IDEA-002, G30-015) is only worth staffing if it explains how it escapes KN-FIND-61347e, which says a cross-genus Poincaré-factor embedding cannot beat rho on the embedded elliptic factor ([ml note](<../research_notes/Index calculus leads next steps/ml_cryptanalysis_ic.md>); [autoresearcher ideas note](<../research_notes/Index calculus leads next steps/autoresearcher_ideas_claims.md>)).
+
+
+

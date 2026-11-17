@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T16:34:40Z",
+ "id": "PCC-20261116-901321",
+ "kind": "statement",
+ "producer": {
+  "commit": "926f7788069664844864128425b96cebe4674af1",
+  "model": "",
+  "session": "codex-20261116-nist-quotient-geometry"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/quartic_descent.cpp",
+    "sha256": "9aa8844a3270f528ccd17042942805fb0a15d78f6152a2fe90dd03b77af1fbc5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/DESCENT_PROTOCOL.md",
+    "sha256": "88988d8b958aa082e4d26f18d76698a172bbfedc46f5c724ceefea2f229616e0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/descent-v1/result.json",
+    "sha256": "af8f3aa783f8f512f3589197f1c8d6479b36f5d91cad873cf656221e91ead63a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/descent-v1/pre-call-manifest.sha256",
+    "sha256": "69a6e2f0fac328f0944f799ae0832356a0b2453c1161b629abd75e883ca6e75f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "For the Riemann candidate reconstructed from actual P192 d7 kernel1 moduli, native code checks seven known Jacobi gradient ratios, reconstructs21 further labelled bitangents in two frames, checks all28 labelled Frobenius correspondences and the full quartic equation, normalizes its24-step scalar cocycle, and constructs a nonsingular Hilbert90 matrix yielding an explicit geometrically smooth plane quartic with every normalized coefficient in Fp. This is unsigned candidate-curve descent evidence; the possible Serre twist relative to the polarized quotient and an executable divisor-class map remain unchecked."
+}

@@ -1,0 +1,202 @@
+[
+  {
+    "theorem": "CubicFiniteNorm22308.base_unit_certificate",
+    "claim": "pcc/claims/PCC-20261116-36ea9c.json",
+    "normalized_statement": "theorem base_unit_certificate : \u2200 x : Fin 223, x=0 \u2228 x^221*x=1",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.base_unit_certificate",
+      "decl_sha256": "3ccaf29798687900a37689efd4666eb8bff9e00357788e274c0ba9aa8d73f55d"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.base_cube_zero",
+    "claim": "pcc/claims/PCC-20261116-906992.json",
+    "normalized_statement": "theorem base_cube_zero : \u2200 x : Fin 223, x^3=0 \u2192 x=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.base_cube_zero",
+      "decl_sha256": "3007a2ee402abdf551dfde33ef6c2af20795a903870b607661e978ab37c4cbab"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.cofactor_cubic_relation",
+    "claim": "pcc/claims/PCC-20261116-de9483.json",
+    "normalized_statement": "theorem cofactor_cubic_relation {R : Type} [CommRing R] (a b c : R) : (3*c^2-a*b)^3-3*(b^2-a*c)^3 = (a^3+3*b^3+9*c^3-9*a*b*c)*(3*c^3-b^3)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.cofactor_cubic_relation",
+      "decl_sha256": "1140da9015a88f3857f35ba285ada58af0eafcfcfb5179c5e9040e259cdf1fe6"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.unit_cube_ratio",
+    "claim": "pcc/claims/PCC-20261116-2dcf13.json",
+    "normalized_statement": "theorem unit_cube_ratio {R : Type} [CommRing R] (x y u : R) (hc : x^3=3*y^3) (hu : u*y=1) : (u*x)^3=3",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.unit_cube_ratio",
+      "decl_sha256": "de5ebd8243d161dc8dfd124a45e958f3d6c962e54e140c52beecf3e3bd2661e0"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.zero_norm_cofactor_cubes",
+    "claim": "pcc/claims/PCC-20261116-141764.json",
+    "normalized_statement": "theorem zero_norm_cofactor_cubes (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (hn : coefficientNorm x=0) : (cofactor x).2.1^3=3*(cofactor x).2.2^3",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.zero_norm_cofactor_cubes",
+      "decl_sha256": "423695267c8fd20f53e6563130f486e02341a012f28db85b76565b66e2c55cb3"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.zero_norm_second_cofactor",
+    "claim": "pcc/claims/PCC-20261116-f851b5.json",
+    "normalized_statement": "theorem zero_norm_second_cofactor (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (hn : coefficientNorm x=0) : (cofactor x).2.2=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.zero_norm_second_cofactor",
+      "decl_sha256": "7738973e450ea3c233875741503b8e2d895bce69872ed9e8f159f028c0fb93f9"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.zero_norm_first_cofactor",
+    "claim": "pcc/claims/PCC-20261116-5c24db.json",
+    "normalized_statement": "theorem zero_norm_first_cofactor (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (hn : coefficientNorm x=0) : (cofactor x).2.1=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.zero_norm_first_cofactor",
+      "decl_sha256": "2bc2200a43f2f079d16e76599133452a316e6a305d0a9ba0e8bfef9a791a60dc"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.zero_cofactors_cube_relation",
+    "claim": "pcc/claims/PCC-20261116-895088.json",
+    "normalized_statement": "theorem zero_cofactors_cube_relation {R : Type} [CommRing R] (a b c : R) (h1 : 3*c^2-a*b=0) (h2 : b^2-a*c=0) : b^3=3*c^3",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.zero_cofactors_cube_relation",
+      "decl_sha256": "0f4ba46b07c45baa1148a65ef50a14ca57f3d7aa48ea1720fdcd9ea7fc77ea48"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.zero_norm_coordinate_cube_relation",
+    "claim": "pcc/claims/PCC-20261116-628db1.json",
+    "normalized_statement": "theorem zero_norm_coordinate_cube_relation (a b c : Fin 223) (hn : coefficientNorm (a,b,c)=0) : b^3=3*c^3",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.zero_norm_coordinate_cube_relation",
+      "decl_sha256": "554f6ba2e093fd099d137d08e990c40708c8b2fc5253468850c83597e77a8f46"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.zero_norm_third_coordinate",
+    "claim": "pcc/claims/PCC-20261116-904526.json",
+    "normalized_statement": "theorem zero_norm_third_coordinate (a b c : Fin 223) (hn : coefficientNorm (a,b,c)=0) : c=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.zero_norm_third_coordinate",
+      "decl_sha256": "ea2317b04fc40f67b10e416d45d82646993d05b589f61e02c7c67eed07480575"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.zero_norm_all_coordinates",
+    "claim": "pcc/claims/PCC-20261116-43a9b6.json",
+    "normalized_statement": "theorem zero_norm_all_coordinates (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (hn : coefficientNorm x=0) : x=(0,0,0)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.zero_norm_all_coordinates",
+      "decl_sha256": "33f581b26e555d1c797549b641397a5f90e8d595985d9a7e8ac79e70aed21185"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.norm_zero_iff",
+    "claim": "pcc/claims/PCC-20261116-2e7c0a.json",
+    "normalized_statement": "theorem norm_zero_iff (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) : coefficientNorm x=0 \u2194 x=(0,0,0)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.norm_zero_iff",
+      "decl_sha256": "3b4db0952384a143d24fd3e9134cdc8e6ba1e45d65c4deb4275cf47f98e58869"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.nonzero_input_nonzero_norm",
+    "claim": "pcc/claims/PCC-20261116-e288b6.json",
+    "normalized_statement": "theorem nonzero_input_nonzero_norm (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (hx : x\u2260(0,0,0)) : coefficientNorm x\u22600",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.nonzero_input_nonzero_norm",
+      "decl_sha256": "d26e2527e6d12fce364f15805ce9df285935c53ae3c8ac8f3762338308c990ff"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.derived_norm_unit",
+    "claim": "pcc/claims/PCC-20261116-103800.json",
+    "normalized_statement": "theorem derived_norm_unit (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (hx : x\u2260(0,0,0)) : (coefficientNorm x)^221*coefficientNorm x=1",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.derived_norm_unit",
+      "decl_sha256": "4d769089c648d18c3cb19942881a628c3264b7ec6a38939bb7109f2ff018f688"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.coefficient_cofactor_product",
+    "claim": "pcc/claims/PCC-20261116-99e465.json",
+    "normalized_statement": "theorem coefficient_cofactor_product (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) : coefficientProduct x (cofactor x)=(coefficientNorm x,0,0)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.coefficient_cofactor_product",
+      "decl_sha256": "57cc2b00808b8cc772bc24c97bc79383662318942acb039f7d36a57461afdf8c"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.coefficient_product_scale",
+    "claim": "pcc/claims/PCC-20261116-00f1a5.json",
+    "normalized_statement": "theorem coefficient_product_scale (x y : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (s : Fin 223) : coefficientProduct x (scale s y)=scale s (coefficientProduct x y)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.coefficient_product_scale",
+      "decl_sha256": "388d634f0f72140abb334cc1ea8835b74704dec75f2d8c1ccb08b4109a720764"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.coefficient_product_comm",
+    "claim": "pcc/claims/PCC-20261116-c67f93.json",
+    "normalized_statement": "theorem coefficient_product_comm (x y : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) : coefficientProduct x y=coefficientProduct y x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.coefficient_product_comm",
+      "decl_sha256": "8dea60fc87423056c64a4306f7b433c255c1b522eebc644b89824d9a5ced1706"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.every_nonzero_coefficient_inverse",
+    "claim": "pcc/claims/PCC-20261116-434958.json",
+    "normalized_statement": "theorem every_nonzero_coefficient_inverse (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (hx : x\u2260(0,0,0)) : coefficientProduct x (scale ((coefficientNorm x)^221) (cofactor x))=(1,0,0) \u2227 coefficientProduct (scale ((coefficientNorm x)^221) (cofactor x)) x=(1,0,0)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.every_nonzero_coefficient_inverse",
+      "decl_sha256": "0528a25808157cb0a8616f271b8b20573607e61f63fbe836d1e9834b324c4988"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.zero_and_unit_controls",
+    "claim": "pcc/claims/PCC-20261116-b5632d.json",
+    "normalized_statement": "theorem zero_and_unit_controls : coefficientNorm (0,0,0)=0 \u2227 coefficientNorm (1,0,0)=1 \u2227 coefficientProduct (1,0,0) (1,0,0)=(1,0,0)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.zero_and_unit_controls",
+      "decl_sha256": "eabe304e39041fc84afb12c5e0daf2bde452068ddebc3be9b572c31172e93439"
+    }
+  },
+  {
+    "theorem": "CubicFiniteNorm22308.reducible_parameter_control",
+    "claim": "pcc/claims/PCC-20261116-8252cb.json",
+    "normalized_statement": "theorem reducible_parameter_control : ((222,1,0) : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223)\u2260(0,0,0) \u2227 ((222 : Fin 223)^3+1*(1 : Fin 223)^3+1^2*(0 : Fin 223)^3- 3*1*222*1*0)=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.reducible_parameter_control",
+      "decl_sha256": "55e4c632a07600958df834bdc046a41e868a16ceb9605ec1269afb20477cf8be"
+    }
+  }
+]

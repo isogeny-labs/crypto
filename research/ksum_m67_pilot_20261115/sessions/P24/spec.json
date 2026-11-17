@@ -1,0 +1,111 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ksum_m67_pilot_20261115 P24",
+ "description": "Sizing pilot, not data: ksum m = 6, 7 against the frozen ksum5 size. Public synthetic curve and targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 10935329,
+    "a": 5320418,
+    "b": 8535318,
+    "group_order": 10933753,
+    "r": 10933753,
+    "gx": 258338,
+    "gy": 9805035
+   }
+  ],
+  "targets_per_curve": 32,
+  "target_seed": 2026111568,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "ksum5-n11",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=11",
+     "oracle": "ksum:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum6-n9",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=9",
+     "oracle": "ksum:m=6",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum6-n10",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=10",
+     "oracle": "ksum:m=6",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum6-n11",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=11",
+     "oracle": "ksum:m=6",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum7-n9",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=9",
+     "oracle": "ksum:m=7",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum7-n10",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=10",
+     "oracle": "ksum:m=7",
+     "max_trials": "13528399621"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 2026111569,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

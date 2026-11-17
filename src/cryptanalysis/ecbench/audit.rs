@@ -1677,7 +1677,7 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
         // Every derived figure must follow from the record's own counts:
         // a hand-edited S, ratio or flag fails here even if resealed.
         let floor = floor_s(r.boundaries.automorphisms_available);
-        let sqrt_r = (w.curve.r as f64).sqrt();
+        let sqrt_r = (w.curve.r.to_f64()).sqrt();
         // The floor's `A` follows the rule the record names (none: the first
         // rule), so a record written before `j = 0` and `j = 1728` curves got
         // their own count still recomputes to the floor it was written with.
@@ -1712,7 +1712,7 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
         let rec: Option<super::exact_scalar::ExactScalar> =
             r.outcome.recovered.as_deref().and_then(|s| s.parse().ok());
         let target_ok = rec.map(|k| inst.mul_generator_exact(k).as_ref() == Some(&w.target));
-        let planted_ok = w.planted.and_then(|p| rec.map(|k| k == p.into()));
+        let planted_ok = w.planted.and_then(|p| rec.map(|k| k == p));
         if target_ok != r.outcome.matches_target || planted_ok != r.outcome.matches_planted {
             record_problems.push(format!("{tag}: verification does not reproduce"));
         }
@@ -1850,23 +1850,22 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
     // neither.
     if let Some(last) = session.last_seq {
         let n = records.len() as u64;
-        let ok = if killed {
-            n == last + 1 || n == last + 2
-        } else {
-            n == last + 1
-        };
+        let ok = last.checked_add(1) == Some(n) || (killed && last.checked_add(2) == Some(n));
         led.check("last_seq", ok, || {
-            format!("session.json says the last record is seq {last}, the records end at {n}")
+            format!("session.json says the last record is seq {last}, the records contain {n} rows")
         });
     }
     if let Some(stop) = &session.stop {
         let n = records.len() as u64;
         led.check(
             "stop",
-            !complete && stop.seq.is_none_or(|s| n == s || n == s + 1),
+            !complete
+                && stop
+                    .seq
+                    .is_none_or(|s| n == s || s.checked_add(1) == Some(n)),
             || {
                 format!(
-                    "session.json says it stopped ({}) at seq {:?}, the records end at {n}",
+                    "session.json says it stopped ({}) at seq {:?}, the records contain {n} rows",
                     stop.kind, stop.seq
                 )
             },
@@ -1987,6 +1986,49 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
 #[cfg(test)]
 pub(crate) mod tests {
     use crate::cryptanalysis::ecbench::methods::{PhaseRecord, SolveReport};
+
+    #[test]
+    fn sequence_counter_overflow_is_rejected_without_panicking() {
+        let dir = fresh("sequence-overflow");
+        let allow = AuditOptions {
+            allow_interrupted: true,
+            ..Default::default()
+        };
+        tamper(&dir, |_, s| {
+            s["last_seq"] = json!(u64::MAX);
+        });
+        let report = audit_opts(&dir, &allow).unwrap();
+        assert_eq!(report.checks.get("last_seq"), Some(&false));
+        assert!(report
+            .problems
+            .iter()
+            .any(|p| p.contains("records contain")));
+        tamper(&dir, |_, s| {
+            s["status"] = json!("interrupted");
+            s["last_seq"] = json!(u64::MAX - 1);
+            s["stop"] = json!({"kind":"interrupt", "seq":u64::MAX, "message":"synthetic validation control"});
+        });
+        let report = audit_opts(&dir, &allow).unwrap();
+        assert_eq!(report.checks.get("last_seq"), Some(&false));
+        assert_eq!(report.checks.get("stop"), Some(&false));
+        tamper(&dir, |records, s| {
+            records.clear();
+            s["records_written"] = json!(0);
+            s["status_counts"] = json!({});
+            s["last_seq"] = json!(u64::MAX);
+        });
+        let report = audit_opts(&dir, &allow).unwrap();
+        assert!(!report.ok);
+        assert_eq!(report.checks.get("last_seq"), Some(&false));
+        assert_eq!(report.checks.get("stop"), Some(&false));
+        tamper(&dir, |_, s| {
+            s["last_seq"] = serde_json::Value::Null;
+            s["stop"]["seq"] = json!(0);
+        });
+        let report = audit_opts(&dir, &allow).unwrap();
+        assert!(report.ok, "{:?}", report.problems);
+        std::fs::remove_dir_all(dir).unwrap();
+    }
 
     fn phase(name: &str, adds: u64, doubles: u64, sm: u64) -> PhaseRecord {
         PhaseRecord {

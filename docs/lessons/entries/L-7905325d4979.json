@@ -1,0 +1,14 @@
+{
+  "action": "cargo builds all ~140 bin targets first; build only --bin ecbench, then compile tests/ecbench.rs with rustc --test against the release libcrypto_lib rlib and serde_json rlib, with CARGO_BIN_EXE_ecbench and CARGO_MANIFEST_DIR set",
+  "created": "2026-11-16T08:10:20Z",
+  "evidence": [
+    "2026-11-16: 27/27 ecbench integration tests passed that way with 2 GB free"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "ecbench-extend"
+  ],
+  "trigger": "running cargo test --test ecbench on a host with a few GB of free disk",
+  "why": ""
+}

@@ -1,0 +1,85 @@
+{
+  "scope": "finite-subgroup Ward folding software checks; no benchmark",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "source_hashes": {
+    "feature-native-division/fixtures.tsv": "48349858d7a8c223201e0913a90a0411c877c8ff1c745221f579cd5196e6ca20",
+    "feature-native-division/lib.rs": "f1dde1055bd78ef0f9863bfbceeda76a384b8f15dfad3aba7715cb6591147f80",
+    "feature-native-joint-window/baseline-geometry.tsv": "32aeaa7ddd3f0deed9a2ba47dafdf1967b335fb8854f04f6f8aeac66e1773e41",
+    "feature-native-joint-window/lib.rs": "8c3e6f2a4ed6fe7b98b32165737bdf8d9b75af9ac0b7599346b6686f0b2af05d",
+    "feature-native-polynomial/fixtures.tsv": "cf6570c523e07e5e5b37b1f192a375ef816c3edf4eccae3c805cde9bc3f1fab9",
+    "feature-native-polynomial/lib.rs": "2097908ea896d0d4558ad05000620a61663f3c7231d50caf7ad7b1feaa9ebc96",
+    "feature-native-source/fixtures.tsv": "a5383e5d17fbd75c4dc11de71b9e677d81bb4e931e7950972b8eedc7c8deb9fe",
+    "feature-native-source/lib.rs": "d8bdc68d8df44d5144151e7dc2a9c3034f73c99acca3310053c658957790c078",
+    "feature-native-value-division/lib.rs": "7980eb7afe322fba43082432d95ea40a66cfce1edf3488cabf6f1f41bf333e93",
+    "feature-native-window/points.tsv": "b7ba763f2bfb8e6c9a85a29d5be65c942ffba271941b53eb34af8e836a1c09ba",
+    "feature-native-window/slots.tsv": "d7645f17999ad0f65d979ee1e3abf4b21c1f4baa21c75c32de5511368a78a1ab",
+    "feature-orbit-local-terms/local.rs": "5408f64b5e60f8f0619376d7335c2703df74857cb86ca535cec6e613aaf4e5a2",
+    "feature-source-finite-fold/fold.rs": "0e7359a937bd3056d17a570c976542765b464e68f601c7cf5725334bcd943e90",
+    "feature-source-finite-fold/prior.rs": "0063fff5360769982e815ab7f46224ba28e4dd4fbd8754678a1af6f0f8239765"
+  },
+  "commands": [
+    {
+      "name": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "--test",
+        "-C",
+        "opt-level=2",
+        "-C",
+        "overflow-checks=yes",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-source-finite-fold/fold.rs",
+        "-o",
+        "/tmp/source-divisor-z23mzjtc/tests"
+      ],
+      "timeout": 90,
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "ac9fcf4746f1386cd88f70e1004bcb03fed00bee81de01343e3061cd5047a210"
+    },
+    {
+      "name": "test",
+      "argv": [
+        "/tmp/source-divisor-z23mzjtc/tests",
+        "fold_tests::",
+        "--test-threads=1"
+      ],
+      "timeout": 30,
+      "exit": 0,
+      "stdout_sha256": "fa8a56f65abfee2ce23a98335764735d36d3bddca1249584e0904841081321f6",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "build-audit",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-C",
+        "overflow-checks=yes",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-source-finite-fold/fold.rs",
+        "-o",
+        "/tmp/source-divisor-z23mzjtc/audit"
+      ],
+      "timeout": 90,
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "80bade5b9d5c9ab5d001faf3e4564d0b44b99e93bfa8ad8c591fa552cb4fee3a"
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "/tmp/source-divisor-z23mzjtc/audit"
+      ],
+      "timeout": 30,
+      "exit": 0,
+      "stdout_sha256": "ae5addff7ea85230d45e4e07a3103f8943d6bad272b14af539ae46c4a5262339",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "binary_hashes": {
+    "tests": "243543078bfbf9f8ee0b1426a05ce8dbcc1c7ec2f919eb0bcee2ad21d16f6ba6",
+    "audit": "d7b14f6aeaf46ff303bacdc8efba3e728d617aabf8c9c85213f85289260625ff"
+  },
+  "sources_unchanged": true,
+  "passed": true
+}

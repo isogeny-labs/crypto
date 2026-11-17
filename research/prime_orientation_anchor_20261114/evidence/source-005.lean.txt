@@ -1,0 +1,257 @@
+module
+public import Mathlib
+public section
+noncomputable section
+
+namespace OrientationAnchor
+open Polynomial Finset
+
+/-- The actual signed displacement of a pair of nonnegative indices. -/
+def delta (x y : ℕ) : ℚ := (y : ℚ) - x
+
+/-- Public anchors are selected by equality of the actual index bits. -/
+def mask (u x y : ℕ) : Finset ℕ :=
+  (range u).filter fun j => x.testBit j = y.testBit j
+
+/-- A displacement of exactly one anchor flips its bit, including carries. -/
+theorem anchor_flips (x y j : ℕ) (h : delta x y = (2 : ℚ)^j) :
+    x.testBit j ≠ y.testBit j := by
+  have heq : y = 2^j+x := by
+    have hc : (y : ℚ) = ((2^j+x : ℕ) : ℚ) := by
+      simp only [Nat.cast_add, Nat.cast_pow, Nat.cast_ofNat]
+      dsimp [delta] at h
+      linarith
+    exact_mod_cast hc
+  rw [heq, Nat.testBit_two_pow_add_eq]
+  cases x.testBit j <;> decide
+
+/-- Every denominator selected by the new guard is nonzero. -/
+theorem denominator_ne_zero (u x y j : ℕ) (hj : j ∈ mask u x y) :
+    (2 : ℚ)^j - delta x y ≠ 0 := by
+  have hb : x.testBit j = y.testBit j := (mem_filter.mp hj).2
+  intro hz
+  exact anchor_flips x y j (by linarith) hb
+
+/-- The actual rational polynomial correction factor. -/
+def factor (d : ℚ) (j : ℕ) : ℚ[X] :=
+  (C ((2 : ℚ)^j) - X) * C (((2 : ℚ)^j-d)⁻¹)
+
+/-- The full masked anchor product; the multiplicities are public. -/
+def correction (u x y : ℕ) (m : ℕ → ℕ) : ℚ[X] :=
+  ∏ j ∈ mask u x y, (factor (delta x y) j)^m j
+
+/-- Every selected factor is exactly one at the displaced source node. -/
+theorem factor_at_delta (u x y j : ℕ) (hj : j ∈ mask u x y) :
+    (factor (delta x y) j).eval (delta x y) = 1 := by
+  simp [factor, mul_inv_cancel₀ (denominator_ne_zero u x y j hj)]
+
+/-- The product preserves its own source value, without a supplied witness. -/
+theorem correction_at_delta (u x y : ℕ) (m : ℕ → ℕ) :
+    (correction u x y m).eval (delta x y) = 1 := by
+  simp only [correction, eval_prod, eval_pow]
+  apply prod_eq_one
+  intro j hj
+  simp [factor_at_delta u x y j hj]
+
+/-- The computed monic quotient, not an existential completion coefficient. -/
+def quotient (u x y : ℕ) (m : ℕ → ℕ) : ℚ[X] :=
+  (correction u x y m - 1) /ₘ (X-C (delta x y))
+
+/-- Exact computed division has zero remainder. -/
+theorem quotient_identity (u x y : ℕ) (m : ℕ → ℕ) :
+    (X-C (delta x y))*quotient u x y m = correction u x y m-1 := by
+  have h := modByMonic_add_div (correction u x y m-1) (X-C (delta x y))
+  simpa [quotient, modByMonic_X_sub_C_eq_C_eval, correction_at_delta] using h
+
+/-- Nodal polynomial for an actual finite rational source set. -/
+def nodal (S : Finset ℚ) : ℚ[X] := ∏ t ∈ S, (X-C t)
+
+/-- Cauchy numerator with its displaced factor removed explicitly. -/
+def puncture (S : Finset ℚ) (d : ℚ) : ℚ[X] := ∏ t ∈ S.erase d, (X-C t)
+
+/-- The chosen scalar is the derivative of the actual nodal polynomial at zero. -/
+def normalizer (S : Finset ℚ) : ℚ := (nodal S).derivative.eval 0
+
+def base (S : Finset ℚ) (d : ℚ) : ℚ[X] :=
+  C ((normalizer S)⁻¹) * puncture S d
+
+def completed (S : Finset ℚ) (u x y : ℕ) (m : ℕ → ℕ) : ℚ[X] :=
+  base S (delta x y) * correction u x y m
+
+def completion (S : Finset ℚ) (u x y : ℕ) (m : ℕ → ℕ) : ℚ[X] :=
+  C ((normalizer S)⁻¹) * quotient u x y m
+
+/-- The source polynomial is the actual puncture times the removed factor. -/
+theorem nodal_puncture (S : Finset ℚ) (d : ℚ) (hd : d ∈ S) :
+    puncture S d * (X-C d) = nodal S := by
+  exact Finset.prod_erase_mul S (fun t => (X-C t : ℚ[X])) hd
+
+/-- Exact completion identity in the original W+C H model. -/
+theorem completed_identity (S : Finset ℚ) (u x y : ℕ) (m : ℕ → ℕ)
+    (hd : delta x y ∈ S) :
+    completed S u x y m - base S (delta x y) =
+      nodal S * completion S u x y m := by
+  have hq := quotient_identity u x y m
+  have hc := nodal_puncture S (delta x y) hd
+  dsimp [completed, base, completion]
+  rw [← hc]
+  calc
+    _ = C ((normalizer S)⁻¹) * puncture S (delta x y) *
+        (correction u x y m - 1) := by ring
+    _ = _ := by rw [← hq]; ring
+
+/-- Every original source value is preserved, not only the displaced node. -/
+theorem completed_at_node (S : Finset ℚ) (u x y : ℕ) (m : ℕ → ℕ)
+    (hd : delta x y ∈ S) (t : ℚ) (ht : t ∈ S) :
+    (completed S u x y m).eval t = (base S (delta x y)).eval t := by
+  have hz : (nodal S).eval t = 0 := by
+    simp only [nodal, eval_prod]
+    exact prod_eq_zero ht (by simp)
+  have h := congrArg (Polynomial.eval t) (completed_identity S u x y m hd)
+  simpa only [eval_sub, eval_mul, hz, zero_mul, sub_eq_zero] using h
+
+
+/-- The source grid is the literal integer interval, embedded in rationals. -/
+def grid (a : ℕ) : Finset ℚ :=
+  (Ico (-(2:ℤ)^a) ((2:ℤ)^a)).image fun z : ℤ => (z : ℚ)
+
+theorem delta_in_grid (a x y : ℕ) (hx : x < 2^a) (hy : y < 2^a) :
+    delta x y ∈ grid a := by
+  apply mem_image.mpr
+  refine ⟨(y : ℤ)-x, ?_, ?_⟩
+  · apply mem_Ico.mpr
+    constructor <;> push_cast <;> omega
+  · simp [delta]
+
+theorem grid_card (a : ℕ) : (grid a).card = 2 * 2^a := by
+  rw [grid, card_image_of_injective _ (Int.cast_injective (α := ℚ)), Int.card_Ico]
+  have he : (2:ℤ)^a - -(2:ℤ)^a = ((2*2^a : ℕ) : ℤ) := by push_cast; ring
+  rw [he, Int.toNat_natCast]
+
+theorem zero_in_grid (a : ℕ) : (0 : ℚ) ∈ grid a := by
+  simpa [delta] using delta_in_grid a 0 0 (by positivity) (by positivity)
+
+/-- Derivative normalization is computed from the same nodal product. -/
+theorem normalizer_eq (S : Finset ℚ) (h0 : 0 ∈ S) :
+    normalizer S = (puncture S 0).eval 0 := by
+  have h := congrArg (fun P : ℚ[X] => P.derivative.eval 0) (nodal_puncture S 0 h0)
+  simpa [normalizer, derivative_mul] using h.symm
+
+theorem normalizer_ne_zero (S : Finset ℚ) (h0 : 0 ∈ S) :
+    normalizer S ≠ 0 := by
+  rw [normalizer_eq S h0]
+  simp only [puncture, eval_prod]
+  apply prod_ne_zero_iff.mpr
+  intro t ht
+  have hn : t ≠ 0 := (mem_erase.mp ht).1
+  simpa using hn
+
+/-- The origin is still the identity diagonal after completion. -/
+theorem completed_origin_diagonal (S : Finset ℚ) (u x : ℕ) (m : ℕ → ℕ)
+    (h0 : 0 ∈ S) : (completed S u x x m).eval 0 = 1 := by
+  have hd : delta x x = 0 := by simp [delta]
+  rw [← hd, completed_at_node S u x x m (by rwa [hd]) _ (by rwa [hd]), hd]
+  simp [base, ← normalizer_eq S h0, inv_mul_cancel₀ (normalizer_ne_zero S h0)]
+
+/-- Distinct indices retain zero at the origin. -/
+theorem completed_origin_offdiagonal (S : Finset ℚ) (u x y : ℕ) (m : ℕ → ℕ)
+    (hd : delta x y ∈ S) (h0 : 0 ∈ S) (hxy : x ≠ y) :
+    (completed S u x y m).eval 0 = 0 := by
+  rw [completed_at_node S u x y m hd 0 h0]
+  have hn : delta x y ≠ 0 := by
+    simp only [delta, sub_ne_zero, ne_eq, Nat.cast_inj]
+    exact Ne.symm hxy
+  have hz : (puncture S (delta x y)).eval 0 = 0 := by
+    simp only [puncture, eval_prod]
+    exact prod_eq_zero (mem_erase.mpr ⟨Ne.symm hn, h0⟩) (by simp)
+  simp [base, hz]
+
+/-- Total public multiplicity budget, including unused anchors. -/
+def mass (u : ℕ) (m : ℕ → ℕ) : ℕ := ∑ j ∈ range u, m j
+
+theorem factor_degree (d : ℚ) (j : ℕ) : (factor d j).natDegree ≤ 1 := by
+  exact (natDegree_mul_C_le _ _).trans (by simp)
+
+theorem correction_degree (u x y : ℕ) (m : ℕ → ℕ) :
+    (correction u x y m).natDegree ≤ mass u m := by
+  apply (natDegree_prod_le _ _).trans
+  calc
+    _ ≤ ∑ j ∈ mask u x y, m j := sum_le_sum fun j _ =>
+      (natDegree_pow_le).trans (by simpa using Nat.mul_le_mul_left (m j) (factor_degree (delta x y) j))
+    _ ≤ mass u m := sum_le_sum_of_subset_of_nonneg (filter_subset ..) (by intros; omega)
+
+theorem base_degree (S : Finset ℚ) (d : ℚ) :
+    (base S d).natDegree ≤ S.card-1 := by
+  apply (natDegree_C_mul_le _ _).trans
+  simp only [puncture, natDegree_finsetProd_X_sub_C_eq_card]
+  exact card_erase_le
+
+/-- The corrected matrix meets the exact stated polynomial degree budget. -/
+theorem completed_degree (S : Finset ℚ) (u x y : ℕ) (m : ℕ → ℕ) :
+    (completed S u x y m).natDegree ≤ S.card-1+mass u m := by
+  exact natDegree_mul_le.trans (Nat.add_le_add (base_degree S _) (correction_degree u x y m))
+
+/-- Strict quotient degree handles the zero polynomial without a positive-mass assumption. -/
+theorem quotient_degree (u x y : ℕ) (m : ℕ → ℕ) :
+    (quotient u x y m).degree < (mass u m : WithBot ℕ) := by
+  by_cases hz : correction u x y m - 1 = 0
+  · simp [quotient, hz]
+  · apply (degree_divByMonic_lt _ _ hz (by simp)).trans_le
+    apply (degree_sub_le _ _).trans
+    exact max_le ((degree_le_natDegree).trans (WithBot.coe_le_coe.mpr (correction_degree u x y m)))
+      (by simp)
+
+theorem completion_degree (S : Finset ℚ) (u x y : ℕ) (m : ℕ → ℕ) :
+    (completion S u x y m).degree < (mass u m : WithBot ℕ) := by
+  by_cases hz : quotient u x y m = 0
+  · simp [completion, hz]
+  · have hn := normalizer_ne_zero
+    dsimp [completion]
+    apply lt_of_le_of_lt (degree_mul_le _ _)
+    apply lt_of_le_of_lt (add_le_add_right degree_C_le _)
+    simpa using quotient_degree u x y m
+
+/-- Proposed per-factor chart content, kept distinct from its valuation bridge. -/
+def beta (i s j : ℕ) : ℤ :=
+  (if j=i then (i:ℤ)+1 else min (i:ℤ) j) - min (s:ℤ) j
+
+def gain (u x y i s : ℕ) (m : ℕ → ℕ) : ℤ :=
+  ∑ j ∈ mask u x y, (m j : ℤ) * beta i s j
+
+def schedule (u i : ℕ) (m : ℕ → ℕ) : ℤ :=
+  (m i : ℤ) - ∑ j ∈ range u, ((j-i : ℕ) : ℤ) * m j
+
+/-- A retained crossing anchor pays one unit; higher anchors pay at worst j-i. -/
+theorem beta_lower (i s j : ℕ) :
+    (if j=i then 1 else -((j-i:ℕ):ℤ)) ≤ beta i s j := by
+  dsimp [beta]
+  split_ifs <;> omega
+
+/-- The diagonal schedule bounds every actual masked crossing exponent sum.
+This integer theorem is not a claim that rational polynomial coefficients have that content. -/
+theorem crossing_gain (u x y i s : ℕ) (m : ℕ → ℕ)
+    (hi : i ∈ mask u x y) : schedule u i m ≤ gain u x y i s m := by
+  have hsum : ∑ j ∈ mask u x y,
+      ((if j=i then (m i:ℤ) else 0) - ((j-i:ℕ):ℤ)*m j) ≤ gain u x y i s m := by
+    apply sum_le_sum
+    intro j hj
+    have h := mul_le_mul_of_nonneg_left (beta_lower i s j) (by positivity : (0:ℤ) ≤ m j)
+    by_cases he : j=i
+    · subst j
+      simpa using h
+    · simpa [he, mul_neg, mul_comm] using h
+  have hmass : (∑ j ∈ mask u x y, ((j-i:ℕ):ℤ)*m j) ≤
+      ∑ j ∈ range u, ((j-i:ℕ):ℤ)*m j :=
+    sum_le_sum_of_subset_of_nonneg (filter_subset ..) (by intros; positivity)
+  simp only [sum_sub_distrib] at hsum
+  have hone : ∑ j ∈ mask u x y, (if j=i then (m i:ℤ) else 0) = m i := by simp [hi]
+  rw [hone] at hsum
+  dsimp [schedule]
+  omega
+
+/-- Away from crossings, s<=i makes every proposed factor gain nonnegative. -/
+theorem beta_nonnegative (i s j : ℕ) (hs : s ≤ i) : 0 ≤ beta i s j := by
+  dsimp [beta]
+  split_ifs <;> omega
+
+end OrientationAnchor

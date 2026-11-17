@@ -1,0 +1,18 @@
+digraph first_independent {
+  graph [rankdir=LR, bgcolor="white", pad="0.15", nodesep="0.30", ranksep="0.55"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, fillcolor="#edf4f7", color="#557383"];
+  edge [fontname="Helvetica", fontsize=10, color="#557383"];
+  residual [label="Fixed residual R", fillcolor="#dcebf1"];
+  probe [label="Compute m=3 batch block\nprobe first-witness pair key"];
+  verify [label="Re-add triple; build row"];
+  rank [shape=diamond, label="Row raises rank?", fillcolor="#fff2d9"];
+  stop [label="Return independent row", fillcolor="#dcefdc"];
+  next [label="Next base position\n(or full-scan miss)", fillcolor="#f7e4e4"];
+  residual -> probe;
+  probe -> verify [label="hit"];
+  probe -> next [label="no hit"];
+  verify -> rank;
+  rank -> stop [label="yes"];
+  rank -> next [label="no"];
+  next -> probe [label="continue", constraint=false];
+}

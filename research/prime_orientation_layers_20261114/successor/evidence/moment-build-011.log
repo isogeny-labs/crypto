@@ -1,0 +1,11 @@
+../evidence/moment-draft-011.lean.txt:453:13: error: Function expected at
+  Nat.lt_two_pow_self
+but this term has type
+  ?m.35 < 2 ^ ?m.35
+
+Note: Expected a function because this term is being applied to the argument
+  (k - 1)
+../evidence/moment-draft-011.lean.txt:452:25: error: unsolved goals
+u k : ℕ
+hk : 0 < k
+⊢ 2 ^ u * k ≤ 2 ^ (u + k - 1)

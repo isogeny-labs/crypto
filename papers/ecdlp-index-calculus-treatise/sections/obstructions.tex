@@ -332,10 +332,118 @@ and index calculus on the whole $J_C(\FF_p)$ (O3). O3 has since been measured
 on the transferred instance and remains open under its frozen rule
 (\S\ref{sec:jac-chain}).
 
-\section{What the obstructions leave open}
+\section{What the obstructions leave open}\label{sec:obs-open}
 
 None of the obstructions above concerns the cost of \emph{solving} the
 decomposition system, nor the linear algebra. The cover obstruction leaves
-the three cases O1--O3 of \S\ref{sec:obs-pushforward} open. Chapter~\ref{ch:falldegree}
+the three cases O1--O3 of \S\ref{sec:obs-pushforward} open, and a note of
+15 November names three more.
+
+\paragraph{O4--O6 and the O4 protocol.} The note labels as O4--O6 the
+hypotheses under which T5--T7 are silent; the labels are the note's, not
+the proof note's (\art{research/chained_transfer_next_20261115/NOTE.md}).
+O4 is a non-hyperelliptic cover with $g\le d^2-d+1$, the smallest being
+$g=3$, $d=2$. O5 is a hyperelliptic cover outside T5's hypotheses ($d>g$,
+$c^*(O)\not\sim d\infty_C$, relations of weight above $g$, or $Q$ in the
+excluded set); every cover measured so far has $d\le g$. O6 is the toy
+size of the measurements ($p\le12{,}841$ at degree 2, $p\le251$ at
+degree 3). The note chose O4 for the next measurement: the bielliptic
+plane quartic $C:v^4=x^3+ax+b$ over $E:y^2=x^3+ax+b$ by
+$(x,v)\mapsto(x,v^2)$, genus 3, degree 2, whose line sections have
+weight 4 and class $K$ and are not fibres. Its existing code recovers
+logarithms only up to $p=257$ and has no rho comparison. The frozen
+protocol runs arm Q (line relations), a control D with the same columns
+and rows found by elliptic additions, and the matched negation rho on
+$E$, priced at 0, 0.1 and 1 GAE and at calibrated weights
+(\art{research/chained_transfer_next_20261115/PROTOCOL.md}).
+
+A red-team review found the frozen rule unreadable before any code was
+written (\art{research/chained_transfer_next_20261115/REDTEAM.md}). Arm Q
+is nearly free at 0 GAE, because its work is native, so its order against
+rho flips inside the band, and the named classifier would class every cell
+unresolved (R1). The factor base has $(r-1)/2$ columns at $p\equiv3\pmod
+4$ and about $p/4$ at $p\equiv1\pmod 4$, and the frozen prime ladder mixed
+both residues (R2). The copied section arithmetic overflows \texttt{u64}
+at $p\ge41{,}874$ (R6). Amendment~1 adopted all 17 findings before any
+code or data. Its ladder is $229$, 421, 821, 1621, 3209, 6421, 12{,}841
+(stage 1) and 25{,}601, 51{,}217, 102{,}409 (stage 2), all $\equiv1\pmod
+4$, with $n/p$ between $0.2347$ and $0.2874$ on stage 1. Its first
+selection pass picked an anomalous curve at $p=229$ ($r=\#E=229$), which
+is why the amendment adds $r\ne p$ and embedding degree above 6 as checks;
+the source discloses this as a selection rule changed after seeing
+selection output, with no arm cost seen. The counted code is written and
+its 16 unit tests pass, including the $p=53$ known answer (45 points, 79
+sections, 11 columns, scalar 17)
+(\art{research/chained_transfer_next_20261115/PROGRESS.md}). The run is
+not done: it waits on the checkpoint gate and an authorised route. The
+protocol's own prior for the verdict ``O4 closed by data'' is $0.75$. O4
+is frozen, not yet run; every number is \texttt{[pcc:unverified]}.
+
+\paragraph{O1: torsion bridges across characteristics.} Two lines of
+12--14 November built explicit cross-characteristic torsion maps and the
+necessary bounds on them
+(\art{research/lift_reduce_second_prime_20261112/CT38_CROSS_CHAR_TORSION.md},
+\art{research/cross_characteristic_global_torsion_20261112/README.md},
+sub-studies CT51--CT94). Every statement is \texttt{[pcc:unverified]}, and
+the sources call them classical results applied to toy instances.
+\begin{itemize}
+\item Positive controls. The rational 5-torsion of Cremona 11a1 reduces
+  isomorphically onto $E(\FF_3)$ and $E(\FF_2)$, both of order 5, which
+  gives a logarithm-preserving map $E(\FF_3)\to E(\FF_2)$ by a five-entry
+  table; CT38 does the same on $y^2-y=x^3-x^2$ between $\FF_{101}$ and
+  $\FF_{103}$. Applying such a map to an arbitrary point needs its global
+  preimage, which enumeration finds in $O(N)$, above rho's
+  $\tilde O(\sqrt N)$. CT69 gives a degree-8 number field in which one
+  3-torsion point of 11a1 reduces to $(18,5)\in E(\FF_{29})$ and to a point
+  of $E(\FF_{2^8})$.
+\item Local lifting without the logarithm. Hensel lifting carries an
+  $\ell$-torsion point to $E(\ZZ/p^N\ZZ)$ from its coordinates alone, so
+  $Q=[x]P$ survives without $x$ (CT74, at $p=29$, six precisions); lifting
+  only the curve equation gives an integral point that is not 3-torsion
+  for $N\ge2$. CT79 chains this to a binary residue for one fixed 3-torsion
+  point, but its candidate list is equivalent to enumerating the
+  logarithms, so it supports no complexity statement.
+\item Necessary bounds. Good reduction of a global $N$-torsion point into
+  a $g$-dimensional abelian variety over $\FF_{q^f}$ forces
+  $N\le(q^{f/2}+1)^{2g}$ (Table~\ref{tab:obs-crosschar}). Serre's bound
+  gives $\ell\le B(f)^g$; over $\mathbb{Q}$ a rational point of order
+  $2^{127}-1$ on a variety with good reduction at 2 needs $g\ge55$, and of
+  order $2^{255}-19$ needs $g\ge110$ (CT56). A full $\ell$-torsion basis
+  needs a field of degree at least $\ell-1$, however the global variety is
+  chosen (CT58). On the binary fibre of 11a1 no nonzero
+  $\FF_{2^d}$-equivariant map of 7-torsion exists for $d<24$ (CT94).
+\end{itemize}
+The bounds are logarithmic in $N$ at fixed $g$ and are not complexity
+lower bounds. No study constructs a transfer of arbitrary encoded points
+with $N^{o(1)}$ lifting cost, which the sources name as the gate before
+any solver is tried. O1 stays open, with no measured arm and no distance
+to rho.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+$N$ & $g=1$ & $g=2$ & $g=3$ & $g=4$ \\
+\midrule
+5 & 1 & 1 & 1 & 1 \\
+17 & 4 & 1 & 1 & 1 \\
+257 & 8 & 4 & 2 & 1 \\
+65537 & 16 & 8 & 5 & 4 \\
+$2^{128}-159$ & 128 & 64 & 43 & 32 \\
+$2^{256}-189$ & 256 & 128 & 86 & 64 \\
+\bottomrule
+\end{tabular}
+\caption[]{Least binary residue degree $f$ not excluded by
+$N\le(2^{f/2}+1)^{2g}$ for a global $N$-torsion point reducing into a
+$g$-dimensional abelian variety over $\FF_{2^f}$; a number field with such
+a place has degree at least $f$. A necessary condition only: the table
+does not assert that any variety attains it. Source:
+\art{research/cross_characteristic_global_torsion_20261112/LOCAL_TO_GLOBAL.md}
+(exact integer check in \texttt{degree\_floor.py});
+\texttt{[pcc:unverified]}.}
+\label{tab:obs-crosschar}
+\end{table}
+
+\paragraph{The other open terms.} Chapter~\ref{ch:falldegree}
 shows that the solving cost is genuinely open. The algorithms of
 Part~\ref{part:algorithms} attack the remaining free terms.

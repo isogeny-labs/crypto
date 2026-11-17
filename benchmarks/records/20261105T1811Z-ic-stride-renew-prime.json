@@ -1,0 +1,107 @@
+{
+  "branch": "claude/ic-stride-renew-prime-20261029",
+  "closed_utc": "2026-11-05T18:11:49+00:00",
+  "commands": [
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/launch-remote",
+        "(isolab-eks launch of the frozen task card)"
+      ],
+      "cwd": ".",
+      "exit": null,
+      "provenance": "Documentary launcher reference (isolab-eks, CodeBuild isolab-experiment-launcher); this import did not execute it. Binary: ecbench sha256 583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9 (isolab-eks image, source cb2ec6873f30), one session per size; replayed by bf5eec6d",
+      "started_utc": null,
+      "wall_s": null
+    }
+  ],
+  "commit": "261dcf92de2af6246c55d87594373f12f4e0b239",
+  "commit_dirty": true,
+  "created_utc": "2026-11-05T18:11:49+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261029-ic-stride-renew-prime"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v236-x86_64-with-glibc2.39"
+  },
+  "id": "20261105T1811Z-ic-stride-renew-prime",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "s_prime_ic_w0",
+      "note": "counted S at w=0 GAE per unpriced native op, copied from VALIDATION.json rho_reference.gae_band (rows icv1-fp20-tm1549-7ec9131a, icv1-fp20-tm327-45c21191, icv1-fp28-t20713-32971d39, icv1-fp28-tm21435-0b5ad955) [pcc:unverified]",
+      "reference": 1.3099889240544926,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 8.678134121323644
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "s_prime_ic_w1",
+      "note": "counted S at w=1 GAE per unpriced native op, copied from VALIDATION.json rho_reference.gae_band (rows icv1-fp20-tm1549-7ec9131a, icv1-fp20-tm327-45c21191, icv1-fp28-t20713-32971d39, icv1-fp28-tm21435-0b5ad955) [pcc:unverified]",
+      "reference": 2.420802047704712,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 20.928015788385263
+    }
+  ],
+  "problem": "archive:ic-stride-renew-prime",
+  "provenance": {
+    "kind": "retrospective_metadata_index",
+    "note": "Record written after the 2026-10-29 EKS sessions; raw files are pinned by the validator report and their artifact-store manifests."
+  },
+  "raw": [
+    {
+      "bytes": 9508286,
+      "path": "research/ic_stride_renew_prime_20261029/P20/eks-results/session/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/03/038119b6f7d5ec9f2c2539607b0929c3a9ed44be1e7de21ccff93b0a4a8aaee3",
+      "sha256": "038119b6f7d5ec9f2c2539607b0929c3a9ed44be1e7de21ccff93b0a4a8aaee3",
+      "uploaded": true
+    },
+    {
+      "bytes": 2933,
+      "path": "research/ic_stride_renew_prime_20261029/P20/eks-results/session/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/85/85bb2819521e5f824668b048c9d63445409b64f24c5a98e722989c31bac35461",
+      "sha256": "85bb2819521e5f824668b048c9d63445409b64f24c5a98e722989c31bac35461",
+      "uploaded": false
+    },
+    {
+      "bytes": 9625035,
+      "path": "research/ic_stride_renew_prime_20261029/P28/eks-results/session/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/09/090a879120bf5cf1831c874f59d5a733ba8e04c9885c77ce87c8db0237599e3f",
+      "sha256": "090a879120bf5cf1831c874f59d5a733ba8e04c9885c77ce87c8db0237599e3f",
+      "uploaded": true
+    },
+    {
+      "bytes": 2934,
+      "path": "research/ic_stride_renew_prime_20261029/P28/eks-results/session/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b9/b9a513f56159ab98e88fa24275c8708133de38a04cb49a69c88826de1c486109",
+      "sha256": "b9a513f56159ab98e88fa24275c8708133de38a04cb49a69c88826de1c486109",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261029-ic-stride-renew-prime/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261029-ic-stride-renew-prime/ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-stride-renew-prime",
+  "status": "measured",
+  "summary": "Retrospective index of the 2026-10-29 ic-stride-renew-prime EKS sessions; validated row, see VALIDATION.json. [pcc:unverified]",
+  "validation": "benchmarks/20261029-ic-stride-renew-prime/VALIDATION.json"
+}

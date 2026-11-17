@@ -1,0 +1,11 @@
+use std::{fs,path::Path};
+fn main(){let a:Vec<_>=std::env::args().collect();let src=Path::new(&a[1]);let mut paths:Vec<_>=fs::read_dir(src).unwrap().map(|e|e.unwrap().path()).filter(|p|p.extension().is_some_and(|e|e=="stdout")).collect();paths.sort();let cases=paths.len();let mut pass=0; let mut primary=0; let mut compatible=0;
+for path in paths {let text=fs::read_to_string(&path).unwrap();let l=text.lines().find(|s|s.starts_with("PASS source_weil ")).unwrap();let p:u64=l.split_whitespace().find_map(|s|s.strip_prefix("p=")).unwrap().parse().unwrap();assert_eq!(p%3,1);let at=l.find(" L=[").unwrap()+4;let end=l[at..].find(']').unwrap()+at;let coeff:Vec<i64>=l[at..end].split(',').map(|s|s.trim().parse().unwrap()).collect();assert_eq!(coeff.len(),7);let chi:Vec<_>=coeff.iter().rev().map(|a|a.rem_euclid(3)as u64).collect();assert_eq!(chi[6],1);assert_eq!(chi[0],1);let mut hs=vec![];
+for a in 1..=2 {for b in 0..3 {for c in 0..3 {let h=[a,b,c,1];let star=[a%3,c*a%3,b*a%3,1];let mut z=[0;7];for i in 0..4{for j in 0..4{z[i+j]=(z[i+j]+h[i]*star[j])%3;}}if z.as_slice()==chi{hs.push(h);}}}}
+let fp=hec_native_ic::fp::Fp::new(3);let mut order13=vec![];
+for h in &hs {let hp=hec_native_ic::poly::Poly::from_coeffs(h);let a=h[0];let star=hec_native_ic::poly::Poly::from_coeffs(&[a,h[2]*a%3,h[1]*a%3,1]);if (0..3).any(|x|hp.eval(x,&fp)==0||star.eval(x,&fp)==0){continue;}if hec_native_ic::poly::Poly::gcd(&hp,&star,&fp)!=hec_native_ic::poly::Poly::one(){continue;}let x=hec_native_ic::poly::Poly::x();if x.powmod(13,&hp,&fp)==hec_native_ic::poly::Poly::one()&&x.powmod(13,&star,&fp)==hec_native_ic::poly::Poly::one(){order13.push(*h);}}
+let fits=(p as u128).checked_pow(13).is_some();if !hs.is_empty(){pass+=1;}if !order13.is_empty(){primary+=1;if fits{compatible+=1;}}
+println!("KERNEL_ADMISSION case={} p={p} charpoly_mod3={chi:?} reciprocal_cubic_choices={} h={hs:?} necessary_condition_passes={} order13_primary_choices={} primary={order13:?} extension_cardinality_fits_u128={fits} kernel_constructed=false",path.file_stem().unwrap().to_str().unwrap(),hs.len(),!hs.is_empty(),order13.len());
+}
+println!("COHORT_COMPLETE source_certificates={cases} necessary_pass={pass} necessary_fail={} order13_primary={primary} arithmetic_compatible={compatible} no_kernel_map_or_DLP_executed=true",cases-pass);
+}
