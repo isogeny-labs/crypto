@@ -2,6 +2,7 @@
 //! Verifies one contiguous original-map -> initial-batches -> marker segment.
 //! Full custody, original-file authentication and exporter release are separate
 //! mandatory caller gates. No search, UNSAT, producer-cost or fall-degree claim.
+#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
 #[path = "sat_initial_packed.rs"]
 mod packed;
 use crate::cryptanalysis::binary_semaev_chain_sat::provenance::{

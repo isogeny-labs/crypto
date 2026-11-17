@@ -11,6 +11,7 @@ use crate::ml_dataset::{
     types::{Artifact, CaseConfig, CaseData},
 };
 use std::path::Path;
+#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
 #[path = "sat_producer_ledger.rs"]
 mod ledger;
 #[path = "owned_search_central.rs"]

@@ -21,8 +21,10 @@ mod sparse {
         fn check(&mut self) -> Result<(), ()>;
     }
 }
+#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
 #[path = "../cryptanalysis/boolean_identity_bqi.rs"]
 mod bqi;
+#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
 #[path = "dynamic_boolean_search_bqi.rs"]
 mod bridge;
 #[path = "dynamic_boolean_search_check.rs"]
@@ -31,6 +33,7 @@ mod check;
 pub(in crate::ml_dataset::solvers) mod continuation;
 #[path = "retained_exclusion_verifier.rs"]
 pub(in crate::ml_dataset::solvers) mod exclusions;
+#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
 #[path = "dynamic_boolean_search_scheduler.rs"]
 mod scheduler;
 pub(in crate::ml_dataset::solvers) use continuation::Limits as ContinuationLimits;

@@ -4,8 +4,10 @@ use super::super::{sparse, Admission, CheckedMap, Error, Quote};
 use super::{audit, Attempt, Identity, ORDER, SCHEMA};
 use serde::{Deserialize, Serialize};
 use std::time::Instant;
+#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
 #[path = "boolean_identity_bqi.rs"]
 mod bqi;
+#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
 #[path = "matrix_rows.rs"]
 mod kernel;
 pub use bqi::{Audit, Limits as CheckerLimits};

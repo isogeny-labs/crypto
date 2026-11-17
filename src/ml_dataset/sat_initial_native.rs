@@ -160,7 +160,7 @@ pub(in crate::ml_dataset::solvers) enum Failure<'a> {
         stop: Stop,
     },
 }
-pub(super) struct NativeInitial<'a> {
+pub(in crate::ml_dataset::solvers) struct NativeInitial<'a> {
     evidence: Evidence<'a>,
     shared: Arc<Mutex<CaptureState>>,
     solver: Option<Solver>,

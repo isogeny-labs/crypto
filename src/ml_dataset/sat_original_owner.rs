@@ -38,7 +38,7 @@ struct DecodedParts {
     complete: Option<Math>,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(super) enum AdmissionStage {
+pub(in crate::ml_dataset::solvers) enum AdmissionStage {
     AttemptBinding,
     Context,
     Reservation,
@@ -56,7 +56,7 @@ pub(in crate::ml_dataset::solvers) enum AdmissionFailure<'a> {
     BeforeBudget(AdmissionStage),
     Retained(FailedAdmission<'a>),
 }
-pub(super) struct FailedAdmission<'a> {
+pub(in crate::ml_dataset::solvers) struct FailedAdmission<'a> {
     original: &'a VerifiedWorkerOriginal<'a>,
     budget: Budget,
     decoded: DecodedParts,

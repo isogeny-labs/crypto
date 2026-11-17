@@ -2,6 +2,8 @@
 //! Frozen boundary: research/rootfind_pair_index_timing_20261116/PROTOCOL.md
 //! and AMENDMENT-1.md. Curve arithmetic is outside timed intervals.
 
+// The frozen research module exposes accessors this timing test does not call.
+#[allow(dead_code)]
 #[path = "../research/rootfind_inline_page_index_20261116/inline_page_index.rs"]
 mod inline_page_index;
 #[path = "../research/rootfind_paged_pair_index_20261116/paged_index.rs"]

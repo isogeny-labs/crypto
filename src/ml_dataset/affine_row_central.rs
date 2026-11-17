@@ -4,6 +4,7 @@ use super::affine_rows::receipt as row_wire;
 use super::*;
 use affine::matrix_rows as row_matrix;
 use provenance::boolean_equations::{self as row_equations, affine_domain as affine};
+#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
 #[path = "sat_original_math_preflight.rs"]
 mod original_math;
 use crate::ml_dataset::{
@@ -11,8 +12,10 @@ use crate::ml_dataset::{
     types::{Artifact, CaseConfig, CaseData},
 };
 use std::path::Path;
+#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
 #[path = "sat_producer_ledger.rs"]
 mod ledger;
+#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
 #[path = "sat_initial_replay.rs"]
 mod transcript;
 /// Must be supplied by the separately authorized replay caller, never inferred
@@ -349,6 +352,7 @@ impl VerifiedInitialCapture {
     }
 }
 
+#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
 #[path = "sat_initial_read.rs"]
 mod retained_read;
 use retained_read::read;
