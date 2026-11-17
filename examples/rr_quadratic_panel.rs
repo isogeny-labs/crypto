@@ -95,8 +95,8 @@
 //! * `norm4` (Boolean degree 4): four summands.  `f = xy + c₂x² + c₁y + c₀x + c₋ ∈ L(5O)`,
 //!   `f = A + By`, `A = c₂x² + c₀x + c₋`, `B = x + c₁`.  `N(f) = (A + By)(A + B(y + x))
 //!   = A² + xAB + B²(x³ + a x² + 1)`
-//!   `= X⁵ + (c₂² + c₂ + a)X⁴ + (c₂c₁ + c₀ + c₁²)X³ + (c₀² + c₀c₁ + c₋ + 1 + a c₁²)X²
-//!   + c₋c₁ X + (c₋² + c₁²)`.  Pinning: `f(−R) = 0` at `−R = (x_R, x_R + y_R)` gives
+//!   `= X⁵ + (c₂² + c₂ + a)X⁴ + (c₂c₁ + c₀ + c₁²)X³ + (c₀² + c₀c₁ + c₋ + 1 + a c₁²)X² +
+//!   c₋c₁ X + (c₋² + c₁²)`.  Pinning: `f(−R) = 0` at `−R = (x_R, x_R + y_R)` gives
 //!   `c₋ = x_R(x_R + y_R) + c₂x_R² + c₁(x_R + y_R) + c₀x_R` (linear in the `c`'s).  The five
 //!   coefficients are matched with `E₁ … E₅`, the elementary symmetric functions of
 //!   `{x_R, x₁, x₂, x₃, x₄}`: `5m` equations in `4ℓ + 3m` bits (summand bits, then `c₂, c₁,

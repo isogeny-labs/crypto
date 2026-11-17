@@ -174,7 +174,7 @@ fn solutions_from_linear_part(
 }
 
 fn masks(points: &[Mask]) -> Vec<u64> {
-    let mut v: Vec<u64> = points.iter().map(|&p| p).collect();
+    let mut v: Vec<u64> = points.iter().copied().collect();
     v.sort_unstable();
     v.dedup();
     v

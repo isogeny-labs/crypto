@@ -19,6 +19,7 @@
 //! branches in increasing `b`), solved
 //!   * `warm`: one solver per (draw, k), branches as assumption sets, learnt clauses kept;
 //!   * `cold`: a fresh solver per branch, the `k` bits as unit clauses.
+//!
 //! The deadline `--budget-s` covers all branches of one (draw, k, mode); branches left
 //! when it expires are `undecided`.  Every SAT model is decoded and checked by group
 //! arithmetic; the expected verdict of every branch is computed from the ground truth
@@ -39,6 +40,7 @@
 //!   * `cold`: a fresh solver per target on the panel's constant-target system;
 //!   * `cold_sym`: a fresh solver per target on the symbolic system (warm's encoding),
 //!     the `2m` target bits as unit clauses.
+//!
 //! Summary ratios `ratio_<a>_over_<b>_{conflicts,decisions,wall}` for cold/warm,
 //! cold_sym/warm (incrementality alone) and cold/cold_sym (encoding size alone).
 //! `--budget-s` is per target per mode.  `wall_s` is loading the solver (cold, cold_sym) plus the
