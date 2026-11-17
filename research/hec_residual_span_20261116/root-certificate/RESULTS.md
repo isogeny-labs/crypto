@@ -14,7 +14,7 @@ identitytest or broad multiplicity claim. Proof in DERIVATION.md.
 
 Oldindexed/newverifier basefield REDC ratios1.010-1.022atp101,
 1.067-1.092atp251,1.118-1.128atp601. Subgroupvectors unchanged. Atp601
-this is11.8-12.8percent fewer verifierbaseREDCs, not a fullpipelinegain.
+this is10.5-11.3percent fewer verifierbaseREDCs, not a fullpipelinegain.
 Completecandidate basecost25452-28062 versus13940-15660source onthese
 cases; subgroupcostunchanged fromindexedversion andstillloses. Allpercase
 counts retained inSUMMARY.tsv, no moduli weighting or wallclaim.
