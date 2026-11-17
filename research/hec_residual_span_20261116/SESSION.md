@@ -1420,3 +1420,10 @@ What was done: frozen d6b9b8ad004 single invocation exits0,3781Sparse/nativeFast
 Decisions made: no unchanged peeling-only producer; free complete support oracle already stalls. Order/revisiting cannot rescue same rows/rule. New supports or multiunknown initialization needed; existingLPwork notnew/free and unchangedbootstrapfloor remainsbinding.
 Open threads: mathematical mechanism coupling components/geometry without previous bootstrap cost, original genus2+10xgoal unresolved.
 Errors: no assertion/runtime errors; oneundetermined arm scientific outcome retained. No retry/S3/cloud.
+
+## Symbolic seed preparation repaired
+
+What was done: compiled all67symbolic seed cases, prefix Sparse/constraint agreement and terminal nativeFast checks; source/native/input/binary hashes retained.
+Decisions made: no supplied seed log; complete support discovery only is free. Corrected protocol/hash checkpoint required before once-only execution.
+Open threads: execute corrected freeze and retain allseed outcomes; original10xgoal unresolved.
+Errors: system-volume temp space exhausted during heredoc, leaving empty protocol in6fb94fb2f91; caught before science. Wrote complete protocol with apply_patch and retained correction explicitly. SSD still has free space; no unrelated cleanup.
