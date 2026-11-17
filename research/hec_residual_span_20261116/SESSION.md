@@ -1221,3 +1221,17 @@ Prospectiveinterpolation/rankgateandcompleteadaptiveproducercostcase;homogeneous
 
 ### Errors
 No scientificfailure/retry/S3/cloud. Explicitnonzerotargettermisnotassumedindependentbecausecorelabelconstraints cancancelit.
+
+## Promotion interpolation adds independent rows and resolves eligible branches
+
+### What was done
+Frozen660b41e29aa pauses5eligiblecore0streamsatthefirstpre-kpromotion,triesall40prescribedthree-pointsigninterpolantsperbranch.200trials/93splitrows,exactH/groupchecksandDSU/Sparse/nativeFastrank/kagreementpass. All5recoverkafter5–38trialswithoutmoreoriginalanchorrows. Sixthp601/source1no-triggercasepreserved. [pcc:unverified]
+
+### Decisions made
+Positivealgebraicbootstrapqualification,notcoldcost/heldout/generalrank/novelty/10x. Everyfailedattemptandafter-ktrialretained. Aproductionmethodneedsallbootstrap/discovery/interpolation/factor/LA/setupchargesandexplicitnocoveragecase. Broadgoalactive,g3/g4separate.
+
+### Open threads
+Exactsharedsign-interpolationcircuitcouldreduceinversioncost;itsalgebra/setup/gatesmustbefrozenbeforemeasurement. Nounboundedcampaignadmittedfromrankonly.
+
+### Errors
+No failedgate/retry,S3/cloud. Newrankgainsdonotbythemselvesimplynetcostbenefitoverremaininganchorwork.
