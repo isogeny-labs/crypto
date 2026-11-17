@@ -1693,3 +1693,10 @@ What was done: usermerge PR4527 verified, newbranch research/hec-quotient-recove
 Decisions made: primary Bruinetal Proposition4.1read; no conjectural recovery or arbitrarytwistsign; originaltargetunchanged. Assertions [pcc:unverified].
 Open threads: pushfreeze then single120CPU invocation; coordinateidentification andtargetlift remain.
 Errors: none in compile, no science yet. Existing ownT7093lease confirmed; connectorattach reports ownscopeconflict but initialcheckallow.
+
+## Quotient curve recovered with twist qualification
+
+What was done: freeze7eb6ff0b323 single invocation exit0, nonsingularconic/exactparameterization/squarefreequintic passes sourcecontrol andimage; candidatecoeff[209,127,378,47,539,495], scale7, counts681/360423, a1=79,a2=2731,N411491. Assertions [pcc:unverified].
+Decisions made: candidatecurve/countqualification, not automaticmaplift; explicit conicbranchpoint/directions retained forGLcoordinate reconstruction.
+Open threads: exactstandardKummer coordinateidentity then originaltargetlift and completecost.
+Errors: none, no rerun/S3/cloud.
