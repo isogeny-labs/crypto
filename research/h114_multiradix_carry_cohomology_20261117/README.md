@@ -5,9 +5,9 @@ first-formal-layer multiplication windings for the faces `(2,3)`, `(2,5)`,
 and `(3,5)`, passed through one shared generator-aware channel, determine the
 canonical scalar modulo 30 after fixed residue-alphabet permutations.
 
-This directory currently contains a preregistration only. It contains no
-candidate scores, selected IDs, decoder outcomes, runtime measurements, or
-claim of a generic ECDLP speedup.
+This directory currently contains the preregistration and generic Lean proof
+layer. It contains no candidate scores, selected IDs, decoder outcomes,
+runtime measurements, or claim of a generic ECDLP speedup.
 
 ## Frozen mechanism
 
@@ -43,6 +43,8 @@ IDs. One unchanged ID must be exact on every one of 28 rows and decode all
 | [`CURVES.json`](CURVES.json) | Seven-curve cohort and coordinate-isomorphism controls | `5dff248152f4cfb3a8b5f9f39542110767d60779d4b917e4b817a935b6170385` |
 | [`mechanism.svg`](mechanism.svg) | Editable six-path/CRT mechanism diagram | `a93c1cc5cd193d0ff6d9321732968cbdc8fd8e8aa06575315c2a5b6fd4988d57` |
 | [`mechanism.png`](mechanism.png) | Compact raster rendering | `9d9cf5d3b39e01ec00a0c5785de65f7d48479b71c5feef65752cb3a018e72585` |
+| [`H114MultiradixCarryCohomology.lean`](H114MultiradixCarryCohomology.lean) | Generic paths, ranges, braid, CRT and conditional decoder | `6bbc556a0cebeafcd493d829180f2c41ad5fdcb9657faed5ae7aaa70c2734eba` |
+| [`proof-gate-v1/`](proof-gate-v1/) | 46 declarations, zero failing, zero trusted-native | retained raw receipt |
 
 The authoritative freeze is the Git tree recorded by the first commit that
 adds this directory; the table hashes are convenience receipts, not a

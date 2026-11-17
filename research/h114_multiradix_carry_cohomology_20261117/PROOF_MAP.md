@@ -1,9 +1,12 @@
 # H114 Lean proof map and instance gate
 
-Status: design gate completed before the first H114 Lean source edit. This map
-covers the structural and conditional-algorithm obligations in `PROTOCOL.md`.
-It deliberately does not assume or assert that one of the 11,520 measured
-predicates is exact.
+Status: design gate completed before the first H114 Lean source edit. Lean
+4.34.1 and Mathlib `d13f23b723b8a846827a245b89c10fc7d3f11612` now build all
+mapped declarations. The repository proof gate audits 46 declarations with
+zero failures and zero trusted-native declarations; its retained receipt is
+`proof-gate-v1/research_h114_multiradix_carry_cohomology_20261117/`. This
+formalization deliberately does not assume or assert that one of the 11,520
+measured predicates is exact.
 
 ## Six-field instance statement
 
