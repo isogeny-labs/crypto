@@ -14,6 +14,24 @@ F(X,Y) = (X-r) A(X) + (Y+s) V(X),  deg A,deg V <=3.
 ```
 For a true nonidentity eight-leaf relation, `V_3` cannot vanish, so normalize `V_3=1`: precisely **seven** scalar unknowns `(A_0..A_3,V_0..V_2)`. This removes the signed constraint identically rather than asking a polynomial solver to rediscover it. The new tests round-trip each planted F and its deliberately altered same-target F through this chart and reject lower-pole / identity branches. This is a more useful starting system for actual algebraic extraction: `H_B^8 mod M(A,V)=0` has eight coefficient constraints in these seven variables, where `M` is the degree-eight monic x-norm quotient.
 
+### Direct monic residual polynomial: eliminate norm and division
+
+There is a further exact identity. Since `s²=C(r)` and `C(X)-C(r)=(X-r)(X²+rX+r²+a)`, put `D_R(X)=X²+rX+r²+a`. For `F=(X-r)A+(Y+s)V` with monic cubic `V`,
+
+```
+N_F(X) = (X-r)[(X-r)A(X)^2 + 2s A(X)V(X) - D_R(X)V(X)^2].
+M_(A,V,R)(X) = D_R(X)V(X)^2 - (X-r)A(X)^2 - 2s A(X)V(X).
+```
+
+Thus `M` is directly monic of degree eight, requiring **no full x-norm construction or synthetic division**. This makes the prospective elimination system explicit and low-dimensional:
+
+```
+unknowns: A0,A1,A2,A3,V0,V1,V2  (V3=1)
+equations: all 8 coefficients of H_B(X)^8 mod M_(A,V,R)(X) equal zero.
+```
+
+The existing Rust file now implements `rr9_signed_chart_monic_factor` (source commit `4680ec0578eb85138c84c5afdad4f9d4619f851f`) and checks all 64 + six signed-leaf fixtures against the *separately computed full norm quotient*, including six repeated-point divisors. The 70 target-preserving mutations must yield a distinct unsupported factor. The expression's algebraic identity follows by direct expansion; its **numerical Rust gates require source-specific CI #44039910636**, not yet assumed passed. This is a lower-cost *verification representation*, not evidence of a cheaper complete ECDLP solver.
+
 The chart construction and round-trip are algebraic reductions, **not** an elimination algorithm recovering the seven variables from R. The source commit is `67a3f6302cf2d72eee3b56946c27902625596e67`; exact-source CI on that commit is required before asserting passing numerical tests.
 
 The original signed norm interpolator, Hermite jets, determinant gates, actual cofactor-one `p=2147483647` curve, first-x31 and Dickson-depth-six31 bases are reused byte-for-byte outside this addition. The existing GitHub Action uses pinned original native Rust 1.100 source as main's old native package is incomplete.
