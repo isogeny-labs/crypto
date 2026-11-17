@@ -255,3 +255,17 @@ PR4480wasexternallymerged2026-11-17T04:01:52Z at67eb72188e249d62baa292f5a732cce4
 
 ### Errors
 Noscientificruntimefailure; no noisererun. Generatorheredocsyntaxfixedbeforefreeze. Unrelated.resumechangespreserved.
+
+## Shared setup equivalence frozen
+
+### What was done
+Implementedcanonicalresiduetable/additive-squareenumeration, polynomialforwarddifferences, primitivegeneratorcharacterclassenumeration insetup/fast.rs. Fixedall320nonzeroconstantsacrossF101g2/F113g3/F109g4. ExactFBordering/sign/z/coefficientvectorcomparison againstexistingcode, fullfreshsetupcountvectors.
+
+### Decisions made
+Classicalsharedoptimization, notnewattack. Mustintegrateequallyallthreecontrols afterall320pass; extraadditions/storage/primitivegeneratorsearchcharged. Nofavorableconstantselection/crossmodelcache/wallclaim. Freeze/pushbeforeexecution.
+
+### Open threads
+Runonce; onlythenprospectiveall18solverprefix/countcomparisonwithsharedsetup.
+
+### Errors
+No runtimeexecutedyet; originalphase/priorfreezesunchanged.
