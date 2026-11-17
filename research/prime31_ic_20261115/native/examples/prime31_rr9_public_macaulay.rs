@@ -318,7 +318,7 @@ fn fixtures(ar:&mut Arithmetic,base:&[(u64,u64);8])->(Point,Vec<Point>,usize) {
         }
     }
     assert_eq!(negatives.len(),2);
-    (positive.expect("a finite positive B8 fibre"),negatives,count)
+    (Some(positive.expect("a finite positive B8 fibre")),negatives,count)
 }
 
 // Test-only independent original-curve replay of a *public-only* coefficient
