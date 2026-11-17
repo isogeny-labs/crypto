@@ -182,6 +182,19 @@ pub fn candidate(
     line: &Line,
     s: u64,
 ) -> Result<Certificate, &'static str> {
+    candidate_with_root_table(ctx, ring, config, line, s, false)
+}
+
+/// Use the existing finite-difference root extractor without weakening any
+/// principal-relation admission check. The default Horner path is retained.
+pub fn candidate_with_root_table(
+    ctx: &Ctx,
+    ring: &FpRing,
+    config: &TwoLargePrimeSieve,
+    line: &Line,
+    s: u64,
+    root_table: bool,
+) -> Result<Certificate, &'static str> {
     let f = &ctx.f.f;
     if s == 0 || s >= f.p {
         return Err("zero/out-of-range sieve parameter");
@@ -211,9 +224,19 @@ pub fn candidate(
     let c: Vec<_> = line.b.iter().map(|b| f.mul(&sq, b)).collect();
     let mut tail = norm.clone();
     let mut terms = Vec::new();
+    let roots = root_table.then(|| ring.roots_by_table(&norm));
     for (i, b) in config.base().iter().enumerate() {
         work::words(2);
-        if ring.eval(&norm, b.x) != 0 {
+        let is_root = if let Some(roots) = &roots {
+            let found = roots.iter().position(|&x| x == b.x);
+            // Aggregate the exact number of comparisons performed, including
+            // unsuccessful membership tests, once per base abscissa.
+            work::words(found.map_or(roots.len(), |index| index + 1) as u64);
+            found.is_some()
+        } else {
+            ring.eval(&norm, b.x) == 0
+        };
+        if !is_root {
             continue;
         }
         let divisor = vec![if b.x == 0 { 0 } else { f.p - b.x }, 1];
@@ -284,6 +307,28 @@ pub fn run_extension_sparse_dlp_on(
     spec: &Spec,
     seed: u64,
     options: ExtensionSparseDlpOptions,
+) -> Result<(Value, Option<u64>), String> {
+    run_extension_sparse_with_roots(spec, seed, options, false)
+}
+
+/// Quadratic graph IC with finite-difference norm roots. The existing entrypoint
+/// retains Horner extraction; full-smooth extraction has its own unchanged path.
+pub fn run_extension_sparse_table_dlp_on(
+    spec: &Spec,
+    seed: u64,
+    options: ExtensionSparseDlpOptions,
+) -> Result<(Value, Option<u64>), String> {
+    if !options.quadratic_remainders {
+        return Err("table-root entrypoint requires quadratic remainder collection".into());
+    }
+    run_extension_sparse_with_roots(spec, seed, options, true)
+}
+
+fn run_extension_sparse_with_roots(
+    spec: &Spec,
+    seed: u64,
+    options: ExtensionSparseDlpOptions,
+    root_table: bool,
 ) -> Result<(Value, Option<u64>), String> {
     options.sparse_rank.validate()?;
     if !(101..=1511).contains(&spec.p)
@@ -401,7 +446,11 @@ pub fn run_extension_sparse_dlp_on(
                                 norm: vec![],
                             })
                     } else {
-                        candidate(&ctx, &ring, &config, &line, s).ok()
+                        if root_table {
+                            candidate_with_root_table(&ctx, &ring, &config, &line, s, true).ok()
+                        } else {
+                            candidate(&ctx, &ring, &config, &line, s).ok()
+                        }
                     };
                     let Some(certificate) = certificate else {
                         counts.refused += 1;
@@ -592,6 +641,10 @@ pub fn run_extension_sparse_dlp_on(
     let collection = json!({"schema":"cover.extension-sparse.collection/v1","mode":mode,"seed":seed,"p":spec.p,"l":spec.l,
         "base":points(&base),"h":remainder::encode(&ctx.cov.hx),"sources":sources,"projections":projections,"checkpoints":checkpoints,"counts":counts,"rank_target":rank_target,"stop":stop,"work_native":collection_native,
         "rank_checks":rank.checkpoints,"rank_options":options.sparse_rank,"rank_semantics":"certified lower bound; zero before success; no incremental RREF products"});
+    let mut collection = collection;
+    if root_table {
+        collection["root_finder"] = json!("forward-differences");
+    }
     let report = json!({"schema":"cover.extension-sparse.dlp/v1","p":spec.p,"l":spec.l,"seed":seed,"options":options,
         "collection":collection,"collection_rank_ready":ready,"initial_basis":initial_basis,"final_extra_counts":basis.as_ref().map(|q|&q.counts),
         "descents":descents,"affine_rows":affine_rows,"projected_rows":projected_rows,"descent_residuals":residuals,"descent_stream_advances":advances,
