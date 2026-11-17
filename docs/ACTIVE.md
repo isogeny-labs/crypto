@@ -25,4 +25,4 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Blocked / questions for the owner
 
-- Relation15x / PR #4530: actual non-test root check141 and36-case actual-root matrix142/144 pass, with full saved-proof audit147/148;98 focused source tests pass. Full release library unit165 still compiling after preserving all selected parent test names and resolving cfg(test) interfaces. Prospective cost-profile169 is prepared, not yet run. Historical benchmark/PCC metadata gates remain unchanged. No15x admitted; goal remains in progress. [pcc:unverified]
+- Relation15x / PR #4530: actual-root36-case adapter and saved-proof audits pass. Profile169/179 completes36 calls with full proof replays, no runtime admission. Current source120 tests180 and3 strict actual-root initial tests181 pass; full release unit165 remains incomplete after46 observed failures. Next is complete packed-constructor hypothesis182. Historical benchmark/PCC metadata gates unchanged; no15x admitted, goal in progress. [pcc:unverified]

@@ -98,7 +98,9 @@ fn storage_snapshot_due(phase: &str, conflicts: u64) -> bool {
 }
 
 /// Typed semantic search events, not an independently checked UNSAT proof. Clause IDs
-/// are immutable insertion indices, independent of movable arena offsets; XOR row IDs are indices in the current matrix,
+/// retain the legacy arena-offset names at attachment and remain immutable
+/// through physical reclamation. Later clauses use unrecycled virtual offsets;
+/// XOR row IDs are indices in the current matrix,
 /// reset by `XorMatrixReset`. Literal/variable names use DIMACS indexing.
 /// A unit clause may be declared before assignment and again after installation;
 /// repeated clause IDs must carry the same literal set.
@@ -642,6 +644,10 @@ pub struct Solver {
     progress: Option<Arc<SolverProgress>>,
     event_observer: Option<EventObserver>,
     event_failure: Option<String>,
+    // Legacy observer names are offsets before any reclamation. Keep a separate
+    // name per immutable insertion slot so moving storage never changes a key.
+    event_clause_ids: Vec<u32>,
+    event_next_clause_id: u32,
     /// Number of variables (1-indexed externally).
     n_vars: u32,
     /// Centre of the literal-indexed tables `values` and `watches`:
@@ -893,6 +899,8 @@ impl Solver {
             progress: None,
             event_observer: None,
             event_failure: None,
+            event_clause_ids: Vec::new(),
+            event_next_clause_id: 0,
             native_admission: None,
             native_failure: None,
             native_pending_model: None,
@@ -972,6 +980,11 @@ impl Solver {
         if self.event_observer.is_some() || self.event_failure.is_some() {
             return Err("SAT event observer already installed or failed".into());
         }
+        self.event_clause_ids
+            .try_reserve_exact(self.clause_at.len())
+            .map_err(|_| "SAT event clause-name allocation refused".to_string())?;
+        self.event_clause_ids.extend_from_slice(&self.clause_at);
+        self.event_next_clause_id = self.next_cref();
         self.event_observer = Some(Box::new(observer));
         self.emit(SolverEvent::Snapshot {
             version: 1,
@@ -1052,7 +1065,12 @@ impl Solver {
                 index
             }
         };
-        u32::try_from(index).expect("clause insertion index exceeds arena budget")
+        if index < self.event_clause_ids.len() {
+            self.event_clause_ids[index]
+        } else {
+            assert_eq!(index, self.clause_at.len());
+            self.event_next_clause_id
+        }
     }
 
     fn event_reason(&self, reason: Reason, variable: usize) -> SolverEventReason {
@@ -1683,6 +1701,18 @@ impl Solver {
         self.arena.push(len);
         self.arena.extend_from_slice(lits);
         self.clause_at.push(cref);
+        if self.observing() {
+            // Observation remains optional and never changes native work counts.
+            // Failure is sticky and censors the trace rather than reusing a key.
+            if self.event_clause_ids.try_reserve(1).is_err() {
+                self.event_failure = Some("SAT event clause-name allocation refused".into());
+            } else if let Some(next) = self.event_next_clause_id.checked_add(len as u32 + 1) {
+                self.event_clause_ids.push(self.event_next_clause_id);
+                self.event_next_clause_id = next;
+            } else {
+                self.event_failure = Some("SAT event clause-name space exhausted".into());
+            }
+        }
         if self.observing() {
             self.emit(SolverEvent::Clause {
                 clause_id: self.event_clause_id(cref),
@@ -4101,6 +4131,9 @@ impl Solver {
                         .map_or(0, |(_, candidates)| capacity_bytes(candidates)),
                 ),
             ]);
+        }
+        if self.event_clause_ids.capacity() != 0 {
+            components.insert("event_clause_ids", capacity_bytes(&self.event_clause_ids));
         }
         let mut original_words = 0u64;
         let mut active_learnt_words = 0u64;
@@ -7039,11 +7072,28 @@ mod tests {
         let mut retained = fixture();
         let before = compact.arena.len();
         let capacity = compact.arena.capacity();
+        let observed = Arc::new(std::sync::Mutex::new(Vec::new()));
+        let sink = observed.clone();
+        compact
+            .set_event_observer(move |event| {
+                sink.lock().unwrap().push(event.clone());
+                Ok(())
+            })
+            .unwrap();
+        let initial_ids = compact.clause_at.clone();
+        for (i, cref) in compact.clause_at.iter().enumerate() {
+            assert_eq!(compact.event_clause_id(*cref), initial_ids[i]);
+        }
         compact.reclaim_clause_arena();
         compact.rebuild_clause_watches();
         assert!(compact.arena.len() < before / 4);
         assert!(compact.arena.capacity() < capacity);
         assert_eq!(compact.clause_at.len(), retained.clause_at.len());
+        for (i, cref) in compact.clause_at.iter().enumerate() {
+            assert_eq!(compact.event_clause_id(*cref), initial_ids[i]);
+        }
+        // The next observed name is the old end, not a newly reused offset.
+        assert_eq!(compact.event_next_clause_id, before as u32);
         assert!(compact.clause_at.windows(2).all(|w| w[0] < w[1]));
         assert!(matches!(compact.reason[5], Reason::Decision));
         match compact.reason[1] {
@@ -7064,6 +7114,10 @@ mod tests {
                 })
                 .collect()
         }
+        assert!(observed.lock().unwrap().iter().any(|event| matches!(
+            event, SolverEvent::Clause { clause_id, existing: false, .. }
+                if *clause_id == before as u32
+        )));
         assert_eq!(exported_truth(&compact), exported_truth(&retained));
         assert_eq!(compact.solve(), retained.solve());
         assert_eq!(compact.model(), retained.model());

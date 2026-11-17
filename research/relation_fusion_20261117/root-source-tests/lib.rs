@@ -22,3 +22,12 @@ mod sat_initial_packed;
 
 #[path = "../../../src/cryptanalysis/ecbench/exact_scalar.rs"]
 pub mod exact_scalar;
+
+// Actual binary-field arithmetic and all its original unit tests.
+#[path = "../../../src/binary_ecc/f2m.rs"]
+pub mod f2m;
+#[path = "../../../src/binary_ecc/operation_tally.rs"]
+pub mod operation_tally;
+pub mod binary_ecc {
+    pub use crate::{f2m, operation_tally};
+}
