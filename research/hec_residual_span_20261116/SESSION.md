@@ -2149,3 +2149,10 @@ What was done: freeze1a62fd27829 once-onlyexit0;24calls/12originaltargets native
 Decisions made: eagerclosure notuniformgain,10xgatefails. Definitionsaddunknown+equation; p60140orbits42rows leaves4constraints. Nextpublicclosure-constraintpriorityrule mustchargeclassification, notfuturewitnessoracle.
 Open threads: prospectiveconstraint-first scheduling/costcase versus bothstreams; originalgenus2+10x andindependentreview/publication/genus3/4coverage.
 Errors: noneinrun,no retry/S3/cloud.
+
+## Fixed-window constraint priority frozen
+
+What was done: built fixed8candidate windows sortedknown-residualfirst/publicTorder, exactVieta results cached, allspeculativeclassification charged. No rank/knownanswer/futurewitness input, persistentqueue/source/geometryproof unchanged.
+Decisions made: original12targets/24calls, same16anchors/3seeds, fullclassification/attempt/proofcost, diagnostictrace inclclassificationcount/native/mutation/repeat gates; Gitfreeze beforeone120CPU. Assertions [pcc:unverified].
+Open threads: executeafterpush, compareagainst eagerclosure andpreclosure notjustweakbaseline; originalgenus2+goal unchanged.
+Errors: onlyunusedwarning,no scienceyet.
