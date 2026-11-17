@@ -2191,3 +2191,17 @@ What was done: freeze16c4cd22c5e once-onlyexit0;24prefixcalls/12targets repeat/n
 Decisions made: rejectuniform10xhybridretainingthisexactprefix beforecompletion/proofcost; remaining3prefixesnotfullwins. No universalbound orfreshfallbackdoublecount.
 Open threads: materiallydifferentbootstrap/relationmechanism withpubliccostcase, originalgenus2+10x/review/publication/genus3/4coverage.
 Errors: none,no retry/S3/cloud.
+
+## Public target-decomposition seed frozen
+
+What was done: buildtargetuquadratic factorization seedwhen2distinctneworbits, exactT=P+Q definitionrow/labels andbothverifiers; chargedordinaryseedfallback otherwise. Dedicatedtargetrowmutations pluscommon216/anchor96 gates.
+Decisions made: original12targets/24calls/same16anchors3seeds, no split-subsetselection;allfactor/proof/sourcebinding/failedattempt costs charged,diagnosticgroup/traces/finalscalar/repeats. Assertions [pcc:unverified]. Sources localindependentseed experiment screened;KB source:91b6bbe9fb73267bbeb5d7c97f493b26 background/no noveltyclaim.
+Open threads: pushfreeze thenone120CPU invocation, measureapplicability+fullcost notassumefactorizationyield advantage.
+Errors: Ruby sourceediting range syntax correctedbeforefiles/execution,unusedwarningonly,noscienceyet.
+
+## Target-decomposition seed qualified on successor PR4582
+
+What was done: PR4561mergedexternallywhilepreparing, newbranchresearch/hec-target-seed-20261117 rebasedonecommit ontoactualfetchedmain;freeze6c3d8f24028 pushedbeforeonce-onlyexit0.24calls/12originaltargets native/scalar/trace/repeat/common216+anchor96+targetrow12 mutations pass.3eligiblecells, mixedcosts (p251base5692->4238,p601source17base15208->13824/subgroup4810->3730;otherp601regresses). Assertions [pcc:unverified].
+Decisions made: retaincorrectbootstrapalternative, allineligiblequery/fallbackcosts included,no uniform10xclaim. No mergebythissession. OriginalPRclosedbyexternalmerge, successor containsnewtestonly.
+Open threads: mathematical useful-rank/cost mechanism+independenttargets, originalgenus2+10x/review/publication/genus3/4coverage.
+Errors: origin/main trackingrefwasstale;rebasedontoverifiedFETCH_HEADmain ratherthanassumetrackingupdated. No scientificfailure/retry/S3/cloud.
