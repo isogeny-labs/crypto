@@ -1011,3 +1011,17 @@ Useful independent-relation yield mechanism, genus3/4 coverage and Gaussian dete
 
 ### Errors
 No arithmetic/counter failure or retry. No S3 polling/cloud spend. Generic fallback setup and all exception cases retained.
+
+## Higher-dimensional section yield screened
+
+### What was done
+Derived exact2parameter residual-degree and rational-point line-incidence construction. Proved pair-visit identity and carried known single-anchor scaling ambiguity into the larger family. Read primary sieve method and KB overlap before attributing the route.
+
+### Decisions made
+Do not implement naive all-pairs merely to gain q²parameters: conditional split-yield model predicts2–3times more visits per full split relation for g2–4, before parameter cost. This is a heuristic screen, not universal impossibility. A candidate must avoid pair generation or justify structured useful-rank concentration. No science producer executed.
+
+### Open threads
+Find an admissible incidence filter or a different useful-rank mechanism with a complete cost case. General mathematical10xgoal stays active.
+
+### Errors
+Initial source-path guess orbit-core/binomial.rs did not exist; inspected actual incremental/pencil sources. No failed or hidden runtime attempt. Git custody, no S3 polling.
