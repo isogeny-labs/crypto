@@ -376,6 +376,7 @@ mod adaptive_b31_tests {
     fn adaptive_dickson_b31_blinded_holdout() {
         let mut ar = Arithmetic::default();
         check_curve(PRIME31, &mut ar).expect("original ordinary cofactor-one prime31");
+        let full_study_start = Instant::now();
         let special = Base::build(PRIME31, 6, &mut ar).expect("Dickson depth-six base");
         assert_eq!(special.points.len(), B31);
         let pts = tokens(&ar, &special.points);
@@ -441,6 +442,11 @@ mod adaptive_b31_tests {
                 "curve_n": PRIME31.n,
                 "factor_base": "actual Dickson depth-six B31",
                 "signed_four_group_points": half.index.len(),
+                "four_set_build_ns_diagnostic": half.build_ns.to_string(),
+                "four_set_build_group_additions": half.build_additions,
+                "four_set_index_capacity_entries": half.index.capacity(),
+                "four_set_ordered_capacity_entries": half.ordered.capacity(),
+                "full_test_wall_ns_diagnostic": full_study_start.elapsed().as_nanos().to_string(),
                 "holdout_seed": format!("{HOLDOUT_SEED:#018x}"),
                 "fresh_target_count": N_HOLDOUT,
                 "public_shift_max_inclusive": MAX_SHIFT,
