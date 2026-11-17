@@ -86,6 +86,57 @@ fn determinant(mut a: [[u64; 9]; 9]) -> u64 {
     d
 }
 
+/// Multiply truncated power series over Fp; coefficients, not derivatives.
+fn series_product(a: &[u64], b: &[u64]) -> Vec<u64> {
+    assert_eq!(a.len(), b.len());
+    let mut out = vec![0u64; a.len()];
+    for i in 0..a.len() {
+        for j in 0..(a.len()-i) {
+            out[i+j] = fp_add(out[i+j], fp_mul(a[i], b[j]));
+        }
+    }
+    out
+}
+
+/// The coefficient of t^order in each L(9O) basis monomial, where
+/// t=x-x(P), y(t)^2=(x(P)+t)^3+a(x(P)+t)+b.
+/// Valid for any affine P with y(P) != 0 and 0 <= order <= 8.
+fn evaluation_higher_jet(q: Point, order: usize) -> Result<[u64; 9], String> {
+    if order >= 9 { return Err("RR9 has only nine rows".into()); }
+    if order == 0 { return evaluation_row(q); }
+    let (x, y) = q.ok_or("infinity needs an O-local parameter")?;
+    if x >= P || y >= P || y == 0 {
+        return Err("noncanonical point or x is not uniformizer at y=0".into());
+    }
+    let len = order+1;
+    let mut one = vec![0u64; len]; one[0] = 1;
+    let mut xs = vec![0u64; len]; xs[0] = x; xs[1] = 1;
+    let mut ys = vec![0u64; len]; ys[0] = y;
+    let x2 = fp_mul(x, x);
+    let inv_two_y = fp_pow(fp_mul(2, y), P-2);
+    for k in 1..len {
+        let c = match k {
+            1 => fp_add(fp_mul(3, x2), PRIME31.a),
+            2 => fp_mul(3, x),
+            3 => 1,
+            _ => 0,
+        };
+        let mut cross = 0u64;
+        for j in 1..k {
+            cross = fp_add(cross, fp_mul(ys[j], ys[k-j]));
+        }
+        ys[k] = fp_mul(fp_sub(c, cross), inv_two_y);
+    }
+    let xx2 = series_product(&xs, &xs);
+    let xx3 = series_product(&xx2, &xs);
+    let xx4 = series_product(&xx3, &xs);
+    let xy = series_product(&xs, &ys);
+    let x2y = series_product(&xx2, &ys);
+    let x3y = series_product(&xx3, &ys);
+    let cols = [one, xs, ys, xx2, xy, xx3, x2y, xx4, x3y];
+    Ok(std::array::from_fn(|i| cols[i][order]))
+}
+
 /// Return a false-zero risk explicitly, never interpret a diagonal determinant.
 fn relation_determinant(leaves: &[Point; 8], residual: Point) -> Result<u64, String> {
     let mut seen = HashSet::new();
@@ -124,23 +175,26 @@ fn evaluation_tangent_jet(q: Point) -> Result<[u64; 9], String> {
     ])
 }
 
-/// Confluent evaluation matrix for at most two occurrences of each signed
-/// point. Each pair yields value row followed by first tangent jet.
+/// Confluent L(9O) matrix for all rational affine multiplicities <=9.
+/// On this prime-order, odd-order curve there are no rational y=0 points:
+/// such a point would be nontrivial rational 2-torsion.
+/// Infinity remains a separate unsupported branch, not a false positive.
 fn relation_determinant_hermite(
     leaves: &[Point; 8], residual: Point,
 ) -> Result<u64, String> {
     let mut a = [[0u64; 9]; 9];
-    let mut seen: HashMap<Point, u8> = HashMap::new();
+    let mut seen: HashMap<Point, usize> = HashMap::new();
     for (i, q) in leaves.iter().copied()
         .chain(std::iter::once(neg(residual))).enumerate()
     {
         if q.is_none() { return Err("effective divisor includes infinity".into()); }
         let entry = seen.entry(q).or_insert(0);
         *entry += 1;
-        a[i] = match *entry {
-            1 => evaluation_row(q)?,
-            2 => evaluation_tangent_jet(q)?,
-            _ => return Err("third occurrence: higher elliptic Hermite jet required".into()),
+        let order = *entry - 1;
+        a[i] = if order == 1 {
+            evaluation_tangent_jet(q)?
+        } else {
+            evaluation_higher_jet(q, order)?
         };
     }
     Ok(determinant(a))
@@ -255,6 +309,33 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
     assert_eq!(hermite_true, 0, "confluent RR9 misses a true repeated-leaf sum");
     assert_ne!(hermite_false, 0, "confluent RR9 admits a false repeated-leaf sum");
 
+    // Preregistered diagonal tests: third, fourth and eighth occurrence.
+    // Construction with original EC arithmetic is *outside* the determinant.
+    let mut higher_controls = Vec::new();
+    for multiplicity in [3usize, 4, 8] {
+        let mut repeated_leaves: [Point; 8] = [Some(base[1]); 8];
+        for leaf in repeated_leaves.iter_mut().take(multiplicity) {
+            *leaf = Some(base[0]);
+        }
+        let true_r = group_sum(ar, &repeated_leaves);
+        let false_r = ar.add(PRIME31, true_r, Some(PRIME31.g));
+        assert!(true_r.is_some() && false_r.is_some());
+        assert_ne!(true_r, false_r);
+        let true_det = relation_determinant_hermite(&repeated_leaves, true_r)
+            .expect("positive high-multiplicity divisor");
+        let false_det = relation_determinant_hermite(&repeated_leaves, false_r)
+            .expect("negative high-multiplicity divisor");
+        assert_eq!(true_det, 0, "higher jet rejects valid signed relation");
+        assert_ne!(false_det, 0, "higher jet admits wrong public residual");
+        higher_controls.push(json!({
+            "multiplicity":multiplicity,
+            "leaves":repeated_leaves, "true_residual":true_r,
+            "wrong_residual_plus_G":false_r,
+            "true_det":true_det, "wrong_det":false_det,
+            "curve_witness_outside_determinant":true
+        }));
+    }
+
     json!({
         "base":label, "factor_base":base, "seed":format!("{SEED:#x}"),
         "accepted_positive":NCASES, "accepted_negative":NCASES,
@@ -266,6 +347,7 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
         "confluent_hermite_repeated_true_det":hermite_true,
         "confluent_hermite_repeated_false_det":hermite_false,
         "confluent_hermite_double_control":true,
+        "confluent_hermite_higher_controls":higher_controls,
         "no_unknown_ecdlp_solved":true, "cases":records
     })
 }
@@ -306,6 +388,19 @@ mod tests {
         assert_eq!(determinant(a), 0);
     }
     #[test]
+    fn rr9_taylor_first_two_coefficients_match_independent_rows() {
+        let mut ar = Arithmetic::default();
+        check_curve(PRIME31, &mut ar).unwrap();
+        let points = first_rational_points(&mut ar);
+        for &point in points.iter().take(16) {
+            let q = Some(point);
+            assert_eq!(evaluation_higher_jet(q, 0).unwrap(), evaluation_row(q).unwrap());
+            assert_eq!(evaluation_higher_jet(q, 1).unwrap(),
+                       evaluation_tangent_jet(q).unwrap());
+        }
+        assert!(evaluation_higher_jet(Some(points[0]), 9).is_err());
+    }
+    #[test]
     fn rr9_original_prime31_bases_and_duplicate_control() {
         let data = run();
         assert_eq!(data["positive_count"], 64);
@@ -318,6 +413,13 @@ mod tests {
             assert_eq!(panel["confluent_hermite_repeated_true_det"], 0);
             assert_ne!(panel["confluent_hermite_repeated_false_det"], 0);
             assert_eq!(panel["confluent_hermite_double_control"], true);
+            let h = panel["confluent_hermite_higher_controls"].as_array().unwrap();
+            assert_eq!(h.len(), 3);
+            for (i, &m) in [3, 4, 8].iter().enumerate() {
+                assert_eq!(h[i]["multiplicity"], m);
+                assert_eq!(h[i]["true_det"], 0);
+                assert_ne!(h[i]["wrong_det"], 0);
+            }
         }
     }
 }
