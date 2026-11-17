@@ -927,3 +927,17 @@ Execute once, retain every failure or cost regression, then decide whether this 
 
 ### Errors
 Pre-freeze review caught a zero-cost native identity case that could have no modulus entry; output now represents missing counts as zero. Removed one unused import. No scientific retry. Original Oxford expressions are transformed into attributed mathematical coefficient tensors, not vendored as a program.
+
+## Generic Kummer primitive gate completed
+
+### What was done
+Once-only execution at e3e877638c0 exited 0: 3168 exact checked steps, 1556 signed recoveries, 52 non-first charts; repeats and all 9504 primitive/36 setup records validate. Retained raw data and Rust-derived summaries. [pcc:unverified]
+
+### Decisions made
+Reject this unchanged circuit as the tenfold route: full REDC regresses in every chain group, and even a free-rest kernel bound is at most 4.547. Any nonnegative weighting of the recorded counter components yields at most 3.306, conditional on that incomplete counter model. Do not promote component or optimistic bounds to full runtime. Keep broader genus-2/3/4 objective active. Git custody replaces unavailable S3; no S3 polling.
+
+### Open threads
+A substantially cheaper generic circuit needs a fresh cost case before a full collector experiment. Existing incremental pencil baseline and Gaussian determinant proof obligations remain separate. PR stays open for review, unmerged by this agent.
+
+### Errors
+No execution or exception failure. Cost gate failed; no producer retry or favorable-input substitution. Counter summaries are derived after the frozen run, not a new scientific execution.
