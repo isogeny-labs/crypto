@@ -409,3 +409,213 @@ PR4498externallymerged2026-11-17T04:26:30Z at164dc1799e20decf5d0e26632bc8941a61b
 
 ### Errors
 No scientificrankfailures/retries;filteredmissisretainedincompleteasregistered. Rootnativepathsparseabsent;usedfrozenretainedcopy.
+
+## OnlineweightedLP eliminator frozen
+
+### What was done
+ImplementedstreamingLP-firstechelonpivotswithsparse≤2LPsupportanddenselabeltails, plusincrementallabelbasis. Exactrowspaceinvariantandtargetpivotcriteriondeclared. Preparedsame1528prefixfullreference/dense/graphcomparisons, recordstoredcoefficientcellsandLP-stage-onlycumulativearithmeticvsscratchFast.
+
+### Decisions made
+Notunion-find/externalfastest/end-to-endcostclaim; sourceproducer/setup/diagnosticsoutsidebothstageintervals. Memorycellsarenotpeakbytes; temporary/metadata/integercostsomitted. Preserveallfilteredmisses/budgets. Freeze/pushbeforeonce-onlyrun.
+
+### Open threads
+Qualifyonlineeveryprefix/rank/target andinspectstagecost, thencompletecostcase. PR4504externallymerged;newsuccesorneededafterresults. Broad10xgoalopen.
+
+### Errors
+No scientificrunyet; originalfrozenimplementationsunchanged.
+
+## Strongeronlinecontrol added before first execution
+
+### What was done
+Initialonlinecheckpointneverexecuted. Addedincrementalfull-matrixecheloncontrolwithoutLPsplit, exacteveryprefixk/fullrankchecks,andFULL.tsvcostreceipt. Recompiledwithoutwarnings;finalfreezeprospectiveamendmentexplicit.
+
+### Decisions made
+CompareagainstbothscratchFastandfullincrementalcontrol; firstdeterminingprefixcostonlyforcompletefilteredstreams, finalbudgetforincomplete. Laterprefixesonlycorrectness. SeparatestreamingreusefromLP-specificgain.
+
+### Open threads
+Executeonlyfinalpushedcheckpointonce. Broadgoalopen.
+
+### Errors
+No scientificexecution/retry; changeispre-executioncomparatorstrengthening.
+
+## Onlineweighted LP gate passes; arithmetic route not supported
+
+### What was done
+At pushed92a556e0a02all1528onlineLP/full/dense/graphprefixchecks passEXIT0. LPwidth≤2,allk/rankmatches andoriginalcontrols pass. First-determinationREDc ratiosonlineLPvscontrols notconsistent: genus2Scratch/Online0.44–1.56,FullIncremental/Online0.78–1.97. Incompleteg4casekeptseparate. Rawhashesverify.
+
+### Decisions made
+Correctengineeringcomponentbutno10xroute. Do notheadlinelatepost-successwork, restart-onlybaseline,cyclecounts orunequalinformation. Fullincrementaloriginalcolumnorderalsochangespivotcomparison;notexternalfastest. Memorycellsnotbytes/end-to-endcost.
+
+### Open threads
+Neednewusefulrelationarrivalmechanism/strongcomplete-costcase,broadgoalopen. PR4504externallymerged2026-11-17T04:31:41Z at5256b62864bb444f489624aa155837942a6da082;deliveronlyonlineworkinsuccessor.
+
+### Errors
+No scientificfailures/retries. Initialunexecutedcheckpointamendedprospectivelywithstrongercontrol;onlyfinalrunexecuted.
+
+## Largerfieldholdout frozen
+
+### What was done
+Fixed6unseenfields:g2 251/1021,g3 211/421,g4 181/271;firstalgebraicallyeligiblec1..32. Fresh2targetspersourceD/17Dfromfixedseed,4unchangedmethods2repeats=192expectedcalls. CopiedqualificationonlypointorderBSGSbudget20000→200000beforeexecution; exactoperator/map/subgroupchecksretained. Nativewrapperdisablecountersduringcommonqualification,enablewholefreshsolve.
+
+### Decisions made
+Noeligibility/runtime-basedfieldreplacement. Allmissing/incompletearmsretained,nomoreanchors/walkbudget. Requireexactreturn/repeat/prefix/flagchecks,nottenfoldcriterion. 600swatchdog,no retry,GitcustodywhileS3down. Thisexpandsscope,notgenericnewmathproof.
+
+### Open threads
+Executeonceafterpushedfreeze,pollsamehandle,retainallcoverage/censoring. Broadgoalopen.
+
+### Errors
+FoundoldfixtureactualBSGSbudget20000duringinspection;prospectivelyraisedcopiedqualificationbudgetratherthansilentlychangingoldsourceorexcludinglargerfields. No scientificrunyet.
+
+## Largerfieldholdout passes; subgroup/geometry coverage limits identified
+
+### What was done
+At pushed77a705f6a14,6models/192sourceverifiedcalls/24workloads passEXIT0,missing/incomplete0. Allrepeat/prefix/flag/REDCgatespass. Newg2REDCratiosp2510.33–1.18,p10211.23–1.80;g4p271wide0.20–37.45withell397. Allrawhashesverify;Rustsummariesretained.
+
+### Decisions made
+Nouniform10claim, no cherrypickhighcomponent. Largerfieldsnotuniformlyhardersubgroups (ell101,631,301267,77152909,48781,397). Derivedexplicitg4x9+cdegree3quotientE:y2=z3+c, JisogenousE×A3;holdoutellordersaboveE-HasseboundssoD/TinA3,notgeneric4dimensionalclassorfreeelliptictransfer. Newcoverageproofscopeexplicit.
+
+### Open threads
+Needprospective strong-subgroupg2/g3anddifferentjustifiedg4classbeforegenericclaims, plusactualnew10mechanism. Broadgoalopen. PR4507currentlyopenaslastchecked;updateshouldincludefinalholdoutscope.
+
+### Errors
+No scientificfailures/retries. Weaksubgroupsretainedasregisteredratherthanreplaced. No boundsorbudgets changedafterexecution.
+
+## Strongwhole-Jacobiansubgroup screen frozen
+
+### What was done
+Preparedfixed8g2/g3fields,c1..32firsteligibilityplus4ell≥U=(ceil√p+1)^(2g),exactintegerconservativeHasseupperbound. ThisguaranteeswholeJacobiancofactor≤4withoutassertingpoint-LCM=#J. PositivecontrolF101g2ell7481/F421g3ell77152909,retainallnoeligiblefields. No targetsolves/performanceexperiment.
+
+### Decisions made
+Do notreplaceweakfieldsafteroutcomes;classifyall8. Genus4separatestructuralrouteauditneedsdifferentclass. ReadGutierrezShaskaprimaryextra-involutionnormalforms/branchorbitaction;do notcallknownsplittinganewattack. Freeze/pushbeforeonce-onlyscreen.
+
+### Open threads
+Runstrengthscreen,completegenus4odd-automorphismobstruction/alternativeclassproof. Broadgoalopen.
+
+### Errors
+OldT7008claimretrybudgetexhausted;itsinitialrankworkmerged,markedoldtaskdoneandclaimedT7010forthiscoverageworkbeforeedits. No scientificrunyet.
+
+## Strength screen passes; prime-Jacobian target gate frozen
+
+### What was done
+At8e706cdb2f6all8fieldsclassified,5accepted,3ineligible,bothpositivecontrolspassEXIT0. Selectedg2F251c18ell67931/F601c7ell411491,g3F113c3ell1247429 plusF101/F421controls. Wholecofactorupper1or2andirreducibleoddbranchpolynomialexcludesrational2torsion,forcing#J=ell. AddedcheckedintegerFrobeniusdeterminantcertificatefornewfive-model160solvegatenotyetexecuted.
+
+### Decisions made
+IncludeALLscreenacceptedmodelsandfreshfixedseedtargets,no weakcaseposthocsubstitution. Ineligible3fieldsretained. SeparateGENUS4-ROUTEproof:tameoddordersonly3/5/9;3/9ellipticquotient,5extra genus2involutionoverclosure. Order4oddpolynomialcandidatehasnopositive-genusintermediatequotientfromthatcyclicactionalone,butrequiresnewsimplicity/action/orderproof,nooldcertificateimport.
+
+### Open threads
+Runonlynew160solvegatesafterpushedfreeze; broadgenus4/10xobjectiveopen.
+
+### Errors
+No strengthscreenfailures/retries. No targetsolvesclaimedfromscreen.
+
+## Primewhole-Jacobian solves pass, tenfold still unsupported
+
+### What was done
+At720ef8cc584all5integerordercertificatesgiveN=ellprime(7481,67931,411491,1247429,77152909);160calls/20freshworkloadsverifyEXIT0. Allrepeat/prefix/normalization/countergatespass,missing/incomplete0,rawhashesverify. G2baseREDCFolded/Batch0.993–2.167,g31.807–4.269acrossfixedmodels/workloads.
+
+### Decisions made
+Weaksubgroupsnolongertheexplanationonthispanel,stillno10x. WholeorderdeducedfromFrobeniusdeterminantnotpointLCM;independentHasse+no2torsionargumentmatches. Structuredfamilyonly,notgenericcurvesorcertifiedgenus4. Allscreenacceptedmodelsincluded,3earlierineligiblefieldsretained.
+
+### Open threads
+Needactualstrongnewmechanismandseparategenus4order4qualificationwithnewproofs. Broadobjectiveopen;PR4507lastobservedopen,currentdeliverymustreflectnewscope.
+
+### Errors
+No scientificfailures/retries. No target/field/budgetselectionafteroutcomes;compileunusedfieldwarningsretained.
+
+## Order-four genus-four proof/certificate screen frozen
+
+### What was done
+Derived sigma(-x,iy) Mumford action and separate finite-field/whole-order/scalar-projection/simplicity obligations. Read Howe–Zhu primary Proposition3/Lemma4. Implemented exact extension counts d1..4, integer reciprocal factor screen for ordinary Weil polynomials, and sufficient finite modular root-of-unity power-collision witnesses. Six fixed models at p13/17/29, all classifications retained; no target solves.
+
+### Decisions made
+No pi=P(sigma) import from binomial family. Absolute certificate conditional on all finite modular witnesses; missing witness stays uncertified. Group/source qualification is a separate flag. Compile/freeze/push before once-only run, no simplicity-count success quota or model replacement.
+
+### Open threads
+Execute fixed screen, inspect actual ordinary/simple/group-qualified coverage before any solver or speed claim. Broadgoalopen.
+
+### Errors
+Previously referenced Rust1.99 stable binaries became unavailable; adapted to Homebrew Rust1.93.1 and recorded version before measurement. No old timing comparison or scientific rerun. Build assertions not executed yet.
+
+## Order-four classification completes; two absolute certificates await independent replay
+
+### What was done
+At86581ac8f26all6fixedcurves smooth/count/action/controlchecks passEXIT0. TwoF17modelsordinary/Fq-simple/absolute-certified andgroup-qualified(ell89,h1600,lambda55;ell53,h1856,lambda30). ThreeothersordinaryreducibleWeilpolynomials;F13model1Fq-simplebutevenWeilpolynomial,exactroot-signcollisionafterFrob²impliesnotabsolute. Allrawhashesverify.
+
+### Decisions made
+No targetsolves/speedclaim. Weaksubgroups/largecofactorsreported;newclassgeometricallyqualifiedonly. Independentlyreplaymodularwitnessarithmeticbeforeusingclass;notrerunpointcounts. Flagsseparategeometry/group;unresolvednotautomaticallydecomposable.
+
+### Open threads
+Compile/freezeindependentmodularverifierfromretainedrawrecords. Broad10xgoalopen;stronggenus4subgroups/actualsolverstillneeded.
+
+### Errors
+Onecurvehas nonbranch-negativecontrol unavailable because allcataloguepoints are branch points; retained in stderr, no model replacement. Originalstabletoolchainpathmissing, recordedHomebrew1.93.1build;nooldtimingcomparison.
+
+## Independent order-four modular witness replay frozen
+
+### What was done
+StandaloneRustverifierusesdeterminant-evaluation/LagrangecharacteristicpolynomialsandindependentpolynomialEuclidean/Fermat arithmetic, no producer imports. Replayallpositives,retainallmisses; requireall127candidateexponentsforbothdeclaredmodels, own totientsieve/primechecks/controls. No independent point-count rerun or whole-admission claim.
+
+### Decisions made
+Freezeinput hashes/verifier/binary andpushbeforeonce-onlyreplay;nooverwrite/retry. Exactevenpolynomialnegativecontrolchecks the F13 geometric-failure deduction separately.
+
+### Open threads
+Run modular replay, then publish calibrated geometric/action controls. No targetsolves or10xclaim.
+
+### Errors
+No scientificreplayexecutionyet; existingrawpointcounts/witnessesunchanged.
+
+## Independent modular replay passes
+
+### What was done
+At7903d33ad45standalone replay exits0:296positivewitnessesverified,85unresolvedretained,all127exponentscoveredforbothdeclaredF17absolutemodels. Determinant/interpolation/standalonepolynomialarithmeticandown totientsieve/controlspass. Original/replayrawhashesverify.
+
+### Decisions made
+Twoabsolutelysimplegenus4/action-qualifiedcontrolsnowavailableunderwrittenfinitecertificate;grouporders89/53andlargecofactorsareexplicit. Independentmodularreplayisnotindependentpointcountreplay/formalproof/admission/attackgain. Nextneedsstrongsubgroup/newsolvercontractornewmechanism,broad10xgoalopen.
+
+### Open threads
+Useorder4classonlywithnewexactN/projection/eigenactioncontract,neveroldpi=P(sigma). Larger/strongergenus4coverageandactual10xmechanismunfulfilled. PR4507lastobservedopen.
+
+### Errors
+No qualification/replayfailuresorretries; earlierstablepathunavailable,Homebrew1.93.1recorded. No timingcomparisonsacrosstoolchains.
+
+## Strong order-four search frozen
+
+### What was done
+Derived exact Hasse/trace-coefficient order interval and unique-multiple certificate from verified point-order LCM. A third-extension count plus certified N recovers c4 without fourth-extension enumeration. Fixed p101/149/197,64coefficients each,first fully eligible actual-cofactor≤4 model per field. Prior six full-count records calibrate reconstruction; point budget eight and BSGS200000 fixed.
+
+### Decisions made
+Every rejection/uncertified field retained; no targets, speed selection or grid extension. Absolute/group certificates still separate; no old binomial Frobenius identity. Compile/freeze/push before once-only600srun; independent modular replay afterwards.
+
+### Open threads
+Execute search and classify coverage; broad10xobjectiveopen.
+
+### Errors
+Pre-freeze review caught that small calibration intervals need not have a unique multiple even with known N; corrected calibration to check containment/formula and explicit positive/negative uniqueness controls rather than assert a false uniqueness premise. No scientific run or retry yet.
+
+## Strong order-four models found in all three fields
+
+### What was done
+Atc0232d3289dsearch exits0,all3fixedfieldsselected: p101/code50 N96713378 ell48356689; p149/code1 N464841698 ell232420849; p197/code52 N1419828866 ell709914433. Allcofactors2, producerabsolute/actioncertificatespass, originalgrouporbits23/35/46. Allrawhashesverify; no targets.
+
+### Decisions made
+Retainallgridrejections; no runtime/performance-basedselection. Independentorder/modularreplaymustprecederelianceonthesestrongcertificates. LargeellalsoexceedsanyproperFp-factorHassebound, givinganadditionalFp-simplicity/orderproofrouteforthereplayer; documentseparatelywithoutmutatingfrozenproducerprotocol.
+
+### Open threads
+Replay certificates independently, then implement and compare actual C4 solvers under public-order metadata contract. Broad10xgoalopen.
+
+### Errors
+No runtime failures/retries; no fourth-extension enumeration for new fields. Calibration uniqueness premise was corrected before freeze, not after execution.
+
+## Strong C4 modular replay retained under Git custody
+
+### What was done
+Checked clean Git state and open PR4507 at4acb3b29fcc. Froze standalone determinant/interpolation verifier ataf4e654edd2 and pushed before once-only execution. Exit0;381positivewitnesses,zero unresolved,three models each covering127exponents; matrix controls passed. Retained input/binary/output hashes and execution checkpoint. Local implementation replay observations only. [pcc:unverified]
+
+### Decisions made
+Git checkpoints replace unavailable S3 custody as explicitly directed by the user. No S3 retry, producer rerun, model replacement or measurement. Reuse existing Howe-Zhu finite-certificate rationale and independent modular arithmetic, with no new priority claim.
+
+### Open threads
+Independent exact point-order/interval/source replay remains pending before strong-model admission. Then actual C4 solver comparison under public exact-order metadata. PR remains for review; no merge authorized.
+
+### Errors
+None in this replay. Toolchain uses Homebrew rustc1.93.1; no cross-toolchain timing claims.
