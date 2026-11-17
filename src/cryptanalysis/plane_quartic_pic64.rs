@@ -402,7 +402,7 @@ pub fn is_odd_prime_below_2_62(q: u64) -> bool {
         sh += 1;
     }
     'base: for a in [2u64, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
-        if a % q == 0 {
+        if a.is_multiple_of(q) {
             continue;
         }
         let mut x = pw(a, d);
