@@ -311,3 +311,17 @@ Qualifytheobstructionandnormalizationpositivecontrols; thenevaluatecheapnormaliz
 
 ### Errors
 T7003retrybudgetexhausted; originaltaskworkwasmergedPR4480, markedthatoldtaskdoneandclaimednewT7008forspecificrankwork. No codeeditedduringunclaimedinterval. CLI done-jsonflagunsupported, retriedvalidcommand; no scientificretry.
+
+## Singleanchor rank gate passes, normalization controls verified
+
+### What was done
+At pushed26ab287b9a6 all892isolatedprefixrankequalities/nativeNonechecks pass; original18cumulativerecoveriesand31008bucketchecks pass/EXIT0. Publicsourcefullysmooth6/6g2,0/6g3,0/6g4. Validpublicsourceequationgives137source-verifieddetermining-prefixevents, notdistinctsolvecount. Rawhashesverify.
+
+### Decisions made
+Scalingobstructionqualifiedonallnonzeroanchorrows. Publicnormalizationisvalidavailableinformationg2; anynextcomparisonmustprovideitANDchargecostequallyPencil/Folded/Expanded. No g3/g4normalizationroute/performanceinferencefromthesecontrols.
+
+### Open threads
+Implementequalpublicsource-normalizedsolvers, qualifyfirstprefix/scalar/completecountcost; strongercrossgenusmechanismstillneeded. Broadgoalopen.
+
+### Errors
+No scientificfailures/retries; priortimingunqualifiedunchanged. Elementarylemma isnotnewpriorityclaim.
