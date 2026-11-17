@@ -17,6 +17,8 @@ mod principal_relation;
 mod quadratic_pair_graph;
 #[path = "../src/cryptanalysis/jv_quadratic_pair_relation.rs"]
 mod quadratic_pair_relation;
+#[path = "../src/cryptanalysis/jv_quartic_discriminant.rs"]
+mod quartic_discriminant;
 #[path = "../src/cryptanalysis/jv_sparse_collection_rank.rs"]
 mod sparse_collection_rank;
 #[allow(dead_code)]
@@ -37,7 +39,10 @@ use crypto_lib::cryptanalysis::{
     },
     residual_walk::is_prime_u64,
 };
-use extension_quadratic_pair_dlp::{run_extension_quadratic_pair_dlp_on, QuadraticPairDlpOptions};
+use extension_quadratic_pair_dlp::{
+    run_extension_discriminant_pair_dlp_on, run_extension_quadratic_pair_dlp_on,
+    DiscriminantPairDlpOptions, QuadraticPairDlpOptions,
+};
 use extension_sparse_dlp::{
     run_extension_sparse_dlp_on, run_extension_sparse_table_dlp_on, ExtensionSparseDlpOptions,
 };
@@ -61,6 +66,9 @@ struct Args {
     generate: bool,
     #[arg(long)]
     root_table: bool,
+    /// Explicit separately registered pair history cap; unused methods reject it.
+    #[arg(long)]
+    pair_split_cap: Option<usize>,
     /// Mathematical replay of retained norms only; starts no DLP worker.
     #[arg(long)]
     replay_norms: Option<PathBuf>,
@@ -174,6 +182,10 @@ fn worker(curve: &PublicCurve, args: &Args, method: &str) -> Result<Value, Strin
     if args.root_table && method != "extension-sparse-remainders" {
         return Err("table roots require the quadratic sparse method".into());
     }
+    if args.pair_split_cap.is_some() && !["quadratic-pairs", "discriminant-pairs"].contains(&method)
+    {
+        return Err("pair split cap requires a quadratic-pair method".into());
+    }
     if matches!(
         method,
         "extension-full-smooth"
@@ -181,6 +193,7 @@ fn worker(curve: &PublicCurve, args: &Args, method: &str) -> Result<Value, Strin
             | "extension-sparse-full"
             | "extension-sparse-remainders"
             | "quadratic-pairs"
+            | "discriminant-pairs"
     ) && args.small_percent != 100
     {
         return Err(
@@ -238,8 +251,12 @@ fn worker(curve: &PublicCurve, args: &Args, method: &str) -> Result<Value, Strin
                 run_extension_remainder_dlp_on(&spec,args.seed,options)?
             },
             "quadratic-pairs"=>{
-                let options=QuadraticPairDlpOptions{b_count:args.b_count,max_descent_residuals:args.max_descent_residuals,max_accepted_descents:args.max_accepted_descents,..Default::default()};
+                let options=QuadraticPairDlpOptions{b_count:args.b_count,max_descent_residuals:args.max_descent_residuals,max_accepted_descents:args.max_accepted_descents,max_split_records:args.pair_split_cap.unwrap_or(262_144),..Default::default()};
                 run_extension_quadratic_pair_dlp_on(&spec,args.seed,options)?
+            }
+            "discriminant-pairs"=>{
+                let collection=QuadraticPairDlpOptions{b_count:args.b_count,max_descent_residuals:args.max_descent_residuals,max_accepted_descents:args.max_accepted_descents,max_split_records:args.pair_split_cap.unwrap_or(262_144),..Default::default()};
+                run_extension_discriminant_pair_dlp_on(&spec,args.seed,DiscriminantPairDlpOptions{collection,..Default::default()})?
             }
             "extension-sparse-full"|"extension-sparse-remainders"=>{
                 let options=ExtensionSparseDlpOptions{quadratic_remainders:method=="extension-sparse-remainders",b_count:args.b_count,max_descent_residuals:args.max_descent_residuals,max_accepted_descents:args.max_accepted_descents,..Default::default()};
@@ -456,6 +473,7 @@ mod tests {
         let mut args = Args {
             generate: false,
             root_table: false,
+            pair_split_cap: None,
             replay_norms: None,
             p: None,
             seed: 331,

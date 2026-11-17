@@ -1,6 +1,7 @@
 //! Grounded two-quadratic graph IC with bounded splitting and sparse rank checks.
 use super::homogeneous_quotient::{ExtraCounts, Quotient};
 use super::quadratic_pair_relation::{self as pair, Certificate, SplitOptions, SplitReport};
+use super::quartic_discriminant as discriminant;
 use super::sparse_collection_rank::{Options as RankOptions, Tracker};
 use super::{principal_relation as remainder, quadratic_pair_graph as graph_core};
 use crate::cryptanalysis::{
@@ -49,6 +50,11 @@ pub struct SplitRecord {
     pub s: u64,
     pub tail: Vec<u64>,
     pub report: SplitReport,
+}
+#[derive(Clone, Serialize, Deserialize)]
+pub struct ScreenRefusal {
+    pub candidate_index: u64,
+    pub assessment: discriminant::Screen,
 }
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct Projection {
@@ -205,6 +211,11 @@ pub struct Extraction<'a> {
     pub rng: &'a mut StdRng,
     pub trace: Option<(Vec<u64>, SplitReport)>,
 }
+struct Screening<'context, 'ring> {
+    context: &'context discriminant::Context<'ring>,
+    refusal: Option<discriminant::Screen>,
+    performed: bool,
+}
 pub fn candidate(
     ctx: &Ctx,
     ring: &FpRing,
@@ -213,7 +224,22 @@ pub fn candidate(
     s: u64,
     extraction: &mut Extraction<'_>,
 ) -> Result<(Certificate, Vec<graph_core::LargeTerm>), &'static str> {
+    candidate_with_screen(ctx, ring, config, line, s, extraction, None)
+}
+fn candidate_with_screen(
+    ctx: &Ctx,
+    ring: &FpRing,
+    config: &TwoLargePrimeSieve,
+    line: &Line,
+    s: u64,
+    extraction: &mut Extraction<'_>,
+    mut screening: Option<&mut Screening<'_, '_>>,
+) -> Result<(Certificate, Vec<graph_core::LargeTerm>), &'static str> {
     extraction.trace = None;
+    if let Some(state) = screening.as_deref_mut() {
+        state.refusal = None;
+        state.performed = false;
+    }
     let f = &ctx.f.f;
     if s == 0 || s >= f.p {
         return Err("zero/out-of-range sieve parameter");
@@ -280,6 +306,14 @@ pub fn candidate(
         1 => vec![],
         3 => vec![ring.monic(&tail)],
         5 => {
+            if let Some(state) = screening {
+                state.performed = true;
+                let assessment = state.context.screen(&tail)?;
+                if assessment.rejects() {
+                    state.refusal = Some(assessment);
+                    return Err("quartic discriminant necessary condition");
+                }
+            }
             let report = pair::split_quartic(ring, &tail, extraction.options, extraction.rng)?;
             let factors = report.factors.clone();
             extraction.trace = Some((tail, report));
@@ -332,6 +366,19 @@ impl Default for QuadraticPairDlpOptions {
         }
     }
 }
+#[derive(Clone, Copy, Debug, Serialize)]
+pub struct DiscriminantPairDlpOptions {
+    pub collection: QuadraticPairDlpOptions,
+    pub max_screen_refusals: usize,
+}
+impl Default for DiscriminantPairDlpOptions {
+    fn default() -> Self {
+        Self {
+            collection: QuadraticPairDlpOptions::default(),
+            max_screen_refusals: 1_000_000,
+        }
+    }
+}
 fn charge_extra(before: &ExtraCounts, after: &ExtraCounts, l: u64) {
     work::hook_muls(l, after.products - before.products);
     work::hook_adds(l, after.additions - before.additions);
@@ -343,6 +390,31 @@ pub fn run_extension_quadratic_pair_dlp_on(
     spec: &Spec,
     seed: u64,
     options: QuadraticPairDlpOptions,
+) -> Result<(Value, Option<u64>), String> {
+    run_quadratic_pair(spec, seed, options, None)
+}
+/// Necessary scalar discriminant screening precedes the unchanged bounded
+/// splitter. The original entrypoint keeps its unscreened wire schema/path.
+pub fn run_extension_discriminant_pair_dlp_on(
+    spec: &Spec,
+    seed: u64,
+    options: DiscriminantPairDlpOptions,
+) -> Result<(Value, Option<u64>), String> {
+    if !(1..=1_000_000).contains(&options.max_screen_refusals) {
+        return Err("bounded discriminant refusal history required".into());
+    }
+    run_quadratic_pair(
+        spec,
+        seed,
+        options.collection,
+        Some(options.max_screen_refusals),
+    )
+}
+fn run_quadratic_pair(
+    spec: &Spec,
+    seed: u64,
+    options: QuadraticPairDlpOptions,
+    max_screen_refusals: Option<usize>,
 ) -> Result<(Value, Option<u64>), String> {
     options.sparse_rank.validate()?;
     let mut graph = graph_core::Graph::new(options.graph)?;
@@ -358,7 +430,11 @@ pub fn run_extension_quadratic_pair_dlp_on(
     {
         return Err("invalid extension-remainder DLP bounds".into());
     }
-    let mode = "grounded-quadratic-pairs";
+    let mode = if max_screen_refusals.is_some() {
+        "discriminant-quadratic-pairs"
+    } else {
+        "grounded-quadratic-pairs"
+    };
     let collection_before = work::snapshot();
     let uniform_before = work::uniform_snapshot();
     let other_before = work::snapshot_other();
@@ -373,6 +449,9 @@ pub fn run_extension_quadratic_pair_dlp_on(
     drop(base_phase);
     let relation_phase = work::enter(Phase::Relations);
     let ring = FpRing::new(spec.p);
+    let screen_context = max_screen_refusals
+        .map(|_| discriminant::Context::new(&ring))
+        .transpose()?;
     let mut ctr = Counters::new(spec.p);
     let mut enum_rng = StdRng::seed_from_u64(seed ^ 0xA17E_2E17);
     let mut split_rng = StdRng::seed_from_u64(seed ^ 0x5155_4144_5041_4952);
@@ -389,6 +468,8 @@ pub fn run_extension_quadratic_pair_dlp_on(
     let mut counts = Counts::default();
     let mut seen = BTreeSet::new();
     let mut splits = Vec::new();
+    let mut screen_refusals = Vec::new();
+    let mut screen_calls = 0u64;
     let mut rank = Tracker::new(
         spec.l,
         base.len(),
@@ -435,13 +516,44 @@ pub fn run_extension_quadratic_pair_dlp_on(
                         counts.b_count = begin + offset as u64;
                         break 'collect;
                     }
+                    if max_screen_refusals.is_some_and(|cap| screen_refusals.len() >= cap) {
+                        stop = "discriminant refusal resource cap".into();
+                        counts.b_count = begin + offset as u64;
+                        break 'collect;
+                    }
                     let mut extraction = Extraction {
                         options: options.split,
                         rng: &mut split_rng,
                         trace: None,
                     };
-                    let certificate =
-                        candidate(&ctx, &ring, &config, &line, s, &mut extraction).ok();
+                    let mut screening = screen_context.as_ref().map(|context| Screening {
+                        context,
+                        refusal: None,
+                        performed: false,
+                    });
+                    let certificate = if let Some(state) = screening.as_mut() {
+                        candidate_with_screen(
+                            &ctx,
+                            &ring,
+                            &config,
+                            &line,
+                            s,
+                            &mut extraction,
+                            Some(state),
+                        )
+                        .ok()
+                    } else {
+                        candidate(&ctx, &ring, &config, &line, s, &mut extraction).ok()
+                    };
+                    if let Some(state) = screening {
+                        screen_calls += u64::from(state.performed);
+                        if let Some(assessment) = state.refusal {
+                            screen_refusals.push(ScreenRefusal {
+                                candidate_index: counts.candidates,
+                                assessment,
+                            });
+                        }
+                    }
                     if let Some((tail, report)) = extraction.trace {
                         splits.push(SplitRecord {
                             candidate_index: counts.candidates,
@@ -646,12 +758,15 @@ pub fn run_extension_quadratic_pair_dlp_on(
             advances += 1;
         }
     }
-    let collection = json!({"schema":"cover.quadratic-pair.collection/v1","mode":mode,"seed":seed,"p":spec.p,"l":spec.l,
+    let mut collection = json!({"schema":if max_screen_refusals.is_some(){"cover.discriminant-pair.collection/v1"}else{"cover.quadratic-pair.collection/v1"},"mode":mode,"seed":seed,"p":spec.p,"l":spec.l,
         "base":points(&base),"h":remainder::encode(&ctx.cov.hx),"sources":sources,"projections":projections,"checkpoints":checkpoints,"counts":counts,"rank_target":rank_target,"stop":stop,"work_native":collection_native,
         "rank_checks":rank.checkpoints,"rank_options":options.sparse_rank,"rank_semantics":"certified lower bound; zero before success; no incremental RREF products",
         "graph_stats":graph.stats(),"graph_options":options.graph,"split_options":options.split,"max_split_records":options.max_split_records,
         "splits":splits,"split_seed_xor":0x5155_4144_5041_4952u64,"root_finder":"forward-differences","sieve_selection":"counter-table-five-ascending"});
-    let report = json!({"schema":"cover.quadratic-pair.dlp/v1","p":spec.p,"l":spec.l,"seed":seed,"options":options,
+    if let Some(cap) = max_screen_refusals {
+        collection["discriminant_screen"] = json!({"method":"euclidean-discriminant-character","max_refusals":cap,"calls":screen_calls,"refusals":screen_refusals});
+    }
+    let report = json!({"schema":if max_screen_refusals.is_some(){"cover.discriminant-pair.dlp/v1"}else{"cover.quadratic-pair.dlp/v1"},"p":spec.p,"l":spec.l,"seed":seed,"options":options,
         "collection":collection,"collection_rank_ready":ready,"initial_basis":initial_basis,"final_extra_counts":basis.as_ref().map(|q|&q.counts),
         "descents":descents,"affine_rows":affine_rows,"projected_rows":projected_rows,"descent_residuals":residuals,"descent_stream_advances":advances,
         "descent_timeouts":timeouts,"descent_incomplete":incomplete,"invalid_descents":invalid,"last_rank":affine.rank(),"solver_modular_muls":affine.ops(),
@@ -736,6 +851,21 @@ mod tests {
             },
         ] {
             assert!(run_extension_quadratic_pair_dlp_on(&spec, 389, options).is_err());
+        }
+    }
+    #[test]
+    fn invalid_screen_history_caps_refused_before_collection() {
+        let spec = cover::generate_spec(101, 17);
+        for max_screen_refusals in [0, 1_000_001] {
+            assert!(run_extension_discriminant_pair_dlp_on(
+                &spec,
+                389,
+                DiscriminantPairDlpOptions {
+                    max_screen_refusals,
+                    ..Default::default()
+                }
+            )
+            .is_err());
         }
     }
 }

@@ -48,10 +48,14 @@ pub mod quadratic_pair_graph;
 #[path = "jv_quadratic_pair_relation.rs"]
 pub mod quadratic_pair_relation;
 
+#[path = "jv_quartic_discriminant.rs"]
+pub mod quartic_discriminant;
+
 #[path = "jv_extension_quadratic_pair_dlp.rs"]
 mod extension_quadratic_pair_dlp;
 pub use extension_quadratic_pair_dlp::{
-    run_extension_quadratic_pair_dlp_on, QuadraticPairDlpOptions,
+    run_extension_discriminant_pair_dlp_on, run_extension_quadratic_pair_dlp_on,
+    DiscriminantPairDlpOptions, QuadraticPairDlpOptions,
 };
 
 #[path = "jv_homogeneous_quotient.rs"]

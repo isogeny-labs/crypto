@@ -88201,3 +88201,21 @@ Dominant174609irreducible-quartic refusals vs4repeated, so repeated-root-onlyfil
 is not pursued. Proposed scalar resultant/discriminant character must preserve
 successful2quad/admission/RNG/witness/rank/affine math and get separate Runpod
 source/protocol; no new screen implementation/measurement yet. Goal ACTIVE.
+
+## Discriminant49source/report freeze pending
+
+37worker/149qualifier serialized controls, strict scoped Clippy/optimized builds and
+four-arm transport pass. Native source PDF44924B/SVG513988B/150dpiPNG46277B viewed.
+PCC3c2fcf/06f517 plus source/report claim UNVERIFIED. New public screened entrypoint,
+old unscreened API/schema preserved. Independent early Sylvester/candidate/RNG/
+source/graph/rank/full-affine qualifier and exact matched pair geometry controls.
+Protocol Amendment44/discriminant-pair-plan.json: original/table/unscreened/screened,
+p1009seed389exposed public point; both pair trace caps524288, early-screen cap1m.
+7200second4CPU8GiB≤0.40USDh, fixture60/worker900/wrapper4000/qualifier1800,
+≥6400seconds remain+live actual detached guardian before sole dispatch.
+Native worker dfc769589e4015f3df90c4f5af7d99f6c0093da39bf5558ff81a8bbba5dfca62;
+checker2e9dd7b356051fbf5d3a072f7828c8555ca5d66e2855db5b4fabb491c9968960.
+All49files currently uncommitted; source100for48intentionally changes only declared
+successor shared producer/export/worker paths. Never rewrite frozen48proof subjects.
+Next source49manifest/private/diff/ledger/PRpublish then Runpod49. No49pod/call yet;
+all owned through48deleted. GoalACTIVE, primarycomplete/fresh/signed parity unadmitted.
