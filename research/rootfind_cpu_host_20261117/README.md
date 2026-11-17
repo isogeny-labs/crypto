@@ -95,3 +95,70 @@ cargo test --release --lib
 Then compare the full `rf64_decompose` operation on equal public target
 streams, preserving `backend=emulate`, lookup type, chunk and thread count,
 and retain the change only if correctness and throughput both hold.
+
+## Follow-up: P-256 host root-finding arithmetic (same date)
+
+This follow-up uses **P-256 only**, independently of the Fp64 improvements.
+`gpu/rootfind/fp256x64.cuh` now uses a public, fixed radix-16 exponent
+on the **host** and removes the same three batch identity multiplications.
+The original device exponentiation is preserved until actual GPU counters
+and occupancy can be measured. The P-256 exponent `p-2` has 64 hex digits:
+31 zeros, 31 F's, one 1 and one D. The chain precomputes
+`a^3, a^12, a^13, a^15` with 3 squarings and 3 multiplies; the loop
+performs 252 squarings and 32 multiplies, totaling **255 squarings
+and 35 multiplies** instead of **256 squarings and 128 multiplies**.
+The batch algorithm now needs `3(n-1)` products rather than `3n`.
+It is an ordinary addition-chain/comb optimization, not a new algorithm.
+
+A local, isolated C++17 reproduction of the existing P-256 limb multiply,
+the original exponentiation, and the new radix-16 code was built with
+`g++ -O2 -std=c++17` and pinned to CPU 0 of an AMD EPYC 9V74 VM.
+The corpus contains 8,192 deterministic public inputs, including Montgomery
+one. The before/after outputs were bitwise identical for every inversion;
+the result multiplied by the input is Montgomery one, and all results in
+batches 0/1/2/4/16/32/64 agreed (n=0 changes to an explicit no-op).
+The benchmark ran nine repeats per arm and used the median per arm.
+Across three separately launched pinned processes:
+
+| Experiment | Old ns/op across runs | New ns/op across runs | Per-run speedup |
+|---|---|---|---|
+| P-256 inverse | 27,295 / 28,328 / 25,481 | 20,716 / 20,199 / 20,389 | 1.318 / 1.403 / 1.250× |
+| P-256 batch of 32 | 34,515 / 34,788 / 32,131 | 28,412 / 27,959 / 24,507 | 1.215 / 1.244 / 1.311× |
+
+The median speedups were **1.318× per host P-256 inverse** and **1.244×
+per 32-element host batch** over these three runs; timings show appreciable
+run-to-run variance. A 128-input sanitizer reproduction passed with
+`-fsanitize=undefined -fno-sanitize-recover=all`; that run's timings are
+not performance evidence. The branch also adds the actual header-based
+`gpu/rootfind/bench_host_inv256.cpp` comparison target and P-256 independent
+bitwise inversion checks in `test_cpu.cpp`.
+
+**Not yet verified:** local git clone/DNS access is unavailable, so the
+measurements above are from a faithful, stand-alone reproduction, *not*
+the actual checked-out `fp256x64.cuh` or an end-to-end rootfinder.
+The repository test and benchmark targets have been added but not run on
+the repository checkout. Direct `perf_event_open` with valid hardware
+cycle-counter attributes returned **EACCES (permission denied)** and the
+`perf` executable is absent. Thus neither the Fp64 nor P-256 results are
+`perf` PMU observations. The two changes are host-only and do not establish
+GPU speedups or full IC-pipeline improvements.
+
+Next gate:
+```sh
+make -C gpu/rootfind test
+make -C gpu/rootfind bench-host-inv
+make -C gpu/rootfind bench-host-inv256
+perf stat -r 5 -e cycles,instructions,branches,branch-misses,cache-misses \\
+  -- gpu/rootfind/bench_host_inv256
+```
+Use a PMU-accessible host with the checked-out PR, compare the same
+input stream, and follow with the fixed-target complete `rf256_decompose`
+call. Keep the PR draft until that validation passes.
+
+### Scope / repository hygiene
+The follow-up also restored `docs/session-logs/2026-11-17.md`
+to its exact base Git blob (SHA-1
+`3573026a2c8b768a75bfaa718d67c0c7e69df37f`), correcting an
+unrelated, accidental deletion of approximately 1.71 million lines
+that had leaked into this PR. All rootfinder measurement detail lives
+in this scoped report instead.
