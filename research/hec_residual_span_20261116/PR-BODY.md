@@ -86,3 +86,7 @@ Freeze `83151284040` qualifies native Smith class transport for both original fi
 ### Actual quartic IC solves on original public targets
 
 Freeze `f749102e1c5` executes four genuine quartic IC solves through the constructed/transported models. Both models yield209verified split-line relations; each solve needs two target equations after7/35/16/17walk steps. Returned scalars83209/44792pass final verification on the original H. Labels occur only in the driver, not solver inputs. Raw relations/structured answers: `native-smith-quartic-ic/CONTROL.txt` and `SOLVES.json`. This completes the fixed-input native correctness chain for the known Smith route; exhaustive q²line setup is costly, accounting remains incomplete, and no speedup or novelty is claimed. Full10xgenus2+goal remains open.
+
+### Rank-stopped secant collection
+
+Freeze `cc9f3a0f902` qualifies a secant/quadratic collector:190/215distinct lines yield the exact same rank66relation space as3783exhaustive lines. All4original answers and walks are unchanged; target rows fall212→68. Fresh paired reference setup and full native phase deltas are retained. Rank work moves into setup, and omitted Pic helper counters make the optimized Pic-counter zero an incomplete-work figure, not zero arithmetic. See `native-smith-secants/RESULTS.md`, `COMPARISON.json`, and `COUNTER-GAP.md`. This is an engineering component result, not total10x evidence. Counter repair and complete matched accounting remain next.

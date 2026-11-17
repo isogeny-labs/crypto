@@ -3087,3 +3087,10 @@ What was done: compiled knownpairquarticfactor removal/quadratic residual/infini
 Decisions made: prospectiveengineeringcomponentcomparison,referencecontrolnewprotocolnotretry;noCPU/end-to-end10xclaim.Catalogabsentfromproducer.Gitfreeze precedes sole600CPUprocess.
 Open threads: executequalification,inspectbasefield/elltradeoffs andfullcostledger;originalIC/rhocomparison/othergenera/fullgoalremainopen.
 Errors: no compilefailure;unusedcopiedmodulewarnings.Noscientificexecutionyet.
+
+## Rank-stopped secants preserve solves with smaller setup relation space
+
+What was done: freezecc9f3a0f902 hashespass/exit0.212/242pairtrials,190/215distinctlines,88acceptedlinecertseach=>rank66/stored66. Allmatchfrozen209linecatalogandfullrank;freshpairedreferencecontrolsretained.4originalanswers/walksunchanged,rows212→68,targetLA25874/27001/26575/29138→803/699/984/981.
+Decisions made: ranksetupadds12915/13983ellmul+66inv;targetLAreductionnotfullgain. FoundPicuncountedstd_values/eval_f/normalize/pointenumeration=>newPiccounter0notzerowork. Fullvectors/countergapretained,not10x/noveltyclaim.
+Open threads: repaircountercoverage/calibratesamekeys/answers, complete construction/transport/hostledger and matchedstrongoriginalIC/rho comparison;othergenera/fullgoalactiveunachieved.
+Errors: no scientificfailure;unusedcopiedmodulewarnings.Gitcustody/noS3/no merge.
