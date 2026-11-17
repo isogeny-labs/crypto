@@ -2632,3 +2632,10 @@ What was done: freeze85f76e74bd3 hashes pass, sole correctness run exit0. All11i
 Decisions made: scope restored to initialfamilies, no automorphismassumption. Hasse uniqueellrestriction explicit. g3/g4smallbase increasestrials, retained; matrixsize/trialcounts not priced as speed. Knownclassical2LPbaseline/APIwork, not10xbreakthrough. Next separatelyfrozen completecost comparison includes Fast/Dense/Hybrid fullbase modes and matchedvalidation, diagnostics disabled.
 Open threads: completecost gate on same22fixtures; then fresh workload/baseline qualification and genuinely newfull10xmechanism. Goal active/unachieved.
 Errors: none in scientific run; all22control andcandidate outcomes retained, no retry/S3/cloud/merge. Shared native arithmetic independently unreviewed.
+
+## Original-family public2LPcompletecount comparison frozen
+
+What was done: compiled matchedvalidation extraction and2LP/Fast/Dense/Hybrid freshcalls on same22publicfixtures.176calls planned with alternatingorder/tworepeats; optimizedoracle equally, candidateaudit0, exact metadata replay andfull16vectors. Baselinevalidation identicalpaidqualifier, no catalogueplaceorder discovery.
+Decisions made: countspermodulus, allcontrol/regression/failure recordsretained; no weightedruntime/novelty/10xclaim. Same m/seeds/budget, no tuning. One600CPUprocess after Gitfreeze, independentqualification remainsseparate.
+Open threads: execute, inspect all176outcomes, comparestrongest controls beforeclaiminganycomponent/fullcostgain.
+Errors: pre-freeze metadata matching strengthened to exactfieldprefix; inherited unusedreportfields warning only. Ownscope check allows, attach existingreservation. No S3/cloud/merge.
