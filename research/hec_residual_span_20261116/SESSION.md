@@ -1151,3 +1151,17 @@ Adaptiveperanchorcores,otheranchorlaws,qualifiedtransport or independentrank/mat
 
 ### Errors
 Retainedoldfileslackedroot supports, so no incidenceinferredfromranktotals. ReleasedownexpiredgeometrictaskandclaimedT7051; no competingagentworktouched. No scientificfailure/retry,S3/cloud.
+
+## Adaptive incidence escape tested without producer rerun
+
+### What was done
+Frozen965d0513a49 postanalysis retains3264anchor/orbitblocks, deduplicatesrowcoverage and computesexactbestblockvisitdensity. Freechangingcores/anchor-skipping maxima5.184–6.340 across6workloads; fixedcoreexactmax3.063–3.597. No statisticalrootassumptions ornewdata. [pcc:unverified]
+
+### Decisions made
+Close10xacceptedrow-per-visit claim fromselectingexistinganchor/orbitblocks onthesecompletepanels,evenfreeoracle. ReferenceisALL16fullscanrowdensity,notcompletingruntime; independentrank,costs,newanchorlawsnotbounded. Fullgoalremainsactive.
+
+### Open threads
+Mustchangeanchorlaw,arithmeticsharing,qualifiedgeometry orweightedrank/matrixcost,notmerelypickbetterexistingcores. Noonstrongerconstructionyet.
+
+### Errors
+No failedanalysis/producerretry/S3/cloud. Olddataused onlyforitsdeclaredscope.
