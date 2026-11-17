@@ -15,13 +15,17 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [x] Freeze and audit #4556 exact-source public B8 RR9 result with native JSON receipt (automation, started 2026-11-17, branch research/prime31-barycentric-evidence-20261117, PR #4558)
+
+- [ ] Build TorsionGuard finite-primary-module soundness analyzer (Codex, started 2026-11-17, branch codex/torsionguard-core-20261117, PR #4554)
+
 - [ ] Publish Vieta Rust speed results and resolve official record/publication blockers (codex, started 2026-11-17, branch lane/vieta-speed-20261117, PR #4525)
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 
 <!-- One line per task, added as the task's first step with its draft PR:
 - [ ] <task> (<runtime>, started YYYY-MM-DD, branch <branch>, PR #<n>) -->
-- [ ] Run the lazy-orbit column sweep vs strong rho (research/ic_lead_chase_20261116/protocol.json): bind ecbench commit/binary, analysis script, queue freeze, isolab L2 run + perf-ipc w_cal (claude, started 2026-11-17, branch claude/admiring-gauss-vo7kxf, PR #4553)
+- [x] Gröbner solver shootout on GF(2^n) Semaev systems: local diagnostic, inherited-f4 vs msolve vs CMS (claude, started 2026-11-16, branch claude/fastest-grobner-base-algorithm-u74ipw, PR #4543; CI blocked by AWS/S3 and main breakages)
 - [x] Track every task first in docs/ACTIVE.md and a draft PR; roll /goal out to isogeny-labs repos (claude, started 2026-11-17, branch track-first-active, PR #4499)
 
 ## Blocked / questions for the owner

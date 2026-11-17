@@ -1686,3 +1686,59 @@ What was done: freeze098b55cbb19 single invocation exit0;480distinctimages, quar
 Decisions made: retainexplicitquartic/map and exactidentity; no automaticglobalbasepoint/degree25/Jacobianlift/twistclaim.
 Open threads: reconstructgenus2curve fromquartic then map/lift/targetqualification andcost.
 Errors: none, no rerun/S3/cloud.
+
+## Quotient curve recovery frozen
+
+What was done: usermerge PR4527 verified, newbranch research/hec-quotient-recovery-20261117 fromorigin/main. Compiled nodeconic/cubic recovery withsourcecontrol, exactconicparam, quinticsquarefreeness andq/q²pointcounts.
+Decisions made: primary Bruinetal Proposition4.1read; no conjectural recovery or arbitrarytwistsign; originaltargetunchanged. Assertions [pcc:unverified].
+Open threads: pushfreeze then single120CPU invocation; coordinateidentification andtargetlift remain.
+Errors: none in compile, no science yet. Existing ownT7093lease confirmed; connectorattach reports ownscopeconflict but initialcheckallow.
+
+## Quotient curve recovered with twist qualification
+
+What was done: freeze7eb6ff0b323 single invocation exit0, nonsingularconic/exactparameterization/squarefreequintic passes sourcecontrol andimage; candidatecoeff[209,127,378,47,539,495], scale7, counts681/360423, a1=79,a2=2731,N411491. Assertions [pcc:unverified].
+Decisions made: candidatecurve/countqualification, not automaticmaplift; explicit conicbranchpoint/directions retained forGLcoordinate reconstruction.
+Open threads: exactstandardKummer coordinateidentity then originaltargetlift and completecost.
+Errors: none, no rerun/S3/cloud.
+
+## Standard Kummer coordinate identity frozen
+
+What was done: compiled conicmatrix inversion, polar cubiclinear correction, explicit generalquinticKummer quartic, fullpolynomialidentity andGL4/transformedquintic output.
+Decisions made: no identification fromcounts alone; no pointfilter/fittedGL. All assertions [pcc:unverified]. Primary paper section2Eq2.2-2.4read.
+Open threads: pushfreeze then once-only invocation; targetMumfordlift remains.
+Errors: none in compile, no science yet; ownT7093lease confirmed.
+
+## Exact standard Kummer coordinate identity completed
+
+What was done: freeze0ef439d7d09 single invocation exit0; invertibleGL4, alpha25/lambda502, exactKstandard(GL*y)=368Fimage(y). Fourtransformedquintics retained. Assertions [pcc:unverified].
+Decisions made: recoveredcurve identified by fullquarticidentity beyondcounts; no globalJacobianlift/degreeproof claim.
+Open threads: explicitMumfordlift and originalrationalgroup compatibility then cost.
+Errors: none,no rerun/S3/cloud.
+
+## Full rational-group map/lift gate frozen
+
+What was done: compiled fixedstandardquintic map, generalquintic Mumfordlift, originalsource firstFBgenerator andcandidate lift; all411491scalarpositions nativewalk/map/validity/lift compatibility scheduled.
+Decisions made: includeall degree0/1/repeatedsupports andsignambiguity; no unknowntargetsolve/performance claim. Assertions [pcc:unverified].
+Open threads: pushfreeze then once-only120CPU invocation, cost/targettransport afterward.
+Errors: none in compile, no science yet.
+
+## Full original rational-group transport qualified
+
+What was done: freeze82eb6786e20 single invocation exit0;411491positions validity/nonzeromap/Kummercompatibility/lift pass; degreehist[1,680,410810],680repeatedsupports, bothwalks closeatN. D=(600,1;157),Dimage=(498,272,1;576,232). Assertions [pcc:unverified].
+Decisions made: finitegroupqualification, notunknownlogsolve/speed/globaldegreeproof; signambiguity retained.
+Open threads: sameoriginaltarget fullcost ICtransport withbestsourcecontrol.
+Errors: apply_patch reportwrite failed withresearchvolume29MiBfree; directRubywrite succeeded, no data/cache deleted. Rawrun intact. No scientificretry/S3/cloud.
+
+## Optimistic quotient backend cost screen frozen
+
+What was done: compiled countedtransport/lift/genericIC/originalverify onfourretainedp601targets, twoexactrepeats. Sourcecounts fromfrozenrootpipeline botharms separately.
+Decisions made: map/quotientderivationfree makescandidate LOWERBOUND notfullcoldcost; favorableoutcome cannotpromote beforemissingcosts. NativeFastoracle/Fastsolver/seed20260916/triallimit200000fixed. Assertions [pcc:unverified].
+Open threads: pushfreeze then once-only120CPU invocation; inspectnegativeadmission beforefullsetuppricing.
+Errors: none in compile; disk973MiBfree, scientificexecutionnotyet.
+
+## Optimistic quotient backend rejected
+
+What was done: freezee278e13933c once-onlyexit0;8calls/4originaltargets complete/exactrepeat/originalverify; freeconstruction candidatebase19.069-21.832x,ell43.792-72.403xsourcearm0; losesbothmoduliagainstarm1too. Rawphasevectors retained,summaryderived. Assertions [pcc:unverified].
+Decisions made: close THISgenericfullFBtransportbackend as10xcandidate, notallquotients/algorithms. UniformfullFBsmoothstate count231881/411491 identicalonboth endpoints is a deduction, notexecuted enumeration; no automaticyieldbenefit.
+Open threads: successor changedproducer/linearalgebra mechanism and completecostcase, originalgoalopen; independentverification/publicationartifacts remain.
+Errors: none,no rerun/S3/cloud.

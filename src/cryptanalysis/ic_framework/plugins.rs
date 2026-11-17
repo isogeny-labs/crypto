@@ -4871,6 +4871,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for SymmetrisedOracle<'_> {
             solving_degree: None,
             timed_out: !out.complete,
             extra,
+            ..Default::default()
         };
         self.totals
             .absorb_outcome(shape, Some(&cost), !out.complete, out.relation.is_some());
@@ -5202,6 +5203,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for ChainedXOracle<'_> {
             solving_degree: None,
             timed_out: exhausted,
             extra,
+            ..Default::default()
         };
         self.totals
             .absorb_outcome(&shape, Some(&cost), exhausted, relation.is_some());

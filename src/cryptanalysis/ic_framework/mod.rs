@@ -222,6 +222,24 @@ pub struct SolverReport {
     /// Mean solving degree over that bound: below one is structure the
     /// solver exploited.
     pub degree_over_bound: Option<f64>,
+    /// Sum of the per-call solving degrees over the run (the "total" solving
+    /// degree): `solving_degree_mean * calls_with_a_degree`.
+    pub solving_degree_sum: u64,
+    /// Measured degree-fall observables over the run (diagnostic, never
+    /// priced): the smallest working degree at which a fall occurred
+    /// (first fall), the largest (last fall), and the observed degree of
+    /// regularity of the system shape where the engine exposes its Hilbert
+    /// series.  Distinct from the advisory `forecaster` below.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first_fall_degree: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_fall_degree: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub degree_of_regularity_observed: Option<u32>,
+    /// The per-working-degree history of the richest solver call, for the
+    /// trace drawing.  Empty unless the engine recorded a trace.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub degree_trace: Vec<crate::cryptanalysis::ic_framework::stages::DegreeStep>,
     pub extra: std::collections::BTreeMap<String, u64>,
     /// The advisory degree-of-regularity forecaster over the run's solver
     /// calls, with the relation matrix's columns and rank set; the
@@ -906,6 +924,11 @@ fn run_pipeline_inner<G: CountedGroup>(
             solving_degree_max: t.solving_degree_max,
             semi_regular_degree: t.semi_regular_degree(),
             degree_over_bound: t.degree_over_bound(),
+            solving_degree_sum: t.solving_degree_sum,
+            first_fall_degree: t.first_fall_degree,
+            last_fall_degree: t.last_fall_degree,
+            degree_of_regularity_observed: t.degree_of_regularity_observed,
+            degree_trace: t.degree_trace.clone(),
             extra: t.extra.clone(),
             forecaster: t.forecaster.clone().map(|mut f| {
                 f.set_relation_state(fb.columns, outcome.rank as usize);
