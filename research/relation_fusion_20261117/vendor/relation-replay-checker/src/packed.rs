@@ -175,7 +175,7 @@ impl<const P: u64> Arithmetic<P> {
         Ok(f)
     }
 }
-fn verify<const P: u64>(input: Input, w: Witness) -> Result<Checked> {
+fn verify<const P: u64>(input: Input, w: Witness, dag: bool) -> Result<Checked> {
     let n = input.variables.len();
     if input.prime != P
         || !(3..=16).contains(&n)
@@ -204,8 +204,8 @@ fn verify<const P: u64>(input: Input, w: Witness) -> Result<Checked> {
         }
     }
     if originals.is_empty()
-        || w.version != 1
-        || w.definitions.len() > n
+        || w.version != if dag { 2 } else { 1 }
+        || w.definitions.len() > if dag { 512 } else { n }
         || w.basis.is_empty()
         || w.basis.len() > 256
     {
@@ -296,6 +296,14 @@ fn verify<const P: u64>(input: Input, w: Witness) -> Result<Checked> {
 }
 /// Full exact replay on either fixed prime. This is a GB receipt, not row-only.
 pub fn verify_json(input: &[u8], wire: &[u8]) -> Result<Checked> {
+    verify_wire(input, wire, false)
+}
+/// Explicit version2 API. Every one of at most512 acyclic nodes is checked;
+/// all prior polynomial/byte/cofactor/work budgets and full basis checks remain.
+pub fn verify_dag_json(input: &[u8], wire: &[u8]) -> Result<Checked> {
+    verify_wire(input, wire, true)
+}
+fn verify_wire(input: &[u8], wire: &[u8], dag: bool) -> Result<Checked> {
     if input.len() > 4 * 1024 * 1024 || wire.len() > 16 * 1024 * 1024 {
         return Err("packed input/wire byte cap".into());
     }
@@ -304,8 +312,8 @@ pub fn verify_json(input: &[u8], wire: &[u8]) -> Result<Checked> {
     let witness: Witness =
         serde_json::from_slice(wire).map_err(|e| format!("packed witness JSON:{e}"))?;
     match input.prime {
-        2147483647 => verify::<2147483647>(input, witness),
-        9007199254740881 => verify::<9007199254740881>(input, witness),
+        2147483647 => verify::<2147483647>(input, witness, dag),
+        9007199254740881 => verify::<9007199254740881>(input, witness, dag),
         _ => Err("packed unsupported prime".into()),
     }
 }
@@ -379,5 +387,30 @@ mod tests {
                 );
             }
         }
+    }
+    #[test]
+    fn explicit_dag_version_and_acyclic_node_budget() {
+        use serde_json::json;
+        let input = json!({"prime":2147483647,"variables":["x","y","z"],"polynomials":[[{"exponents":[1,0,0],"coefficient":1}]]});
+        let row = |i| json!({"polynomial":[{"exponents":[1,0,0],"coefficient":1}],"proof":[{"generator":i,"exponents":[0,0,0],"coefficient":1}]});
+        let mut wire = json!({"version":2,"definitions":[row(0),row(1)],"basis":[row(2)],"input_reductions":[[{"generator":0,"exponents":[0,0,0],"coefficient":1}]],"pair_reductions":[]});
+        let ib = serde_json::to_vec(&input).unwrap();
+        let check = |v: &serde_json::Value| verify_dag_json(&ib, &serde_json::to_vec(v).unwrap());
+        assert_eq!(check(&wire).unwrap().stats.definitions, 2);
+        assert!(verify_json(&ib, &serde_json::to_vec(&wire).unwrap()).is_err());
+        let original = wire.clone();
+        wire["definitions"][0]["proof"][0]["generator"] = json!(1);
+        assert!(check(&wire).is_err());
+        wire = original.clone();
+        wire["definitions"][1]["proof"][0]["generator"] = json!(2);
+        assert!(check(&wire).is_err());
+        wire = original.clone();
+        wire["definitions"] = json!(vec![row(0); 512]);
+        assert_eq!(check(&wire).unwrap().stats.definitions, 512);
+        wire["definitions"].as_array_mut().unwrap().push(row(0));
+        assert!(check(&wire).is_err());
+        wire = original;
+        wire["version"] = json!(1);
+        assert!(check(&wire).is_err());
     }
 }

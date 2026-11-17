@@ -1,5 +1,7 @@
 # Native auxiliary-curve root finding and incidence integration
 
+[Three subsequent recurrence-optimization runs](recurrence_20261117/README.md) include FLINT recurrence, shared preinverse and block-size tuning, a standalone CLI and full-root controls. These are separate local measurements; original evidence below is preserved.
+
 The [new local runtime report](measure_20261117/README.md) measures the
 acceleration extension: at B128,5.27× median paired gain for the new Bloom pair
 path and4.99× for composition versus same-generator Horner, with complete

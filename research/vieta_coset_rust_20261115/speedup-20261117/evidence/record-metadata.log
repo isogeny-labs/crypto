@@ -1,0 +1,10 @@
+18 raw file(s) recorded
+127 raw file(s) recorded
+benchrec: unknown unit 'calls'; one of S, bytes, count, cpu_s, cycles_per_op, fmul, gae, ipc, ir, ir_per_op, log2_gae, ns_per_gae, ops_per_s, percent, ratio, wall_s
+20261117T0709Z-vieta-speedup-cpu-profile registered 18 local files; no upload
+Traceback (most recent call last):
+  File "/workspace/crypto-vieta-speedup/research/vieta_coset_rust_20261115/speedup-20261117/record-metadata.py", line 31, in <module>
+    subprocess.run(['python3','tools/benchrec.py','metric',str(record),'--name','failed_calls','--value',str(s['failed']),'--unit','calls','--better','neutral','--note','Stored Rust summary; includes warmups; producer unverified.'],check=True)
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['python3', 'tools/benchrec.py', 'metric', 'benchmarks/records/20261117T0757Z-vieta-shared-field-selection.json', '--name', 'failed_calls', '--value', '0', '--unit', 'calls', '--better', 'neutral', '--note', 'Stored Rust summary; includes warmups; producer unverified.']' returned non-zero exit status 1.

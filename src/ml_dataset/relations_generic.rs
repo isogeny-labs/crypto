@@ -798,7 +798,7 @@ mod tests {
     use super::*;
     fn config(family: &str, n: u32, twist: bool, m: usize) -> CaseConfig {
         CaseConfig {
-                        channels: None,
+            channels: None,
             factor_base_policy: None,
             family: family.into(),
             n,
@@ -809,7 +809,7 @@ mod tests {
             key_index: 2,
             seed: 42,
             factor_base_size: 2,
-            factor_base_policy: None,
+
             degree_bound: 3,
             work_limit: 20_000,
             solver: "double-large-prime".into(),
@@ -1741,6 +1741,7 @@ mod trace_integration_tests {
             degree_bound: 3,
             work_limit: 20_000,
             solver: "double-large-prime".into(),
+            channels: None,
         }
     }
     fn case(cfg: &CaseConfig) -> CaseData {

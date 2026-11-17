@@ -7,6 +7,7 @@ use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use std::time::Instant;
 
 pub mod cheap;
+mod dag;
 pub mod projection;
 pub mod quotient;
 pub mod replay;
@@ -15,14 +16,14 @@ pub mod workload;
 // Only the explicit native-owned factory selects these mathematically identical
 // kernel variants. Legacy public paths start in mode zero on every thread.
 thread_local! {
-    static NATIVE_KERNELS: std::cell::Cell<u8> = const { std::cell::Cell::new(0) };
+    static NATIVE_KERNELS: std::cell::Cell<u16> = const { std::cell::Cell::new(0) };
 }
-fn native_kernel_bits() -> u8 {
+fn native_kernel_bits() -> u16 {
     NATIVE_KERNELS.with(|v| v.get())
 }
-fn with_native_kernel_bits<T>(bits: u8, work: impl FnOnce() -> T) -> T {
-    assert!(bits <= 127);
-    struct Restore(u8);
+fn with_native_kernel_bits<T>(bits: u16, work: impl FnOnce() -> T) -> T {
+    assert!(bits <= 127 || bits == 231 || bits == 487);
+    struct Restore(u16);
     impl Drop for Restore {
         fn drop(&mut self) {
             NATIVE_KERNELS.with(|v| v.set(self.0));

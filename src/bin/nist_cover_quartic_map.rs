@@ -220,10 +220,16 @@ fn run_wide(args: &[String]) -> ExitCode {
     let mut gamma_max = 400u64;
     let mut seed = 0x5eed_5656u64;
     let mut out = String::new();
+    let mut psi = false;
     let mut i = 0;
     while i < args.len() {
         let v = args.get(i + 1).cloned().unwrap_or_default();
         match args[i].as_str() {
+            "--psi" => {
+                psi = true;
+                i += 1;
+                continue;
+            }
             "--bits" => bits = v.parse().unwrap(),
             "--gamma-max" => gamma_max = v.parse().unwrap(),
             "--seed" => seed = v.parse().unwrap(),
@@ -345,6 +351,75 @@ fn run_wide(args: &[String]) -> ExitCode {
     };
     println!("smoothness certificate: {smooth} ({smooth_msg})");
 
+    // Amendment S56b: Psi into Pic^0(C) with the 64-bit Pic^0 arithmetic.
+    let (psi_ok, psi_rec) = if psi {
+        let t_psi = std::time::Instant::now();
+        match wide::Transfer64::new(&w, quartic, &hold_pts) {
+            Err(e) => {
+                println!("Psi: Transfer64 failed: {e}");
+                (false, json!({"status": "transfer64_failed", "reason": e}))
+            }
+            Ok(t64) => {
+                let pool = t64.sample_pool(48, &mut rng);
+                let mut rng_a = sp::SplitMix64(seed ^ 0xA11CE);
+                let mut rng_b = sp::SplitMix64(seed ^ 0xB0B);
+                let mut run = || -> Result<serde_json::Value, String> {
+                    let g1 = t64.transfer_divisor(&jac, &pg, &pool, &mut rng_a)?;
+                    let g2 = t64.transfer_divisor(&jac, &pg, &pool, &mut rng_b)?;
+                    let qq = t64.transfer_divisor(&jac, &pq, &pool, &mut rng_a)?;
+                    let rr = t64.transfer_divisor(&jac, &pr, &pool, &mut rng_a)?;
+                    let c = &t64.c;
+                    let well_defined = c.eq(&g1, &g2);
+                    let nonzero = !c.is_zero(&g1);
+                    let order_n = c.is_zero(&c.mul_scalar(&g1, n as u128));
+                    let log_carried = c.eq(&c.mul_scalar(&g1, k as u128), &qq);
+                    let additive = c.eq(&c.add(&g1, &qq), &rr);
+                    let wrong_k = c.eq(&c.mul_scalar(&g1, (k + 1) as u128), &qq);
+                    Ok(json!({
+                        "pool_points": pool.len(),
+                        "well_defined_two_representatives": well_defined,
+                        "image_nonzero": nonzero,
+                        "order_n_preserved": order_n,
+                        "planted_log_carried": log_carried,
+                        "additive": additive,
+                        "wrong_k_control_matches": wrong_k,
+                        "psi_G_key": g1.key().0.to_vec(),
+                        "psi_Q_key": qq.key().0.to_vec(),
+                    }))
+                };
+                match run() {
+                    Err(e) => {
+                        println!("Psi: transfer failed: {e}");
+                        (false, json!({"status": "transfer_failed", "reason": e}))
+                    }
+                    Ok(mut v) => {
+                        let b = |key: &str| v[key].as_bool().unwrap_or(false);
+                        let ok = b("well_defined_two_representatives")
+                            && b("image_nonzero")
+                            && b("order_n_preserved")
+                            && b("planted_log_carried")
+                            && b("additive")
+                            && !b("wrong_k_control_matches");
+                        println!(
+                            "Psi: well-defined {}; nonzero {}; [n]Psi(phi*G) = 0 {}; Psi(phi*Q) = [k]Psi(phi*G) {}; additive {}; wrong-k control matches (must be false) {} ({} pool points, {:.2} s)",
+                            b("well_defined_two_representatives"), b("image_nonzero"), b("order_n_preserved"),
+                            b("planted_log_carried"), b("additive"), b("wrong_k_control_matches"),
+                            pool.len(), t_psi.elapsed().as_secs_f64()
+                        );
+                        v["status"] = json!("ok");
+                        v["seconds"] = json!(t_psi.elapsed().as_secs_f64());
+                        (ok, v)
+                    }
+                }
+            }
+        }
+    } else {
+        (
+            true,
+            json!("not_run: pass --psi (amendment S56b, plane_quartic_pic64)"),
+        )
+    };
+
     let all_ok = e_cross
         && e_order_ok
         && pull_nonzero
@@ -354,7 +429,8 @@ fn run_wide(args: &[String]) -> ExitCode {
         && !pull_wrong_k
         && hold_on == hold_pts.len()
         && hold_on_bad == 0
-        && smooth;
+        && smooth
+        && psi_ok;
     let rec = json!({
         "bits": bits, "p": p, "two_pow_bits_minus_p": ((1u128 << bits) - p as u128) as u64,
         "a": "-3", "a_mod_p": a, "b": b, "n": n, "generator_G": [gx, gy],
@@ -371,7 +447,7 @@ fn run_wide(args: &[String]) -> ExitCode {
         "heldout_points": hold_pts.len(), "heldout_on_C": hold_on, "heldout_rational": hold_rational,
         "heldout_draws": hold_draws, "perturbed_C_control_on": hold_on_bad,
         "smooth_certified": smooth, "smooth_certificate": smooth_msg,
-        "psi_pic0_transfer": "not_run: plane_quartic_pic is u32 (p < 2^31); port required",
+        "psi_pic0_transfer": psi_rec,
         "wall_seconds": t0.elapsed().as_secs_f64(),
         "all_checks_ok": all_ok,
         "status": "ok"

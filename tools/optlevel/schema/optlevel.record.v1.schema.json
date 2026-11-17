@@ -1,0 +1,739 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "$id": "optlevel.record/v1",
+ "title": "Optimization-level record",
+ "description": "How close one implementation runs to the measured ceiling of its machine. Not a speed claim, benchmark row or leaderboard entry. Definitions: docs/OPTIMIZATION_LEVEL.md. Checked by tools/optlevel/score.py validate() (a draft-07 subset: type, required, properties, enum, const, items, minimum, maximum) plus enforce_tier().",
+ "type": "object",
+ "required": [
+  "schema",
+  "kind",
+  "tool_version",
+  "tier",
+  "device",
+  "kernel",
+  "host",
+  "calibration",
+  "achieved",
+  "intensity",
+  "roofline",
+  "attainment",
+  "parallel",
+  "diagnosis",
+  "algorithmic",
+  "noise_floor",
+  "grade",
+  "flags",
+  "not_a_speed_claim"
+ ],
+ "properties": {
+  "schema": {
+   "const": "optlevel.record/v1"
+  },
+  "kind": {
+   "const": "record"
+  },
+  "tool_version": {
+   "type": "string"
+  },
+  "created_utc": {
+   "type": [
+    "string",
+    "null"
+   ]
+  },
+  "label": {
+   "type": "string"
+  },
+  "tier": {
+   "enum": [
+    "T-pmu",
+    "T-timing",
+    "T-gpu-ncu",
+    "T-gpu-timing"
+   ]
+  },
+  "device": {
+   "enum": [
+    "cpu",
+    "gpu"
+   ]
+  },
+  "kernel": {
+   "type": "object",
+   "required": [
+    "op_class"
+   ],
+   "properties": {
+    "op_class": {
+     "type": "string"
+    },
+    "command": {
+     "type": [
+      "array",
+      "null"
+     ],
+     "items": {
+      "type": "string"
+     }
+    },
+    "ops_source": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "repository": {
+     "type": "string"
+    },
+    "path": {
+     "type": "string"
+    },
+    "registry_id": {
+     "type": "string"
+    },
+    "expectation": {
+     "type": "string"
+    }
+   }
+  },
+  "host": {
+   "type": "object",
+   "required": [
+    "fingerprint",
+    "cpu_model",
+    "logical_cpus"
+   ],
+   "properties": {
+    "fingerprint": {
+     "type": "string"
+    },
+    "cpu_model": {
+     "type": "string"
+    },
+    "logical_cpus": {
+     "type": "integer"
+    }
+   }
+  },
+  "calibration": {
+   "type": "object",
+   "required": [
+    "fingerprint"
+   ],
+   "properties": {
+    "fingerprint": {
+     "type": "string"
+    },
+    "created_utc": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "sha256": {
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   }
+  },
+  "achieved": {
+   "type": "object",
+   "description": "keys: single, threads_<k>",
+   "properties": {
+    "single": {
+     "type": "object",
+     "required": [
+      "ops_per_s"
+     ],
+     "properties": {
+      "ops_per_s": {
+       "type": "object",
+       "required": [
+        "median",
+        "min",
+        "max",
+        "n"
+       ],
+       "properties": {
+        "median": {
+         "type": "number"
+        },
+        "min": {
+         "type": "number"
+        },
+        "max": {
+         "type": "number"
+        },
+        "n": {
+         "type": "integer",
+         "minimum": 1
+        }
+       }
+      },
+      "ops": {
+       "type": [
+        "object",
+        "null"
+       ],
+       "required": [
+        "median",
+        "min",
+        "max",
+        "n"
+       ],
+       "properties": {
+        "median": {
+         "type": "number"
+        },
+        "min": {
+         "type": "number"
+        },
+        "max": {
+         "type": "number"
+        },
+        "n": {
+         "type": "integer",
+         "minimum": 1
+        }
+       }
+      },
+      "wall_s": {
+       "type": [
+        "object",
+        "null"
+       ],
+       "required": [
+        "median",
+        "min",
+        "max",
+        "n"
+       ],
+       "properties": {
+        "median": {
+         "type": "number"
+        },
+        "min": {
+         "type": "number"
+        },
+        "max": {
+         "type": "number"
+        },
+        "n": {
+         "type": "integer",
+         "minimum": 1
+        }
+       }
+      },
+      "threads": {
+       "type": "integer"
+      }
+     }
+    }
+   }
+  },
+  "intensity": {
+   "type": "object",
+   "required": [
+    "source",
+    "bytes_per_op",
+    "ops_per_byte"
+   ],
+   "properties": {
+    "source": {
+     "enum": [
+      "imc",
+      "llc-miss",
+      "declared",
+      "none"
+     ]
+    },
+    "bytes_per_op": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "ops_per_byte": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "working_set_bytes": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "in_cache": {
+     "type": "boolean"
+    },
+    "declared_bytes_per_op": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "measured_bytes_per_op": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "declared_over_measured": {
+     "type": [
+      "number",
+      "null"
+     ]
+    }
+   }
+  },
+  "roofline": {
+   "type": "object",
+   "properties": {
+    "single": {
+     "type": "object",
+     "required": [
+      "compute_roof_ops_per_s",
+      "memory_roof_ops_per_s",
+      "bound_ops_per_s",
+      "binding",
+      "threads",
+      "bandwidth_bytes_per_s"
+     ],
+     "properties": {
+      "compute_roof_ops_per_s": {
+       "type": "number",
+       "minimum": 0
+      },
+      "memory_roof_ops_per_s": {
+       "type": [
+        "number",
+        "null"
+       ]
+      },
+      "bound_ops_per_s": {
+       "type": "number",
+       "minimum": 0
+      },
+      "bound_low_ops_per_s": {
+       "type": "number"
+      },
+      "binding": {
+       "enum": [
+        "compute",
+        "memory",
+        "compute (traffic unknown)"
+       ]
+      },
+      "next_roof_ratio": {
+       "type": [
+        "number",
+        "null"
+       ]
+      },
+      "threads": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "bandwidth_bytes_per_s": {
+       "type": "number"
+      },
+      "ceiling_interpolated": {
+       "type": "boolean"
+      },
+      "ceiling_extrapolated": {
+       "type": "boolean"
+      }
+     }
+    },
+    "full": {
+     "type": "object",
+     "required": [
+      "compute_roof_ops_per_s",
+      "memory_roof_ops_per_s",
+      "bound_ops_per_s",
+      "binding",
+      "threads",
+      "bandwidth_bytes_per_s"
+     ],
+     "properties": {
+      "compute_roof_ops_per_s": {
+       "type": "number",
+       "minimum": 0
+      },
+      "memory_roof_ops_per_s": {
+       "type": [
+        "number",
+        "null"
+       ]
+      },
+      "bound_ops_per_s": {
+       "type": "number",
+       "minimum": 0
+      },
+      "bound_low_ops_per_s": {
+       "type": "number"
+      },
+      "binding": {
+       "enum": [
+        "compute",
+        "memory",
+        "compute (traffic unknown)"
+       ]
+      },
+      "next_roof_ratio": {
+       "type": [
+        "number",
+        "null"
+       ]
+      },
+      "threads": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "bandwidth_bytes_per_s": {
+       "type": "number"
+      },
+      "ceiling_interpolated": {
+       "type": "boolean"
+      },
+      "ceiling_extrapolated": {
+       "type": "boolean"
+      }
+     }
+    }
+   }
+  },
+  "attainment": {
+   "type": "object",
+   "properties": {
+    "single": {
+     "type": "object",
+     "required": [
+      "value",
+      "low",
+      "high"
+     ],
+     "properties": {
+      "value": {
+       "type": "number",
+       "minimum": 0
+      },
+      "low": {
+       "type": "number"
+      },
+      "high": {
+       "type": "number"
+      }
+     }
+    },
+    "full": {
+     "type": "object",
+     "required": [
+      "value",
+      "low",
+      "high"
+     ],
+     "properties": {
+      "value": {
+       "type": "number",
+       "minimum": 0
+      },
+      "low": {
+       "type": "number"
+      },
+      "high": {
+       "type": "number"
+      }
+     }
+    }
+   }
+  },
+  "parallel": {
+   "type": [
+    "object",
+    "null"
+   ],
+   "required": [
+    "threads",
+    "raw_efficiency",
+    "roofline_normalised_efficiency",
+    "machine_scaling",
+    "curve"
+   ],
+   "properties": {
+    "threads": {
+     "type": "integer",
+     "minimum": 2
+    },
+    "raw_efficiency": {
+     "type": "number"
+    },
+    "roofline_normalised_efficiency": {
+     "type": "number"
+    },
+    "machine_scaling": {
+     "type": "number"
+    },
+    "curve": {
+     "type": "array"
+    }
+   }
+  },
+  "diagnosis": {
+   "type": "object",
+   "required": [
+    "ipc",
+    "topdown",
+    "llc_misses_per_op",
+    "dtlb_misses_per_op",
+    "vector_share_static",
+    "scalar_ceiling_ratio",
+    "latency_attainment",
+    "gpu",
+    "unavailable"
+   ],
+   "properties": {
+    "ipc": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "cycles_per_op": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "instructions_per_op": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "branch_miss_rate": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "llc_misses_per_op": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "l1d_misses_per_op": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "dtlb_misses_per_op": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "topdown": {
+     "type": [
+      "object",
+      "null"
+     ]
+    },
+    "vector_share_sampled": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "vector_share_static": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "scalar_ceiling_ratio": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "simd_headroom": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "latency_attainment": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "startup_share": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "gpu": {
+     "type": [
+      "object",
+      "null"
+     ]
+    },
+    "unavailable": {
+     "type": "object"
+    }
+   }
+  },
+  "algorithmic": {
+   "type": "object",
+   "required": [
+    "counted_ops",
+    "best_known_ops",
+    "ratio"
+   ],
+   "properties": {
+    "counted_ops": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "best_known_ops": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "ratio": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "source": {
+     "type": "string"
+    },
+    "note": {
+     "type": "string"
+    }
+   }
+  },
+  "noise_floor": {
+   "type": [
+    "object",
+    "null"
+   ],
+   "required": [
+    "aa_ratio_deviation",
+    "rel_range",
+    "value",
+    "pairs",
+    "sufficient"
+   ],
+   "properties": {
+    "aa_ratio_deviation": {
+     "type": "number"
+    },
+    "rel_range": {
+     "type": "number"
+    },
+    "value": {
+     "type": "number",
+     "minimum": 0
+    },
+    "pairs": {
+     "type": "integer"
+    },
+    "sufficient": {
+     "type": "boolean"
+    },
+    "full_rel_range": {
+     "type": "number"
+    }
+   }
+  },
+  "conditions": {
+   "type": [
+    "object",
+    "null"
+   ]
+  },
+  "grade": {
+   "type": "object",
+   "required": [
+    "score",
+    "letter",
+    "letter_range",
+    "scope",
+    "rule",
+    "limiting_factor",
+    "limiting_basis",
+    "invalid"
+   ],
+   "properties": {
+    "score": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "letter": {
+     "enum": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      null
+     ]
+    },
+    "letter_range": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "scope": {
+     "enum": [
+      "single+parallel",
+      "single-thread only",
+      "parallel only",
+      "invalid"
+     ]
+    },
+    "rule": {
+     "type": "string"
+    },
+    "limiting_factor": {
+     "type": "string"
+    },
+    "limiting_basis": {
+     "type": "string"
+    },
+    "invalid": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "flags": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "not_a_speed_claim": {
+   "type": "string"
+  }
+ }
+}

@@ -945,7 +945,7 @@ mod tests {
     #[test]
     fn genuine_unknown_scalar_large_prime_cycle_replay() {
         let config = CaseConfig {
-                        channels: None,
+            channels: None,
             factor_base_policy: None,
             family: "koblitz".into(),
             n: 13,
@@ -956,7 +956,7 @@ mod tests {
             key_index: 2,
             seed: 42,
             factor_base_size: 2,
-            factor_base_policy: None,
+
             degree_bound: 3,
             work_limit: 20_000,
             solver: "double-large-prime".into(),
