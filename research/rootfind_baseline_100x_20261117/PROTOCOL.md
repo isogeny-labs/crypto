@@ -57,3 +57,15 @@ field operations per addition. A separate micro-kernel times `add`,
 
 The numbers feed `PLAN.md`: each proposed lever gets a predicted factor
 computed from these shares, and the cheapest test that would falsify it.
+
+## Amendment 1 (2026-11-17, after the first run, before any analysis)
+
+- The 40-bit prime cell cannot be built: `find_prime_order_curve` asserts
+  8 ≤ bits ≤ 32, and the run stopped there (`baseline.stderr`). The 24- and
+  32-bit rows written before the stop are kept as they are. The 40-bit cell
+  is replaced by a 28-bit cell, and the Koblitz cells, which the stop
+  prevented, run in a second invocation (`baseline-2.jsonl`).
+- The 24-bit curve is too small for A = 256 and A = 1024: most of its targets
+  decompose (`found` 185 and 256 of 256), so those rows time hits and early
+  exits, not refutations. They are reported but not used for per-addition
+  costs. The 32-bit rows (`found` 0, 1 and 96) are the reference.
