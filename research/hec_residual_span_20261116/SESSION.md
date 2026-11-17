@@ -3108,3 +3108,10 @@ What was done: freeze064ba08fc68 hashespass/exit0;exactprimitivevector/valuespas
 Decisions made: accountingrepairnotnovelty/10x;PicM/Iendpointcoveragefixed, notwholeCPU/attackledger. Native/ell vectorsdistinct;fullmodel/kernelconstructstillfrozenprovideddata.
 Open threads: completeconstruction/nativefield/ellledger and matchedoriginalHIC/rhocomparisonbeforemorequartictuning;othergenera/full10xgoalactiveunachieved/independentreviewopen.
 Errors: no scientificfailure;unusedcopiedmodulewarnings.Gitcustody/noS3/no merge.
+
+## Matched original IC and favorable quartic screen frozen
+
+What was done: compiled2coldreplaysperoriginalfixture ofqualifiednormalizedHIC withexactoldvector/reportchecks, independentHfinalverificationcharge;frozenPic/nativephasevectors transcribed raw and4componentprice-familyboundscomputedinRust.
+Decisions made: currentquarticsetup/onlineonly favorablelowerbounds;notwallCPU/asymptotic/isogenyimpossibilityclaim. Checkanticipatedsetup33/16bound,retainalloutcomes. Gitfreeze precedes sole600CPUprocess.
+Open threads: executematchedscreen; ifnegativeprioritizenewstructuralcostmechanismforgenus2+overgenericPicoptimizations;fullgoalactiveunachieved.
+Errors: unusedimport/helpercompilewarningsonly.Noscientificexecutionyet.
