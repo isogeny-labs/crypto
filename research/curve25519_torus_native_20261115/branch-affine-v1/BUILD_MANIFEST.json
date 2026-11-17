@@ -1,0 +1,424 @@
+{
+  "schema": "torus.branch-affine.build/v1",
+  "standing": "producer unsigned/unverified",
+  "prepared_before": "immutable native qualification",
+  "at": "2026-11-16T23:20:17.328948+00:00",
+  "base_commit": "efa830fc60e64eeddcad5d19454c0c9acf5c3931",
+  "purpose": "fixed native development controls; no performance/scaling campaign",
+  "source_inputs": 98,
+  "unchanged_previous_inputs": 64,
+  "new_inputs": 34,
+  "sources": {
+    "research/curve25519_torus_native_20261115/indexed-circuit-v1/native-v1/actual-augmented-system.json": {
+      "bytes": 625700,
+      "sha256": "d9183888aef32b669fcb694df9758b47fb723f97c1e9fd8865a74a23fd336c99"
+    },
+    "research/curve25519_torus_native_20261115/membership-circuit-v1/native-v1/controls.json": {
+      "bytes": 16516,
+      "sha256": "3c85f7f0d4aad564eac27e1c23a46e6d32466e7f0a7fecdb34e1972828528494"
+    },
+    "research/curve25519_torus_native_20261115/target-circuit-v2/native-v2/controls.json": {
+      "bytes": 24893,
+      "sha256": "13e45094bd346ace706fc1918c4f0278b0c0470959d2d2f6843f57c70f1e8370"
+    },
+    "research/curve25519_torus_native_20261115/target-circuit-v2/native-v2/six-member-system.json.gz": {
+      "bytes": 29428,
+      "sha256": "5b92bf1e7ef2b468175262d0a77e762386f83e364271a34f830624f1f9e87522"
+    },
+    "research/curve25519_torus_native_20261115/worklist-solver-v1/native-v1.tar.xz": {
+      "bytes": 10992,
+      "sha256": "a67942ca041409c948f6f9d345f34570b4ede31edb0889729dcaa266dad0d0b7"
+    },
+    "src/cryptanalysis/identity_certificate.rs": {
+      "bytes": 29523,
+      "sha256": "d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270"
+    },
+    "src/hash/sha256.rs": {
+      "bytes": 18239,
+      "sha256": "2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf"
+    },
+    "tools/torus-affine-closure/Cargo.lock": {
+      "bytes": 8297,
+      "sha256": "6bd613cdef5742cd1334ea98ae49e16ba31689b74fd7fc1de4f8843315045aca"
+    },
+    "tools/torus-affine-closure/Cargo.toml": {
+      "bytes": 565,
+      "sha256": "ffc142b56a258f5bbbec0bc8144877e4b946ea7810e924f3ee3cd021cc8732f2"
+    },
+    "tools/torus-affine-closure/fixtures/public-targets.json": {
+      "bytes": 900,
+      "sha256": "d52ca916ee48cd3610a081a3f9f8b9e48d20298a31cca69e8dd14dd09ed7d64e"
+    },
+    "tools/torus-affine-closure/src/check.rs": {
+      "bytes": 12537,
+      "sha256": "dda5a19dd9cd3ea9c122e52c305df8e625d442ff338ed43edfe2eb6f6d98ca99"
+    },
+    "tools/torus-affine-closure/src/controls.rs": {
+      "bytes": 20481,
+      "sha256": "0f5f91088585d02056b805e53355d337a7c1bfbd36e1d7c8516f27a833c035e4"
+    },
+    "tools/torus-affine-closure/src/lib.rs": {
+      "bytes": 15199,
+      "sha256": "ef27b767674f7e50eea3b907a0befffd6a4cf333ab84f9c3a34bcdd718c1be89"
+    },
+    "tools/torus-affine-closure/src/main.rs": {
+      "bytes": 2886,
+      "sha256": "2e96292766bb1206fca219336c2a928a54200418f953e3f9369199d20cbf1f71"
+    },
+    "tools/torus-coset-circuit/Cargo.lock": {
+      "bytes": 7598,
+      "sha256": "415fcf11fe54c2a636fbed893fc45cd05df7921eb4fec203afe59bb5c2d0a35c"
+    },
+    "tools/torus-coset-circuit/Cargo.toml": {
+      "bytes": 333,
+      "sha256": "d97162ca0ffc60c16508434b7718b8d296b790652cf8c244c205ba5042dc2f38"
+    },
+    "tools/torus-coset-circuit/src/aggregation.rs": {
+      "bytes": 9383,
+      "sha256": "a0731121480542519f895806d1ee3c707ab23bb77811e06f319573bda20b8017"
+    },
+    "tools/torus-coset-circuit/src/aggregation_controls.rs": {
+      "bytes": 13983,
+      "sha256": "c543f2ecae227279e6803bbd2083ec2a911beb26231d0b960d0a6e2063a03593"
+    },
+    "tools/torus-coset-circuit/src/bin/aggregation_control.rs": {
+      "bytes": 2639,
+      "sha256": "ae9319fda6fa742c47212ae495d373d49c5d426235599f7386d38560f5a805c7"
+    },
+    "tools/torus-coset-circuit/src/controls.rs": {
+      "bytes": 9623,
+      "sha256": "6e2466de570d8c09d837f0c87880f23864a6d2e8597840f9e9473f6aa1074aea"
+    },
+    "tools/torus-coset-circuit/src/index.rs": {
+      "bytes": 5278,
+      "sha256": "3ccfa86c2bb7e46db92aa517769e7f03667f3d1fa590b5b7be99f58caaa8bcea"
+    },
+    "tools/torus-coset-circuit/src/lib.rs": {
+      "bytes": 10381,
+      "sha256": "121f666ccd79ea7621c3217a5fade3d32dafe894e2c4111b01eb1bf4d0b3233e"
+    },
+    "tools/torus-coset-circuit/src/main.rs": {
+      "bytes": 2292,
+      "sha256": "90dd0c48fbff1c0b13090a30ba851045e397a87393ff55b720836934e885bb3b"
+    },
+    "tools/torus-energy/Cargo.lock": {
+      "bytes": 6563,
+      "sha256": "a9767c844c1c15f5496798111d9c16a550332517abb371b68feddad180b0c732"
+    },
+    "tools/torus-energy/Cargo.toml": {
+      "bytes": 354,
+      "sha256": "7f936056d3fc2f8b250a229a69fed3f2273b07b93eba1d7abc193ab492aab133"
+    },
+    "tools/torus-energy/examples/many_coset_audit.rs": {
+      "bytes": 6281,
+      "sha256": "767852fd0c49110298f7e2c69ff821e7e02f7bf796f31be55397a133b71bf278"
+    },
+    "tools/torus-energy/examples/moment_identity.rs": {
+      "bytes": 2529,
+      "sha256": "b01ad531aab8c89e20b02f326b23d8d54a0520ae590c128a8dc1f65f8128ac26"
+    },
+    "tools/torus-energy/examples/rankfree_control.rs": {
+      "bytes": 9345,
+      "sha256": "6e3f225f2ab3449d03ef4a5c18d13d7178b502d4099035ecc6e157b632d1ce0f"
+    },
+    "tools/torus-energy/examples/scaling_audit.rs": {
+      "bytes": 5524,
+      "sha256": "a2d1d29deda0080253ab3591e4d11360243718717b11860c4d5fa326fd5e7778"
+    },
+    "tools/torus-energy/src/lib.rs": {
+      "bytes": 10066,
+      "sha256": "bc826540a17cf3c2e2fed25b88a2d2426a658470a038cb7a8000a7eaca4fed06"
+    },
+    "tools/torus-energy/src/main.rs": {
+      "bytes": 2471,
+      "sha256": "d6cb90549bbcb60efd49b96ac48b3ba9931ae57d361ccc1e862c9c28ec6c2f9e"
+    },
+    "tools/torus-energy/tests/moment_certificate.rs": {
+      "bytes": 1813,
+      "sha256": "b52324139a6c7c448cdbc40549ffd5e67c6018ca681b7e97c9cad3558d9bb29b"
+    },
+    "tools/torus-indexed-circuit/Cargo.lock": {
+      "bytes": 7809,
+      "sha256": "6bc2a62d393449c79a2d8059f576e5426eb0ca5130c9f5dd0daf875d21ff8389"
+    },
+    "tools/torus-indexed-circuit/Cargo.toml": {
+      "bytes": 442,
+      "sha256": "3ee82b232abe586d3c0c98b1cebc19187cb2e307cd150b5611584b82759b5f67"
+    },
+    "tools/torus-indexed-circuit/src/controls.rs": {
+      "bytes": 16871,
+      "sha256": "2916497f5a78e8d1cb2fcb29b3d664a3ced3179af9fed5e8c4e77b3eab5eb1a0"
+    },
+    "tools/torus-indexed-circuit/src/lib.rs": {
+      "bytes": 13628,
+      "sha256": "b48efbfbf7c566f1844975d7d6e33c964cab6c3b338651365ccee0a69ac0fa9d"
+    },
+    "tools/torus-indexed-circuit/src/main.rs": {
+      "bytes": 1955,
+      "sha256": "cd830033cfdad5bf79e539d47c032d900718ddf4bcdea661b397924ab6c17b5c"
+    },
+    "tools/torus-s4-tree/Cargo.lock": {
+      "bytes": 6128,
+      "sha256": "1eb8c32a44afd0b2fe01c8f7c6478d24f7b1e39af2b42cf0794b70130fe2a872"
+    },
+    "tools/torus-s4-tree/Cargo.toml": {
+      "bytes": 296,
+      "sha256": "4b1a0bf001a8b15f8f8ef0a8e8679a1a08acdf17b14517b6c257ebcfad6a4c6d"
+    },
+    "tools/torus-s4-tree/src/energy.rs": {
+      "bytes": 3747,
+      "sha256": "334d6ec43474c347ce17e0b033e67f8ea28b192599f129bbe88a4e04e22950b6"
+    },
+    "tools/torus-s4-tree/src/lib.rs": {
+      "bytes": 22445,
+      "sha256": "5106cdebcead6c09b9b5192942382db7ea565687b543cd90e8fa47146c478ae3"
+    },
+    "tools/torus-s4-tree/src/main.rs": {
+      "bytes": 5278,
+      "sha256": "f5eaf122d679b844ffbcf4301ea39e78b57b5250a100113322917b511129a0bd"
+    },
+    "tools/torus-s4-tree/src/transport.rs": {
+      "bytes": 2870,
+      "sha256": "b26a56ed09f803b77fceed7a7c482fc76bc16c78cf84dcd45c2380201c6878a4"
+    },
+    "tools/torus-s4-tree/tests/identity.rs": {
+      "bytes": 1910,
+      "sha256": "921e6bd2df10113cdbe7988d345e40dc80f92b321ff498ab842d2c22a3c7ca19"
+    },
+    "tools/torus-s4-tree/tests/tree.rs": {
+      "bytes": 5966,
+      "sha256": "357c492f7287b459e18d95202327f81239720ea420ffe083f020eee8fa4af812"
+    },
+    "tools/torus-s4/Cargo.lock": {
+      "bytes": 5807,
+      "sha256": "504bb76ad1591dd843797dee0ce82f334456b725399a002fd8a300c95dc6cb16"
+    },
+    "tools/torus-s4/Cargo.toml": {
+      "bytes": 276,
+      "sha256": "f91d0d01a8d17f13d3c5fd357ab782caf638c3ecf024987634838253c50472cb"
+    },
+    "tools/torus-s4/src/lib.rs": {
+      "bytes": 19346,
+      "sha256": "403d139bf632604eb3e993de945384d7c7cadef350ecd8f63315a28538b24070"
+    },
+    "tools/torus-s4/src/main.rs": {
+      "bytes": 1427,
+      "sha256": "6d7141e42def559d05980469194dfcc6dc496f7e7847470a768f1daed18dce40"
+    },
+    "tools/torus-s4/tests/backend.rs": {
+      "bytes": 2660,
+      "sha256": "8684e6da9dd01560ac657254e4b49472e84d16b92d7e0d7302b2cbbddb3a7e97"
+    },
+    "tools/torus-s4/tests/fixtures/M1_nonmember.json": {
+      "bytes": 357,
+      "sha256": "8e2d83ee006d149dbbcc04f4d88e204ab4e84fcad1e53f5712c3c353cbcafc84"
+    },
+    "tools/torus-s4/tests/fixtures/M1_planted.json": {
+      "bytes": 354,
+      "sha256": "76699033fdd652c5f36218dd37cbf8488c0e62f5ca0310673f4cb7cd73bb5e08"
+    },
+    "tools/torus-s4/tests/fixtures/M25_planted.json": {
+      "bytes": 149,
+      "sha256": "8e99d4626f91056e4d5a25d4408f59390c603ba79beaff804b6c1f07f164d7e4"
+    },
+    "tools/torus-s4/tests/fixtures/M5_planted.json": {
+      "bytes": 135,
+      "sha256": "d6b9cc83f285c83106d217621ec5b8e8386821e2b8ef0133fb6cd9938bca9705"
+    },
+    "tools/torus-s4/tests/fixtures/M79_planted.json": {
+      "bytes": 159,
+      "sha256": "11dc16ea232b7aa9a2159ad95c698bd8eddbf059cbededf2a1532f51b732ea6f"
+    },
+    "tools/torus-s4/tests/fixtures/actual_planted.json": {
+      "bytes": 451,
+      "sha256": "807d47640a47d8f67102e89b0687a074fd21a0a4f5d67fd17002ad97a45a1522"
+    },
+    "tools/torus-s4/tests/fixtures/actual_uniform0.json": {
+      "bytes": 451,
+      "sha256": "ed580bb8ae526e2c258849fc31fa90fb0916d10e3a828ba6f60f4a71d76c18f2"
+    },
+    "tools/torus-s4/tests/fixtures/actual_uniform1.json": {
+      "bytes": 453,
+      "sha256": "e2e9fdad2ceaf54213cc1e75787afa215a25bc4908d2f22b4332409e332642f8"
+    },
+    "tools/torus-s4/tests/native.rs": {
+      "bytes": 6795,
+      "sha256": "0b5967832f4cf78dd8f02c4a4b1b36e5b57437e6109b6e4b4d88bbc814def11e"
+    },
+    "tools/torus-worklist-solver/Cargo.lock": {
+      "bytes": 8035,
+      "sha256": "d6b627c626814ab381386f6f4e57b03e3715d1de8e73f1d16a3ed1f4da54a46b"
+    },
+    "tools/torus-worklist-solver/Cargo.toml": {
+      "bytes": 491,
+      "sha256": "bbe55a1d041fd311049ad52bcb508460ad04111f2c0c8bf1ba396bbe7ed0c14e"
+    },
+    "tools/torus-worklist-solver/src/controls.rs": {
+      "bytes": 12536,
+      "sha256": "7ea56d4053be2bf196592de99d3c8490589b3ea249a9045a0437b87f872e24db"
+    },
+    "tools/torus-worklist-solver/src/lib.rs": {
+      "bytes": 18858,
+      "sha256": "6c554e106d89fe26a7371f655442fa671adc777b527edddac2edc9665d70ad5e"
+    },
+    "tools/torus-worklist-solver/src/main.rs": {
+      "bytes": 1532,
+      "sha256": "0028510aa66ca2d808c08c9970ff51f8764bc378ae199f38e67cca521f831bec"
+    },
+    "tools/torus-branch-affine/Cargo.toml": {
+      "bytes": 611,
+      "sha256": "b340c9d047225123063b560f15d3505ea6eb2dba26bc1fd89d03377065a87f96"
+    },
+    "tools/torus-branch-affine/Cargo.lock": {
+      "bytes": 8572,
+      "sha256": "e39d9d90d3ded07b7d872109b42c824f13aa6ca97048e9b7149de9cab0479366"
+    },
+    "tools/torus-branch-affine/src/lib.rs": {
+      "bytes": 28420,
+      "sha256": "8454b5f1464896d5e997380e2b1576ddb0aba61cc79371c3baff551323fdafc7"
+    },
+    "tools/torus-branch-affine/src/check.rs": {
+      "bytes": 6416,
+      "sha256": "81084712fd4b8124eb297068aaf3858e711e9c358c2bfcbba6b45f8c97785312"
+    },
+    "tools/torus-branch-affine/src/controls.rs": {
+      "bytes": 18074,
+      "sha256": "a6e8ce599a2dca3815130c4bf381ee46f1ac36904557369205738636815f2b0a"
+    },
+    "tools/torus-branch-affine/src/main.rs": {
+      "bytes": 1118,
+      "sha256": "d67af6ff3d02b1f276ae8717c42f79d1c146ff6d9950db740b615c97ba6539df"
+    },
+    "tools/torus-branch-affine/fixtures/actual-q1-indexed.json": {
+      "bytes": 42555,
+      "sha256": "79a4fb816fd3e9529954673cf581fe8014504f144fc2675fc8b67662c8af230a"
+    },
+    "tools/torus-branch-affine/fixtures/actual-q1-original.json": {
+      "bytes": 38736,
+      "sha256": "3b35c5180e568f51ad2eaf327bd5e5f4d8c2ea73ee1529de7643dc396e349836"
+    },
+    "tools/torus-branch-affine/fixtures/toy-00-indexed.json": {
+      "bytes": 55004,
+      "sha256": "ec0577f3acfc93d78070e5a719b194b5a159be997b488479da9bd244bdc7c80b"
+    },
+    "tools/torus-branch-affine/fixtures/toy-00-original.json": {
+      "bytes": 39332,
+      "sha256": "23b56476add5e3a9729a62d18afb9a4b818181bf190f0accf70a2aafbb94d80c"
+    },
+    "tools/torus-branch-affine/fixtures/toy-01-indexed.json": {
+      "bytes": 55106,
+      "sha256": "80c9d2192f0d6ee73a5ff40f05cf4059c7da8001465c9e8069498ea7bd6f13bf"
+    },
+    "tools/torus-branch-affine/fixtures/toy-01-original.json": {
+      "bytes": 39434,
+      "sha256": "11d4956a79b77ae44728a30bb1b4a09539408a5db9332e67581d797dd2e8a5eb"
+    },
+    "tools/torus-branch-affine/fixtures/toy-02-indexed.json": {
+      "bytes": 55106,
+      "sha256": "eed66ec451ca6301d548a44ca350fcaa2364e2247d8b047d11156b4233cb8c66"
+    },
+    "tools/torus-branch-affine/fixtures/toy-02-original.json": {
+      "bytes": 39434,
+      "sha256": "112a9363227bf0b255fdcb583cc09bd21a403f29f2a61f74ead5d3038bfeddfd"
+    },
+    "tools/torus-branch-affine/fixtures/toy-03-indexed.json": {
+      "bytes": 55106,
+      "sha256": "e8c9586493b7881b4973adcade112c2a3dd3a4482100d48edfd18c422e85d3ae"
+    },
+    "tools/torus-branch-affine/fixtures/toy-03-original.json": {
+      "bytes": 39434,
+      "sha256": "6eea904a751d78deac1ff704dc80b5614184b7860a9c4ead63b387cd63f93846"
+    },
+    "tools/torus-branch-affine/fixtures/toy-04-indexed.json": {
+      "bytes": 55106,
+      "sha256": "dcfc052ccc0bbd978811faabc9246ab33e99d81341371e1f7061f00640f61f67"
+    },
+    "tools/torus-branch-affine/fixtures/toy-04-original.json": {
+      "bytes": 39434,
+      "sha256": "154315ff136aed5f42541184e3c0d2febd047db08628ed204ebb5f9d7b9a635d"
+    },
+    "tools/torus-branch-affine/fixtures/toy-05-indexed.json": {
+      "bytes": 55106,
+      "sha256": "2a156d7230d7af2887363cfe7c4a0fd531367e6a3c16ec35bdef18875e4b993d"
+    },
+    "tools/torus-branch-affine/fixtures/toy-05-original.json": {
+      "bytes": 39434,
+      "sha256": "ff5acde997613ebce548adff0a673c9b75cb2cf9ef8cde7ea8230c0a7f5578ca"
+    },
+    "tools/torus-branch-affine/fixtures/toy-06-indexed.json": {
+      "bytes": 55106,
+      "sha256": "d6bf066d2001665de43f0d46dc1ccfbdb38f2d3c0ba2fbbd414392d210133b7b"
+    },
+    "tools/torus-branch-affine/fixtures/toy-06-original.json": {
+      "bytes": 39434,
+      "sha256": "0a4136cbea6683bb2612d615bf9163fda8127ad210576300526f3e172f9eccbd"
+    },
+    "tools/torus-branch-affine/fixtures/toy-07-indexed.json": {
+      "bytes": 55106,
+      "sha256": "e4f764d64c7411c46cd8e60ff896d2d48a2ec15eab844d933344f1b614a8b329"
+    },
+    "tools/torus-branch-affine/fixtures/toy-07-original.json": {
+      "bytes": 39434,
+      "sha256": "a7134a0b3ce96471d9356d73892f2c9f3f2aa01e25292de4cbe22f48632fbda9"
+    },
+    "tools/torus-branch-affine/fixtures/toy-08-indexed.json": {
+      "bytes": 55106,
+      "sha256": "811907e9687c8c4ee99d6d9cfe54fe1c6564ad1f8e5243b3060f1c53c74124ae"
+    },
+    "tools/torus-branch-affine/fixtures/toy-08-original.json": {
+      "bytes": 39434,
+      "sha256": "439406f8c5832c5e0d547001000a0e805e9d328fa25b722a7a26e839a7c16695"
+    },
+    "tools/torus-branch-affine/fixtures/toy-09-indexed.json": {
+      "bytes": 55105,
+      "sha256": "efb1267f26621dab899c3248e79d67a40c688e5c41f79f0c01d856d1b484d221"
+    },
+    "tools/torus-branch-affine/fixtures/toy-09-original.json": {
+      "bytes": 39433,
+      "sha256": "fa7976ac1c944464cb2c005a25b856bb0cf2dc2c090c1a8f27208c18606dff3d"
+    },
+    "tools/torus-branch-affine/fixtures/toy-10-indexed.json": {
+      "bytes": 55106,
+      "sha256": "759cd31c1aa50f8b4278b8c8d82d2db05a3a30f63877ed85965cb09259d6a66a"
+    },
+    "tools/torus-branch-affine/fixtures/toy-10-original.json": {
+      "bytes": 39434,
+      "sha256": "d87ed10064f50098ea0c4edf879bca84b9f1fb4f6c60310740bae9b498188600"
+    },
+    "tools/torus-branch-affine/fixtures/toy-11-indexed.json": {
+      "bytes": 55106,
+      "sha256": "5f6078350bbf27a136d0c87e27bb225ed8ebbd2c9f338b560eb544f81bc5aabc"
+    },
+    "tools/torus-branch-affine/fixtures/toy-11-original.json": {
+      "bytes": 39434,
+      "sha256": "7fa4e9b9b952004ae4ed163c3ccf3d7d1a3b33c062c22254ae4bb431596ab403"
+    },
+    "tools/torus-branch-affine/fixtures/toy-12-indexed.json": {
+      "bytes": 55106,
+      "sha256": "2d74849b9c03a77e434eb3ce9c0ab5bcc86a2afe94c0bf453ef32b4e5f2bfa68"
+    },
+    "tools/torus-branch-affine/fixtures/toy-12-original.json": {
+      "bytes": 39434,
+      "sha256": "2aa1e26a103b067f71cca08a527c827f0b2b5946cfeaba05d42ab7769f345feb"
+    }
+  },
+  "binary": {
+    "path": "/workspace/curve25519-native-binaries/branch-affine-control-v1",
+    "bytes": 3432840,
+    "sha256": "87e5872e4f5743884237b56b740a27be6f03c2e1127adde1ccf60c149ebcfb4f"
+  },
+  "new_delta": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/source-v1-delta.tar.xz",
+    "bytes": 18960,
+    "sha256": "f0735ae1100e76b91587221b0e662a2ad5ba30c99552c1cd00c5e49694d76ae8",
+    "inputs": 34
+  },
+  "composite": "old64 context(43+6+6+9) plus34new; five source archives, not monolithic98",
+  "commands": [
+    "cargo test --release --lib",
+    "cargo clippy --release --all-targets -- -D warnings",
+    "cargo fmt -- --check",
+    "cargo build --release"
+  ],
+  "cargo_target_dir": "tools/torus-affine-closure/target shared build cache; immutable retained old binaries unchanged"
+}

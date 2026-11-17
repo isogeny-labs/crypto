@@ -1,0 +1,185 @@
+{
+  "schema": "torus.branch-affine.audit-build/v1",
+  "standing": "producer unsigned/unverified",
+  "at": "2026-11-16T23:28:03.970305+00:00",
+  "purpose": "separate native post-call reader; core98precall inputs unchanged",
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "flags": [
+    "--edition=2021",
+    "-D warnings",
+    "-O",
+    "-L dependency=each recorded rlib directory",
+    "--extern serde_json=tools/torus-affine-closure/target/release/build/serde_json/7b6593489d3d98ae/out/libserde_json-7b6593489d3d98ae.rlib",
+    "--extern sha2=tools/torus-affine-closure/target/release/build/sha2/e5c19d2feeba5922/out/libsha2-e5c19d2feeba5922.rlib"
+  ],
+  "subjects": {
+    "research/curve25519_torus_native_20261115/branch-affine-v1/audit-v1.rs": {
+      "bytes": 6683,
+      "sha256": "378d9e4b2acfb5b553196c9a125cd477c362120af12a7b4ed0aa8fbf0a1f0b53"
+    },
+    "/workspace/curve25519-native-binaries/branch-affine-postcall-audit-v1": {
+      "bytes": 4760208,
+      "sha256": "2b246aa058d7310484a85a22bef245d9ebe3b869331b790f2c6a476ba41296f2"
+    },
+    "tools/torus-branch-affine/Cargo.lock": {
+      "bytes": 8572,
+      "sha256": "e39d9d90d3ded07b7d872109b42c824f13aa6ca97048e9b7149de9cab0479366"
+    },
+    "tools/torus-affine-closure/target/release/build/adler2/73a8c4653ea78d55/out/libadler2-73a8c4653ea78d55.rlib": {
+      "bytes": 24964,
+      "sha256": "df91a2b2a3afeb18f3a71c6dfa505c48c54cc4ead68c9a41ea3b73d66310f446"
+    },
+    "tools/torus-affine-closure/target/release/build/autocfg/97002fcc86ec6a55/out/libautocfg-97002fcc86ec6a55.rlib": {
+      "bytes": 653168,
+      "sha256": "8b5e0711ffc058d08e10564adf29daf6bb7f225c46039f12206c6e5b693e50b6"
+    },
+    "tools/torus-affine-closure/target/release/build/block-buffer/8e46a675f21ba4f3/out/libblock_buffer-8e46a675f21ba4f3.rlib": {
+      "bytes": 68606,
+      "sha256": "e83d559555a0620a6b5b1f976963f9e542f2d1c2f37682c680bc1b9b8f22d670"
+    },
+    "tools/torus-affine-closure/target/release/build/cfg-if/57cfe49ad4c106de/out/libcfg_if-57cfe49ad4c106de.rlib": {
+      "bytes": 8106,
+      "sha256": "a6361e5f6718c45d8f2068c07620e10270f1e21ac85bfba3b084c0aa159180b3"
+    },
+    "tools/torus-affine-closure/target/release/build/cpufeatures/bf62ed8354f3434f/out/libcpufeatures-bf62ed8354f3434f.rlib": {
+      "bytes": 41572,
+      "sha256": "3d571310434d1ba1e1544a39c7ffbe8e0f2e7de58dd1bcace2149aec1d3ad581"
+    },
+    "tools/torus-affine-closure/target/release/build/crc32fast/662c14a2fd24ba7a/out/libcrc32fast-662c14a2fd24ba7a.rlib": {
+      "bytes": 98350,
+      "sha256": "ec272a7b720507e1360fe39036483598e9af8add1c6d18c40a6f539d9e3f7690"
+    },
+    "tools/torus-affine-closure/target/release/build/crypto-common/c6b545ca474c158c/out/libcrypto_common-c6b545ca474c158c.rlib": {
+      "bytes": 34370,
+      "sha256": "3e2a1a12d41e4b2bf2618693226dc4136e3352059ceab1966f80747ff36b3dd4"
+    },
+    "tools/torus-affine-closure/target/release/build/digest/a1b913685e780232/out/libdigest-a1b913685e780232.rlib": {
+      "bytes": 202920,
+      "sha256": "b96e8d0486186e8ba107dec00243cb6885d8ba1a25de3f9828372518e99a9469"
+    },
+    "tools/torus-affine-closure/target/release/build/flate2/55c4dd256b00061b/out/libflate2-55c4dd256b00061b.rlib": {
+      "bytes": 765458,
+      "sha256": "087959e00c80c409c9416d1189178b174d34291797cc5cd2e321577963e2dd52"
+    },
+    "tools/torus-affine-closure/target/release/build/generic-array/3130cdccfb7486fa/out/libgeneric_array-3130cdccfb7486fa.rlib": {
+      "bytes": 979564,
+      "sha256": "c003a0c2cadf800accf44c4b9bc9de41d62424db9049903fc0b9ea20bb162248"
+    },
+    "tools/torus-affine-closure/target/release/build/hex/c672ff782b75fe6b/out/libhex-c672ff782b75fe6b.rlib": {
+      "bytes": 435474,
+      "sha256": "5093a2455e07f3d6a39e3c207f6e6feffe1a5d0d8e1d286326c22737e6ac32e4"
+    },
+    "tools/torus-affine-closure/target/release/build/itoa/345586e865460c9e/out/libitoa-345586e865460c9e.rlib": {
+      "bytes": 84858,
+      "sha256": "b5b8533686746400903a6fce760c9a9a2850ea2810fd583b61604e0bdaba8e85"
+    },
+    "tools/torus-affine-closure/target/release/build/memchr/7b797f9cf7f67c10/out/libmemchr-7b797f9cf7f67c10.rlib": {
+      "bytes": 1596148,
+      "sha256": "ca89a56c62ab9a9383d33d6941611c865b660ae52a782287735bdfe9c1f23a5a"
+    },
+    "tools/torus-affine-closure/target/release/build/miniz_oxide/f8b7be59e5ee6a60/out/libminiz_oxide-f8b7be59e5ee6a60.rlib": {
+      "bytes": 540500,
+      "sha256": "069ffc7f18b7e837d7f6fd3f5048bf5dcd03912039d1db64076357c6345eca8a"
+    },
+    "tools/torus-affine-closure/target/release/build/num-bigint/a66b0e8c5b224c33/out/libnum_bigint-a66b0e8c5b224c33.rlib": {
+      "bytes": 3238670,
+      "sha256": "172b9e7525cdd3c1e764c72ca6af219434f4aa87c8e17244f28bd1f9aca37c87"
+    },
+    "tools/torus-affine-closure/target/release/build/num-integer/c932a1a32475d12a/out/libnum_integer-c932a1a32475d12a.rlib": {
+      "bytes": 372690,
+      "sha256": "1898be43b662ccf566356ad2098559e6d8341868bfde12b55ed55ca82931bc55"
+    },
+    "tools/torus-affine-closure/target/release/build/num-traits/30b29027c029b5f9/out/libnum_traits-30b29027c029b5f9.rlib": {
+      "bytes": 2042628,
+      "sha256": "0a08fdb252e1d2dd9b7329c8a862d9909cd59becf1805b3b57d6326f10e72b12"
+    },
+    "tools/torus-affine-closure/target/release/build/proc-macro2/ed96570e161c3728/out/libproc_macro2-ed96570e161c3728.rlib": {
+      "bytes": 1180044,
+      "sha256": "32fbc89a0be674f2fdd84645d6c1c1febd12beb0165d8326d207dd298de9256c"
+    },
+    "tools/torus-affine-closure/target/release/build/quote/3810e0bbeb31a69b/out/libquote-3810e0bbeb31a69b.rlib": {
+      "bytes": 505776,
+      "sha256": "3884497bfded029570b0bd1d86d74e2c8377090e66190cc6ad4f3a40aaf45198"
+    },
+    "tools/torus-affine-closure/target/release/build/serde/e4f1432260507e07/out/libserde-e4f1432260507e07.rlib": {
+      "bytes": 1002628,
+      "sha256": "2cb9fd593f931af9de48e3d592cf9cd26de85bc21836cb4eecb25e2c6d3b9bbb"
+    },
+    "tools/torus-affine-closure/target/release/build/serde_core/8ea593845b3b3f55/out/libserde_core-8ea593845b3b3f55.rlib": {
+      "bytes": 5547010,
+      "sha256": "e6159441583c5533ed1590efdfd39e50ceeb8c14d5a539450e5b7d8419a5ee50"
+    },
+    "tools/torus-affine-closure/target/release/build/serde_json/7b6593489d3d98ae/out/libserde_json-7b6593489d3d98ae.rlib": {
+      "bytes": 2260906,
+      "sha256": "9ac563b49685ce108699e1f371001bf67b96842bbe64b8bbb8fbbdc9df4c1af2"
+    },
+    "tools/torus-affine-closure/target/release/build/sha2/e5c19d2feeba5922/out/libsha2-e5c19d2feeba5922.rlib": {
+      "bytes": 843764,
+      "sha256": "e1a123066c8add79bb860ea579a9c8ad1854e214c5ebd2b159f03f7434d1ffa5"
+    },
+    "tools/torus-affine-closure/target/release/build/simd-adler32/426a15a822976d51/out/libsimd_adler32-426a15a822976d51.rlib": {
+      "bytes": 576288,
+      "sha256": "89f7a45fe16ad3bfcaf1574c7d6cc0df8802c3a91e3ab1edf07a51004cc16d38"
+    },
+    "tools/torus-affine-closure/target/release/build/syn/c3ad30aae9a31c63/out/libsyn-c3ad30aae9a31c63.rlib": {
+      "bytes": 6243954,
+      "sha256": "182438fa9973b9b0c46b025ad728d32002f98ffb69ef8a7611c03a9df3774a88"
+    },
+    "tools/torus-affine-closure/target/release/build/torus-affine-closure/245ea98ae39f5a69/out/libtorus_affine_closure-245ea98ae39f5a69.rlib": {
+      "bytes": 4212828,
+      "sha256": "cb1ae351144d6ed2a8b30f43a4ffec753393eb4f2390b6fb8000872a714dbe89"
+    },
+    "tools/torus-affine-closure/target/release/build/torus-affine-closure/b7ade9bb4a010c11/out/libtorus_affine_closure-b7ade9bb4a010c11.rlib": {
+      "bytes": 4213758,
+      "sha256": "e45c395ac6020d2e4924cd1dd81fa2a6837d9f6578e7f8187e58738f4b62f537"
+    },
+    "tools/torus-affine-closure/target/release/build/torus-branch-affine/34f482e67adfa9bc/out/libtorus_branch_affine-34f482e67adfa9bc.rlib": {
+      "bytes": 4363578,
+      "sha256": "a73580fa2495261ae95f39d71acb861251d54ba46ecace5d02aa171ee24397f4"
+    },
+    "tools/torus-affine-closure/target/release/build/torus-coset-circuit/39adbd87a60fa593/out/libtorus_coset_circuit-39adbd87a60fa593.rlib": {
+      "bytes": 1070344,
+      "sha256": "304a34f6c6e2ebfedfc178b11b1648acf14515907501d17d1d16500c42858792"
+    },
+    "tools/torus-affine-closure/target/release/build/torus-indexed-circuit/1b39a6c41f137f1b/out/libtorus_indexed_circuit-1b39a6c41f137f1b.rlib": {
+      "bytes": 926548,
+      "sha256": "f6be65279bffeef608b884e6fd9b8cae8d54d4d07a1d1cf4f5beebb7de14e21c"
+    },
+    "tools/torus-affine-closure/target/release/build/torus-s4/95e2d248dd6a7463/out/libtorus_s4-95e2d248dd6a7463.rlib": {
+      "bytes": 722884,
+      "sha256": "2ee9a142781c710bc711b57337998837a56383e784bce40d30d61a9ceeb7a572"
+    },
+    "tools/torus-affine-closure/target/release/build/torus-s4-tree/786c2e8a51caa7ae/out/libtorus_s4_tree-786c2e8a51caa7ae.rlib": {
+      "bytes": 1722292,
+      "sha256": "b5d70e0a89a8fcff335f03e93a45ca9ae75e6a0a528dfa6612a120ef4f91e4d0"
+    },
+    "tools/torus-affine-closure/target/release/build/torus-worklist-solver/8c0b375c43329faa/out/libtorus_worklist_solver-8c0b375c43329faa.rlib": {
+      "bytes": 885248,
+      "sha256": "fe94482931225dc9dae19c976cfde0a4a67dc799e359d54c9bd7a5a867986321"
+    },
+    "tools/torus-affine-closure/target/release/build/typenum/722c800cc611d181/out/libtypenum-722c800cc611d181.rlib": {
+      "bytes": 2867148,
+      "sha256": "465438d5d7a5ecbd2080e547b64f96992a65ff25cd6482ec696d4af6b53716a2"
+    },
+    "tools/torus-affine-closure/target/release/build/unicode-ident/7da61436b8d09b00/out/libunicode_ident-7da61436b8d09b00.rlib": {
+      "bytes": 52726,
+      "sha256": "1f0ccf82f142ec8cd0e5571d340605729117f7a3587b73fa257fd941747df8e1"
+    },
+    "tools/torus-affine-closure/target/release/build/version_check/0c32d13a8942c8c5/out/libversion_check-0c32d13a8942c8c5.rlib": {
+      "bytes": 424284,
+      "sha256": "6cc02ac07dbde3d4283f344051ce19fb336ac85af820898af29ea0c185917f25"
+    },
+    "tools/torus-affine-closure/target/release/build/zmij/09112a8dc53e0e79/out/libzmij-09112a8dc53e0e79.rlib": {
+      "bytes": 514836,
+      "sha256": "8f9c9a97ff5eef7eae82c94c3576c66a308e94d5b17aae881b63ceda08a77006"
+    },
+    "tools/torus-affine-closure/target/release/libtorus_affine_closure.rlib": {
+      "bytes": 4212828,
+      "sha256": "cb1ae351144d6ed2a8b30f43a4ffec753393eb4f2390b6fb8000872a714dbe89"
+    },
+    "tools/torus-affine-closure/target/release/libtorus_branch_affine.rlib": {
+      "bytes": 4363578,
+      "sha256": "a73580fa2495261ae95f39d71acb861251d54ba46ecace5d02aa171ee24397f4"
+    }
+  }
+}
