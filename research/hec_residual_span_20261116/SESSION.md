@@ -2772,3 +2772,10 @@ What was done: derived Horner quotientring recurrence(c,d)->(d-Ac,ai-Bc); newgen
 Decisions made: ordinary quotientring circuitoptimizationnotnewmath/10x; mustqualify everyunknownimage/nativeprincipalidentity and measurewholecost against strongestpreparedquadratic. Single600CPUexecutionafterGitfreeze.
 Open threads: qualify/measure, thenintegrateLPandvalidationcostcase;10xobjectiveactive.
 Errors: inheritedunusedimport/helperwarnings only; no scientificexecutionbeforefreeze. No S3/cloud/merge.
+
+## Shared residue image circuit qualifies with completebase improvement
+
+What was done: freezeec1f1f48b1b hashpass/exit0.22audit+44freshcounted solves allnativeverified; directunknownordinate/uHornerchecks andallprincipalnorm/splitchecks pass, oldReportsreplay, subgroupFULL16unchanged, repeatedcount/lookupexact. Baseold/newratios g21.080-1.304,g31.024-1.053,g41.005-1.013;22/22improve. p4001source1base158510->121514/subgroup77584same.
+Decisions made: qualifiedsharedquotientringconstantfactoroptimization, not10x/newmath/runtimeclaim. Keepstrongerimagecontrolforfuturecomparisons; cannottransplant oldphasecounts asnewphasepartition. LP/verificationcostcase stillrequired.
+Open threads: integrateddeferredLPpayload/solver/publicverificationconstruction withcrediblefullcost;fullgoalactiveunachieved/independentreviewpending.
+Errors: no scientificfailure; inheritedunusedsource/importwarnings only. No S3/cloud/merge orunchangedrerun.
