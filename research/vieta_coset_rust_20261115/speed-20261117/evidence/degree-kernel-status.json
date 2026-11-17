@@ -1,0 +1,54 @@
+{
+  "schema": "vieta-degree-kernel-status/v1",
+  "lean_version": "4.35.0",
+  "lean_commit": "eb6cafb7290e8bd5f2937522d8d804f58f02bafc",
+  "crypto_lean": "23569e7f1da1abb865601f8f0dacc16fa11810e3",
+  "crypto_lean_pr": "https://github.com/aburan28/crypto-lean/pull/26",
+  "crypto_research": "0ca36c9d5b49f2fcba56f79a51456a715b7aae5e",
+  "mathlib": "cfc55fc58714a59dc06e6e79edc6d1d95140d3c2",
+  "focused_lake_build": "PASS",
+  "proof_gate": "PASS",
+  "proof_gate_theorems": 21,
+  "trusted_native_exceptions": 0,
+  "axioms_allowed": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "arbitrary_tower_normal_form_contracts_instantiated": false,
+  "general_independent_signed_standing": false,
+  "alternate_checker": {
+    "command": [
+      "lean4lean",
+      "--help"
+    ],
+    "observed_error": "failed to read Std.olean, incompatible header; invocation scanned standard library unexpectedly",
+    "checker_exit": null,
+    "independent_recheck_pass": false,
+    "full_log_retained": false
+  },
+  "pins": [
+    {
+      "path": "lean/BoundBridge.lean",
+      "sha256": "25a95137d350a055ee89c02629d3d19261514259bf88746b7ee3a2c703675bc0"
+    },
+    {
+      "path": "lean/ProjectorInstances.lean",
+      "sha256": "bcc2fc5503feb52274c35801228bb84bd44412488298ebc88ade8069cb0e014d"
+    },
+    {
+      "path": "lean/lakefile.toml",
+      "sha256": "c36eb657b9c63615836ccdd5ffc059cfc29c27c61daf5405a89dba1181fbee84"
+    },
+    {
+      "path": "lean/lake-manifest.json",
+      "sha256": "89306706c5ec78ca4108c4efde11e28cebf956090cceab163cf8b76f349784fc"
+    },
+    {
+      "path": "lean/lean-toolchain",
+      "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+    }
+  ],
+  "native_prime_curve_diagonal_test": "PASS; exact nonempty repeated-point relation on prime-order19 toy curve; no timing qualifier change",
+  "standing": "producer mathematical artifacts with kernel checks; no full general/signed standing [pcc:unverified]"
+}

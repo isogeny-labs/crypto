@@ -1,0 +1,7 @@
+# Table-root graph IC47 source checkpoint
+
+Goal active. Run46's nine complete cold solves and independent Rust replay all succeed; sparse collection lowers observed LA/whole primitive subtotals, single elapsed times slightly rise. SourcePR4494merged; resultPR4508is the continuation. All owned runners through46are deleted. Complete native costs/fresh scaling/signed admission remain open. Historical frozen46source/proofs reconstruct from ed5ca5ab8a4f41f89165a40e7efefc21aa76a399. [pcc:unverified]
+
+47adds a separate public Rust quadratic sparse entrypoint reusing existing FpRing::roots_by_table. Base-order division, signs, principal identities, signed graph, sparse certificates and Nagao/affine/group checks stay intact. Current entrypoint retains Horner. New paired checker includes unchanged46mathematics, requires exact full geometry/candidate/refusal/cohort/trace/descent endpoints and a hash-bound46default geometry/primitive regression. Retained11822norms compare exactly against independent u128Horner at every Fpabscissa; no new local scientific measurement. [pcc:unverified]
+
+AMENDMENT42/table-roots-plan.json register two cold full scalar recoveries, same exposed p1009/seed389public input, no warmup/retry/exclusion. Worker/checker/transport/source/binaries publish before allocation and sole Runpodcall. Owned4500second guardian must be detached and checked live; collect/hash/private-scan/delete before interpretation. No47allocation/invocation exists at this source checkpoint. [pcc:unverified]
