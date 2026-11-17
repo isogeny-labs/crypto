@@ -43,6 +43,72 @@ fn parity(a: &WordMask, b: &WordMask) -> u64 {
     (((a[0] & b[0]) ^ (a[1] & b[1]) ^ (a[2] & b[2])).count_ones() & 1) as u64
 }
 
+/// Four-bit combination tables for the first sixteen projected equations.
+/// Four 16-bit coefficient rows share each word; RHS bits remain separate.
+/// This evaluates the existing F2-linear maps, without changing their order.
+struct PackedRowMap {
+    coefficients: Vec<[u64; 4]>,
+    rhs: Vec<u16>,
+    rows: usize,
+}
+impl PackedRowMap {
+    fn new(equations: &[Vec<WordMask>], rhs: &[WordMask], n: u32) -> Option<Self> {
+        let width = equations.first()?.len();
+        if width > 16 {
+            return None;
+        }
+        let rows = equations.len().min(16);
+        let groups = (n as usize).div_ceil(4);
+        let mut coefficients = vec![[0; 4]; groups * 16];
+        let mut rhs_table = vec![0u16; groups * 16];
+        for group in 0..groups {
+            let mut basis = [[0u64; 4]; 4];
+            let mut rhs_basis = [0u16; 4];
+            for b in 0..4 {
+                let bit = group * 4 + b;
+                if bit >= n as usize {
+                    continue;
+                }
+                for row in 0..rows {
+                    for col in 0..width {
+                        let value = (equations[row][col][bit / 64] >> (bit % 64)) & 1;
+                        basis[b][row / 4] |= value << ((row % 4) * 16 + col);
+                    }
+                    rhs_basis[b] |= (((rhs[row][bit / 64] >> (bit % 64)) & 1) as u16) << row;
+                }
+            }
+            for value in 1usize..16 {
+                let prev = group * 16 + (value & (value - 1));
+                let b = value.trailing_zeros() as usize;
+                coefficients[group * 16 + value] =
+                    std::array::from_fn(|i| coefficients[prev][i] ^ basis[b][i]);
+                rhs_table[group * 16 + value] = rhs_table[prev] ^ rhs_basis[b];
+            }
+        }
+        Some(Self {
+            coefficients,
+            rhs: rhs_table,
+            rows,
+        })
+    }
+    fn evaluate(&self, z: WordMask, target: WordMask) -> ([u64; 4], u16) {
+        let mut coefficients = [0; 4];
+        let mut rhs = 0;
+        for (group, table) in self.coefficients.chunks_exact(16).enumerate() {
+            let shift = (group % 16) * 4;
+            let zi = ((z[group / 16] >> shift) & 15) as usize;
+            let ti = ((target[group / 16] >> shift) & 15) as usize;
+            let c = table[zi];
+            for i in 0..4 {
+                coefficients[i] ^= c[i];
+            }
+            rhs ^= self.rhs[group * 16 + ti];
+        }
+        (coefficients, rhs)
+    }
+}
+
+#[cfg_attr(test, derive(Debug, PartialEq, Eq))]
 enum ProjectedResult {
     Inconsistent,
     Unique(F2mElement, F2mElement),
@@ -59,6 +125,7 @@ struct ProductProjection {
     w_pivots: Vec<(usize, WordMask)>,
     halves: Vec<F2mElement>,
     w_support: WordMask,
+    row_map: Option<PackedRowMap>,
 }
 impl ProductProjection {
     fn reduce_with(pivots: &[(usize, WordMask)], mut a: WordMask) -> WordMask {
@@ -131,12 +198,14 @@ impl ProductProjection {
                 w_support[i] |= w[i];
             }
         }
+        let row_map = PackedRowMap::new(&equations, &rhs, c.m);
         Self {
             equations,
             rhs,
             w_pivots: pivots,
             halves,
             w_support,
+            row_map,
         }
     }
 
@@ -165,11 +234,29 @@ impl ProductProjection {
         let zw = z;
         let offset = field.add(y, field.mul(z, field.half(z)));
         let target = offset;
+        let packed = self.row_map.as_ref().map(|m| m.evaluate(zw, target));
         for (j, (columns, rhs)) in self.equations.iter().zip(&self.rhs).enumerate() {
-            let mut row = parity(rhs, &target) << width;
-            for (i, col) in columns.iter().enumerate() {
-                row |= parity(col, &zw) << i;
-            }
+            let mut row =
+                if let (Some(map), Some((coefficients, targets))) = (&self.row_map, &packed) {
+                    if j < map.rows {
+                        ((coefficients[j / 4] >> ((j % 4) * 16)) & 0xffff)
+                            | (((targets >> j) & 1) as u64) << width
+                    } else {
+                        columns
+                            .iter()
+                            .enumerate()
+                            .fold(parity(rhs, &target) << width, |r, (i, col)| {
+                                r | (parity(col, &zw) << i)
+                            })
+                    }
+                } else {
+                    columns
+                        .iter()
+                        .enumerate()
+                        .fold(parity(rhs, &target) << width, |r, (i, col)| {
+                            r | (parity(col, &zw) << i)
+                        })
+                };
             loop {
                 let coefficients = row & coefficient_mask;
                 if coefficients == 0 {
@@ -412,6 +499,54 @@ mod tests {
     use super::*;
 
     #[test]
+    fn packed_row_maps_match_all_input_basis_vectors_and_independent_random_pairs() {
+        let mut seed = 20261117u64;
+        let mut draw = || {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed
+        };
+        for n in [5u32, 83, 131] {
+            for width in [1, 13, 16] {
+                let equations: Vec<Vec<WordMask>> = (0..21)
+                    .map(|_| (0..width).map(|_| [draw(), draw(), draw()]).collect())
+                    .collect();
+                let rhs: Vec<_> = (0..21).map(|_| [draw(), draw(), draw()]).collect();
+                let map = PackedRowMap::new(&equations, &rhs, n).unwrap();
+                assert_eq!(map.rows, 16);
+                assert_eq!(map.coefficients.len(), (n as usize).div_ceil(4) * 16);
+                let mut pairs = vec![([0; 3], [0; 3])];
+                for bit in 0..n as usize {
+                    let mut e = [0; 3];
+                    e[bit / 64] = 1u64 << (bit % 64);
+                    pairs.push((e, [0; 3]));
+                    pairs.push(([0; 3], e));
+                }
+                for _ in 0..128 {
+                    let z = words(&F2mElement::from_words(&[draw(), draw(), draw()], n));
+                    let t = words(&F2mElement::from_words(&[draw(), draw(), draw()], n));
+                    pairs.push((z, t));
+                }
+                for (z, target) in pairs {
+                    let (packed, targets) = map.evaluate(z, target);
+                    for j in 0..map.rows {
+                        let actual = (packed[j / 4] >> ((j % 4) * 16)) & 0xffff;
+                        let expected = equations[j]
+                            .iter()
+                            .enumerate()
+                            .fold(0, |r, (i, col)| r | (parity(col, &z) << i));
+                        assert_eq!(actual, expected, "n{n}/width{width}/row{j}");
+                        assert_eq!(((targets >> j) & 1) as u64, parity(&rhs[j], &target));
+                    }
+                }
+            }
+            assert!(PackedRowMap::new(&vec![vec![[0; 3]; 17]; 21], &[[0; 3]; 21], n).is_none());
+        }
+        assert!(PackedRowMap::new(&[], &[], 5).is_none());
+    }
+
+    #[test]
     fn packed_basis_preserves_reference_pivots_and_numeric_coordinate_order() {
         let mut seed = 202611153u64;
         for n in [5, 83, 131] {
@@ -532,6 +667,13 @@ mod tests {
                 .collect();
             let ws = basis(products, 5);
             let projector = ProductProjection::new(&xs, &ws, &c);
+            let mut scalar = ProductProjection::new(&xs, &ws, &c);
+            scalar.row_map = None;
+            let mut tail = ProductProjection::new(&xs, &ws, &c);
+            tail.equations
+                .splice(0..0, vec![vec![[0; 3]; xs.len() + 1]; 16]);
+            tail.rhs.splice(0..0, [[0; 3]; 16]);
+            tail.row_map = PackedRowMap::new(&tail.equations, &tail.rhs, c.m);
             for p in &points {
                 let BinaryPoint::Affine { x: z, y } = p else {
                     unreachable!()
@@ -563,7 +705,10 @@ mod tests {
                         }
                     }
                 }
-                match projector.solve(&xs, &c, z, y).0 {
+                let answer = projector.solve(&xs, &c, z, y).0;
+                assert_eq!(answer, scalar.solve(&xs, &c, z, y).0);
+                assert_eq!(answer, tail.solve(&xs, &c, z, y).0);
+                match answer {
                     ProjectedResult::Inconsistent => {
                         classifications[0] += 1;
                         assert!(expected.is_empty());
