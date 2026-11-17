@@ -5864,6 +5864,106 @@ mod tests {
         assert_eq!(r.degree_of_regularity_observed, None);
     }
 
+    /// Records a degree-fall dataset for the research-visuals trace figure:
+    /// a family of systems over F_101 in three variables that grows from a
+    /// regular sequence (three quadrics) to an over-determined one (up to six),
+    /// so the recorded per-degree Hilbert deviation shows how added relations
+    /// drive the degree of regularity down. No-op unless `ECBENCH_DEGREE_TRACE_OUT`
+    /// names an output path, so ordinary test runs are unaffected. Pure
+    /// instrument output: the Rust engine computes and records; the figure only
+    /// lays these values out.
+    #[test]
+    fn emit_degree_fall_dataset() {
+        let Ok(out) = std::env::var("ECBENCH_DEGREE_TRACE_OUT") else {
+            return;
+        };
+        let p = 101u64;
+        let n = 3usize;
+        // Deterministic "generic" quadric coefficients from an LCG, so the
+        // dataset is reproducible without an external RNG dependency.
+        let mut state = 0x2026_1117u64;
+        let mut next = || {
+            state = state
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            (state >> 33) % p
+        };
+        let monos: Vec<Vec<u32>> = {
+            let mut v = Vec::new();
+            for a in 0..=2u32 {
+                for b in 0..=2u32 {
+                    for c in 0..=2u32 {
+                        if a + b + c <= 2 {
+                            v.push(vec![a, b, c]);
+                        }
+                    }
+                }
+            }
+            v
+        };
+        // Each quadric is forced to vanish at (1,1,1): every monomial is 1
+        // there, so after drawing the non-constant coefficients the constant
+        // term is set to cancel their sum. That keeps (1,1,1) a common root for
+        // every k, so the over-determined systems stay consistent (an
+        // inconsistent system has no degree-of-regularity story to record).
+        let quadrics: Vec<Poly> = (0..6)
+            .map(|_| {
+                let mut terms: Vec<(Vec<u32>, u64)> = monos
+                    .iter()
+                    .filter(|m| !m.iter().all(|&e| e == 0))
+                    .filter_map(|m| {
+                        let c = next();
+                        (c != 0).then(|| (m.clone(), c))
+                    })
+                    .collect();
+                let s: u64 = terms.iter().map(|(_, c)| c % p).sum::<u64>() % p;
+                let k0 = (p - s) % p;
+                if k0 != 0 {
+                    terms.push((vec![0, 0, 0], k0));
+                }
+                terms
+            })
+            .collect();
+        let mut systems = Vec::new();
+        for k in 3..=6usize {
+            let input: Vec<Poly> = quadrics[..k].to_vec();
+            let mut opts = F4Options::new(Ordering::Grevlex, 12);
+            opts.record_degree_falls = true;
+            let r = f4(&input, n, p, &opts);
+            let steps: Vec<serde_json::Value> = r
+                .degree_falls
+                .iter()
+                .map(|s| {
+                    serde_json::json!({
+                        "degree": s.degree,
+                        "expected": s.hilbert_expected,
+                        "realized": s.hilbert_realized,
+                        "is_fall": s.is_fall,
+                    })
+                })
+                .collect();
+            systems.push(serde_json::json!({
+                "relations": k,
+                "n_vars": n,
+                "p": p,
+                "first_fall_degree": r.first_fall_degree,
+                "last_fall_degree": r.last_fall_degree,
+                "degree_of_regularity_observed": r.degree_of_regularity_observed,
+                "solving_degree": r.solving_degree,
+                "timed_out": r.timed_out,
+                "steps": steps,
+            }));
+        }
+        let dataset = serde_json::json!({
+            "schema": "ecbench.degree-fall-dataset/v1",
+            "field": p,
+            "n_vars": n,
+            "family": "quadric sequence, 3..6 relations, LCG-seeded over F_101",
+            "systems": systems,
+        });
+        std::fs::write(&out, serde_json::to_string_pretty(&dataset).unwrap()).unwrap();
+    }
+
     #[test]
     fn recursive_visitors_reject_all_checkpoint_options_before_callbacks_or_file_effects() {
         let root = std::env::temp_dir().join(format!(
