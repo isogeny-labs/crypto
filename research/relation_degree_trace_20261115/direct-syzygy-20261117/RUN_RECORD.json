@@ -1,0 +1,30 @@
+{
+  "schema": "direct-run-record/v1",
+  "status": "registered",
+  "created_utc": "2026-11-17T01:06:45.789060+00:00",
+  "method_published_commit": "0583346733f8e7bbd0ee80fe3698ec7f6dc2092c",
+  "pr": "https://github.com/isogeny-labs/crypto/pull/4476",
+  "protocol_sha256": "a7f5efdc6e51136aa34d0503764ca900ca1c75ab89e6692f0a84716f7172be28",
+  "command": [
+    "python",
+    "/workspace/relation-native-qualifiers/direct-monitor-20261117/isolated_bench.py",
+    "reserve",
+    "--cpus",
+    "0",
+    "--out",
+    "/workspace/direct-development-monitor-55.jsonl",
+    "--label",
+    "fixed-direct-construction-four-routes",
+    "--",
+    "taskset",
+    "-c",
+    "0",
+    "/workspace/relation-native-qualifiers/direct-driver-39bdb79f5-55",
+    "direct-paired",
+    "/workspace/direct-development-results-55",
+    "research/relation_degree_trace_20261115/direct-syzygy-20261117/config-55.json",
+    "development"
+  ],
+  "scope": "3 fixed development cases n3/4/6 seed7; all4routes parent and nativechildren onCPU0; no timing data yet",
+  "standing": "unsigned producer record"
+}
