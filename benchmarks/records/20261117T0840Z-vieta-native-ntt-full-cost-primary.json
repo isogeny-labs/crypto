@@ -1,7 +1,33 @@
 {
   "branch": "lane/vieta-speedup-20261117",
   "closed_utc": null,
-  "commands": [],
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "tools/isolated_bench.py",
+        "run",
+        "--cpus",
+        "4",
+        "--out",
+        "research/vieta_coset_rust_20261115/speedup-20261117/runs/primary/isolation.jsonl",
+        "--label",
+        "vieta-primary",
+        "--",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=3s",
+        "1800",
+        "bash",
+        "research/vieta_coset_rust_20261115/speedup-20261117/primary-native.sh",
+        "/workspace/scratch/vieta-speedup-binaries/f45c05dc311058ad65f3085d29fd1a7909fb744c0564357da3b29a0e6cba04f0"
+      ],
+      "cwd": ".",
+      "exit": 4,
+      "started_utc": "2026-11-17T08:41:35+00:00",
+      "wall_s": 695.81
+    }
+  ],
   "commit": "e86f65ca9548179aec424ca71c4ed37c8bf87926",
   "commit_dirty": false,
   "created_utc": "2026-11-17T08:40:53+00:00",
