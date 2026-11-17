@@ -1263,3 +1263,17 @@ Newinitialrelation/preparationgeometry;source-reusemustbecharged/labeledandnotfr
 
 ### Errors
 No failedgate/retry/S3/cloud. Reusedimmutablecompletingbaselineandmatchedseed,notoldtargetcounts.
+
+## Deferred eigenvalue learned from relation consistency
+
+### What was done
+Frozen c5cfa225c8c tests4unknown-actionhypotheseson12full/one-corestreamswithoutcharacterinputtoinference.7338prefixcheckswithoppositeFBpivotordersagree. Allstreamsreject3wrongrootsandinfertrueorientedlambda+k;postqualificationgroupchecks pass. One-coreuses1–8extrarowsversusknownlambda. DerivedR=Fell[Z]/Phi5LPunit argumentandCRTlabelzero-divisorobligations. [pcc:unverified]
+
+### Decisions made
+Positivealternativebootstraplogic,notcost/novelty/10x. Hypotheticalmapsnotadmitteduntilgeometricqualification. Fourparallelsolvesmaycostmore;sharedringimplementationandfreshfullcostcaserequired. g3/g4remainopen,goalactive.
+
+### Open threads
+Implement/cost-qualifyR-DSUandcorrectCRT-awarelabelsolverorfindabetterinitialconstruction. CanonicalFB/source/finalcheckcostsremain.
+
+### Errors
+No scientificgatefailure/retry,S3/cloud. Wronghypothesisprovisionalkisnotadmittedassolutionbeforeconsistencyandgroupqualification.
