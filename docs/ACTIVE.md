@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] P-192 relation pipeline: functional replay complete; independent signed verification and admitted costs pending (Codex, started 2026-11-17, branch lane/nist-relation-pipeline, PR #4529; in progress)
+- [ ] P-192 relation pipeline: functional replay and portable handoff complete; blocked on external verification/cloud connections (Codex, started 2026-11-17, branch lane/nist-relation-pipeline, PR #4529; automatic goal paused, resume when connections are supplied)
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 
