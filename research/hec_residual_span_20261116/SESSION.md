@@ -1791,3 +1791,10 @@ What was done: compiled countedcompleteorbitindex, ambiguouskeysinvalid, unchang
 Decisions made: includeindexbuild andallbindingcosts; compareoldcertificate/source separately, no componenttofullgain promotion. All assertions [pcc:unverified].
 Open threads: pushfreeze then once-only120CPU invocation; actionproof remainsseparate.
 Errors: none in compile, no science yet; ownT7093scope retained.
+
+## Indexed verifier instrumentation failure and prospective amendment
+
+What was done: freeze0bb73a644a4 exits101 phasecounterunderflow afterfirsttargettworepeats; partialraw/exit preserved.
+Decisions made: no claim of12targetpass; newindexed-certificate-v2 resets phase before uncountedqualification. No mathematicalverifier/inputcriterion change. Assertions [pcc:unverified].
+Open threads: compile/freeze newversion then once-only gate.
+Errors: stalephaseLAST frompreviousinterval; retained, not overwritten.
