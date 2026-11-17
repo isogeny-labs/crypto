@@ -1525,3 +1525,10 @@ What was done:literature-first scaling screen distinguishes firsthit fromgrowth;
 Decisions made: avoiddense-labelseed-widthfactorbeforelargerpoolprototype; witnessgenerationdense referenceonly,no productioncost/10xclaim. KnownfieldoperatornotringKrylovqualification.
 Open threads: executeonce; efficienttargetwitnesssolver/fullscaledproducerremainrequired.
 Errors: none,nosciencebeforepushedfreeze.
+
+## Sparse dependency operator and target witness completed
+
+What was done:f030dee3d7aone invocation exits0;18panels252basiscolumns54adjoints,RHSandoriginalequationreplaypass. OriginalSparse/SchurSparse/nativeFasttargetsagree; all18targetwitnessesverifyusingmatrixfreetransposeandgroupchecks. p601intermediatepanelterms7811/7978versusdensenonzeros13444/10904,smallpanelsnotuniformsaving.
+Decisions made: operatorcorrectnessandwitnessverificationonly,densewitnessfinderreference,nofree-supportproduceror10xclaim. Growthheuristicrecoversclassicalexponent,notbreakthrough; futurebackendmustavoidreintroducingdenseSchur.
+Open threads: efficientrectangular/rank-deficienttargetwitnessfinder andscaledproducer,costedoriginalgenus2+targets; goalopen.
+Errors: none,no scientificretry/S3/cloud.
