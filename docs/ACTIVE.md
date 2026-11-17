@@ -11,11 +11,16 @@ follow-ups here; history belongs in the session log, not in this file.
 
 ## Current goal
 
-Establish an exponent-reducing relation-collection method for ordinary prime-field elliptic curves, with complete charged costs, a frozen matched baseline, and independent scaling validation.
+Establish an exponent-reducing relation-collection method for ordinary prime-field elliptic curves, with complete charged costs, a frozen matched baseline, and independent scaling validation. Contract: [prime-field exponent goal](../research/aps_prime_field_exponent_20261117/GOAL.md).
 
 ## Active items (top = next)
 
-- [ ] Pin prime-field relation-collection exponent goal and contract (Codex, started 2026-11-17, branch codex/aps-prime-field-exponent-goal-20261117; in progress)
+- [x] Pin prime-field relation-collection exponent goal and acceptance contract (Codex, started 2026-11-17, branch codex/aps-prime-field-exponent-goal-20261117, PR #4531)
+- [ ] Derive the size-dependent collection cost model; specify a mechanism that can change its exponent, family and parameter laws.
+- [ ] Complete native cost/memory accounting and independent replay/export; freeze the strongest applicable matched baseline.
+- [ ] Preregister sizes, public targets, exponent margin, power, budgets and held-out test; complete prospective checkpoint and run admission.
+- [ ] Run admitted growing-size experiments; account for every attempt and test aggregate/per-phase exponents and frozen predictions.
+- [ ] Independently audit the mechanism, assumptions and costs; record a stage-scoped exponent result or falsification and its end-to-end effect.
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 
@@ -24,3 +29,10 @@ Establish an exponent-reducing relation-collection method for ordinary prime-fie
 - [x] Track every task first in docs/ACTIVE.md and a draft PR; roll /goal out to isogeny-labs repos (claude, started 2026-11-17, branch track-first-active, PR #4499)
 
 ## Blocked / questions for the owner
+
+The exponent goal remains open. Complete accounting, canonical export/replay,
+frozen protocol, prospective checkpoint and admission are prerequisites to
+performance runs. Canonical protocol/schema access and checkpoint readback
+remain unresolved. The APS native-ledger publication/reconciliation hold remains
+in force; keep PR #4531 auto-merge off.
+
