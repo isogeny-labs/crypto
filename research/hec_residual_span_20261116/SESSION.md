@@ -2835,3 +2835,10 @@ What was done: screenedearlieronecorepromotioninterpolationrankgain, implemented
 Decisions made: allgroundedpoints fixedpolicy, g>=3collisionheuristicmaybenefitbutg2nopoweradvantage;rankandcompletecostgatefalsifyyield-onlyreasoning. Classicalharvestingnotnovelty. One600CPUrun afterGitfreeze, allregressions/failuresretained.
 Open threads: executegenericfeedbackgateagainststrongstaticforest;10xgoalactiveunachieved.
 Errors: inheritedunusedsource/helperwarnings only;no scientificexecutionbeforefreeze. No S3/cloud/merge.
+
+## Generic all-grounded harvesting qualifies but complete costs mixed/regress
+
+What was done: freezed2335114daf hashespass/exit0;22audit+44freshcalls allnativeanswers/newauditReport/repeatedvectors pass, fullrawprefixFastchecks/norm/principalidentitychecks pass,16offsubgroupfinalrejections/6unavailable. Promotionsactive: p4001source1basis45->947/1462promotedscans. Static/harvestbaseg2.829-1.053(1/12improve),g3.981-1.398(5/6),g41.047-1.422(4/4);subgroupg2.449-.884(0/12),g3.540-1.143(2/6),g4.531-1.059(1/4).
+Decisions made: rejectfixedall-groundedscan asgenericgain, keeppositivehighergenusbasecountsandallregressions. Selectivepromotionrequiresnewcost/rankcase/prospectiveholdout; noafteroutcomecutfitting. Knownonecorecomponentgainnotgenericcomplete10x.
+Open threads: integratedrelationmechanismwithpricedaffinesubstitution/usefulrankcaseagainststaticforest;fullgoalactiveunachieved/independentreviewopen.
+Errors: no scientificfailure; inheritedunusedsource/helperwarnings.No S3/cloud/merge/unchangedrerun.
