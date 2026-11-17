@@ -1204,6 +1204,17 @@ fn echelon_fl(
     let free_cols: Vec<usize> = (0..n_cols).filter(|&c| pivot_of[c] == NONE).collect();
     let n_free = free_cols.len();
     let free_words = n_free.div_ceil(64);
+    // While B' is built, the original packed matrix is still live.  Charge
+    // both so the solver's peak-memory report does not hide the FL scratch
+    // matrix behind the already-recorded full-width allocation.
+    let full_words = n_cols.div_ceil(64) as u64;
+    let original_words = (reducer_count + pair_rows.len()) as u64 * full_words;
+    let bprime_words = reducer_count as u64 * free_words as u64;
+    st.peak_matrix_bytes = st.peak_matrix_bytes.max(
+        original_words
+            .saturating_add(bprime_words)
+            .saturating_mul(8),
+    );
     let mut free_index = vec![NONE; n_cols];
     for (index, &column) in free_cols.iter().enumerate() {
         free_index[column] = index as u32;
@@ -2932,7 +2943,11 @@ mod tests {
             // A triangular reducer block: every tail column lies strictly
             // right of its distinct leading column, exactly as symbolic
             // preprocessing orders Boolean F4 reducers.
-            for lead in 0..reducer_count {
+            // Interleave pivot and free columns instead of making the
+            // reducer block a contiguous prefix.  Symbolic preprocessing
+            // only guarantees distinct leads and rightward tails.
+            let reducer_leads: Vec<usize> = (0..reducer_count).map(|index| index * 2).collect();
+            for &lead in &reducer_leads {
                 let mut bits = vec![0u64; words];
                 bits[lead / 64] |= 1u64 << (lead % 64);
                 for column in lead + 1..n_cols {
@@ -2957,7 +2972,7 @@ mod tests {
                 echelon_block_tables(rows.clone(), n_cols, &mut reference_stats, None).unwrap();
             let reference_new: Vec<Vec<u64>> = reference
                 .into_iter()
-                .filter(|(lead, _)| *lead >= reducer_count)
+                .filter(|(lead, _)| reducer_leads.binary_search(lead).is_err())
                 .map(|(_, row)| row.bits)
                 .collect();
 
