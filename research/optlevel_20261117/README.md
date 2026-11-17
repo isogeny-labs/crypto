@@ -67,10 +67,11 @@ Readings:
   ceiling from a low one except by that flag.
 - **Vectorizing two classes does not help on this compiler and CPU.**
   `mulwide_u64` and `modmuladd_p62` (64x64→128 multiplies) have a SIMD/scalar
-  ratio of 1.0: gcc's vector code for them is no faster than `mulx`. The
-  ceiling is the best of the builds, so this costs nothing, and it is a
-  measured statement that `Fp64` rho arithmetic has no SIMD headroom here short
-  of IFMA limbs, for which v1 has no class.
+  ratio of 1.0: gcc's vector code for them reaches the same rate as scalar `mulx` [pcc:unverified]. The
+  ceiling is the best of the builds, so this costs nothing. It says only that
+  gcc's auto-vectorization gives the `modmuladd_p62` and `mulwide_u64`
+  calibration loops no headroom here; hand-written IFMA limbs were not tried
+  and v1 has no class for them.
 - **A memory-to-memory FMA loop is not the FMA ceiling.** The array kernel
   reached 7–11 G/s; sixteen register-resident vector accumulators reached
   45 G/s (about 16 per cycle). A blocked matrix product approaches the second,
@@ -152,7 +153,7 @@ Single-thread attainment, both runs:
      they are loops of the same shape as calibration kernels (the daxpy is
      not a bandwidth kernel, but the row operation is the `modmuladd_p31`
      ceiling kernel). They test the pipeline and its stability, not that the
-     ceiling is the best possible code. Only an independent faster
+     ceiling is the best possible code. Only an independent, better-tuned
      implementation can test that, and it would show as `CEILING_EXCEEDED`.
   2. "Not vectorized" comes from `objdump` (static share 0.00 for the scalar
      build, 0.29 for the vector build, whose function also holds scalar
@@ -208,7 +209,7 @@ What the two records say together:
   it. This is the "operation counter counts the wrong thing" failure mode in
   its undercounting form, which the tool cannot detect by itself. The record
   is still useful as a number: it says the float64 path is not the
-  bottleneck at this size, so a faster BLAS or a GPU would move this cell by
+  bottleneck at this size, so another BLAS or a GPU could change this cell by
   at most about 12%.
 - **Algorithmic axis, not scored.** The counted products are dense, while the
   product rows are shifts of sparse basis rows. Whether a sparse reduction
@@ -281,4 +282,5 @@ three-pass replay above.
   `controls-roofline.svg` and `.png`.
 - `real_kernel/`: the wrapper, two measurements, two records, the roofline
   SVG and PNG.
-- `report.pdf`: this page's tables and figures.
+- `report.pdf`: this page's tables and figures, rendered at commit cb21eb38c6;
+  three sentences were reworded afterwards (sections 2, 3 and 4), no number changed.
