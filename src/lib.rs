@@ -38,6 +38,7 @@ pub mod prime_hyperelliptic;
 pub mod store;
 pub mod symmetric;
 pub mod tls13;
+pub mod torsionguard;
 pub mod utils;
 pub mod visualize;
 pub mod zk;
