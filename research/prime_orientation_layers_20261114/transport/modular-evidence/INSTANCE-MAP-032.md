@@ -1,0 +1,8 @@
+# Actual unused packet-slot padding instance
+
+1. Structure: actual finite Slots=Fin P times Ports a; keep predicate; Real/Dummy subtypes and Bool assignments; arbitrary CommSemiring R; original row/column tensors. Actual endpoints in V+Dummy with original vertex type V.
+2. Named laws AS STATED: CryptoLean.TensorPadding.contraction_padded at owner0538641; Equiv.sumCompl, arrowCongr, Equiv.sum_comp; Fintype.card_prod/card_fin/card_subtype_compl; Nat.le_div_iff_mul_le; Fintype.card_subtype_eq and card_congr/subtypeEquivRight. Exact source signatures read; KB unavailable.
+3. Object: actual per-dummy indicator row tensor (spin false), unchanged column tensor, transported onto all physical Slots. Endpoint sends real slot to its original vertex and each unused slot to its own new endpoint.
+4. Probe161: sumCompl assignment bijection -> finite contraction transport -> existing owner padding theorem. Pointwise formulas show actual dummy unary factors. Total slots=P*2^a, dummy count=total-real; source count P<=3M/2^a and actual real count=M imply total<=3M,dummies<=2M. Dummy endpoint fiber iff slot equals chosen dummy -> existing subtype cardinality law yields degree1.
+5. Missing only actual instance/formula/count/endpoint equalities; no new generic tensor or counting law. All premises explicit. Source label consistency/balance, degree of old vertices, immutable descriptions and child recurrence remain separate obligations.
+6. Inheritance: finite types from Fin/subtype, assignment equivalence from Mathlib, contraction identity from compiled/audited shared owner, counting from existing cardinality laws. No source sampler/packing or runtime claim from these conditional packet bounds. [pcc:unverified]

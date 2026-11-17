@@ -1,0 +1,32 @@
+docs/tensor-padding-interface/source-001.lean.txt:11:0: warning: automatically included section variable(s) unused in theorem `CryptoLean.TensorPadding.contraction_eq_sum`:
+  [DecidableEq Sigma]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq Sigma] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+docs/tensor-padding-interface/source-001.lean.txt:20:0: warning: automatically included section variable(s) unused in theorem `CryptoLean.TensorPadding.leftPad_eq`:
+  [Fintype I]
+  [Fintype Sigma]
+  [DecidableEq I]
+  [DecidableEq D]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Fintype I] [Fintype Sigma] [DecidableEq I] [DecidableEq D] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+docs/tensor-padding-interface/source-001.lean.txt:24:0: warning: automatically included section variable(s) unused in theorem `CryptoLean.TensorPadding.rightPad_eq`:
+  [CommSemiring R]
+  [Fintype I]
+  [Fintype D]
+  [Fintype Sigma]
+  [DecidableEq I]
+  [DecidableEq D]
+  [DecidableEq Sigma]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CommSemiring
+  R] [Fintype I] [Fintype D] [Fintype Sigma] [DecidableEq I] [DecidableEq D] [DecidableEq Sigma] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+'CryptoLean.TensorPadding.contraction_eq_sum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CryptoLean.TensorPadding.dummyWeight_eq_prod' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CryptoLean.TensorPadding.leftPad_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CryptoLean.TensorPadding.rightPad_eq' depends on axioms: [propext, Classical.choice, Quot.sound]

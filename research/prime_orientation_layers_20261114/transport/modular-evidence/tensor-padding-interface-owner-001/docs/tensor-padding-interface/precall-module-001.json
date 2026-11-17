@@ -1,0 +1,40 @@
+{
+  "created_at": "2026-11-17T04:36:17.752075+00:00",
+  "commands": [
+    "lake build CryptoLean.TensorPaddingInterface",
+    "lake env lean --run tools/AuditAxioms.lean CryptoLean.TensorPaddingInterface"
+  ],
+  "scope": "Focused new companion interface only, original frozen TensorPadding module unchanged.",
+  "inputs": [
+    {
+      "path": "CryptoLean/TensorPaddingInterface.lean",
+      "bytes": 1205,
+      "sha256": "e1374de93489d4adfd00967dabd994ed34e963f4e6bbb5bc5c3d25818563096c"
+    },
+    {
+      "path": "docs/tensor-padding-interface/source-002.lean.txt",
+      "bytes": 1205,
+      "sha256": "e1374de93489d4adfd00967dabd994ed34e963f4e6bbb5bc5c3d25818563096c"
+    },
+    {
+      "path": "CryptoLean/TensorPadding.lean",
+      "bytes": 2053,
+      "sha256": "72820656bb23ecc6b54e72d93773932b0601f0af5b199ca85784c53e9e272e72"
+    },
+    {
+      "path": "tools/AuditAxioms.lean",
+      "bytes": 3855,
+      "sha256": "fdb8bd3af4301a9f50c7d8d0049994459f15b07abe397b8dddc1e49532dad96d"
+    },
+    {
+      "path": "lake-manifest.json",
+      "bytes": 3157,
+      "sha256": "0698b3bab96df3923ba118299043185eefda83072820c13bfe1e6035b9efbb75"
+    },
+    {
+      "path": "lean-toolchain",
+      "bytes": 25,
+      "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+    }
+  ]
+}

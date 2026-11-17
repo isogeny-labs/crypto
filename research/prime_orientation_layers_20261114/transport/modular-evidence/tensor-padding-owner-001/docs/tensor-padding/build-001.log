@@ -1,0 +1,108 @@
+docs/tensor-padding/source-001.lean.txt:8:32: error: invalid binder annotation, type is not a class instance
+  ?m.2
+
+Note: Use the command `set_option checkBinderAnnotations false` to disable the check
+docs/tensor-padding/source-001.lean.txt:12:28: error: type expected, got
+  (Sigma : (?m.3 → Type ?u.7) → Type (max ?u.8 ?u.7))
+docs/tensor-padding/source-001.lean.txt:12:28: error: type expected, got
+  (Sigma : (?m.5 → Type ?u.16) → Type (max ?u.17 ?u.16))
+docs/tensor-padding/source-001.lean.txt:12:52: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HMul R R ?m.15
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+docs/tensor-padding/source-001.lean.txt:12:47: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  AddCommMonoid R
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+docs/tensor-padding/source-001.lean.txt:14:28: error: type expected, got
+  (Sigma : (?m.3 → Type ?u.6) → Type (max ?u.7 ?u.6))
+docs/tensor-padding/source-001.lean.txt:14:28: error: type expected, got
+  (Sigma : (?m.5 → Type ?u.13) → Type (max ?u.14 ?u.13))
+docs/tensor-padding/source-001.lean.txt:15:24: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat R 1
+numerals are polymorphic in Lean, but the numeral `1` cannot be used in a context where the expected type is
+  R
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+docs/tensor-padding/source-001.lean.txt:15:31: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat R 0
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  R
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+docs/tensor-padding/source-001.lean.txt:15:2: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  CommMonoid R
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+docs/tensor-padding/source-001.lean.txt:17:35: error: type expected, got
+  (Sigma : (?m.3 → Type ?u.6) → Type (max ?u.7 ?u.6))
+docs/tensor-padding/source-001.lean.txt:17:35: error: type expected, got
+  (Sigma : (?m.5 → Type ?u.13) → Type (max ?u.14 ?u.13))
+docs/tensor-padding/source-001.lean.txt:18:41: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat R 1
+numerals are polymorphic in Lean, but the numeral `1` cannot be used in a context where the expected type is
+  R
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+docs/tensor-padding/source-001.lean.txt:18:48: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat R 0
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  R
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+docs/tensor-padding/source-001.lean.txt:20:18: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  CommMonoidWithZero ?m.28
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+docs/tensor-padding/source-001.lean.txt:18:53: error: unsolved goals
+D : Sort u_1
+R : Type u_2
+d0 : sorry
+x : sorry
+⊢ sorry = if x = d0 then 1 else 0
+docs/tensor-padding/source-001.lean.txt:20:6: warning: declaration uses `sorry`
+docs/tensor-padding/source-001.lean.txt:23:22: error: type expected, got
+  (Sigma : (?m.4 → Type ?u.8) → Type (max ?u.9 ?u.8))
+docs/tensor-padding/source-001.lean.txt:23:44: error: type expected, got
+  (Sigma : (?m.6 → Type ?u.16) → Type (max ?u.17 ?u.16))
+docs/tensor-padding/source-001.lean.txt:23:64: error: type expected, got
+  (Sigma : (?m.8 → Type ?u.25) → Type (max ?u.26 ?u.25))
+docs/tensor-padding/source-001.lean.txt:26:23: error: type expected, got
+  (Sigma : (?m.4 → Type ?u.8) → Type (max ?u.9 ?u.8))
+docs/tensor-padding/source-001.lean.txt:26:48: error: type expected, got
+  (Sigma : (?m.6 → Type ?u.18) → Type (max ?u.19 ?u.18))
+docs/tensor-padding/source-001.lean.txt:29:39: error: type expected, got
+  (Sigma : (?m.4 → Type ?u.8) → Type (max ?u.9 ?u.8))
+docs/tensor-padding/source-001.lean.txt:29:39: error: type expected, got
+  (Sigma : (?m.6 → Type ?u.17) → Type (max ?u.18 ?u.17))
+docs/tensor-padding/source-001.lean.txt:29:61: error: type expected, got
+  (Sigma : (?m.8 → Type ?u.25) → Type (max ?u.26 ?u.25))
+docs/tensor-padding/source-001.lean.txt:33:60: error: Application type mismatch: The argument
+  I
+has type
+  Sort u_1
+of sort `Type u_1` but is expected to have type
+  Type ?u.57
+of sort `Type (?u.57 + 1)` in the application
+  Equiv.sumArrowEquivProdArrow I
+docs/tensor-padding/source-001.lean.txt:34:14: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HMul R R ?m.45
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+docs/tensor-padding/source-001.lean.txt:35:18: error: type expected, got
+  (Sigma : (?m.47 → Type ?u.80) → Type (max ?u.81 ?u.80))
+docs/tensor-padding/source-001.lean.txt:35:32: error: type expected, got
+  (Sigma : (?m.49 → Type ?u.86) → Type (max ?u.87 ?u.86))
+docs/tensor-padding/source-001.lean.txt:35:57: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HMul R R ?m.73
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+docs/tensor-padding/source-001.lean.txt:38:34: error(lean.unknownIdentifier): Unknown identifier `dummyWeight_eq`
+docs/tensor-padding/source-001.lean.txt:38:17: warning: declaration uses `sorry`
+docs/tensor-padding/source-001.lean.txt:38:25: warning: declaration uses `sorry`
+docs/tensor-padding/source-001.lean.txt:44:14: error(lean.unknownIdentifier): Unknown constant `CryptoLean.TensorPadding.dummyWeight_eq`
+'CryptoLean.TensorPadding.contraction_padded' depends on axioms: [sorryAx]
