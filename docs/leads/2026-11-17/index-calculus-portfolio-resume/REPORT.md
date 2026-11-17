@@ -1,8 +1,8 @@
 # Index-calculus lead portfolio — resumed audit
 
-**Audit time:** 2026-11-17 UTC<br>
-**Repository base:** `isogeny-labs/crypto` `833a35d21ec2368ab081b2083d7762ed0bfd2bbc`<br>
-**Task branch / PR:** `codex/index-calculus-resume-20261117`, [#4594](https://github.com/isogeny-labs/crypto/pull/4594)<br>
+**Audit time:** 2026-11-17 UTC\
+**Repository base:** `isogeny-labs/crypto` `833a35d21ec2368ab081b2083d7762ed0bfd2bbc`\
+**Task branch / PR:** `codex/index-calculus-resume-20261117`, [#4594](https://github.com/isogeny-labs/crypto/pull/4594)\
 **Evidence class:** source/PR/run-record audit; no new scientific run. Every scientific or performance statement below is `[pcc:unverified]` unless an exact standing is stated.
 
 ## Decision
@@ -15,7 +15,7 @@ The portfolio now has three different kinds of leader; collapsing them into one 
 
 The best unowned research slot is **Curve25519 compressed six-sum / norm-section coefficient selection**, but it is a theory-and-construction slot: derive a target-conditioned coefficient recurrence, root extraction, and subcubic storage/work bound before another solver campaign. The proposed mechanism has no complete constructor, useful-yield bound, or exponent change yet. `[pcc:unverified]`
 
-[![Decision diagram](portfolio.png)](portfolio.svg)
+[![Decision diagram](portfolio.svg)](portfolio.svg)
 
 The vector source is [portfolio.dot](portfolio.dot); the rendered vector is [portfolio.svg](portfolio.svg).
 
