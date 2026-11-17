@@ -1170,9 +1170,179 @@ fn rr9_b8_exceptional_fibre_audit(ar: &mut Arithmetic) -> Value {
         "pcc":"unverified"})
 }
 
+
+/// Reconstruct the ninth zero of an RR9 function from seven *given* signed
+/// affine points S_i and a public affine residual R.  This is NOT relation
+/// extraction: the divisor identity proves T=R-sum(S_i), a generic group
+/// subtraction, although this implementation obtains T algebraically.
+///
+/// Hermite jet comparison is essential if T shares an x-coordinate with a
+/// supplied zero: F(T)=0 alone is insufficient to distinguish T from -T.
+fn rr9_complete_seven_signed_leaves(
+    ar: &mut Arithmetic, leaves: &[Point; 7], residual: Point,
+) -> Result<Option<Point>, String> {
+    let (rx, _) = residual.ok_or("seven-anchor completion excludes R=O")?;
+    if leaves.iter().any(|q| q.is_none()) {
+        return Err("seven-anchor completion excludes supplied infinity".into());
+    }
+    let divisor: [Point; 8] = std::array::from_fn(|i| {
+        if i < 7 { leaves[i] } else { neg(residual) }
+    });
+    // Existing L(9O) kernel uses true higher-order jets for repeated points.
+    let coeff = rr9_leaves_kernel(&divisor)?;
+    let norm = rr9_norm(&coeff);
+    if norm[9] == 0 {
+        // Ninth zero is at O, where the affine norm factor is unavailable.
+        return Ok(None);
+    }
+    let mut known_x = vec![1u64];
+    for q in leaves.iter().copied().chain(std::iter::once(residual)) {
+        let (x, _) = q.ok_or("infinite point in divisor x factors")?;
+        known_x = rr9_poly_mul(&known_x, &[fp_sub(0, x), 1]);
+    }
+    let (quotient, remainder) = rr9_poly_div_rem(&norm, &known_x)?;
+    if remainder != [0] || quotient.len() != 2 || quotient[1] != norm[9] {
+        return Err("RR9 norm does not leave an exact linear ninth-zero factor".into());
+    }
+    let x = fp_mul(fp_sub(0, quotient[0]), fp_pow(quotient[1], P - 2));
+    let y = ar.sqrt(ar.rhs(PRIME31, x), P)
+        .ok_or("ninth norm x-coordinate has no rational curve lift")?;
+    if y == 0 { return Err("prime-order prime31 has no affine rational 2-torsion".into()); }
+    let positive = Some((x, y));
+    let negative = neg(positive);
+    // Test for ONE ADDITIONAL local zero beyond the eight already imposed.
+    // This also disambiguates the exceptional x(T)=x(R) tangent-jet branch.
+    let has_extra = |q: Point| -> Result<bool, String> {
+        let order = divisor.iter().filter(|&&given| given == q).count();
+        let row = evaluation_higher_jet(q, order)?;
+        let value = (0..9).fold(0u64, |acc, i| fp_add(acc, fp_mul(row[i], coeff[i])));
+        Ok(value == 0)
+    };
+    match (has_extra(positive)?, has_extra(negative)?) {
+        (true, false) => Ok(positive),
+        (false, true) => Ok(negative),
+        (false, false) => Err(format!("RR9 ninth norm root at x={x} has no signed extra zero")),
+        (true, true) => Err(format!("RR9 ninth norm root at x={x} has ambiguous extra zeros")),
+    }
+}
+
+/// Full exact B8 sign-mask and original-curve B31 audit of seven-leaf
+/// interpolation. The original group sum is the INDEPENDENT test oracle;
+/// only seven signed leaves and public R are passed to the algebraic routine.
+fn rr9_seven_anchor_completion_audit(ar: &mut Arithmetic) -> Value {
+    let first = first_rational_points(ar);
+    let b8: [(u64,u64);8] = first[..8].try_into().unwrap();
+    let mut b8_checked = 0usize;
+    let mut b8_infinity = 0usize;
+    let mut exceptional_r_x = 0usize;
+    let mut computation_ns = 0u128;
+    for mask in 0u16..256 {
+        let signed: [Point; 8] = std::array::from_fn(|i| {
+            if (mask >> i) & 1 == 1 { neg(Some(b8[i])) } else { Some(b8[i]) }
+        });
+        let residual = group_sum(ar, &signed);
+        if residual.is_none() {
+            b8_infinity += 1;
+            continue;
+        }
+        let seven: [Point; 7] = std::array::from_fn(|i| signed[i]);
+        let started = Instant::now();
+        let completion = rr9_complete_seven_signed_leaves(ar, &seven, residual)
+            .expect("B8 RR9 algebraic completion should have one exact signed ninth zero");
+        computation_ns += started.elapsed().as_nanos();
+        assert_eq!(completion, signed[7], "B8 algebraic ninth zero differs from original EC sum");
+        if residual.unwrap().0 == signed[7].unwrap().0 { exceptional_r_x += 1; }
+        b8_checked += 1;
+    }
+    assert!(b8_checked >= 250, "unexpected number of infinity B8 residuals");
+    let residual = Some(PRIME31.g);
+    let mut exceptional_fixtures = 0usize;
+    for &minus in &[false, true] {
+        let points = rr9_b8_exceptional_fixture(ar, residual, minus);
+        let seven: [Point; 7] = std::array::from_fn(|i| Some(points[i]));
+        let completed = rr9_complete_seven_signed_leaves(ar, &seven, residual)
+            .expect("exceptional seven-anchor Hermite completion");
+        assert_eq!(completed, Some(points[7]), "R/-R exceptional completion chooses wrong tangent sign");
+        exceptional_fixtures += 1;
+    }
+    let mut negative_off_base = 0usize;
+    let mut negative_trials = 0usize;
+    for &mask in &[0u8, 0x35, 0x96, 0xff] {
+        let signed: [Point;8] = std::array::from_fn(|i|
+            if (mask >> i) & 1 == 1 { neg(Some(b8[i])) } else { Some(b8[i]) });
+        let seven: [Point;7] = std::array::from_fn(|i| signed[i]);
+        let mut target = group_sum(ar, &signed);
+        let seven_sum = seven.iter().copied().fold(None, |acc,q| ar.add(PRIME31, acc, q));
+        for _ in 0..64 {
+            target = ar.add(PRIME31,target,Some(PRIME31.g));
+            negative_trials += 1;
+            if target.is_none() { continue; }
+            let expected = ar.add(PRIME31, target, neg(seven_sum));
+            let Some((ex,_)) = expected else { continue; };
+            if b8.iter().any(|&(x,_)| x == ex) { continue; }
+            let completed = rr9_complete_seven_signed_leaves(ar, &seven, target)
+                .expect("negative off-base algebraic completion");
+            assert_eq!(completed, expected, "nonfactor-base completion must match generic subtraction");
+            assert!(!b8.iter().any(|&(x,_)| x == completed.unwrap().0),
+                "off-base negative was accepted as a factor-base leaf");
+            negative_off_base += 1;
+            break;
+        }
+    }
+    assert_eq!(negative_off_base, 4, "not all B8 off-base negative controls completed");
+    let dickson = Base::build(PRIME31, 6, ar).unwrap();
+    assert_eq!(dickson.points.len(),31);
+    let mut b31_checked = 0usize;
+    let mut draws = 0usize;
+    for (index, base) in [&first, &dickson.points].into_iter().enumerate() {
+        let mut seed = SEED ^ (index as u64) ^ 0x5345_5645_4e5f_414e;
+        let mut panel_checked = 0usize;
+        while panel_checked < 32 {
+            draws += 1;
+            assert!(draws < 2000, "B31 seven-anchor completion trial cap exceeded");
+            let mut choices: Vec<usize> = (0..31).collect();
+            let signed: [Point;8] = std::array::from_fn(|i| {
+                let j = i + (splitmix64(&mut seed) as usize % (31-i));
+                choices.swap(i,j);
+                let q = Some(base[choices[i]]);
+                if splitmix64(&mut seed)&1==1 {neg(q)} else {q}
+            });
+            let residual = group_sum(ar,&signed);
+            if residual.is_none() { continue; }
+            let seven: [Point;7] = std::array::from_fn(|i| signed[i]);
+            let started = Instant::now();
+            let completion = rr9_complete_seven_signed_leaves(ar,&seven,residual)
+                .expect("B31 given seven signed leaves complete to eighth");
+            computation_ns += started.elapsed().as_nanos();
+            assert_eq!(completion,signed[7], "B31 target-conditioned ninth norm root mismatches EC sum");
+            panel_checked += 1;
+            b31_checked += 1;
+        }
+    }
+    json!({
+        "schema":"prime31.rr9.seven_anchor_completion.v1",
+        "p":PRIME31.p,"n":PRIME31.n,
+        "b8_sign_masks_total":256,
+        "b8_positive_checked":b8_checked,"b8_infinity_residuals":b8_infinity,
+        "b8_residual_x_equals_withheld_x":exceptional_r_x,
+        "explicit_R_and_minus_R_jet_fixtures":exceptional_fixtures,
+        "negative_off_base_completed":negative_off_base,
+        "negative_target_offsets_tried":negative_trials,
+        "b31_given_support_completions":b31_checked,
+        "b31_raw_draws":draws,
+        "interpolation_wall_ns_diagnostic_only":computation_ns.to_string(),
+        "seven_signed_leaf_points_supplied":true,
+        "generic_group_subtraction_equivalence_proved":true,
+        "public_only_relation_extraction":false,
+        "complete_unknown_target_ecdlp_recoveries":0,
+        "pcc":"unverified"
+    })
+}
+
 fn run() -> Value {
     let mut ar = Arithmetic::default();
     check_curve(PRIME31, &mut ar).expect("prime31 curve certificate");
+    let seven_anchor_audit = rr9_seven_anchor_completion_audit(&mut ar);
     let b8_fibre_audit = rr9_b8_linear_fibre_audit(&mut ar);
     let b8_exceptional_audit = rr9_b8_exceptional_fibre_audit(&mut ar);
     let b1 = first_rational_points(&mut ar);
@@ -1185,7 +1355,8 @@ fn run() -> Value {
         "curve":PRIME31, "method":"L(9O) evaluation determinant on nine distinct affine points",
         "positive_count":64, "negative_count":64,
         "panels":[first,dickson], "b8_signed_fibres":b8_fibre_audit,
-        "b8_exceptional_x_signed_fibres":b8_exceptional_audit, "source_only_pcc":"unverified",
+        "b8_exceptional_x_signed_fibres":b8_exceptional_audit,
+        "seven_anchor_completion":seven_anchor_audit, "source_only_pcc":"unverified",
         "nonenumerative_factor_extraction":false,
         "complete_unknown_target_ecdlp_recoveries":0,
         "matched_optimized_rho":false
@@ -1298,6 +1469,19 @@ mod tests {
         let mut bad = zero;
         bad[0] = P;
         assert!(rr9_public_norm_support(&bad, Some(PRIME31.g), &h).is_err());
+    }
+    #[test]
+    fn rr9_seven_anchor_generic_equivalence_on_actual_prime31() {
+        let mut ar = Arithmetic::default();
+        check_curve(PRIME31,&mut ar).unwrap();
+        let report = rr9_seven_anchor_completion_audit(&mut ar);
+        assert_eq!(report["b8_sign_masks_total"],256);
+        assert!(report["b8_positive_checked"].as_u64().unwrap()>=250);
+        assert_eq!(report["explicit_R_and_minus_R_jet_fixtures"],2);
+        assert_eq!(report["negative_off_base_completed"],4);
+        assert_eq!(report["b31_given_support_completions"],64);
+        assert_eq!(report["public_only_relation_extraction"],false);
+        assert_eq!(report["complete_unknown_target_ecdlp_recoveries"],0);
     }
     #[test]
     fn rr9_b8_exceptional_x_jet_fibre_equivalence() {
