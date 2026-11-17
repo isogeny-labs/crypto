@@ -1833,3 +1833,10 @@ What was done: freeze7c3ce5a0231 once-onlyexit0;12orientations/12wronglambda/204
 Decisions made: pi=P(sigma) fromtwistedtraces+tracepairing; no unqualifiedCM/actionassumption added, fixedwholeorderpremise unchanged. p601verifierbase1.787-1.926old/new,completecandidatebase1.226-1.325x andell8.637-10.344xsourcecost. No fullgain.
 Open threads: sparsewitnessconstruction/zerowork elimination withsamecertificatepredicate, thenchangedproducer; independentproofreview/formalization.
 Errors: none,no rerun/S3/cloud.
+
+## Sparse certificate witness gate frozen
+
+What was done: compiled orderednonzero Gaussian rows/witness propagation, samepivotorder/finaldensepacket; verifierzero/unit terms skipped afterrangechecks. Fullpacketreplay andbaseverifierexactness required.
+Decisions made: no geometry/action/premise changes,12accept84mutation24costcontrols retained; onlysubgroupconstruction/checking changes. Assertions [pcc:unverified].
+Open threads: pushfreeze then once-only120CPU invocation.
+Errors: none in compile, no science yet.
