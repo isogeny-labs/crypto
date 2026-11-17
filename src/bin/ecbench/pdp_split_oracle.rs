@@ -342,6 +342,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for PdpSplitOracle<'_> {
             solving_degree: Some(sd_max),
             timed_out,
             extra,
+            ..Default::default()
         };
         self.totals.absorb(shape, Some(&cost), timed_out);
         found
