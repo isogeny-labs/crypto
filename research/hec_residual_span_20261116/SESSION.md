@@ -25,3 +25,7 @@ Owner authorizes Git custody while S3 is unavailable. New T-6982 scoped lease co
 ## Original quadratic gate executed
 
 Under pushed Git checkpoint f63dbabd059, original frozen gate exits0, all6cells/checks pass. H7no collisions; H13has17/9/7collisions but zero incremental rank and identical first completion245/238/242. Raw outputs/prefixes/exit/commit/timestamps/outputhashes retained. No speed premise follows. Commit/push this result before executing the separately frozen extension. No source changes or failed outputs hidden.
+
+## V1 input-family failure and prospective v2 fixture amendment
+
+V1execution checkpoint d65d090d4da, exit101: all eight g2/g3cells pass polynomial/group/partition/span checks; selecting the first g4fixture fails because its original family has no irreducible member. Retained fullstdout/stderr/exit/run/outputhashes, not classified as a complete pass. V2adds deterministic g4-only squarefree irreducible binomial fallback, chosen without rank/admission selection, and emits exact coefficients. Separate amended source/buildmanifest/lock/binary/freeze/outputdirectory; all scientific checks and coverage unchanged. Eight completed g2/g3rows must replay byte-identically. Original freezes and binaries retained. V2build succeeds; push amendment before execution. No mathematical nonexistence or tenfold claim.
