@@ -2576,3 +2576,10 @@ What was done: freeze56ffb4fc245 hashes passed; one complete-solver invocation e
 Decisions made: retain integrated solver as stronger original-genus-two source baseline, not a10x/runtime/independent-verification claim. Conditional admitted Frobenius premise explicit. Future producer comparisons must not hide this stronger verification option.
 Open threads: genus3/4 generic evaluator/complete-control extension with full costs and operator qualification; remaining producer/setup work and full10xmathematical goal active/unachieved.
 Errors: none in scientific integration; inherited unused snapshot warning only. No S3/cloud/merge.
+
+## Six-field cross-genus complete-verification substitution frozen
+
+What was done: compiled all four retained collector modes with only final verification replaced, exact original setup/fast producer preserved. Driver reconstructs all24holdout public source/target receipts exactly; all source/operator/mutation checks and scalar/polynomial repeats precede192fresh complete calls and fullvector substitutions.
+Decisions made: keep all cases/regressions, no post-hoc fallback; conditional operator qualification and genus-four subgroup scope explicit. No added free Fp preparation. One120CPU process after Git freeze, counts not walltime, no10xclaim.
+Open threads: execute full cross-genus test, report all96per-arm ratios and strongest-arm comparisons.
+Errors: inherited unused imports/report fields/modes warnings; compile clean otherwise. Own conflict check allows, attach same reservation. No S3/cloud/merge.
