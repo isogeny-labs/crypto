@@ -14,6 +14,7 @@
 #include <chrono>
 #include <cstdint>
 #include <cstdio>
+#include <cstring>
 #include <random>
 #include <vector>
 
@@ -96,7 +97,7 @@ static double batch_ns(Fn fn, const Fp256Ctx &f,
     return times[4];
 }
 
-int main() {
+int main(int argc, char **argv) {
     const Fp256Ctx f = fp256_ctx_p256();
     std::mt19937_64 rng(0x25620261117ull);
     std::vector<U256x64> xs(8192);
@@ -106,6 +107,22 @@ int main() {
         x = fp256_to_mont(f, canonical);
     }
     xs[0] = f.one;
+    /* Perf mode runs only one arm on the identical deterministic corpus.
+     * This avoids counting two algorithms together in perf stat. */
+    if (argc == 2) {
+        const char *mode = argv[1];
+        if (std::strcmp(mode, "--perf-inv-before") == 0)
+            std::printf("P256 before inverse %.1f ns/op\n", inversion_ns(inv_before256, f, xs));
+        else if (std::strcmp(mode, "--perf-inv-after") == 0)
+            std::printf("P256 after inverse %.1f ns/op\n", inversion_ns(inv_after256, f, xs));
+        else if (std::strcmp(mode, "--perf-batch32-before") == 0)
+            std::printf("P256 before batch32 %.1f ns/op\n", batch_ns(batch_before256, f, xs, 32));
+        else if (std::strcmp(mode, "--perf-batch32-after") == 0)
+            std::printf("P256 after batch32 %.1f ns/op\n", batch_ns(batch_after256, f, xs, 32));
+        else { std::fprintf(stderr, "Unknown perf mode: %s\n", mode); return 2; }
+        return 0;
+    }
+    if (argc != 1) { std::fprintf(stderr, "Usage: %s [--perf-inv-before|--perf-inv-after|--perf-batch32-before|--perf-batch32-after]\n", argv[0]); return 2; }
     for (const auto &x : xs) {
         const U256x64 a = inv_before256(f, x), b = inv_after256(f, x);
         if (!u256_eq(a, b) || !u256_eq(fp256_mul(f, x, b), f.one)) {
