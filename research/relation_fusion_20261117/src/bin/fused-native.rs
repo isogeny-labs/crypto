@@ -21,7 +21,7 @@ fn save(path: &Path, bytes: &[u8]) -> Result<()> {
 fn main() -> Result<()> {
     let args: Vec<_> = std::env::args().collect();
     if args.len() != 5 {
-        return Err("usage:fused-native compact|compact-sparse|expanded|cubic-reference|cubic-dag|cubic-dag-pruned legacy|packed legacy|frontier|packed-products|packed-batch NEW_PROOF_DIR; original System on stdin".into());
+        return Err("usage:fused-native compact|compact-sparse|compact-dag|expanded|cubic-reference|cubic-dag|cubic-dag-pruned legacy|packed legacy|frontier|packed-products|packed-batch NEW_PROOF_DIR; original System on stdin".into());
     }
     let start = Instant::now();
     let mut original = Vec::new();
@@ -47,7 +47,9 @@ fn main() -> Result<()> {
         return Err("legacy consumer supports only p31".into());
     }
     let construct = Instant::now();
-    let (wire, constructor) = if args[1] == "cubic-dag-pruned" {
+    let (wire, constructor) = if args[1] == "compact-dag" {
+        replay::produce_compact_dag_for_packed(&system, kernel)?
+    } else if args[1] == "cubic-dag-pruned" {
         replay::produce_cubic_dag_pruned_for_packed(&system, kernel)?
     } else if args[1] == "cubic-dag" {
         (
@@ -64,7 +66,7 @@ fn main() -> Result<()> {
     };
     let construct_ns = construct.elapsed().as_nanos();
     let verify = Instant::now();
-    let checked = if args[1].starts_with("cubic-dag") {
+    let checked = if args[1].starts_with("cubic-dag") || args[1] == "compact-dag" {
         if args[2] != "packed" {
             return Err("DAG requires explicit packed consumer".into());
         }

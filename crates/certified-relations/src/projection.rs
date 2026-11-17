@@ -455,8 +455,27 @@ pub(crate) fn subset_quadratic(
     p: u64,
     pairs: &[cheap::PairMetadata],
 ) -> Option<(Row, Vertex, Work)> {
+    subset_quadratic_impl(inputs, n, p, pairs, false)
+        .map(|(row, vertex, work, _)| (row, vertex, work))
+}
+pub(crate) fn subset_quadratic_dag(
+    inputs: &[Poly],
+    n: usize,
+    p: u64,
+    pairs: &[cheap::PairMetadata],
+) -> Option<(Row, Vertex, Work, Vec<Row>)> {
+    subset_quadratic_impl(inputs, n, p, pairs, true)
+}
+fn subset_quadratic_impl(
+    inputs: &[Poly],
+    n: usize,
+    p: u64,
+    pairs: &[cheap::PairMetadata],
+    retain: bool,
+) -> Option<(Row, Vertex, Work, Vec<Row>)> {
     let mut cache: Vec<Option<Row>> = vec![None; pairs.len()];
     let mut work = Work::default();
+    let mut definitions = Vec::new();
     for axis in (0..n).rev() {
         let incident: Vec<_> = pairs
             .iter()
@@ -492,6 +511,19 @@ pub(crate) fn subset_quadratic(
                 swap(canonical, pair.variables[0], pair.variables[1])
             };
             assert!(verify(&oriented, inputs, p));
+            let oriented = if retain {
+                if definitions.len() >= 512 {
+                    return None;
+                }
+                let local = Row {
+                    poly: oriented.poly.clone(),
+                    proof: BTreeMap::from([((inputs.len() + definitions.len(), vec![0; n]), 1)]),
+                };
+                definitions.push(oriented);
+                local
+            } else {
+                oriented
+            };
             count += 1;
             root = Some(if let Some(previous) = root {
                 gcd(previous, oriented, axis, p)
@@ -509,15 +541,26 @@ pub(crate) fn subset_quadratic(
             continue;
         }
         work.vertex_gcd_folds += 1;
-        assert!(verify(&root, inputs, p));
+        let extended;
+        let generators = if retain {
+            extended = inputs
+                .iter()
+                .cloned()
+                .chain(definitions.iter().map(|row| row.poly.clone()))
+                .collect::<Vec<_>>();
+            extended.as_slice()
+        } else {
+            inputs
+        };
+        assert!(verify(&root, generators, p));
         let vertex = Vertex {
             variable: axis,
             incident_projections: count,
             degree: d,
             certificate_terms: root.proof.len(),
-            certificate_product_degree: certificate_degree(&root, inputs),
+            certificate_product_degree: certificate_degree(&root, generators),
         };
-        return Some((root, vertex, work));
+        return Some((root, vertex, work, definitions));
     }
     None
 }

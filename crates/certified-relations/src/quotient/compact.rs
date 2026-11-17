@@ -15,6 +15,7 @@ pub struct Certificate {
 }
 #[derive(Clone, Debug, Serialize)]
 pub struct Info {
+    pub root_projection_definitions: usize,
     pub batch_groups_attempted: usize,
     pub batch_groups_completed: usize,
     pub coordinates_batched: usize,
@@ -94,10 +95,14 @@ fn reduced(basis: &[Row]) -> bool {
 /// Check acyclic membership identities, both ideal containments, reducedness
 /// and every S-pair. This is exact arithmetic, not an independent signature.
 pub fn verify(certificate: &Certificate, inputs: &[Poly], n: usize, p: u64) -> bool {
-    verify_impl(certificate, inputs, n, p, false)
+    verify_impl(certificate, inputs, n, p, false, n)
 }
 pub fn verify_product(certificate: &Certificate, inputs: &[Poly], n: usize, p: u64) -> bool {
-    verify_impl(certificate, inputs, n, p, true)
+    verify_impl(certificate, inputs, n, p, true, n)
+}
+/// Explicit v2 definition budget; all identity and whole-basis checks remain.
+pub fn verify_dag_product(certificate: &Certificate, inputs: &[Poly], n: usize, p: u64) -> bool {
+    verify_impl(certificate, inputs, n, p, true, 512)
 }
 fn verify_impl(
     certificate: &Certificate,
@@ -105,9 +110,10 @@ fn verify_impl(
     n: usize,
     p: u64,
     product: bool,
+    definition_cap: usize,
 ) -> bool {
     if !admitted(inputs, n, p)
-        || certificate.definitions.len() > n
+        || certificate.definitions.len() > definition_cap
         || certificate.basis.is_empty()
         || certificate.basis.len() > BASIS_CAP
     {
@@ -152,6 +158,7 @@ fn verify_impl(
         }
 }
 struct Chain {
+    definition_cap: usize,
     generators: Vec<Poly>,
     definitions: Vec<Row>,
     stored_terms: usize,
@@ -163,7 +170,7 @@ impl Chain {
     fn push(&mut self, row: Row) -> Result<Row, String> {
         let (work, _) = row_shape(&row, &self.generators, self.n, self.p)
             .ok_or("compact: invalid local identity shape/reference/budget")?;
-        if self.definitions.len() >= self.n
+        if self.definitions.len() >= self.definition_cap
             || self.stored_terms + row.proof.len() > PROOF_CAP
             || self.identity_work + work > IDENTITY_WORK_CAP
         {
@@ -194,10 +201,14 @@ fn original_bound(row: &Row, bounds: &[usize]) -> usize {
 /// Same polynomial construction as the expanded control, with a different
 /// retained certificate representation. No oracle, witness or hidden fallback.
 pub fn solve(inputs: &[Poly], n: usize, p: u64) -> Result<Output, String> {
-    solve_impl(inputs, n, p, false, false, false)
+    solve_impl(inputs, n, p, false, false, false, false)
 }
 pub fn solve_product(inputs: &[Poly], n: usize, p: u64) -> Result<Output, String> {
-    solve_impl(inputs, n, p, false, false, true)
+    solve_impl(inputs, n, p, false, false, true, false)
+}
+/// Share checked edge-resultant nodes through root GCD; explicit v2 only.
+pub fn solve_sparse_dag_product(inputs: &[Poly], n: usize, p: u64) -> Result<Output, String> {
+    solve_impl(inputs, n, p, false, true, true, true)
 }
 pub struct SparseOutput {
     pub output: Output,
@@ -218,7 +229,7 @@ fn solve_sparse_impl(
     p: u64,
     product: bool,
 ) -> Result<SparseOutput, String> {
-    match solve_impl(inputs, n, p, false, true, product) {
+    match solve_impl(inputs, n, p, false, true, product, false) {
         Ok(output) => Ok(SparseOutput {
             output,
             subset_succeeded: true,
@@ -238,7 +249,7 @@ fn solve_sparse_impl(
 /// Explicit ablation: eagerly construct every vertex before selecting a root.
 /// Polynomial kernels, proof representation and final checks match solve.
 pub fn solve_all_vertices(inputs: &[Poly], n: usize, p: u64) -> Result<Output, String> {
-    solve_impl(inputs, n, p, true, false, false)
+    solve_impl(inputs, n, p, true, false, false, false)
 }
 fn solve_impl(
     inputs: &[Poly],
@@ -247,11 +258,19 @@ fn solve_impl(
     all_vertices: bool,
     subset: bool,
     product: bool,
+    dag: bool,
 ) -> Result<Output, String> {
     if !admitted(inputs, n, p) {
         return Err("compact: unsupported prime/input shape".into());
     }
-    let (root_row, root, projection_work, pairs) = if subset {
+    let mut root_definitions = Vec::new();
+    let (root_row, root, projection_work, pairs) = if dag {
+        let pairs = cheap::pair_metadata(inputs, n, p);
+        let (row, root, work, definitions) = projection::subset_quadratic_dag(inputs, n, p, &pairs)
+            .ok_or("compact-dag: no supported subset vertex")?;
+        root_definitions = definitions;
+        (row, root, work, pairs)
+    } else if subset {
         let pairs = cheap::pair_metadata(inputs, n, p);
         let (row, root, work) = projection::subset_quadratic(inputs, n, p, &pairs)
             .ok_or("compact: no supported subset vertex")?;
@@ -297,7 +316,9 @@ fn solve_impl(
         )
     };
     let t = root.variable;
+    let root_projection_definitions = root_definitions.len();
     let mut chain = Chain {
+        definition_cap: if dag { 512 } else { n },
         generators: inputs.to_vec(),
         definitions: Vec::new(),
         stored_terms: 0,
@@ -305,6 +326,9 @@ fn solve_impl(
         n,
         p,
     };
+    for definition in root_definitions {
+        chain.push(definition)?;
+    }
     let h = chain.push(root_row)?;
     let originals = input_rows(inputs, n);
     let mut rules = vec![None; n];
@@ -414,7 +438,9 @@ fn solve_impl(
         definitions: chain.definitions,
         basis,
     };
-    if !(if product {
+    if !(if dag {
+        verify_dag_product(&certificate, inputs, n, p)
+    } else if product {
         verify_product(&certificate, inputs, n, p)
     } else {
         verify(&certificate, inputs, n, p)
@@ -435,6 +461,7 @@ fn solve_impl(
     let definition_terms = certificate.definitions.iter().map(|r| r.proof.len()).sum();
     let basis_terms = certificate.basis.iter().map(|r| r.proof.len()).sum();
     let info = Info {
+        root_projection_definitions,
         batch_groups_attempted,
         batch_groups_completed,
         coordinates_batched,
@@ -463,6 +490,45 @@ fn solve_impl(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn root_dag_retains_full_ideal_and_old_version_budget() {
+        for p in [2147483647, 9007199254740881] {
+            for n in [3, 6] {
+                for hub in [0, n - 1] {
+                    let edges: Vec<_> = (0..n).filter(|v| *v != hub).map(|v| (hub, v)).collect();
+                    let system = workload::generate_graph(p, n, 7, &edges).unwrap().system;
+                    let inputs = system.decode().unwrap();
+                    let old = solve_sparse_product(&inputs, n, p).unwrap().output;
+                    for bits in [103, 231, 487] {
+                        let new = with_native_kernel_bits(bits, || {
+                            solve_sparse_dag_product(&inputs, n, p)
+                        })
+                        .unwrap();
+                        assert_eq!(new.info.root_projection_definitions, 2);
+                        assert_eq!(new.certificate.definitions.len(), n + 2);
+                        assert_eq!(
+                            new.certificate
+                                .basis
+                                .iter()
+                                .map(|r| &r.poly)
+                                .collect::<Vec<_>>(),
+                            old.certificate
+                                .basis
+                                .iter()
+                                .map(|r| &r.poly)
+                                .collect::<Vec<_>>()
+                        );
+                        assert!(verify_dag_product(&new.certificate, &inputs, n, p));
+                        assert!(!verify_product(&new.certificate, &inputs, n, p));
+                        let mut changed = inputs.clone();
+                        let coefficient = changed[0].values_mut().next().unwrap();
+                        *coefficient = (*coefficient + 1) % p;
+                        assert!(!verify_dag_product(&new.certificate, &changed, n, p));
+                    }
+                }
+            }
+        }
+    }
     #[test]
     fn sufficient_subset_keeps_full_checked_star_ideals() {
         for hub in [0, 7] {

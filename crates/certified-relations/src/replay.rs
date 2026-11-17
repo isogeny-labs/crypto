@@ -234,6 +234,26 @@ pub fn produce_native_for_packed(
 pub fn produce_cubic_for_packed(system: &System, kernels: NativeKernels) -> Result<Vec<u8>, String> {
     with_native_kernel_bits(kernels.bits(), || cubic_for_packed_impl(system))
 }
+/// Explicit v2 compact certificate with local root-resultant provenance.
+pub fn produce_compact_dag_for_packed(
+    system: &System,
+    kernels: NativeKernels,
+) -> Result<(Vec<u8>, serde_json::Value), String> {
+    if ![2147483647, 9007199254740881].contains(&system.prime) {
+        return Err("packed wire supports only the two fixed primes".into());
+    }
+    with_native_kernel_bits(kernels.bits(), || {
+        let input = system.decode()?;
+        let output = quotient::compact::solve_sparse_dag_product(&input, system.variables.len(), system.prime)?;
+        let witness = complete_impl(system,
+            output.certificate.definitions.iter().map(member).collect(),
+            output.certificate.basis.iter().map(member).collect(),
+            true, CompletionExports::PackedDag)?;
+        let wire = serde_json::to_vec(&witness).map_err(|e| e.to_string())?;
+        if wire.len() > 16 * 1024 * 1024 { return Err("packed serialized proof byte cap".into()); }
+        Ok((wire, serde_json::to_value(output.info).map_err(|e| e.to_string())?))
+    })
+}
 fn cubic_for_packed_impl(system: &System) -> Result<Vec<u8>, String> {
     let input = system.decode()?;
     let n = system.variables.len();

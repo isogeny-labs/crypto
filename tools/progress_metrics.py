@@ -1058,6 +1058,20 @@ def relation_fusion_observations(ref, since):
                  source=f"{path}@{commit}")
 
 
+def relation_fusion_repeated(ref, since):
+    """Export recorded component medians with their actual admission status."""
+    path = "research/relation_fusion_20261117/MATCHED_ANALYSIS_85.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        for case in data.get("cases", []):
+            for arm in case.get("arms", []):
+                key = f"p{case['prime']}.n{case['n']}.{arm['arm']}"
+                emit(f"relation.fusion.repeated.{key}.parent_ns", arm["median_parent_ns"],
+                     date=date, problem="complete-certificate-replay", unit="ns", better="neutral",
+                     label="Five-call median; contended85, no timing admission; PCC unverified",
+                     source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -1103,6 +1117,7 @@ def main():
     vieta_component(a.ref, a.since)
     trace_local_runtime(a.ref, a.since)
     relation_fusion_observations(a.ref, a.since)
+    relation_fusion_repeated(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
