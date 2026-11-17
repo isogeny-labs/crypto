@@ -19,10 +19,14 @@ variable count and final Gröbner-basis degree alone do not meet this goal.
 ## Active items (top = next)
 
 - [x] Freeze the ideal-module regularity definition and comparison protocol (codex, started 2026-11-17, branch lane/p256-dreg-half-20261117, PR #4567; tracking4555 merged before research publication)
-- [ ] Establish a complete-system baseline on the frozen finite depth4 cell, preserving the original depth8 workload (codex, PR #4567; in progress; public qualifier exhausted two calls without a value)
-- [ ] Extend exact component certificates and falsification controls to complete baseline/candidate relation ideals (codex, PR #4567; component verifier implemented)
+- [ ] Establish a complete-system baseline on the frozen finite depth4 cell, preserving the original depth8 workload (codex, PR #4567; four native cells censored; no admitted full D)
+- [ ] Extend retained membership certificates (signed D8→4 and16→5) to complete baseline/candidate relation ideals (codex, PR #4567; full-system certificate pending)
 - [ ] Establish a candidate with D_candidate <= D_baseline/2, preserving exact relations and charging auxiliary variables/covers (codex, PR #4567)
-- [ ] Validate m=2–7 and record scope, replay, costs and remaining obligations (codex, PR #4567)
+- [ ] Validate m=2–7 and record scope, replay, costs and remaining obligations (codex, PR #4567; 48 paired exports/12 planted replays checked; full solve/depth8 pending)
+
+- [x] Freeze and audit #4556 exact-source public B8 RR9 result with native JSON receipt (automation, started 2026-11-17, branch research/prime31-barycentric-evidence-20261117, PR #4558)
+
+- [ ] Build TorsionGuard finite-primary-module soundness analyzer (Codex, started 2026-11-17, branch codex/torsionguard-core-20261117, PR #4554)
 
 - [ ] Publish Vieta Rust speed results and resolve official record/publication blockers (codex, started 2026-11-17, branch lane/vieta-speed-20261117, PR #4525)
 
