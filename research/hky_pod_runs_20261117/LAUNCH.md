@@ -139,3 +139,8 @@ pushed, which are this directory at commit `833a35d21e`.
 - (6,3) D = 8 on `msweep-a`: censored by `max_entries` (1.4e10) after 14,465 s; the closure did not decide. (6,3)
   stays "at least 8". Pod `o3cc7qp0n24apx` terminated (GET 404).
 - Depth 14 c = 6 still running (4 h 49 min, peak RSS 22.0 GB). Only pod `gz5n46wfmmg86r` left from this batch.
+
+## 23:36 UTC
+
+- Depth 14 c = 6 still running (5 h 50 min, peak RSS 22.4 GB). Only pod left. Within the pre-run estimate
+  (4 to 13.5 h on 16 cores; this host is 32 shared vCPU under heavy neighbour load).
