@@ -2891,3 +2891,10 @@ What was done: proved imageintegralrelationlatticemodell=lambda-perp when genera
 Decisions made: do notinferlowdegree/coldcostgainfromfullrelationspace. Needfirst-rho1alpha/betaextraction/constraintverification/subgroupcertificatebeforefinishertrial; classifyunavailable/scale/zero-directioncases. No newexperimentor10xclaim.
 Open threads: certifiedquotientdescriptorgate onall22prefixes withcomponentcostandfullconstraintchecks;thenboundedlowdegree span ifapplicable. Fullgoalactiveunachieved/independentreviewopen.
 Errors: none. No S3/cloud/merge/unchangedrerun.
+
+## First-rho1 affine quotient descriptor gate frozen
+
+What was done: addedexactbacksubstitution ofsmalltargetlastbasis toS0/w, readonlyforestexpressionextensionwithfreeLPparameters0, groundedalpha/betamatrixrank/minorwitness. Allrawprior/currentrows mustsatisfy particular/nullidentities; targeta0/b1. Prepared44AUDITcallsrequiringoldfinaloutcomes anddescriptor/componentcountrepeat. Extractorreceivesnoknownscalar.
+Decisions made: measureonlydescriptorcomponent underexplicitcounterinterval, allcore/auditchecksdisabledcounts;notintegratedspeedclaim. Rank2certifiesnonzeroellcomponentviaactualgroundedlambda=a+kb; rank1premiseremainsconditional. No lowdegreefinisher/negativecollector rerun.
+Open threads: executestructuralclassificationall22, then boundedlowdegree span onlyifapplicableandcostcasecredible. Fullgoalactiveunachieved.
+Errors: inheritedunusedsource/helperwarningsonly;no scientificexecutionbeforefreeze.No S3/cloud/merge.
