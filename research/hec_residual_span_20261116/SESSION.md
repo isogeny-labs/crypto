@@ -2471,3 +2471,10 @@ What was done: freezefe767fa8aec input hashes passed, one C invocation exit0. Al
 Decisions made: strengthens complex-candidate distinction conditional CM interpretation; not algebraic recovery or finite-field curves. Before expensive CM reconstruction, measure exact source smoothness saturation ceiling on original target subgroup to test relevance to10x.
 Open threads: source complete-subgroup smoothness census; subsequent mechanism must address actual remaining dominant cost, not assume distinct quotients imply speedup.
 Errors: none in frozen C execution; no S3/cloud/merge.
+
+## Original genus-two saturation census frozen
+
+What was done: derived full-base reduced-pair count S=1+m+(m²-w)/2 and conditional uniform-success ceilingN/S. Compiled Rust complete67931target-subgroup census with primality/order/validity/closure/degree/oracle-versus-count checks.
+Decisions made: test probability-only isogeny gain before further expensive CM reconstruction. Bound does not cover arithmetic/rank/nonuniform/truncated-base improvements. One120CPU invocation after Git freeze/push, no wall benchmark.
+Open threads: execute and use exact density to prioritize a mechanism capable of10x.
+Errors: pre-freeze missing-borrow compile error corrected; no scientific failure/run occurred during compilation.
