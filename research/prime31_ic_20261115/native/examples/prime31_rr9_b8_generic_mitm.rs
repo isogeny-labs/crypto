@@ -16,7 +16,8 @@ const BLIND_TARGETS: usize = 1024;
 fn first_eight(ar: &mut Arithmetic) -> [(u64, u64); 8] {
     let mut base = Vec::new();
     for x in 0..PRIME31.p {
-        if let Some(y) = ar.sqrt(ar.rhs(PRIME31, x), PRIME31.p) {
+        let rhs = ar.rhs(PRIME31, x);
+        if let Some(y) = ar.sqrt(rhs, PRIME31.p) {
             assert_ne!(y, 0, "cofactor-one prime group has no rational two-torsion");
             base.push((x, y.min(PRIME31.p - y)));
             if base.len() == 8 { break; }
