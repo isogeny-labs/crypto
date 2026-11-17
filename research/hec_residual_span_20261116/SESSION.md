@@ -1728,3 +1728,10 @@ What was done: freeze82eb6786e20 single invocation exit0;411491positions validit
 Decisions made: finitegroupqualification, notunknownlogsolve/speed/globaldegreeproof; signambiguity retained.
 Open threads: sameoriginaltarget fullcost ICtransport withbestsourcecontrol.
 Errors: apply_patch reportwrite failed withresearchvolume29MiBfree; directRubywrite succeeded, no data/cache deleted. Rawrun intact. No scientificretry/S3/cloud.
+
+## Optimistic quotient backend cost screen frozen
+
+What was done: compiled countedtransport/lift/genericIC/originalverify onfourretainedp601targets, twoexactrepeats. Sourcecounts fromfrozenrootpipeline botharms separately.
+Decisions made: map/quotientderivationfree makescandidate LOWERBOUND notfullcoldcost; favorableoutcome cannotpromote beforemissingcosts. NativeFastoracle/Fastsolver/seed20260916/triallimit200000fixed. Assertions [pcc:unverified].
+Open threads: pushfreeze then once-only120CPU invocation; inspectnegativeadmission beforefullsetuppricing.
+Errors: none in compile; disk973MiBfree, scientificexecutionnotyet.
