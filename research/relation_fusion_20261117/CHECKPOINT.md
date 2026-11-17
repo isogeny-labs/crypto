@@ -15,3 +15,7 @@ Next useful alternative: recover compiler-valid baseline source from trustedGit 
 Separate metadata blockers: benchrecglobalprogress refuses documentary20261105T0828Z-icb-large-prime-n53-s1-archive command1 (exitnull; historicalrecordexplicitlysaysnotcaptured). Newbenchrecords remainopen despite attemptedclose; nohistoricalexclusion added. FullPCCledgerverify rejects151oldclaims missingclaim_type; each byte-equalc5main. Hashchainandcanonicalbaseprefix checks pass. Allownclaims carrydata type,unsigned/notcovered. Do notrewritefrozenclaims/keyring/gates to obtain green.
 
 Preserve every rawfailure/outlier,originalproofobligation andsourcecontext. Latestreviewable reports/records/claims are inPR4530; goalactive even if publicationstage finishes.
+
+## Later recovery106
+
+Work/relation-root-recovery reconstructs live source prerequisites from trusted branches; once merged into the lane, three earlier small repairs and SAT/custody recovery are applied. ActualSAT46 plus actualpacked-codec1 tests pass (47total). No full crypto_lib success: after include hydration,109 other API/type diagnostics remain; ROOT_BUILD_BLOCKERS_104.json and ROOT_RECOVERY_REPORT.md describe them. Rootadapter stillpending; applyonlyits certified.rs hunk after remaining baseline recovery. No accepted15x, no goalclosure.

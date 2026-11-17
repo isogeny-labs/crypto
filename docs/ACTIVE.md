@@ -25,4 +25,4 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Blocked / questions for the owner
 
-- Relation15x / PR #4530: full crypto_lib baseline has malformed SAT scopes; saved adapter and tests await compiler-valid source. Benchmark closure and global PCC verification also reject pre-existing incomplete historical metadata; no frozen evidence or gate was changed. Constructor-only comparisons failed15x; goal remains in progress.
+- Relation15x / PR #4530: partial source recovery passes47 SAT/codec tests, but full crypto_lib still has109 other API/type diagnostics; saved adapter tests await a coherent baseline. Benchmark closure and global PCC verification also reject pre-existing incomplete historical metadata; no frozen evidence or gate was changed. Constructor-only comparisons failed15x; goal remains in progress.

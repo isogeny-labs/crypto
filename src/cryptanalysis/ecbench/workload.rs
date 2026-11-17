@@ -1636,7 +1636,6 @@ impl Instance {
                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
                     }
                 }
-                Instance::Wide(_) | Instance::Fp4(_) | Instance::ThreeLeads(_) | Instance::Hyper(_) => {
                 Instance::Wide(_)
                 | Instance::Fp4(_)
                 | Instance::ThreeLeads(_)
