@@ -12,6 +12,18 @@ name = "pdp_lin_cdcl"
 path = "examples/pdp_lin_cdcl.rs"
 crate-type = ["lib"]
 
+# Shared modules of the jv_sieve_* examples (included there with #[path]); built
+# as library examples so Cargo's example discovery does not require a `main`.
+[[example]]
+name = "jv_sieve_quadratic_pair_relation_controls"
+path = "examples/jv_sieve_quadratic_pair_relation_controls.rs"
+crate-type = ["lib"]
+
+[[example]]
+name = "jv_sieve_quadratic_pair_graph_controls"
+path = "examples/jv_sieve_quadratic_pair_graph_controls.rs"
+crate-type = ["lib"]
+
 [[example]]
 name = "performance_gains_audit"
 path = "examples/performance_gains_audit.rs"
