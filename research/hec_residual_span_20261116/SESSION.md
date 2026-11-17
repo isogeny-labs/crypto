@@ -1946,3 +1946,10 @@ What was done: freeze4c71783dc31 once-onlyexit0;24calls/12targets bytepackets/fu
 Decisions made: retainengineering index; mixed vs retainedcontrols (p601arm0base0.811-1.501,subgroup0.868-1.106), no10x. Priornonsplitspan identity/ranknegative alreadycovers naive reuse.
 Open threads: mathematical mechanism reducing jointcollection/proof work from correctedbaseline, require usefulsubgrouprank/coldcost; genus3/4fullcoverage,independentreview/publication artifacts.
 Errors: none in execution,no retry/S3/cloud.
+
+## Witness-supported packet frozen
+
+What was done: retainedraw supportaudit2..16nonzeroof7..35rows; derived exactrestricted w^TA=eT,w^Tb=k underzero-weight removal. Built terminalpacket compression retainingallreps, fullproducer/construction charged and replayed.
+Decisions made: same12targets/24calls, bothverifiers84mutation gate, prunedpackets retained; nofieldarithmetic discountfor collection/construction, vector costsunpriced. Assertions [pcc:unverified]. Sourceschecked(KB): source:4548c0e85d47f9299ddc900c047c266d crypto:docs/ic/ECDLP_RESEARCH_TECHNIQUES.md,revision9b2119e8fbac482b98b50521c0d604bb, sparsecombination replay; localindexed builder/verifier read.
+Open threads: pushfreeze then one120CPU invocation, comparecomplete costs tobothcontrols, original10xgoalunchanged.
+Errors: none in compile,no scienceyet.
