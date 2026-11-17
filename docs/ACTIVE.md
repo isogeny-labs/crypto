@@ -24,3 +24,5 @@ _(none pinned — set one with `/goal <text>`)_
 - [x] Track every task first in docs/ACTIVE.md and a draft PR; roll /goal out to isogeny-labs repos (claude, started 2026-11-17, branch track-first-active, PR #4499)
 
 ## Blocked / questions for the owner
+
+- Relation15x / PR #4530: full crypto_lib baseline has malformed SAT scopes; saved adapter and tests await compiler-valid source. Benchmark closure and global PCC verification also reject pre-existing incomplete historical metadata; no frozen evidence or gate was changed. Constructor-only comparisons failed15x; goal remains in progress.

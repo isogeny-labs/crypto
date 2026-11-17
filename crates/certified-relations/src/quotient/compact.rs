@@ -491,6 +491,31 @@ fn solve_impl(
 mod tests {
     use super::*;
     #[test]
+    fn root_dag_handles_connected_paths_and_refuses_disconnected_inputs() {
+        for p in [2147483647, 9007199254740881] {
+            let n = 6;
+            let edges: Vec<_> = (0..n - 1).map(|i| (i, i + 1)).collect();
+            let system = workload::generate_graph(p, n, 7, &edges).unwrap().system;
+            let inputs = system.decode().unwrap();
+            let old = solve_sparse_product(&inputs, n, p).unwrap().output;
+            let new = solve_sparse_dag_product(&inputs, n, p).unwrap();
+            assert_eq!(
+                new.certificate
+                    .basis
+                    .iter()
+                    .map(|r| &r.poly)
+                    .collect::<Vec<_>>(),
+                old.certificate
+                    .basis
+                    .iter()
+                    .map(|r| &r.poly)
+                    .collect::<Vec<_>>()
+            );
+            assert!(verify_dag_product(&new.certificate, &inputs, n, p));
+            assert!(solve_sparse_dag_product(&inputs[..2], n, p).is_err());
+        }
+    }
+    #[test]
     fn root_dag_retains_full_ideal_and_old_version_budget() {
         for p in [2147483647, 9007199254740881] {
             for n in [3, 6] {

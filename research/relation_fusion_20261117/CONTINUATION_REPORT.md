@@ -4,7 +4,7 @@ The repeated study does not establish 15x. All240 planned calls completed with m
 
 The primary candidate, batch487, was compared with the strongest of the other five arms in each matched round. Five A/A rounds preceded five rotated AB rounds on the six fixed cases (seed7,LAST star,n3/4/6,p31/p53). This small sample is diagnostic; bootstrap bounds are not a general confidence guarantee. The frozen gate requires uncontended execution, exact full-basis agreement, all repeats, lower bounds above15 in all cases and an improvement beyond A/A spread. It failed.
 
-|Field|n|Batch / strongest control median ratio|Simultaneous lower bound|A/A largest symmetric ratio|
+|Field|n|Strongest control / batch (median)|Simultaneous lower bound|A/A largest symmetric ratio|
 |---|---:|---:|---:|---:|
 |2147483647|3|0.8604|0.6684|1.3351|
 |2147483647|4|0.9361|0.7212|1.5237|
@@ -24,6 +24,8 @@ Live dependencies now use maintained crates. Integrated producer/checker tests p
 Profile86 counted23,376,889 simulated instructions in a fixed p53/n6 frontier call; instruction shares include vector axpy13.94%,free6.73%,monomial allocation4.92%,malloc4.31%. These are instruction shares,not wall-time shares. It used an externally reserved/pinned CPU0; the profile manifest records isolation none because it did not own that wrapper. The separate monitor is archived.
 
 The new root-resultant DAG retains checked edge resultants before the Euclidean GCD. At n6 this changes complete proof cofactors433to417 and referenced products2725to2581. It is a modest correctness-qualified representation change,not a measured speedup. Existing APIs keep their budgets; explicitv2 uses the previously declared512node cap and every complete obligation. [pcc:unverified]
+
+\newpage
 
 ## Evidence and scope
 
