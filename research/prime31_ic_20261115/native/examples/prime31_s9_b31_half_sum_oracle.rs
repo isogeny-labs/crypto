@@ -623,6 +623,7 @@ mod batch_complement_tests {
 
     #[test]
     fn actual_dickson31_matched_batched_complements() {
+        let entire_setup_start = Instant::now();
         let mut ar = Arithmetic::default();
         check_curve(PRIME31, &mut ar).expect("original cofactor-one prime31 curve");
         let base = Base::build(PRIME31, 6, &mut ar).expect("unchanged Dickson31");
@@ -630,6 +631,7 @@ mod batch_complement_tests {
         let pts = tokens(&ar, &base.points);
         let half = FourSet::build(&mut ar, &pts);
         assert_eq!(half.index.len(), 618_885);
+        let entire_setup_ns = entire_setup_start.elapsed().as_nanos();
 
         // Explicit same-x and identity tests at the arithmetic operation level,
         // not a claim that a naturally successful query visited those branches.
@@ -663,6 +665,7 @@ mod batch_complement_tests {
 
         let mut old_total_ns = 0_u128;
         let mut new_total_ns = 0_u128;
+        let mut shared_residual_generation_ns = 0_u128;
         let mut old_fp_inversions = 0_u64;
         let mut old_fp_multiplications = 0_u64;
         let mut old_group_additions = 0_u64;
@@ -679,8 +682,10 @@ mod batch_complement_tests {
         for (case, q) in public_targets.iter().copied().enumerate() {
             let mut found = false;
             for shift in 0..=8_u64 {
+                let common_start = Instant::now();
                 let delta = ar.scalar(PRIME31, shift, Some(PRIME31.g));
                 let residual = ar.add(PRIME31, q, delta);
+                shared_residual_generation_ns += common_start.elapsed().as_nanos();
                 total_attempts += 1;
 
                 let old_before = ar.counts;
@@ -730,6 +735,10 @@ mod batch_complement_tests {
             "original_dickson31_base_size":B31,
             "signed_four_group_points":half.index.len(),
             "four_set_setup_ns_diagnostic":half.build_ns.to_string(),
+            "curve_validation_and_full_factor_base_and_four_set_setup_ns":entire_setup_ns.to_string(),
+            "shared_residual_generation_ns_excluded_from_both_arms":shared_residual_generation_ns.to_string(),
+            "legacy_setup_plus_query_plus_shared_residual_ns":(entire_setup_ns + old_total_ns + shared_residual_generation_ns).to_string(),
+            "batch_setup_plus_query_plus_shared_residual_ns":(entire_setup_ns + new_total_ns + shared_residual_generation_ns).to_string(),
             "four_set_setup_group_additions":half.build_additions,
             "hashmap_capacity_entries_not_bytes":half.index.capacity(),
             "public_target_count":public_targets.len(),
