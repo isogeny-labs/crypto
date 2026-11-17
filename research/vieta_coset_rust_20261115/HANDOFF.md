@@ -1,5 +1,24 @@
 # Vieta Rust port: continuation receipt
 
+## PR4410 merged; terminal closeout — 17 November, 01:41 UTC
+
+PR4410 merged at2026-11-16T23:16:15Z as2b15288e325bcfea86175601c1321d1520c9d6d2
+from0396799e4f. Required PCC/artifact jobs failed before that merge; size passed.
+Do not describe it as green CI or infer why GitHub accepted it. Selected logs
+show missing claim_type errors, shared403 downloads, artifact-manifest JSON
+Extra data, and a rustfmt scope setup missing-file error. See
+next-20261116/closeout-20261117/STATUS.json, CI_JOB_EXCERPTS.json and CLOSEOUT.md.
+
+Recorded publication-window episodeE-e353fbdbd1ca and matching partial lesson
+outcomeO-c9d953fa0a47. Original prompt/intervention timestamps/full-session costs
+are incomplete; no zero-intervention or unsupervised-success claim. Revert
+check due2026-11-30T23:16:15Z is not yet performed. Automation2624 disabled with
+service success; stop this study's polling. Source/data/protocol/report/selected
+claim files match the published head at recording base2043bee6ae. No benchmark,
+cloud/S3 action, gate change or protected promotion. General scientific standing
+remains unverified. Publish this metadata-only closeout as a small follow-up;
+no implementation or measurement work remains active.
+
 ## Automated merge audit and repair — 16 November, 21:53 UTC
 
 PR4410 advanced automatically todb2b11314c by merging maina8b29cbbe0 into97fea7bf45.
