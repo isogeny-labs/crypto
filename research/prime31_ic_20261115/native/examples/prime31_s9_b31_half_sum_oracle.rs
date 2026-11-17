@@ -1005,10 +1005,17 @@ mod complete_b31_1024_tests {
         let mut target_negatives = 0usize;
         let mut exact_point_checks = 0usize;
         let mut returned = Vec::with_capacity(TARGETS);
+        let mut target_transcript = Vec::with_capacity(TARGETS);
         for &(q, caller_k) in &targets {
+            let before_attempts = target_attempts;
+            let before_negatives = target_negatives;
+            let mut signed_witness: Option<Word8> = None;
+            let mut successful_shift: Option<u64> = None;
             let recovered = if let Some((word, shift)) = public_relation(
                 &mut ar, &half, &pts, q, &mut stats, &mut target_attempts, &mut target_negatives
             ) {
+                signed_witness = Some(word);
+                successful_shift = Some(shift);
                 let mut rlog = 0u64;
                 for token in word {
                     let i = (token / 2) as usize;
@@ -1029,6 +1036,15 @@ mod complete_b31_1024_tests {
             exact_point_checks += 1;
             // Caller knows this, candidate (including fallback) did not receive it.
             assert_eq!(recovered, caller_k);
+            target_transcript.push(json!({
+                "public_target_q":q,
+                "recovered_log":recovered,
+                "shift":successful_shift,
+                "signed_eight_token_witness":signed_witness,
+                "membership_attempts":target_attempts-before_attempts,
+                "exhaustive_negatives":target_negatives-before_negatives,
+                "used_generic_bsgs_fallback":signed_witness.is_none()
+            }));
             returned.push(recovered);
         }
         let target_solve_verify_ns = target_start.elapsed().as_nanos();
@@ -1041,6 +1057,10 @@ mod complete_b31_1024_tests {
             "field_p": PRIME31.p, "order_n": PRIME31.n,
             "curve_a": PRIME31.a, "curve_b": PRIME31.b,
             "base_size":DIM, "half_set":half.index.len(),
+            "base_points":base.points,
+            "basis_rows_raw":collected,
+            "recovered_factor_base_logs":logs,
+            "target_replay_transcript":target_transcript,
             "basis_rows":collected.len(), "basis_rank":rank.count,
             "basis_dependent_rows":rank.dependent,
             "basis_source_points":used_sources, "basis_unresolved_shift_cap":setup_unresolved,
