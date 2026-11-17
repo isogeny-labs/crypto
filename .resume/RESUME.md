@@ -7712,3 +7712,21 @@ Outcome source tag, new linked worktree/branch and exact source intake, successo
 
 ## Errors
 Initial audit report title/subtitle joined; corrected and final page inspected before report claim, original rendered page retained in scratch. No native source or unit rerun. New main baseline lacks trust/policy files; no alternate identity/provider or weakened check is used. [pcc:unverified]
+
+
+---
+
+2026-11-17T01:03:25.302218+00:00
+# Retain post-PR4472 complete source-fork claims and balanced class12 evidence
+
+## What was done
+Source claims668611/9cf968/a38dff/465331/65ffd2/13c2b7/5ea1e1 retained append-only with exact native source/evidence/report proof paths. Actual current worktree /workspace/crypto-chained-chart-current source outcome4841e784/tag exact readback0, all13 tests9 phases0,226 witnesses3952 pairs39 controls, report50757B inspected. Original canonical trust/keyring/policy/gates absent on d06 main; original old-keyring/tool bytes remain unchanged here. [pcc:unverified]
+
+## Decisions made
+This checkout remains a preserved source-fork record collector, not active canonical main. Commit whole post5f3 records as a normal child/tag only, never push closed lane/chained-transfers/PR4455. All raw claims remain unsigned, no old ledger choose/rechain/drop. Native12 raw292-file hold moved whole to RAM after byte/SHA/mode check, source archives preserved. [pcc:unverified]
+
+## Open threads
+Active PR4472bd8a first ownCI01:07; normal successor source after actualhead observation. Actual Richelot factors/correspondence/dual[2], original fullLP/admission/cost/store/PCC/merge/paid/vault constraints remain. [pcc:unverified]
+
+## Errors
+Full original failures/corrections retained, no native rerun. Current-main missing trust roots are not replaced by this archival checkout; original-data source-fork claims are not signed or canonical standing. [pcc:unverified]
