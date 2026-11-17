@@ -28,9 +28,14 @@ rustc --edition=2021 -D warnings -O h113_winding_lab.rs -o h113_winding_lab
 ```
 
 The independent verifier is implemented in paired cryptanalysis PR #1733.
-The Lean proof, raw artifact, measured report, and rendered visual report
-remain pending. A protocol and compiling implementation do not establish the
-candidate identity or an ECDLP algorithm. [pcc:unverified]
+`H113BinaryTrinaryWinding.lean` proves the generic carry diamond, canonical
+representative range, conditional base-six reconstruction, inverse-six group
+update, and final uniqueness endpoint. `PROOF_MAP.md` records the instance
+gate and claim boundary; `proof-gate-v1/` passes 14 declarations with zero
+trusted-native. The raw artifact, measured report, and rendered visual report
+remain pending. A protocol, compiling implementation, and conditional Lean
+proof do not establish the candidate identity or an ECDLP algorithm.
+[pcc:unverified]
 
 ## Sources checked
 
