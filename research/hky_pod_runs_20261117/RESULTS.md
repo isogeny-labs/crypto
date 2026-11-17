@@ -22,7 +22,7 @@ Depth 14 (target 0, c <= 6) started 17:46 UTC: c = 5 closed without 1, dimension
 |--:|:--|:--|
 | 4 | 6 (certified 6) | 7 (certified 7) |
 | 5 | 6 (certified 6) | 8, at 226,325 columns, 257 s and 259 s (certified: lower bound 8) |
-| 6 | 7 (certified 7), 61,183 columns, 10 s | at least 8: D = 7 closed without 1 (440,772 columns, 2 s); D = 8 (1,136,799 columns) hit the 2,400 s budget on target 0; rerun on one target with an 18,000 s budget started 17:31 |
+| 6 | 7 (certified 7), 61,183 columns, 10 s | at least 8: D = 7 closed without 1 (440,772 columns, 2 s); D = 8 (1,136,799 columns) censored by the 1.4e10-entry cap after 14,465 s on one target, so still undecided |
 | 7 | 8, at 471,041 columns, 935 s and 934 s | at least 8: D = 8 (4,384,467 columns) not run (column cap) |
 | 8 | 8, at 1,466,345 columns, about 200 s; same from two hosts | at least 8: D = 7 closed without 1 (3,947,416 columns, 180 s); D = 8 (13,962,982 columns) abandoned |
 | 9 | at least 9: D = 8 closed without 1 on both targets (3,981,645 columns, dimension 1,047,766, 639 s each); D = 9 (11,075,610 columns) hit the 2,400 s budget on target 0 and was not waited for on target 1 | not emitted by the driver |
