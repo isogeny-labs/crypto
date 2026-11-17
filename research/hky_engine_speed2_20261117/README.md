@@ -307,3 +307,19 @@ test on the pod**, not a measured result.
 | `trace_summary.sh`, `util_model.sh` | read `--hky3-trace` output: per-rank-slice work, thread model |
 | `PREDICTION_t12.md` | the held-out prediction, committed before the run |
 | `raw/` | every row, log, trace and `cond.log`/`rss.log` behind the tables |
+
+## Held-out t = 12 prediction — SCORED (main session, 2026-11-17 23:19 UTC)
+
+`PREDICTION_t12.md` was committed (de2ddd11) before this run. Measured (`raw/t12/v2.jsonl`,
+hky3 default, 4 shared vCPU, neighbour load):
+
+| quantity | predicted (point, band) | measured | verdict |
+|---|---|---|---|
+| answer | 1 enters at c = 6 (d_F = 5) | 1 enters at c = 6; dims 0,0,2,146,3727,32057,190051 | MATCH |
+| muladds, c = 6 | 2.0e12 (1.8e12–2.5e12) | 2.1048e12 | in band (+5% on point) |
+| wall, c = 6 | 850 s (720–1180) | 950 s | in band |
+
+v1 at this cell (pod README §8): 3.69e12 muladds, 1,722 s on these 4 vCPU. So v2/v1 = **0.57× muladds,
+0.55× wall** at t = 12, consistent with the 0.47× / 2.1× at t = 10. The low-degree closures match v1
+exactly (c = 5: dims …,3727,32057; 1 ∉ V_5). This is `[pcc:unverified]`: one draw, one instrument, no
+PMU; "1 enters" rests on this engine alone, as for v1.
