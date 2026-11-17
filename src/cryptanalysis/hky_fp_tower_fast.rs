@@ -15,9 +15,10 @@
 //!   (`p < 2³¹`, so `acc + f·x < 2⁶³`) and one conditional subtraction of `p²`
 //!   replaces the division; a value is reduced modulo `p` once, when its
 //!   column is visited.
-//! - level 2: no heap. Touched columns are bits of a bitmap scanned upward
-//!   (a pivot row only touches columns after its own), and a row that meets
-//!   no pivot added since it was reduced is not reduced twice.
+//! - level 2: no heap and no list of touched columns: the accumulator is
+//!   scanned upward between the first and the last column touched (a pivot
+//!   row only touches columns after its own), and a row that meets no pivot
+//!   added since it was reduced is not reduced twice.
 //! - level 3: products `x·g` are formed when they are taken from the queue,
 //!   in the parallel section, from the stored row (the queue holds
 //!   `(row, variable)` pairs, not polynomials), and the column index uses a
@@ -173,7 +174,8 @@ impl Index {
     }
 }
 
-/// The order the queue of pending rows is served in.
+/// The order the queue of pending rows is served in. The space does not
+/// depend on it; the work does, by a factor of several (README, "Schedule").
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum QueueOrder {
     /// The reference's: last in, first out.
@@ -181,6 +183,9 @@ pub enum QueueOrder {
     /// Products of the lowest-degree rows first (last in, first out among
     /// equals). Same space; only the work to reach `1` changes.
     LowDegreeFirst,
+    /// Products of the sparsest stored rows first (by the bit length of the
+    /// row's number of terms; last in, first out among equals).
+    SparseFirst,
 }
 
 /// What [`closure_fast`] does differently from the reference.
@@ -191,7 +196,8 @@ pub struct FastOptions {
     /// A candidate involution of the tower variables (`perm[j]` is the image
     /// of variable `j`), or `None` for no split. Verified before use.
     pub symmetry: Option<Vec<usize>>,
-    /// Rows per batch; 0 keeps the limits' value (the reference's 4096).
+    /// Rows per batch. 0 picks it: the limits' value (the reference's 4096)
+    /// under [`QueueOrder::Lifo`], `max(32, 2 · threads)` otherwise.
     pub batch: usize,
     pub order: QueueOrder,
     /// A row is stored dense when `nnz · dense_den > span · dense_num`
@@ -202,6 +208,14 @@ pub struct FastOptions {
     /// measurement. 1: the products by variable 0 are not formed.
     /// 2: the delayed reduction subtracts `p² − 1` instead of `p²`.
     pub fault: u8,
+    /// Levels 2 on. A row is reduced only until its leading column is not a
+    /// pivot; the reference also clears every later pivot column. Same
+    /// leading monomials, same space. **Measured slower** (the rows are
+    /// denser: README, "Tried and rejected"); kept off, for the record.
+    pub lead_only: bool,
+    /// [`QueueOrder::SparseFirst`]: doublings of the number of terms per
+    /// priority bucket.
+    pub sparse_width: usize,
 }
 
 impl Default for FastOptions {
@@ -210,10 +224,12 @@ impl Default for FastOptions {
             level: 4,
             symmetry: None,
             batch: 0,
-            order: QueueOrder::Lifo,
+            order: QueueOrder::SparseFirst,
             dense_num: 1,
             dense_den: 3,
             fault: 0,
+            lead_only: false,
+            sparse_width: 1,
         }
     }
 }
@@ -242,6 +258,7 @@ pub struct FastStats {
     /// Stored coefficients (a dense row counts its whole slice).
     pub stored_words: u64,
     pub threads: usize,
+    pub batch: usize,
     pub simd: &'static str,
 }
 
@@ -306,7 +323,6 @@ struct Echelon {
 /// Per-thread scratch.
 struct Scratch {
     acc: Vec<u64>,
-    bits: Vec<u64>,
     touched: Vec<u32>,
 }
 
@@ -314,7 +330,6 @@ impl Scratch {
     fn new(n: usize) -> Self {
         Scratch {
             acc: vec![0u64; n],
-            bits: vec![0u64; n / 64 + 2],
             touched: Vec::new(),
         }
     }
@@ -419,6 +434,7 @@ struct Ctx {
     simd: Simd,
     dense_num: usize,
     dense_den: usize,
+    lead_only: bool,
 }
 
 impl Echelon {
@@ -490,41 +506,54 @@ impl Echelon {
         (out, ops)
     }
 
-    /// Levels 2 on: the touched columns are bits scanned upward.
+    /// Levels 2 on: no heap and no list of touched columns. The accumulator
+    /// is scanned upward from the row's first column to the last column
+    /// touched so far (a pivot row only touches columns after its own).
     fn reduce_scan(&self, cx: &Ctx, r: &[(u32, u32)], s: &mut Scratch) -> (Row, u64) {
         let (p, p2, bm) = (cx.p, cx.p2, cx.barrett_m);
         let n = self.pivot.len();
         let acc = &mut s.acc[..n];
-        let bits = &mut s.bits;
         let mut ops = 0u64;
-        let Some(&(first, _)) = r.first() else {
+        let (Some(&(first, _)), Some(&(last, _))) = (r.first(), r.last()) else {
             return (Vec::new(), 0);
         };
         for &(col, c) in r {
             acc[col as usize] = u64::from(c);
-            bits[(col >> 6) as usize] |= 1u64 << (col & 63);
         }
         let mut out: Row = Vec::new();
-        let nw = n.div_ceil(64);
-        let mut w = (first >> 6) as usize;
-        while w < nw {
-            let word = bits[w];
-            if word == 0 {
-                w += 1;
+        let mut last = last as usize;
+        let mut ci = first as usize;
+        while ci <= last {
+            let raw = acc[ci];
+            if raw == 0 {
+                ci += 1;
                 continue;
             }
-            let b = word.trailing_zeros();
-            bits[w] = word & (word - 1);
-            let col = (w as u32) << 6 | b;
-            let ci = col as usize;
-            let v = barrett(acc[ci], p, bm);
             acc[ci] = 0;
+            let v = barrett(raw, p, bm);
             if v == 0 {
+                ci += 1;
                 continue;
             }
             let piv = self.pivot[ci];
             if piv == NONE {
-                out.push((col, v as u32));
+                out.push((ci as u32, v as u32));
+                if cx.lead_only {
+                    // Lead-only: the row has its leading column; the rest is
+                    // gathered as it stands, pivot columns included.
+                    for c2 in ci + 1..=last {
+                        let raw = acc[c2];
+                        if raw != 0 {
+                            acc[c2] = 0;
+                            let x = barrett(raw, p, bm);
+                            if x != 0 {
+                                out.push((c2 as u32, x as u32));
+                            }
+                        }
+                    }
+                    break;
+                }
+                ci += 1;
                 continue;
             }
             let f = p - v;
@@ -535,30 +564,16 @@ impl Echelon {
                         let i = c2 as usize;
                         let t = acc[i] + f * u64::from(x);
                         acc[i] = t.min(t.wrapping_sub(p2));
-                        bits[i >> 6] |= 1u64 << (i & 63);
                     }
+                    last = last.max(row[row.len() - 1].0 as usize);
                 }
                 RowS::Dense { v: dv, nnz, .. } => {
                     ops += u64::from(*nnz);
-                    let lo = ci + 1;
-                    axpy_dense(cx.simd, &mut acc[lo..], &dv[1..], f, p2);
-                    // every later column may now be non-zero
-                    if lo < n {
-                        let (w0, w1) = (lo >> 6, (n - 1) >> 6);
-                        let m0 = !0u64 << (lo & 63);
-                        let m1 = !0u64 >> (63 - ((n - 1) & 63));
-                        if w0 == w1 {
-                            bits[w0] |= m0 & m1;
-                        } else {
-                            bits[w0] |= m0;
-                            for x in &mut bits[w0 + 1..w1] {
-                                *x = !0;
-                            }
-                            bits[w1] |= m1;
-                        }
-                    }
+                    axpy_dense(cx.simd, &mut acc[ci + 1..], &dv[1..], f, p2);
+                    last = n - 1;
                 }
             }
+            ci += 1;
         }
         ops += normalise(&mut out, p);
         (out, ops)
@@ -573,7 +588,10 @@ impl Echelon {
     }
 
     /// Whether a row reduced before this batch meets a pivot added since.
-    fn meets_fresh_pivot(&self, r: &[(u32, u32)]) -> bool {
+    fn meets_fresh_pivot(&self, r: &[(u32, u32)], lead_only: bool) -> bool {
+        if lead_only {
+            return r.first().is_some_and(|&(c, _)| self.pivot[c as usize] != NONE);
+        }
         self.fresh > 0 && r.iter().any(|&(c, _)| self.pivot[c as usize] != NONE)
     }
 }
@@ -933,6 +951,13 @@ impl<'a> Space<'a> {
     }
 }
 
+/// The bucket of a row with `nnz` terms in [`QueueOrder::SparseFirst`]:
+/// `1 + ⌊log₂ nnz / width⌋` (`width` doublings per bucket).
+fn sparse_bucket(nnz: usize, width: usize) -> usize {
+    let lg = (usize::BITS - 1 - nnz.max(1).leading_zeros()) as usize;
+    1 + lg / width.max(1)
+}
+
 enum Item {
     Row(u8, Row),
     /// `x_var ·` (row `row` of part `part`), formed when dequeued.
@@ -1012,6 +1037,7 @@ pub fn closure_fast(
         simd,
         dense_num: opts.dense_num,
         dense_den: opts.dense_den,
+        lead_only: opts.lead_only && opts.level >= 2,
     };
     let nv = ring.n_vars();
     let applies = |v: usize| space.applies(v) && !(opts.fault == 1 && v == 0);
@@ -1032,6 +1058,7 @@ pub fn closure_fast(
     let n_buckets = match opts.order {
         QueueOrder::Lifo => 1,
         QueueOrder::LowDegreeFirst => c as usize + 2,
+        QueueOrder::SparseFirst => 66,
     };
     let mut queue: Vec<Vec<Item>> = (0..n_buckets).map(|_| Vec::new()).collect();
     for (g, &sign) in live.iter().zip(&signs) {
@@ -1042,7 +1069,12 @@ pub fn closure_fast(
             }
         }
     }
-    let batch_size = if opts.batch == 0 { limits.batch } else { opts.batch };
+    let batch_size = match (opts.batch, opts.order) {
+        (0, QueueOrder::Lifo) => limits.batch,
+        (0, _) => (2 * rayon::current_num_threads()).max(32),
+        (b, _) => b,
+    };
+    stats.batch = batch_size;
     let mut rows_reduced = 0u64;
     let mut muladds = 0u64;
     let mut entries = 0u64;
@@ -1104,7 +1136,7 @@ pub fn closure_fast(
                 }
                 let qi = q as usize;
                 // Against the pivots this batch has added.
-                let r = if cx.level >= 2 && !ech[qi].meets_fresh_pivot(&r) {
+                let r = if cx.level >= 2 && !ech[qi].meets_fresh_pivot(&r, cx.lead_only) {
                     r
                 } else {
                     let (r, ops) = ech[qi].reduce(&cx, &r, &mut seq);
@@ -1137,6 +1169,7 @@ pub fn closure_fast(
                     let bucket = match opts.order {
                         QueueOrder::Lifo => 0,
                         QueueOrder::LowDegreeFirst => d as usize + 1,
+                        QueueOrder::SparseFirst => sparse_bucket(stored.nnz(), opts.sparse_width),
                     };
                     if lazy_queue {
                         for v in 0..nv {
@@ -1388,6 +1421,7 @@ mod tests {
                     (0, QueueOrder::Lifo),
                     (7, QueueOrder::Lifo),
                     (0, QueueOrder::LowDegreeFirst),
+                    (5, QueueOrder::SparseFirst),
                 ] {
                     let opts = FastOptions {
                         level,
@@ -1398,9 +1432,19 @@ mod tests {
                         dense_num: 1,
                         dense_den: 8,
                         fault: 0,
+                        lead_only: false,
+                        sparse_width: 1,
                     };
                     let fast = fall_degrees_fast(ring, gens, 1, cmax, &limits, &opts);
                     same(&reference, &fast, &format!("level {level} sym {sym} batch {batch} {order:?}"));
+                    if level >= 2 {
+                        let opts = FastOptions {
+                            lead_only: true,
+                            ..opts
+                        };
+                        let fast = fall_degrees_fast(ring, gens, 1, cmax, &limits, &opts);
+                        same(&reference, &fast, &format!("lead-only level {level} sym {sym} batch {batch}"));
+                    }
                 }
             }
         }
@@ -1414,6 +1458,7 @@ mod tests {
         let reference = fall_degrees(&ring, &gens, 1, 5, &limits);
         let opts = FastOptions {
             level: 0,
+            order: QueueOrder::Lifo,
             ..FastOptions::default()
         };
         let fast = fall_degrees_fast(&ring, &gens, 1, 5, &limits, &opts);

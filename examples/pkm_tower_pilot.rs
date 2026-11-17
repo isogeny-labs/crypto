@@ -2155,7 +2155,8 @@ fn measure_hky(
                     "parallel_s": st.parallel_s, "sequential_s": st.sequential_s,
                     "multiply_cpu_s": st.multiply_cpu_s, "batches": st.batches,
                     "dense_rows": st.dense_rows, "sparse_rows": st.sparse_rows,
-                    "stored_words": st.stored_words, "threads": st.threads, "simd": st.simd,
+                    "stored_words": st.stored_words, "threads": st.threads, "batch": st.batch,
+                    "simd": st.simd,
                 }));
             },
         )
@@ -2205,6 +2206,7 @@ fn measure_hky(
         // Only rows of the fast instrument carry its options and timers.
         extra["hky2"] = json!({"level": a.hky2.level, "sym": a.hky2_sym, "batch": a.hky2.batch,
             "order": format!("{:?}", a.hky2.order), "fault": a.hky2.fault,
+            "lead_only": a.hky2.lead_only, "sparse_width": a.hky2.sparse_width,
             "dense": [a.hky2.dense_num, a.hky2.dense_den], "stats": fast_stats});
     }
     Outcome {
@@ -2998,6 +3000,8 @@ fn parse_args() -> Args {
             "--hky-cmax" => a.hky_cmax = v.parse().expect("--hky-cmax"),
             "--hky2-level" => a.hky2.level = v.parse().expect("--hky2-level"),
             "--hky2-batch" => a.hky2.batch = v.parse().expect("--hky2-batch"),
+            "--hky2-sparse-width" => a.hky2.sparse_width = v.parse().expect("--hky2-sparse-width"),
+            "--hky2-lead-only" => a.hky2.lead_only = v == "on",
             "--hky2-fault" => a.hky2.fault = v.parse().expect("--hky2-fault"),
             "--hky2-dense" => {
                 let (n, d) = v.split_once('/').expect("--hky2-dense NUM/DEN");
@@ -3015,6 +3019,7 @@ fn parse_args() -> Args {
                 a.hky2.order = match v.as_str() {
                     "lifo" => QueueOrder::Lifo,
                     "low-degree-first" => QueueOrder::LowDegreeFirst,
+                    "sparse-first" => QueueOrder::SparseFirst,
                     other => panic!("--hky2-order lifo|low-degree-first, not `{other}`"),
                 }
             }
