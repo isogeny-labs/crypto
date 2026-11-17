@@ -1904,3 +1904,10 @@ What was done: freezec02d12d4c28 once-onlyexit0;72 kernel calls/12 targets exact
 Decisions made: measured norm constructor not admitted for a gcd collector; not a universal lowerbound. Next standardVieta specialization x3=t²+u1-x1-x2 removes residual polynomial divisions while requiring full trace/certificate equality.
 Open threads: prospectively freeze Vieta producer equivalence/cold-cost gate; extend residualcoefficient extraction to g3/4 separately; original10xgoal unchanged.
 Errors: no execution errors; no retry/S3/cloud.
+
+## Vieta residual producer frozen
+
+What was done: compiled isolated coefficient-root producer; diagnostic old quotient and native group checks, original fulltrace/packet replay gates, unchanged subgroup arithmetic and full certificate costs.
+Decisions made: standardVieta identity x3=t²+u1-x1-x2, notnovelty; original12g2targets/24measuredcalls, Gitfreeze before one120CPU invocation. Assertions [pcc:unverified].
+Open threads: execute after push, compare producer and complete costs against both retained arms and oldcompletecandidate.
+Errors: traceprefix escaping corrected before freeze; no science yet.
