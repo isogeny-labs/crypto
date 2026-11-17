@@ -1123,3 +1123,17 @@ A genuinelybettercompletecost/rankmechanism isrequired; classicalLPproducer nowh
 
 ### Errors
 No runtime/assertionfailure;24incompletecalls areexplicit scientificoutcomes, notinfrastructurefailures. NoS3/cloud/oldbaselinererun.
+
+## Deterministic incidence criterion derived from restricted failure
+
+### What was done
+Inspected all12unresolvedg4terminalrecords:0–8rows over128anchors, verifiednone by independentprefixsolver. Derived exact k*A<=I for n=g+1,k=g-1 and scanratebound F/rho<=kappa*n/k, with explicit signedpointfraction and concentrationdefinition. Separated deterministicidentity,uniformmarginal expectationbound and strongerindependenceheuristic.
+
+### Decisions made
+No assumptionthat terminalgraphcoverage/rankcausewasmeasured: fullmatrix/rejectedcandidate support isnotretained. A concentration-only10xscanclaim requireskappa>=10/3,5,6 in g2/3/4; thisisnotaglobalalgorithm bound. Newcandidate muststateconcentration or independentrank/matrixadvantage andchargepilotcosts. Broadgoalactive.
+
+### Open threads
+No demonstrated mechanismyetmeets theseconditions. Existingfailure isclosedwithoutretuneorbudgetextension.
+
+### Errors
+No scientificrun orS3access. Do not infer entire128anchorpanelincidence from oldbaselinewhichstopsatfirstsolution.
