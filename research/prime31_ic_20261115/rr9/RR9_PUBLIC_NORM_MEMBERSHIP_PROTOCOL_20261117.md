@@ -1,0 +1,38 @@
+# EXP-R31-RR9-PUBLIC-NORM — exact public-only coefficient certificate
+
+**Prospective scope, 2026-11-17 UTC.** Real ordinary cofactor-one curve `p=2147483647`, `E:y^2=x^3+847514846x+2087444724`, prime group order `n=2147446831`. The reused native Rust `prime31_rr9_evaluation.rs` remains the implementation. No caller scalar, known leaves, group addition or generic half-sum tables are inputs to the proposed *membership predicate*; planted leaves remain only in an outside fixture builder. **No coefficient search, non-generic ECDLP solver or speedup is claimed.** [pcc:unverified]
+
+## Exact statement to test
+
+Let `B` consist of rational affine representatives with pairwise distinct x-coordinates and `H_B(X)=product_(P in B)(X-x(P))`. For `R != O`, a nonzero `F=U(X)+Y V(X)` with `deg U<=4`, `deg V<=3`, `V_3!=0`, define
+`N_F=U^2-(X^3+aX+b)V^2`, and (provided `F(-R)=0`)
+`M_F=N_F/(-V_3^2 (X-x(R)))`, a monic degree-eight polynomial.
+Then
+
+`F(-R)=0 and M_F | H_B^8`
+
+is **equivalent to** the remaining eight zeroes (counted with multiplicity) of `F` being signed points from `B`. Consequently they sum to `R`. Conversely every eight-leaf signed decomposition of nonidentity `R` determines such `F` uniquely up to scale by Riemann–Roch. Both orientations and repeated points are retained; `M_F` is **not** a distinct-root-only constraint.
+
+Proof idea: `F` has exactly nine finite zeroes since its pole order at `O` is nine. The x-norm records their x-coordinates including multiplicities. The rational support of each root of `H_B` is `{P,-P}`. `F(-R)=0` chooses the ninth signed point; removing one copy leaves eight base-supported zeroes. Their sum is `R` because the divisor of a rational function sums to `O`. The converse uses the one-dimensional `L(9O-D)` for any effective degree-eight signed divisor `D`, and `R != O` forces pole order nine. Infinity, noncanonical input and `V_3=0` require separate branches, not acceptance.
+
+This tests **membership of supplied coefficients F**, not how to find them from R. The previous RR9 norm equality tested an already supplied eight-leaf factorization; the new public predicate is a stricter *interface separation* for future nonenumerative elimination.
+
+## Source-exact deterministic controls (no timing claims)
+
+1. Use existing 32+32 planted distinct positive certificates on the two native B31 bases. Construct `H_B` from public x-coordinates alone; then the public predicate receives only `(F,R,H_B)`. Assert its synthetic division has zero remainder, monic quotient degree 8, and `H_B^8 mod M_F = 0` using modular polynomial exponentiation.
+2. For every positive, change `F` by adding `X-x(R)` to `U`: this **preserves F(-R)=0** but should break base support. Assert false, counting any unexpected true as a scientific collision needing analysis, not silently skipping it.
+3. Retain all 128 original-curve determinant positive/negative decisions, naive duplicate false-positive, Hermite multiplicities `3,4,8` and ninth-jet falsifier. On all six repeated-leaf originals, public membership should pass and the constrained mutation should fail.
+4. Unit-test polynomial modular remainder and `H^8` divisibility on repeated-root toy polynomials. The implementation must not call elliptic group arithmetic or enumerate candidate leaves inside membership.
+5. Existing pinned Rust 1.100 workflow on pull_request is the expected executable verification. Any compile or test failure stays a failure, is fixed in a distinct commit and never reported as a pass.
+
+## Prior sources and contrast
+
+- Merged crypto #4466: RR9/Hermite signed norm interpolation; #4451: zero-fibre obstruction; #4228/#4349: quotient/rootfinding; #4188: earlier m4 norm/GCD; #4373: censored anchored m8 F4. No new norm novelty claim.
+- Merged #4513 and open #4532: complete reusable mixed-base 1024-Q Rust IC, and matched shared BSGS generic control **170.113ms versus IC 2221.474ms** on one unisolated producer-run [pcc:unverified]. This is the correct batch-cost frontier, not rho-only. BSGS reference has 2^20 baby entries and material memory.
+- crypto-autoresearcher #3301/#3305 and crypto #4484/#4486: negative/censored nonenumerative and minor APS-optimization leads; do not repeat.
+- Primary literature: Amadori–Pintore–Sala (Finite Fields and Their Applications 51, 2018, DOI 10.1016/j.ffa.2018.01.009); McGuire–Mueller (ePrint 2017/1262, sections 2–6) has non-Gröbner prime-field summation-polynomial alternatives and explicitly estimates complexity worse than square-root group methods under its random-base model. Elliptic Riemann–Roch and polynomial norms are classical.
+- KB MCP not exposed in this tool runtime and no repository checkout/executable wrapper here; fallback was bounded repo PR, primary-source and session-log search. Conductor and Rust toolchain also unavailable in this runtime (no executable `cargo`).
+
+## Next real extraction gate
+
+Eliminate the seven remaining projective coefficient degrees of freedom after the linear condition `F(-R)=0`, **without enumerating signed supports**. The `H_B^8 mod M_F=0` condition gives eight explicit polynomial remainders in the coefficients; verify exact fibre equality at B4/B8 against independently enumerated *test only* solutions, including signed collisions and infinity branches. Instrument F4/FGLM, root isolation, saturation, rank, memory and all failed calls. Only after success attempt complete hidden-Q logs on B31 and frozen same-host cold comparisons with shared BSGS and tuned rho. No performance inference from a membership check alone.
