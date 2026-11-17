@@ -297,3 +297,17 @@ Broad10xgenus2+objectiveopen; currentevidence stillshortespeciallyg2. PR4490shou
 
 ### Errors
 No320model/integrationgatefailuresorretries. Compileunusedimports/fieldswarningsretained; originalimplementationsunchanged.
+
+## Singleanchor scaling lemma and rankgate frozen
+
+### What was done
+DerivedaffinescalingY'=sY,k'=sk+(s−1)a/b preservingallrowsfromoneanchor. Nonzeroanchorimplieskvaries, soextra rowscannotfixscale. Prepared892isolatedprefixdense/drop-target/augmentedrank/nativeNonechecks plusvalidPUBLICsmoothsource normalizationpositivecontrols andoriginal18cumulativerecoveries.
+
+### Decisions made
+No claimofnewpriority/unconditionalbound. Distinctsourceequations oranchorcoefficientratiosbreakthisspecificsymmetrybutdonotguaranteefullrank. Fullbucket/polynomial/originalgroupverificationretained. Freeze/pushbeforeonce-onlyrankexperiment.
+
+### Open threads
+Qualifytheobstructionandnormalizationpositivecontrols; thenevaluatecheapnormalizationmechanismwithcostcase. Broadgoalopen.
+
+### Errors
+T7003retrybudgetexhausted; originaltaskworkwasmergedPR4480, markedthatoldtaskdoneandclaimednewT7008forspecificrankwork. No codeeditedduringunclaimedinterval. CLI done-jsonflagunsupported, retriedvalidcommand; no scientificretry.
