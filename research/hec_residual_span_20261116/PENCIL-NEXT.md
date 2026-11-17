@@ -1,0 +1,21 @@
+# Next mechanism: target-anchored interpolation pencils
+
+Status: derived candidate and prospective correctness falsifier; no performance or novelty claim. Existing cold results reject tenfold from orbit row representation alone. This mechanism changes relation generation instead. Prior art includes the primary paper Improved sieving on algebraic curves, https://www-fourier.univ-grenoble-alpes.fr/~viva/research/articles/SievingB.pdf; its actual methods must be compared before attributing novelty.
+
+Let C:y²=f(x), deg f=2g+1, over an odd prime field. For a valid degree-g Mumford divisor R=(u,v), with u monic and deg v<g, set v_t=v+t*u and H_t=(f-v_t²)/u. Exact divisibility holds for every t because u divides f-v². H_t has degree g+1 for all t: f contributes its monic degree 2g+1 term and v_t² has degree at most 2g. The function y-v_t has pole order 2g+1 at infinity. Its zero divisor consists of R and the residual divisor defined by H_t with y=v_t. Consequently [R]+[residual]=0. Multiplicities and shared support must be counted through exact polynomial division, not distinct-root counts alone.
+
+For each rational affine point (x,y) with u(x) nonzero, exactly one pencil parameter has that point in the residual:
+
+ t=(y-v(x))/u(x).
+
+A complete bucket pass over both signs of every rational point thus collects all residual roots away from u=0, without one Jacobian addition or one polynomial factorization per parameter. At u=0 the formula is undefined: these are not ignorable. Reject parameters with gcd(H_t,u) nontrivial in a first correctness implementation, or handle their local intersection multiplicities separately. Retain ramification y=0 only once. Check exact H_t reconstruction before retaining a fully split row; degree-g+1 root count alone is insufficient when multiplicities occur.
+
+If R=aD+bT+sum n_i P_i, a fully rational residual gives a target-bearing equation with unchanged known a,b,n_i. The residual signs come from y=v_t, so R plus that signed residual equals zero in the original Jacobian. Orbit contraction can then be applied exactly as in the qualified production method. This does not supply any unknown orbit logarithm for free.
+
+Critical rank risk: a single fixed R supplies the same a,b and taken vector for every t. Differences of its rows are homogeneous relations. Many rows can be dependent even if all H_t split. Count useful coefficient and augmented rank, target uniqueness, and final original-source verification. A split count is not a solve count. Multiple independently tracked anchors may be necessary and their construction belongs in the cost.
+
+Cost hypothesis only: O(q) field evaluations/inversions and O(q) bucket storage per pencil can replace q group additions and smoothness tests. Batched inversions can reduce inversion count but introduce charged preparation/storage. A random degree-g+1 splitting heuristic suggests about q/(g+1)! parameters, but the pencil is structured; this heuristic is not a theorem and must not determine a claimed speedup. A full q scan may lose against a walk that stops after tens of trials on the current small-orbit panel. Early termination and biased scanning require their own frozen protocol.
+
+Prospective correctness gate, before timing: for the exact existing genus-2/3/4 fixtures and both public source variants, fix anchor coefficients and seeds in advance; enumerate every t and compare buckets with independent exact factorization of H_t; retain all rejected/shared-root/multiple-root cases. For each accepted row check the principal-divisor relation in the original group, agreement of independently assembled full/folded rows, rank increment and target determination. Compare complete solvers on identical public inputs including pencil setup, anchor construction, LA and verification. Include equal-information Expanded and current Folded as completing controls, not just default Native. Freeze the actual source/protocol/hash checkpoint in Git before any scientific run. Reject the mechanism if it cannot improve the strongest completing control across the registered genus panel; do not promote relation yield alone.
+
+This note records the algebra and falsifier, not permission to skip qualification or a measured result. The requested tenfold genus-2+ objective remains open.
