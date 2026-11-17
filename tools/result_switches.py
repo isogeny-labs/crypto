@@ -32,15 +32,15 @@ RECORDED_EXACT = (
     "RAYON_NUM_THREADS", "OMP_NUM_THREADS", "CUDA_VISIBLE_DEVICES",
     "RUSTFLAGS", "CARGO_ENCODED_RUSTFLAGS", "CC", "CXX", "CFLAGS", "HASHCLASH_PREFIX",
     "D4_BIN_MVAR", "FES_GPU_TIMING", "PENCIL_RETAINED_INVENTORY", "SMITH_CANONICAL_SWEEP",
-    "HKY2_SIMD",  # selects the portable / AVX2 / AVX-512 kernel: same values, different timings
+    # HKY2_SIMD selects the field kernel; N83_SAT_PHASE_TRACE times solve phases (overhead).
+    "HKY2_SIMD", "N83_SAT_PHASE_TRACE",
 )
 # Read by the sources but cannot change a computed value.
 # GH_TOKEN and GITHUB_TOKEN are credentials read by `ic update`: they must never
 # be written into a run record, whatever they could change.
 NOT_RESULT_AFFECTING = frozenset({"HOSTNAME", "PATH", "TMPDIR", "CRYPTO_AUDIT_DIR", "TASKQ_TASK_ID",
-                                  "GH_TOKEN", "GITHUB_TOKEN",
-                                  # an output path for smoke rows; a phase-timing trace switch
-                                  "FASTGROUP_SMOKE_OUT", "N83_SAT_PHASE_TRACE"})
+                                  "FASTGROUP_SMOKE_OUT",  # output path only
+                                  "GH_TOKEN", "GITHUB_TOKEN"})
 
 
 def is_recorded(name: str) -> bool:

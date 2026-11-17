@@ -1,0 +1,62 @@
+digraph phased_panel {
+  graph [
+    rankdir=TB,
+    bgcolor="white",
+    pad="0.22",
+    nodesep="0.38",
+    ranksep="0.38",
+    fontname="DejaVu Sans",
+    label="ECBench phased panel: promotion is not a speedup claim",
+    labelloc="t",
+    fontsize=18
+  ];
+  node [
+    shape=box,
+    style="rounded,filled",
+    color="#26384a",
+    fontname="DejaVu Sans",
+    fontsize=10,
+    margin="0.16,0.11"
+  ];
+  edge [
+    color="#536878",
+    fontname="DejaVu Sans",
+    fontsize=9,
+    arrowsize=0.75
+  ];
+
+  p1 [fillcolor="#dff3ea", label="PHASE 1 · nominal 20-bit subgroup\nwindow 18–23 · 32 targets/cell\nK0/K1 · B21/B24 · P20 · j=0 · j=1728\nstate: ready to preregister"];
+  g12 [shape=diamond, fillcolor="#fff2cc", label="G0–G5\nidentity + plan\nrelation/rank\ncorrectness + controls\nreplay + 4× headroom"];
+  p2 [fillcolor="#dcecf8", label="PHASE 2 · nominal 30-bit subgroup\nwindow 27–33 · 32 targets/cell\na=0,n=37 · B27 · P32a\nstate: ready to preregister"];
+  g23 [shape=diamond, fillcolor="#fff2cc", label="G0–G5\nsame frozen gates\nall core families survive"];
+  p3 [fillcolor="#fbe5d6", label="PHASE 3 · nominal 60-bit subgroup\nwindow 56–62 · 32 targets/cell\na=0,n=73 · B59 · P61-j0\nstate: partially blocked"];
+  g34 [shape=diamond, fillcolor="#f4cccc", label="G0–G5 + wide parity\nK0 IC method support\nwide binary/prime readiness\nchallenge imports"];
+  p4 [fillcolor="#eadcf8", label="PHASE 4 · nominal 80-bit subgroup\nwindow 76–84 · 8 targets/cell\na=0,n=83 · ECC2-79 · ECCp-79\nstate: blocked"];
+
+  stop1 [shape=octagon, fillcolor="#f4cccc", label="STOP / preserve evidence\nredesign gets new ID\nand restarts at Phase 1"];
+  stop2 [shape=octagon, fillcolor="#f4cccc", label="STOP / preserve evidence"];
+  stop3 [shape=octagon, fillcolor="#f4cccc", label="STOP / implement blockers"];
+  dossier [fillcolor="#eeeeee", label="Complete phase dossier\nincluding failures, timeouts, OOMs,\npruned candidates, and projections"];
+  claim [shape=hexagon, fillcolor="#cfe2f3", label="SEPARATE G6 CLAIM GATE\nverified cold E2E solves\nstrongest applicable rho\npaired upper bound < 1\nat w = 0, 0.1, 1\nindependent replay"];
+  result [shape=box3d, fillcolor="#d9ead3", label="Range- and family-specific\nspeedup statement only if G6 passes"];
+  noclaim [shape=box3d, fillcolor="#fce5cd", label="No speedup claim\nphase readiness may still pass"];
+
+  {rank=same; g12; stop1}
+  {rank=same; g23; stop2}
+  {rank=same; g34; stop3}
+  {rank=same; result; noclaim}
+
+  p1 -> g12;
+  g12 -> p2 [label="pass"];
+  g12 -> stop1 [label="fail", color="#a61c00"];
+  p2 -> g23;
+  g23 -> p3 [label="pass"];
+  g23 -> stop2 [label="fail", color="#a61c00"];
+  p3 -> g34;
+  g34 -> p4 [label="pass"];
+  g34 -> stop3 [label="blocked/fail", color="#a61c00"];
+  p4 -> dossier;
+  dossier -> claim [label="evaluate; never infer"];
+  claim -> result [label="pass"];
+  claim -> noclaim [label="fail / unresolved", color="#a61c00"];
+}
