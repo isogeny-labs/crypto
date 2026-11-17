@@ -30,12 +30,21 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs
+            research/prime31_ic_20261115/native/examples/prime31_linear_chord_audit.rs
+          sparse-checkout-cone-mode: false
       - name: Checkout immutable Rust baseline with complete native dependencies
         uses: actions/checkout@v4
         with:
           ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
           path: aps-pinned
           persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/
+            src/cryptanalysis/f4_fp_tower.rs
+            src/cryptanalysis/sig_fp_tower.rs
+          sparse-checkout-cone-mode: false
       - name: Overlay only candidate Rust source on immutable exact-scientific baseline
         run: |
           set -euo pipefail
