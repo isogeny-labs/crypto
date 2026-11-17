@@ -8,6 +8,8 @@ description = "Read-only native backend frontiers from sealed ecbench evidence"
 [dependencies]
 clap = { version = "4.5", features = ["derive"] }
 hex = "0.4"
+# src/cryptanalysis/ecbench/canonical.rs (included by path) uses num_bigint::BigUint since f57e537f51.
+num-bigint = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["float_roundtrip"] }
 sha2 = "0.10"
