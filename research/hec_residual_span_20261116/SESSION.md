@@ -2884,3 +2884,10 @@ What was done: provedg+1groundedinputpoints/interpolantVdeg<=g leaveEXACTdegreeg
 Decisions made: do notsilentlyportgenus2quadraticcase tog3/g4 orlaunch64-trialfinisherwithoutcoverage/costcase. Degreegfactoring/grounding/quotientconstruction/lateprefixcostmustbecharged. Dimensioncountconditionalnotuniversal lowerbound; purex/2torsionexceptionexplicit.
 Open threads: establishconstructibleallgenusrelationyield/completecostcase ornewmechanismagainststrongcontrols;full10xgoalactiveunachieved/independentreviewopen.
 Errors: none. No S3/cloud/merge/newexperiment/unchangedrerun.
+
+## Grounded principal relation saturation and scale obstruction derived
+
+What was done: proved imageintegralrelationlatticemodell=lambda-perp when generatedgroundedsubgroup hasnonzero uniqueellcomponent, withtensorimage/SNFqualification. Derivedrho1finisherexistence iffgroundeddirectionnotproportionaltrueprojectedlogs; rank[alpha beta]2sufficient, rank<=1scaleobstructedunderlambda!=0premise. GaveC101/D17P/T=P counterexample torho1availability-alone andsource-normalization sufficientcondition. Effectivepositiveprincipalrepresentatives existbutmayhavehugepoledegree.
+Decisions made: do notinferlowdegree/coldcostgainfromfullrelationspace. Needfirst-rho1alpha/betaextraction/constraintverification/subgroupcertificatebeforefinishertrial; classifyunavailable/scale/zero-directioncases. No newexperimentor10xclaim.
+Open threads: certifiedquotientdescriptorgate onall22prefixes withcomponentcostandfullconstraintchecks;thenboundedlowdegree span ifapplicable. Fullgoalactiveunachieved/independentreviewopen.
+Errors: none. No S3/cloud/merge/unchangedrerun.
