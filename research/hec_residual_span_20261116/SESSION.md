@@ -549,3 +549,17 @@ Compile/freezeindependentmodularverifierfromretainedrawrecords. Broad10xgoalopen
 
 ### Errors
 Onecurvehas nonbranch-negativecontrol unavailable because allcataloguepoints are branch points; retained in stderr, no model replacement. Originalstabletoolchainpathmissing, recordedHomebrew1.93.1build;nooldtimingcomparison.
+
+## Independent order-four modular witness replay frozen
+
+### What was done
+StandaloneRustverifierusesdeterminant-evaluation/LagrangecharacteristicpolynomialsandindependentpolynomialEuclidean/Fermat arithmetic, no producer imports. Replayallpositives,retainallmisses; requireall127candidateexponentsforbothdeclaredmodels, own totientsieve/primechecks/controls. No independent point-count rerun or whole-admission claim.
+
+### Decisions made
+Freezeinput hashes/verifier/binary andpushbeforeonce-onlyreplay;nooverwrite/retry. Exactevenpolynomialnegativecontrolchecks the F13 geometric-failure deduction separately.
+
+### Open threads
+Run modular replay, then publish calibrated geometric/action controls. No targetsolves or10xclaim.
+
+### Errors
+No scientificreplayexecutionyet; existingrawpointcounts/witnessesunchanged.
