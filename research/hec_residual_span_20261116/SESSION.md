@@ -2555,3 +2555,10 @@ What was done: compiled joint automorphism evaluator for arbitrary reduced sourc
 Decisions made: targets/source unchanged; test final verification rather than cofactor compression, so original h1instances included. Certified Frobenius-operator premise conditional and checked outside core; no independent verification/admission claimed. Derived fullsource totals retain all other phases; no wall or integrated-solver claim. One120CPU process after Git freeze.
 Open threads: execute/replay, inspect every regression and derived total before choosing further construction.
 Errors: only inherited unused-helper warnings; no scientific run yet. Own scope check allows, attach same reservation. No S3/cloud/merge.
+
+## Original short-verification gate passes, complete integration next
+
+What was done: freeze400c5341373 hashes pass, sole run exit0; all12native verify vectors replay exactly, R/S/witness/scalar controls pass, wrong scalar/source/target rejected, repeats exact. Verification component2.069-8.335x baseREDC reduction, derived sourcecontrol totals1.239-2.471x; all16derived vectors retained.
+Decisions made: no10x/integrated/wall/independent verification claim. Conditional operator contract explicit; next prospective integration checks complete solver outputs/counters against derived totals without changing producer.
+Open threads: integrated fullcount replay, then remaining producer/setup costs and stronger10x mechanism acrossgenus2+.
+Errors: none in run; inherited helper warnings only. No S3/cloud/merge.
