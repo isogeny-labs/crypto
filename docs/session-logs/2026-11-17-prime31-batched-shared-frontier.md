@@ -35,3 +35,21 @@
 
 ### Errors
 - Excessive root repository checkout scope before the correction; no Rust or benchmark failure yet.
+
+## 18:50 UTC — exact-head CI failure for #4596 analyzed before compatibility repair
+
+### What was done (commands, files, features)
+- Read full exact-head GitHub Actions run #44150203613 (https://github.com/isogeny-labs/crypto/actions/runs/44150203613), job 134276095028 and repository Git source. The pinned native library 40/40 and earlier IC/BSGS example test suites 3/3 and 23/23 passed. The experiment and all 1,024-target matched timings did not run.
+- The root primefast-pinned crate failed at compile time: sparse checkout omitted five existing source files (docs/ic/boundary_targets.json, docs/ic/calibration.json, docs/ecbench/schema.sql, docs/curves/registry.json, docs/curves/standards/parameters.json). The c161793 pinned old F4 diagnostic struct lacks an unrelated recording_degree_falls method and three Option<u32> fields now accessed by APS observer files, causing 15 errors unrelated to prime_fast and the candidate.
+- Verified all five missing documents exist at the exact pinned commit. Inspected full pinned F4 file, which has one VisitReport definition and one F4Options impl and no diagnostic fields/method. Main's F4 differs and has duplicate methods; do not substitute its prime-fast source.
+
+### Decisions made (and why)
+- Amend only source-specific workflow checkout to retrieve five pinned documents and use a fail-closed, source-hash-pinned compatibility shim within the ephemeral pinned root F4 file: three VisitReport option diagnostics with default None and no-op F4Options::recording_degree_falls for unrelated APS observers. Do not alter original Rust prime_fast, frozen corpus, candidate parameters, BSGS reference or assertions.
+- If source sentinels/hash drift, fail before measurement. No ECDLP speed claim.
+
+### Open threads
+- Re-run exact-source Rust CI, inspect full 1024 public targets and original cached BSGS on same runner. Preserve failures rather than retune.
+- Independently signed validation and external prime-field IC comparisons remain separate gates.
+
+### Errors
+- Run #44150203613 blocked during root compilation with 15 source/checkout errors. No new performance or solver completeness claim follows.
