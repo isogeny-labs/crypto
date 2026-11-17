@@ -591,3 +591,17 @@ Execute search and classify coverage; broad10xobjectiveopen.
 
 ### Errors
 Pre-freeze review caught that small calibration intervals need not have a unique multiple even with known N; corrected calibration to check containment/formula and explicit positive/negative uniqueness controls rather than assert a false uniqueness premise. No scientific run or retry yet.
+
+## Strong order-four models found in all three fields
+
+### What was done
+Atc0232d3289dsearch exits0,all3fixedfieldsselected: p101/code50 N96713378 ell48356689; p149/code1 N464841698 ell232420849; p197/code52 N1419828866 ell709914433. Allcofactors2, producerabsolute/actioncertificatespass, originalgrouporbits23/35/46. Allrawhashesverify; no targets.
+
+### Decisions made
+Retainallgridrejections; no runtime/performance-basedselection. Independentorder/modularreplaymustprecederelianceonthesestrongcertificates. LargeellalsoexceedsanyproperFp-factorHassebound, givinganadditionalFp-simplicity/orderproofrouteforthereplayer; documentseparatelywithoutmutatingfrozenproducerprotocol.
+
+### Open threads
+Replay certificates independently, then implement and compare actual C4 solvers under public-order metadata contract. Broad10xgoalopen.
+
+### Errors
+No runtime failures/retries; no fourth-extension enumeration for new fields. Calibration uniqueness premise was corrected before freeze, not after execution.
