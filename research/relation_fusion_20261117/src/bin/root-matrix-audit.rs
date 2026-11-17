@@ -155,7 +155,13 @@ fn audit(
         require(
             [2147483647, 9007199254740881].contains(&p)
                 && [3, 4, 6].contains(&n)
-                && ["compact-sparse", "compact-dag"].contains(&form)
+                && [
+                    "compact-sparse",
+                    "compact-dag",
+                    "packed-sparse",
+                    "packed-dag",
+                ]
+                .contains(&form)
                 && ["frontier103", "products231", "batch487"].contains(&kernel)
                 && seen.insert((p, n, form.to_owned(), kernel.to_owned())),
             "case domain/duplicate",
@@ -197,7 +203,7 @@ fn audit(
             original(&input, n, p)? == original(&frozen, n, p)?,
             "frozen input differs",
         )?;
-        let checked = if form == "compact-dag" {
+        let checked = if form.ends_with("-dag") {
             packed::verify_dag_json(&input, &proof)
         } else {
             packed::verify_json(&input, &proof)

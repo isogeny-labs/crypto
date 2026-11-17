@@ -16,6 +16,9 @@ pub use relation_replay_checker::{Checked as ReplayChecked, Stats as ReplayCheck
 pub enum ReplayForm {
     CompactSparse,
     CompactDag,
+    /// Same wire families, with packed monomials throughout construction.
+    PackedSparse,
+    PackedDag,
 }
 
 /// Accepted only after independent wire replay and the native representation check.
@@ -55,10 +58,10 @@ fn packed_check(
     form: ReplayForm,
 ) -> Result<ReplayChecked, String> {
     match form {
-        ReplayForm::CompactSparse => {
+        ReplayForm::CompactSparse | ReplayForm::PackedSparse => {
             relation_replay_checker::packed::verify_json(original, witness)
         }
-        ReplayForm::CompactDag => {
+        ReplayForm::CompactDag | ReplayForm::PackedDag => {
             relation_replay_checker::packed::verify_dag_json(original, witness)
         }
     }
@@ -94,6 +97,8 @@ pub fn try_packed_replay_basis(
         ReplayForm::CompactDag => {
             algebra::replay::produce_compact_dag_for_packed(&system, kernels)?
         }
+        ReplayForm::PackedSparse => algebra::packed_constructor::produce_sparse(&system, kernels)?,
+        ReplayForm::PackedDag => algebra::packed_constructor::produce_dag(&system, kernels)?,
     };
     let checked = packed_check(&original_json, &witness_json, form)?;
     let basis = export_replayed(&checked, p)?;

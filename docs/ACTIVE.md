@@ -25,4 +25,4 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Blocked / questions for the owner
 
-- Relation15x / PR #4530: actual-root36-case adapter and saved-proof audits pass. Profile169/179 completes36 calls with full proof replays, no runtime admission. Current source120 tests180 and3 strict actual-root initial tests181 pass; full release unit165 remains incomplete after46 observed failures. Next is complete packed-constructor hypothesis182. Historical benchmark/PCC metadata gates unchanged; no15x admitted, goal in progress. [pcc:unverified]
+- Relation15x / PR #4530: complete packed constructor implemented,68/69producer and14checker tests pass; fixed36proof cases match legacy bytes/metadata; actual-root packed198 and old199 pass36cases each. Archive206/207 preserves/replays full proof evidence. Prospective1260-call matched protocol200 awaits publication/execution; primary packed-dag487 vs12strong controls. Ordinary root165 and historical metadata gates remain incomplete/unchanged; goal active, no15x admitted. [pcc:unverified]
