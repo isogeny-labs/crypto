@@ -46,6 +46,8 @@ is preserved separately pending validation admission.
 
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
 
+The [17 November native Rust identity component study](20261117-native-identity/) has checked pipeline full-paid paired medians1.306792/1.286039/1.254269 and work medians3.242510/3.067128/2.907275 at n3/4/6,25mainblocks each,AMD EPYC9V74 localL0. Ordinary95 controls reject n4/n6; prospective simultaneous screens pass. The unsigned synthetic polynomial-kernel result remains outside the admitted table; no15x claim. [Study](../research/relation_degree_trace_20261115/native-identity-20261117/RESULT.md),[PDF](20261117-native-identity/results-report.pdf). [pcc:unverified]
+
 The [29 October synthetic generator-study planning record](20261029-generator-preflight/)
 has documentary browsing copies (0.040s / 0.170s / 0.458s; n=1 per phase,
 shared host, no admitted performance comparison). It remains outside the

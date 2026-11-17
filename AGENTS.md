@@ -37,6 +37,28 @@ Keep entries about this project; do not copy private global logs or chat transcr
 
 <!-- END SHARED SESSION LOG -->
 
+## Goal: what to work on next
+
+Sessions should never need a prompt to find their work. `docs/ACTIVE.md`
+holds the owner's pinned goal and ordered active items; the newest session
+logs hold the open threads. `python3 tools/goal_brief.py` prints both (pinned
+items first, then the newest "Open threads", capped at 120 lines).
+
+- **Claude** gets the brief automatically from the SessionStart hook, and
+  `/goal` (`.claude/commands/goal.md`) re-reads it and starts the next item;
+  `/goal <text>` pins a new goal and breaks it into items.
+- **Codex** gets it from its SessionStart hook (`.codex/hooks.json`,
+  `--hook-json`). Codex and other runtimes without the hook run
+  `python3 tools/goal_brief.py` at session start, and treat a bare `goal` /
+  `/goal` message like Claude's `/goal`.
+- With no other instruction, take the first unchecked item in
+  `docs/ACTIVE.md`; if there is none, the most recent open thread no other
+  live session owns (`conductor check`). State the choice in one line and
+  start; ask only for decisions the brief marks as the owner's.
+- Check items off, add follow-ups and move blocked items to "Blocked /
+  questions" in `docs/ACTIVE.md` as you go; the history goes in the session
+  log. Every other rule in this file still applies to the work itself.
+
 # Agent instructions
 
 ## Research progress and communication
