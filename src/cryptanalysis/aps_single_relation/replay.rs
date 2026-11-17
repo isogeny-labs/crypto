@@ -199,6 +199,16 @@ struct Algebra {
     _f4_field_multiplications: u64,
     #[serde(default, rename = "roots")]
     _roots: Option<Roots>,
+    // Degree-fall diagnostics (first-fall / last-fall degree, observed degree
+    // of regularity). Parsed strictly for schema compatibility — never trusted
+    // as a cost certificate — and `default` so transcripts predating the
+    // diagnostic still replay. Their underscore names mark that boundary.
+    #[serde(default, rename = "first_fall_degree")]
+    _first_fall_degree: Option<u32>,
+    #[serde(default, rename = "last_fall_degree")]
+    _last_fall_degree: Option<u32>,
+    #[serde(default, rename = "degree_of_regularity_observed")]
+    _degree_of_regularity_observed: Option<u32>,
 }
 
 #[derive(Deserialize)]

@@ -30,6 +30,8 @@ _(none pinned — set one with `/goal <text>`)_
 
 - [x] Repair main-side CI breakage left by the 2026-11-16 merges: parity lock and IC reference currency (workflow store pulls deferred until the store is repaired) (claude, started 2026-11-17, branch claude/hyperelliptic-index-calculus-td1fdn, PR #4576)
 
+- [ ] Repair main's rust (library) red: #4577 merged the degree-fall features but not the APS-replay transcript-schema fix, so 12 aps_single_relation::replay tests fail on main; register first_fall/last_fall/degree_of_regularity_observed in the replay Algebra struct (claude, started 2026-11-17, branch claude/nifty-heisenberg-khbw4f)
+
 <!-- One line per task, added as the task's first step with its draft PR:
 - [ ] <task> (<runtime>, started YYYY-MM-DD, branch <branch>, PR #<n>) -->
 - [x] Gröbner solver shootout on GF(2^n) Semaev systems: local diagnostic, inherited-f4 vs msolve vs CMS (claude, started 2026-11-16, branch claude/fastest-grobner-base-algorithm-u74ipw, PR #4543; CI blocked by AWS/S3 and main breakages)
