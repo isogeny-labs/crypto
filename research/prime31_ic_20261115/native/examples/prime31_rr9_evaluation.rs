@@ -240,9 +240,6 @@ fn rr9_leaves_kernel(leaves: &[Point; 8]) -> Result<[u64; 9], String> {
     for i in 0..8 {
         out[pivots[i]] = fp_sub(0, rows[i][free]);
     }
-    for (&q, &expected_order) in leaves.iter().zip((0..8).collect::<Vec<_>>().iter()) {
-        let _ = (q, expected_order); // Multiplicity rows are checked below independently.
-    }
     let mut again: HashMap<Point, usize> = HashMap::new();
     for &q in leaves {
         let order = again.entry(q).or_insert(0);
