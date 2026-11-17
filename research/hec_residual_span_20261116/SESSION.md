@@ -1235,3 +1235,17 @@ Exactsharedsign-interpolationcircuitcouldreduceinversioncost;itsalgebra/setup/ga
 
 ### Errors
 No failedgate/retry,S3/cloud. Newrankgainsdonotbythemselvesimplynetcostbenefitoverremaininganchorwork.
+
+## Shared-sign interpolation qualified against prepared control
+
+### What was done
+Frozen d2b202a942c primitivegatepasses20calls/800outputs; independentinterpolationcomparisonREDC1.556–2.212/inv120to1. Addedstrongpreparedcontrolat5e42753968d,also20calls/800outputs,withbotharmsoneinverseandidenticalbasispreparation. IsolatedsigncorrectionREDCgain1.138–1.300. All10retainedcandidatevectorsbyte-identical. [pcc:unverified]
+
+### Decisions made
+Reportstrongcontrolprimary,not120xinversionasatenfoldalgorithm. Allpreparation/rootattemptscountedbutcoldsetup/bootstrap/discovery/LA/finalverifyremainoutsideprimitive. No coldadaptivecampaignadmittedfromthisgainalone. Broadgoalactive,g3/g4open.
+
+### Open threads
+Needcompletecompetitiveadaptiveconstructionornewgeometry; modestcircuitgaincannotreplacecostcase. Originalnocoveragecontrolpreserved.
+
+### Errors
+Pre-freezeliteralnewlineescapecompilefailurefixed; postanalysisRubyeditserializationfailed,recoveredwithoutproducerrun. Bothscientificgatespassonce.NoS3/cloud.
