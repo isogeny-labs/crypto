@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Extend the coverage census and test incremental primary rank on charged synthetic streams (Codex, started 2026-11-17, branch codex/index-calculus-synthetic-leads-20261117, PR #4617)
+- [x] Extend the coverage census and test incremental primary rank on charged synthetic streams (Codex, completed 2026-11-17, branch codex/index-calculus-synthetic-leads-20261117, PR #4617)
 
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
