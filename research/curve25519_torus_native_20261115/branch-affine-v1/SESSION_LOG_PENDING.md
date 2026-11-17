@@ -86,3 +86,19 @@
 - Fresh no-checkout sparse setup had empty index, yielding false deletion diagnostics; exact HEAD index/worktree restored,then missing pcc path materialized before any canonical ledger append. Unsupported add--no-cone changed nothing. No deletion committed; checkpoint/new files preserved.
 - Volatile tool storage lost initial closure readbacks; immutable metadata recovered once. First parent closure script incorrectly treated every context input as tracked and passedURL to integer --pr; no episode created. Existing outcome preceded facts in that unguarded attempt; bounded facts now fill its unchanged evidence path. No invented55tracked matches.
 - Earlier paper404,status diagnostic exclusion,audit-library-path failure and layout/prose corrections remain documented. Qualified source,raw outputs,claim files and report bytes remain unchanged.
+
+## 2026-11-17T00:39:46.895424+00:00 — Qualified source published on pinned review context
+
+### What was done (commands, files, features)
+- Committed qualified packet ase6199f4907c7eec688926bc9bf13cd8833afaf46 and published with maintained lane helper as9f20a4784df2868bd22e7924c7f592e472278bd5,parents345652eb/e6199f49,tree42a43d254adacbf7783d382555b9bb52bcd17282. All121owned changed paths and entire initial tree match. Normal atomic creation of context/lane refs at345652eb; no force/rebase. [pcc:unverified]
+- Final native98inputs and61attestation subjects matched before publication; lessons364/autonomy189 againstcanonical base had0errors. New core archive remains280300bytes/SHA5332de1c and local bytes retained. Policy selected that one new payload; upload not yet established. Whole scientific diff has preserved raw/pinned whitespace advisories; lossless diagnostic retained. [pcc:unverified]
+
+### Decisions made (and why)
+- Complete metadata handoff before opening the new regular PR so the uploader starts on its intended final metadata head. Exact intended body linted before submission. Review base is complete source context,not main gate admission. Source/code/results stay frozen; no native rerun for metadata.
+- Restore same paused checker for the actual new PR after opening/readback; no terminal predecessor polling and no new research assigned to checker. Initial branch publication is real activity; own scheduling/prose is not.
+
+### Open threads (unfinished, pick up next time)
+- Open regular follow-on PR fromlane/curve25519-affine tocodex/curve25519-source-context-345652eb,read actual final-head CI once,then cadence. Require trusted archive receipt; maintain main dependency/history gates before any retarget/merge. Native reversible-component/accounting work remains unscheduled next research.
+
+### Errors (what went wrong, how it was handled)
+- Source publication/identity readback succeeded at scoped level. No artifact upload,all-green CI,signature,full cost or exponent claim. Metadata owner/historical recovery limitations remain recorded. Do not re-register now-published1228events as unpublished.
