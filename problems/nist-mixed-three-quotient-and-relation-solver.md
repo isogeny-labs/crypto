@@ -3,8 +3,8 @@
 - **Status:** open
 - **Kind:** implementation gap, independent-verification gap, resource/access limit
 - **Affected work:** [test report](../research/nist_cover_three_tests_20261116/README.md), [protocol](../research/nist_cover_three_tests_20261116/PROTOCOL.md), [odd-isogeny execution](odd-isogeny-quartic-transfer-execution.md), [projected relation cost](prime-cover-projected-relation-cost-missing.md)
-- **Next action owner:** lane/nist-p192-polarized-quotient
-- **Last updated:** 2026-11-16
+- **Next action owner:** lane/nist-complete-maps
+- **Last updated:** 2026-11-17
 
 ## Problem
 
@@ -30,9 +30,35 @@ The original P-192 speedup test remains open. All26 actual kernel witnesses and 
 - [ ] Freeze public inputs, standard-panel controls and complete per-phase costs before a paid experiment; obtain current budget/capacity, source-image pin and S3 checkpoint admission.
 - [ ] Run and independently replay the complete one-target comparison; retain null/failure outcomes.
 
+## Map-interface successor,2026-11-17
+
+The new [map status/report](../research/nist_cover_three_tests_20261116/MAPS_STATUS.md)
+records executed forward signed cycles,actual KM conversion,rational/closed
+transpose and projective line-complement evaluation. Both composition
+directions are checked on the fixed fixtures. Colliding coordinates,repeated
+support,reference multiplicity5 and pole-fiber point multiplicity4 are
+included;failed KM qualifications remain in their original directories.
+The denominator audit has no factors of degree<=3,so reduced Fp source
+Mumford inputs cannot encounter those coefficient poles. These are producer
+results under PCC-20261117-3afdeb,6ebf8b,4ff1c3,501577,905d71 andfd5c89.
+They do not update the original performance claim. [pcc:unverified]
+
+Remaining map obligations are independent verification,universal reverse
+search-bound certification under its declared caps,and inverse conversion of
+arbitrary opaque KM spaces to explicit geometric divisors. Do not continue to
+list the generic rational/closed transpose or forward KM interface as wholly
+unimplemented. Scalar recovery is not the user's immediate selected map task.
+
 ## Next discriminating step
 
-Implement the generic transpose-dual/exceptional-chart interface and restricted individual descent,starting from the [completed quotient proof](../research/nist_cover_three_tests_20261116/POLARIZED_QUOTIENT.md). Do not repeat the successful source/public/kernel/height stages without a changed input or concern. Preserve the declared seven-variable timeout and all witnesses. The original paid envelope remains2CPU/8GiB/1800s,zero retries and totalUSD5 after admission;native correctness units do not constitute that cost evaluation. [pcc:unverified]
+Review the universal reverse moving/search obligation and opaque KM-to-divisor
+conversion,starting from the [executed map successor](../research/nist_cover_three_tests_20261116/MAPS_STATUS.md).
+Do not repeat successful source/public/kernel/height/map fixtures without a
+changed input or concern. The original performance and restricted-descent
+objectives stay open separately. Preserve the declared seven-variable timeout
+and all witnesses. The original paid envelope remains2CPU/8GiB/1800s,zero
+retries and totalUSD5 after admission;native correctness units do not constitute
+that cost evaluation. [pcc:unverified]
 
 ## Resolution and history
 

@@ -325,3 +325,87 @@ Implementequalpublicsource-normalizedsolvers, qualifyfirstprefix/scalar/complete
 
 ### Errors
 No scientificfailures/retries; priortimingunqualifiedunchanged. Elementarylemma isnotnewpriorityclaim.
+
+## Equalpublicsource normalization frozen
+
+### What was done
+Addedsharedchargedhelperusingreferenceoracle/publicsourcev/signedmultiplicities/fullandorbitrows/originalsourcegroupreconstruction; equationdY=1onlywhenfullysplit. AppliedsamehelperafterequalsetupinPencil/Folded/Expandedcopies. Prepared108solvegateall18workloads/repeats/flags andFoldedExpandedprefixequivalence.
+
+### Decisions made
+No sourcepointindex/cofactor/expectedscalar/logtableinfo. Sourcehelpercostincludingfailedattemptschargedallarms. Preserveanchor/walkseed/budgets; retainanyregressions. Fixedavailabilityexpectedfrompriorindependentgate:6g2yes,othersnone. NoPlainarmclaim.
+
+### Open threads
+Executeonceafterpushedfreezeandcompareequallynormalizedcontrols. Broadobjectiveopen.
+
+### Errors
+No runtimeexperimentyet. Unusedimport/enum/reportwarningsretained; originalfrozenimplementationsunchanged.
+
+## Equalpublicnormalization gate passes
+
+### What was done
+At pushed813ff56b030,108sourceverifiedsolves/repeats/REDCgatespassEXIT0;FoldedExpandedprefixesagreeall18. Directnormalizationavailable6g2only. Pencilfirstanchorcompletion4/6g2,2stillneedsecondanchor. EqualnormalizedFolded/PencilbaseREDCrangesg2 1.236275–1.773936,g3 2.364468–8.764122,g4 2.568023–6.555429. Rawhashesverify.
+
+### Decisions made
+Normalizationnecessaryinformationdoesnotguaranteefullrank; information/costequalinallcontrols. No10xsolve/wall/newmathclaim. Failedsourceattemptoverheadretainedg3/g4. PR4490externallymerged2026-11-17T04:16:09Z atcce9fea818edf2bfa813aeda8108526e1fd2033b,observedviaGitHub. Deliveronlynewnormalizationworkinsuccessorfrommerge, noteditmergedPR.
+
+### Open threads
+Needstrongerchargedrelation-generation/anchorworkmechanismbeyondnormalization, especiallyg2. Broadgoalopen.
+
+### Errors
+No scientificfailures/retries. Priorwallnoiseunchanged; source/buildwarningsretained.
+
+## Batched denominator inversion frozen
+
+### What was done
+Implementedclassicalprefix-productoneinversebackwardpassfornonzerodenominatorlists,cost1inverse+3(n−1)multiplications. Pencilcollectsnonzerouvaluespreservingpoint/sign/bucket/anchororder. Prepared774helperexactness/costprobesplus144freshsolvesacrossbatch/scalarPencil/Folded/Expandedwithunchangeddeterminingtuples.
+
+### Decisions made
+Chargeextramultiplications/storage; notsinglecounterwall/noveltyclaim. Sourceinfo/sharedsetup/verificationequal. Freeze/pushbeforeonce-onlyrun; no unchangednoisererun.
+
+### Open threads
+Qualifyexacthelperformula/prefixes andinspectcompletefieldvectortradeoff. Broadgoalopen.
+
+### Errors
+GenerationstringindentmismatchandRustnestedmodulepathcaughtbeforefreeze/run, fixed; finalreleasebuilds. Unusedimports/reportwarningsretained. No scientificretry.
+
+## Batch inversion qualifies exact stream and tradeoff
+
+### What was done
+At pushed71060297990,774helperexactness/costformulacasesand144sourceverifiedsolvespassEXIT0. Batch/scalarfirstprefixesagreeall18, repeats/REDCgatespass. Basefieldaddedmul=3savedinv,addedREDC=6savedinvverifiedeachcase;ellvectorsunchanged. Savedinv32–68g2,239–277g3,245–431g4. Rawhashesverify.
+
+### Decisions made
+Fullvectortradeoffretained,notcomponenttenfoldpromotion. Folded/BatchREDCranges1.19–1.71g2,2.18–7.82g3,2.38–6.00g4. Classicaloptimization/conditionalI>3Mlocalbreak-even,notcalibratedwall/newmathclaim.
+
+### Open threads
+Needstrongercompletecost/relationmechanismespeciallyg2;broadgoalopen. Keepinformationequalandfailedwallrununqualified.
+
+### Errors
+No scientificgatefailures/retries. Pre-freezegeneration/modulepatherrorsfixed; finalbuildwarningsretained.
+
+## Weighted LP quotient priorart and rankgate frozen
+
+### What was done
+ReadGTTDprimarysection3.1cycle/full-versus-single-LPdistinction andTsakouIonicapriororbitfactorbases. KBfoundexistingorbitLPproposal e3470db8 anddraftGLVvoltagegraph7ed0688d; no noveltyclaim. ExistingnativeLPbaselinealreadyexactcoefficientelimination. Implementedweightedgraphpotentialrankformula V−balancedungroundedcomponents, withindependentdenseprefixchecksontwofixedsmallorbitbases andparallel-edgefalsecyclenegativecontrols.
+
+### Decisions made
+Graphleftnullitynotindependentlabelrank; bothreported. Retainallfilteredtargetmisses/rejections, no10xfromvertexcounts. Newdiagnosticpreservesoriginal892relations/31008bucketchecks/18recoveries, notperformanceexperiment or olddraftdispatch. Freeze/pushbeforeexecution.
+
+### Open threads
+Qualifygraphsemantics/actualindependentlabelarrival; broadobjectiveopen. Needcompletecostcasebeforeproductiongraphcollector.
+
+### Errors
+Initialreadrootnativepathabsentinsparsecheckout; usedretainedcountednativecopy. No scientificrunyet.
+
+## Weighted graph rank gate passes, real false-cycle controls observed
+
+### What was done
+At pushed0beced90ca2,1528weightedgraph/denseLPprefixrankchecksand3parallel-edgenegativecontrols passEXIT0. Naivecycleformulafails26actualprefixes. Filteredcompletiong2/g3bothcuts6/6;g4small2=5/6,small4=6/6. Original18recoveries/31008bucketchecks/892relationspass. Rawhashesverify;postrunRustsummaryretained.
+
+### Decisions made
+Retainonefilteredg4misswithoutbudgetextension. Leftnullitynotindependentlabelrank (example86vs3). No performance/newpriorityclaimfromgraphstats. ExistingexactLPbaseline/primarypriorartretainauthority. Chargedonlineproductioncollectorwouldneednewprotocolandcompletecostcase.
+
+### Open threads
+PR4498externallymerged2026-11-17T04:26:30Z at164dc1799e20decf5d0e26632bc8941a61bf0bf6;createonlygraphsuccessorfrommerge. Broad10xgoalopen,especiallyg2.
+
+### Errors
+No scientificrankfailures/retries;filteredmissisretainedincompleteasregistered. Rootnativepathsparseabsent;usedfrozenretainedcopy.

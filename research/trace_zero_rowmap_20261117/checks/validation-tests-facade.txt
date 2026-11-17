@@ -1,0 +1,42 @@
+   Compiling full-trace-zero-backend v0.1.0 (/workspace/crypto-trace/research/trace_zero_rowmap_20261117/native/backend)
+error[E0432]: unresolved import `crate::ct_bignum`
+ --> backend/src/../../../../../src/ecc/field.rs:7:12
+  |
+7 | use crate::ct_bignum::{MontgomeryContext, Uint, U256};
+  |            ^^^^^^^^^ could not find `ct_bignum` in the crate root
+
+error[E0432]: unresolved import `crate::ecc::mont_vt`
+ --> backend/src/../../../../../src/ecc/field.rs:8:17
+  |
+8 | use crate::ecc::mont_vt::{ct_pow4, ct_pow4_public};
+  |                 ^^^^^^^ could not find `mont_vt` in `ecc`
+
+error[E0432]: unresolved import `super::mont_vt`
+  --> backend/src/../../../../../src/ecc/point.rs:20:12
+   |
+20 | use super::mont_vt::{Jac as MontJac, Mont};
+   |            ^^^^^^^ could not find `mont_vt` in `super`
+
+error[E0432]: unresolved import `zeroize`
+  --> backend/src/../../../../../src/utils/random.rs:21:5
+   |
+21 | use zeroize::{Zeroize, Zeroizing};
+   |     ^^^^^^^ use of unresolved module or unlinked crate `zeroize`
+   |
+   = help: if you wanted to use a crate named `zeroize`, use `cargo add zeroize` to add it to your `Cargo.toml`
+
+error[E0599]: no method named `zeroize` found for mutable reference `&mut [u8]` in the current scope
+  --> backend/src/../../../../../src/utils/random.rs:63:13
+   |
+63 |         buf.zeroize();
+   |             ^^^^^^^
+   |
+help: there is a method `zero` with a similar name
+   |
+63 -         buf.zeroize();
+63 +         buf.zero();
+   |
+
+Some errors have detailed explanations: E0432, E0599.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `full-trace-zero-backend` (lib) due to 5 previous errors

@@ -15,6 +15,33 @@ pub struct Quotient {
     modulus: u64,
 }
 impl Quotient {
+    /// Rank must already have been certified against the source matrix.
+    pub(crate) fn from_rank_certified_kernel(
+        modulus: u64,
+        kernel: Vec<u64>,
+        rank: usize,
+    ) -> Result<Self, &'static str> {
+        if modulus < 3
+            || kernel.len() < 2
+            || kernel.len() > 4096
+            || rank.checked_add(1) != Some(kernel.len())
+            || kernel.last() != Some(&1)
+            || kernel.iter().any(|&x| x >= modulus)
+        {
+            return Err("canonical certified kernel required");
+        }
+        let free_column = kernel.len() - 1;
+        let counts = ExtraCounts {
+            word_events: (kernel.len() + 4) as u64,
+            ..Default::default()
+        };
+        Ok(Self {
+            free_column,
+            kernel,
+            counts,
+            modulus,
+        })
+    }
     pub fn from_rref(
         modulus: u64,
         columns: usize,
@@ -96,6 +123,19 @@ impl Quotient {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn certified_kernel_constructor_shape_and_projection() {
+        let mut q = Quotient::from_rank_certified_kernel(101, vec![99, 1], 1).unwrap();
+        assert_eq!(q.project(&[3, 4, 1], 17).unwrap(), ([99, 1], 17));
+        for (h, r) in [
+            (vec![99, 1], 0),
+            (vec![101, 1], 1),
+            (vec![99, 0], 1),
+            (vec![], 0),
+        ] {
+            assert!(Quotient::from_rank_certified_kernel(101, h, r).is_err());
+        }
+    }
     #[test]
     fn hand_kernel_and_projection() {
         let mut q = Quotient::from_rref(101, 2, &[(0, vec![1, 2], 0)]).unwrap();

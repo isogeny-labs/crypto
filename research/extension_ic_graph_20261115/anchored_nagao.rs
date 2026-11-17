@@ -100,6 +100,40 @@ pub fn decompose(
     rng: &mut StdRng,
     retain_quadratics: bool,
 ) -> Output {
+    decompose_using(
+        ctx,
+        base,
+        by_x,
+        r,
+        opts,
+        rng,
+        retain_quadratics,
+        |polys, p, opts, rng| {
+            Ok(cover::solve_zero_dim_traced(
+                polys, 6, p, opts, rng, ctx.trace,
+            ))
+        },
+    )
+    .expect("the original solver has no materializer error")
+}
+
+/// Opt-in algebraic backend; the existing ordinate, norm and group checks stay
+/// in this materializer. Backend refusals are errors, never empty root sets.
+pub fn decompose_using(
+    ctx: &Ctx,
+    base: &[BaseEl],
+    by_x: &HashMap<u64, usize>,
+    r: &Div<E2>,
+    opts: &F4Options,
+    rng: &mut StdRng,
+    retain_quadratics: bool,
+    solve: impl FnOnce(
+        &[crypto_lib::cryptanalysis::f4_fp::Poly],
+        u64,
+        &F4Options,
+        &mut StdRng,
+    ) -> Result<(Vec<Vec<u64>>, ZeroDimStats), &'static str>,
+) -> Result<Output, &'static str> {
     let mut out = Output {
         full: vec![],
         partial: vec![],
@@ -108,7 +142,7 @@ pub fn decompose(
         degenerate: r.u.len() != 4,
     };
     if out.degenerate {
-        return out;
+        return Ok(out);
     }
     let f = &ctx.f.f;
     let mut v = r.v.clone();
@@ -116,11 +150,14 @@ pub fn decompose(
     let forms = cover::weil_forms(f, &ctx.cov.hx, &r.u, &v);
     let polys = forms.polys(&ctx.reim, f.p);
     f.count_public(6 * 10 * 8);
-    let (solutions, stats) = cover::solve_zero_dim_traced(&polys, 6, f.p, opts, rng, ctx.trace);
+    let (solutions, stats) = solve(&polys, f.p, opts, rng)?;
     out.stats = stats;
     let ring = FpRing::new(f.p);
     let mut full = BTreeSet::new();
     for solution in solutions {
+        if solution.len() != 6 || solution.iter().any(|&x| x >= f.p) {
+            return Err("noncanonical algebraic solution");
+        }
         let lam = [
             E2([solution[0], solution[1]]),
             E2([solution[2], solution[3]]),
@@ -240,7 +277,7 @@ pub fn decompose(
         out.cofactors.push(event);
     }
     out.full = full.into_iter().collect();
-    out
+    Ok(out)
 }
 
 #[cfg(test)]

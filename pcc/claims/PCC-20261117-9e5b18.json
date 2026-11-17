@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T04:14:56Z",
+ "id": "PCC-20261117-9e5b18",
+ "kind": "statement",
+ "producer": {
+  "commit": "9cd33984b22faf1780bcc83938ef49f07d109515",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_rowmap_20261117/shared-history.json",
+    "sha256": "0d53ce893de52684e76b14a08ba07ebdefc7c1090acf3ba82fb9870cfe4ad381"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_rowmap_20261117/shared-history.tar.xz",
+    "sha256": "f3802cf50a6ff000f44f1e556cfbb99f01d9343e7f679a4d90438795c9fd8ce3"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Administrative Git/PCC reconciliation; scientific sources/results unchanged.",
+ "statement": "Shared metadata merge preserves the entire original branch/main/common ledgers and journals in an extracted and deterministically repacked whole archive, keeps actual main ledger byte prefix, and re-registers five immutable unsigned claim subjects through the maintained PCC API. Claim files/proofs are byte-identical and journal suffix block multiplicities are retained in timestamp order. This is metadata custody only, not signed scientific verification."
+}
