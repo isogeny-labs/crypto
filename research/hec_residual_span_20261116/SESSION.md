@@ -2135,3 +2135,10 @@ What was done: freeze03c6c0bd4d9 once-onlyexit0;24calls/12originaltargets origin
 Decisions made: retainnormalizationasalternative, no posthocD/C oraclechoice oruniformgainclaim; cheapstep doesnotpredictproductiveclosure,10xgatefails.
 Open threads: mathematical productive-relation/scheduling mechanism withpubliccostdecision andindependenttargets, originalgenus2+goal/review/publication/genus3/4coverage.
 Errors: noneinrun,no retry/S3/cloud.
+
+## Anchor work-queue closure frozen
+
+What was done: checkedprior singleanchorambiguity applieswithoutsourceequation, currentpublicnormalizationbreaksthatobstruction. Builtpersistentperanchor buckets/cursor, ingestonlyneworbits, closecurrentanchorbeforeadvance, sameprincipal/formalconsensus/nativeproofs.
+Decisions made: original12targets/24calls, same16anchors/3seeds, allattempts/batches/inversions/proofs charged, diagnosticnativefulltrace+mutation/repeat gates. Assertions [pcc:unverified]. Sources anchor-rank results/protocol andKB source:91b6bbe9fb73267bbeb5d7c97f493b26 backgroundonly,no noveltyclaim.
+Open threads: pushfreeze thenone120CPU invocation, inspectstalls/anchorcount/proofcost beforegainclaims.
+Errors: onlyunusedwarning,noscienceyet.
