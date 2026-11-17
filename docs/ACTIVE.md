@@ -22,6 +22,7 @@ _(none pinned — set one with `/goal <text>`)_
 - [ ] Publish Vieta Rust speed results and resolve official record/publication blockers (codex, started 2026-11-17, branch lane/vieta-speed-20261117, PR #4525)
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
+- [ ] Port the linearized two-summand root finder (lfd-summation-systems PR #28) into ic_framework as a decomposition oracle and compare it with rootfind-mitm, rootfind-pairs and matrix-F4 on the same instances (claude, started 2026-11-17, branch claude/index-calculus-root-finding-e95kd6)
 
 <!-- One line per task, added as the task's first step with its draft PR:
 - [ ] <task> (<runtime>, started YYYY-MM-DD, branch <branch>, PR #<n>) -->
