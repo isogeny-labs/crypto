@@ -1476,3 +1476,10 @@ What was done:f3cb6e18a1esingle invocation exits0;17of18complete,223originalgrou
 Decisions made: removed eagerfullFB/actionprecomputation fromproducer,notpricedasfreegain. SourceCpromiseexplicit; classicalintegration,fullcostnext. Priornegativegates preserved.
 Open threads: coldcountercomparison withalllazy/ring/CRT/finalcosts; fixedseedstallneedsprospectivechargedfallback; originalgenus2+goalopen.
 Errors: noscientificerrors/retries,S3/cloud; incompletearmretained.
+
+## Lazy cyclotomic cold fallback gate frozen
+
+What was done:compiled12freshseed2026113000targetcomparison48calls,strongnormalizedfullscancontrol. Candidatefixed3seedorbitfallback,allrestartdiscovery/setup/CRT/anchor/finalcostscharged. Separateknownstallfallbackqualification,notpooled. Diagnosticgatesandexacttracerepeatsrequired; hashesfrozen.
+Decisions made: nopublicaction/FBtocandidate,equalCsourcepromiseverifiedbotharms,allfailuresretained. Noarbitrarycounterweights/10xclaim.
+Open threads: executesinglefrozengateandpricecompletepipeline.
+Errors: none, nosciencebeforepushedcheckpoint.
