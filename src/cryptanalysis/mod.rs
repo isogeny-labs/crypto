@@ -405,6 +405,7 @@ pub mod smith_elliptic_walk;
 pub mod smith_isogeny;
 pub mod smith_kernel_coverage;
 pub mod smith_prop24;
+pub mod smith_route_s;
 pub mod smith_trigonal;
 pub mod smt_oracle;
 pub mod solinas_correlations;
