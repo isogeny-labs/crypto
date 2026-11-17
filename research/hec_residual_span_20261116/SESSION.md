@@ -2436,3 +2436,10 @@ What was done: resumed authoritative Git state; prior summary's freeze/run had n
 Decisions made: original p251,c18 preserved; actual source only reports predicted order discriminant, so no independent order-discriminant claim. Git custody while S3 unavailable; one120CPU invocation after push. Existing own T-7093 reservation verified; conflict check allows, attach reports same own reservation.
 Open threads: execute/check module certificate, then geometric invariants and finite-field maps; original broader speed objective remains open.
 Errors: summary overstated prior filesystem state; no prior run exists and no measurement was repeated. Two unused-helper build warnings.
+
+## Exceptional19 enumeration passes, map-coordinate bug retained
+
+What was done: frozen input hashes passed; once-only run exit101 after362 stable lines,20 isotropic kernels/four size-five symmetry orbits; first quotient principal form/F/V checks passed before Q determinant failure.
+Decisions made: preserve failed original. transformed(19I,B) incorrectly conjugates scalar; successor solves BQ=19I directly with exact Cramer division and all original checks unchanged.
+Open threads: separately freeze/run v2, then geometric construction.
+Errors: expected detQ361, got19^4=130321; implementation coordinate conversion error, not a changed mathematical prediction.
