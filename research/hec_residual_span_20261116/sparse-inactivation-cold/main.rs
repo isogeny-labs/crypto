@@ -1,0 +1,10 @@
+mod core;
+#[path="../orbit-core/sparse.rs"]mod sparse;
+mod baseline;
+#[path="../setup/fast.rs"]mod fast;
+use hec_native_ic::{counted,fp::Fp,jac::Curve,poly::Poly,rng::Rng};
+fn main(){counted::disable();println!("p\tsm\tcase\trep\tarm\tmodulus\tk\texpected\trows\tscans\tvisits\tcounts");let(mut calls,mut incomplete)=(0,0);
+for(p,cc,ell)in[(101,2,7481),(251,18,67931),(601,7,411491)]{let c=Curve::new(Fp::new(p),Poly::from_coeffs(&[cc,0,0,0,0,1]));let(fb,_,_)=fast::prepare(&c);let base=c.place(fb[0].0,fb[0].1);assert!(c.is_zero(&c.mul(&base,ell)));let mut rng=Rng::new(2026112900^p);
+for sm in [1,17]{let d=c.mul(&base,sm);for case in 0..2{let expected=1+rng.below(ell-1);let target=c.mul(&d,expected);let gate=core::solve(&c,&d,&target,ell,sm,true);let control=baseline::solve(&c,&d,&target,ell,sm,true);let mut prior=std::collections::BTreeMap::new();
+for rep in 0..2{for n in 0..2{let arm=if rep==0{n}else{1-n};counted::reset();let(k,rows,scans,visits)=if arm==0{let r=baseline::solve(&c,&d,&target,ell,sm,false);assert_eq!((r.k,r.relations,r.anchors,r.parameter),(control.k,control.relations,control.anchors,control.parameter));(r.k,r.relations,r.anchors,0)}else{let r=core::solve(&c,&d,&target,ell,sm,false);assert_eq!(r,gate);(r.k,r.rows,r.scans as u64,r.visits as u64)};let counts=counted::snapshot();counted::disable();if let Some(k)=k{assert_eq!(k,expected);assert_eq!(c.mul(&d,k),target);}else{incomplete+=1;}let signature=(k,rows,scans,visits,counts.clone());if rep==1{assert_eq!(prior[&arm],signature);}else{prior.insert(arm,signature);}for(modulus,v)in counts{assert_eq!(v[8],2*v[7]+v[5]+v[6]);println!("{p}\t{sm}\t{case}\t{rep}\t{arm}\t{modulus}\t{}\t{expected}\t{rows}\t{scans}\t{visits}\t{}",k.map_or("none".into(),|k|k.to_string()),v.iter().map(u64::to_string).collect::<Vec<_>>().join(","));}calls+=1;}}
+}}}assert_eq!(calls,48);eprintln!("calls={calls} incomplete_calls={incomplete} fresh_targets=12 exact_repeats=true diagnostic_gates_both_arms=true all_returned_scalars_verify=true");}

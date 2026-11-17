@@ -153,3 +153,10 @@ the full prime-order group, explicit quartic `C` verified on 120/120 held-out
 image points and certified smooth by resultants. `Psi` into `Pic^0(C)` not run
 at that size (u32 `plane_quartic_pic`). See `RESULTS_S56.md` and
 `reports/s56/report_s56.pdf`. `[pcc:unverified]`
+
+## Amendment S56b (Psi into Pic^0(C) at 56 bits)
+
+With a 64-bit copy of the `Pic^0` arithmetic, `Psi` runs at `p = 2^56 - 5`:
+well defined, order `n` preserved, and `Psi(phi^*(Q)) = [k] Psi(phi^*(G))` for
+the planted `k`; the wrong-`k` control fails. See `RESULTS_S56B.md` and
+`reports/s56b/report_s56b.pdf`. `[pcc:unverified]`

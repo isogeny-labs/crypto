@@ -1,0 +1,113 @@
+{
+  "branch": "lane/relation-fusion-next",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "/workspace/relation-native-qualifiers/direct-monitor-20261117/isolated_bench.py",
+        "reserve",
+        "--cpus",
+        "0",
+        "--period",
+        "0.1",
+        "--out",
+        "/workspace/fusion-root-dag-monitor-96.jsonl",
+        "--label",
+        "fusion-root-dag-96",
+        "--",
+        "taskset",
+        "-c",
+        "0",
+        "/workspace/relation-native-qualifiers/fusion-96/root-dag-compare",
+        "/workspace/fusion-root-dag-96",
+        "/workspace/relation-native-qualifiers/fusion-96/fused-native",
+        "/workspace/fusion-qualification-66",
+        "/workspace/relation-native-qualifiers/fusion-85/fused-native"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-17T06:58:22+00:00",
+      "wall_s": 3.296
+    }
+  ],
+  "commit": "0bab6ab79e1fc25e93a86d51df4244a524febf56",
+  "commit_dirty": false,
+  "created_utc": "2026-11-17T06:57:25+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261117-fusion-root-dag"
+  ],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "bc0ac39ff549",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261117T0657Z-fusion-root-dag-96",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 210,
+      "name": "correct_calls",
+      "note": "All complete,uncontended,full-basis matched; candidate within A/A spread,no15x admission",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 210.0
+    }
+  ],
+  "problem": "complete-certificate-replay",
+  "raw": [
+    {
+      "bytes": 60920,
+      "path": "research/relation_fusion_20261117/root-dag-96.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bc/bcee804bf3d5d80e9076defa6df4b8488eebdd24fc380f6d8fa9cd979d11ad59",
+      "sha256": "bcee804bf3d5d80e9076defa6df4b8488eebdd24fc380f6d8fa9cd979d11ad59",
+      "uploaded": false
+    },
+    {
+      "bytes": 2864,
+      "path": "research/relation_fusion_20261117/root-dag-isolation-96.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e9/e97899f11dc29e0be4659a7bf9da4b4e7b15309123e8da6757d7cd20ca97e2e3",
+      "sha256": "e97899f11dc29e0be4659a7bf9da4b4e7b15309123e8da6757d7cd20ca97e2e3",
+      "uploaded": false
+    },
+    {
+      "bytes": 37278,
+      "path": "research/relation_fusion_20261117/ROOT_DAG_ANALYSIS_96.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/27/273ca9d3f25b8cc37a1dec07038e0eafd0624c6aba061f0ef4772971fff71e75",
+      "sha256": "273ca9d3f25b8cc37a1dec07038e0eafd0624c6aba061f0ef4772971fff71e75",
+      "uploaded": false
+    },
+    {
+      "bytes": 13311,
+      "path": "research/relation_fusion_20261117/ROOT_DAG_PINS_BEFORE_96.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/12/120926f4bf17b1f76dbfc7d65a3d6b963f2fa753fad78300ef2e1a1c2c239b7e",
+      "sha256": "120926f4bf17b1f76dbfc7d65a3d6b963f2fa753fad78300ef2e1a1c2c239b7e",
+      "uploaded": false
+    },
+    {
+      "bytes": 9102,
+      "path": "research/relation_fusion_20261117/ROOT_DAG_PINS_AFTER_96.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/99/99a14484f246725f57a21f54e513f9188fd3c6e08662e52cd4f7251c4be51bf7",
+      "sha256": "99a14484f246725f57a21f54e513f9188fd3c6e08662e52cd4f7251c4be51bf7",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "fusion-root-dag-96",
+  "status": "open",
+  "summary": "",
+  "validation": null
+}
