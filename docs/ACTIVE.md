@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Daily 2026-11-17 cross-repository PR and research-lead evidence sweep (automation, started 2026-11-17, branch codex/daily-research-leads-20261117)
+- [x] Daily 2026-11-17 cross-repository PR and research-lead evidence sweep (automation, started 2026-11-17, branch codex/daily-research-leads-20261117, PR #4571; documentary PDF/public snapshot completed, review and source validation gates remain external)
 
 - [x] Freeze and audit #4556 exact-source public B8 RR9 result with native JSON receipt (automation, started 2026-11-17, branch research/prime31-barycentric-evidence-20261117, PR #4558)
 
