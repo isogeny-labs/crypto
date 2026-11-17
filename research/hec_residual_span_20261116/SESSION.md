@@ -843,3 +843,17 @@ Integrateincrementalsparsepencilasbaselineengineeringifneeded,thennewrelation-ge
 
 ### Errors
 No runtimefailures/censoring/retries;9g3p421smoothrowsfilter-rejectedandcharged. Historicalknown-logwalkcollisionpreventedfalsepriorityclaim.
+
+## Orbit-core result wording clarified
+
+### What was done
+Rewrote the derived result report in plain prose and explicitly rejected the route as a tenfold candidate on the registered panel. Raw evidence and frozen producer are unchanged.
+
+### Decisions made
+The general sparse reference prevents attributing avoided zero work or repeated elimination to new mathematics. Preserve the distinction between a component reduction and the stronger pencil comparison.
+
+### Open threads
+A new relation-generation mechanism still needs a complete cost case; the broad objective is active. Generic incremental pencil elimination is a baseline improvement to evaluate separately.
+
+### Errors
+The previous compact phrase about closing a supported candidate was ambiguous; replaced it with an explicit rejection based on the table.
