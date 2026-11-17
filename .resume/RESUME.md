@@ -88161,3 +88161,67 @@ Read author-linked 2005Feb15Gaudry–Thériault–Thomé preprint §§2.3/3.1/3.
 CIae2artifacts sizecheck nowPASS then35base-equal workflow-pull wiring errors; sibling CI_AFTER_RASTER.md preservesoldpinnedCI_BLOCKERS. Otherbase metrics/store/sharedparity/legacygateissuesremain, no all-green/merge bypass. Source core48publication and remote verification next. Goalactive; primary complete-count/freshgrowing/signed admission notmet. Finaltest/Clippy assets in local-final-build-assets; earlierintermediatehashes explicitlypre-final. No Python science.
 
 Published core48:5071f3a88de321db68eee687f586425753557ed0, remote feature+immutablemeasure/grounded-pair-graph48-core-source verifiedequal; PR4508regularopen/auto-mergeon, title/body final46/47+core48scope, connectorconfirmscore/controls/NEXT/PDF. CInewheadinprogress/BLOCKED, noallgreen. Nextcommand/work: readgrounded-pair-graph48/NEXT.md and implementboundedquarticsplitter/checkedtwo-remainderprincipalcertificate. No48measurement/allocation; goalactive.
+
+## Active continuation: two-quadratic graph IC48 source/protocol freeze
+
+2026-11-17: PR4508merged. New branch feat/extension-ic-quadratic-pair-collector,
+tracking-only331f11edef, PR4537(draft tracking; mark ready on source publication).
+New Rust pair principal/splitter, grounded collector and separate complete source/
+graph/enumeration/RNG/rank/affine qualifier implemented.17admission/36worker/
+143qualifier serialized controls, optimized native builds/Clippy and transport pass.
+PCC92f18d/fe6376UNVERIFIED. One inspected native source/report PDF and43074B150dpi
+preview. Main c5cbb67b19metadata reconciliation preserves every journal block and
+unchanged1361entry ledger; audit validation/pair48/shared-reconciliation.json.
+Next verify/freeze pair48-source/build/report manifests, publish immutable source
+and regular PR, then new three-arm Runpod trial from Amendment43/pair plan.
+No48pod/call yet; all owned runners through47deleted. Lifetime6000seconds,4CPU8GiB,
+≤0.40USDh, live detached guardian before sole dispatch. AllscienceRust, no local
+natural-yield/performance measurement. Old46/47/core48proof subjects unchanged.
+Goal ACTIVE; complete native/fresh/scaling/signed rho admission remains open.
+
+## Active continuation after Runpod48cap outcome
+
+Execution source f58a7eb96be9fe47c40f5ef5dcaabe74e2392854, PR4537ready/BLOCKED,
+immutable measure/quadratic-pair48-run-source. Sole call07:18:13Z; all3workers0,
+candidate capped at262144quartic histories before sparse checkpoint, no scalar;
+frozen qualifier1. Owned pod1juwnyxwvu3w98deleted07:21:23Z (204/independent404),
+all owned runners through48deleted. Original archives/raw157MBwitness LOCAL under
+/workspace/ic-runpod-runs/runpod-quadratic-pair-20261117-48, hash-bound. Preserve!
+Separate native postexecution cap checker0checks94685originals/417projections/
+262144quartic histories/309699candidates/cohort/RNG; true rank417<508target,
+producer certified bound0. Original/table full math replay pass. Failed original
+complete-pipeline admission stays unchanged. PCC3cdb59/8c1742/a27dc9/7185d3UNVERIFIED.
+One viewed native cap report PDF43215B/SVG408146B/150dpiPNG36481B plus benchmarkcopies.
+Next publish resultpacket+3native postexecution programs to PR4537, then implement
+new typed quartic discriminant screen. Sources read: Swan1962PJMCorollary1and§4,
+https://msp.org/pjm/1962/12-3/pjm-v12-n3-p27-s.pdf,
+SHA256db8a73496c10f2a32549b31b673f3039d2b6ba1533a90b2d3fac3e81a2cfbdc2.
+KB unavailable(wrapper127). Written necessary screen/proposed controls in48/NEXT.md.
+Dominant174609irreducible-quartic refusals vs4repeated, so repeated-root-onlyfilter
+is not pursued. Proposed scalar resultant/discriminant character must preserve
+successful2quad/admission/RNG/witness/rank/affine math and get separate Runpod
+source/protocol; no new screen implementation/measurement yet. Goal ACTIVE.
+
+## Discriminant49source/report freeze pending
+
+37worker/149qualifier serialized controls, strict scoped Clippy/optimized builds and
+four-arm transport pass. Native source PDF44924B/SVG513988B/150dpiPNG46277B viewed.
+PCC3c2fcf/06f517 plus source/report claim UNVERIFIED. New public screened entrypoint,
+old unscreened API/schema preserved. Independent early Sylvester/candidate/RNG/
+source/graph/rank/full-affine qualifier and exact matched pair geometry controls.
+Protocol Amendment44/discriminant-pair-plan.json: original/table/unscreened/screened,
+p1009seed389exposed public point; both pair trace caps524288, early-screen cap1m.
+7200second4CPU8GiB≤0.40USDh, fixture60/worker900/wrapper4000/qualifier1800,
+≥6400seconds remain+live actual detached guardian before sole dispatch.
+Native worker dfc769589e4015f3df90c4f5af7d99f6c0093da39bf5558ff81a8bbba5dfca62;
+checker2e9dd7b356051fbf5d3a072f7828c8555ca5d66e2855db5b4fabb491c9968960.
+All49files currently uncommitted; source100for48intentionally changes only declared
+successor shared producer/export/worker paths. Never rewrite frozen48proof subjects.
+Next source49manifest/private/diff/ledger/PRpublish then Runpod49. No49pod/call yet;
+all owned through48deleted. GoalACTIVE, primarycomplete/fresh/signed parity unadmitted.
+
+2026-11-17 Codex Runpod49 continuation: all four Rust workers recover expected scalar; original qualifier1(timer equality)preserved; separate retained-data replay0/150controls. Screen observed subtotal6235988188572vs6441136952022unscreened, both above originalIC/table in incomplete unit. Results/report/custody under research/extension_ic_graph_20261115/runpod-discriminant-pair-20261117-49; detailed RESUME_RUN49.md. All owned pods through49deleted. Goal active; next bounded signed-forest recorded-source study, new natural-yield/timing only Runpod. Claims208002/bba5e6/611a9f/3319ad/5b5086UNVERIFIED. [pcc:unverified]
+
+2026-11-17 Codex deferred50integration: core98fe3e3bpublished; new separate producer/worker/complete qualifier with explicit activation_source,45/158controls/strictClippy and eight-arm transport pass. Independent flat-index replay matches108058recorded49sources/865full witnesses. Amendment45/deferred-pair-plan/RESUME_DEFERRED50.md register originalIC/table/grounded-screened/deferred-screened +4rho portfolio, worker360/wrapper3200/qualifier1800/lifetime7200/remaining6400. Protocol PDF/figures inspected. No50pod/call; publish/freeze source/native/metadata first. All owned through49deleted, goal active, claims187567/1bb597/3a7141UNVERIFIED. [pcc:unverified]
+
+2026-11-17 Codex Run50: eight matched Rust IC/rho workers recover expected scalar, original complete qualifier0; podqp4dpp4peu66x9deleted10:49:49Z DELETE204/GET404. Deferred5913875255822observed bitops/24.727sinner/27.829sprocess,5.165%lower than grounded-screened; fastest registered rho plain-b16/36.902sinner/36.908sprocess. N1exposed/incomplete/unsigned, no primary parity. All original/custody/native report data under runpod-deferred-pair-20261117-50; detailed RESUME_RUN50.md/NEXT.md. Descent3415residuals/3426280619436dominates; primary Nagao/class-domain review before cheaper/partial descent; strengthen complete/fresh/scaling/strongest-reference admission. Format-only export successor after cleanup distinguished by separate manifest. Claims7defbb/6224b9/853115/0ecee3UNVERIFIED. Goal active, no owned paid runner. [pcc:unverified]

@@ -2,9 +2,12 @@
 
 Calibration protocol72 calls is frozen separately from primary504 calls.
 The primary plan has6 configurations,6 arms,2 excluded warmups and12 retained
-targets per configuration (6 per population). Its JSON remains a draft until
-native calibration supplies a runtime forecast; the matrix/N/limits/analysis
-are already specified. No old run is resumed or pooled.
+targets per configuration (6 per population). Calibration completed72/72 calls
+and its native forecast filled only prospective runtime metadata. Main JSON
+was frozen04:38:20UTC with canonical hashf88b57e6b52d..., published before
+its first affected call around04:56UTC. Matrix/N/limits/analysis did not change.
+The original pre-calibration main draft is preserved separately. No old run
+is resumed or pooled.
 
 Configurations: coset word62/m8192,16384; coset P224/m2048; rational word62/m2048;
 rational P224/m128,512. Word62 is the existing4179340454199820289/A2/B3 field

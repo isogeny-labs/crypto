@@ -902,6 +902,7 @@ mod tests {
                 protocol_sha256: Some(super::super::digest(&protocol)),
                 split_rule: "curve-twist-component-sha256-v1".into(),
                 factor_base_policies: policies,
+                channels: None,
             };
             let binding = json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":super::super::digest(&serde_json::to_vec(&plan).unwrap()),
                 "source_commit":"a".repeat(40),"binary_sha256":"b".repeat(64),"shard_index":0,"shard_count":1,

@@ -1,0 +1,10 @@
+[package]
+name="hec-peeling-operator"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../holdout/native"}
+[[bin]]
+name="peeling-operator"
+path="../main.rs"

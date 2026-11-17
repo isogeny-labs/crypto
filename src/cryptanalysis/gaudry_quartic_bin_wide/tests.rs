@@ -98,7 +98,7 @@ fn supported_controls_match_old_fields_points_scalars_and_counts() {
         assert_eq!(old_point(narrow.neg(&p)), wide.neg(&old_point(p)));
         for k in [0, 1, 2, 3, 17, 511, u64::MAX] {
             assert_eq!(
-                old_point(narrow.mul(&p, k)),
+                old_point(narrow.mul(&p, u128::from(k))),
                 wide.mul(&old_point(p), u128::from(k))
             );
         }
