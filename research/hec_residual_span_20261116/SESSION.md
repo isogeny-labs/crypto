@@ -1967,3 +1967,10 @@ What was done: derived exact discoverylabel+primitiveprovenance invariant; built
 Decisions made: same producer/rows/scalars, witnessmaychange and bothverifiers84mutations mustpass;24completecalls original12targets, comparison to supportedpacket/bothcontrols. Assertions [pcc:unverified]. Sources core/ring/sparse/KB exactcombination receipt inprotocol; standard elimination no noveltyclaim.
 Open threads: pushfreeze then once-only120CPU invocation, inspect fullcost/constructiveness; originalgenus2+10xgoal unchanged.
 Errors: onlyunusedimportwarnings, no scientificexecutionyet.
+
+## Triangular primitive provenance qualified
+
+What was done: freezea0763f01207 once-onlyexit0;24calls/12targets exactrows/scalars/traces/controlvectors, explicit originalmatrix witnessidentity, native/phase/repeat and84mutation gates pass. P601subgroupconstruction708-998REDC vs2768-4476, complete subgroupold/new2.057-2.486; baseunchanged. Assertions [pcc:unverified].
+Decisions made: retainstructuredelimination/provenance, notnovelty/full10x; witnessrebuild aftercollection notyetformalringonlinepropagation. CRTzero-divisor provenance cannotbeassumedfree.
+Open threads: reduce basefieldcollection/scan/setup with fullproofcost; originalgenus2+10xgoal, genus3/4fullpipeline and independentreview/publicationartifacts.
+Errors: noexecutionfailure,no retry/S3/cloud.
