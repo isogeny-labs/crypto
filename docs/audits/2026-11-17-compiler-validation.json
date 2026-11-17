@@ -479,5 +479,21 @@
     "Reported S3 outage; artifact access not probed during this batch",
     "151 pre-existing PCC claims missing required claim_type; digest-bound claim and ledger bytes remain unchanged",
     "Malformed closed benchmark record 20261117T0334Z-hec-multi-production-cold; preserved unchanged and rejected by the repaired tool"
-  ]
+  ],
+  "publication": {
+    "source_snapshot_commit": "73566fe2206734c3802d7dff6e500a8fc629394d",
+    "validated_tree_equals_local_checkpoint": true,
+    "local_history_checkpoint": "8dc3c4a7ac69193d7885df6f1ffb451291de8201",
+    "local_history_checkpoint_ref": "refs/codex/checkpoints/maintained-semantic-ci-20261117-8dc3c4a7",
+    "reason": "Inherited local history contains missing promisor objects; retain it locally and publish the identical reviewed tree on the existing tracking commit. No published history is rewritten."
+  },
+  "library_delta_audit": {
+    "files_changed_after_library_checkpoint": [
+      "src/cryptanalysis/f4_trace.rs",
+      "src/cryptanalysis/partial_enlargement.rs",
+      "src/cryptanalysis/wide_groebner.rs"
+    ],
+    "f4_trace_and_wide_groebner_production_prefixes_byte_identical": true,
+    "partial_enlargement_identical_after_removing_only_new_comment_and_lint_allowance": true
+  }
 }
