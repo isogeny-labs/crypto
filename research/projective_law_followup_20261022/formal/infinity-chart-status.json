@@ -1,0 +1,38 @@
+{
+  "schema": "projective-law-infinity-chart/v1",
+  "scope": "proof-side normalized genus-2 quintic; rational overlap x!=0",
+  "proved": [
+    {
+      "id": "chart_equation",
+      "lean": "Common22InfinityChart.curve_chart_equation",
+      "statement": "z=1/x, w=y/x^3 imply w^2=z*(1+a3*z^2+a2*z^3+a1*z^4+a0*z^5)"
+    },
+    {
+      "id": "chart_unit_residue",
+      "lean": "Common22InfinityChart.chart_factor_at_origin",
+      "statement": "u(0)=1"
+    },
+    {
+      "id": "source_interpolant_chart",
+      "lean": "Common22InfinityChart.source_interpolant_chart",
+      "statement": "z^3*(n(x)-B*y)=-C+n2*z+n1*z^2+n0*z^3-B*w"
+    },
+    {
+      "id": "interpolant_residues",
+      "lean": "Common22InfinityChart.interpolant_residue; Common22InfinityChart.interpolant_linear_w_ne_zero",
+      "statement": "constant=-C, and at C=0,B!=0 the w coefficient is nonzero"
+    }
+  ],
+  "written_conditional_result": {
+    "claim": "pole order 6 at infinity for C!=0; pole order 5 for C=0,B!=0",
+    "status": "conditional; not kernel-checked",
+    "missing_lemma": "smooth projective completion local ring at infinity is a DVR with uniformizer w and unit u(z)"
+  },
+  "other_open_obligations": [
+    "zero-divisor multiplicities at repeated and Weierstrass support",
+    "source output Mumford pair equals the residual divisor",
+    "principal divisor to Pic0 transport",
+    "Rust-to-Lean runtime semantics"
+  ],
+  "numerical_cost_change": null
+}

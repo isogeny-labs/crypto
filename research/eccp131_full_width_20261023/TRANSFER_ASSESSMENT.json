@@ -1,0 +1,309 @@
+{
+  "format": "correspondence-assessment-draft-v2",
+  "assessment_state": "draft",
+  "authority": "companion artifact; not a ledger record, certificate, performance claim, novelty finding, or status transition",
+  "scope": {
+    "question": "Can the b=301 rational 2-isogeny tower transport the published ECCp-131 subgroup?",
+    "classical_or_quantum": "classical",
+    "cold_start_or_amortized": "cold_start",
+    "target_count": 1,
+    "parameter_boundary": "exact published ECCp-131 over Fp and auxiliary b=301 over the same Fp"
+  },
+  "source": {
+    "object_uid": "Certicom ECCp-131",
+    "representation_uid": null,
+    "field_sha256": null,
+    "equations": "y^2=x^3+ax+b; a=0x41cb121ce2b31f608a76fc8f23d73cb66; b=0x2f74f717e8dec90991e5ea9b2ff03da58",
+    "field": "Fp; p=0x48e1d43f293469e33194c43186b3abc0b",
+    "characteristic": "0x48e1d43f293469e33194c43186b3abc0b",
+    "extension_degree": 1,
+    "defining_field_polynomial": null,
+    "dimension": 1,
+    "ambient_group_order": 1550031797834347859219047037805205710577,
+    "subgroup": {
+      "order": 1550031797834347859219047037805205710577,
+      "cofactor": 1,
+      "generator": [
+        "0x3df84a96b5688ef574fa91a32e197198a",
+        "0x14721161917a44fb7b4626f36f0942e71"
+      ],
+      "target": [
+        "0x3aa6f004fc62e2da1ed0bfb62c3ffb568",
+        "0x9c21c284ba8a445bb2701bf55e3a67ed"
+      ]
+    }
+  },
+  "destination": {
+    "object_uid": "auxiliary-E-a1-b301-Fp",
+    "representation_uid": null,
+    "field_sha256": null,
+    "object_kind": "elliptic_curve",
+    "equations": "y^2=x^3+x+301",
+    "field": "Fp; p=0x48e1d43f293469e33194c43186b3abc0b",
+    "dimension": 1,
+    "genus": 1,
+    "ambient_group_order": 1550031797834347859229712325794928046336,
+    "polarization_type": null,
+    "jacobian_realization": null
+  },
+  "transformation": {
+    "kind": "eight degree-2 auxiliary isogenies followed by partial x-coordinate lift",
+    "family": "rational-2-isogeny-tower",
+    "typed_domain": "E'(Fp)",
+    "typed_codomain": "auxiliary quotient curves; then coordinate-selected points on E(Fp)",
+    "curve_map": "eight rational Velu maps among auxiliary curves",
+    "induced_group_map": "none from E to Eprime or reverse",
+    "degree": "2 per auxiliary step; no map to E",
+    "kernel": null,
+    "field_of_definition": "Fp",
+    "formulas": null,
+    "inverse_or_recovery": "none",
+    "exceptional_cases": [],
+    "normalization": null
+  },
+  "typed_path": {
+    "nodes": [
+      "published E(Fp), order n",
+      "auxiliary Eprime(Fp), order m",
+      "eight auxiliary quotients",
+      "115 x-lifted points on published E"
+    ],
+    "edges": [
+      "no nontrivial Fp group map: gcd(n,m)=1",
+      "eight verified auxiliary degree-2 maps",
+      "partial coordinate selection, no homomorphism"
+    ],
+    "junction_compatibility": [],
+    "weakest_open_obligation": "published-curve natural relation, rank, target descent"
+  },
+  "algebraic_screen": {
+    "dimension": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": null
+    },
+    "group_order": {
+      "state": "refuted",
+      "evidence": [
+        "runs/replay.json",
+        "runs/identity_check.stdout",
+        "runs/transfer-order-screen.json"
+      ],
+      "scope": "nontrivial Fp rational-point homomorphism between published E and b=301 auxiliary Eprime"
+    },
+    "frobenius_or_weil_polynomial": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": null
+    },
+    "field_of_definition": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": null
+    },
+    "riemann_hurwitz_or_different": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": null
+    },
+    "polarization_or_jacobian_locus": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": null
+    }
+  },
+  "obligations": {
+    "existence": {
+      "state": "refuted",
+      "evidence": [
+        "runs/transfer-order-screen.json",
+        "TRANSFER_AUDIT.md"
+      ],
+      "scope": "transport through exact auxiliary b=301 rational-point group"
+    },
+    "explicit_construction": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": null
+    },
+    "map_correctness": {
+      "state": "supported",
+      "evidence": [
+        "runs/replay.json"
+      ],
+      "scope": "eight auxiliary rational 2-isogeny maps only"
+    },
+    "subgroup_preservation": {
+      "state": "refuted",
+      "evidence": [
+        "runs/transfer-order-screen.json",
+        "TRANSFER_AUDIT.md"
+      ],
+      "scope": "transport through exact auxiliary b=301 rational-point group"
+    },
+    "scalar_recovery": {
+      "state": "refuted",
+      "evidence": [
+        "runs/transfer-order-screen.json",
+        "TRANSFER_AUDIT.md"
+      ],
+      "scope": "transport through exact auxiliary b=301 rational-point group"
+    },
+    "destination_solver_applicability": {
+      "state": "unknown",
+      "evidence": [
+        "BENCH_REPORT.md"
+      ],
+      "scope": "115 lifted published-curve columns; no natural row"
+    },
+    "computational_advantage": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": null
+    },
+    "scaling_support": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": null
+    },
+    "novelty_within_boundary": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": null
+    }
+  },
+  "preservation_certificate": {
+    "identity": "gcd(n,m)=1 implies image of any rational-point homomorphism is trivial",
+    "source_subgroup_order": 1550031797834347859219047037805205710577,
+    "image_order": 1,
+    "kernel_intersection": "entire source subgroup",
+    "recovery_map": null,
+    "scalar_multiplier": null,
+    "invertible_mod_subgroup_order": null,
+    "proof_artifact": "TRANSFER_AUDIT.md",
+    "implementation_checks": [
+      "runs/transfer-order-screen.json"
+    ]
+  },
+  "destination_solver": {
+    "name": null,
+    "source": null,
+    "supported_object_class": null,
+    "hypotheses": [],
+    "image_subgroup_compatibility": null,
+    "factor_base_identity": null,
+    "smoothness_model": null,
+    "relation_validity_and_rank": null,
+    "linear_algebra": null,
+    "individual_log": null,
+    "recovery_and_source_verification": null,
+    "complexity_model": null
+  },
+  "representation_checks": {
+    "restriction_of_scalars_adds_solver_edge": null,
+    "split_factor_location": null,
+    "surface_group_object": null,
+    "kummer_sign_or_phase_recovery": null,
+    "lattice_torsion_location": null,
+    "lattice_coordinate_extraction_non_circular": null,
+    "endomorphism_orbit_costs": null
+  },
+  "mechanism": {
+    "proposed_benefit": null,
+    "prediction": null,
+    "falsification_condition": null,
+    "assumptions": []
+  },
+  "cost_comparison": {
+    "workload": "one published ECCp-131 target",
+    "baseline_candidates": [],
+    "selected_baseline": "unmeasured here",
+    "units": "seconds and sampled KiB for component observations only",
+    "cold_start": {
+      "search": "83.927 s measured",
+      "construction": "included in search/replay receipts",
+      "map": "no map to published subgroup",
+      "preprocessing": null,
+      "relations": "8.276 s replay plus 256+256 screen; zero natural rows",
+      "linear_algebra": "unavailable",
+      "individual_log": "unavailable",
+      "recovery": "unavailable",
+      "verification": null,
+      "failed_attempts_and_duplicates": null
+    },
+    "amortized": {
+      "reusable_setup": null,
+      "target_count": null,
+      "reuse_certificate": null,
+      "per_target": null
+    },
+    "memory_and_data": null,
+    "hardware_and_parallelism": null,
+    "success_probability": null,
+    "uncertainty": null,
+    "modeled_or_measured": "component-measured, end-to-end-unmeasured",
+    "progress_fidelity_claim_record": null
+  },
+  "controls": {
+    "direct_source_baseline": "required for future cost claim",
+    "generic_solver_on_transported_subgroup": null,
+    "coordinate_isomorphism": "required for future transfer proposal",
+    "matched_random_destination": "required for future transfer proposal",
+    "transported_vs_reselected_data": null,
+    "null_and_known_false": [],
+    "additional": [
+      "eight planted point equations independently replayed on published curve"
+    ]
+  },
+  "protocol": {
+    "parameter_scope": null,
+    "sample_selection": null,
+    "paired_instances": null,
+    "seeds_or_independent_classes": null,
+    "stopping_rules": null,
+    "invalidation_rules": null,
+    "hardware_manifest": null,
+    "commands_and_revision": null,
+    "execution_route": null
+  },
+  "novelty": {
+    "fingerprint": null,
+    "equivalence_checks": [],
+    "searched_sources": [],
+    "searched_families_and_queries": [],
+    "search_date": null,
+    "unavailable_material": [],
+    "asserted_novelty_dimension": null,
+    "claim_boundary": null
+  },
+  "exploration_boundary": {
+    "families": [
+      "one b=301 auxiliary rational 2-isogeny tower"
+    ],
+    "parameters": "p exact; t=8; 115 x-lifted columns",
+    "completed_scope": "exact order compatibility and existing tower certificate",
+    "completeness_claim": "only this auxiliary transport interpretation"
+  },
+  "sources": [
+    "runs/identity_check.stdout",
+    "runs/search.stdout",
+    "runs/replay.json",
+    "runs/transfer-order-screen.json",
+    "TRANSFER_AUDIT.md"
+  ],
+  "open_obligations": [
+    "natural ECCp-131 relation on published group",
+    "independent useful rank",
+    "published-target descent",
+    "cold end-to-end cost"
+  ],
+  "verdicts": {
+    "valid_transfer": "refuted for b=301 rational-point group",
+    "algorithmically_relevant": "unknown",
+    "modeled_advantage": "unknown",
+    "measured_advantage": "unknown",
+    "novel_reduction_within_boundary": "unknown"
+  },
+  "recommended_next_action": "Specify an exact published-group relation mechanism with measurable support and independent replay.",
+  "official_status_change": "none"
+}

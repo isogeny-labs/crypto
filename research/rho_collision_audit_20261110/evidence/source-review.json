@@ -1,0 +1,26 @@
+{
+  "schema": "rho-collision-source-review/v1",
+  "created": "2026-11-10T17:24:09.208525+00:00",
+  "KB": "MCP absent; fresh wrapper127; bounded repository, primary sources and pinned Mathlib fallback. Conductor absent.",
+  "sources": [
+    {
+      "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch14.pdf",
+      "sha256": "ab59d8013db88ca145a101ddf9a9e28876fc4d10c76aac115d11da7bbbe1fada",
+      "read_scope": "Adding-walk setup14.2.1, definition14.2.1 and14.2.5 pp296–297. Definition samples increment table uniformly; expected collision penalty is qualified/conjectural.",
+      "effect": "Fixed bounded support counterfamily tests universal variance-only reading; does not refute qualified random-table heuristic."
+    },
+    {
+      "url": "https://link.springer.com/content/pdf/10.1007/BF01199265.pdf",
+      "sha256": "4629e178e68096fa5b37193de34e3e55dfb3f12021721dea06080737b5901458",
+      "read_scope": "Theorems1–2, pp191–193, assumptions and fixed-support/random-support distinction.",
+      "effect": "Average random distinct supports and fixed-support slow examples already distinguished; no novelty claim or refutation of qualified mixing theorem."
+    },
+    {
+      "url": "https://github.com/leanprover-community/mathlib4/blob/56a005855ea17e0b0958f73ec801ae140b0a1679/Mathlib/Data/Nat/Prime/Infinite.lean",
+      "read_scope": "Nat.exists_infinite_primes statement and Euclid proof lines30–46; iterate/cardinality/ZMod cast APIs checked.",
+      "effect": "Actual prime infinitude theorem discharges unbounded modulus, no assumed infinitude axiom."
+    }
+  ],
+  "scope": "Every actual walk with increments1..r has first repeat T with p≤rT and T≤p. Actual independent uniform node-label PMF expectation has p≤rE and E≤p. For r20 and primep>20, actual indegree mean1/variance19/20, distinct/nonzero increments. No realC bounds E²≤Cp uniformly over such primes. Fixed increment table; generic/random-support averages, exact limiting constants and qualified Hildebrand theorem remain open.",
+  "novelty": "Known fixed-support obstruction formalized with actual collision index and productPMF, no novelty claim."
+}

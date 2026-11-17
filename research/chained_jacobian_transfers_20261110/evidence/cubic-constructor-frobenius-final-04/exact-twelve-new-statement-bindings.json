@@ -1,0 +1,122 @@
+[
+  {
+    "theorem": "CubicConstructorFrobenius22301.constructor_guard",
+    "claim": "pcc/claims/PCC-20261116-a7544c.json",
+    "normalized_statement": "theorem constructor_guard : (223 : Nat)%12=7 \u2227 (223-1)/3=74",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-final-04/CubicConstructorFrobenius22301.lean",
+      "theorem": "CubicConstructorFrobenius22301.constructor_guard",
+      "decl_sha256": "8ba0a93eb7fe2dc70b7d19fa7d01c41154305e026721e042898ab46744b6eb25"
+    }
+  },
+  {
+    "theorem": "CubicConstructorFrobenius22301.skipped_candidate_two",
+    "claim": "pcc/claims/PCC-20261116-41acd9.json",
+    "normalized_statement": "theorem skipped_candidate_two : (2 : Nat)^74%223=1",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-final-04/CubicConstructorFrobenius22301.lean",
+      "theorem": "CubicConstructorFrobenius22301.skipped_candidate_two",
+      "decl_sha256": "9c0aa8923eedb2b0e362ac71e17110e0e84a0cf79d5e60a2ce0a3a4d31229fe6"
+    }
+  },
+  {
+    "theorem": "CubicConstructorFrobenius22301.selected_candidate_three",
+    "claim": "pcc/claims/PCC-20261116-08a651.json",
+    "normalized_statement": "theorem selected_candidate_three : (3 : Nat)^74%223=183 \u2227 (183 : Nat)\u22601",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-final-04/CubicConstructorFrobenius22301.lean",
+      "theorem": "CubicConstructorFrobenius22301.selected_candidate_three",
+      "decl_sha256": "ab15ef7e026355bc4a5cf9aecac4c175c6dfbc6de2ee0eb70e693beed7a74010"
+    }
+  },
+  {
+    "theorem": "CubicConstructorFrobenius22301.no_base_cubic_root_three",
+    "claim": "pcc/claims/PCC-20261116-345fee.json",
+    "normalized_statement": "theorem no_base_cubic_root_three : \u2200 x : Fin 223, x^3\u2260(3 : Fin 223)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-final-04/CubicConstructorFrobenius22301.lean",
+      "theorem": "CubicConstructorFrobenius22301.no_base_cubic_root_three",
+      "decl_sha256": "e0c55a26e4b2dfcf463534adec5f3fdb298a0d833fe3f4377dada25661f3dee7"
+    }
+  },
+  {
+    "theorem": "CubicConstructorFrobenius22301.frobenius_coefficients",
+    "claim": "pcc/claims/PCC-20261116-a55fbd.json",
+    "normalized_statement": "theorem frobenius_coefficients : (3 : Fin 223)^74=183 \u2227 (183 : Fin 223)^2=39 \u2227 (183 : Fin 223)^3=1 \u2227 (39 : Fin 223)^3=1 \u2227 (183 : Fin 223)\u22601 \u2227 (39 : Fin 223)\u22601",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-final-04/CubicConstructorFrobenius22301.lean",
+      "theorem": "CubicConstructorFrobenius22301.frobenius_coefficients",
+      "decl_sha256": "a9027249e49664f5dbf6afd27367759982d216950428b83ffa65b19c21c5c25c"
+    }
+  },
+  {
+    "theorem": "CubicConstructorFrobenius22301.constructor_size",
+    "claim": "pcc/claims/PCC-20261116-0cede9.json",
+    "normalized_statement": "theorem constructor_size : (223 : Nat)^3=11089567",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-final-04/CubicConstructorFrobenius22301.lean",
+      "theorem": "CubicConstructorFrobenius22301.constructor_size",
+      "decl_sha256": "1d85b3ec291718eadf4e275039e3ffa92ab50f8c13a02d4acee8507cf23d2e5e"
+    }
+  },
+  {
+    "theorem": "CubicConstructorFrobenius22301.group_power",
+    "claim": "pcc/claims/PCC-20261116-821846.json",
+    "normalized_statement": "theorem group_power {R : Type} [Semiring R] (z : R) (m n : Nat) : z^(m*n)=(z^m)^n",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-final-04/CubicConstructorFrobenius22301.lean",
+      "theorem": "CubicConstructorFrobenius22301.group_power",
+      "decl_sha256": "9ff165bb7d28720e29c2efefda01c1be5f1d0bbe1b0749d31693b09a046837c7"
+    }
+  },
+  {
+    "theorem": "CubicConstructorFrobenius22301.coefficient_power",
+    "claim": "pcc/claims/PCC-20261116-f43f5f.json",
+    "normalized_statement": "theorem coefficient_power {R : Type} [CommRing R] [IsCharP R 223] : (3 : R)^74=183",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-final-04/CubicConstructorFrobenius22301.lean",
+      "theorem": "CubicConstructorFrobenius22301.coefficient_power",
+      "decl_sha256": "a913e7b0b0e0350c653646fbc91adfc0b93addd4bbf00f0b5f3907abfa83d605"
+    }
+  },
+  {
+    "theorem": "CubicConstructorFrobenius22301.generator_frobenius",
+    "claim": "pcc/claims/PCC-20261116-216688.json",
+    "normalized_statement": "theorem generator_frobenius {R : Type} [CommRing R] [IsCharP R 223] (z : R) (hz : z^3=3) : z^223=183*z",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-final-04/CubicConstructorFrobenius22301.lean",
+      "theorem": "CubicConstructorFrobenius22301.generator_frobenius",
+      "decl_sha256": "2d9ecf265e30ee8f4ed0a2c533f7c0c92cfb140587ea90d19fd9af766c65e82d"
+    }
+  },
+  {
+    "theorem": "CubicConstructorFrobenius22301.squared_generator_frobenius",
+    "claim": "pcc/claims/PCC-20261116-c14ecd.json",
+    "normalized_statement": "theorem squared_generator_frobenius {R : Type} [CommRing R] [IsCharP R 223] (z : R) (hz : z^3=3) : (z^2)^223=39*z^2",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-final-04/CubicConstructorFrobenius22301.lean",
+      "theorem": "CubicConstructorFrobenius22301.squared_generator_frobenius",
+      "decl_sha256": "28dc3337f2303d66b45155a8eed106edd712fb998dab06b46367dcb5fd5edaca"
+    }
+  },
+  {
+    "theorem": "CubicConstructorFrobenius22301.basis_frobenius_three",
+    "claim": "pcc/claims/PCC-20261116-7c2720.json",
+    "normalized_statement": "theorem basis_frobenius_three (a b c : Fin 223) : basisFrob (basisFrob (basisFrob (a,b,c)))=(a,b,c)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-final-04/CubicConstructorFrobenius22301.lean",
+      "theorem": "CubicConstructorFrobenius22301.basis_frobenius_three",
+      "decl_sha256": "91de9bb5053e54bd03463de1e32df3629c113924663a9bd53f190e7a8ea93507"
+    }
+  },
+  {
+    "theorem": "CubicConstructorFrobenius22301.fixed_coefficient_subspace",
+    "claim": "pcc/claims/PCC-20261116-876dac.json",
+    "normalized_statement": "theorem fixed_coefficient_subspace (a b c : Fin 223) : basisFrob (a,b,c)=(a,b,c) \u2194 b=0 \u2227 c=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-final-04/CubicConstructorFrobenius22301.lean",
+      "theorem": "CubicConstructorFrobenius22301.fixed_coefficient_subspace",
+      "decl_sha256": "c6cfc50240b5d0bafcf6ba19da3662ab64d493f766375227efd7eda930adec64"
+    }
+  }
+]

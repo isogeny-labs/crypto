@@ -1,0 +1,27 @@
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValid.lean:33:21: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValid.lean:33:31: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValid.lean:36:3: error: unsolved goals
+case neg
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+f : List UInt64
+d : Stored
+hp : 1 < p.toNat
+hb : p.toNat < 2 ^ 31
+hf : Canon p f
+hu : d.u.size = 3
+hv : d.v.size = 2
+hc : Stored.canonical p d
+hd : d.degree ≤ 2
+hl : ¬d.u.toList[d.degree]? = some 1
+⊢ d.u[d.degree]? = some 1 ∧ FallbackGeometry.remainder p (residual p f (vp d)) (up d) = some [] ↔
+    d.u.size = 3 ∧
+      d.v.size = 2 ∧
+        Stored.canonical p d ∧ d.u[d.degree]? = some 1 ∧ wordsPoly p (up d) ∣ wordsPoly p f - wordsPoly p (vp d) ^ 2
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValid.lean:36:19: warning: This simp argument is unused:
+  hl
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [test, hd, WellFormed]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

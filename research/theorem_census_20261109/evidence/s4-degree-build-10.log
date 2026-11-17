@@ -1,0 +1,26 @@
+S4Degree.lean:207:68: error: unsolved goals
+R : Type u_1
+inst✝¹ : CommRing R
+S : Type u_2
+inst✝ : CommRing S
+f : R →+* S
+b2 b4 b6 b8 x y z t : R
+⊢ ((f x - f y) ^ 2 * (-f b6 + (-(f b4 * (f z + f t)) + (-(f b2 * f z * f t) + -(f 2 * f z * f t * (f z + f t))))) -
+        (-f b6 + (-(f b4 * (f x + f y)) + (-(f b2 * f x * f y) + -(f 2 * f x * f y * (f x + f y))))) *
+          (f z - f t) ^ 2) *
+      ((-f b6 + (-(f b4 * (f x + f y)) + (-(f b2 * f x * f y) + -(f 2 * f x * f y * (f x + f y))))) *
+          ((f z * f t) ^ 2 - f b4 * f z * f t - f b6 * (f z + f t) - f b8) -
+        ((f x * f y) ^ 2 - f b4 * f x * f y - f b6 * (f x + f y) - f b8) *
+          (-f b6 + (-(f b4 * (f z + f t)) + (-(f b2 * f z * f t) + -(f 2 * f z * f t * (f z + f t)))))) =
+    ((f x - f y) ^ 2 * (-f b6 + (-(f b4 * (f z + f t)) + (-(f b2 * f z * f t) + -(2 * f z * f t * (f z + f t))))) -
+        (-f b6 + (-(f b4 * (f x + f y)) + (-(f b2 * f x * f y) + -(2 * f x * f y * (f x + f y))))) * (f z - f t) ^ 2) *
+      ((-f b6 + (-(f b4 * (f x + f y)) + (-(f b2 * f x * f y) + -(2 * f x * f y * (f x + f y))))) *
+          ((f z * f t) ^ 2 - f b4 * f z * f t - f b6 * (f z + f t) - f b8) -
+        ((f x * f y) ^ 2 - f b4 * f x * f y - f b6 * (f x + f y) - f b8) *
+          (-f b6 + (-(f b4 * (f z + f t)) + (-(f b2 * f z * f t) + -(2 * f z * f t * (f z + f t))))))
+'S4DegreeAudit.quartic_coeff_four' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.quartic_natDegree_four_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.curveLast_natDegree_four_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.fullySymbolicLast_natDegree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.all_four_symbolic_degrees' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.actual_specialization_degree_zero' depends on axioms: [propext, Classical.choice, Quot.sound]

@@ -1,0 +1,25 @@
+
+running 21 tests
+test checkpoint_selection::tests::cap_refuses_before_owner_charge ... ok
+test checkpoint_selection::tests::exactly_one_bound_terminal_prefix_preserves_predecessor ... ok
+test checkpoint_selection::tests::multiple_tails_are_rejected ... ok
+test checkpoint_selection::tests::resource_or_identity_unavailable_never_salvages ... ok
+test checkpoint_selection::tests::original_deadline_refuses_before_charge ... ok
+test checkpoint_selection::tests::cannot_skip_malformed_middle ... ok
+test checkpoint_selection::tests::empty_is_not_a_candidate ... ok
+test checkpoint_selection::tests::shared_owner_refusal_has_no_candidate_or_retry ... ok
+test checkpoint_selection::tests::sequence_gaps_or_duplicates_are_rejected ... ok
+test checkpoint_selection::tests::malformed_tail_never_salvages_earlier_rows ... ok
+test checkpoint_selection::tests::latest_complete_wins ... ok
+test checkpoint_selection::tests::cannot_continue_after_truncated_snapshot ... ok
+test checkpoint_selection::tests::only_partial_capture_is_not_a_candidate ... ok
+test installed_decode_only_partial_has_no_selected_rows ... ok
+test installed_decode_retains_full_failure_and_bound_tail ... ok
+test installed_decode_no_identity_partial_is_incomplete ... ok
+test installed_decode_no_fallback_past_malformed_complete ... ok
+test installed_decode_no_candidate_on_resource_refusal ... ok
+test installed_decode_never_skips_middle_partial ... ok
+test installed_decode_rejects_tail_wrong_original_map ... ok
+test installed_decode_selects_latest_complete ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s

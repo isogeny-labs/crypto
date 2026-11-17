@@ -1,0 +1,67 @@
+{
+  "schema": "isolab.offline-controller-package/v1",
+  "created_utc": "2026-10-30T20:25:37Z",
+  "archive": {
+    "path": "controller.zip",
+    "sha256": "7791cec77e94d1fa710383a5004dfb0628125c03ee54eaedfd1a007475600fd8",
+    "bytes": 18931890,
+    "entries": 12
+  },
+  "recipe": {
+    "path": "deploy-controller-reference",
+    "sha256": "ffae52b6f0ae3b6cef679a585710459dcd79844df97119eb383204676eba247e",
+    "executed": false,
+    "packaging_command": "sha256sum bin/* deploy/submit-job deploy/remote/* resume/* > SHA256SUMS; zip -q -X -r controller.zip bin deploy resume SHA256SUMS"
+  },
+  "source_mapping": {
+    "controller_binary": "b0403250273d2e06e58b18a745f221f2c8d9881979afbe027fdb5f8c237628a6",
+    "controller_qualification_sha256": "9f0607c5c38438f4131ca5d4a118563cd139a33331cdc05edfc5bfd20659a18c",
+    "controller_source_manifest_sha256": "79047cc0133d522074e852bfbc592c5702d2d3732c9b52c84874ce969f5c4cfb",
+    "wrapper_reference_git_head": "1befe970928bc83257caa4cfc35432ca72385ea4",
+    "wrapper_comparison": "tracked HEAD run-controller, buildspec and verify-build matched retained source; current submit-job matches inherited archive",
+    "support_binaries": "isolab-eks-mcp and kubectl reused byte-for-byte from inherited package; no new source build qualification",
+    "inherited_archive_sha256": "0bd84d4009064968365f03518adbca1bf6fd6c27eeed24721721e20018a9e85a"
+  },
+  "payload_files": [
+    {
+      "sha256": "6a99e34d63200820e6c73d7e2d3487d4fe89055c94212c93285ee33d99ab497f",
+      "path": "bin/isolab-eks-mcp"
+    },
+    {
+      "sha256": "b0403250273d2e06e58b18a745f221f2c8d9881979afbe027fdb5f8c237628a6",
+      "path": "bin/isolab-eks-recovery"
+    },
+    {
+      "sha256": "33bc88a24c3b09cf55bfd59e6ca977881b61fc3f25ab65bc80c65b430248648e",
+      "path": "bin/kubectl"
+    },
+    {
+      "sha256": "def41b1a72b6e48dc4e6f8256455be44ccc5100a017f515d8bd2821558abcbce",
+      "path": "deploy/submit-job"
+    },
+    {
+      "sha256": "6a020d533df4f18645726377b53d17fddb9efbe693c4b8a42a1d2e24169f7556",
+      "path": "deploy/remote/verify-build"
+    },
+    {
+      "sha256": "ce5ff43794e6a75b8880b709da13cde62ec1ae8dde4ee23f18a003c0ee2ab133",
+      "path": "resume/buildspec.yml"
+    },
+    {
+      "sha256": "59fd9e1337af8560309cbb52dbb49821ebd2f0a10b19b3b69caef0f84e1d602b",
+      "path": "resume/run-controller"
+    }
+  ],
+  "checks": {
+    "zip_integrity": true,
+    "extracted_manifest": true,
+    "exact_controller_binary": true,
+    "all_six_executables_mode_0755": true
+  },
+  "new_binary_builds": 0,
+  "binaries_executed": false,
+  "aws_calls": 0,
+  "published": false,
+  "deployed": false,
+  "publication_authorized_by_old_hashes": false
+}

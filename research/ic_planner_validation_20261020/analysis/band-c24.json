@@ -1,0 +1,284 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "log2_r": 23.473710331945945,
+      "arm": "double-base",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        19.571737279786657,
+        20.43626756231573,
+        28.217040105077434
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "log2_r": 23.473710331945945,
+      "arm": "full-rank",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        43.39950099969233,
+        51.235940645014374,
+        121.76389745291262
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "log2_r": 23.473710331945945,
+      "arm": "half-base",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        20.115858516703312,
+        23.8267004060977,
+        57.224277410647154
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "log2_r": 23.473710331945945,
+      "arm": "plan",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        13.144743892474073,
+        14.922661956853856,
+        30.9239245362719
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "log2_r": 23.473710331945945,
+      "arm": "plan-aa",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        13.144743892474073,
+        14.922661956853856,
+        30.9239245362719
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "log2_r": 23.473710331945945,
+      "arm": "random-targets",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        545.1205687766777,
+        546.8106737233517,
+        562.0216182434175
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "log2_r": 23.473710331945945,
+      "arm": "rho-neg",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1.046552271143898,
+        1.1404034486594175,
+        1.9850640462990932
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "log2_r": 23.473710331945945,
+      "arm": "rootfind",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1975.880652971916,
+        2174.3095931766006,
+        3960.170055018753
+      ],
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "double-base",
+      "b": "full-rank",
+      "verdict": "double-base < full-rank"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "double-base",
+      "b": "half-base",
+      "verdict": "double-base < half-base"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "double-base",
+      "b": "plan",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "double-base",
+      "b": "plan-aa",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "double-base",
+      "b": "random-targets",
+      "verdict": "double-base < random-targets"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "double-base",
+      "b": "rho-neg",
+      "verdict": "rho-neg < double-base"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "double-base",
+      "b": "rootfind",
+      "verdict": "double-base < rootfind"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "full-rank",
+      "b": "half-base",
+      "verdict": "half-base < full-rank"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "full-rank",
+      "b": "plan",
+      "verdict": "plan < full-rank"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "full-rank",
+      "b": "plan-aa",
+      "verdict": "plan-aa < full-rank"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "full-rank",
+      "b": "random-targets",
+      "verdict": "full-rank < random-targets"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "full-rank",
+      "b": "rho-neg",
+      "verdict": "rho-neg < full-rank"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "full-rank",
+      "b": "rootfind",
+      "verdict": "full-rank < rootfind"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "half-base",
+      "b": "plan",
+      "verdict": "plan < half-base"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "half-base",
+      "b": "plan-aa",
+      "verdict": "plan-aa < half-base"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "half-base",
+      "b": "random-targets",
+      "verdict": "half-base < random-targets"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "half-base",
+      "b": "rho-neg",
+      "verdict": "rho-neg < half-base"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "half-base",
+      "b": "rootfind",
+      "verdict": "half-base < rootfind"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "plan",
+      "b": "plan-aa",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "plan",
+      "b": "random-targets",
+      "verdict": "plan < random-targets"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "plan",
+      "b": "rho-neg",
+      "verdict": "rho-neg < plan"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "plan",
+      "b": "rootfind",
+      "verdict": "plan < rootfind"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "plan-aa",
+      "b": "random-targets",
+      "verdict": "plan-aa < random-targets"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "plan-aa",
+      "b": "rho-neg",
+      "verdict": "rho-neg < plan-aa"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "plan-aa",
+      "b": "rootfind",
+      "verdict": "plan-aa < rootfind"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "random-targets",
+      "b": "rho-neg",
+      "verdict": "rho-neg < random-targets"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "random-targets",
+      "b": "rootfind",
+      "verdict": "random-targets < rootfind"
+    },
+    {
+      "curve": "icv1-fp24-tm1741-7eb5536e",
+      "a": "rho-neg",
+      "b": "rootfind",
+      "verdict": "rho-neg < rootfind"
+    }
+  ]
+}

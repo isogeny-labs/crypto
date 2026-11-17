@@ -1,0 +1,20 @@
+digraph large_curves {
+  graph [rankdir=TB, bgcolor="white", labelloc=t, label="Large-curve coverage: fixed public correctness fixtures", fontsize=18];
+  node [shape=box, style="rounded,filled", fillcolor="#edf3fa", fontname="Helvetica", fontsize=12];
+  edge [fontname="Helvetica", fontsize=10, color="#39546b"];
+  standards [label="SEC2 prime parameters + public generator G\n256 / 256 / 384 / 521 bits"];
+  input [label="S = {x(G), x(2G), x(4G)}; R = 16G\n5 variables, 6 explicit polynomial inputs"];
+  points [label="Native provenance + OpenSSL point recheck\n112 public points; G through 28G nonzero", fillcolor="#e4f3e7"];
+  producer [label="Native constructive producer\nseparate modular polynomial arithmetic"];
+  replay [label="Independent exact BigUint DAG replay\n413 / 415 / 415 / 415 nodes; cap 5", fillcolor="#e4f3e7"];
+  theorem [label="Uniform lower + first-fall proofs\nordinary guarded B=3 model"];
+  conclusion [label="Combined mathematical application\nfirst / last = (4,5)", fillcolor="#e4f3e7"];
+  binary [label="Large binary fields: theorem applies\nno large-binary proof files generated", fillcolor="#fff2d7"];
+  standards -> input;
+  input -> points;
+  input -> producer;
+  producer -> replay;
+  points -> conclusion;
+  replay -> conclusion;
+  theorem -> conclusion;
+}

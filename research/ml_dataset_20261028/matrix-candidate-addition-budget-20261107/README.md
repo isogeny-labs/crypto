@@ -1,0 +1,11 @@
+# Candidate group additions without resetting matrix search
+
+The original Budget phase graph permits Matrix -> MatrixComplete -> Extraction -> Complete. Testing the first candidate in final Extraction prevents continuing matrix search after an exhausted signed model. The added reserve_matrix_candidate_addition method requires Matrix and shares the original additions counter, configured addition limit, sticky stop and absolute deadline. It changes no phase, native counters, limits or ownership identity. Existing final-extraction reserve_addition behavior is untouched.
+
+The owning adapter must test provisional candidates while still in Matrix. A successfully checked signed relation may then finish_native and begin_extraction(true) for publication. A model with certified exhausted sign choices stays Matrix for continuation. Generic semantic rejection is not an exclusion certificate. No method returns from Extraction to Matrix, so no phase ceiling is reset or replenished.
+
+The source basis is the exact staged koblitz_m3 Budget begin_native, observe, finish_native, begin_extraction, reserve_addition and finish_extraction contracts. budget.patch adds only the new admission method. SOURCE_BINDING.json pins the original and full proposed file. Production source is unchanged.
+
+Six standalone tests passed on the mechanically extracted actual Budget declarations/implementation through the pre-admit_original boundary. Only serde derives/attribute were removed to avoid repository dependencies; the ledger and phase logic are the real source, not a substitute test implementation. Tests cover preservation of original ownership/deadlines/native counts, shared candidate/final addition limits, exact-limit successful completion, rejection in every wrong phase, sticky deadline refusal and native-phase cap preservation across candidate checking.
+
+The full proposed source includes unchanged surrounding modules; this standalone test does not type-check the assembled worker or authenticate a real original instance. Runtime original-owner/lift/continuation integration, publication and replay remain required. Reservations are not measured instructions. No scientific generation, cloud job, frozen-source mutation or saved SAT rebuild retry occurred.

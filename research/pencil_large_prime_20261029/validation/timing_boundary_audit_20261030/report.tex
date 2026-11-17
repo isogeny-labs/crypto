@@ -1,0 +1,60 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.65in]{geometry}
+\usepackage{booktabs,longtable,hyperref,tikz,xcolor}
+\usetikzlibrary{positioning}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
+\definecolor{solve}{HTML}{2B6CB0}\definecolor{method}{HTML}{C05621}\definecolor{online}{HTML}{2F855A}\definecolor{floor}{HTML}{B8322C}
+\begin{document}
+\raggedright\sloppy
+{\LARGE p739 timing-boundary audit}\\[4pt]
+{\small Neutral source-and-record evidence packet, 2026-10-30}\par
+\textbf{Scope.} Public synthetic known-answer observations only. This report records source semantics and retained ranges. It makes no performance judgment, protocol amendment, experiment approval, qualified ratio, or new solver execution.
+\section*{Bound evidence}
+Instrument commit: \texttt{543a54b4b1c3be7052872af3ffe393a44c69a3c3}.\\
+Record SHA-256: \texttt{9ccc07c9b55b9180af36c3b910891803dde7f4249742881a7322f748bfdb73f7}.\\
+Protocol SHA-256: \texttt{d2ca570ce39f2effa9564576bdb6b6e16148a0a6d511eeb05c3a01565e48d948}.\\
+The packet retains complete source blobs and their Git object IDs in \texttt{audit.json} and \texttt{source-blobs/}.
+\section*{Observed interval ranges}
+\begin{longtable}{llll}
+\toprule Arm & solve wall & common method-call wall & online wall \\ \midrule
+pencil & 6.413--14.484 ms; median 13.107 ms & 7.479--15.533 ms; median 14.178 ms & 4.678--12.692 ms; median 11.359 ms \\
+rho & 0.210--0.353 ms; median 0.265 ms & 0.369--0.513 ms; median 0.423 ms & 0.163--0.303 ms; median 0.216 ms \\
+rho\_AA & 0.207--0.356 ms; median 0.264 ms & 0.365--0.511 ms; median 0.421 ms & 0.160--0.307 ms; median 0.216 ms \\
+\bottomrule\end{longtable}
+Each arm contains 360 rows: 300 measured and 60 warmup. All 1,080 outcomes are verified and match the public target. Pencil rows are L2. All rho and rho\_AA rows are L1 and carry the solve-too-short blocker.
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\draw[gray!35,thin,dotted] (2.300,0.2) -- (2.300,9.7); \node[below] at (2.300,0.2) {0.1};
+\draw[gray!35,thin,dotted] (4.027,0.2) -- (4.027,9.7); \node[below] at (4.027,0.2) {0.2};
+\draw[gray!35,thin,dotted] (6.310,0.2) -- (6.310,9.7); \node[below] at (6.310,0.2) {0.5};
+\draw[floor,thick,dashed] (8.037,0.2) -- (8.037,9.7); \node[below] at (8.037,0.2) {1};
+\draw[gray!35,thin,dotted] (9.763,0.2) -- (9.763,9.7); \node[below] at (9.763,0.2) {2};
+\draw[gray!35,thin,dotted] (12.046,0.2) -- (12.046,9.7); \node[below] at (12.046,0.2) {5};
+\draw[gray!35,thin,dotted] (13.773,0.2) -- (13.773,9.7); \node[below] at (13.773,0.2) {10};
+\draw[gray!35,thin,dotted] (15.500,0.2) -- (15.500,9.7); \node[below] at (15.500,0.2) {20};
+\node[floor,above] at (8.037,9.7) {unchanged 1 ms floor};
+\node[anchor=east] at (2.15,9.200) {pencil / solve}; \draw[solve,line width=1.2pt] (12.666,9.200) -- (14.696,9.200); \draw[solve] (12.666,9.080)--(12.666,9.320) (14.696,9.080)--(14.696,9.320); \draw[solve,fill=white,line width=1pt] (14.447,9.200) circle (2.2pt);
+\node[anchor=east] at (2.15,8.200) {pencil / method-call}; \draw[method,line width=1.2pt] (13.049,8.200) -- (14.870,8.200); \draw[method] (13.049,8.080)--(13.049,8.320) (14.870,8.080)--(14.870,8.320); \draw[method,fill=white,line width=1pt] (14.643,8.200) circle (2.2pt);
+\node[anchor=east] at (2.15,7.200) {pencil / online}; \draw[online,line width=1.2pt] (11.880,7.200) -- (14.367,7.200); \draw[online] (11.880,7.080)--(11.880,7.320) (14.367,7.080)--(14.367,7.320); \draw[online,fill=white,line width=1pt] (14.090,7.200) circle (2.2pt);
+\node[anchor=east] at (2.15,6.200) {rho / solve}; \draw[solve,line width=1.2pt] (4.149,6.200) -- (5.444,6.200); \draw[solve] (4.149,6.080)--(4.149,6.320) (5.444,6.080)--(5.444,6.320); \draw[solve,fill=white,line width=1pt] (4.724,6.200) circle (2.2pt);
+\node[anchor=east] at (2.15,5.200) {rho / method-call}; \draw[method,line width=1.2pt] (5.551,5.200) -- (6.372,5.200); \draw[method] (5.551,5.080)--(5.551,5.320) (6.372,5.080)--(6.372,5.320); \draw[method,fill=white,line width=1pt] (5.892,5.200) circle (2.2pt);
+\node[anchor=east] at (2.15,4.200) {rho / online}; \draw[online,line width=1.2pt] (3.514,4.200) -- (5.061,4.200); \draw[online] (3.514,4.080)--(3.514,4.320) (5.061,4.080)--(5.061,4.320); \draw[online,fill=white,line width=1pt] (4.220,4.200) circle (2.2pt);
+\node[anchor=east] at (2.15,3.200) {rho\_AA / solve}; \draw[solve,line width=1.2pt] (4.107,3.200) -- (5.460,3.200); \draw[solve] (4.107,3.080)--(4.107,3.320) (5.460,3.080)--(5.460,3.320); \draw[solve,fill=white,line width=1pt] (4.716,3.200) circle (2.2pt);
+\node[anchor=east] at (2.15,2.200) {rho\_AA / method-call}; \draw[method,line width=1.2pt] (5.526,2.200) -- (6.365,2.200); \draw[method] (5.526,2.080)--(5.526,2.320) (6.365,2.080)--(6.365,2.320); \draw[method,fill=white,line width=1pt] (5.883,2.200) circle (2.2pt);
+\node[anchor=east] at (2.15,1.200) {rho\_AA / online}; \draw[online,line width=1.2pt] (3.476,1.200) -- (5.098,1.200); \draw[online] (3.476,1.080)--(3.476,1.320) (5.098,1.080)--(5.098,1.320); \draw[online,fill=white,line width=1pt] (4.219,1.200) circle (2.2pt);
+\node at (8.9,-0.55) {wall interval (milliseconds, logarithmic axis)};\end{tikzpicture}\end{center}
+\textit{Figure.} Min--max whiskers and exact median dot from all retained rows. This is descriptive only.
+\section*{Observed source and protocol facts}
+\begin{enumerate}
+\item Grading version 3 compares \texttt{time.solve\_wall\_ns} with the unchanged 1,000,000 ns floor. The protocol primary cold field is \texttt{time.method\_call\_wall\_ns}.
+\item The protocol prose says the cold endpoint is the immediate method return before the profiling dump. The selected method-call field actually stops after nested instrumentation closes and \texttt{methods::complete} returns.
+\item Every one of the 720 rho/rho\_AA method-call intervals is also below 1 ms. Changing only the classifier field would therefore admit none of those rows.
+\item The instrument contract permits \texttt{rho\_solve} and \texttt{recovery\_check} for a generic method. The canonical exporter checks every arm for exactly the five index-calculus target phase names.
+\end{enumerate}
+\textbf{Qualification status.} Raw intervals and operation/count evidence remain observations. Timing qualification and qualified ratios are null in this audit. Process wall is not substituted because it includes work outside the declared common method boundary.
+\section*{Prospective design question; not approved}
+A fixed repetition count of eight was discussed because the smallest observed rho/rho\_AA online interval is 160,313 ns and eight times that observation is 1,282,504 ns. This arithmetic does not approve K=8. Any repetition factor, boundary, phase schema, budget, or new run requires a new pre-data protocol and review. A follow-up would have to preserve the exact targets, arms, controls, streams and unchanged 1 ms floor; retain each repetition; establish a cold-state/reset boundary; separate one-invocation operation counts from timing amplification; and fail closed.
+\section*{Limits}
+Ranges include warmup and measured rows, counted separately. No uncertainty interval, significance test, speed ratio, cost ratio, or ranking is computed. This is a source-and-record audit, not an independent mathematical proof or timing qualification.
+\section*{Reproduction}
+The native Rust extractor in \texttt{native\_extract/} accepts only the pinned source objects, record hash, and protocol hash. It invokes no solver. Exact commands and the packet manifest are in \texttt{README.md} and \texttt{SHA256SUMS}.
+\end{document}

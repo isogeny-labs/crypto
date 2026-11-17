@@ -1,0 +1,184 @@
+{
+  "schema": "research.proof-packet-status/v1",
+  "task": "T-1198",
+  "kind": "monic_remainder_exact_divisibility_test",
+  "main_declarations": 10,
+  "control_declarations": 8,
+  "checks": {
+    "normalized1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "zerotest1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls3": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "readback": [
+    {
+      "name": "MonicZeroTest.selected_normal",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicZeroTest.loop_normal",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicZeroTest.checked_normal",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicZeroTest.zero_iff_empty",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicZeroTest.degree_lt_length",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicZeroTest.divisor_degree_lower",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicZeroTest.shorter_degree",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicZeroTest.shorter_divisible_empty",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicZeroTest.checked_empty_iff",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicZeroTest.input_length_empty_iff",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicZeroControls.divisible_accepts",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicZeroControls.nondivisible_rejects",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicZeroControls.initial_zeros_normalized",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicZeroControls.zero_polynomial_accepts",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicZeroControls.nonmonic_rejected",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicZeroControls.insufficient_fuel_distinct",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicZeroControls.noncanonical_zero_counterexample",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicZeroControls.untrimmed_zero_not_normal",
+      "axioms": []
+    }
+  ],
+  "failed_attempts": [
+    "controls1",
+    "controls2"
+  ],
+  "assumptions": [
+    "prime 0<p<2^31",
+    "canonical divisor and input words",
+    "divisor last word is one"
+  ],
+  "fuel_assumption": "fuel >= input coefficient-list length",
+  "criterion": "checked remainder = Some(empty) iff divisor polynomial divides input",
+  "terminal_result": "empty remainder or remainder shorter than divisor",
+  "preserved": [
+    "canonical words",
+    "polynomial divisibility equivalence"
+  ],
+  "independent_source_fidelity_review": "pending",
+  "compiled_rust_equivalence": "not proved",
+  "quotient_and_instrumentation": "excluded",
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "upstream_compiled_dependencies": "retained trust boundary"
+}

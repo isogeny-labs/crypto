@@ -1,0 +1,137 @@
+\section{Mathematical setting and the field taxonomy}\label{sec:math}
+
+The size of a field, the order of the whole curve group, and the order of
+the subgroup containing the logarithm must remain separate. Throughout,
+$q$ denotes a field cardinality, $r$ a prime subgroup order, $h$ a
+cofactor, and $Q=[d]G$ a target in $\langle G\rangle$. A curve over an
+83-bit field can contain a much smaller prime subgroup. Its ECDLP is
+priced in that subgroup, not in the field size.
+
+\subsection{Generic reference algorithms}
+
+Pollard rho obtains a collision among combinations $[a]G+[b]Q$ and solves
+the resulting scalar congruence. The familiar random-collision
+normalisation is approximately $\sqrt{\pi r/2}$ group steps under idealised
+assumptions. This is a model constant, not a universal implementation
+bound. Negation, efficiently computable automorphisms, fruitless cycles,
+distinguished-point density and restart policy change observed constants.
+Parallel collision search changes throughput and coordination costs
+without by itself changing the square-root exponent.\cite{pollard1978,vanoorschot1999}
+
+Baby-step giant-step spends square-root memory to obtain another generic
+tradeoff. Kangaroo is appropriate when the unknown scalar is known to lie
+in an interval; its scale is the interval width, not automatically $r$.
+Pohlig--Hellman decomposes composite orders, so a ``large curve'' whose
+largest prime factor is small is not a large prime-order ECDLP instance.
+These distinctions are implemented in the native toolkit and in the
+challenge infrastructure.\src{CA-README}\src{COST}
+
+Generic-group lower bounds establish asymptotic limitations under an
+explicit oracle model. They should not be read as a sharp leading-constant
+claim of exactly $\sqrt{r/2}$ operations for every implementation with free
+negation. The cost challenge is valuable as an executable metering
+instrument; this retrospective does not adopt every explanatory constant
+in its README as a separately proved lower bound.
+
+\subsection{Index calculus as a complete method}
+
+Choose a factor base $\B=\{F_1,\ldots,F_B\}$, or a quotient of it under
+known symmetries. A relation expresses a sampled point as a short sum of
+base points. For example,
+\[
+ [a]G+[b]Q=\sum_i c_iF_i
+ \quad\Longrightarrow\quad
+ a+bd\equiv\sum_i c_i\log_G(F_i)\pmod r.
+\]
+After enough independent relations, linear algebra and a target descent
+recover the logarithm. Relation count, matrix rank, and recovered scalars
+are separate checks. A large number of valid but dependent rows can leave
+the system unable to determine the requested target.
+
+For a random-set heuristic with $B$ points and $m$ unordered summands, the
+expected number of decompositions is roughly $B^m/(m!r)$. This is not a
+universal yield theorem: repeated points, signs, orbit stabilisers,
+cofactors, projection into $\langle G\rangle$ and collisions can change the
+count. The programme repeatedly found that exact subgroup and base
+conventions matter.\src{BOUNDARY}\src{HEUR}
+
+Semaev's summation polynomials encode the existence of point sums through
+their abscissae. They provide algebraic formulations, but replacing a group
+problem by a polynomial system does not make the system cheap. The cost
+of constructing, solving, lifting and verifying that system is central to
+the programme.\cite{semaev2004}
+
+\begin{table}[htbp]\small
+\caption{Field and problem regimes in the portfolio. Evidence in one row
+does not automatically transfer to another.}
+\begin{tabularx}{\linewidth}{@{}p{2.7cm}YY@{}}\toprule
+Regime & Structure used & Principal limitation in this record \\\midrule
+$E(\F_p)$ & coordinate subsets, multiplicative towers, low-degree maps,
+special endomorphisms & no general sub-rho prime-field IC demonstrated \\
+Ordinary $E(\F_{2^n})$ & $\F_2$ subspaces, Weil restriction, Boolean
+algebra & decomposition degree and total yield remain limiting \\
+Koblitz $E/\F_2$ over $\F_{2^n}$ & Frobenius orbits and known subgroup
+eigenvalues & rho receives the same available symmetry; setup is material \\
+Composite-degree binary fields & proper subfields and GHS descent &
+weak classes, genus and explicit maps determine applicability \\
+Prime-degree binary extensions & no proper intermediate subfield &
+composite-degree GHS conclusions require a new construction \\
+$E(\F_{p^k})$, small fixed $k$ & base-field abscissae, Gaudry/Joux--Vitse,
+torsion invariants & expensive algebraic constants and linear algebra \\
+Higher-genus Jacobians & divisor arithmetic, covers, large primes &
+source-subgroup transport and same-problem reference must be verified \\
+Supersingular isogeny problems & graph navigation, quaternion and Kani
+constructions & an isogeny problem or KEM is not the ordinary ECDLP \\\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Prime, binary, and extension fields}
+
+In a prime field, Frobenius exists but is the identity on field elements;
+there is no proper intermediate subfield or nontrivial $\F_p$-linear
+coordinate subspace. Saying that ``$\F_p$ has no Frobenius'' is therefore
+an imprecise shorthand. The actual obstacle is the absence of a useful
+nontrivial subfield decomposition of the kind available over extensions.
+This does not rule out nonlinear sparse sets or other non-generic
+algorithms.
+
+In $\F_{2^n}$, an $\F_2$-subspace of dimension $\ell$ supplies a compact
+membership condition for a factor base. Weil restriction turns an
+extension-field polynomial into Boolean equations. The behaviour of the
+resulting ideal depends on the formulation and product spaces, not merely
+the nominal field degree. On Koblitz curves, the map
+$\pi:(x,y)\mapsto(x^2,y^2)$ is also a curve endomorphism. Its action on the
+selected cyclic subgroup can be represented by a known eigenvalue
+$\lambda\bmod r$, allowing orbit-weighted relations.\cite{ggmp2020}
+
+Over $\F_{p^k}$, a base defined by $x\in\F_p$ interacts with summation
+polynomials through Weil restriction. Fixed-degree extension-field
+algorithms and their symmetry reductions are established antecedents of
+the implemented work. Their asymptotic opportunities do not imply
+reasonable constants at the measured sizes, nor do they imply an
+algorithm on $E(\F_p)$.\cite{gaudry2009,diem2011,fghr2014}
+
+The implemented studies therefore cover prime fields, binary extensions,
+and selected odd-characteristic extensions, notably degrees two through
+six, together with protocol-specific extension arithmetic. This is not a
+claim of a complete backend for every finite field, every characteristic
+or every elliptic-curve model. Backend limits and unimplemented field
+degrees remain separate from mathematical applicability.
+
+\subsection{Isogenies and higher-dimensional transfers}
+
+An isogeny defined over the working field is a homomorphism on rational
+points. If its restriction to the prime subgroup is injective, then
+$\varphi(Q)=[d]\varphi(G)$ preserves the logarithm. A destination solver
+must still solve that transported instance more cheaply after charging
+map discovery, construction, evaluation and recovery. A small degree,
+shared $j$-invariant, common group order or common endomorphism field is
+not by itself an executable transport certificate.
+
+A cover or Jacobian route has more obligations: a concrete destination,
+an explicit nonzero map, a proof or check of subgroup preservation, an
+implementable destination solver, and the total source-to-answer cost.
+Merely finding a low-genus curve with desirable arithmetic does not
+establish that the source ECDLP can reach it. The portfolio's newer
+identity and curve registries explicitly encode these distinctions.
+\src{TRANSFER}\src{TEN}\src{VOLCANO}

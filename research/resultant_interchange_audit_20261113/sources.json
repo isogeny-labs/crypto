@@ -1,0 +1,124 @@
+{
+  "schema": "resultant-interchange-source-plan/v1",
+  "created": "2026-11-13T17:04:25.640777+00:00",
+  "formal": {
+    "project": "research/resultant_interchange_audit_20261113/lean",
+    "theorem": "ResultantInterchangeAudit.resultant_interchange_with_degree_drop_control",
+    "statement": "theorem resultant_interchange_with_degree_drop_control : (∀ (R : Type) [CommRing R] [IsDomain R] (p : Polynomial R) (q : Polynomial (Polynomial R)) (r : Polynomial R) (dx dy : ℕ), q.natDegree ≤ dy → (Polynomial.Bivariate.swap q).natDegree ≤ dx → leftFixed p q r dx dy = rightFixed p q r dx dy ∧ (innerY p q dy).natDegree ≤ p.natDegree * dx ∧ (innerX q r dx).natDegree ≤ dy * r.natDegree) ∧ controlQ.natDegree = 1 ∧ (Polynomial.Bivariate.swap controlQ).natDegree = 1 ∧ (innerY controlP controlQ 1).natDegree < controlP.natDegree * 1 ∧ leftNatural controlP controlQ controlR 1 ≠ rightNatural controlP controlQ controlR 1 ∧ leftFixed controlP controlQ controlR 1 1 = rightFixed controlP controlQ controlR 1 1",
+    "decl_sha256": "24ccb18a96629b4469b65e1a4626eeff74ff6682d1e45f5c28d3107aecfc93d6",
+    "scope": "Fixed-size iterated Sylvester-resultant interchange over every commutative integral domain under explicit bidegree bounds, with both intermediate degree bounds derived; no nonzero/monicity/separability/characteristic/splitting/no-degree-drop premises. Actual root-multiset product/Fubini proof and injective algebraic-closure/fraction-field descent. Direct rational P=y^2-y,Q=xy+1,R=2x+1 counterexample to resetting natural outer degrees: sides -1 and2 versus fixed sides2and2, with actual bidegrees1 and strict degree drop. Separate natural-size compatibility theorem requires sharp intermediate degree equalities. Does not refute qualified Semaev or establish canonical arbitrary-split normalization, higher symmetry or higher absolute irreducibility. No native experiment or new execution assurance.",
+    "sources": [
+      {
+        "path": "research/resultant_interchange_audit_20261113/lean/Definitions.lean",
+        "bytes": 1405,
+        "sha256": "2ef9816af6fb11118589a3ac23abd10b6c10b0447d73f522a95631003c1606ba"
+      },
+      {
+        "path": "research/resultant_interchange_audit_20261113/lean/DegreeDropControl.lean",
+        "bytes": 3439,
+        "sha256": "47145d96b6d2a7b2d2179c55c009c0e1d30f207763e2b32f97f8671ca5b71446"
+      },
+      {
+        "path": "research/resultant_interchange_audit_20261113/lean/DomainInterchange.lean",
+        "bytes": 3780,
+        "sha256": "db508fb51bc97b00928f87f540fec0093be7a39ec52cf87e41d9c93d9175d8c5"
+      },
+      {
+        "path": "research/resultant_interchange_audit_20261113/lean/FieldInterchange.lean",
+        "bytes": 4359,
+        "sha256": "61c3e2a5c19b4a4581c49eff4ddb0b776d8935337fa4ec81fa03801abc345b80"
+      },
+      {
+        "path": "research/resultant_interchange_audit_20261113/lean/SplitInterchange.lean",
+        "bytes": 5171,
+        "sha256": "15fa7135ea55f0d554920970af5c37298c4c1fd2c3a338ae4ac5590957ddf777"
+      },
+      {
+        "path": "research/resultant_interchange_audit_20261113/lean/lake-manifest.json",
+        "bytes": 3561,
+        "sha256": "ae065ef42758e41ad3d966bb078b3cf34681205d1c9355b72f0ed3cd24387d40"
+      },
+      {
+        "path": "research/resultant_interchange_audit_20261113/lean/lakefile.toml",
+        "bytes": 397,
+        "sha256": "5f03eb79f4c676010a52491c51a2680dcac5dac1ab059c76f81b754a9464ea4d"
+      },
+      {
+        "path": "research/resultant_interchange_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "research/resultant_interchange_audit_20261113/evidence/attempts.tar.gz",
+      "bytes": 11529,
+      "sha256": "5743f90f9c2a8e8188d3a772b234ef2edeb1979e66e4fa54918e5d293d20061f"
+    },
+    {
+      "path": "research/resultant_interchange_audit_20261113/evidence/attempts.json",
+      "bytes": 9691,
+      "sha256": "0c2e04c206760fba184dcae6460c3ddbc78946087efff9f1157ada6149b50da0"
+    },
+    {
+      "path": "research/resultant_interchange_audit_20261113/evidence/gate.tar.gz",
+      "bytes": 1357,
+      "sha256": "b30a477906db0a0ebff80490a379ff157c0d251952c99ba5dde3d3121a40741a"
+    },
+    {
+      "path": "research/resultant_interchange_audit_20261113/evidence/gate.json",
+      "bytes": 1194,
+      "sha256": "b45e9ebd1297d6c5dc77a12cda093e84dc31544235110bdf9cd3d5af1d005b3d"
+    },
+    {
+      "path": "research/resultant_interchange_audit_20261113/evidence/source-review.json",
+      "bytes": 2132,
+      "sha256": "86cc94f1d798231763846f06b3c69050f5e6a74c4f8258f923d894a52349f8ae"
+    },
+    {
+      "path": "research/resultant_interchange_audit_20261113/proof-map.json",
+      "bytes": 1965,
+      "sha256": "caffd74bd07078ced0b8e2ad01839eab0cd03e88aaf5a744edeb7ea16be9433e"
+    },
+    {
+      "path": "research/resultant_interchange_audit_20261113/render_report.py",
+      "bytes": 5861,
+      "sha256": "4ad67a4817ac15351b92075bceb61060351a6e20dd9379533699b024ac142244"
+    },
+    {
+      "path": "research/resultant_interchange_audit_20261113/reports/layout.json",
+      "bytes": 239,
+      "sha256": "b436817166b49b014ffb4bfa7592e370a1273c5013367e5c1033300eec2cedaa"
+    },
+    {
+      "path": "research/resultant_interchange_audit_20261113/reports/proof-flow.svg",
+      "bytes": 1721,
+      "sha256": "28b7951acd9b9bb867b2ff2d01c84b9a1c4351faecad1e46654bd8febcbbb3d5"
+    },
+    {
+      "path": "research/resultant_interchange_audit_20261113/reports/report.pdf",
+      "bytes": 46372,
+      "sha256": "2b64d319ef9fd4a0081021eb9500ffcde6702f504defa5520f2a8b6177c13c4b"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 46,
+    "gate_failures": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "waivers": false,
+    "canonical_arbitrary_split_proved": false,
+    "qualified_source_refuted": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

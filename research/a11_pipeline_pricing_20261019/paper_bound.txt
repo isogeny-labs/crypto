@@ -1,0 +1,36 @@
+A11 as an algebraic decomposition oracle: paper bound from committed rows
+group-law arm: research/ic_frontier_campaign_20261015/phase1/sessions/PKM20/records.jsonl
+algebraic side: research/factor_base_designs_20261015/runs/C1-rescore.jsonl
+curve: p = 946177, r = 473453
+
+Measured (32 solves per arm; GAE per DLP and, for IC, per relation; unpriced natives at w GAE each)
+  w = 0    ic-pkm (group law, t = 8, m = 3): 32 verified, per DLP mean 27015 [25532, 28734] GAE, per relation mean 244.9 [229.3, 262.8], relations per DLP 110.3
+  w = 0    rho-neg (matched reference):        32 verified, per DLP mean 892 [234, 1420] GAE
+  w = 0.1  ic-pkm (group law, t = 8, m = 3): 32 verified, per DLP mean 29332 [27236, 32216] GAE, per relation mean 265.9 [244.7, 290.2], relations per DLP 110.3
+  w = 0.1  rho-neg (matched reference):        32 verified, per DLP mean 892 [234, 1420] GAE
+  w = 1    ic-pkm (group law, t = 8, m = 3): 32 verified, per DLP mean 50187 [40015, 63556] GAE, per relation mean 454.6 [370.5, 572.6], relations per DLP 110.3
+  w = 1    rho-neg (matched reference):        32 verified, per DLP mean 892 [234, 1420] GAE
+
+Algebraic oracle, lower bound (m = 3; F = mean F4 row-reduction multiplications per system, measured on p1)
+  P(t) = 1 − exp(−8·C(N,3)/r), N = 2^(t−1); per relation = F/(e·P) GAE; per DLP = (N + 1)·F/(e·P)
+  arm  t  N    F (field mults)   P(t)        per relation GAE at e = 1 / 12 / 50          per DLP GAE at e = 50
+  A11  3  4    4.7883e6          6.7586e-5   7.085e10 / 5.904e9 / 1.417e9          7.085e9   measured
+  A11  4  8    8.5507e8          9.4579e-4   9.041e11 / 7.534e10 / 1.808e10          1.627e11   measured
+  A11  5  16   5.2155e11         9.4178e-3   5.538e13 / 4.615e12 / 1.108e12          1.883e13   measured
+  A11  6  32   5.2155e11         8.0394e-2   6.487e12 / 5.406e11 / 1.297e11          4.282e12   extrapolated (held at the last measured t)
+  A11  7  64   5.2155e11         5.0540e-1   1.032e12 / 8.600e10 / 2.064e10          1.342e12   extrapolated (held at the last measured t)
+  A11  8  128  5.2155e11         9.9687e-1   5.232e11 / 4.360e10 / 1.046e10          1.350e12   extrapolated (held at the last measured t)
+  A11  9  256  5.2155e11         1.0000e0    5.216e11 / 4.346e10 / 1.043e10          2.681e12   extrapolated (held at the last measured t)
+  A11  10 512  5.2155e11         1.0000e0    5.216e11 / 4.346e10 / 1.043e10          5.351e12   extrapolated (held at the last measured t)
+  A11  11 1024 5.2155e11         1.0000e0    5.216e11 / 4.346e10 / 1.043e10          1.069e13   extrapolated (held at the last measured t)
+  A11  12 2048 5.2155e11         1.0000e0    5.216e11 / 4.346e10 / 1.043e10          2.137e13   extrapolated (held at the last measured t)
+  A0   3  4    2.3851e8          6.7586e-5   3.529e12 / 2.941e11 / 7.058e10          3.529e11   measured
+  A0   4  8    1.5921e10         9.4579e-4   1.683e13 / 1.403e12 / 3.367e11          3.030e12   measured
+
+Comparison per DLP (algebraic lower bound at e = 50, the most generous exchange; measured arms at each w)
+  cheapest algebraic lower bound: 7.085e9 GAE at A11 t = 3 (measured)
+  w = 0    group-law IC 27015 GAE, rho 892 GAE;  algebraic bound / group-law IC = 2.623e5, / rho = 7.944e6
+  w = 0.1  group-law IC 29332 GAE, rho 892 GAE;  algebraic bound / group-law IC = 2.415e5, / rho = 7.944e6
+  w = 1    group-law IC 50187 GAE, rho 892 GAE;  algebraic bound / group-law IC = 1.412e5, / rho = 7.944e6
+
+Verdict (holds across the whole band): even the most generous lower bound for an A11 algebraic oracle costs more per DLP than the group-law oracle ecbench already runs, at every w in {0, 0.1, 1}

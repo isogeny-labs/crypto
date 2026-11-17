@@ -1,0 +1,7 @@
+fn choose(n: usize, k: usize) -> u64 {
+    let mut out = 1;
+    for i in 0..k {
+        out = out * (n - i) as u64 / (i + 1) as u64;
+    }
+    out
+}

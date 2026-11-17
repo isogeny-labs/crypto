@@ -1,0 +1,11 @@
+digraph lib_validation {
+  graph [rankdir=LR, bgcolor="white", label="N83 V5 equivalent-source macOS library validation", labelloc=t, fontsize=16];
+  node [shape=box, style="rounded,filled", fillcolor="#eef3fa", color="#364b67", fontname="Helvetica"];
+  source [label="Library-equivalent source\na8821d64 vs a91b8b66"];
+  compile [label="Release test binary\ncompiled"];
+  planned [label="6,565 tests announced"];
+  observed [label="Terminal lines before stop\n2,462 ok · 46 ignored\n0 failed lines", fillcolor="#e4f2e8"];
+  stop [label="Boot floor reached\n1,947,868 KiB free\nexit 143", fillcolor="#f7dedd"];
+  verdict [label="Full-suite verdict absent\n4,057 terminal lines unobserved", fillcolor="#f4e9d7"];
+  source -> compile -> planned -> observed -> stop -> verdict;
+}

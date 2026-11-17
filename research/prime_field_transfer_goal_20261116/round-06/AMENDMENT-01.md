@@ -1,0 +1,9 @@
+# Prospective public-point qualification, version07
+
+The modular constructor now admits the order127 model after unchanged small regressions. Original precision/cap failures remain untouched. Before new calls, declare public precisions16/32/64/128 for the same four hash-derived public inputs at each of orders61 and127. The original order19 auditor retains1/2/4/8/16/32 as a regression. Each point call remains capped60seconds.
+
+Version07 copies frozen version06; only the public precision list, native LLL step budget80000 (previous10000) and historical setup dimension metadata2d+2 change. No Lean limit changes. Raising a native budget is a new prospective parameter study, not repair or deletion of old failures, and not an efficiency claim. Source API, global C(beta)=0/source matching, target specialization/Smart solve, source OpenSSL checks and controls remain binding. No source scalar or subgroup lookup. One original call per each of nine declared bins. Keep timeouts and partial rows; only completed checked JSON rows/summaries count, never a started/partial accepted field.
+
+First require the full order19 qualification output to compare byte-identically to frozen round04. Then launch the eight public-point bins. Capture immutable source/executable qualifiers and pre/post records. If a call times out, preserve completed prefixes separately from its failure; no inferred result at later precisions. All109 published scientific pins and version06 inputs remain unchanged. Native C++/GMP/OpenSSL local correctness only, no Python crypto, timing/performance or paid run.
+
+Execution plan before calls: public bins run in two fixture waves, up to four point processes concurrently; every process retains its own60-second limit. This shared local development run is not timing/isolation evidence.

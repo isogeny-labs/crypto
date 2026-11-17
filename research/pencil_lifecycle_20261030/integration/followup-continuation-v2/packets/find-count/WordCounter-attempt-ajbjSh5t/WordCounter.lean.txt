@@ -1,0 +1,20 @@
+import FindCount
+set_option autoImplicit false
+namespace FindCount
+def ticks (c : UInt64) : Nat → UInt64
+ | 0 => c
+ | n+1 => ticks (c+1) n
+theorem ticks_mod (c : UInt64) (n : Nat) : (ticks c n).toNat=(c.toNat+n)%UInt64.size := by
+ induction n generalizing c with
+ | zero => simp [ticks,Nat.mod_eq_of_lt c.toNat_lt]
+ | succ n ih =>
+   simp [ticks,ih,UInt64.toNat_add,Nat.add_mod,Nat.add_assoc,Nat.add_comm,Nat.add_left_comm]
+theorem ticks_exact (c : UInt64) (n : Nat) (h : c.toNat+n<UInt64.size) :
+ (ticks c n).toNat=c.toNat+n := by rw [ticks_mod,Nat.mod_eq_of_lt h]
+theorem ticks_sequence (c : UInt64) (a b : Nat) : ticks (ticks c a) b=ticks c (a+b) := by
+ induction a generalizing c with
+ | zero => simp [ticks]
+ | succ a ih => simpa [ticks,Nat.succ_add] using ih (c+1)
+theorem prefix_no_overflow (c : UInt64) (n j : Nat) (hj : j≤n) (h : c.toNat+n<UInt64.size) :
+ (ticks c j).toNat=c.toNat+j := ticks_exact c j (by omega)
+end FindCount

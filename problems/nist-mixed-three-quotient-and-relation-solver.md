@@ -3,12 +3,12 @@
 - **Status:** open
 - **Kind:** implementation gap, independent-verification gap, resource/access limit
 - **Affected work:** [test report](../research/nist_cover_three_tests_20261116/README.md), [protocol](../research/nist_cover_three_tests_20261116/PROTOCOL.md), [odd-isogeny execution](odd-isogeny-quartic-transfer-execution.md), [projected relation cost](prime-cover-projected-relation-cost-missing.md)
-- **Next action owner:** lane/nist-cover-three-tests
+- **Next action owner:** lane/nist-p192-polarized-quotient
 - **Last updated:** 2026-11-16
 
 ## Problem
 
-The original P-192 speedup test remains open. A global genus3 correspondence now passes exact quartic,characteristic-polynomial and differential identities(PCC-20261116-fe2b13). Its full-source class evaluator passes the actual G/Q bridge to the degree6 elliptic transfer and generic negation,doubling/addition(PCC-20261116-b54698). See [FORMAL_RECONSTRUCTION.md](../research/nist_cover_three_tests_20261116/FORMAL_RECONSTRUCTION.md). Six source-bound setup rows have rank6 on225 projected points. Actual recorded-kernel,polarization/degree,dual and restricted-base individual-descent checks remain;no scalar is recovered by the known-answer fixture. Paid performance runs still require restored,live-confirmed headroom. [pcc:unverified]
+The original P-192 speedup test remains open. All26 actual kernel witnesses and two exact height algorithms now support the written same-field degree27/polarization3 quotient proof;see [POLARIZED_QUOTIENT.md](../research/nist_cover_three_tests_20261116/POLARIZED_QUOTIENT.md),PCC-20261116-3f440b,PCC-20261116-ce4a7b and PCC-20261116-8559fc. The source evaluator and public bridge are executed;six setup rows have rank6 on225 projected points. Generic transpose-dual execution,exceptional-chart handling and restricted individual descent remain. Paid performance runs still require restored,live-confirmed headroom. [pcc:unverified]
 
 ## Evidence and uncertainty
 
@@ -24,14 +24,15 @@ The original P-192 speedup test remains open. A global genus3 correspondence now
 
 - [x] Execute the coset-image quotient/dual and source-point recovery for all eight P-192 kernels, plus additional public small-curve IC recoveries. This is component coverage, not completion of the original advantage claim. [pcc:unverified]
 - [x] Reconstruct a smooth nonhyperelliptic candidate from actual kernel1 quotient moduli and descend its curve equation to Fp. This is candidate-curve geometry, with no same-field polarized Jacobian identification asserted. [pcc:unverified]
-- [ ] Settle the possible Serre twist and construct/check an actual divisor-class isogeny and dual, including exceptional inputs.
+- [x] Identify one same-field polarized quotient with actual kernel witnesses,exact heights,written geometric proof and a regular-chart source evaluator. Producer standing;generic transpose-dual execution and exceptional inputs remain separate. [pcc:unverified]
+- [ ] Implement generic transpose-dual evaluation and complete exceptional-chart interfaces.
 - [ ] Implement an explicit projected relation solver and independent checking on original elliptic points, merging duplicate projected base images before rank accounting.
 - [ ] Freeze public inputs, standard-panel controls and complete per-phase costs before a paid experiment; obtain current budget/capacity, source-image pin and S3 checkpoint admission.
 - [ ] Run and independently replay the complete one-target comparison; retain null/failure outcomes.
 
 ## Next discriminating step
 
-Construct and check the generic source-Jacobian isogeny using the [formal rational-reference plan](../research/nist_cover_three_tests_20261116/FORMAL_ISOGENY_PLAN.md),which is currently unexecuted. The public closed-fiber/class stage has passed and should not be repeated without a changed input or concern. Preserve the separate projected individual-descent requirement and all witnesses. The first exact-field seven-variable solve timed out under its declared limit;do not silently relaunch it. The original paid envelope remains2CPU/8GiB/1800s,zero retries and totalUSD5 after admission;native correctness units do not constitute that cost evaluation. [pcc:unverified]
+Implement the generic transpose-dual/exceptional-chart interface and restricted individual descent,starting from the [completed quotient proof](../research/nist_cover_three_tests_20261116/POLARIZED_QUOTIENT.md). Do not repeat the successful source/public/kernel/height stages without a changed input or concern. Preserve the declared seven-variable timeout and all witnesses. The original paid envelope remains2CPU/8GiB/1800s,zero retries and totalUSD5 after admission;native correctness units do not constitute that cost evaluation. [pcc:unverified]
 
 ## Resolution and history
 

@@ -1,0 +1,20 @@
+digraph selector_ideas {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.24", ranksep="0.36", fontname="DejaVu Sans"];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, margin="0.13,0.10", color="#9aa8b8", fillcolor="#f3f6fa"];
+  edge [color="#667588", arrowsize=0.65];
+  input [label="Independent colored point records\nPrivate labels stay outside selection", fillcolor="#dfeef8"];
+  a [label="A · Rational interpolation\nFind u + yv with one zero per color"];
+  b [label="B · Batched pencils\nShare two-point completion queries"];
+  c [label="C · Redundant representations\nTrack canceling auxiliary shifts"];
+  ga [label="Open: state-count + useful-yield bounds", fillcolor="#fff2d8"];
+  gb [label="Open: query without anchor expansion", fillcolor="#fff2d8"];
+  gc [label="Open: survival moments + charged cost", fillcolor="#fff2d8"];
+  final [label="Check actual group sum and record provenance\nRecover scalar and verify it on E", fillcolor="#e4f2e8"];
+  input -> a; input -> b; input -> c;
+  a -> ga; b -> gb; c -> gc;
+  ga -> final [style=dashed]; gb -> final [style=dashed]; gc -> final [style=dashed];
+  {rank=same; a; b; c;}
+  {rank=same; ga; gb; gc;}
+  caption [shape=plaintext, label="All three paths are proposals. Dashed edges require missing algorithms/lemmas.", fillcolor="white", fontsize=10];
+  final -> caption [style=invis];
+}

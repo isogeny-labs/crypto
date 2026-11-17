@@ -1,0 +1,42 @@
+[
+  {
+    "name": "T20Geometry.common_leading_determinant",
+    "claim_path": "pcc/claims/PCC-20261112-89e906.json",
+    "statement": "theorem common_leading_determinant {R : Type} [CommRing R] (q a b c d e f g h i : R) : (q*a)*(q*e)*(q*i)+(q*b)*(q*f)*(q*g)+(q*c)*(q*d)*(q*h)- (q*a)*(q*f)*(q*h)-(q*b)*(q*d)*(q*i)-(q*c)*(q*e)*(q*g) = q^3*(a*e*i+b*f*g+c*d*h-a*f*h-b*d*i-c*e*g)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/T20Geometry.lean",
+      "theorem": "T20Geometry.common_leading_determinant",
+      "decl_sha256": "5261b5dbbe0ce56494480b894f0827a73f64999ceda79638d180bb3fbd2c4224"
+    }
+  },
+  {
+    "name": "T20Geometry.normalization_factorization",
+    "claim_path": "pcc/claims/PCC-20261112-02c312.json",
+    "statement": "theorem normalization_factorization {R : Type} [CommRing R] (q s d t a b c : R) : q^3*d^3*((s*t*a)*(s*t*b)*(s*t*c)) = (q*s)^3*(d*t)^3*(a*b*c)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/T20Geometry.lean",
+      "theorem": "T20Geometry.normalization_factorization",
+      "decl_sha256": "bf89f6a44eab693a90b756eeced514008f15aca2b2e53dca595815b62c0d9cfa"
+    }
+  },
+  {
+    "name": "T20Geometry.normalization_from_units",
+    "claim_path": "pcc/claims/PCC-20261112-fee2b1.json",
+    "statement": "theorem normalization_from_units {R : Type} [CommRing R] (q s d t a b c : R) (hq : q*s=1) (hd : d*t=1) : q^3*d^3*((s*t*a)*(s*t*b)*(s*t*c))=a*b*c",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/T20Geometry.lean",
+      "theorem": "T20Geometry.normalization_from_units",
+      "decl_sha256": "b98ffe4910e9bf2837b8a90fcae26f8eb2b3e0d1bef26f9ecd5963461862124e"
+    }
+  },
+  {
+    "name": "T20Geometry.actual_normalization_constants",
+    "claim_path": "pcc/claims/PCC-20261112-151a58.json",
+    "statement": "theorem actual_normalization_constants : (11 : Fin 101)^3=18 \u2227 (18 : Fin 101)*67=95 \u2227 (18 : Fin 101)*34=6 \u2227 (50 : Fin 101)^2=76",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/T20Geometry.lean",
+      "theorem": "T20Geometry.actual_normalization_constants",
+      "decl_sha256": "4532eccbc0f29fdeb8216a52c9b38d8d5892d9b7c127a152ce7fe8c9e9d3fa96"
+    }
+  }
+]

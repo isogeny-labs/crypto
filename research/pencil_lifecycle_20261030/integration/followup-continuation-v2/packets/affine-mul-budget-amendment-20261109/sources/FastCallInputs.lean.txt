@@ -1,0 +1,52 @@
+import FastPayloadPolynomial
+import ReductionFinalStorage
+import FallbackWordRemainder
+set_option autoImplicit false
+namespace FastCalls
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest FastPrelude FastPayload
+
+def ua (w : Inputs) : List UInt64 := [w.ra,w.qa,1]
+def ub (w : Inputs) : List UInt64 := [w.rb,w.qb,1]
+def va (w : Inputs) : List UInt64 := trimFuel 2 [w.ta,w.sa]
+def sl (p : UInt64) (w : Inputs) : List UInt64 := [slope0 p w,slope1 p w]
+def u (p : UInt64) (w : Inputs) : List UInt64 := ProductPolynomial.product p (ua w) (ub w)
+def v (p : UInt64) (w : Inputs) : List UInt64 :=
+ ResidualWord.padd p (va w) (ProductPolynomial.product p (sl p w) (ua w))
+
+theorem inputs_decode (p : UInt64) (w : Inputs) [Fact p.toNat.Prime]
+ (hp : 2<p.toNat) (hb : p.toNat<2^31) (hw : w.canonical p)
+ (hn : normWord p w≠0) (hs : s1Word p w≠0) :
+ Canon p (ua w) ∧ Canon p (ub w) ∧ Canon p (va w) ∧ Canon p (sl p w) ∧
+ wordsPoly p (ua w)=FastCRT.support (w.qa.toNat : ZMod p.toNat) w.ra.toNat ∧
+ wordsPoly p (ub w)=FastCRT.support (w.qb.toNat : ZMod p.toNat) w.rb.toNat ∧
+ wordsPoly p (va w)=FastCRT.delta (w.sa.toNat : ZMod p.toNat) w.ta.toNat ∧
+ wordsPoly p (sl p w)=decodedSlope p w := by
+ rcases hw with ⟨hqa,hra,hsa,hta,hqb,hrb,hsb,htb⟩
+ have hww : w.canonical p := ⟨hqa,hra,hsa,hta,hqb,hrb,hsb,htb⟩
+ obtain ⟨h0,h1,_,_⟩ := slope_words_decode p w hp hb hww hn hs
+ have hva : Canon p [w.ta,w.sa] := by simp [Canon,hta,hsa]
+ refine ⟨?_,?_,trim_good p _ _ hva,?_,?_,?_,?_,?_⟩
+ · simp [ua,Canon,hra,hqa];omega
+ · simp [ub,Canon,hrb,hqb];omega
+ · simp [sl,Canon,h0,h1]
+ · simp [ua,wordsPoly,listPoly,FastCRT.support];ring
+ · simp [ub,wordsPoly,listPoly,FastCRT.support];ring
+ · rw [show va w=trimFuel 2 [w.ta,w.sa] from rfl,trim_preserves]
+   simp [wordsPoly,listPoly,FastCRT.delta];ring
+ · simp [sl,wordsPoly,listPoly,decodedSlope];ring
+
+theorem prepared_decode (p : UInt64) (w : Inputs) [Fact p.toNat.Prime]
+ (hp : 2<p.toNat) (hb : p.toNat<2^31) (hw : w.canonical p)
+ (hn : normWord p w≠0) (hs : s1Word p w≠0) :
+ Canon p (u p w) ∧ Normal (u p w) ∧ Canon p (v p w) ∧
+ wordsPoly p (u p w)=sourceU p w ∧ wordsPoly p (v p w)=decodedV p w := by
+ obtain ⟨hac,hbc,hvc,hsc,had,hbd,hvd,hsd⟩ := inputs_decode p w hp hb hw hn hs
+ have hu := ProductPolynomial.product_correct p (ua w) (ub w) (by omega) hb hac hbc
+ have hm := ProductPolynomial.product_correct p (sl p w) (ua w) (by omega) hb hsc hac
+ have hv := ResidualWord.add_correct p (va w) _ (by omega) hb hvc hm.1
+ refine ⟨hu.1,FallbackWord.product_normal p _ _,hv.1,?_,?_⟩
+ · change wordsPoly p (ProductPolynomial.product p (ua w) (ub w))=_
+   rw [hu.2,had,hbd];rfl
+ · change wordsPoly p (ResidualWord.padd p (va w) _) = _
+   rw [hv.2,hm.2,hvd,hsd,had];rfl
+end FastCalls

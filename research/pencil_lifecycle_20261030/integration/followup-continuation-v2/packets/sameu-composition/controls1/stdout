@@ -1,0 +1,29 @@
+/var/tmp/pencil-sameu-mixed-composition-20261031-v1/Controls.lean:11:55: error: Tactic `decide` failed for proposition
+  nq a = 0 ∧ nr a = -1 ∧ ns a = 0 ∧ nt a = 1
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableAnd`, `instDecidableEqFin`, `instDecidableEqNat`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match h : (↑(nq a)).beq ↑0 with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/var/tmp/pencil-sameu-mixed-composition-20261031-v1/Controls.lean:12:55: error: Tactic `decide` failed for proposition
+  nq b = 0 ∧ nr b = -1 ∧ ns b = 1 ∧ nt b = 0
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableAnd`, `instDecidableEqFin`, `instDecidableEqNat`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match h : (↑(nq b)).beq ↑0 with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/var/tmp/pencil-sameu-mixed-composition-20261031-v1/Controls.lean:17:66: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/var/tmp/pencil-sameu-mixed-composition-20261031-v1/Controls.lean:22:66: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/var/tmp/pencil-sameu-mixed-composition-20261031-v1/Controls.lean:27:1: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`

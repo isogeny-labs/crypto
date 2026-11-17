@@ -1,0 +1,24 @@
+{
+  "schema": "n83.known-witness-phase-prefix-panel/v1",
+  "status": "FROZEN_BEFORE_SOLVER_CALLS",
+  "scope": "known_answer_phase_search_diagnostic",
+  "candidate_id": null,
+  "parent_xcnf_sha256": "c2cc36eee7a72dbc583a217a0d42d02c74d5d3fde241536941b6614fc565b81e",
+  "generator_source_sha256": "ac0a9407b5b8c8889386cf597a9247fad4d68bd771f2f0c931c87142e58307c4",
+  "formulas": [
+    {"phase_prefix": 1, "xcnf_sha256": "28fbef4e54961372e9bfb066b7d30a655d16857fe8c5c27b1095ec3e45f05d5b"},
+    {"phase_prefix": 2, "xcnf_sha256": "6e6ee5d63ed1b34da34304190e7cb52470264c001adcb540a0b62e78e8e703cf"},
+    {"phase_prefix": 3, "xcnf_sha256": "0d39a98aa244f0d20cf2c9fcebb6fa77bfd5cb5f7a7ee6b8550357b1c97bf3b0"},
+    {"phase_prefix": 4, "xcnf_sha256": "181993ae5042cf6ab18e1765d628433abe521f247a7428df9e579469f749a2dc"}
+  ],
+  "five_thousand_conflict_order": [4, 3, 2, 1],
+  "hundred_thousand_conflict_order_if_unresolved": [1, 2, 3, 4],
+  "solver": "CryptoMiniSat 5.14.7",
+  "threads": 1,
+  "solver_wall_cap_seconds": 60,
+  "external_watchdog_slack_seconds": 15,
+  "verification": "check every CNF and XOR row, fixed x blocks, original-field S3 chain and curve point sum on each SAT model",
+  "host_tier": "L0_unisolated_stage_diagnostic",
+  "natural_relation_yield": null,
+  "selected_best_total_runtime": null
+}

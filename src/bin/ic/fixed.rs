@@ -1,0 +1,127 @@
+//! Fixed-parameter wide-field workflow through the existing Python ONB engine.
+use clap::Args;
+use serde_json::Value;
+use std::{
+    path::PathBuf,
+    process::{Command, Stdio},
+};
+
+#[derive(Args, Clone)]
+pub struct FixedArgs {
+    /// Fixed K_0 parameters and target coordinates, including the field basis.
+    #[arg(long)]
+    pub params: PathBuf,
+    /// Durable campaign directory. Rerun with the same parameters to resume.
+    #[arg(long)]
+    pub dir: PathBuf,
+    /// Stage; all also attempts target-specific relations when base logs are incomplete.
+    #[arg(long, default_value = "all", value_parser = ["select", "pairs", "collect", "logs", "solve", "all", "status"])]
+    pub stage: String,
+    /// Exact pair table, bounded SAT, or an opt-in learned policy with pair fallback.
+    #[arg(long, default_value = "pairs", value_parser = ["pairs", "sat", "learned"])]
+    pub solver: String,
+    /// JSON selector trained with indexcalc_selector.py; required for learned.
+    #[arg(long)]
+    pub selector_model: Option<PathBuf>,
+    /// Additional probes per collection stream or target in this invocation.
+    #[arg(long, default_value_t = 32)]
+    pub attempts: u32,
+    /// Maximum new pair candidates built in this invocation.
+    #[arg(long, default_value_t = 10000)]
+    pub pair_budget: u64,
+    /// Native SAT solve budget; a separate watchdog bounds each complete SAT query.
+    #[arg(long, default_value_t = 0.25)]
+    pub query_seconds: f64,
+    /// Python interpreter; python-sat and pycryptosat are needed only for SAT.
+    #[arg(long, default_value = "python3")]
+    pub python: PathBuf,
+    /// Print live stage, pair-table, attempt and relation progress to stderr.
+    #[arg(long)]
+    pub progress: bool,
+    /// Processes used to compute pair sums; 1 disables the pool.
+    #[arg(long, default_value_t = 1, value_parser = clap::value_parser!(u32).range(1..=64))]
+    pub pair_workers: u32,
+    /// Attempts between progress heartbeats; 0 prints only relations and stage changes.
+    #[arg(long, default_value_t = 100)]
+    pub progress_every: u32,
+    /// Rewrite saved relations as JSON Lines, then append each new verified relation.
+    #[arg(long)]
+    pub relations_out: Option<PathBuf>,
+}
+
+fn fixed_engine() -> Option<PathBuf> {
+    if let Some(path) = std::env::var_os("IC_FIXED_ENGINE") {
+        let path = PathBuf::from(path);
+        if path.is_file() {
+            return Some(path);
+        }
+    }
+    super::install::share_file("ecc2k130/codegen/indexcalc_fixed.py")
+}
+
+pub fn run(args: FixedArgs) -> Result<Value, String> {
+    let script = fixed_engine().ok_or_else(|| {
+        "fixed workflow engine is missing; looked for IC_FIXED_ENGINE, \
+         IC_SHARE_DIR, <prefix>/share/cryptocli/ecc2k130/codegen/indexcalc_fixed.py, \
+         <exe-dir>/ecc2k130/codegen/indexcalc_fixed.py, and the source checkout"
+            .to_string()
+    })?;
+    let mut command = Command::new(&args.python);
+    command.arg(script);
+    if let Some(model) = &args.selector_model {
+        command.arg("--selector-model").arg(model);
+    }
+    command
+        .arg("--params")
+        .arg(&args.params)
+        .arg("--dir")
+        .arg(&args.dir)
+        .arg("--stage")
+        .arg(&args.stage)
+        .arg("--solver")
+        .arg(&args.solver)
+        .arg("--attempts")
+        .arg(args.attempts.to_string())
+        .arg("--pair-budget")
+        .arg(args.pair_budget.to_string())
+        .arg("--query-seconds")
+        .arg(args.query_seconds.to_string())
+        .arg("--pair-workers")
+        .arg(args.pair_workers.to_string());
+    if args.progress {
+        command
+            .arg("--progress")
+            .arg("--progress-every")
+            .arg(args.progress_every.to_string());
+    }
+    if let Some(path) = &args.relations_out {
+        command.arg("--relations-out").arg(path);
+    }
+    let result = command
+        .stdin(Stdio::null())
+        .stderr(Stdio::inherit())
+        .output()
+        .map_err(|e| {
+            format!(
+                "could not run fixed workflow with {}: {e}",
+                args.python.display()
+            )
+        })?;
+    let report: Value = serde_json::from_slice(&result.stdout).map_err(|e| {
+        format!(
+            "fixed workflow exited {} without a valid JSON report: {e}",
+            result.status
+        )
+    })?;
+    if report["operation"] != "fixed" {
+        return Err("fixed workflow returned an unexpected report".into());
+    }
+    if !result.status.success() && matches!(report["status"].as_str(), Some("complete" | "stopped"))
+    {
+        return Err(format!(
+            "fixed workflow reported success but exited {}",
+            result.status
+        ));
+    }
+    Ok(report)
+}

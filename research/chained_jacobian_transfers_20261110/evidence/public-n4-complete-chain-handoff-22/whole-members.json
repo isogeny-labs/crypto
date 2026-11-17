@@ -1,0 +1,3973 @@
+{
+  "all_declared_whole_roots": [
+    "ct82-fixed-chain-geometry-build-01",
+    "ct82-fixed-chain-geometry-build-02",
+    "ct82-fixed-chain-geometry-native-01",
+    "ct82-chain-descent-proof-01",
+    "ct82-chain-descent-proof-02",
+    "ct82-full-group-norm-proof-01",
+    "ct82-fourth24-CI-acceptance-01",
+    "ct82-fixed-chain-evaluator-build-01",
+    "ct82-fixed-chain-evaluator-build-02",
+    "ct82-fixed-chain-evaluator-native-01",
+    "ct82-current-original-checkpoint-11",
+    "ct82-current-original-checkpoint-12",
+    "ct82-fixed-geometry-report-01",
+    "ct82-complete-chain-report-01"
+  ],
+  "all_members_no_filter": true,
+  "all_members_roundtripped": true,
+  "members": [
+    {
+      "path": "actual-consumer-proof-stage/ChainDescent.lean",
+      "bytes": 6600,
+      "sha256": "81992c0f4f4af00a5b3e94fea24542ac32660fdc4416403f3fe9fadf521df305",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/fixed-jacobian-chain-01/target/ct82-chain-descent-stage-02/ChainDescent.lean",
+      "held_original": true
+    },
+    {
+      "path": "actual-proof-stage/ct82-chain-descent-stage-01/ChainDescent.lean",
+      "bytes": 5190,
+      "sha256": "5b179749ba70051fd401332cd40a8ff283dd86f18e8f7977300ed111873a220e",
+      "local_original": "/workspace/crypto/target/ct82-chain-descent-stage-01/ChainDescent.lean",
+      "held_original": true
+    },
+    {
+      "path": "actual-proof-stage/ct82-chain-descent-stage-02/ChainDescent.lean",
+      "bytes": 6600,
+      "sha256": "81992c0f4f4af00a5b3e94fea24542ac32660fdc4416403f3fe9fadf521df305",
+      "local_original": "/workspace/crypto/target/ct82-chain-descent-stage-02/ChainDescent.lean",
+      "held_original": true
+    },
+    {
+      "path": "actual-proof-stage/ct82-full-group-norm-stage-01/FullGroupNorm.lean",
+      "bytes": 2597,
+      "sha256": "ef2940bc3bb7ce1ed2952cf18f6d93063effa27a869c1f677959eff563431d3a",
+      "local_original": "/workspace/crypto/target/ct82-full-group-norm-stage-01/FullGroupNorm.lean",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-ChainDescent-01.lean",
+      "bytes": 5190,
+      "sha256": "5b179749ba70051fd401332cd40a8ff283dd86f18e8f7977300ed111873a220e",
+      "local_original": "/workspace/scratch/ct82-ChainDescent-01.lean",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-ChainDescent-02.lean",
+      "bytes": 6600,
+      "sha256": "81992c0f4f4af00a5b3e94fea24542ac32660fdc4416403f3fe9fadf521df305",
+      "local_original": "/workspace/scratch/ct82-ChainDescent-02.lean",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-chain-descent-consumer-caller-01.exit",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "local_original": "/workspace/scratch/ct82-chain-descent-consumer-caller-01.exit",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-chain-descent-consumer-caller-01.txt",
+      "bytes": 90,
+      "sha256": "741e6ad2663d3e69150efb92f183f1a0c6e3cc98adb5257d6bece8f8df557037",
+      "local_original": "/workspace/scratch/ct82-chain-descent-consumer-caller-01.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-chain-descent-consumer-caller-02.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-chain-descent-consumer-caller-02.exit",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-chain-descent-consumer-caller-02.txt",
+      "bytes": 165,
+      "sha256": "df9b95f3b75200acea2d73f39886db8bd3de09a9ae3d776862e91b1506a6ece5",
+      "local_original": "/workspace/scratch/ct82-chain-descent-consumer-caller-02.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-chain-descent-producer-caller-01.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-chain-descent-producer-caller-01.exit",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-chain-descent-producer-caller-01.txt",
+      "bytes": 98,
+      "sha256": "026ba04fc5872773ac1d27fa62b1fdf8456e054458cc4e86a5b29c6b2f299b2a",
+      "local_original": "/workspace/scratch/ct82-chain-descent-producer-caller-01.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-chain-descent-producer-caller-02.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-chain-descent-producer-caller-02.exit",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-chain-descent-producer-caller-02.txt",
+      "bytes": 98,
+      "sha256": "25a96eecae3dd3e72e4b2409283b4b71eb609ff43d3ba60bbdf9f64b5c903d0c",
+      "local_original": "/workspace/scratch/ct82-chain-descent-producer-caller-02.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-checkpoint11-artifacts-api.json",
+      "bytes": 1098,
+      "sha256": "082a4a88253ac9ed16f924b0619d437f2a563dd5593d96550a9f8a11a4b2938f",
+      "local_original": "/workspace/scratch/ct82-checkpoint11-artifacts-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-checkpoint11-jobs-api.json",
+      "bytes": 2339,
+      "sha256": "6cce5914bf94b7547eb3822d19e2053f7d859968a54cbb83acb7821d9f0d6657",
+      "local_original": "/workspace/scratch/ct82-checkpoint11-jobs-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-checkpoint11-whole-log-api.json",
+      "bytes": 235373,
+      "sha256": "374f48841b253322147cfe42cd0b60e153db2f02259e4bb93b46d26370870e18",
+      "local_original": "/workspace/scratch/ct82-checkpoint11-whole-log-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-checkpoint12-artifacts-api.json",
+      "bytes": 1098,
+      "sha256": "c2d140d05bea2030df9f7c9fc4f38bcd9db46f5bb14f0cfc15795b75b86c5717",
+      "local_original": "/workspace/scratch/ct82-checkpoint12-artifacts-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-checkpoint12-jobs-api.json",
+      "bytes": 2339,
+      "sha256": "e3d421c6310235ec6bcc40f43b8851df75f079c9664815350ec99793fabafa29",
+      "local_original": "/workspace/scratch/ct82-checkpoint12-jobs-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-checkpoint12-whole-log-api.json",
+      "bytes": 235375,
+      "sha256": "5d134619d3e56e36f0e2a8da44417165786f897da43e3c2ba90af9af3e5109c2",
+      "local_original": "/workspace/scratch/ct82-checkpoint12-whole-log-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-closed-complete-chain-exact-byte-dedup-01.json",
+      "bytes": 1037,
+      "sha256": "232cf1e22525cc649396418524b78083323e576b11f8e9bc6a514985164db33e",
+      "local_original": "/workspace/scratch/ct82-closed-complete-chain-exact-byte-dedup-01.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-closed-derived-metadata-cleanup-06.json.xz",
+      "bytes": 3396,
+      "sha256": "0716b5aafe2017aac4ff146f4d6361fc127a71b3718ad833da518424c8ed45c9",
+      "local_original": "/workspace/scratch/ct82-closed-derived-metadata-cleanup-06.json.xz",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-closed-evaluator-library-exact-byte-dedup-01.json",
+      "bytes": 2148,
+      "sha256": "81aa23cb53baeafce651300aac32ada44926098439751114f5f95498e4155724",
+      "local_original": "/workspace/scratch/ct82-closed-evaluator-library-exact-byte-dedup-01.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-closed-geometry-exact-byte-dedup-01.json",
+      "bytes": 3006,
+      "sha256": "33a51281db26cc5054d0bd5c9b49359f711006afbcb755c279a6f337efd00d7b",
+      "local_original": "/workspace/scratch/ct82-closed-geometry-exact-byte-dedup-01.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-closed-scientific-exact-byte-dedup-01.json.xz",
+      "bytes": 1300,
+      "sha256": "ec43b1b92c37b06ab3c4062ffb11b2cb2d7684ab661efa61733ff274a17aa36a",
+      "local_original": "/workspace/scratch/ct82-closed-scientific-exact-byte-dedup-01.json.xz",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-complete-chain-native-supervisor-01.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-complete-chain-native-supervisor-01.exit",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-complete-chain-native-supervisor-01.finish",
+      "bytes": 21,
+      "sha256": "918639a5e3b45f295a1a5052bf202b63c350d9b63658beed0fd04c10ff62559f",
+      "local_original": "/workspace/scratch/ct82-complete-chain-native-supervisor-01.finish",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-complete-chain-native-supervisor-01.start",
+      "bytes": 21,
+      "sha256": "21278da1d5bbc60bdbe79e0d1890b4aeb0812935310190d1447137d5862aa944",
+      "local_original": "/workspace/scratch/ct82-complete-chain-native-supervisor-01.start",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-complete-chain-native-supervisor-01.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-complete-chain-native-supervisor-01.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-complete-chain-native.claim.txt",
+      "bytes": 36,
+      "sha256": "bb31ccd042bd20bfd58ecfa8ddd93723032107b6704215b3447f3e16832d466d",
+      "local_original": "/workspace/scratch/ct82-complete-chain-native.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-complete-chain-report.claim.txt",
+      "bytes": 36,
+      "sha256": "7a1bffd75b2c23cc7c4f3f67f607dd76bb7a211bb522633334917da6407d47fa",
+      "local_original": "/workspace/scratch/ct82-complete-chain-report.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-evaluator-build.claim.txt",
+      "bytes": 36,
+      "sha256": "da2537ea5bc05a95f8cc4691d9853a0b85860bd37abe7db37c25685c23edce5b",
+      "local_original": "/workspace/scratch/ct82-evaluator-build.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-fixed-chain-evaluator-build-caller-01.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-caller-01.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-fixed-chain-evaluator-build-caller-02.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-caller-02.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-fixed-chain-geometry-build-caller-01.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-caller-01.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-fixed-chain-geometry-build-caller-02.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-caller-02.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-fixed-chain-geometry-native-caller-01.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-caller-01.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-fourth24-CI.claim.txt",
+      "bytes": 36,
+      "sha256": "f3b9aecadb98ffe7523297b608cd9912ce336719d4c522a64a8f58b1c41f59c3",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-fourth24-artifacts-api.json",
+      "bytes": 1094,
+      "sha256": "ca0b7c5999fd0077023f07c4e072e75e559f86c6437661e401b80e7f991d8d19",
+      "local_original": "/workspace/scratch/ct82-fourth24-artifacts-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-fourth24-jobs-api.json",
+      "bytes": 2959,
+      "sha256": "52360a5fb4e64225b9617600c6512fdec59ef40aba7b6b7b30df8f848b516f10",
+      "local_original": "/workspace/scratch/ct82-fourth24-jobs-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-fourth24-log-part-000.txt",
+      "bytes": 210,
+      "sha256": "94706eab5bc599a6309f59bd5b1923c166c13dc39ca3a08038dbaf0b15c51b01",
+      "local_original": "/workspace/scratch/ct82-fourth24-log-part-000.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-full-group-norm-consumer-caller-01.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-full-group-norm-consumer-caller-01.exit",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-full-group-norm-consumer-caller-01.txt",
+      "bytes": 146,
+      "sha256": "a916062ba19882353816cb6761849e9e9a5524455e6268738fc98e568a810148",
+      "local_original": "/workspace/scratch/ct82-full-group-norm-consumer-caller-01.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-full-group-norm-producer-caller-01.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-full-group-norm-producer-caller-01.exit",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-full-group-norm-producer-caller-01.txt",
+      "bytes": 101,
+      "sha256": "ead95fa66d2c70fa6bb6a121496d4bed88174ee85fd359a2990170e70438415a",
+      "local_original": "/workspace/scratch/ct82-full-group-norm-producer-caller-01.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-geometry-build.claim.txt",
+      "bytes": 36,
+      "sha256": "0c612a9caefb41c183602d5eea32f1edc031e1d1db5d240748631ab0e884092d",
+      "local_original": "/workspace/scratch/ct82-geometry-build.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-geometry-build02.claim.txt",
+      "bytes": 36,
+      "sha256": "d91320e4eca56fcead5e828216d353132a910c60a59d900680ba00e71412fdee",
+      "local_original": "/workspace/scratch/ct82-geometry-build02.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-geometry-native.claim.txt",
+      "bytes": 36,
+      "sha256": "addab2e2556658eed461fb38a7e73206f156d464a6f5ab8871fa433c7c2b3640",
+      "local_original": "/workspace/scratch/ct82-geometry-native.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-geometry-report.claim.txt",
+      "bytes": 36,
+      "sha256": "ff4c9d5d89d038d31385f875393355ce96bd3fbdb10fd378a7d478df51518fa3",
+      "local_original": "/workspace/scratch/ct82-geometry-report.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-github-queue-at67a.md",
+      "bytes": 6064,
+      "sha256": "c6459780d1eb039ccf9692f31697663cece51f23e8967d2d5dd0d4c7187a4113",
+      "local_original": "/workspace/scratch/ct82-github-queue-at67a.md",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-handoff21-fast-forward-caller-01.txt",
+      "bytes": 159,
+      "sha256": "ae25feffebd8cfe95589a02c8a9952f597d9c5be24ea1fad68971e85ada24a3d",
+      "local_original": "/workspace/scratch/ct82-handoff21-fast-forward-caller-01.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-handoff21-preparation-caller-01.txt",
+      "bytes": 390,
+      "sha256": "e4f05ff3fcc814019b809c26503d486e47b80b1d70c45a448434c50e3caef535",
+      "local_original": "/workspace/scratch/ct82-handoff21-preparation-caller-01.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-handoff21-preparation.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-handoff21-preparation.exit",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-handoff21-preparation.finish",
+      "bytes": 21,
+      "sha256": "665708db988b4554c8ad14f2c125f896b8c4ed82a174cfc92cf06b031f30a584",
+      "local_original": "/workspace/scratch/ct82-handoff21-preparation.finish",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-handoff21-preparation.pid",
+      "bytes": 7,
+      "sha256": "f12d9a65d1701ee2044b5866449206deb5a0070b676d383c319c514ed5358fa8",
+      "local_original": "/workspace/scratch/ct82-handoff21-preparation.pid",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-handoff21-preparation.start",
+      "bytes": 21,
+      "sha256": "8b302395b2c34fa488bc0ba6a3dcfc4991f2ff66462d4d857e0364848b59571a",
+      "local_original": "/workspace/scratch/ct82-handoff21-preparation.start",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-handoff21-root-commit-caller-01.txt",
+      "bytes": 232,
+      "sha256": "eb06634e8b72bce874988448a2a5d59dd173ab93c0ca041d3850baab5119fd47",
+      "local_original": "/workspace/scratch/ct82-handoff21-root-commit-caller-01.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-native-result-pdf-attribute-failure.claim.txt",
+      "bytes": 36,
+      "sha256": "b292776d08b8179f985c3ae22d7f422dcd4e470a35f6a106abc631e201b1b012",
+      "local_original": "/workspace/scratch/ct82-native-result-pdf-attribute-failure.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-norm-point-protocol.claim.txt",
+      "bytes": 36,
+      "sha256": "716c76e6e4a43aef35707a38c041a35b9c0218d1b3198fdfc69cd29b53c54be8",
+      "local_original": "/workspace/scratch/ct82-norm-point-protocol.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-root-handoff21-settled-01.paths0",
+      "bytes": 4304,
+      "sha256": "0d2e35f7d1149fa501828e75f3017cd2aa1f72611d158be3af8e0829af81b3ca",
+      "local_original": "/workspace/scratch/ct82-root-handoff21-settled-01.paths0",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-root-handoff21-settlement-publication-caller01.txt",
+      "bytes": 104,
+      "sha256": "6509b3bea055894eb82f07a59486a3308648c5ad6810ba6435f90a4764a3a9fc",
+      "local_original": "/workspace/scratch/ct82-root-handoff21-settlement-publication-caller01.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-root-whole21-01-governance.claim",
+      "bytes": 36,
+      "sha256": "d3f2d05881865fb67be1082b029a8fd5592741b75b2e47184dbbb74060044585",
+      "local_original": "/workspace/scratch/ct82-root-whole21-01-governance.claim",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-root-whole21-01.paths0",
+      "bytes": 3277,
+      "sha256": "614d224d6a68ac1519d0a82375c54269322743611f5aabce1604baf8db04e585",
+      "local_original": "/workspace/scratch/ct82-root-whole21-01.paths0",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-scientific-roots21-01.json",
+      "bytes": 521,
+      "sha256": "349c95e3a7af5251848ee2f8eef36804cebde42d8c1726df3ab33fd3c327d34b",
+      "local_original": "/workspace/scratch/ct82-scientific-roots21-01.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-source161c-checkpoint-initial-api.json",
+      "bytes": 36,
+      "sha256": "a2790a384d7d281e7395679000c35d27768d89dbd7052f725b8f4688beb59915",
+      "local_original": "/workspace/scratch/ct82-source161c-checkpoint-initial-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-source161c-checkpoint-initial.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-source161c-checkpoint-initial.exit",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-source161c-first-head-workflow-runs-api.json",
+      "bytes": 335550,
+      "sha256": "3ddc8c157eca940ec5b27dadcf0bf3d1b2abfd93377a0f36f1d97747d917393d",
+      "local_original": "/workspace/scratch/ct82-source161c-first-head-workflow-runs-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82-source70ec-initial-workflow-runs-api.json",
+      "bytes": 322130,
+      "sha256": "5a90b49b1ab91119d3f364d6d209e16b851041c2d9271358e6af07d6d7446791",
+      "local_original": "/workspace/scratch/ct82-source70ec-initial-workflow-runs-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_audit_fourth24_CI_01.py",
+      "bytes": 6021,
+      "sha256": "78c4ff4c6738a69228598241fdd617483ca1cd29dd84aea77ac5bf210f2de412",
+      "local_original": "/workspace/scratch/ct82_audit_fourth24_CI_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_checkpoint_root_handoff21_01.py",
+      "bytes": 5662,
+      "sha256": "9a90bab91ad0a95cd772b5f5a8e8d7691c3a878e8da36280a4172f54be50a63a",
+      "local_original": "/workspace/scratch/ct82_checkpoint_root_handoff21_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_commit_evaluator_source_01.py",
+      "bytes": 14113,
+      "sha256": "6c628c383450831aed92c30c45623ce01e26bd2858383d0b0f755d1a126b15b9",
+      "local_original": "/workspace/scratch/ct82_commit_evaluator_source_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_commit_fourth_projection_01.py",
+      "bytes": 12822,
+      "sha256": "99de07408fa0a020b8f3d4c474b47a77eae38f6a609c62b37d1bdaa95398e6a7",
+      "local_original": "/workspace/scratch/ct82_commit_fourth_projection_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_commit_geometry_source_01.py",
+      "bytes": 13609,
+      "sha256": "59bd15534bc8e27fa18759d6328664f05d0822becacfe1c40a48a1dc767aa2e6",
+      "local_original": "/workspace/scratch/ct82_commit_geometry_source_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_commit_handoff21_01.py",
+      "bytes": 6578,
+      "sha256": "2088906a7bfe9dc6781fc6811c5dec85baa4d17e6146ac1dc66ffb9661206baa",
+      "local_original": "/workspace/scratch/ct82_commit_handoff21_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_handoff21_fast_forward_01.py",
+      "bytes": 6039,
+      "sha256": "b9ada96f82250b30f47164b4f108928738201c0a84a172ee9a58c319b358358d",
+      "local_original": "/workspace/scratch/ct82_handoff21_fast_forward_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_handoff21_owned_baseline_01.py",
+      "bytes": 1675,
+      "sha256": "9ba20f14df5267f307c3717ef8bc3b18ce9a1de90d7f78fa37257d54c53cc203",
+      "local_original": "/workspace/scratch/ct82_handoff21_owned_baseline_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_import_original_checkpoint_11.py",
+      "bytes": 5925,
+      "sha256": "5a4a96c5c454d09bb6c2dae444158bd212a120c475b49d0359504a1c13b0a116",
+      "local_original": "/workspace/scratch/ct82_import_original_checkpoint_11.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_import_original_checkpoint_12.py",
+      "bytes": 5925,
+      "sha256": "84a2c450fa284591b61de91a6ebbceaace03fc4d06e4fe09e64328ada5bcca1b",
+      "local_original": "/workspace/scratch/ct82_import_original_checkpoint_12.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_launch_complete_chain_native_01.sh",
+      "bytes": 614,
+      "sha256": "a8d5cca8bc74f2d19e3bd5816101165ec12199dd3e171fd9bcca48110f8aecfb",
+      "local_original": "/workspace/scratch/ct82_launch_complete_chain_native_01.sh",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_prepare_handoff21_01.py",
+      "bytes": 19601,
+      "sha256": "17febeb94ced11e9e9b4b5bbe5072bca61e7afc48338abd17c75ff06c6b04ce4",
+      "local_original": "/workspace/scratch/ct82_prepare_handoff21_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_record_and_project_handoff21_01.py",
+      "bytes": 9904,
+      "sha256": "cb7c9c39fb8c7ab6880a0eafdc8310337847116f2ef5abb3e2b8cd148677f5bc",
+      "local_original": "/workspace/scratch/ct82_record_and_project_handoff21_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_record_chain_descent_proof_02.py",
+      "bytes": 3740,
+      "sha256": "53b7b6ab1cd562f165d97bcb4f99acb3c7a04ddfc4ee96a1bd451d73a99682ae",
+      "local_original": "/workspace/scratch/ct82_record_chain_descent_proof_02.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_record_complete_chain_native_01.py",
+      "bytes": 5551,
+      "sha256": "920022b90fa12f8f46d671b207ab1fac0ff962fcdf1713675d3c57181a1d5ae7",
+      "local_original": "/workspace/scratch/ct82_record_complete_chain_native_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_record_complete_chain_report_01.py",
+      "bytes": 5041,
+      "sha256": "0ac6234b90581c1eda80e1ffa2496566d29d9ef0e249f35cbe87b583b964e47d",
+      "local_original": "/workspace/scratch/ct82_record_complete_chain_report_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_record_evaluator_builds_01.py",
+      "bytes": 7262,
+      "sha256": "4e0c00b7682d3eb65cf7ed8435fe3ad67048cd2a855143981fade915db4125df",
+      "local_original": "/workspace/scratch/ct82_record_evaluator_builds_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_record_fourth24_CI_01.py",
+      "bytes": 3734,
+      "sha256": "c2e6a4f75941ed80ca958bf31e1d9939fc3c583a2bc4ba07c202ba6ed8c27774",
+      "local_original": "/workspace/scratch/ct82_record_fourth24_CI_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_record_full_group_proof_01.py",
+      "bytes": 3419,
+      "sha256": "63f15660d0f9e921686cbfccb0b5c451d22f2da6da71cae1e15b8e818ce35737",
+      "local_original": "/workspace/scratch/ct82_record_full_group_proof_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_record_geometry_build_01.py",
+      "bytes": 4985,
+      "sha256": "09aaf9e0da3ccc3e8089d65e204b42d3d0ca31c8892789820d38a297e47779fa",
+      "local_original": "/workspace/scratch/ct82_record_geometry_build_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_record_geometry_build_02.py",
+      "bytes": 4424,
+      "sha256": "9f77dd1c4472d1c84cd64c0b013d3b931943775038ce964b2638267224c8e655",
+      "local_original": "/workspace/scratch/ct82_record_geometry_build_02.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_record_geometry_native_01.py",
+      "bytes": 4636,
+      "sha256": "e5c4826eae17054332ef2a7bbe9e03b2fbcc781167010c8f4a538039a26f628c",
+      "local_original": "/workspace/scratch/ct82_record_geometry_native_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_record_geometry_report_01.py",
+      "bytes": 4565,
+      "sha256": "392724c81ad4aee4e617eceba4e22148488cd3ae780700bea9b99f4fd3aface8",
+      "local_original": "/workspace/scratch/ct82_record_geometry_report_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct82_record_successor_protocol_01.py",
+      "bytes": 5859,
+      "sha256": "04cbe7e2da20eb5a89a96d85986203a6b79304ec22770f2f17ee65eb41446e23",
+      "local_original": "/workspace/scratch/ct82_record_successor_protocol_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct83-closed-derived-metadata-cleanup-07.json.xz",
+      "bytes": 556,
+      "sha256": "8bab76294d6e70c82854fb778ae736b0ce961d2be4f894e9ad69d2ec2da717d2",
+      "local_original": "/workspace/scratch/ct83-closed-derived-metadata-cleanup-07.json.xz",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct83-root-complete-chain-settled-01.paths0",
+      "bytes": 3603,
+      "sha256": "dd981c61e51879f41c5c82276029556f2ae0341673dd93bf7a055513629ebc56",
+      "local_original": "/workspace/scratch/ct83-root-complete-chain-settled-01.paths0",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct83-root-complete-chain-settlement-publication-caller01.txt",
+      "bytes": 104,
+      "sha256": "b9a388cd1e116a88f457c2fe7e511fa22bb9e20d8bae9385f693774b9c7ee367",
+      "local_original": "/workspace/scratch/ct83-root-complete-chain-settlement-publication-caller01.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct83-root-complete-chain.claim.txt",
+      "bytes": 36,
+      "sha256": "218e6fc05ec15ab41f0ca77455d75c211647970b36e20a27f1d6f35a43c1c8c0",
+      "local_original": "/workspace/scratch/ct83-root-complete-chain.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct83-scientific-roots22-01.json",
+      "bytes": 537,
+      "sha256": "caeb2a8a82cc3be97d1a792a32beab9b5d1b92e161973bff8e0c59f167322b6c",
+      "local_original": "/workspace/scratch/ct83-scientific-roots22-01.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct83_checkpoint_root_complete_chain_01.py",
+      "bytes": 6689,
+      "sha256": "14e5ecff5297b209efe2cb1a541cd0c01e094a4d923ca068c285df8f8d8a9f62",
+      "local_original": "/workspace/scratch/ct83_checkpoint_root_complete_chain_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct83_commit_root_complete_chain_01.py",
+      "bytes": 5414,
+      "sha256": "9179c973ab94688862e7f2d9f1013f3f8898b2f3e17a79f71fe0b5962bc079ca",
+      "local_original": "/workspace/scratch/ct83_commit_root_complete_chain_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-handoff21-actual-publication-01/branch-head-api.json",
+      "bytes": 4354,
+      "sha256": "4d3aa120d43912fb994b8213f9801823d89b378a9ff23109c3c18b5a303f2e9f",
+      "local_original": "/workspace/scratch/ct82-handoff21-actual-publication-01/branch-head-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-handoff21-actual-publication-01/jobs-final-api.json",
+      "bytes": 2823,
+      "sha256": "792be731d2f569d2a0f51e0c286529f4ad27722bd7b4bba3612181ba3d0e78a4",
+      "local_original": "/workspace/scratch/ct82-handoff21-actual-publication-01/jobs-final-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-handoff21-actual-publication-01/publisher-bot-commit-api.json",
+      "bytes": 6562,
+      "sha256": "258d965d1d456035669953443a60bbca66e91b7cc24e5e7c826508dcd5e7fa67",
+      "local_original": "/workspace/scratch/ct82-handoff21-actual-publication-01/publisher-bot-commit-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-handoff21-actual-publication-01/whole-job.log",
+      "bytes": 432419,
+      "sha256": "0a502ad7d4a0e2c7974ca925c70c5f00436911102cae032be8047fc766c0810c",
+      "local_original": "/workspace/scratch/ct82-handoff21-actual-publication-01/whole-job.log",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-handoff21-actual-publication-01/whole-log-api.json",
+      "bytes": 436620,
+      "sha256": "1492c109f551513ead5d3a6df37cd9945e6a2c061479d21f944d70e4f5a625d8",
+      "local_original": "/workspace/scratch/ct82-handoff21-actual-publication-01/whole-log-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-handoff21-artifact-ff-01/artifact.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-handoff21-artifact-ff-01/artifact.exit",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-handoff21-artifact-ff-01/artifact.txt",
+      "bytes": 41,
+      "sha256": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934",
+      "local_original": "/workspace/scratch/ct82-handoff21-artifact-ff-01/artifact.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-handoff21-artifact-ff-01/canonical-manifests.json",
+      "bytes": 1006,
+      "sha256": "3e81f267c055fe9f69659c0e28e50ce69cfab264a7e990e71ce87cc88f9206bd",
+      "local_original": "/workspace/scratch/ct82-handoff21-artifact-ff-01/canonical-manifests.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-handoff21-artifact-ff-01/dirty-preservation.json",
+      "bytes": 39094,
+      "sha256": "7e6140e6c31659ef5920a7d25a39dc86e941c0c9c4aad260c964f3cfa43a385b",
+      "local_original": "/workspace/scratch/ct82-handoff21-artifact-ff-01/dirty-preservation.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-handoff21-artifact-ff-01/exact-ff.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-handoff21-artifact-ff-01/exact-ff.exit",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-handoff21-artifact-ff-01/exact-ff.txt",
+      "bytes": 6300,
+      "sha256": "38fb6f21251ec68e18ff4052d3519899266e4faa21a957694b7ae1d667e172e3",
+      "local_original": "/workspace/scratch/ct82-handoff21-artifact-ff-01/exact-ff.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-handoff21-artifact-ff-01/fetch.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-handoff21-artifact-ff-01/fetch.exit",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-handoff21-artifact-ff-01/fetch.txt",
+      "bytes": 126,
+      "sha256": "c26fd4439dbd3f034b812ee33cf5b18624fd459a475b313c9bd0417dc96342c9",
+      "local_original": "/workspace/scratch/ct82-handoff21-artifact-ff-01/fetch.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-handoff21-artifact-ff-01/wiring.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-handoff21-artifact-ff-01/wiring.exit",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-handoff21-artifact-ff-01/wiring.txt",
+      "bytes": 432,
+      "sha256": "0c04bbeafdbf2d9b367c3c1322e8d9c7b1ad9fca5865ab9dcd09daf1c19e2e61",
+      "local_original": "/workspace/scratch/ct82-handoff21-artifact-ff-01/wiring.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-root-handoff21-settlement-publication-01/expected-head-lookup.log",
+      "bytes": 96,
+      "sha256": "38c1f7df05c5e79aa07b8354ca162ff2eef25b10f2c99be844905ce579dbb47c",
+      "local_original": "/workspace/scratch/ct82-root-handoff21-settlement-publication-01/expected-head-lookup.log",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-root-handoff21-settlement-publication-01/push.log",
+      "bytes": 396,
+      "sha256": "88c6b09b5e72c59472198fd564a48ab070760348c371a0ee0109e3219f067f27",
+      "local_original": "/workspace/scratch/ct82-root-handoff21-settlement-publication-01/push.log",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-root-handoff21-settlement-publication-01/receipt.json",
+      "bytes": 657,
+      "sha256": "418f54273ee1e12a5e5f346c86c0d32e1e2b308a5233879855309f0379186c65",
+      "local_original": "/workspace/scratch/ct82-root-handoff21-settlement-publication-01/receipt.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-root21-payload-publication-01/expected-head-lookup.log",
+      "bytes": 96,
+      "sha256": "44eba89cb291da504052fb1104df4908c8ab7d7631c0cdbc50b4f092dde15b85",
+      "local_original": "/workspace/scratch/ct82-root21-payload-publication-01/expected-head-lookup.log",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-root21-payload-publication-01/push.log",
+      "bytes": 396,
+      "sha256": "aa49afee38306d4157f3d0c39f9cfa6fc352b2cf74dbdc458b626ffee0e8e7ad",
+      "local_original": "/workspace/scratch/ct82-root21-payload-publication-01/push.log",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct82-root21-payload-publication-01/receipt.json",
+      "bytes": 657,
+      "sha256": "7e8c83d43f1367d01336d1e3c8d03c68928b7c57478a2eba043430c51cb22461",
+      "local_original": "/workspace/scratch/ct82-root21-payload-publication-01/receipt.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct83-root-complete-chain-settlement-publication-01/expected-head-lookup.log",
+      "bytes": 96,
+      "sha256": "d10839ebbd3eca974c4b1912bd25c5344584e133186696c6075756123e30afcb",
+      "local_original": "/workspace/scratch/ct83-root-complete-chain-settlement-publication-01/expected-head-lookup.log",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct83-root-complete-chain-settlement-publication-01/push.log",
+      "bytes": 396,
+      "sha256": "ca1585a1edd37d60742cb0012a9f3523edd0468fc2dca1e3af626e9f4dc7ecc4",
+      "local_original": "/workspace/scratch/ct83-root-complete-chain-settlement-publication-01/push.log",
+      "held_original": true
+    },
+    {
+      "path": "closed-publication-controls/ct83-root-complete-chain-settlement-publication-01/receipt.json",
+      "bytes": 657,
+      "sha256": "c27b067cc2820845752d7df9a1f30b3158a40a6eca4fc8a3b79583e7348c9985",
+      "local_original": "/workspace/scratch/ct83-root-complete-chain-settlement-publication-01/receipt.json",
+      "held_original": true
+    },
+    {
+      "path": "consumer-pending/.resume/RESUME.md",
+      "bytes": 228985,
+      "sha256": "d6b6688dffaa301fab9668f4e6049d97571bbdad0ed159ad801106f4e6901a50",
+      "local_original": "/workspace/cryptanalysis/.resume/RESUME.md",
+      "held_original": true
+    },
+    {
+      "path": "consumer-pending/docs/session-logs/2026-11-15.md",
+      "bytes": 23854,
+      "sha256": "6770257ee48055758c9e4607925c9877aefe820536d52c24bab10075f6383bdf",
+      "local_original": "/workspace/cryptanalysis/docs/session-logs/2026-11-15.md",
+      "held_original": true
+    },
+    {
+      "path": "consumer-pending/experiments/chained-transfer-public-target/CHECKPOINT.md",
+      "bytes": 194475,
+      "sha256": "2741ab680b507450a20fe17c53031474c484297a65cb57e31c876646155c1ce2",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/CHECKPOINT.md",
+      "held_original": true
+    },
+    {
+      "path": "consumer-pending/experiments/chained-transfer-public-target/RESEARCH_QUEUE.md",
+      "bytes": 184316,
+      "sha256": "4bbf5f9a230e11f89074a15982fc4f6a234cb7f3f05bf75f3503adf71abe21e6",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/RESEARCH_QUEUE.md",
+      "held_original": true
+    },
+    {
+      "path": "consumer-reports/fixed-chain-complete-result-01/REPORT.md",
+      "bytes": 1052,
+      "sha256": "c169e921898ecd47e6f3017e0c2e34173be96227d59c1e5fe2d91dd36b2c1876",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/fixed-chain-complete-result-01/REPORT.md",
+      "held_original": true
+    },
+    {
+      "path": "consumer-reports/fixed-chain-complete-result-01/original-record-command.py",
+      "bytes": 5041,
+      "sha256": "0ac6234b90581c1eda80e1ffa2496566d29d9ef0e249f35cbe87b583b964e47d",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/fixed-chain-complete-result-01/original-record-command.py",
+      "held_original": true
+    },
+    {
+      "path": "consumer-reports/fixed-chain-complete-result-01/original-render.py",
+      "bytes": 215,
+      "sha256": "099f87746b9e56df0059d4ebc9e4ca91fe2c39cf61986097aeba98b5de5f4fff",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/fixed-chain-complete-result-01/original-render.py",
+      "held_original": true
+    },
+    {
+      "path": "consumer-reports/fixed-chain-complete-result-01/render-inputs.json",
+      "bytes": 1410,
+      "sha256": "5081d808852fd5fd7227b92c763b61ba41676ed8c6d74c0bcbd9e7a3f6d17c6a",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/fixed-chain-complete-result-01/render-inputs.json",
+      "held_original": true
+    },
+    {
+      "path": "consumer-reports/fixed-chain-complete-result-01/report.pdf",
+      "bytes": 58309,
+      "sha256": "64ae1be7bc57e1f768eab844f681b8e7874a19effc2f0cd6dc8dc85b86a7b9dc",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/fixed-chain-complete-result-01/report.pdf",
+      "held_original": true
+    },
+    {
+      "path": "consumer-reports/fixed-chain-complete-result-01/report.typ",
+      "bytes": 7764,
+      "sha256": "d7995ddaaf926532438a71304143da67379cbe61684d8e61fa473efcf0617c3e",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/fixed-chain-complete-result-01/report.typ",
+      "held_original": true
+    },
+    {
+      "path": "consumer-reports/fixed-chain-complete-result-01/visual-inspection.json",
+      "bytes": 1106,
+      "sha256": "c0b8fb022dfd041bdcfd0fb0c815a4a626be071f8cc0fb9f7a615028851219c5",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/fixed-chain-complete-result-01/visual-inspection.json",
+      "held_original": true
+    },
+    {
+      "path": "consumer-reports/fixed-geometry-result-01/REPORT.md",
+      "bytes": 951,
+      "sha256": "10abcf14817700ddfa8919fa265419e9c4d87ab02325e1c5f5495667e5327383",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/fixed-geometry-result-01/REPORT.md",
+      "held_original": true
+    },
+    {
+      "path": "consumer-reports/fixed-geometry-result-01/original-record-command.py",
+      "bytes": 4565,
+      "sha256": "392724c81ad4aee4e617eceba4e22148488cd3ae780700bea9b99f4fd3aface8",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/fixed-geometry-result-01/original-record-command.py",
+      "held_original": true
+    },
+    {
+      "path": "consumer-reports/fixed-geometry-result-01/original-render.py",
+      "bytes": 215,
+      "sha256": "099f87746b9e56df0059d4ebc9e4ca91fe2c39cf61986097aeba98b5de5f4fff",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/fixed-geometry-result-01/original-render.py",
+      "held_original": true
+    },
+    {
+      "path": "consumer-reports/fixed-geometry-result-01/render-inputs.json",
+      "bytes": 1189,
+      "sha256": "61812d6ad3d7b39f926271286bf8077e599d0d5cc782b5d99f5b3d072dedfcd6",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/fixed-geometry-result-01/render-inputs.json",
+      "held_original": true
+    },
+    {
+      "path": "consumer-reports/fixed-geometry-result-01/report.pdf",
+      "bytes": 52872,
+      "sha256": "892785e9ef73e89840fe756bab577b702a8501e08bf235f16289f17f8b9345cb",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/fixed-geometry-result-01/report.pdf",
+      "held_original": true
+    },
+    {
+      "path": "consumer-reports/fixed-geometry-result-01/report.typ",
+      "bytes": 7392,
+      "sha256": "3cf5024a5690f03090c95fe9c6c9ee03327913eb4a82ee949f7ac553f63de971",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/fixed-geometry-result-01/report.typ",
+      "held_original": true
+    },
+    {
+      "path": "consumer-reports/fixed-geometry-result-01/visual-inspection.json",
+      "bytes": 1056,
+      "sha256": "1f33d605a5283afd1abd32e84e252789c08de61e86cb9e062c158713238ff6dd",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/fixed-geometry-result-01/visual-inspection.json",
+      "held_original": true
+    },
+    {
+      "path": "control/exact-byte-dedup-before-capture.json",
+      "bytes": 1037,
+      "sha256": "232cf1e22525cc649396418524b78083323e576b11f8e9bc6a514985164db33e",
+      "local_original": "/workspace/scratch/ct82-closed-complete-chain-exact-byte-dedup-01.json",
+      "held_original": true
+    },
+    {
+      "path": "control/original-genuine21-archive-parts.json",
+      "bytes": 4058,
+      "sha256": "8ffd216de0d5df0468b0ab54d561e67a2e50d974a054d695eaff077d758fc4ce",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-handoff-21/archive-parts.json",
+      "held_original": true
+    },
+    {
+      "path": "control/original-genuine21-manifest.json",
+      "bytes": 757,
+      "sha256": "cf3a7e34472edf6d6edde7161b133b3f62634a5536b5ebeecca7a0bd9a6282d3",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-handoff-21/.artifacts.json",
+      "held_original": true
+    },
+    {
+      "path": "control/original-prepare-command.py",
+      "bytes": 20392,
+      "sha256": "3270dda0d9a87566453a5d828015d5ea244e5946fd6cacd2f2dead740c049988",
+      "local_original": "/workspace/scratch/ct84_prepare_handoff22_01.py",
+      "held_original": false
+    },
+    {
+      "path": "control/previous21-inputs.json",
+      "bytes": 8463987,
+      "sha256": "b7f94acd84d9f335e53a8a8a7675487dd43d085f75d8726d8bfa9206edd3fd08",
+      "local_original": "/workspace/scratch/ct82-whole-closed-science-handoff-21/current-inputs.json",
+      "held_original": true
+    },
+    {
+      "path": "control/scientific-root-declaration.json",
+      "bytes": 537,
+      "sha256": "caeb2a8a82cc3be97d1a792a32beab9b5d1b92e161973bff8e0c59f167322b6c",
+      "local_original": "/workspace/scratch/ct83-scientific-roots22-01.json",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/artifact.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/artifact.exit",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/artifact.txt",
+      "bytes": 41,
+      "sha256": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/artifact.txt",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/branch-head-api.json",
+      "bytes": 4354,
+      "sha256": "4d3aa120d43912fb994b8213f9801823d89b378a9ff23109c3c18b5a303f2e9f",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/branch-head-api.json",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/canonical-manifests.json",
+      "bytes": 1006,
+      "sha256": "3e81f267c055fe9f69659c0e28e50ce69cfab264a7e990e71ce87cc88f9206bd",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/canonical-manifests.json",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/dirty-preservation.json",
+      "bytes": 39094,
+      "sha256": "7e6140e6c31659ef5920a7d25a39dc86e941c0c9c4aad260c964f3cfa43a385b",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/dirty-preservation.json",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/exact-ff.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/exact-ff.exit",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/exact-ff.txt",
+      "bytes": 6300,
+      "sha256": "38fb6f21251ec68e18ff4052d3519899266e4faa21a957694b7ae1d667e172e3",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/exact-ff.txt",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/fetch.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/fetch.exit",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/fetch.txt",
+      "bytes": 126,
+      "sha256": "c26fd4439dbd3f034b812ee33cf5b18624fd459a475b313c9bd0417dc96342c9",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/fetch.txt",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/jobs-final-api.json",
+      "bytes": 2823,
+      "sha256": "792be731d2f569d2a0f51e0c286529f4ad27722bd7b4bba3612181ba3d0e78a4",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/jobs-final-api.json",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/normal-push-receipt.json",
+      "bytes": 657,
+      "sha256": "7e8c83d43f1367d01336d1e3c8d03c68928b7c57478a2eba043430c51cb22461",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/normal-push-receipt.json",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/normal-push.log",
+      "bytes": 396,
+      "sha256": "aa49afee38306d4157f3d0c39f9cfa6fc352b2cf74dbdc458b626ffee0e8e7ad",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/normal-push.log",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/original-FF-command.py",
+      "bytes": 6039,
+      "sha256": "b9ada96f82250b30f47164b4f108928738201c0a84a172ee9a58c319b358358d",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/original-FF-command.py",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/original-owned-command.py",
+      "bytes": 1675,
+      "sha256": "9ba20f14df5267f307c3717ef8bc3b18ce9a1de90d7f78fa37257d54c53cc203",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/original-owned-command.py",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/original-record-command.py",
+      "bytes": 9904,
+      "sha256": "cb7c9c39fb8c7ab6880a0eafdc8310337847116f2ef5abb3e2b8cd148677f5bc",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/original-record-command.py",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/owned-before.json",
+      "bytes": 1475,
+      "sha256": "0bea440ba4d9f27858bdb2bb50d70947f4da3a3973881448e760cc6f7a94260b",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/owned-before.json",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/publication.json",
+      "bytes": 1799,
+      "sha256": "aab3eac0c0207cb0c313f2d0159b05bbfa4a1ff8b82c114d0cead96a25029493",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/publication.json",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/publisher-bot-commit-api.json",
+      "bytes": 6562,
+      "sha256": "258d965d1d456035669953443a60bbca66e91b7cc24e5e7c826508dcd5e7fa67",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/publisher-bot-commit-api.json",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/whole-job.log.xz",
+      "bytes": 44012,
+      "sha256": "0f08eff19388f774cb1050af6ebbbe3419799e0d56127bfb038d469e02b567a1",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/whole-job.log.xz",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/whole-log-api.json",
+      "bytes": 436620,
+      "sha256": "1492c109f551513ead5d3a6df37cd9945e6a2c061479d21f944d70e4f5a625d8",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/whole-log-api.json",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/wiring.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/wiring.exit",
+      "held_original": true
+    },
+    {
+      "path": "prior21-publication/wiring.txt",
+      "bytes": 432,
+      "sha256": "0c04bbeafdbf2d9b367c3c1322e8d9c7b1ad9fca5865ab9dcd09daf1c19e2e61",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/wiring.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-chain-descent-proof-01/consumer/_workspace_scratch_ct82-ChainDescent-01_lean/build.log",
+      "bytes": 110,
+      "sha256": "f1de36175f56743899bd1e7033b56e639645425058f8ca5f68221ae9e55288a1",
+      "local_original": "/workspace/scratch/ct82-chain-descent-proof-01/consumer/_workspace_scratch_ct82-ChainDescent-01_lean/build.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-chain-descent-proof-01/consumer/_workspace_scratch_ct82-ChainDescent-01_lean/status",
+      "bytes": 11,
+      "sha256": "0c6532fbd1cb7b97b6781811241a4e7dcaebf0e3ff758f7054a3038de5d2281f",
+      "local_original": "/workspace/scratch/ct82-chain-descent-proof-01/consumer/_workspace_scratch_ct82-ChainDescent-01_lean/status",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-chain-descent-proof-01/producer/target_ct82-chain-descent-stage-01_ChainDescent_lean/audit.log",
+      "bytes": 788,
+      "sha256": "5b705db9259aa4c88744d34043403c5ab271a9c547e5f8490e29618b6f7b8e58",
+      "local_original": "/workspace/scratch/ct82-chain-descent-proof-01/producer/target_ct82-chain-descent-stage-01_ChainDescent_lean/audit.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-chain-descent-proof-01/producer/target_ct82-chain-descent-stage-01_ChainDescent_lean/build.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-chain-descent-proof-01/producer/target_ct82-chain-descent-stage-01_ChainDescent_lean/build.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-chain-descent-proof-01/producer/target_ct82-chain-descent-stage-01_ChainDescent_lean/status",
+      "bytes": 5,
+      "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431",
+      "local_original": "/workspace/scratch/ct82-chain-descent-proof-01/producer/target_ct82-chain-descent-stage-01_ChainDescent_lean/status",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-chain-descent-proof-02/consumer/experiments_chained-transfer-public-target_fixed-jacobian-chain-01_target_ct82-chain-descent-stage-02_ChainDescent_lean/audit.log",
+      "bytes": 926,
+      "sha256": "e9178ccde67724f9d11fdb7fed9438056aefb6717a2f3149149daa0d6fff5d7a",
+      "local_original": "/workspace/scratch/ct82-chain-descent-proof-02/consumer/experiments_chained-transfer-public-target_fixed-jacobian-chain-01_target_ct82-chain-descent-stage-02_ChainDescent_lean/audit.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-chain-descent-proof-02/consumer/experiments_chained-transfer-public-target_fixed-jacobian-chain-01_target_ct82-chain-descent-stage-02_ChainDescent_lean/build.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-chain-descent-proof-02/consumer/experiments_chained-transfer-public-target_fixed-jacobian-chain-01_target_ct82-chain-descent-stage-02_ChainDescent_lean/build.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-chain-descent-proof-02/consumer/experiments_chained-transfer-public-target_fixed-jacobian-chain-01_target_ct82-chain-descent-stage-02_ChainDescent_lean/status",
+      "bytes": 5,
+      "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431",
+      "local_original": "/workspace/scratch/ct82-chain-descent-proof-02/consumer/experiments_chained-transfer-public-target_fixed-jacobian-chain-01_target_ct82-chain-descent-stage-02_ChainDescent_lean/status",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-chain-descent-proof-02/producer/target_ct82-chain-descent-stage-02_ChainDescent_lean/audit.log",
+      "bytes": 877,
+      "sha256": "e28adbf83997d163a5548a7fb3356bb8ea9dac280a1edcb4da21b88238b8c6c3",
+      "local_original": "/workspace/scratch/ct82-chain-descent-proof-02/producer/target_ct82-chain-descent-stage-02_ChainDescent_lean/audit.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-chain-descent-proof-02/producer/target_ct82-chain-descent-stage-02_ChainDescent_lean/build.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-chain-descent-proof-02/producer/target_ct82-chain-descent-stage-02_ChainDescent_lean/build.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-chain-descent-proof-02/producer/target_ct82-chain-descent-stage-02_ChainDescent_lean/status",
+      "bytes": 5,
+      "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431",
+      "local_original": "/workspace/scratch/ct82-chain-descent-proof-02/producer/target_ct82-chain-descent-stage-02_ChainDescent_lean/status",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-complete-chain-report-01/draft-before-spacing-01/page-1.png",
+      "bytes": 283273,
+      "sha256": "bd19e72c8652d5a4ee314637c5932d32fb1e767980c6d8e4e9488aeb7c784e5e",
+      "local_original": "/workspace/scratch/ct82-complete-chain-report-01/draft-before-spacing-01/page-1.png",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-complete-chain-report-01/draft-before-spacing-01/page-2.png",
+      "bytes": 323528,
+      "sha256": "54f6eb62c20390376e118259613a2a4fcb93de653d5ba711429007bb01e7f717",
+      "local_original": "/workspace/scratch/ct82-complete-chain-report-01/draft-before-spacing-01/page-2.png",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-complete-chain-report-01/draft-before-spacing-01/report.pdf",
+      "bytes": 58278,
+      "sha256": "a60920b898a94aa385e45677a85e4a1b7326a2ded47c9c6e5961d08bc467a392",
+      "local_original": "/workspace/scratch/ct82-complete-chain-report-01/draft-before-spacing-01/report.pdf",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-complete-chain-report-01/draft-before-spacing-01/report.typ",
+      "bytes": 7714,
+      "sha256": "b9621aca6f0f426fe9743cb428b83fd3923c419c230d54e5cbcc42340212620a",
+      "local_original": "/workspace/scratch/ct82-complete-chain-report-01/draft-before-spacing-01/report.typ",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-complete-chain-report-01/page-1.png",
+      "bytes": 282661,
+      "sha256": "7df04c58b33ebc1968327f1798b1c1c529f34e233ff5214982f039c56ea0d68b",
+      "local_original": "/workspace/scratch/ct82-complete-chain-report-01/page-1.png",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-complete-chain-report-01/page-2.png",
+      "bytes": 323397,
+      "sha256": "c1c77d4ef082181fed4cde6f8a4dcded89d94af37e0dbabad98f4acf778366f2",
+      "local_original": "/workspace/scratch/ct82-complete-chain-report-01/page-2.png",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-complete-chain-report-01/render.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-complete-chain-report-01/render.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-complete-chain-report-01/render02.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-complete-chain-report-01/render02.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-complete-chain-report-01/report.pdf",
+      "bytes": 58309,
+      "sha256": "64ae1be7bc57e1f768eab844f681b8e7874a19effc2f0cd6dc8dc85b86a7b9dc",
+      "local_original": "/workspace/scratch/ct82-complete-chain-report-01/report.pdf",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-complete-chain-report-01/report.typ",
+      "bytes": 7764,
+      "sha256": "d7995ddaaf926532438a71304143da67379cbe61684d8e61fa473efcf0617c3e",
+      "local_original": "/workspace/scratch/ct82-complete-chain-report-01/report.typ",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/after-Git-status.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/after-Git-status.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/artifacts-api.json",
+      "bytes": 1098,
+      "sha256": "082a4a88253ac9ed16f924b0619d437f2a563dd5593d96550a9f8a11a4b2938f",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/artifacts-api.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/before-Git-status.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/before-Git-status.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/jobs-api.json",
+      "bytes": 2339,
+      "sha256": "6cce5914bf94b7547eb3822d19e2053f7d859968a54cbb83acb7821d9f0d6657",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/jobs-api.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/boot-id.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/boot-id.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/boot-id.log",
+      "bytes": 37,
+      "sha256": "8b4583381d87a81f9a256f96273349da2845193af90c9a10c0f5cf72ec47b54e",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/boot-id.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/kernel.txt",
+      "bytes": 23,
+      "sha256": "311c760e365846e58740176d212ad01995d2f5b6b2ab41541b807d4bab46c071",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/kernel.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/original-RESUME.md",
+      "bytes": 219861,
+      "sha256": "4b191615274444d27b1c4e7ae1be2fb7fbafe446d650501f404e7eeb0e079aad",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/original-RESUME.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/original-final-status.log",
+      "bytes": 361,
+      "sha256": "7d48049ad20f7f00d90d2f04ddbf2c92ce7a12b07045a37a509838b70172e6e3",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/original-final-status.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/original-gate.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/original-gate.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/original-gate.log",
+      "bytes": 189,
+      "sha256": "fe22f0a33f03cf095b06bc3ac5e17f25f6041f08df11d795af1653b4e0f66ad4",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/original-gate.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/original-last-push.txt",
+      "bytes": 233,
+      "sha256": "86d524c733c7b32597b64a5bb54d3e33941abe4541db244fb3564238035b34b9",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/original-last-push.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/pack-RESUME.md",
+      "bytes": 219861,
+      "sha256": "4b191615274444d27b1c4e7ae1be2fb7fbafe446d650501f404e7eeb0e079aad",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/pack-RESUME.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/pack-meta.json",
+      "bytes": 915,
+      "sha256": "1e59ea4119554566fedebab3ed9682b5681573f60faab3f8e99201ef7c10a03c",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/pack-meta.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/readback-meta.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/readback-meta.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/readback-meta.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/readback-meta.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/readback-pack.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/readback-pack.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/readback-pack.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/readback-pack.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/readback-resume.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/readback-resume.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/readback-resume.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/readback-resume.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/remote-RESUME.md",
+      "bytes": 219861,
+      "sha256": "4b191615274444d27b1c4e7ae1be2fb7fbafe446d650501f404e7eeb0e079aad",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/remote-RESUME.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/remote-checkpoint.tar.gz",
+      "bytes": 70708,
+      "sha256": "c63e7caac73204c69d2a96f9ff4b16afb63a305380b90ebd5b89a9ed471e0c93",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/remote-checkpoint.tar.gz",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/remote-inputs.sha256",
+      "bytes": 413,
+      "sha256": "dfa4785fdec81dff848e0fb9bc9725151eefd0991804b2780cae4a6c51b59bab",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/remote-inputs.sha256",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/remote-members.txt",
+      "bytes": 27,
+      "sha256": "5a0a767e57348eea0fc85336d44ca9b4ae9d7fc017b6138118f392a9a9c6261f",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/remote-members.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/remote-meta.json",
+      "bytes": 915,
+      "sha256": "1e59ea4119554566fedebab3ed9682b5681573f60faab3f8e99201ef7c10a03c",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/remote-meta.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/source-branch.txt",
+      "bytes": 49,
+      "sha256": "e6571014388bfa4c46c7f297143bb8350772a197d2c4c2360019793e9a708873",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/source-branch.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/source-head.txt",
+      "bytes": 41,
+      "sha256": "c0bd854c5d5339ccfe235c7e361922cb7c0c76286c87818b46a215472d0b37c4",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/source-head.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/source-inputs.sha256",
+      "bytes": 373,
+      "sha256": "e52e72aa03ccfe593ae8260e1343528c35c8fc7b7ff5584071155921419fa2a1",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/source-inputs.sha256",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/time-namespace.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/time-namespace.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/time-namespace.log",
+      "bytes": 18,
+      "sha256": "a4f4417c3fcb6187539627ed27d186fc669f8d750ec81843dd40cc46485e65d2",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/time-namespace.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/time-offsets.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/time-offsets.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/members/time-offsets.log",
+      "bytes": 64,
+      "sha256": "bd9f74ac5eaa3df538867b32ee7d9240020020a199963645d7ab92f008209ac5",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/members/time-offsets.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/observation.json",
+      "bytes": 1123,
+      "sha256": "0a29b859beab6c5d6f6b109e846fa1f4960aae3d9e0889e29cc368d8c45bcf80",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/observation.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/original-import-command.py",
+      "bytes": 5925,
+      "sha256": "5a4a96c5c454d09bb6c2dae444158bd212a120c475b49d0359504a1c13b0a116",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/original-import-command.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/original-local-gate.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/original-local-gate.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/original-local-gate.log",
+      "bytes": 196,
+      "sha256": "484d30d766338895789d4427b10b35cbe137a10b808b40930491e778110e68f7",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/original-local-gate.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/original-local-status.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/original-local-status.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/original-local-status.log",
+      "bytes": 13824,
+      "sha256": "82150ec22a0d961faf7c44f20bebf58e6169170f5238b11ddd4522cdf9d83c92",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/original-local-status.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/previous-local-last-push.txt",
+      "bytes": 233,
+      "sha256": "680164d680f37effe2fa2e5a90c3b518019f47fa91e5e9cc049b4b650a38d844",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/previous-local-last-push.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/whole-log-api.json",
+      "bytes": 235373,
+      "sha256": "374f48841b253322147cfe42cd0b60e153db2f02259e4bb93b46d26370870e18",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/whole-log-api.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/whole-members.json",
+      "bytes": 3609,
+      "sha256": "395d46cb326df456fdaa032f1507c4ac256d8ddb37ca7357eb69465ac0033f42",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/whole-members.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-11/whole-original-GitHub-artifact.zip",
+      "bytes": 287563,
+      "sha256": "08c474581e04a127bdca2e99a0d114729b63b905ec25a4e2bf7bb50d36100830",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-11/whole-original-GitHub-artifact.zip",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/after-Git-status.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/after-Git-status.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/artifacts-api.json",
+      "bytes": 1098,
+      "sha256": "c2d140d05bea2030df9f7c9fc4f38bcd9db46f5bb14f0cfc15795b75b86c5717",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/artifacts-api.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/before-Git-status.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/before-Git-status.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/jobs-api.json",
+      "bytes": 2339,
+      "sha256": "e3d421c6310235ec6bcc40f43b8851df75f079c9664815350ec99793fabafa29",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/jobs-api.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/boot-id.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/boot-id.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/boot-id.log",
+      "bytes": 37,
+      "sha256": "d5577b3f0fe80f7d483bf7cfcb70cc6b658cd5b3f438d4082213a31a7fe0c454",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/boot-id.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/kernel.txt",
+      "bytes": 23,
+      "sha256": "311c760e365846e58740176d212ad01995d2f5b6b2ab41541b807d4bab46c071",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/kernel.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/original-RESUME.md",
+      "bytes": 222787,
+      "sha256": "d1ca7fac306dbffdf1caa22d8ac2cb7fcedff5a8c39324a44e2dccf0033e21a2",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/original-RESUME.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/original-final-status.log",
+      "bytes": 361,
+      "sha256": "c2972b5f5d7b77ca3cd20c87697fe24b034222bb95975421df3180898c6c6091",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/original-final-status.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/original-gate.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/original-gate.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/original-gate.log",
+      "bytes": 189,
+      "sha256": "c393e7e3a1caa5aa52c94f3eeb380d76f6ff126758c2dd449fb3ed7af8f55695",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/original-gate.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/original-last-push.txt",
+      "bytes": 233,
+      "sha256": "aa247253f97f7230a90e94ff9977eedd7c837d73d7fbd73a101bafe3af93cd44",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/original-last-push.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/pack-RESUME.md",
+      "bytes": 222787,
+      "sha256": "d1ca7fac306dbffdf1caa22d8ac2cb7fcedff5a8c39324a44e2dccf0033e21a2",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/pack-RESUME.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/pack-meta.json",
+      "bytes": 915,
+      "sha256": "71099ffb8125231ae33ecd9c74d19944abbb60ffaea36e7d9aa5cff8ed5990d7",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/pack-meta.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/readback-meta.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/readback-meta.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/readback-meta.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/readback-meta.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/readback-pack.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/readback-pack.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/readback-pack.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/readback-pack.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/readback-resume.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/readback-resume.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/readback-resume.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/readback-resume.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/remote-RESUME.md",
+      "bytes": 222787,
+      "sha256": "d1ca7fac306dbffdf1caa22d8ac2cb7fcedff5a8c39324a44e2dccf0033e21a2",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/remote-RESUME.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/remote-checkpoint.tar.gz",
+      "bytes": 71775,
+      "sha256": "45ec0e07f96d3a83165b265e79278ea56072c7d878bc2238b757d784a667c500",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/remote-checkpoint.tar.gz",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/remote-inputs.sha256",
+      "bytes": 413,
+      "sha256": "621e81042bd3710837a62bd96dcf2e7b786493ecceb6efbd7fbda32001fd4c66",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/remote-inputs.sha256",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/remote-members.txt",
+      "bytes": 27,
+      "sha256": "5a0a767e57348eea0fc85336d44ca9b4ae9d7fc017b6138118f392a9a9c6261f",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/remote-members.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/remote-meta.json",
+      "bytes": 915,
+      "sha256": "71099ffb8125231ae33ecd9c74d19944abbb60ffaea36e7d9aa5cff8ed5990d7",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/remote-meta.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/source-branch.txt",
+      "bytes": 49,
+      "sha256": "e6571014388bfa4c46c7f297143bb8350772a197d2c4c2360019793e9a708873",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/source-branch.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/source-head.txt",
+      "bytes": 41,
+      "sha256": "abbae09a5c6694e2b11b3525cf4ef248a2df12063d9677b9247a3e35bb98fe77",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/source-head.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/source-inputs.sha256",
+      "bytes": 373,
+      "sha256": "a9f80a3049111b45b579439fc2458acc23ad75f4924e3974e60bad1d414df0d2",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/source-inputs.sha256",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/time-namespace.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/time-namespace.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/time-namespace.log",
+      "bytes": 18,
+      "sha256": "a4f4417c3fcb6187539627ed27d186fc669f8d750ec81843dd40cc46485e65d2",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/time-namespace.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/time-offsets.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/time-offsets.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/members/time-offsets.log",
+      "bytes": 64,
+      "sha256": "bd9f74ac5eaa3df538867b32ee7d9240020020a199963645d7ab92f008209ac5",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/members/time-offsets.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/observation.json",
+      "bytes": 1123,
+      "sha256": "c105caa146079a47d6fefe3a9202a1511a727dc2591c77f625cbc571f63f43ce",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/observation.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/original-import-command.py",
+      "bytes": 5925,
+      "sha256": "84a2c450fa284591b61de91a6ebbceaace03fc4d06e4fe09e64328ada5bcca1b",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/original-import-command.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/original-local-gate.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/original-local-gate.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/original-local-gate.log",
+      "bytes": 196,
+      "sha256": "80efb5e0b58ddef6a4ee5932d3e87a06e25fefcfc505119139d134e7bc0542e2",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/original-local-gate.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/original-local-status.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/original-local-status.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/original-local-status.log",
+      "bytes": 13824,
+      "sha256": "e245ec2c6a02bc32e60d06552772e97f8ea05592719e34c29511ffe8313d4904",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/original-local-status.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/previous-local-last-push.txt",
+      "bytes": 233,
+      "sha256": "86d524c733c7b32597b64a5bb54d3e33941abe4541db244fb3564238035b34b9",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/previous-local-last-push.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/whole-log-api.json",
+      "bytes": 235375,
+      "sha256": "5d134619d3e56e36f0e2a8da44417165786f897da43e3c2ba90af9af3e5109c2",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/whole-log-api.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/whole-members.json",
+      "bytes": 3609,
+      "sha256": "bcddcbd858edad8b9aceeb3a9213f7bd6eb6cd16b12a2eb6c8c2be1b061ed604",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/whole-members.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-current-original-checkpoint-12/whole-original-GitHub-artifact.zip",
+      "bytes": 291743,
+      "sha256": "33c95e6a42f303120a2844918dc0c0d8371958f64be3ab329fa042b4fea1cf1a",
+      "local_original": "/workspace/scratch/ct82-current-original-checkpoint-12/whole-original-GitHub-artifact.zip",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta",
+      "bytes": 8306696,
+      "sha256": "bc0eb459fb4959fd22afef379eaa30ef4b226729177a023075d916b75d1bb416",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos.rlib",
+      "bytes": 49789168,
+      "sha256": "15e4ed73ecf373485f8ec408dc8ec31c3ac3e9cd0e1fc472ebc6a7798a971a0c",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos.rlib",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/.gitignore",
+      "bytes": 21,
+      "sha256": "25363254190831a58ddf8af349902a50bbc9e437e7ae32d5b445940114179e8a",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/.gitignore",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/Cargo.lock",
+      "bytes": 7545,
+      "sha256": "d684ac638d22466be2c5ede3f46aad6abdac07748a5a07953864622d9c26d964",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/Cargo.lock",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/Cargo.toml",
+      "bytes": 756,
+      "sha256": "8b4e129d926a679badfeb76682c5ab9d3f9850a1daf52d7bf07f466aa13057df",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/Cargo.toml",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/PROOF_BRIDGES.md",
+      "bytes": 1487,
+      "sha256": "bf1f5a2b931efcf57f7c43923d42a678ae3d62dd74cef433fb225ab5612665c9",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/PROOF_BRIDGES.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/build-only-01.sh",
+      "bytes": 2043,
+      "sha256": "1af9e0017c24a8c94fabf81063aaac19eb53f747653aa2bb04c9351a2eae6716",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/build-only-01.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/capture_auditor.py",
+      "bytes": 1224,
+      "sha256": "51951feef15cd01f7050f318becf0a903e3a6c34c031cb5ab28bdbd40be45c64",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/capture_auditor.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/capture_engine.py",
+      "bytes": 2855,
+      "sha256": "d6ad2b6626e8e2cc7feef5ec32d6544adc6be040ceca9cf150a2b5f5a25b178d",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/capture_engine.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/frozen-prior-inputs-01.sha256",
+      "bytes": 142020,
+      "sha256": "fc0f145a48612c941fd6614b30a12b3fb477f15799904aad7344bde91ccad30d",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/frozen-prior-inputs-01.sha256",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/generated/curve_residual.rs",
+      "bytes": 610,
+      "sha256": "ab29e27eb14658a0d409f18cf2b9be784cd9640b9f5273fba217863aa09374dd",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/generated/curve_residual.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/generated/custody.json",
+      "bytes": 2772,
+      "sha256": "2e215181d6a28ba001d755b1c0e8385b41e00b0ba6c565cb021b600c51f98b77",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/generated/custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/generated/encoding.rs",
+      "bytes": 517,
+      "sha256": "82604bce1992f8172d244ce0994aa7b0ff8510a6866517f8e6b942100d351de4",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/generated/encoding.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/generated/halving.rs",
+      "bytes": 1343,
+      "sha256": "909d269795be3cba718cecd0c66ccaa60b77826e59e21358d44cb75ae8848003",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/generated/halving.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/generated/literal_halves.rs",
+      "bytes": 1512,
+      "sha256": "1acbcfcf8ba95f3dd489b49df32fd789574e9340133882f3620f987cb5d933a4",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/generated/literal_halves.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/generated/parse_packet.rs",
+      "bytes": 708,
+      "sha256": "22e2eeed7d63c5570a8e1a4b662307f97daa39c43f30195a631f20979f56a77b",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/generated/parse_packet.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/generated/polynomial.rs",
+      "bytes": 517,
+      "sha256": "782c0ee85216824242a36d097f1761d770e8f40654323a4b7c9fe740f8a2f049",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/generated/polynomial.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/generated/rational.rs",
+      "bytes": 1985,
+      "sha256": "fa332b8799f834ed2fddd175317a6a69194c8c30f8f360a8e4086b34452dfb2f",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/generated/rational.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/lean/ChainDescent.lean",
+      "bytes": 6600,
+      "sha256": "81992c0f4f4af00a5b3e94fea24542ac32660fdc4416403f3fe9fadf521df305",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/lean/ChainDescent.lean",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/materialize.py",
+      "bytes": 1930,
+      "sha256": "5cbbbaa7b0a94508473a0f9a175074c9d6b41b5612a89954742c47a06ec0eb2f",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/materialize.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/src/bin/audit_chain.rs",
+      "bytes": 5105,
+      "sha256": "8e3f189bd8c5bfccee5e4f5f5e1d8a4b00d3858d3ed44be99f6afa3b9cd15266",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/src/bin/audit_chain.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/src/lib.rs",
+      "bytes": 18707,
+      "sha256": "71e12fc1d1737d768978914c68d787403cf0479ee4d15944717274dc46f2df48",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/src/lib.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/src/rational.rs",
+      "bytes": 3678,
+      "sha256": "d8f2693fb8d835ce197d9d10c79e8cefb7e62dc370a4d8bda6a61482c0cdfe9c",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/src/rational.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-source/src/tests.rs",
+      "bytes": 17544,
+      "sha256": "51020be2d3d70db9c1379917bf493b488771a7d192812748916fdc6a9694e0fc",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/actual-source/src/tests.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/chain-compile.exit",
+      "bytes": 4,
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/chain-compile.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/chain-compile.stderr.txt",
+      "bytes": 417,
+      "sha256": "11ed0e0f68505849542dcb685b24f4527c0f2cbb3070a0ef270152eb34d2402b",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/chain-compile.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/chain-compile.txt",
+      "bytes": 101411,
+      "sha256": "8528bbac51c05d814bb8549fed61f4c06f70f671ff0bc8856103399383389774",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/chain-compile.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/engine-prepared.json",
+      "bytes": 1798,
+      "sha256": "6d70281e2117e466326bef7f9572d4764002a522e610a3c3c1d0435c18a70fa5",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/engine-prepared.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/finish.txt",
+      "bytes": 21,
+      "sha256": "192b198bea50c8aecc1ff266dc30571482444dd5af262a7a11cfcb3e0cfbb6af",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/finish.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/metadata.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/metadata.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/metadata.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/metadata.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/metadata.txt",
+      "bytes": 161616,
+      "sha256": "619ba0f08f4a3e7407da36bd386e22fbf167fa24215013a10d309b8585a8594d",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/metadata.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/original-command.sh",
+      "bytes": 2043,
+      "sha256": "1af9e0017c24a8c94fabf81063aaac19eb53f747653aa2bb04c9351a2eae6716",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/original-command.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/original-engine-preparation.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/original-engine-preparation.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/original-engine-preparation.stderr.txt",
+      "bytes": 62,
+      "sha256": "222a02ed477d249a21359df8cae975864a62d848f4739cadc5b00b6190a963c6",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/original-engine-preparation.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/original-engine-preparation.txt",
+      "bytes": 736,
+      "sha256": "33202632055a9ad43985e64e882179cd93622db747eb5db3e9488f60b570d150",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/original-engine-preparation.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/original.exit",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/original.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/prior-inputs.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/prior-inputs.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/prior-inputs.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/prior-inputs.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/prior-inputs.txt",
+      "bytes": 75060,
+      "sha256": "efb2c6f660c6d6836c228ce2aa2f8b5ab62e32745c201e7d1680f2384f108611",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/prior-inputs.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-01/start.txt",
+      "bytes": 21,
+      "sha256": "124ccb8f1f2404c91bc8ee3d5aeee118f34bb2e9e99b017b950ddf64a7241118",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-01/start.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-compiled-auditor.bin",
+      "bytes": 639904,
+      "sha256": "59922cf3f7f6f5675437710d87438ed855a66418ba098f99b0d08e4038fce6a1",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-compiled-auditor.bin",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta",
+      "bytes": 8306696,
+      "sha256": "bc0eb459fb4959fd22afef379eaa30ef4b226729177a023075d916b75d1bb416",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta"
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-prepared-original-engine/libisogeny_algos.rlib",
+      "bytes": 49789168,
+      "sha256": "15e4ed73ecf373485f8ec408dc8ec31c3ac3e9cd0e1fc472ebc6a7798a971a0c",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-prepared-original-engine/libisogeny_algos.rlib",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos.rlib"
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/.gitignore",
+      "bytes": 21,
+      "sha256": "25363254190831a58ddf8af349902a50bbc9e437e7ae32d5b445940114179e8a",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/.gitignore",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/Cargo.lock",
+      "bytes": 7545,
+      "sha256": "d684ac638d22466be2c5ede3f46aad6abdac07748a5a07953864622d9c26d964",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/Cargo.lock",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/Cargo.toml",
+      "bytes": 756,
+      "sha256": "8b4e129d926a679badfeb76682c5ab9d3f9850a1daf52d7bf07f466aa13057df",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/Cargo.toml",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/PROOF_BRIDGES.md",
+      "bytes": 1487,
+      "sha256": "bf1f5a2b931efcf57f7c43923d42a678ae3d62dd74cef433fb225ab5612665c9",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/PROOF_BRIDGES.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/build-only-01.sh",
+      "bytes": 2043,
+      "sha256": "1af9e0017c24a8c94fabf81063aaac19eb53f747653aa2bb04c9351a2eae6716",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/build-only-01.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/capture_auditor.py",
+      "bytes": 1224,
+      "sha256": "51951feef15cd01f7050f318becf0a903e3a6c34c031cb5ab28bdbd40be45c64",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/capture_auditor.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/capture_engine.py",
+      "bytes": 2855,
+      "sha256": "d6ad2b6626e8e2cc7feef5ec32d6544adc6be040ceca9cf150a2b5f5a25b178d",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/capture_engine.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/frozen-prior-inputs-01.sha256",
+      "bytes": 142020,
+      "sha256": "fc0f145a48612c941fd6614b30a12b3fb477f15799904aad7344bde91ccad30d",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/frozen-prior-inputs-01.sha256",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/generated/curve_residual.rs",
+      "bytes": 610,
+      "sha256": "ab29e27eb14658a0d409f18cf2b9be784cd9640b9f5273fba217863aa09374dd",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/generated/curve_residual.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/generated/custody.json",
+      "bytes": 2772,
+      "sha256": "2e215181d6a28ba001d755b1c0e8385b41e00b0ba6c565cb021b600c51f98b77",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/generated/custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/generated/encoding.rs",
+      "bytes": 517,
+      "sha256": "82604bce1992f8172d244ce0994aa7b0ff8510a6866517f8e6b942100d351de4",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/generated/encoding.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/generated/halving.rs",
+      "bytes": 1343,
+      "sha256": "909d269795be3cba718cecd0c66ccaa60b77826e59e21358d44cb75ae8848003",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/generated/halving.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/generated/literal_halves.rs",
+      "bytes": 1512,
+      "sha256": "1acbcfcf8ba95f3dd489b49df32fd789574e9340133882f3620f987cb5d933a4",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/generated/literal_halves.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/generated/parse_packet.rs",
+      "bytes": 708,
+      "sha256": "22e2eeed7d63c5570a8e1a4b662307f97daa39c43f30195a631f20979f56a77b",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/generated/parse_packet.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/generated/polynomial.rs",
+      "bytes": 517,
+      "sha256": "782c0ee85216824242a36d097f1761d770e8f40654323a4b7c9fe740f8a2f049",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/generated/polynomial.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/generated/rational.rs",
+      "bytes": 1985,
+      "sha256": "fa332b8799f834ed2fddd175317a6a69194c8c30f8f360a8e4086b34452dfb2f",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/generated/rational.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/lean/ChainDescent.lean",
+      "bytes": 6600,
+      "sha256": "81992c0f4f4af00a5b3e94fea24542ac32660fdc4416403f3fe9fadf521df305",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/lean/ChainDescent.lean",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/materialize.py",
+      "bytes": 1930,
+      "sha256": "5cbbbaa7b0a94508473a0f9a175074c9d6b41b5612a89954742c47a06ec0eb2f",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/materialize.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/src/bin/audit_chain.rs",
+      "bytes": 5105,
+      "sha256": "8e3f189bd8c5bfccee5e4f5f5e1d8a4b00d3858d3ed44be99f6afa3b9cd15266",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/src/bin/audit_chain.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/src/lib.rs",
+      "bytes": 18707,
+      "sha256": "71e12fc1d1737d768978914c68d787403cf0479ee4d15944717274dc46f2df48",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/src/lib.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/src/rational.rs",
+      "bytes": 3678,
+      "sha256": "d8f2693fb8d835ce197d9d10c79e8cefb7e62dc370a4d8bda6a61482c0cdfe9c",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/src/rational.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/actual-source/src/tests.rs",
+      "bytes": 17508,
+      "sha256": "ea271e9a0ad9c95a1c84f3c76a7c7194c9a663ffe6e12a2ef1b60e2410eb2723",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/actual-source/src/tests.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/auditor-actual-path.txt",
+      "bytes": 87,
+      "sha256": "32edc2be29f264946e446a4f9f0672676ad940cba347c596a5635c57d7e0115a",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/auditor-actual-path.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/auditor-compile.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/auditor-compile.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/auditor-compile.stderr.txt",
+      "bytes": 228,
+      "sha256": "34c372a836673a18655dfcd806eec5a85d8f7531fa8d6151b1bcf87e3c98b0c9",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/auditor-compile.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/auditor-compile.txt",
+      "bytes": 96022,
+      "sha256": "f381a2d1dedb146157f389d64aa790da2d137cdf5e50356b2ef9bfc4a7dbd3f4",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/auditor-compile.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/auditor-compiled-custody.json",
+      "bytes": 1469,
+      "sha256": "ffdceb807c417a81ec623ebc644c49ed275bb89da61f27388492d5e9046edfd3",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/auditor-compiled-custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/chain-compile.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/chain-compile.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/chain-compile.stderr.txt",
+      "bytes": 228,
+      "sha256": "916be10e2256cd78027e3504b58018458b69a414d2adb51ae93a32bfbed527db",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/chain-compile.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/chain-compile.txt",
+      "bytes": 92915,
+      "sha256": "c90b0218d30e928e156cfa4cf2a509e7713e99640811348f79d44cb671a6bbf5",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/chain-compile.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/chain-compiled-binary.json",
+      "bytes": 1576,
+      "sha256": "9a52c55cded3b98dec66ee43f680dff35cf0d881e939ce93fb3c65eb59651a03",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/chain-compiled-binary.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/chain-original-compiled-test.bin",
+      "bytes": 4483904,
+      "sha256": "18dd229d2ec4a78465b86a431761a7f4071f262d5e9f5d690221ed7896388ef3",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/chain-original-compiled-test.bin",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/engine-prepared.json",
+      "bytes": 1798,
+      "sha256": "d83db577c26d092fab59359fb6e4c0132511e81bf51133e4941abf30bc950858",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/engine-prepared.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/engine-reused.json",
+      "bytes": 2044,
+      "sha256": "e5d886ce19fe22497af4b2542dc090afdb66fa8e9791ff488c1e142419f2b72d",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/engine-reused.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/final-prior-inputs.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/final-prior-inputs.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/final-prior-inputs.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/final-prior-inputs.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/final-prior-inputs.txt",
+      "bytes": 75060,
+      "sha256": "efb2c6f660c6d6836c228ce2aa2f8b5ab62e32745c201e7d1680f2384f108611",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/final-prior-inputs.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/finish.txt",
+      "bytes": 21,
+      "sha256": "d043769ec8a5c1006d05a31610305c1d81ea8e43dfc9f416eb34bd664c3aa73d",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/finish.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/metadata.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/metadata.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/metadata.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/metadata.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/metadata.txt",
+      "bytes": 161616,
+      "sha256": "619ba0f08f4a3e7407da36bd386e22fbf167fa24215013a10d309b8585a8594d",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/metadata.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/original-command.sh",
+      "bytes": 2043,
+      "sha256": "1af9e0017c24a8c94fabf81063aaac19eb53f747653aa2bb04c9351a2eae6716",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/original-command.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/original-engine-preparation.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/original-engine-preparation.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/original-engine-preparation.stderr.txt",
+      "bytes": 62,
+      "sha256": "9576f1f7e73fc2bb1ec2336aae60cb485c591eadc60a1b998573411c34057e08",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/original-engine-preparation.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/original-engine-preparation.txt",
+      "bytes": 736,
+      "sha256": "33202632055a9ad43985e64e882179cd93622db747eb5db3e9488f60b570d150",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/original-engine-preparation.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/original.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/original.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/prior-inputs.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/prior-inputs.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/prior-inputs.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/prior-inputs.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/prior-inputs.txt",
+      "bytes": 75060,
+      "sha256": "efb2c6f660c6d6836c228ce2aa2f8b5ab62e32745c201e7d1680f2384f108611",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/prior-inputs.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-build-02/start.txt",
+      "bytes": 21,
+      "sha256": "f4f562ba6a09831a024d18794b2c8dd5829d7e36a9df26e140d44aa267747cdc",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-build-02/start.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_ALL_EXCEPTIONALS-entire-actual-records-omitted.txt",
+      "bytes": 9357465,
+      "sha256": "8180275ae8e0e85957e3faf5e84db7e743b3ae5e3b5de068571aa6ec9784ad7c",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_ALL_EXCEPTIONALS-entire-actual-records-omitted.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_ALL_EXCEPTIONALS-omission.exit",
+      "bytes": 4,
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_ALL_EXCEPTIONALS-omission.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_ALL_EXCEPTIONALS-omission.txt",
+      "bytes": 271,
+      "sha256": "b09e8d6391506c0413340efdffb0a5d6a958438ffdd8844ec53fc50e68b7b5c0",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_ALL_EXCEPTIONALS-omission.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_ALL_PUBLIC-entire-actual-records-omitted.txt",
+      "bytes": 14973944,
+      "sha256": "961456570467d6c3b5b13b561cd5b24b35b1ae969970572a35bc136e16ac5bc4",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_ALL_PUBLIC-entire-actual-records-omitted.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_ALL_PUBLIC-omission.exit",
+      "bytes": 4,
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_ALL_PUBLIC-omission.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_ALL_PUBLIC-omission.txt",
+      "bytes": 271,
+      "sha256": "30a1197551537fd41c3a7166c1c889e8692ade22fdf4106f9640158f691a89c7",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_ALL_PUBLIC-omission.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_EXCEPTIONAL_CASE-entire-actual-records-omitted.txt",
+      "bytes": 9306927,
+      "sha256": "be26e10c6682deb3300eb06d380f81c3fb4333ab7f901c17e602db98c17a1dff",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_EXCEPTIONAL_CASE-entire-actual-records-omitted.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_EXCEPTIONAL_CASE-omission.exit",
+      "bytes": 4,
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_EXCEPTIONAL_CASE-omission.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_EXCEPTIONAL_CASE-omission.txt",
+      "bytes": 270,
+      "sha256": "38f35a3346c5dbabaab203c72de95b25764e4427c2ab89f1f5a408112080e5ca",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_EXCEPTIONAL_CASE-omission.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_SELECTED_CALL_VECTORS-entire-actual-records-omitted.txt",
+      "bytes": 15492547,
+      "sha256": "a4deef644c6edb72a4d385c41d4f18b096f86a68f9fd03ffcf9a5733870fe264",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_SELECTED_CALL_VECTORS-entire-actual-records-omitted.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_SELECTED_CALL_VECTORS-omission.exit",
+      "bytes": 4,
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_SELECTED_CALL_VECTORS-omission.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_SELECTED_CALL_VECTORS-omission.txt",
+      "bytes": 271,
+      "sha256": "1cb431b2c96f6b42f25a9049258cc3c315e532f64e0b2f6baad47e47813f1b9a",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/N4_FIXED_CHAIN_SELECTED_CALL_VECTORS-omission.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/actual-before-native-auditor.bin",
+      "bytes": 639904,
+      "sha256": "59922cf3f7f6f5675437710d87438ed855a66418ba098f99b0d08e4038fce6a1",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/actual-before-native-auditor.bin",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/actual-before-native-test.bin",
+      "bytes": 4483904,
+      "sha256": "18dd229d2ec4a78465b86a431761a7f4071f262d5e9f5d690221ed7896388ef3",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/actual-before-native-test.bin",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/all695-compared.json",
+      "bytes": 123633074,
+      "sha256": "da48602ba10420d3363be3df874ca3c8eb805cad0615eeb403710a6a03a60f36",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/all695-compared.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/all695-expected.json",
+      "bytes": 123633074,
+      "sha256": "da48602ba10420d3363be3df874ca3c8eb805cad0615eeb403710a6a03a60f36",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/all695-expected.json",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct82-fixed-chain-evaluator-native-01/all695-compared.json"
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/auditor-actual-path.txt",
+      "bytes": 87,
+      "sha256": "32edc2be29f264946e446a4f9f0672676ad940cba347c596a5635c57d7e0115a",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/auditor-actual-path.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/compare695.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/compare695.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/compare695.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/compare695.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/final-auditor-bytes.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/final-auditor-bytes.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/final-auditor-bytes.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/final-auditor-bytes.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/final-prior1080.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/final-prior1080.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/final-prior1080.txt",
+      "bytes": 75060,
+      "sha256": "efb2c6f660c6d6836c228ce2aa2f8b5ab62e32745c201e7d1680f2384f108611",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/final-prior1080.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/final-test-bytes.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/final-test-bytes.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/final-test-bytes.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/final-test-bytes.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/finish.txt",
+      "bytes": 21,
+      "sha256": "918639a5e3b45f295a1a5052bf202b63c350d9b63658beed0fd04c10ff62559f",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/finish.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/freeze695.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/freeze695.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/freeze695.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/freeze695.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/immediate-original-gate.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/immediate-original-gate.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/immediate-original-gate.txt",
+      "bytes": 196,
+      "sha256": "80efb5e0b58ddef6a4ee5932d3e87a06e25fefcfc505119139d134e7bc0542e2",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/immediate-original-gate.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/initial-prior1080.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/initial-prior1080.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/initial-prior1080.txt",
+      "bytes": 75060,
+      "sha256": "efb2c6f660c6d6836c228ce2aa2f8b5ab62e32745c201e7d1680f2384f108611",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/initial-prior1080.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/native.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/native.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/native.txt",
+      "bytes": 15584399,
+      "sha256": "8509d64fec9f7f4054f0ac9d876e2db70e00009b5a768a660ec2f5d57dac1d64",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/native.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/old-sixteen.json",
+      "bytes": 43111384,
+      "sha256": "f8c77d8aa6a0a134aa7836fc9d4f2be662bb5eee9da6bf33770a934d11296312",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/old-sixteen.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/original-command.sh",
+      "bytes": 2349,
+      "sha256": "71b7e91576e5f597a9ff76ac6733e5aa034bb35f24218ea516eb0377b9d7bb1c",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/original-command.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/original.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/original.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/phases.txt",
+      "bytes": 370,
+      "sha256": "7cd9ba3aa390ab381f0f7bad725ef331d27184ef8863b587f408c8234f6c53b6",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/phases.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/runtime-custody.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/runtime-custody.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/runtime-custody.json",
+      "bytes": 6586,
+      "sha256": "9ce91aa825d091ebce5461e0ac0164633e18a13dedf8f5d4934f8fd7220afc81",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/runtime-custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/runtime-custody.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/runtime-custody.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/start.txt",
+      "bytes": 21,
+      "sha256": "21278da1d5bbc60bdbe79e0d1890b4aeb0812935310190d1447137d5862aa944",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/start.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-evaluator-native-01/test-actual-path.txt",
+      "bytes": 124,
+      "sha256": "018304e5fbf84ca413b213984d2942e9e8d3b21069e9a04e4655927f08371ee4",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-evaluator-native-01/test-actual-path.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta",
+      "bytes": 8306696,
+      "sha256": "bc0eb459fb4959fd22afef379eaa30ef4b226729177a023075d916b75d1bb416",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta"
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/actual-prepared-original-engine/libisogeny_algos.rlib",
+      "bytes": 49789168,
+      "sha256": "15e4ed73ecf373485f8ec408dc8ec31c3ac3e9cd0e1fc472ebc6a7798a971a0c",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/actual-prepared-original-engine/libisogeny_algos.rlib",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos.rlib"
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/actual-source/.gitignore",
+      "bytes": 21,
+      "sha256": "25363254190831a58ddf8af349902a50bbc9e437e7ae32d5b445940114179e8a",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/actual-source/.gitignore",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/actual-source/Cargo.lock",
+      "bytes": 7238,
+      "sha256": "cdfc2bc1ba343f415d0fbee4b38635e66fc19857ee2f315e136c2b5a2c132e39",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/actual-source/Cargo.lock",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/actual-source/Cargo.toml",
+      "bytes": 992,
+      "sha256": "29c9c215f504dc7fee77273a6bb42989a6dacddc9287a207d5ccb0be52585c56",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/actual-source/Cargo.toml",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/actual-source/README.md",
+      "bytes": 1944,
+      "sha256": "4b879cb7f9d1cf0fac8b468dfae4741cdfc12285b2f9cdd22441a212570fcc5a",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/actual-source/README.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/actual-source/build-only-01.sh",
+      "bytes": 1835,
+      "sha256": "4d84678ebfae9b5a50674232a12802b2381aa7c58235044231e3a394ca9a62fc",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/actual-source/build-only-01.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/actual-source/capture_engine.py",
+      "bytes": 2858,
+      "sha256": "ed80f92ee7b8c9c1ecb8d2fd81c245c460eea3e78704133c5de3207572c039e2",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/actual-source/capture_engine.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/actual-source/frozen-prior-inputs-01.sha256",
+      "bytes": 139090,
+      "sha256": "7b0667f95603623cbae968333811b92bd2bfe91989064f7a3ff22ad81ab35b6d",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/actual-source/frozen-prior-inputs-01.sha256",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/actual-source/generated/adapter.rs",
+      "bytes": 19132,
+      "sha256": "89bf7d914b918b7607750ae22b82187c3df294f13c1c5bcb4c85f314b470d041",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/actual-source/generated/adapter.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/actual-source/generated/custody.json",
+      "bytes": 1775,
+      "sha256": "5be2e294d4a1919535d19d33540bfd36066541a751557f3e0a8a941182ab7477",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/actual-source/generated/custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/actual-source/generated/norm.rs",
+      "bytes": 22302,
+      "sha256": "1badf36600c737dd68b5823102659f3e2dca7463b51c47a246dab7819e1283bd",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/actual-source/generated/norm.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/actual-source/generated/quadratic.rs",
+      "bytes": 13879,
+      "sha256": "e4d6e9302a00ea6b148bb630764aef54cabdc091b58d8da42e886574bfa877e2",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/actual-source/generated/quadratic.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/actual-source/materialize.py",
+      "bytes": 1710,
+      "sha256": "0c0f940f3cadc96106b4d8a0f926a8c11f3270b1ecc11086a215ee1ee6861ac0",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/actual-source/materialize.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/actual-source/src/lib.rs",
+      "bytes": 5150,
+      "sha256": "b539ead2cd255cffdc0b4125cacd8075b04400c2a91abf9ca42deb186430a3b5",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/actual-source/src/lib.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/actual-source/src/tests.rs",
+      "bytes": 10616,
+      "sha256": "d9ae2a5116fa030adb949a993dff7af4f425fad0d6a3657b88d16b11b3b5b508",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/actual-source/src/tests.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/engine-prepared.json",
+      "bytes": 1796,
+      "sha256": "b54b339985cdeded397735f6eaf2cf6c84af0b6ed6e43754da2e169bf018ce28",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/engine-prepared.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/engine-reused.json",
+      "bytes": 2044,
+      "sha256": "e5d886ce19fe22497af4b2542dc090afdb66fa8e9791ff488c1e142419f2b72d",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/engine-reused.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/final-prior-inputs.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/final-prior-inputs.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/final-prior-inputs.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/final-prior-inputs.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/final-prior-inputs.txt",
+      "bytes": 73370,
+      "sha256": "25eec89f1d3fc64d9a505a88056cc03b232122d58edde598ae833c865168ee92",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/final-prior-inputs.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/finish.txt",
+      "bytes": 21,
+      "sha256": "2674bbfe933e51e0f9ea473297f8646fb6052f5c6544e769c2f2d2d64dbda753",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/finish.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/geometry-compile.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/geometry-compile.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/geometry-compile.stderr.txt",
+      "bytes": 970,
+      "sha256": "a079c24546072e111cd5c97aeb6c9625414e51eafaed100e3afd8d1d4c53eca6",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/geometry-compile.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/geometry-compile.txt",
+      "bytes": 93163,
+      "sha256": "9e4f4140234971d4c7154a5adf447904fdd6bc628e2658c7754fa6b6fa42978f",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/geometry-compile.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/geometry-compiled-binary.json",
+      "bytes": 1496,
+      "sha256": "22793faae945d4d50835b6bb2e73e25c8ea90f8064b481a28e115c400a67e31c",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/geometry-compiled-binary.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/geometry-original-compiled-test.bin",
+      "bytes": 5143528,
+      "sha256": "e56960caa538d1cc4d3aa4d7f77ac6c959330b2223eca96aa7cc4bcf262bc011",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/geometry-original-compiled-test.bin",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/metadata.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/metadata.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/metadata.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/metadata.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/metadata.txt",
+      "bytes": 155674,
+      "sha256": "93a2de380582935e6e5de7f13bae4217312c4d13826135d9c53777a5d943f9dd",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/metadata.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/original-command.sh",
+      "bytes": 1835,
+      "sha256": "4d84678ebfae9b5a50674232a12802b2381aa7c58235044231e3a394ca9a62fc",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/original-command.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/original-engine-preparation.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/original-engine-preparation.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/original-engine-preparation.stderr.txt",
+      "bytes": 62,
+      "sha256": "9576f1f7e73fc2bb1ec2336aae60cb485c591eadc60a1b998573411c34057e08",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/original-engine-preparation.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/original-engine-preparation.txt",
+      "bytes": 736,
+      "sha256": "33202632055a9ad43985e64e882179cd93622db747eb5db3e9488f60b570d150",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/original-engine-preparation.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/original.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/original.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/prior-inputs.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/prior-inputs.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/prior-inputs.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/prior-inputs.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/prior-inputs.txt",
+      "bytes": 73370,
+      "sha256": "25eec89f1d3fc64d9a505a88056cc03b232122d58edde598ae833c865168ee92",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/prior-inputs.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-01/start.txt",
+      "bytes": 21,
+      "sha256": "14d2b73e13c9cf876d10ef03d67e805d5a23e1c2a4a7a393bf36aa231a9e8948",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-01/start.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta",
+      "bytes": 8306696,
+      "sha256": "bc0eb459fb4959fd22afef379eaa30ef4b226729177a023075d916b75d1bb416",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta"
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-prepared-original-engine/libisogeny_algos.rlib",
+      "bytes": 49789168,
+      "sha256": "15e4ed73ecf373485f8ec408dc8ec31c3ac3e9cd0e1fc472ebc6a7798a971a0c",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-prepared-original-engine/libisogeny_algos.rlib",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct82-fixed-chain-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos.rlib"
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-source/.gitignore",
+      "bytes": 21,
+      "sha256": "25363254190831a58ddf8af349902a50bbc9e437e7ae32d5b445940114179e8a",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-source/.gitignore",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-source/Cargo.lock",
+      "bytes": 7238,
+      "sha256": "cdfc2bc1ba343f415d0fbee4b38635e66fc19857ee2f315e136c2b5a2c132e39",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-source/Cargo.lock",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-source/Cargo.toml",
+      "bytes": 991,
+      "sha256": "8fd5165bdf83b82460641bdb274d9862405ee66e7dfdd113115573f8f3e43765",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-source/Cargo.toml",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-source/README.md",
+      "bytes": 1944,
+      "sha256": "4b879cb7f9d1cf0fac8b468dfae4741cdfc12285b2f9cdd22441a212570fcc5a",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-source/README.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-source/build-only-01.sh",
+      "bytes": 1835,
+      "sha256": "4d84678ebfae9b5a50674232a12802b2381aa7c58235044231e3a394ca9a62fc",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-source/build-only-01.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-source/capture_engine.py",
+      "bytes": 2858,
+      "sha256": "ed80f92ee7b8c9c1ecb8d2fd81c245c460eea3e78704133c5de3207572c039e2",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-source/capture_engine.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-source/frozen-prior-inputs-01.sha256",
+      "bytes": 139090,
+      "sha256": "7b0667f95603623cbae968333811b92bd2bfe91989064f7a3ff22ad81ab35b6d",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-source/frozen-prior-inputs-01.sha256",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-source/generated/adapter.rs",
+      "bytes": 19132,
+      "sha256": "89bf7d914b918b7607750ae22b82187c3df294f13c1c5bcb4c85f314b470d041",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-source/generated/adapter.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-source/generated/custody.json",
+      "bytes": 1775,
+      "sha256": "5be2e294d4a1919535d19d33540bfd36066541a751557f3e0a8a941182ab7477",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-source/generated/custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-source/generated/norm.rs",
+      "bytes": 22302,
+      "sha256": "1badf36600c737dd68b5823102659f3e2dca7463b51c47a246dab7819e1283bd",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-source/generated/norm.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-source/generated/quadratic.rs",
+      "bytes": 13879,
+      "sha256": "e4d6e9302a00ea6b148bb630764aef54cabdc091b58d8da42e886574bfa877e2",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-source/generated/quadratic.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-source/materialize.py",
+      "bytes": 1710,
+      "sha256": "0c0f940f3cadc96106b4d8a0f926a8c11f3270b1ecc11086a215ee1ee6861ac0",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-source/materialize.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-source/run-native-01.sh",
+      "bytes": 1363,
+      "sha256": "c3c51319bb864a75c7655bef1e362d179e45be56e6bc0e44beb9fd889876a6b8",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-source/run-native-01.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-source/runtime_custody.py",
+      "bytes": 1557,
+      "sha256": "4d24af440fb738a9d0b998968f764039ec2328da6da93e35a96a065ebc9e1b82",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-source/runtime_custody.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-source/src/lib.rs",
+      "bytes": 5150,
+      "sha256": "b539ead2cd255cffdc0b4125cacd8075b04400c2a91abf9ca42deb186430a3b5",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-source/src/lib.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/actual-source/src/tests.rs",
+      "bytes": 10616,
+      "sha256": "d9ae2a5116fa030adb949a993dff7af4f425fad0d6a3657b88d16b11b3b5b508",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/actual-source/src/tests.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/engine-prepared.json",
+      "bytes": 1796,
+      "sha256": "eb7a3cc3af0f24a7f4792055fb979fec0b2dcefd026cb492b41cb5957c88b794",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/engine-prepared.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/engine-reused.json",
+      "bytes": 2044,
+      "sha256": "e5d886ce19fe22497af4b2542dc090afdb66fa8e9791ff488c1e142419f2b72d",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/engine-reused.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/final-prior-inputs.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/final-prior-inputs.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/final-prior-inputs.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/final-prior-inputs.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/final-prior-inputs.txt",
+      "bytes": 73370,
+      "sha256": "25eec89f1d3fc64d9a505a88056cc03b232122d58edde598ae833c865168ee92",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/final-prior-inputs.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/finish.txt",
+      "bytes": 21,
+      "sha256": "e87d608fc51f264383cb15646c43ef5814e43f2e20529fcdc837b04ca207af11",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/finish.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/geometry-compile.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/geometry-compile.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/geometry-compile.stderr.txt",
+      "bytes": 62,
+      "sha256": "9576f1f7e73fc2bb1ec2336aae60cb485c591eadc60a1b998573411c34057e08",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/geometry-compile.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/geometry-compile.txt",
+      "bytes": 93156,
+      "sha256": "58c136e3d90bfa2d8ef1f2a3b969c981a875703dad8dcc292c870aa4ca7dad38",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/geometry-compile.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/geometry-compiled-binary.json",
+      "bytes": 1495,
+      "sha256": "b8e7e81a7873bee47119837b401ef8e4cf8faf94541352a0b6f6ecf4f9c86ea4",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/geometry-compiled-binary.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/geometry-original-compiled-test.bin",
+      "bytes": 5143528,
+      "sha256": "e56960caa538d1cc4d3aa4d7f77ac6c959330b2223eca96aa7cc4bcf262bc011",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/geometry-original-compiled-test.bin",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct82-fixed-chain-geometry-build-01/geometry-original-compiled-test.bin"
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/metadata.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/metadata.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/metadata.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/metadata.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/metadata.txt",
+      "bytes": 155674,
+      "sha256": "93a2de380582935e6e5de7f13bae4217312c4d13826135d9c53777a5d943f9dd",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/metadata.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/original-command.sh",
+      "bytes": 1835,
+      "sha256": "4d84678ebfae9b5a50674232a12802b2381aa7c58235044231e3a394ca9a62fc",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/original-command.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/original-engine-preparation.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/original-engine-preparation.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/original-engine-preparation.stderr.txt",
+      "bytes": 62,
+      "sha256": "222a02ed477d249a21359df8cae975864a62d848f4739cadc5b00b6190a963c6",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/original-engine-preparation.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/original-engine-preparation.txt",
+      "bytes": 736,
+      "sha256": "33202632055a9ad43985e64e882179cd93622db747eb5db3e9488f60b570d150",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/original-engine-preparation.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/original.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/original.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/prior-inputs.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/prior-inputs.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/prior-inputs.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/prior-inputs.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/prior-inputs.txt",
+      "bytes": 73370,
+      "sha256": "25eec89f1d3fc64d9a505a88056cc03b232122d58edde598ae833c865168ee92",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/prior-inputs.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-build-02/start.txt",
+      "bytes": 21,
+      "sha256": "d3347740616d21693433f5cdbe8de0b0d0c4548f16f89657bbbae31d0d6b6a59",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-build-02/start.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/actual-before-native-test.bin",
+      "bytes": 5143528,
+      "sha256": "e56960caa538d1cc4d3aa4d7f77ac6c959330b2223eca96aa7cc4bcf262bc011",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/actual-before-native-test.bin",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct82-fixed-chain-geometry-build-01/geometry-original-compiled-test.bin"
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/all-thirteen-whole-records.json",
+      "bytes": 11514935,
+      "sha256": "e357f0cfeddc775cc1556abcd0fe9b5d62b8aadd3d642cf398f30231856b2b08",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/all-thirteen-whole-records.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/final-prior-inputs.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/final-prior-inputs.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/final-prior-inputs.txt",
+      "bytes": 73370,
+      "sha256": "25eec89f1d3fc64d9a505a88056cc03b232122d58edde598ae833c865168ee92",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/final-prior-inputs.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/final-runtime-bytes.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/final-runtime-bytes.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/final-runtime-bytes.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/final-runtime-bytes.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/finish.txt",
+      "bytes": 21,
+      "sha256": "0708703fe789dea75abde4801e7460898b6d293dbfc593580a1ff287e96268c2",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/finish.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/immediate-original-gate.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/immediate-original-gate.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/immediate-original-gate.txt",
+      "bytes": 196,
+      "sha256": "484d30d766338895789d4427b10b35cbe137a10b808b40930491e778110e68f7",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/immediate-original-gate.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/initial-prior-inputs.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/initial-prior-inputs.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/initial-prior-inputs.txt",
+      "bytes": 73370,
+      "sha256": "25eec89f1d3fc64d9a505a88056cc03b232122d58edde598ae833c865168ee92",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/initial-prior-inputs.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/native.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/native.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/native.txt",
+      "bytes": 1796715,
+      "sha256": "e56436e694ec14fcd518582c0b385410df2eefa4bf6d9614e747e9e2cd2ad746",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/native.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/original-command.sh",
+      "bytes": 1363,
+      "sha256": "c3c51319bb864a75c7655bef1e362d179e45be56e6bc0e44beb9fd889876a6b8",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/original-command.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/original.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/original.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/runtime-custody.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/runtime-custody.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/runtime-custody.json",
+      "bytes": 4037,
+      "sha256": "792c40629229153e0166c7eaa109de4a61a4a873178a2963bc39bc8a0e0d570b",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/runtime-custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/runtime-custody.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/runtime-custody.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/start.txt",
+      "bytes": 21,
+      "sha256": "0a6efe23f9231f56cb56f1f52a1a9014bcfbe4de38970089b1750e681dc17dbe",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/start.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-chain-geometry-native-01/test-actual-path.txt",
+      "bytes": 114,
+      "sha256": "03f8c942fd9112896ca493587becf6612791d127488f51f4e3e39ccd3ff58bc4",
+      "local_original": "/workspace/scratch/ct82-fixed-chain-geometry-native-01/test-actual-path.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-geometry-report-01/draft-before-spacing-01/page-1.png",
+      "bytes": 288903,
+      "sha256": "ee0a4ef3d8f321b4b19e99ac4d0429e10f8e78bbc0f944b550d9a60ac065a470",
+      "local_original": "/workspace/scratch/ct82-fixed-geometry-report-01/draft-before-spacing-01/page-1.png",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-geometry-report-01/draft-before-spacing-01/page-2.png",
+      "bytes": 295737,
+      "sha256": "4f8df7a563c091f608ea0939054120c8b1f75fd2b4c38012da0280e7b92d31a0",
+      "local_original": "/workspace/scratch/ct82-fixed-geometry-report-01/draft-before-spacing-01/page-2.png",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-geometry-report-01/draft-before-spacing-01/report.pdf",
+      "bytes": 52875,
+      "sha256": "6ebd9d58722af6cee33848dbdfccee1eb1396b12ab55835a94d23ec0679e43a9",
+      "local_original": "/workspace/scratch/ct82-fixed-geometry-report-01/draft-before-spacing-01/report.pdf",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-geometry-report-01/draft-before-spacing-01/report.typ",
+      "bytes": 7344,
+      "sha256": "437ba28199fcb3d5aec0b1947c3f6ff1fc9e2cf09c25e2b05e2b90b5ce95d55d",
+      "local_original": "/workspace/scratch/ct82-fixed-geometry-report-01/draft-before-spacing-01/report.typ",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-geometry-report-01/page-1.png",
+      "bytes": 288492,
+      "sha256": "1b542891f7680caff456d470b5d23d5dc48e646595b6cc6674ee2ba958ef6e38",
+      "local_original": "/workspace/scratch/ct82-fixed-geometry-report-01/page-1.png",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-geometry-report-01/page-2.png",
+      "bytes": 296954,
+      "sha256": "a86fec4a27209eabf97897e397aba044f1c1807620b5a3ad0cfe798833bd0341",
+      "local_original": "/workspace/scratch/ct82-fixed-geometry-report-01/page-2.png",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-geometry-report-01/render.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-geometry-report-01/render.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-geometry-report-01/render02.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fixed-geometry-report-01/render02.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-geometry-report-01/report.pdf",
+      "bytes": 52872,
+      "sha256": "892785e9ef73e89840fe756bab577b702a8501e08bf235f16289f17f8b9345cb",
+      "local_original": "/workspace/scratch/ct82-fixed-geometry-report-01/report.pdf",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fixed-geometry-report-01/report.typ",
+      "bytes": 7392,
+      "sha256": "3cf5024a5690f03090c95fe9c6c9ee03327913eb4a82ee949f7ac553f63de971",
+      "local_original": "/workspace/scratch/ct82-fixed-geometry-report-01/report.typ",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/actual-CI-auditor-N4_FOURTH_MATCHED_ENDPOINTS-omission.exit",
+      "bytes": 4,
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/actual-CI-auditor-N4_FOURTH_MATCHED_ENDPOINTS-omission.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/actual-CI-auditor-N4_FOURTH_MATCHED_ENDPOINTS-omission.txt",
+      "bytes": 255,
+      "sha256": "0086db6cd5c46c3b606dd10c56c6b3bf8e54181c112f7c9805b4eaec90b3c833",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/actual-CI-auditor-N4_FOURTH_MATCHED_ENDPOINTS-omission.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/actual-CI-auditor-N4_FOURTH_PUBLIC-omission.exit",
+      "bytes": 4,
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/actual-CI-auditor-N4_FOURTH_PUBLIC-omission.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/actual-CI-auditor-N4_FOURTH_PUBLIC-omission.txt",
+      "bytes": 255,
+      "sha256": "157b83bc3a17562d18d856fee173a51105072fd41f24582ca994d92579ba0454",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/actual-CI-auditor-N4_FOURTH_PUBLIC-omission.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/actual-CI-auditor-positive.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/actual-CI-auditor-positive.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/actual-CI-auditor-positive.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/actual-CI-auditor-positive.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/actual-CI-auditor-whole-five-control.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/actual-CI-auditor-whole-five-control.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/actual-CI-auditor-whole-five-control.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/actual-CI-auditor-whole-five-control.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/all-original-phase-exits.json",
+      "bytes": 2132,
+      "sha256": "5a6c3b7dcaa38ef3ac43f0085c441dda1c90bab435a609878ac329e0c381c0bb",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/all-original-phase-exits.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/artifacts-api.json",
+      "bytes": 1094,
+      "sha256": "ca0b7c5999fd0077023f07c4e072e75e559f86c6437661e401b80e7f991d8d19",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/artifacts-api.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/audit-input/N4_FOURTH_MATCHED_ENDPOINTS-entire-actual-record-omitted.txt",
+      "bytes": 8315463,
+      "sha256": "5c5a6d975aa4d87bffa354d21ab731afd084825d1cca1d819b61f0a83a242529",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/audit-input/N4_FOURTH_MATCHED_ENDPOINTS-entire-actual-record-omitted.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/audit-input/N4_FOURTH_PUBLIC-entire-actual-record-omitted.txt",
+      "bytes": 8385963,
+      "sha256": "8b121f97ae4f234d21032f1a389e46bbe767b0cb76733f92100ea5bb22701d5c",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/audit-input/N4_FOURTH_PUBLIC-entire-actual-record-omitted.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/audit-input/actual-compiled-auditor.bin",
+      "bytes": 636456,
+      "sha256": "bc946b2de958bf98a8f4ac53c2e1465eb52e8eeaad07caca9a74a66650ace838",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/audit-input/actual-compiled-auditor.bin",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/audit-input/actual-old-third-dual.txt",
+      "bytes": 51202,
+      "sha256": "5024e71ee43e6666bb6acc38db71d6855c7b79a1613f5a7d48485df4d0cb622c",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/audit-input/actual-old-third-dual.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/audit-input/all-sixteen-expected.json",
+      "bytes": 43111384,
+      "sha256": "f8c77d8aa6a0a134aa7836fc9d4f2be662bb5eee9da6bf33770a934d11296312",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/audit-input/all-sixteen-expected.json",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct82-fixed-chain-evaluator-native-01/old-sixteen.json"
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/audit-input/old-nine-expected.json",
+      "bytes": 20618844,
+      "sha256": "4ddfcba9151ee522988611a370161122d30109f77c26f39c34a58cfa386f0060",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/audit-input/old-nine-expected.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/audit-input/paired-fourth-native.txt",
+      "bytes": 8389449,
+      "sha256": "1ed91eae61f32280273f752d866a834616c007af0446a3502812066d96f0d15e",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/audit-input/paired-fourth-native.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/audit-input/whole-five-control-accepted.json",
+      "bytes": 284557,
+      "sha256": "aa39a7823e3b0111b1ab1b326f7829488fa9c4d21b0a338f8e951c3677dfbd37",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/audit-input/whole-five-control-accepted.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/audit-input/whole-five-original-control.json",
+      "bytes": 284557,
+      "sha256": "aa39a7823e3b0111b1ab1b326f7829488fa9c4d21b0a338f8e951c3677dfbd37",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/audit-input/whole-five-original-control.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/audit-input/whole-positive-accepted.json",
+      "bytes": 43111384,
+      "sha256": "f8c77d8aa6a0a134aa7836fc9d4f2be662bb5eee9da6bf33770a934d11296312",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/audit-input/whole-positive-accepted.json",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct82-fixed-chain-evaluator-native-01/old-sixteen.json"
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/audit-observation.json",
+      "bytes": 1059,
+      "sha256": "4319f5c298dd5ca64ab1814721171ab431db4f513c7ddaf7c84df55ebcc8b0d8",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/audit-observation.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/connector-whole-log-failure.json",
+      "bytes": 210,
+      "sha256": "94706eab5bc599a6309f59bd5b1923c166c13dc39ca3a08038dbaf0b15c51b01",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/connector-whole-log-failure.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/connector-whole-log-retry-failure.json",
+      "bytes": 210,
+      "sha256": "94706eab5bc599a6309f59bd5b1923c166c13dc39ca3a08038dbaf0b15c51b01",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/connector-whole-log-retry-failure.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/jobs-api.json",
+      "bytes": 2959,
+      "sha256": "52360a5fb4e64225b9617600c6512fdec59ef40aba7b6b7b30df8f848b516f10",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/jobs-api.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/log-retrieval-diagnosis.json",
+      "bytes": 422,
+      "sha256": "538972d839475fed39d4717ce7cc89d6fa7b9bdfdf38b50d96325c082c69635c",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/log-retrieval-diagnosis.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/whole-job-from-run-zip.log",
+      "bytes": 8972686,
+      "sha256": "25302576710c88f7e5829bd95e14b75159b3d07746342ea528af80a8cb6bb79f",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/whole-job-from-run-zip.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/whole-job.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/whole-job.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/whole-log-cli.exit",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/whole-log-cli.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/whole-members.json",
+      "bytes": 28491,
+      "sha256": "ad524191a8958a7e6e6091f992d308bc35410142a5fee3d7508a71e846a1b7e1",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/whole-members.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/whole-original-artifact.zip",
+      "bytes": 35654567,
+      "sha256": "48ff0906f647f8b853fbf2670b0aee949a162ac8ebf91c083e5cd13abbcb1809",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/whole-original-artifact.zip",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/whole-run-log-members.json",
+      "bytes": 2960,
+      "sha256": "dc777372483754ee6ae70c46f6262079d3271f1871a2e4772e4f774ea7f8eabc",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/whole-run-log-members.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/whole-run-logs-cli.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/whole-run-logs-cli.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-fourth24-CI-acceptance-01/whole-run-logs.zip",
+      "bytes": 2247565,
+      "sha256": "8034dd39c857994dc5fe2abfd627a0ccf4996b7072f0367c746c127e9a09ded8",
+      "local_original": "/workspace/scratch/ct82-fourth24-CI-acceptance-01/whole-run-logs.zip",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-full-group-norm-proof-01/consumer/experiments_chained-transfer-public-target_fixed-jacobian-chain-evaluator-01_lean_FullGroupNorm_lean/audit.log",
+      "bytes": 591,
+      "sha256": "677af623e3d7c0a40d934404ccedd2ed1c1f312856d9f9a64594986f8cf9725a",
+      "local_original": "/workspace/scratch/ct82-full-group-norm-proof-01/consumer/experiments_chained-transfer-public-target_fixed-jacobian-chain-evaluator-01_lean_FullGroupNorm_lean/audit.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-full-group-norm-proof-01/consumer/experiments_chained-transfer-public-target_fixed-jacobian-chain-evaluator-01_lean_FullGroupNorm_lean/build.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-full-group-norm-proof-01/consumer/experiments_chained-transfer-public-target_fixed-jacobian-chain-evaluator-01_lean_FullGroupNorm_lean/build.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-full-group-norm-proof-01/consumer/experiments_chained-transfer-public-target_fixed-jacobian-chain-evaluator-01_lean_FullGroupNorm_lean/status",
+      "bytes": 5,
+      "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431",
+      "local_original": "/workspace/scratch/ct82-full-group-norm-proof-01/consumer/experiments_chained-transfer-public-target_fixed-jacobian-chain-evaluator-01_lean_FullGroupNorm_lean/status",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-full-group-norm-proof-01/producer/target_ct82-full-group-norm-stage-01_FullGroupNorm_lean/audit.log",
+      "bytes": 542,
+      "sha256": "c6991f3f8c3f10ed22709835c5029c72808fa1dc52c6311c5fd34e6b2f371bfb",
+      "local_original": "/workspace/scratch/ct82-full-group-norm-proof-01/producer/target_ct82-full-group-norm-stage-01_FullGroupNorm_lean/audit.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-full-group-norm-proof-01/producer/target_ct82-full-group-norm-stage-01_FullGroupNorm_lean/build.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct82-full-group-norm-proof-01/producer/target_ct82-full-group-norm-stage-01_FullGroupNorm_lean/build.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct82-full-group-norm-proof-01/producer/target_ct82-full-group-norm-stage-01_FullGroupNorm_lean/status",
+      "bytes": 5,
+      "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431",
+      "local_original": "/workspace/scratch/ct82-full-group-norm-proof-01/producer/target_ct82-full-group-norm-stage-01_FullGroupNorm_lean/status",
+      "held_original": true
+    },
+    {
+      "path": "control/root-base.txt",
+      "bytes": 41,
+      "sha256": "28345a2112d80e56b2999800d1327cc6ad206ab5e1389405ba7c3c438a5e6c47"
+    },
+    {
+      "path": "control/consumer-base.txt",
+      "bytes": 41,
+      "sha256": "4623a7f6e25bcd8dc21541f7031d0e4e9c8acd408ae0cd0e8baa5e26eff5c3fc"
+    },
+    {
+      "path": "control/consumer-pending.patch",
+      "bytes": 13396,
+      "sha256": "8d6ceaaa7777ea9d669c30b8a240d1d65c291fe7e91db684d9f07f5620ab818e"
+    },
+    {
+      "path": "control/old-prior21-consumer-ledger.jsonl",
+      "bytes": 403165,
+      "sha256": "2149392f1674a51331df9e420b6c5ee46dfd05707f7b03551521a7597919d890"
+    }
+  ]
+}

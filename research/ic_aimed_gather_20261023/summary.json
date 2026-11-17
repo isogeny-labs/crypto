@@ -1,0 +1,127 @@
+{
+  "callgrind": [
+    {
+      "params": "k0n53",
+      "baseline_ir": 32295175033,
+      "candidate_ir": 31565619257,
+      "ratio": 1.0231123543010554,
+      "saved_ir": 729555776
+    },
+    {
+      "params": "k0n61",
+      "baseline_ir": 140009833925,
+      "candidate_ir": 136000266634,
+      "ratio": 1.0294820546329548,
+      "saved_ir": 4009567291
+    }
+  ],
+  "perf": [
+    {
+      "run": "baseline-r1",
+      "arm": "baseline",
+      "gather_closure_pct": 2.59,
+      "hash_closure_pct": 2.58,
+      "scan_family_pct": 20.64
+    },
+    {
+      "run": "baseline-r2",
+      "arm": "baseline",
+      "gather_closure_pct": 2.53,
+      "hash_closure_pct": 2.26,
+      "scan_family_pct": 21.29
+    },
+    {
+      "run": "baseline-r3",
+      "arm": "baseline",
+      "gather_closure_pct": 2.68,
+      "hash_closure_pct": 2.47,
+      "scan_family_pct": 21.57
+    },
+    {
+      "run": "candidate-r1",
+      "arm": "candidate",
+      "gather_closure_pct": 0,
+      "hash_closure_pct": 0,
+      "scan_family_pct": 18.39
+    },
+    {
+      "run": "candidate-r2",
+      "arm": "candidate",
+      "gather_closure_pct": 0,
+      "hash_closure_pct": 0,
+      "scan_family_pct": 18.27
+    },
+    {
+      "run": "candidate-r3",
+      "arm": "candidate",
+      "gather_closure_pct": 0,
+      "hash_closure_pct": 0,
+      "scan_family_pct": 19.08
+    }
+  ],
+  "native": {
+    "ab_collect": {
+      "median": 1.1113287936761795,
+      "ci95": {
+        "lo": 1.0647831016579432,
+        "hi": 1.1603953138001177
+      },
+      "n": 30,
+      "above_one": 28
+    },
+    "ab_total": {
+      "median": 1.0372200949688133,
+      "ci95": {
+        "lo": 1.0179062487910673,
+        "hi": 1.0684941771115628
+      },
+      "n": 30,
+      "above_one": 26
+    },
+    "aa_collect": {
+      "median": 0.9976659804558075,
+      "ci95": {
+        "lo": 0.9444588298520109,
+        "hi": 1.0873582038536536
+      },
+      "n": 5,
+      "above_one": 2
+    },
+    "aa_total": {
+      "median": 0.9927136917805259,
+      "ci95": {
+        "lo": 0.9525616744947626,
+        "hi": 1.1209627232568113
+      },
+      "n": 5,
+      "above_one": 1
+    },
+    "identity": [
+      {
+        "status": "complete",
+        "all_verified": true,
+        "recovered": [
+          "518509155375"
+        ]
+      }
+    ],
+    "median_ms": {
+      "baseline": {
+        "collect": 219.5903325,
+        "total": 400.121339
+      },
+      "candidate": {
+        "collect": 194.381489,
+        "total": 374.195062
+      }
+    },
+    "established_collect": false,
+    "established_total": false,
+    "isolation": {
+      "runs": 70,
+      "contended": 0,
+      "nonzero_exit": 0,
+      "refused_then_retried": 38
+    }
+  }
+}

@@ -1,0 +1,416 @@
+{
+  "card_id": "CARD-BLINDSPOT-07-02",
+  "card_path": "research/blindspots_20261018/07-blocked-f4-degree-cells/card-02.yaml",
+  "card_sha256": "cd52833972192518b4039d2bdb6914d64cb6eb8e96c20235caf3189bf0a1cf8f",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-07/card-02"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-07/card-02/b07",
+        "examples/blindspots_07_blocked_closure.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 3.2,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 3.2,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-02/b07",
+        "closure",
+        "--m",
+        "4",
+        "--n",
+        "11",
+        "--ell",
+        "4",
+        "--basis",
+        "1452,1544,883,714",
+        "--xr",
+        "1068",
+        "--from",
+        "3",
+        "--to",
+        "4",
+        "--label",
+        "r-11-4-4-u1",
+        "--time-limit",
+        "300",
+        "--expect-solutions",
+        "0"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 19.461,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r-11-4-4-u1",
+      "index": 3,
+      "outputs": {},
+      "seconds": 19.461,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "6742766827b6c3fcf2a76c65d839a27464766f11759a37ec0b19ae8e029abe99",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"count\",\"cell\":\"r-11-4-4-u1\",\"solutions\":0}",
+        "{\"tool\":\"b07\",\"cell\":\"r-11-4-4-u1\",\"m\":4,\"n\":11,\"ell\":4,\"n_vars\":38,\"degree\":3,\"columns\":9178,\"status\":\"saturated\",\"refuted\":false,\"rank\":1400,\"products\":2098,\"seed_rows\":33,\"chunks\":4,\"falls\":56,\"new_pivots\":1400,\"word_ops\":849493,\"word_ops_forward\":87407,\"word_ops_block\":556455,\"word_ops_pass\":205631,\"hits_forward\":2024,\"bytes_pass\":1170680,\"bytes_read_forward\":699256,\"basis_bytes_peak\":908784,\"rss_peak_kb\":5224,\"secs\":0.006,\"secs_forward\":0.001,\"secs_block\":0.002,\"secs_pass\":0.001,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"cell\":\"r-11-4-4-u1\",\"m\":4,\"n\":11,\"ell\":4,\"n_vars\":38,\"degree\":4,\"columns\":82993,\"status\":\"refuted\",\"refuted\":true,\"rank\":81033,\"products\":181478,\"seed_rows\":33,\"chunks\":46,\"falls\":8773,\"new_pivots\":81033,\"word_ops\":18411911417,\"word_ops_forward\":3655978173,\"word_ops_block\":2024379035,\"word_ops_pass\":12731554209,\"hits_forward\":11539525,\"bytes_pass\":10097536680,\"bytes_read_forward\":29247825384,\"basis_bytes_peak\":420493528,\"rss_peak_kb\":463604,\"secs\":19.416,\"secs_forward\":4.205,\"secs_block\":2.211,\"secs_pass\":12.269,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"mode\":\"closure-summary\",\"cell\":\"r-11-4-4-u1\",\"closure_degree\":4,\"last_status\":\"refuted\",\"rss_peak_kb\":463604}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-02/b07",
+        "closure",
+        "--m",
+        "4",
+        "--n",
+        "11",
+        "--ell",
+        "4",
+        "--basis",
+        "1213,527,866,1984",
+        "--xr",
+        "1261",
+        "--from",
+        "3",
+        "--to",
+        "4",
+        "--label",
+        "r-11-4-4-u2",
+        "--time-limit",
+        "300",
+        "--expect-solutions",
+        "0"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 27.443,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r-11-4-4-u2",
+      "index": 4,
+      "outputs": {},
+      "seconds": 27.443,
+      "stderr_sha256": "4d7ef93db2e0030103f22892936fcd8bb8ee587e732ec09a6ba978e691e4f9e2",
+      "stderr_tail": [
+        "  [21s] rank 77289 products 206057 pending 1380 basis 389 MiB vm 434 MiB rss-peak 438 MiB"
+      ],
+      "stdout_sha256": "2e55ebb2081634a7d3558106bcdfb87a34542552a97af5a8870bec970afa5d2c",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"count\",\"cell\":\"r-11-4-4-u2\",\"solutions\":0}",
+        "{\"tool\":\"b07\",\"cell\":\"r-11-4-4-u2\",\"m\":4,\"n\":11,\"ell\":4,\"n_vars\":38,\"degree\":3,\"columns\":9178,\"status\":\"saturated\",\"refuted\":false,\"rank\":1401,\"products\":2098,\"seed_rows\":33,\"chunks\":4,\"falls\":56,\"new_pivots\":1401,\"word_ops\":968988,\"word_ops_forward\":85589,\"word_ops_block\":622348,\"word_ops_pass\":261051,\"hits_forward\":1952,\"bytes_pass\":1175760,\"bytes_read_forward\":684712,\"basis_bytes_peak\":911912,\"rss_peak_kb\":5244,\"secs\":0.004,\"secs_forward\":0.001,\"secs_block\":0.001,\"secs_pass\":0.001,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"cell\":\"r-11-4-4-u2\",\"m\":4,\"n\":11,\"ell\":4,\"n_vars\":38,\"degree\":4,\"columns\":82993,\"status\":\"refuted\",\"refuted\":true,\"rank\":82467,\"products\":222438,\"seed_rows\":33,\"chunks\":56,\"falls\":9076,\"new_pivots\":82467,\"word_ops\":27920183387,\"word_ops_forward\":9717034308,\"word_ops_block\":4163974783,\"word_ops_pass\":14039174296,\"hits_forward\":24181591,\"bytes_pass\":13421001464,\"bytes_read_forward\":77736274464,\"basis_bytes_peak\":427602424,\"rss_peak_kb\":503804,\"secs\":27.393,\"secs_forward\":9.591,\"secs_block\":3.308,\"secs_pass\":13.704,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"mode\":\"closure-summary\",\"cell\":\"r-11-4-4-u2\",\"closure_degree\":4,\"last_status\":\"refuted\",\"rss_peak_kb\":503804}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-02/b07",
+        "closure",
+        "--m",
+        "4",
+        "--n",
+        "11",
+        "--ell",
+        "4",
+        "--basis",
+        "652,1678,1128,975",
+        "--xr",
+        "698",
+        "--from",
+        "3",
+        "--to",
+        "4",
+        "--label",
+        "r-11-4-4-u3",
+        "--time-limit",
+        "300",
+        "--expect-solutions",
+        "0"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 34.219,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r-11-4-4-u3",
+      "index": 5,
+      "outputs": {},
+      "seconds": 34.219,
+      "stderr_sha256": "8af0c8376a80f445cb732071335e4daae57bae0eb67dc86dff079ab3c33593e8",
+      "stderr_tail": [
+        "  [22s] rank 72885 products 165115 pending 1957 basis 360 MiB vm 401 MiB rss-peak 407 MiB"
+      ],
+      "stdout_sha256": "2318b51ae8b5da9930bf24d3435064f0e24d3732a194d2545524bf9516a52dfb",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"count\",\"cell\":\"r-11-4-4-u3\",\"solutions\":0}",
+        "{\"tool\":\"b07\",\"cell\":\"r-11-4-4-u3\",\"m\":4,\"n\":11,\"ell\":4,\"n_vars\":38,\"degree\":3,\"columns\":9178,\"status\":\"saturated\",\"refuted\":false,\"rank\":1401,\"products\":2098,\"seed_rows\":33,\"chunks\":4,\"falls\":56,\"new_pivots\":1401,\"word_ops\":946623,\"word_ops_forward\":86200,\"word_ops_block\":616182,\"word_ops_pass\":244241,\"hits_forward\":1934,\"bytes_pass\":1177016,\"bytes_read_forward\":689600,\"basis_bytes_peak\":911920,\"rss_peak_kb\":5144,\"secs\":0.005,\"secs_forward\":0.001,\"secs_block\":0.002,\"secs_pass\":0.001,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"cell\":\"r-11-4-4-u3\",\"m\":4,\"n\":11,\"ell\":4,\"n_vars\":38,\"degree\":4,\"columns\":82993,\"status\":\"refuted\",\"refuted\":true,\"rank\":80370,\"products\":193766,\"seed_rows\":33,\"chunks\":49,\"falls\":8311,\"new_pivots\":80370,\"word_ops\":48331430182,\"word_ops_forward\":11324548028,\"word_ops_block\":4623358518,\"word_ops_pass\":32383523636,\"hits_forward\":26985040,\"bytes_pass\":10527064696,\"bytes_read_forward\":90596384224,\"basis_bytes_peak\":418925992,\"rss_peak_kb\":485208,\"secs\":34.169,\"secs_forward\":11.094,\"secs_block\":3.482,\"secs_pass\":18.836,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"mode\":\"closure-summary\",\"cell\":\"r-11-4-4-u3\",\"closure_degree\":4,\"last_status\":\"refuted\",\"rss_peak_kb\":485208}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-02/b07",
+        "closure",
+        "--m",
+        "4",
+        "--n",
+        "13",
+        "--ell",
+        "4",
+        "--basis",
+        "3282,7995,4756,7689",
+        "--xr",
+        "444",
+        "--from",
+        "3",
+        "--to",
+        "4",
+        "--label",
+        "r-13-4-4-i06u0",
+        "--time-limit",
+        "300",
+        "--expect-solutions",
+        "0"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 54.937,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r-13-4-4-i06u0",
+      "index": 6,
+      "outputs": {},
+      "seconds": 54.937,
+      "stderr_sha256": "e067ec09ab48967c9625892afd6bc34d379580c2261dfd1b0ec34c942db6ef2f",
+      "stderr_tail": [
+        "  [20s] rank 87576 products 169601 pending 2855 basis 608 MiB vm 679 MiB rss-peak 678 MiB",
+        "  [41s] rank 113967 products 288362 pending 2781 basis 857 MiB vm 912 MiB rss-peak 912 MiB"
+      ],
+      "stdout_sha256": "dc96bc198aba06f88014da7f63b5e7a4e459fb15c5b2499e3a07a2a6d0966285",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"count\",\"cell\":\"r-13-4-4-i06u0\",\"solutions\":0}",
+        "{\"tool\":\"b07\",\"cell\":\"r-13-4-4-i06u0\",\"m\":4,\"n\":13,\"ell\":4,\"n_vars\":42,\"degree\":3,\"columns\":12384,\"status\":\"saturated\",\"refuted\":false,\"rank\":1799,\"products\":2654,\"seed_rows\":39,\"chunks\":4,\"falls\":64,\"new_pivots\":1799,\"word_ops\":2075096,\"word_ops_forward\":132012,\"word_ops_block\":1369067,\"word_ops_pass\":574017,\"hits_forward\":2423,\"bytes_pass\":2050088,\"bytes_read_forward\":1056096,\"basis_bytes_peak\":1572448,\"rss_peak_kb\":6952,\"secs\":0.009,\"secs_forward\":0.001,\"secs_block\":0.003,\"secs_pass\":0.001,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"cell\":\"r-13-4-4-i06u0\",\"m\":4,\"n\":13,\"ell\":4,\"n_vars\":42,\"degree\":4,\"columns\":124314,\"status\":\"refuted\",\"refuted\":true,\"rank\":122766,\"products\":333414,\"seed_rows\":39,\"chunks\":83,\"falls\":12064,\"new_pivots\":122766,\"word_ops\":35970891783,\"word_ops_forward\":10798964654,\"word_ops_block\":5462375114,\"word_ops_pass\":19709552015,\"hits_forward\":21802991,\"bytes_pass\":45930307016,\"bytes_read_forward\":86391717232,\"basis_bytes_peak\":955170392,\"rss_peak_kb\":1009880,\"secs\":54.815,\"secs_forward\":12.008,\"secs_block\":4.814,\"secs_pass\":36.338,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"mode\":\"closure-summary\",\"cell\":\"r-13-4-4-i06u0\",\"closure_degree\":4,\"last_status\":\"refuted\",\"rss_peak_kb\":1009880}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-02/b07",
+        "closure",
+        "--m",
+        "4",
+        "--n",
+        "13",
+        "--ell",
+        "4",
+        "--basis",
+        "3283,4071,3917,7233",
+        "--xr",
+        "8005",
+        "--from",
+        "3",
+        "--to",
+        "4",
+        "--label",
+        "sat-13-4-4-d0",
+        "--time-limit",
+        "300",
+        "--expect-solutions",
+        "48",
+        "--expect-no-refutation"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 104.872,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "sat-13-4-4-d0",
+      "index": 7,
+      "outputs": {},
+      "seconds": 104.872,
+      "stderr_sha256": "9ccc75946e5b68a5b9b01bf5bb94cee5311bf804c98ebc88669c21e5c63f415a",
+      "stderr_tail": [
+        "  [23s] rank 70655 products 116357 pending 2178 basis 485 MiB vm 541 MiB rss-peak 539 MiB",
+        "  [44s] rank 97770 products 210549 pending 1839 basis 723 MiB vm 795 MiB rss-peak 794 MiB",
+        "  [64s] rank 112700 products 300671 pending 1024 basis 854 MiB vm 916 MiB rss-peak 925 MiB",
+        "  [88s] rank 123693 products 337531 pending 4158 basis 916 MiB vm 1072 MiB rss-peak 1203 MiB"
+      ],
+      "stdout_sha256": "d976ac30d01c64affa609e0bd96afa3bb7474e0c44b75c3d9868817e46e8f8ac",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"count\",\"cell\":\"sat-13-4-4-d0\",\"solutions\":48}",
+        "{\"tool\":\"b07\",\"cell\":\"sat-13-4-4-d0\",\"m\":4,\"n\":13,\"ell\":4,\"n_vars\":42,\"degree\":3,\"columns\":12384,\"status\":\"saturated\",\"refuted\":false,\"rank\":1799,\"products\":2655,\"seed_rows\":39,\"chunks\":4,\"falls\":64,\"new_pivots\":1799,\"word_ops\":2224344,\"word_ops_forward\":150004,\"word_ops_block\":1448346,\"word_ops_pass\":625994,\"hits_forward\":2617,\"bytes_pass\":2056032,\"bytes_read_forward\":1200032,\"basis_bytes_peak\":1575840,\"rss_peak_kb\":6876,\"secs\":0.010,\"secs_forward\":0.001,\"secs_block\":0.004,\"secs_pass\":0.002,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"cell\":\"sat-13-4-4-d0\",\"m\":4,\"n\":13,\"ell\":4,\"n_vars\":42,\"degree\":4,\"columns\":124314,\"status\":\"saturated\",\"refuted\":false,\"rank\":124266,\"products\":513225,\"seed_rows\":39,\"chunks\":128,\"falls\":12336,\"new_pivots\":124266,\"word_ops\":83788840955,\"word_ops_forward\":21057710947,\"word_ops_block\":9349428450,\"word_ops_pass\":53381701558,\"hits_forward\":49733450,\"bytes_pass\":69690937568,\"bytes_read_forward\":168461687576,\"basis_bytes_peak\":966959424,\"rss_peak_kb\":1232372,\"secs\":104.774,\"secs_forward\":24.231,\"secs_block\":8.743,\"secs_pass\":69.628,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"mode\":\"closure-summary\",\"cell\":\"sat-13-4-4-d0\",\"closure_degree\":null,\"last_status\":\"saturated\",\"rss_peak_kb\":1232372}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-07/card-02/b07"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-07/card-02"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 9,
+  "commit": "29e4a1e3f0544b181396957a7b6ab3fc66bb0170",
+  "dirty_after": [
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u2.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u2.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u3.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u3.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-13-4-4-i06u0.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-13-4-4-i06u0.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-sat-13-4-4-d0.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-sat-13-4-4-d0.stdout.log"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

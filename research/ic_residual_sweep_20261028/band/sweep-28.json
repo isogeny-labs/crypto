@@ -1,0 +1,432 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "log2_r": 27.955005572422284,
+      "arm": "pair-table-b512",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        24.798541593408984,
+        26.494674029542992,
+        41.75986595474904
+      ],
+      "charged_sum": 14400456.0,
+      "native_sum": 9849402,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "log2_r": 27.955005572422284,
+      "arm": "rho-lanes16",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        1.1559112479807503,
+        1.2690825250568458,
+        2.2876240187417105
+      ],
+      "charged_sum": 671235.0,
+      "native_sum": 657183,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "log2_r": 27.955005572422284,
+      "arm": "rho-neg",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        1.0293393667072985,
+        1.1298818697518456,
+        2.0347643971527685
+      ],
+      "charged_sum": 597735.0,
+      "native_sum": 583848,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "log2_r": 27.955005572422284,
+      "arm": "sweep-b128",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        11.703001460918854,
+        12.8737743142408,
+        23.410729994138322
+      ],
+      "charged_sum": 6795906.0,
+      "native_sum": 6798651,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "log2_r": 27.955005572422284,
+      "arm": "sweep-b16",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        5.529424371511231,
+        6.075464766483525,
+        10.989828321234164
+      ],
+      "charged_sum": 3210924.0,
+      "native_sum": 3170844,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "log2_r": 27.955005572422284,
+      "arm": "sweep-b2",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        2.592171463683341,
+        2.8429325751427617,
+        5.099782578277546
+      ],
+      "charged_sum": 1505268.0,
+      "native_sum": 1456164,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "log2_r": 27.955005572422284,
+      "arm": "sweep-b32",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        6.4875941775482024,
+        7.130391284765158,
+        12.915565249717753
+      ],
+      "charged_sum": 3767331.0,
+      "native_sum": 3732708,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "log2_r": 27.955005572422284,
+      "arm": "sweep-b4",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        3.285475401107716,
+        3.6058014517548713,
+        6.4887359075792785
+      ],
+      "charged_sum": 1907868.0,
+      "native_sum": 1860126,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "log2_r": 27.955005572422284,
+      "arm": "sweep-b64",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        8.989811780140386,
+        9.885476258245138,
+        17.946456561187894
+      ],
+      "charged_sum": 5220363.0,
+      "native_sum": 5201103,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "log2_r": 27.955005572422284,
+      "arm": "sweep-b8",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        3.912218027579963,
+        4.295601156237704,
+        7.746049314157391
+      ],
+      "charged_sum": 2271816.0,
+      "native_sum": 2226297,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "pair-table-b512",
+      "b": "rho-lanes16",
+      "verdict": "rho-lanes16 < pair-table-b512"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "pair-table-b512",
+      "b": "rho-neg",
+      "verdict": "rho-neg < pair-table-b512"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "pair-table-b512",
+      "b": "sweep-b128",
+      "verdict": "sweep-b128 < pair-table-b512"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "pair-table-b512",
+      "b": "sweep-b16",
+      "verdict": "sweep-b16 < pair-table-b512"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "pair-table-b512",
+      "b": "sweep-b2",
+      "verdict": "sweep-b2 < pair-table-b512"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "pair-table-b512",
+      "b": "sweep-b32",
+      "verdict": "sweep-b32 < pair-table-b512"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "pair-table-b512",
+      "b": "sweep-b4",
+      "verdict": "sweep-b4 < pair-table-b512"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "pair-table-b512",
+      "b": "sweep-b64",
+      "verdict": "sweep-b64 < pair-table-b512"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "pair-table-b512",
+      "b": "sweep-b8",
+      "verdict": "sweep-b8 < pair-table-b512"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "rho-lanes16",
+      "b": "rho-neg",
+      "verdict": "rho-neg < rho-lanes16"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "rho-lanes16",
+      "b": "sweep-b128",
+      "verdict": "rho-lanes16 < sweep-b128"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "rho-lanes16",
+      "b": "sweep-b16",
+      "verdict": "rho-lanes16 < sweep-b16"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "rho-lanes16",
+      "b": "sweep-b2",
+      "verdict": "rho-lanes16 < sweep-b2"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "rho-lanes16",
+      "b": "sweep-b32",
+      "verdict": "rho-lanes16 < sweep-b32"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "rho-lanes16",
+      "b": "sweep-b4",
+      "verdict": "rho-lanes16 < sweep-b4"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "rho-lanes16",
+      "b": "sweep-b64",
+      "verdict": "rho-lanes16 < sweep-b64"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "rho-lanes16",
+      "b": "sweep-b8",
+      "verdict": "rho-lanes16 < sweep-b8"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "rho-neg",
+      "b": "sweep-b128",
+      "verdict": "rho-neg < sweep-b128"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "rho-neg",
+      "b": "sweep-b16",
+      "verdict": "rho-neg < sweep-b16"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "rho-neg",
+      "b": "sweep-b2",
+      "verdict": "rho-neg < sweep-b2"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "rho-neg",
+      "b": "sweep-b32",
+      "verdict": "rho-neg < sweep-b32"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "rho-neg",
+      "b": "sweep-b4",
+      "verdict": "rho-neg < sweep-b4"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "rho-neg",
+      "b": "sweep-b64",
+      "verdict": "rho-neg < sweep-b64"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "rho-neg",
+      "b": "sweep-b8",
+      "verdict": "rho-neg < sweep-b8"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b128",
+      "b": "sweep-b16",
+      "verdict": "sweep-b16 < sweep-b128"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b128",
+      "b": "sweep-b2",
+      "verdict": "sweep-b2 < sweep-b128"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b128",
+      "b": "sweep-b32",
+      "verdict": "sweep-b32 < sweep-b128"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b128",
+      "b": "sweep-b4",
+      "verdict": "sweep-b4 < sweep-b128"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b128",
+      "b": "sweep-b64",
+      "verdict": "sweep-b64 < sweep-b128"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b128",
+      "b": "sweep-b8",
+      "verdict": "sweep-b8 < sweep-b128"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b16",
+      "b": "sweep-b2",
+      "verdict": "sweep-b2 < sweep-b16"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b16",
+      "b": "sweep-b32",
+      "verdict": "sweep-b16 < sweep-b32"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b16",
+      "b": "sweep-b4",
+      "verdict": "sweep-b4 < sweep-b16"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b16",
+      "b": "sweep-b64",
+      "verdict": "sweep-b16 < sweep-b64"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b16",
+      "b": "sweep-b8",
+      "verdict": "sweep-b8 < sweep-b16"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b2",
+      "b": "sweep-b32",
+      "verdict": "sweep-b2 < sweep-b32"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b2",
+      "b": "sweep-b4",
+      "verdict": "sweep-b2 < sweep-b4"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b2",
+      "b": "sweep-b64",
+      "verdict": "sweep-b2 < sweep-b64"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b2",
+      "b": "sweep-b8",
+      "verdict": "sweep-b2 < sweep-b8"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b32",
+      "b": "sweep-b4",
+      "verdict": "sweep-b4 < sweep-b32"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b32",
+      "b": "sweep-b64",
+      "verdict": "sweep-b32 < sweep-b64"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b32",
+      "b": "sweep-b8",
+      "verdict": "sweep-b8 < sweep-b32"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b4",
+      "b": "sweep-b64",
+      "verdict": "sweep-b4 < sweep-b64"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b4",
+      "b": "sweep-b8",
+      "verdict": "sweep-b4 < sweep-b8"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "sweep-b64",
+      "b": "sweep-b8",
+      "verdict": "sweep-b8 < sweep-b64"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+
+running 17 tests
+test actual_complete_latest_snapshot_is_selected ... ok
+test actual_multichunk_prefix_selects_only_its_complete_predecessor ... ok
+test altered_tail_identity_cannot_salvage_an_earlier_positive ... ok
+test resource_refusal_after_good_decode_never_selects_rows ... ok
+test selection::tests::cannot_continue_after_truncated_snapshot ... ok
+test selection::tests::cannot_skip_malformed_middle ... ok
+test selection::tests::cap_refuses_before_owner_charge ... ok
+test selection::tests::empty_is_not_a_candidate ... ok
+test selection::tests::exactly_one_bound_terminal_prefix_preserves_predecessor ... ok
+test selection::tests::latest_complete_wins ... ok
+test selection::tests::malformed_tail_never_salvages_earlier_rows ... ok
+test selection::tests::multiple_tails_are_rejected ... ok
+test selection::tests::only_partial_capture_is_not_a_candidate ... ok
+test selection::tests::original_deadline_refuses_before_charge ... ok
+test selection::tests::resource_or_identity_unavailable_never_salvages ... ok
+test selection::tests::sequence_gaps_or_duplicates_are_rejected ... ok
+test selection::tests::shared_owner_refusal_has_no_candidate_or_retry ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s

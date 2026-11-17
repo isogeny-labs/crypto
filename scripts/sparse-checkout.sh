@@ -1,0 +1,337 @@
+#!/usr/bin/env bash
+# Sparse checkout for building and running the harness (ecbench, cargo test)
+# without the GBs of research archives it never reads. docs/sparse-checkout.md.
+#
+#   scripts/sparse-checkout.sh status
+#   scripts/sparse-checkout.sh apply [--profile NAME] [--path P]...  # harness by default
+#   scripts/sparse-checkout.sh add --path P...         # widen the current profile
+#   scripts/sparse-checkout.sh patterns [--profile NAME] [--path P]...  # print, change nothing
+#   scripts/sparse-checkout.sh heavy [--write]        # the research/ dirs harness leaves out
+#   scripts/sparse-checkout.sh disable                 # full checkout again
+#   scripts/sparse-checkout.sh clone URL DIR [--branch B] [--profile NAME] [--path P]...
+#
+# Profile harness: everything except the large research/ directories (HEAVY_MB),
+# plus every research/ path the Rust code needs: include_str!/include_bytes!
+# targets anywhere (compile time) and research/ string literals in src/ and
+# tests/ (read by cargo test). Those are recomputed from the sources on every
+# apply. New research/<topic>_<date>/ directories, where ecbench sessions land,
+# are included by default, so `git add` accepts them.
+#
+# Profile minimal: the root files, dot-directories and the CORE directories
+# below, plus the Cargo targets declared outside them and the same Rust
+# references (any top-level directory, not only research/). Every other
+# directory, research/ included, is left out until named with --path.
+#
+# Excluded files stay in HEAD and in the index (skip-worktree): `git ls-files`
+# still lists them. Off disk is not absent; `add --path` materializes a path.
+# Thin git orchestration only, per AGENTS.md ("Implementation language").
+set -euo pipefail
+
+# Profile harness leaves out every research/ directory holding HEAVY_MB (20)
+# MB or more of tracked content in HEAD. heavy_dirs computes the list from
+# HEAD when the clone holds every blob; a partial clone cannot size a blob
+# without downloading it, so there it reads HEAVY_FILE, the snapshot that
+# `heavy --write` refreshes from a full clone.
+HEAVY_MB=${HEAVY_MB:-20}
+HEAVY_FILE=scripts/sparse-heavy-dirs.txt
+HEAVY=()
+HEAVY_LOADED=
+# Directories the minimal profile keeps whole.
+CORE=(src docs scripts tools benches examples tests store)
+STATE="# sparse-checkout.sh"
+PROFILE=harness
+SEG='[A-Za-z0-9_.@+=,-]'
+
+die() { echo "sparse-checkout: $*" >&2; exit 2; }
+
+# Collapse "." and ".." in a relative path.
+normpath() {
+  local IFS=/ part out=()
+  for part in $1; do
+    case "$part" in
+      ''|.) ;;
+      ..) [ ${#out[@]} -gt 0 ] && unset 'out[${#out[@]}-1]' ;;
+      *) out+=("$part") ;;
+    esac
+  done
+  echo "${out[*]}"
+}
+
+# Paths the Rust code compiles in or reads, one per line.
+candidates() {
+  local roots=() r file line target
+  for r in src tests benches examples build.rs $(cargo_targets) \
+    $(cargo_path_deps | sed -n 's#^/\(.*\)/$#\1#p'); do
+    [ -e "$r" ] && roots+=("$r")
+  done
+  [ ${#roots[@]} -gt 0 ] || return 0
+  # Whole files, newlines folded, so include_str!(\n "path" ) is found too.
+  grep -rlE --include='*.rs' 'include_(str|bytes)!' "${roots[@]}" 2>/dev/null |
+    while IFS= read -r file; do
+      { tr '\n' ' ' < "$file" |
+          grep -oE 'include_(str|bytes)!\([[:space:]]*"[^"]+"' || true; } |
+        while IFS= read -r line; do
+          target=${line#*\"}; target=${target%\"}
+          normpath "$(dirname "$file")/$target"
+        done
+    done
+  # #[path = "..."] modules, with their directory (they declare submodules).
+  grep -rlE --include='*.rs' '#\[path[[:space:]]*=' "${roots[@]}" 2>/dev/null |
+    while IFS= read -r file; do
+      { grep -oE '#\[path[[:space:]]*=[[:space:]]*"[^"]+"' "$file" || true; } |
+        while IFS= read -r line; do
+          target=${line#*\"}; target=${target%\"}
+          target=$(normpath "$(dirname "$file")/$target")
+          echo "$(dirname "$target")/"
+        done
+    done
+  for r in src tests; do
+    [ -d "$r" ] && grep -rhoE --include='*.rs' "(\.\./)*research/$SEG+(/$SEG+)*" "$r" 2>/dev/null |
+      sed -E 's#^(\.\./)+##'
+  done
+  return 0
+}
+
+# Directories of the Cargo targets ([[bin]], [[bench]], ...) declared by path
+# in Cargo.toml: a target's sibling modules live beside it. Both profiles use
+# them: a harness checkout had lost two [[bin]] sources under heavy research/
+# directories, which broke `cargo test` and `cargo clippy --tests`.
+cargo_targets() {
+  [ -f Cargo.toml ] || return 0
+  sed -nE 's/^[[:space:]]*path[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' Cargo.toml |
+    while IFS= read -r target; do echo "$(dirname "$target")/"; done | sort -u
+}
+
+# Rule lines for the crates the root Cargo.toml depends on by path
+# (`name = { path = "dir", ... }`), followed transitively. Cargo reads every
+# path dependency's manifest, optional ones included, so an excluded
+# Cargo.toml breaks `cargo build` for the whole workspace (2026-11-02: the
+# heavy research/pencil_large_prime_20261029 lost its manifest). Each crate
+# gets its manifest, lockfile, build script, src/ and the directories of
+# its declared target paths, not its data, so heavy crates stay light.
+cargo_path_deps() {
+  [ -f Cargo.toml ] || return 0
+  local queue=(.) seen=" " dir dep norm t manifest
+  while [ ${#queue[@]} -gt 0 ]; do
+    dir=${queue[0]}
+    queue=("${queue[@]:1}")
+    if [ -f "$dir/Cargo.toml" ]; then
+      manifest=$(cat "$dir/Cargo.toml")
+    else
+      # A fresh sparse clone has not materialized its path dependencies yet.
+      # Discover their manifests and transitive dependencies from the commit.
+      manifest=$(git show "HEAD:$dir/Cargo.toml" 2>/dev/null) || continue
+    fi
+    if [ "$dir" != . ]; then
+      echo "/$dir/Cargo.toml"
+      echo "/$dir/Cargo.lock"
+      echo "/$dir/build.rs"
+      echo "/$dir/src/"
+      sed -nE 's/^[[:space:]]*path[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' <<< "$manifest" |
+        while IFS= read -r t; do
+          t=$(realpath -m --relative-to=. "$dir/$(dirname "$t")")
+          case "$t" in .|..*) ;; *) echo "/$t/" ;; esac
+        done
+    fi
+    while IFS= read -r dep; do
+      norm=$(realpath -m --relative-to=. "$dir/$dep")
+      case "$norm" in .|..*) continue ;; esac
+      case "$seen" in *" $norm "*) continue ;; esac
+      seen="$seen$norm "
+      queue+=("$norm")
+    done < <(grep -oE '\{[^}]*\bpath[[:space:]]*=[[:space:]]*"[^"]+"' <<< "$manifest" |
+      sed -E 's/.*path[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/')
+  done | sort -u
+}
+
+# Rule lines for the tracked paths among the candidates: a file, or dir/.
+# Profile harness keeps only research/ ones (the rest is already present).
+# A bare top-level directory ("research/," in prose) is never a reference.
+referenced() {
+  local tracked=$1 cand keep='^research/'
+  [ "$PROFILE" = minimal ] && keep='/'
+  { candidates; cargo_targets; } |
+    sed -E 's/[.,:;]+$//' | grep -- "$keep" | grep -vE '^[^/]+/?$' | sort -u |
+    while IFS= read -r cand; do
+      if grep -qxF -- "$cand" "$tracked"; then
+        echo "/$cand"
+      elif awk -v p="${cand%/}/" 'index($0, p) == 1 { found = 1; exit } END { exit !found }' "$tracked"; then
+        echo "/${cand%/}/"
+      fi
+    done
+}
+
+heavy_dirs() {
+  if [ "$(git config --bool remote.origin.promisor 2>/dev/null)" = true ]; then
+    git show "HEAD:$HEAVY_FILE" 2>/dev/null | grep -vE '^(#|$)' || true
+    return 0
+  fi
+  git ls-tree -r -l HEAD -- research/ |
+    awk -F'\t' -v min=$((HEAVY_MB * 1000000)) '
+      { split($1, m, " "); n = split($2, p, "/")
+        if (n >= 3 && m[4] != "-") s[p[1] "/" p[2]] += m[4] }
+      END { for (d in s) if (s[d] >= min) printf "%d %s\n", s[d], d }' |
+    sort -rn | cut -d' ' -f2-
+}
+
+load_heavy() {
+  [ -n "$HEAVY_LOADED" ] && return 0
+  mapfile -t HEAVY < <(heavy_dirs)
+  HEAVY_LOADED=1
+}
+
+# Rules for a named path, re-including excluded directories beneath it
+# (a parent rule does not override a more specific exclusion).
+include() {
+  local path=${1#/} h
+  echo "/$path"
+  case "$path" in */) ;; *) return 0 ;; esac
+  [ "$PROFILE" = harness ] || return 0
+  load_heavy
+  for h in "${HEAVY[@]}"; do
+    case "$h/" in "$path"?*) echo "/$h/" ;; esac
+  done
+}
+
+# The base rules of the profile, before references and named paths.
+base_rules() {
+  local h
+  if [ "$PROFILE" = minimal ]; then
+    echo "/*"
+    echo "!/*/"
+    echo "/.*/"
+    for h in "${CORE[@]}"; do echo "/$h/"; done
+  else
+    load_heavy
+    echo "/*"
+    for h in "${HEAVY[@]}"; do echo "!/$h/"; done
+  fi
+}
+
+render() {  # render [paths...]
+  local tracked h p
+  tracked=$(mktemp)
+  git ls-files > "$tracked"
+  [ -s "$tracked" ] || git ls-tree -r --name-only HEAD > "$tracked"
+  echo "$STATE profile=$PROFILE"
+  for p in "$@"; do echo "$STATE path=$p"; done
+  base_rules
+  echo "# paths the Rust code and Cargo.toml compile in or read"
+  referenced "$tracked"
+  echo "# crates Cargo.toml depends on by path (manifests and sources)"
+  cargo_path_deps
+  if [ $# -gt 0 ]; then
+    echo "# named paths"
+    for p in "$@"; do include "$p"; done
+  fi
+  rm -f "$tracked"
+}
+
+rules_file() { git rev-parse --git-path info/sparse-checkout; }
+
+is_sparse() { [ "$(git config --bool core.sparseCheckout 2>/dev/null)" = true ]; }
+
+saved_profile() {
+  is_sparse || return 0
+  sed -n "s/^$STATE profile=//p" "$(rules_file)" 2>/dev/null | head -n 1
+}
+
+saved_paths() {
+  is_sparse || return 0
+  sed -n "s/^$STATE path=//p" "$(rules_file)" 2>/dev/null || true
+}
+
+apply() {
+  render "$@" | git sparse-checkout set --no-cone --stdin
+  # The first pass brings cold path dependencies onto disk. Read their source
+  # references too (for example include_str! fixtures outside src/) before
+  # declaring the checkout ready to build.
+  render "$@" | git sparse-checkout set --no-cone --stdin
+  status
+}
+
+status() {
+  local total skipped
+  total=$(git ls-files | wc -l | tr -d ' ')
+  if is_sparse; then
+    skipped=$(git ls-files -t | grep -c '^S ' || true)
+    if grep -q "^$STATE profile=" "$(rules_file)" 2>/dev/null; then
+      echo "sparse checkout (profile $(saved_profile)): $((total - skipped)) of $total tracked files on disk, $skipped skipped"
+    else
+      echo "sparse checkout (rules not set by this script): $((total - skipped)) of $total tracked files on disk"
+    fi
+    saved_paths | sed 's/^/  + path /'
+  else
+    echo "full checkout: $total tracked files on disk"
+  fi
+  echo "history: $( [ "$(git rev-parse --is-shallow-repository)" = true ] && echo shallow || echo complete ); partial clone filter: $(git config remote.origin.partialclonefilter || echo none)"
+}
+
+parse_paths() {
+  PATHS=()
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --path) [ $# -ge 2 ] || die "--path needs a value"; PATHS+=("$2"); shift 2 ;;
+      --profile)
+        [ $# -ge 2 ] || die "--profile needs a value"
+        case "$2" in harness|minimal) PROFILE=$2 ;; *) die "unknown profile '$2' (harness, minimal)" ;; esac
+        shift 2 ;;
+      *) die "unexpected argument: $1" ;;
+    esac
+  done
+}
+
+cmd=${1:-status}
+[ $# -gt 0 ] && shift
+
+if [ "$cmd" = clone ]; then
+  [ $# -ge 2 ] || die "usage: clone URL DIR [--branch B] [--profile NAME] [--path P]..."
+  url=$1 dir=$2; shift 2
+  branch=()
+  if [ "${1:-}" = --branch ]; then
+    [ $# -ge 2 ] || die "--branch needs a value"; branch=(--branch "$2"); shift 2
+  fi
+  parse_paths "$@"
+  git clone --filter=blob:none --no-checkout ${branch[@]+"${branch[@]}"} "$url" "$dir"
+  cd "$dir"
+  # The base rules first, so the sources exist to compute the references from.
+  base_rules | git sparse-checkout set --no-cone --stdin
+  git checkout -f -q HEAD
+  apply ${PATHS[@]+"${PATHS[@]}"}
+  exit 0
+fi
+
+top=$(git rev-parse --show-toplevel 2>/dev/null) || die "not inside a git worktree"
+cd "$top"
+case "$cmd" in
+  status) status ;;
+  apply) parse_paths "$@"; apply ${PATHS[@]+"${PATHS[@]}"} ;;
+  patterns) parse_paths "$@"; render ${PATHS[@]+"${PATHS[@]}"} ;;
+  add)
+    { is_sparse && grep -q "^$STATE profile=" "$(rules_file)"; } || die "no profile applied here; run 'apply' first"
+    parse_paths "$@"
+    PROFILE=$(saved_profile)
+    case "$PROFILE" in harness|minimal) ;; *) PROFILE=harness ;; esac
+    merged=()
+    while IFS= read -r p; do
+      [ -n "$p" ] && merged+=("$p")
+    done < <({ saved_paths; printf '%s\n' ${PATHS[@]+"${PATHS[@]}"}; } | sort -u)
+    apply ${merged[@]+"${merged[@]}"}
+    ;;
+  heavy)
+    case "${1:-}" in
+      '') load_heavy; printf '%s\n' ${HEAVY[@]+"${HEAVY[@]}"} ;;
+      --write)
+        [ "$(git config --bool remote.origin.promisor 2>/dev/null)" = true ] &&
+          die "a partial clone cannot size its blobs; run 'heavy --write' in a full clone"
+        { echo "# research/ directories with >= $HEAVY_MB MB tracked in HEAD $(git rev-parse --short HEAD)."
+          echo "# Generated by scripts/sparse-checkout.sh heavy --write; profile harness"
+          echo "# reads it only in a partial clone, and computes the list everywhere else."
+          heavy_dirs; } > "$HEAVY_FILE"
+        echo "wrote $HEAVY_FILE ($(grep -vc '^#' "$HEAVY_FILE") directories)" ;;
+      *) die "usage: heavy [--write]" ;;
+    esac ;;
+  disable) git sparse-checkout disable; status ;;
+  -h|--help|help) sed -n '2,27p' "$0" | sed 's/^# \{0,1\}//' ;;
+  *) die "unknown command '$cmd' (status, apply, add, patterns, heavy, disable, clone)" ;;
+esac

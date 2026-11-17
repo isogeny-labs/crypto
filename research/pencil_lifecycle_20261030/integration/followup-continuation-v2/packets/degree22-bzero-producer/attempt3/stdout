@@ -1,0 +1,53 @@
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/BZero.lean:15:16: warning: Unused tactic linter: `ring` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/BZero.lean:15:16: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/BZero.lean:22:80: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/BZero.lean:53:52: warning: Unused tactic linter: `ring` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/BZero.lean:53:52: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/BZero.lean:106:138: error: Application type mismatch: The argument
+  a
+has type
+  D2.{u_1} K
+of sort `Type u_1` but is expected to have type
+  D2.{0} ℕ
+of sort `Type` in the application
+  point a
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/BZero.lean:106:132: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field ℕ
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/BZero.lean:106:114: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field ℕ
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/BZero.lean:106:63: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+a0 a1 a2 a3 : K
+a : D2 K
+hz : a.z ≠ 0
+hw : a.w ≠ 0
+hs : a.s ≠ 0
+h2 : 2 ≠ 0
+hb : sourceB a = 0
+ha : validTwo (WeightedDoubling.curve a0 a1 a2 a3) a
+hg : IsCoprime (WeightedDoubling.curve a0 a1 a2 a3) (derivative (WeightedDoubling.curve a0 a1 a2 a3))
+hsn : ns a ≠ 0
+hb' : (nq a * ns a - nt a) * nt a - nr a * ns a ^ 2 = 0
+hpz : (point a).z ≠ 0
+hpw : (point a).w ≠ 0
+hpx : WeightedAdd11.nx (point a) = nt a / ns a - nq a
+hpy : WeightedAdd11.ny (point a) = 2 * nt a - nq a * ns a
+hn : 2 * nt a - nq a * ns a ≠ 0
+hraw : (point a).y ≠ 0
+hv : validPoint (WeightedDoubling.curve a0 a1 a2 a3) (point a)
+⊢ eval (sorry ()) (sorry ()) = 0

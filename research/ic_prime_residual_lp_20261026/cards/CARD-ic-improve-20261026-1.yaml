@@ -1,0 +1,995 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-ic-improve-20261026-1
+experiment_id: ic_improve_20261026
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: b561ebca805ff3a7a11fec4fe5578669c6702e61
+receipt: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.receipt.json
+binds:
+- path: research/ic_planner_weight_rule_binkob_20261026/PROTOCOL.md
+  sha256: 63fe09d312b80b521fc47ac75d0110e9447d64bb53236e03d78903083036caed
+- path: research/ic_prime_residual_lp_20261026/PROTOCOL.md
+  sha256: 76e9190a107e9ccdc6e0acfd2106cb06283d144c2bcc551c5c72be2cd36a0008
+- path: research/ic_planner_weight_rule_binkob_20261026/specs/A-b21.json
+  sha256: b0d80c8a0e018fe47ddace3975d4cd2550ece050409d1ad3851b10e65c86837a
+- path: research/ic_planner_weight_rule_binkob_20261026/specs/A-b23.json
+  sha256: 71e6bdcb0e7770f56cba20909a66bd1d1468ba2d2f9cca20e89ba1d50fa09ee6
+- path: research/ic_planner_weight_rule_binkob_20261026/specs/A-b25.json
+  sha256: 713935ffa7ad24f190a55e0709d4f4fa8191faee613e4106ca9818fd6147ae09
+- path: research/ic_planner_weight_rule_binkob_20261026/specs/A-k23.json
+  sha256: 40b5c3b100e52fcb03d8c4e9fd4bd3db57c33b4b3f76a2693424fbb2f22193b3
+- path: research/ic_planner_weight_rule_binkob_20261026/specs/A-k31.json
+  sha256: fad2ed4115e64f6ae2d16b149fd6f8f0895948e8bb841985c70761146c8f67db
+- path: research/ic_planner_weight_rule_binkob_20261026/specs/A-k37.json
+  sha256: e8226986a9bff1dc2e592123f518ed6a5c9e3c96832a25be97455c2ba9099d49
+- path: research/ic_prime_residual_lp_20261026/specs/p21.json
+  sha256: 29a6befcffba8674f2310652be2393c35b1cf3e39de4f68f63f46572701b03bc
+- path: research/ic_prime_residual_lp_20261026/specs/p22.json
+  sha256: a09a3f5be1ba92c6a2a47b2608f4b12e779cd9f740af80373388bb9ccfd4dea9
+- path: research/ic_prime_residual_lp_20261026/specs/p24.json
+  sha256: 8709178cfff476b50428ed4bb3fd413e5ad2d47ee94b68f6011650fc1b26f771
+- path: research/ic_prime_residual_lp_20261026/specs/p26.json
+  sha256: 9e18e95b76d6c81054ae5d0d51ceb8d4222c2e27da48e69ea4920fb38f77e614
+- path: research/ic_prime_residual_lp_20261026/specs/p28.json
+  sha256: 187bbf42cc0b658bcfcc9026fef703855563a594cb67b368ac4d359c814a6771
+- path: research/ic_prime_residual_lp_20261026/specs/p32.json
+  sha256: f634393de29b3ea6eed4927473015a471b087a4c434ac77f56c72d9895d0087f
+- path: ./target/release/ecbench
+  sha256: d0ff6d067e9f29aa011ecfd99575d8767c4672d805978eea6b9e3e59b75185fa
+- path: ./target/release/ic
+  sha256: 08a28a6b329eb2102b9f05f9b78fe063247867a55b80c1a7eea7a4d190401108
+- path: ./target/release/examples/ic_residual_curve_free_null
+  sha256: 1e4ca6f573d68fe890af0be76e5cf50aecd7cb905b3ee17167e8a5b56ee7fadb
+must_not_exist:
+- research/ic_planner_weight_rule_binkob_20261026/sessions/A-b21
+- research/ic_planner_weight_rule_binkob_20261026/sessions/A-b21.audit.json
+- research/ic_planner_weight_rule_binkob_20261026/sessions/A-b23
+- research/ic_planner_weight_rule_binkob_20261026/sessions/A-b23.audit.json
+- research/ic_planner_weight_rule_binkob_20261026/sessions/A-b25
+- research/ic_planner_weight_rule_binkob_20261026/sessions/A-b25.audit.json
+- research/ic_planner_weight_rule_binkob_20261026/sessions/A-k23
+- research/ic_planner_weight_rule_binkob_20261026/sessions/A-k23.audit.json
+- research/ic_planner_weight_rule_binkob_20261026/sessions/A-k31
+- research/ic_planner_weight_rule_binkob_20261026/sessions/A-k31.audit.json
+- research/ic_planner_weight_rule_binkob_20261026/sessions/A-k37
+- research/ic_planner_weight_rule_binkob_20261026/sessions/A-k37.audit.json
+- research/ic_prime_residual_lp_20261026/sessions/p21
+- research/ic_prime_residual_lp_20261026/sessions/p21.audit.json
+- research/ic_prime_residual_lp_20261026/sessions/p22
+- research/ic_prime_residual_lp_20261026/sessions/p22.audit.json
+- research/ic_prime_residual_lp_20261026/sessions/p24
+- research/ic_prime_residual_lp_20261026/sessions/p24.audit.json
+- research/ic_prime_residual_lp_20261026/sessions/p26
+- research/ic_prime_residual_lp_20261026/sessions/p26.audit.json
+- research/ic_prime_residual_lp_20261026/sessions/p28
+- research/ic_prime_residual_lp_20261026/sessions/p28.audit.json
+- research/ic_prime_residual_lp_20261026/sessions/p32
+- research/ic_prime_residual_lp_20261026/sessions/p32.audit.json
+- research/ic_prime_residual_lp_20261026/analysis/null-p21-B4.json
+- research/ic_prime_residual_lp_20261026/analysis/null-p21-B16.json
+- research/ic_prime_residual_lp_20261026/analysis/null-p21-B64.json
+- research/ic_prime_residual_lp_20261026/analysis/null-p24-B4.json
+- research/ic_prime_residual_lp_20261026/analysis/null-p24-B16.json
+- research/ic_prime_residual_lp_20261026/analysis/null-p24-B64.json
+- research/ic_prime_residual_lp_20261026/analysis/null-p28-B4.json
+- research/ic_prime_residual_lp_20261026/analysis/null-p28-B16.json
+- research/ic_prime_residual_lp_20261026/analysis/null-p28-B64.json
+commands:
+- id: git-clean
+  argv:
+  - python3
+  - -c
+  - import subprocess,sys; out=subprocess.run(['git','status','--porcelain','--untracked-files=all','--',':(exclude)research/ic_planner_weight_rule_binkob_20261026/cards',':(exclude)research/ic_prime_residual_lp_20261026/cards'],capture_output=True,text=True).stdout; sys.exit(1 if out.strip() else 0)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: sessions-absent
+  argv:
+  - python3
+  - -c
+  - import os,sys; sys.exit(1 if any(os.path.exists(p) for p in ['research/ic_planner_weight_rule_binkob_20261026/sessions/A-b21', 'research/ic_planner_weight_rule_binkob_20261026/sessions/A-b23', 'research/ic_planner_weight_rule_binkob_20261026/sessions/A-b25', 'research/ic_planner_weight_rule_binkob_20261026/sessions/A-k23', 'research/ic_planner_weight_rule_binkob_20261026/sessions/A-k31', 'research/ic_planner_weight_rule_binkob_20261026/sessions/A-k37', 'research/ic_prime_residual_lp_20261026/sessions/p21', 'research/ic_prime_residual_lp_20261026/sessions/p22', 'research/ic_prime_residual_lp_20261026/sessions/p24', 'research/ic_prime_residual_lp_20261026/sessions/p26', 'research/ic_prime_residual_lp_20261026/sessions/p28', 'research/ic_prime_residual_lp_20261026/sessions/p32', 'research/ic_planner_weight_rule_binkob_20261026/sessions/A-b21.audit.json', 'research/ic_planner_weight_rule_binkob_20261026/sessions/A-b23.audit.json', 'research/ic_planner_weight_rule_binkob_20261026/sessions/A-b25.audit.json', 'research/ic_planner_weight_rule_binkob_20261026/sessions/A-k23.audit.json', 'research/ic_planner_weight_rule_binkob_20261026/sessions/A-k31.audit.json', 'research/ic_planner_weight_rule_binkob_20261026/sessions/A-k37.audit.json', 'research/ic_prime_residual_lp_20261026/sessions/p21.audit.json', 'research/ic_prime_residual_lp_20261026/sessions/p22.audit.json', 'research/ic_prime_residual_lp_20261026/sessions/p24.audit.json', 'research/ic_prime_residual_lp_20261026/sessions/p26.audit.json', 'research/ic_prime_residual_lp_20261026/sessions/p28.audit.json', 'research/ic_prime_residual_lp_20261026/sessions/p32.audit.json']) else 0)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-record
+  argv:
+  - df
+  - -h
+  - /
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.disk-start.stdout
+- id: disk-before-run-a-b21
+  argv: &id001
+  - python3
+  - -c
+  - import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-a-b21
+  argv: &id002
+  - python3
+  - -c
+  - "import re, sys, time\nstart = time.time()\nheld = 0\nwhile True:\n    value = float(re.search(r'some avg10=([0-9.]+)', open('/proc/pressure/cpu').read()).group(1))\n    if value <= 1.0:\n        held += 1\n    else:\n        held = 0\n    if held >= 6:\n        sys.exit(0)\n    if time.time() - start >= 1800:\n        sys.exit(1)\n    time.sleep(5)\n"
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-a-b21
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_planner_weight_rule_binkob_20261026/specs/A-b21.json
+  - --out
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b21
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 345600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.run-a-b21.stdout
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.run-a-b21.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b21/session.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b21/plan.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b21/spec.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b21/host.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b21/records.jsonl
+- id: disk-before-run-a-b23
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-a-b23
+  argv: *id002
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-a-b23
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_planner_weight_rule_binkob_20261026/specs/A-b23.json
+  - --out
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b23
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 345600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.run-a-b23.stdout
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.run-a-b23.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b23/session.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b23/plan.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b23/spec.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b23/host.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b23/records.jsonl
+- id: disk-before-run-a-b25
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-a-b25
+  argv: *id002
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-a-b25
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_planner_weight_rule_binkob_20261026/specs/A-b25.json
+  - --out
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b25
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 345600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.run-a-b25.stdout
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.run-a-b25.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b25/session.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b25/plan.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b25/spec.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b25/host.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b25/records.jsonl
+- id: disk-before-run-a-k23
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-a-k23
+  argv: *id002
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-a-k23
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_planner_weight_rule_binkob_20261026/specs/A-k23.json
+  - --out
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k23
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 403200
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.run-a-k23.stdout
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.run-a-k23.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k23/session.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k23/plan.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k23/spec.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k23/host.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k23/records.jsonl
+- id: disk-before-run-a-k31
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-a-k31
+  argv: *id002
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-a-k31
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_planner_weight_rule_binkob_20261026/specs/A-k31.json
+  - --out
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k31
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 403200
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.run-a-k31.stdout
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.run-a-k31.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k31/session.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k31/plan.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k31/spec.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k31/host.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k31/records.jsonl
+- id: disk-before-run-a-k37
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-a-k37
+  argv: *id002
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-a-k37
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_planner_weight_rule_binkob_20261026/specs/A-k37.json
+  - --out
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k37
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 460800
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.run-a-k37.stdout
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.run-a-k37.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k37/session.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k37/plan.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k37/spec.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k37/host.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k37/records.jsonl
+- id: disk-before-run-p21
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-p21
+  argv: *id002
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-p21
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_prime_residual_lp_20261026/specs/p21.json
+  - --out
+  - research/ic_prime_residual_lp_20261026/sessions/p21
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 460800
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.run-p21.stdout
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.run-p21.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/sessions/p21/session.json
+  - research/ic_prime_residual_lp_20261026/sessions/p21/plan.json
+  - research/ic_prime_residual_lp_20261026/sessions/p21/spec.json
+  - research/ic_prime_residual_lp_20261026/sessions/p21/host.json
+  - research/ic_prime_residual_lp_20261026/sessions/p21/records.jsonl
+- id: disk-before-run-p22
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-p22
+  argv: *id002
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-p22
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_prime_residual_lp_20261026/specs/p22.json
+  - --out
+  - research/ic_prime_residual_lp_20261026/sessions/p22
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 460800
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.run-p22.stdout
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.run-p22.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/sessions/p22/session.json
+  - research/ic_prime_residual_lp_20261026/sessions/p22/plan.json
+  - research/ic_prime_residual_lp_20261026/sessions/p22/spec.json
+  - research/ic_prime_residual_lp_20261026/sessions/p22/host.json
+  - research/ic_prime_residual_lp_20261026/sessions/p22/records.jsonl
+- id: disk-before-run-p24
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-p24
+  argv: *id002
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-p24
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_prime_residual_lp_20261026/specs/p24.json
+  - --out
+  - research/ic_prime_residual_lp_20261026/sessions/p24
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 460800
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.run-p24.stdout
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.run-p24.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/sessions/p24/session.json
+  - research/ic_prime_residual_lp_20261026/sessions/p24/plan.json
+  - research/ic_prime_residual_lp_20261026/sessions/p24/spec.json
+  - research/ic_prime_residual_lp_20261026/sessions/p24/host.json
+  - research/ic_prime_residual_lp_20261026/sessions/p24/records.jsonl
+- id: disk-before-run-p26
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-p26
+  argv: *id002
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-p26
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_prime_residual_lp_20261026/specs/p26.json
+  - --out
+  - research/ic_prime_residual_lp_20261026/sessions/p26
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 460800
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.run-p26.stdout
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.run-p26.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/sessions/p26/session.json
+  - research/ic_prime_residual_lp_20261026/sessions/p26/plan.json
+  - research/ic_prime_residual_lp_20261026/sessions/p26/spec.json
+  - research/ic_prime_residual_lp_20261026/sessions/p26/host.json
+  - research/ic_prime_residual_lp_20261026/sessions/p26/records.jsonl
+- id: disk-before-run-p28
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-p28
+  argv: *id002
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-p28
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_prime_residual_lp_20261026/specs/p28.json
+  - --out
+  - research/ic_prime_residual_lp_20261026/sessions/p28
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 460800
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.run-p28.stdout
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.run-p28.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/sessions/p28/session.json
+  - research/ic_prime_residual_lp_20261026/sessions/p28/plan.json
+  - research/ic_prime_residual_lp_20261026/sessions/p28/spec.json
+  - research/ic_prime_residual_lp_20261026/sessions/p28/host.json
+  - research/ic_prime_residual_lp_20261026/sessions/p28/records.jsonl
+- id: disk-before-run-p32
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-p32
+  argv: *id002
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-p32
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_prime_residual_lp_20261026/specs/p32.json
+  - --out
+  - research/ic_prime_residual_lp_20261026/sessions/p32
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 460800
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.run-p32.stdout
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.run-p32.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/sessions/p32/session.json
+  - research/ic_prime_residual_lp_20261026/sessions/p32/plan.json
+  - research/ic_prime_residual_lp_20261026/sessions/p32/spec.json
+  - research/ic_prime_residual_lp_20261026/sessions/p32/host.json
+  - research/ic_prime_residual_lp_20261026/sessions/p32/records.jsonl
+- id: disk-before-verify-a-b21
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-a-b21
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b21
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/sessions/A-b21.audit.json
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.verify-a-b21.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b21.audit.json
+- id: count-a-b21
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/A-b21.audit.json')); s=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/A-b21/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-a-b23
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-a-b23
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b23
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/sessions/A-b23.audit.json
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.verify-a-b23.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b23.audit.json
+- id: count-a-b23
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/A-b23.audit.json')); s=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/A-b23/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-a-b25
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-a-b25
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b25
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/sessions/A-b25.audit.json
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.verify-a-b25.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-b25.audit.json
+- id: count-a-b25
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/A-b25.audit.json')); s=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/A-b25/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-a-k23
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-a-k23
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k23
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/sessions/A-k23.audit.json
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.verify-a-k23.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k23.audit.json
+- id: count-a-k23
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/A-k23.audit.json')); s=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/A-k23/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-a-k31
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-a-k31
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k31
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/sessions/A-k31.audit.json
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.verify-a-k31.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k31.audit.json
+- id: count-a-k31
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/A-k31.audit.json')); s=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/A-k31/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-a-k37
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-a-k37
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k37
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/sessions/A-k37.audit.json
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-1.verify-a-k37.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/A-k37.audit.json
+- id: count-a-k37
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/A-k37.audit.json')); s=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/A-k37/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-p21
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-p21
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_prime_residual_lp_20261026/sessions/p21
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/sessions/p21.audit.json
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.verify-p21.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/sessions/p21.audit.json
+- id: count-p21
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_prime_residual_lp_20261026/sessions/p21.audit.json')); s=json.load(open('research/ic_prime_residual_lp_20261026/sessions/p21/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-p22
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-p22
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_prime_residual_lp_20261026/sessions/p22
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/sessions/p22.audit.json
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.verify-p22.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/sessions/p22.audit.json
+- id: count-p22
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_prime_residual_lp_20261026/sessions/p22.audit.json')); s=json.load(open('research/ic_prime_residual_lp_20261026/sessions/p22/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-p24
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-p24
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_prime_residual_lp_20261026/sessions/p24
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/sessions/p24.audit.json
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.verify-p24.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/sessions/p24.audit.json
+- id: count-p24
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_prime_residual_lp_20261026/sessions/p24.audit.json')); s=json.load(open('research/ic_prime_residual_lp_20261026/sessions/p24/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-p26
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-p26
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_prime_residual_lp_20261026/sessions/p26
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/sessions/p26.audit.json
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.verify-p26.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/sessions/p26.audit.json
+- id: count-p26
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_prime_residual_lp_20261026/sessions/p26.audit.json')); s=json.load(open('research/ic_prime_residual_lp_20261026/sessions/p26/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-p28
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-p28
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_prime_residual_lp_20261026/sessions/p28
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/sessions/p28.audit.json
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.verify-p28.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/sessions/p28.audit.json
+- id: count-p28
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_prime_residual_lp_20261026/sessions/p28.audit.json')); s=json.load(open('research/ic_prime_residual_lp_20261026/sessions/p28/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-p32
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-p32
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_prime_residual_lp_20261026/sessions/p32
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/sessions/p32.audit.json
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.verify-p32.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/sessions/p32.audit.json
+- id: count-p32
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_prime_residual_lp_20261026/sessions/p32.audit.json')); s=json.load(open('research/ic_prime_residual_lp_20261026/sessions/p32/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: null-p21-b4
+  argv:
+  - ./target/release/examples/ic_residual_curve_free_null
+  - '{"kind":"prime_explicit","p":1579673,"a":49127,"b":471469,"group_order":1579297,"r":1579297,"gx":3,"gy":739631}'
+  - '4'
+  - '64'
+  - '20261102'
+  timeout_seconds: 7200
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/analysis/null-p21-B4.json
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.null-p21-b4.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/analysis/null-p21-B4.json
+- id: null-p21-b16
+  argv:
+  - ./target/release/examples/ic_residual_curve_free_null
+  - '{"kind":"prime_explicit","p":1579673,"a":49127,"b":471469,"group_order":1579297,"r":1579297,"gx":3,"gy":739631}'
+  - '16'
+  - '64'
+  - '20261102'
+  timeout_seconds: 7200
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/analysis/null-p21-B16.json
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.null-p21-b16.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/analysis/null-p21-B16.json
+- id: null-p21-b64
+  argv:
+  - ./target/release/examples/ic_residual_curve_free_null
+  - '{"kind":"prime_explicit","p":1579673,"a":49127,"b":471469,"group_order":1579297,"r":1579297,"gx":3,"gy":739631}'
+  - '64'
+  - '64'
+  - '20261102'
+  timeout_seconds: 7200
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/analysis/null-p21-B64.json
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.null-p21-b64.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/analysis/null-p21-B64.json
+- id: null-p24-b4
+  argv:
+  - ./target/release/examples/ic_residual_curve_free_null
+  - '{"kind":"prime_explicit","p":16777199,"a":16777196,"b":31,"group_order":16782299,"r":16782299,"gx":2,"gy":5412647}'
+  - '4'
+  - '64'
+  - '20261102'
+  timeout_seconds: 7200
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/analysis/null-p24-B4.json
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.null-p24-b4.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/analysis/null-p24-B4.json
+- id: null-p24-b16
+  argv:
+  - ./target/release/examples/ic_residual_curve_free_null
+  - '{"kind":"prime_explicit","p":16777199,"a":16777196,"b":31,"group_order":16782299,"r":16782299,"gx":2,"gy":5412647}'
+  - '16'
+  - '64'
+  - '20261102'
+  timeout_seconds: 7200
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/analysis/null-p24-B16.json
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.null-p24-b16.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/analysis/null-p24-B16.json
+- id: null-p24-b64
+  argv:
+  - ./target/release/examples/ic_residual_curve_free_null
+  - '{"kind":"prime_explicit","p":16777199,"a":16777196,"b":31,"group_order":16782299,"r":16782299,"gx":2,"gy":5412647}'
+  - '64'
+  - '64'
+  - '20261102'
+  timeout_seconds: 7200
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/analysis/null-p24-B64.json
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.null-p24-b64.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/analysis/null-p24-B64.json
+- id: null-p28-b4
+  argv:
+  - ./target/release/examples/ic_residual_curve_free_null
+  - '{"kind":"prime_explicit","p":268435399,"a":268435396,"b":3,"group_order":268407199,"r":268407199,"gx":1,"gy":1}'
+  - '4'
+  - '64'
+  - '20261102'
+  timeout_seconds: 7200
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/analysis/null-p28-B4.json
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.null-p28-b4.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/analysis/null-p28-B4.json
+- id: null-p28-b16
+  argv:
+  - ./target/release/examples/ic_residual_curve_free_null
+  - '{"kind":"prime_explicit","p":268435399,"a":268435396,"b":3,"group_order":268407199,"r":268407199,"gx":1,"gy":1}'
+  - '16'
+  - '64'
+  - '20261102'
+  timeout_seconds: 7200
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/analysis/null-p28-B16.json
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.null-p28-b16.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/analysis/null-p28-B16.json
+- id: null-p28-b64
+  argv:
+  - ./target/release/examples/ic_residual_curve_free_null
+  - '{"kind":"prime_explicit","p":268435399,"a":268435396,"b":3,"group_order":268407199,"r":268407199,"gx":1,"gy":1}'
+  - '64'
+  - '64'
+  - '20261102'
+  timeout_seconds: 7200
+  success_exit_codes:
+  - 0
+  stdout: research/ic_prime_residual_lp_20261026/analysis/null-p28-B64.json
+  stderr: research/ic_prime_residual_lp_20261026/cards/CARD-ic-improve-20261026-1.null-p28-b64.stderr
+  outputs:
+  - research/ic_prime_residual_lp_20261026/analysis/null-p28-B64.json
+bus_address: executor-mechanical-ic-improve-20261026-1
+background: true
+write_scope:
+- research/ic_planner_weight_rule_binkob_20261026/sessions/
+- research/ic_planner_weight_rule_binkob_20261026/cards/
+- research/ic_planner_weight_rule_binkob_20261026/analysis/
+- research/ic_prime_residual_lp_20261026/sessions/
+- research/ic_prime_residual_lp_20261026/cards/
+- research/ic_prime_residual_lp_20261026/analysis/
+stop_when:
+- The run command exits with status 2.
+- Any command in the card exits with a status other than 0, or times out.
+- A count command exits with status 1, meaning a verify command reported a verified count below the executions planned for its session.
+- The disk has less than 1000000000 bytes free before a session or an audit.
+- The working tree has a change outside research/ic_planner_weight_rule_binkob_20261026/cards and research/ic_prime_residual_lp_20261026/cards before the first session.
+- 'On any stop: report the printed text verbatim, retry nothing and edit nothing.'

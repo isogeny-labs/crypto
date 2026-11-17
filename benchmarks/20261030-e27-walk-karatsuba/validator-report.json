@@ -1,0 +1,2334 @@
+{
+ "schema": "validator-report/v1",
+ "status": "pass",
+ "independent": true,
+ "validator": "independent validator subagent (Claude Opus 5.5), not the session that produced E27; this recompute is its own standard-library Rust program (validate_e27.rs: own JSON parser, own SHA-256) and shares no code with examples/e27_walk.rs, examples/e27_tables.rs, experiments/32_walk_karatsuba/summary.json or tables.md",
+ "date": "2026-10-30",
+ "row": "E27 (GLV note §9.25 pre-registration, §9.29 results): the matched <±psi> walk with Karatsuba F_p4 products and batched norm inversions over 16 lockstep walks (Stage W), and E31's solver-A pipeline with Karatsuba products (IC side), on E25's ten GLS curves, both arms",
+ "script": "research/e27_walk_20261030/validate_e27.rs (rustc -O --edition 2021; `validate_e27 report . research/e27_walk_20261030`)",
+ "status_rule": "pass iff every check holds and every headline agrees with its printed figure within half a unit of the last printed digit (exact for counts)",
+ "raw_data": [
+  {
+   "path": "../../experiments/32_walk_karatsuba/stage_w.json",
+   "sha256": "e63191edd8561208b55b6be582c6e69244c1e21c6fc5bab274f2cf1847fda3d1"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p101s1.json",
+   "sha256": "e73678810c24da921589f8e77d8ad83d894dc5ff023e7913508ef6b201438db7"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p101s2.json",
+   "sha256": "4aae4ec5866654358f72e1df8b9d021b751eb6cba2e3d7ae1f54293d6c9bbd91"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p149s1.json",
+   "sha256": "d35fe1354818e709a43c1d7520ffa7269f75ac9fdad08ae69c69d28edde25db7"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p149s2.json",
+   "sha256": "8b86c30cb57af6e563ee2888f8860dab9090a6c9171e3fda0218ffacd07f6f85"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p197s1.json",
+   "sha256": "99ab02e0f3143f09259e3be67c9916912feb197753c7679e1b9740ef7358c935"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p197s2.json",
+   "sha256": "e2db47a63c72e035f701b8d8e62cfb031b21681fc16b7e696c30f151dcc6451b"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p269s1.json",
+   "sha256": "ca89fc4676ba87f1ed5d8bfb1d7f02fc7166d0b9440bb864e0f7bc4dc26f208a"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p269s2.json",
+   "sha256": "d1aa960d1537b7b4510d236bc32c34fa63c59e605c60ecccadde800ed489f8da"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p397s1.json",
+   "sha256": "c01cde05204b4dbd42f89c7b8ff7283ad6681bcf86a2aaf882f1d92e3ae245a0"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p397s2.json",
+   "sha256": "ca27c4538a37d8c225b462d86aa02a5a2766364f2787bfe72a0227a89cdcf664"
+  },
+  {
+   "path": "../../benchmarks/20261018-k4-gls-v4/replay-certificate.json",
+   "sha256": "3dc0530ddaa572b541a5caaf1e57bda012be3d933320482e4086dc75dbaa8bf5"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p101s1.json",
+   "sha256": "39d93707a3dc8430fce2df47886012ea6545b63b02d8cdf58990eb4e6d3adadb"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p101s1.json",
+   "sha256": "b36f3a9fdb704233d1af8d93d59ec1a683a8a964ceaa3d71743e9ad25d3c3b39"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p101s2.json",
+   "sha256": "bc4c3a81a1a7de63ddf204a4b8b289ae6bcc200f33a7bcc6251e65430afd31f9"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p101s2.json",
+   "sha256": "a090dc3efe4585a4532f86eb8966b7995b007b8f94b421ee4f38094b379e6653"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p149s1.json",
+   "sha256": "71618ef39d4b6ca0ec0a38b3667288393d087572cc6d97208e5d331baed0d5f7"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p149s1.json",
+   "sha256": "94f077092d14eb94072cd373a1cd3d8183ece90f320619f91d04bb9b69c643ce"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p149s2.json",
+   "sha256": "683e68771a3615fc2cacfa573736b156478899cbe8d99a81e4edaf611a3a8b24"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p149s2.json",
+   "sha256": "210c65f16dab920edf43031868b88197336439c2e93599575c4bfee8e176cb06"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p197s1.json",
+   "sha256": "db97629bc6887c37fd5b3b06bd62b37e14936c660022af252e653a0a796c0d10"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p197s1.json",
+   "sha256": "33fc49156cbbd88df15fe9fd8d4c759f0a730718a2da329c3de46cf4b2572b8d"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p197s2.json",
+   "sha256": "d86f811e85852e311ee8583823ef5a3619635c0511148038c6cf99f83ed1f38a"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p197s2.json",
+   "sha256": "2ac24660a68e713a5a0b4c17f04fa7268b84efd0c7afae56e69972bf69647d7e"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p269s1.json",
+   "sha256": "ed045d101098b39e58686b48cc663aaedb8b40920f13f8824be7badebe5c817a"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p269s1.json",
+   "sha256": "1549c869ea9192de424fd15dec1e074ea51fbfe018023df75d49d3b6a3717277"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p269s2.json",
+   "sha256": "a67423a8acf8fab3fd32276b31374ab60deef3864d2c4129a0b63db14f232e1a"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p269s2.json",
+   "sha256": "2bf95cc827b0ca91d7941b7268efacc523e7c289bd12e792083bd5e825a4b388"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p397s1.json",
+   "sha256": "cb469c62cbf518eb8610f42e50dff859b28c480c4d9776fe9921bf1e3465eabd"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p397s1.json",
+   "sha256": "2fb42a34c4c84a22a6fa88a7b54ddf5a41c98b89783b06db43c2b64324915bde"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p397s2.json",
+   "sha256": "7fbc78e9ffc61aeca3353f14d70badf51624b15e2344cd380b066951f847fd0c"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p397s2.json",
+   "sha256": "4398fc1c6ed6c699493ad2b916a604bad086a64c70ac4c568a378b8482e3ded6"
+  }
+ ],
+ "headline": [
+  {
+   "name": "Fp4::mul schoolbook",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "19",
+   "claimed": 19,
+   "recomputed": 19,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per_op_costs.schoolbook.fp4_mul (counter)"
+  },
+  {
+   "name": "Fp4::mul Karatsuba",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "13",
+   "claimed": 13,
+   "recomputed": 13,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per_op_costs.karatsuba.fp4_mul (counter)"
+  },
+  {
+   "name": "affine addition, schoolbook (E25 reference)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "97",
+   "claimed": 97,
+   "recomputed": 97,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per_op_costs.schoolbook.add_distinct_unbatched"
+  },
+  {
+   "name": "affine addition, Karatsuba unbatched",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "79",
+   "claimed": 79,
+   "recomputed": 79,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per_op_costs.karatsuba.add_distinct_unbatched"
+  },
+  {
+   "name": "doubling, schoolbook",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "116",
+   "claimed": 116,
+   "recomputed": 116,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per_op_costs.schoolbook.double_unbatched"
+  },
+  {
+   "name": "doubling, Karatsuba unbatched",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "92",
+   "claimed": 92,
+   "recomputed": 92,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per_op_costs.karatsuba.double_unbatched"
+  },
+  {
+   "name": "GLS map psi, schoolbook",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "38",
+   "claimed": 38,
+   "recomputed": 38,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per_op_costs.schoolbook.psi_gls"
+  },
+  {
+   "name": "GLS map psi, Karatsuba",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "26",
+   "claimed": 26,
+   "recomputed": 26,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per_op_costs.karatsuba.psi_gls"
+  },
+  {
+   "name": "norm-inversion share per inversion, min over 20 pools",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "3.27",
+   "claimed": 3.27,
+   "recomputed": 3.268119558587035,
+   "rel_tol": 0.0015290519892966362,
+   "agrees": true,
+   "definition": "recorded_batch_muls / recorded_inversions per (curve, fold) pool"
+  },
+  {
+   "name": "norm-inversion share per inversion, max over 20 pools",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "3.75",
+   "claimed": 3.75,
+   "recomputed": 3.7481416249282518,
+   "rel_tol": 0.0013333333346666667,
+   "agrees": true,
+   "definition": "recorded_batch_muls / recorded_inversions per (curve, fold) pool"
+  },
+  {
+   "name": "affine addition, batched (iii), min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "66.3",
+   "claimed": 66.3,
+   "recomputed": 66.26811955858703,
+   "rel_tol": 0.0007541478137254902,
+   "agrees": true,
+   "definition": "Karatsuba add 79 with the 16 of its F_p inversion replaced by the pool's share (identity checked per pool)"
+  },
+  {
+   "name": "affine addition, batched (iii), max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "66.7",
+   "claimed": 66.7,
+   "recomputed": 66.74814162492825,
+   "rel_tol": 0.0007496251881559221,
+   "agrees": true,
+   "definition": "as above"
+  },
+  {
+   "name": "walks identical under (i), (ii), (iii)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "320",
+   "claimed": 320,
+   "recomputed": 320,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "count of walks whose identity fields agree three ways"
+  },
+  {
+   "name": "(i) reproduces E25's walk records field for field",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "320",
+   "claimed": 320,
+   "recomputed": 320,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "count of (i) walks equal to E25's arm-A record (E25 convention)"
+  },
+  {
+   "name": "walk cost (i)/(iii), min over both walks and ten curves",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.4533",
+   "claimed": 1.4533,
+   "recomputed": 1.4533050198396589,
+   "rel_tol": 0.000034404458852267256,
+   "agrees": true,
+   "definition": "sum over 16 walks of (fp_muls - verify_fp_muls), (i) over (iii)"
+  },
+  {
+   "name": "walk cost (i)/(iii), max over both walks and ten curves",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.4634",
+   "claimed": 1.4634,
+   "recomputed": 1.4634077413286173,
+   "rel_tol": 0.000034167008370917044,
+   "agrees": true,
+   "definition": "as above"
+  },
+  {
+   "name": "<±psi> walk cost (i)/(iii), min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.4559",
+   "claimed": 1.4559,
+   "recomputed": 1.4558877854498817,
+   "rel_tol": 0.00003434301809877052,
+   "agrees": true,
+   "definition": "Gls fold only"
+  },
+  {
+   "name": "<±psi> walk cost (i)/(iii), max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.4634",
+   "claimed": 1.4634,
+   "recomputed": 1.4634077413286173,
+   "rel_tol": 0.000034167008370917044,
+   "agrees": true,
+   "definition": "Gls fold only"
+  },
+  {
+   "name": "negation walk cost (i)/(iii), min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.4533",
+   "claimed": 1.4533,
+   "recomputed": 1.4533050198396589,
+   "rel_tol": 0.000034404458852267256,
+   "agrees": true,
+   "definition": "Negation fold only"
+  },
+  {
+   "name": "negation walk cost (i)/(iii), max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.4621",
+   "claimed": 1.4621,
+   "recomputed": 1.4621115168687575,
+   "rel_tol": 0.000034197387353806174,
+   "agrees": true,
+   "definition": "Negation fold only"
+  },
+  {
+   "name": "[d]G check at p=101 seed 1: group operations per <±psi> walk",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "+31",
+   "claimed": 31,
+   "recomputed": 31,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "verify_group_ops of every (i) walk (one value)"
+  },
+  {
+   "name": "[d]G check at p=101 seed 1: F_p multiplications per <±psi> walk",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "+3,309",
+   "claimed": 3309,
+   "recomputed": 3309,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "verify_fp_muls of every (i) walk (one value)"
+  },
+  {
+   "name": "[d]G check, % of a <±psi> walk, min over the ten curves",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "0.13",
+   "claimed": 0.13,
+   "recomputed": 0.12645763021065462,
+   "rel_tol": 0.0384615385,
+   "agrees": true,
+   "definition": "sum verify_fp_muls / sum (fp_muls - verify_fp_muls), walk (i), per curve"
+  },
+  {
+   "name": "[d]G check, % of a <±psi> walk, max over the ten curves",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "0.78",
+   "claimed": 0.78,
+   "recomputed": 0.7758417756402034,
+   "rel_tol": 0.006410256416666667,
+   "agrees": true,
+   "definition": "as above"
+  },
+  {
+   "name": "S_A / S_A,K, min over 20 rows",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.00475",
+   "claimed": 1.00475,
+   "recomputed": 1.0047534098224176,
+   "rel_tol": 0.000004976362284150287,
+   "agrees": true,
+   "definition": "E31 total_muls over E27 total_muls, same (p, seed, arm)"
+  },
+  {
+   "name": "S_A / S_A,K, max over 20 rows",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.00566",
+   "claimed": 1.00566,
+   "recomputed": 1.0056573672004079,
+   "rel_tol": 0.000004971859281466898,
+   "agrees": true,
+   "definition": "as above"
+  },
+  {
+   "name": "non-solve F_p4 work, % of S_A, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "2.00",
+   "claimed": 2,
+   "recomputed": 2.0035929985813645,
+   "rel_tol": 0.0025000000025000003,
+   "agrees": true,
+   "definition": "(generation + base + precompute + weil + lift + check) / total_muls on E31's records"
+  },
+  {
+   "name": "non-solve F_p4 work, % of S_A, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "2.48",
+   "claimed": 2.48,
+   "recomputed": 2.4751466200223926,
+   "rel_tol": 0.0020161290342741935,
+   "agrees": true,
+   "definition": "as above"
+  },
+  {
+   "name": "IC-side F_p inversions per run, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "4.7e5",
+   "claimed": 470000,
+   "recomputed": 472508,
+   "rel_tol": 0.010638297882978725,
+   "agrees": true,
+   "definition": "ic_fp_inversions"
+  },
+  {
+   "name": "IC-side F_p inversions per run, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "2.6e7",
+   "claimed": 26000000,
+   "recomputed": 25525814,
+   "rel_tol": 0.01923076925,
+   "agrees": true,
+   "definition": "ic_fp_inversions"
+  },
+  {
+   "name": "saving from batching the IC side's inversions, % of S, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "0.127",
+   "claimed": 0.127,
+   "recomputed": 0.12671495886775785,
+   "rel_tol": 0.003937007877952756,
+   "agrees": true,
+   "definition": "(16 - the curve's <±psi> pool share) * ic_fp_inversions / S_A,K (the definition the printed figure uses; errata E2)"
+  },
+  {
+   "name": "saving from batching the IC side's inversions, % of S, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "0.170",
+   "claimed": 0.17,
+   "recomputed": 0.17031968976942966,
+   "rel_tol": 0.002941176473529412,
+   "agrees": true,
+   "definition": "as above"
+  },
+  {
+   "name": "S/rho E31 A at 0 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "4.42e3",
+   "claimed": 4420,
+   "recomputed": 4415.100780483653,
+   "rel_tol": 0.0011312217205882355,
+   "agrees": true,
+   "definition": "(S_A + 0 * 97 * macaulay_entries) / (rho_E31 + 0 * 97 * steps), E31 solver-A records against E25's walk (i)"
+  },
+  {
+   "name": "S/rho E31 A at 0 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "2.79e5",
+   "claimed": 279000,
+   "recomputed": 279277.2446299923,
+   "rel_tol": 0.0017921146971326166,
+   "agrees": true,
+   "definition": "(S_A + 0 * 97 * macaulay_entries) / (rho_E31 + 0 * 97 * steps), E31 solver-A records against E25's walk (i)"
+  },
+  {
+   "name": "S/rho E27 at 0 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "6.39e3",
+   "claimed": 6390,
+   "recomputed": 6391.730928925254,
+   "rel_tol": 0.0007824726142410017,
+   "agrees": true,
+   "definition": "(S_A,K + 0 * 97 * macaulay_entries) / (rho_iii + 0 * 97 * steps), E27 records against Stage W walk (iii), E25 convention"
+  },
+  {
+   "name": "S/rho E27 at 0 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "4.06e5",
+   "claimed": 406000,
+   "recomputed": 405543.5536728417,
+   "rel_tol": 0.0012315270948275864,
+   "agrees": true,
+   "definition": "(S_A,K + 0 * 97 * macaulay_entries) / (rho_iii + 0 * 97 * steps), E27 records against Stage W walk (iii), E25 convention"
+  },
+  {
+   "name": "growth of S/rho per row at 0 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.4477",
+   "claimed": 1.4477,
+   "recomputed": 1.447697628371027,
+   "rel_tol": 0.00003453754234302688,
+   "agrees": true,
+   "definition": "E27 S/rho over E31 S/rho, same row"
+  },
+  {
+   "name": "growth of S/rho per row at 0 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.4564",
+   "claimed": 1.4564,
+   "recomputed": 1.4563686561102047,
+   "rel_tol": 0.00003433122771903324,
+   "agrees": true,
+   "definition": "as above"
+  },
+  {
+   "name": "S/rho E31 A at 0.1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.50e4",
+   "claimed": 15000,
+   "recomputed": 15018.543530923198,
+   "rel_tol": 0.003333333336666667,
+   "agrees": true,
+   "definition": "(S_A + 0.1 * 97 * macaulay_entries) / (rho_E31 + 0.1 * 97 * steps), E31 solver-A records against E25's walk (i)"
+  },
+  {
+   "name": "S/rho E31 A at 0.1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "9.77e5",
+   "claimed": 977000,
+   "recomputed": 976567.2755422535,
+   "rel_tol": 0.0005117707272262027,
+   "agrees": true,
+   "definition": "(S_A + 0.1 * 97 * macaulay_entries) / (rho_E31 + 0.1 * 97 * steps), E31 solver-A records against E25's walk (i)"
+  },
+  {
+   "name": "S/rho E27 at 0.1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "2.13e4",
+   "claimed": 21300,
+   "recomputed": 21251.614891748253,
+   "rel_tol": 0.0023474178427230047,
+   "agrees": true,
+   "definition": "(S_A,K + 0.1 * 97 * macaulay_entries) / (rho_iii + 0.1 * 97 * steps), E27 records against Stage W walk (iii), E25 convention"
+  },
+  {
+   "name": "S/rho E27 at 0.1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.39e6",
+   "claimed": 1390000,
+   "recomputed": 1394064.3080821137,
+   "rel_tol": 0.003597122305755396,
+   "agrees": true,
+   "definition": "(S_A,K + 0.1 * 97 * macaulay_entries) / (rho_iii + 0.1 * 97 * steps), E27 records against Stage W walk (iii), E25 convention"
+  },
+  {
+   "name": "growth of S/rho per row at 0.1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.4150",
+   "claimed": 1.415,
+   "recomputed": 1.4150250220995901,
+   "rel_tol": 0.00003533568908127209,
+   "agrees": true,
+   "definition": "E27 S/rho over E31 S/rho, same row"
+  },
+  {
+   "name": "growth of S/rho per row at 0.1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.4427",
+   "claimed": 1.4427,
+   "recomputed": 1.4426595376357538,
+   "rel_tol": 0.00003465723993207181,
+   "agrees": true,
+   "definition": "as above"
+  },
+  {
+   "name": "S/rho E31 A at 1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "7.33e4",
+   "claimed": 73300,
+   "recomputed": 73335.08552925396,
+   "rel_tol": 0.0006821282407912688,
+   "agrees": true,
+   "definition": "(S_A + 1 * 97 * macaulay_entries) / (rho_E31 + 1 * 97 * steps), E31 solver-A records against E25's walk (i)"
+  },
+  {
+   "name": "S/rho E31 A at 1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "5.22e6",
+   "claimed": 5220000,
+   "recomputed": 5223882.515081011,
+   "rel_tol": 0.0009578544070881226,
+   "agrees": true,
+   "definition": "(S_A + 1 * 97 * macaulay_entries) / (rho_E31 + 1 * 97 * steps), E31 solver-A records against E25's walk (i)"
+  },
+  {
+   "name": "S/rho E27 at 1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "9.07e4",
+   "claimed": 90700,
+   "recomputed": 90669.71546396094,
+   "rel_tol": 0.0005512679167585448,
+   "agrees": true,
+   "definition": "(S_A,K + 1 * 97 * macaulay_entries) / (rho_iii + 1 * 97 * steps), E27 records against Stage W walk (iii), E25 convention"
+  },
+  {
+   "name": "S/rho E27 at 1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "6.64e6",
+   "claimed": 6640000,
+   "recomputed": 6636884.883024465,
+   "rel_tol": 0.0007530120489457833,
+   "agrees": true,
+   "definition": "(S_A,K + 1 * 97 * macaulay_entries) / (rho_iii + 1 * 97 * steps), E27 records against Stage W walk (iii), E25 convention"
+  },
+  {
+   "name": "growth of S/rho per row at 1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.2364",
+   "claimed": 1.2364,
+   "recomputed": 1.2363756694303172,
+   "rel_tol": 0.00004043998709964413,
+   "agrees": true,
+   "definition": "E27 S/rho over E31 S/rho, same row"
+  },
+  {
+   "name": "growth of S/rho per row at 1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.3252",
+   "claimed": 1.3252,
+   "recomputed": 1.3251569730039692,
+   "rel_tol": 0.00003773015397675823,
+   "agrees": true,
+   "definition": "as above"
+  },
+  {
+   "name": "G2.99 verdict growth at 0 GAE, min (rounded)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.448",
+   "claimed": 1.448,
+   "recomputed": 1.447697628371027,
+   "rel_tol": 0.0003453038677486189,
+   "agrees": true,
+   "definition": "as above, three decimals"
+  },
+  {
+   "name": "G2.99 verdict growth at 0 GAE, max (rounded)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.456",
+   "claimed": 1.456,
+   "recomputed": 1.4563686561102047,
+   "rel_tol": 0.00034340659375000005,
+   "agrees": true,
+   "definition": "as above, three decimals"
+  },
+  {
+   "name": "G2.99 verdict growth at 0.1 GAE, min (rounded)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.415",
+   "claimed": 1.415,
+   "recomputed": 1.4150250220995901,
+   "rel_tol": 0.0003533568908127209,
+   "agrees": true,
+   "definition": "as above, three decimals"
+  },
+  {
+   "name": "G2.99 verdict growth at 0.1 GAE, max (rounded)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.443",
+   "claimed": 1.443,
+   "recomputed": 1.4426595376357538,
+   "rel_tol": 0.0003465003468468469,
+   "agrees": true,
+   "definition": "as above, three decimals"
+  },
+  {
+   "name": "G2.99 verdict growth at 1 GAE, min (rounded)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.236",
+   "claimed": 1.236,
+   "recomputed": 1.2363756694303172,
+   "rel_tol": 0.0004045307447411004,
+   "agrees": true,
+   "definition": "as above, three decimals"
+  },
+  {
+   "name": "G2.99 verdict growth at 1 GAE, max (rounded)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.325",
+   "claimed": 1.325,
+   "recomputed": 1.3251569730039692,
+   "rel_tol": 0.0003773584909433963,
+   "agrees": true,
+   "definition": "as above, three decimals"
+  },
+  {
+   "name": "best row p=397 s1 arm B, S/rho at 0 GAE, E31",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "4.42e3",
+   "claimed": 4420,
+   "recomputed": 4415.100780483653,
+   "rel_tol": 0.0011312217205882355,
+   "agrees": true,
+   "definition": "that row"
+  },
+  {
+   "name": "best row p=397 s1 arm B, S/rho at 0 GAE, E27",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "6.39e3",
+   "claimed": 6390,
+   "recomputed": 6391.730928925254,
+   "rel_tol": 0.0007824726142410017,
+   "agrees": true,
+   "definition": "that row"
+  },
+  {
+   "name": "growth at 1 GAE on the p=101 seed 2 rows (both above G2.99's 1.30)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.29",
+   "printed": "1.3252",
+   "claimed": 1.3252,
+   "recomputed": 1.3251540681816987,
+   "rel_tol": 0.00003773015397675823,
+   "agrees": true,
+   "definition": "min over the two rows"
+  }
+ ],
+ "headline_disagreements": [],
+ "checks": [
+  {
+   "check": "stage W covers E25's ten curves, 16 walks per fold, pool 16",
+   "holds": true,
+   "detail": "10 curves, walks_per_fold 16, pool 16"
+  },
+  {
+   "check": "every walk uses E25's seeds 1000*seed + k, k < 16, in order, for its fold",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "320 walks identical under (i), (ii), (iii) (seed, steps, group ops, recovered, correct, visit digest, cycle escapes, verify group ops)",
+   "holds": true,
+   "detail": "320 of 320"
+  },
+  {
+   "check": "every walk under every arithmetic is correct (recovered = planted d and [d]G = Q in the producing binary)",
+   "holds": true,
+   "detail": "320 of 320 walk triples"
+  },
+  {
+   "check": "(i) equals E25's arm-A walk record field for field (steps, group ops and F_p mults without the [d]G check, cycle escapes, correct)",
+   "holds": true,
+   "detail": "320 of 320"
+  },
+  {
+   "check": "(i) equals E25's arm-B walk record field for field (E25 records each walk in both arms)",
+   "holds": true,
+   "detail": "320 of 320"
+  },
+  {
+   "check": "one logarithm per curve across all 96 walks",
+   "holds": true,
+   "detail": "[(101, 1, 1538068), (101, 2, 557533), (149, 1, 4914788), (149, 2, 2874927), (197, 1, 79622603), (197, 2, 7399960), (269, 1, 270725152), (269, 2, 309622187), (397, 1, 1275612762), (397, 2, 1421554453)]"
+  },
+  {
+   "check": "the recovered logarithm equals the planted d that E25's independent validator checked (dG = Q in its own arithmetic), with equal n and cofactor, on all ten curves",
+   "holds": true,
+   "detail": "10 of 10 (benchmarks/20261018-k4-gls-v4/replay-certificate.json)"
+  },
+  {
+   "check": "recorded means, verify means, mean steps/group ops and inversion shares equal the recompute from the per-walk records",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "recorded flags replay_matches_e25, karatsuba_identical, batched_identical true and e25_records = 16",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "per pool: sum (ii) - sum (iii) = 16 * recorded_inversions - recorded_batch_muls (only the inversion price differs)",
+   "holds": true,
+   "detail": "true on 20 pools"
+  },
+  {
+   "check": "per pool: batch_muls = 3 * inversions + 13 * rounds (3(m-1)+16 per round, every round non-empty)",
+   "holds": true,
+   "detail": "20 of 20 pools"
+  },
+  {
+   "check": "per-op costs: mul 19/13, inv 40, add 40+3mul, doubling 40+4mul, psi 2mul (derived from gaudry_quartic.rs and equal to the counters)",
+   "holds": true,
+   "detail": "Obj([(\"karatsuba\", Obj([(\"add_distinct_unbatched\", Num(\"79\")), (\"double_unbatched\", Num(\"92\")), (\"fp4_inv_unbatched\", Num(\"40\")), (\"fp4_mul\", Num(\"13\")), (\"psi_gls\", Num(\"26\"))])), (\"schoolbook\", Obj([(\"add_distinct_unbatched\", Num(\"97\")), (\"double_unbatched\", Num(\"116\")), (\"fp4_inv_unbatched\", Num("
+  },
+  {
+   "check": "E27 and E31 records: arms, solver chain, fp4_product karatsuba, p, seed",
+   "holds": true,
+   "detail": "true (also: total = sum of the eight phase counts on both sides; solve_muls, la_fp_muls, macaulay_entries equal; E31 rho_matched = walk (i) mean; fp_muls_per_add 97 / 79)"
+  },
+  {
+   "check": "instance identity: n, group_order, cofactor, base_points equal in E25, E31, E27 and Stage W",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "index-calculus logarithm (Wiedemann) equals the walks' logarithm on every row; solved and correct",
+   "holds": true,
+   "detail": "true on 20 rows"
+  },
+  {
+   "check": "the pipeline process's own <±psi> and negation walks equal Stage W's walk (ii) record for record (cost included)",
+   "holds": true,
+   "detail": "640 of 640"
+  },
+  {
+   "check": "disclosure: the E27 e2e records' rho_matched_muls is walk (ii) WITH the [d]G check, so their `ratio` field is not the E27 distance",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "every other field of E31 A's records reproduced: differing leaves are only multiplication counts and what derives from them, walk group ops (the [d]G check, now charged), and wall times",
+   "holds": true,
+   "detail": "5920 of 8200 compared leaves identical; differing: {\"$.base_muls\", \"$.call.max\", \"$.call.mean\", \"$.call.median\", \"$.call.min\", \"$.call.p10\", \"$.call.p90\", \"$.check_muls\", \"$.fp_muls_per_add\", \"$.generation_muls\", \"$.lift_muls\", \"$.precompute_muls\", \"$.ratio\", \"$.rho[*].fp_muls\", \"$.rho[*].group_ops\", \"$.rho_matched_muls\", \"$.rho_negation_muls\", \"$.rho_unfolded_muls\", \"$.total_muls\", \"$.weil_muls\"}; added in E27: {\"$.folded.recovered\", \"$.fp4_product\", \"$.ic_fp_inversions\", \"$.rho[*].recovered\", \"$.rho[*].verify_fp_muls\", \"$.rho[*].verify_group_ops\", \"$.rho[*].visit_digest\"}; unexpected: []; missing in E27: {}"
+  },
+  {
+   "check": "G2.99: rows outside the registered growth bands are exactly the two p=101 seed 2 rows at 1 GAE (falsified high), as reported",
+   "holds": true,
+   "detail": "[\"p=101 s2 arm A at 1 GAE: 1.3252 (band [1.12, 1.3])\", \"p=101 s2 arm B at 1 GAE: 1.3252 (band [1.12, 1.3])\"]"
+  },
+  {
+   "check": "rho ahead of every row at every weight (min S/rho over 20 rows x 3 weights, both references)",
+   "holds": true,
+   "detail": "min S/rho 4415.100780483653"
+  },
+  {
+   "check": "G2.96: Fp4::mul = 13; batched distinct addition in [64, 70]; per group op (i)/(iii) in [1.38, 1.50]",
+   "holds": true,
+   "detail": "addition 66.268-66.748, ratio 1.4533-1.4634"
+  },
+  {
+   "check": "G2.97: (i)/(iii) in [1.38, 1.50] on every curve, both walks",
+   "holds": true,
+   "detail": "1.4533-1.4634"
+  },
+  {
+   "check": "G2.98: S_A/S_A,K in [1.001, 1.008] on every row",
+   "holds": true,
+   "detail": "1.004753-1.005657"
+  },
+  {
+   "check": "§5a: the matched walk (iii) is below the index calculus on all 20 rows at 0, 0.1 and 1 GAE",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "manual: the E27 pre-registration (§9.25, G2.95-G2.99) was committed before any E27 code and is unchanged since",
+   "holds": true,
+   "detail": "b3a0617adead7eaccf4ba545008ff16e6c053a9a 2026-10-30T17:42:12Z precedes code 6490d0faccc25cbcadce7dd4879c428344b3ae51 2026-10-30T18:34:23Z and is its ancestor; §9.25 at HEAD 5b8f3d217 is byte-identical to b3a0617ad except one trailing blank line added when §9.26 was appended (git log -L shows no other commit touching the section)"
+  },
+  {
+   "check": "manual: binary_commit.txt names the code commit plus compile repairs, and HEAD descends from it",
+   "holds": true,
+   "detail": "binary_commit.txt = af2504ef161cbe804d855f3fa26c435bc02ba282, whose parent is the E27 code commit 6490d0fac; af2504ef1 touches only binary_semaev_chain_sat.rs (-1 line), ml_dataset/s3_budget.rs, ml_dataset/storage.rs, store/mod.rs (8+/4-, compile repairs off the E27 path); HEAD 5b8f3d217 descends from it"
+  },
+  {
+   "check": "manual: the replayed tree is the recorded binary commit's build inputs, byte for byte",
+   "holds": true,
+   "detail": "1,732 files, every one equal to its af2504ef1 blob"
+  },
+  {
+   "check": "manual: HEAD's E27 code equals the recorded binary's in behaviour (source level)",
+   "holds": true,
+   "detail": "not byte-identical: 37 files differ (merges of main and E28-E30 code). Cargo.toml, Cargo.lock and examples/e27_walk.rs are unchanged; the modules on the E27 path (quartic_folds, gaudry_quartic, residual_walk, glv_invariant_base, gaudry_quartic_d4, gaudry_cubic, d4_weighted_s5, klein_v4) are unchanged except quartic_folds.rs and gaudry_quartic.rs, whose E27-path changes are (a) `if m > 0 { cost / m }` -> `cost.checked_div(m)` in the batch share (identical), (b) E29's rho_twist24_with (not on E27's path), (c) E30's trivial-product audit counter, off unless --audit, serialized only when on (quartic_pipeline_gls gains the --audit flag); the e27_tests module is byte-identical. Executed at HEAD: the e27_ unit tests (unit_tests_e27, built from HEAD's tree). Not executed at HEAD: a replay of the E27 runs with HEAD-built examples (the container restart wiped the tmpfs build before it was made); HEAD's equivalence on the recorded runs is therefore source-level plus the unit tests"
+  },
+  {
+   "check": "manual: G2.95's unit tests: Karatsuba = schoolbook with a perturbed-factor control; batched additions = serial with a perturbed-inverse control; batched walks = serial walks, digests distinguish walks",
+   "holds": true,
+   "detail": "replay/unit_test.log: Finished release in 16m 12s; 3 passed, 0 failed (e27_karatsuba_product_equals_the_schoolbook, e27_batched_additions_equal_serial_additions, e27_batched_walks_are_the_serial_walks), 2026-10-30T23:58:27Z. Run from HEAD's tree because the lib test target does not compile at af2504ef1 (an unrelated test helper in src/ml_dataset/storage.rs, repaired in ed49f1378); the e27_tests module is byte-identical at af2504ef1 and HEAD"
+  },
+  {
+   "check": "manual: negative control on the validator's comparator: perturbed leaves in a copy of the replay are each detected, and nothing else",
+   "holds": true,
+   "detail": "exactly the 3 perturbed leaves reported (23,141 of 23,144 identical). The first version of the comparator compared differing integer texts as f64 and missed the two digest changes (2^64-range integers collapse in an f64); it was fixed to compare integers exactly (i128) before any replay comparison was recorded, and the control re-run passed"
+  },
+  {
+   "check": "manual: negative control on the validator's recompute: one perturbed digest in a scratch copy of the committed stage_w.json breaks the bit-identity check",
+   "holds": true,
+   "detail": "status fail: '320 walks identical' check 319 of 320, headline 'walks identical' printed 320 recomputed 319"
+  },
+  {
+   "check": "manual: main's 652238c03 is where rho4_folded began charging the [d]G = Q check, and E31's binary predates it",
+   "holds": true,
+   "detail": "652238c03 (2026-10-24T10:26:43Z) adds `correct = found == Some(inst.d) && found.is_some_and(|d| curve.mul(&inst.g, d) == inst.q)` on the walk's counting curve; it is an ancestor of af2504ef1 and not of E31's recorded binary a8f52422d5, so E31's walks did not charge it and E27's do (recorded apart as verify_fp_muls / verify_group_ops)"
+  },
+  {
+   "check": "G2.95's unit tests (e27_) were run by the validator and passed",
+   "holds": true,
+   "detail": "true"
+  }
+ ],
+ "check_failures": [],
+ "errata": [
+  {
+   "id": "E1",
+   "claim": "§9.29 Stage W: \"(i)/(ii) (Karatsuba alone) ≈ 1.27\" (for both walks)",
+   "recomputed": "<±psi> 1.2653-1.2826; negation 1.2298-1.2410",
+   "effect": "none on any verdict or headline: (i)/(iii), the registered quantity, is reproduced exactly; the ≈ 1.27 holds for the <±psi> walk only"
+  },
+  {
+   "id": "E2",
+   "claim": "§9.29 IC side: \"Batching the IC side's F_p inversions too could save at most a further 0.127-0.170 % of S (bound, not built)\"",
+   "recomputed": "0.127-0.170 % reproduces only as (16 - the curve's <±psi> pool share) per inversion (0.1267-0.1703 %), i.e. batching at the walk's measured share; under the batch cost 3(m-1)+16 the saving per inversion tends to 13 as m grows, so the upper bound is 13 * ic_fp_inversions / S = 0.1303-0.1803 % (and 16 per inversion, all of it, 0.1604-0.2219 %)",
+   "effect": "none on any verdict: the quantity is a side bound; \"at most\" should read \"at the walk's batch share\" or the bound should be 0.130-0.180 %"
+  },
+  {
+   "id": "E3",
+   "claim": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p*s*.json fields rho_matched_muls and ratio",
+   "recomputed": "in these records rho_matched_muls is the mean of walk (ii) (Karatsuba, unbatched) WITH the [d]G check (e.g. p=101 s1: 407,712.125 = 405,069.125 + 2,643), and ratio = total_muls / that; neither is the E27 distance, which uses Stage W walk (iii) without the check (E25's convention)",
+   "effect": "none on §9.29 (its distances use walk (iii), reproduced here); a reader taking `ratio` from the E27 records would understate the distance at 0 GAE by the factor rho_matched_muls / rho_iii = 1.1365-1.1657; the convention is disclosed in §9.29 but the records do not say it"
+  }
+ ],
+ "verdicts_recomputed": [
+  {
+   "id": "G2.95",
+   "note": "holds for the runs; unit tests run with the session's final test build",
+   "recomputed": "320/320 walks identical three ways; (i) = E25 on 320/320 (both arms); unit tests e27_ by the validator: pass"
+  },
+  {
+   "id": "G2.96",
+   "note": "holds",
+   "recomputed": "mul 13; batched addition 66.27-66.75; (i)/(iii) 1.4533-1.4634: holds"
+  },
+  {
+   "id": "G2.97",
+   "note": "holds",
+   "recomputed": "1.4533-1.4634 on every curve, both walks: holds"
+  },
+  {
+   "id": "G2.98",
+   "note": "holds",
+   "recomputed": "1.00475-1.00566; non-solve share 2.00-2.48 %; every other field reproduced: holds"
+  },
+  {
+   "id": "G2.99",
+   "note": "holds at 0 and 0.1; falsified high at 1 GAE on the two p = 101 seed 2 rows (1.3252, band <= 1.30)",
+   "recomputed": "rows outside the bands: [\"p=101 s2 arm A at 1 GAE: 1.3252 (band [1.12, 1.3])\", \"p=101 s2 arm B at 1 GAE: 1.3252 (band [1.12, 1.3])\"]; rho ahead of every row at every weight: true"
+  }
+ ],
+ "limitations": [
+  "Operation counts only. Wall times were neither claimed nor compared; the replay ran locally in the validator's 4-vCPU container (not isolab-eks), which is acceptable because no wall time is admitted.",
+  "The matched rho reference prices every walk without the [d]G = Q check (E25's and E31's convention, 0.13-0.78 % of a <±psi> walk) while the index calculus keeps its own check_muls; this favours rho, so the distances are conservative for the index calculus.",
+  "The batched walk (iii) runs in e27_walk, the index calculus in quartic_pipeline_gls: two binaries of one build (same commit, same crypto_lib counters). The pipeline process's own walks equal Stage W's walk (ii) record for record, and (iii) differs from (ii) only by the price of the recorded F_p inversions (identity checked on all 20 pools); same_binary_or_process is asserted on that basis.",
+  "Batched inversions are charged 3(m-1)+16 per round with m the round's inversions (all independent: begin/end additions; the inverses returned are the ones used, so bit-identity covers them). m averages above 16 because set-up rounds carry many independent scalar-multiplication steps; fillers keep the pool at 16 walks. The 16 charged per F_p inversion is the repository's convention, unchanged.",
+  "The index-calculus side is not batched (bound in errata E2); §5a's unpriced native work is priced only as one GAE per Macaulay entry and per walk step, as registered; F_p additions and the walks' hash traffic stay unpriced on both sides.",
+  "Scale: p = 101-397 (n of 22.6-33.6 bits), two seeds per p, 16 walks per fold; the 1.45x reference correction is measured on these curves only.",
+  "Unit tests ran on the recorded tree plus the producer's later test-only repair of an unrelated test helper (src/ml_dataset/storage.rs, commit ed49f1378), without which the lib test target does not compile at af2504ef1."
+ ],
+ "manual_checks": {
+  "path": "replay/manual_checks.json",
+  "sha256": "d2099a4b9925b221b0bb8366ef32e9e21569dfe70fcce91f39f1523e2d0d81c1"
+ },
+ "logarithms": [
+  {
+   "p": 101,
+   "seed": 1,
+   "d": 1538068
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "d": 557533
+  },
+  {
+   "p": 149,
+   "seed": 1,
+   "d": 4914788
+  },
+  {
+   "p": 149,
+   "seed": 2,
+   "d": 2874927
+  },
+  {
+   "p": 197,
+   "seed": 1,
+   "d": 79622603
+  },
+  {
+   "p": 197,
+   "seed": 2,
+   "d": 7399960
+  },
+  {
+   "p": 269,
+   "seed": 1,
+   "d": 270725152
+  },
+  {
+   "p": 269,
+   "seed": 2,
+   "d": 309622187
+  },
+  {
+   "p": 397,
+   "seed": 1,
+   "d": 1275612762
+  },
+  {
+   "p": 397,
+   "seed": 2,
+   "d": 1421554453
+  }
+ ],
+ "stage_w_pools": [
+  {
+   "p": 101,
+   "seed": 1,
+   "fold": "Gls",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 514284.875,
+   "mean_walk_fp_muls_ii": 405069.125,
+   "mean_walk_fp_muls_iii": 351834.8125,
+   "mean_verify_fp_muls_i_ii_iii": [
+    3309,
+    2643,
+    2271
+   ],
+   "mean_steps": 2007.1875,
+   "mean_walk_group_ops": 4276.875,
+   "ratio_i_over_iii": 1.4617225377605294,
+   "ratio_i_over_ii": 1.2696224996165777,
+   "recorded_inversions": 67854,
+   "recorded_batch_muls": 227963,
+   "inversion_share": 3.359610339847319,
+   "batched_addition_fp_muls": 66.35961033984732,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 35
+  },
+  {
+   "p": 101,
+   "seed": 1,
+   "fold": "Negation",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 441946.25,
+   "mean_walk_fp_muls_ii": 356378.75,
+   "mean_walk_fp_muls_iii": 302421.125,
+   "mean_verify_fp_muls_i_ii_iii": [
+    3309,
+    2643,
+    2273.75
+   ],
+   "mean_steps": 2064,
+   "mean_walk_group_ops": 4340.5625,
+   "ratio_i_over_iii": 1.461360379503912,
+   "ratio_i_over_ii": 1.240102699726064,
+   "recorded_inversions": 68873,
+   "recorded_batch_muls": 232738,
+   "inversion_share": 3.379234242736631,
+   "batched_addition_fp_muls": 66.37923424273663,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 29
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "fold": "Gls",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 399050.4375,
+   "mean_walk_fp_muls_ii": 315390.5625,
+   "mean_walk_fp_muls_iii": 272685.75,
+   "mean_verify_fp_muls_i_ii_iii": [
+    3096,
+    2472,
+    2127.9375
+   ],
+   "mean_steps": 1192.4375,
+   "mean_walk_group_ops": 3419.1875,
+   "ratio_i_over_iii": 1.4634077413286173,
+   "ratio_i_over_ii": 1.265258016399904,
+   "recorded_inversions": 54099,
+   "recorded_batch_muls": 176802,
+   "inversion_share": 3.268119558587035,
+   "batched_addition_fp_muls": 66.26811955858703,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 22
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "fold": "Negation",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 410363.4375,
+   "mean_walk_fp_muls_ii": 330681.5625,
+   "mean_walk_fp_muls_iii": 280664.9375,
+   "mean_verify_fp_muls_i_ii_iii": [
+    3096,
+    2472,
+    2129
+   ],
+   "mean_steps": 1772.75,
+   "mean_walk_group_ops": 4016.9375,
+   "ratio_i_over_iii": 1.4621115168687575,
+   "ratio_i_over_ii": 1.2409625574452763,
+   "recorded_inversions": 63663,
+   "recorded_batch_muls": 212854,
+   "inversion_share": 3.343449099162779,
+   "batched_addition_fp_muls": 66.34344909916278,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 26
+  },
+  {
+   "p": 149,
+   "seed": 1,
+   "fold": "Gls",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 823986.25,
+   "mean_walk_fp_muls_ii": 646483.75,
+   "mean_walk_fp_muls_iii": 564610.5,
+   "mean_verify_fp_muls_i_ii_iii": [
+    3832,
+    3064,
+    2635.1875
+   ],
+   "mean_steps": 4056.625,
+   "mean_walk_group_ops": 6613.375,
+   "ratio_i_over_iii": 1.4593888176008063,
+   "ratio_i_over_ii": 1.2745660660457436,
+   "recorded_inversions": 105318,
+   "recorded_batch_muls": 368255,
+   "inversion_share": 3.49660077099831,
+   "batched_addition_fp_muls": 66.49660077099831,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 25
+  },
+  {
+   "p": 149,
+   "seed": 1,
+   "fold": "Negation",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 701339.4375,
+   "mean_walk_fp_muls_ii": 567273.5625,
+   "mean_walk_fp_muls_iii": 480865.875,
+   "mean_verify_fp_muls_i_ii_iii": [
+    3832,
+    3064,
+    2633.625
+   ],
+   "mean_steps": 4415.6875,
+   "mean_walk_group_ops": 6985.9375,
+   "ratio_i_over_iii": 1.4584928437685456,
+   "ratio_i_over_ii": 1.236333726551905,
+   "recorded_inversions": 111279,
+   "recorded_batch_muls": 391055,
+   "inversion_share": 3.514185066364723,
+   "batched_addition_fp_muls": 66.51418506636472,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 34
+  },
+  {
+   "p": 149,
+   "seed": 2,
+   "fold": "Gls",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 808767.625,
+   "mean_walk_fp_muls_ii": 634558.375,
+   "mean_walk_fp_muls_iii": 554206.3125,
+   "mean_verify_fp_muls_i_ii_iii": [
+    3910,
+    3130,
+    2689.3125
+   ],
+   "mean_steps": 3965.0625,
+   "mean_walk_group_ops": 6493.625,
+   "ratio_i_over_iii": 1.459325898602066,
+   "ratio_i_over_ii": 1.2745362079572269,
+   "recorded_inversions": 103418,
+   "recorded_batch_muls": 362004,
+   "inversion_share": 3.500396449360846,
+   "batched_addition_fp_muls": 66.50039644936085,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 19
+  },
+  {
+   "p": 149,
+   "seed": 2,
+   "fold": "Negation",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 636397.3125,
+   "mean_walk_fp_muls_ii": 514408.6875,
+   "mean_walk_fp_muls_iii": 436166.8125,
+   "mean_verify_fp_muls_i_ii_iii": [
+    3910,
+    3130,
+    2689.125
+   ],
+   "mean_steps": 3798.6875,
+   "mean_walk_group_ops": 6318.5,
+   "ratio_i_over_iii": 1.4590686275563436,
+   "ratio_i_over_ii": 1.237143399721452,
+   "recorded_inversions": 100616,
+   "recorded_batch_muls": 350932,
+   "inversion_share": 3.4878349367893775,
+   "batched_addition_fp_muls": 66.48783493678938,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 23
+  },
+  {
+   "p": 197,
+   "seed": 1,
+   "fold": "Gls",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 1034958.1875,
+   "mean_walk_fp_muls_ii": 810884.8125,
+   "mean_walk_fp_muls_iii": 709525.125,
+   "mean_verify_fp_muls_i_ii_iii": [
+    4684,
+    3748,
+    3223.375
+   ],
+   "mean_steps": 5454,
+   "mean_walk_group_ops": 8200.8125,
+   "ratio_i_over_iii": 1.4586631974449107,
+   "ratio_i_over_ii": 1.276331942029066,
+   "recorded_inversions": 130845,
+   "recorded_batch_muls": 463371,
+   "inversion_share": 3.541373380717643,
+   "batched_addition_fp_muls": 66.54137338071764,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 31
+  },
+  {
+   "p": 197,
+   "seed": 1,
+   "fold": "Negation",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 1106279.6875,
+   "mean_walk_fp_muls_ii": 896795.3125,
+   "mean_walk_fp_muls_iii": 759642.375,
+   "mean_verify_fp_muls_i_ii_iii": [
+    4684,
+    3748,
+    3221.875
+   ],
+   "mean_steps": 8310.0625,
+   "mean_walk_group_ops": 11138.8125,
+   "ratio_i_over_iii": 1.4563164508825617,
+   "ratio_i_over_ii": 1.2335921832776082,
+   "recorded_inversions": 177853,
+   "recorded_batch_muls": 642783,
+   "inversion_share": 3.614125148296627,
+   "batched_addition_fp_muls": 66.61412514829662,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 24
+  },
+  {
+   "p": 197,
+   "seed": 2,
+   "fold": "Gls",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 988036.9375,
+   "mean_walk_fp_muls_ii": 774381.0625,
+   "mean_walk_fp_muls_iii": 677271.3125,
+   "mean_verify_fp_muls_i_ii_iii": [
+    3541,
+    2827,
+    2437.375
+   ],
+   "mean_steps": 5119.1875,
+   "mean_walk_group_ops": 7852.5,
+   "ratio_i_over_iii": 1.4588495323283015,
+   "ratio_i_over_ii": 1.2759053460194865,
+   "recorded_inversions": 125096,
+   "recorded_batch_muls": 441546,
+   "inversion_share": 3.529657223252542,
+   "batched_addition_fp_muls": 66.52965722325254,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 38
+  },
+  {
+   "p": 197,
+   "seed": 2,
+   "fold": "Negation",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 1106632.3125,
+   "mean_walk_fp_muls_ii": 897088.6875,
+   "mean_walk_fp_muls_iii": 759903.1875,
+   "mean_verify_fp_muls_i_ii_iii": [
+    3541,
+    2827,
+    2436.25
+   ],
+   "mean_steps": 8312.5625,
+   "mean_walk_group_ops": 11142.9375,
+   "ratio_i_over_iii": 1.456280656146083,
+   "ratio_i_over_ii": 1.2335818385849393,
+   "recorded_inversions": 177743,
+   "recorded_batch_muls": 642668,
+   "inversion_share": 3.6157148242124864,
+   "batched_addition_fp_muls": 66.61571482421249,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 26
+  },
+  {
+   "p": 269,
+   "seed": 1,
+   "fold": "Gls",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 1628025.4375,
+   "mean_walk_fp_muls_ii": 1272595.5625,
+   "mean_walk_fp_muls_iii": 1117087.875,
+   "mean_verify_fp_muls_i_ii_iii": [
+    4043,
+    3221,
+    2779.4375
+   ],
+   "mean_steps": 9565.4375,
+   "mean_walk_group_ops": 12628.4375,
+   "ratio_i_over_iii": 1.4573835003803977,
+   "ratio_i_over_ii": 1.2792952336732668,
+   "recorded_inversions": 201575,
+   "recorded_batch_muls": 730012,
+   "inversion_share": 3.621540369589483,
+   "batched_addition_fp_muls": 66.62154036958948,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 30
+  },
+  {
+   "p": 269,
+   "seed": 1,
+   "fold": "Negation",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 1837102.3125,
+   "mean_walk_fp_muls_ii": 1491673.6875,
+   "mean_walk_fp_muls_iii": 1262876,
+   "mean_verify_fp_muls_i_ii_iii": [
+    4043,
+    3221,
+    2782.5625
+   ],
+   "mean_steps": 15397.5,
+   "mean_walk_group_ops": 18647.125,
+   "ratio_i_over_iii": 1.454697304010845,
+   "ratio_i_over_ii": 1.2315711726328886,
+   "recorded_inversions": 297874,
+   "recorded_batch_muls": 1098206,
+   "inversion_share": 3.686813887751197,
+   "batched_addition_fp_muls": 66.6868138877512,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 22
+  },
+  {
+   "p": 269,
+   "seed": 2,
+   "fold": "Gls",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 1613435.5,
+   "mean_walk_fp_muls_ii": 1261238.5,
+   "mean_walk_fp_muls_iii": 1107117.8125,
+   "mean_verify_fp_muls_i_ii_iii": [
+    4819,
+    3853,
+    3316.125
+   ],
+   "mean_steps": 9478.4375,
+   "mean_walk_group_ops": 12519.625,
+   "ratio_i_over_iii": 1.45732954684983,
+   "ratio_i_over_ii": 1.279246946552932,
+   "recorded_inversions": 199962,
+   "recorded_batch_muls": 724871,
+   "inversion_share": 3.6250437583140798,
+   "batched_addition_fp_muls": 66.62504375831408,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 24
+  },
+  {
+   "p": 269,
+   "seed": 2,
+   "fold": "Negation",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 2272050.75,
+   "mean_walk_fp_muls_ii": 1845905.25,
+   "mean_walk_fp_muls_iii": 1562425.25,
+   "mean_verify_fp_muls_i_ii_iii": [
+    4819,
+    3853,
+    3315.625
+   ],
+   "mean_steps": 19756.5625,
+   "mean_walk_group_ops": 23130.75,
+   "ratio_i_over_iii": 1.4541820480691796,
+   "ratio_i_over_ii": 1.2308598992283055,
+   "recorded_inversions": 369740,
+   "recorded_batch_muls": 1371562,
+   "inversion_share": 3.709531021799102,
+   "batched_addition_fp_muls": 66.70953102179911,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 29
+  },
+  {
+   "p": 397,
+   "seed": 1,
+   "fold": "Gls",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 3687401.0625,
+   "mean_walk_fp_muls_ii": 2874849.9375,
+   "mean_walk_fp_muls_iii": 2532750.875,
+   "mean_verify_fp_muls_i_ii_iii": [
+    4663,
+    3721,
+    3207.3125
+   ],
+   "mean_steps": 24193.5625,
+   "mean_walk_group_ops": 27924.0625,
+   "ratio_i_over_iii": 1.4558877854498817,
+   "ratio_i_over_ii": 1.2826412309042479,
+   "recorded_inversions": 446401,
+   "recorded_batch_muls": 1660612,
+   "inversion_share": 3.7200006272387385,
+   "batched_addition_fp_muls": 66.72000062723873,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 35
+  },
+  {
+   "p": 397,
+   "seed": 1,
+   "fold": "Negation",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 3610785.6875,
+   "mean_walk_fp_muls_ii": 2935797.3125,
+   "mean_walk_fp_muls_iii": 2484322.0625,
+   "mean_verify_fp_muls_i_ii_iii": [
+    4663,
+    3721,
+    3205.25
+   ],
+   "mean_steps": 32880.4375,
+   "mean_walk_group_ops": 36899.0625,
+   "ratio_i_over_iii": 1.4534289824993252,
+   "ratio_i_over_ii": 1.229916545030559,
+   "recorded_inversions": 590001,
+   "recorded_batch_muls": 2208160,
+   "inversion_share": 3.74263772434284,
+   "batched_addition_fp_muls": 66.74263772434284,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 26
+  },
+  {
+   "p": 397,
+   "seed": 2,
+   "fold": "Gls",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 3302439.875,
+   "mean_walk_fp_muls_ii": 2575404.125,
+   "mean_walk_fp_muls_iii": 2268122.8125,
+   "mean_verify_fp_muls_i_ii_iii": [
+    5051,
+    4037,
+    3475.0625
+   ],
+   "mean_steps": 21438.8125,
+   "mean_walk_group_ops": 25070,
+   "ratio_i_over_iii": 1.4560233937949514,
+   "ratio_i_over_ii": 1.282299675978037,
+   "recorded_inversions": 400800,
+   "recorded_batch_muls": 1487308,
+   "inversion_share": 3.7108483033932136,
+   "batched_addition_fp_muls": 66.71084830339322,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 23
+  },
+  {
+   "p": 397,
+   "seed": 2,
+   "fold": "Negation",
+   "walks_identical_3_ways": 16,
+   "mean_walk_fp_muls_i": 3888518.5,
+   "mean_walk_fp_muls_ii": 3162014.5,
+   "mean_walk_fp_muls_iii": 2675638.25,
+   "mean_verify_fp_muls_i_ii_iii": [
+    5051,
+    4037,
+    3474.625
+   ],
+   "mean_steps": 35702.5,
+   "mean_walk_group_ops": 39764.0625,
+   "ratio_i_over_iii": 1.4533050198396589,
+   "ratio_i_over_ii": 1.229759857204956,
+   "recorded_inversions": 635905,
+   "recorded_batch_muls": 2383462,
+   "inversion_share": 3.7481416249282518,
+   "batched_addition_fp_muls": 66.74814162492825,
+   "kara_minus_batched_total_eq_16inv_minus_share": true,
+   "pool_batch_muls_eq_3inv_plus_13rounds": true,
+   "filler_walks": 29
+  }
+ ],
+ "ic_rows": [
+  {
+   "p": 101,
+   "seed": 1,
+   "arm": "A",
+   "S_A_E31": 27092897978,
+   "S_AK_E27": 26964723596,
+   "S_A_over_S_AK": 1.0047534098224176,
+   "non_solve_share_of_S_A": 0.020035929985813643,
+   "macaulay_entries": 7446468736,
+   "ic_fp_inversions": 2703108,
+   "rho_E31_walk_i": 514284.875,
+   "rho_E27_walk_iii": 351834.8125,
+   "rho_steps": 2007.1875,
+   "band": {
+    "0": {
+     "ic_E27": 26964723596,
+     "rho_E27": 351834.8125,
+     "S_over_rho_E31": 52680.72092923207,
+     "S_over_rho_E27": 76640.29435972882,
+     "growth": 1.4548072427232446
+    },
+    "0.1": {
+     "ic_E27": 99195470335.20001,
+     "rho_E27": 371304.53125,
+     "S_over_rho_E31": 186084.85225275875,
+     "S_over_rho_E27": 267153.94504143967,
+     "growth": 1.4356565932543768
+    },
+    "1": {
+     "ic_E27": 749272190988,
+     "rho_E27": 546532,
+     "S_over_rho_E31": 1057008.92167494,
+     "S_over_rho_E27": 1370957.5852612474,
+     "growth": 1.297016096220667
+    }
+   }
+  },
+  {
+   "p": 101,
+   "seed": 1,
+   "arm": "B",
+   "S_A_E31": 13899571384,
+   "S_AK_E27": 13833208042,
+   "S_A_over_S_AK": 1.0047973934750718,
+   "non_solve_share_of_S_A": 0.020210811055898673,
+   "macaulay_entries": 3832401664,
+   "ic_fp_inversions": 1393766,
+   "rho_E31_walk_i": 514284.875,
+   "rho_E27_walk_iii": 351834.8125,
+   "rho_steps": 2007.1875,
+   "band": {
+    "0": {
+     "ic_E27": 13833208042,
+     "rho_E27": 351834.8125,
+     "S_over_rho_E31": 27026.988464321454,
+     "S_over_rho_E27": 39317.337428057945,
+     "growth": 1.4547435604955055
+    },
+    "0.1": {
+     "ic_E27": 51007504182.8,
+     "rho_E27": 371304.53125,
+     "S_over_rho_E31": 95687.92123355847,
+     "S_over_rho_E27": 137373.77244248215,
+     "growth": 1.4356438166022583
+    },
+    "1": {
+     "ic_E27": 385576169450,
+     "rho_E27": 546532,
+     "S_over_rho_E31": 543938.3493457566,
+     "S_over_rho_E27": 705496.0541194294,
+     "growth": 1.2970147351588517
+    }
+   }
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "arm": "A",
+   "S_A_E31": 9865699461,
+   "S_AK_E27": 9818244813,
+   "S_A_over_S_AK": 1.0048333127665718,
+   "non_solve_share_of_S_A": 0.020390340674295147,
+   "macaulay_entries": 2719210368,
+   "ic_fp_inversions": 997053,
+   "rho_E31_walk_i": 399050.4375,
+   "rho_E27_walk_iii": 272685.75,
+   "rho_steps": 1192.4375,
+   "band": {
+    "0": {
+     "ic_E27": 9818244813,
+     "rho_E27": 272685.75,
+     "S_over_rho_E31": 24722.938590939397,
+     "S_over_rho_E27": 36005.71285078153,
+     "growth": 1.4563686561102047
+    },
+    "0.1": {
+     "ic_E27": 36194585382.600006,
+     "rho_E27": 284252.39375,
+     "S_over_rho_E31": 88262.37798065301,
+     "S_over_rho_E27": 127332.56140820101,
+     "growth": 1.4426595376357538
+    },
+    "1": {
+     "ic_E27": 273581650509,
+     "rho_E27": 388352.1875,
+     "S_over_rho_E31": 531610.9077577844,
+     "S_over_rho_E27": 704467.9013401978,
+     "growth": 1.3251569730039692
+    }
+   }
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "arm": "B",
+   "S_A_E31": 4682498928,
+   "S_AK_E27": 4659726750,
+   "S_A_over_S_AK": 1.0048870200382458,
+   "non_solve_share_of_S_A": 0.020572882232595784,
+   "macaulay_entries": 1288514304,
+   "ic_fp_inversions": 472508,
+   "rho_E31_walk_i": 399050.4375,
+   "rho_E27_walk_iii": 272685.75,
+   "rho_steps": 1192.4375,
+   "band": {
+    "0": {
+     "ic_E27": 4659726750,
+     "rho_E27": 272685.75,
+     "S_over_rho_E31": 11734.102980403322,
+     "S_over_rho_E27": 17088.26643856527,
+     "growth": 1.456290818915066
+    },
+    "0.1": {
+     "ic_E27": 17158315498.800001,
+     "rho_E27": 284252.39375,
+     "S_over_rho_E31": 41842.11632038628,
+     "S_over_rho_E27": 60362.958680625015,
+     "growth": 1.4426363671097349
+    },
+    "1": {
+     "ic_E27": 129645614238,
+     "rho_E27": 388352.1875,
+     "S_over_rho_E31": 251921.77042184598,
+     "S_over_rho_E27": 333835.15893804515,
+     "growth": 1.3251540681816987
+    }
+   }
+  },
+  {
+   "p": 149,
+   "seed": 1,
+   "arm": "A",
+   "S_A_E31": 230120609513,
+   "S_AK_E27": 228974148611,
+   "S_A_over_S_AK": 1.0050069447094996,
+   "non_solve_share_of_S_A": 0.02132335668406439,
+   "macaulay_entries": 63194288640,
+   "ic_fp_inversions": 25525814,
+   "rho_E31_walk_i": 823986.25,
+   "rho_E27_walk_iii": 564610.5,
+   "rho_steps": 4056.625,
+   "band": {
+    "0": {
+     "ic_E27": 228974148611,
+     "rho_E27": 564610.5,
+     "S_over_rho_E31": 279277.2446299923,
+     "S_over_rho_E27": 405543.5536728417,
+     "growth": 1.4521181423503966
+    },
+    "0.1": {
+     "ic_E27": 841958748419.0001,
+     "rho_E27": 603959.7625,
+     "S_over_rho_E31": 976567.2755422535,
+     "S_over_rho_E27": 1394064.3080821137,
+     "growth": 1.42751487070672
+    },
+    "1": {
+     "ic_E27": 6358820146691,
+     "rho_E27": 958103.125,
+     "S_over_rho_E31": 5223882.515081011,
+     "S_over_rho_E27": 6636884.883024465,
+     "growth": 1.2704889254044684
+    }
+   }
+  },
+  {
+   "p": 149,
+   "seed": 1,
+   "arm": "B",
+   "S_A_E31": 86429946254,
+   "S_AK_E27": 85999708286,
+   "S_A_over_S_AK": 1.0050027840393272,
+   "non_solve_share_of_S_A": 0.021304458139875127,
+   "macaulay_entries": 23709225792,
+   "ic_fp_inversions": 9571265,
+   "rho_E31_walk_i": 823986.25,
+   "rho_E27_walk_iii": 564610.5,
+   "rho_steps": 4056.625,
+   "band": {
+    "0": {
+     "ic_E27": 85999708286,
+     "rho_E27": 564610.5,
+     "S_over_rho_E31": 104892.46180260896,
+     "S_over_rho_E27": 152316.87736235865,
+     "growth": 1.4521241540597545
+    },
+    "0.1": {
+     "ic_E27": 315979198468.4,
+     "rho_E27": 603959.7625,
+     "S_over_rho_E31": 366496.4916364425,
+     "S_over_rho_E27": 523179.2216760467,
+     "growth": 1.4275149520258723
+    },
+    "1": {
+     "ic_E27": 2385794610110,
+     "rho_E27": 958103.125,
+     "S_over_rho_E31": 1959972.281307961,
+     "S_over_rho_E27": 2490122.9813961834,
+     "growth": 1.2704888763704523
+    }
+   }
+  },
+  {
+   "p": 149,
+   "seed": 2,
+   "arm": "A",
+   "S_A_E31": 39758972369,
+   "S_AK_E27": 39561022727,
+   "S_A_over_S_AK": 1.0050036533020392,
+   "non_solve_share_of_S_A": 0.0213592964656737,
+   "macaulay_entries": 10888461696,
+   "ic_fp_inversions": 4401508,
+   "rho_E31_walk_i": 808767.625,
+   "rho_E27_walk_iii": 554206.3125,
+   "rho_steps": 3965.0625,
+   "band": {
+    "0": {
+     "ic_E27": 39561022727,
+     "rho_E27": 554206.3125,
+     "S_over_rho_E31": 49159.94550226958,
+     "S_over_rho_E27": 71383.20483673668,
+     "growth": 1.4520602923256112
+    },
+    "0.1": {
+     "ic_E27": 145179101178.2,
+     "rho_E27": 592667.41875,
+     "S_over_rho_E31": 171591.26627553217,
+     "S_over_rho_E27": 244958.80250073224,
+     "growth": 1.4275715065089056
+    },
+    "1": {
+     "ic_E27": 1095741807239,
+     "rho_E27": 938817.375,
+     "S_over_rho_E31": 918350.3680435888,
+     "S_over_rho_E27": 1167151.180216493,
+     "growth": 1.2709214487526563
+    }
+   }
+  },
+  {
+   "p": 149,
+   "seed": 2,
+   "arm": "B",
+   "S_A_E31": 22465283217,
+   "S_AK_E27": 22353365025,
+   "S_A_over_S_AK": 1.0050067715475872,
+   "non_solve_share_of_S_A": 0.021367244933585206,
+   "macaulay_entries": 6146620032,
+   "ic_fp_inversions": 2482666,
+   "rho_E31_walk_i": 808767.625,
+   "rho_E27_walk_iii": 554206.3125,
+   "rho_steps": 3965.0625,
+   "band": {
+    "0": {
+     "ic_E27": 22353365025,
+     "rho_E27": 554206.3125,
+     "S_over_rho_E31": 27777.179158228544,
+     "S_over_rho_E27": 40334.0137433025,
+     "growth": 1.4520557870021944
+    },
+    "0.1": {
+     "ic_E27": 81975579335.40001,
+     "rho_E27": 592667.41875,
+     "S_over_rho_E31": 96889.41663520811,
+     "S_over_rho_E27": 138316.32504498967,
+     "growth": 1.4275689734592505
+    },
+    "1": {
+     "ic_E27": 618575508129,
+     "rho_E27": 938817.375,
+     "S_over_rho_E31": 518433.4468190341,
+     "S_over_rho_E27": 658888.0059116929,
+     "growth": 1.2709210988497164
+    }
+   }
+  },
+  {
+   "p": 197,
+   "seed": 1,
+   "arm": "A",
+   "S_A_E31": 33536914676,
+   "S_AK_E27": 33364322762,
+   "S_A_over_S_AK": 1.0051729482187055,
+   "non_solve_share_of_S_A": 0.02226492690856736,
+   "macaulay_entries": 9128112000,
+   "ic_fp_inversions": 3961745,
+   "rho_E31_walk_i": 1034958.1875,
+   "rho_E27_walk_iii": 709525.125,
+   "rho_steps": 5454,
+   "band": {
+    "0": {
+     "ic_E27": 33364322762,
+     "rho_E27": 709525.125,
+     "S_over_rho_E31": 32404.125191772542,
+     "S_over_rho_E27": 47023.45496503735,
+     "growth": 1.4511564403218846
+    },
+    "0.1": {
+     "ic_E27": 121907009162.00002,
+     "rho_E27": 762428.925,
+     "S_over_rho_E31": 112219.75073929128,
+     "S_over_rho_E27": 159892.94892241925,
+     "growth": 1.4248200327398897
+    },
+    "1": {
+     "ic_E27": 918791186762,
+     "rho_E27": 1238563.125,
+     "S_over_rho_E31": 587574.1808200539,
+     "S_over_rho_E27": 741820.2336372641,
+     "growth": 1.2625133265759485
+    }
+   }
+  },
+  {
+   "p": 197,
+   "seed": 1,
+   "arm": "B",
+   "S_A_E31": 24878373248,
+   "S_AK_E27": 24750444620,
+   "S_A_over_S_AK": 1.0051687406009921,
+   "non_solve_share_of_S_A": 0.022237769265901482,
+   "macaulay_entries": 6764870784,
+   "ic_fp_inversions": 2931746,
+   "rho_E31_walk_i": 1034958.1875,
+   "rho_E27_walk_iii": 709525.125,
+   "rho_steps": 5454,
+   "band": {
+    "0": {
+     "ic_E27": 24750444620,
+     "rho_E27": 709525.125,
+     "S_over_rho_E31": 24038.046704181466,
+     "S_over_rho_E27": 34883.11230698138,
+     "growth": 1.4511625148358411
+    },
+    "0.1": {
+     "ic_E27": 90369691224.80002,
+     "rho_E27": 762428.925,
+     "S_over_rho_E31": 83188.51186332128,
+     "S_over_rho_E27": 118528.67626290544,
+     "growth": 1.4248202499120077
+    },
+    "1": {
+     "ic_E27": 680942910668,
+     "rho_E27": 1238563.125,
+     "S_over_rho_E31": 435468.35007614107,
+     "S_over_rho_E27": 549784.5825726484,
+     "growth": 1.2625132974107516
+    }
+   }
+  },
+  {
+   "p": 197,
+   "seed": 2,
+   "arm": "A",
+   "S_A_E31": 17226260595,
+   "S_AK_E27": 17136680229,
+   "S_A_over_S_AK": 1.0052274048883987,
+   "non_solve_share_of_S_A": 0.022519331741248396,
+   "macaulay_entries": 4691155392,
+   "ic_fp_inversions": 2056419,
+   "rho_E31_walk_i": 988036.9375,
+   "rho_E27_walk_iii": 677271.3125,
+   "rho_steps": 5119.1875,
+   "band": {
+    "0": {
+     "ic_E27": 17136680229,
+     "rho_E27": 677271.3125,
+     "S_over_rho_E31": 17434.834611130114,
+     "S_over_rho_E27": 25302.533730158546,
+     "growth": 1.4512631920239623
+    },
+    "0.1": {
+     "ic_E27": 62640887531.4,
+     "rho_E27": 726927.43125,
+     "S_over_rho_E31": 60451.85280905169,
+     "S_over_rho_E27": 86172.13333617749,
+     "growth": 1.4254671996302253
+    },
+    "1": {
+     "ic_E27": 472178753253,
+     "rho_E27": 1173832.5,
+     "S_over_rho_E31": 318111.9022489672,
+     "S_over_rho_E27": 402253.94445374445,
+     "growth": 1.2645045394715357
+    }
+   }
+  },
+  {
+   "p": 197,
+   "seed": 2,
+   "arm": "B",
+   "S_A_E31": 10174739227,
+   "S_AK_E27": 10121590489,
+   "S_A_over_S_AK": 1.0052510263142695,
+   "non_solve_share_of_S_A": 0.02258792809059184,
+   "macaulay_entries": 2771075328,
+   "ic_fp_inversions": 1211730,
+   "rho_E31_walk_i": 988036.9375,
+   "rho_E27_walk_iii": 677271.3125,
+   "rho_steps": 5119.1875,
+   "band": {
+    "0": {
+     "ic_E27": 10121590489,
+     "rho_E27": 677271.3125,
+     "S_over_rho_E31": 10297.93405572957,
+     "S_over_rho_E27": 14944.66147050928,
+     "growth": 1.4512290901876925
+    },
+    "0.1": {
+     "ic_E27": 37001021170.600006,
+     "rho_E27": 726927.43125,
+     "S_over_rho_E31": 35708.21803752433,
+     "S_over_rho_E27": 50900.57078596455,
+     "growth": 1.4254581601488818
+    },
+    "1": {
+     "ic_E27": 278915897305,
+     "rho_E27": 1173832.5,
+     "S_over_rho_E31": 187908.79588575527,
+     "S_over_rho_E27": 237611.32640730258,
+     "growth": 1.2645034804638173
+    }
+   }
+  },
+  {
+   "p": 269,
+   "seed": 1,
+   "arm": "A",
+   "S_A_E31": 53572585848,
+   "S_AK_E27": 53286038394,
+   "S_A_over_S_AK": 1.0053775334522197,
+   "non_solve_share_of_S_A": 0.023268535973544707,
+   "macaulay_entries": 14597220288,
+   "ic_fp_inversions": 6803775,
+   "rho_E31_walk_i": 1628025.4375,
+   "rho_E27_walk_iii": 1117087.875,
+   "rho_steps": 9565.4375,
+   "band": {
+    "0": {
+     "ic_E27": 53286038394,
+     "rho_E27": 1117087.875,
+     "S_over_rho_E31": 32906.47960038401,
+     "S_over_rho_E27": 47700.84752195524,
+     "growth": 1.449588290854382
+    },
+    "0.1": {
+     "ic_E27": 194879075187.6,
+     "rho_E27": 1209872.61875,
+     "S_over_rho_E31": 113414.9627705197,
+     "S_over_rho_E27": 161074.04380218356,
+     "growth": 1.4202186366546339
+    },
+    "1": {
+     "ic_E27": 1469216406330,
+     "rho_E27": 2044935.3125,
+     "S_over_rho_E31": 574951.5041056179,
+     "S_over_rho_E27": 718465.9570154496,
+     "growth": 1.2496114052837894
+    }
+   }
+  },
+  {
+   "p": 269,
+   "seed": 1,
+   "arm": "B",
+   "S_A_E31": 30856902622,
+   "S_AK_E27": 30691610728,
+   "S_A_over_S_AK": 1.0053855724766247,
+   "non_solve_share_of_S_A": 0.023294731710612974,
+   "macaulay_entries": 8405358528,
+   "ic_fp_inversions": 3917982,
+   "rho_E31_walk_i": 1628025.4375,
+   "rho_E27_walk_iii": 1117087.875,
+   "rho_steps": 9565.4375,
+   "band": {
+    "0": {
+     "ic_E27": 30691610728,
+     "rho_E27": 1117087.875,
+     "S_over_rho_E31": 18953.575239821766,
+     "S_over_rho_E27": 27474.66104938253,
+     "growth": 1.4495767000021096
+    },
+    "0.1": {
+     "ic_E27": 112223588449.6,
+     "rho_E27": 1209872.61875,
+     "S_over_rho_E31": 65311.60819955197,
+     "S_over_rho_E27": 92756.5321426529,
+     "growth": 1.4202150995768803
+    },
+    "1": {
+     "ic_E27": 846011387944,
+     "rho_E27": 2044935.3125,
+     "S_over_rho_E31": 331071.5052046554,
+     "S_over_rho_E27": 413710.58672253235,
+     "growth": 1.2496109759334095
+    }
+   }
+  },
+  {
+   "p": 269,
+   "seed": 2,
+   "arm": "A",
+   "S_A_E31": 19882875493,
+   "S_AK_E27": 19775127049,
+   "S_A_over_S_AK": 1.0054486852970914,
+   "non_solve_share_of_S_A": 0.023623294586608615,
+   "macaulay_entries": 5425916160,
+   "ic_fp_inversions": 2557777,
+   "rho_E31_walk_i": 1613435.5,
+   "rho_E27_walk_iii": 1107117.8125,
+   "rho_steps": 9478.4375,
+   "band": {
+    "0": {
+     "ic_E27": 19775127049,
+     "rho_E27": 1107117.8125,
+     "S_over_rho_E31": 12323.31598815075,
+     "S_over_rho_E27": 17861.809127924225,
+     "growth": 1.449432047762056
+    },
+    "0.1": {
+     "ic_E27": 72406513801,
+     "rho_E27": 1199058.65625,
+     "S_over_rho_E31": 42520.9734559507,
+     "S_over_rho_E27": 60386.13159046614,
+     "growth": 1.4201493212055158
+    },
+    "1": {
+     "ic_E27": 546088994569,
+     "rho_E27": 2026526.25,
+     "S_over_rho_E31": 215645.63648248857,
+     "S_over_rho_E27": 269470.47666863434,
+     "growth": 1.2495985593036407
+    }
+   }
+  },
+  {
+   "p": 269,
+   "seed": 2,
+   "arm": "B",
+   "S_A_E31": 9827483637,
+   "S_AK_E27": 9773820165,
+   "S_A_over_S_AK": 1.005490531961307,
+   "non_solve_share_of_S_A": 0.023766548551720574,
+   "macaulay_entries": 2681474880,
+   "ic_fp_inversions": 1265553,
+   "rho_E31_walk_i": 1613435.5,
+   "rho_E27_walk_iii": 1107117.8125,
+   "rho_steps": 9478.4375,
+   "band": {
+    "0": {
+     "ic_E27": 9773820165,
+     "rho_E27": 1107117.8125,
+     "S_over_rho_E31": 6091.029754210813,
+     "S_over_rho_E27": 8828.166302310306,
+     "growth": 1.449371725069521
+    },
+    "0.1": {
+     "ic_E27": 35784126501,
+     "rho_E27": 1199058.65625,
+     "S_over_rho_E31": 21014.5931156728,
+     "S_over_rho_E27": 29843.51625708886,
+     "growth": 1.4201329567895085
+    },
+    "1": {
+     "ic_E27": 269876883525,
+     "rho_E27": 2026526.25,
+     "S_over_rho_E31": 106572.11958484513,
+     "S_over_rho_E27": 133172.1627218004,
+     "growth": 1.2495966416036064
+    }
+   }
+  },
+  {
+   "p": 397,
+   "seed": 1,
+   "arm": "A",
+   "S_A_E31": 28085056071,
+   "S_AK_E27": 27927862989,
+   "S_A_over_S_AK": 1.0056285395721798,
+   "non_solve_share_of_S_A": 0.02465630982716937,
+   "macaulay_entries": 7572761280,
+   "ic_fp_inversions": 3872628,
+   "rho_E31_walk_i": 3687401.0625,
+   "rho_E27_walk_iii": 2532750.875,
+   "rho_steps": 24193.5625,
+   "band": {
+    "0": {
+     "ic_E27": 27927862989,
+     "rho_E27": 2532750.875,
+     "S_over_rho_E31": 7616.4907464551125,
+     "S_over_rho_E27": 11026.691675311335,
+     "growth": 1.4477391284750667
+    },
+    "0.1": {
+     "ic_E27": 101383647405.00002,
+     "rho_E27": 2767428.43125,
+     "S_over_rho_E31": 25889.547445982087,
+     "S_over_rho_E27": 36634.60498568585,
+     "growth": 1.4150345834404046
+    },
+    "1": {
+     "ic_E27": 762485707149,
+     "rho_E27": 4879526.4375,
+     "S_over_rho_E31": 126387.23518156879,
+     "S_over_rho_E27": 156262.23505813314,
+     "growth": 1.2363767182156151
+    }
+   }
+  },
+  {
+   "p": 397,
+   "seed": 1,
+   "arm": "B",
+   "S_A_E31": 16280247309,
+   "S_AK_E27": 16188662103,
+   "S_A_over_S_AK": 1.0056573672004079,
+   "non_solve_share_of_S_A": 0.024751466200223924,
+   "macaulay_entries": 4394191872,
+   "ic_fp_inversions": 2245316,
+   "rho_E31_walk_i": 3687401.0625,
+   "rho_E27_walk_iii": 2532750.875,
+   "rho_steps": 24193.5625,
+   "band": {
+    "0": {
+     "ic_E27": 16188662103,
+     "rho_E27": 2532750.875,
+     "S_over_rho_E31": 4415.100780483653,
+     "S_over_rho_E27": 6391.730928925254,
+     "growth": 1.447697628371027
+    },
+    "0.1": {
+     "ic_E27": 58812323261.4,
+     "rho_E27": 2767428.43125,
+     "S_over_rho_E31": 15018.543530923198,
+     "S_over_rho_E27": 21251.614891748253,
+     "growth": 1.4150250220995901
+    },
+    "1": {
+     "ic_E27": 442425273687,
+     "rho_E27": 4879526.4375,
+     "S_over_rho_E31": 73335.08552925396,
+     "S_over_rho_E27": 90669.71546396094,
+     "growth": 1.2363756694303172
+    }
+   }
+  },
+  {
+   "p": 397,
+   "seed": 2,
+   "arm": "A",
+   "S_A_E31": 51511467220,
+   "S_AK_E27": 51225062800,
+   "S_A_over_S_AK": 1.005591099441268,
+   "non_solve_share_of_S_A": 0.024310454246074958,
+   "macaulay_entries": 13904260608,
+   "ic_fp_inversions": 7055925,
+   "rho_E31_walk_i": 3302439.875,
+   "rho_E27_walk_iii": 2268122.8125,
+   "rho_steps": 21438.8125,
+   "band": {
+    "0": {
+     "ic_E27": 51225062800,
+     "rho_E27": 2268122.8125,
+     "S_over_rho_E31": 15598.003043128832,
+     "S_over_rho_E27": 22584.783556556198,
+     "growth": 1.4479278850060973
+    },
+    "0.1": {
+     "ic_E27": 186096390697.60004,
+     "rho_E27": 2476079.29375,
+     "S_over_rho_E31": 53094.51589013853,
+     "S_over_rho_E27": 75157.68625315657,
+     "growth": 1.4155451837751087
+    },
+    "1": {
+     "ic_E27": 1399938341776,
+     "rho_E27": 4347687.625,
+     "S_over_rho_E31": 260167.8793495105,
+     "S_over_rho_E27": 321996.072975919,
+     "growth": 1.2376472982790787
+    }
+   }
+  },
+  {
+   "p": 397,
+   "seed": 2,
+   "arm": "B",
+   "S_A_E31": 22167942593,
+   "S_AK_E27": 22044076955,
+   "S_A_over_S_AK": 1.0056189986204844,
+   "non_solve_share_of_S_A": 0.024413136795603755,
+   "macaulay_entries": 5982337536,
+   "ic_fp_inversions": 3040593,
+   "rho_E31_walk_i": 3302439.875,
+   "rho_E27_walk_iii": 2268122.8125,
+   "rho_steps": 21438.8125,
+   "band": {
+    "0": {
+     "ic_E27": 22044076955,
+     "rho_E27": 2268122.8125,
+     "S_over_rho_E31": 6712.595363450788,
+     "S_over_rho_E27": 9719.08436064901,
+     "growth": 1.4478877147233045
+    },
+    "0.1": {
+     "ic_E27": 80072751054.20001,
+     "rho_E27": 2476079.29375,
+     "S_over_rho_E31": 22845.45918850898,
+     "S_over_rho_E27": 32338.5245603062,
+     "growth": 1.4155340145919295
+    },
+    "1": {
+     "ic_E27": 602330817947,
+     "rho_E27": 4347687.625,
+     "S_over_rho_E31": 111938.71402309142,
+     "S_over_rho_E27": 138540.50012321206,
+     "growth": 1.2376459863084817
+    }
+   }
+  }
+ ],
+ "secondary": {
+  "gae_remeasured_sensitivity": {
+   "claim": "§9.29: with the GAE re-measured under (iii) (66.3-66.7 instead of 97) on the E27 side, the 1-GAE growth is 1.016-1.017",
+   "definition_a": "(S_A,K + g' E)/(rho_iii + g' steps) over E31's 1-GAE S/rho (g' = 63 + that curve's <±psi> pool share)",
+   "definition_a_range": [
+    1.016282079392046,
+    1.017289022887144
+   ],
+   "definition_b": "(S_A,K + g' E)/(rho_iii + g' steps) over E27's own 1-GAE S/rho at GAE 97",
+   "definition_b_range": [
+    0.7669144864311874,
+    0.8227985919658319
+   ]
+  },
+  "bound_16_per_inversion_pct": [
+   0.16039373756612788,
+   0.22191491657202822
+  ],
+  "ic_leaf_comparison_e31_vs_e27": {
+   "compared": 8200,
+   "identical": 5920,
+   "differing_paths": [
+    "$.base_muls",
+    "$.call.max",
+    "$.call.mean",
+    "$.call.median",
+    "$.call.min",
+    "$.call.p10",
+    "$.call.p90",
+    "$.check_muls",
+    "$.fp_muls_per_add",
+    "$.generation_muls",
+    "$.lift_muls",
+    "$.precompute_muls",
+    "$.ratio",
+    "$.rho[*].fp_muls",
+    "$.rho[*].group_ops",
+    "$.rho_matched_muls",
+    "$.rho_negation_muls",
+    "$.rho_unfolded_muls",
+    "$.total_muls",
+    "$.weil_muls"
+   ],
+   "added_in_e27": [
+    "$.folded.recovered",
+    "$.fp4_product",
+    "$.ic_fp_inversions",
+    "$.rho[*].recovered",
+    "$.rho[*].verify_fp_muls",
+    "$.rho[*].verify_group_ops",
+    "$.rho[*].visit_digest"
+   ]
+  }
+ },
+ "gae_band": {
+  "definition": "medians over the ten curves of arm B (E25's GLS-fold benchmark arm), E27 IC side S_A,K + g*97*macaulay_entries against the matched <±psi> walk (iii) rho_iii + g*97*steps (E25 convention, [d]G check excluded), g = 0, 0.1, 1",
+  "values": {
+   "0": {
+    "ic": 19116369529,
+    "rho": 693398.21875
+   },
+   "0.1": {
+    "ic": 69442537157.8,
+    "rho": 744678.1781250001
+   },
+   "1": {
+    "ic": 522378045817,
+    "rho": 1206197.8125
+   }
+  },
+  "order_rho_below_ic_on_all_20_rows_all_weights": true
+ }
+}

@@ -1,0 +1,21 @@
+{
+  "schema":"cover.two-lp-balance.runpod-validation/v1",
+  "driver_kind":"cover-two-lp-factor-base-checkpoint-balance",
+  "backend":"runpod_user_authorized",
+  "cpu_affinity_rule":"first_allowed_cpu_bound_before_call",
+  "runpod_max_hourly_usd":0.40,
+  "runpod_lifetime_seconds":2700,
+  "runpod_compute_type":"CPU",
+  "source_revision":null,
+  "p":1009,"seed":359,"m":9,"b_count":1018081,
+  "max_descent_residuals":8192,"max_accepted_descents":32,
+  "mode_order":["ic","s75-r32","s75-r128","s85-r32","s85-r128","s95-r32","s95-r128"],
+  "rounds":1,"warmup_rounds":0,"automatic_retries":0,
+  "fixture_timeout_seconds":60,"worker_timeout_seconds":300,"timeout_seconds":2300,"memory_gib":8,
+  "allow_comparative_claims":false,
+  "component_hashes":"validation/balance-source.sha256",
+  "target_class":"public-only workers with held-out planted answer",
+  "recorded_timing":"cold_process_wall_practicality_only",
+  "pricing_scope":"observed primitive counts and known gate events only; native bookkeeping incomplete",
+  "complete_total":null,"rho_parity":false
+}

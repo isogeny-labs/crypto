@@ -1,0 +1,552 @@
+{
+  "card_id": "CARD-elliptic-code-list-decoding-20261107-R2-1",
+  "card_path": "research/elliptic_code_list_decoding_20261107/cards/CARD-elliptic-code-list-decoding-20261107-R2-1.yaml",
+  "card_sha256": "416fe68fb5f436f1a249d187881b407a67bd64bdb1347234db32bf6eb3008a3c",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "7897a300a75d7e6458a04ab5852340efa1335152",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-ancestor",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--quiet",
+        "7897a300a75d7e6458a04ab5852340efa1335152",
+        "HEAD",
+        "--",
+        "research/elliptic_code_list_decoding_20261107",
+        ":(exclude)research/elliptic_code_list_decoding_20261107/cards",
+        "taskq/",
+        "tools/task_card.py",
+        "tools/benchrec.py"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.011,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-paths-unchanged",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.011,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "e8481f7c5df55ad8d91358c0b8519c5c63e3852dc3865f79b4f05a0465d4ac43",
+        ".provenance.protocol_sha256 == $h",
+        "research/elliptic_code_list_decoding_20261107/eks/r2img_request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "request-protocol-identity",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "-n",
+        "--slurpfile",
+        "r",
+        "research/elliptic_code_list_decoding_20261107/eks/r2img_request.json",
+        "--slurpfile",
+        "l",
+        "research/elliptic_code_list_decoding_20261107/eks/layer-receipt.json",
+        "--arg",
+        "i",
+        "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:a361afc0755649e32453e3140260bf58ed0a85975d5998c3d30d056bde5bc568",
+        "$r[0].job.image == $i and $l[0].image_uri == $i"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "image-equals-layer-receipt",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/elliptic_code_list_decoding_20261107/eks/r2img_validate.sh",
+        "research/elliptic_code_list_decoding_20261107/eks/r2img_request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.066,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate-request",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.066,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "170c4d1b12d5cb9a796772752c415b96a31e5ef02978fb699799a713d058e1a4",
+      "stdout_tail": [
+        "validator: /home/user/crypto/taskq/deploy/eks-karpenter/remote/run-command (sha256 1cdaa7447893fd5c...), 22 jq lines",
+        "VALID    research/elliptic_code_list_decoding_20261107/eks/r2img_request.json"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "aws",
+        "ecr",
+        "describe-images",
+        "--repository-name",
+        "isolab/tasks",
+        "--image-ids",
+        "imageDigest=sha256:a361afc0755649e32453e3140260bf58ed0a85975d5998c3d30d056bde5bc568",
+        "--region",
+        "us-east-2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.067,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "image-exists-in-ecr",
+      "index": 6,
+      "outputs": {},
+      "seconds": 1.067,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "af8b9c2c1bc249b3aa2c5a6c4c118bdcf9346dd7c3a40487f67a5edfe0a99714",
+      "stdout_tail": [
+        "{",
+        "    \"imageDetails\": [",
+        "        {",
+        "            \"registryId\": \"104186811093\",",
+        "            \"repositoryName\": \"isolab/tasks\",",
+        "            \"imageDigest\": \"sha256:a361afc0755649e32453e3140260bf58ed0a85975d5998c3d30d056bde5bc568\",",
+        "            \"imageTags\": [",
+        "                \"ecld-f13a690df016\"",
+        "            ],",
+        "            \"imageSizeInBytes\": 148296681,",
+        "            \"imagePushedAt\": 1794113092.534,",
+        "            \"imageManifestMediaType\": \"application/vnd.docker.distribution.manifest.v2+json\",",
+        "            \"artifactMediaType\": \"application/vnd.docker.container.image.v1+json\",",
+        "            \"lastRecordedPullTime\": 1794113228.05,",
+        "            \"imageStatus\": \"ACTIVE\"",
+        "        }",
+        "    ]",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "scripts/checkpoint.sh",
+        "gate"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 9.33,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "checkpoint-gate",
+      "index": 7,
+      "outputs": {},
+      "seconds": 9.33,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "4ddce511e4dc30c9cc14a59b84c090aea5d6d2492ab181ddc7936842934ff40f",
+      "stdout_tail": [
+        "checkpoint: s3://setec-astronomy-artifacts/checkpoints/crypto/claude__serene-davinci-ujoi58/20261108T045900Z-6137209239d5/ (0 unpushed commit(s), 1 spec file(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "run",
+        "benchmarks/records/20261108T0449Z-ecld-panel.json",
+        "--",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command",
+        "research/elliptic_code_list_decoding_20261107/eks/r2img_request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 117.949,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch",
+      "index": 8,
+      "outputs": {
+        "research/elliptic_code_list_decoding_20261107/receipts/R2/launch/result.json": "e8d3055c10c4747cee8c7762abee1339f7128181095af860f7901bd6058c9cd2"
+      },
+      "seconds": 117.949,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "3083a7e1a73d70eceb822ff186d8248ba14f2865f5ff7584ac7570db702124c3",
+      "stdout_tail": [
+        "{",
+        "  \"schema\": \"isolab.eks.command-result/v1\",",
+        "  \"state\": \"active\",",
+        "  \"job_name\": \"ecld-panel-20261107\",",
+        "  \"job_uid\": \"7dd03f8f-f3c9-413e-9fb2-ad44c2f8cd00\",",
+        "  \"pods\": [",
+        "    {",
+        "      \"uid\": \"c24ac183-0e85-4a80-a46b-b51eb4db180d\",",
+        "      \"phase\": \"Running\",",
+        "      \"node\": \"ip-10-84-26-14.us-east-2.compute.internal\",",
+        "      \"exit_code\": null",
+        "    }",
+        "  ],",
+        "  \"results_prefix\": \"s3://isolab-results-104186811093-us-east-2/runs/ecld-panel-20261107/\",",
+        "  \"receipt_uri\": \"s3://isolab-results-104186811093-us-east-2/runs/ecld-panel-20261107/launcher/c48ca665-3679-423f-9013-823457f32ae8/\",",
+        "  \"request_sha256\": \"e9ce9afc740f05ad027f6f90db8a3f5de408b5eb89aa3fd1239bcedaa4104ea2\",",
+        "  \"manifest_sha256\": \"c86d258ba5e858990f625f7dba151c0468b854a54ecdf485517a91dcdf82bb16\",",
+        "  \"launcher\": \"isolab-experiment-launcher:c48ca665-3679-423f-9013-823457f32ae8\",",
+        "  \"exit_code\": 0",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-c",
+        "{job_name, job_uid, pods, state, exit_code, launcher, receipt_uri, results_prefix, request_sha256, manifest_sha256}",
+        "research/elliptic_code_list_decoding_20261107/receipts/R2/launch/result.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "record-launch",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "dd13b357a109a789d2af9a02185a2dbb08a31f1a49bd81b93ca2c0873949439e",
+      "stdout_tail": [
+        "{\"job_name\":\"ecld-panel-20261107\",\"job_uid\":\"7dd03f8f-f3c9-413e-9fb2-ad44c2f8cd00\",\"pods\":[{\"uid\":\"c24ac183-0e85-4a80-a46b-b51eb4db180d\",\"phase\":\"Running\",\"node\":\"ip-10-84-26-14.us-east-2.compute.internal\",\"exit_code\":null}],\"state\":\"active\",\"exit_code\":0,\"launcher\":\"isolab-experiment-launcher:c48ca665-3679-423f-9013-823457f32ae8\",\"receipt_uri\":\"s3://isolab-results-104186811093-us-east-2/runs/ecld-panel-20261107/launcher/c48ca665-3679-423f-9013-823457f32ae8/\",\"results_prefix\":\"s3://isolab-results-104186811093-us-east-2/runs/ecld-panel-20261107/\",\"request_sha256\":\"e9ce9afc740f05ad027f6f90db8a3f5de408b5eb89aa3fd1239bcedaa4104ea2\",\"manifest_sha256\":\"c86d258ba5e858990f625f7dba151c0468b854a54ecdf485517a91dcdf82bb16\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "run",
+        "benchmarks/records/20261108T0449Z-ecld-panel.json",
+        "--",
+        "research/elliptic_code_list_decoding_20261107/cards/wait_command_status.sh",
+        "research/elliptic_code_list_decoding_20261107/cards/status_request.json",
+        "ecld-panel-20261107",
+        "research/elliptic_code_list_decoding_20261107/receipts/R2/status",
+        "23400",
+        "60",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 858.81,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "wait",
+      "index": 10,
+      "outputs": {
+        "research/elliptic_code_list_decoding_20261107/receipts/R2/status/final-status.json": "35d400cb37ac42b17726aeb5ab73cfd27f6d4b9d6bdb5eae8d52f16427ee3fb8"
+      },
+      "seconds": 858.81,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a73b559590c39a7e43081e639ab7ec4fd9fcab9acb35e9e6cd1f0e2112ce616f",
+      "stdout_tail": [
+        "2026-11-08T05:01:59Z poll 1 launcher_exit 0 state active",
+        "2026-11-08T05:03:52Z poll 2 launcher_exit 0 state active",
+        "2026-11-08T05:05:45Z poll 3 launcher_exit 0 state active",
+        "2026-11-08T05:06:49Z poll 4 launcher_exit 255 state none",
+        "2026-11-08T05:08:42Z poll 5 launcher_exit 0 state active",
+        "2026-11-08T05:09:46Z poll 6 launcher_exit 255 state none",
+        "2026-11-08T05:11:38Z poll 7 launcher_exit 0 state active",
+        "2026-11-08T05:13:31Z poll 8 launcher_exit 0 state active",
+        "2026-11-08T05:15:23Z poll 9 launcher_exit 0 state succeeded",
+        "{\"state\":\"succeeded\",\"job_name\":\"ecld-panel-20261107\",\"job_uid\":\"7dd03f8f-f3c9-413e-9fb2-ad44c2f8cd00\",\"pods\":[{\"name\":\"ecld-panel-20261107-mt2bq\",\"uid\":\"c24ac183-0e85-4a80-a46b-b51eb4db180d\",\"phase\":\"Succeeded\",\"node\":\"ip-10-84-26-14.us-east-2.compute.internal\",\"started\":\"2026-11-08T04:59:54Z\",\"exit_code\":0,\"reason\":\"Completed\"}],\"launcher\":\"isolab-experiment-launcher:1419d1fa-acaa-4dc8-a4f0-1cceef5c5d18\",\"receipt_uri\":\"s3://isolab-results-104186811093-us-east-2/runs/ecld-panel-20261107/launcher/1419d1fa-acaa-4dc8-a4f0-1cceef5c5d18/\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "aws",
+        "s3",
+        "sync",
+        "s3://isolab-results-104186811093-us-east-2/runs/ecld-panel-20261107/",
+        "research/elliptic_code_list_decoding_20261107/results/R2",
+        "--exclude",
+        "launcher/*",
+        "--only-show-errors"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2.274,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "download",
+      "index": 11,
+      "outputs": {},
+      "seconds": 2.274,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/elliptic_code_list_decoding_20261107/cards/verify_results.sh",
+        "research/elliptic_code_list_decoding_20261107/receipts/R2/status/final-status.json",
+        "research/elliptic_code_list_decoding_20261107/receipts/R2/launch/result.json",
+        "research/elliptic_code_list_decoding_20261107/results/R2",
+        "binary.sha256",
+        "087cc8e3e3deecf87b186e9a8fd0a903cd79516429e3918ac7abccc54eb6d024  /opt/ecld/ecld_toy"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.028,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify",
+      "index": 12,
+      "outputs": {},
+      "seconds": 0.028,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "7b900f76284ff8d88766772fcb8b500cbfb59c610c1dcbb616aaf607d2a18f0c",
+      "stdout_tail": [
+        "lines/line_57.err: OK",
+        "lines/line_57.jsonl: OK",
+        "lines/line_58.err: OK",
+        "lines/line_58.jsonl: OK",
+        "lines/line_59.err: OK",
+        "lines/line_59.jsonl: OK",
+        "lines/line_60.err: OK",
+        "lines/line_60.jsonl: OK",
+        "lines/line_61.err: OK",
+        "lines/line_61.jsonl: OK",
+        "lines/line_62.err: OK",
+        "lines/line_62.jsonl: OK",
+        "lines/line_63.err: OK",
+        "lines/line_63.jsonl: OK",
+        "lines/line_64.err: OK",
+        "lines/line_64.jsonl: OK",
+        "panel.jsonl: OK",
+        "progress.txt: OK",
+        "SHA256SUMS lines: 132",
+        "verified: job ecld-panel-20261107 job_uid 7dd03f8f-f3c9-413e-9fb2-ad44c2f8cd00 pod_uid c24ac183-0e85-4a80-a46b-b51eb4db180d"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "find",
+        "research/elliptic_code_list_decoding_20261107/results/R2",
+        "-type",
+        "f",
+        "-exec",
+        "python3",
+        "tools/benchrec.py",
+        "add-raw",
+        "benchmarks/records/20261108T0449Z-ecld-panel.json",
+        "{}",
+        "+"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.071,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "add-raw",
+      "index": 13,
+      "outputs": {},
+      "seconds": 0.071,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "c293fab22b37bc8a3dbb25f46994bf72cd8082aed69c33d7f21d474e6fe1ade7",
+      "stdout_tail": [
+        "133 raw file(s) recorded"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "upload",
+        "benchmarks/records/20261108T0449Z-ecld-panel.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 158.81,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "upload-raw",
+      "index": 14,
+      "outputs": {},
+      "seconds": 158.81,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 14,
+  "commit": "6137209239d5e0b77ccd702e9ab499173466335c",
+  "dirty_after": [
+    "enchmarks/records/20261108T0449Z-ecld-panel.json",
+    "research/prime_medium_rho_p4_confirm_20261108/cards/check_session_complete.sh",
+    "research/prime_medium_rho_p4_confirm_20261108/cards/fetch_session.sh",
+    "research/prime_medium_rho_p4_confirm_20261108/cards/frozen-ecbench.sha256",
+    "research/prime_medium_rho_p4_confirm_20261108/cards/record_raw.sh",
+    "research/prime_medium_rho_p4_confirm_20261108/cards/resume_wait.sh",
+    "research/prime_medium_rho_p4_confirm_20261108/cards/run_recorded.sh",
+    "research/prime_medium_rho_p4_confirm_20261108/cards/wait_launcher_result.sh"
+  ],
+  "dirty_before": [
+    "research/ml_learnability_control_20261107/eks/image.json",
+    "research/ml_learnability_control_20261107/protocol.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

@@ -1,0 +1,28 @@
+{
+  "schema": "software.prospective-source-review/v1",
+  "proposal_manifest_sha256": "f955229acbba4efb9f8734350121fcb424f690151e2da1fd5f456f241f7825ee",
+  "finding": {
+    "id": "new-source-root-rejection-unreceipted",
+    "severity": "bounded evidence gap",
+    "source": "build-receipted-isolated.py:7",
+    "condition": "invalid/symlink/wrong-prefix source root",
+    "effect": "receipt dir already created, validation raises before receipt and try/finally",
+    "correction": "validate within initialized receipt scope or emit explicit preparation rejection receipt"
+  },
+  "required_preparation": [
+    "exact source commit and consumed-input closure",
+    "exclusive source ownership",
+    "bound external paths/symlinks/config/toolchain",
+    "pre/post inventory and clean checks",
+    "exclusive target cache ownership"
+  ],
+  "optional_implementations": [
+    "full checkout versus separately reviewed complete sparse closure",
+    "read-only permissions as supplemental accidental-write protection",
+    "later worktree cleanup"
+  ],
+  "time_scope": "cargo cap unchanged; pre/post120s each separate",
+  "status": "source review completed; new rejection receipt gap requires correction for promised failure coverage",
+  "native_execution": false,
+  "checkout_performed": false
+}

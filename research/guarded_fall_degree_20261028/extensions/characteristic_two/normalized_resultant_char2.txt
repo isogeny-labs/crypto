@@ -1,0 +1,84 @@
+Characteristic-two degree-five quadratic-fibre lemma
+Date: 2026-10-28
+
+Setting
+-------
+Let k have characteristic two. Let g(w),g(z) be monic cubics and suppose
+their equations are available in V_5. Suppose also that
+ H1=u^2+A(w)u+B(w), H2=u^2+C(z)u+D(z)
+are available in V_5, with A,B,C,D of degree at most two in their one
+state variable. All degrees here are ordinary polynomial total degrees.
+NF means reduction modulo g(w),g(z), without changing u powers.
+
+Then the scalar normal form of Res_u(H1,H2) belongs to V_5. If g splits
+with three distinct roots and the two quadratics have no common root on
+any scalar grid branch, then 1 belongs to V_5.
+
+Proof
+-----
+Set E=A+C, J=B+D, L=H1+H2=E*u+J. The product E*L has degree at most
+five. Its normal form is
+ P=NF(E*L)=K*u+G,
+ K=NF(E^2)=NF(A^2+C^2), G=NF(E*J).
+
+Frobenius is the essential replacement for division by two: K is a SUM
+of a quadratic in w and a quadratic in z. There is no mixed A*C term.
+G has degree at most two in each state variable, so its total degree is
+at most four. Therefore P has total degree at most four.
+
+Multiply P by w, then reduce. The u coefficient w*K has reduced total
+degree at most three; after multiplying by u this contributes at most
+four. The scalar coefficient w*G reduces to bidegree at most (2,2), also
+degree at most four. Thus NF(w*P) has degree at most four. Multiplying it
+by w a second time costs at most five and gives NF(w^2*P). Hence
+NF(A(w)*P) is available by a scalar linear combination of P, NF(w*P),
+NF(w^2*P), even though a direct unreduced product could have degree six.
+
+The three other products
+ K*H1, u*P, J*L
+all cost at most five: K has degree at most two, H1 at most three,
+P at most four, and J at most two while L is at most three.
+
+Their sum with the staged A*P product gives, modulo the scalar cubics,
+
+ K*H1 + u*P + J*L + A*P
+   = E^2*(u^2+A*u+B)
+       + u*(E^2*u+E*J)
+       + J*(E*u+J)
+       + A*(E^2*u+E*J)
+   = J^2+A*E*J+B*E^2.
+
+All u^2 and u terms cancel in characteristic two. The last expression
+is exactly the monic quadratic resultant. Its scalar normal form has
+bidegree at most (2,2), and has therefore been derived inside V_5.
+
+If g has three distinct roots, the scalar quotient is k^9. A resultant
+nonzero at each grid point is a unit. Every scalar normal form has total
+degree at most four, so successive multiplication by w or z, followed by
+reduction, costs at most five and returns to that scalar normal-form
+space. Thus the available scalar rows form an ideal containing a unit,
+and contain 1.
+
+Degree-five normalization is characteristic-independent
+------------------------------------------------------
+For q(t,u)=alpha(t)u^2+beta(t)u+gamma(t), with coefficient degrees at
+most two and alpha invertible modulo the cubic g(t), start from q in V_4.
+Multiplication by t followed by cubic reduction costs five and returns
+to degree at most four. Repeat once. If alpha^{-1} mod g=I0+I1*t+I2*t^2,
+the linear combination of q, NF(t*q), NF(t^2*q) yields a monic H in V_5.
+No division by two or perfect-field assumption is used.
+
+Scope
+-----
+This is a purely algebraic lemma. Applying it to an elliptic-curve
+presentation still requires the correct characteristic-two Semaev
+polynomial, the missing-root reduction, and the rational/common-root
+interpretation. It does not prove a claim about a Boolean Weil descent
+or growing factor-base dimension by itself.
+
+Checks
+------
+The unreduced displayed cancellation identity was independently expanded
+over F_2 with symbolic coefficients A,B,C,D,u and reduced to zero. That
+finite symbolic check supplements the written identity; it is not needed
+as an assumption of the proof.

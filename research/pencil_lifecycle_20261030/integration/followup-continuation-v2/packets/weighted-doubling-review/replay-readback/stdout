@@ -1,0 +1,47 @@
+WeightedDoubling.tangent_identity.{u_1} {K : Type u_1} [Field K] (a0 a1 a2 a3 x y m : K) :
+  WeightedDoubling.curve a0 a1 a2 a3 - (Polynomial.C m * Polynomial.X + Polynomial.C (y - m * x)) ^ 2 =
+    (Polynomial.X - Polynomial.C x) ^ 2 *
+          (Polynomial.X ^ 3 + Polynomial.C (2 * x) * Polynomial.X ^ 2 + Polynomial.C (3 * x ^ 2 + a3) * Polynomial.X +
+            Polynomial.C (4 * x ^ 3 + 2 * a3 * x + a2 - m ^ 2)) +
+        Polynomial.C (WeightedDoubling.value a0 a1 a2 a3 x - y ^ 2) +
+      Polynomial.C (WeightedDoubling.deriv a1 a2 a3 x - 2 * y * m) * (Polynomial.X - Polynomial.C x)
+WeightedDoubling.tangent_valid.{u_1} {K : Type u_1} [Field K] (a0 a1 a2 a3 x y : K)
+  (hp : WeightedDoubling.value a0 a1 a2 a3 x = y ^ 2) (hy : 2 * y ≠ 0) :
+  have m := WeightedDoubling.deriv a1 a2 a3 x / (2 * y);
+  (Polynomial.X - Polynomial.C x) ^ 2 ∣
+    WeightedDoubling.curve a0 a1 a2 a3 - (Polynomial.C m * Polynomial.X + Polynomial.C (y - m * x)) ^ 2
+WeightedDoubling.normalized_output.{u_1} {K : Type u_1} [Field K] (a0 a1 a2 a3 x y z w : K) (hz : z ≠ 0) (hw : w ≠ 0)
+  (h2 : 2 ≠ 0) (hy : y ≠ 0) :
+  have c := WeightedDoubling.output a0 a1 a2 a3 x y z w;
+  have xx := x / z ^ 2;
+  have yy := y / (z ^ 5 * w);
+  c.z ≠ 0 ∧
+    c.w ≠ 0 ∧
+      2 * yy ≠ 0 ∧
+        c.q / c.z ^ 2 = -2 * xx ∧
+          c.r / c.z ^ 4 = xx ^ 2 ∧
+            c.s / (c.z ^ 3 * c.w) = WeightedDoubling.deriv a1 a2 a3 xx / (2 * yy) ∧
+              c.t / (c.z ^ 5 * c.w) = (2 * a0 + a1 * xx - a3 * xx ^ 3 - 3 * xx ^ 5) / (2 * yy)
+WeightedDoubling.intercept.{u_1} {K : Type u_1} [Field K] (a0 a1 a2 a3 x y : K)
+  (hp : WeightedDoubling.value a0 a1 a2 a3 x = y ^ 2) (h2 : 2 ≠ 0) (hy : y ≠ 0) :
+  (2 * a0 + a1 * x - a3 * x ^ 3 - 3 * x ^ 5) / (2 * y) = y - WeightedDoubling.deriv a1 a2 a3 x / (2 * y) * x
+WeightedDoubling.weighted_preserves.{u_1} {K : Type u_1} [Field K] (a0 a1 a2 a3 x y z w : K) (hz : z ≠ 0) (hw : w ≠ 0)
+  (h2 : 2 ≠ 0) (hy : y ≠ 0) (hp : WeightedDoubling.value a0 a1 a2 a3 (x / z ^ 2) = (y / (z ^ 5 * w)) ^ 2) :
+  have c := WeightedDoubling.output a0 a1 a2 a3 x y z w;
+  c.z ≠ 0 ∧
+    c.w ≠ 0 ∧
+      Polynomial.X ^ 2 + Polynomial.C (c.q / c.z ^ 2) * Polynomial.X + Polynomial.C (c.r / c.z ^ 4) ∣
+        WeightedDoubling.curve a0 a1 a2 a3 -
+          (Polynomial.C (c.s / (c.z ^ 3 * c.w)) * Polynomial.X + Polynomial.C (c.t / (c.z ^ 5 * c.w))) ^ 2
+WeightedDoubling.self_guard.{u_1} {K : Type u_1} [Field K] [DecidableEq K] (x y z w : K) (hz : z ≠ 0) (hw : w ≠ 0)
+  (h2 : 2 ≠ 0) (hy : y ≠ 0) :
+  Add11Distinct.classify (x * z ^ 2) (y * (z ^ 5 * w)) (x * z ^ 2) (y * (z ^ 5 * w)) = Add11Distinct.Prelude.doubling
+WeightedDoubling.zero_y_inverse.{u_1} {K : Type u_1} [Field K] [DecidableEq K] (x z w : K) :
+  Add11Distinct.classify (x * z ^ 2) (0 * (z ^ 5 * w)) (x * z ^ 2) (0 * (z ^ 5 * w)) = Add11Distinct.Prelude.inverse
+'WeightedDoubling.tangent_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'WeightedDoubling.tangent_valid' depends on axioms: [propext, Classical.choice, Quot.sound]
+'WeightedDoubling.normalized_output' depends on axioms: [propext, Classical.choice, Quot.sound]
+'WeightedDoubling.intercept' depends on axioms: [propext, Classical.choice, Quot.sound]
+'WeightedDoubling.weighted_preserves' depends on axioms: [propext, Classical.choice, Quot.sound]
+'WeightedDoubling.self_guard' depends on axioms: [propext, Classical.choice, Quot.sound]
+'WeightedDoubling.zero_y_inverse' depends on axioms: [propext, Quot.sound]

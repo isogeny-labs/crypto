@@ -1,0 +1,227 @@
+WeberRootBoundary.lean:9:4: error: failed to compile definition, compiler IR check failed at `WeberRootBoundary.W._closed_0`. Error: depends on declaration 'Polynomial.zero', which has no executable code; consider marking definition as 'noncomputable'
+WeberRootBoundary.lean:10:4: error: failed to compile definition, compiler IR check failed at `npowBinRec.go._at_.npowBinRec._at_.WeberRootBoundary.kernel.spec_0.spec_0._closed_1`. Error: depends on declaration 'Polynomial.one', which has no executable code; consider marking definition as 'noncomputable'
+WeberRootBoundary.lean:14:4: error: failed to compile definition, compiler IR check failed at `Nat.cast._at_.Nat.cast._at_.WeberRootBoundary.homogeneous.spec_0.spec_0._closed_0`. Error: depends on declaration 'Polynomial.commRing', which has no executable code; consider marking definition as 'noncomputable'
+WeberRootBoundary.lean:18:4: error: failed to compile definition, compiler IR check failed at `WeberRootBoundary.betaTwo._closed_0`. Error: depends on declaration 'Polynomial.semiring', which has no executable code; consider marking definition as 'noncomputable'
+WeberRootBoundary.lean:19:4: error: failed to compile definition, compiler IR check failed at `WeberRootBoundary.quotientTwo._closed_0`. Error: depends on declaration 'Polynomial.semiring', which has no executable code; consider marking definition as 'noncomputable'
+WeberRootBoundary.lean:20:4: error: failed to compile definition, compiler IR check failed at `WeberRootBoundary.numeratorTwo._closed_0`. Error: depends on declaration 'Polynomial.semiring', which has no executable code; consider marking definition as 'noncomputable'
+WeberRootBoundary.lean:21:4: error: failed to compile definition, compiler IR check failed at `WeberRootBoundary.clearedQuotientTwo._closed_0`. Error: depends on declaration 'Polynomial.semiring', which has no executable code; consider marking definition as 'noncomputable'
+Try this:
+  ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+Try this:
+  ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+WeberRootBoundary.lean:35:46: error: unsolved goals
+case re.ext
+x : ℚ
+⊢ -(eval x (QuadraticAlgebra.re 19) * 233472) + eval x (QuadraticAlgebra.re 19) * x * 54420480 +
+                                                  (eval x (QuadraticAlgebra.re 19) * x ^ 2 * 35958528 -
+                                                    eval x (QuadraticAlgebra.re 19) * x ^ 3 * 340825920) +
+                                                eval x (QuadraticAlgebra.re 19) * x ^ 4 * 18839664 +
+                                              eval x (QuadraticAlgebra.re 19) * x ^ 5 * 41940 +
+                                            (-(eval x (QuadraticAlgebra.re 19) * x ^ 6 * 6267) -
+                                              x * eval x (QuadraticAlgebra.im 19) * 22164480) +
+                                          (-(x * eval x (QuadraticAlgebra.re 36) * 62161920) -
+                                            x * eval x (QuadraticAlgebra.re 36) * eval x (QuadraticAlgebra.im 36) *
+                                              1276800) +
+                                        (x * eval x (QuadraticAlgebra.re 36) ^ 2 * 565440 -
+                                          x * eval x (QuadraticAlgebra.im 36) * 80110080) +
+                                      x * eval x (QuadraticAlgebra.im 36) ^ 2 * 72960 +
+                                    (-(x ^ 2 * eval x (QuadraticAlgebra.im 19) * 220324608) -
+                                      x ^ 2 * eval x (QuadraticAlgebra.re 36) * 283701312) +
+                                  (x ^ 2 * eval x (QuadraticAlgebra.re 36) * eval x (QuadraticAlgebra.im 36) * 18240 -
+                                    x ^ 2 * eval x (QuadraticAlgebra.re 36) ^ 2 * 20976) +
+                                x ^ 2 * eval x (QuadraticAlgebra.im 36) * 248735232 +
+                              x ^ 2 * eval x (QuadraticAlgebra.im 36) ^ 2 * 11856 +
+                            x ^ 3 * eval x (QuadraticAlgebra.im 19) * 117528960 +
+                          (x ^ 3 * eval x (QuadraticAlgebra.re 36) * 17619840 -
+                            x ^ 3 * eval x (QuadraticAlgebra.im 36) * 4021920) +
+                        (x ^ 4 * eval x (QuadraticAlgebra.im 19) * 11466288 -
+                          x ^ 4 * eval x (QuadraticAlgebra.re 36) * 148428) +
+                      (-(x ^ 4 * eval x (QuadraticAlgebra.im 36) * 129276) -
+                        x ^ 5 * eval x (QuadraticAlgebra.im 19) * 814500) +
+                    x ^ 6 * eval x (QuadraticAlgebra.im 19) * 8970 +
+                  eval x (QuadraticAlgebra.im 19) * 3784704 +
+                eval x (QuadraticAlgebra.re 36) * 14533632 +
+              eval x (QuadraticAlgebra.re 36) * eval x (QuadraticAlgebra.im 36) * 116736 +
+            eval x (QuadraticAlgebra.re 36) * eval x (QuadraticAlgebra.im 36) ^ 2 * 960 +
+          (eval x (QuadraticAlgebra.re 36) ^ 2 * 102144 -
+            eval x (QuadraticAlgebra.re 36) ^ 2 * eval x (QuadraticAlgebra.im 36) * 576) +
+        (-(eval x (QuadraticAlgebra.re 36) ^ 3 * 128) - eval x (QuadraticAlgebra.im 36) * 14183424) +
+      (-(eval x (QuadraticAlgebra.im 36) ^ 2 * 160512) - eval x (QuadraticAlgebra.im 36) ^ 3 * 128) =
+    645181440 - eval x (QuadraticAlgebra.re 19) * x ^ 3 * 1735104 + eval x (QuadraticAlgebra.re 19) * x ^ 4 * 6471216 +
+                    eval x (QuadraticAlgebra.re 19) * x ^ 5 * 31608 +
+                  (-(eval x (QuadraticAlgebra.re 19) * x ^ 6 * 6267) - x * 471029760) +
+                (-(x ^ 2 * 9557220096) - x ^ 3 * 5808411264) +
+              x ^ 3 * eval x (QuadraticAlgebra.im 19) * 2203584 +
+            x ^ 4 * 229657104 +
+          x ^ 4 * eval x (QuadraticAlgebra.im 19) * 4086144 +
+        (x ^ 5 * 196308 - x ^ 5 * eval x (QuadraticAlgebra.im 19) * 556452) +
+      x ^ 6 * eval x (QuadraticAlgebra.im 19) * 8970
+
+case im.ext
+x : ℚ
+⊢ -(eval x (QuadraticAlgebra.re 19) * 3784704) + eval x (QuadraticAlgebra.re 19) * x * 22164480 +
+                                                  eval x (QuadraticAlgebra.re 19) * x ^ 2 * 220324608 +
+                                                (-(eval x (QuadraticAlgebra.re 19) * x ^ 3 * 117528960) -
+                                                  eval x (QuadraticAlgebra.re 19) * x ^ 4 * 11466288) +
+                                              (eval x (QuadraticAlgebra.re 19) * x ^ 5 * 814500 -
+                                                eval x (QuadraticAlgebra.re 19) * x ^ 6 * 8970) +
+                                            (x * eval x (QuadraticAlgebra.im 19) * 32256000 -
+                                              x * eval x (QuadraticAlgebra.im 36) * 142272000) +
+                                          (-(x * eval x (QuadraticAlgebra.im 36) * eval x (QuadraticAlgebra.re 36) *
+                                                145920) -
+                                            x * eval x (QuadraticAlgebra.im 36) ^ 2 * 565440) +
+                                        x * eval x (QuadraticAlgebra.re 36) * 80110080 +
+                                      (x * eval x (QuadraticAlgebra.re 36) ^ 2 * 638400 -
+                                        x ^ 2 * eval x (QuadraticAlgebra.im 19) * 184366080) +
+                                    (-(x ^ 2 * eval x (QuadraticAlgebra.im 36) * 34966080) -
+                                      x ^ 2 * eval x (QuadraticAlgebra.im 36) * eval x (QuadraticAlgebra.re 36) *
+                                        23712) +
+                                  (x ^ 2 * eval x (QuadraticAlgebra.im 36) ^ 2 * 20976 -
+                                    x ^ 2 * eval x (QuadraticAlgebra.re 36) * 248735232) +
+                                (-(x ^ 2 * eval x (QuadraticAlgebra.re 36) ^ 2 * 9120) -
+                                  x ^ 3 * eval x (QuadraticAlgebra.im 19) * 223296960) +
+                              x ^ 3 * eval x (QuadraticAlgebra.im 36) * 13597920 +
+                            x ^ 3 * eval x (QuadraticAlgebra.re 36) * 4021920 +
+                          (x ^ 4 * eval x (QuadraticAlgebra.im 19) * 30305952 -
+                            x ^ 4 * eval x (QuadraticAlgebra.im 36) * 277704) +
+                        (x ^ 4 * eval x (QuadraticAlgebra.re 36) * 129276 -
+                          x ^ 5 * eval x (QuadraticAlgebra.im 19) * 772560) +
+                      x ^ 6 * eval x (QuadraticAlgebra.im 19) * 2703 +
+                    eval x (QuadraticAlgebra.im 19) * 3551232 +
+                  eval x (QuadraticAlgebra.im 36) * 350208 +
+                eval x (QuadraticAlgebra.im 36) * eval x (QuadraticAlgebra.re 36) * 321024 +
+              (-(eval x (QuadraticAlgebra.im 36) * eval x (QuadraticAlgebra.re 36) ^ 2 * 960) -
+                eval x (QuadraticAlgebra.im 36) ^ 2 * 102144) +
+            eval x (QuadraticAlgebra.im 36) ^ 2 * eval x (QuadraticAlgebra.re 36) * 384 +
+          eval x (QuadraticAlgebra.im 36) ^ 3 * 192 +
+        (eval x (QuadraticAlgebra.re 36) * 14183424 - eval x (QuadraticAlgebra.re 36) ^ 2 * 58368) +
+      eval x (QuadraticAlgebra.re 36) ^ 3 * 192 =
+    372006912 +
+                    (-(eval x (QuadraticAlgebra.re 19) * x ^ 3 * 2203584) -
+                      eval x (QuadraticAlgebra.re 19) * x ^ 4 * 4086144) +
+                  (eval x (QuadraticAlgebra.re 19) * x ^ 5 * 556452 - eval x (QuadraticAlgebra.re 19) * x ^ 6 * 8970) +
+                x * 4132454400 +
+              (-(x ^ 2 * 4780120320) - x ^ 3 * 2046393024) +
+            (x ^ 3 * eval x (QuadraticAlgebra.im 19) * 468480 - x ^ 4 * 135568800) +
+          x ^ 4 * eval x (QuadraticAlgebra.im 19) * 10557360 +
+        (x ^ 5 * 4902912 - x ^ 5 * eval x (QuadraticAlgebra.im 19) * 524844) +
+      x ^ 6 * eval x (QuadraticAlgebra.im 19) * 2703
+WeberRootBoundary.lean:40:4: error: failed to compile definition, compiler IR check failed at `WeberRootBoundary.betaFour._closed_0`. Error: depends on declaration 'Polynomial.semiring', which has no executable code; consider marking definition as 'noncomputable'
+WeberRootBoundary.lean:41:4: error: failed to compile definition, compiler IR check failed at `WeberRootBoundary.quotientFour._closed_0`. Error: depends on declaration 'Polynomial.semiring', which has no executable code; consider marking definition as 'noncomputable'
+WeberRootBoundary.lean:42:4: error: failed to compile definition, compiler IR check failed at `WeberRootBoundary.numeratorFour._closed_0`. Error: depends on declaration 'Polynomial.semiring', which has no executable code; consider marking definition as 'noncomputable'
+WeberRootBoundary.lean:43:4: error: failed to compile definition, compiler IR check failed at `WeberRootBoundary.clearedQuotientFour._closed_0`. Error: depends on declaration 'Polynomial.semiring', which has no executable code; consider marking definition as 'noncomputable'
+Try this:
+  ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+Try this:
+  ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+WeberRootBoundary.lean:57:47: error: unsolved goals
+case re.ext
+x : ℚ
+⊢ eval x (QuadraticAlgebra.re 19) * 446140416 + eval x (QuadraticAlgebra.re 19) * x * 1787351040 +
+                                                eval x (QuadraticAlgebra.re 19) * x ^ 2 * 1320839424 +
+                                              eval x (QuadraticAlgebra.re 19) * x ^ 3 * 195710208 +
+                                            (-(eval x (QuadraticAlgebra.re 19) * x ^ 4 * 16298208) -
+                                              eval x (QuadraticAlgebra.re 19) * x ^ 5 * 34488) +
+                                          eval x (QuadraticAlgebra.re 19) * x ^ 6 * 6267 +
+                                        (-(x * eval x (QuadraticAlgebra.im 19) * 2391422976) -
+                                          x * eval x (QuadraticAlgebra.re 36) * 587473920) +
+                                      (x * eval x (QuadraticAlgebra.re 36) * eval x (QuadraticAlgebra.im 36) * 1211136 -
+                                        x * eval x (QuadraticAlgebra.re 36) ^ 2 * 532608) +
+                                    x * eval x (QuadraticAlgebra.im 36) * 924023808 +
+                                  (-(x * eval x (QuadraticAlgebra.im 36) ^ 2 * 72960) -
+                                    x ^ 2 * eval x (QuadraticAlgebra.im 19) * 1016163072) +
+                                (-(x ^ 2 * eval x (QuadraticAlgebra.re 36) * 222403968) -
+                                  x ^ 2 * eval x (QuadraticAlgebra.re 36) * eval x (QuadraticAlgebra.im 36) * 18240) +
+                              x ^ 2 * eval x (QuadraticAlgebra.re 36) ^ 2 * 20976 +
+                            x ^ 2 * eval x (QuadraticAlgebra.im 36) * 201588480 +
+                          (-(x ^ 2 * eval x (QuadraticAlgebra.im 36) ^ 2 * 11856) -
+                            x ^ 3 * eval x (QuadraticAlgebra.im 19) * 83532288) +
+                        x ^ 3 * eval x (QuadraticAlgebra.re 36) * 16700544 +
+                      (-(x ^ 3 * eval x (QuadraticAlgebra.im 36) * 3907008) -
+                        x ^ 4 * eval x (QuadraticAlgebra.im 19) * 9213840) +
+                    (-(x ^ 4 * eval x (QuadraticAlgebra.re 36) * 148428) -
+                      x ^ 4 * eval x (QuadraticAlgebra.im 36) * 129276) +
+                  (x ^ 5 * eval x (QuadraticAlgebra.im 19) * 768168 - x ^ 6 * eval x (QuadraticAlgebra.im 19) * 8970) +
+                (-(eval x (QuadraticAlgebra.im 19) * 1383309312) - eval x (QuadraticAlgebra.re 36) * 157243392) +
+              eval x (QuadraticAlgebra.re 36) * eval x (QuadraticAlgebra.im 36) * 2247168 +
+            (eval x (QuadraticAlgebra.re 36) * eval x (QuadraticAlgebra.im 36) ^ 2 * 960 -
+              eval x (QuadraticAlgebra.re 36) ^ 2 * 496128) +
+          (-(eval x (QuadraticAlgebra.re 36) ^ 2 * eval x (QuadraticAlgebra.im 36) * 576) -
+            eval x (QuadraticAlgebra.re 36) ^ 3 * 128) +
+        eval x (QuadraticAlgebra.im 36) * 754873344 +
+      (-(eval x (QuadraticAlgebra.im 36) ^ 2 * 627456) - eval x (QuadraticAlgebra.im 36) ^ 3 * 128) =
+    2166951936 - eval x (QuadraticAlgebra.re 19) * x ^ 3 * 14682624 +
+                    (-(eval x (QuadraticAlgebra.re 19) * x ^ 4 * 5335920) -
+                      eval x (QuadraticAlgebra.re 19) * x ^ 5 * 24156) +
+                  eval x (QuadraticAlgebra.re 19) * x ^ 6 * 6267 +
+                x * 12120348672 +
+              x ^ 2 * 17116591104 +
+            x ^ 3 * 4598683392 +
+          (x ^ 3 * eval x (QuadraticAlgebra.im 19) * 1497792 - x ^ 4 * 213626880) +
+        (-(x ^ 4 * eval x (QuadraticAlgebra.im 19) * 3058416) - x ^ 5 * 196308) +
+      (x ^ 5 * eval x (QuadraticAlgebra.im 19) * 510120 - x ^ 6 * eval x (QuadraticAlgebra.im 19) * 8970)
+
+case im.ext
+x : ℚ
+⊢ eval x (QuadraticAlgebra.re 19) * 1383309312 + eval x (QuadraticAlgebra.re 19) * x * 2391422976 +
+                                                        eval x (QuadraticAlgebra.re 19) * x ^ 2 * 1016163072 +
+                                                      eval x (QuadraticAlgebra.re 19) * x ^ 3 * 83532288 +
+                                                    (eval x (QuadraticAlgebra.re 19) * x ^ 4 * 9213840 -
+                                                      eval x (QuadraticAlgebra.re 19) * x ^ 5 * 768168) +
+                                                  (eval x (QuadraticAlgebra.re 19) * x ^ 6 * 8970 -
+                                                    x * eval x (QuadraticAlgebra.im 19) * 604071936) +
+                                                x * eval x (QuadraticAlgebra.im 36) * 336549888 +
+                                              x * eval x (QuadraticAlgebra.im 36) * eval x (QuadraticAlgebra.re 36) *
+                                                145920 +
+                                            x * eval x (QuadraticAlgebra.im 36) ^ 2 * 532608 +
+                                          (-(x * eval x (QuadraticAlgebra.re 36) * 924023808) -
+                                            x * eval x (QuadraticAlgebra.re 36) ^ 2 * 605568) +
+                                        (x ^ 2 * eval x (QuadraticAlgebra.im 19) * 304676352 -
+                                          x ^ 2 * eval x (QuadraticAlgebra.im 36) * 20815488) +
+                                      x ^ 2 * eval x (QuadraticAlgebra.im 36) * eval x (QuadraticAlgebra.re 36) *
+                                        23712 +
+                                    (-(x ^ 2 * eval x (QuadraticAlgebra.im 36) ^ 2 * 20976) -
+                                      x ^ 2 * eval x (QuadraticAlgebra.re 36) * 201588480) +
+                                  x ^ 2 * eval x (QuadraticAlgebra.re 36) ^ 2 * 9120 +
+                                x ^ 3 * eval x (QuadraticAlgebra.im 19) * 112177920 +
+                              x ^ 3 * eval x (QuadraticAlgebra.im 36) * 12793536 +
+                            x ^ 3 * eval x (QuadraticAlgebra.re 36) * 3907008 +
+                          (-(x ^ 4 * eval x (QuadraticAlgebra.im 19) * 25512048) -
+                            x ^ 4 * eval x (QuadraticAlgebra.im 36) * 277704) +
+                        x ^ 4 * eval x (QuadraticAlgebra.re 36) * 129276 +
+                      x ^ 5 * eval x (QuadraticAlgebra.im 19) * 733680 +
+                    (-(x ^ 6 * eval x (QuadraticAlgebra.im 19) * 2703) - eval x (QuadraticAlgebra.im 19) * 937168896) +
+                  eval x (QuadraticAlgebra.im 36) * 597629952 +
+                (eval x (QuadraticAlgebra.im 36) * eval x (QuadraticAlgebra.re 36) * 1254912 -
+                  eval x (QuadraticAlgebra.im 36) * eval x (QuadraticAlgebra.re 36) ^ 2 * 960) +
+              eval x (QuadraticAlgebra.im 36) ^ 2 * 496128 +
+            eval x (QuadraticAlgebra.im 36) ^ 2 * eval x (QuadraticAlgebra.re 36) * 384 +
+          eval x (QuadraticAlgebra.im 36) ^ 3 * 192 +
+        (-(eval x (QuadraticAlgebra.re 36) * 754873344) - eval x (QuadraticAlgebra.re 36) ^ 2 * 1123584) +
+      eval x (QuadraticAlgebra.re 36) ^ 3 * 192 =
+    -2339770368 - eval x (QuadraticAlgebra.re 19) * x ^ 3 * 1497792 +
+                    (eval x (QuadraticAlgebra.re 19) * x ^ 4 * 3058416 -
+                      eval x (QuadraticAlgebra.re 19) * x ^ 5 * 510120) +
+                  eval x (QuadraticAlgebra.re 19) * x ^ 6 * 8970 +
+                x * 11387363328 +
+              x ^ 2 * 12061732608 +
+            (x ^ 3 * 1756223808 - x ^ 3 * eval x (QuadraticAlgebra.im 19) * 13184832) +
+          x ^ 4 * 121606992 +
+        (-(x ^ 4 * eval x (QuadraticAlgebra.im 19) * 8394336) - x ^ 5 * 4902912) +
+      (x ^ 5 * eval x (QuadraticAlgebra.im 19) * 485964 - x ^ 6 * eval x (QuadraticAlgebra.im 19) * 2703)

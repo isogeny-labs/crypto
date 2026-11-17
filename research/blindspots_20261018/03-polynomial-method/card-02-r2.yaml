@@ -1,0 +1,73 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-03-02-r2
+experiment_id: BLINDSPOT-03
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/03-polynomial-method/raw/receipt-card-02-r2.json
+binds:
+  - {path: examples/blindspots_03_polynomial_method.rs, sha256: c4a2a1ac94687e6a8170d651e5ecca81c444d4656f293207437f8394a224647c}
+  - {path: research/blindspots_20261018/03-polynomial-method/draws.tsv, sha256: d748ab677344ac8cde3e9bf75c6ded9fb62d6ce20f4bde90a9ceb8c52bb45028}
+commands:
+  - id: make-build-dir
+    argv: ["mkdir", "-p", "target/blindspots-03-r2/c02"]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+  - id: build-b03
+    argv: ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "target-cpu=native", "-o", "target/blindspots-03-r2/c02/b03", "examples/blindspots_03_polynomial_method.rs"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-build-b03.stdout.log
+    stderr: research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-build-b03.stderr.log
+  - id: fes-c13-6-2
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-03-r2/c02/b03", "fes", "--draws", "research/blindspots_20261018/03-polynomial-method/draws.tsv", "--cell", "c13-6-2", "--targets", "0-7", "--random", "8"]
+    timeout_seconds: 20
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c13-6-2.stdout.log
+    stderr: research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c13-6-2.stderr.log
+  - id: fes-c17-8-2
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-03-r2/c02/b03", "fes", "--draws", "research/blindspots_20261018/03-polynomial-method/draws.tsv", "--cell", "c17-8-2", "--targets", "0-7", "--random", "8"]
+    timeout_seconds: 20
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c17-8-2.stdout.log
+    stderr: research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c17-8-2.stderr.log
+  - id: fes-c21-10-2
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-03-r2/c02/b03", "fes", "--draws", "research/blindspots_20261018/03-polynomial-method/draws.tsv", "--cell", "c21-10-2", "--targets", "0-7", "--random", "8"]
+    timeout_seconds: 20
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c21-10-2.stdout.log
+    stderr: research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c21-10-2.stderr.log
+  - id: fes-c25-12-2
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-03-r2/c02/b03", "fes", "--draws", "research/blindspots_20261018/03-polynomial-method/draws.tsv", "--cell", "c25-12-2", "--targets", "0-7", "--random", "8"]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c25-12-2.stdout.log
+    stderr: research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c25-12-2.stderr.log
+  - id: fes-c29-14-2
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-03-r2/c02/b03", "fes", "--draws", "research/blindspots_20261018/03-polynomial-method/draws.tsv", "--cell", "c29-14-2", "--targets", "0-7", "--random", "8"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c29-14-2.stdout.log
+    stderr: research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c29-14-2.stderr.log
+  - id: crossover
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-03-r2/c02/b03", "crossover"]
+    timeout_seconds: 200
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-crossover.stdout.log
+    stderr: research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-crossover.stderr.log
+  - id: remove-build-dir
+    argv: ["rm", "-rf", "target/blindspots-03-r2/c02"]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-03
+background: false
+write_scope:
+  - research/blindspots_20261018/03-polynomial-method/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with timeout 600000."

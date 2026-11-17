@@ -1,0 +1,204 @@
+{
+  "all_stages_charged_same_series": true,
+  "claim_boundary": "Equal-advice diagnostic on public synthetic Koblitz points: BL preprocessing rho with Frobenius folding against compact-orbit IC at the IC table's byte budget. Not a deployed-curve claim, not an asymptotic claim, not end-to-end S; precomputation of both arms is reported apart from the online intervals.",
+  "claim_boundary_non_claims": "Equal-advice diagnostic on public synthetic Koblitz points: BL preprocessing rho with Frobenius folding against compact-orbit IC at the IC table's byte budget. Not a deployed-curve claim, not an asymptotic claim, not end-to-end S; precomputation of both arms is reported apart from the online intervals.",
+  "co_measured": {
+    "bl_process_resident_throughout": true,
+    "order": [
+      "IC#1",
+      "BL#1",
+      "BL#2",
+      "IC#2"
+    ],
+    "process_group_id": 8581,
+    "same_process_group": true
+  },
+  "executable_or_source_hash": {
+    "bl_binary_sha256": "882896bec038ac77415764026da34bda56bf609ba7081059dc32e49248fa4098",
+    "ic_binary_sha256": "d045d922575518452ce61b1e8eade23230f46a7a7ebd555b7934b1cc7fa792cf"
+  },
+  "fixture_hash": "2a49a36da31ac4a971696b054e62ea1111b6890afc6b4526fe4a9ed8b87333fa",
+  "host_id": "vm",
+  "ic_cost": 0.176266,
+  "ic_online_interval": {
+    "included_stages": [
+      "target_query",
+      "target_PDP",
+      "target_relation_check",
+      "target_descent",
+      "target_recovery_check"
+    ],
+    "start_event": "target_query_begin",
+    "stop_event": "recovery_check_end"
+  },
+  "ic_online_ms": 0.176266,
+  "ic_online_phase_ms": {
+    "T_target_PDP_ms": 0.156191,
+    "T_target_descent_ms": 0.0007840000000000001,
+    "T_target_query_ms": 0.000049999999999999996,
+    "T_target_recovery_check_ms": 0.013242,
+    "T_target_relation_check_ms": 0.005999
+  },
+  "ic_online_wall_ms": 0.176266,
+  "ic_replay_certificate_sha256": "b5b25ecde92d55312f15fd11c3c99c74f02ba88a110e9bcadfa513c4e71fbef4",
+  "ic_resource_envelope": {
+    "address_space_cap_bytes": 4294967296,
+    "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpuset": "0-3",
+    "isolation_receipt": null,
+    "kernel": "6.18.44-fc-v139",
+    "mem_total_kib": 16479424,
+    "nice": 0,
+    "online_threads": 1,
+    "process_group_id": 8581,
+    "session_id": "n41smoke-20261018T2128Z-pg8581",
+    "setup_threads": 4
+  },
+  "ic_scalar_verified": true,
+  "ic_target_hash": "93839bc4bfbab60a5c2471efde899841e89524fb585b836437b4656fa5fe6d03",
+  "ic_verified": true,
+  "independent_validation": false,
+  "isolation_levels": {
+    "ic": "L0",
+    "required": "L2",
+    "rho": "L0"
+  },
+  "n_or_bits": 41,
+  "online_interval": {
+    "ic_included_stages": [
+      "target_query",
+      "target_PDP",
+      "target_relation_check",
+      "target_descent",
+      "target_recovery_check"
+    ],
+    "ic_start_event": "target_query_begin",
+    "ic_stop_event": "recovery_check_end",
+    "rho_included_stages": [
+      "walk",
+      "collision",
+      "recovery_check"
+    ],
+    "rho_start_event": "target_walk_start",
+    "rho_stop_event": "recovery_check_end"
+  },
+  "online_speedup": 1.0331828032632497,
+  "operation_accounting": {
+    "boundary": "native units; the section 5a band in decision.json prices them at 0, 0.1 and 1 GAE",
+    "calibrated_operation_ratio": null,
+    "calibration_status": "unknown",
+    "common_operation_unit": null,
+    "counter_note": "per-target online counters; precomputation counters are in the BL precompute record",
+    "counter_scope": "whole_measured_record",
+    "ic": {
+      "cost_is_lower_bound": true,
+      "native_counters": {
+        "probes": 420,
+        "relation_checks": 1,
+        "root_calls": 210
+      },
+      "record_id": "fd7ffbc04c39933420eedb277c408cea13331972fe0f57a853d56ff73b341954",
+      "unpriced_work": [
+        "S3 root solves",
+        "root-table probes",
+        "normal-basis canonicalisation"
+      ]
+    },
+    "rho": {
+      "cost_is_lower_bound": true,
+      "native_counters": {
+        "online_steps": 115,
+        "table_lookups": 8,
+        "verifications": 1,
+        "walks": 8
+      },
+      "record_id": "f08119a7710854f4eac486ed5e1aa4a60f571b29c8f77e4f120bbddf01b34fcb",
+      "unpriced_work": [
+        "normal-basis canonicalisation per step",
+        "[c]G scalar multiplications",
+        "table binary search"
+      ]
+    },
+    "total_work_S": null
+  },
+  "paired_target": {
+    "ic_public_q": [
+      "1937192090556",
+      "1752757913148"
+    ],
+    "rho_public_q": [
+      "1937192090556",
+      "1752757913148"
+    ],
+    "same_public_point": true
+  },
+  "record_class": "verified_answer_exploratory_wall",
+  "recovered_d_verified": true,
+  "resource_caps": {
+    "address_space_cap_bytes": 4294967296,
+    "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpuset": "0-3",
+    "isolation_receipt": null,
+    "kernel": "6.18.44-fc-v139",
+    "mem_total_kib": 16479424,
+    "nice": 0,
+    "online_threads": 1,
+    "process_group_id": 8581,
+    "session_id": "n41smoke-20261018T2128Z-pg8581",
+    "setup_threads": 4
+  },
+  "rho_cost": 0.182115,
+  "rho_online_interval": {
+    "included_stages": [
+      "walk",
+      "collision",
+      "recovery_check"
+    ],
+    "start_event": "target_walk_start",
+    "stop_event": "recovery_check_end"
+  },
+  "rho_online_ms": 0.182115,
+  "rho_online_phase_ms": {
+    "recovery_check_ms": 0.013337,
+    "walk_and_collision_ms": 0.168778
+  },
+  "rho_online_wall_ms": 0.182115,
+  "rho_policy": {
+    "collision_policy": "binary search of the 8-byte class fingerprint in the sorted G-only DP table; every hit verified by [d]G = Q",
+    "distinguished_point_memory_bytes": 43610032,
+    "level": 1,
+    "table_entries": 2725627,
+    "tier": "A",
+    "walk_policy": "preprocessing rho, signed-Frobenius classes, 2048 G-only jumps, 4-step look-ahead, identical map offline and online",
+    "worker_count": 1
+  },
+  "rho_replay_certificate_sha256": "44627e44e0c824d7d897eca52fee3bcf3ba3eb4af8411be97396f913aa44ef8a",
+  "rho_resource_envelope": {
+    "address_space_cap_bytes": 4294967296,
+    "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpuset": "0-3",
+    "isolation_receipt": null,
+    "kernel": "6.18.44-fc-v139",
+    "mem_total_kib": 16479424,
+    "nice": 0,
+    "online_threads": 1,
+    "process_group_id": 8581,
+    "session_id": "n41smoke-20261018T2128Z-pg8581",
+    "setup_threads": 4
+  },
+  "rho_scalar_verified": true,
+  "rho_target_hash": "93839bc4bfbab60a5c2471efde899841e89524fb585b836437b4656fa5fe6d03",
+  "rho_verified": true,
+  "rung": "n41smoke",
+  "same_resource_envelope": true,
+  "schema": "ic_equal_advice_claim/v1",
+  "seeds": {
+    "bl_seed": "v1",
+    "ic_rank_seed": 7
+  },
+  "target_count": 1,
+  "timing_class": "single_target_online_wall",
+  "verdict": "DIAGNOSTIC_NOT_PROMOTED",
+  "workload_id": "8a2c931ac7c2",
+  "workload_manifest_sha256": "8a2c931ac7c2bc2cd717d27b9892b95d56e823feb38f411e9b5be84c4d22b8b4"
+}

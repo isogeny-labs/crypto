@@ -1,0 +1,53 @@
+{
+  "schema": "research.component-status/v1",
+  "utc": "2026-10-31T07:10:16.213213+00:00",
+  "assembly": "completed using existing base and one runtime build",
+  "qualification_complete": false,
+  "passed_cases": [
+    "Q0"
+  ],
+  "positive_program_exit": 0,
+  "preexec_pids_observations": [
+    {
+      "schema": "software.preexec-pids/v1",
+      "case": "Q1",
+      "nonce": "0159ca8a-9eec-479a-9aa2-04d62b131f89",
+      "pid": 1,
+      "uid": 1000,
+      "gid": 1000,
+      "cgroup_mapping": "0::/",
+      "cgroup_device": 27,
+      "cgroup_inode": 1262919,
+      "pids_max": 1,
+      "pids_current": 1,
+      "monotonic_seconds": 195299,
+      "monotonic_nanoseconds": 130242741,
+      "boundary": "before_tested_program_exec"
+    }
+  ],
+  "failure": "Stop: unexpected writable-layer change",
+  "writable_layer_diff": [
+    "A /fixtures",
+    "A /qualification",
+    "A /qualification/exec-gate"
+  ],
+  "cleanup_complete": true,
+  "scientific_execution": false,
+  "remaining_worker_seconds": null,
+  "cost_ratio_to_rho": null,
+  "bindings": {
+    "assembly": {
+      "path": "/var/tmp/pencil-runtime-only-recovery-execution-20261031-v1/receipt.json",
+      "sha256": "034b887041b385f819c3e81d1bb31b38ceb48464fe2813eb574384ebee1ccbe2"
+    },
+    "qualification": {
+      "path": "/var/tmp/pencil-runtime-qualification-execution-20261031-v5/receipt.json",
+      "sha256": "44d9166c4f68e1f247f31c9d52727f3b4b338ae00bf031db431faccebadca6f7"
+    },
+    "diff": {
+      "path": "/var/tmp/pencil-runtime-qualification-execution-20261031-v5/030-diff-Q1/stdout",
+      "sha256": "0f6371185b0230f9ffdaee67123ce88b48e6b3844b3aeecdf36302254936853d"
+    }
+  },
+  "next_action": "Prospectively review mount-placeholder accounting; do not reinterpret the failed empty-diff check as a pass."
+}

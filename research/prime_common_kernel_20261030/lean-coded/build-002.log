@@ -1,0 +1,13 @@
+✖ [3138/3139] Building CodedProjection (2.3s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/audit/coded-projection-lean/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/audit/coded-projection-lean/CodedProjection.lean -o /workspace/audit/coded-projection-lean/.lake/build/lib/lean/CodedProjection.olean -i /workspace/audit/coded-projection-lean/.lake/build/lib/lean/CodedProjection.ilean -c /workspace/audit/coded-projection-lean/.lake/build/ir/CodedProjection.c --setup /workspace/audit/coded-projection-lean/.lake/build/ir/CodedProjection.setup.json --json
+info: CodedProjection.lean:82:0: 'CodedProjection.projected_is_matrix_product' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CodedProjection.lean:83:0: 'CodedProjection.nonzero_syndrome_annihilates' depends on axioms: [propext, Quot.sound]
+error: CodedProjection.lean:83:43: unexpected token '('; expected command
+info: CodedProjection.lean:84:0: 'CodedProjection.zero_syndrome_preserves' depends on axioms: [propext, Quot.sound]
+error: CodedProjection.lean:84:38: unexpected token '('; expected command
+info: CodedProjection.lean:85:0: 'CodedProjection.mismatched_pair_annihilates' depends on axioms: [propext, Quot.sound]
+info: CodedProjection.lean:86:0: 'CodedProjection.matched_pair_preserves' depends on axioms: [propext, Quot.sound]
+info: CodedProjection.lean:87:0: 'CodedProjection.weighted_pair_diagonal' depends on axioms: [propext, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- CodedProjection
+error: build failed

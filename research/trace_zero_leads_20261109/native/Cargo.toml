@@ -1,0 +1,12 @@
+[package]
+name = "trace-zero-leads"
+version = "0.1.0"
+edition = "2021"
+publish = false
+default-run = "trace-zero-leads"
+[workspace]
+[dependencies]
+full-trace-zero-backend = { path = "../../full_trace_zero_variety_20261109/native/backend" }
+num-bigint = "0.4"
+num-traits = "0.2"
+serde_json = "1"

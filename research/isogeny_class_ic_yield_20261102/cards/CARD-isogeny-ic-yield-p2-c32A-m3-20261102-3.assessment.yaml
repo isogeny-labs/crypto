@@ -1,0 +1,13 @@
+card_id: CARD-isogeny-ic-yield-p2-c32A-m3-20261102-3
+relay_verbatim: not_checked   # no receipt exists (the card never completed) and no executor report file was supplied; check-relay needs both
+outcome: impeded
+stopped_at_step: cell
+recommendation: rerun_after_infrastructure_fix
+reasons:
+  - "Infrastructure stop, not a card or data fault: the main session sent SIGTERM at about 6 min (exit 143) because the executor tool would have killed the background command at its 30-minute limit; the card timeout_seconds is 7200. run.log ends with: ecbench: interrupted by signal 15, and the last row is 445/5440 m3-main ... interrupted S=- L0."
+  - "No receipt: cards/CARD-isogeny-ic-yield-p2-c32A-m3-20261102-3.receipt.json does not exist (task_card.py was terminated with the command), nor do .run.stdout and .run.stderr; the declared outputs spec.json, audit.json, analysis.json were not all written (audit.json and analysis.json do not exist)."
+  - "Partial run directory retained unread under p2_prime_analogues/runs/_failed/CARD-isogeny-ic-yield-p2-c32A-m3-20261102-3-attempt1/c32A_m3/: spec.json (sha256 9efa85db1cc8470d49cf0bf30d4c8d75dc491ccf2adbf3b4186495b887aa1926), run.log (5ea13990db9c3bc800b1d6de86a423e54398aa7303b20d6430648e30322606ad), session/{host.json 9c4fa556787d3a1415f014c2ba60094b28ef1dfe7dda6c612e689a25272b9922, plan.json 54b55df26ea53f376efc7f60b260deabc021635166212cebb72d861249aea661, records.jsonl cbceb326bb753cb483564c6acbfda1c3c1a33670e7f894f74c75ae4eafc23554 (445 lines), session.json 8b06d4618d8514107ab499ba2af409c2393732038fb623754ee876861c0631d1}; plan.json and records.jsonl are gzipped in the main checkout (hashes are of the uncompressed originals). 445 of 5440 planned runs: no data is used in analysis."
+  - "Moved aside so must_not_exist (p2_prime_analogues/runs/c32A_m3) passes: ls reports no such directory in /home/user/crypto-p2run. HEAD there is b2d8929120, the pin; nothing committed there."
+  - "Card unchanged: python3 tools/task_card.py lint in /home/user/crypto-p2run prints CARD OK (card sha256 dd9a0398b2251fe9b444fcbadf99298fb836477f97bc3d98fdf13fe235f88e4b); every bind sha256 matches the file on disk. PROTOCOL.md (a bound file) was not edited; the launch note is in LAUNCH_NOTE.md, which no card binds."
+  - "Relaunch route: detached launch per LAUNCH_NOTE.md in the same directory, same card, same argv, env and binary."
+interpretation: not_assessed

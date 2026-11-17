@@ -1,0 +1,32 @@
+{
+  "exit_code": 0,
+  "client_terminal_exit": 0,
+  "inspection_raw_sha256": "cc127ff2f9e360a99694a1eede49161b8978a947ff2f7863185945c37dc1ec87",
+  "inspection_raw_bytes_read": 9442,
+  "inspection_raw_persisted": false,
+  "argv": [
+    "/usr/bin/sudo",
+    "-n",
+    "/usr/bin/env",
+    "-i",
+    "PATH=/usr/bin:/bin",
+    "HOME=/var/tmp/pencil-runtime-qualification-execution-20261031-v5/empty-docker-config",
+    "DOCKER_CONFIG=/var/tmp/pencil-runtime-qualification-execution-20261031-v5/empty-docker-config",
+    "/usr/bin/docker",
+    "--host",
+    "unix:///var/run/docker.sock",
+    "info",
+    "--format",
+    "{{json .}}"
+  ],
+  "started_monotonic": 195295.917211343,
+  "ended_monotonic": 195296.220086073,
+  "cap_seconds": 20,
+  "environment_names": [
+    "HOME",
+    "LANG",
+    "PATH"
+  ],
+  "docker_environment": "empty allowlist; no endpoint/TLS/proxy/credential selectors",
+  "supervisor_deadline": 195595.848124873
+}

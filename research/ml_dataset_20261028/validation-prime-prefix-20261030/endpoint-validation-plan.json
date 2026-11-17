@@ -1,0 +1,62 @@
+{
+  "schema": "software-validation-plan/v1",
+  "source_commit": "113526b577044a6283be81acb1a847c89c96aa4e",
+  "binary": "target/release/deps/crypto_lib-6aedeb38eb570a69",
+  "binary_sha256": "0e029dc58ce55ff17d19aef4a214055218ab30562f7923ca9478aad0038414a2",
+  "build_evidence": "prefix-combined-dataset-04.log and prefix-combined-full-01.log",
+  "test": "ml_dataset::solvers::tests::all_adapter_endpoints_return_structured_outcomes",
+  "field_sizes": [
+    23,
+    61
+  ],
+  "families": [
+    "koblitz",
+    "binary",
+    "prime"
+  ],
+  "twists": [
+    false,
+    true
+  ],
+  "arities": [
+    2,
+    4,
+    15
+  ],
+  "methods": [
+    "enumerate",
+    "bsgs",
+    "sat",
+    "weil",
+    "f4",
+    "f5",
+    "f6",
+    "root",
+    "pkm",
+    "double-large-prime"
+  ],
+  "combinations": 360,
+  "factor_base_size": 4,
+  "work_limit": 64,
+  "degree_bound": 2,
+  "private_witness_removed": true,
+  "rayon_threads": 1,
+  "test_threads": 1,
+  "checks": [
+    "all360 combinations visited",
+    "declared outcome schema and supported status set",
+    "nonempty reason",
+    "completion false on unsupported or exhausted outcomes",
+    "first and last fall degree remain null",
+    "native verification of returned solution certificates"
+  ],
+  "not_proven": [
+    "every adapter supports every combination",
+    "wide prime F4 supervised-context admission",
+    "full requested arity and field-size cross product",
+    "complete solver traces or instructions",
+    "cloud generation"
+  ],
+  "scientific_samples_added": 0,
+  "verified_cloud_dataset_cells": 0
+}

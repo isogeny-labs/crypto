@@ -1,0 +1,72 @@
+{
+  "schema": "research.formal-component/v1",
+  "scope": "arbitrary nonzero-weight C0 field payload decode and curve membership",
+  "main_declarations": 14,
+  "controls": 7,
+  "readbacks": 21,
+  "checks": {
+    "weights1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "weights2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "scale1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "point1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "point2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "guards1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "module_sha256": {
+    "WeightedCZero": "c1e8bc25f6550d46b9974b3990373c1345d4d495b9e03f77e3b84f0f4f98f300",
+    "PayloadScale": "304a79c16c8090ebd3845546169f5e0270455c4d282cd45694e23d6d3962a2ae",
+    "WeightedPoint": "96eb0211c1928fc36b334ad0741d12075daf3503c51750c75334deb939e79af8",
+    "WeightedGuards": "bd4bf916487e98fd58c1b511ad697c5ea17ff3b5f7d17d1de1a1ff27ddab8036",
+    "WeightedControls": "35f56d132b76247f1c5268e00609b1b8219cf55396d633ce1930c7a9cdeb1953",
+    "WeightedReadback": "63bc44caaff4849cab294ba8d2752f26f39fab2d176dffacb95dca8cf01521a6"
+  },
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "scientific_execution": false,
+  "independent_review": false,
+  "machine_correspondence": false,
+  "divisor_class_sum": false,
+  "native_execution_cost_equivalence": false
+}

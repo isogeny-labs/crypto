@@ -1,0 +1,13 @@
+import SignedPair
+namespace SignedPairControls
+-- Non-two-torsion anchor witness in an odd-order group.
+theorem anchor_one : (1 : ZMod 11)+(1 : ZMod 11)≠0 := by decide
+-- The zero-anchor ambiguity hypotheses are inhabited.
+theorem distinct_signs : (1 : ZMod 11)≠ -(1 : ZMod 11) := by decide
+theorem zero_anchor : ((-(1 : ZMod 11))=1 ∨ (-(1 : ZMod 11))= -1) ∧
+ ((0+(-(1 : ZMod 11)))=(0+1) ∨ (0+(-(1 : ZMod 11)))= -(0+1)) ∧ (-(1 : ZMod 11))≠1 :=
+ SignedPair.zero_anchor_ambiguity 1 distinct_signs
+end SignedPairControls
+#print axioms SignedPairControls.anchor_one
+#print axioms SignedPairControls.distinct_signs
+#print axioms SignedPairControls.zero_anchor

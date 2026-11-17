@@ -1,0 +1,51 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-isogeny-ic-yield-p2-c28A-m2-20261102-2
+experiment_id: isogeny_class_ic_yield_20261102
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 2104bfb43465c068f61227065424ffd4ef1126ef
+receipt: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2-c28A-m2-20261102-2.receipt.json
+binds:
+  - {path: research/isogeny_class_ic_yield_20261102/DESIGN.md, sha256: f3748782cd1254a0db75dafa85989edfcb297a7d7aac46bf6f51be42d75712f9}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/PROTOCOL.md, sha256: 58f90474c857c3753fbd77651ed381c0ea75a5bdb6423b892880d6ff7b781e30}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/protocol.json, sha256: 8b6fc89c3c60352b7e5203bcd1120cc10babf28ce91c59b3fce77c12976a14e0}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/versions/protocol-v1.json, sha256: 6fda9efb1a160d4d71d8bd394e6e2139b1d608c6673fa630c0034536f16a3b0d}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/README.md, sha256: 69b7c4af07d6bd5d2c564efc7643f9eff9fbca65679f22f3cdc0d949ab7946e2}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/classes.json, sha256: 7e79c642399cdda52e0e6666123cf8abcad27dbf68c9ff7dda14f0d3316adb47}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/run_class.sh, sha256: 72d4e262ecd70e0699a842d582b32fd9b0c98f6070606fd3811ecf49882ed43b}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/src/spec.rs, sha256: 810131e49a5382acb0235e72d127ebc77219a0f34e6e843282054cb08c19113f}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/src/analyze.rs, sha256: f6cc7286daae471bc40e5860ed8673f1e1676b9fadce3199b8fe67ca8d167678}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/target/release/p2tool, sha256: d553ca57f35138644c601e093fed5fd3bb4dc0a9217e4b1dd1789fcfb1cfa992}
+  - {path: target/release/ecbench, sha256: 3447ba8a3e410bf816f0fbb13fc7aed235c63a834d31ab32b00f480a930fac1c}
+must_not_exist: [research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/c28A_m2]
+commands:
+  - id: cell
+    argv:
+      - research/isogeny_class_ic_yield_20261102/p2_prime_analogues/run_class.sh
+      - "c28A"
+      - "2"
+      - research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/c28A_m2
+      - "--targets"
+      - "4"
+      - "--rounds"
+      - "4"
+      - "--aa"
+      - "1"
+    env:
+      ECBENCH: ./target/release/ecbench
+      P2TOOL: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/target/release/p2tool
+      ISOLATION: L0
+      REPLAYS: "12"
+      ALLOW_BUSY: ""
+    timeout_seconds: 10800
+    success_exit_codes: [0]
+    stdout: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2-c28A-m2-20261102-2.run.stdout
+    stderr: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2-c28A-m2-20261102-2.run.stderr
+    outputs: [research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/c28A_m2/spec.json, research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/c28A_m2/audit.json, research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/c28A_m2/analysis.json]
+bus_address: executor-mechanical-isogeny-ic-yield
+background: true
+write_scope: [research/isogeny_class_ic_yield_20261102/cards/, research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/]
+stop_when:
+  - Any command exits nonzero or reaches its timeout; retain the output directory research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/c28A_m2.
+notes: "LOCAL FALLBACK ROUTE under protocol amendment A1 (protocol.json version 2): isolation L0, the clock metric is descriptive only. Not an EKS card. Run the cards one at a time, in the order of the list given with the dispatch: ecbench holds one benchmark lock per host. P2 cell c28A, m=2, run order position 7 of 12. Run in the worktree /home/user/crypto-p2run (detached at the pinned commit)."

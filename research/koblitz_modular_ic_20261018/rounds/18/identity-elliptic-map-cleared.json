@@ -1,0 +1,225 @@
+{
+  "id": "IDC1hee24ebe64bfee106",
+  "independence": "native issuer;128 extra parsed checks and explicit source-bound kernel theorem",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound18.lean",
+    "sha256": "8fe4332961cf54b7a20194af6dbc0053a787de1c03ae22d675435a3fb102f2e7"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 202610230302,
+  "statement": {
+    "degree_bound": 4,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": 0,
+                          "op": "const"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "args": "t",
+                                  "op": "var"
+                                },
+                                {
+                                  "args": "x",
+                                  "op": "var"
+                                }
+                              ],
+                              "op": "mul"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "args": "t",
+                                  "op": "var"
+                                },
+                                {
+                                  "args": "x",
+                                  "op": "var"
+                                }
+                              ],
+                              "op": "mul"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "add"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "x",
+                          "op": "var"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "t",
+                              "op": "var"
+                            },
+                            {
+                              "args": "x",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": "a",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        {
+          "args": 1,
+          "op": "const"
+        }
+      ],
+      "op": "add"
+    },
+    "name": "elliptic-map-cleared",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "x",
+                  "op": "var"
+                },
+                {
+                  "args": "x",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": 0,
+                              "op": "const"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "args": "t",
+                                  "op": "var"
+                                },
+                                {
+                                  "args": "t",
+                                  "op": "var"
+                                }
+                              ],
+                              "op": "mul"
+                            }
+                          ],
+                          "op": "add"
+                        },
+                        {
+                          "args": "t",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "add"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": "a",
+                  "op": "var"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": 1,
+          "op": "const"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "KoblitzRound18.elliptic_map_cleared",
+    "variables": [
+      "x",
+      "t",
+      "a"
+    ]
+  },
+  "value_digest": "304cc5676091ee743cd1cd711e002f33cebfd8894708d3aa13773fc9f70e87ff"
+}

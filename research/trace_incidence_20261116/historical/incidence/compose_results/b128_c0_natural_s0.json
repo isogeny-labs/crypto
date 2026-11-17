@@ -1,0 +1,69 @@
+{
+  "status": "none",
+  "witness": null,
+  "recovery": null,
+  "root_candidates": 0,
+  "gcd_evaluations": 128,
+  "group_counters": {},
+  "arm": "split_compose",
+  "gcd_degree": 0,
+  "gcd_coefficients": [
+    1
+  ],
+  "phase_cpu_seconds": {
+    "preprocessing": 0.001083695999999995,
+    "modular_composition_incidence": 0.38363433999999996,
+    "incidence_gcd": 0.0,
+    "witness_and_scalar_recovery": 0.0
+  },
+  "solver_core_bracket_cpu_seconds": 0.384718036,
+  "solver_total_wall_seconds": 0.3859920719987713,
+  "counters": {
+    "interpolation_scalar_inversions": 128,
+    "denominator_scalar_inversions": 128,
+    "quotient_multiplications": 640,
+    "polynomial_product_coefficient_pairs": 8437888,
+    "native_modular_compositions": 256
+  },
+  "dimensions": {
+    "quotient_dimension": 128,
+    "first_pool_iterations": 128,
+    "largest_stored_univariate_degree": 128,
+    "backend_internal_workspace": "Native FLINT compose_mod workspace; not a pair table; peak process RSS measured."
+  },
+  "peak_process_rss_kib": 25868,
+  "complexity_scope": "B iterations, 2B native degree-B modular compositions, 5B explicit quotient products, O(B^2) classical interpolation coefficient work. compose_mod internals uncounted; no subquadratic claim.",
+  "schema": "incidence-compose-result/v1",
+  "fixture_id": "b128_c0_natural_s0",
+  "B": 128,
+  "kind": "natural",
+  "fixture_sha256": "b26fde653f5321d818199cd967265f1f61f97c368f4720b5770f04888d60d7ec",
+  "fixture_generation": {
+    "accepted": 384,
+    "counter_scope": "Public alpha*P+beta*Q pool construction, including rejected draws; Python modular inverse internals not expanded into multiplications.",
+    "counters": {
+      "affine_additions": 8928,
+      "affine_doublings": 17739,
+      "field_inversions": 26667,
+      "field_multiplications": 53334,
+      "field_squarings": 44406,
+      "group_add_calls": 27435,
+      "scalar_bits": 17739,
+      "scalar_multiplications": 768
+    },
+    "cpu_seconds": 0.05259813599999985,
+    "draws": 384,
+    "rejected": {},
+    "secret_used_for_pool_generation": false,
+    "wall_seconds": 0.05260274600004777
+  },
+  "solver_total_cpu_seconds": 0.38602912899999997,
+  "batch_cpu_seconds": 0.38602912899999997,
+  "batch_wall_seconds": 0.38606617400000687,
+  "timing_repetitions": 1,
+  "cpu_affinity": [
+    1
+  ],
+  "flint_version": "0.9.0",
+  "phase_timing_scope": "Short inner CPU intervals unreliable/undersum; outer batch complete-call CPU is primary."
+}

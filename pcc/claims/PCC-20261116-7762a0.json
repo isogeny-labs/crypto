@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T13:31:39Z",
+ "id": "PCC-20261116-7762a0",
+ "kind": "statement",
+ "producer": {
+  "commit": "a193a1bbffbc5e535cf1e66d4b2a7a19d4708738",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-first-cast-failure-02/entire-first-source.lean.txt",
+    "sha256": "01140713d8a76296386e40f6890f51aedd576cef21d7a8f512dbaf255750bccb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-first-cast-failure-02/entire-original-direct-compile.exit",
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-first-cast-failure-02/entire-original-direct-compile.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-first-cast-failure-02/entire-original-direct-compile.stdout",
+    "sha256": "f77587d77184c0746710998e8d84dccd6bea15b5b6be072cf50bcd54a37df866"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "First cubic constructor/Frobenius static Lean module397 fails1 only in generic coefficient_power cast simplification: original simp rewrites a whole natural power cast to OfNat before exposing the semiring power, causing a type mismatch. Whole exact source/stdout/stderr/exit retained, including erroneous downstream sorryAx outputs; this module is not accepted. Constructor/no-base-root/finite coefficient/action statements are not promoted from this failed module. Fix explicit cast/power calculation in a distinct source attempt, then both unchanged original gates before any result. No original source/model/policy/native/paid process changed."
+}

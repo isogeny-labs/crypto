@@ -1,0 +1,60 @@
+{
+  "schema": "research.formal-component-result/v1",
+  "scope": "positive shared-support distinct-other mixed branch: literal UInt64 values and scoped dispatcher",
+  "status": "producer_checked_independent_review_pending",
+  "theorems": [
+    "positive_xz_decode",
+    "doubled_decode",
+    "positive_valid_transport",
+    "positive_word_preserves"
+  ],
+  "premises": [
+    "prime 5<=p<2^31",
+    "canonical coordinates and four curve coefficients",
+    "four nonzero word weights",
+    "original normalized point/divisor validity",
+    "literal outer k=0",
+    "literal cancellation guard false",
+    "literal distinct-other support guard"
+  ],
+  "derived": [
+    "original word y nonzero",
+    "Some word return",
+    "canonical output",
+    "nonzero output weights",
+    "normalized Mumford output validity"
+  ],
+  "no_output_validity_premise": true,
+  "native_receipts": {
+    "attempt1": 1,
+    "attempt2": 124,
+    "attempt3": 124,
+    "attempt4": 1,
+    "attempt5": 1,
+    "attempt6": 0,
+    "controls1": 1,
+    "readback1": 0,
+    "controls2": 1,
+    "controls3": 1,
+    "controls4": 1,
+    "controls5": 0,
+    "attempt7": 0,
+    "readback2": 0,
+    "controls6": 0,
+    "readback3": 0
+  },
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "pdf_pages": 1,
+  "pdf_visual_inspection": true,
+  "limits": [
+    "restricted positive-distinct dispatcher only",
+    "Field.n=1 tables=None retained value mapping",
+    "no compiler/counter/class-sum/whole-walk claim"
+  ]
+}

@@ -1,0 +1,4 @@
+pdp generate /tmp/n83-candidate-inputs/spike31 /tmp/n83-candidate-bases/r31/data research/n83_candidate_pdp_20261028/evidence/pdp/baseline spike31
+top single /tmp/n83-candidate-inputs/spike31 /tmp/n83-candidate-top/spike31-parent/certificates
+top single-replay /tmp/n83-candidate-inputs/spike31 /tmp/n83-candidate-top/spike31-parent/certificates
+# 48 serial case runs: timeout --kill-after=5s 60s prlimit --as=8589934592 -- target/release/fall run CASE_INPUT_ROOT CASE_OUTPUT_ROOT

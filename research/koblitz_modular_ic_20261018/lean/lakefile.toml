@@ -1,0 +1,275 @@
+name = "koblitz_modular_proofs"
+version = "0.1.0"
+defaultTargets = ["KoblitzRound24Geometry","KoblitzRound23Local","KoblitzRound22SS","KoblitzRound22TwoMap","KoblitzRound22TwoMapData","KoblitzRound22Polarization","KoblitzRound22Base","KoblitzRound22Coupled","KoblitzRound22","KoblitzRound22Recovery","KoblitzRound21","KoblitzRound21Equivariant","KoblitzRound21TangentData","KoblitzRound21DescentData","KoblitzRound21Boundary","KoblitzRound21Separators","KoblitzRound21FinalBoundary","KoblitzRound21Family","KoblitzRound21LastBoundary","KoblitzRound20Projector","KoblitzRound20","KoblitzRound20Picard","KoblitzRound20Kernel","KoblitzRound20Retraction","KoblitzRound20Sections","KoblitzRound20Separators","KoblitzRound20Boundary","KoblitzRound20Maps","KoblitzRound19OrbitCover","KoblitzRound19Polarization","KoblitzRound19Family", "KoblitzRound19FinalBoundary","KoblitzRound19", "KoblitzRound19Separators", "KoblitzRound19Boundary", "KoblitzRound19Maps","KoblitzRound18Refinement","KoblitzRound18MapCounterexamples","KoblitzRound18Hecke","KoblitzRound18Squares","KoblitzRound18FinalBoundary","KoblitzRound18","KoblitzRound18Tate","KoblitzRound18Companion","KoblitzRound18Theta","KoblitzRound18Frobenius","KoblitzRound18Boundary","KoblitzRound17LiftProof", "KoblitzRound17Theta", "KoblitzRound17", "KoblitzRound17Boundary", "KoblitzRound17Integral", "KoblitzRound17Survivors", "KoblitzRound16Carrier", "KoblitzRelations", "KoblitzRound03", "KoblitzRound04", "KoblitzRound05", "KoblitzRound06", "KoblitzRound07", "KoblitzRound07Cofactor", "KoblitzRound08", "KoblitzRound09", "KoblitzRound10", "KoblitzRound11", "KoblitzRound12Boundary", "KoblitzRound12", "KoblitzRound13", "KoblitzRound13Boundary", "KoblitzRound13Data", "KoblitzRound13Square", "KoblitzRound13SquareData", "KoblitzRound14", "KoblitzRound14Boundary", "KoblitzRound14Supports", "KoblitzRound14Relations", "KoblitzRound14Cusps", "KoblitzRound15", "KoblitzRound15Jets", "KoblitzRound15Theta", "KoblitzRound15CM", "KoblitzRound16CM", "KoblitzRound16Ramification", "KoblitzRound16Sections", "KoblitzRound16", "KoblitzRound16Separators", "KoblitzRound16Boundary"]
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "d13f23b723b8a846827a245b89c10fc7d3f11612"
+
+[[lean_lib]]
+name = "KoblitzRelations"
+
+[[lean_lib]]
+name = "KoblitzRound03"
+
+[[lean_lib]]
+name = "KoblitzRound04"
+
+[[lean_lib]]
+name = "KoblitzRound05"
+
+[[lean_lib]]
+name = "KoblitzRound05Quotients"
+
+[[lean_lib]]
+name = "KoblitzRound06Matrices"
+
+[[lean_lib]]
+name = "KoblitzRound06"
+
+[[lean_lib]]
+name = "KoblitzRound07"
+
+[[lean_lib]]
+name = "KoblitzRound07Cofactor"
+
+[[lean_lib]]
+name = "KoblitzRound08"
+
+[[lean_lib]]
+name = "KoblitzRound09"
+
+[[lean_lib]]
+name = "KoblitzRound10"
+
+[[lean_lib]]
+name = "KoblitzRound11"
+
+[[lean_lib]]
+name = "KoblitzRound12Boundary"
+
+[[lean_lib]]
+name = "KoblitzRound12"
+
+[[lean_lib]]
+name = "KoblitzRound13"
+
+[[lean_lib]]
+name = "KoblitzRound13Boundary"
+
+[[lean_lib]]
+name = "KoblitzRound13Data"
+
+[[lean_lib]]
+name = "KoblitzRound13Square"
+
+[[lean_lib]]
+name = "KoblitzRound13SquareData"
+
+[[lean_lib]]
+name = "KoblitzRound14"
+
+[[lean_lib]]
+name = "KoblitzRound14Boundary"
+
+[[lean_lib]]
+name = "KoblitzRound14Supports"
+
+[[lean_lib]]
+name = "KoblitzRound14Relations"
+
+[[lean_lib]]
+name = "KoblitzRound14Cusps"
+
+[[lean_lib]]
+name = "KoblitzRound15"
+
+[[lean_lib]]
+name = "KoblitzRound15Jets"
+
+[[lean_lib]]
+name = "KoblitzRound15Theta"
+
+[[lean_lib]]
+name = "KoblitzRound15CM"
+
+[[lean_lib]]
+name = "KoblitzRound16CM"
+
+[[lean_lib]]
+name = "KoblitzRound16Ramification"
+
+[[lean_lib]]
+name = "KoblitzRound16Sections"
+
+[[lean_lib]]
+name = "KoblitzRound16"
+
+[[lean_lib]]
+name = "KoblitzRound16Separators"
+
+[[lean_lib]]
+name = "KoblitzRound16Boundary"
+
+[[lean_lib]]
+name = "KoblitzRound16Carrier"
+
+[[lean_lib]]
+name = "KoblitzRound17Survivors"
+
+[[lean_lib]]
+name = "KoblitzRound17Integral"
+
+[[lean_lib]]
+name = "KoblitzRound17"
+
+[[lean_lib]]
+name = "KoblitzRound17Boundary"
+
+[[lean_lib]]
+name = "KoblitzRound17Theta"
+
+[[lean_lib]]
+name = "KoblitzRound17LiftProof"
+
+[[lean_lib]]
+name = "KoblitzRound18"
+
+[[lean_lib]]
+name = "KoblitzRound18Tate"
+
+[[lean_lib]]
+name = "KoblitzRound18Companion"
+
+[[lean_lib]]
+name = "KoblitzRound18Theta"
+
+[[lean_lib]]
+name = "KoblitzRound18Frobenius"
+
+[[lean_lib]]
+name = "KoblitzRound18Boundary"
+
+[[lean_lib]]
+name = "KoblitzRound18Hecke"
+
+[[lean_lib]]
+name = "KoblitzRound18Squares"
+
+[[lean_lib]]
+name = "KoblitzRound18FinalBoundary"
+
+[[lean_lib]]
+name = "KoblitzRound18Refinement"
+
+[[lean_lib]]
+name = "KoblitzRound18MapCounterexamples"
+
+[[lean_lib]]
+name = "KoblitzRound19"
+
+[[lean_lib]]
+name = "KoblitzRound19Separators"
+
+[[lean_lib]]
+name = "KoblitzRound19Boundary"
+
+[[lean_lib]]
+name = "KoblitzRound19Maps"
+
+[[lean_lib]]
+name = "KoblitzRound19Family"
+
+[[lean_lib]]
+name = "KoblitzRound19FinalBoundary"
+
+[[lean_lib]]
+name = "KoblitzRound19Polarization"
+
+[[lean_lib]]
+name = "KoblitzRound19OrbitCover"
+
+[[lean_lib]]
+name = "KoblitzRound20"
+
+[[lean_lib]]
+name = "KoblitzRound20Picard"
+
+[[lean_lib]]
+name = "KoblitzRound20Kernel"
+
+[[lean_lib]]
+name = "KoblitzRound20Retraction"
+
+[[lean_lib]]
+name = "KoblitzRound20Sections"
+
+[[lean_lib]]
+name = "KoblitzRound20Separators"
+
+[[lean_lib]]
+name = "KoblitzRound20Boundary"
+
+[[lean_lib]]
+name = "KoblitzRound20Maps"
+
+[[lean_lib]]
+name = "KoblitzRound20Projector"
+
+[[lean_lib]]
+name = "KoblitzRound21"
+
+[[lean_lib]]
+name = "KoblitzRound21Equivariant"
+
+[[lean_lib]]
+name = "KoblitzRound21TangentData"
+
+[[lean_lib]]
+name = "KoblitzRound21DescentData"
+
+[[lean_lib]]
+name = "KoblitzRound21Boundary"
+
+[[lean_lib]]
+name = "KoblitzRound21Separators"
+
+[[lean_lib]]
+name = "KoblitzRound21FinalBoundary"
+
+[[lean_lib]]
+name = "KoblitzRound21Family"
+
+[[lean_lib]]
+name = "KoblitzRound21LastBoundary"
+
+[[lean_lib]]
+name = "KoblitzRound22"
+
+[[lean_lib]]
+name = "KoblitzRound22Recovery"
+
+[[lean_lib]]
+name = "KoblitzRound22Coupled"
+
+[[lean_lib]]
+name = "KoblitzRound22Base"
+
+[[lean_lib]]
+name = "KoblitzRound22Polarization"
+
+[[lean_lib]]
+name = "KoblitzRound22TwoMap"
+
+[[lean_lib]]
+name = "KoblitzRound22TwoMapData"
+
+[[lean_lib]]
+name = "KoblitzRound22SS"
+
+[[lean_lib]]
+name = "KoblitzRound23Local"
+
+[[lean_lib]]
+name = "KoblitzRound24Geometry"

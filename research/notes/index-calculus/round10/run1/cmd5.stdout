@@ -1,0 +1,7 @@
+
+H1 (mixed plain S_walk, N >= 1e5, 7 rows): median 1.406 (<= 1.45), two largest ["2.240", "1.696"] (<= 1.55) -> FALSIFIED
+H2 (mixed fold/plain walk ops, N >= 1e5): median 0.960 -> FALSIFIED (> 0.80)
+H3 (control, N <= 6e4, 10 rows): |median mixed - median old| plain S_walk = 0.023 -> HOLDS (< 0.15)
+H4 (every run verified): HOLDS
+Max fruitless share, fold+mix: 6.0%
+Ideal S_walk: plain 1.2533, folded 0.8862.

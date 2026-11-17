@@ -1,0 +1,21 @@
+digraph Orientation {
+  graph [rankdir=TB,bgcolor="white",fontname="Helvetica",nodesep=.3,ranksep=.45];
+  node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=11,fillcolor="#edf5fb",color="#345b7d"];
+  edge [fontname="Helvetica",fontsize=9,color="#345b7d"];
+  guard [label="Actual index-bit equality mask\nOmit first differing bit; denominators nonzero"];
+  completion [label="Computed monic quotient H\nW_new - W_base = C H; every node preserved"];
+  content [label="Actual coefficientwise correction bounds\nCrossing gain >= G_i; all source charts integral"];
+  transfer [label="Conditional completed-matrix transfer\nBase content k -> crossing content k+g"];
+  base [label="OPEN: literal Cauchy base content",fillcolor="#fff2d5",style="rounded,filled,dashed"];
+  rank [label="OPEN: integral U,V weighted modes\nCharge mask refinement, degree and precision",fillcolor="#fff2d5",style="rounded,filled,dashed"];
+  cost [label="OPEN: recursion and complete expected bit cost",fillcolor="#fff2d5",style="rounded,filled,dashed"];
+  guard -> completion;
+  guard -> content;
+  content -> transfer;
+  base -> transfer [style=dashed];
+  completion -> rank;
+  transfer -> rank [style=dashed];
+  rank -> cost [style=dashed];
+  status [shape=note,label="Source-bound Lean artifacts\nUnsigned PCC claims; no runtime claim",fillcolor="#f5f5f5",color="#777777"];
+  status -> guard [style=dotted,arrowhead=none];
+}

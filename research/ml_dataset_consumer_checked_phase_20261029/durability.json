@@ -1,0 +1,237 @@
+{
+  "schema": "consumer-checked-phase-durability/v1",
+  "verified_at": "2026-10-29T04:48:49.147384+00:00",
+  "source_commit": "8558e2b8edad6a9635e8532c077fb1a52d2c22f5",
+  "runtime_commit": "0ceec70eb18d0b0c8642e09b68879f527cd23bdf",
+  "bucket": "setec-astronomy-artifacts",
+  "key": "ml-dataset/20261029/consumer-checked-phase/final/03bfd537bf9809f9102bdfd9b5ecea91e5dfde404a5ee2d117a1f7ee83d99441/checkpoint.tar.gz",
+  "archive_sha256": "03bfd537bf9809f9102bdfd9b5ecea91e5dfde404a5ee2d117a1f7ee83d99441",
+  "archive_bytes": 2943449,
+  "conditional_put": true,
+  "fresh_get": true,
+  "archive_byte_identical": true,
+  "internal_file_hashes_verified": 733,
+  "git_bundle_verified": true,
+  "restored_cli_sha256": "2512b52b8d4061febd068746b0e15fffb72cc5c1bfb8e4f54f45469236d8523c",
+  "restored_replay": [
+    {
+      "fixture": "sealed-worker",
+      "audit_exit": 0,
+      "export_exit": 0,
+      "export_byte_identical": true,
+      "export_sha256": "22c971a476c3e86861fb48f8101864d0c4d891ebbadf1227180be2351529ffa7",
+      "checked_phase_contract": {
+        "schema": "ml-dataset.checked-phase-contract/v1",
+        "validator": "independent-sealed-phase-v2/v1",
+        "policy_sha256": "45c9f43fa4df83c6c478094a84478690dd791e27fccaa19af5b87db33f6b4a50",
+        "binding": {
+          "schema": "crypto.ml-dataset.attempt-binding/v1",
+          "run_sha256": "574176646f5d90faa6158fad2eb531f0628c706d5cdb8aeb86db22cbe7e8433a",
+          "plan_sha256": "39dda0ae6a2dc08d06cab89afcda9306ca8ef78c77ecd5e036d9db0c364b2824",
+          "protocol_sha256": "43e053d35055dd5d845c61de4b640022af51b22a9efccc12d677000590181f7d",
+          "config_sha256": "c2749a85c728a847c5357366c7bf75fecba604e91ab42c316748d824f86729bb",
+          "source_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "binary_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "cell_index": 0,
+          "attempt_sha256": "44f401a8121e0b5217a291f0b874172f7c63a93f1b040403f0805e8e80165148"
+        },
+        "input_artifacts": [
+          {
+            "bytes": 785,
+            "encoding": "json",
+            "path": "measurement-policy.json",
+            "role": "restricted-measurement-policy",
+            "sha256": "45c9f43fa4df83c6c478094a84478690dd791e27fccaa19af5b87db33f6b4a50"
+          },
+          {
+            "bytes": 1167,
+            "encoding": "json",
+            "path": "telemetry/curve-construction-start.json",
+            "role": "phase-start",
+            "sha256": "9ad238c47d0af034cf062f9d50fd5fcd5435bcebec24d8f00a02de2263cd4fce"
+          },
+          {
+            "bytes": 4471,
+            "encoding": "json",
+            "path": "telemetry/curve-construction.json",
+            "role": "hardware-and-resource-telemetry",
+            "sha256": "65061ef6893e1e6e1465666aa25ef8ee1b15b8a9ccee32f4fe034bf05f3b30e8"
+          },
+          {
+            "bytes": 1168,
+            "encoding": "json",
+            "path": "telemetry/known-answer-replay-start.json",
+            "role": "phase-start",
+            "sha256": "b8b432ba3b607e48dc0f3fe4f5cc4865ec6a1b45f234153aae311946b96b5e22"
+          },
+          {
+            "bytes": 4471,
+            "encoding": "json",
+            "path": "telemetry/known-answer-replay.json",
+            "role": "hardware-and-resource-telemetry",
+            "sha256": "bc6261638f72639a7b71402bfe17a727d0eab038babff9e36b470f40bfa881f8"
+          },
+          {
+            "bytes": 1167,
+            "encoding": "json",
+            "path": "telemetry/factor-base-replay-start.json",
+            "role": "phase-start",
+            "sha256": "72d3deeda9594622a53d45fb4678b5bf5c5c633d670c7acbb24961bc9a4b355c"
+          },
+          {
+            "bytes": 4470,
+            "encoding": "json",
+            "path": "telemetry/factor-base-replay.json",
+            "role": "hardware-and-resource-telemetry",
+            "sha256": "148c2e3073ca4a9ad310f2251bcec9b8fffa60da888fc1169c7355e3db0d6ea7"
+          },
+          {
+            "bytes": 1155,
+            "encoding": "json",
+            "path": "telemetry/solver-start.json",
+            "role": "phase-start",
+            "sha256": "6dbebc1d2f8ab28153b0ce32600f73299993ba532ffd46a5f36226449da9b2cd"
+          },
+          {
+            "bytes": 4459,
+            "encoding": "json",
+            "path": "telemetry/solver.json",
+            "role": "hardware-and-resource-telemetry",
+            "sha256": "1c7e6a560981cba6e4db88851440e8d0537ca54bb5238b56044b66f59e4385ce"
+          }
+        ],
+        "supplied_starts": 4,
+        "supplied_ends": 4,
+        "prefix_state": "completed_recorded_prefix",
+        "phases": [
+          {
+            "phase": "curve-construction",
+            "ordinal": 0,
+            "start_sha256": "9ad238c47d0af034cf062f9d50fd5fcd5435bcebec24d8f00a02de2263cd4fce",
+            "end_sha256": "65061ef6893e1e6e1465666aa25ef8ee1b15b8a9ccee32f4fe034bf05f3b30e8",
+            "state": "recorded_end_checked",
+            "start_binding_checked": true,
+            "lifecycle_checked": true,
+            "projection_checked": true,
+            "error_message_check": "not_supplied"
+          },
+          {
+            "phase": "known-answer-replay",
+            "ordinal": 1,
+            "start_sha256": "b8b432ba3b607e48dc0f3fe4f5cc4865ec6a1b45f234153aae311946b96b5e22",
+            "end_sha256": "bc6261638f72639a7b71402bfe17a727d0eab038babff9e36b470f40bfa881f8",
+            "state": "recorded_end_checked",
+            "start_binding_checked": true,
+            "lifecycle_checked": true,
+            "projection_checked": true,
+            "error_message_check": "not_supplied"
+          },
+          {
+            "phase": "factor-base-replay",
+            "ordinal": 2,
+            "start_sha256": "72d3deeda9594622a53d45fb4678b5bf5c5c633d670c7acbb24961bc9a4b355c",
+            "end_sha256": "148c2e3073ca4a9ad310f2251bcec9b8fffa60da888fc1169c7355e3db0d6ea7",
+            "state": "recorded_end_checked",
+            "start_binding_checked": true,
+            "lifecycle_checked": true,
+            "projection_checked": true,
+            "error_message_check": "not_supplied"
+          },
+          {
+            "phase": "solver",
+            "ordinal": 3,
+            "start_sha256": "6dbebc1d2f8ab28153b0ce32600f73299993ba532ffd46a5f36226449da9b2cd",
+            "end_sha256": "1c7e6a560981cba6e4db88851440e8d0537ca54bb5238b56044b66f59e4385ce",
+            "state": "recorded_end_checked",
+            "start_binding_checked": true,
+            "lifecycle_checked": true,
+            "projection_checked": true,
+            "error_message_check": "not_supplied"
+          }
+        ],
+        "authoritative_binding_checked": true,
+        "modeled_storage_limit": 33554432,
+        "modeled_storage_reserved": 2268068,
+        "independently_verified": false,
+        "hardware_independently_verified": false,
+        "platform_admitted": false,
+        "training_cost_eligible": false,
+        "complete_execution_verified": false,
+        "clock_valid_for_comparison": false,
+        "whole_worker_instruction_count": null,
+        "partial_snapshot_chain_verified": false
+      }
+    },
+    {
+      "fixture": "sealed-registryless-prefix",
+      "audit_exit": 0,
+      "export_exit": 0,
+      "export_byte_identical": true,
+      "export_sha256": "344134db26f2cac2479200b3b5f61508f44607489a827fc030eb9ac0231dd259",
+      "checked_phase_contract": {
+        "schema": "ml-dataset.checked-phase-contract/v1",
+        "validator": "independent-sealed-phase-v2/v1",
+        "policy_sha256": "45c9f43fa4df83c6c478094a84478690dd791e27fccaa19af5b87db33f6b4a50",
+        "binding": {
+          "schema": "crypto.ml-dataset.attempt-binding/v1",
+          "run_sha256": "574176646f5d90faa6158fad2eb531f0628c706d5cdb8aeb86db22cbe7e8433a",
+          "plan_sha256": "39dda0ae6a2dc08d06cab89afcda9306ca8ef78c77ecd5e036d9db0c364b2824",
+          "protocol_sha256": "43e053d35055dd5d845c61de4b640022af51b22a9efccc12d677000590181f7d",
+          "config_sha256": "c2749a85c728a847c5357366c7bf75fecba604e91ab42c316748d824f86729bb",
+          "source_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "binary_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "cell_index": 0,
+          "attempt_sha256": "44f401a8121e0b5217a291f0b874172f7c63a93f1b040403f0805e8e80165148"
+        },
+        "input_artifacts": [
+          {
+            "bytes": 785,
+            "encoding": "json",
+            "path": "measurement-policy.json",
+            "role": "restricted-measurement-policy",
+            "sha256": "45c9f43fa4df83c6c478094a84478690dd791e27fccaa19af5b87db33f6b4a50"
+          },
+          {
+            "bytes": 1166,
+            "encoding": "json",
+            "path": "telemetry/curve-construction-start.json",
+            "role": "phase-start",
+            "sha256": "7bc21b92adb27696de76e0996e335c955859a4f459b499b6c55ad2928c979b76"
+          }
+        ],
+        "supplied_starts": 1,
+        "supplied_ends": 0,
+        "prefix_state": "interrupted_or_unfinished",
+        "phases": [
+          {
+            "phase": "curve-construction",
+            "ordinal": 0,
+            "start_sha256": "7bc21b92adb27696de76e0996e335c955859a4f459b499b6c55ad2928c979b76",
+            "end_sha256": null,
+            "state": "interrupted_or_unfinished",
+            "start_binding_checked": true,
+            "lifecycle_checked": false,
+            "projection_checked": false,
+            "error_message_check": "not_supplied"
+          }
+        ],
+        "authoritative_binding_checked": true,
+        "modeled_storage_limit": 33554432,
+        "modeled_storage_reserved": 282824,
+        "independently_verified": false,
+        "hardware_independently_verified": false,
+        "platform_admitted": false,
+        "training_cost_eligible": false,
+        "complete_execution_verified": false,
+        "clock_valid_for_comparison": false,
+        "whole_worker_instruction_count": null,
+        "partial_snapshot_chain_verified": false
+      }
+    }
+  ],
+  "producer_invoked": false,
+  "hardware_verified": false,
+  "controller_archive": true,
+  "worker_publication": false,
+  "scientific_dataset_generated": false
+}

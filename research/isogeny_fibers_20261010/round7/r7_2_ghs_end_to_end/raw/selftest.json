@@ -1,0 +1,55 @@
+{
+  "checks": [
+    {
+      "E_order": 4192,
+      "a": 0,
+      "beta": 40,
+      "check": "fast_count_e == count_e_points",
+      "l": 2,
+      "n": 6
+    },
+    {
+      "E_order": 4144,
+      "a": 1,
+      "beta": 5,
+      "check": "fast_count_e == count_e_points",
+      "l": 2,
+      "n": 6
+    },
+    {
+      "E_order": 4144,
+      "a": 0,
+      "beta": 8,
+      "check": "fast_count_e == count_e_points",
+      "l": 3,
+      "n": 4
+    },
+    {
+      "E_order": 16328,
+      "a": 0,
+      "beta": 76,
+      "check": "fast_count_e == count_e_points",
+      "l": 2,
+      "n": 7
+    },
+    {
+      "check": "rho and bsgs recover every d in [1, 130] on order-131 subgroup, N=12",
+      "mean_E_ops_bsgs": 20.0,
+      "mean_E_ops_rho": 79.1,
+      "sqrt_ell": 11.445523142259598
+    },
+    {
+      "additions": 400,
+      "check": "ledger-priced E additions vs GroupAdd formula",
+      "formula_gates": "884000",
+      "ledger_gates": "884000",
+      "ratio": 1.0
+    },
+    {
+      "check": "flt_inverse inner counts at m=12",
+      "mul": 5,
+      "square": 3
+    }
+  ],
+  "selftest": "ok"
+}

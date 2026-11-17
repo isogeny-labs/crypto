@@ -1,0 +1,44 @@
+import CryptoLean.Group.PartiteCoverage
+import CryptoLean.Curve.LineIncidence
+open scoped BigOperators
+open Polynomial
+set_option autoImplicit false
+
+-- Floor laws, used as stated with the components as variables.
+example {G H : Type*} [AddGroup G] [AddGroup H]
+    (f : G →+ H) (hf : Function.Surjective f) :
+    Nat.card f.ker * Nat.card H = Nat.card G :=
+  AddSubgroup.card_ker_mul_card_of_surjective hf
+
+example {Ω : Type*} [Fintype Ω] (f g : Ω → ℕ) :
+    (∑ x, f x*g x)^2 ≤ (∑ x, f x^2) * ∑ x, g x^2 :=
+  Finset.sum_mul_sq_le_sq_mul_sq Finset.univ f g
+
+example {F : Type*} [Field F] (p : F[X]) (s : Finset F)
+    (h : s.val ⊆ p.roots) : s.card ≤ p.natDegree :=
+  Polynomial.card_le_degree_of_subset_roots h
+
+-- Actual semantic objects and endpoints, without copying their proofs.
+example {G : Type*} [AddCommGroup G] [Fintype G] {m b : ℕ}
+    (hm : 0 < m) (hb : 0 < b) :
+    b^m * Fintype.card G^(m*b) ≤ (Fintype.card G+b^m-1) *
+      Nat.card {x : (Fin m × Fin b) → G // ∃ a : Fin m → Fin b,
+        CryptoLean.PartiteCoverage.tupleSum a x = 0} :=
+  CryptoLean.PartiteCoverage.coverage_count hm hb
+
+example {F : Type*} [Field F] [Fintype F]
+    (W : WeierstrassCurve.Affine F) (x y : F) (hP : W.Equation x y) (Λ : Finset F) :
+    Nat.card {q : F × F // q.1 ≠ x ∧ W.Equation q.1 q.2 ∧
+      ∃ ℓ ∈ Λ, q.2 = ℓ*(q.1-x)+y} ≤ 2*Λ.card :=
+  CryptoLean.LineIncidence.slope_family_point_card W x y hP Λ
+
+#print axioms CryptoLean.PartiteCoverage.coverage_count
+#print axioms CryptoLean.PartiteCoverage.first_moment
+#print axioms CryptoLean.PartiteCoverage.second_moment
+#print axioms CryptoLean.LineIncidence.addPolynomial_eval
+#print axioms CryptoLean.LineIncidence.addPolynomial_natDegree
+#print axioms CryptoLean.LineIncidence.line_root_iff
+#print axioms CryptoLean.LineIncidence.line_x_card
+#print axioms CryptoLean.LineIncidence.other_line_x_card
+#print axioms CryptoLean.LineIncidence.other_line_point_card
+#print axioms CryptoLean.LineIncidence.slope_family_point_card

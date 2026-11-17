@@ -1,0 +1,22 @@
+=== m 15 ic records 2 rho records 2
+ target 0 f_rec 159 solver_ops 3.84e+11 row_ops 1.386e+09 fixed(non-mul) gae 3.761e+06 mul share 0.9985 S 3.197656187285161
+   in-situ: solver wall ns/op 13.22 ; solve cpu_ns/(solver ops) upper 7.79
+ target 1 f_rec 159 solver_ops 3.907e+11 row_ops 1.41e+09 fixed(non-mul) gae 3.789e+06 mul share 0.9985 S 3.253332383449516
+   in-situ: solver wall ns/op 13.19 ; solve cpu_ns/(solver ops) upper 7.76
+ recorded         f=159.0  IC GAE mean 2.449e+09  IC/rho(mean-mean) 6.30 -> recorded 6.30 ; corr 1.000 ; same-target IC/rho [19.07, 3.8] vs rec [19.07, 3.8]
+ mul_latency      f=109.2  IC GAE mean 3.563e+09  IC/rho(mean-mean) 9.17 -> recorded 6.30 ; corr 1.455 ; same-target IC/rho [27.75, 5.53] vs rec [19.07, 3.8]
+ mul_randoperand  f=178.6  IC GAE mean 2.18e+09  IC/rho(mean-mean) 5.61 -> recorded 6.30 ; corr 0.890 ; same-target IC/rho [16.98, 3.38] vs rec [19.07, 3.8]
+ mul_throughput   f=314.6  IC GAE mean 1.24e+09  IC/rho(mean-mean) 3.19 -> recorded 6.30 ; corr 0.506 ; same-target IC/rho [9.66, 1.92] vs rec [19.07, 3.8]
+ axpy_stream      f=391.1  IC GAE mean 9.977e+08  IC/rho(mean-mean) 2.57 -> recorded 6.30 ; corr 0.407 ; same-target IC/rho [7.77, 1.55] vs rec [19.07, 3.8]
+ insitu_cpu       f=62.2  IC GAE mean 6.25e+09  IC/rho(mean-mean) 16.08 -> recorded 6.30 ; corr 2.552 ; same-target IC/rho [48.76, 9.68] vs rec [19.07, 3.8]
+ insitu_wall      f=36.4  IC GAE mean 1.069e+10  IC/rho(mean-mean) 27.50 -> recorded 6.30 ; corr 4.365 ; same-target IC/rho [83.34, 16.57] vs rec [19.07, 3.8]
+=== m 17 ic records 1 rho records 2
+ target 0 f_rec 161 solver_ops 1.636e+12 row_ops 2.243e+10 fixed(non-mul) gae 1.51e+07 mul share 0.9985 S 0.849325344919391
+   in-situ: solver wall ns/op 15.77 ; solve cpu_ns/(solver ops) upper 9.94
+ recorded         f=161.0  IC GAE mean 1.032e+10  IC/rho(mean-mean) 0.72 -> recorded 0.72 ; corr 1.000 ; same-target IC/rho [0.62] vs rec [0.62]
+ mul_latency      f=104.0  IC GAE mean 1.596e+10  IC/rho(mean-mean) 1.11 -> recorded 0.72 ; corr 1.547 ; same-target IC/rho [0.97] vs rec [0.62]
+ mul_randoperand  f=251.6  IC GAE mean 6.609e+09  IC/rho(mean-mean) 0.46 -> recorded 0.72 ; corr 0.641 ; same-target IC/rho [0.4] vs rec [0.62]
+ mul_throughput   f=396.3  IC GAE mean 4.201e+09  IC/rho(mean-mean) 0.29 -> recorded 0.72 ; corr 0.407 ; same-target IC/rho [0.25] vs rec [0.62]
+ axpy_stream      f=526.3  IC GAE mean 3.167e+09  IC/rho(mean-mean) 0.22 -> recorded 0.72 ; corr 0.307 ; same-target IC/rho [0.19] vs rec [0.62]
+ insitu_cpu       f=88.2  IC GAE mean 1.882e+10  IC/rho(mean-mean) 1.31 -> recorded 0.72 ; corr 1.824 ; same-target IC/rho [1.14] vs rec [0.62]
+ insitu_wall      f=52.3  IC GAE mean 3.173e+10  IC/rho(mean-mean) 2.21 -> recorded 0.72 ; corr 3.075 ; same-target IC/rho [1.92] vs rec [0.62]

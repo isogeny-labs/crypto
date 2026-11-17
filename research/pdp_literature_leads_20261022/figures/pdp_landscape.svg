@@ -1,0 +1,72 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='1400' height='700' viewBox='0 0 1400 700'>
+<defs><marker id='arr' markerWidth='10' markerHeight='10' refX='9' refY='3' orient='auto'><path d='M0,0 L0,6 L9,3 z' fill='#334'/></marker></defs>
+<rect width='1400' height='700' fill='white'/>
+<text x='700.0' y='24' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='15' font-weight='bold'>Point decomposition: the standard pipeline and where the 14 lead cards intervene (every edge proposed, none measured)</text>
+<rect x='40' y='48' width='290' height='80' rx='8' ry='8' fill='#f4f6fa' stroke='#334' stroke-width='1.4'/>
+<text x='185.0' y='65' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='12' font-weight='bold'>1. Relation search</text>
+<text x='185.0' y='78.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>Q = P_1 + ... + P_m with P_i in a factor</text>
+<text x='185.0' y='92.0' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>base F (subspace V, small x, digits)</text>
+<rect x='370' y='48' width='290' height='80' rx='8' ry='8' fill='#f4f6fa' stroke='#334' stroke-width='1.4'/>
+<text x='515.0' y='65' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='12' font-weight='bold'>2. Summation polynomial</text>
+<text x='515.0' y='78.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>S_{m+1}(x_1, ..., x_m, x_Q) = 0: one equation</text>
+<text x='515.0' y='92.0' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>over K, degree 2^{m-1} in each variable</text>
+<rect x='700' y='48' width='290' height='80' rx='8' ry='8' fill='#f4f6fa' stroke='#334' stroke-width='1.4'/>
+<text x='845.0' y='65' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='12' font-weight='bold'>3. Weil descent / digit expansion</text>
+<text x='845.0' y='78.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>n equations over F_2 (or F_q) in m·ℓ unknowns;</text>
+<text x='845.0' y='92.0' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>symmetrise under S_m and torsion</text>
+<rect x='1030' y='48' width='290' height='80' rx='8' ry='8' fill='#f4f6fa' stroke='#334' stroke-width='1.4'/>
+<text x='1175.0' y='65' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='12' font-weight='bold'>4. Groebner / XL / SAT solve</text>
+<text x='1175.0' y='78.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>cost set by the solving degree D; measured</text>
+<text x='1175.0' y='92.0' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>4 (msolve) to 7 (XL); PKM tower D ≥ 8 at N = 20</text>
+<line x1='330' y1='88.0' x2='370' y2='88.0' stroke='#334' stroke-width='1.4' marker-end='url(#arr)'/>
+<line x1='660' y1='88.0' x2='700' y2='88.0' stroke='#334' stroke-width='1.4' marker-end='url(#arr)'/>
+<line x1='990' y1='88.0' x2='1030' y2='88.0' stroke='#334' stroke-width='1.4' marker-end='url(#arr)'/>
+<rect x='40' y='170' width='290' height='96' rx='8' ry='8' fill='#eef7ee' stroke='#334' stroke-width='1.4'/>
+<text x='185.0' y='187' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='12' font-weight='bold'>Replace stage 2 (the polynomial)</text>
+<text x='185.0' y='200.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>LEAD-01 MinRank / Kipnis–Shamir / support minors</text>
+<text x='185.0' y='214.0' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>LEAD-10 chord (slope) small-root family over F_p</text>
+<text x='185.0' y='227.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>LEAD-13 summation ideals and Nagao on covers</text>
+<text x='185.0' y='241.0' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>LEAD-11 McGuire–Mueller evaluation (verify text)</text>
+<rect x='370' y='170' width='290' height='96' rx='8' ry='8' fill='#eef7ee' stroke='#334' stroke-width='1.4'/>
+<text x='515.0' y='187' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='12' font-weight='bold'>Replace stage 3 (descent, coordinates)</text>
+<text x='515.0' y='200.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>LEAD-03 ℓ-torsion (ℓ = 3, 4) symmetrisation,</text>
+<text x='515.0' y='214.0' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>Kummer-model (Montgomery, theta) coordinates</text>
+<text x='515.0' y='227.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>LEAD-06 trace-zero representation (n = 3, 5)</text>
+<text x='515.0' y='241.0' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>LEAD-14 digit / tower systems as block systems</text>
+<rect x='700' y='170' width='290' height='96' rx='8' ry='8' fill='#eef1fb' stroke='#334' stroke-width='1.4'/>
+<text x='845.0' y='187' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='12' font-weight='bold'>Replace or amortise stage 4 (the solve)</text>
+<text x='845.0' y='200.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>LEAD-02 parametric eliminant: Groebner once per</text>
+<text x='845.0' y='214.0' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>curve, per-target univariate root finding</text>
+<text x='845.0' y='227.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>LEAD-07 Crossbred on the (ℓ, m) degree cells</text>
+<text x='845.0' y='241.0' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>LEAD-09 Ore / linearized-polynomial elimination</text>
+<rect x='1030' y='170' width='290' height='96' rx='8' ry='8' fill='#fff4e6' stroke='#334' stroke-width='1.4'/>
+<text x='1175.0' y='187' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='12' font-weight='bold'>Cut wasted solves, steer the solver</text>
+<text x='1175.0' y='200.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>LEAD-04 homomorphic class pre-partition</text>
+<text x='1175.0' y='214.0' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>(Tate pairing, ℓ-descent, binary trace parity)</text>
+<text x='1175.0' y='227.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>LEAD-08 learned orderings and branching for</text>
+<text x='1175.0' y='241.0' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.8'>F4 and WDSat (home: ml-cryptanalysis)</text>
+<line x1='185.0' y1='170' x2='185.0' y2='128' stroke='#334' stroke-width='1.4' stroke-dasharray='6,4' marker-end='url(#arr)'/>
+<line x1='515.0' y1='170' x2='515.0' y2='128' stroke='#334' stroke-width='1.4' stroke-dasharray='6,4' marker-end='url(#arr)'/>
+<line x1='845.0' y1='170' x2='845.0' y2='128' stroke='#334' stroke-width='1.4' stroke-dasharray='6,4' marker-end='url(#arr)'/>
+<line x1='1175.0' y1='170' x2='1175.0' y2='128' stroke='#334' stroke-width='1.4' stroke-dasharray='6,4' marker-end='url(#arr)'/>
+<rect x='40' y='300' width='620' height='78' rx='8' ry='8' fill='#f6eef7' stroke='#334' stroke-width='1.4'/>
+<text x='350.0' y='317' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='12' font-weight='bold'>Measure the degree law (LEAD-05)</text>
+<text x='350.0' y='330.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.4'>S_3 closure degree 3 | 4 | 5 for n ≤ 16 | 17–36 | 37–52, then slope ≈ 0.036 (Solovyev 2026, GitHub preprint);</text>
+<text x='350.0' y='344.0' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.4'>Kosters–Yeo 2015: 3, 4, 4, ≥ 5 at n = 16, 20, 30, 40; this repository: msolve 4 at cells (15, 5) and (11, 4),</text>
+<text x='350.0' y='357.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.4'>XL refutation 5–7 on the same cells. Which instrument is 'the' degree of regularity is the open question.</text>
+<rect x='700' y='300' width='660' height='78' rx='8' ry='8' fill='#f6eef7' stroke='#334' stroke-width='1.4'/>
+<text x='1030.0' y='317' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='12' font-weight='bold'>Theory gate (LEAD-12): which oracles can move the exponent at all</text>
+<text x='1030.0' y='330.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.4'>Corrigan-Gibbs–Kogan / Shoup: S·T² ≳ n for every oracle built from group operations and membership tests;</text>
+<text x='1030.0' y='344.0' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.4'>structured GGM (ePrint 2026/384): structure must be exploited on ≥ q^{-1/2} of the points;</text>
+<text x='1030.0' y='357.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.4'>non-adaptive bounds (ePrint 2025/783): table-lookup hybrids below √N advice need T = Ω(√N).</text>
+<rect x='40' y='410' width='1320' height='150' rx='8' ry='8' fill='#fbeeee' stroke='#a33' stroke-width='1.4'/>
+<text x='700.0' y='427' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='12' font-weight='bold'>Closed ground the cards must not re-open (theorem, exact computation or repository measurement)</text>
+<text x='700.0' y='440.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.4'>BKK / mixed volume = Bézout · Semaev-cover monodromy (Z/2)^{m-2} · factor-base geometry conserves yield (KN-FIND-007) · isogeny transport ≤ a constant</text>
+<text x='700.0' y='454.0' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.4'>xedni and lifting (exact α = 3) · GGMP Frobenius-stable bases at n = 131 (none) · GHS and Joux–Vitse covers for ECC2K-130 (genus 2^130)</text>
+<text x='700.0' y='467.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.4'>single-polynomial Coppersmith for S_5 (reach 1/80) · shared-target Coppersmith 1.12× (2026-10-14) · Kummer-exponent Fourier spectrum flat (2026-10-14)</text>
+<text x='700.0' y='481.0' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.4'>quasi-subfield bases: no yield gain at n = 31 · algebraic-base solution counts 0.93–1.03× random · record-and-replay F4 2–7 % · PKM plateau broke (D ≥ 8)</text>
+<text x='700.0' y='494.5' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.4'>Baseline (docs/ic/LEADERBOARD.md): every row above matched rho, Koblitz 5.23×–21×, prime 5.47×–13.5×; one live exponent regime: cubic-GHS genus-3 at q^{1.30} vs rho q^{1.5}</text>
+<text x='700.0' y='508.0' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='9.4'>Success criterion (owner, 2026-10-15): every verified, measured improvement over the index-calculus baseline is a success; the gap to rho is reported as a distance, not a gate</text>
+<text x='700.0' y='640' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='10'>Legend: green = a formulation replaces a pipeline stage; blue = solver; orange = filter or steering; purple = measurement or theory; red = closed ground.</text>
+<text x='700.0' y='658' text-anchor='middle' font-family='DejaVu Sans, Arial, sans-serif' font-size='10'>Dashed arrows: proposed intervention points. Study research/pdp_literature_leads_20261022 (2026-10-22); cards in LEADS.md, assessments in leads/LEAD-NN.md, verifications in leads/LEAD-NN.verify.md.</text>
+</svg>

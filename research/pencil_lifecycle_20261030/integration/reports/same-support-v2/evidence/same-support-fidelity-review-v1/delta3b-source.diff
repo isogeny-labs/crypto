@@ -1,0 +1,29 @@
+--- original
++++ candidate3b
+@@ -23,17 +23,23 @@
+     ring
+   rw [he] at hd
+   have hu : (X ^ 2 + C q * X + C r).natDegree = 2 := by
+-    simpa using (natDegree_quadratic (K := K) (a := (1:K)) (b := q) (c := r) one_ne_zero)
++    simpa using (natDegree_quadratic (R := K) (a := (1:K)) (b := q) (c := r) one_ne_zero)
+   have hl : (C ((t2-t1)*(s1+s1)) * X + C ((t2-t1)*(t2+t1))).natDegree ≤ 1 :=
+     natDegree_linear_le
+   have hz := eq_zero_of_dvd_of_natDegree_lt hd (by omega :
+     (C ((t2-t1)*(s1+s1)) * X + C ((t2-t1)*(t2+t1))).natDegree <
+       (X ^ 2 + C q * X + C r).natDegree)
++  have coeff1_linear (a b : K) : (C a * X + C b : K[X]).coeff 1 = a := by
++    simp
++  have coeff0_linear (a b : K) : (C a * X + C b : K[X]).coeff 0 = b := by
++    simp
+   constructor
+   · have hh := congrArg (fun p : K[X] => p.coeff 1) hz
+-    simpa using hh
++    rw [coeff1_linear, coeff_zero] at hh
++    exact hh
+   · have hh := congrArg (fun p : K[X] => p.coeff 0) hz
+-    simpa using hh
++    rw [coeff0_linear, coeff_zero] at hh
++    exact hh
+ 
+ #print axioms validity_coefficients
+ end SameSupportCandidate

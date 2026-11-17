@@ -1,0 +1,44 @@
+{
+  "schema": "crypto.ml-dataset.generic-filter-trace-software-validation/v1",
+  "source_commit": "58bd5ab64424f7710540e0aea502225de6e6c438",
+  "source_clean_before_compile": true,
+  "scoped_source_hashes_rechecked": true,
+  "dataset": {
+    "passed": 165,
+    "failed": 0,
+    "ignored": 1,
+    "exit_code": 0
+  },
+  "native_filter": {
+    "passed": 13,
+    "failed": 0,
+    "ignored": 0,
+    "exit_code": 0
+  },
+  "cli_integration": {
+    "passed": 8,
+    "failed": 0,
+    "ignored": 0,
+    "exit_code": 0
+  },
+  "strict_clippy": {
+    "arguments": "--release --lib --tests --bin crypto -- -D warnings",
+    "exit_code": 0
+  },
+  "executables": {
+    "library_sha256": "170b963e08d8570ff1efdb175390b151c40d9d2d9156524366923d8090efdece",
+    "cli_sha256": "968a316daab4084ef61fd46c779832b9ebd9e482e58492674bc82174c4b1cfb7",
+    "cli_integration_sha256": "6a20b5f91dbedd463a51bc9bc799b1968b03f14b398df3f0f62ed86ccdff9a8c"
+  },
+  "independent_read_review": "generic-filter-read-review/REVIEW.md",
+  "initial_failures_retained": true,
+  "full_library_gate": {
+    "passed": 5198,
+    "failed": 0,
+    "ignored": 123,
+    "exit_code": 0
+  },
+  "consumer_generic_v2_support_verified": false,
+  "scientific_dataset_generated": false,
+  "source_equivalent_delivery_merge": "1e8096394fdd51a2e33fd47b6b21ef47d848602f"
+}

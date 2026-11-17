@@ -1,0 +1,3831 @@
+{
+  "band": {
+    "ranks": [
+      {
+        "a": "abscissa",
+        "b": "abscissa-aa",
+        "curve": "icv1-fp16-t295-8d3c3165",
+        "verdict": "unresolved inside the band"
+      },
+      {
+        "a": "abscissa",
+        "b": "known-log",
+        "curve": "icv1-fp16-t295-8d3c3165",
+        "verdict": "known-log < abscissa"
+      },
+      {
+        "a": "abscissa",
+        "b": "known-log-aa",
+        "curve": "icv1-fp16-t295-8d3c3165",
+        "verdict": "known-log-aa < abscissa"
+      },
+      {
+        "a": "abscissa",
+        "b": "rho-neg",
+        "curve": "icv1-fp16-t295-8d3c3165",
+        "verdict": "rho-neg < abscissa"
+      },
+      {
+        "a": "abscissa-aa",
+        "b": "known-log",
+        "curve": "icv1-fp16-t295-8d3c3165",
+        "verdict": "known-log < abscissa-aa"
+      },
+      {
+        "a": "abscissa-aa",
+        "b": "known-log-aa",
+        "curve": "icv1-fp16-t295-8d3c3165",
+        "verdict": "known-log-aa < abscissa-aa"
+      },
+      {
+        "a": "abscissa-aa",
+        "b": "rho-neg",
+        "curve": "icv1-fp16-t295-8d3c3165",
+        "verdict": "rho-neg < abscissa-aa"
+      },
+      {
+        "a": "known-log",
+        "b": "known-log-aa",
+        "curve": "icv1-fp16-t295-8d3c3165",
+        "verdict": "unresolved inside the band"
+      },
+      {
+        "a": "known-log",
+        "b": "rho-neg",
+        "curve": "icv1-fp16-t295-8d3c3165",
+        "verdict": "rho-neg < known-log"
+      },
+      {
+        "a": "known-log-aa",
+        "b": "rho-neg",
+        "curve": "icv1-fp16-t295-8d3c3165",
+        "verdict": "rho-neg < known-log-aa"
+      }
+    ],
+    "rows": [
+      {
+        "arm": "abscissa",
+        "curve": "icv1-fp16-t295-8d3c3165",
+        "log2_r": 15.696886046427368,
+        "mean_s": [
+          10.929887917383741,
+          11.578504592506025,
+          17.41605466860655
+        ],
+        "runs": 40,
+        "uncounted": [],
+        "verified": 40
+      },
+      {
+        "arm": "abscissa-aa",
+        "curve": "icv1-fp16-t295-8d3c3165",
+        "log2_r": 15.696886046427368,
+        "mean_s": [
+          10.929887917383741,
+          11.578504592506025,
+          17.41605466860655
+        ],
+        "runs": 40,
+        "uncounted": [],
+        "verified": 40
+      },
+      {
+        "arm": "known-log",
+        "curve": "icv1-fp16-t295-8d3c3165",
+        "log2_r": 15.696886046427368,
+        "mean_s": [
+          7.545951836254109,
+          8.109254184930418,
+          13.178975323017216
+        ],
+        "runs": 40,
+        "uncounted": [],
+        "verified": 40
+      },
+      {
+        "arm": "known-log-aa",
+        "curve": "icv1-fp16-t295-8d3c3165",
+        "log2_r": 15.696886046427368,
+        "mean_s": [
+          7.545951836254109,
+          8.109254184930418,
+          13.178975323017216
+        ],
+        "runs": 40,
+        "uncounted": [],
+        "verified": 40
+      },
+      {
+        "arm": "rho-neg",
+        "curve": "icv1-fp16-t295-8d3c3165",
+        "log2_r": 15.696886046427368,
+        "mean_s": [
+          1.8084684685406234,
+          1.922452313714717,
+          2.948306920281559
+        ],
+        "runs": 40,
+        "uncounted": [],
+        "verified": 40
+      }
+    ],
+    "schema": "ecbench.band/v1",
+    "weights": [
+      0.0,
+      0.1,
+      1.0
+    ]
+  },
+  "ratios": [
+    {
+      "all_runs_verified": true,
+      "candidate": "known-log",
+      "curve": "icv1-fp16-t295-8d3c3165",
+      "native_counts_complete": true,
+      "ratio_reference_over_candidate": [
+        1.4484439013871913,
+        1.4278137456860807,
+        1.3215029425079226
+      ],
+      "reference": "abscissa"
+    },
+    {
+      "all_runs_verified": true,
+      "candidate": "known-log",
+      "curve": "icv1-fp16-t295-8d3c3165",
+      "native_counts_complete": true,
+      "ratio_reference_over_candidate": [
+        0.23966074893984035,
+        0.23706894245431928,
+        0.2237129099962962
+      ],
+      "reference": "rho-neg"
+    }
+  ],
+  "records_sha256": "dcc22fd1d5692785bd10d17772841af3cb92ef84418cf361a776c4a9abfd6994",
+  "schema": "known-log-study.summary/v1",
+  "session": "/workspace/crypto/research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-generator-1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "workloads": [
+    {
+      "arm": "abscissa",
+      "counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 119,
+        "matrix_rows": 119,
+        "matrix_work": 1316,
+        "relations_found": 119,
+        "targets_tried": 3472
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "a25da4aa6dc732c698c2ea333752c17bb4d06cb2fb40c2b9cf74bfbc086f701b": 64
+      },
+      "first_run_counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 27,
+        "matrix_rows": 27,
+        "matrix_work": 313,
+        "relations_found": 27,
+        "targets_tried": 649
+      },
+      "native_unpriced_totals": {
+        "legendre_symbols_uncharged": 310,
+        "lookups_uncharged": 3450,
+        "row_ops_uncharged": 1316,
+        "sqrt_solves_uncharged": 160,
+        "target_guard_probes_uncharged": 3472
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 1689931,
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "relations": 8077.0,
+        "verify": 75.0
+      },
+      "priced_gae_totals": [
+        13432.0,
+        14302.8,
+        22140.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xbf4a",
+        "0x3fdb"
+      ],
+      "workload_id": "W0556bd7c09f9"
+    },
+    {
+      "arm": "abscissa-aa",
+      "counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 119,
+        "matrix_rows": 119,
+        "matrix_work": 1316,
+        "relations_found": 119,
+        "targets_tried": 3472
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "a25da4aa6dc732c698c2ea333752c17bb4d06cb2fb40c2b9cf74bfbc086f701b": 64
+      },
+      "first_run_counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 27,
+        "matrix_rows": 27,
+        "matrix_work": 313,
+        "relations_found": 27,
+        "targets_tried": 649
+      },
+      "native_unpriced_totals": {
+        "legendre_symbols_uncharged": 310,
+        "lookups_uncharged": 3450,
+        "row_ops_uncharged": 1316,
+        "sqrt_solves_uncharged": 160,
+        "target_guard_probes_uncharged": 3472
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 1300522,
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "relations": 8077.0,
+        "verify": 75.0
+      },
+      "priced_gae_totals": [
+        13432.0,
+        14302.8,
+        22140.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xbf4a",
+        "0x3fdb"
+      ],
+      "workload_id": "W0556bd7c09f9"
+    },
+    {
+      "arm": "known-log",
+      "counters": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 117,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 5280,
+        "pair_colliding_attempts": 85,
+        "pair_distinct_signed_classes": 5035,
+        "pair_identity_sums": 160,
+        "query_scalar_draws_uncharged": 5,
+        "relation_point_checks": 5,
+        "relations_found": 5,
+        "scalar_additions_uncharged": 122,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120,
+        "target_equation_rank": 5,
+        "targets_tried": 117,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 5
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "26b5715258b2b96d5e63ff816d0bdf8343723241168ea52187f541b43d53f4be": 64
+      },
+      "first_run_counters": {
+        "base_dedup_probes_uncharged": 32,
+        "base_index_entries_uncharged": 64,
+        "base_negations_uncharged": 96,
+        "base_scalar_draws_uncharged": 32,
+        "lookups_uncharged": 8,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 1056,
+        "pair_colliding_attempts": 17,
+        "pair_distinct_signed_classes": 1007,
+        "pair_identity_sums": 32,
+        "query_scalar_draws_uncharged": 1,
+        "relation_point_checks": 1,
+        "relations_found": 1,
+        "scalar_additions_uncharged": 9,
+        "scalar_multiplications_uncharged": 1,
+        "table_inserts_uncharged": 1024,
+        "target_equation_rank": 1,
+        "targets_tried": 8,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 1
+      },
+      "native_unpriced_totals": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 117,
+        "query_scalar_draws_uncharged": 5,
+        "scalar_additions_uncharged": 122,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 51366,
+      "phase_gae_totals": {
+        "factor_base": 3085.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "target_PDP": 5.0,
+        "target_descent": 0.0,
+        "target_query": 215.0,
+        "target_recovery_check": 75.0,
+        "target_relation_check": 5.0
+      },
+      "priced_gae_totals": [
+        8665.0,
+        9313.9,
+        15154.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xbf4a",
+        "0x3fdb"
+      ],
+      "workload_id": "W0556bd7c09f9"
+    },
+    {
+      "arm": "known-log-aa",
+      "counters": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 117,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 5280,
+        "pair_colliding_attempts": 85,
+        "pair_distinct_signed_classes": 5035,
+        "pair_identity_sums": 160,
+        "query_scalar_draws_uncharged": 5,
+        "relation_point_checks": 5,
+        "relations_found": 5,
+        "scalar_additions_uncharged": 122,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120,
+        "target_equation_rank": 5,
+        "targets_tried": 117,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 5
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "26b5715258b2b96d5e63ff816d0bdf8343723241168ea52187f541b43d53f4be": 64
+      },
+      "first_run_counters": {
+        "base_dedup_probes_uncharged": 32,
+        "base_index_entries_uncharged": 64,
+        "base_negations_uncharged": 96,
+        "base_scalar_draws_uncharged": 32,
+        "lookups_uncharged": 8,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 1056,
+        "pair_colliding_attempts": 17,
+        "pair_distinct_signed_classes": 1007,
+        "pair_identity_sums": 32,
+        "query_scalar_draws_uncharged": 1,
+        "relation_point_checks": 1,
+        "relations_found": 1,
+        "scalar_additions_uncharged": 9,
+        "scalar_multiplications_uncharged": 1,
+        "table_inserts_uncharged": 1024,
+        "target_equation_rank": 1,
+        "targets_tried": 8,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 1
+      },
+      "native_unpriced_totals": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 117,
+        "query_scalar_draws_uncharged": 5,
+        "scalar_additions_uncharged": 122,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 51308,
+      "phase_gae_totals": {
+        "factor_base": 3085.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "target_PDP": 5.0,
+        "target_descent": 0.0,
+        "target_query": 215.0,
+        "target_recovery_check": 75.0,
+        "target_relation_check": 5.0
+      },
+      "priced_gae_totals": [
+        8665.0,
+        9313.9,
+        15154.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xbf4a",
+        "0x3fdb"
+      ],
+      "workload_id": "W0556bd7c09f9"
+    },
+    {
+      "arm": "rho-neg",
+      "counters": {
+        "canonicalisations_uncharged": 1639,
+        "cycle_escape_doublings": 8,
+        "cycles_length_2": 0,
+        "cycles_length_4": 5,
+        "cycles_other_length": 3,
+        "distinguished_point_bits": 20,
+        "distinguished_points": 82,
+        "jump_coefficient_bits": 45,
+        "jumps": 40,
+        "look_ahead_additions": 104,
+        "setup_additions": 298,
+        "setup_doublings": 387,
+        "start_additions": 77,
+        "steps": 1445,
+        "useless_collisions": 0,
+        "verification_operations": 75,
+        "walk_operations": 1557,
+        "walks": 82,
+        "walks_abandoned_in_a_cycle": 0,
+        "walks_capped": 0
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {},
+      "first_run_counters": {
+        "canonicalisations_uncharged": 342,
+        "cycle_escape_doublings": 1,
+        "cycles_length_2": 0,
+        "cycles_length_4": 1,
+        "cycles_other_length": 0,
+        "distinguished_point_bits": 4,
+        "distinguished_points": 16,
+        "jump_coefficient_bits": 9,
+        "jumps": 8,
+        "look_ahead_additions": 19,
+        "setup_additions": 53,
+        "setup_doublings": 77,
+        "start_additions": 15,
+        "steps": 306,
+        "useless_collisions": 0,
+        "verification_operations": 15,
+        "walk_operations": 326,
+        "walks": 16,
+        "walks_abandoned_in_a_cycle": 0,
+        "walks_capped": 0
+      },
+      "native_unpriced_totals": {
+        "canonicalisations_uncharged": 1639
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 23510825,
+      "phase_gae_totals": {
+        "internal_verification": 75.0,
+        "search": 1634.0,
+        "setup": 685.0
+      },
+      "priced_gae_totals": [
+        2394.0,
+        2557.9,
+        4033.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xbf4a",
+        "0x3fdb"
+      ],
+      "workload_id": "W0556bd7c09f9"
+    },
+    {
+      "arm": "abscissa",
+      "counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 99,
+        "matrix_rows": 99,
+        "matrix_work": 1038,
+        "relations_found": 99,
+        "targets_tried": 2541
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "a25da4aa6dc732c698c2ea333752c17bb4d06cb2fb40c2b9cf74bfbc086f701b": 64
+      },
+      "first_run_counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 20,
+        "matrix_rows": 20,
+        "matrix_work": 178,
+        "relations_found": 20,
+        "targets_tried": 451
+      },
+      "native_unpriced_totals": {
+        "legendre_symbols_uncharged": 310,
+        "lookups_uncharged": 2527,
+        "row_ops_uncharged": 1038,
+        "sqrt_solves_uncharged": 160,
+        "target_guard_probes_uncharged": 2541
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 1605646,
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "relations": 6813.0,
+        "verify": 105.0
+      },
+      "priced_gae_totals": [
+        12198.0,
+        12855.599999999999,
+        18774.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xb47e",
+        "0x4d4e"
+      ],
+      "workload_id": "W5216e8fd3ebf"
+    },
+    {
+      "arm": "abscissa-aa",
+      "counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 99,
+        "matrix_rows": 99,
+        "matrix_work": 1038,
+        "relations_found": 99,
+        "targets_tried": 2541
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "a25da4aa6dc732c698c2ea333752c17bb4d06cb2fb40c2b9cf74bfbc086f701b": 64
+      },
+      "first_run_counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 20,
+        "matrix_rows": 20,
+        "matrix_work": 178,
+        "relations_found": 20,
+        "targets_tried": 451
+      },
+      "native_unpriced_totals": {
+        "legendre_symbols_uncharged": 310,
+        "lookups_uncharged": 2527,
+        "row_ops_uncharged": 1038,
+        "sqrt_solves_uncharged": 160,
+        "target_guard_probes_uncharged": 2541
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 1327994,
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "relations": 6813.0,
+        "verify": 105.0
+      },
+      "priced_gae_totals": [
+        12198.0,
+        12855.599999999999,
+        18774.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xb47e",
+        "0x4d4e"
+      ],
+      "workload_id": "W5216e8fd3ebf"
+    },
+    {
+      "arm": "known-log",
+      "counters": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 162,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 5280,
+        "pair_colliding_attempts": 85,
+        "pair_distinct_signed_classes": 5035,
+        "pair_identity_sums": 160,
+        "query_scalar_draws_uncharged": 5,
+        "relation_point_checks": 5,
+        "relations_found": 5,
+        "scalar_additions_uncharged": 167,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120,
+        "target_equation_rank": 5,
+        "targets_tried": 162,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 5
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "26b5715258b2b96d5e63ff816d0bdf8343723241168ea52187f541b43d53f4be": 64
+      },
+      "first_run_counters": {
+        "base_dedup_probes_uncharged": 32,
+        "base_index_entries_uncharged": 64,
+        "base_negations_uncharged": 96,
+        "base_scalar_draws_uncharged": 32,
+        "lookups_uncharged": 7,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 1056,
+        "pair_colliding_attempts": 17,
+        "pair_distinct_signed_classes": 1007,
+        "pair_identity_sums": 32,
+        "query_scalar_draws_uncharged": 1,
+        "relation_point_checks": 1,
+        "relations_found": 1,
+        "scalar_additions_uncharged": 8,
+        "scalar_multiplications_uncharged": 1,
+        "table_inserts_uncharged": 1024,
+        "target_equation_rank": 1,
+        "targets_tried": 7,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 1
+      },
+      "native_unpriced_totals": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 162,
+        "query_scalar_draws_uncharged": 5,
+        "scalar_additions_uncharged": 167,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 62023,
+      "phase_gae_totals": {
+        "factor_base": 3085.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "target_PDP": 5.0,
+        "target_descent": 0.0,
+        "target_query": 279.0,
+        "target_recovery_check": 105.0,
+        "target_relation_check": 5.0
+      },
+      "priced_gae_totals": [
+        8759.0,
+        9416.900000000001,
+        15338.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xb47e",
+        "0x4d4e"
+      ],
+      "workload_id": "W5216e8fd3ebf"
+    },
+    {
+      "arm": "known-log-aa",
+      "counters": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 162,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 5280,
+        "pair_colliding_attempts": 85,
+        "pair_distinct_signed_classes": 5035,
+        "pair_identity_sums": 160,
+        "query_scalar_draws_uncharged": 5,
+        "relation_point_checks": 5,
+        "relations_found": 5,
+        "scalar_additions_uncharged": 167,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120,
+        "target_equation_rank": 5,
+        "targets_tried": 162,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 5
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "26b5715258b2b96d5e63ff816d0bdf8343723241168ea52187f541b43d53f4be": 64
+      },
+      "first_run_counters": {
+        "base_dedup_probes_uncharged": 32,
+        "base_index_entries_uncharged": 64,
+        "base_negations_uncharged": 96,
+        "base_scalar_draws_uncharged": 32,
+        "lookups_uncharged": 7,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 1056,
+        "pair_colliding_attempts": 17,
+        "pair_distinct_signed_classes": 1007,
+        "pair_identity_sums": 32,
+        "query_scalar_draws_uncharged": 1,
+        "relation_point_checks": 1,
+        "relations_found": 1,
+        "scalar_additions_uncharged": 8,
+        "scalar_multiplications_uncharged": 1,
+        "table_inserts_uncharged": 1024,
+        "target_equation_rank": 1,
+        "targets_tried": 7,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 1
+      },
+      "native_unpriced_totals": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 162,
+        "query_scalar_draws_uncharged": 5,
+        "scalar_additions_uncharged": 167,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 62264,
+      "phase_gae_totals": {
+        "factor_base": 3085.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "target_PDP": 5.0,
+        "target_descent": 0.0,
+        "target_query": 279.0,
+        "target_recovery_check": 105.0,
+        "target_relation_check": 5.0
+      },
+      "priced_gae_totals": [
+        8759.0,
+        9416.900000000001,
+        15338.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xb47e",
+        "0x4d4e"
+      ],
+      "workload_id": "W5216e8fd3ebf"
+    },
+    {
+      "arm": "rho-neg",
+      "counters": {
+        "canonicalisations_uncharged": 1451,
+        "cycle_escape_doublings": 6,
+        "cycles_length_2": 1,
+        "cycles_length_4": 4,
+        "cycles_other_length": 1,
+        "distinguished_point_bits": 20,
+        "distinguished_points": 88,
+        "jump_coefficient_bits": 45,
+        "jumps": 40,
+        "look_ahead_additions": 94,
+        "setup_additions": 289,
+        "setup_doublings": 386,
+        "start_additions": 83,
+        "steps": 1263,
+        "useless_collisions": 0,
+        "verification_operations": 105,
+        "walk_operations": 1363,
+        "walks": 88,
+        "walks_abandoned_in_a_cycle": 0,
+        "walks_capped": 0
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {},
+      "first_run_counters": {
+        "canonicalisations_uncharged": 394,
+        "cycle_escape_doublings": 2,
+        "cycles_length_2": 0,
+        "cycles_length_4": 1,
+        "cycles_other_length": 1,
+        "distinguished_point_bits": 4,
+        "distinguished_points": 24,
+        "jump_coefficient_bits": 9,
+        "jumps": 8,
+        "look_ahead_additions": 14,
+        "setup_additions": 55,
+        "setup_doublings": 76,
+        "start_additions": 23,
+        "steps": 354,
+        "useless_collisions": 0,
+        "verification_operations": 21,
+        "walk_operations": 370,
+        "walks": 24,
+        "walks_abandoned_in_a_cycle": 0,
+        "walks_capped": 0
+      },
+      "native_unpriced_totals": {
+        "canonicalisations_uncharged": 1451
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 26116449,
+      "phase_gae_totals": {
+        "internal_verification": 105.0,
+        "search": 1446.0,
+        "setup": 675.0
+      },
+      "priced_gae_totals": [
+        2226.0,
+        2371.1,
+        3677.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xb47e",
+        "0x4d4e"
+      ],
+      "workload_id": "W5216e8fd3ebf"
+    },
+    {
+      "arm": "abscissa",
+      "counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 121,
+        "matrix_rows": 121,
+        "matrix_work": 1513,
+        "relations_found": 121,
+        "targets_tried": 2946
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "a25da4aa6dc732c698c2ea333752c17bb4d06cb2fb40c2b9cf74bfbc086f701b": 64
+      },
+      "first_run_counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 30,
+        "matrix_rows": 30,
+        "matrix_work": 391,
+        "relations_found": 30,
+        "targets_tried": 694
+      },
+      "native_unpriced_totals": {
+        "legendre_symbols_uncharged": 310,
+        "lookups_uncharged": 2931,
+        "row_ops_uncharged": 1513,
+        "sqrt_solves_uncharged": 160,
+        "target_guard_probes_uncharged": 2946
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 1230627,
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "relations": 7273.0,
+        "verify": 110.0
+      },
+      "priced_gae_totals": [
+        12663.0,
+        13449.0,
+        20523.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x91ea",
+        "0x8ccc"
+      ],
+      "workload_id": "W5ce15580734e"
+    },
+    {
+      "arm": "abscissa-aa",
+      "counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 121,
+        "matrix_rows": 121,
+        "matrix_work": 1513,
+        "relations_found": 121,
+        "targets_tried": 2946
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "a25da4aa6dc732c698c2ea333752c17bb4d06cb2fb40c2b9cf74bfbc086f701b": 64
+      },
+      "first_run_counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 30,
+        "matrix_rows": 30,
+        "matrix_work": 391,
+        "relations_found": 30,
+        "targets_tried": 694
+      },
+      "native_unpriced_totals": {
+        "legendre_symbols_uncharged": 310,
+        "lookups_uncharged": 2931,
+        "row_ops_uncharged": 1513,
+        "sqrt_solves_uncharged": 160,
+        "target_guard_probes_uncharged": 2946
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 1257787,
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "relations": 7273.0,
+        "verify": 110.0
+      },
+      "priced_gae_totals": [
+        12663.0,
+        13449.0,
+        20523.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x91ea",
+        "0x8ccc"
+      ],
+      "workload_id": "W5ce15580734e"
+    },
+    {
+      "arm": "known-log",
+      "counters": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 150,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 5280,
+        "pair_colliding_attempts": 85,
+        "pair_distinct_signed_classes": 5035,
+        "pair_identity_sums": 160,
+        "query_scalar_draws_uncharged": 5,
+        "relation_point_checks": 5,
+        "relations_found": 5,
+        "scalar_additions_uncharged": 155,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120,
+        "target_equation_rank": 5,
+        "targets_tried": 150,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 5
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "26b5715258b2b96d5e63ff816d0bdf8343723241168ea52187f541b43d53f4be": 64
+      },
+      "first_run_counters": {
+        "base_dedup_probes_uncharged": 32,
+        "base_index_entries_uncharged": 64,
+        "base_negations_uncharged": 96,
+        "base_scalar_draws_uncharged": 32,
+        "lookups_uncharged": 5,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 1056,
+        "pair_colliding_attempts": 17,
+        "pair_distinct_signed_classes": 1007,
+        "pair_identity_sums": 32,
+        "query_scalar_draws_uncharged": 1,
+        "relation_point_checks": 1,
+        "relations_found": 1,
+        "scalar_additions_uncharged": 6,
+        "scalar_multiplications_uncharged": 1,
+        "table_inserts_uncharged": 1024,
+        "target_equation_rank": 1,
+        "targets_tried": 5,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 1
+      },
+      "native_unpriced_totals": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 150,
+        "query_scalar_draws_uncharged": 5,
+        "scalar_additions_uncharged": 155,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 57666,
+      "phase_gae_totals": {
+        "factor_base": 3085.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "target_PDP": 5.0,
+        "target_descent": 0.0,
+        "target_query": 240.0,
+        "target_recovery_check": 110.0,
+        "target_relation_check": 5.0
+      },
+      "priced_gae_totals": [
+        8725.0,
+        9380.5,
+        15280.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x91ea",
+        "0x8ccc"
+      ],
+      "workload_id": "W5ce15580734e"
+    },
+    {
+      "arm": "known-log-aa",
+      "counters": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 150,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 5280,
+        "pair_colliding_attempts": 85,
+        "pair_distinct_signed_classes": 5035,
+        "pair_identity_sums": 160,
+        "query_scalar_draws_uncharged": 5,
+        "relation_point_checks": 5,
+        "relations_found": 5,
+        "scalar_additions_uncharged": 155,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120,
+        "target_equation_rank": 5,
+        "targets_tried": 150,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 5
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "26b5715258b2b96d5e63ff816d0bdf8343723241168ea52187f541b43d53f4be": 64
+      },
+      "first_run_counters": {
+        "base_dedup_probes_uncharged": 32,
+        "base_index_entries_uncharged": 64,
+        "base_negations_uncharged": 96,
+        "base_scalar_draws_uncharged": 32,
+        "lookups_uncharged": 5,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 1056,
+        "pair_colliding_attempts": 17,
+        "pair_distinct_signed_classes": 1007,
+        "pair_identity_sums": 32,
+        "query_scalar_draws_uncharged": 1,
+        "relation_point_checks": 1,
+        "relations_found": 1,
+        "scalar_additions_uncharged": 6,
+        "scalar_multiplications_uncharged": 1,
+        "table_inserts_uncharged": 1024,
+        "target_equation_rank": 1,
+        "targets_tried": 5,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 1
+      },
+      "native_unpriced_totals": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 150,
+        "query_scalar_draws_uncharged": 5,
+        "scalar_additions_uncharged": 155,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 58717,
+      "phase_gae_totals": {
+        "factor_base": 3085.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "target_PDP": 5.0,
+        "target_descent": 0.0,
+        "target_query": 240.0,
+        "target_recovery_check": 110.0,
+        "target_relation_check": 5.0
+      },
+      "priced_gae_totals": [
+        8725.0,
+        9380.5,
+        15280.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x91ea",
+        "0x8ccc"
+      ],
+      "workload_id": "W5ce15580734e"
+    },
+    {
+      "arm": "rho-neg",
+      "counters": {
+        "canonicalisations_uncharged": 1175,
+        "cycle_escape_doublings": 7,
+        "cycles_length_2": 1,
+        "cycles_length_4": 3,
+        "cycles_other_length": 3,
+        "distinguished_point_bits": 20,
+        "distinguished_points": 52,
+        "jump_coefficient_bits": 45,
+        "jumps": 40,
+        "look_ahead_additions": 90,
+        "setup_additions": 301,
+        "setup_doublings": 381,
+        "start_additions": 47,
+        "steps": 1026,
+        "useless_collisions": 0,
+        "verification_operations": 110,
+        "walk_operations": 1123,
+        "walks": 52,
+        "walks_abandoned_in_a_cycle": 0,
+        "walks_capped": 0
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {},
+      "first_run_counters": {
+        "canonicalisations_uncharged": 161,
+        "cycle_escape_doublings": 2,
+        "cycles_length_2": 0,
+        "cycles_length_4": 2,
+        "cycles_other_length": 0,
+        "distinguished_point_bits": 4,
+        "distinguished_points": 5,
+        "jump_coefficient_bits": 9,
+        "jumps": 8,
+        "look_ahead_additions": 12,
+        "setup_additions": 56,
+        "setup_doublings": 71,
+        "start_additions": 4,
+        "steps": 142,
+        "useless_collisions": 0,
+        "verification_operations": 22,
+        "walk_operations": 156,
+        "walks": 5,
+        "walks_abandoned_in_a_cycle": 0,
+        "walks_capped": 0
+      },
+      "native_unpriced_totals": {
+        "canonicalisations_uncharged": 1175
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 28278190,
+      "phase_gae_totals": {
+        "internal_verification": 110.0,
+        "search": 1170.0,
+        "setup": 682.0
+      },
+      "priced_gae_totals": [
+        1962.0,
+        2079.5,
+        3137.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x91ea",
+        "0x8ccc"
+      ],
+      "workload_id": "W5ce15580734e"
+    },
+    {
+      "arm": "abscissa",
+      "counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 106,
+        "matrix_rows": 106,
+        "matrix_work": 1177,
+        "relations_found": 106,
+        "targets_tried": 2662
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "a25da4aa6dc732c698c2ea333752c17bb4d06cb2fb40c2b9cf74bfbc086f701b": 64
+      },
+      "first_run_counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 21,
+        "matrix_rows": 21,
+        "matrix_work": 218,
+        "relations_found": 21,
+        "targets_tried": 447
+      },
+      "native_unpriced_totals": {
+        "legendre_symbols_uncharged": 310,
+        "lookups_uncharged": 2652,
+        "row_ops_uncharged": 1177,
+        "sqrt_solves_uncharged": 160,
+        "target_guard_probes_uncharged": 2662
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 1217078,
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "relations": 6699.0,
+        "verify": 125.0
+      },
+      "priced_gae_totals": [
+        12104.0,
+        12800.099999999999,
+        19065.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x6abc",
+        "0xb7ce"
+      ],
+      "workload_id": "W90c2ba0a92fc"
+    },
+    {
+      "arm": "abscissa-aa",
+      "counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 106,
+        "matrix_rows": 106,
+        "matrix_work": 1177,
+        "relations_found": 106,
+        "targets_tried": 2662
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "a25da4aa6dc732c698c2ea333752c17bb4d06cb2fb40c2b9cf74bfbc086f701b": 64
+      },
+      "first_run_counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 21,
+        "matrix_rows": 21,
+        "matrix_work": 218,
+        "relations_found": 21,
+        "targets_tried": 447
+      },
+      "native_unpriced_totals": {
+        "legendre_symbols_uncharged": 310,
+        "lookups_uncharged": 2652,
+        "row_ops_uncharged": 1177,
+        "sqrt_solves_uncharged": 160,
+        "target_guard_probes_uncharged": 2662
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 1504395,
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "relations": 6699.0,
+        "verify": 125.0
+      },
+      "priced_gae_totals": [
+        12104.0,
+        12800.099999999999,
+        19065.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x6abc",
+        "0xb7ce"
+      ],
+      "workload_id": "W90c2ba0a92fc"
+    },
+    {
+      "arm": "known-log",
+      "counters": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 134,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 5280,
+        "pair_colliding_attempts": 85,
+        "pair_distinct_signed_classes": 5035,
+        "pair_identity_sums": 160,
+        "query_scalar_draws_uncharged": 5,
+        "relation_point_checks": 5,
+        "relations_found": 5,
+        "scalar_additions_uncharged": 139,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120,
+        "target_equation_rank": 5,
+        "targets_tried": 134,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 5
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "26b5715258b2b96d5e63ff816d0bdf8343723241168ea52187f541b43d53f4be": 64
+      },
+      "first_run_counters": {
+        "base_dedup_probes_uncharged": 32,
+        "base_index_entries_uncharged": 64,
+        "base_negations_uncharged": 96,
+        "base_scalar_draws_uncharged": 32,
+        "lookups_uncharged": 80,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 1056,
+        "pair_colliding_attempts": 17,
+        "pair_distinct_signed_classes": 1007,
+        "pair_identity_sums": 32,
+        "query_scalar_draws_uncharged": 1,
+        "relation_point_checks": 1,
+        "relations_found": 1,
+        "scalar_additions_uncharged": 81,
+        "scalar_multiplications_uncharged": 1,
+        "table_inserts_uncharged": 1024,
+        "target_equation_rank": 1,
+        "targets_tried": 80,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 1
+      },
+      "native_unpriced_totals": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 134,
+        "query_scalar_draws_uncharged": 5,
+        "scalar_additions_uncharged": 139,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 57715,
+      "phase_gae_totals": {
+        "factor_base": 3085.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "target_PDP": 5.0,
+        "target_descent": 0.0,
+        "target_query": 229.0,
+        "target_recovery_check": 125.0,
+        "target_relation_check": 5.0
+      },
+      "priced_gae_totals": [
+        8729.0,
+        9381.3,
+        15252.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x6abc",
+        "0xb7ce"
+      ],
+      "workload_id": "W90c2ba0a92fc"
+    },
+    {
+      "arm": "known-log-aa",
+      "counters": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 134,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 5280,
+        "pair_colliding_attempts": 85,
+        "pair_distinct_signed_classes": 5035,
+        "pair_identity_sums": 160,
+        "query_scalar_draws_uncharged": 5,
+        "relation_point_checks": 5,
+        "relations_found": 5,
+        "scalar_additions_uncharged": 139,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120,
+        "target_equation_rank": 5,
+        "targets_tried": 134,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 5
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "26b5715258b2b96d5e63ff816d0bdf8343723241168ea52187f541b43d53f4be": 64
+      },
+      "first_run_counters": {
+        "base_dedup_probes_uncharged": 32,
+        "base_index_entries_uncharged": 64,
+        "base_negations_uncharged": 96,
+        "base_scalar_draws_uncharged": 32,
+        "lookups_uncharged": 80,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 1056,
+        "pair_colliding_attempts": 17,
+        "pair_distinct_signed_classes": 1007,
+        "pair_identity_sums": 32,
+        "query_scalar_draws_uncharged": 1,
+        "relation_point_checks": 1,
+        "relations_found": 1,
+        "scalar_additions_uncharged": 81,
+        "scalar_multiplications_uncharged": 1,
+        "table_inserts_uncharged": 1024,
+        "target_equation_rank": 1,
+        "targets_tried": 80,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 1
+      },
+      "native_unpriced_totals": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 134,
+        "query_scalar_draws_uncharged": 5,
+        "scalar_additions_uncharged": 139,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 113198,
+      "phase_gae_totals": {
+        "factor_base": 3085.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "target_PDP": 5.0,
+        "target_descent": 0.0,
+        "target_query": 229.0,
+        "target_recovery_check": 125.0,
+        "target_relation_check": 5.0
+      },
+      "priced_gae_totals": [
+        8729.0,
+        9381.3,
+        15252.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x6abc",
+        "0xb7ce"
+      ],
+      "workload_id": "W90c2ba0a92fc"
+    },
+    {
+      "arm": "rho-neg",
+      "counters": {
+        "canonicalisations_uncharged": 1478,
+        "cycle_escape_doublings": 6,
+        "cycles_length_2": 1,
+        "cycles_length_4": 4,
+        "cycles_other_length": 1,
+        "distinguished_point_bits": 20,
+        "distinguished_points": 79,
+        "jump_coefficient_bits": 45,
+        "jumps": 40,
+        "look_ahead_additions": 88,
+        "setup_additions": 296,
+        "setup_doublings": 382,
+        "start_additions": 74,
+        "steps": 1305,
+        "useless_collisions": 0,
+        "verification_operations": 125,
+        "walk_operations": 1399,
+        "walks": 79,
+        "walks_abandoned_in_a_cycle": 0,
+        "walks_capped": 0
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {},
+      "first_run_counters": {
+        "canonicalisations_uncharged": 238,
+        "cycle_escape_doublings": 1,
+        "cycles_length_2": 1,
+        "cycles_length_4": 0,
+        "cycles_other_length": 0,
+        "distinguished_point_bits": 4,
+        "distinguished_points": 11,
+        "jump_coefficient_bits": 9,
+        "jumps": 8,
+        "look_ahead_additions": 10,
+        "setup_additions": 59,
+        "setup_doublings": 78,
+        "start_additions": 10,
+        "steps": 216,
+        "useless_collisions": 0,
+        "verification_operations": 25,
+        "walk_operations": 227,
+        "walks": 11,
+        "walks_abandoned_in_a_cycle": 0,
+        "walks_capped": 0
+      },
+      "native_unpriced_totals": {
+        "canonicalisations_uncharged": 1478
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 23107968,
+      "phase_gae_totals": {
+        "internal_verification": 125.0,
+        "search": 1473.0,
+        "setup": 678.0
+      },
+      "priced_gae_totals": [
+        2276.0,
+        2423.8,
+        3754.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x6abc",
+        "0xb7ce"
+      ],
+      "workload_id": "W90c2ba0a92fc"
+    },
+    {
+      "arm": "abscissa",
+      "counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 106,
+        "matrix_rows": 106,
+        "matrix_work": 1170,
+        "relations_found": 106,
+        "targets_tried": 2916
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "a25da4aa6dc732c698c2ea333752c17bb4d06cb2fb40c2b9cf74bfbc086f701b": 64
+      },
+      "first_run_counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 23,
+        "matrix_rows": 23,
+        "matrix_work": 315,
+        "relations_found": 23,
+        "targets_tried": 627
+      },
+      "native_unpriced_totals": {
+        "legendre_symbols_uncharged": 310,
+        "lookups_uncharged": 2905,
+        "row_ops_uncharged": 1170,
+        "sqrt_solves_uncharged": 160,
+        "target_guard_probes_uncharged": 2916
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 1193494,
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "relations": 7139.0,
+        "verify": 85.0
+      },
+      "priced_gae_totals": [
+        12504.0,
+        13250.100000000002,
+        19965.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x592a",
+        "0x31e9"
+      ],
+      "workload_id": "W94009a1bb228"
+    },
+    {
+      "arm": "abscissa-aa",
+      "counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 106,
+        "matrix_rows": 106,
+        "matrix_work": 1170,
+        "relations_found": 106,
+        "targets_tried": 2916
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "a25da4aa6dc732c698c2ea333752c17bb4d06cb2fb40c2b9cf74bfbc086f701b": 64
+      },
+      "first_run_counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 23,
+        "matrix_rows": 23,
+        "matrix_work": 315,
+        "relations_found": 23,
+        "targets_tried": 627
+      },
+      "native_unpriced_totals": {
+        "legendre_symbols_uncharged": 310,
+        "lookups_uncharged": 2905,
+        "row_ops_uncharged": 1170,
+        "sqrt_solves_uncharged": 160,
+        "target_guard_probes_uncharged": 2916
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 1324537,
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "relations": 7139.0,
+        "verify": 85.0
+      },
+      "priced_gae_totals": [
+        12504.0,
+        13250.100000000002,
+        19965.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x592a",
+        "0x31e9"
+      ],
+      "workload_id": "W94009a1bb228"
+    },
+    {
+      "arm": "known-log",
+      "counters": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 81,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 5280,
+        "pair_colliding_attempts": 85,
+        "pair_distinct_signed_classes": 5035,
+        "pair_identity_sums": 160,
+        "query_scalar_draws_uncharged": 5,
+        "relation_point_checks": 5,
+        "relations_found": 5,
+        "scalar_additions_uncharged": 86,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120,
+        "target_equation_rank": 5,
+        "targets_tried": 81,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 5
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "26b5715258b2b96d5e63ff816d0bdf8343723241168ea52187f541b43d53f4be": 64
+      },
+      "first_run_counters": {
+        "base_dedup_probes_uncharged": 32,
+        "base_index_entries_uncharged": 64,
+        "base_negations_uncharged": 96,
+        "base_scalar_draws_uncharged": 32,
+        "lookups_uncharged": 14,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 1056,
+        "pair_colliding_attempts": 17,
+        "pair_distinct_signed_classes": 1007,
+        "pair_identity_sums": 32,
+        "query_scalar_draws_uncharged": 1,
+        "relation_point_checks": 1,
+        "relations_found": 1,
+        "scalar_additions_uncharged": 15,
+        "scalar_multiplications_uncharged": 1,
+        "table_inserts_uncharged": 1024,
+        "target_equation_rank": 1,
+        "targets_tried": 14,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 1
+      },
+      "native_unpriced_totals": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 81,
+        "query_scalar_draws_uncharged": 5,
+        "scalar_additions_uncharged": 86,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 248449,
+      "phase_gae_totals": {
+        "factor_base": 3085.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "target_PDP": 5.0,
+        "target_descent": 0.0,
+        "target_query": 186.0,
+        "target_recovery_check": 85.0,
+        "target_relation_check": 5.0
+      },
+      "priced_gae_totals": [
+        8646.0,
+        9287.7,
+        15063.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x592a",
+        "0x31e9"
+      ],
+      "workload_id": "W94009a1bb228"
+    },
+    {
+      "arm": "known-log-aa",
+      "counters": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 81,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 5280,
+        "pair_colliding_attempts": 85,
+        "pair_distinct_signed_classes": 5035,
+        "pair_identity_sums": 160,
+        "query_scalar_draws_uncharged": 5,
+        "relation_point_checks": 5,
+        "relations_found": 5,
+        "scalar_additions_uncharged": 86,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120,
+        "target_equation_rank": 5,
+        "targets_tried": 81,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 5
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "26b5715258b2b96d5e63ff816d0bdf8343723241168ea52187f541b43d53f4be": 64
+      },
+      "first_run_counters": {
+        "base_dedup_probes_uncharged": 32,
+        "base_index_entries_uncharged": 64,
+        "base_negations_uncharged": 96,
+        "base_scalar_draws_uncharged": 32,
+        "lookups_uncharged": 14,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 1056,
+        "pair_colliding_attempts": 17,
+        "pair_distinct_signed_classes": 1007,
+        "pair_identity_sums": 32,
+        "query_scalar_draws_uncharged": 1,
+        "relation_point_checks": 1,
+        "relations_found": 1,
+        "scalar_additions_uncharged": 15,
+        "scalar_multiplications_uncharged": 1,
+        "table_inserts_uncharged": 1024,
+        "target_equation_rank": 1,
+        "targets_tried": 14,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 1
+      },
+      "native_unpriced_totals": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 81,
+        "query_scalar_draws_uncharged": 5,
+        "scalar_additions_uncharged": 86,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 44705,
+      "phase_gae_totals": {
+        "factor_base": 3085.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "target_PDP": 5.0,
+        "target_descent": 0.0,
+        "target_query": 186.0,
+        "target_recovery_check": 85.0,
+        "target_relation_check": 5.0
+      },
+      "priced_gae_totals": [
+        8646.0,
+        9287.7,
+        15063.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x592a",
+        "0x31e9"
+      ],
+      "workload_id": "W94009a1bb228"
+    },
+    {
+      "arm": "rho-neg",
+      "counters": {
+        "canonicalisations_uncharged": 1426,
+        "cycle_escape_doublings": 3,
+        "cycles_length_2": 0,
+        "cycles_length_4": 1,
+        "cycles_other_length": 2,
+        "distinguished_point_bits": 20,
+        "distinguished_points": 74,
+        "jump_coefficient_bits": 45,
+        "jumps": 40,
+        "look_ahead_additions": 82,
+        "setup_additions": 300,
+        "setup_doublings": 380,
+        "start_additions": 69,
+        "steps": 1267,
+        "useless_collisions": 0,
+        "verification_operations": 85,
+        "walk_operations": 1352,
+        "walks": 74,
+        "walks_abandoned_in_a_cycle": 0,
+        "walks_capped": 0
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {},
+      "first_run_counters": {
+        "canonicalisations_uncharged": 532,
+        "cycle_escape_doublings": 1,
+        "cycles_length_2": 0,
+        "cycles_length_4": 0,
+        "cycles_other_length": 1,
+        "distinguished_point_bits": 4,
+        "distinguished_points": 26,
+        "jump_coefficient_bits": 9,
+        "jumps": 8,
+        "look_ahead_additions": 26,
+        "setup_additions": 60,
+        "setup_doublings": 75,
+        "start_additions": 25,
+        "steps": 479,
+        "useless_collisions": 0,
+        "verification_operations": 17,
+        "walk_operations": 506,
+        "walks": 26,
+        "walks_abandoned_in_a_cycle": 0,
+        "walks_capped": 0
+      },
+      "native_unpriced_totals": {
+        "canonicalisations_uncharged": 1426
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 28577233,
+      "phase_gae_totals": {
+        "internal_verification": 85.0,
+        "search": 1421.0,
+        "setup": 680.0
+      },
+      "priced_gae_totals": [
+        2186.0,
+        2328.6000000000004,
+        3612.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x592a",
+        "0x31e9"
+      ],
+      "workload_id": "W94009a1bb228"
+    },
+    {
+      "arm": "abscissa",
+      "counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 124,
+        "matrix_rows": 124,
+        "matrix_work": 1531,
+        "relations_found": 124,
+        "targets_tried": 3433
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "a25da4aa6dc732c698c2ea333752c17bb4d06cb2fb40c2b9cf74bfbc086f701b": 64
+      },
+      "first_run_counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 26,
+        "matrix_rows": 26,
+        "matrix_work": 292,
+        "relations_found": 26,
+        "targets_tried": 707
+      },
+      "native_unpriced_totals": {
+        "legendre_symbols_uncharged": 310,
+        "lookups_uncharged": 3407,
+        "row_ops_uncharged": 1531,
+        "sqrt_solves_uncharged": 160,
+        "target_guard_probes_uncharged": 3433
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 1406329,
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "relations": 8247.0,
+        "verify": 115.0
+      },
+      "priced_gae_totals": [
+        13642.0,
+        14526.099999999999,
+        22483.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x200d",
+        "0x6233"
+      ],
+      "workload_id": "Wa32b51a8ee3f"
+    },
+    {
+      "arm": "abscissa-aa",
+      "counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 124,
+        "matrix_rows": 124,
+        "matrix_work": 1531,
+        "relations_found": 124,
+        "targets_tried": 3433
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "a25da4aa6dc732c698c2ea333752c17bb4d06cb2fb40c2b9cf74bfbc086f701b": 64
+      },
+      "first_run_counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 26,
+        "matrix_rows": 26,
+        "matrix_work": 292,
+        "relations_found": 26,
+        "targets_tried": 707
+      },
+      "native_unpriced_totals": {
+        "legendre_symbols_uncharged": 310,
+        "lookups_uncharged": 3407,
+        "row_ops_uncharged": 1531,
+        "sqrt_solves_uncharged": 160,
+        "target_guard_probes_uncharged": 3433
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 1310246,
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "relations": 8247.0,
+        "verify": 115.0
+      },
+      "priced_gae_totals": [
+        13642.0,
+        14526.099999999999,
+        22483.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x200d",
+        "0x6233"
+      ],
+      "workload_id": "Wa32b51a8ee3f"
+    },
+    {
+      "arm": "known-log",
+      "counters": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 75,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 5280,
+        "pair_colliding_attempts": 85,
+        "pair_distinct_signed_classes": 5035,
+        "pair_identity_sums": 160,
+        "query_scalar_draws_uncharged": 5,
+        "relation_point_checks": 5,
+        "relations_found": 5,
+        "scalar_additions_uncharged": 80,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120,
+        "target_equation_rank": 5,
+        "targets_tried": 75,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 5
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "26b5715258b2b96d5e63ff816d0bdf8343723241168ea52187f541b43d53f4be": 64
+      },
+      "first_run_counters": {
+        "base_dedup_probes_uncharged": 32,
+        "base_index_entries_uncharged": 64,
+        "base_negations_uncharged": 96,
+        "base_scalar_draws_uncharged": 32,
+        "lookups_uncharged": 24,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 1056,
+        "pair_colliding_attempts": 17,
+        "pair_distinct_signed_classes": 1007,
+        "pair_identity_sums": 32,
+        "query_scalar_draws_uncharged": 1,
+        "relation_point_checks": 1,
+        "relations_found": 1,
+        "scalar_additions_uncharged": 25,
+        "scalar_multiplications_uncharged": 1,
+        "table_inserts_uncharged": 1024,
+        "target_equation_rank": 1,
+        "targets_tried": 24,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 1
+      },
+      "native_unpriced_totals": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 75,
+        "query_scalar_draws_uncharged": 5,
+        "scalar_additions_uncharged": 80,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 46769,
+      "phase_gae_totals": {
+        "factor_base": 3085.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "target_PDP": 5.0,
+        "target_descent": 0.0,
+        "target_query": 185.0,
+        "target_recovery_check": 115.0,
+        "target_relation_check": 5.0
+      },
+      "priced_gae_totals": [
+        8675.0,
+        9315.5,
+        15080.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x200d",
+        "0x6233"
+      ],
+      "workload_id": "Wa32b51a8ee3f"
+    },
+    {
+      "arm": "known-log-aa",
+      "counters": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 75,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 5280,
+        "pair_colliding_attempts": 85,
+        "pair_distinct_signed_classes": 5035,
+        "pair_identity_sums": 160,
+        "query_scalar_draws_uncharged": 5,
+        "relation_point_checks": 5,
+        "relations_found": 5,
+        "scalar_additions_uncharged": 80,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120,
+        "target_equation_rank": 5,
+        "targets_tried": 75,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 5
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "26b5715258b2b96d5e63ff816d0bdf8343723241168ea52187f541b43d53f4be": 64
+      },
+      "first_run_counters": {
+        "base_dedup_probes_uncharged": 32,
+        "base_index_entries_uncharged": 64,
+        "base_negations_uncharged": 96,
+        "base_scalar_draws_uncharged": 32,
+        "lookups_uncharged": 24,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 1056,
+        "pair_colliding_attempts": 17,
+        "pair_distinct_signed_classes": 1007,
+        "pair_identity_sums": 32,
+        "query_scalar_draws_uncharged": 1,
+        "relation_point_checks": 1,
+        "relations_found": 1,
+        "scalar_additions_uncharged": 25,
+        "scalar_multiplications_uncharged": 1,
+        "table_inserts_uncharged": 1024,
+        "target_equation_rank": 1,
+        "targets_tried": 24,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 1
+      },
+      "native_unpriced_totals": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 75,
+        "query_scalar_draws_uncharged": 5,
+        "scalar_additions_uncharged": 80,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 61761,
+      "phase_gae_totals": {
+        "factor_base": 3085.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "target_PDP": 5.0,
+        "target_descent": 0.0,
+        "target_query": 185.0,
+        "target_recovery_check": 115.0,
+        "target_relation_check": 5.0
+      },
+      "priced_gae_totals": [
+        8675.0,
+        9315.5,
+        15080.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x200d",
+        "0x6233"
+      ],
+      "workload_id": "Wa32b51a8ee3f"
+    },
+    {
+      "arm": "rho-neg",
+      "counters": {
+        "canonicalisations_uncharged": 1328,
+        "cycle_escape_doublings": 5,
+        "cycles_length_2": 1,
+        "cycles_length_4": 3,
+        "cycles_other_length": 1,
+        "distinguished_point_bits": 20,
+        "distinguished_points": 88,
+        "jump_coefficient_bits": 45,
+        "jumps": 40,
+        "look_ahead_additions": 78,
+        "setup_additions": 286,
+        "setup_doublings": 387,
+        "start_additions": 83,
+        "steps": 1157,
+        "useless_collisions": 0,
+        "verification_operations": 115,
+        "walk_operations": 1240,
+        "walks": 88,
+        "walks_abandoned_in_a_cycle": 0,
+        "walks_capped": 0
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {},
+      "first_run_counters": {
+        "canonicalisations_uncharged": 278,
+        "cycle_escape_doublings": 2,
+        "cycles_length_2": 0,
+        "cycles_length_4": 2,
+        "cycles_other_length": 0,
+        "distinguished_point_bits": 4,
+        "distinguished_points": 20,
+        "jump_coefficient_bits": 9,
+        "jumps": 8,
+        "look_ahead_additions": 16,
+        "setup_additions": 52,
+        "setup_doublings": 77,
+        "start_additions": 19,
+        "steps": 240,
+        "useless_collisions": 0,
+        "verification_operations": 23,
+        "walk_operations": 258,
+        "walks": 20,
+        "walks_abandoned_in_a_cycle": 0,
+        "walks_capped": 0
+      },
+      "native_unpriced_totals": {
+        "canonicalisations_uncharged": 1328
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 25368086,
+      "phase_gae_totals": {
+        "internal_verification": 115.0,
+        "search": 1323.0,
+        "setup": 673.0
+      },
+      "priced_gae_totals": [
+        2111.0,
+        2243.8,
+        3439.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0x200d",
+        "0x6233"
+      ],
+      "workload_id": "Wa32b51a8ee3f"
+    },
+    {
+      "arm": "abscissa",
+      "counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 94,
+        "matrix_rows": 94,
+        "matrix_work": 938,
+        "relations_found": 94,
+        "targets_tried": 2236
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "a25da4aa6dc732c698c2ea333752c17bb4d06cb2fb40c2b9cf74bfbc086f701b": 64
+      },
+      "first_run_counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 17,
+        "matrix_rows": 17,
+        "matrix_work": 163,
+        "relations_found": 17,
+        "targets_tried": 329
+      },
+      "native_unpriced_totals": {
+        "legendre_symbols_uncharged": 310,
+        "lookups_uncharged": 2228,
+        "row_ops_uncharged": 938,
+        "sqrt_solves_uncharged": 160,
+        "target_guard_probes_uncharged": 2236
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 1021870,
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "relations": 6192.0,
+        "verify": 100.0
+      },
+      "priced_gae_totals": [
+        11572.0,
+        12159.199999999999,
+        17444.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xc237",
+        "0x5921"
+      ],
+      "workload_id": "Wb7067aeaa02f"
+    },
+    {
+      "arm": "abscissa-aa",
+      "counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 94,
+        "matrix_rows": 94,
+        "matrix_work": 938,
+        "relations_found": 94,
+        "targets_tried": 2236
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "a25da4aa6dc732c698c2ea333752c17bb4d06cb2fb40c2b9cf74bfbc086f701b": 64
+      },
+      "first_run_counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 17,
+        "matrix_rows": 17,
+        "matrix_work": 163,
+        "relations_found": 17,
+        "targets_tried": 329
+      },
+      "native_unpriced_totals": {
+        "legendre_symbols_uncharged": 310,
+        "lookups_uncharged": 2228,
+        "row_ops_uncharged": 938,
+        "sqrt_solves_uncharged": 160,
+        "target_guard_probes_uncharged": 2236
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 1177828,
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "relations": 6192.0,
+        "verify": 100.0
+      },
+      "priced_gae_totals": [
+        11572.0,
+        12159.199999999999,
+        17444.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xc237",
+        "0x5921"
+      ],
+      "workload_id": "Wb7067aeaa02f"
+    },
+    {
+      "arm": "known-log",
+      "counters": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 102,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 5280,
+        "pair_colliding_attempts": 85,
+        "pair_distinct_signed_classes": 5035,
+        "pair_identity_sums": 160,
+        "query_scalar_draws_uncharged": 5,
+        "relation_point_checks": 5,
+        "relations_found": 5,
+        "scalar_additions_uncharged": 107,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120,
+        "target_equation_rank": 5,
+        "targets_tried": 102,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 5
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "26b5715258b2b96d5e63ff816d0bdf8343723241168ea52187f541b43d53f4be": 64
+      },
+      "first_run_counters": {
+        "base_dedup_probes_uncharged": 32,
+        "base_index_entries_uncharged": 64,
+        "base_negations_uncharged": 96,
+        "base_scalar_draws_uncharged": 32,
+        "lookups_uncharged": 10,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 1056,
+        "pair_colliding_attempts": 17,
+        "pair_distinct_signed_classes": 1007,
+        "pair_identity_sums": 32,
+        "query_scalar_draws_uncharged": 1,
+        "relation_point_checks": 1,
+        "relations_found": 1,
+        "scalar_additions_uncharged": 11,
+        "scalar_multiplications_uncharged": 1,
+        "table_inserts_uncharged": 1024,
+        "target_equation_rank": 1,
+        "targets_tried": 10,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 1
+      },
+      "native_unpriced_totals": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 102,
+        "query_scalar_draws_uncharged": 5,
+        "scalar_additions_uncharged": 107,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 50244,
+      "phase_gae_totals": {
+        "factor_base": 3085.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "target_PDP": 5.0,
+        "target_descent": 0.0,
+        "target_query": 205.0,
+        "target_recovery_check": 100.0,
+        "target_relation_check": 5.0
+      },
+      "priced_gae_totals": [
+        8680.0,
+        9325.900000000001,
+        15139.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xc237",
+        "0x5921"
+      ],
+      "workload_id": "Wb7067aeaa02f"
+    },
+    {
+      "arm": "known-log-aa",
+      "counters": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 102,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 5280,
+        "pair_colliding_attempts": 85,
+        "pair_distinct_signed_classes": 5035,
+        "pair_identity_sums": 160,
+        "query_scalar_draws_uncharged": 5,
+        "relation_point_checks": 5,
+        "relations_found": 5,
+        "scalar_additions_uncharged": 107,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120,
+        "target_equation_rank": 5,
+        "targets_tried": 102,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 5
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "26b5715258b2b96d5e63ff816d0bdf8343723241168ea52187f541b43d53f4be": 64
+      },
+      "first_run_counters": {
+        "base_dedup_probes_uncharged": 32,
+        "base_index_entries_uncharged": 64,
+        "base_negations_uncharged": 96,
+        "base_scalar_draws_uncharged": 32,
+        "lookups_uncharged": 10,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 1056,
+        "pair_colliding_attempts": 17,
+        "pair_distinct_signed_classes": 1007,
+        "pair_identity_sums": 32,
+        "query_scalar_draws_uncharged": 1,
+        "relation_point_checks": 1,
+        "relations_found": 1,
+        "scalar_additions_uncharged": 11,
+        "scalar_multiplications_uncharged": 1,
+        "table_inserts_uncharged": 1024,
+        "target_equation_rank": 1,
+        "targets_tried": 10,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 1
+      },
+      "native_unpriced_totals": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 102,
+        "query_scalar_draws_uncharged": 5,
+        "scalar_additions_uncharged": 107,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 94571,
+      "phase_gae_totals": {
+        "factor_base": 3085.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "target_PDP": 5.0,
+        "target_descent": 0.0,
+        "target_query": 205.0,
+        "target_recovery_check": 100.0,
+        "target_relation_check": 5.0
+      },
+      "priced_gae_totals": [
+        8680.0,
+        9325.900000000001,
+        15139.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xc237",
+        "0x5921"
+      ],
+      "workload_id": "Wb7067aeaa02f"
+    },
+    {
+      "arm": "rho-neg",
+      "counters": {
+        "canonicalisations_uncharged": 1056,
+        "cycle_escape_doublings": 2,
+        "cycles_length_2": 0,
+        "cycles_length_4": 1,
+        "cycles_other_length": 1,
+        "distinguished_point_bits": 20,
+        "distinguished_points": 59,
+        "jump_coefficient_bits": 45,
+        "jumps": 40,
+        "look_ahead_additions": 54,
+        "setup_additions": 278,
+        "setup_doublings": 379,
+        "start_additions": 54,
+        "steps": 941,
+        "useless_collisions": 0,
+        "verification_operations": 100,
+        "walk_operations": 997,
+        "walks": 59,
+        "walks_abandoned_in_a_cycle": 0,
+        "walks_capped": 0
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {},
+      "first_run_counters": {
+        "canonicalisations_uncharged": 133,
+        "cycle_escape_doublings": 0,
+        "cycles_length_2": 0,
+        "cycles_length_4": 0,
+        "cycles_other_length": 0,
+        "distinguished_point_bits": 4,
+        "distinguished_points": 6,
+        "jump_coefficient_bits": 9,
+        "jumps": 8,
+        "look_ahead_additions": 10,
+        "setup_additions": 57,
+        "setup_doublings": 76,
+        "start_additions": 5,
+        "steps": 117,
+        "useless_collisions": 0,
+        "verification_operations": 20,
+        "walk_operations": 127,
+        "walks": 6,
+        "walks_abandoned_in_a_cycle": 0,
+        "walks_capped": 0
+      },
+      "native_unpriced_totals": {
+        "canonicalisations_uncharged": 1056
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 28378070,
+      "phase_gae_totals": {
+        "internal_verification": 100.0,
+        "search": 1051.0,
+        "setup": 657.0
+      },
+      "priced_gae_totals": [
+        1808.0,
+        1913.6,
+        2864.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xc237",
+        "0x5921"
+      ],
+      "workload_id": "Wb7067aeaa02f"
+    },
+    {
+      "arm": "abscissa",
+      "counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 118,
+        "matrix_rows": 118,
+        "matrix_work": 1475,
+        "relations_found": 118,
+        "targets_tried": 2794
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "a25da4aa6dc732c698c2ea333752c17bb4d06cb2fb40c2b9cf74bfbc086f701b": 64
+      },
+      "first_run_counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 21,
+        "matrix_rows": 21,
+        "matrix_work": 238,
+        "relations_found": 21,
+        "targets_tried": 380
+      },
+      "native_unpriced_totals": {
+        "legendre_symbols_uncharged": 310,
+        "lookups_uncharged": 2777,
+        "row_ops_uncharged": 1475,
+        "sqrt_solves_uncharged": 160,
+        "target_guard_probes_uncharged": 2794
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 1159492,
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "relations": 7271.0,
+        "verify": 95.0
+      },
+      "priced_gae_totals": [
+        12646.0,
+        13397.599999999999,
+        20162.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xc34d",
+        "0x1e27"
+      ],
+      "workload_id": "Wf3d5ae804d7c"
+    },
+    {
+      "arm": "abscissa-aa",
+      "counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 118,
+        "matrix_rows": 118,
+        "matrix_work": 1475,
+        "relations_found": 118,
+        "targets_tried": 2794
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "a25da4aa6dc732c698c2ea333752c17bb4d06cb2fb40c2b9cf74bfbc086f701b": 64
+      },
+      "first_run_counters": {
+        "matrix_dependent": 0,
+        "matrix_rank": 21,
+        "matrix_rows": 21,
+        "matrix_work": 238,
+        "relations_found": 21,
+        "targets_tried": 380
+      },
+      "native_unpriced_totals": {
+        "legendre_symbols_uncharged": 310,
+        "lookups_uncharged": 2777,
+        "row_ops_uncharged": 1475,
+        "sqrt_solves_uncharged": 160,
+        "target_guard_probes_uncharged": 2794
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 1406650,
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "relations": 7271.0,
+        "verify": 95.0
+      },
+      "priced_gae_totals": [
+        12646.0,
+        13397.599999999999,
+        20162.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xc34d",
+        "0x1e27"
+      ],
+      "workload_id": "Wf3d5ae804d7c"
+    },
+    {
+      "arm": "known-log",
+      "counters": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 124,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 5280,
+        "pair_colliding_attempts": 85,
+        "pair_distinct_signed_classes": 5035,
+        "pair_identity_sums": 160,
+        "query_scalar_draws_uncharged": 5,
+        "relation_point_checks": 5,
+        "relations_found": 5,
+        "scalar_additions_uncharged": 129,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120,
+        "target_equation_rank": 5,
+        "targets_tried": 124,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 5
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "26b5715258b2b96d5e63ff816d0bdf8343723241168ea52187f541b43d53f4be": 64
+      },
+      "first_run_counters": {
+        "base_dedup_probes_uncharged": 32,
+        "base_index_entries_uncharged": 64,
+        "base_negations_uncharged": 96,
+        "base_scalar_draws_uncharged": 32,
+        "lookups_uncharged": 28,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 1056,
+        "pair_colliding_attempts": 17,
+        "pair_distinct_signed_classes": 1007,
+        "pair_identity_sums": 32,
+        "query_scalar_draws_uncharged": 1,
+        "relation_point_checks": 1,
+        "relations_found": 1,
+        "scalar_additions_uncharged": 29,
+        "scalar_multiplications_uncharged": 1,
+        "table_inserts_uncharged": 1024,
+        "target_equation_rank": 1,
+        "targets_tried": 28,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 1
+      },
+      "native_unpriced_totals": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 124,
+        "query_scalar_draws_uncharged": 5,
+        "scalar_additions_uncharged": 129,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 53328,
+      "phase_gae_totals": {
+        "factor_base": 3085.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "target_PDP": 5.0,
+        "target_descent": 0.0,
+        "target_query": 216.0,
+        "target_recovery_check": 95.0,
+        "target_relation_check": 5.0
+      },
+      "priced_gae_totals": [
+        8686.0,
+        9336.3,
+        15189.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xc34d",
+        "0x1e27"
+      ],
+      "workload_id": "Wf3d5ae804d7c"
+    },
+    {
+      "arm": "known-log-aa",
+      "counters": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 124,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 5280,
+        "pair_colliding_attempts": 85,
+        "pair_distinct_signed_classes": 5035,
+        "pair_identity_sums": 160,
+        "query_scalar_draws_uncharged": 5,
+        "relation_point_checks": 5,
+        "relations_found": 5,
+        "scalar_additions_uncharged": 129,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120,
+        "target_equation_rank": 5,
+        "targets_tried": 124,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 5
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {
+        "26b5715258b2b96d5e63ff816d0bdf8343723241168ea52187f541b43d53f4be": 64
+      },
+      "first_run_counters": {
+        "base_dedup_probes_uncharged": 32,
+        "base_index_entries_uncharged": 64,
+        "base_negations_uncharged": 96,
+        "base_scalar_draws_uncharged": 32,
+        "lookups_uncharged": 28,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 1056,
+        "pair_colliding_attempts": 17,
+        "pair_distinct_signed_classes": 1007,
+        "pair_identity_sums": 32,
+        "query_scalar_draws_uncharged": 1,
+        "relation_point_checks": 1,
+        "relations_found": 1,
+        "scalar_additions_uncharged": 29,
+        "scalar_multiplications_uncharged": 1,
+        "table_inserts_uncharged": 1024,
+        "target_equation_rank": 1,
+        "targets_tried": 28,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 1
+      },
+      "native_unpriced_totals": {
+        "base_dedup_probes_uncharged": 160,
+        "base_index_entries_uncharged": 320,
+        "base_negations_uncharged": 480,
+        "base_scalar_draws_uncharged": 160,
+        "lookups_uncharged": 124,
+        "query_scalar_draws_uncharged": 5,
+        "scalar_additions_uncharged": 129,
+        "scalar_multiplications_uncharged": 5,
+        "table_inserts_uncharged": 5120
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 52779,
+      "phase_gae_totals": {
+        "factor_base": 3085.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 5280.0,
+        "target_PDP": 5.0,
+        "target_descent": 0.0,
+        "target_query": 216.0,
+        "target_recovery_check": 95.0,
+        "target_relation_check": 5.0
+      },
+      "priced_gae_totals": [
+        8686.0,
+        9336.3,
+        15189.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xc34d",
+        "0x1e27"
+      ],
+      "workload_id": "Wf3d5ae804d7c"
+    },
+    {
+      "arm": "rho-neg",
+      "counters": {
+        "canonicalisations_uncharged": 955,
+        "cycle_escape_doublings": 3,
+        "cycles_length_2": 0,
+        "cycles_length_4": 2,
+        "cycles_other_length": 1,
+        "distinguished_point_bits": 20,
+        "distinguished_points": 57,
+        "jump_coefficient_bits": 45,
+        "jumps": 40,
+        "look_ahead_additions": 61,
+        "setup_additions": 280,
+        "setup_doublings": 384,
+        "start_additions": 52,
+        "steps": 834,
+        "useless_collisions": 0,
+        "verification_operations": 95,
+        "walk_operations": 898,
+        "walks": 57,
+        "walks_abandoned_in_a_cycle": 0,
+        "walks_capped": 0
+      },
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 53411, a: 4589, b: 186 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+        "ec1": "EC1P16Cfph38c70ce62cf6",
+        "family": "prime",
+        "field_bits": 16,
+        "field_degree": null,
+        "generator": [
+          "0xabce",
+          "0x589f"
+        ],
+        "group_order": 53117,
+        "icv1": "ICV1:fp-53411:295:53117:36611:unk:unk:r:8d3c316511e3",
+        "r": 53117,
+        "registered": true,
+        "slug": "icv1-fp16-t295-8d3c3165"
+      },
+      "factor_base_point_hashes": {},
+      "first_run_counters": {
+        "canonicalisations_uncharged": 141,
+        "cycle_escape_doublings": 1,
+        "cycles_length_2": 0,
+        "cycles_length_4": 1,
+        "cycles_other_length": 0,
+        "distinguished_point_bits": 4,
+        "distinguished_points": 9,
+        "jump_coefficient_bits": 9,
+        "jumps": 8,
+        "look_ahead_additions": 9,
+        "setup_additions": 52,
+        "setup_doublings": 77,
+        "start_additions": 8,
+        "steps": 122,
+        "useless_collisions": 0,
+        "verification_operations": 19,
+        "walk_operations": 132,
+        "walks": 9,
+        "walks_abandoned_in_a_cycle": 0,
+        "walks_capped": 0
+      },
+      "native_unpriced_totals": {
+        "canonicalisations_uncharged": 955
+      },
+      "online_complete": 5,
+      "online_wall_ns_sum_descriptive": 26955515,
+      "phase_gae_totals": {
+        "internal_verification": 95.0,
+        "search": 950.0,
+        "setup": 664.0
+      },
+      "priced_gae_totals": [
+        1709.0,
+        1804.5,
+        2664.0
+      ],
+      "rounds": 5,
+      "statuses": {
+        "verified": 5
+      },
+      "target": [
+        "0xc34d",
+        "0x1e27"
+      ],
+      "workload_id": "Wf3d5ae804d7c"
+    }
+  ]
+}

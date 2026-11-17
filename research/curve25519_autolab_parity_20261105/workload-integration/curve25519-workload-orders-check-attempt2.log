@@ -1,0 +1,70 @@
+    Checking crypto v0.1.0 (/home/ec2-user/crypto-curve25519-workload-20261105)
+error[E0282]: type annotations needed
+  --> src/cryptanalysis/ecbench/three_leads.rs:89:31
+   |
+89 |         group_order: (i.order.into()).into(),
+   |                               ^^^^
+   |
+help: try using a fully qualified path to specify the expected types
+   |
+89 -         group_order: (i.order.into()).into(),
+89 +         group_order: (<u64 as Into<T>>::into(i.order)).into(),
+   |
+
+error[E0004]: non-exhaustive patterns: `(&workload::Instance::Curve25519(_), _)` not covered
+    --> src/cryptanalysis/ecbench/methods.rs:2981:11
+     |
+2981 |     match (inst, d.family) {
+     |           ^^^^^^^^^^^^^^^^ pattern `(&workload::Instance::Curve25519(_), _)` not covered
+     |
+     = note: the matched value is of type `(&workload::Instance, &str)`
+     = note: match arms with guards don't count towards exhaustivity
+help: ensure that all possible cases are being handled by adding a match arm with a wildcard pattern or an explicit pattern as shown
+     |
+3283 ~         },
+3284 +         (&workload::Instance::Curve25519(_), _) => todo!()
+     |
+
+error[E0004]: non-exhaustive patterns: `&workload::Instance::Curve25519(_)` not covered
+    --> src/cryptanalysis/ecbench/methods.rs:7485:11
+     |
+7485 |     match &inst {
+     |           ^^^^^ pattern `&workload::Instance::Curve25519(_)` not covered
+     |
+note: `workload::Instance` defined here
+    --> src/cryptanalysis/ecbench/workload.rs:819:10
+     |
+ 819 | pub enum Instance {
+     |          ^^^^^^^^
+ 820 |     Curve25519(Box<Curve25519Wide>),
+     |     ---------- not covered
+     = note: the matched value is of type `&workload::Instance`
+help: ensure that all possible cases are being handled by adding a match arm with a wildcard pattern or an explicit pattern as shown
+     |
+7607 ~         | Instance::Hyper(_) => unreachable!("returned above"),
+7608 ~         &workload::Instance::Curve25519(_) => todo!(),
+     |
+
+error[E0004]: non-exhaustive patterns: `&workload::Instance::Curve25519(_)` not covered
+    --> src/cryptanalysis/ecbench/workload.rs:1630:19
+     |
+1630 |             match self {
+     |                   ^^^^ pattern `&workload::Instance::Curve25519(_)` not covered
+     |
+note: `workload::Instance` defined here
+    --> src/cryptanalysis/ecbench/workload.rs:819:10
+     |
+ 819 | pub enum Instance {
+     |          ^^^^^^^^
+ 820 |     Curve25519(Box<Curve25519Wide>),
+     |     ---------- not covered
+     = note: the matched value is of type `&workload::Instance`
+help: ensure that all possible cases are being handled by adding a match arm with a wildcard pattern or an explicit pattern as shown
+     |
+1739 ~                 },
+1740 +                 &workload::Instance::Curve25519(_) => todo!()
+     |
+
+Some errors have detailed explanations: E0004, E0282.
+For more information about an error, try `rustc --explain E0004`.
+error: could not compile `crypto` (lib) due to 4 previous errors

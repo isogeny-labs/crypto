@@ -1,0 +1,22 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\sloppy
+\begin{document}
+\section*{Branch root multiplicity: independent source review}
+Source fidelity supported; kernel unverified. Seven prospective declarations were checked against the preserved preread derivation and exact imported API definitions. Candidate revision \texttt{a649d5a6f84b} matched published bytes. No compiler or trial ran.
+\paragraph{Actual residual units.} The affine quotient evaluation sends a polynomial to its value at $a$. Its kernel is the actual branch ideal. The localization unit criterion, followed by the projective stalk ring equivalence, therefore proves
+\[E(q)\text{ is a unit}\quad\Longleftrightarrow\quad q(a)\ne0.\]
+The unit criterion is derived, not assumed.
+\paragraph{Multiplicity transport.} For $g\ne0$, set $m=\operatorname{rootMultiplicity}(a,g)$. The imported polynomial division theorems give
+\[g=(X-a)^m q,\qquad q(a)\ne0.\]
+The actual branch parameter has valuation $v_P(x-a)=2$. Product and power rules for additive valuation give
+\[v_P(E(g))=2m.\]
+The candidate retains a finite-valued equality and proves non-top before reporting the corresponding natural-number order.
+\paragraph{Support result.} The preceding stalk norm construction supplies the sum of three support valuations equal to two. The new proof first derives that each polynomial is nonzero, then applies the generic transport. Finite natural casts yield
+\[2(m_1+m_2+m_U)=2,\qquad m_1+m_2+m_U=1.\]
+This is base-polynomial multiplicity sum one, with stalk valuation sum two.
+\paragraph{Edge cases checked.} The zero-polynomial convention is handled: mathlib assigns root multiplicity zero to the zero polynomial, whereas its germ has infinite valuation. Nonzero constants give zero order; higher powers give twice their arbitrary multiplicity. The residual cannot vanish at $a$ by the exact polynomial division theorem. Simple-branch hypotheses remain explicit for valuation claims. No separable-cover interpretation in characteristic two is added.
+\paragraph{Scope and next checks.} The support theorem accepts a generic polynomial norm identity; it does not add a dedicated coefficient-expression wrapper. Existing source norm identities can supply that premise. Exact compilation with full import bindings and independent seven-name axiom readback remain pending. Printed audit commands in source are not audit results. Global divisor and infinity components are separate.
+\end{document}

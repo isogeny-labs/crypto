@@ -1,0 +1,101 @@
+module
+public import OrientationRank
+import all OrientationAnchor
+import all OrientationValuation
+import all OrientationContent
+import all OrientationProduct
+import all OrientationResidue
+import all OrientationDiagonal
+import all OrientationJet
+import all OrientationLeading
+import all OrientationRefinement
+public section
+noncomputable section
+namespace OrientationMoment
+open Polynomial Finset OrientationAnchor OrientationResidue OrientationDiagonal OrientationJet OrientationLeading OrientationRefinement
+
+def rowResidue (u x : ℕ) : ℕ := x % 2^u
+def rowQuotient (u x : ℕ) : ℕ := x / 2^u
+
+theorem row_split (u x : ℕ) : (x:ℚ) = (rowResidue u x:ℚ)+(2:ℚ)^u*(rowQuotient u x:ℚ) := by
+  dsimp [rowResidue,rowQuotient]
+  exact_mod_cast (Nat.mod_add_div x (2^u)).symm
+
+theorem row_mod (u x : ℕ) : x % 2^u = rowResidue u x % 2^u := by
+  simp [rowResidue]
+
+theorem row_bound (u x : ℕ) : rowResidue u x < 2^u := Nat.mod_lt _ (by positivity)
+
+theorem row_source_bound (a u x : ℕ) (hu : u ≤ a) : rowResidue u x < 2^a :=
+  lt_of_lt_of_le (row_bound u x) (Nat.pow_le_pow_right (by decide) hu)
+
+theorem row_crossing (u i x y : ℕ) (hi : i < u) (hc : x.testBit i = y.testBit i) :
+    (rowResidue u x).testBit i = y.testBit i :=
+  (matching_bits u x (rowResidue u x) i hi (row_mod u x)).symm.trans hc
+
+def slope (u r y : ℕ) (q : ℚ) : ℚ := (2:ℚ)^u/(q-delta r y)
+
+theorem power_integral (u : ℕ) : VBound (u:ℤ) ((2:ℚ)^u) := by
+  right
+  rw [two_power_valuation]
+
+theorem anchor_slope_even (u x y j : ℕ) (hj : j ∈ mask u x y) :
+    VBound 1 (slope u (rowResidue u x) y ((2:ℚ)^j)) := by
+  have hmask := masks_stable u u x (rowResidue u x) y le_rfl (row_mod u x)
+  have hp := selected_denominator_le u (rowResidue u x) y j (hmask ▸ hj)
+  have hb := vbound_div (power_integral u) (r:=((2:ℚ)^j-delta (rowResidue u x) y))
+  have hju : j < u := mem_range.mp (mem_filter.mp hj).1
+  exact hb.mono (by omega)
+
+theorem pole_slope_even (u i x y : ℕ) (hi : i < u) (hc : x.testBit i = y.testBit i) :
+    VBound 1 (slope u (rowResidue u x) y (poleQ i)) := by
+  have hp := crossing_denominator_le (rowResidue u x) y i (row_crossing u i x y hi hc)
+  have hb := vbound_div (power_integral u) (r:=poleQ i-delta (rowResidue u x) y)
+  exact hb.mono (by omega)
+
+/-- Actual row-coordinate denominator identity, with the actual nonzero prototype. -/
+theorem denominator_inverse (u x y : ℕ) (q : ℚ)
+    (hd : q-delta (rowResidue u x) y ≠ 0) :
+    (q-delta (rowResidue u x) y)/(q-delta x y) =
+      (1+slope u (rowResidue u x) y q*(rowQuotient u x:ℚ))⁻¹ := by
+  have hs := row_split u x
+  have he : 1+slope u (rowResidue u x) y q*(rowQuotient u x:ℚ) =
+      (q-delta x y)/(q-delta (rowResidue u x) y) := by
+    unfold slope delta
+    have hdn : q-((y:ℚ)-(rowResidue u x:ℚ)) ≠ 0 := hd
+    field_simp [hdn]
+    nlinarith [hs]
+  rw [he,inv_div]
+
+def reciprocalProduct (u i x y : ℕ) (m : ℕ → ℕ) : ℚ :=
+  (1+slope u (rowResidue u x) y (poleQ i)*(rowQuotient u x:ℚ))⁻¹ *
+  ∏ j ∈ mask u x y,
+    ((1+slope u (rowResidue u x) y ((2:ℚ)^j)*(rowQuotient u x:ℚ))⁻¹)^m j
+
+theorem comparison_reciprocal (u i x y : ℕ) (m : ℕ → ℕ)
+    (hi : i < u) (hc : x.testBit i = y.testBit i) :
+    comparisonRatio u i x (rowResidue u x) y m = reciprocalProduct u i x y m := by
+  have hmask := masks_stable u u x (rowResidue u x) y le_rfl (row_mod u x)
+  have hb := denominator_inverse u x y (poleQ i)
+    (sub_ne_zero.mpr (Ne.symm (crossing_displacement_ne_pole (rowResidue u x) y i
+      (row_crossing u i x y hi hc))))
+  have hp : correctionRatio u x (rowResidue u x) y m =
+      ∏ j ∈ mask u x y,
+        ((1+slope u (rowResidue u x) y ((2:ℚ)^j)*(rowQuotient u x:ℚ))⁻¹)^m j := by
+    unfold correctionRatio
+    apply prod_congr rfl
+    intro j hj
+    rw [denominator_inverse u x y ((2:ℚ)^j)
+      (denominator_ne_zero u (rowResidue u x) y j (hmask ▸ hj))]
+  simp only [comparisonRatio,hb,hp,reciprocalProduct]
+
+/-- The actual normalized completed first jet is the actual reciprocal family. -/
+theorem actual_reciprocal_family (a u i x y : ℕ) (m : ℕ → ℕ)
+    (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u ≤ a)
+    (hc : x.testBit i = y.testBit i) :
+    firstJet a u i x y m/diagonalJet a u i m =
+      (firstJet a u i (rowResidue u x) y m/diagonalJet a u i m)*reciprocalProduct u i x y m := by
+  rw [actual_jet_comparison a u u i x (rowResidue u x) y m hx (row_source_bound a u x hu)
+    hy hi le_rfl hu (row_mod u x) hc,comparison_reciprocal u i x y m hi hc]
+
+end OrientationMoment

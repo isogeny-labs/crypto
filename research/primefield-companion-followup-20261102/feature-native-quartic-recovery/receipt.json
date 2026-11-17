@@ -1,0 +1,35 @@
+{
+  "recorded_at": "2026-11-05T18:42:08.404413+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-recovery/lib.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-quartic-recovery-20261105/tests"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-quartic-recovery-20261105/tests",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    }
+  ],
+  "source_lock_entries": 22,
+  "binary_sha256": "c728110fa21f0c4e5a0e94ff5d8d7bbdb29fa7fdd0d87e5915d22f7d2431006c",
+  "overflow_checks": true,
+  "comparative_panel": false
+}

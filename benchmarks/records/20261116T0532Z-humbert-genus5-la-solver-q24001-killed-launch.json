@@ -1,0 +1,59 @@
+{
+  "branch": "leads-ff",
+  "closed_utc": "2026-11-16T05:32:43+00:00",
+  "commands": [
+    {
+      "argv": [
+        "env",
+        "BIN=research/humbert_genus5_cover_20261021/la_solver_20261116/bin/humbert-v5",
+        "BIN_SHA256_PREFIX=6fc61135",
+        "PRIMES=24001",
+        "research/humbert_genus5_cover_20261021/la_solver_20261116/run_v5.sh",
+        "research/humbert_genus5_cover_20261021/la_solver_20261116/campaign/q24001"
+      ],
+      "cwd": ".",
+      "exit": null,
+      "note": "added by hand: the session's 2 h background limit killed the launcher (and benchrec run) after 34/40 rows (seed 5, positions 0-1 done), so benchrec could not write this entry; started_utc is approximate (end of the q=16001 launch), wall_s is the limit, not a measurement. The 6 missing rows were run by the resume command in 20261116T0059Z-humbert-genus5-la-solver.json",
+      "started_utc": "2026-11-16T01:25:30+00:00",
+      "wall_s": 7200.0
+    }
+  ],
+  "commit": "af53cd4ff23d3dc68438be1a5cdbf8e43ebb00a3",
+  "commit_dirty": true,
+  "created_utc": "2026-11-16T05:32:24+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261116-humbert-genus5-la-solver"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261116T0532Z-humbert-genus5-la-solver-q24001-killed-launch",
+  "metrics": [],
+  "problem": "ic:humbert-genus5-toy",
+  "raw": [
+    {
+      "bytes": 71059,
+      "path": "research/humbert_genus5_cover_20261021/la_solver_20261116/campaign/q24001/results/v5.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7d/7d80563ca593845a0324a9f40169c31624cc298db0457ce2a99a7ddc09bcb6d0",
+      "sha256": "7d80563ca593845a0324a9f40169c31624cc298db0457ce2a99a7ddc09bcb6d0",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "humbert-genus5-la-solver-q24001-killed-launch",
+  "status": "censored",
+  "summary": "la_solver_20261116 q=24001 launcher killed by the 2 h background limit after 34/40 rows (the dlpx clique/precheck loop at seed 5 took 2637 s); the 6 missing rows were resumed in 20261116T0059Z-humbert-genus5-la-solver.json (measured)",
+  "validation": null
+}

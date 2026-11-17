@@ -1,0 +1,126 @@
+{
+  "assessed": "2026-11-04T04:07:29Z",
+  "round": 4,
+  "rule": "improvement = paired sel/inc 95% interval below 1 at w = 0 and band order sel < inc at every weight; regression = interval above 1 or band inc < sel; else null",
+  "schema": "ic_autolab.result/v1",
+  "sizes": {
+    "28": {
+      "band_rho": "rho-neg < sel",
+      "band_verdict": "sel < inc",
+      "class": "improvement",
+      "distance_to_rho": {
+        "inc": [
+          16.483909273486567,
+          16.552242319070686,
+          16.869832015200256
+        ],
+        "sel": [
+          10.7743499420872,
+          10.110197831464204,
+          7.023435560097953
+        ]
+      },
+      "evidence": {
+        "binary_sha256": "3fd22853485e388782ac0821295c56f81725fc832fd3610978be8088b5098bca",
+        "compare_verdict": "ops (ok): sel / inc = 0.6536 [0.636, 0.672] (linearised_t, df 31) over 64 pairs on 32 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.6536, w=0.1: 0.6108, w=1: 0.4163): sel < inc at every weight; wall: admitted ns/GAE sel/inc 0.7048 [0.680, 0.731], bias-corrected 0.7162 [0.680, 0.754] (A/A 0.9841, includes arm A), outside noise; end-to-end wall 0.4607 [0.437, 0.486]; ns/GAE of inc, sel is an upper bound on its cost per operation (GAE is a lower bound)",
+        "levels": {
+          "verified": 480
+        },
+        "session_dir": "research/curve25519_autolab_20261104/round-004/sessions/holdout-k28",
+        "session_id": "ECBS1h4fa56ebd629d",
+        "spec_sha256": "b0192131151642cb7dd065961eb006749db2f3af6447ea03bdd33370d325ce96",
+        "verify_exit": 0,
+        "verify_receipt": "research/curve25519_autolab_20261104/round-004/analysis/verify-holdout-k28.json",
+        "verify_receipt_sha256": "6b1c0a3f7fc28a45c31c7bb9a197921ee1a4efff121e3eec87243d5396c945bd"
+      },
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=203,scan_cap=3248",
+        "family": "mitm2",
+        "n": 203,
+        "name": "mitm2-n203",
+        "oracle": "mitm:negation_folded=1"
+      },
+      "ratio": {
+        "aa": {
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "ratio": 1.0
+        },
+        "w0": {
+          "admissible": true,
+          "ci95": [
+            0.6357966708581336,
+            0.6719600803318089
+          ],
+          "ratio": 0.6536283210086055,
+          "status": "ok"
+        },
+        "w0.1": {
+          "ci95": [
+            0.5925395416668978,
+            0.6296341845335123
+          ],
+          "ratio": 0.610805329971259
+        },
+        "w1": {
+          "ci95": [
+            0.39859839091844496,
+            0.4348526760231003
+          ],
+          "ratio": 0.41633109053899375
+        }
+      },
+      "s": {
+        "inc": [
+          16.73652778630764,
+          18.37970176752688,
+          33.168267598500016
+        ],
+        "rho_neg": [
+          1.0153251579240001,
+          1.1104055519022147,
+          1.9661290977061507
+        ],
+        "sel": [
+          10.939468556478129,
+          11.226419802887582,
+          13.808981020572682
+        ]
+      },
+      "sel": {
+        "factor_base": "prime-projected-abscissa:size=21,scan_cap=336",
+        "family": "ksum4",
+        "n": 21,
+        "name": "ksum4-n21",
+        "oracle": "ksum:m=4"
+      },
+      "why": [
+        "compare ops.status = ok, admissible = true",
+        "sel / inc = 0.6536 [0.636, 0.672] at w = 0",
+        "band: sel < inc",
+        "A/A inc-aa / inc interval [1.000, 1.000] contains 1"
+      ]
+    },
+    "32": {
+      "class": "no_challenger",
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=512,scan_cap=8192",
+        "family": "mitm2",
+        "n": 512,
+        "name": "mitm2-n512",
+        "oracle": "mitm:negation_folded=1"
+      },
+      "incumbent_s": [
+        23.31,
+        25.52,
+        45.41
+      ],
+      "why": [
+        "no_challenger"
+      ]
+    }
+  },
+  "track": "generic"
+}

@@ -1,0 +1,88 @@
+{
+  "schema": "pencil-native-analysis-build/v1",
+  "observed_utc": "2026-10-30T02:27:33Z",
+  "source_revision": "d66d95baaabb077afd5d7c888c77fb6b3b5f52fc",
+  "source_files_match_commit": false,
+  "source_state": "frozen reviewed working-tree sources; exact source hashes and binary bytes are authoritative until the scoped source commit is created",
+  "sources": [
+    {
+      "path": "native_price/Cargo.lock",
+      "sha256": "d7d2479f3a9c691991bb13c7d8398602df198a94b3b73ef136c901d1285e1957"
+    },
+    {
+      "path": "native_price/Cargo.toml",
+      "sha256": "85dbb703cd29656e9916ae7aaa299790f1967ba8d4b931e1c6b19f031374b077"
+    },
+    {
+      "path": "native_price/src/aggregate.rs",
+      "sha256": "8240aa54f6fa37eead6c63180e9dbf4b28752a7ba8df1433a337568a005b4b62"
+    },
+    {
+      "path": "native_price/src/analyzer.rs",
+      "sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d"
+    },
+    {
+      "path": "native_price/src/bin/analyze_cohort.rs",
+      "sha256": "3fdeed22637da8b6d1864590a8ba2a26665fc503d3acfb6d78aa436483f44623"
+    },
+    {
+      "path": "native_price/src/bin/analyze_pair.rs",
+      "sha256": "1ff553390e3584017edde1d27e15f1b6d3a6f1a2ec9d196899582530d964bac1"
+    },
+    {
+      "path": "native_price/src/disjoint.rs",
+      "sha256": "04a8a0b9acb9c70c4c01a4e8f00a947cb234c62a700b1185ccf96f4336575e89"
+    },
+    {
+      "path": "native_price/src/importer.rs",
+      "sha256": "db05f1bda12bfbdeaff4806f3d3ac968e165c05d06b28e8dd73bb9868963633d"
+    },
+    {
+      "path": "native_price/src/lib.rs",
+      "sha256": "8709765fa9f15e9c6b441a3fc2c6da1e49f86b52ec8178fd27376ab75b16842e"
+    },
+    {
+      "path": "paired_export/Cargo.lock",
+      "sha256": "310199aab018093643475dac1a38e5e1ddf88d261c560c82c006ae06eb08676f"
+    },
+    {
+      "path": "paired_export/Cargo.toml",
+      "sha256": "0a198bb240dee5fe2900d3e6323951e75a246459161c16046a6ed857c464e67f"
+    },
+    {
+      "path": "paired_export/src/lib.rs",
+      "sha256": "d8ef61a5db60874e3c9de2539c0f1201d75a2589c410687d3509b147b06288fe"
+    },
+    {
+      "path": "paired_export/src/main.rs",
+      "sha256": "638a3fc180f24ae7e2494d28cb4544f2e70564b16a3e65d38b33ca51f05560e6"
+    },
+    {
+      "path": "paired_export/src/plan.rs",
+      "sha256": "fb8f3dd4fbcc42119d2f3f435b32eadaf6a7beb3fd7f2abcc13c67dd8fba2720"
+    }
+  ],
+  "build_command": "cargo +1.99.1 build --release --locked --offline",
+  "build_exit_code": 0,
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1",
+  "binaries": [
+    {
+      "name": "analyze_pair",
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_price/target/release/analyze_pair",
+      "bytes": 874424,
+      "sha256": "a239de86526e9c37de451e8cc0218c5a2a09bf260d9f4606312f3726361b32d1"
+    },
+    {
+      "name": "analyze_cohort",
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_price/target/release/analyze_cohort",
+      "bytes": 1653848,
+      "sha256": "e086ebeb7f261983af647284307a768e522b1f5921eabfb0146706f7eede360d"
+    }
+  ],
+  "mapping_sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+  "full_reviewed_source_manifest_sha256": "b20f282b8dd083355f71f7e4b99520a3fcd8cfe56a1f446baf35ece630ca23bf",
+  "build_log_sha256": "e9a8e9cafe86010a0dcaff7713ff441b202120a28dea039cddf7f0ea40371b6a",
+  "independent_review_sha256": "34c2c2155d5359956973e625ee00e260307b4c2eb420aa4e776c6f61cf44dbd1",
+  "experiment_executions": 0,
+  "receipt_scope": "Source-linked analyzer release build after final source freeze; no solver, plan generation, cloud job, or empirical execution."
+}

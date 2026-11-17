@@ -1,0 +1,24 @@
+{
+  "task": "T-2086",
+  "before_data": true,
+  "classes": [
+    "theorem",
+    "exact_computation"
+  ],
+  "construction": "Retain zero baby/chunk evaluations of A+WB with W^2=f(T)f(V), no eps/derivative or denominator norms. Localize a giant factor at the one zero baby, verify both signed point pairs, return scalar from j(G-Q)=U=aG+bQ: k=(j-a)/(j+b) mod r when denominator nonzero.",
+  "small": "All scalar fixtures k=0..r-1 on F11r7,F17r19,F211r199; two layouts, inherited sqrt and integer cubic-balanced width ceil(cuberoot(r^2)) capped at(r-1)/2. Solver receives G,Q,r,P,U and public U labels, never k. Standard U=G. Separate direct full-index reference outside solver. Per nontrivial k/layout, U=O and U=s(G-Q),s=2, are zero-denominator controls. Wrong j sign candidate rejected; rational P rejected.",
+  "P192": "27-index prefix,b4, three complete giant blocks. All24Round63planted-U witnesses must localize but reject zero-denominator scalar equation. Nine planted synthetic public targets k=1-1/s mod r,s in[2,3,4,5,8,13,17,22,26], U=G, recover with final scalar check. Retain actual publicQ,muG,lambdaG prefix U=G outcomes without assuming hits. Native source point order and2P nonrational guard checked. No full order-r P192 solve claimed.",
+  "costs": "No secret reference inside solver; no O(r) coverage bitmap or full point table inside candidate. Record guards/labels,layout points,surface formation/evaluation,leaf scan,witness checks,scalar inverse and final verification. Classical sparse multiplication/direct evaluation only; KU not implemented. Source setup and every failure retained.",
+  "qualification": "Fresh source build; science/diagnostic byte equality; changed small recovered scalar and P192witness index rejected. All cases retained.",
+  "bounds": {
+    "seconds_per_command": 120,
+    "build_jobs": 1,
+    "native_processes": 1,
+    "cloud_jobs": 0,
+    "generators": 0,
+    "unchanged_retries": 0,
+    "CLI_max_coverage": 4096,
+    "CLI_max_width": 64
+  },
+  "sources": "KB tools and migrated wrapper unavailable; Round71surface-product-proof direct-extraction appendix, original public subgroup inputs, KU2011Cor4.5 already read. New scalar equation is derived by collecting G,Q coefficients; zero-denominator guard is mandatory. No novelty/advantage inference."
+}

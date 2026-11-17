@@ -1,0 +1,116 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h517504d65837",
+  "label": "XP-20261016-prime-base-oracle-tuning Stage H (holdout), 20-bit fresh prime-order curve — §13 second-host re-execution (rounds 2→5, isolation L0→L2 for EKS admission; seeds unchanged)",
+  "spec_id": "ECS1h3d7d7d2bd0bc",
+  "spec_sha256": "3d7d7d2bd0bcd8bd9e78b55817b37fa12c8eb84f26d06ea102babcb127015934",
+  "env_class_id": "ECBENV2h3a51beea0bc2",
+  "host_sha256": "22c01e5cfa3e4664447c82403fd268acbc54016ba943a1470892056a84236a9b",
+  "plan_sha256": "78337b820dcd7c978a58312d40245d4c06eeef63f6fc8853226ead48e020a1aa",
+  "binary_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9",
+  "git_commit": null,
+  "git_dirty": null,
+  "options": {
+    "cpus": "auto",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": false,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": {
+    "run_cpu": 4,
+    "reserved": [
+      4
+    ],
+    "node": 0,
+    "request": "auto",
+    "unreserved_siblings": [],
+    "observed": [
+      4
+    ]
+  },
+  "preflight": {
+    "quiet": true,
+    "reasons": [],
+    "settle_seconds": 2.0,
+    "reserved_busy_seconds": {
+      "4": 0.0
+    },
+    "before": {
+      "unix_ms": 1793243933506,
+      "loadavg": [
+        0.42,
+        0.13,
+        0.04
+      ],
+      "psi_cpu_some_avg10": 1.51,
+      "psi_cpu_some_total_us": 25022886,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "4": {
+          "busy": 0,
+          "idle": 8421,
+          "steal": 0
+        }
+      }
+    },
+    "after": {
+      "unix_ms": 1793243935506,
+      "loadavg": [
+        0.39,
+        0.13,
+        0.04
+      ],
+      "psi_cpu_some_avg10": 1.24,
+      "psi_cpu_some_total_us": 25022886,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "4": {
+          "busy": 0,
+          "idle": 8621,
+          "steal": 0
+        }
+      }
+    }
+  },
+  "eviction": {
+    "moved_count": 1,
+    "failed_user_threads": 0,
+    "failed_kernel_threads": 0
+  },
+  "runner_on_run_cpu": false,
+  "runner_cpus": [
+    1,
+    2,
+    3
+  ],
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "13a58e10467e4a1c4e7e8a504a8ac7ea197415e7887cf8fe7aab6187d5081fc1",
+  "child_env": {
+    "HOME": "/work",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1793243935508,
+  "finished_unix_ms": 1793243973660,
+  "status": "complete",
+  "executions_planned": 2016,
+  "records_written": 2016,
+  "records_sha256": "a9bce342f9910287721eecb3c8e27239c7d8642e7e7b06456d80fc307d395924",
+  "status_counts": {
+    "verified": 2016
+  }
+}

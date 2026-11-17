@@ -1,0 +1,20 @@
+{
+  "schema": "registry-merge-semantics-addendum/v1",
+  "status": "identity-and-alias-preservation-pass",
+  "prior_receipt_sha256": "c38b7c0759d2d7951868c34f6268322a7978457e8f1effc7e877b1c3bd590616",
+  "common_records_with_metadata_differences": 325,
+  "changes_from_ours_only": 0,
+  "changes_from_theirs_only": 325,
+  "common_records_with_changed_canonical_model_or_identity": [],
+  "parameter_provenance_descriptors": [
+    {
+      "slug": "icv1-f2m73-tm184271214331-9d25cc67",
+      "field": "params.modulus_rule",
+      "ours": "least sparse irreducible, uncapped (docs/curves/ICV1.md)",
+      "theirs": "recorded in the run"
+    }
+  ],
+  "semantically_conflicting_two_sided_changes": [],
+  "clarification": "The earlier all-parent-records label means preservation of every parent curve identity and alias. It does not mean two differing metadata versions are simultaneously stored: ordinary one-sided changes relative to the common base are retained. Both original versions remain in the parent commits. Canonical model JSON, ICV1, trace, order, j and End values agree for every shared identity. The sole differing parameter descriptor is recorded explicitly. No frozen experiment record or ledger conflict was resolved by choosing a side.",
+  "first_attempt": "The initial infrastructure wrapper compared the outer alias envelope instead of its aliases member and failed before writing repository files. The corrected wrapper checks every individual parent alias."
+}

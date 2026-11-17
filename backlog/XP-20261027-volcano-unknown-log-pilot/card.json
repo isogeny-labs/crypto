@@ -1,0 +1,113 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261027-volcano-unknown-log-pilot",
+  "title": "Unchanged volcano source: unknown-log relation collection and descent",
+  "created": "2026-10-27",
+  "authors": [
+    "Codex"
+  ],
+  "status": "blocked",
+  "status_note": "Native controls pass and the source-only checkpoint passed encrypted S3 readback. The authorized lab identity was denied codebuild:StartBuild; custom image and qualified collector recovery are still missing. No full-width experiment started.",
+  "blocked_on": [
+    "problem:problems/photo-volcano-two-sum-ic-recovery.md",
+    "hw:Lab identity denied codebuild:StartBuild on isolab-experiment-launcher; authorized custom-command route required",
+    "hw:Tested-source immutable custom image not built",
+    "note:No native hash-table serialization or qualified CRIU restore is implemented for this workload"
+  ],
+  "links": {
+    "lead": "https://github.com/isogeny-labs/crypto-autoresearcher/blob/main/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-generic-table-decomposition.yaml",
+    "notes": [
+      "research/volcano_ic_recovery_20261027/README.md",
+      "research/volcano_ic_recovery_20261027/PROTOCOL.md",
+      "research/volcano_ic_recovery_20261027/LAUNCH_STATUS.md",
+      "research/volcano_ic_recovery_20261027/validation/access_20261028.json"
+    ],
+    "prs": [
+      2707
+    ]
+  },
+  "question": "Can bounded coefficients over the original 12 unknown-log factor-base points produce rank 12 and recover the unchanged source C0/G0/K0 target without importing historical DLP answers?",
+  "decision_value": "A full-rank independently replayed recovery establishes a correctness prerequisite for extending the original ten-generator graph workload. Inadequate rank, descent failure or censoring instead identifies a concrete coverage, representation or resource bottleneck. Neither outcome establishes a new algebraic solver or a speed advantage.",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "b8631dedbf745ddb033b543aa485c447a8d4e888"
+  },
+  "code": {
+    "repo": "https://github.com/isogeny-labs/crypto",
+    "branch": "main",
+    "build": [
+      [
+        "bash",
+        "research/volcano_ic_recovery_20261027/test.sh",
+        "/work/validated-development-receipt"
+      ]
+    ],
+    "commit": "6187036c049b6de2b1521b014f575952e4f1705c"
+  },
+  "resources": {
+    "cpus": 4,
+    "ram_gb": 14,
+    "disk_gb": 20,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Radius-12 table payload is 9566497092 bytes, excluding overhead. Application cap 12 GiB; intended c8a.2xlarge Spot worker. 3600 seconds is a deadline, not a runtime estimate. No cloud allocation occurred."
+  },
+  "run": {
+    "argv": [
+      "/work/validated-development-receipt/build/runner",
+      "run",
+      "research/volcano_ic_recovery_20261027/public_source_case.json",
+      "research/volcano_ic_recovery_20261027/pilot_config.json",
+      "{out}",
+      "--private-output",
+      "--explicit"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 3600
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "volcano.ic.bounded-summary/v1",
+    "verify": [
+      "/work/validated-development-receipt/build/verify",
+      "research/volcano_ic_recovery_20261027/public_source_case.json",
+      "research/volcano_ic_recovery_20261027/pilot_config.json",
+      "{out}/records.private.jsonl"
+    ],
+    "land": "research/volcano_ic_recovery_20261027"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261027-volcano-unknown-log-pilot"
+    ],
+    "ttl_s": 4200,
+    "env": {
+      "name": "volcano-ic-unknown-log-native",
+      "recipe": "Build merged source 6187036c049b6de2b1521b014f575952e4f1705c, run native controls, then publish and verify a UID-1000 custom-command image. Image not built or submitted; lab launch permission is denied."
+    },
+    "exec": {
+      "cpus": 4,
+      "memory_mb": 14336,
+      "timeout_s": 3600,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261027-volcano-unknown-log-pilot"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Blocked development prerequisite; propose no scheduler priority or paid objective until authorization, executable image, checkpoint/recovery and measured resource feasibility are established."
+    }
+  },
+  "owner_hint": "Photographed-volcano experiment maintainer"
+}

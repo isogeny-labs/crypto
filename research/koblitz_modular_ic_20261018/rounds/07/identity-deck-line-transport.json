@@ -1,0 +1,142 @@
+{
+  "id": "IDC1h4a9fbbb8fcf6dd5d",
+  "independence": "same-agent issuer and separate128 evaluation checks; direct universal Lean identities",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound07.lean",
+    "sha256": "5134bf37042f4bc93069ed0be9a1bbf30c32a0e7e2e5fd3c67ddf0bb81943d97"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 2026101907,
+  "statement": {
+    "degree_bound": 3,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": "a",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": "q",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": "b",
+              "op": "var"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "u",
+                      "op": "var"
+                    },
+                    {
+                      "args": "p",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": "q",
+                  "op": "var"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "name": "deck-line-transport",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "b",
+                  "op": "var"
+                },
+                {
+                  "args": "u",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": "p",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "b",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": -1,
+                      "op": "const"
+                    },
+                    {
+                      "args": "a",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": "q",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "KoblitzRound07.deck_line_identity: universal coefficient identity; actual level geometry checked separately",
+    "variables": [
+      "a",
+      "b",
+      "u",
+      "p",
+      "q"
+    ]
+  },
+  "value_digest": "67fd6c73c5f75ad16637b4d501780c947d2ad5cfb4f2863077d33bdc5956ddb1"
+}

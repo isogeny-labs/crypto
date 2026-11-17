@@ -1,0 +1,18 @@
+K<w> := GF(512);
+k<a> := GF(8);
+Embed(k,K);
+fromint := func<n | &+[(Integers()!((n div 2^i) mod 2))*w^i : i in [0..8]]>;
+E := EllipticCurve([K|1,0,0,0,fromint(32)]);
+G := E![fromint(255),fromint(59),1];
+Q := E![fromint(206),fromint(467),1];
+assert Order(G) eq 139 and Q eq 7*G;
+C,h := WeilDescent(E,k,fromint(218) : HyperellipticImage := false);
+assert Genus(C) eq 3;
+dO := h(E!0);
+D := h(G)-dO;
+T := h(Q)-dO;
+assert Degree(D) eq 0 and Degree(T) eq 0;
+print "generator_principal", IsPrincipal(D);
+print "generator_139_principal", IsPrincipal(139*D);
+print "target_7_generator_principal", IsPrincipal(T-7*D);
+print "target_principal", IsPrincipal(T);

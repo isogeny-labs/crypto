@@ -1,0 +1,27 @@
+set -euo pipefail
+job_root="${ISOLAB_RESULTS_URI%/*/*}/"
+src4="s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r27-20261031-r4/source-v4"
+src5="${job_root}source-v5"
+mkdir -p /work/source/src/bin /work/source/target/release /work/results
+aws s3 cp "$src4/BUNDLE_FORMAT.json" /work/source/BUNDLE_FORMAT.json --only-show-errors --region us-east-2
+aws s3 cp "$src4/BUNDLE_INDEX.json" /work/source/BUNDLE_INDEX.json --only-show-errors --region us-east-2
+aws s3 cp "$src4/bundle-manifest.sha256" /work/source/bundle-manifest.sha256 --only-show-errors --region us-east-2
+aws s3 cp "$src4/src/bin/factor_base.rs" /work/source/src/bin/factor_base.rs --only-show-errors --region us-east-2
+aws s3 cp "$src4/src/field.rs" /work/source/src/field.rs --only-show-errors --region us-east-2
+aws s3 cp "$src4/FORMAT.json" /work/source/FORMAT.json --only-show-errors --region us-east-2
+aws s3 cp "$src4/FACTOR_BASE_VARIANT_SWEEP_DESIGN.md" /work/source/FACTOR_BASE_VARIANT_SWEEP_DESIGN.md --only-show-errors --region us-east-2
+aws s3 cp "$src4/RUN_OUTPUT_FORMAT.json" /work/source/RUN_OUTPUT_FORMAT.json --only-show-errors --region us-east-2
+aws s3 cp "$src4/run-base-variant-v2.sh" /work/source/run-base-variant-v2.sh --only-show-errors --region us-east-2
+aws s3 cp "$src4/target/release/factor_base" /work/source/target/release/factor_base --only-show-errors --region us-east-2
+aws s3 cp "$src5/protocol-factor-base-variants-v5.json" /work/source/protocol-factor-base-variants-v5.json --only-show-errors --region us-east-2
+aws s3 cp "$src5/protocol-factor-base-variants-v5.sha256" /work/source/protocol-factor-base-variants-v5.sha256 --only-show-errors --region us-east-2
+aws s3 cp "$src5/factor-base-variant-source-index-v5.json" /work/source/factor-base-variant-source-index-v5.json --only-show-errors --region us-east-2
+aws s3 cp "$src5/factor-base-variant-source-index-v5.sha256" /work/source/factor-base-variant-source-index-v5.sha256 --only-show-errors --region us-east-2
+cd /work/source
+sha256sum -c bundle-manifest.sha256
+sha256sum -c protocol-factor-base-variants-v5.sha256
+sha256sum -c factor-base-variant-source-index-v5.sha256
+jq -r '.entries[] | "\(.sha256)  \(.path)"' factor-base-variant-source-index-v5.json > source-files.sha256
+sha256sum -c source-files.sha256
+chmod 755 run-base-variant-v2.sh target/release/factor_base
+exec ./run-base-variant-v2.sh ./target/release/factor_base 27 /work/results/r27 "$job_root" ./protocol-factor-base-variants-v5.json

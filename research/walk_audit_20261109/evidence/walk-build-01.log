@@ -1,0 +1,59 @@
+WalkBoundary.lean:29:2: error: Application type mismatch: The argument
+  Finset.range (3 * t + 1)
+has type
+  Finset ℕ
+but is expected to have type
+  Finset (ZMod p)
+in the application
+  Finset.image (fun n => n) (Finset.range (3 * t + 1))
+WalkBoundary.lean:39:8: warning: declaration uses `sorry`
+WalkBoundary.lean:42:2: warning: Unused tactic linter: `refine ⟨∑ i, (history i).val, Finset.mem_range.mpr ?_, ?_⟩` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+WalkBoundary.lean:43:2: warning: Unused tactic linter: `·
+  have h := history_sum_le t history
+  omega` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+WalkBoundary.lean:45:2: warning: Unused tactic linter: `· simp [position]` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+WalkBoundary.lean:43:2: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+WalkBoundary.lean:45:2: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+WalkBoundary.lean:55:38: error: unsolved goals
+p t : ℕ
+⊢ (sorry ()).card ≤ 3 * t + 1
+WalkBoundary.lean:63:8: error(lean.unknownIdentifier): Unknown identifier `mul_le_mul_right'`
+WalkBoundary.lean:64:2: error: No goals to be solved
+WalkBoundary.lean:70:2: error: Tactic `apply` failed: could not unify the conclusion of `(ENNReal.le_div_iff_mul_le (Or.inl ?m.56) (Or.inl ?m.59)).mpr`
+  ?m.51 ≤ ?m.53 / ?m.52
+with the goal
+  3 * ↑t + 1 ≤ 1 / 2 * ↑p
+
+Note: The full type of `(ENNReal.le_div_iff_mul_le (Or.inl ?m.56) (Or.inl ?m.59)).mpr` is
+  ?m.51 * ?m.52 ≤ ?m.53 → ?m.51 ≤ ?m.53 / ?m.52
+
+p t : ℕ
+inst✝ : NeZero p
+h : 6 * t + 2 ≤ p
+⊢ 3 * ↑t + 1 ≤ 1 / 2 * ↑p
+WalkBoundary.lean:85:44: error: unsolved goals
+p t : ℕ
+inst✝ : NeZero p
+h : 6 * t + 2 ≤ p
+hmixed : ∀ (s : Set (ZMod p)), (walkLaw p t).toOuterMeasure s ≤ (uniformPMF (ZMod p)).toOuterMeasure s + 1 / 4
+he : 1 ≤ (uniformPMF (ZMod p)).toOuterMeasure ↑(arcEvent p t) + 1 / 4
+hu : (uniformPMF (ZMod p)).toOuterMeasure ↑(arcEvent p t) ≤ 1 / 2
+⊢ ?m.76 < 1
+WalkBoundary.lean:85:19: error: Application type mismatch: The argument
+  add_le_add_right hu ?m.84
+has type
+  ?m.84 + (uniformPMF (ZMod p)).toOuterMeasure ↑(arcEvent p t) ≤ ?m.84 + 1 / 2
+but is expected to have type
+  (uniformPMF (ZMod p)).toOuterMeasure ↑(arcEvent p t) + 1 / 4 ≤ ?m.76
+in the application
+  lt_of_le_of_lt (add_le_add_right hu ?m.84)

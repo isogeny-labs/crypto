@@ -1,0 +1,89 @@
+{
+  "schema": "twist.block-batched-instruction-probe/v1",
+  "fixed_workload": "icv1-fp6-tm7-fc20da94-b8-m2-s0",
+  "unit": "Callgrind simulated guest instructions Ir",
+  "scope": "one worker process per candidate, serialized batch of ideals to batch of bases",
+  "by_arm": [
+    {
+      "arm": "direct-aa",
+      "engine": "native",
+      "requested_branches": 1,
+      "completed_branches": 1,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 2431590,
+      "processes": 1
+    },
+    {
+      "arm": "bits-control",
+      "engine": "native",
+      "requested_branches": 1,
+      "completed_branches": 1,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 21911730,
+      "processes": 1
+    },
+    {
+      "arm": "direct-chain",
+      "engine": "native",
+      "requested_branches": 1,
+      "completed_branches": 1,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 2431742,
+      "processes": 1
+    },
+    {
+      "arm": "factored-control",
+      "engine": "native",
+      "requested_branches": 1,
+      "completed_branches": 1,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 63477695,
+      "processes": 1
+    },
+    {
+      "arm": "first-pair-invariant",
+      "engine": "native",
+      "requested_branches": 2,
+      "completed_branches": 2,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 1847549,
+      "processes": 1
+    },
+    {
+      "arm": "frobenius-block",
+      "engine": "native",
+      "requested_branches": 1,
+      "completed_branches": 1,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 2436407,
+      "processes": 1
+    },
+    {
+      "arm": "hybrid-eight",
+      "engine": "native",
+      "requested_branches": 8,
+      "completed_branches": 8,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 2458250,
+      "processes": 1
+    },
+    {
+      "arm": "ordinary-prefix-order",
+      "engine": "native",
+      "requested_branches": 1,
+      "completed_branches": 1,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 2431752,
+      "processes": 1
+    }
+  ],
+  "AA_relative_spread": 0.00006250858464937208,
+  "AA_within_preregistered_5_percent": true,
+  "worker_binary_sha256": "36fbae37f54fc33499a885d5ae43a191b1031bb8f3eb5eb7c7c97ac798e1d989",
+  "valgrind_launcher_sha256": "4652774bd116cb49951ef74115ad4237cad5021b2bd4d80002f09d986ec438b9",
+  "source_panel_sha256": "764ea00255c7063ba3bb873c2e722c4239cd0c48fe83c05b8ae535492d7784f0",
+  "construction_parent_orchestration_certification_lifting_and_DLP_costs_missing": true,
+  "wall_time_admitted": false,
+  "complete_cost_or_speedup_established": false,
+  "new_targets_generated": false
+}

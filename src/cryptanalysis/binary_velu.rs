@@ -1,0 +1,1995 @@
+//! # Explicit isogenies of ordinary binary curves, and what they transport
+//!
+//! [`crate::cryptanalysis::koblitz_isogeny_cost`] measures the ECDLP across an
+//! isogeny class by handing every member the same discrete logarithm `d`.
+//! That is *what an isogeny does to the logarithm* — `φ: E → E'` of degree
+//! coprime to `r` carries `Q = [d]P` to `φ(Q) = [d]φ(P)` — but it is not the
+//! map.  This module computes the map, so the pullback is a computation
+//! rather than an inference.
+//!
+//! ## The formulas, for `E: y² + xy = x³ + a₂x² + a₆`
+//!
+//! Vélu (1971) holds in every characteristic for a general Weierstrass
+//! model.  Specialising `a₁ = 1`, `a₃ = a₄ = 0` and reducing mod 2 collapses
+//! it dramatically.  For a kernel point `Q`:
+//!
+//! ```text
+//!   g_Q^x = 3x_Q² + 2a₂x_Q + a₄ − a₁y_Q = x_Q² + y_Q
+//!   g_Q^y = −2y_Q − a₁x_Q − a₃         = x_Q
+//!   t_Q   = 2g_Q^x − a₁ g_Q^y          = x_Q
+//!   u_Q   = (g_Q^y)²                   = x_Q²
+//!   w_Q   = u_Q + t_Q x_Q = x_Q² + x_Q² = 0
+//! ```
+//!
+//! so with `t = Σ_{Q ∈ S} x_Q` over a half-set `S` of the kernel (one point
+//! per `±` pair) and `b₂ = a₁² + 4a₂ = 1`:
+//!
+//! ```text
+//!   a₄' = a₄ − 5t      = t
+//!   a₆' = a₆ − b₂t − 7w = a₆ + t
+//! ```
+//!
+//! The codomain `y² + xy = x³ + a₂x² + tx + (a₆ + t)` is not in short form.
+//! Substituting `y ↦ y + t` clears the `x` term — `(y+t)² + x(y+t) = y² + xy
+//! + tx + t²` — and leaves
+//!
+//! ```text
+//!   a₆' = a₆ + t + t²        ← [`velu_codomain`]
+//! ```
+//!
+//! with `a₂` unchanged up to the `s² + s` freedom, hence unchanged in trace
+//! class — which is the consistency check that isogenous curves share a
+//! trace.
+//!
+//! **The abscissa map** is the part that would normally need the kernel's
+//! roots.  It does not, because char 2 is kind.  Writing `h(x) = Π_{Q ∈ S}
+//! (x + x_Q)` for the kernel polynomial of degree `d = (ℓ−1)/2`:
+//!
+//! ```text
+//!   Σ 1/(x + x_Q)   = h'(x)/h(x)
+//!   Σ x_Q/(x + x_Q) = d + x·h'/h                       (each term is 1 + x/(x+x_Q))
+//!   Σ z_Q²          = (Σ z_Q)²                          (Frobenius is additive)
+//! ```
+//!
+//! so with `A = (d mod 2) + x·h'(x)/h(x)`,
+//!
+//! ```text
+//!   X = x + A + A²           ← [`velu_x_map`]
+//! ```
+//!
+//! which is computable from `h`'s coefficients alone, over `F_{2^n}`, with no
+//! extension field and no root-finding.
+//!
+//! ## Why this is believed
+//!
+//! The derivation above is checked against an **independent oracle** rather
+//! than trusted: at `ℓ = 3` the codomain's `j' = 1/a₆'` must be a root of the
+//! classical modular polynomial `Φ₃(X, j)`, which
+//! [`crate::cryptanalysis::binary_isogeny`] tabulates.  Over `F_{2^8}` with
+//! `a₆ = 1` the four `ψ₃` roots `{13, 81, 177, 236}` produce exactly the four
+//! `Φ₃` roots, as a permutation, with every codomain order equal to `#E`.
+//! [`velu_matches_the_modular_polynomial_at_ell_3`] pins that.
+//!
+//! [`velu_point_map`] also computes the ordinate.  This matters when the
+//! target logarithm is unknown: choosing unrelated signs for `φ(P)` and
+//! `φ(Q)` from their abscissae does not transport a signed relation.
+//! [`transport_instance`] retains its original abscissa-only report for
+//! historical callers.
+
+use std::collections::{BTreeSet, HashMap};
+
+use crate::binary_ecc::{BinaryCurve, BinaryPoint, F2mElement, F2mPoly, IrreduciblePoly};
+use crate::cryptanalysis::binary_isogeny::find_roots_in_f2m;
+use crate::cryptanalysis::ic_boundary::{
+    binary_point_count, ArtinSchreier, BinaryGroup, CountedGroup, GroupOps,
+};
+use crate::cryptanalysis::koblitz_fast::{FastCurve, FastPoint};
+use crate::cryptanalysis::semaev_decomp::Gf2;
+
+// ── field helpers ───────────────────────────────────────────────────
+
+/// `v` as an element of `F_{2^n}` in the polynomial basis.  For `n > 64`
+/// the bits of `v` above 63 are zero (a shift by 64 or more overflows: it
+/// panics in a debug build and wraps to bit `i mod 64` in a release build).
+pub fn elt(v: u64, n: u32) -> F2mElement {
+    let bits: Vec<u32> = (0..n.min(64)).filter(|i| (v >> i) & 1 == 1).collect();
+    F2mElement::from_bit_positions(&bits, n)
+}
+
+/// The integer whose bits are the coordinates of `e`.
+pub fn to_u64(e: &F2mElement) -> u64 {
+    e.to_biguint().to_u64_digits().first().copied().unwrap_or(0)
+}
+
+// ── Part A: division polynomials ────────────────────────────────────
+
+/// **The `m`-division polynomial** `ψ_m ∈ F_{2^n}[x]` of
+/// `E: y² + xy = x³ + a₂x² + a₆`.
+///
+/// In char 2 with `a₁ = 1`, `a₃ = 0` the usual `y`-dependence disappears:
+/// `ψ₂ = 2y + a₁x + a₃ = x`, a polynomial in `x` alone, so every `ψ_m` is.
+/// The `b`-invariants collapse to `b₂ = 1`, `b₄ = b₆ = 0`, `b₈ = a₆`, giving
+///
+/// ```text
+///   ψ₁ = 1,  ψ₂ = x,  ψ₃ = x⁴ + x³ + a₆,  ψ₄ = x⁶ + a₆x²
+/// ```
+///
+/// and thereafter the standard recurrences, which hold in any
+/// characteristic:
+///
+/// ```text
+///   ψ_{2m+1} = ψ_{m+2}ψ_m³ + ψ_{m−1}ψ_{m+1}³
+///   ψ_{2m}·ψ₂ = ψ_m(ψ_{m+2}ψ_{m−1}² + ψ_{m−2}ψ_{m+1}²)
+/// ```
+///
+/// For odd `ℓ`, `deg ψ_ℓ = (ℓ² − 1)/2`, and its roots are the abscissae of
+/// the `ℓ`-torsion — `(ℓ+1)` subgroups of order `ℓ`, each contributing
+/// `(ℓ−1)/2` of them.
+pub fn division_polynomial(a6: &F2mElement, m: u32, n: u32, irr: &IrreduciblePoly) -> F2mPoly {
+    let zero = F2mElement::zero(n);
+    let one = F2mElement::one(n);
+    let p0 = F2mPoly::zero(n);
+    let p1 = F2mPoly::from_coeffs(vec![one.clone()], n);
+    let psi2 = F2mPoly::from_coeffs(vec![zero.clone(), one.clone()], n);
+    // ψ₃ = x⁴ + x³ + a₆
+    let psi3 = F2mPoly::from_coeffs(
+        vec![
+            a6.clone(),
+            zero.clone(),
+            zero.clone(),
+            one.clone(),
+            one.clone(),
+        ],
+        n,
+    );
+    // ψ₄ = ψ₂·(x⁵ + a₆x) = x⁶ + a₆x²
+    let psi4 = F2mPoly::from_coeffs(
+        vec![
+            zero.clone(),
+            zero.clone(),
+            a6.clone(),
+            zero.clone(),
+            zero.clone(),
+            zero.clone(),
+            one.clone(),
+        ],
+        n,
+    );
+
+    match m {
+        0 => return p0,
+        1 => return p1,
+        2 => return psi2,
+        3 => return psi3,
+        4 => return psi4,
+        _ => {}
+    }
+
+    let mut cache: HashMap<u32, F2mPoly> = HashMap::new();
+    cache.insert(0, p0);
+    cache.insert(1, p1);
+    cache.insert(2, psi2);
+    cache.insert(3, psi3);
+    cache.insert(4, psi4);
+    psi_rec(m, a6, n, irr, &mut cache)
+}
+
+#[allow(clippy::only_used_in_recursion)]
+fn psi_rec(
+    m: u32,
+    a6: &F2mElement,
+    n: u32,
+    irr: &IrreduciblePoly,
+    cache: &mut HashMap<u32, F2mPoly>,
+) -> F2mPoly {
+    if let Some(p) = cache.get(&m) {
+        return p.clone();
+    }
+    let out = if m % 2 == 1 {
+        let k = (m - 1) / 2; // m = 2k+1
+        let a = psi_rec(k + 2, a6, n, irr, cache);
+        let b = psi_rec(k, a6, n, irr, cache);
+        let c = psi_rec(k.wrapping_sub(1), a6, n, irr, cache);
+        let d = psi_rec(k + 1, a6, n, irr, cache);
+        let b3 = b.mul(&b, irr).mul(&b, irr);
+        let d3 = d.mul(&d, irr).mul(&d, irr);
+        a.mul(&b3, irr).add(&c.mul(&d3, irr))
+    } else {
+        let k = m / 2; // m = 2k
+        let a = psi_rec(k + 2, a6, n, irr, cache);
+        let b = psi_rec(k - 1, a6, n, irr, cache);
+        let c = psi_rec(k - 2, a6, n, irr, cache);
+        let d = psi_rec(k + 1, a6, n, irr, cache);
+        let e = psi_rec(k, a6, n, irr, cache);
+        let b2 = b.mul(&b, irr);
+        let d2 = d.mul(&d, irr);
+        let inner = a.mul(&b2, irr).add(&c.mul(&d2, irr));
+        let num = e.mul(&inner, irr);
+        // divide by ψ₂ = x
+        let psi2 = F2mPoly::from_coeffs(vec![F2mElement::zero(n), F2mElement::one(n)], n);
+        let (q, r) = num.divrem(&psi2, irr);
+        debug_assert!(r.is_zero(), "ψ₂ must divide the even-index numerator");
+        q
+    };
+    cache.insert(m, out.clone());
+    out
+}
+
+// ── Part B: Vélu ────────────────────────────────────────────────────
+
+/// An explicit isogeny, named by its kernel polynomial.
+#[derive(Clone, Debug)]
+pub struct BinaryIsogeny {
+    /// Extension degree of the base field.
+    pub n: u32,
+    /// `a₂` of both curves — an isogeny preserves the trace, hence the
+    /// family.
+    pub a2: u8,
+    /// `a₆` of the domain.
+    pub a6: u64,
+    /// `a₆` of the codomain, from [`velu_codomain`].
+    pub a6_codomain: u64,
+    /// Odd degree `ℓ`.
+    pub ell: u64,
+    /// Monic kernel polynomial, degree `(ℓ−1)/2`.
+    pub kernel: F2mPoly,
+    /// `t = Σ x_Q`, the trace of the kernel's abscissae.
+    pub t: u64,
+}
+
+/// **The codomain's `a₆`.**  `a₆' = a₆ + t + t²` where `t` is the sum of the
+/// kernel abscissae, i.e. the coefficient of `x^{d−1}` in the monic kernel
+/// polynomial of degree `d`.
+pub fn velu_codomain(
+    a6: &F2mElement,
+    kernel: &F2mPoly,
+    n: u32,
+    irr: &IrreduciblePoly,
+) -> F2mElement {
+    let d = kernel.degree().unwrap_or(0);
+    let t = if d == 0 {
+        F2mElement::zero(n)
+    } else {
+        kernel.coeff(d - 1)
+    };
+    a6.add(&t).add(&t.mul(&t, irr))
+}
+
+/// **The abscissa map** `X = x + A + A²`, `A = (d mod 2) + x·h'/h`.
+///
+/// Returns `None` when `h(x) = 0`, i.e. `x` is a kernel abscissa and the
+/// point maps to the identity.
+pub fn velu_x_map(
+    x: &F2mElement,
+    kernel: &F2mPoly,
+    n: u32,
+    irr: &IrreduciblePoly,
+) -> Option<F2mElement> {
+    let d = kernel.degree().unwrap_or(0);
+    let hv = kernel.eval(x, irr);
+    if hv.is_zero() {
+        return None;
+    }
+    let hp = derivative(kernel, n);
+    let hpv = hp.eval(x, irr);
+    let mut a = x.mul(&hpv, irr).mul(&hv.flt_inverse(irr)?, irr);
+    if d % 2 == 1 {
+        a = a.add(&F2mElement::one(n));
+    }
+    Some(x.add(&a).add(&a.mul(&a, irr)))
+}
+
+#[derive(Debug, PartialEq, Eq)]
+enum VeluAffineImage {
+    Infinity,
+    Affine { x: F2mElement, y: F2mElement },
+}
+
+/// The single field-element implementation behind both public point-map
+/// wrappers. Keeping the ordinate formula here prevents the wide and packed
+/// backends from silently acquiring different sign conventions.
+fn velu_affine_point_map(
+    x: &F2mElement,
+    y: &F2mElement,
+    kernel: &F2mPoly,
+    n: u32,
+    irr: &IrreduciblePoly,
+) -> Option<VeluAffineImage> {
+    if !velu_map_field_is_consistent(x, y, kernel, n, irr) {
+        return None;
+    }
+
+    let h = kernel.eval(x, irr);
+    if h.is_zero() {
+        return Some(VeluAffineImage::Infinity);
+    }
+    let h_inv = h.flt_inverse(irr)?;
+    let l = derivative(kernel, n).eval(x, irr).mul(&h_inv, irr);
+    let l2 = l.mul(&l, irr);
+    let e2 = hasse_eval(kernel, 2, x, irr).mul(&h_inv, irr);
+    let e3 = hasse_eval(kernel, 3, x, irr).mul(&h_inv, irr);
+    let p3 = l2.mul(&l, irr).add(&l.mul(&e2, irr)).add(&e3);
+    let x2 = x.mul(x, irr);
+    let x3 = x2.mul(x, irr);
+    let parity = if kernel.degree().unwrap_or(0) % 2 == 1 {
+        F2mElement::one(n)
+    } else {
+        F2mElement::zero(n)
+    };
+    let a = parity.add(&x.mul(&l, irr));
+    let a2 = a.mul(&a, irr);
+    let image_x = x.add(&a).add(&a2);
+    let y_coefficient = F2mElement::one(n).add(&l).add(&x.mul(&l2, irr));
+    let z3_sum = parity
+        .add(&x.mul(&l, irr))
+        .add(&x2.mul(&l2, irr))
+        .add(&x3.mul(&p3, irr));
+    let image_y = y_coefficient
+        .mul(y, irr)
+        .add(&x.mul(&a2.add(&a), irr))
+        .add(&a)
+        .add(&z3_sum);
+    Some(VeluAffineImage::Affine {
+        x: image_x,
+        y: image_y,
+    })
+}
+
+fn velu_map_field_parameters_are_consistent(
+    kernel: &F2mPoly,
+    n: u32,
+    irr: &IrreduciblePoly,
+) -> bool {
+    n != 0
+        && kernel.m == n
+        && kernel
+            .coeffs
+            .iter()
+            .all(|coefficient| coefficient.m_value() == n)
+        && irr.degree == n
+        && irr.low_terms.iter().all(|&term| term < n)
+}
+
+fn velu_map_field_is_consistent(
+    x: &F2mElement,
+    y: &F2mElement,
+    kernel: &F2mPoly,
+    n: u32,
+    irr: &IrreduciblePoly,
+) -> bool {
+    x.m_value() == n && y.m_value() == n && velu_map_field_parameters_are_consistent(kernel, n, irr)
+}
+
+/// Map a point across a normalized odd-degree binary Vélu isogeny without
+/// restricting the field degree to the `u64` fast backend.
+///
+/// This is the wide-field counterpart of [`velu_point_map`]. It keeps every
+/// coordinate as an [`F2mElement`], so standardized fields such as
+/// `F_{2^113}` are not truncated. Both coordinate widths, every kernel
+/// coefficient width, and the reduction-polynomial degree are checked before
+/// arithmetic. A kernel point maps to [`BinaryPoint::Infinity`].
+///
+/// This routine deliberately does not establish that `point` lies on the
+/// domain curve, that the reduction polynomial is irreducible, or that
+/// `kernel` describes a subgroup of that curve. Those are certificate-level
+/// obligations for the caller. `None` means inconsistent field parameters or
+/// that a required inversion failed; it is not the image identity.
+pub fn velu_point_map_binary(
+    point: &BinaryPoint,
+    kernel: &F2mPoly,
+    n: u32,
+    irr: &IrreduciblePoly,
+) -> Option<BinaryPoint> {
+    if !velu_map_field_parameters_are_consistent(kernel, n, irr) {
+        return None;
+    }
+    let BinaryPoint::Affine { x, y } = point else {
+        return Some(BinaryPoint::Infinity);
+    };
+    match velu_affine_point_map(x, y, kernel, n, irr)? {
+        VeluAffineImage::Infinity => Some(BinaryPoint::Infinity),
+        VeluAffineImage::Affine { x, y } => Some(BinaryPoint::Affine { x, y }),
+    }
+}
+
+/// Map a point across the normalized odd-degree isogeny, including its sign.
+///
+/// For kernel abscissae `u_i`, put `L = h'(x)/h(x)` and
+/// `E_j = h^[j](x)/h(x)`, where `h^[j]` is the j-th Hasse derivative.
+/// Newton's identities in characteristic two give
+/// `Σ_i 1/(x+u_i)^3 = L^3 + L E_2 + E_3`.  Substituting these sums into
+/// Vélu's pairwise ordinate formula avoids splitting the kernel polynomial
+/// over an extension field. The result is the same short Weierstrass model as
+/// [`velu_codomain`]. This wrapper accepts only fields supported by
+/// [`FastCurve`] and rejects packed coordinates with set bits above `n`; the
+/// shared field-element core also checks the kernel coefficient widths and
+/// reduction-polynomial degree. The caller remains responsible for validating
+/// the point and kernel against the domain curve. `None` means a contract
+/// failure or failed inversion; kernel points map to `Some(INFINITY)`.
+pub fn velu_point_map(
+    point: FastPoint,
+    kernel: &F2mPoly,
+    n: u32,
+    irr: &IrreduciblePoly,
+) -> Option<FastPoint> {
+    if n > FastCurve::MAX_DEGREE || !velu_map_field_parameters_are_consistent(kernel, n, irr) {
+        return None;
+    }
+    if point.infinity {
+        return Some(FastPoint::INFINITY);
+    }
+    let field_mask = (1u64 << n) - 1;
+    if (point.x | point.y) & !field_mask != 0 {
+        return None;
+    }
+    let x = elt(point.x, n);
+    let y = elt(point.y, n);
+    match velu_affine_point_map(&x, &y, kernel, n, irr)? {
+        VeluAffineImage::Infinity => Some(FastPoint::INFINITY),
+        VeluAffineImage::Affine { x, y } => Some(FastPoint::affine(to_u64(&x), to_u64(&y))),
+    }
+}
+
+/// Pull a rational point back through a coprime-degree isogeny.
+///
+/// If the degree is coprime to `#E(F_q)`, the map is bijective on rational
+/// points. For image abscissa `X`, the numerator of `X - velu_x_map(x)` is
+/// `(X+x)h² + xhh' + x²(h')²`. Find its rational roots, lift both signs on
+/// the domain, and accept only the unique point whose complete forward image
+/// equals `image`. This costs a degree-`ell` root finding per preimage;
+/// callers must charge that work when a pullback base is built.
+pub fn velu_preimage_point(
+    domain: &Curve,
+    iso: &BinaryIsogeny,
+    image: FastPoint,
+) -> Result<FastPoint, String> {
+    if iso.n != domain.n
+        || iso.a2 != domain.a2
+        || iso.a6 != domain.a6
+        || iso.kernel.m != domain.n
+        || iso.ell.is_multiple_of(2)
+        || iso.kernel.degree() != Some(((iso.ell.saturating_sub(1)) / 2) as usize)
+    {
+        return Err("isogeny and domain do not match".into());
+    }
+    if iso.ell == 0 || gcd_u64(domain.order, iso.ell) != 1 {
+        return Err("isogeny degree is not coprime to rational group order".into());
+    }
+    if image.infinity {
+        return Ok(FastPoint::INFINITY);
+    }
+    let n = domain.n;
+    let mask = (1u64 << n) - 1;
+    if (image.x | image.y) & !mask != 0 {
+        return Err("image coordinates are outside the field".into());
+    }
+    let codomain = Curve::with_order(n, &domain.irr, domain.a2, iso.a6_codomain, domain.order)
+        .ok_or("isogeny codomain is unsupported")?;
+    if !codomain.fast.is_on_curve(image) {
+        return Err("image is not on the isogeny codomain".into());
+    }
+    let irr = &domain.irr;
+    let x = F2mPoly::x(n);
+    let h = &iso.kernel;
+    let hp = derivative(h, n);
+    let h2 = h.mul(h, irr);
+    let equation = x
+        .add(&F2mPoly::constant(elt(image.x, n)))
+        .mul(&h2, irr)
+        .add(&x.mul(h, irr).mul(&hp, irr))
+        .add(&x.mul(&x, irr).mul(&hp.mul(&hp, irr), irr));
+    let mut candidates = Vec::new();
+    for root in find_roots_in_f2m(&equation, n, irr) {
+        for point in domain.points_with_x(to_u64(&root)) {
+            if velu_point_map(point, h, n, irr) == Some(image) && !candidates.contains(&point) {
+                candidates.push(point);
+            }
+        }
+    }
+    match candidates.as_slice() {
+        [point] => Ok(*point),
+        [] => Err("no rational point maps to the supplied image".into()),
+        _ => Err("multiple rational preimages despite coprime degree".into()),
+    }
+}
+
+fn gcd_u64(mut a: u64, mut b: u64) -> u64 {
+    while b != 0 {
+        (a, b) = (b, a % b);
+    }
+    a
+}
+
+/// Evaluate a Hasse derivative without constructing a polynomial.  Lucas's
+/// theorem makes the coefficient of `x^(i-j)` equal to `c_i` precisely when
+/// the set bits of `j` are also set in `i`.
+fn hasse_eval(p: &F2mPoly, j: usize, x: &F2mElement, irr: &IrreduciblePoly) -> F2mElement {
+    let mut acc = F2mElement::zero(p.m);
+    let Some(degree) = p.degree() else {
+        return acc;
+    };
+    for i in (j..=degree).rev() {
+        acc = acc.mul(x, irr);
+        if (i & j) == j {
+            acc = acc.add(&p.coeff(i));
+        }
+    }
+    acc
+}
+
+/// Formal derivative in char 2: only odd-index coefficients survive.
+pub fn derivative(p: &F2mPoly, n: u32) -> F2mPoly {
+    let deg = match p.degree() {
+        Some(d) => d,
+        None => return F2mPoly::zero(n),
+    };
+    let mut coeffs = vec![F2mElement::zero(n); deg.max(1)];
+    for i in 1..=deg {
+        if i % 2 == 1 {
+            coeffs[i - 1] = p.coeff(i);
+        }
+    }
+    let mut out = F2mPoly::from_coeffs(coeffs, n);
+    out.trim();
+    out
+}
+
+// ── Part C: kernels from rational torsion ───────────────────────────
+
+/// A curve with fast point arithmetic and its group order.
+pub struct Curve {
+    pub n: u32,
+    pub irr: IrreduciblePoly,
+    pub gf: Gf2,
+    pub ash: ArtinSchreier,
+    pub a2: u8,
+    pub a6: u64,
+    pub fast: FastCurve,
+    pub order: u64,
+}
+
+impl Curve {
+    pub fn new(n: u32, irr: &IrreduciblePoly, a2: u8, a6: u64) -> Option<Self> {
+        let gf = Gf2::new(irr);
+        let ash = ArtinSchreier::new(&gf);
+        let order = binary_point_count(&gf, &ash, a2 as u64, a6);
+        Self::with_order(n, irr, a2, a6, order)
+    }
+
+    /// The curve with `order` taken as given — no `O(2ⁿ)` point count.  The
+    /// caller is responsible for certifying it (see the class walk, which
+    /// does so from a point of large prime order).
+    pub fn with_order(n: u32, irr: &IrreduciblePoly, a2: u8, a6: u64, order: u64) -> Option<Self> {
+        let gf = Gf2::new(irr);
+        let ash = ArtinSchreier::new(&gf);
+        let curve = BinaryCurve {
+            m: n,
+            irreducible: irr.clone(),
+            a: elt(a2 as u64, n),
+            b: elt(a6, n),
+            generator: BinaryPoint::Infinity,
+            order: order.into(),
+            cofactor: 1u64.into(),
+        };
+        let fast = FastCurve::new(&curve)?;
+        Some(Curve {
+            n,
+            irr: irr.clone(),
+            gf,
+            ash,
+            a2,
+            a6,
+            fast,
+            order,
+        })
+    }
+
+    /// Both points with abscissa `x`, or none.
+    pub fn points_with_x(&self, x: u64) -> Vec<FastPoint> {
+        let f = &self.fast.field;
+        if x == 0 {
+            return vec![FastPoint::affine(0, f.sqr_k(self.a6, self.n - 1))];
+        }
+        let inv = f.inv(x);
+        let c = x ^ (self.a2 as u64) ^ f.mul(self.a6, f.sqr(inv));
+        match self.ash.solve(c) {
+            Some(u) => {
+                let p = FastPoint::affine(x, f.mul(x, u));
+                vec![p, self.fast.neg(p)]
+            }
+            None => Vec::new(),
+        }
+    }
+
+    pub fn group(&self) -> BinaryGroup<'_> {
+        BinaryGroup(&self.fast)
+    }
+}
+
+/// **Enumerate the order-`ℓ` subgroups that live in `E(F_{2^n})`.**
+///
+/// When `ℓ² | #E` the full `ℓ`-torsion can be rational, and then all `ℓ+1`
+/// subgroups are found here directly from points — no division polynomial,
+/// no factorisation.  When only `ℓ ∥ #E` there is one rational subgroup.
+/// When `ℓ ∤ #E` there are none, and the caller must go through
+/// [`division_polynomial`] instead; [`kernels_via_rational_torsion`] says so
+/// by returning an empty vector rather than by failing.
+///
+/// Returns each subgroup as its kernel polynomial.
+pub fn kernels_via_rational_torsion(curve: &Curve, ell: u64, scan_limit: u64) -> Vec<F2mPoly> {
+    if !curve.order.is_multiple_of(ell) {
+        return Vec::new();
+    }
+    let group = curve.group();
+    let mut ops = GroupOps::default();
+    // The cofactor must strip EVERY power of `ell`, not one.  When the
+    // `ell`-Sylow is `Z/ℓ × Z/ℓ` its exponent is `ℓ`, so `#E/ℓ` still
+    // carries a factor `ℓ` and annihilates the whole `ell`-part —
+    // `[#E/3]P = O` for every `P` at `n = 8`, where the 3-Sylow is
+    // `Z/3 × Z/3`.  Removing the full `ℓ`-power lands in the Sylow instead.
+    let mut cofactor = curve.order;
+    while cofactor.is_multiple_of(ell) {
+        cofactor /= ell;
+    }
+
+    // Collect points of order exactly ℓ by clearing the cofactor off a
+    // scan of abscissae.  `scan_limit` bounds the scan; the ℓ-torsion is
+    // dense enough that a small multiple of ℓ² suffices in practice, and
+    // the caller checks the subgroup count it got back.
+    let mut torsion: BTreeSet<u64> = BTreeSet::new();
+    let limit = scan_limit.min(1u64 << curve.n);
+    for x in 0..limit {
+        let Some(&p) = curve.points_with_x(x).first() else {
+            continue;
+        };
+        let mut q = group.mul(&mut ops, p, cofactor);
+        if q.infinity {
+            continue;
+        }
+        // Descend inside the Sylow to an element of order exactly `ell`.
+        while !group.mul(&mut ops, q, ell).infinity {
+            q = group.mul(&mut ops, q, ell);
+            if q.infinity {
+                break;
+            }
+        }
+        if q.infinity {
+            continue;
+        }
+        torsion.insert(q.pack());
+    }
+
+    // Group the ℓ-torsion into cyclic subgroups.
+    let mut seen: BTreeSet<u64> = BTreeSet::new();
+    let mut out = Vec::new();
+    let packed: Vec<u64> = torsion.iter().copied().collect();
+    for &key in &packed {
+        if seen.contains(&key) {
+            continue;
+        }
+        // Recover a point with this packed identity.
+        let Some(p) = unpack(curve, key) else {
+            continue;
+        };
+        // Walk ⟨p⟩, collecting abscissae one per ± pair.
+        let mut xs: BTreeSet<u64> = BTreeSet::new();
+        let mut cur = p;
+        for _ in 1..ell {
+            if cur.infinity {
+                break;
+            }
+            seen.insert(cur.pack());
+            xs.insert(cur.x);
+            cur = group.add(&mut ops, cur, p);
+        }
+        if xs.len() as u64 != (ell - 1) / 2 {
+            continue; // not a clean order-ℓ subgroup
+        }
+        out.push(kernel_polynomial(&xs, curve.n, &curve.irr));
+    }
+    out
+}
+
+fn unpack(curve: &Curve, packed: u64) -> Option<FastPoint> {
+    if packed == 0 {
+        return Some(FastPoint::INFINITY);
+    }
+    let x = (packed >> 1) - 1;
+    let sign = packed & 1;
+    let pts = curve.points_with_x(x);
+    pts.into_iter().find(|p| (p.pack() & 1) == sign)
+}
+
+/// `h(x) = Π (x + x_i)` from a set of abscissae.
+pub fn kernel_polynomial(xs: &BTreeSet<u64>, n: u32, irr: &IrreduciblePoly) -> F2mPoly {
+    let mut h = F2mPoly::from_coeffs(vec![F2mElement::one(n)], n);
+    for &x in xs {
+        let lin = F2mPoly::from_coeffs(vec![elt(x, n), F2mElement::one(n)], n);
+        h = h.mul(&lin, irr);
+    }
+    h
+}
+
+/// Build the isogeny a kernel polynomial defines.
+pub fn isogeny_from_kernel(curve: &Curve, kernel: F2mPoly, ell: u64) -> BinaryIsogeny {
+    let a6e = elt(curve.a6, curve.n);
+    let a6p = velu_codomain(&a6e, &kernel, curve.n, &curve.irr);
+    let d = kernel.degree().unwrap_or(0);
+    let t = if d == 0 {
+        0
+    } else {
+        to_u64(&kernel.coeff(d - 1))
+    };
+    BinaryIsogeny {
+        n: curve.n,
+        a2: curve.a2,
+        a6: curve.a6,
+        a6_codomain: to_u64(&a6p),
+        ell,
+        kernel,
+        t,
+    }
+}
+
+// ── Part D: transporting a DLP instance ─────────────────────────────
+
+/// What an explicit isogeny did to one DLP instance.
+#[derive(Clone, Debug)]
+pub struct TransportReport {
+    pub ell: u64,
+    pub a6_domain: u64,
+    pub a6_codomain: u64,
+    /// `#E'`, which must equal `#E` for an isogeny.
+    pub codomain_order: u64,
+    pub order_preserved: bool,
+    /// `x(φ(P))` and `x(φ(Q))`.
+    pub x_phi_p: Option<u64>,
+    pub x_phi_q: Option<u64>,
+    /// Whether `[d]φ(P)` has abscissa `x(φ(Q))` — the transport, verified as
+    /// a computation on the codomain.
+    pub transported: bool,
+    /// `φ(P)` has order `r` on the codomain, so the instance really did land
+    /// in a subgroup of the right size.
+    pub image_order_ok: bool,
+}
+
+/// **Transport `(P, Q = [d]P)` across `φ` and check it.**
+///
+/// Only abscissae are mapped, so `φ(P)` is determined up to sign.  A sign on
+/// `φ(Q)` would flip the logarithm to `−d`; checking `x([d]φ(P)) = x(φ(Q))`
+/// is insensitive to both signs at once, which is exactly the statement the
+/// DLP needs — `Q` and `−Q` have logarithms `d` and `−d`, and an attacker
+/// solving on `E'` recovers one of them.
+pub fn transport_instance(
+    domain: &Curve,
+    iso: &BinaryIsogeny,
+    p: FastPoint,
+    q: FastPoint,
+    d: u64,
+    r: u64,
+) -> Option<TransportReport> {
+    let codomain = Curve::new(domain.n, &domain.irr, domain.a2, iso.a6_codomain)?;
+    let order_preserved = codomain.order == domain.order;
+
+    let xp =
+        velu_x_map(&elt(p.x, domain.n), &iso.kernel, domain.n, &domain.irr).map(|e| to_u64(&e));
+    let xq =
+        velu_x_map(&elt(q.x, domain.n), &iso.kernel, domain.n, &domain.irr).map(|e| to_u64(&e));
+
+    let mut transported = false;
+    let mut image_order_ok = false;
+    if let (Some(xp), Some(xq)) = (xp, xq) {
+        if let Some(&pp) = codomain.points_with_x(xp).first() {
+            let group = codomain.group();
+            let mut ops = GroupOps::default();
+            image_order_ok = group.mul(&mut ops, pp, r).infinity;
+            let dp = group.mul(&mut ops, pp, d % r);
+            transported = !dp.infinity && dp.x == xq;
+        }
+    }
+
+    Some(TransportReport {
+        ell: iso.ell,
+        a6_domain: iso.a6,
+        a6_codomain: iso.a6_codomain,
+        codomain_order: codomain.order,
+        order_preserved,
+        x_phi_p: xp,
+        x_phi_q: xq,
+        transported,
+        image_order_ok,
+    })
+}
+
+// ── Part E: x-only evaluation from kernel abscissae (lit2026 W11) ───
+//
+// After Banegas–Sarkis–Smith, ePrint 2026/704 ("Fast isogeny evaluation on
+// binary curves"), whose abstract reports an affine product evaluation at
+// `5s M` (`4s` with normalised kernel points) for `ℓ = 2s + 1` and
+// inversion-free projective/twisted-Kummer variants, about 4.2× faster
+// than Vélu-style x-evaluation.  The paper's PDF was not retrievable in
+// this session (HTTP 403), so the formulas below are derived here and
+// checked against the module's own Vélu maps; the counts are ours.
+//
+// With kernel abscissae `x_1..x_s` (one per `±` pair) and the identity
+// `x(P+Q) + x(P−Q) = x_P x_Q/(x_P + x_Q)²` on `y² + xy = x³ + a₂x² + b`,
+// Vélu's abscissa map is
+//
+// ```text
+//   φ(x) = x + Σ_i x·x_i/(x + x_i)² = x + A + A²,  A = (s mod 2) + x·Σ 1/(x + x_i)
+// ```
+//
+// and, because `x(P+Q)·x(P−Q) = ((x x_i + √b)/(x + x_i))²`, the product
+//
+// ```text
+//   φ_Π(x) = x · Π_i ((x·x_i + √b)/(x + x_i))²  =  (Π x_i)² · φ(x)
+// ```
+//
+// is the same isogeny followed by the scaling `x ↦ u²x`, `u = Π x_i`
+// (checked for every kernel in the tests).  Evaluators:
+//
+// | evaluator                | per point                       |
+// |--------------------------|---------------------------------|
+// | [`xeval_batch_inverse`]  | `3s M + 1M + 1S + I` (the torsion walk's form) |
+// | [`xeval_kernel_poly`]    | `≈ 2s M + 2M + 1S + I` given `h` (`velu_x_map`) |
+// | [`xeval_fraction`]       | `2s M + 2M + 1S + I`            |
+// | [`xeval_product`]        | `3s M + 2M + 1S + I` (+1M to normalise) |
+// | [`xeval_projective`]     | `3s M + 5M + 2S`, no inversion  |
+
+/// Operations counted in `F_{2^n}`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct F2mCounts {
+    pub mul: u64,
+    pub sqr: u64,
+    pub inv: u64,
+    pub add: u64,
+}
+
+/// `F_{2^n}` arithmetic with operation counts (a [`std::cell::Cell`]
+/// per context, so single-threaded).
+pub struct F2mCtx<'a> {
+    pub irr: &'a IrreduciblePoly,
+    pub n: u32,
+    counts: std::cell::Cell<F2mCounts>,
+}
+
+impl<'a> F2mCtx<'a> {
+    pub fn new(irr: &'a IrreduciblePoly) -> Self {
+        Self {
+            irr,
+            n: irr.degree,
+            counts: std::cell::Cell::new(F2mCounts::default()),
+        }
+    }
+    pub fn counts(&self) -> F2mCounts {
+        self.counts.get()
+    }
+    pub fn reset(&self) {
+        self.counts.set(F2mCounts::default());
+    }
+    fn bump(&self, g: impl FnOnce(&mut F2mCounts)) {
+        let mut c = self.counts.get();
+        g(&mut c);
+        self.counts.set(c);
+    }
+    pub fn mul(&self, a: &F2mElement, b: &F2mElement) -> F2mElement {
+        self.bump(|c| c.mul += 1);
+        a.mul(b, self.irr)
+    }
+    pub fn sqr(&self, a: &F2mElement) -> F2mElement {
+        self.bump(|c| c.sqr += 1);
+        a.square(self.irr)
+    }
+    pub fn add(&self, a: &F2mElement, b: &F2mElement) -> F2mElement {
+        self.bump(|c| c.add += 1);
+        a.add(b)
+    }
+    pub fn inv(&self, a: &F2mElement) -> Option<F2mElement> {
+        self.bump(|c| c.inv += 1);
+        a.flt_inverse(self.irr)
+    }
+    pub fn zero(&self) -> F2mElement {
+        F2mElement::zero(self.n)
+    }
+    pub fn one(&self) -> F2mElement {
+        F2mElement::one(self.n)
+    }
+    /// `√b = b^{2^{n−1}}` (uncounted set-up).
+    pub fn sqrt(&self, b: &F2mElement) -> F2mElement {
+        b.square_k_times(self.n - 1, self.irr)
+    }
+}
+
+/// The batch-inversion form of [`crate::cryptanalysis::binary_torsion_walk::velu_x_from_abscissae`]
+/// over `F_{2^n}`: invert every `x + x_i` by Montgomery's trick and sum.
+/// `None` when `x` is a kernel abscissa.
+pub fn xeval_batch_inverse(c: &F2mCtx, x: &F2mElement, xs: &[F2mElement]) -> Option<F2mElement> {
+    let dens: Vec<F2mElement> = xs.iter().map(|xi| c.add(x, xi)).collect();
+    if dens.iter().any(|d| d.is_zero()) {
+        return None;
+    }
+    let mut prefix = Vec::with_capacity(dens.len());
+    let mut acc = c.one();
+    for (i, d) in dens.iter().enumerate() {
+        prefix.push(acc.clone());
+        acc = if i == 0 { d.clone() } else { c.mul(&acc, d) };
+    }
+    let mut inv_all = c.inv(&acc)?;
+    let mut sum = c.zero();
+    for i in (0..dens.len()).rev() {
+        let inv_i = if i == 0 {
+            inv_all.clone()
+        } else {
+            c.mul(&inv_all, &prefix[i])
+        };
+        sum = c.add(&sum, &inv_i);
+        if i > 0 {
+            inv_all = c.mul(&inv_all, &dens[i]);
+        }
+    }
+    Some(finish_a(c, x, c.mul(x, &sum), xs.len()))
+}
+
+/// `X = x + A + A²` with `A = (s mod 2) + xΣ`.
+fn finish_a(c: &F2mCtx, x: &F2mElement, x_sigma: F2mElement, s: usize) -> F2mElement {
+    let a = if s % 2 == 1 {
+        c.add(&x_sigma, &c.one())
+    } else {
+        x_sigma
+    };
+    c.add(&c.add(x, &a), &c.sqr(&a))
+}
+
+/// [`velu_x_map`] on the counting context: Horner on `h` and on `h'`.
+/// The kernel polynomial and its derivative are inputs (building `h` from
+/// the abscissae costs `s(s−1)/2` multiplications, counted by
+/// [`kernel_poly_counted`]).
+pub fn xeval_kernel_poly(
+    c: &F2mCtx,
+    x: &F2mElement,
+    h: &F2mPoly,
+    dh: &F2mPoly,
+) -> Option<F2mElement> {
+    let horner = |p: &F2mPoly| -> F2mElement {
+        let Some(d) = p.degree() else {
+            return c.zero();
+        };
+        let mut acc = p.coeff(d);
+        for i in (0..d).rev() {
+            acc = c.add(&c.mul(&acc, x), &p.coeff(i));
+        }
+        acc
+    };
+    let hv = horner(h);
+    if hv.is_zero() {
+        return None;
+    }
+    let hpv = horner(dh);
+    let s = h.degree().unwrap_or(0);
+    let xs = c.mul(&c.mul(x, &hpv), &c.inv(&hv)?);
+    Some(finish_a(c, x, xs, s))
+}
+
+/// `h = Π (x + x_i)`, counted.
+pub fn kernel_poly_counted(c: &F2mCtx, xs: &[F2mElement]) -> F2mPoly {
+    // coefficients low → high, monic
+    let mut coeffs = vec![c.one()];
+    for xi in xs {
+        let mut next = vec![c.zero(); coeffs.len() + 1];
+        for (j, cj) in coeffs.iter().enumerate() {
+            // (x + xi)·Σ cj x^j: cj → x^{j+1}, xi·cj → x^j
+            next[j + 1] = c.add(&next[j + 1], cj);
+            let t = if cj.is_zero() || *cj == c.one() {
+                if *cj == c.one() {
+                    xi.clone()
+                } else {
+                    c.zero()
+                }
+            } else {
+                c.mul(xi, cj)
+            };
+            next[j] = c.add(&next[j], &t);
+        }
+        coeffs = next;
+    }
+    F2mPoly::from_coeffs(coeffs, c.n)
+}
+
+/// The fraction form: `Σ 1/(x + x_i) = N/D` accumulated as
+/// `N ← N·d + D`, `D ← D·d` (`2M` per kernel point), one inversion.
+pub fn xeval_fraction(c: &F2mCtx, x: &F2mElement, xs: &[F2mElement]) -> Option<F2mElement> {
+    let (num, den) = fraction_sum(c, x, xs)?;
+    let xs_ = c.mul(&c.mul(x, &num), &c.inv(&den)?);
+    Some(finish_a(c, x, xs_, xs.len()))
+}
+
+/// `(N, D)` with `N/D = Σ 1/(x + x_i)`; `None` at a kernel abscissa.
+fn fraction_sum(c: &F2mCtx, x: &F2mElement, xs: &[F2mElement]) -> Option<(F2mElement, F2mElement)> {
+    let mut it = xs.iter();
+    let Some(x1) = it.next() else {
+        return Some((c.zero(), c.one()));
+    };
+    let mut den = c.add(x, x1);
+    if den.is_zero() {
+        return None;
+    }
+    let mut num = c.one();
+    for xi in it {
+        let d = c.add(x, xi);
+        if d.is_zero() {
+            return None;
+        }
+        num = c.add(&c.mul(&num, &d), &den);
+        den = c.mul(&den, &d);
+    }
+    Some((num, den))
+}
+
+/// The fraction form for several points sharing one inversion
+/// (Montgomery's trick over the per-point denominators).
+pub fn xeval_fraction_multi(
+    c: &F2mCtx,
+    pts: &[F2mElement],
+    xs: &[F2mElement],
+) -> Option<Vec<F2mElement>> {
+    let mut nd = Vec::with_capacity(pts.len());
+    for x in pts {
+        nd.push(fraction_sum(c, x, xs)?);
+    }
+    // prefix products of the denominators
+    let mut prefix = Vec::with_capacity(nd.len());
+    let mut acc = c.one();
+    for (i, (_, d)) in nd.iter().enumerate() {
+        prefix.push(acc.clone());
+        acc = if i == 0 { d.clone() } else { c.mul(&acc, d) };
+    }
+    let mut inv_all = c.inv(&acc)?;
+    let mut out = vec![c.zero(); pts.len()];
+    for i in (0..nd.len()).rev() {
+        let inv_i = if i == 0 {
+            inv_all.clone()
+        } else {
+            c.mul(&inv_all, &prefix[i])
+        };
+        if i > 0 {
+            inv_all = c.mul(&inv_all, &nd[i].1);
+        }
+        let xs_ = c.mul(&c.mul(&pts[i], &nd[i].0), &inv_i);
+        out[i] = finish_a(c, &pts[i], xs_, xs.len());
+    }
+    Some(out)
+}
+
+/// The product form `φ_Π(x) = x·Π((x·x_i + √b)/(x + x_i))²`, which is
+/// `u²·φ(x)` with `u = Π x_i`.  With `norm = Some(u^{-2})` the result is
+/// normalised back to [`velu_x_map`]'s model (one more multiplication).
+pub fn xeval_product(
+    c: &F2mCtx,
+    x: &F2mElement,
+    xs: &[F2mElement],
+    sqrt_b: &F2mElement,
+    norm: Option<&F2mElement>,
+) -> Option<F2mElement> {
+    let mut num = c.one();
+    let mut den = c.one();
+    for (i, xi) in xs.iter().enumerate() {
+        let d = c.add(x, xi);
+        if d.is_zero() {
+            return None;
+        }
+        let t = c.add(&c.mul(x, xi), sqrt_b);
+        if i == 0 {
+            num = t;
+            den = d;
+        } else {
+            num = c.mul(&num, &t);
+            den = c.mul(&den, &d);
+        }
+    }
+    let q = c.mul(&num, &c.inv(&den)?);
+    let mut out = c.mul(x, &c.sqr(&q));
+    if let Some(n) = norm {
+        out = c.mul(&out, n);
+    }
+    Some(out)
+}
+
+/// Inversion-free projective evaluation: `(X : Z) ↦ (X' : Z')` with
+/// `x = X/Z`, `d_i = X + x_i Z`, `Σ 1/(x + x_i) = Z·N/D`,
+/// `Aₙ = (s mod 2)·D + X·N`,
+/// `X' = D·(X·D + Z·Aₙ) + Z·Aₙ²`, `Z' = Z·D²`.
+/// `None` at a kernel abscissa (`D = 0`).
+pub fn xeval_projective(
+    c: &F2mCtx,
+    xz: (&F2mElement, &F2mElement),
+    xs: &[F2mElement],
+) -> Option<(F2mElement, F2mElement)> {
+    let (x, z) = xz;
+    let mut num = c.zero();
+    let mut den = c.one();
+    for (i, xi) in xs.iter().enumerate() {
+        let d = c.add(x, &c.mul(xi, z));
+        if d.is_zero() {
+            return None;
+        }
+        if i == 0 {
+            num = c.one();
+            den = d;
+        } else {
+            num = c.add(&c.mul(&num, &d), &den);
+            den = c.mul(&den, &d);
+        }
+    }
+    let xn = c.mul(x, &num);
+    let an = if xs.len() % 2 == 1 {
+        c.add(&den, &xn)
+    } else {
+        xn
+    };
+    let d2 = c.sqr(&den);
+    let inner = c.add(&c.mul(x, &den), &c.mul(z, &an));
+    let xp = c.add(&c.mul(&den, &inner), &c.mul(z, &c.sqr(&an)));
+    let zp = c.mul(z, &d2);
+    Some((xp, zp))
+}
+
+/// The subgroup abscissae `x(P), x(2P), …, x(sP)` from `x(P)` alone, by
+/// the char-2 Kummer line: `x(2P) = x² + b/x²`,
+/// `x((k+1)P) = x((k−1)P) + x(kP)·x(P)/(x(kP) + x(P))²`.  Works for a
+/// point on `E` or on its quadratic twist (both share the Kummer line).
+/// Counted (one inversion per step).
+pub fn subgroup_abscissae_counted(
+    c: &F2mCtx,
+    x1: &F2mElement,
+    b: &F2mElement,
+    s: usize,
+) -> Option<Vec<F2mElement>> {
+    let mut out = vec![x1.clone()];
+    if s == 1 {
+        return Some(out);
+    }
+    let x1s = c.sqr(x1);
+    let x2 = c.add(&x1s, &c.mul(b, &c.inv(&x1s)?));
+    out.push(x2);
+    while out.len() < s {
+        let k = out.len();
+        let xk = &out[k - 1];
+        let xkm1 = if k >= 2 { &out[k - 2] } else { x1 };
+        let den = c.sqr(&c.add(xk, x1));
+        let t = c.mul(&c.mul(xk, x1), &c.inv(&den)?);
+        out.push(c.add(xkm1, &t));
+    }
+    Some(out)
+}
+
+/// An ordinate for `x` on `y² + xy = x³ + a₂x² + b` over `F_{2^n}`, `n`
+/// odd: `y = x·z` with `z² + z = x + a₂ + b/x²`, `z` the half-trace.
+/// `None` when `x = 0` or the trace is 1 (then `x` is on the twist).
+pub fn y_for_x_odd(
+    x: &F2mElement,
+    a2: &F2mElement,
+    b: &F2mElement,
+    irr: &IrreduciblePoly,
+) -> Option<F2mElement> {
+    let n = irr.degree;
+    if n.is_multiple_of(2) || x.is_zero() {
+        return None;
+    }
+    let x2 = x.square(irr);
+    let cc = x.add(a2).add(&b.mul(&x2.flt_inverse(irr)?, irr));
+    let mut z = cc.clone();
+    let mut t = cc.clone();
+    for _ in 0..(n - 1) / 2 {
+        t = t.square(irr).square(irr);
+        z = z.add(&t);
+    }
+    (z.square(irr).add(&z) == cc).then(|| x.mul(&z, irr))
+}
+
+/// The rational ℓ-kernels of `y² + xy = x³ + a₂x² + b` over `F_{2^n}`
+/// whose abscissae are all in `F_{2^n}`: the `F_{2^n}`-roots of `ψ_ℓ`,
+/// grouped into subgroups.  Each kernel is its `s = (ℓ−1)/2` abscissae in
+/// generation order `x(P), x(2P), …`.
+pub fn rational_kernels_wide(
+    b: &F2mElement,
+    ell: u32,
+    irr: &IrreduciblePoly,
+) -> Vec<Vec<F2mElement>> {
+    let n = irr.degree;
+    let psi = division_polynomial(b, ell, n, irr);
+    let mut roots = find_roots_in_f2m(&psi, n, irr);
+    roots.sort_by_key(|r| r.to_biguint());
+    roots.dedup();
+    let s = ((ell - 1) / 2) as usize;
+    let c = F2mCtx::new(irr);
+    let mut used = vec![false; roots.len()];
+    let mut out = Vec::new();
+    for i in 0..roots.len() {
+        if used[i] {
+            continue;
+        }
+        let Some(xs) = subgroup_abscissae_counted(&c, &roots[i], b, s) else {
+            continue;
+        };
+        let mut ok = true;
+        for x in &xs {
+            match roots.iter().position(|r| r == x) {
+                Some(j) => used[j] = true,
+                None => ok = false,
+            }
+        }
+        if ok {
+            out.push(xs);
+        }
+    }
+    out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::cryptanalysis::binary_field_basis::BinaryFieldBasis;
+    use crate::cryptanalysis::binary_isogeny::{find_roots_in_f2m, phi_l_mod2_in_x};
+    use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+    use flate2::read::GzDecoder;
+    use std::io::Read;
+
+    fn field(n: u32) -> IrreduciblePoly {
+        find_irreducible_sparse(n).expect("a sparse irreducible exists")
+    }
+
+    #[test]
+    fn psi3_matches_its_closed_form_and_psi_recurrence_agrees() {
+        let n = 8;
+        let irr = field(n);
+        let a6 = elt(1, n);
+        let p3 = division_polynomial(&a6, 3, n, &irr);
+        assert_eq!(p3.degree(), Some(4), "deg ψ₃ = (9−1)/2");
+        let p5 = division_polynomial(&a6, 5, n, &irr);
+        assert_eq!(p5.degree(), Some(12), "deg ψ₅ = (25−1)/2");
+        let p7 = division_polynomial(&a6, 7, n, &irr);
+        assert_eq!(p7.degree(), Some(24), "deg ψ₇ = (49−1)/2");
+    }
+
+    /// The load-bearing test: Vélu's codomain, derived here from scratch for
+    /// char 2, against the classical modular polynomial the repository
+    /// tabulates independently.
+    #[test]
+    fn velu_matches_the_modular_polynomial_at_ell_3() {
+        let n = 8;
+        let irr = field(n);
+        let gf = Gf2::new(&irr);
+        let a6v = 1u64;
+        let a6 = elt(a6v, n);
+
+        let psi3 = division_polynomial(&a6, 3, n, &irr);
+        let roots = find_roots_in_f2m(&psi3, n, &irr);
+        assert_eq!(roots.len(), 4, "E[3] is rational over F_2^8 here");
+
+        let j = gf.inv(a6v);
+        let phi = phi_l_mod2_in_x(3, &elt(j, n), n, &irr);
+        let jroots: Vec<u64> = find_roots_in_f2m(&phi, n, &irr)
+            .iter()
+            .map(to_u64)
+            .collect();
+        assert_eq!(jroots.len(), 4);
+
+        for root in &roots {
+            // d = 1, so the kernel polynomial is the linear factor.
+            let h = F2mPoly::from_coeffs(vec![root.clone(), F2mElement::one(n)], n);
+            let a6p = velu_codomain(&a6, &h, n, &irr);
+            let a6p_v = to_u64(&a6p);
+            assert_ne!(a6p_v, 0, "codomain must be non-singular");
+            let jp = gf.inv(a6p_v);
+            assert!(
+                jroots.contains(&jp),
+                "j' = {jp} from Vélu is not a root of Φ₃(X, {j})"
+            );
+        }
+    }
+
+    /// Vélu's codomain at ℓ = 5 and 7 against the exact-integer Φ_ℓ
+    /// (`modular_polynomial::phi_exact`): for a rational cyclic kernel of
+    /// order ℓ, j' = 1/a₆' is a root of Φ_ℓ(X, j) and the codomain has the
+    /// domain's order. Extends the ℓ = 3 oracle above.
+    #[test]
+    fn velu_codomain_matches_exact_phi_at_ell_5_and_7() {
+        for ell in [5u64, 7] {
+            let mut tested = 0;
+            'search: for n in 9u32..=13 {
+                let irr = field(n);
+                let gf = Gf2::new(&irr);
+                for a6v in 1u64..40 {
+                    let Some(curve) = Curve::new(n, &irr, 0, a6v) else {
+                        continue;
+                    };
+                    if curve.order % ell != 0 || curve.order % (ell * ell) == 0 {
+                        continue;
+                    }
+                    // A point of exact order ell: multiply any point by order/ell.
+                    let cof = curve.order / ell;
+                    let mut kernel_pt = None;
+                    for x in 1u64..(1u64 << n) {
+                        for r in curve.points_with_x(x) {
+                            let q = curve.fast.mul_u64(r, cof);
+                            if !q.infinity {
+                                kernel_pt = Some(q);
+                                break;
+                            }
+                        }
+                        if kernel_pt.is_some() {
+                            break;
+                        }
+                    }
+                    let p = kernel_pt.expect("order divisible by ell has such a point");
+                    // h(X) = prod_{i=1}^{(ell-1)/2} (X + x(iP)).
+                    let mut h = F2mPoly::from_coeffs(vec![F2mElement::one(n)], n);
+                    let mut multiple = p;
+                    for _ in 0..(ell - 1) / 2 {
+                        let lin =
+                            F2mPoly::from_coeffs(vec![elt(multiple.x, n), F2mElement::one(n)], n);
+                        h = h.mul(&lin, &irr);
+                        multiple = curve.fast.add(multiple, p);
+                    }
+                    let a6 = elt(a6v, n);
+                    let a6p = velu_codomain(&a6, &h, n, &irr);
+                    let a6p_v = to_u64(&a6p);
+                    assert_ne!(a6p_v, 0, "ell={ell} n={n} a6={a6v}: singular codomain");
+                    let jp = gf.inv(a6p_v);
+                    let phi = phi_l_mod2_in_x(ell as u32, &elt(gf.inv(a6v), n), n, &irr);
+                    let jroots: Vec<u64> = find_roots_in_f2m(&phi, n, &irr)
+                        .iter()
+                        .map(to_u64)
+                        .collect();
+                    assert!(
+                        jroots.contains(&jp),
+                        "ell={ell} n={n} a6={a6v}: j'={jp} not a root of Phi_ell"
+                    );
+                    let codomain = Curve::new(n, &irr, 0, a6p_v).expect("codomain curve");
+                    assert_eq!(
+                        codomain.order, curve.order,
+                        "ell={ell} n={n} a6={a6v}: order changed"
+                    );
+                    tested += 1;
+                    if tested >= 3 {
+                        break 'search;
+                    }
+                }
+            }
+            assert!(
+                tested >= 1,
+                "no rational order-{ell} kernel found in the search range"
+            );
+        }
+    }
+
+    #[test]
+    fn the_codomain_is_isogenous_so_its_order_is_unchanged() {
+        let n = 8;
+        let irr = field(n);
+        let a6v = 1u64;
+        let domain = Curve::new(n, &irr, 0, a6v).expect("curve");
+        let psi3 = division_polynomial(&elt(a6v, n), 3, n, &irr);
+        for root in find_roots_in_f2m(&psi3, n, &irr) {
+            let h = F2mPoly::from_coeffs(vec![root, F2mElement::one(n)], n);
+            let iso = isogeny_from_kernel(&domain, h, 3);
+            let codomain = Curve::new(n, &irr, 0, iso.a6_codomain).expect("codomain is a curve");
+            assert_eq!(
+                codomain.order, domain.order,
+                "an isogeny preserves the number of points"
+            );
+        }
+    }
+
+    #[test]
+    fn rational_torsion_finds_every_subgroup_the_division_polynomial_does() {
+        let n = 8;
+        let irr = field(n);
+        let a6v = 1u64;
+        let curve = Curve::new(n, &irr, 0, a6v).expect("curve");
+        assert_eq!(curve.order % 3, 0, "3 | #E, so the torsion route applies");
+
+        let from_points = kernels_via_rational_torsion(&curve, 3, 1 << n);
+        let psi3 = division_polynomial(&elt(a6v, n), 3, n, &irr);
+        let from_psi = find_roots_in_f2m(&psi3, n, &irr);
+
+        let a: BTreeSet<u64> = from_points.iter().map(|h| to_u64(&h.coeff(0))).collect();
+        let b: BTreeSet<u64> = from_psi.iter().map(to_u64).collect();
+        assert_eq!(a, b, "both routes must name the same four subgroups");
+    }
+
+    #[test]
+    fn the_x_map_sends_the_curve_into_its_codomain() {
+        let n = 8;
+        let irr = field(n);
+        let a6v = 1u64;
+        let domain = Curve::new(n, &irr, 0, a6v).expect("curve");
+        let psi3 = division_polynomial(&elt(a6v, n), 3, n, &irr);
+        let root = find_roots_in_f2m(&psi3, n, &irr)
+            .into_iter()
+            .next()
+            .expect("a kernel");
+        let h = F2mPoly::from_coeffs(vec![root, F2mElement::one(n)], n);
+        let iso = isogeny_from_kernel(&domain, h, 3);
+        let codomain = Curve::new(n, &irr, 0, iso.a6_codomain).expect("codomain");
+
+        let mut mapped = 0;
+        for x in 0..(1u64 << n) {
+            if domain.points_with_x(x).is_empty() {
+                continue;
+            }
+            let Some(xe) = velu_x_map(&elt(x, n), &iso.kernel, n, &irr) else {
+                continue; // kernel abscissa, maps to O
+            };
+            assert!(
+                !codomain.points_with_x(to_u64(&xe)).is_empty(),
+                "φ({x}) = {} is not an abscissa on the codomain",
+                to_u64(&xe)
+            );
+            mapped += 1;
+        }
+        assert!(mapped > 0, "something must have been mapped");
+    }
+
+    #[test]
+    fn full_point_map_preserves_sign_and_addition_on_small_curve() {
+        let n = 8;
+        let irr = field(n);
+        let domain = Curve::new(n, &irr, 0, 1).expect("curve");
+        let psi3 = division_polynomial(&elt(1, n), 3, n, &irr);
+        for root in find_roots_in_f2m(&psi3, n, &irr) {
+            let kernel_x = to_u64(&root);
+            let kernel_point = domain.points_with_x(kernel_x)[0];
+            let h = F2mPoly::from_coeffs(vec![root, F2mElement::one(n)], n);
+            let iso = isogeny_from_kernel(&domain, h, 3);
+            let codomain = Curve::new(n, &irr, 0, iso.a6_codomain).expect("codomain");
+            assert!(velu_preimage_point(&domain, &iso, FastPoint::INFINITY).is_err());
+            let map = |p| velu_point_map(p, &iso.kernel, n, &irr).expect("defined map");
+            assert_eq!(map(FastPoint::INFINITY), FastPoint::INFINITY);
+            assert_eq!(
+                velu_point_map_binary(&BinaryPoint::Infinity, &iso.kernel, n, &irr),
+                Some(BinaryPoint::Infinity),
+                "both wrappers preserve the identity"
+            );
+            let points: Vec<_> = (0..(1u64 << n))
+                .flat_map(|x| domain.points_with_x(x))
+                .collect();
+            for &p in &points {
+                let image = map(p);
+                let wide_point = if p.infinity {
+                    BinaryPoint::Infinity
+                } else {
+                    BinaryPoint::Affine {
+                        x: elt(p.x, n),
+                        y: elt(p.y, n),
+                    }
+                };
+                let wide_image = velu_point_map_binary(&wide_point, &iso.kernel, n, &irr)
+                    .expect("wide map is defined");
+                let expected_wide = if image.infinity {
+                    BinaryPoint::Infinity
+                } else {
+                    BinaryPoint::Affine {
+                        x: elt(image.x, n),
+                        y: elt(image.y, n),
+                    }
+                };
+                assert_eq!(wide_image, expected_wide, "wide and u64 maps differ");
+                assert!(codomain.fast.is_on_curve(image), "image of {p:?} off curve");
+                assert_eq!(image, codomain.fast.neg(map(domain.fast.neg(p))));
+                if !image.infinity {
+                    assert_eq!(
+                        Some(image.x),
+                        velu_x_map(&elt(p.x, n), &iso.kernel, n, &irr).map(|x| to_u64(&x))
+                    );
+                    // Independent direct Vélu sum: for a degree-3 kernel,
+                    // normalized Y = y(P) + y(P+Q) + y(P-Q).
+                    let plus = domain.fast.add(p, kernel_point);
+                    let minus = domain.fast.add(p, domain.fast.neg(kernel_point));
+                    assert!(!plus.infinity && !minus.infinity);
+                    assert_eq!(image.y, p.y ^ plus.y ^ minus.y);
+                }
+            }
+            for &p in points.iter().step_by(17) {
+                for &q in points.iter().step_by(19) {
+                    assert_eq!(
+                        map(domain.fast.add(p, q)),
+                        codomain.fast.add(map(p), map(q)),
+                        "homomorphism failed at {p:?} + {q:?}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn wide_point_map_retains_high_bits_and_rejects_width_mismatches() {
+        let n = 113;
+        let irr = IrreduciblePoly::deg_113();
+        // A constant kernel is the degree-one identity map. It isolates the
+        // representation contract from curve-membership obligations and
+        // makes truncation of either coordinate immediately visible.
+        let identity_kernel = F2mPoly::one(n);
+        let point = BinaryPoint::Affine {
+            x: F2mElement::from_bit_positions(&[3, 79, 112], n),
+            y: F2mElement::from_bit_positions(&[7, 64, 109], n),
+        };
+        assert_eq!(
+            velu_point_map_binary(&point, &identity_kernel, n, &irr),
+            Some(point.clone()),
+            "the wide wrapper must not truncate coordinates above bit 63"
+        );
+        assert_eq!(
+            velu_point_map_binary(&BinaryPoint::Infinity, &identity_kernel, n, &irr),
+            Some(BinaryPoint::Infinity)
+        );
+
+        let wrong_width_point = BinaryPoint::Affine {
+            x: F2mElement::one(n - 1),
+            y: F2mElement::zero(n - 1),
+        };
+        assert_eq!(
+            velu_point_map_binary(&wrong_width_point, &identity_kernel, n, &irr),
+            None
+        );
+
+        // F2mPoly exposes its representation, so reject a polynomial whose
+        // declared field and coefficient fields disagree before eval() can
+        // rely on debug-only width assertions.
+        let wrong_width_kernel = F2mPoly {
+            m: n,
+            coeffs: vec![F2mElement::one(n - 1)],
+        };
+        assert_eq!(
+            velu_point_map_binary(&point, &wrong_width_kernel, n, &irr),
+            None
+        );
+
+        let malformed_modulus = IrreduciblePoly {
+            degree: n,
+            low_terms: vec![0, n],
+        };
+        assert_eq!(
+            velu_point_map_binary(&point, &identity_kernel, n, &malformed_modulus),
+            None
+        );
+
+        // The packed wrapper must reject a wide field before evaluating its
+        // bit mask or converting through u64.
+        assert_eq!(
+            velu_point_map(FastPoint::affine(1, 1), &identity_kernel, n, &irr),
+            None
+        );
+    }
+
+    fn archive_field_element(expression: &str) -> u64 {
+        let mut value = 0u64;
+        for monomial in expression.trim_matches(['(', ')']).split(" + ") {
+            let bit = match monomial {
+                "1" => 0,
+                "a" => 1,
+                power => power
+                    .strip_prefix("a^")
+                    .expect("archived field monomial")
+                    .parse::<u32>()
+                    .expect("archived field exponent"),
+            };
+            assert!(bit < 37, "archived coefficient exceeds field degree");
+            value ^= 1u64 << bit;
+        }
+        value
+    }
+
+    fn archive_kernel(expression: &str) -> F2mPoly {
+        let mut terms = Vec::new();
+        let mut start = 0;
+        let mut depth = 0;
+        for (index, symbol) in expression.char_indices() {
+            match symbol {
+                '(' => depth += 1,
+                ')' => depth -= 1,
+                '+' if depth == 0 => {
+                    terms.push(expression[start..index].trim());
+                    start = index + 1;
+                }
+                _ => {}
+            }
+        }
+        assert_eq!(depth, 0, "balanced archived polynomial");
+        terms.push(expression[start..].trim());
+        let mut coeffs = vec![F2mElement::zero(37); 37];
+        for term in terms {
+            let (coefficient, degree) = if let Some((coefficient, suffix)) = term.rsplit_once("*x")
+            {
+                (archive_field_element(coefficient), archive_x_degree(suffix))
+            } else if let Some(suffix) = term.strip_prefix('x') {
+                (1, archive_x_degree(suffix))
+            } else {
+                (archive_field_element(term), 0)
+            };
+            assert!(degree <= 36, "degree-36 archived kernel");
+            if degree == 0 {
+                // Sage prints the constant coefficient without parentheses.
+                coeffs[0] = elt(to_u64(&coeffs[0]) ^ coefficient, 37);
+            } else {
+                assert!(coeffs[degree].is_zero(), "duplicate kernel term");
+                coeffs[degree] = elt(coefficient, 37);
+            }
+        }
+        F2mPoly::from_coeffs(coeffs, 37)
+    }
+
+    fn archive_x_degree(suffix: &str) -> usize {
+        if suffix.is_empty() {
+            1
+        } else {
+            suffix
+                .strip_prefix('^')
+                .expect("archived x power")
+                .parse()
+                .expect("archived x exponent")
+        }
+    }
+
+    fn degree_73_archive() -> serde_json::Value {
+        let bytes = include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz"
+        ));
+        let mut raw = String::new();
+        GzDecoder::new(&bytes[..])
+            .read_to_string(&mut raw)
+            .expect("frozen descent archive is gzip JSON");
+        serde_json::from_str(&raw).expect("frozen descent JSON")
+    }
+
+    #[test]
+    fn archived_degree_73_descent_has_oriented_native_point_map() {
+        let record = degree_73_archive();
+        let certificate = &record["isogeny_certificate"];
+        assert_eq!(certificate["degree"], 73);
+        assert_eq!(
+            certificate["field_modulus"],
+            "x^37 + x^5 + x^4 + x^3 + x^2 + x + 1"
+        );
+        let irr = IrreduciblePoly {
+            degree: 37,
+            low_terms: vec![0, 1, 2, 3, 4, 5],
+        };
+        let order = 137_439_487_532u64;
+        let subgroup_order = 230_603_167u64;
+        assert_eq!(order % subgroup_order, 0);
+        let domain = Curve::with_order(37, &irr, 0, 1, order).expect("source curve");
+        let kernel = archive_kernel(
+            certificate["kernel_polynomial"]
+                .as_str()
+                .expect("archived kernel"),
+        );
+        assert_eq!(kernel.degree(), Some(36));
+        assert_eq!(to_u64(&kernel.lead()), 1);
+        let iso = isogeny_from_kernel(&domain, kernel, 73);
+        let expected_a6 = archive_field_element(
+            certificate["target_normalized_coefficients"]["a6"]
+                .as_str()
+                .expect("archived normalized a6"),
+        );
+        assert_eq!(iso.a6_codomain, expected_a6);
+        assert_eq!(
+            iso.t,
+            archive_field_element(
+                certificate["target_normalized_coefficients"]["y_shift"]
+                    .as_str()
+                    .expect("archived y shift")
+            )
+        );
+        let codomain = Curve::with_order(37, &irr, 0, expected_a6, order).expect("leaf curve");
+        let map = |p| velu_point_map(p, &iso.kernel, 37, &irr).expect("defined isogeny map");
+        assert_eq!(map(FastPoint::INFINITY), FastPoint::INFINITY);
+
+        let mut points = Vec::new();
+        for x in 1..128 {
+            let Some(p) = domain.points_with_x(x).into_iter().next() else {
+                continue;
+            };
+            let p = domain.fast.mul_u64(p, order / subgroup_order);
+            if p.infinity || points.contains(&p) {
+                continue;
+            }
+            assert!(domain.fast.mul_u64(p, subgroup_order).infinity);
+            let image = map(p);
+            assert!(!image.infinity);
+            assert!(codomain.fast.is_on_curve(image));
+            assert!(codomain.fast.mul_u64(image, subgroup_order).infinity);
+            assert_eq!(map(domain.fast.neg(p)), codomain.fast.neg(image));
+            assert_eq!(
+                Some(image.x),
+                velu_x_map(&elt(p.x, 37), &iso.kernel, 37, &irr).map(|x| to_u64(&x))
+            );
+            points.push(p);
+            if points.len() == 8 {
+                break;
+            }
+        }
+        assert_eq!(points.len(), 8, "deterministic subgroup sample");
+        for pair in points.windows(2) {
+            let p = pair[0];
+            let q = pair[1];
+            assert_eq!(
+                map(domain.fast.add(p, q)),
+                codomain.fast.add(map(p), map(q)),
+                "archived degree-73 map must be a homomorphism"
+            );
+        }
+        let p = points[0];
+        let d = 12_345_678u64;
+        assert_eq!(
+            map(domain.fast.mul_u64(p, d)),
+            codomain.fast.mul_u64(map(p), d),
+            "transported target must retain its signed logarithm"
+        );
+    }
+
+    #[test]
+    fn frozen_unknown_targets_reach_degree_73_leaf_through_basis_bridge() {
+        let frozen: serde_json::Value = serde_json::from_str(include_str!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json"
+        )))
+        .expect("frozen campaign");
+        let spec = &frozen["specs"]["n37_L1024"];
+        let source_modulus = IrreduciblePoly {
+            degree: 37,
+            low_terms: serde_json::from_value(spec["field_modulus_low_terms"].clone())
+                .expect("control modulus"),
+        };
+        let archive_modulus = IrreduciblePoly {
+            degree: 37,
+            low_terms: vec![0, 1, 2, 3, 4, 5],
+        };
+        let bridge = BinaryFieldBasis::from_generator_image(
+            &source_modulus,
+            &archive_modulus,
+            10_156_182_909,
+        )
+        .expect("frozen field-basis bridge");
+        let certificate = degree_73_archive();
+        let certificate = &certificate["isogeny_certificate"];
+        assert_eq!(
+            certificate["field_modulus"],
+            "x^37 + x^5 + x^4 + x^3 + x^2 + x + 1"
+        );
+        let order = 137_439_487_532;
+        let subgroup_order = spec["subgroup_order"].as_u64().expect("subgroup order");
+        let control = Curve::with_order(37, &source_modulus, 0, 1, order).expect("control curve");
+        let archived_source =
+            Curve::with_order(37, &archive_modulus, 0, 1, order).expect("archived source");
+        let kernel = archive_kernel(
+            certificate["kernel_polynomial"]
+                .as_str()
+                .expect("archived kernel"),
+        );
+        let iso = isogeny_from_kernel(&archived_source, kernel, 73);
+        let expected_a6 = archive_field_element(
+            certificate["target_normalized_coefficients"]["a6"]
+                .as_str()
+                .expect("leaf coefficient"),
+        );
+        assert_eq!(iso.a6_codomain, expected_a6);
+        let leaf =
+            Curve::with_order(37, &archive_modulus, 0, expected_a6, order).expect("archived leaf");
+        let transport = |p| {
+            velu_point_map(
+                bridge.map_point(p).expect("basis image"),
+                &iso.kernel,
+                37,
+                &archive_modulus,
+            )
+            .expect("degree-73 image")
+        };
+        let generator_words: [u64; 2] =
+            serde_json::from_value(spec["generator"].clone()).expect("control generator");
+        let generator = FastPoint::affine(generator_words[0], generator_words[1]);
+        let image_generator = transport(generator);
+        assert!(!image_generator.infinity);
+        assert!(leaf.fast.is_on_curve(image_generator));
+        assert!(leaf.fast.mul_u64(image_generator, subgroup_order).infinity);
+        assert_eq!(
+            velu_preimage_point(&archived_source, &iso, image_generator),
+            bridge
+                .map_point(generator)
+                .ok_or("mapped generator".to_string())
+        );
+        assert_eq!(
+            velu_preimage_point(&archived_source, &iso, FastPoint::INFINITY),
+            Ok(FastPoint::INFINITY)
+        );
+        assert!(velu_preimage_point(&archived_source, &iso, FastPoint::affine(0, 0)).is_err());
+        let source_two_torsion = control.points_with_x(0)[0];
+        assert_eq!(
+            velu_preimage_point(&archived_source, &iso, transport(source_two_torsion)),
+            bridge
+                .map_point(source_two_torsion)
+                .ok_or("mapped two-torsion".to_string())
+        );
+
+        let points = include_str!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl"
+        ));
+        let mut count = 0;
+        for line in points.lines() {
+            let words: [u64; 2] = serde_json::from_str(line).expect("public target");
+            let q = FastPoint::affine(words[0], words[1]);
+            assert!(control.fast.is_on_curve(q));
+            let image = transport(q);
+            assert!(!image.infinity);
+            assert!(leaf.fast.is_on_curve(image));
+            assert!(leaf.fast.mul_u64(image, subgroup_order).infinity);
+            assert_eq!(transport(control.fast.neg(q)), leaf.fast.neg(image));
+            if count < 4 {
+                assert_eq!(
+                    velu_preimage_point(&archived_source, &iso, image),
+                    bridge.map_point(q).ok_or("mapped target".to_string())
+                );
+            }
+            if count < 16 {
+                assert_eq!(
+                    transport(control.fast.add(generator, q)),
+                    leaf.fast.add(image_generator, image)
+                );
+            }
+            count += 1;
+        }
+        assert_eq!(count, 1024);
+
+        // These points are chosen on the descendant itself, before any
+        // source coordinates are known. They exercise the intended native
+        // base -> pullback direction rather than only reversing pushforwards.
+        let mut native_points = Vec::new();
+        let mut manifest_rows = Vec::new();
+        for x in 1..4096 {
+            let Some(point) = leaf.points_with_x(x).into_iter().next() else {
+                continue;
+            };
+            let native = leaf.fast.mul_u64(point, order / subgroup_order);
+            if native.infinity
+                || native_points
+                    .iter()
+                    .any(|point: &FastPoint| point.x == native.x)
+            {
+                continue;
+            }
+            let archived_preimage =
+                velu_preimage_point(&archived_source, &iso, native).expect("native pullback");
+            assert!(archived_source.fast.is_on_curve(archived_preimage));
+            assert!(
+                archived_source
+                    .fast
+                    .mul_u64(archived_preimage, subgroup_order)
+                    .infinity
+            );
+            let control_preimage = bridge
+                .inverse_point(archived_preimage)
+                .expect("control-basis pullback");
+            assert!(control.fast.is_on_curve(control_preimage));
+            assert_eq!(transport(control_preimage), native);
+            manifest_rows.push(serde_json::json!({
+                "index": native_points.len(),
+                "leaf": [native.x, native.y],
+                "archive_pullback": [archived_preimage.x, archived_preimage.y],
+                "control_pullback": [control_preimage.x, control_preimage.y]
+            }));
+            native_points.push(native);
+            if native_points.len() == 42 {
+                break;
+            }
+        }
+        assert_eq!(native_points.len(), 42);
+        let manifest = serde_json::json!({
+            "schema": "n37-native-42-basis-bridge-v1",
+            "control_model": "icv1-f2m37-tm534059-32aad96b",
+            "source_modulus_low_terms": [0, 1, 4, 6],
+            "archive_modulus_low_terms": [0, 1, 2, 3, 4, 5],
+            "source_generator_image": 10_156_182_909u64,
+            "isogeny_degree": 73,
+            "group_order": order,
+            "subgroup_order": subgroup_order,
+            "cofactor": order / subgroup_order,
+            "archive_sha256": "eb4773d556886672e8b80735fc486c16b73765fd5069ff81133100bfc3eafa90",
+            "frozen_sha256": "da958a3f1117dd1b88703fed2055c5c9f64255516e1e920f35d193bf53c6a88d",
+            "points_sha256": "187ec04fe50326bbb2f17dadf76056841f04af37a8abb8ff7f502fcd531711ad",
+            "selection": "first 42 distinct sign classes after cofactor 596 of first lift at ascending leaf x",
+            "rows": manifest_rows
+        });
+        if let Ok(path) = std::env::var("N37_NATIVE_BASE_MANIFEST_OUT") {
+            std::fs::write(
+                path,
+                serde_json::to_vec_pretty(&manifest).expect("manifest JSON"),
+            )
+            .expect("write native manifest");
+        }
+        let frozen_manifest: serde_json::Value = serde_json::from_str(include_str!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json"
+        )))
+        .expect("frozen native base manifest");
+        assert_eq!(manifest, frozen_manifest);
+    }
+
+    // ── lit2026 W11: x-only evaluators ─────────────────────────────────
+
+    /// Every x-only evaluator agrees with [`velu_x_map`] and with the
+    /// abscissa of [`velu_point_map_binary`], whose image lies on the
+    /// [`velu_codomain`] curve; the product form is `u²·φ`, `u = Π x_i`.
+    /// ℓ = 3, 5, 7 over `F_{2^163}` (the sect163 field polynomial).
+    #[test]
+    fn xonly_evaluators_match_velu_at_163_bits() {
+        let irr = IrreduciblePoly::deg_163();
+        let n = 163u32;
+        let c = F2mCtx::new(&irr);
+        for ell in [3u32, 5, 7] {
+            let s = ((ell - 1) / 2) as usize;
+            // first b = elt(v) with an x-rational ℓ-kernel
+            let (b, kernels) = (1u64..400)
+                .map(|v| {
+                    let b = elt(v.wrapping_mul(0x9E37_79B9) ^ 0x5bd1e995, n);
+                    let k = rational_kernels_wide(&b, ell, &irr);
+                    (b, k)
+                })
+                .find(|(_, k)| !k.is_empty())
+                .expect("an x-rational kernel within the scan");
+            let sqrt_b = c.sqrt(&b);
+            for xs in kernels.iter().take(2) {
+                assert_eq!(xs.len(), s);
+                let h = kernel_poly_counted(&c, xs);
+                let dh = derivative(&h, n);
+                let a6p = velu_codomain(&b, &h, n, &irr);
+                let u = xs.iter().skip(1).fold(xs[0].clone(), |a, x| a.mul(x, &irr));
+                let u2inv = u.square(&irr).flt_inverse(&irr).unwrap();
+                // carried points: x on E (a2 = 1) with a y
+                let one = F2mElement::one(n);
+                let mut tried = 0;
+                for v in 2u64..200 {
+                    let x = elt(v * 7919 + 13, n);
+                    let Some(y) = y_for_x_odd(&x, &one, &b, &irr) else {
+                        continue;
+                    };
+                    let pt = BinaryPoint::Affine { x: x.clone(), y };
+                    let want = velu_x_map(&x, &h, n, &irr).unwrap();
+                    let full = velu_point_map_binary(&pt, &h, n, &irr).unwrap();
+                    let BinaryPoint::Affine { x: fx, y: fy } = &full else {
+                        panic!("O")
+                    };
+                    assert_eq!(fx, &want, "Vélu point map vs x map");
+                    // image on y² + xy = x³ + x² + a6'
+                    let lhs = fy.square(&irr).add(&fx.mul(fy, &irr));
+                    let fx2 = fx.square(&irr);
+                    let rhs = fx2.mul(fx, &irr).add(&fx2).add(&a6p);
+                    assert_eq!(lhs, rhs, "image on the codomain");
+                    assert_eq!(xeval_batch_inverse(&c, &x, xs).unwrap(), want);
+                    assert_eq!(xeval_kernel_poly(&c, &x, &h, &dh).unwrap(), want);
+                    assert_eq!(xeval_fraction(&c, &x, xs).unwrap(), want);
+                    let prod = xeval_product(&c, &x, xs, &sqrt_b, None).unwrap();
+                    assert_eq!(prod, want.mul(&u.square(&irr), &irr), "φ_Π = u²φ");
+                    assert_eq!(
+                        xeval_product(&c, &x, xs, &sqrt_b, Some(&u2inv)).unwrap(),
+                        want
+                    );
+                    let z = elt(v + 99, n);
+                    let (xp, zp) = xeval_projective(&c, (&x.mul(&z, &irr), &z), xs).unwrap();
+                    assert_eq!(xp.mul(&zp.flt_inverse(&irr).unwrap(), &irr), want);
+                    let multi = xeval_fraction_multi(&c, &[x.clone(), want.clone()], xs).unwrap();
+                    assert_eq!(multi[0], want);
+                    assert_eq!(multi[1], xeval_fraction(&c, &want, xs).unwrap());
+                    tried += 1;
+                    if tried == 4 {
+                        break;
+                    }
+                }
+                assert_eq!(tried, 4, "ℓ={ell}: points found");
+                // kernel abscissae map to O
+                assert!(xeval_fraction(&c, &xs[0], xs).is_none());
+            }
+        }
+    }
+}

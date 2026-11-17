@@ -1,0 +1,45 @@
+LIB "linalg.lib";
+proc require58(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../space58-01/complete-space58.sing"));
+matrix zero58[96][100];
+require58(nrows(jets58)==514 && ncols(jets58)==196 && nrows(constraints58)==96 && ncols(constraints58)==196 && ncols(kernel58)==100,"CHECK58_ALL_MATRIX_SHAPES");
+require58(mat_rk(jets58)==196 && mat_rk(constraints58)==96 && mat_rk(kernel58)==100,"CHECK58_COMPLETE_RANKS");
+require58(constraints58*kernel58==zero58 && recovery58*kernel58==unitmat(100),"CHECK58_KERNEL_AND_LEFT_INVERSE");
+require58(kernel58*recovery58+homotopy58*constraints58==unitmat(196),"CHECK58_COMPLETE_KERNEL_RECOVERY");
+require58(jets58*sigma58==sigmaJets58 && sigma58*sigma58==unitmat(196),"CHECK58_AMBIENT_SOURCE_INVOLUTION");
+require58(sigma58*kernel58==kernel58*sigmaRestricted58 && sigmaRestricted58*sigmaRestricted58==unitmat(100),"CHECK58_RESTRICTED_SOURCE_INVOLUTION");
+require58(jets58*controlColumns58==controlJets58,"CHECK58_ALL_CONTROL_JETS");
+matrix N58=sigmaRestricted58+unitmat(100);int traceRank58=mat_rk(N58);matrix zeroSquare58[100][100];
+require58(N58*N58==zeroSquare58,"CHECK58_TRACE_SQUARE_ZERO");
+matrix bad58=kernel58;int nonzero58=1;while(constraints58[1,nonzero58]==0){nonzero58++;}bad58[nonzero58,1]=bad58[nonzero58,1]+1;
+require58(constraints58*bad58!=zero58,"CHECK58_CHANGED_KERNEL_REJECTED");
+execute(read("../../../57/runs/space57-02/complete-space57.sing"));
+execute(read("../include58-01/inclusion-space58.sing"));
+map newMap58=completeSpace58,w;matrix fullKernel58=newMap58(kernel58);matrix fullSigma58=newMap58(sigmaRestricted58);matrix fullN58=newMap58(N58);matrix fullJets58=newMap58(jets58);
+map oldMap58=completeSpace57,w;matrix oldSigma58=oldMap58(sigmaRestricted57);
+require58(mat_rk(inclusion58)==24 && fullKernel58*inclusion58==ambientInclusion58 && fullJets58*ambientInclusion58==inclusionJets58,"CHECK58_ALL_INCLUSION_PRODUCTS");
+require58(fullSigma58*inclusion58==inclusion58*oldSigma58,"CHECK58_INCLUSION_EQUIVARIANCE");
+require58(fullN58*contraction58+contraction58*fullN58==unitmat(100) && jordan58*jordanInverse58==unitmat(100),"CHECK58_FULL_TRACE_CONTRACTION");
+require58(fullN58*oldTracePreimages58==inclusion58*oldExceptional58,"CHECK58_FOUR_OLD_CLASSES_NEW_TRACES");
+execute(read("../field58-01/field-space58.sing"));ideal savedIdeal58=sourceIdeal58;ideal savedValues58=completeValues58;ideal savedDivided58=dividedValues58;poly savedA58=actualA58;
+execute(read("../../../50/runs/rr-field50-01/rr-field50.sing"));
+map fieldMap58=fieldSpace58,l,v;ideal GB58=std(fieldMap58(savedIdeal58));ideal actualValues58=fieldMap58(savedValues58);ideal actualDivided58=fieldMap58(savedDivided58);poly A58=fieldMap58(savedA58);
+map columnsMap58=completeSpace58,0;matrix columns58=columnsMap58(kernel58);
+int i58;int j58;poly reconstructed58;
+for(j58=1;j58<=100;j58++){
+ reconstructed58=0;for(i58=1;i58<=196;i58++){reconstructed58=reconstructed58+columns58[i58,j58]*rrProducts50[i58];}
+ require58(reduce(reconstructed58+actualValues58[j58],GB58)==0,"CHECK58_ALL100_ACTUAL_RECONSTRUCTIONS");
+ require58(reduce(A58^2*actualDivided58[j58]+actualValues58[j58],GB58)==0,"CHECK58_ALL100_DIVISION_PRODUCTS");
+}
+execute(read("../include58-01/inclusion-field58.sing"));ideal savedPreimages58=newTracePreimages58;
+setring rrFieldCertificate50;map preimageMap58=inclusionField58,l,v;ideal actualPreimages58=preimageMap58(savedPreimages58);
+map includeMap58=inclusionSpace58,0;matrix traceColumns58=includeMap58(oldTracePreimages58);matrix targetColumns58=includeMap58(oldTargets58);
+poly preimage58;poly target58;
+for(j58=1;j58<=4;j58++){
+ preimage58=0;target58=0;
+ for(i58=1;i58<=100;i58++){preimage58=preimage58+traceColumns58[i58,j58]*actualDivided58[i58];target58=target58+targetColumns58[i58,j58]*actualDivided58[i58];}
+ require58(reduce(preimage58+actualPreimages58[j58],GB58)==0,"CHECK58_ACTUAL_PREIMAGE_BINDING");
+ require58(reduce(subst(preimage58,l,l+A58)+preimage58+target58,GB58)==0,"CHECK58_FOUR_ACTUAL_TRACE_PRODUCTS");
+}
+print("CHECK58_RESULT ambient_dimension=196 complete_dimension=100 constraint_rank=96 field_reconstructions=100 division_products=100 inclusion_rank=24 old_classes_new_traces=4 actual_trace_products=4 sigma_nilpotent_rank="+string(traceRank58)+" corrupted_kernel_rejected=1");
+print("CHECK58_ALL_CHECKS_PASS");quit;

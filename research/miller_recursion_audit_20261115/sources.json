@@ -1,0 +1,337 @@
+{
+  "schema": "miller-recursion-source-plan/v1",
+  "created": "2026-11-15T06:48:18.585813+00:00",
+  "formal": {
+    "project": "research/miller_recursion_audit_20261115/lean",
+    "theorem": "MillerRecursionAudit.miller_recursion_certificate",
+    "statement": "theorem miller_recursion_certificate : (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (P : W.Point) (n : ℕ), millerFunction W P n ≠ 0 ∧ principalPointDivisor W (millerFunction W P n) ((miller_has_point_divisor W P n).support_finite W) = millerDivisor W P n ∧ functionValuation W (parameter W ^ (-pointOrder W (millerFunction W P n) 0) * millerFunction W P n - 1) < 1 ∧ (n • P = 0 → principalPointDivisor W (millerFunction W P n) ((miller_has_point_divisor W P n).support_finite W) = (n : ℤ) • Finsupp.single P 1 - (n : ℤ) • Finsupp.single 0 1)) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (P : W.Point) (i j : ℕ) (f g : W.FunctionField), IsMillerFunction W P i f → IsMillerFunction W P j g → IsMillerFunction W P (i + j) (f * g * stepFunction W (i • P) (j • P))) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (P : W.Point), millerFunction W P 1 = 1) ∧ controlCurve.Δ ≠ 0 ∧ twoPoint ≠ 0 ∧ twoPoint + twoPoint = 0 ∧ pointOrder controlCurve (stepFunction controlCurve twoPoint twoPoint) 0 = (-2 : ℤ) ∧ ¬ HasPointDivisor controlCurve (MillerNormValuationAudit.lineFunction controlCurve 4 0 (controlCurve.slope 4 4 0 0)) (chordDivisor controlCurve twoPoint twoPoint)",
+    "decl_sha256": "3be8f68d63b18ecd7bf18c28c045b53530c90948403c38146513bc3bcdb1d3bd",
+    "scope": "Actual all-n Miller rational functions and normalized principal point divisors for every field/general Weierstrass model/actual nonsingular point. Construct explicit actual addition-step function:1 if either point is O, actual vertical function if points negative, actual chord divided by actual vertical through sum otherwise. Derive nonzero/exact actual local-valuation divisor(P)+(Q)-(P+Q)-(O) in every branch. Recursively construct f0=1,f(n+1)=fn*g(nP,P), prove every fn nonzero with actual finite-support Finsupp principal point divisor n(P)-([n]P)-(n-1)(O), using integer n-1 convention; derive actual n-torsion divisor n(P)-n(O). Actual local orders are official derived normalized adic valuations, with infinity chart valuation already identified. Prove source leading-residue-one normalization using actual parameter X/Y, valuation near-one multiplication/division and actual scaled functions. Prove any valid normalized i,j functions produce a valid normalized i+j function with actual addition step; prove chosen f1=1. Do not infer equality of differently constructed functions from same divisor without uniqueness proof; no binary algorithm runtime/complexity refinement claimed. Actual F5 y²=x³+1 nonzero two-torsion(4,0) control: correct vertical step pole2, treating it as ordinary chord gives pole3 and false actual divisor. Qualified source Def26.3.4/Ex26.3.5/Algorithm29 exceptions survive; no source-refutation/novelty claim. Thirty-three modules include27exact credited earlier modules and6new. Over arbitraryK point divisors on nonsingularKpoints; for elliptic model over algebraically closedK all geometricpoints. SeparateMathlibScheme.localRing/Divisor APIinterop, general all-function divisor finiteness, translation/Weil reciprocity/isogeny/Lang/Cartier/Jacobian/canonicalpairing/MOV-FR/full14 remainopen. Samehost/prover/Mathlib; source header audit procedural only, not independent compiler/parser/physicalhost assurance or signedstanding/canonicalpromotion.",
+    "sources": [
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/AllMiller.lean",
+        "bytes": 3541,
+        "sha256": "957b06f548600a2befac32f94513ff5bc5782fbcea21d73079d65ef385c446ae"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/ChartAdicValuation.lean",
+        "bytes": 3767,
+        "sha256": "b8f6b793ef7d2a3805885417979e737e93265d56a02a03bf402979ac17d32078"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/ChartAlgebra.lean",
+        "bytes": 5144,
+        "sha256": "211969ef3498e5d786030a97b8783bd07a9b9d5434f2238114cf1b448c3f737a"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/ChartCertificate.lean",
+        "bytes": 2296,
+        "sha256": "b191e8c77a5364b9bf9d06c7216ba954c38493ff60470390451b5cc9289f85bd"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/ChartFractionField.lean",
+        "bytes": 5097,
+        "sha256": "3c0f5414072a7da74490335bff5f7224d833fdcc36c2c4c6be7f137d7c71dea7"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/ChartLocalization.lean",
+        "bytes": 4824,
+        "sha256": "6fd5bf89c3d69e4ca7d8c9bb3fbdc9a617c8a9151283890be0cbff26506d5112"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/DVRIdentification.lean",
+        "bytes": 3372,
+        "sha256": "964e3c213cdd1296bb3fffc2229ca2d4ed96f5dfce9c8b79f9cf2e55693ad0fc"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/DiscreteValuation.lean",
+        "bytes": 2448,
+        "sha256": "f6738d685680882f75f7c108344b5e9ac0893dcdbd2af8ae4a20da3327a27d7d"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/FieldValuation.lean",
+        "bytes": 3643,
+        "sha256": "163d20cb0fc845f2edbc23f2c8ee5b980398496522a97bc0e97ec8a17afdf57b"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/FiniteControls.lean",
+        "bytes": 4550,
+        "sha256": "6d89f39552273975fcb78c48e379a5d545a92809fd9f3adadaae75f141e57056"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/FiniteDVR.lean",
+        "bytes": 6827,
+        "sha256": "4b1ca398165e92d3562300d43f03f946c56d5d681b5a245c86c8733f7465caa1"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/FiniteFractionField.lean",
+        "bytes": 3133,
+        "sha256": "b5c768debd68ab967466a30e623d4d8ab720b1d9e4482100c2598ed2b746ff20"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/FinitePointCertificate.lean",
+        "bytes": 3225,
+        "sha256": "e1982dcd3f71270e748979792f672bd3748bfec428af31c553423bd298fbed2b"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/FiniteValuation.lean",
+        "bytes": 4354,
+        "sha256": "7afdecddd0bde0b2aecaa9ae632a09fb4602dc2d8d07c5af5062e0c06a50b0eb"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/GuardControls.lean",
+        "bytes": 2953,
+        "sha256": "d993b8a271d0b45b877f0f0c03ae970934500a70981549df266473b43d83d366"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/InfinityMonic.lean",
+        "bytes": 6901,
+        "sha256": "522fc47b03d83b14d6ee0e649b6a61db0de3391ad5ea5ce01c2b3510060f3075"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/LineEvaluation.lean",
+        "bytes": 2628,
+        "sha256": "59405f70efc92e408edb087790965f3dc7d8559dd3b55fe0deb122e859de49ef"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/LineIdeals.lean",
+        "bytes": 5086,
+        "sha256": "f14f02c6998c132789cb332a5879cb57bb0ed6f17c1664bfd5fbabf98678d097"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/LineMultiplicity.lean",
+        "bytes": 5708,
+        "sha256": "f63e57417708ec7f8d809b169567a332365b4e8f00db30483d1ff8662442aca2"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/LocalComparison.lean",
+        "bytes": 3873,
+        "sha256": "cb0cedd56066bd863244da6aca7c0b921b0ff8bebd286b257db98aadd7aa5075"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/LocalOrderAlgebra.lean",
+        "bytes": 4627,
+        "sha256": "208e6317562c3428e3c4ecf87ee2c818e49ca601e58529ed0bc92b37bad601da"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/LocalOriginEvaluation.lean",
+        "bytes": 2050,
+        "sha256": "3692803fda5ecbb3185199a0b9e045ffb42ea6ce62e2ffc04122b3bc71d939c7"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/MillerFunctions.lean",
+        "bytes": 4605,
+        "sha256": "274cc4f86af5b0e939d99af53fa5c4db1105d66f097736ff7894a4e5325fc57b"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/MillerStep.lean",
+        "bytes": 3712,
+        "sha256": "af03145385dd37fe065e7f532e26f256b010b49f2a8b5c839045987f87e897b3"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/NormDegree.lean",
+        "bytes": 4835,
+        "sha256": "b5fa20da01cfda772c8a08f89ca606ff9e5e7aff6a4a523cb3f951165e012523"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/Normalization.lean",
+        "bytes": 5458,
+        "sha256": "44c85d6dc162812ed51585bb40fda49b96b2e0a2e691fe9c2c33952e222e1a5a"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/OriginEvaluation.lean",
+        "bytes": 5686,
+        "sha256": "5f183c7d2306ea8a6f4874e4e226ae6c47f8919399a8f7bd8a439f630941adb0"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/PointDivisor.lean",
+        "bytes": 6952,
+        "sha256": "1c501f52d0a66d4c8118c3555f279b2599a121806af2c44518db608bd0086986"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/PointLocalization.lean",
+        "bytes": 4265,
+        "sha256": "9bf6c929fb31a34187a82ed3d3ddb7d9d3fba5f7f1b6b332fa43d578ccfb6594"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/RecursionCertificate.lean",
+        "bytes": 2595,
+        "sha256": "88f37e0bfa19bd6cf009bf8340eae0e82ef79b55478c79e9c7e1f22a4c1cd49f"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/RecursionControls.lean",
+        "bytes": 2016,
+        "sha256": "089da7719c94e96d224c501a97a78dd0f677f1a60b5e75e4ebf3dd77256208dd"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/ResidueNormalization.lean",
+        "bytes": 2544,
+        "sha256": "32f900d3a371477a41a28a3e7d6f6b9e099524b443ad40a0d82bf1e4f3efe4a4"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/ValuationCertificate.lean",
+        "bytes": 2235,
+        "sha256": "0985573e46e42c4e289927ab0ca314de33924b64c7cdc0ea89591e445d355fdf"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/lakefile.toml",
+        "bytes": 923,
+        "sha256": "8fd396b00f567c8fe682d31f61b9a1008bab8e0df5db160e54b60c9466c1f7d1"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3179,
+        "sha256": "24aa990385d3efa7cb32b33104fb4ec7fcb57b54a4ef488d0d2ecfe4ed22ff1c"
+      },
+      {
+        "path": "research/miller_recursion_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "AllMiller",
+    "ChartAdicValuation",
+    "ChartAlgebra",
+    "ChartCertificate",
+    "ChartFractionField",
+    "ChartLocalization",
+    "DVRIdentification",
+    "DiscreteValuation",
+    "FieldValuation",
+    "FiniteControls",
+    "FiniteDVR",
+    "FiniteFractionField",
+    "FinitePointCertificate",
+    "FiniteValuation",
+    "GuardControls",
+    "InfinityMonic",
+    "LineEvaluation",
+    "LineIdeals",
+    "LineMultiplicity",
+    "LocalComparison",
+    "LocalOrderAlgebra",
+    "LocalOriginEvaluation",
+    "MillerFunctions",
+    "MillerStep",
+    "NormDegree",
+    "Normalization",
+    "OriginEvaluation",
+    "PointDivisor",
+    "PointLocalization",
+    "RecursionCertificate",
+    "RecursionControls",
+    "ResidueNormalization",
+    "ValuationCertificate"
+  ],
+  "artifacts": [
+    {
+      "path": "research/miller_recursion_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 32952,
+      "sha256": "cbed52f79cf7226fd7910574d01256aad3c288b30ab747960eaa5adf630b6221"
+    },
+    {
+      "path": "research/miller_recursion_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "013b60c95c6930075c71914d263475ed0dd3ada9cfa145913c9adc9e6b9d5857"
+    },
+    {
+      "path": "research/miller_recursion_audit_20261115/evidence/attempts.json",
+      "bytes": 226,
+      "sha256": "91feebe8990c71948c3b1cdbe5a2305e3779b8f6556c24c307c5ac0376114a88"
+    },
+    {
+      "path": "research/miller_recursion_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 4182,
+      "sha256": "06282485de1bbf87e18c6d70bb3e3d166dcc4d32720fb6ab3a8487a10f98a7c6"
+    },
+    {
+      "path": "research/miller_recursion_audit_20261115/evidence/gate.json",
+      "bytes": 1416,
+      "sha256": "7d2e9ef6a4fc34434bbe25852b275cecfa4bc1036f613c2eb6c5681a9ae1543d"
+    },
+    {
+      "path": "research/miller_recursion_audit_20261115/evidence/source-review.json",
+      "bytes": 8819,
+      "sha256": "4f4601eba7825a161404b8df35b43c700e6daf103bfce40875a6ddd6904dcd45"
+    },
+    {
+      "path": "research/miller_recursion_audit_20261115/evidence/binding-check.json",
+      "bytes": 5462,
+      "sha256": "18fc9632c3ea06a4bf057071e14d6ed78f833335d474712f922207bb2191f78a"
+    },
+    {
+      "path": "research/miller_recursion_audit_20261115/proof-map.json",
+      "bytes": 6765,
+      "sha256": "2ad1b2f5a550d65f1fe05330721ebf0f17afc53c07731266b68516f2f1be4682"
+    },
+    {
+      "path": "research/miller_recursion_audit_20261115/render_report.py",
+      "bytes": 6800,
+      "sha256": "df5336162897e1e8f0e314933aa04aaa8fee997b90aa1b840e93d14ea3f7499d"
+    },
+    {
+      "path": "research/miller_recursion_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/miller_recursion_audit_20261115/export_binding_input.py",
+      "bytes": 1739,
+      "sha256": "d4d1a4c5ded4594e94246561159bef047685fa915de8c96a7500adb57dee61f6"
+    },
+    {
+      "path": "research/miller_recursion_audit_20261115/reports/layout.json",
+      "bytes": 264,
+      "sha256": "48492b25e2948b137a104b158b561807845fa1518cd5f32c87c393414edb4fb6"
+    },
+    {
+      "path": "research/miller_recursion_audit_20261115/reports/miller-recursion.svg",
+      "bytes": 1412,
+      "sha256": "80aadd8754444bc69429b8023fb5824fc78ef3e2290af10f5af8147b2e376528"
+    },
+    {
+      "path": "research/miller_recursion_audit_20261115/reports/report.pdf",
+      "bytes": 46939,
+      "sha256": "ecfb14ee449f8ef769e0236ecace6e6473345db3fab0a7afe0e071749004535b"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 285,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "exact_reused_credited_modules": 27,
+    "new_modules": 6,
+    "actual_all_n_nonzero_functions_and_point_divisors": true,
+    "actual_leading_residue_one_normalization": true,
+    "actual_normalized_addition_invariant": true,
+    "actual_vertical_exception_countercontrol": true,
+    "arbitrary_field_scope": "NonsingularKpoints; elliptic model overalgclosedK includesallgeometricpoints.",
+    "chosen_function_uniqueness_or_binary_algorithm_refinement": false,
+    "mathlib_projective_Scheme_localRing_Divisor_comparison": false,
+    "general_all_function_finiteness_or_canonical_pairing": false,
+    "full_original14_completion": false,
+    "independent_implementation_or_physicalhost_validation": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

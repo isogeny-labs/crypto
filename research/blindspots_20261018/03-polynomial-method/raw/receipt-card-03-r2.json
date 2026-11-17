@@ -1,0 +1,194 @@
+{
+  "card_id": "CARD-BLINDSPOT-03-03-r2",
+  "card_path": "research/blindspots_20261018/03-polynomial-method/card-03-r2.yaml",
+  "card_sha256": "13938fbcfd2646b39cb338c9858705b38b847508096a4416b3a4fe3cafba757d",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-03-r2/c03"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-build-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-03-r2/c03/b03",
+        "examples/blindspots_03_polynomial_method.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 4.543,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build-b03",
+      "index": 2,
+      "outputs": {},
+      "seconds": 4.543,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-03-r2/c03/b03",
+        "fes",
+        "--draws",
+        "research/blindspots_20261018/03-polynomial-method/draws.tsv",
+        "--cell",
+        "c33-16-2",
+        "--targets",
+        "0-7",
+        "--random",
+        "8"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 165.065,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fes-c33-16-2",
+      "index": 3,
+      "outputs": {},
+      "seconds": 165.065,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "07fe1388b7ad85f234d08373d5bad6665ff961f68190a75447d27e3c4e6affd5",
+      "stdout_tail": [
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c33-16-2\",\"target\":0,\"N\":32,\"E\":33,\"d\":2,\"sols\":0,\"bitops\":292057738752,\"log2\":38.087463,\"ms\":10456.569250,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c33-16-2\",\"target\":1,\"N\":32,\"E\":33,\"d\":2,\"sols\":0,\"bitops\":292057623900,\"log2\":38.087462,\"ms\":10951.028664,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c33-16-2\",\"target\":2,\"N\":32,\"E\":33,\"d\":2,\"sols\":0,\"bitops\":292057898823,\"log2\":38.087463,\"ms\":10154.413273,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c33-16-2\",\"target\":3,\"N\":32,\"E\":33,\"d\":2,\"sols\":0,\"bitops\":292057789744,\"log2\":38.087463,\"ms\":10933.898708,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c33-16-2\",\"target\":4,\"N\":32,\"E\":33,\"d\":2,\"sols\":0,\"bitops\":292057888174,\"log2\":38.087463,\"ms\":10145.391128,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c33-16-2\",\"target\":5,\"N\":32,\"E\":33,\"d\":2,\"sols\":0,\"bitops\":292057544068,\"log2\":38.087462,\"ms\":9492.422748,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c33-16-2\",\"target\":6,\"N\":32,\"E\":33,\"d\":2,\"sols\":0,\"bitops\":292057754960,\"log2\":38.087463,\"ms\":10029.473071,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"desc\",\"cell\":\"c33-16-2\",\"target\":7,\"N\":32,\"E\":33,\"d\":2,\"sols\":0,\"bitops\":292057855970,\"log2\":38.087463,\"ms\":10143.636907,\"affine_combos\":1,\"affine_linear_rank\":1,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c33-16-2\",\"target\":0,\"N\":32,\"E\":33,\"d\":2,\"sols\":1,\"bitops\":292057863884,\"log2\":38.087463,\"ms\":10663.265616,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c33-16-2\",\"target\":1,\"N\":32,\"E\":33,\"d\":2,\"sols\":2,\"bitops\":292058019851,\"log2\":38.087464,\"ms\":10428.926807,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c33-16-2\",\"target\":2,\"N\":32,\"E\":33,\"d\":2,\"sols\":1,\"bitops\":292057866413,\"log2\":38.087463,\"ms\":10026.526855,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c33-16-2\",\"target\":3,\"N\":32,\"E\":33,\"d\":2,\"sols\":1,\"bitops\":292057645107,\"log2\":38.087462,\"ms\":9989.280093,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c33-16-2\",\"target\":4,\"N\":32,\"E\":33,\"d\":2,\"sols\":1,\"bitops\":292057675645,\"log2\":38.087462,\"ms\":10851.274600,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c33-16-2\",\"target\":5,\"N\":32,\"E\":33,\"d\":2,\"sols\":0,\"bitops\":292057810430,\"log2\":38.087463,\"ms\":9865.475255,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c33-16-2\",\"target\":6,\"N\":32,\"E\":33,\"d\":2,\"sols\":3,\"bitops\":292057870407,\"log2\":38.087463,\"ms\":10156.569033,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}",
+        "{\"item\":\"03\",\"kind\":\"fes\",\"sys\":\"rand\",\"cell\":\"c33-16-2\",\"target\":7,\"N\":32,\"E\":33,\"d\":2,\"sols\":2,\"bitops\":292057680031,\"log2\":38.087462,\"ms\":10680.701016,\"affine_combos\":0,\"affine_linear_rank\":0,\"affine_const_one\":0}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-rf",
+        "target/blindspots-03-r2/c03"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-build-dir",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 4,
+  "commit": "d4737d55df423c113b484f04f21d052860eda4e5",
+  "dirty_after": [
+    "examples/blindspots_13_rho_negation.rs",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-build-b03.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-build-b03.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-crossover.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-crossover.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c13-6-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c13-6-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c17-8-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c17-8-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c21-10-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c21-10-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c25-12-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c25-12-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c29-14-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c29-14-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-03-r2-build-b03.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-03-r2-build-b03.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-03-r2-fes-c33-16-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-03-r2-fes-c33-16-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/receipt-card-02-r2.json"
+  ],
+  "dirty_before": [
+    "examples/blindspots_13_rho_negation.rs",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-build-b03.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-build-b03.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-crossover.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-crossover.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c13-6-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c13-6-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c17-8-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c17-8-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c21-10-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c21-10-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c25-12-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c25-12-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c29-14-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c29-14-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/receipt-card-02-r2.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

@@ -1,0 +1,106 @@
+{
+  "schema": "isolab.recovery.qualification/v1",
+  "frozen_at": "2026-10-22T05:34:07.112073+00:00",
+  "request": {
+    "schema": "isolab.eks.resumable/v1",
+    "run_name": "ecbench-periodic-20261022-b",
+    "deadline_unix_seconds": 1792650847,
+    "build": {
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+      "source_revision": "cb2ec6873f30b683f7885b53c410d69965f02c20",
+      "ecbench_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9"
+    },
+    "runtime_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0ecb5bf15e2f22b8d12242c3cb306735b1e44e696c698f2dade470b517869dd9",
+    "spec": {
+      "schema": "ecbench.spec/v1",
+      "label": "Periodic CRIU checkpoint rotation and distinct fresh L2 epoch qualification",
+      "description": "Isolation and correctness validation after a computation-only restore; independent fresh warmup and A/A. No algorithm speed claim.",
+      "workloads": {
+        "curves": [
+          {
+            "kind": "prime_search",
+            "bits": 32,
+            "seed": 59297
+          }
+        ],
+        "targets_per_curve": 2,
+        "target_seed": 20261002
+      },
+      "arms": [
+        {
+          "name": "rho-neg",
+          "role": "reference",
+          "method": {
+            "id": "rho.negation"
+          }
+        },
+        {
+          "name": "rho-plain",
+          "role": "baseline",
+          "method": {
+            "id": "rho.plain"
+          }
+        },
+        {
+          "name": "rho-neg-aa",
+          "role": "control",
+          "method": {
+            "id": "rho.negation"
+          }
+        }
+      ],
+      "measurement": {
+        "rounds": 600,
+        "warmup": 1,
+        "order": "alternate",
+        "seed": 1,
+        "isolation_required": "L2",
+        "timeout_seconds": 120
+      }
+    },
+    "instance_type": "c8a.2xlarge",
+    "checkpoint_interval_seconds": 30,
+    "max_restores": 2
+  },
+  "source_revision": "5499eeb9d72e6e777cb0d28b0ade41afbfff90b7",
+  "controller": {
+    "key": "inputs/recovery-controllers/3fb8d9295a82035427089010b837a7ad7b4a81c7b74c27daa0032fc39d6f71b8.zip",
+    "version": "zRt.nWTruYAwQsLhxESieSWTuTFm.qjx",
+    "sha256": "3fb8d9295a82035427089010b837a7ad7b4a81c7b74c27daa0032fc39d6f71b8"
+  },
+  "runtime": {
+    "key": "inputs/recovery-runtime/3ab3cf238340dfdeebec721ae52066aea7b1fe998d0360d2d96f4929e25dc03c.tar.gz",
+    "version": "bYbVePk2FoY4YW.amrLf.ifXlXsm0VOY",
+    "sha256": "3ab3cf238340dfdeebec721ae52066aea7b1fe998d0360d2d96f4929e25dc03c",
+    "schema": "isolab.recovery.runtime/v1",
+    "bucket": "isolab-results-104186811093-us-east-2",
+    "source_revision": "5499eeb9d72e6e777cb0d28b0ade41afbfff90b7",
+    "source_archive_sha256": "ea578888e0cb6c829387579d416561025d9b25b3d9ebabe6835d7d0f4cda7f73",
+    "qualification": "Bounded recapture fix: 20 controller tests passed; live multi-generation qualification pending"
+  },
+  "steps": [
+    "Submit immutable request through native harness",
+    "Observe at least two committed generations",
+    "Stop this controller and confirm terminal owner status",
+    "Confirm dedicated worker hosts no unrelated workloads, then terminate only that worker",
+    "Resubmit the identical request and original deadline",
+    "Require restored computational progress, full native replay, one fresh L2 epoch and all S3 hashes"
+  ],
+  "acceptance": {
+    "committed_generations_minimum": 2,
+    "fresh_l2_records": 3606,
+    "native_measured_replays": 3600,
+    "aa_admitted": true,
+    "payload_hashes": 19,
+    "timing_retries": 0,
+    "restored_attempt_required": true
+  },
+  "limits": {
+    "deadline_seconds": 3600,
+    "standard_spot_account_vcpus": 96,
+    "lab_nodepool_vcpus": 64,
+    "instance_type": "c8a.2xlarge"
+  },
+  "claim": "Infrastructure correctness and isolation only; no algorithm performance claim",
+  "prior_evidence": "Attempt A failed before any snapshot/benchmark; retained. B validates bounded zombie recapture and periodic rotation."
+}

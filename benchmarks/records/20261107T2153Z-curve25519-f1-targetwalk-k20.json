@@ -1,0 +1,248 @@
+{
+  "branch": "claude/curve25519-index-calculus-i674j4",
+  "closed_utc": "2026-11-07T22:09:21+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/curve25519_f1_targetwalk_20261108/scripts/run_sessions.sh",
+        "20"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-07T22:01:27+00:00",
+      "wall_s": 46.652
+    }
+  ],
+  "commit": "40c27ab7b369d943ab7e8d9ea7a3bd6224e61ef6",
+  "commit_dirty": true,
+  "created_utc": "2026-11-07T21:53:48+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261108-curve25519-f1-targetwalk"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
+  },
+  "id": "20261107T2153Z-curve25519-f1-targetwalk-k20",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ratio_twcj_over_f1_w0",
+      "note": "S(tw+cj)/S(current F=1 x=0.7), pooled 8 single-target sessions, 95% CI, w=0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.8845,
+        0.9338
+      ],
+      "unit": "ratio",
+      "value": 0.9088
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ratio_twcj_over_rho_w0",
+      "note": "S(tw+cj)/S(rho-neg), frozen band (w>0 asymmetric: walk inserts unpriced, rho canonicalisations priced), pooled 8 single-target sessions, 95% CI, w=0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.3409,
+        1.4539
+      ],
+      "unit": "ratio",
+      "value": 1.3963
+    },
+    {
+      "baseline": 2.3528,
+      "better": "lower",
+      "n": 512,
+      "name": "s_twcj_w0",
+      "note": "tw=1,cj=1 mean S at w=0; baseline current F=1 x=0.7; reference rho-neg same sessions; 8 sessions x 64 rounds",
+      "reference": 1.5314,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 2.1383
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ratio_twcj_over_f1_w01",
+      "note": "S(tw+cj)/S(current F=1 x=0.7), pooled 8 single-target sessions, 95% CI, w=0.1",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.8634,
+        0.9117
+      ],
+      "unit": "ratio",
+      "value": 0.8872
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ratio_twcj_over_rho_w01",
+      "note": "S(tw+cj)/S(rho-neg), frozen band (w>0 asymmetric: walk inserts unpriced, rho canonicalisations priced), pooled 8 single-target sessions, 95% CI, w=0.1",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.2528,
+        1.3611
+      ],
+      "unit": "ratio",
+      "value": 1.3058
+    },
+    {
+      "baseline": 2.4151,
+      "better": "lower",
+      "n": 512,
+      "name": "s_twcj_w01",
+      "note": "tw=1,cj=1 mean S at w=0.1; baseline current F=1 x=0.7; reference rho-neg same sessions; 8 sessions x 64 rounds",
+      "reference": 1.6409,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 2.1428
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ratio_twcj_over_f1_w1",
+      "note": "S(tw+cj)/S(current F=1 x=0.7), pooled 8 single-target sessions, 95% CI, w=1",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.7123,
+        0.7554
+      ],
+      "unit": "ratio",
+      "value": 0.7335
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ratio_twcj_over_rho_w1",
+      "note": "S(tw+cj)/S(rho-neg), frozen band (w>0 asymmetric: walk inserts unpriced, rho canonicalisations priced), pooled 8 single-target sessions, 95% CI, w=1",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.7932,
+        0.8709
+      ],
+      "unit": "ratio",
+      "value": 0.8312
+    },
+    {
+      "baseline": 2.976,
+      "better": "lower",
+      "n": 512,
+      "name": "s_twcj_w1",
+      "note": "tw=1,cj=1 mean S at w=1; baseline current F=1 x=0.7; reference rho-neg same sessions; 8 sessions x 64 rounds",
+      "reference": 2.6265,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 2.183
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ratio_tw_over_f1_w0",
+      "note": "S(tw, plain jumps)/S(current F=1), w=0, pooled 8 sessions, 95% CI",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.1322,
+        1.1999
+      ],
+      "unit": "ratio",
+      "value": 1.1656
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ratio_twcj_over_tw_w0",
+      "note": "S(tw+cj)/S(tw): effect of chained jumps alone, w=0, pooled 8 sessions, 95% CI",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.7483,
+        0.8125
+      ],
+      "unit": "ratio",
+      "value": 0.7797
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ratio_twcj_over_rho_w1_inserts_priced",
+      "note": "POST HOC (not frozen): S(tw+cj)/S(rho-neg) at w=1 with walk table inserts also priced at w; scripts/sensitivity_inserts.py",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.2976,
+        1.4258
+      ],
+      "unit": "ratio",
+      "value": 1.3602
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 512,
+      "name": "twcj_walk_s",
+      "note": "tw+cj walk phase only: mean walk additions to rank 2 / sqrt(r); model floor E[sqrt(Gamma(2,1))] = 1.3293 (derived)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "S",
+      "value": 1.3895
+    }
+  ],
+  "problem": "ic:curve25519-k20-single-target",
+  "raw": [
+    {
+      "bytes": 1110958,
+      "path": "research/curve25519_f1_targetwalk_20261108/data/sessions-k20-records.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c8/c85666dc4b00964396badb80d9c316d7e023e3fd2b415d8d5a51cbbafa412317",
+      "sha256": "c85666dc4b00964396badb80d9c316d7e023e3fd2b415d8d5a51cbbafa412317",
+      "uploaded": false
+    },
+    {
+      "bytes": 14375,
+      "path": "research/curve25519_f1_targetwalk_20261108/data/pooled_measured.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/31/3195e22f7ed2d39a0943a19adc482b395d65b46dc1eea3537a1292f3e7b6d3ca",
+      "sha256": "3195e22f7ed2d39a0943a19adc482b395d65b46dc1eea3537a1292f3e7b6d3ca",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261108-curve25519-f1-targetwalk/report.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261108-curve25519-f1-targetwalk/ratio_to_rho.svg",
+      "benchmarks/20261108-curve25519-f1-targetwalk/phases.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "curve25519-f1-targetwalk-k20",
+  "status": "measured",
+  "summary": "k=20 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+  "validation": null
+}

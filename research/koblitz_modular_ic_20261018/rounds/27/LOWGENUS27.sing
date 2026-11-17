@@ -1,0 +1,58 @@
+// Target trace-zero polynomials and the complete diamond quotient filters.
+ring lowQ=0,(t),lp;
+poly ePlus=t^2-t+2;poly eMinus=t^2+t+2;
+poly numeratorPlus=t^10-11*t^5+32;poly numeratorMinus=t^10+11*t^5+32;
+poly pPlus=numeratorPlus/ePlus;poly pMinus=numeratorMinus/eMinus;
+if(pPlus*ePlus!=numeratorPlus || pMinus*eMinus!=numeratorMinus){ERROR("tracezero division is not exact");}
+list facPlus=factorize(pPlus);list facMinus=factorize(pMinus);
+print("A5_PLUS_AND_MINUS_WEIL_POLYNOMIALS");pPlus;pMinus;
+print("IRREDUCIBLE_TARGET_FACTORS");facPlus;facMinus;
+if(deg(pPlus)!=8 || size(facPlus[1])!=2 || size(facMinus[1])!=2 || facPlus[2][2]!=1 || facMinus[2][2]!=1){ERROR("target irreducibility filter failed");}
+if(pPlus==subst(pPlus,t,-t) || pMinus==subst(pMinus,t,-t) || pMinus!=subst(pPlus,t,-t)){ERROR("target sign/parity filter failed");}
+list planted=factorize((t-1)*(t+2));
+if(size(planted[1])!=3){ERROR("factorization positive control failed");}
+int qGenus=7;int dGenus=13;int hGenus=31;int cGenus=61;
+if(2*cGenus-2!=5*(2*dGenus-2) || 2*cGenus-2!=10*(2*qGenus-2) || 2*hGenus-2!=5*(2*qGenus-2)){ERROR("free quotient genera inconsistent");}
+print("DIAMOND_QUOTIENT_GENERA C,H,D,Q");cGenus;hGenus;dGenus;qGenus;
+// Actual integral mixed correspondence on the cyclic10 source action.
+ideal cyc=std(ideal(t^10-1));
+poly n5=1+t^2+t^4+t^6+t^8;
+poly mixed=reduce((1-t^5)*(5-n5),cyc);
+print("ACTUAL_MIXED_INTEGRAL_CORRESPONDENCE");mixed;
+if(reduce(mixed^2-10*mixed,cyc)!=0){ERROR("mixed correspondence pseudo-idempotence failed");}
+int mixedDimension=cGenus-hGenus-dGenus+qGenus;
+print("MIXED_CARRIER_DIMENSION");mixedDimension;
+if(mixedDimension!=24){ERROR("mixed dimension bookkeeping failed");}
+// Arbitrary two conjugate pairs at p2 for a quadratic character with chi(2)=-1.
+ring evenQ=(0,aa,bb),(t),lp;
+poly evenP=(t^2-aa*t-2)*(t^2+aa*t-2)*(t^2-bb*t-2)*(t^2+bb*t-2);
+if(evenP!=subst(evenP,t,-t) || deg(evenP)!=8){ERROR("quadratic-nebentypus Euler parity failed");}
+print("GENERIC_QUARTIC_NEWFORM_EULER_POLYNOMIAL_IS_EVEN");evenP;
+ring low11=11,(t),lp;
+poly mixed=imap(lowQ,mixed);
+if(subst(mixed,t,6)!=10 || 10*subst(mixed,t,6)!=1){ERROR("mixed correspondence not invertible on residual6 line");}
+print("MIXED_RECOVERY_ON_RESIDUAL_6_LINE");subst(mixed,t,6);10*subst(mixed,t,6);
+// Translation by (0,0) has no fixed point on u-unit affine base.
+ring fixed2=2,(u,v,iu),dp;
+ideal equations=v^2+v+u^3+u,u+v+u^3,u*v+u+v+u^3*v,u*iu+1;
+ideal fixed=std(equations);
+if(size(fixed)!=1 || fixed[1]!=1){ERROR("base translation fixed locus not empty");}
+matrix witness=lift(equations,ideal(1));
+matrix residual=matrix(equations)*witness-matrix(ideal(1));
+if(residual[1,1]!=0){ERROR("fixed locus unit certificate failed");}
+print("BASE_TRANSLATION_FIXED_LOCUS_CERTIFICATE");witness;
+// The original ordinary elliptic z=y/x has degree3, even over F32.
+list modulusFactors=factorize(u^5+u^2+1);
+if(size(modulusFactors[1])!=2 || modulusFactors[2][2]!=1){ERROR("F32 modulus irreducibility");}
+ring e32=(2,beta32),(x,z),dp;
+minpoly=beta32^5+beta32^2+1;
+int aCurve;poly cubic;list fac;
+for(aCurve=0;aCurve<=1;aCurve++){
+ cubic=x^3+(z^2+z+aCurve)*x^2+1;fac=factorize(cubic);
+ print("ORDINARY_NORMALIZED_Z_CUBIC "+string(aCurve));fac;
+ if(size(fac[1])!=2 || fac[2][2]!=1){ERROR("ordinary z-coordinate cubic not irreducible overF32");}
+}
+int thetaNuDegree=34;int thetaLambdaDegree=80;int thetaRRDegree=110;
+if(thetaNuDegree%3==0 || thetaLambdaDegree%3==0 || thetaRRDegree%3==0){ERROR("trace-coordinate degree obstruction failed");}
+print("CONSTANT_TRANSLATES_OF_THETA_NU_AND_LAMBDA_FAIL_DEGREE3");thetaNuDegree;thetaLambdaDegree;thetaRRDegree;
+print("LOWGENUS27_ALL_CHECKS_PASS");quit;

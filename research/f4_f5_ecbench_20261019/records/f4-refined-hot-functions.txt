@@ -1,0 +1,54 @@
+--------------------------------------------------------------------------------
+Profile data file 'research/f4_f5_ecbench_20261019/lookup-profiles/solve-f4-0-b/region.callgrind.1' (creator: callgrind-3.19.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 58624839
+Trigger: Client Request: ["solve-f4",23,230,0,0]
+Profiled target:  /tmp/boolean-column-lookup --profile 1 --arm solve-f4 --n 23 --seed 230 --random 0 --matrix-runtime quadratic-tail (PID 58, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  off
+
+--------------------------------------------------------------------------------
+Ir                   
+--------------------------------------------------------------------------------
+372,330,835 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                    file:function
+--------------------------------------------------------------------------------
+192,445,195 (51.69%)  ???:crypto_lib::cryptanalysis::koblitz_groebner::matrix_f4_f2_counted_impl [/tmp/boolean-column-lookup]
+ 71,732,640 (19.27%)  ???:crypto_lib::cryptanalysis::koblitz_groebner::pack_polynomials_flat_direct [/tmp/boolean-column-lookup]
+ 40,122,656 (10.78%)  ???:crypto_lib::cryptanalysis::mq_fes::gray_incremental_find_all [/tmp/boolean-column-lookup]
+  8,583,284 ( 2.31%)  ???:<crypto_lib::cryptanalysis::koblitz_groebner::F4ColumnIndex>::get [/tmp/boolean-column-lookup]
+  8,135,801 ( 2.19%)  ???:<hashbrown::map::HashMap<u64, (), core::hash::BuildHasherDefault<crypto_lib::cryptanalysis::fx_hash::MaskHasher>>>::insert [/tmp/boolean-column-lookup]
+  4,731,074 ( 1.27%)  ???:core::slice::sort::shared::smallsort::small_sort_network::<usize, <usize as core::cmp::PartialOrd>::lt> [/tmp/boolean-column-lookup]
+  4,499,831 ( 1.21%)  ???:crypto_lib::cryptanalysis::koblitz_groebner::macaulay_rows_monos_with_mask [/tmp/boolean-column-lookup]
+  4,292,093 ( 1.15%)  ???:_int_malloc [/usr/lib64/libc.so.6]
+  4,027,199 ( 1.08%)  ???:<crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly>::substitute_popcnt [/tmp/boolean-column-lookup]
+  3,312,530 ( 0.89%)  ???:core::slice::sort::unstable::quicksort::quicksort::<u64, <u64 as core::cmp::PartialOrd>::lt> [/tmp/boolean-column-lookup]
+  3,148,160 ( 0.85%)  ???:<core::iter::adapters::map::Map<core::slice::iter::Iter<crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly>, crypto_lib::cryptanalysis::koblitz_groebner::quadratic_tail_roots::{closure#1}> as core::iter::traits::iterator::Iterator>::try_fold::<(), <core::iter::adapters::GenericShunt<core::iter::adapters::map::Map<core::slice::iter::Iter<crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly>, crypto_lib::cryptanalysis::koblitz_groebner::quadratic_tail_roots::{closure#1}>, core::option::Option<core::convert::Infallible>> as core::iter::traits::iterator::Iterator>::try_fold<(), core::iter::traits::iterator::Iterator::try_for_each::call<crypto_lib::cryptanalysis::mq_fes::QuadraticForm, core::ops::control_flow::ControlFlow<crypto_lib::cryptanalysis::mq_fes::QuadraticForm>, core::ops::control_flow::ControlFlow<crypto_lib::cryptanalysis::mq_fes::QuadraticForm>::Break>::{closure#0}, core::ops::control_flow::ControlFlow<crypto_lib::cryptanalysis::mq_fes::QuadraticForm>>::{closure#0}, core::ops::control_flow::ControlFlow<core::ops::control_flow::ControlFlow<crypto_lib::cryptanalysis::mq_fes::QuadraticForm>>> [/tmp/boolean-column-lookup]
+  2,953,438 ( 0.79%)  ???:_int_free [/usr/lib64/libc.so.6]
+  2,875,835 ( 0.77%)  ???:malloc_consolidate [/usr/lib64/libc.so.6]
+  2,439,668 ( 0.66%)  ???:<crypto_lib::cryptanalysis::koblitz_groebner::pack_rows_flat_with_layout as core::ops::function::Fn<(&[alloc::vec::Vec<u64>], &crypto_lib::cryptanalysis::koblitz_groebner::F4ColumnLayout, bool)>>::call [/tmp/boolean-column-lookup]
+  2,265,088 ( 0.61%)  ???:crypto_lib::cryptanalysis::mq_fes::gray_tables [/tmp/boolean-column-lookup]
+  2,110,982 ( 0.57%)  ???:__memcpy_avx_unaligned_erms [/usr/lib64/libc.so.6]
+  1,867,091 ( 0.50%)  ???:calloc [/usr/lib64/libc.so.6]
+  1,656,940 ( 0.45%)  ???:crypto_lib::cryptanalysis::koblitz_groebner::macaulay_columns [/tmp/boolean-column-lookup]
+  1,316,929 ( 0.35%)  ???:unlink_chunk.constprop.0 [/usr/lib64/libc.so.6]
+  1,178,026 ( 0.32%)  ???:__memset_avx2_unaligned_erms [/usr/lib64/libc.so.6]
+    928,622 ( 0.25%)  ???:core::slice::sort::shared::smallsort::small_sort_network::<u64, <[u64]>::sort_unstable_by_key<core::cmp::Reverse<u128>, crypto_lib::cryptanalysis::koblitz_groebner::macaulay_columns::{closure#0}>::{closure#0}> [/tmp/boolean-column-lookup]
+    825,625 ( 0.22%)  ???:free [/usr/lib64/libc.so.6]
+    752,053 ( 0.20%)  ???:core::slice::sort::unstable::quicksort::quicksort::<u64, <[u64]>::sort_unstable_by_key<core::cmp::Reverse<u128>, crypto_lib::cryptanalysis::koblitz_groebner::macaulay_columns::{closure#0}>::{closure#0}>'2 [/tmp/boolean-column-lookup]
+    632,960 ( 0.17%)  ???:<alloc::vec::Vec<alloc::vec::Vec<bool>> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<alloc::vec::Vec<bool>, core::iter::adapters::map::Map<core::ops::range::Range<usize>, <crypto_lib::cryptanalysis::mq_fes::QuadraticForm>::from_anf_row::{closure#0}>>>::from_iter [/tmp/boolean-column-lookup]
+    495,625 ( 0.13%)  ???:<hashbrown::map::HashMap<u64, usize, core::hash::BuildHasherDefault<crypto_lib::cryptanalysis::fx_hash::MaskHasher>>>::insert [/tmp/boolean-column-lookup]
+    471,428 ( 0.13%)  ???:__rustc::__rdl_alloc_zeroed [/tmp/boolean-column-lookup]
+    449,370 ( 0.12%)  ???:core::slice::sort::unstable::ipnsort::<u64, <u64 as core::cmp::PartialOrd>::lt> [/tmp/boolean-column-lookup]
+    419,646 ( 0.11%)  ???:<hashbrown::raw::RawTable<(u64, ())>>::reserve_rehash::<hashbrown::map::make_hasher<u64, (), core::hash::BuildHasherDefault<crypto_lib::cryptanalysis::fx_hash::MaskHasher>>::{closure#0}> [/tmp/boolean-column-lookup]
+

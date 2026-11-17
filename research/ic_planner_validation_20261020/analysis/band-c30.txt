@@ -1,0 +1,41 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp30-t8157-3aef4064 | 29.62 | double-base | 24/24 | 38.583 | 40.181 | 54.560 | — |
+| icv1-fp30-t8157-3aef4064 | 29.62 | full-rank | 24/24 | 116.301 | 138.026 | 333.546 | — |
+| icv1-fp30-t8157-3aef4064 | 29.62 | half-base | 24/24 | 32.762 | 38.914 | 94.283 | — |
+| icv1-fp30-t8157-3aef4064 | 29.62 | plan | 24/24 | 24.161 | 27.454 | 57.089 | — |
+| icv1-fp30-t8157-3aef4064 | 29.62 | plan-aa | 24/24 | 24.161 | 27.454 | 57.089 | — |
+| icv1-fp30-t8157-3aef4064 | 29.62 | random-targets | 24/24 | 1417.226 | 1420.610 | 1451.060 | — |
+| icv1-fp30-t8157-3aef4064 | 29.62 | rho-neg | 24/24 | 0.937 | 1.030 | 1.861 | — |
+| icv1-fp30-t8157-3aef4064 | 29.62 | rootfind | 24/24 | 15379.978 | 16919.620 | 30776.389 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp30-t8157-3aef4064 | double-base vs full-rank | double-base < full-rank |
+| icv1-fp30-t8157-3aef4064 | double-base vs half-base | unresolved inside the band |
+| icv1-fp30-t8157-3aef4064 | double-base vs plan | unresolved inside the band |
+| icv1-fp30-t8157-3aef4064 | double-base vs plan-aa | unresolved inside the band |
+| icv1-fp30-t8157-3aef4064 | double-base vs random-targets | double-base < random-targets |
+| icv1-fp30-t8157-3aef4064 | double-base vs rho-neg | rho-neg < double-base |
+| icv1-fp30-t8157-3aef4064 | double-base vs rootfind | double-base < rootfind |
+| icv1-fp30-t8157-3aef4064 | full-rank vs half-base | half-base < full-rank |
+| icv1-fp30-t8157-3aef4064 | full-rank vs plan | plan < full-rank |
+| icv1-fp30-t8157-3aef4064 | full-rank vs plan-aa | plan-aa < full-rank |
+| icv1-fp30-t8157-3aef4064 | full-rank vs random-targets | full-rank < random-targets |
+| icv1-fp30-t8157-3aef4064 | full-rank vs rho-neg | rho-neg < full-rank |
+| icv1-fp30-t8157-3aef4064 | full-rank vs rootfind | full-rank < rootfind |
+| icv1-fp30-t8157-3aef4064 | half-base vs plan | plan < half-base |
+| icv1-fp30-t8157-3aef4064 | half-base vs plan-aa | plan-aa < half-base |
+| icv1-fp30-t8157-3aef4064 | half-base vs random-targets | half-base < random-targets |
+| icv1-fp30-t8157-3aef4064 | half-base vs rho-neg | rho-neg < half-base |
+| icv1-fp30-t8157-3aef4064 | half-base vs rootfind | half-base < rootfind |
+| icv1-fp30-t8157-3aef4064 | plan vs plan-aa | unresolved inside the band |
+| icv1-fp30-t8157-3aef4064 | plan vs random-targets | plan < random-targets |
+| icv1-fp30-t8157-3aef4064 | plan vs rho-neg | rho-neg < plan |
+| icv1-fp30-t8157-3aef4064 | plan vs rootfind | plan < rootfind |
+| icv1-fp30-t8157-3aef4064 | plan-aa vs random-targets | plan-aa < random-targets |
+| icv1-fp30-t8157-3aef4064 | plan-aa vs rho-neg | rho-neg < plan-aa |
+| icv1-fp30-t8157-3aef4064 | plan-aa vs rootfind | plan-aa < rootfind |
+| icv1-fp30-t8157-3aef4064 | random-targets vs rho-neg | rho-neg < random-targets |
+| icv1-fp30-t8157-3aef4064 | random-targets vs rootfind | random-targets < rootfind |
+| icv1-fp30-t8157-3aef4064 | rho-neg vs rootfind | rho-neg < rootfind |

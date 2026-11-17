@@ -1,0 +1,29 @@
+{
+  "schema": "n83.proof-bridge-review-format/v1",
+  "purpose": "Technical review packet with separate machine checks and independent mathematical reports",
+  "layout": {
+    "review-plan.json": "Precommitted claims, Coordinator prior, scoped joints, attacks, controls and exact producer hashes",
+    "checker-plan.json": "Equivalent assignments in the existing independence-checker schema; local reviewer IDs belong to archival task T-995",
+    "blind-statement.md": "Mathematical definition given to the blind reviewer, without producer proof methods or predicted degree values",
+    "snapshot-manifest.json": "Absolute permitted input locations and SHA256 hashes for immutable reviewer snapshots",
+    "filtered-supplement.json": "Separately committed one-case raw input/source/factor supplement, following the reviewer's initial missing-data finding",
+    "machine/LefschetzBoundary.lean": "Exact source containing eight arithmetic declarations checked freshly",
+    "machine/*.lean.txt": "Deliberate compiler/audit control source text; not ordinary proof modules",
+    "machine/*.log": "Full fresh compiler and axiom logs, including expected failures",
+    "machine/verification.json": "Exact named declarations, toolchain and binary hash, six control outcomes and explicit trust boundary",
+    "machine/raw-archive-manifest.json": "Original filenames and hashes in the immutable machine.tar.gz archive",
+    "machine/published-manifest.json": "Published file mapping, with control source extensions changed to .lean.txt without altering their bytes",
+    "reviewers/TASK-*/": "Each reviewer's report, attestation and any separately preserved check implementation/logs",
+    "independence-check.log": "Existing checker result on the plan and exact reviewer attestations; checks declarations rather than authenticating isolation",
+    "claim-status.json": "Per-claim machine status, independent mathematical findings, dependencies and next actions",
+    "report.pdf": "Inspected technical report with proof-dependency diagram",
+    "reviewer-custody.json": "Full raw reviewer archive, hash, restoration and exact restored-binary replay scope",
+    "synthesis.md": "Coordinator synthesis after receiving all reports; concrete degrees, dependencies and deviations",
+    "dependencies.svg": "Proof dependency diagram; not a measured-performance plot",
+    "render-report.py": "Metadata-only rendering script for the report and diagram",
+    "packet-manifest.json": "Hashes of all packet files except this manifest itself",
+    "reviewers/TASK-N83-FILTERED/workflow-deviation-python*": "Preserved noncompliant historical attempts; not accepted replay evidence"
+  },
+  "preservation": "Producer records remain immutable. Supplements and corrections are separate records. Failed or noncompliant attempts are retained with their execution provenance.",
+  "units": "Ordinary polynomial total degree with generator degree shifts; auxiliary monomial-order weights are a separate convention"
+}

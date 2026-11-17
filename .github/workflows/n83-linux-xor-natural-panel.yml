@@ -1,0 +1,148 @@
+name: N83 primary Linux XOR natural panel
+
+on:
+  push:
+    branches:
+      - codex/n83-aws-handoff-20261025
+    paths:
+      - .github/workflows/n83-linux-xor-natural-panel.yml
+      - research/koblitz_n83_factor_base_sweep_20261008/verification/linux-xor-natural-panel-20261025/protocol.json
+      - research/koblitz_n83_factor_base_sweep_20261008/verification/linux-xor-natural-panel-20261025/run_panel.py
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: n83-primary-linux-xor-natural-panel
+  cancel-in-progress: false
+
+jobs:
+  natural-panel:
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-aws-handoff-20261025'
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n83-linux-xor-natural-panel.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n83-linux-xor-natural-panel.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 45
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      PANEL: research/koblitz_n83_factor_base_sweep_20261008/verification/linux-xor-natural-panel-20261025
+      BUNDLE: research/koblitz_n83_factor_base_sweep_20261008/verification/linux-xor-complete-inputs-20261025
+      PREFLIGHT: research/koblitz_n83_factor_base_sweep_20261008/verification/linux-xor-actions-preflight-20261025
+    steps:
+      - name: Check out frozen protocol
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          path: protocol
+      - name: Check out pinned mathematical worker source
+        uses: actions/checkout@v4
+        with:
+          ref: acfcd8adfad8d45ddf9c5f799f9385120dce6cf4
+          fetch-depth: 1
+          path: source
+      - name: Record host and fetch exact preflight binaries
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/n83-panel-meta" "$RUNNER_TEMP/n83-panel-bin"
+          uname -a > "$RUNNER_TEMP/n83-panel-meta/uname.txt"
+          git -C protocol rev-parse HEAD > "$RUNNER_TEMP/n83-panel-meta/protocol-commit.txt"
+          git -C source rev-parse HEAD > "$RUNNER_TEMP/n83-panel-meta/source-commit.txt"
+          gh api repos/aburan28/crypto/actions/artifacts/12593635829/zip \
+            > "$RUNNER_TEMP/n83-panel-meta/preflight.zip"
+          printf '%s  %s\n' \
+            00713618c7c09188a9f75fef6ce6323af376428cc48d537491394c91429d1237 \
+            "$RUNNER_TEMP/n83-panel-meta/preflight.zip" | sha256sum -c \
+            > "$RUNNER_TEMP/n83-panel-meta/preflight.sha256-check"
+          unzip -q "$RUNNER_TEMP/n83-panel-meta/preflight.zip" \
+            cryptominisat5 koblitz_n83_mixed_orbit_worker \
+            -d "$RUNNER_TEMP/n83-panel-bin"
+          chmod 755 "$RUNNER_TEMP/n83-panel-bin/cryptominisat5" \
+            "$RUNNER_TEMP/n83-panel-bin/koblitz_n83_mixed_orbit_worker"
+          sha256sum "$RUNNER_TEMP/n83-panel-bin/cryptominisat5" \
+            "$RUNNER_TEMP/n83-panel-bin/koblitz_n83_mixed_orbit_worker" \
+            > "$RUNNER_TEMP/n83-panel-meta/binaries.sha256"
+          printf '%s  %s\n' \
+            0936420373bbdf22c2a3d37291e3a4ab4e041d7f41ae3ceed003373fb596ddb2 \
+            "$RUNNER_TEMP/n83-panel-bin/cryptominisat5" \
+            | sha256sum -c
+          printf '%s  %s\n' \
+            ee471eb40a313b9b9be4e538780d2468548c323134c4d789e0db29fe7d5d18be \
+            "$RUNNER_TEMP/n83-panel-bin/koblitz_n83_mixed_orbit_worker" \
+            | sha256sum -c
+          rm "$RUNNER_TEMP/n83-panel-meta/preflight.zip"
+      - name: Install frozen Linux solver dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq 2>&1 \
+            | tee "$RUNNER_TEMP/n83-panel-meta/apt-update.log"
+          sudo apt-get install -y -qq --no-install-recommends \
+            'cryptominisat=5.11.15+dfsg1-1.1build1' 2>&1 \
+            | tee "$RUNNER_TEMP/n83-panel-meta/apt-install.log"
+          dpkg-query -W '-f=${Package}=${Version}\n' cryptominisat \
+            > "$RUNNER_TEMP/n83-panel-meta/package.txt"
+          ldd "$RUNNER_TEMP/n83-panel-bin/cryptominisat5" \
+            > "$RUNNER_TEMP/n83-panel-meta/solver-ldd.txt"
+          if grep -q 'not found' "$RUNNER_TEMP/n83-panel-meta/solver-ldd.txt"; then
+            exit 1
+          fi
+          printf '%s  %s\n' \
+            0936420373bbdf22c2a3d37291e3a4ab4e041d7f41ae3ceed003373fb596ddb2 \
+            "$(command -v cryptominisat5)" | sha256sum -c
+      - name: Repeat positive wide-XOR solver smoke
+        run: |
+          set -euo pipefail
+          python3 "protocol/$PREFLIGHT/smoke.py" \
+            --out "$RUNNER_TEMP/n83-panel-meta" \
+            > "$RUNNER_TEMP/n83-panel-meta/positive-smoke.json"
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+      - name: Fresh-fetch and independently replay all S3 inputs
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check --only-binary=:all: \
+            --target "$RUNNER_TEMP/n83-panel-pydeps" \
+            -r "protocol/$BUNDLE/requirements.txt"
+          PYTHONPATH="$RUNNER_TEMP/n83-panel-pydeps" \
+            python3 "protocol/$BUNDLE/fetch.py" \
+              --out "$RUNNER_TEMP/n83-panel-inputs" \
+              > "$RUNNER_TEMP/n83-panel-meta/input-replay.json" \
+              2> "$RUNNER_TEMP/n83-panel-meta/input-replay.stderr"
+      - name: Qualify exact panel inputs and binaries
+        run: |
+          set -euo pipefail
+          python3 "protocol/$PANEL/run_panel.py" \
+            --protocol "protocol/$PANEL/protocol.json" \
+            --inputs "$RUNNER_TEMP/n83-panel-inputs" \
+            --solver "$RUNNER_TEMP/n83-panel-bin/cryptominisat5" \
+            --worker "$RUNNER_TEMP/n83-panel-bin/koblitz_n83_mixed_orbit_worker" \
+            --source "$GITHUB_WORKSPACE/source" \
+            --out "$RUNNER_TEMP/n83-panel-results" \
+            --preflight-only \
+            > "$RUNNER_TEMP/n83-panel-meta/panel-preflight.json"
+      - name: Execute frozen sequential natural-query panel
+        run: |
+          set -euo pipefail
+          python3 "protocol/$PANEL/run_panel.py" \
+            --protocol "protocol/$PANEL/protocol.json" \
+            --inputs "$RUNNER_TEMP/n83-panel-inputs" \
+            --solver "$RUNNER_TEMP/n83-panel-bin/cryptominisat5" \
+            --worker "$RUNNER_TEMP/n83-panel-bin/koblitz_n83_mixed_orbit_worker" \
+            --source "$GITHUB_WORKSPACE/source" \
+            --out "$RUNNER_TEMP/n83-panel-results" \
+            > "$RUNNER_TEMP/n83-panel-meta/panel-progress.jsonl" \
+            2> "$RUNNER_TEMP/n83-panel-meta/panel.stderr"
+      - name: Preserve exact process streams and receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-linux-xor-natural-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/n83-panel-meta/
+            ${{ runner.temp }}/n83-panel-results/
+          if-no-files-found: warn
+          retention-days: 90

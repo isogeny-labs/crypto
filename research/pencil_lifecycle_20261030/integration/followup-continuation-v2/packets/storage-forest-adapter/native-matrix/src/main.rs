@@ -1,0 +1,41 @@
+use serde_json::{Value,json};
+use sha2::{Digest,Sha256};
+use std::{collections::BTreeMap,fs,path::Path};
+type R<T> = Result<T,String>;
+const BINDING:&str="8f6c33e483a6ceffe8009004470afd7699c4ccd330327804d496e7ea95966772";
+fn ensure(b:bool,e:&str)->R<()> {if b {Ok(())} else {Err(e.into())}}
+fn hash(b:&[u8])->String {format!("{:x}",Sha256::digest(b))}
+fn read(p:&Path)->R<Vec<u8>> {fs::read(p).map_err(|e|format!("{}: {e}",p.display()))}
+fn jsonfile(p:&Path)->R<Value> {serde_json::from_slice(&read(p)?).map_err(|e|e.to_string())}
+fn arr(v:&Value)->R<&Vec<Value>> {v.as_array().ok_or("expected array".into())}
+fn num(v:&Value)->R<u64> {v.as_u64().ok_or("expected unsigned integer".into())}
+fn text(v:&Value)->R<&str> {v.as_str().ok_or("expected string".into())}
+fn index(v:&[Value])->R<BTreeMap<u64,Value>> {let mut m=BTreeMap::new();for r in v {ensure(m.insert(num(&r["p"])?,r.clone()).is_none(),"duplicate model")?;}Ok(m)}
+fn lines(p:&Path)->R<BTreeMap<u64,Value>> {let bytes=read(p)?;let s=std::str::from_utf8(&bytes).map_err(|e|e.to_string())?;index(&s.lines().map(|l|serde_json::from_str(l).map_err(|e|e.to_string())).collect::<R<Vec<Value>>>()?)}
+fn prime(p:u64)->bool {if p<2{return false;}let mut d=2;while d<=p/d {if p%d==0{return false;}d+=1;}true}
+// Extended Euclid, not the producer's Fermat exponentiation.
+fn inverse(a:u64,p:u64)->R<u64> {let(mut r0,mut r1)=(p as i128,a as i128);let(mut t0,mut t1)=(0i128,1i128);while r1!=0 {let q=r0/r1;(r0,r1)=(r1,r0-q*r1);(t0,t1)=(t1,t0-q*t1);}ensure(r0==1,"inverse gcd")?;Ok(t0.rem_euclid(p as i128) as u64)}
+fn square(v:&Value,p:u64,c:u64)->R<()> {
+ ensure(p>=2&&p<=1u64<<32&&prime(p),"prime bound")?;ensure(0<c&&c<p,"nonzero canonical scalar")?;
+ let rows=arr(v)?;ensure(rows.len()==4,"row count")?;let mut m=Vec::new();for row in rows {let row=arr(row)?;ensure(row.len()==4,"column count")?;m.push(row.iter().map(|x|{let n=num(x)?;ensure(n<p,"canonical entry")?;Ok(n)}).collect::<R<Vec<_>>>()?);}
+ for (i,row) in m.iter().enumerate() {for j in 0..4 {let dot:u128=row.iter().zip(m.iter()).map(|(x,r)|*x as u128*r[j] as u128).sum();ensure(dot%p as u128==if i==j{c as u128}else{0},"matrix square mismatch")?;}}Ok(())
+}
+fn compute(theta:&BTreeMap<u64,Value>,generic:&BTreeMap<u64,Value>,summary:&Value)->R<Vec<Value>> {
+ let cert=index(arr(&summary["models"])?)?;ensure(cert.len()==21,"21 models")?;ensure(cert.keys().eq(theta.keys())&&cert.keys().eq(generic.keys()),"model membership")?;let mut out=Vec::new();
+ for (&p,c) in &cert {ensure(p>=2&&p<=1u64<<32&&prime(p),"prime bound")?;let t=&theta[&p]["selected"];let d=num(&t["delta"])?;let r0=num(&t["r0"])?;ensure(0<d&&d<p&&r0<p,"normalization domain")?;let di=inverse(d,p)?;
+ let actions=arr(&generic[&p]["torsion_actions"])?;let saved=arr(&c["square_scalars"])?;ensure(actions.len()==5&&saved.len()==5&&num(&c["action_count"])?==5,"five actions")?;
+ let mut roots=std::collections::BTreeSet::new();for(i,a)in actions.iter().enumerate(){let root=num(&a["root"])?;ensure(root<p&&roots.insert(root),"canonical distinct roots")?;let scalar=num(&saved[i])?;square(&a["action"]["matrix"],p,scalar)?;let delta=(root as i128-r0 as i128).rem_euclid(p as i128) as u128;let normalized=(delta*di as u128%p as u128)as u64;out.push(json!({"p":p,"index":i,"square_scalar":scalar,"normalized_root":normalized}));}}
+ ensure(out.len()==105,"105 actions")?;Ok(out)
+}
+fn verify_bindings(root:&Path,binding:&Path)->R<Value>{let b=read(binding)?;ensure(hash(&b)==BINDING,"fixed binding manifest digest")?;let v:Value=serde_json::from_slice(&b).map_err(|e|e.to_string())?;let files=arr(&v["files"])?;ensure(files.len()==133&&num(&v["verified_entries"])?==133,"133-file inventory")?;let mut seen=std::collections::BTreeSet::new();for f in files {let rel=text(&f["path"])?;ensure(seen.insert(rel),"duplicate bound path")?;let p=Path::new(rel);ensure(!p.is_absolute()&&!p.components().any(|x|matches!(x,std::path::Component::ParentDir)),"unsafe path")?;ensure(hash(&read(&root.join(p))?)==text(&f["sha256"])?,&format!("bound input mismatch: {rel}"))?;}Ok(v)}
+fn audit(root:&Path,binding:&Path)->R<Value>{verify_bindings(root,binding)?;let s=jsonfile(&root.join("inputs/summary.json"))?;let theta=lines(&root.join("inputs/theta-models.jsonl"))?;let generic=lines(&root.join("inputs/generic-models.jsonl"))?;let rows=compute(&theta,&generic,&s)?;
+ let mut pins=BTreeMap::new();for v in arr(&s["source_digests"])? {ensure(pins.insert(text(&v["path"])?.to_string(),text(&v["sha256"])?.to_string()).is_none(),"duplicate pin")?;}ensure(pins.len()==12,"12 source pins")?;
+ let ix=jsonfile(&root.join("pin-index.json"))?;ensure(arr(&ix)?.len()==12,"12 pin locations")?;let mut seen=std::collections::BTreeSet::new();for v in arr(&ix)? {let name=text(&v["path"])?;ensure(seen.insert(name),"duplicate pin location")?;let expected=pins.get(name).ok_or("unknown pin")?;ensure(hash(&read(&root.join(text(&v["local"])?))?)==*expected,"source pin mismatch")?;}
+ let prod=jsonfile(&root.join("result-final.json"))?;let mut expected=Vec::new();for m in arr(&prod["models"])? {for a in arr(&m["actions"])? {expected.push(json!({"p":m["p"],"index":a["index"],"square_scalar":a["square_scalar"],"normalized_root":a["normalized_root"]}));}}ensure(rows==expected,"ordered producer agreement")?;
+ for section in ["linear","loader"] {let a=read(&root.join(format!("historical-{section}.txt")))?;let b=read(&root.join(format!("supplied-{section}.txt")))?;ensure(!a.is_empty()&&a==b,"section equality")?;let hist=read(&root.join("inputs/pins/walk_impl.rs"))?;let now=read(&root.join("walk-source.rs"))?;ensure(hist.windows(a.len()).any(|w|w==a)&&now.windows(a.len()).any(|w|w==a),"literal section binding")?;}
+ verify_bindings(root,binding)?;Ok(json!({"schema":"native-independent-matrix-review/v1","accepted":true,"models":21,"actions":105,"rows":rows,"source_pins":12,"bound_files":133,"fixed_binding_sha256":BINDING,"inputs_unchanged":true,"language":"Rust","scientific_execution":false,"new_cost_ratio":null}))}
+fn controls(root:&Path,binding:&Path)->R<Value>{verify_bindings(root,binding)?;let summary=jsonfile(&root.join("inputs/summary.json"))?;let theta=lines(&root.join("inputs/theta-models.jsonl"))?;let generic=lines(&root.join("inputs/generic-models.jsonl"))?;let p=*generic.keys().next().ok_or("no model")?;let mut result=Vec::new();
+ for name in ["shape","noncanonical","coefficient","missing_model","scalar_order","zero_delta"] {let(mut t,mut g,mut s)=(theta.clone(),generic.clone(),summary.clone());match name {"shape"=>{g.get_mut(&p).unwrap()["torsion_actions"][0]["action"]["matrix"][0].as_array_mut().unwrap().pop();},"noncanonical"=>g.get_mut(&p).unwrap()["torsion_actions"][0]["action"]["matrix"][0][0]=json!(p),"coefficient"=>{let x=num(&g[&p]["torsion_actions"][0]["action"]["matrix"][0][0])?;g.get_mut(&p).unwrap()["torsion_actions"][0]["action"]["matrix"][0][0]=json!((x+1)%p);},"missing_model"=>{g.remove(&p);},"scalar_order"=>s["models"][0]["square_scalars"].as_array_mut().unwrap().reverse(),"zero_delta"=>t.get_mut(&p).unwrap()["selected"]["delta"]=json!(0),_=>unreachable!()};let r=compute(&t,&g,&s);ensure(r.is_err(),name)?;result.push(json!({"case":name,"expected":"reject","error":r.unwrap_err()}));}
+ ensure(index(&[json!({"p":7}),json!({"p":7})]).is_err(),"duplicate model control")?;result.push(json!({"case":"duplicate_model","expected":"reject"}));
+ let id=json!([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]);square(&id,7,1)?;ensure(square(&id,15,1).is_err(),"composite")?;ensure(square(&id,7,0).is_err(),"zero scalar")?;result.push(json!({"case":"identity_positive","expected":"accept"}));result.push(json!({"case":"composite","expected":"reject"}));result.push(json!({"case":"zero_scalar","expected":"reject"}));verify_bindings(root,binding)?;Ok(json!({"accepted":true,"fixed_cases":result,"case_count":result.len()}))}
+fn main(){let args:Vec<String>=std::env::args().collect();let result=if args.len()!=4{Err("usage: CHECKER audit|controls INPUT_ROOT BINDING".into())}else{match args[1].as_str(){"audit"=>audit(Path::new(&args[2]),Path::new(&args[3])),"controls"=>controls(Path::new(&args[2]),Path::new(&args[3])),_=>Err("unknown mode".into())}};match result {Ok(v)=>println!("{}",serde_json::to_string_pretty(&v).unwrap()),Err(e)=>{println!("{}",json!({"accepted":false,"error":e}));std::process::exit(1)}}}
