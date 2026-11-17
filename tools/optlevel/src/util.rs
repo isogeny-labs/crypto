@@ -6,18 +6,27 @@ use sha2::{Digest, Sha256};
 use std::path::Path;
 
 pub fn sha256_hex(bytes: &[u8]) -> String {
-    Sha256::digest(bytes).iter().map(|b| format!("{b:02x}")).collect()
+    Sha256::digest(bytes)
+        .iter()
+        .map(|b| format!("{b:02x}"))
+        .collect()
 }
 pub fn sha256_file(path: &Path) -> Result<String, String> {
-    std::fs::read(path).map(|b| sha256_hex(&b)).map_err(|e| format!("{}: {e}", path.display()))
+    std::fs::read(path)
+        .map(|b| sha256_hex(&b))
+        .map_err(|e| format!("{}: {e}", path.display()))
 }
 
 /// Pretty JSON with one space of indentation and sorted keys (serde_json's
 /// map is a BTreeMap), newline-terminated: the layout of every optlevel file.
 pub fn to_pretty(doc: &Value) -> String {
     let mut out = Vec::new();
-    let mut ser = serde_json::Serializer::with_formatter(&mut out, serde_json::ser::PrettyFormatter::with_indent(b" "));
-    doc.serialize(&mut ser).expect("JSON values always serialize");
+    let mut ser = serde_json::Serializer::with_formatter(
+        &mut out,
+        serde_json::ser::PrettyFormatter::with_indent(b" "),
+    );
+    doc.serialize(&mut ser)
+        .expect("JSON values always serialize");
     out.push(b'\n');
     String::from_utf8(out).expect("serde_json writes UTF-8")
 }
@@ -34,7 +43,8 @@ pub fn read_json(path: &Path) -> Result<Value, String> {
 /// A document plus `_sha256`, the hash of the file it came from.
 pub fn load_json(path: &Path) -> Result<Value, String> {
     let bytes = std::fs::read(path).map_err(|e| format!("{}: {e}", path.display()))?;
-    let mut doc: Value = serde_json::from_slice(&bytes).map_err(|e| format!("{}: {e}", path.display()))?;
+    let mut doc: Value =
+        serde_json::from_slice(&bytes).map_err(|e| format!("{}: {e}", path.display()))?;
     if let Some(o) = doc.as_object_mut() {
         o.insert("_sha256".into(), Value::String(sha256_hex(&bytes)));
     }
@@ -42,7 +52,9 @@ pub fn load_json(path: &Path) -> Result<Value, String> {
 }
 /// Trimmed file contents, None when unreadable.
 pub fn read_trim(path: impl AsRef<Path>) -> Option<String> {
-    std::fs::read_to_string(path).ok().map(|s| s.trim().to_string())
+    std::fs::read_to_string(path)
+        .ok()
+        .map(|s| s.trim().to_string())
 }
 
 /// `json.dumps(v, sort_keys=True)` with Python's default separators and ASCII
@@ -95,7 +107,9 @@ pub fn py_dumps(v: &Value) -> String {
                 }
                 out.push('}');
             }
-            Value::Number(n) if n.is_f64() => out.push_str(&py_repr(n.as_f64().unwrap_or(f64::NAN))),
+            Value::Number(n) if n.is_f64() => {
+                out.push_str(&py_repr(n.as_f64().unwrap_or(f64::NAN)))
+            }
             other => out.push_str(&other.to_string()),
         }
     }
@@ -105,7 +119,11 @@ pub fn py_dumps(v: &Value) -> String {
 }
 
 fn py_exp(mantissa: &str, exp: i32) -> String {
-    format!("{mantissa}e{}{:02}", if exp < 0 { '-' } else { '+' }, exp.abs())
+    format!(
+        "{mantissa}e{}{:02}",
+        if exp < 0 { '-' } else { '+' },
+        exp.abs()
+    )
 }
 /// Python's `repr(float)`: shortest round-trip digits, exponent form outside [1e-4, 1e16).
 pub fn py_repr(x: f64) -> String {
@@ -116,7 +134,11 @@ pub fn py_repr(x: f64) -> String {
         return if x > 0.0 { "inf".into() } else { "-inf".into() };
     }
     if x == 0.0 {
-        return if x.is_sign_negative() { "-0.0".into() } else { "0.0".into() };
+        return if x.is_sign_negative() {
+            "-0.0".into()
+        } else {
+            "0.0".into()
+        };
     }
     let a = x.abs();
     if (1e-4..1e16).contains(&a) {
@@ -141,7 +163,13 @@ pub fn py_g3(x: f64) -> String {
     let s = format!("{x:.2e}");
     let (m, e) = s.split_once('e').unwrap_or((&s, "0"));
     let exp: i32 = e.parse().unwrap_or(0);
-    let strip = |t: String| if t.contains('.') { t.trim_end_matches('0').trim_end_matches('.').to_string() } else { t };
+    let strip = |t: String| {
+        if t.contains('.') {
+            t.trim_end_matches('0').trim_end_matches('.').to_string()
+        } else {
+            t
+        }
+    };
     if !(-4..3).contains(&exp) {
         return py_exp(&strip(m.to_string()), exp);
     }
@@ -149,19 +177,29 @@ pub fn py_g3(x: f64) -> String {
 }
 /// Python's `shlex.quote`.
 pub fn sh_quote(s: &str) -> String {
-    if !s.is_empty() && s.chars().all(|c| c.is_ascii_alphanumeric() || "@%+=:,./-_".contains(c)) {
+    if !s.is_empty()
+        && s.chars()
+            .all(|c| c.is_ascii_alphanumeric() || "@%+=:,./-_".contains(c))
+    {
         return s.to_string();
     }
     format!("'{}'", s.replace('\'', "'\"'\"'"))
 }
 /// `html.escape(s, quote=True)`.
 pub fn html_escape(s: &str) -> String {
-    s.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;").replace('"', "&quot;").replace('\'', "&#x27;")
+    s.replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('"', "&quot;")
+        .replace('\'', "&#x27;")
 }
 
 /// Current UTC time as `YYYY-MM-DDTHH:MM:SSZ` (civil-from-days, no dependency).
 pub fn utcnow() -> String {
-    let secs = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs() as i64).unwrap_or(0);
+    let secs = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs() as i64)
+        .unwrap_or(0);
     utc_from_unix(secs)
 }
 pub fn utc_from_unix(secs: i64) -> String {
@@ -175,14 +213,24 @@ pub fn utc_from_unix(secs: i64) -> String {
     let d = doy - (153 * mp + 2) / 5 + 1;
     let m = if mp < 10 { mp + 3 } else { mp - 9 };
     let y = yoe + era * 400 + if m <= 2 { 1 } else { 0 };
-    format!("{y:04}-{m:02}-{d:02}T{:02}:{:02}:{:02}Z", rem / 3600, rem % 3600 / 60, rem % 60)
+    format!(
+        "{y:04}-{m:02}-{d:02}T{:02}:{:02}:{:02}Z",
+        rem / 3600,
+        rem % 3600 / 60,
+        rem % 60
+    )
 }
 
 /// First executable named `name` on PATH.
 pub fn which(name: &str) -> Option<String> {
     use std::os::unix::fs::PermissionsExt;
     let path = std::env::var_os("PATH")?;
-    std::env::split_paths(&path).map(|d| d.join(name)).find(|p| {
-        std::fs::metadata(p).map(|m| m.is_file() && m.permissions().mode() & 0o111 != 0).unwrap_or(false)
-    }).map(|p| p.to_string_lossy().into_owned())
+    std::env::split_paths(&path)
+        .map(|d| d.join(name))
+        .find(|p| {
+            std::fs::metadata(p)
+                .map(|m| m.is_file() && m.permissions().mode() & 0o111 != 0)
+                .unwrap_or(false)
+        })
+        .map(|p| p.to_string_lossy().into_owned())
 }

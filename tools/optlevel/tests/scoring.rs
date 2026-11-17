@@ -31,7 +31,12 @@ struct M {
 }
 impl Default for M {
     fn default() -> Self {
-        M { rn: None, bytes_per_op: None, tier: "T-timing", ws: None }
+        M {
+            rn: None,
+            bytes_per_op: None,
+            tier: "T-timing",
+            ws: None,
+        }
     }
 }
 fn meas(cls: &str, r1: f64, m: M) -> Value {
@@ -49,7 +54,15 @@ fn build(c: &Value, m: &Value) -> Value {
     S::build_record(c, m, Extras::default()).unwrap()
 }
 fn build_diag(c: &Value, m: &Value, diag: Value) -> Value {
-    S::build_record(c, m, Extras { extra_diag: diag.as_object().cloned().unwrap_or_default(), ..Default::default() }).unwrap()
+    S::build_record(
+        c,
+        m,
+        Extras {
+            extra_diag: diag.as_object().cloned().unwrap_or_default(),
+            ..Default::default()
+        },
+    )
+    .unwrap()
 }
 /// Every record a test builds must pass the schema and the tier rules.
 fn check(rec: Value) -> Value {
@@ -58,7 +71,10 @@ fn check(rec: Value) -> Value {
     rec
 }
 fn close(a: f64, b: f64) {
-    assert!((a - b).abs() <= 1e-7 * b.abs().max(1e-300) + 1e-12, "{a} != {b}");
+    assert!(
+        (a - b).abs() <= 1e-7 * b.abs().max(1e-300) + 1e-12,
+        "{a} != {b}"
+    );
 }
 fn num(v: &Value) -> f64 {
     v.as_f64().unwrap_or_else(|| panic!("not a number: {v}"))
@@ -73,7 +89,10 @@ fn has_flag(r: &Value, flag: &str) -> bool {
 // ---- Arithmetic (8) ------------------------------------------------------------
 #[test]
 fn stats() {
-    assert_eq!(S::stats(&[3.0, 1.0, 2.0]), json!({"median": 2.0, "min": 1.0, "max": 3.0, "n": 3}));
+    assert_eq!(
+        S::stats(&[3.0, 1.0, 2.0]),
+        json!({"median": 2.0, "min": 1.0, "max": 3.0, "n": 3})
+    );
     assert_eq!(S::stats(&[1.0, 2.0, 3.0, 4.0])["median"], 2.5);
     assert!(S::stats_opt([None]).is_null());
 }
@@ -81,7 +100,16 @@ fn stats() {
 #[test]
 fn interp() {
     let pts = [(1, 10.0), (4, 34.0)];
-    assert_eq!(S::interp_scale(&pts, 4).unwrap(), (34.0, Interp { interpolated: false, extrapolated: false }));
+    assert_eq!(
+        S::interp_scale(&pts, 4).unwrap(),
+        (
+            34.0,
+            Interp {
+                interpolated: false,
+                extrapolated: false
+            }
+        )
+    );
     let (v, meta) = S::interp_scale(&pts, 2).unwrap();
     close(v, 18.0);
     assert!(meta.interpolated);
@@ -97,33 +125,57 @@ fn roofline() {
     close(num(&r["bound_ops_per_s"]), 1e10 / 24.0);
     close(num(&r["next_roof_ratio"]), 2e9 / (1e10 / 24.0));
     let r = S::roofline(2e9, 1e10, Some(1.0)).unwrap(); // memory roof 1e10 > peak
-    assert_eq!((text(&r["binding"]), num(&r["bound_ops_per_s"])), ("compute", 2e9));
+    assert_eq!(
+        (text(&r["binding"]), num(&r["bound_ops_per_s"])),
+        ("compute", 2e9)
+    );
     let r = S::roofline(2e9, 1e10, None).unwrap();
     assert_eq!(r["binding"], "compute (traffic unknown)");
     assert!(r["memory_roof_ops_per_s"].is_null());
-    assert_eq!(S::roofline(2e9, 1e10, Some(0.0)).unwrap()["binding"], "compute");
+    assert_eq!(
+        S::roofline(2e9, 1e10, Some(0.0)).unwrap()["binding"],
+        "compute"
+    );
     assert!(S::roofline(0.0, 1e10, Some(1.0)).is_err());
 }
 
 #[test]
 fn attainment_interval() {
     let a = S::attainment(&st3(50.0, 40.0, 60.0), 100.0, Some(80.0));
-    assert_eq!((num(&a["value"]), num(&a["low"]), num(&a["high"])), (0.5, 0.4, 0.75));
+    assert_eq!(
+        (num(&a["value"]), num(&a["low"]), num(&a["high"])),
+        (0.5, 0.4, 0.75)
+    );
 }
 
 #[test]
 fn noise_floor() {
-    let nf = S::noise_floor(&[100.0, 101.0, 99.0, 100.0, 100.0], &[102.0, 103.0, 101.0, 102.0, 102.0]);
-    close(num(&nf["aa_ratio_deviation"]), (100.0f64 / 102.0 - 1.0).abs());
+    let nf = S::noise_floor(
+        &[100.0, 101.0, 99.0, 100.0, 100.0],
+        &[102.0, 103.0, 101.0, 102.0, 102.0],
+    );
+    close(
+        num(&nf["aa_ratio_deviation"]),
+        (100.0f64 / 102.0 - 1.0).abs(),
+    );
     close(num(&nf["rel_range"]), (103.0 - 99.0) / 101.0);
-    assert_eq!(num(&nf["value"]), num(&nf["aa_ratio_deviation"]).max(num(&nf["rel_range"])));
+    assert_eq!(
+        num(&nf["value"]),
+        num(&nf["aa_ratio_deviation"]).max(num(&nf["rel_range"]))
+    );
     assert_eq!(nf["sufficient"], true);
-    assert_eq!(S::noise_floor(&[1.0, 1.0], &[1.0, 1.0])["sufficient"], false);
+    assert_eq!(
+        S::noise_floor(&[1.0, 1.0], &[1.0, 1.0])["sufficient"],
+        false
+    );
 }
 
 #[test]
 fn letters() {
-    let got: Vec<&str> = [0.95, 0.70, 0.69, 0.40, 0.2, 0.08, 0.01].iter().map(|x| S::letter(Some(*x)).unwrap()).collect();
+    let got: Vec<&str> = [0.95, 0.70, 0.69, 0.40, 0.2, 0.08, 0.01]
+        .iter()
+        .map(|x| S::letter(Some(*x)).unwrap())
+        .collect();
     assert_eq!(got.join(""), "AABBCDE");
     assert_eq!(S::letter_range(Some(0.68), 0.05).unwrap(), "A/B");
     assert_eq!(S::letter_range(Some(0.55), 0.05).unwrap(), "B");
@@ -141,15 +193,35 @@ fn parallel() {
 fn grade_rule() {
     let g = S::summary_grade(Some(0.9), Some(0.4), 0.0, &[]);
     close(num(&g["score"]), 0.36f64.sqrt());
-    assert_eq!((text(&g["letter"]), text(&g["scope"])), ("B", "single+parallel"));
-    assert_eq!(S::summary_grade(Some(0.9), None, 0.0, &[])["scope"], "single-thread only");
-    assert!(S::summary_grade(Some(0.9), Some(0.9), 0.0, &["too short".to_string()])["score"].is_null());
+    assert_eq!(
+        (text(&g["letter"]), text(&g["scope"])),
+        ("B", "single+parallel")
+    );
+    assert_eq!(
+        S::summary_grade(Some(0.9), None, 0.0, &[])["scope"],
+        "single-thread only"
+    );
+    assert!(
+        S::summary_grade(Some(0.9), Some(0.9), 0.0, &["too short".to_string()])["score"].is_null()
+    );
 }
 
 // ---- Records (16) ----------------------------------------------------------------
 #[test]
 fn positive_control_near_compute_roof() {
-    let r = check(build(&calib(), &meas("modmuladd_p31", 1.9e9, M { rn: Some(7.4e9), bytes_per_op: Some(12.0), ws: Some(16384), ..Default::default() })));
+    let r = check(build(
+        &calib(),
+        &meas(
+            "modmuladd_p31",
+            1.9e9,
+            M {
+                rn: Some(7.4e9),
+                bytes_per_op: Some(12.0),
+                ws: Some(16384),
+                ..Default::default()
+            },
+        ),
+    ));
     assert_eq!(r["roofline"]["single"]["binding"], "compute");
     assert_eq!(r["intensity"]["in_cache"], true);
     close(num(&r["attainment"]["single"]["value"]), 0.95);
@@ -160,8 +232,21 @@ fn positive_control_near_compute_roof() {
 
 #[test]
 fn scalar_control_is_core_bound() {
-    let m = meas("modmuladd_p31", 5.2e8, M { rn: Some(2.0e9), bytes_per_op: Some(12.0), ws: Some(16384), ..Default::default() });
-    let r = check(build_diag(&calib(), &m, json!({"vector_share_static": 0.0})));
+    let m = meas(
+        "modmuladd_p31",
+        5.2e8,
+        M {
+            rn: Some(2.0e9),
+            bytes_per_op: Some(12.0),
+            ws: Some(16384),
+            ..Default::default()
+        },
+    );
+    let r = check(build_diag(
+        &calib(),
+        &m,
+        json!({"vector_share_static": 0.0}),
+    ));
     close(num(&r["attainment"]["single"]["value"]), 0.26);
     assert!(text(&r["grade"]["limiting_factor"]).contains("not vectorized"));
     assert_eq!(r["grade"]["letter"], "C");
@@ -171,9 +256,24 @@ fn scalar_control_is_core_bound() {
 
 #[test]
 fn stream_on_bandwidth_slope() {
-    let r = check(build(&calib(), &meas("fma_f64", 4.0e8, M { rn: Some(7.9e8), bytes_per_op: Some(24.0), ws: Some(1 << 30), ..Default::default() })));
+    let r = check(build(
+        &calib(),
+        &meas(
+            "fma_f64",
+            4.0e8,
+            M {
+                rn: Some(7.9e8),
+                bytes_per_op: Some(24.0),
+                ws: Some(1 << 30),
+                ..Default::default()
+            },
+        ),
+    ));
     assert_eq!(r["roofline"]["single"]["binding"], "memory");
-    close(num(&r["attainment"]["single"]["value"]), 4.0e8 / (1e10 / 24.0));
+    close(
+        num(&r["attainment"]["single"]["value"]),
+        4.0e8 / (1e10 / 24.0),
+    );
     close(num(&r["parallel"]["raw_efficiency"]), 7.9e8 / 1.6e9);
     assert!(num(&r["parallel"]["roofline_normalised_efficiency"]) > 0.95);
     assert_eq!(r["grade"]["letter"], "A");
@@ -182,7 +282,19 @@ fn stream_on_bandwidth_slope() {
 
 #[test]
 fn pointer_chase_is_latency_bound() {
-    let r = check(build(&calib(), &meas("ptr_hop", 1.0e7, M { rn: Some(4.0e7), bytes_per_op: Some(64.0), ws: Some(1 << 30), ..Default::default() })));
+    let r = check(build(
+        &calib(),
+        &meas(
+            "ptr_hop",
+            1.0e7,
+            M {
+                rn: Some(4.0e7),
+                bytes_per_op: Some(64.0),
+                ws: Some(1 << 30),
+                ..Default::default()
+            },
+        ),
+    ));
     assert!(num(&r["attainment"]["single"]["value"]) < 0.08);
     close(num(&r["diagnosis"]["latency_attainment"]), 1.0);
     assert!(text(&r["grade"]["limiting_factor"]).contains("latency bound"));
@@ -191,13 +303,34 @@ fn pointer_chase_is_latency_bound() {
 
 #[test]
 fn parallel_limits() {
-    let r = check(build(&calib(), &meas("modmuladd_p31", 1.9e9, M { rn: Some(2.4e9), bytes_per_op: Some(12.0), ws: Some(16384), ..Default::default() })));
+    let r = check(build(
+        &calib(),
+        &meas(
+            "modmuladd_p31",
+            1.9e9,
+            M {
+                rn: Some(2.4e9),
+                bytes_per_op: Some(12.0),
+                ws: Some(16384),
+                ..Default::default()
+            },
+        ),
+    ));
     assert!(text(&r["grade"]["limiting_factor"]).contains("parallel scaling"));
 }
 
 #[test]
 fn contended_full_point_is_reported_but_not_graded() {
-    let mut m = meas("modmuladd_p31", 1.9e9, M { rn: Some(4.0e9), bytes_per_op: Some(12.0), ws: Some(16384), ..Default::default() });
+    let mut m = meas(
+        "modmuladd_p31",
+        1.9e9,
+        M {
+            rn: Some(4.0e9),
+            bytes_per_op: Some(12.0),
+            ws: Some(16384),
+            ..Default::default()
+        },
+    );
     m["points"]["4"]["other_cpu_cores"] = st(2.0);
     let r = check(build(&calib(), &m));
     assert!(has_flag(&r, "FULL_POINT_CONTENDED"));
@@ -211,14 +344,27 @@ fn contended_full_point_is_reported_but_not_graded() {
 fn unknown_intensity_is_flagged() {
     let r = check(build(&calib(), &meas("fma_f64", 1e10, M::default())));
     assert!(has_flag(&r, "INTENSITY_UNKNOWN"));
-    assert_eq!(r["roofline"]["single"]["binding"], "compute (traffic unknown)");
+    assert_eq!(
+        r["roofline"]["single"]["binding"],
+        "compute (traffic unknown)"
+    );
     assert_eq!(r["grade"]["scope"], "single-thread only");
     assert!(r["parallel"].is_null());
 }
 
 #[test]
 fn ceiling_exceeded_invalidates() {
-    let r = check(build(&calib(), &meas("modmuladd_p31", 3.0e9, M { bytes_per_op: Some(0.0), ..Default::default() })));
+    let r = check(build(
+        &calib(),
+        &meas(
+            "modmuladd_p31",
+            3.0e9,
+            M {
+                bytes_per_op: Some(0.0),
+                ..Default::default()
+            },
+        ),
+    ));
     assert!(has_flag(&r, "CEILING_EXCEEDED"));
     assert!(r["grade"]["score"].is_null());
     assert_eq!(r["grade"]["scope"], "invalid");
@@ -227,7 +373,14 @@ fn ceiling_exceeded_invalidates() {
 
 #[test]
 fn too_short_invalidates() {
-    let mut m = meas("modmuladd_p31", 1e9, M { bytes_per_op: Some(0.0), ..Default::default() });
+    let mut m = meas(
+        "modmuladd_p31",
+        1e9,
+        M {
+            bytes_per_op: Some(0.0),
+            ..Default::default()
+        },
+    );
     m["flags"] = json!(["TOO_SHORT"]);
     let r = check(build(&calib(), &m));
     assert!(r["grade"]["letter"].is_null());
@@ -235,7 +388,14 @@ fn too_short_invalidates() {
 
 #[test]
 fn timing_tier_carries_no_pmu_values() {
-    let mut m = meas("modmuladd_p31", 1e9, M { bytes_per_op: Some(0.0), ..Default::default() });
+    let mut m = meas(
+        "modmuladd_p31",
+        1e9,
+        M {
+            bytes_per_op: Some(0.0),
+            ..Default::default()
+        },
+    );
     m["pmu"] = json!({"ipc": 2.5, "llc_misses_per_op": 0.1});
     m["memory_traffic"] = json!({"source": "llc-miss", "bytes_per_op": 6.4});
     let r = check(build(&calib(), &m));
@@ -253,7 +413,16 @@ fn timing_tier_carries_no_pmu_values() {
 
 #[test]
 fn pmu_tier_uses_measured_traffic_and_topdown() {
-    let mut m = meas("modmuladd_p31", 4e8, M { bytes_per_op: Some(12.0), tier: "T-pmu", ws: Some(1 << 30), ..Default::default() });
+    let mut m = meas(
+        "modmuladd_p31",
+        4e8,
+        M {
+            bytes_per_op: Some(12.0),
+            tier: "T-pmu",
+            ws: Some(1 << 30),
+            ..Default::default()
+        },
+    );
     m["pmu"] = json!({"ipc": 0.8, "cycles_per_op": 7.0, "instructions_per_op": 5.6, "llc_misses_per_op": 0.01, "dtlb_misses_per_op": 0.0});
     m["memory_traffic"] = json!({"source": "llc-miss", "bytes_per_op": 0.64});
     let td = json!({"frontend_bound": 0.05, "bad_speculation": 0.05, "backend_bound": 0.6, "retiring": 0.3, "memory_bound": 0.1, "core_bound": 0.5});
@@ -267,31 +436,73 @@ fn pmu_tier_uses_measured_traffic_and_topdown() {
 
 #[test]
 fn gpu_tiers() {
-    let mut m = meas("fma_f64", 1e10, M { bytes_per_op: Some(0.0), tier: "T-gpu-timing", ..Default::default() });
+    let mut m = meas(
+        "fma_f64",
+        1e10,
+        M {
+            bytes_per_op: Some(0.0),
+            tier: "T-gpu-timing",
+            ..Default::default()
+        },
+    );
     m["gpu"] = json!({"nvidia_smi": {"samples": 3}});
     let r = check(build(&calib(), &m));
     assert_eq!(r["device"], "gpu");
     let mut bad = r.clone();
     bad["diagnosis"]["gpu"]["ncu"] = json!({"sm_throughput_pct": 90});
     assert!(S::enforce_tier(&bad).is_err());
-    let mut cpu = check(build(&calib(), &meas("fma_f64", 1e10, M { bytes_per_op: Some(0.0), ..Default::default() })));
+    let mut cpu = check(build(
+        &calib(),
+        &meas(
+            "fma_f64",
+            1e10,
+            M {
+                bytes_per_op: Some(0.0),
+                ..Default::default()
+            },
+        ),
+    ));
     cpu["diagnosis"]["gpu"] = json!({});
     assert!(S::enforce_tier(&cpu).is_err());
 }
 
 #[test]
 fn graded_record_needs_noise_floor() {
-    let mut m = meas("fma_f64", 1e10, M { bytes_per_op: Some(0.0), ..Default::default() });
+    let mut m = meas(
+        "fma_f64",
+        1e10,
+        M {
+            bytes_per_op: Some(0.0),
+            ..Default::default()
+        },
+    );
     m["noise_floor"] = Value::Null;
     assert!(S::build_record(&calib(), &m, Extras::default()).is_err());
 }
 
 #[test]
 fn host_mismatch_and_algorithmic_axis() {
-    let mut m = meas("fma_f64", 3.9e10, M { bytes_per_op: Some(0.0), ..Default::default() });
+    let mut m = meas(
+        "fma_f64",
+        3.9e10,
+        M {
+            bytes_per_op: Some(0.0),
+            ..Default::default()
+        },
+    );
     m["host"]["fingerprint"] = json!("0000000000000000");
     let alg = json!({"counted_ops": 1e12, "best_known_ops": 1e9, "ratio": 1e3});
-    let r = check(S::build_record(&calib(), &m, Extras { algorithmic: Some(alg), ..Default::default() }).unwrap());
+    let r = check(
+        S::build_record(
+            &calib(),
+            &m,
+            Extras {
+                algorithmic: Some(alg),
+                ..Default::default()
+            },
+        )
+        .unwrap(),
+    );
     assert!(has_flag(&r, "CALIBRATION_HOST_MISMATCH"));
     assert_eq!(r["grade"]["letter"], "A"); // a tuned bad algorithm still scores high
     assert_eq!(num(&r["algorithmic"]["ratio"]), 1e3);
@@ -299,9 +510,21 @@ fn host_mismatch_and_algorithmic_axis() {
 
 #[test]
 fn schema_rejects() {
-    let r = build(&calib(), &meas("fma_f64", 1e10, M { bytes_per_op: Some(0.0), ..Default::default() }));
+    let r = build(
+        &calib(),
+        &meas(
+            "fma_f64",
+            1e10,
+            M {
+                bytes_per_op: Some(0.0),
+                ..Default::default()
+            },
+        ),
+    );
     let mutations: [fn(&mut Value); 4] = [
-        |d| { d.as_object_mut().unwrap().remove("noise_floor"); },
+        |d| {
+            d.as_object_mut().unwrap().remove("noise_floor");
+        },
         |d| d["tier"] = json!("T-guess"),
         |d| d["grade"]["letter"] = json!("S"),
         |d| d["attainment"]["single"]["value"] = json!("high"),
@@ -315,8 +538,22 @@ fn schema_rejects() {
 
 #[test]
 fn benchrec_units() {
-    let r = build(&calib(), &meas("fma_f64", 1e10, M { rn: Some(3e10), bytes_per_op: Some(0.0), ..Default::default() }));
-    let mut units: Vec<String> = S::benchrec_metrics(&r).iter().map(|m| text(&m["unit"]).to_string()).collect();
+    let r = build(
+        &calib(),
+        &meas(
+            "fma_f64",
+            1e10,
+            M {
+                rn: Some(3e10),
+                bytes_per_op: Some(0.0),
+                ..Default::default()
+            },
+        ),
+    );
+    let mut units: Vec<String> = S::benchrec_metrics(&r)
+        .iter()
+        .map(|m| text(&m["unit"]).to_string())
+        .collect();
     units.sort();
     units.dedup();
     assert_eq!(units, ["ops_per_s", "ratio"]);
@@ -332,9 +569,23 @@ fn ops_protocol() {
     let out = "noise\n{\"schema\":\"optlevel.ops/v1\",\"ops\":10,\"kernel_seconds\":1.0,\"bytes_declared\":80,\"op_class\":\"x\",\"working_set_bytes\":64}\n\
                {\"schema\":\"optlevel.ops/v1\",\"ops\":5,\"kernel_seconds\":0.5,\"bytes_declared\":40}\n{\"schema\":\"other\",\"ops\":99}\n";
     let o = run::parse_ops(out, "", None, None).unwrap();
-    assert_eq!((o.ops, o.kernel_seconds, o.bytes_declared, o.op_class.as_deref(), o.working_set_bytes), (15, Some(1.5), Some(120.0), Some("x"), Some(64)));
+    assert_eq!(
+        (
+            o.ops,
+            o.kernel_seconds,
+            o.bytes_declared,
+            o.op_class.as_deref(),
+            o.working_set_bytes
+        ),
+        (15, Some(1.5), Some(120.0), Some("x"), Some(64))
+    );
     let re = regex::Regex::new(r"walk_steps=([\d,]+)").unwrap();
-    assert_eq!(run::parse_ops("walk_steps=1,000\n", "walk_steps=24", None, Some(&re)).unwrap().ops, 1024);
+    assert_eq!(
+        run::parse_ops("walk_steps=1,000\n", "walk_steps=24", None, Some(&re))
+            .unwrap()
+            .ops,
+        1024
+    );
     assert_eq!(run::parse_ops("", "", Some(7), None).unwrap().ops, 7);
     assert!(run::parse_ops("nothing", "", None, None).is_none());
 }
@@ -343,16 +594,37 @@ fn ops_protocol() {
 fn perf_csv() {
     let text = "# started\n1000,,cycles:u,5,100.00,,\n2500,,instructions:u,5,100.00,2.5,insn per cycle\n40,,cache-misses:u,5,62.50,,\n<not supported>,,dTLB-load-misses:u,0,100.00,,\n";
     let (c, mux, nc) = run::parse_perf_csv(text);
-    assert_eq!((num(&c["cycles"]), num(&c["instructions"])), (1000.0, 2500.0));
-    assert_eq!((mux, nc), (vec!["cache-misses".to_string()], vec!["dTLB-load-misses".to_string()]));
+    assert_eq!(
+        (num(&c["cycles"]), num(&c["instructions"])),
+        (1000.0, 2500.0)
+    );
+    assert_eq!(
+        (mux, nc),
+        (
+            vec!["cache-misses".to_string()],
+            vec!["dTLB-load-misses".to_string()]
+        )
+    );
 }
 
 #[test]
 fn pmu_summary() {
-    let core = [json!({"ops": 100, "counters": {"cycles": 400.0, "instructions": 1000.0, "branches": 100.0, "branch-misses": 2.0}})];
-    let mem = [json!({"ops": 100, "counters": {"cycles": 400.0, "instructions": 1000.0, "cache-misses": 50.0}, "multiplexed": ["cache-misses"]})];
+    let core = [
+        json!({"ops": 100, "counters": {"cycles": 400.0, "instructions": 1000.0, "branches": 100.0, "branch-misses": 2.0}}),
+    ];
+    let mem = [
+        json!({"ops": 100, "counters": {"cycles": 400.0, "instructions": 1000.0, "cache-misses": 50.0}, "multiplexed": ["cache-misses"]}),
+    ];
     let (pmu, mux) = cmd::summarise_pmu(&core, &mem);
-    assert_eq!((num(&pmu["ipc"]), num(&pmu["cycles_per_op"]), num(&pmu["branch_miss_rate"]), num(&pmu["llc_misses_per_op"])), (2.5, 4.0, 0.02, 0.5));
+    assert_eq!(
+        (
+            num(&pmu["ipc"]),
+            num(&pmu["cycles_per_op"]),
+            num(&pmu["branch_miss_rate"]),
+            num(&pmu["llc_misses_per_op"])
+        ),
+        (2.5, 4.0, 0.02, 0.5)
+    );
     assert_eq!(mux, ["cache-misses"]);
     assert!(pmu["dtlb_misses_per_op"].is_null());
 }
@@ -371,7 +643,9 @@ fn topdown_normalise() {
 
 #[test]
 fn smi_samples() {
-    let s = cmd::parse_smi_samples("98, 40, 310.5, 71, 0x0000000000000000\n97, 41, 300.0, 72, 0x0000000000000004\nbad line\n");
+    let s = cmd::parse_smi_samples(
+        "98, 40, 310.5, 71, 0x0000000000000000\n97, 41, 300.0, 72, 0x0000000000000004\nbad line\n",
+    );
     assert_eq!(s["samples"], 2);
     assert_eq!(num(&s["utilization_gpu_pct"]["median"]), 97.5);
     assert_eq!(num(&s["throttled_sample_share"]), 0.5);
@@ -379,8 +653,18 @@ fn smi_samples() {
 
 #[test]
 fn scale_spec() {
-    assert_eq!(cmd::parse_scale(Some("copies:4,1")).unwrap(), ("copies".to_string(), None, vec![1, 4]));
-    assert_eq!(cmd::parse_scale(Some("env:RAYON_NUM_THREADS:1,2,4")).unwrap(), ("env".to_string(), Some("RAYON_NUM_THREADS".to_string()), vec![1, 2, 4]));
+    assert_eq!(
+        cmd::parse_scale(Some("copies:4,1")).unwrap(),
+        ("copies".to_string(), None, vec![1, 4])
+    );
+    assert_eq!(
+        cmd::parse_scale(Some("env:RAYON_NUM_THREADS:1,2,4")).unwrap(),
+        (
+            "env".to_string(),
+            Some("RAYON_NUM_THREADS".to_string()),
+            vec![1, 2, 4]
+        )
+    );
     assert!(cmd::parse_scale(Some("threads:4")).is_err());
 }
 
@@ -399,7 +683,11 @@ fn assert_wellformed(svg: &str) {
         assert!(!rest[..i].contains('>'), "stray > in text: {}", &rest[..i]);
         let j = i + rest[i..].find('>').expect("unterminated tag");
         let tag = &rest[i + 1..j];
-        assert_eq!(tag.matches('"').count() % 2, 0, "unbalanced quotes in <{tag}>");
+        assert_eq!(
+            tag.matches('"').count() % 2,
+            0,
+            "unbalanced quotes in <{tag}>"
+        );
         if let Some(name) = tag.strip_prefix('/') {
             assert_eq!(stack.pop().as_deref(), Some(name), "mismatched </{name}>");
         } else if !tag.ends_with('/') {
@@ -408,16 +696,59 @@ fn assert_wellformed(svg: &str) {
         rest = &rest[j + 1..];
     }
     assert!(stack.is_empty(), "unclosed: {stack:?}");
-    let body = svg.replace("&amp;", "").replace("&lt;", "").replace("&gt;", "").replace("&quot;", "").replace("&#x27;", "");
+    let body = svg
+        .replace("&amp;", "")
+        .replace("&lt;", "")
+        .replace("&gt;", "")
+        .replace("&quot;", "")
+        .replace("&#x27;", "");
     assert!(!body.contains('&'), "unescaped ampersand");
 }
 
 #[test]
 fn plot_is_wellformed_and_two_surface() {
     let c = calib();
-    let recs = [build(&c, &meas("modmuladd_p31", 1.9e9, M { rn: Some(7.4e9), bytes_per_op: Some(12.0), ws: Some(16384), ..Default::default() })),
-                build(&c, &meas("fma_f64", 4.0e8, M { rn: Some(7.9e8), bytes_per_op: Some(24.0), ws: Some(1 << 30), ..Default::default() })),
-                build(&c, &meas("ptr_hop", 1.0e7, M { rn: Some(4.0e7), bytes_per_op: Some(64.0), ws: Some(1 << 30), ..Default::default() }))];
+    let recs = [
+        build(
+            &c,
+            &meas(
+                "modmuladd_p31",
+                1.9e9,
+                M {
+                    rn: Some(7.4e9),
+                    bytes_per_op: Some(12.0),
+                    ws: Some(16384),
+                    ..Default::default()
+                },
+            ),
+        ),
+        build(
+            &c,
+            &meas(
+                "fma_f64",
+                4.0e8,
+                M {
+                    rn: Some(7.9e8),
+                    bytes_per_op: Some(24.0),
+                    ws: Some(1 << 30),
+                    ..Default::default()
+                },
+            ),
+        ),
+        build(
+            &c,
+            &meas(
+                "ptr_hop",
+                1.0e7,
+                M {
+                    rn: Some(4.0e7),
+                    bytes_per_op: Some(64.0),
+                    ws: Some(1 << 30),
+                    ..Default::default()
+                },
+            ),
+        ),
+    ];
     let text = plot::roofline_svg(&c, &recs, "t & <t>").unwrap();
     assert_wellformed(&text);
     assert!(text.contains("prefers-color-scheme: dark"));
@@ -437,13 +768,32 @@ fn registry() {
     assert_eq!(ids.len(), n);
     for k in kernels {
         let k: &Map<String, Value> = k.as_object().unwrap();
-        for field in ["id", "repository", "path", "device", "op_class", "ops_counter", "measure", "status"] {
+        for field in [
+            "id",
+            "repository",
+            "path",
+            "device",
+            "op_class",
+            "ops_counter",
+            "measure",
+            "status",
+        ] {
             assert!(k.contains_key(field), "{:?} lacks {field}", k.get("id"));
         }
         assert!(["cpu", "gpu"].contains(&text(&k["device"])));
-        assert!(["measured here", "needs PMU host", "needs GPU", "needs build"].contains(&text(&k["status"])));
+        assert!([
+            "measured here",
+            "needs PMU host",
+            "needs GPU",
+            "needs build"
+        ]
+        .contains(&text(&k["status"])));
         assert!(["emitted", "derivable", "none"].contains(&text(&k["ops_counter"]["kind"])));
         // no command line names the removed Python entry point
-        assert!(!text(&k["measure"]).contains("optlevel.py"), "{} still calls optlevel.py", text(&k["id"]));
+        assert!(
+            !text(&k["measure"]).contains("optlevel.py"),
+            "{} still calls optlevel.py",
+            text(&k["id"])
+        );
     }
 }

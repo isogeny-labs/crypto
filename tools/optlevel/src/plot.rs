@@ -30,10 +30,24 @@ struct Pal {
     axis: &'static str,
     s: [&'static str; 4],
 }
-const LIGHT: Pal = Pal { surface: "#fcfcfb", text: "#0b0b0b", text2: "#52514e", muted: "#898781", grid: "#e4e3dd", axis: "#c3c2b7",
-                         s: ["#2a78d6", "#eb6834", "#1baf7a", "#898781"] };
-const DARK: Pal = Pal { surface: "#1a1a19", text: "#f0efec", text2: "#c3c2b7", muted: "#898781", grid: "#2c2c2a", axis: "#383835",
-                        s: ["#3987e5", "#d95926", "#199e70", "#898781"] };
+const LIGHT: Pal = Pal {
+    surface: "#fcfcfb",
+    text: "#0b0b0b",
+    text2: "#52514e",
+    muted: "#898781",
+    grid: "#e4e3dd",
+    axis: "#c3c2b7",
+    s: ["#2a78d6", "#eb6834", "#1baf7a", "#898781"],
+};
+const DARK: Pal = Pal {
+    surface: "#1a1a19",
+    text: "#f0efec",
+    text2: "#c3c2b7",
+    muted: "#898781",
+    grid: "#2c2c2a",
+    axis: "#383835",
+    s: ["#3987e5", "#d95926", "#199e70", "#898781"],
+};
 const W: f64 = 920.0;
 const H: f64 = 560.0;
 const ML: f64 = 86.0;
@@ -55,7 +69,10 @@ fn css() -> String {
         let mut out = format!("{pre}.surface{{fill:{}}}{pre}.t1{{fill:{}}}{pre}.t2{{fill:{}}}{pre}.mut{{fill:{}}}{pre}.grid{{stroke:{}}}{pre}.axis{{stroke:{}}}{pre}.ring{{stroke:{}}}{pre}.halo{{stroke:{}}}",
                               p.surface, p.text, p.text2, p.muted, p.grid, p.axis, p.surface, p.surface);
         for i in 0..4 {
-            out += &format!("{pre}.l{i}{{stroke:{}}}{pre}.f{i}{{fill:{}}}", p.s[i], p.s[i]);
+            out += &format!(
+                "{pre}.l{i}{{stroke:{}}}{pre}.f{i}{{fill:{}}}",
+                p.s[i], p.s[i]
+            );
         }
         out
     }
@@ -83,7 +100,11 @@ fn int(v: f64) -> String {
 
 pub fn roofline_svg(calib: &Value, records: &[Value], title: &str) -> Result<String, String> {
     // a record's roof is its class's calibration entry (or its alias's)
-    let roof_class = |r: &Value| -> Option<String> { class_entry(calib, r["kernel"]["op_class"].as_str()?).ok().map(|(_, n)| n) };
+    let roof_class = |r: &Value| -> Option<String> {
+        class_entry(calib, r["kernel"]["op_class"].as_str()?)
+            .ok()
+            .map(|(_, n)| n)
+    };
     let mut classes: Vec<String> = Vec::new();
     for r in records {
         if let Some(c) = roof_class(r) {
@@ -94,24 +115,54 @@ pub fn roofline_svg(calib: &Value, records: &[Value], title: &str) -> Result<Str
     }
     let slot = |c: &str| classes.iter().position(|x| x == c).unwrap_or(0).min(3);
     let bw = &calib["memory"]["bandwidth_bytes_per_s"];
-    let mut ks: Vec<i64> = bw.as_object().map(|o| o.keys().filter_map(|k| k.parse().ok()).collect()).unwrap_or_default();
+    let mut ks: Vec<i64> = bw
+        .as_object()
+        .map(|o| o.keys().filter_map(|k| k.parse().ok()).collect())
+        .unwrap_or_default();
     ks.sort();
-    let (Some(&k1), Some(&kn)) = (ks.first(), ks.last()) else { return Err("calibration has no bandwidth points".into()) };
+    let (Some(&k1), Some(&kn)) = (ks.first(), ks.last()) else {
+        return Err("calibration has no bandwidth points".into());
+    };
     let bwmax = |k: i64| f(&bw[k.to_string()], "max").unwrap_or(f64::NAN);
-    let peak = |c: &str, k: i64| f(&calib["compute"][c]["total_ops_per_s"][k.to_string()], "max").unwrap_or(f64::NAN);
+    let peak = |c: &str, k: i64| {
+        f(
+            &calib["compute"][c]["total_ops_per_s"][k.to_string()],
+            "max",
+        )
+        .unwrap_or(f64::NAN)
+    };
     let mut pts: Vec<Pt> = Vec::new();
     for r in records {
         let Some(c) = roof_class(r) else { continue };
         let opb = r["intensity"]["ops_per_byte"].as_f64();
         for name in ["single", "full"] {
-            let Some(att) = r["attainment"].get(name) else { continue };
-            let ach = if name == "single" { &r["achieved"]["single"] } else { &r["achieved"][format!("threads_{}", r["roofline"]["full"]["threads"])] };
+            let Some(att) = r["attainment"].get(name) else {
+                continue;
+            };
+            let ach = if name == "single" {
+                &r["achieved"]["single"]
+            } else {
+                &r["achieved"][format!("threads_{}", r["roofline"]["full"]["threads"])]
+            };
             let s = &ach["ops_per_s"];
-            let label = r["label"].as_str().filter(|l| !l.is_empty()).unwrap_or(&c).to_string();
-            pts.push(Pt { label, cls: c.clone(), x: opb, y: f(s, "median").unwrap_or(f64::NAN), lo: f(s, "min").unwrap_or(f64::NAN),
-                          hi: f(s, "max").unwrap_or(f64::NAN), single: name == "single", att: f(att, "value").unwrap_or(f64::NAN),
-                          tier: r["tier"].as_str().unwrap_or("").to_string(), threads: r["roofline"][name]["threads"].as_i64().unwrap_or(0),
-                          incache: r["intensity"]["in_cache"].as_bool().unwrap_or(false) });
+            let label = r["label"]
+                .as_str()
+                .filter(|l| !l.is_empty())
+                .unwrap_or(&c)
+                .to_string();
+            pts.push(Pt {
+                label,
+                cls: c.clone(),
+                x: opb,
+                y: f(s, "median").unwrap_or(f64::NAN),
+                lo: f(s, "min").unwrap_or(f64::NAN),
+                hi: f(s, "max").unwrap_or(f64::NAN),
+                single: name == "single",
+                att: f(att, "value").unwrap_or(f64::NAN),
+                tier: r["tier"].as_str().unwrap_or("").to_string(),
+                threads: r["roofline"][name]["threads"].as_i64().unwrap_or(0),
+                incache: r["intensity"]["in_cache"].as_bool().unwrap_or(false),
+            });
         }
     }
     if classes.is_empty() {
@@ -125,16 +176,28 @@ pub fn roofline_svg(calib: &Value, records: &[Value], title: &str) -> Result<Str
             knees.push(peak(c, k) / bwmax(k));
         }
     }
-    let xs: Vec<f64> = pts.iter().filter_map(|p| p.x.filter(|x| *x != 0.0)).chain(knees.iter().copied()).collect();
+    let xs: Vec<f64> = pts
+        .iter()
+        .filter_map(|p| p.x.filter(|x| *x != 0.0))
+        .chain(knees.iter().copied())
+        .collect();
     let fold = |v: &[f64], init: f64, g: fn(f64, f64) -> f64| v.iter().copied().fold(init, g);
     let xmin = 10f64.powf((fold(&xs, f64::INFINITY, f64::min) / 4.0).log10().floor());
-    let xmax = 10f64.powf((fold(&xs, f64::NEG_INFINITY, f64::max) * 4.0).log10().ceil());
+    let xmax = 10f64.powf(
+        (fold(&xs, f64::NEG_INFINITY, f64::max) * 4.0)
+            .log10()
+            .ceil(),
+    );
     let mut ys: Vec<f64> = pts.iter().map(|p| p.lo).collect();
     ys.push(xmin * bwmax(k1));
     let ymin = 10f64.powf((fold(&ys, f64::INFINITY, f64::min) / 1.5).log10().floor());
     let mut tops = peaks.clone();
     tops.extend(pts.iter().map(|p| p.hi));
-    let ymax = 10f64.powf((fold(&tops, f64::NEG_INFINITY, f64::max) * 1.2).log10().ceil());
+    let ymax = 10f64.powf(
+        (fold(&tops, f64::NEG_INFINITY, f64::max) * 1.2)
+            .log10()
+            .ceil(),
+    );
     let (pw, ph) = (W - ML - MR, H - MT - MB);
     let x_of = |v: f64| ML + pw * (v.log10() - xmin.log10()) / (xmax.log10() - xmin.log10());
     let y_of = |v: f64| {
@@ -179,21 +242,54 @@ pub fn roofline_svg(calib: &Value, records: &[Value], title: &str) -> Result<Str
         for (k, dash) in lines {
             let (pk, b) = (peak(c, k), bwmax(k));
             let knee = (pk / b).max(xmin).min(xmax);
-            let d = format!("M{:.1},{:.1} L{:.1},{:.1} L{:.1},{:.1}", x_of(xmin), y_of(xmin * b), x_of(knee), y_of(pk.min(knee * b)), x_of(xmax), y_of(pk));
+            let d = format!(
+                "M{:.1},{:.1} L{:.1},{:.1} L{:.1},{:.1}",
+                x_of(xmin),
+                y_of(xmin * b),
+                x_of(knee),
+                y_of(pk.min(knee * b)),
+                x_of(xmax),
+                y_of(pk)
+            );
             o.push(format!("<path class=\"l{i}\" d=\"{d}\" fill=\"none\" stroke=\"{}\" stroke-width=\"2\"{dash}><title>{} roof, {k} core(s): peak {} ops/s, bandwidth {} B/s</title></path>",
                            LIGHT.s[i], esc(c), fmt(pk), fmt(b)));
         }
     }
     // markers, with direct labels stacked top to bottom in marker order
-    let mut geo: Vec<(f64, f64, bool, &Pt)> = pts.iter().map(|p| (y_of(p.y), p.x.map(x_of).unwrap_or(ML + pw - 10.0), p.x.is_none(), p)).collect();
+    let mut geo: Vec<(f64, f64, bool, &Pt)> = pts
+        .iter()
+        .map(|p| {
+            (
+                y_of(p.y),
+                p.x.map(x_of).unwrap_or(ML + pw - 10.0),
+                p.x.is_none(),
+                p,
+            )
+        })
+        .collect();
     geo.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));
     let (mut last_right, mut last_left) = (-1e9f64, -1e9f64);
     for (y, x, unknown, p) in geo {
         let i = slot(&p.cls);
         let col = LIGHT.s[i];
         let which = if p.single { "single" } else { "full" };
-        let tip = format!("{} ({which}, {} thread(s), {}): {} ops/s [{}, {}], attainment {:.3}{}", p.label, p.threads, p.tier, fmt(p.y), fmt(p.lo), fmt(p.hi), p.att,
-                          if p.incache { "; working set in cache, no DRAM traffic, drawn at the right edge" } else if unknown { "; memory traffic unknown, drawn at the right edge" } else { "" });
+        let tip = format!(
+            "{} ({which}, {} thread(s), {}): {} ops/s [{}, {}], attainment {:.3}{}",
+            p.label,
+            p.threads,
+            p.tier,
+            fmt(p.y),
+            fmt(p.lo),
+            fmt(p.hi),
+            p.att,
+            if p.incache {
+                "; working set in cache, no DRAM traffic, drawn at the right edge"
+            } else if unknown {
+                "; memory traffic unknown, drawn at the right edge"
+            } else {
+                ""
+            }
+        );
         o.push(format!("<line class=\"l{i}\" x1=\"{x:.1}\" y1=\"{:.1}\" x2=\"{x:.1}\" y2=\"{:.1}\" stroke=\"{col}\" stroke-width=\"2\"/>", y_of(p.lo), y_of(p.hi)));
         if p.single {
             o.push(format!("<circle class=\"f{i} ring\" cx=\"{x:.1}\" cy=\"{y:.1}\" r=\"5.5\" fill=\"{col}\" stroke=\"{}\" stroke-width=\"2\"><title>{}</title></circle>", LIGHT.surface, esc(&tip)));
@@ -207,8 +303,16 @@ pub fn roofline_svg(calib: &Value, records: &[Value], title: &str) -> Result<Str
         } else {
             last_left = ly;
         }
-        let tag = if p.single { "1t".to_string() } else { format!("{}t", p.threads) };
-        let (anchor, lx) = if right { ("end", x - 22.0) } else { ("start", x + 22.0) };
+        let tag = if p.single {
+            "1t".to_string()
+        } else {
+            format!("{}t", p.threads)
+        };
+        let (anchor, lx) = if right {
+            ("end", x - 22.0)
+        } else {
+            ("start", x + 22.0)
+        };
         let ex = if right { x - 7.0 } else { x + 7.0 };
         o.push(format!("<path class=\"axis\" d=\"M{ex:.1},{y:.1} L{:.1},{:.1}\" fill=\"none\" stroke=\"{}\" stroke-width=\"1\"/>", lx + if right { 4.0 } else { -4.0 }, ly - 4.0, LIGHT.axis));
         o.push(format!("<text class=\"t1 halo\" x=\"{lx:.1}\" y=\"{ly:.1}\" font-size=\"11\" text-anchor=\"{anchor}\" fill=\"{}\" stroke=\"{}\" stroke-width=\"3\" paint-order=\"stroke\" stroke-linejoin=\"round\">{} {tag}: {:.2}{}</text>",
@@ -221,21 +325,46 @@ pub fn roofline_svg(calib: &Value, records: &[Value], title: &str) -> Result<Str
         let i = slot(c);
         ly += 20;
         o.push(format!("<line class=\"l{i}\" x1=\"{lx}\" y1=\"{0}\" x2=\"{1}\" y2=\"{0}\" stroke=\"{2}\" stroke-width=\"2\"/>", ly - 4, lx + 26, LIGHT.s[i]));
-        o.push(format!("<text class=\"t1\" x=\"{}\" y=\"{ly}\" font-size=\"11.5\" fill=\"{}\">{}</text>", lx + 32, LIGHT.text, esc(c)));
+        o.push(format!(
+            "<text class=\"t1\" x=\"{}\" y=\"{ly}\" font-size=\"11.5\" fill=\"{}\">{}</text>",
+            lx + 32,
+            LIGHT.text,
+            esc(c)
+        ));
     }
-    let notes = [format!("solid: {k1} core"), if kn != k1 { format!("dashed: all {kn} cores") } else { String::new() }, "filled marker: single thread".into(),
-                 "ring: full parallelism".into(), "bar: min to max over runs".into(), "label: attainment".into(),
-                 "in cache: no DRAM traffic (right edge)".into(), "*: traffic unknown (right edge)".into()];
+    let notes = [
+        format!("solid: {k1} core"),
+        if kn != k1 {
+            format!("dashed: all {kn} cores")
+        } else {
+            String::new()
+        },
+        "filled marker: single thread".into(),
+        "ring: full parallelism".into(),
+        "bar: min to max over runs".into(),
+        "label: attainment".into(),
+        "in cache: no DRAM traffic (right edge)".into(),
+        "*: traffic unknown (right edge)".into(),
+    ];
     ly += 14;
     for n in notes.iter().filter(|n| !n.is_empty()) {
         ly += 16;
-        o.push(format!("<text class=\"t2\" x=\"{lx}\" y=\"{ly}\" font-size=\"11\" fill=\"{}\">{}</text>", LIGHT.text2, esc(n)));
+        o.push(format!(
+            "<text class=\"t2\" x=\"{lx}\" y=\"{ly}\" font-size=\"11\" fill=\"{}\">{}</text>",
+            LIGHT.text2,
+            esc(n)
+        ));
     }
     o.push("</svg>".into());
     Ok(o.join("\n") + "\n")
 }
 
-pub fn write_roofline(calib: &Value, records: &[Value], out: &Path, title: &str) -> Result<(), String> {
+pub fn write_roofline(
+    calib: &Value,
+    records: &[Value],
+    out: &Path,
+    title: &str,
+) -> Result<(), String> {
     let svg = roofline_svg(calib, records, title)?;
     if let Some(p) = out.parent().filter(|p| !p.as_os_str().is_empty()) {
         std::fs::create_dir_all(p).map_err(|e| format!("{}: {e}", p.display()))?;

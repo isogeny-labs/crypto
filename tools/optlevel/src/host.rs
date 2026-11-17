@@ -8,8 +8,26 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 pub const ISA_FLAGS: [&str; 20] = [
-    "sse4_2", "avx", "avx2", "fma", "bmi2", "adx", "popcnt", "pclmulqdq", "avx512f", "avx512dq", "avx512bw", "avx512vl",
-    "avx512ifma", "avx512_vpopcntdq", "vpclmulqdq", "gfni", "neon", "asimd", "sve", "pmull",
+    "sse4_2",
+    "avx",
+    "avx2",
+    "fma",
+    "bmi2",
+    "adx",
+    "popcnt",
+    "pclmulqdq",
+    "avx512f",
+    "avx512dq",
+    "avx512bw",
+    "avx512vl",
+    "avx512ifma",
+    "avx512_vpopcntdq",
+    "vpclmulqdq",
+    "gfni",
+    "neon",
+    "asimd",
+    "sve",
+    "pmull",
 ];
 /// Helper programs `tools/profile.sh` needs for its GPU subcommands.
 pub const HELPER_TOOLS: [&str; 2] = ["gawk", "jq"];
@@ -22,7 +40,9 @@ pub fn affinity() -> Vec<usize> {
         if libc::sched_getaffinity(0, std::mem::size_of::<libc::cpu_set_t>(), &mut set) != 0 {
             return (0..online_cpus()).collect();
         }
-        (0..libc::CPU_SETSIZE as usize).filter(|&i| libc::CPU_ISSET(i, &set)).collect()
+        (0..libc::CPU_SETSIZE as usize)
+            .filter(|&i| libc::CPU_ISSET(i, &set))
+            .collect()
     }
 }
 pub fn online_cpus() -> usize {
@@ -81,7 +101,9 @@ pub fn cgroup_cpu_quota(root: &Path) -> Option<Quota> {
     let mut v1_rel = "/".to_string();
     for line in membership.lines() {
         let mut parts = line.splitn(3, ':');
-        let (Some(_id), Some(ctrl), Some(path)) = (parts.next(), parts.next(), parts.next()) else { continue };
+        let (Some(_id), Some(ctrl), Some(path)) = (parts.next(), parts.next(), parts.next()) else {
+            continue;
+        };
         if ctrl.is_empty() {
             v2_rel = path.to_string();
         } else if ctrl.split(',').any(|c| c == "cpu") {
@@ -90,16 +112,35 @@ pub fn cgroup_cpu_quota(root: &Path) -> Option<Quota> {
     }
     for dir in chain(&base, &v2_rel) {
         if let Some(t) = read_trim(dir.join("cpu.max")) {
-            consider(parse_v2(&t), format!("cgroup v2 cpu.max \"{t}\" ({})", dir.strip_prefix(root).unwrap_or(&dir).display()));
+            consider(
+                parse_v2(&t),
+                format!(
+                    "cgroup v2 cpu.max \"{t}\" ({})",
+                    dir.strip_prefix(root).unwrap_or(&dir).display()
+                ),
+            );
         }
     }
     for mount in ["cpu,cpuacct", "cpu"] {
         let mount = base.join(mount);
         for dir in chain(&mount, &v1_rel) {
-            let (Some(q), Some(p)) = (read_trim(dir.join("cpu.cfs_quota_us")), read_trim(dir.join("cpu.cfs_period_us"))) else { continue };
-            let (Ok(qf), Ok(pf)) = (q.parse::<f64>(), p.parse::<f64>()) else { continue };
+            let (Some(q), Some(p)) = (
+                read_trim(dir.join("cpu.cfs_quota_us")),
+                read_trim(dir.join("cpu.cfs_period_us")),
+            ) else {
+                continue;
+            };
+            let (Ok(qf), Ok(pf)) = (q.parse::<f64>(), p.parse::<f64>()) else {
+                continue;
+            };
             if qf > 0.0 && pf > 0.0 {
-                consider(Some(qf / pf), format!("cgroup v1 cpu.cfs_quota_us {q} / cpu.cfs_period_us {p} ({})", dir.strip_prefix(root).unwrap_or(&dir).display()));
+                consider(
+                    Some(qf / pf),
+                    format!(
+                        "cgroup v1 cpu.cfs_quota_us {q} / cpu.cfs_period_us {p} ({})",
+                        dir.strip_prefix(root).unwrap_or(&dir).display()
+                    ),
+                );
             }
         }
     }
@@ -109,14 +150,21 @@ pub fn cgroup_cpu_quota(root: &Path) -> Option<Quota> {
 /// CPUs a pinned-copies run can use at once: the affinity mask, cut to the
 /// CPU quota (rounded down, at least 1).  `declared` is OPTLEVEL_CPUS, for
 /// containers whose allotment no kernel interface shows.
-pub fn usable_cpus(affinity: usize, quota: Option<&Quota>, declared: Option<usize>) -> (usize, String) {
+pub fn usable_cpus(
+    affinity: usize,
+    quota: Option<&Quota>,
+    declared: Option<usize>,
+) -> (usize, String) {
     let mut n = affinity.max(1);
     let mut why = format!("affinity mask ({affinity} CPUs)");
     if let Some(q) = quota {
         let cap = ((q.cores + 1e-9).floor() as usize).max(1);
         if cap < n {
             n = cap;
-            why = format!("{} = {:.2} cores, below the affinity mask ({affinity} CPUs)", q.source, q.cores);
+            why = format!(
+                "{} = {:.2} cores, below the affinity mask ({affinity} CPUs)",
+                q.source, q.cores
+            );
         }
     }
     if let Some(d) = declared.filter(|d| *d >= 1 && *d < n) {
@@ -132,21 +180,51 @@ fn declared_cpus() -> Option<usize> {
 
 /// The number of CPUs calibrate, measure and controls scale to.
 pub fn usable_cpu_count() -> usize {
-    usable_cpus(affinity().len(), cgroup_cpu_quota(Path::new("/")).as_ref(), declared_cpus()).0
+    usable_cpus(
+        affinity().len(),
+        cgroup_cpu_quota(Path::new("/")).as_ref(),
+        declared_cpus(),
+    )
+    .0
 }
 
 pub fn cache_sizes() -> Value {
     let mut out = serde_json::Map::new();
     let re = Regex::new(r"^(\d+)([KMG]?)").unwrap();
-    let mut dirs: Vec<PathBuf> = std::fs::read_dir("/sys/devices/system/cpu/cpu0/cache").into_iter().flatten().flatten()
-        .map(|e| e.path()).filter(|p| p.file_name().map(|n| n.to_string_lossy().starts_with("index")).unwrap_or(false)).collect();
+    let mut dirs: Vec<PathBuf> = std::fs::read_dir("/sys/devices/system/cpu/cpu0/cache")
+        .into_iter()
+        .flatten()
+        .flatten()
+        .map(|e| e.path())
+        .filter(|p| {
+            p.file_name()
+                .map(|n| n.to_string_lossy().starts_with("index"))
+                .unwrap_or(false)
+        })
+        .collect();
     dirs.sort();
     for idx in dirs {
-        let (lvl, typ, size) = (read_trim(idx.join("level")), read_trim(idx.join("type")), read_trim(idx.join("size")).unwrap_or_default());
+        let (lvl, typ, size) = (
+            read_trim(idx.join("level")),
+            read_trim(idx.join("type")),
+            read_trim(idx.join("size")).unwrap_or_default(),
+        );
         if let (Some(lvl), Some(m)) = (lvl.filter(|l| !l.is_empty()), re.captures(&size)) {
-            let mult: u64 = match &m[2] { "K" => 1 << 10, "M" => 1 << 20, "G" => 1 << 30, _ => 1 };
-            let suffix = match typ.as_deref() { Some("Data") => "d", Some("Instruction") => "i", _ => "" };
-            out.insert(format!("L{lvl}{suffix}"), json!(m[1].parse::<u64>().unwrap_or(0) * mult));
+            let mult: u64 = match &m[2] {
+                "K" => 1 << 10,
+                "M" => 1 << 20,
+                "G" => 1 << 30,
+                _ => 1,
+            };
+            let suffix = match typ.as_deref() {
+                Some("Data") => "d",
+                Some("Instruction") => "i",
+                _ => "",
+            };
+            out.insert(
+                format!("L{lvl}{suffix}"),
+                json!(m[1].parse::<u64>().unwrap_or(0) * mult),
+            );
         }
     }
     Value::Object(out)
@@ -159,29 +237,50 @@ fn uname() -> (String, String) {
         if libc::uname(&mut u) != 0 {
             return ("unknown".into(), "unknown".into());
         }
-        let s = |p: &[libc::c_char]| std::ffi::CStr::from_ptr(p.as_ptr()).to_string_lossy().into_owned();
+        let s = |p: &[libc::c_char]| {
+            std::ffi::CStr::from_ptr(p.as_ptr())
+                .to_string_lossy()
+                .into_owned()
+        };
         (s(&u.machine), s(&u.release))
     }
 }
 
 fn sorted_dir(path: &str) -> Vec<String> {
-    let mut v: Vec<String> = std::fs::read_dir(path).into_iter().flatten().flatten().map(|e| e.file_name().to_string_lossy().into_owned()).collect();
+    let mut v: Vec<String> = std::fs::read_dir(path)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .map(|e| e.file_name().to_string_lossy().into_owned())
+        .collect();
     v.sort();
     v
 }
 
 pub fn host_info() -> Value {
     let cpuinfo = std::fs::read_to_string("/proc/cpuinfo").unwrap_or_default();
-    let model = Regex::new(r"model name\s*:\s*(.*)").unwrap().captures(&cpuinfo).map(|m| m[1].trim().to_string());
-    let mut flagset: Vec<String> = Regex::new(r"(?m)^(?:flags|Features)\s*:\s*(.*)").unwrap().captures(&cpuinfo)
-        .map(|m| m[1].split_whitespace().map(String::from).collect()).unwrap_or_default();
+    let model = Regex::new(r"model name\s*:\s*(.*)")
+        .unwrap()
+        .captures(&cpuinfo)
+        .map(|m| m[1].trim().to_string());
+    let mut flagset: Vec<String> = Regex::new(r"(?m)^(?:flags|Features)\s*:\s*(.*)")
+        .unwrap()
+        .captures(&cpuinfo)
+        .map(|m| m[1].split_whitespace().map(String::from).collect())
+        .unwrap_or_default();
     flagset.sort();
     let caches = cache_sizes();
     let cpus = affinity();
-    let mem = Regex::new(r"MemTotal:\s*(\d+)").unwrap().captures(&std::fs::read_to_string("/proc/meminfo").unwrap_or_default())
-        .and_then(|m| m[1].parse::<u64>().ok()).map(|kb| kb * 1024);
+    let mem = Regex::new(r"MemTotal:\s*(\d+)")
+        .unwrap()
+        .captures(&std::fs::read_to_string("/proc/meminfo").unwrap_or_default())
+        .and_then(|m| m[1].parse::<u64>().ok())
+        .map(|kb| kb * 1024);
     let node_re = Regex::new(r"^node\d+$").unwrap();
-    let nodes = sorted_dir("/sys/devices/system/node").iter().filter(|n| node_re.is_match(n)).count();
+    let nodes = sorted_dir("/sys/devices/system/node")
+        .iter()
+        .filter(|n| node_re.is_match(n))
+        .count();
     let (arch, kernel) = uname();
     let hypervisor = flagset.iter().any(|f| f == "hypervisor");
     let logical = online_cpus();
@@ -190,7 +289,9 @@ pub fn host_info() -> Value {
     let (usable, usable_why) = usable_cpus(cpus.len(), quota.as_ref(), declared_cpus());
     // The fingerprint hashes the same text as the tool's first version, so a
     // calibration taken by either version matches this host in both.
-    let key = py_dumps(&json!([cpu_model, arch, logical, flagset, caches, mem, hypervisor]));
+    let key = py_dumps(&json!([
+        cpu_model, arch, logical, flagset, caches, mem, hypervisor
+    ]));
     json!({
         "cpu_model": cpu_model, "arch": arch, "kernel": kernel,
         "logical_cpus": logical, "allowed_cpus": cpus,
@@ -215,8 +316,15 @@ pub fn host_info() -> Value {
 
 /// Which helper programs are missing, with what needs them.
 pub fn helper_tools() -> Value {
-    let found: serde_json::Map<String, Value> = HELPER_TOOLS.iter().map(|t| (t.to_string(), json!(which(t)))).collect();
-    let missing: Vec<&str> = HELPER_TOOLS.iter().copied().filter(|t| found[*t].is_null()).collect();
+    let found: serde_json::Map<String, Value> = HELPER_TOOLS
+        .iter()
+        .map(|t| (t.to_string(), json!(which(t))))
+        .collect();
+    let missing: Vec<&str> = HELPER_TOOLS
+        .iter()
+        .copied()
+        .filter(|t| found[*t].is_null())
+        .collect();
     json!({"found": found, "missing": missing,
            "needed_by": "tools/profile.sh (its ncu and nsys subcommands exit 2 without gawk and jq)"})
 }
@@ -227,35 +335,68 @@ pub fn find_perf() -> Option<String> {
     cands.extend(std::env::var("PERF").ok());
     cands.extend(which("perf"));
     let mut glob = |dir: &str, prefix: &str| {
-        let mut v: Vec<String> = sorted_dir(dir).into_iter().filter(|n| n.starts_with(prefix)).map(|n| format!("{dir}/{n}/perf")).collect();
+        let mut v: Vec<String> = sorted_dir(dir)
+            .into_iter()
+            .filter(|n| n.starts_with(prefix))
+            .map(|n| format!("{dir}/{n}/perf"))
+            .collect();
         v.reverse();
         cands.extend(v);
     };
     glob("/usr/lib", "linux-tools");
     glob("/usr/lib/linux-tools", "");
-    cands.into_iter().find(|p| Command::new(p).arg("--version").output().map(|o| o.status.success()).unwrap_or(false))
+    cands.into_iter().find(|p| {
+        Command::new(p)
+            .arg("--version")
+            .output()
+            .map(|o| o.status.success())
+            .unwrap_or(false)
+    })
 }
 
 /// The same test as tools/perf_ipc.sh: can this process count cycles:u and
 /// instructions:u?  Returns the perf path, or the reason it is unavailable.
 pub fn pmu_probe() -> Result<String, String> {
     let sources = sorted_dir("/sys/bus/event_source/devices");
-    let perf = find_perf().ok_or_else(|| format!("no working perf binary (event sources: {})", if sources.is_empty() { "none".into() } else { sources.join(" ") }))?;
-    let r = Command::new(&perf).args(["stat", "-x,", "-e", "cycles:u,instructions:u", "--", "true"]).output()
+    let perf = find_perf().ok_or_else(|| {
+        format!(
+            "no working perf binary (event sources: {})",
+            if sources.is_empty() {
+                "none".into()
+            } else {
+                sources.join(" ")
+            }
+        )
+    })?;
+    let r = Command::new(&perf)
+        .args(["stat", "-x,", "-e", "cycles:u,instructions:u", "--", "true"])
+        .output()
         .map_err(|e| format!("perf probe failed: {e}"))?;
     classify_perf_probe(&String::from_utf8_lossy(&r.stderr), r.status.code())?;
     Ok(perf)
 }
 pub fn classify_perf_probe(stderr: &str, code: Option<i32>) -> Result<(), String> {
-    if Regex::new(r"<not (supported|counted)>").unwrap().is_match(stderr) {
+    if Regex::new(r"<not (supported|counted)>")
+        .unwrap()
+        .is_match(stderr)
+    {
         return Err("perf cannot count cycles:u/instructions:u here (<not supported>): no hardware PMU is exposed".into());
     }
-    if Regex::new(r"(?i)permission|access to performance monitoring").unwrap().is_match(stderr) {
-        return Err(format!("perf_event_paranoid={} forbids counting", read_trim("/proc/sys/kernel/perf_event_paranoid").unwrap_or_else(|| "?".into())));
+    if Regex::new(r"(?i)permission|access to performance monitoring")
+        .unwrap()
+        .is_match(stderr)
+    {
+        return Err(format!(
+            "perf_event_paranoid={} forbids counting",
+            read_trim("/proc/sys/kernel/perf_event_paranoid").unwrap_or_else(|| "?".into())
+        ));
     }
     match code {
         Some(0) => Ok(()),
-        c => Err(format!("perf probe exit {}", c.map(|c| c.to_string()).unwrap_or_else(|| "signal".into()))),
+        c => Err(format!(
+            "perf probe exit {}",
+            c.map(|c| c.to_string()).unwrap_or_else(|| "signal".into())
+        )),
     }
 }
 
@@ -266,20 +407,39 @@ pub struct ProcStat {
 }
 pub fn proc_stat() -> ProcStat {
     let text = std::fs::read_to_string("/proc/stat").unwrap_or_default();
-    let mut v: Vec<f64> = text.lines().next().unwrap_or("").split_whitespace().skip(1).filter_map(|x| x.parse().ok()).collect();
+    let mut v: Vec<f64> = text
+        .lines()
+        .next()
+        .unwrap_or("")
+        .split_whitespace()
+        .skip(1)
+        .filter_map(|x| x.parse().ok())
+        .collect();
     v.resize(v.len().max(8), 0.0);
     // SAFETY: sysconf has no preconditions.
     let hz = (unsafe { libc::sysconf(libc::_SC_CLK_TCK) }).max(1) as f64;
-    ProcStat { busy_s: (v[0] + v[1] + v[2] + v[5] + v[6]) / hz, steal_s: v[7] / hz }
+    ProcStat {
+        busy_s: (v[0] + v[1] + v[2] + v[5] + v[6]) / hz,
+        steal_s: v[7] / hz,
+    }
 }
 pub fn throttle_count() -> Option<u64> {
     let mut tot = None;
     for cpu in sorted_dir("/sys/devices/system/cpu") {
-        if !cpu.starts_with("cpu") || !cpu[3..].chars().next().map(|c| c.is_ascii_digit()).unwrap_or(false) {
+        if !cpu.starts_with("cpu")
+            || !cpu[3..]
+                .chars()
+                .next()
+                .map(|c| c.is_ascii_digit())
+                .unwrap_or(false)
+        {
             continue;
         }
         let dir = format!("/sys/devices/system/cpu/{cpu}/thermal_throttle");
-        for f in sorted_dir(&dir).into_iter().filter(|f| f.ends_with("_throttle_count")) {
+        for f in sorted_dir(&dir)
+            .into_iter()
+            .filter(|f| f.ends_with("_throttle_count"))
+        {
             if let Some(v) = read_trim(format!("{dir}/{f}")).and_then(|v| v.parse::<u64>().ok()) {
                 tot = Some(tot.unwrap_or(0) + v);
             }
@@ -288,7 +448,9 @@ pub fn throttle_count() -> Option<u64> {
     tot
 }
 pub fn loadavg1() -> f64 {
-    read_trim("/proc/loadavg").and_then(|s| s.split_whitespace().next().and_then(|x| x.parse().ok())).unwrap_or(0.0)
+    read_trim("/proc/loadavg")
+        .and_then(|s| s.split_whitespace().next().and_then(|x| x.parse().ok()))
+        .unwrap_or(0.0)
 }
 
 pub struct Begin {
@@ -299,13 +461,24 @@ pub struct Begin {
     psi_cpu: Option<String>,
 }
 pub fn conditions_begin() -> Begin {
-    Begin { t: std::time::Instant::now(), stat: proc_stat(), throttle: throttle_count(), loadavg: loadavg1(), psi_cpu: read_trim("/proc/pressure/cpu") }
+    Begin {
+        t: std::time::Instant::now(),
+        stat: proc_stat(),
+        throttle: throttle_count(),
+        loadavg: loadavg1(),
+        psi_cpu: read_trim("/proc/pressure/cpu"),
+    }
 }
 pub fn conditions_end(begin: &Begin, own_cpu_s: f64) -> Value {
     let wall = begin.t.elapsed().as_secs_f64().max(1e-9);
     let st = proc_stat();
     let other = ((st.busy_s - begin.stat.busy_s) - own_cpu_s).max(0.0) / wall;
-    let psi = begin.psi_cpu.as_deref().and_then(|p| Regex::new(r"some avg10=([\d.]+)").unwrap().captures(p).and_then(|m| m[1].parse::<f64>().ok()));
+    let psi = begin.psi_cpu.as_deref().and_then(|p| {
+        Regex::new(r"some avg10=([\d.]+)")
+            .unwrap()
+            .captures(p)
+            .and_then(|m| m[1].parse::<f64>().ok())
+    });
     let thr = match (throttle_count(), begin.throttle) {
         (Some(a), Some(b)) => json!(a as i64 - b as i64),
         _ => Value::Null,

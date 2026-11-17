@@ -25,7 +25,8 @@ builds of kernels/optk.c to the best-of.  OPTLEVEL_CPUS=N declares a CPU
 allotment that neither the affinity mask nor a cgroup quota shows.
 Exit status: 0 ok, 1 a record failed validation, 2 usage, 3 unsupported on this host, 4 the command failed.";
 
-const CALIBRATE: &str = "optlevel calibrate --out CAL.json [--seconds 0.5] [--repeat 3] [--triad-bytes N] [--c-kernels]
+const CALIBRATE: &str =
+    "optlevel calibrate --out CAL.json [--seconds 0.5] [--repeat 3] [--triad-bytes N] [--c-kernels]
   --seconds S      timed seconds per kernel run
   --triad-bytes N  bytes per triad array (default 1.5 x LLC)
   --c-kernels      also build kernels/optk.c with the system C compiler and take the best of both";
@@ -48,7 +49,8 @@ const SCORE: &str = "optlevel score --calibration CAL.json --measurement M.json 
   [--topdown topdown.json] [--vector-share X] [--ncu kernels.json] [--nsys summary.json]
   [--counted-ops N] [--best-known-ops N] [--best-known-source TEXT]
   [--repository R] [--path P] [--registry-id ID]";
-const CONTROLS: &str = "optlevel controls --out DIR [--repeat 5] [--seconds 1.0] [--cal-seconds 0.5] [--cal-repeat 3]
+const CONTROLS: &str =
+    "optlevel controls --out DIR [--repeat 5] [--seconds 1.0] [--cal-seconds 0.5] [--cal-repeat 3]
   [--recalibrate] [--rescore] [--timing-only] [--c-kernels]
   --rescore   reuse the measurement files already in --out; only score and plot again";
 const GPU: &str = "optlevel gpu probe [--no-ncu-check]
@@ -66,7 +68,12 @@ pub struct Parsed {
 /// `values` and `bools` name the accepted options (without the dashes).  With
 /// `remainder`, everything from the first positional or `--` on is the command.
 pub fn parse(args: &[String], values: &[&str], bools: &[&str], remainder: bool) -> Res<Parsed> {
-    let mut p = Parsed { opts: BTreeMap::new(), flags: Vec::new(), pos: Vec::new(), help: false };
+    let mut p = Parsed {
+        opts: BTreeMap::new(),
+        flags: Vec::new(),
+        pos: Vec::new(),
+        help: false,
+    };
     let mut i = 0;
     while i < args.len() {
         let a = &args[i];
@@ -94,7 +101,10 @@ pub fn parse(args: &[String], values: &[&str], bools: &[&str], remainder: bool) 
                     Some(v) => v,
                     None => {
                         i += 1;
-                        args.get(i).cloned().ok_or_else(|| Fail { code: 2, msg: format!("--{name} needs a value") })?
+                        args.get(i).cloned().ok_or_else(|| Fail {
+                            code: 2,
+                            msg: format!("--{name} needs a value"),
+                        })?
                     }
                 };
                 p.opts.insert(name.to_string(), v);
@@ -120,12 +130,18 @@ impl Parsed {
         self.opts.get(name).cloned()
     }
     pub fn req(&self, name: &str) -> Res<String> {
-        self.opt(name).ok_or_else(|| Fail { code: 2, msg: format!("--{name} is required") })
+        self.opt(name).ok_or_else(|| Fail {
+            code: 2,
+            msg: format!("--{name} is required"),
+        })
     }
     pub fn num<T: std::str::FromStr>(&self, name: &str) -> Res<Option<T>> {
         match self.opts.get(name) {
             None => Ok(None),
-            Some(v) => v.parse().map(Some).map_err(|_| Fail { code: 2, msg: format!("--{name}: bad value {v:?}") }),
+            Some(v) => v.parse().map(Some).map_err(|_| Fail {
+                code: 2,
+                msg: format!("--{name}: bad value {v:?}"),
+            }),
         }
     }
     pub fn num_or<T: std::str::FromStr>(&self, name: &str, default: T) -> Res<T> {
@@ -133,19 +149,44 @@ impl Parsed {
     }
 }
 
-const MEASURE_VALUES: [&str; 11] = ["out", "label", "repeat", "ops", "ops-regex", "op-class", "bytes-per-op", "working-set-bytes", "cwd", "scale", "timeout"];
+const MEASURE_VALUES: [&str; 11] = [
+    "out",
+    "label",
+    "repeat",
+    "ops",
+    "ops-regex",
+    "op-class",
+    "bytes-per-op",
+    "working-set-bytes",
+    "cwd",
+    "scale",
+    "timeout",
+];
 
 fn measure_args(p: &Parsed) -> Res<cmd::MeasureArgs> {
     Ok(cmd::MeasureArgs {
-        out: p.req("out")?, label: p.opt("label").unwrap_or_default(), repeat: p.num_or("repeat", 5)?, ops: p.num("ops")?,
-        ops_regex: p.opt("ops-regex"), op_class: p.opt("op-class"), bytes_per_op: p.num("bytes-per-op")?,
-        working_set_bytes: p.num("working-set-bytes")?, cwd: p.opt("cwd"), cmd: p.pos.clone(), scale: p.opt("scale"),
-        timing_only: p.flag("timing-only"), no_pin: p.flag("no-pin"), warmup: p.flag("warmup"), timeout: p.num("timeout")?,
+        out: p.req("out")?,
+        label: p.opt("label").unwrap_or_default(),
+        repeat: p.num_or("repeat", 5)?,
+        ops: p.num("ops")?,
+        ops_regex: p.opt("ops-regex"),
+        op_class: p.opt("op-class"),
+        bytes_per_op: p.num("bytes-per-op")?,
+        working_set_bytes: p.num("working-set-bytes")?,
+        cwd: p.opt("cwd"),
+        cmd: p.pos.clone(),
+        scale: p.opt("scale"),
+        timing_only: p.flag("timing-only"),
+        no_pin: p.flag("no-pin"),
+        warmup: p.flag("warmup"),
+        timeout: p.num("timeout")?,
     })
 }
 
 fn dispatch(args: &[String]) -> Res<()> {
-    let Some(sub) = args.first() else { return fail(2, USAGE) };
+    let Some(sub) = args.first() else {
+        return fail(2, USAGE);
+    };
     let rest = &args[1..];
     let help = |p: &Parsed, text: &str| -> bool {
         if p.help {
@@ -164,29 +205,79 @@ fn dispatch(args: &[String]) -> Res<()> {
         },
         "probe" => {
             let p = parse(rest, &[], &[], false)?;
-            if help(&p, "optlevel probe") { return Ok(()) }
+            if help(&p, "optlevel probe") {
+                return Ok(());
+            }
             cmd::cmd_probe()
         }
         "calibrate" => {
-            let p = parse(rest, &["out", "seconds", "repeat", "triad-bytes"], &["c-kernels"], false)?;
-            if help(&p, CALIBRATE) { return Ok(()) }
-            cmd::cmd_calibrate(&cmd::CalibrateArgs { out: p.req("out")?, seconds: p.num_or("seconds", 0.5)?, repeat: p.num_or("repeat", 3)?,
-                                                     triad_bytes: p.num("triad-bytes")?, c_kernels: p.flag("c-kernels") })
+            let p = parse(
+                rest,
+                &["out", "seconds", "repeat", "triad-bytes"],
+                &["c-kernels"],
+                false,
+            )?;
+            if help(&p, CALIBRATE) {
+                return Ok(());
+            }
+            cmd::cmd_calibrate(&cmd::CalibrateArgs {
+                out: p.req("out")?,
+                seconds: p.num_or("seconds", 0.5)?,
+                repeat: p.num_or("repeat", 3)?,
+                triad_bytes: p.num("triad-bytes")?,
+                c_kernels: p.flag("c-kernels"),
+            })
         }
         "measure" => {
-            let p = parse(rest, &MEASURE_VALUES, &["timing-only", "no-pin", "warmup"], true)?;
-            if help(&p, &format!("{MEASURE}\n{MEASURE_OPTS}")) { return Ok(()) }
+            let p = parse(
+                rest,
+                &MEASURE_VALUES,
+                &["timing-only", "no-pin", "warmup"],
+                true,
+            )?;
+            if help(&p, &format!("{MEASURE}\n{MEASURE_OPTS}")) {
+                return Ok(());
+            }
             cmd::cmd_measure(&measure_args(&p)?)
         }
         "score" => {
-            let p = parse(rest, &["calibration", "measurement", "out", "topdown", "vector-share", "ncu", "nsys", "counted-ops", "best-known-ops",
-                                  "best-known-source", "repository", "path", "registry-id"], &[], false)?;
-            if help(&p, SCORE) { return Ok(()) }
+            let p = parse(
+                rest,
+                &[
+                    "calibration",
+                    "measurement",
+                    "out",
+                    "topdown",
+                    "vector-share",
+                    "ncu",
+                    "nsys",
+                    "counted-ops",
+                    "best-known-ops",
+                    "best-known-source",
+                    "repository",
+                    "path",
+                    "registry-id",
+                ],
+                &[],
+                false,
+            )?;
+            if help(&p, SCORE) {
+                return Ok(());
+            }
             cmd::cmd_score(&cmd::ScoreArgs {
-                calibration: p.req("calibration")?, measurement: p.req("measurement")?, out: p.req("out")?, topdown: p.opt("topdown"),
-                vector_share: p.num("vector-share")?, ncu: p.opt("ncu"), nsys: p.opt("nsys"), counted_ops: p.num("counted-ops")?,
-                best_known_ops: p.num("best-known-ops")?, best_known_source: p.opt("best-known-source"), repository: p.opt("repository"),
-                path: p.opt("path"), registry_id: p.opt("registry-id"),
+                calibration: p.req("calibration")?,
+                measurement: p.req("measurement")?,
+                out: p.req("out")?,
+                topdown: p.opt("topdown"),
+                vector_share: p.num("vector-share")?,
+                ncu: p.opt("ncu"),
+                nsys: p.opt("nsys"),
+                counted_ops: p.num("counted-ops")?,
+                best_known_ops: p.num("best-known-ops")?,
+                best_known_source: p.opt("best-known-source"),
+                repository: p.opt("repository"),
+                path: p.opt("path"),
+                registry_id: p.opt("registry-id"),
             })
         }
         "plot" => {
@@ -195,42 +286,82 @@ fn dispatch(args: &[String]) -> Res<()> {
             if p.pos.is_empty() {
                 return fail(2, "plot needs at least one record");
             }
-            cmd::cmd_plot(&p.req("calibration")?, &p.req("out")?, &p.opt("title").unwrap_or_else(|| "Roofline".into()), &p.pos)
+            cmd::cmd_plot(
+                &p.req("calibration")?,
+                &p.req("out")?,
+                &p.opt("title").unwrap_or_else(|| "Roofline".into()),
+                &p.pos,
+            )
         }
         "controls" => {
-            let p = parse(rest, &["out", "repeat", "seconds", "cal-seconds", "cal-repeat"], &["recalibrate", "rescore", "timing-only", "c-kernels"], false)?;
-            if help(&p, CONTROLS) { return Ok(()) }
-            cmd::cmd_controls(&cmd::ControlsArgs { out: p.req("out")?, repeat: p.num_or("repeat", 5)?, seconds: p.num_or("seconds", 1.0)?,
-                                                   cal_seconds: p.num_or("cal-seconds", 0.5)?, cal_repeat: p.num_or("cal-repeat", 3)?,
-                                                   recalibrate: p.flag("recalibrate"), rescore: p.flag("rescore"), timing_only: p.flag("timing-only"),
-                                                   c_kernels: p.flag("c-kernels") })
+            let p = parse(
+                rest,
+                &["out", "repeat", "seconds", "cal-seconds", "cal-repeat"],
+                &["recalibrate", "rescore", "timing-only", "c-kernels"],
+                false,
+            )?;
+            if help(&p, CONTROLS) {
+                return Ok(());
+            }
+            cmd::cmd_controls(&cmd::ControlsArgs {
+                out: p.req("out")?,
+                repeat: p.num_or("repeat", 5)?,
+                seconds: p.num_or("seconds", 1.0)?,
+                cal_seconds: p.num_or("cal-seconds", 0.5)?,
+                cal_repeat: p.num_or("cal-repeat", 3)?,
+                recalibrate: p.flag("recalibrate"),
+                rescore: p.flag("rescore"),
+                timing_only: p.flag("timing-only"),
+                c_kernels: p.flag("c-kernels"),
+            })
         }
         "vector-share" => {
             let p = parse(rest, &[], &[], false)?;
-            if help(&p, "optlevel vector-share BINARY SYMBOL...") { return Ok(()) }
+            if help(&p, "optlevel vector-share BINARY SYMBOL...") {
+                return Ok(());
+            }
             if p.pos.len() < 2 {
                 return fail(2, "vector-share BINARY SYMBOL...");
             }
-            print!("{}", crate::util::to_pretty(&cmd::vector_share(&p.pos[0], &p.pos[1..])?));
+            print!(
+                "{}",
+                crate::util::to_pretty(&cmd::vector_share(&p.pos[0], &p.pos[1..])?)
+            );
             Ok(())
         }
         "gpu" => {
-            let Some(g) = rest.first() else { return fail(2, GPU) };
+            let Some(g) = rest.first() else {
+                return fail(2, GPU);
+            };
             let rest = &rest[1..];
             match g.as_str() {
                 "probe" => {
                     let p = parse(rest, &[], &["no-ncu-check"], false)?;
-                    if help(&p, GPU) { return Ok(()) }
+                    if help(&p, GPU) {
+                        return Ok(());
+                    }
                     cmd::cmd_gpu_probe(!p.flag("no-ncu-check"))
                 }
                 "calibrate" => {
                     let p = parse(rest, &["out", "repeat"], &[], false)?;
-                    if help(&p, GPU) { return Ok(()) }
-                    cmd::cmd_gpu_calibrate(&cmd::GpuCalibrateArgs { out: p.req("out")?, repeat: p.num_or("repeat", 3)? })
+                    if help(&p, GPU) {
+                        return Ok(());
+                    }
+                    cmd::cmd_gpu_calibrate(&cmd::GpuCalibrateArgs {
+                        out: p.req("out")?,
+                        repeat: p.num_or("repeat", 3)?,
+                    })
                 }
                 "measure" => {
                     let p = parse(rest, &MEASURE_VALUES[..9], &[], true)?;
-                    if help(&p, &format!("optlevel gpu measure --out M.json [options] -- CMD...\n{MEASURE_OPTS}")) { return Ok(()) }
+                    if help(
+                        &p,
+                        &format!(
+                            "optlevel gpu measure --out M.json [options] -- CMD...\n{MEASURE_OPTS}"
+                        ),
+                    ) {
+                        return Ok(());
+                    }
                     cmd::cmd_gpu_measure(&measure_args(&p)?)
                 }
                 "-h" | "--help" => {
@@ -242,7 +373,9 @@ fn dispatch(args: &[String]) -> Res<()> {
         }
         "validate" => {
             let p = parse(rest, &[], &[], false)?;
-            if help(&p, "optlevel validate R.json [R2.json ...]") { return Ok(()) }
+            if help(&p, "optlevel validate R.json [R2.json ...]") {
+                return Ok(());
+            }
             if p.pos.is_empty() {
                 return fail(2, "validate needs at least one record");
             }
@@ -250,7 +383,9 @@ fn dispatch(args: &[String]) -> Res<()> {
         }
         "benchrec" => {
             let p = parse(rest, &[], &[], false)?;
-            if help(&p, "optlevel benchrec R.json") { return Ok(()) }
+            if help(&p, "optlevel benchrec R.json") {
+                return Ok(());
+            }
             match p.pos.as_slice() {
                 [r] => cmd::cmd_benchrec(r),
                 _ => fail(2, "benchrec R.json"),
@@ -258,7 +393,9 @@ fn dispatch(args: &[String]) -> Res<()> {
         }
         "summary" => {
             let p = parse(rest, &[], &[], false)?;
-            if help(&p, "optlevel summary R.json [R2.json ...]") { return Ok(()) }
+            if help(&p, "optlevel summary R.json [R2.json ...]") {
+                return Ok(());
+            }
             cmd::cmd_summary(&p.pos)
         }
         other => fail(2, format!("unknown command {other:?}\n\n{USAGE}")),

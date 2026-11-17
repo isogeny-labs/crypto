@@ -25,8 +25,19 @@ pub const P31_NINV: u32 = 2013265919; // -P31^-1 mod 2^32
 pub const P62: u64 = 4611686018427387847; // 2^62 - 57
 
 pub const KERNELS: &[&str] = &[
-    "muladd_u32", "muladd_u64", "mulwide_u64", "modmuladd_p31", "modmuladd_p62", "horner_p31",
-    "xor_u64", "popcnt_u64", "fma_f64", "fma_f64_reg", "triad", "chase", "clock",
+    "muladd_u32",
+    "muladd_u64",
+    "mulwide_u64",
+    "modmuladd_p31",
+    "modmuladd_p62",
+    "horner_p31",
+    "xor_u64",
+    "popcnt_u64",
+    "fma_f64",
+    "fma_f64_reg",
+    "triad",
+    "chase",
+    "clock",
 ];
 
 pub fn p62_ninv() -> u64 {
@@ -61,7 +72,9 @@ pub struct Buf<T> {
 }
 impl<T: Copy> Buf<T> {
     pub fn zeroed(len: usize) -> Self {
-        let layout = std::alloc::Layout::from_size_align((len * std::mem::size_of::<T>()).max(4096), 4096).expect("layout");
+        let layout =
+            std::alloc::Layout::from_size_align((len * std::mem::size_of::<T>()).max(4096), 4096)
+                .expect("layout");
         // SAFETY: the layout has non-zero size; all-zero bytes are a valid T for the integer, float and Node types used here.
         let ptr = unsafe { std::alloc::alloc_zeroed(layout) } as *mut T;
         if ptr.is_null() {
@@ -108,7 +121,9 @@ mod body {
         #[cfg(target_arch = "x86_64")]
         if S {
             let mut x = v;
-            unsafe { core::arch::asm!("/* {0:e} */", inout(reg) x, options(pure, nomem, nostack, preserves_flags)) };
+            unsafe {
+                core::arch::asm!("/* {0:e} */", inout(reg) x, options(pure, nomem, nostack, preserves_flags))
+            };
             return x;
         }
         #[cfg(not(target_arch = "x86_64"))]
@@ -122,7 +137,9 @@ mod body {
         #[cfg(target_arch = "x86_64")]
         if S {
             let mut x = v;
-            unsafe { core::arch::asm!("/* {0} */", inout(reg) x, options(pure, nomem, nostack, preserves_flags)) };
+            unsafe {
+                core::arch::asm!("/* {0} */", inout(reg) x, options(pure, nomem, nostack, preserves_flags))
+            };
             return x;
         }
         #[cfg(not(target_arch = "x86_64"))]
@@ -136,7 +153,9 @@ mod body {
         #[cfg(target_arch = "x86_64")]
         if S {
             let mut x = v;
-            unsafe { core::arch::asm!("/* {0} */", inout(xmm_reg) x, options(pure, nomem, nostack, preserves_flags)) };
+            unsafe {
+                core::arch::asm!("/* {0} */", inout(xmm_reg) x, options(pure, nomem, nostack, preserves_flags))
+            };
             return x;
         }
         #[cfg(not(target_arch = "x86_64"))]
@@ -176,7 +195,11 @@ mod body {
     }
     #[inline(always)]
     pub fn fma<const F: bool>(a: f64, s: f64, b: f64) -> f64 {
-        if F { a.mul_add(s, b) } else { a * s + b }
+        if F {
+            a.mul_add(s, b)
+        } else {
+            a * s + b
+        }
     }
 
     #[inline(always)]
@@ -351,9 +374,25 @@ macro_rules! isa_mod {
 isa_mod!(base, false, false, 8, 2, self::fma_reg);
 isa_mod!(base_scalar, true, false, 8, 1, self::fma_reg);
 #[cfg(target_arch = "x86_64")]
-isa_mod!(scalar, true, true, 8, 1, self::fma_reg, "avx,avx2,fma,bmi1,bmi2,popcnt,lzcnt");
+isa_mod!(
+    scalar,
+    true,
+    true,
+    8,
+    1,
+    self::fma_reg,
+    "avx,avx2,fma,bmi1,bmi2,popcnt,lzcnt"
+);
 #[cfg(target_arch = "x86_64")]
-isa_mod!(avx2, false, true, 12, 4, super::fma_reg_ymm, "avx,avx2,fma,bmi1,bmi2,popcnt,lzcnt");
+isa_mod!(
+    avx2,
+    false,
+    true,
+    12,
+    4,
+    super::fma_reg_ymm,
+    "avx,avx2,fma,bmi1,bmi2,popcnt,lzcnt"
+);
 #[cfg(target_arch = "x86_64")]
 isa_mod!(avx512, false, true, 16, 8, super::fma_reg_zmm, "avx,avx2,fma,bmi1,bmi2,popcnt,lzcnt,avx512f,avx512dq,avx512bw,avx512vl,avx512cd,avx512vpopcntdq");
 
@@ -429,11 +468,19 @@ pub fn available_isas() -> Vec<&'static str> {
     let mut v = Vec::new();
     #[cfg(target_arch = "x86_64")]
     {
-        let avx2 = is_x86_feature_detected!("avx2") && is_x86_feature_detected!("fma") && is_x86_feature_detected!("bmi1")
-            && is_x86_feature_detected!("bmi2") && is_x86_feature_detected!("popcnt") && is_x86_feature_detected!("lzcnt");
-        let avx512 = avx2 && is_x86_feature_detected!("avx512f") && is_x86_feature_detected!("avx512dq")
-            && is_x86_feature_detected!("avx512bw") && is_x86_feature_detected!("avx512vl")
-            && is_x86_feature_detected!("avx512cd") && is_x86_feature_detected!("avx512vpopcntdq");
+        let avx2 = is_x86_feature_detected!("avx2")
+            && is_x86_feature_detected!("fma")
+            && is_x86_feature_detected!("bmi1")
+            && is_x86_feature_detected!("bmi2")
+            && is_x86_feature_detected!("popcnt")
+            && is_x86_feature_detected!("lzcnt");
+        let avx512 = avx2
+            && is_x86_feature_detected!("avx512f")
+            && is_x86_feature_detected!("avx512dq")
+            && is_x86_feature_detected!("avx512bw")
+            && is_x86_feature_detected!("avx512vl")
+            && is_x86_feature_detected!("avx512cd")
+            && is_x86_feature_detected!("avx512vpopcntdq");
         if avx512 {
             v.push("avx512");
         }
@@ -476,8 +523,16 @@ pub fn passes(isa: &str) -> Option<Passes> {
 
 /// The exported symbol of a kernel's pass in one isa (for `vector-share`).
 pub fn symbol(isa: &str, kernel: &str) -> String {
-    let m = if isa == "scalar" && !available_isas().contains(&"avx2") { "base_scalar" } else { isa };
-    let k = if kernel == "fma_f64_reg" { "fma_reg" } else { kernel };
+    let m = if isa == "scalar" && !available_isas().contains(&"avx2") {
+        "base_scalar"
+    } else {
+        isa
+    };
+    let k = if kernel == "fma_f64_reg" {
+        "fma_reg"
+    } else {
+        kernel
+    };
     format!("optk_{m}_pass_{k}")
 }
 
@@ -527,7 +582,11 @@ fn timed(limit: Limit, n: usize, mut pass: impl FnMut()) -> Timed {
         for _ in 0..k {
             pass();
         }
-        return Timed { ops: k * n as u64, seconds: t0.elapsed().as_secs_f64(), batch: k.max(1) };
+        return Timed {
+            ops: k * n as u64,
+            seconds: t0.elapsed().as_secs_f64(),
+            batch: k.max(1),
+        };
     }
     let mut batch = 1u64;
     if !limit.timer_every_pass {
@@ -551,13 +610,22 @@ fn timed(limit: Limit, n: usize, mut pass: impl FnMut()) -> Timed {
         ops += batch * n as u64;
         let el = t0.elapsed().as_secs_f64();
         if el >= limit.seconds {
-            return Timed { ops, seconds: el, batch };
+            return Timed {
+                ops,
+                seconds: el,
+                batch,
+            };
         }
     }
 }
 
 pub fn run(kernel: &str, isa: &str, n_arg: usize, limit: Limit) -> Result<Outcome, String> {
-    let p = passes(isa).ok_or_else(|| format!("isa {isa} is not available on this host (available: {})", available_isas().join(" ")))?;
+    let p = passes(isa).ok_or_else(|| {
+        format!(
+            "isa {isa} is not available on this host (available: {})",
+            available_isas().join(" ")
+        )
+    })?;
     let mut rng = Rng::new();
     let mut n = n_arg;
     let mut cls = kernel.to_string();
@@ -582,9 +650,13 @@ pub fn run(kernel: &str, isa: &str, n_arg: usize, limit: Limit) -> Result<Outcom
                 }
             }
             t = if modp {
-                timed(limit, n, || unsafe { (p.modmuladd_p31)(&mut a, &c, 1234567891) })
+                timed(limit, n, || unsafe {
+                    (p.modmuladd_p31)(&mut a, &c, 1234567891)
+                })
             } else {
-                timed(limit, n, || unsafe { (p.muladd_u32)(&mut a, &c, 2654435761) })
+                timed(limit, n, || unsafe {
+                    (p.muladd_u32)(&mut a, &c, 2654435761)
+                })
             };
             ws = 8 * n;
             bytes_per_op = 12.0;
@@ -607,15 +679,27 @@ pub fn run(kernel: &str, isa: &str, n_arg: usize, limit: Limit) -> Result<Outcom
             let ninv = p62_ninv();
             let mut pop = 0u64;
             t = match kernel {
-                "muladd_u64" => timed(limit, n, || unsafe { (p.muladd_u64)(&mut a, &b, 0x9E3779B97F4A7C15) }),
-                "mulwide_u64" => timed(limit, n, || unsafe { (p.mulwide_u64)(&mut a, &b, 0x9E3779B97F4A7C15) }),
-                "modmuladd_p62" => timed(limit, n, || unsafe { (p.modmuladd_p62)(&mut a, &b, 0x123456789ABCDEF, ninv) }),
+                "muladd_u64" => timed(limit, n, || unsafe {
+                    (p.muladd_u64)(&mut a, &b, 0x9E3779B97F4A7C15)
+                }),
+                "mulwide_u64" => timed(limit, n, || unsafe {
+                    (p.mulwide_u64)(&mut a, &b, 0x9E3779B97F4A7C15)
+                }),
+                "modmuladd_p62" => timed(limit, n, || unsafe {
+                    (p.modmuladd_p62)(&mut a, &b, 0x123456789ABCDEF, ninv)
+                }),
                 "xor_u64" => timed(limit, n, || unsafe { (p.xor_u64)(&mut a, &b) }),
-                _ => timed(limit, n, || pop = pop.wrapping_add(unsafe { (p.popcnt_u64)(&a, &b) })),
+                _ => timed(limit, n, || {
+                    pop = pop.wrapping_add(unsafe { (p.popcnt_u64)(&a, &b) })
+                }),
             };
             ws = 16 * n;
             bytes_per_op = if kernel == "popcnt_u64" { 16.0 } else { 24.0 };
-            sum = if kernel == "popcnt_u64" { pop } else { a.iter().fold(0u64, |s, &x| s.wrapping_add(x)) };
+            sum = if kernel == "popcnt_u64" {
+                pop
+            } else {
+                a.iter().fold(0u64, |s, &x| s.wrapping_add(x))
+            };
         }
         "horner_p31" => {
             cls = "modmuladd_p31".into();
@@ -627,7 +711,9 @@ pub fn run(kernel: &str, isa: &str, n_arg: usize, limit: Limit) -> Result<Outcom
                 *x = (rng.next() % P31 as u64) as u32;
             }
             let mut acc = 1u32;
-            t = timed(limit, n, || acc = unsafe { (p.horner_p31)(&b, 1234567891, acc) });
+            t = timed(limit, n, || {
+                acc = unsafe { (p.horner_p31)(&b, 1234567891, acc) }
+            });
             ws = 4 * n;
             bytes_per_op = 4.0;
             sum = acc as u64;
@@ -666,7 +752,11 @@ pub fn run(kernel: &str, isa: &str, n_arg: usize, limit: Limit) -> Result<Outcom
             if n == 0 {
                 n = 48 << 20;
             }
-            let (mut a, mut b, mut c) = (Buf::<f64>::zeroed(n), Buf::<f64>::zeroed(n), Buf::<f64>::zeroed(n));
+            let (mut a, mut b, mut c) = (
+                Buf::<f64>::zeroed(n),
+                Buf::<f64>::zeroed(n),
+                Buf::<f64>::zeroed(n),
+            );
             for i in 0..n {
                 a[i] = 0.0; // written, so the pages exist before the warm-up pass
                 b[i] = (i & 1023) as f64;
@@ -675,7 +765,10 @@ pub fn run(kernel: &str, isa: &str, n_arg: usize, limit: Limit) -> Result<Outcom
             t = timed(limit, n, || unsafe { (p.triad)(&mut a, &b, &c, 3.0) });
             ws = 24 * n;
             bytes_per_op = 32.0;
-            sum = a.iter().step_by(4097).fold(0u64, |s, &x| s.wrapping_add(x as u64));
+            sum = a
+                .iter()
+                .step_by(4097)
+                .fold(0u64, |s, &x| s.wrapping_add(x as u64));
         }
         "chase" => {
             // one dependent load per operation over a random single cycle of
@@ -713,10 +806,25 @@ pub fn run(kernel: &str, isa: &str, n_arg: usize, limit: Limit) -> Result<Outcom
             bytes_per_op = 0.0;
             sum = x;
         }
-        _ => return Err(format!("unknown kernel {kernel}; kernels: {}", KERNELS.join(" "))),
+        _ => {
+            return Err(format!(
+                "unknown kernel {kernel}; kernels: {}",
+                KERNELS.join(" ")
+            ))
+        }
     }
-    Ok(Outcome { kernel: kernel.into(), isa: isa.into(), op_class: cls, ops: t.ops, seconds: t.seconds, bytes_per_op,
-                 working_set: ws, elements: n, checksum: sum, passes_per_timer_read: t.batch })
+    Ok(Outcome {
+        kernel: kernel.into(),
+        isa: isa.into(),
+        op_class: cls,
+        ops: t.ops,
+        seconds: t.seconds,
+        bytes_per_op,
+        working_set: ws,
+        elements: n,
+        checksum: sum,
+        passes_per_timer_read: t.batch,
+    })
 }
 
 /// `optlevel kernel NAME [--isa I] [--n N] [--seconds S] [--passes K] [--timer-every-pass]`
@@ -730,14 +838,33 @@ pub fn main(args: &[String]) -> i32 {
         return usage();
     }
     let (mut n, mut isa) = (0usize, available_isas()[0].to_string());
-    let mut limit = Limit { seconds: 1.0, passes: None, timer_every_pass: false };
+    let mut limit = Limit {
+        seconds: 1.0,
+        passes: None,
+        timer_every_pass: false,
+    };
     let mut i = 1;
     while i < args.len() {
         let val = args.get(i + 1);
         match (args[i].as_str(), val) {
-            ("--n", Some(v)) => n = match v.parse() { Ok(x) => x, Err(_) => return usage() },
-            ("--seconds", Some(v)) => limit.seconds = match v.parse() { Ok(x) => x, Err(_) => return usage() },
-            ("--passes", Some(v)) => limit.passes = match v.parse() { Ok(x) => Some(x), Err(_) => return usage() },
+            ("--n", Some(v)) => {
+                n = match v.parse() {
+                    Ok(x) => x,
+                    Err(_) => return usage(),
+                }
+            }
+            ("--seconds", Some(v)) => {
+                limit.seconds = match v.parse() {
+                    Ok(x) => x,
+                    Err(_) => return usage(),
+                }
+            }
+            ("--passes", Some(v)) => {
+                limit.passes = match v.parse() {
+                    Ok(x) => Some(x),
+                    Err(_) => return usage(),
+                }
+            }
             ("--isa", Some(v)) => isa = v.clone(),
             ("--timer-every-pass", _) => {
                 limit.timer_every_pass = true;

@@ -4,7 +4,11 @@
 use optlevel::kernels::{self, Limit, Rng, P31, P62};
 
 fn fixed(passes: u64) -> Limit {
-    Limit { seconds: 0.0, passes: Some(passes), timer_every_pass: false }
+    Limit {
+        seconds: 0.0,
+        passes: Some(passes),
+        timer_every_pass: false,
+    }
 }
 fn powmod(mut b: u128, mut e: u128, m: u128) -> u128 {
     let mut r = 1;
@@ -23,18 +27,38 @@ fn powmod(mut b: u128, mut e: u128, m: u128) -> u128 {
 fn every_isa_gives_the_same_checksum() {
     let isas = kernels::available_isas();
     assert!(isas.contains(&"scalar"));
-    for k in ["muladd_u32", "muladd_u64", "mulwide_u64", "modmuladd_p31", "modmuladd_p62", "horner_p31", "xor_u64", "popcnt_u64", "chase", "clock"] {
+    for k in [
+        "muladd_u32",
+        "muladd_u64",
+        "mulwide_u64",
+        "modmuladd_p31",
+        "modmuladd_p62",
+        "horner_p31",
+        "xor_u64",
+        "popcnt_u64",
+        "chase",
+        "clock",
+    ] {
         // odd sizes exercise the vector loops' remainders
         for n in [1usize, 67, 1000] {
-            let sums: Vec<u64> = isas.iter().map(|i| kernels::run(k, i, n, fixed(3)).unwrap().checksum).collect();
-            assert!(sums.windows(2).all(|w| w[0] == w[1]), "{k} n={n}: {isas:?} -> {sums:x?}");
+            let sums: Vec<u64> = isas
+                .iter()
+                .map(|i| kernels::run(k, i, n, fixed(3)).unwrap().checksum)
+                .collect();
+            assert!(
+                sums.windows(2).all(|w| w[0] == w[1]),
+                "{k} n={n}: {isas:?} -> {sums:x?}"
+            );
         }
     }
     // floating point: the fused variants agree with each other exactly
     #[cfg(target_arch = "x86_64")]
     for k in ["fma_f64", "triad"] {
         let fused: Vec<&&str> = isas.iter().filter(|i| **i != "base").collect();
-        let sums: Vec<u64> = fused.iter().map(|i| kernels::run(k, i, 999, fixed(3)).unwrap().checksum).collect();
+        let sums: Vec<u64> = fused
+            .iter()
+            .map(|i| kernels::run(k, i, 999, fixed(3)).unwrap().checksum)
+            .collect();
         assert!(sums.windows(2).all(|w| w[0] == w[1]), "{k}: {sums:x?}");
     }
 }
@@ -42,7 +66,10 @@ fn every_isa_gives_the_same_checksum() {
 #[test]
 fn counts_and_protocol_line() {
     let o = kernels::run("modmuladd_p31", "scalar", 100, fixed(7)).unwrap();
-    assert_eq!((o.ops, o.elements, o.working_set, o.op_class.as_str()), (700, 100, 800, "modmuladd_p31"));
+    assert_eq!(
+        (o.ops, o.elements, o.working_set, o.op_class.as_str()),
+        (700, 100, 800, "modmuladd_p31")
+    );
     let d: serde_json::Value = serde_json::from_str(&o.json_line()).unwrap();
     assert_eq!(d["schema"], "optlevel.ops/v1");
     assert_eq!(d["ops"], 700);
@@ -52,7 +79,12 @@ fn counts_and_protocol_line() {
     let c = kernels::run("chase", "scalar", 64, fixed(2)).unwrap();
     // a single cycle of n nodes: after whole passes the walk is back at node 0
     assert_eq!((c.op_class.as_str(), c.checksum), ("ptr_hop", 0));
-    assert_eq!(kernels::run("clock", "scalar", 1000, fixed(4)).unwrap().checksum, 5000); // warm-up + 4 passes
+    assert_eq!(
+        kernels::run("clock", "scalar", 1000, fixed(4))
+            .unwrap()
+            .checksum,
+        5000
+    ); // warm-up + 4 passes
     assert!(kernels::run("nope", "scalar", 0, fixed(1)).is_err());
     assert!(kernels::run("clock", "no-such-isa", 0, fixed(1)).is_err());
 }
@@ -76,7 +108,13 @@ fn modmuladd_p31_matches_a_plain_reference() {
     }
     let want: u64 = a.iter().sum();
     for isa in kernels::available_isas() {
-        assert_eq!(kernels::run("modmuladd_p31", isa, n, fixed(passes)).unwrap().checksum, want, "{isa}");
+        assert_eq!(
+            kernels::run("modmuladd_p31", isa, n, fixed(passes))
+                .unwrap()
+                .checksum,
+            want,
+            "{isa}"
+        );
     }
 }
 
@@ -127,19 +165,41 @@ fn modmuladd_p62_matches_a_plain_reference() {
     };
     for _ in 0..passes + 1 {
         for i in 0..n {
-            a[i] = ((a[i] as u128 + mulmod(mulmod(b[i] as u128, 0x123456789ABCDEF), rinv)) % p) as u64;
+            a[i] =
+                ((a[i] as u128 + mulmod(mulmod(b[i] as u128, 0x123456789ABCDEF), rinv)) % p) as u64;
         }
     }
     let want = a.iter().fold(0u64, |s, x| s.wrapping_add(*x));
     for isa in kernels::available_isas() {
-        assert_eq!(kernels::run("modmuladd_p62", isa, n, fixed(passes)).unwrap().checksum, want, "{isa}");
+        assert_eq!(
+            kernels::run("modmuladd_p62", isa, n, fixed(passes))
+                .unwrap()
+                .checksum,
+            want,
+            "{isa}"
+        );
     }
 }
 
 #[test]
 fn timed_run_reports_a_rate() {
-    let o = kernels::run("muladd_u64", kernels::available_isas()[0], 0, Limit { seconds: 0.02, passes: None, timer_every_pass: false }).unwrap();
+    let o = kernels::run(
+        "muladd_u64",
+        kernels::available_isas()[0],
+        0,
+        Limit {
+            seconds: 0.02,
+            passes: None,
+            timer_every_pass: false,
+        },
+    )
+    .unwrap();
     assert!(o.seconds >= 0.02 && o.seconds < 1.0, "{}", o.seconds);
-    assert!(o.ops as f64 / o.seconds > 1e8, "{} ops in {} s", o.ops, o.seconds);
+    assert!(
+        o.ops as f64 / o.seconds > 1e8,
+        "{} ops in {} s",
+        o.ops,
+        o.seconds
+    );
     assert!(o.passes_per_timer_read >= 1);
 }

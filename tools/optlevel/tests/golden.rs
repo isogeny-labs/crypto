@@ -16,7 +16,15 @@ fn files(dir: &Path, suffix: &str) -> Vec<PathBuf> {
     let mut out = Vec::new();
     let mut stack = vec![dir.to_path_buf()];
     while let Some(d) = stack.pop() {
-        for e in std::fs::read_dir(&d).unwrap_or_else(|e| panic!("{}: {e} (the golden tests need the committed evidence directories)", d.display())).flatten() {
+        for e in std::fs::read_dir(&d)
+            .unwrap_or_else(|e| {
+                panic!(
+                    "{}: {e} (the golden tests need the committed evidence directories)",
+                    d.display()
+                )
+            })
+            .flatten()
+        {
             let p = e.path();
             if p.is_dir() {
                 stack.push(p);
@@ -29,7 +37,10 @@ fn files(dir: &Path, suffix: &str) -> Vec<PathBuf> {
     out
 }
 fn evidence_dirs() -> [PathBuf; 2] {
-    [repo().join("research/optlevel_20261117"), repo().join("research/hky_pod_runs_20261117/results")]
+    [
+        repo().join("research/optlevel_20261117"),
+        repo().join("research/hky_pod_runs_20261117/results"),
+    ]
 }
 
 /// Differences between two JSON values; numbers are compared as f64 (exactly).
@@ -66,7 +77,12 @@ fn committed_records_validate() {
     let mut n = 0;
     for dir in evidence_dirs() {
         for p in files(&dir, ".record.json") {
-            assert_eq!(record_errors(&read_json(&p).unwrap()), Vec::<String>::new(), "{}", p.display());
+            assert_eq!(
+                record_errors(&read_json(&p).unwrap()),
+                Vec::<String>::new(),
+                "{}",
+                p.display()
+            );
             n += 1;
         }
     }
@@ -87,23 +103,42 @@ fn rescoring_committed_measurements_reproduces_committed_records() {
     let (mut checked, mut attainments) = (0, 0);
     for dir in evidence_dirs() {
         for rec_path in files(&dir, ".record.json") {
-            let stem = rec_path.to_string_lossy().trim_end_matches(".record.json").to_string();
-            let Some(meas_path) = [".measurement.json", ".measure.json"].iter().map(|s| PathBuf::from(format!("{stem}{s}"))).find(|p| p.exists()) else {
+            let stem = rec_path
+                .to_string_lossy()
+                .trim_end_matches(".record.json")
+                .to_string();
+            let Some(meas_path) = [".measurement.json", ".measure.json"]
+                .iter()
+                .map(|s| PathBuf::from(format!("{stem}{s}")))
+                .find(|p| p.exists())
+            else {
                 continue; // two pod records were committed without their measurement files
             };
             let want = read_json(&rec_path).unwrap();
-            let calib = calibrations.iter().find(|c| c["_sha256"] == want["calibration"]["sha256"])
-                .unwrap_or_else(|| panic!("{}: no committed calibration has sha256 {}", rec_path.display(), want["calibration"]["sha256"]));
+            let calib = calibrations
+                .iter()
+                .find(|c| c["_sha256"] == want["calibration"]["sha256"])
+                .unwrap_or_else(|| {
+                    panic!(
+                        "{}: no committed calibration has sha256 {}",
+                        rec_path.display(),
+                        want["calibration"]["sha256"]
+                    )
+                });
             // what the scoring command line supplied, taken from the committed record
             let text = |v: &Value| v.as_str().map(String::from);
             let args = ScoreArgs {
                 vector_share: want["diagnosis"]["vector_share_static"].as_f64(),
-                repository: text(&want["kernel"]["repository"]), path: text(&want["kernel"]["path"]), registry_id: text(&want["kernel"]["registry_id"]),
-                counted_ops: want["algorithmic"]["counted_ops"].as_f64(), best_known_ops: want["algorithmic"]["best_known_ops"].as_f64(),
+                repository: text(&want["kernel"]["repository"]),
+                path: text(&want["kernel"]["path"]),
+                registry_id: text(&want["kernel"]["registry_id"]),
+                counted_ops: want["algorithmic"]["counted_ops"].as_f64(),
+                best_known_ops: want["algorithmic"]["best_known_ops"].as_f64(),
                 best_known_source: text(&want["algorithmic"]["source"]),
                 ..Default::default()
             };
-            let mut got = score_documents(calib, &load_json(&meas_path).unwrap(), &args).unwrap_or_else(|e| panic!("{}: {}", rec_path.display(), e.msg));
+            let mut got = score_documents(calib, &load_json(&meas_path).unwrap(), &args)
+                .unwrap_or_else(|e| panic!("{}: {}", rec_path.display(), e.msg));
             // not derived from the measurement: the tool version, and the control's expectation text
             got["tool_version"] = want["tool_version"].clone();
             if let Some(e) = want["kernel"].get("expectation") {
@@ -114,15 +149,27 @@ fn rescoring_committed_measurements_reproduces_committed_records() {
             assert!(d.is_empty(), "{}:\n{}", rec_path.display(), d.join("\n"));
             for point in ["single", "full"] {
                 if let Some(a) = want["attainment"].get(point) {
-                    assert_eq!(a["value"].as_f64().unwrap().to_bits(), got["attainment"][point]["value"].as_f64().unwrap().to_bits());
+                    assert_eq!(
+                        a["value"].as_f64().unwrap().to_bits(),
+                        got["attainment"][point]["value"]
+                            .as_f64()
+                            .unwrap()
+                            .to_bits()
+                    );
                     attainments += 1;
                 }
             }
             checked += 1;
         }
     }
-    assert!(checked >= 15, "only {checked} committed records could be re-scored");
-    assert!(attainments >= 27, "only {attainments} attainment values compared");
+    assert!(
+        checked >= 15,
+        "only {checked} committed records could be re-scored"
+    );
+    assert!(
+        attainments >= 27,
+        "only {attainments} attainment values compared"
+    );
 }
 
 #[test]
@@ -130,11 +177,23 @@ fn committed_control_rooflines_are_reproduced_byte_for_byte() {
     for run in ["controls-run1", "controls-run2"] {
         let dir = repo().join("research/optlevel_20261117").join(run);
         let calib = load_json(&dir.join("calibration.json")).unwrap();
-        let recs: Vec<Value> = ["positive-simd-incache", "scalar-incache", "serial-dependency", "stream-daxpy", "pointer-chase", "aa-repeat"]
-            .iter().map(|c| read_json(&dir.join(format!("{c}.record.json"))).unwrap()).collect();
+        let recs: Vec<Value> = [
+            "positive-simd-incache",
+            "scalar-incache",
+            "serial-dependency",
+            "stream-daxpy",
+            "pointer-chase",
+            "aa-repeat",
+        ]
+        .iter()
+        .map(|c| read_json(&dir.join(format!("{c}.record.json"))).unwrap())
+        .collect();
         let svg = plot::roofline_svg(&calib, &recs, "optlevel controls").unwrap();
         let want = std::fs::read_to_string(dir.join("controls-roofline.svg")).unwrap();
-        assert!(svg == want, "{run}: controls-roofline.svg differs from the committed file");
+        assert!(
+            svg == want,
+            "{run}: controls-roofline.svg differs from the committed file"
+        );
     }
 }
 
@@ -142,9 +201,22 @@ fn committed_control_rooflines_are_reproduced_byte_for_byte() {
 fn committed_controls_table_is_reproduced() {
     for run in ["controls-run1", "controls-run2"] {
         let dir = repo().join("research/optlevel_20261117").join(run);
-        let recs: Vec<Value> = ["positive-simd-incache", "scalar-incache", "serial-dependency", "stream-daxpy", "pointer-chase", "aa-repeat"]
-            .iter().map(|c| read_json(&dir.join(format!("{c}.record.json"))).unwrap()).collect();
+        let recs: Vec<Value> = [
+            "positive-simd-incache",
+            "scalar-incache",
+            "serial-dependency",
+            "stream-daxpy",
+            "pointer-chase",
+            "aa-repeat",
+        ]
+        .iter()
+        .map(|c| read_json(&dir.join(format!("{c}.record.json"))).unwrap())
+        .collect();
         let want = std::fs::read_to_string(dir.join("controls.md")).unwrap();
-        assert_eq!(format!("{}\n", optlevel::cmd::controls_table(&recs)), want, "{run}");
+        assert_eq!(
+            format!("{}\n", optlevel::cmd::controls_table(&recs)),
+            want,
+            "{run}"
+        );
     }
 }

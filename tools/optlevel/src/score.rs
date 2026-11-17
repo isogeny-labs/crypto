@@ -17,21 +17,35 @@ pub const OPS_SCHEMA: &str = "optlevel.ops/v1";
 
 pub const TIERS: [&str; 4] = ["T-pmu", "T-timing", "T-gpu-ncu", "T-gpu-timing"];
 /// Published grade rule (docs/OPTIMIZATION_LEVEL.md section 6).  Lower edges.
-pub const GRADE_EDGES: [(&str, f64); 5] = [("A", 0.70), ("B", 0.40), ("C", 0.20), ("D", 0.08), ("E", 0.0)];
+pub const GRADE_EDGES: [(&str, f64); 5] = [
+    ("A", 0.70),
+    ("B", 0.40),
+    ("C", 0.20),
+    ("D", 0.08),
+    ("E", 0.0),
+];
 pub const NEAR_ROOF: f64 = 0.70; // an attainment at or above this is "near the roof"
 pub const CEILING_SLACK: f64 = 0.02; // attainment above 1 + slack + noise raises CEILING_EXCEEDED
 pub const MIN_KERNEL_SECONDS: f64 = 0.5; // shorter timed regions raise TOO_SHORT
 pub const CONTENDED_CORES: f64 = 0.25; // CPU-seconds per second used by everything else on the host
 pub const PMU_ONLY: [&str; 9] = [
-    "ipc", "cycles_per_op", "instructions_per_op", "branch_miss_rate", "llc_misses_per_op",
-    "l1d_misses_per_op", "dtlb_misses_per_op", "topdown", "vector_share_sampled",
+    "ipc",
+    "cycles_per_op",
+    "instructions_per_op",
+    "branch_miss_rate",
+    "llc_misses_per_op",
+    "l1d_misses_per_op",
+    "dtlb_misses_per_op",
+    "topdown",
+    "vector_share_sampled",
 ];
 /// Operation classes scored against another class's compute ceiling when the
 /// calibration has no entry of their own: a streamed triad performs one
 /// multiply-add per element, so its compute roof is the fma_f64 ceiling and
 /// its memory roof is bandwidth / declared bytes per operation.
 pub const CLASS_ALIASES: [(&str, &str); 1] = [("triad", "fma_f64")];
-pub const NOT_A_SPEED_CLAIM: &str = "An optimization level describes how close one implementation runs to what its own \
+pub const NOT_A_SPEED_CLAIM: &str =
+    "An optimization level describes how close one implementation runs to what its own \
 machine can do for the operations it counts. It is not a speed result, not a \
 comparison between algorithms, not a benchmark or leaderboard row, and not evidence \
 under the validation gate. A perfectly tuned bad algorithm scores high.";
@@ -55,7 +69,13 @@ pub fn truthy(v: Option<&Value>) -> bool {
     }
 }
 fn strs(v: Option<&Value>) -> Vec<String> {
-    v.and_then(Value::as_array).map(|a| a.iter().filter_map(|x| x.as_str().map(String::from)).collect()).unwrap_or_default()
+    v.and_then(Value::as_array)
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(String::from))
+                .collect()
+        })
+        .unwrap_or_default()
 }
 fn obj(v: Value) -> Map<String, Value> {
     match v {
@@ -72,7 +92,11 @@ pub fn stats(xs: &[f64]) -> Value {
     }
     xs.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
     let n = xs.len();
-    let med = if n % 2 == 1 { xs[n / 2] } else { (xs[n / 2 - 1] + xs[n / 2]) / 2.0 };
+    let med = if n % 2 == 1 {
+        xs[n / 2]
+    } else {
+        (xs[n / 2 - 1] + xs[n / 2]) / 2.0
+    };
     json!({"median": med, "min": xs[0], "max": xs[n - 1], "n": n})
 }
 pub fn stats_opt(xs: impl IntoIterator<Item = Option<f64>>) -> Value {
@@ -98,20 +122,44 @@ pub fn interp_scale(points: &[(i64, f64)], k: i64) -> R<(f64, Interp)> {
     }
     for &(a, b) in &pts {
         if a == k {
-            return Ok((b, Interp { interpolated: false, extrapolated: false }));
+            return Ok((
+                b,
+                Interp {
+                    interpolated: false,
+                    extrapolated: false,
+                },
+            ));
         }
     }
     let (first, last) = (pts[0], pts[pts.len() - 1]);
     if k < first.0 {
-        return Ok((first.1 * k as f64 / first.0 as f64, Interp { interpolated: true, extrapolated: false }));
+        return Ok((
+            first.1 * k as f64 / first.0 as f64,
+            Interp {
+                interpolated: true,
+                extrapolated: false,
+            },
+        ));
     }
     if k > last.0 {
-        return Ok((last.1, Interp { interpolated: false, extrapolated: true }));
+        return Ok((
+            last.1,
+            Interp {
+                interpolated: false,
+                extrapolated: true,
+            },
+        ));
     }
     for w in pts.windows(2) {
         let ((a0, b0), (a1, b1)) = (w[0], w[1]);
         if a0 < k && k < a1 {
-            return Ok((b0 + (b1 - b0) * (k - a0) as f64 / (a1 - a0) as f64, Interp { interpolated: true, extrapolated: false }));
+            return Ok((
+                b0 + (b1 - b0) * (k - a0) as f64 / (a1 - a0) as f64,
+                Interp {
+                    interpolated: true,
+                    extrapolated: false,
+                },
+            ));
         }
     }
     Err("unreachable".into())
@@ -128,9 +176,13 @@ pub fn roofline(peak: f64, bandwidth: f64, bytes_per_op: Option<f64>) -> R<Map<S
     if !(peak > 0.0) {
         return Err("peak rate must be positive".into());
     }
-    let mut out = obj(json!({"compute_roof_ops_per_s": peak, "memory_roof_ops_per_s": null, "bound_ops_per_s": peak,
-                              "binding": "compute (traffic unknown)", "next_roof_ratio": null}));
-    let Some(bpo) = bytes_per_op else { return Ok(out) };
+    let mut out = obj(
+        json!({"compute_roof_ops_per_s": peak, "memory_roof_ops_per_s": null, "bound_ops_per_s": peak,
+                              "binding": "compute (traffic unknown)", "next_roof_ratio": null}),
+    );
+    let Some(bpo) = bytes_per_op else {
+        return Ok(out);
+    };
     if bpo <= 0.0 {
         out.insert("binding".into(), json!("compute"));
         return Ok(out);
@@ -138,8 +190,14 @@ pub fn roofline(peak: f64, bandwidth: f64, bytes_per_op: Option<f64>) -> R<Map<S
     let mem = bandwidth / bpo;
     out.insert("memory_roof_ops_per_s".into(), json!(mem));
     out.insert("bound_ops_per_s".into(), json!(peak.min(mem)));
-    out.insert("binding".into(), json!(if mem < peak { "memory" } else { "compute" }));
-    out.insert("next_roof_ratio".into(), json!(peak.max(mem) / peak.min(mem)));
+    out.insert(
+        "binding".into(),
+        json!(if mem < peak { "memory" } else { "compute" }),
+    );
+    out.insert(
+        "next_roof_ratio".into(),
+        json!(peak.max(mem) / peak.min(mem)),
+    );
     Ok(out)
 }
 
@@ -190,7 +248,10 @@ pub fn letter(score: Option<f64>) -> Option<&'static str> {
 /// Letters the score could carry inside its noise floor, e.g. "B" or "B/C".
 pub fn letter_range(score: Option<f64>, rel_noise: f64) -> Option<String> {
     let s = score?;
-    let (hi, lo) = (letter(Some(s * (1.0 + rel_noise))), letter(Some(s * (1.0 - rel_noise))));
+    let (hi, lo) = (
+        letter(Some(s * (1.0 + rel_noise))),
+        letter(Some(s * (1.0 - rel_noise))),
+    );
     match (hi, lo) {
         (Some(h), Some(l)) if h == l => Some(h.to_string()),
         (h, l) => Some(format!("{}/{}", h.unwrap_or("None"), l.unwrap_or("None"))),
@@ -203,7 +264,14 @@ pub fn letter_range(score: Option<f64>, rel_noise: f64) -> Option<String> {
 /// normalised = [rate(k)/rate(1)] / [bound(k)/bound(1)]  = A_full / A_single
 /// The second does not charge the kernel for the machine's own saturation
 /// (memory bandwidth and all-core frequency do not scale with k).
-pub fn parallel_block(single_rate: f64, full_rate: f64, threads: i64, bound_single: f64, bound_full: f64, curve: Value) -> Value {
+pub fn parallel_block(
+    single_rate: f64,
+    full_rate: f64,
+    threads: i64,
+    bound_single: f64,
+    bound_full: f64,
+    curve: Value,
+) -> Value {
     if single_rate == 0.0 || full_rate == 0.0 || threads == 0 {
         return Value::Null;
     }
@@ -217,9 +285,16 @@ pub fn parallel_block(single_rate: f64, full_rate: f64, threads: i64, bound_sing
 /// Published rule: score = sqrt(A_single * A_full) when both operating points
 /// were measured (scope "single+parallel"), else the one measured (scope names
 /// it).  A score is never compared across scopes.
-pub fn summary_grade(a_single: Option<f64>, a_full: Option<f64>, rel_noise: f64, invalid: &[String]) -> Map<String, Value> {
+pub fn summary_grade(
+    a_single: Option<f64>,
+    a_full: Option<f64>,
+    rel_noise: f64,
+    invalid: &[String],
+) -> Map<String, Value> {
     if !invalid.is_empty() {
-        return obj(json!({"score": null, "letter": null, "letter_range": null, "scope": "invalid", "invalid": invalid, "rule": GRADE_RULE}));
+        return obj(
+            json!({"score": null, "letter": null, "letter_range": null, "scope": "invalid", "invalid": invalid, "rule": GRADE_RULE}),
+        );
     }
     let (s, scope) = match (a_single, a_full) {
         (Some(a), Some(b)) => (Some((a * b).sqrt()), "single+parallel"),
@@ -227,8 +302,10 @@ pub fn summary_grade(a_single: Option<f64>, a_full: Option<f64>, rel_noise: f64,
         (None, Some(b)) => (Some(b), "parallel only"),
         (None, None) => (None, "invalid"),
     };
-    obj(json!({"score": s, "letter": letter(s), "letter_range": letter_range(s, rel_noise), "scope": scope,
-               "invalid": [], "rule": GRADE_RULE}))
+    obj(
+        json!({"score": s, "letter": letter(s), "letter_range": letter_range(s, rel_noise), "scope": scope,
+               "invalid": [], "rule": GRADE_RULE}),
+    )
 }
 
 /// Name the largest non-retiring top-down share, refined by level 2.
@@ -251,7 +328,8 @@ pub fn topdown_limit(td: &Value) -> Option<String> {
         "backend_bound" => match (f(td, "memory_bound"), f(td, "core_bound")) {
             (Some(mem), Some(core)) => {
                 if mem >= core {
-                    "backend: memory bound (cache or TLB misses inside a compute-bound kernel)".into()
+                    "backend: memory bound (cache or TLB misses inside a compute-bound kernel)"
+                        .into()
                 } else {
                     "backend: core bound (dependency chains, divider, port contention)".into()
                 }
@@ -264,18 +342,29 @@ pub fn topdown_limit(td: &Value) -> Option<String> {
 }
 
 /// The published decision rule, in order.  Returns (text, basis).
-pub fn limiting_factor(tier: &str, roof: &Value, a_single: Option<f64>, par: &Value, diag: &Value) -> (String, String) {
+pub fn limiting_factor(
+    tier: &str,
+    roof: &Value,
+    a_single: Option<f64>,
+    par: &Value,
+    diag: &Value,
+) -> (String, String) {
     if a_single.is_none() && par.is_null() {
         return ("nothing measured".into(), "none".into());
     }
     let norm = f(par, "roofline_normalised_efficiency");
     let binding = roof.get("binding").and_then(Value::as_str).unwrap_or("");
-    if a_single.map(|a| a >= NEAR_ROOF).unwrap_or(false) && norm.map(|n| n >= NEAR_ROOF).unwrap_or(true) {
+    if a_single.map(|a| a >= NEAR_ROOF).unwrap_or(false)
+        && norm.map(|n| n >= NEAR_ROOF).unwrap_or(true)
+    {
         if binding == "memory" {
             return ("at the memory-bandwidth roof: only higher arithmetic intensity (blocking, packing, \
                      fewer bytes per operation) or a different algorithm helps".into(), "roofline".into());
         }
-        return ("none above threshold: near the roofline; what remains is the algorithmic axis".into(), "roofline".into());
+        return (
+            "none above threshold: near the roofline; what remains is the algorithmic axis".into(),
+            "roofline".into(),
+        );
     }
     if let Some(n) = norm {
         if a_single.map(|a| n < a).unwrap_or(true) {
@@ -291,8 +380,16 @@ pub fn limiting_factor(tier: &str, roof: &Value, a_single: Option<f64>, par: &Va
                                  (latency attainment {lat:.2}); far below the bandwidth roof"), "roofline + latency calibration".into());
             }
         }
-        if tier == "T-pmu" && f(diag, "dtlb_misses_per_op").map(|x| x > 0.05).unwrap_or(false) {
-            return ("memory bound below the bandwidth roof with TLB misses: page size or access order".into(), "pmu".into());
+        if tier == "T-pmu"
+            && f(diag, "dtlb_misses_per_op")
+                .map(|x| x > 0.05)
+                .unwrap_or(false)
+        {
+            return (
+                "memory bound below the bandwidth roof with TLB misses: page size or access order"
+                    .into(),
+                "pmu".into(),
+            );
         }
         return ("memory bound, below the bandwidth roof: random or dependent access, TLB, or NUMA placement".into(), "roofline".into());
     }
@@ -304,7 +401,11 @@ pub fn limiting_factor(tier: &str, roof: &Value, a_single: Option<f64>, par: &Va
     let sr = f(diag, "scalar_ceiling_ratio");
     let head = f(diag, "simd_headroom").filter(|h| *h != 0.0);
     let vs = f(diag, "vector_share_static");
-    let suffix = if binding == "compute" { "" } else { " (memory traffic unknown: the bound may be lower than assumed)" };
+    let suffix = if binding == "compute" {
+        ""
+    } else {
+        " (memory traffic unknown: the bound may be lower than assumed)"
+    };
     if let (Some(vs), Some(head)) = (vs, head) {
         if vs < 0.2 && head > 1.5 {
             return (format!("core bound / not vectorized (static vector share {vs:.2} in the named symbols; \
@@ -326,19 +427,35 @@ pub fn limiting_factor(tier: &str, roof: &Value, a_single: Option<f64>, par: &Va
 pub fn enforce_tier(record: &Value) -> R<()> {
     let tier = record.get("tier").and_then(Value::as_str).unwrap_or("");
     if !TIERS.contains(&tier) {
-        return Err(format!("unknown tier {:?}", record.get("tier").unwrap_or(&Value::Null).to_string()));
+        return Err(format!(
+            "unknown tier {:?}",
+            record.get("tier").unwrap_or(&Value::Null).to_string()
+        ));
     }
     let null = Value::Null;
     let diag = record.get("diagnosis").unwrap_or(&null);
     let present = |v: Option<&Value>| v.map(|x| !x.is_null()).unwrap_or(false);
     if tier != "T-pmu" {
-        let bad: Vec<&str> = PMU_ONLY.iter().copied().filter(|k| present(diag.get(*k))).collect();
+        let bad: Vec<&str> = PMU_ONLY
+            .iter()
+            .copied()
+            .filter(|k| present(diag.get(*k)))
+            .collect();
         if !bad.is_empty() {
-            return Err(format!("tier {tier} must not report PMU components: {}", bad.join(", ")));
+            return Err(format!(
+                "tier {tier} must not report PMU components: {}",
+                bad.join(", ")
+            ));
         }
-        let src = record.get("intensity").and_then(|i| i.get("source")).and_then(Value::as_str).unwrap_or("");
+        let src = record
+            .get("intensity")
+            .and_then(|i| i.get("source"))
+            .and_then(Value::as_str)
+            .unwrap_or("");
         if src == "llc-miss" || src == "imc" {
-            return Err(format!("tier {tier} cannot have measured memory traffic ({src})"));
+            return Err(format!(
+                "tier {tier} cannot have measured memory traffic ({src})"
+            ));
         }
     }
     if tier != "T-gpu-ncu" && present(diag.get("gpu").and_then(|g| g.get("ncu"))) {
@@ -347,7 +464,9 @@ pub fn enforce_tier(record: &Value) -> R<()> {
     if !tier.starts_with("T-gpu") && present(diag.get("gpu")) {
         return Err("a CPU-tier record must not carry GPU components".into());
     }
-    if !present(record.get("noise_floor")) && present(record.get("grade").and_then(|g| g.get("score"))) {
+    if !present(record.get("noise_floor"))
+        && present(record.get("grade").and_then(|g| g.get("score")))
+    {
         return Err("a graded record must carry its A/A noise floor".into());
     }
     Ok(())
@@ -425,7 +544,13 @@ fn validate_at(doc: &Value, schema: &Value, path: &str, errs: &mut Vec<String>) 
         }
     }
     if let Some(o) = doc.as_object() {
-        for k in schema.get("required").and_then(Value::as_array).into_iter().flatten().filter_map(Value::as_str) {
+        for k in schema
+            .get("required")
+            .and_then(Value::as_array)
+            .into_iter()
+            .flatten()
+            .filter_map(Value::as_str)
+        {
             if !o.contains_key(k) {
                 errs.push(format!("{path}: missing {k}"));
             }
@@ -448,14 +573,24 @@ fn validate_at(doc: &Value, schema: &Value, path: &str, errs: &mut Vec<String>) 
 
 // ---- record assembly ---------------------------------------------------------
 fn scale_points(table: &Value, field: &str) -> Vec<(i64, f64)> {
-    table.as_object().map(|o| o.iter().filter_map(|(k, v)| Some((k.parse().ok()?, f(v, field)?))).collect()).unwrap_or_default()
+    table
+        .as_object()
+        .map(|o| {
+            o.iter()
+                .filter_map(|(k, v)| Some((k.parse().ok()?, f(v, field)?)))
+                .collect()
+        })
+        .unwrap_or_default()
 }
 
 /// The calibration entry an operation class is scored against: its own, or its
 /// alias's (CLASS_ALIASES).  Returns (entry, name of the class actually used).
 pub fn class_entry<'a>(calib: &'a Value, op_class: &str) -> R<(&'a Value, String)> {
     let compute = calib.get("compute").and_then(Value::as_object);
-    if let Some(c) = compute.and_then(|c| c.get(op_class)).filter(|c| truthy(Some(c))) {
+    if let Some(c) = compute
+        .and_then(|c| c.get(op_class))
+        .filter(|c| truthy(Some(c)))
+    {
         return Ok((c, op_class.to_string()));
     }
     for (from, to) in CLASS_ALIASES {
@@ -467,7 +602,9 @@ pub fn class_entry<'a>(calib: &'a Value, op_class: &str) -> R<(&'a Value, String
     }
     let mut names: Vec<&String> = compute.map(|c| c.keys().collect()).unwrap_or_default();
     names.sort();
-    Err(format!("calibration has no ceiling for operation class {op_class:?}; classes: {names:?}"))
+    Err(format!(
+        "calibration has no ceiling for operation class {op_class:?}; classes: {names:?}"
+    ))
 }
 
 /// (peak, peak_median, meta) of an operation class at `threads` cores.
@@ -496,8 +633,16 @@ pub struct Extras {
 /// `calib["_sha256"]`, when present, is the SHA-256 of the calibration file.
 pub fn build_record(calib: &Value, meas: &Value, extras: Extras) -> R<Value> {
     let mut flags = strs(meas.get("flags"));
-    let tier = meas.get("tier").and_then(Value::as_str).ok_or("measurement has no tier")?.to_string();
-    let op_class = meas.get("op_class").and_then(Value::as_str).ok_or("measurement has no op_class")?.to_string();
+    let tier = meas
+        .get("tier")
+        .and_then(Value::as_str)
+        .ok_or("measurement has no tier")?
+        .to_string();
+    let op_class = meas
+        .get("op_class")
+        .and_then(Value::as_str)
+        .ok_or("measurement has no op_class")?
+        .to_string();
     if calib["host"]["fingerprint"] != meas["host"]["fingerprint"] {
         flags.push("CALIBRATION_HOST_MISMATCH".into());
     }
@@ -506,14 +651,24 @@ pub fn build_record(calib: &Value, meas: &Value, extras: Extras) -> R<Value> {
     }
     let (_, ceiling_class) = class_entry(calib, &op_class)?;
     if ceiling_class != op_class {
-        flags.push(format!("CEILING_CLASS_ALIAS_{}", ceiling_class.to_uppercase()));
+        flags.push(format!(
+            "CEILING_CLASS_ALIAS_{}",
+            ceiling_class.to_uppercase()
+        ));
     }
 
     // memory traffic: measured sources outrank the declared one
-    let declared = meas.get("declared_bytes_per_op").cloned().unwrap_or(Value::Null);
-    let mut intensity = obj(json!({"source": "none", "bytes_per_op": null, "ops_per_byte": null,
-                                   "declared_bytes_per_op": declared, "measured_bytes_per_op": null, "declared_over_measured": null}));
-    let mt_bpo = meas.get("memory_traffic").and_then(|m| f(m, "bytes_per_op"));
+    let declared = meas
+        .get("declared_bytes_per_op")
+        .cloned()
+        .unwrap_or(Value::Null);
+    let mut intensity = obj(
+        json!({"source": "none", "bytes_per_op": null, "ops_per_byte": null,
+                                   "declared_bytes_per_op": declared, "measured_bytes_per_op": null, "declared_over_measured": null}),
+    );
+    let mt_bpo = meas
+        .get("memory_traffic")
+        .and_then(|m| f(m, "bytes_per_op"));
     if tier == "T-pmu" && mt_bpo.is_some() {
         let b = mt_bpo.unwrap();
         intensity.insert("source".into(), meas["memory_traffic"]["source"].clone());
@@ -527,8 +682,14 @@ pub fn build_record(calib: &Value, meas: &Value, extras: Extras) -> R<Value> {
     } else if !declared.is_null() {
         intensity.insert("source".into(), json!("declared"));
         intensity.insert("bytes_per_op".into(), declared.clone());
-        let ws = meas.get("working_set_bytes").cloned().unwrap_or(Value::Null);
-        let llc = calib.get("memory").and_then(|m| f(m, "llc_bytes")).filter(|x| *x != 0.0);
+        let ws = meas
+            .get("working_set_bytes")
+            .cloned()
+            .unwrap_or(Value::Null);
+        let llc = calib
+            .get("memory")
+            .and_then(|m| f(m, "llc_bytes"))
+            .filter(|x| *x != 0.0);
         intensity.insert("working_set_bytes".into(), ws.clone());
         if let (Some(w), Some(llc)) = (ws.as_f64(), llc) {
             if w <= llc {
@@ -537,8 +698,15 @@ pub fn build_record(calib: &Value, meas: &Value, extras: Extras) -> R<Value> {
                 // compute roof is an upper bound on the true roof.
                 intensity.insert("bytes_per_op".into(), json!(0.0));
                 intensity.insert("in_cache".into(), json!(true));
-                let l2 = calib["host"].get("caches_bytes").and_then(Value::as_object)
-                    .and_then(|c| c.iter().filter(|(k, _)| k.starts_with("L2")).filter_map(|(_, v)| v.as_f64()).reduce(f64::max));
+                let l2 = calib["host"]
+                    .get("caches_bytes")
+                    .and_then(Value::as_object)
+                    .and_then(|c| {
+                        c.iter()
+                            .filter(|(k, _)| k.starts_with("L2"))
+                            .filter_map(|(_, v)| v.as_f64())
+                            .reduce(f64::max)
+                    });
                 if l2.map(|l2| l2 != 0.0 && w > l2).unwrap_or(false) {
                     flags.push("WORKING_SET_IN_LLC".into());
                 }
@@ -553,10 +721,19 @@ pub fn build_record(calib: &Value, meas: &Value, extras: Extras) -> R<Value> {
         flags.push("INTENSITY_UNKNOWN".into());
     }
 
-    let points = meas.get("points").and_then(Value::as_object).ok_or("measurement has no points")?;
+    let points = meas
+        .get("points")
+        .and_then(Value::as_object)
+        .ok_or("measurement has no points")?;
     let single = points.get("1").filter(|p| truthy(Some(p)));
-    let full_k = points.keys().filter_map(|k| k.parse::<i64>().ok()).filter(|k| *k > 1).max();
-    let full = full_k.and_then(|k| points.get(&k.to_string())).filter(|p| truthy(Some(p)));
+    let full_k = points
+        .keys()
+        .filter_map(|k| k.parse::<i64>().ok())
+        .filter(|k| *k > 1)
+        .max();
+    let full = full_k
+        .and_then(|k| points.get(&k.to_string()))
+        .filter(|p| truthy(Some(p)));
 
     let roof_at = |k: i64| -> R<Map<String, Value>> {
         let (peak, peak_med, m1) = class_ceiling(calib, &op_class, k)?;
@@ -566,11 +743,23 @@ pub fn build_record(calib: &Value, meas: &Value, extras: Extras) -> R<Value> {
         r.insert("threads".into(), json!(k));
         r.insert("bandwidth_bytes_per_s".into(), json!(bw));
         r.insert("bound_low_ops_per_s".into(), lo);
-        r.insert("ceiling_interpolated".into(), json!(m1.interpolated || m2.interpolated));
-        r.insert("ceiling_extrapolated".into(), json!(m1.extrapolated || m2.extrapolated));
+        r.insert(
+            "ceiling_interpolated".into(),
+            json!(m1.interpolated || m2.interpolated),
+        );
+        r.insert(
+            "ceiling_extrapolated".into(),
+            json!(m1.extrapolated || m2.extrapolated),
+        );
         Ok(r)
     };
-    let att_of = |p: &Value, r: &Map<String, Value>| attainment(&p["ops_per_s"], r["bound_ops_per_s"].as_f64().unwrap_or(0.0), r["bound_low_ops_per_s"].as_f64());
+    let att_of = |p: &Value, r: &Map<String, Value>| {
+        attainment(
+            &p["ops_per_s"],
+            r["bound_ops_per_s"].as_f64().unwrap_or(0.0),
+            r["bound_low_ops_per_s"].as_f64(),
+        )
+    };
 
     let (mut roofs, mut att) = (Map::new(), Map::new());
     if let Some(s) = single {
@@ -591,7 +780,9 @@ pub fn build_record(calib: &Value, meas: &Value, extras: Extras) -> R<Value> {
     // Validity of the full point: k copies need k free cores.  When everything
     // else on the host used more than CONTENDED_CORES during those runs, the
     // full point is reported but neither graded nor used for diagnosis.
-    let full_other = full.and_then(|p| p.get("other_cpu_cores")).and_then(|o| f(o, "median"));
+    let full_other = full
+        .and_then(|p| p.get("other_cpu_cores"))
+        .and_then(|o| f(o, "median"));
     let full_usable = full.is_some() && !full_other.map(|o| o > CONTENDED_CORES).unwrap_or(false);
     if full.is_some() && !full_usable {
         flags.push("FULL_POINT_CONTENDED".into());
@@ -602,13 +793,21 @@ pub fn build_record(calib: &Value, meas: &Value, extras: Extras) -> R<Value> {
         let s_med = f(&s["ops_per_s"], "median").unwrap_or(f64::NAN);
         let mut keys: Vec<i64> = points.keys().filter_map(|k| k.parse().ok()).collect();
         keys.sort();
-        let curve: Vec<Value> = keys.iter().map(|kk| {
-            let m = f(&points[&kk.to_string()]["ops_per_s"], "median").unwrap_or(f64::NAN);
-            json!({"threads": kk, "ops_per_s": m, "raw_efficiency": m / (*kk as f64 * s_med)})
-        }).collect();
-        par = parallel_block(s_med, f(&fp["ops_per_s"], "median").unwrap_or(f64::NAN), k,
-                             f(&roofs["single"], "bound_ops_per_s").unwrap_or(f64::NAN),
-                             f(&roofs["full"], "bound_ops_per_s").unwrap_or(f64::NAN), Value::Array(curve));
+        let curve: Vec<Value> = keys
+            .iter()
+            .map(|kk| {
+                let m = f(&points[&kk.to_string()]["ops_per_s"], "median").unwrap_or(f64::NAN);
+                json!({"threads": kk, "ops_per_s": m, "raw_efficiency": m / (*kk as f64 * s_med)})
+            })
+            .collect();
+        par = parallel_block(
+            s_med,
+            f(&fp["ops_per_s"], "median").unwrap_or(f64::NAN),
+            k,
+            f(&roofs["single"], "bound_ops_per_s").unwrap_or(f64::NAN),
+            f(&roofs["full"], "bound_ops_per_s").unwrap_or(f64::NAN),
+            Value::Array(curve),
+        );
     }
 
     let mut nf = meas.get("noise_floor").cloned().unwrap_or(Value::Null);
@@ -623,23 +822,41 @@ pub fn build_record(calib: &Value, meas: &Value, extras: Extras) -> R<Value> {
     for k in PMU_ONLY {
         diag.insert(k.into(), Value::Null);
     }
-    for k in ["scalar_ceiling_ratio", "simd_headroom", "vector_share_static", "latency_attainment", "gpu"] {
+    for k in [
+        "scalar_ceiling_ratio",
+        "simd_headroom",
+        "vector_share_static",
+        "latency_attainment",
+        "gpu",
+    ] {
         diag.insert(k.into(), Value::Null);
     }
-    diag.insert("startup_share".into(), meas.get("startup_share").cloned().unwrap_or(Value::Null));
+    diag.insert(
+        "startup_share".into(),
+        meas.get("startup_share").cloned().unwrap_or(Value::Null),
+    );
     let mut unavailable = Map::new();
     let cc = class_entry(calib, &op_class)?.0;
     if let Some(s) = single {
         let s_med = f(&s["ops_per_s"], "median").unwrap_or(f64::NAN);
-        if let (Some(sc), Some(si)) = (f(cc, "scalar_ops_per_s").filter(|x| *x != 0.0), f(cc, "simd_ops_per_s").filter(|x| *x != 0.0)) {
+        if let (Some(sc), Some(si)) = (
+            f(cc, "scalar_ops_per_s").filter(|x| *x != 0.0),
+            f(cc, "simd_ops_per_s").filter(|x| *x != 0.0),
+        ) {
             diag.insert("scalar_ceiling_ratio".into(), json!(s_med / sc));
             diag.insert("simd_headroom".into(), json!(si / sc));
         }
-        let lat = calib.get("memory").and_then(|m| m.get("latency_ns")).filter(|l| truthy(Some(l)));
+        let lat = calib
+            .get("memory")
+            .and_then(|m| m.get("latency_ns"))
+            .filter(|l| truthy(Some(l)));
         if let Some(lat) = lat {
             if roofs["single"]["binding"] == "memory" {
                 // dependent misses per second one thread can serve, one at a time
-                diag.insert("latency_attainment".into(), json!(s_med * f(lat, "median").unwrap_or(f64::NAN) * 1e-9));
+                diag.insert(
+                    "latency_attainment".into(),
+                    json!(s_med * f(lat, "median").unwrap_or(f64::NAN) * 1e-9),
+                );
             }
         }
     }
@@ -652,7 +869,10 @@ pub fn build_record(calib: &Value, meas: &Value, extras: Extras) -> R<Value> {
             }
         }
     } else {
-        let why = meas.get("pmu_unavailable_reason").and_then(Value::as_str).filter(|s| !s.is_empty())
+        let why = meas
+            .get("pmu_unavailable_reason")
+            .and_then(Value::as_str)
+            .filter(|s| !s.is_empty())
             .unwrap_or("no hardware PMU on the measuring host");
         for k in PMU_ONLY {
             unavailable.insert(k.into(), json!(why));
@@ -663,7 +883,10 @@ pub fn build_record(calib: &Value, meas: &Value, extras: Extras) -> R<Value> {
         diag.insert(k, v);
     }
     if diag["gpu"].is_null() && tier.starts_with("T-gpu") {
-        diag.insert("gpu".into(), meas.get("gpu").cloned().unwrap_or(Value::Null));
+        diag.insert(
+            "gpu".into(),
+            meas.get("gpu").cloned().unwrap_or(Value::Null),
+        );
     }
 
     let mut invalid: Vec<String> = Vec::new();
@@ -673,7 +896,8 @@ pub fn build_record(calib: &Value, meas: &Value, extras: Extras) -> R<Value> {
                 continue;
             }
             let fs = &full.unwrap()["ops_per_s"];
-            let spread = (f(fs, "max").unwrap_or(f64::NAN) - f(fs, "min").unwrap_or(f64::NAN)) / f(fs, "median").unwrap_or(f64::NAN);
+            let spread = (f(fs, "max").unwrap_or(f64::NAN) - f(fs, "min").unwrap_or(f64::NAN))
+                / f(fs, "median").unwrap_or(f64::NAN);
             if let Some(o) = nf.as_object_mut() {
                 o.insert("full_rel_range".into(), json!(spread));
             }
@@ -699,20 +923,46 @@ pub fn build_record(calib: &Value, meas: &Value, extras: Extras) -> R<Value> {
     let mut grade = summary_grade(a1, if full_usable { an } else { None }, rel_noise, &invalid);
     let (text, basis) = if !grade["score"].is_null() && !roofs.is_empty() {
         let roof = roofs.get("single").or(roofs.get("full")).unwrap();
-        limiting_factor(&tier, roof, a1, if full_usable { &par } else { &Value::Null }, &diag)
+        limiting_factor(
+            &tier,
+            roof,
+            a1,
+            if full_usable { &par } else { &Value::Null },
+            &diag,
+        )
     } else {
-        (if invalid.is_empty() { "nothing measured".to_string() } else { format!("invalid: {}", invalid.join("; ")) }, "validity checks".to_string())
+        (
+            if invalid.is_empty() {
+                "nothing measured".to_string()
+            } else {
+                format!("invalid: {}", invalid.join("; "))
+            },
+            "validity checks".to_string(),
+        )
     };
     grade.insert("limiting_factor".into(), json!(text));
     grade.insert("limiting_basis".into(), json!(basis));
 
-    let mut kernel = obj(json!({"op_class": op_class, "command": meas.get("command").cloned().unwrap_or(Value::Null),
-                                "ops_source": meas.get("ops_source").cloned().unwrap_or(Value::Null)}));
+    let mut kernel = obj(
+        json!({"op_class": op_class, "command": meas.get("command").cloned().unwrap_or(Value::Null),
+                                "ops_source": meas.get("ops_source").cloned().unwrap_or(Value::Null)}),
+    );
     for (k, v) in extras.kernel {
         kernel.insert(k, v);
     }
-    let achieved: Map<String, Value> = points.iter()
-        .map(|(k, v)| (if k == "1" { "single".to_string() } else { format!("threads_{k}") }, v.clone())).collect();
+    let achieved: Map<String, Value> = points
+        .iter()
+        .map(|(k, v)| {
+            (
+                if k == "1" {
+                    "single".to_string()
+                } else {
+                    format!("threads_{k}")
+                },
+                v.clone(),
+            )
+        })
+        .collect();
     flags.sort();
     flags.dedup();
     let algorithmic = extras.algorithmic.filter(|a| truthy(Some(a)))
@@ -741,8 +991,19 @@ pub fn benchrec_metrics(record: &Value) -> Vec<Value> {
     let mut out = Vec::new();
     let lab = record["kernel"]["op_class"].as_str().unwrap_or("");
     // insertion order of the first tool version: single, then threads_<k> ascending
-    let mut names: Vec<&String> = record["achieved"].as_object().map(|o| o.keys().collect()).unwrap_or_default();
-    names.sort_by_key(|n| if n.as_str() == "single" { 1 } else { n.trim_start_matches("threads_").parse::<i64>().unwrap_or(i64::MAX) });
+    let mut names: Vec<&String> = record["achieved"]
+        .as_object()
+        .map(|o| o.keys().collect())
+        .unwrap_or_default();
+    names.sort_by_key(|n| {
+        if n.as_str() == "single" {
+            1
+        } else {
+            n.trim_start_matches("threads_")
+                .parse::<i64>()
+                .unwrap_or(i64::MAX)
+        }
+    });
     for name in names {
         let s = &record["achieved"][name]["ops_per_s"];
         out.push(json!({"name": format!("optlevel:{lab}:{name}:ops_per_s"), "value": s["median"], "unit": "ops_per_s",
