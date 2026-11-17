@@ -1117,7 +1117,6 @@ mod table_recurrence_controls {
                     let limits = Limits {
                         work: work - u64::from(mode == 1),
                         bytes: (1 << 20) - u64::from(mode == 2),
-                        ..Limits::default()
                     };
                     let mut gate = Gate {
                         limits,

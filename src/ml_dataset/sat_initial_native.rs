@@ -667,6 +667,45 @@ fn seal_initial(
     Ok(())
 }
 
+impl NativeInitial<'_> {
+    /// Move every owned native/evidence buffer. No clone, allocation, new budget,
+    /// observer or sink. Fixed original hashes survive the ended borrowed token.
+    pub(super) fn detach(self) -> NativeInitial<'static> {
+        let Evidence {
+            original: _,
+            original_hashes,
+            binding,
+            launch_sha256,
+            math,
+            checked,
+            unchecked,
+            pattern,
+            map_bytes,
+            map_ack,
+            publication_attempted,
+            map_published,
+        } = self.evidence;
+        NativeInitial {
+            evidence: Evidence {
+                original: None,
+                original_hashes,
+                binding,
+                launch_sha256,
+                math,
+                checked,
+                unchecked,
+                pattern,
+                map_bytes,
+                map_ack,
+                publication_attempted,
+                map_published,
+            },
+            shared: self.shared,
+            solver: self.solver,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1052,7 +1091,8 @@ mod tests {
         // Exercise the real capture serializer at its maximum sequence. These
         // are serialization extrema, not claimed valid native solver states.
         let digest = "f".repeat(64);
-        let events = [SolverEvent::Snapshot {
+        let events = [
+            SolverEvent::Snapshot {
                 version: u32::MAX,
                 variables: u32::MAX,
                 trail_limits: Vec::new(),
@@ -1068,7 +1108,8 @@ mod tests {
                 row_id: usize::MAX,
                 mask: vec![u64::MAX; 3],
                 rhs: false,
-            }];
+            },
+        ];
         for count in [0, 1, 3] {
             let record = Batch {
                 schema: "ml-dataset.sat-initial-batch/v3",
@@ -1259,44 +1300,5 @@ mod tests {
         assert!(state.seal_ack.is_none());
         assert!(!state.events.is_empty());
         assert_eq!(solver.stats.decisions, 0);
-    }
-}
-
-impl NativeInitial<'_> {
-    /// Move every owned native/evidence buffer. No clone, allocation, new budget,
-    /// observer or sink. Fixed original hashes survive the ended borrowed token.
-    pub(super) fn detach(self) -> NativeInitial<'static> {
-        let Evidence {
-            original: _,
-            original_hashes,
-            binding,
-            launch_sha256,
-            math,
-            checked,
-            unchecked,
-            pattern,
-            map_bytes,
-            map_ack,
-            publication_attempted,
-            map_published,
-        } = self.evidence;
-        NativeInitial {
-            evidence: Evidence {
-                original: None,
-                original_hashes,
-                binding,
-                launch_sha256,
-                math,
-                checked,
-                unchecked,
-                pattern,
-                map_bytes,
-                map_ack,
-                publication_attempted,
-                map_published,
-            },
-            shared: self.shared,
-            solver: self.solver,
-        }
     }
 }

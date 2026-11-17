@@ -1532,6 +1532,316 @@ fn export_with_graph_projector(
     Ok(json!({"manifest":manifest_artifact,"export":manifest}))
 }
 
+/// Deliberate public recipe fields only. New provenance or enum fields cannot
+/// enter model inputs through a whole-object copy.
+pub(super) fn policy_projection(value: &Value) -> Result<Value, String> {
+    use super::types::FactorBasePolicy;
+    let policy: FactorBasePolicy =
+        serde_json::from_value(value.clone()).map_err(|e| e.to_string())?;
+    Ok(match policy {
+        FactorBasePolicy::Legacy {} => json!({"kind":"legacy"}),
+        FactorBasePolicy::SampledXProjectedControl { candidate_limit } => {
+            json!({"kind":"sampled_x_projected_control","candidate_limit":candidate_limit})
+        }
+        FactorBasePolicy::BinarySubspaceIntersection {
+            basis,
+            candidate_limit,
+        } => {
+            json!({"kind":"binary_subspace_intersection","basis":basis,"candidate_limit":candidate_limit})
+        }
+        FactorBasePolicy::BinaryFrobeniusUnionIntersection {
+            basis,
+            candidate_limit,
+        } => {
+            json!({"kind":"binary_frobenius_union_intersection","basis":basis,"candidate_limit":candidate_limit})
+        }
+    })
+}
+
+fn export_koblitz_prefix_rows(
+    dir: &Path,
+    config: &super::types::CaseConfig,
+    outcome: &Value,
+    artifacts: &[Artifact],
+    target_id: &str,
+    group: &str,
+    partition: &str,
+    prefix_features: &mut Sorter,
+    prefix_records: &mut Sorter,
+    prefix_occurrences: &mut u64,
+) -> Result<(), String> {
+    // This call verifies original recipe, central semantics, complete
+    // committed custody and all retained group additions before callbacks.
+    // Source descriptors and replay summaries remain restricted.
+    let source_artifacts: Vec<_> = artifacts
+        .iter()
+        .filter(|a| {
+            matches!(
+                a.path.as_str(),
+                "live/events.jsonl"
+                    | "live/committed.json"
+                    | "capture-binding.json"
+                    | "capture-limits.json"
+            )
+        })
+        .collect();
+    let mut occurrence = 0u64;
+    let replay = super::solvers::project_koblitz_m3_prefixes(
+        dir,
+        config,
+        outcome,
+        artifacts,
+        &mut |feature, record| {
+            occurrence += 1;
+            let record_id = super::digest(
+                format!("{target_id}\nkoblitz-prefix-record\n{occurrence}").as_bytes(),
+            );
+            let prefix_id = if let Some(feature) = feature {
+                let prefix_id = super::digest(bounded_json(&feature, MAX_RECORD_BYTES)?.as_bytes());
+                prefix_features.push(&prefix_id, &json!({"schema":"ml-dataset.prefix-features/v1",
+                                        "feature_id":prefix_id,"split_component":group,"split":partition,"inputs":feature}))?;
+                *prefix_occurrences += 1;
+                Some(prefix_id)
+            } else {
+                None
+            };
+            prefix_records.push(&record_id, &json!({"schema":"ml-dataset.restricted-prefix-record/v1",
+                                    "record_id":record_id,"source_target_id":target_id,"source_event_artifacts":source_artifacts,
+                                    "feature_id":prefix_id,"split_component":group,"split":partition,"record":record}))
+        },
+    )?;
+    let record_id = super::digest(format!("{target_id}\nkoblitz-prefix-replay-summary").as_bytes());
+    prefix_records.push(&record_id, &json!({"schema":"ml-dataset.restricted-prefix-record/v1",
+                            "record_id":record_id,"source_target_id":target_id,"source_event_artifacts":source_artifacts,
+                            "feature_id":null,"split_component":group,"split":partition,"record":replay}))?;
+    Ok(())
+}
+
+/// Uses the production replay, row assembly, hashing and external-sort path.
+/// It does not substitute synthetic events or manufacture a whole-cell seal.
+#[cfg(test)]
+pub(super) fn check_native_export_rows(
+    dir: &Path,
+    config: &super::types::CaseConfig,
+    outcome: &Value,
+    artifacts: &[Artifact],
+    expected: u64,
+) {
+    let root = dir.join("native-export-software-control");
+    fs::create_dir(&root).unwrap();
+    let mut features = Sorter::new(&root, "native-feature");
+    let mut records = Sorter::new(&root, "native-record");
+    let mut count = 0;
+    let (group, partition) = split_for_size(config.n as u64);
+    export_koblitz_prefix_rows(
+        dir,
+        config,
+        outcome,
+        artifacts,
+        "software-control",
+        &group,
+        partition,
+        &mut features,
+        &mut records,
+        &mut count,
+    )
+    .unwrap();
+    assert_eq!(count, expected);
+    let public_path = root.join("prefix-features.jsonl");
+    let restricted_path = root.join("prefix-records.jsonl");
+    let unique = features.finish(&public_path).unwrap();
+    records.finish(&restricted_path).unwrap();
+    assert_eq!(unique > 0, expected > 0);
+    for line in fs::read_to_string(public_path).unwrap().lines() {
+        let row: Value = serde_json::from_str(line).unwrap();
+        assert_eq!(
+            row["feature_id"],
+            super::digest(
+                bounded_json(&row["inputs"], MAX_RECORD_BYTES)
+                    .unwrap()
+                    .as_bytes()
+            )
+        );
+        assert_eq!(
+            row["inputs"]["static_inputs"]["source_factor_base_policy"],
+            config
+                .factor_base_policy
+                .as_ref()
+                .map(|p| policy_projection(&serde_json::to_value(p).unwrap()).unwrap())
+                .unwrap_or(Value::Null)
+        );
+        for forbidden in [
+            "sampling_seed",
+            "construction_status",
+            "construction_counters",
+            "matches_target",
+            "label",
+            "source_capture_sequence",
+            "source_binding_sha256",
+            "known_answer_scalar",
+        ] {
+            assert!(!line.contains(forbidden), "{forbidden}");
+        }
+    }
+    assert!(fs::read_to_string(restricted_path)
+        .unwrap()
+        .contains("matrix_projection_status"));
+    fs::remove_dir_all(root).unwrap();
+}
+
+fn export_ordinary_prefix_rows(
+    dir: &Path,
+    config: &super::types::CaseConfig,
+    outcome: &Value,
+    artifacts: &[Artifact],
+    target_id: &str,
+    group: &str,
+    partition: &str,
+    prefix_features: &mut Sorter,
+    prefix_records: &mut Sorter,
+    prefix_occurrences: &mut u64,
+) -> Result<(), String> {
+    // This call verifies original recipe, central semantics, complete
+    // committed custody and all retained group additions before callbacks.
+    // Source descriptors and replay summaries remain restricted.
+    let source_artifacts: Vec<_> = artifacts
+        .iter()
+        .filter(|a| {
+            matches!(
+                a.path.as_str(),
+                "live/events.jsonl"
+                    | "live/committed.json"
+                    | "capture-binding.json"
+                    | "capture-limits.json"
+            )
+        })
+        .collect();
+    let mut occurrence = 0u64;
+    let replay = super::solvers::project_ordinary_m3_prefixes(
+        dir,
+        config,
+        outcome,
+        artifacts,
+        &mut |feature, record| {
+            occurrence += 1;
+            let record_id = super::digest(
+                format!("{target_id}\nordinary-prefix-record\n{occurrence}").as_bytes(),
+            );
+            let prefix_id = if let Some(feature) = feature {
+                let prefix_id = super::digest(bounded_json(&feature, MAX_RECORD_BYTES)?.as_bytes());
+                prefix_features.push(&prefix_id, &json!({"schema":"ml-dataset.prefix-features/v1",
+                                        "feature_id":prefix_id,"split_component":group,"split":partition,"inputs":feature}))?;
+                *prefix_occurrences += 1;
+                Some(prefix_id)
+            } else {
+                None
+            };
+            prefix_records.push(&record_id, &json!({"schema":"ml-dataset.restricted-prefix-record/v1",
+                                    "record_id":record_id,"source_target_id":target_id,"source_event_artifacts":source_artifacts,
+                                    "feature_id":prefix_id,"split_component":group,"split":partition,"record":record}))
+        },
+    )?;
+    let record_id =
+        super::digest(format!("{target_id}\nordinary-prefix-replay-summary").as_bytes());
+    prefix_records.push(&record_id, &json!({"schema":"ml-dataset.restricted-prefix-record/v1",
+                            "record_id":record_id,"source_target_id":target_id,"source_event_artifacts":source_artifacts,
+                            "feature_id":null,"split_component":group,"split":partition,"record":replay}))?;
+    Ok(())
+}
+
+/// Uses the production replay, row assembly, hashing and external-sort path.
+/// It does not substitute synthetic events or manufacture a whole-cell seal.
+#[cfg(test)]
+pub(super) fn check_ordinary_export_rows(
+    dir: &Path,
+    config: &super::types::CaseConfig,
+    outcome: &Value,
+    artifacts: &[Artifact],
+    expected: u64,
+) {
+    let root = dir.join("ordinary-export-software-control");
+    fs::create_dir(&root).unwrap();
+    let mut features = Sorter::new(&root, "native-feature");
+    let mut records = Sorter::new(&root, "native-record");
+    let mut count = 0;
+    let (group, partition) = split_for_size(config.n as u64);
+    export_ordinary_prefix_rows(
+        dir,
+        config,
+        outcome,
+        artifacts,
+        "software-control",
+        &group,
+        partition,
+        &mut features,
+        &mut records,
+        &mut count,
+    )
+    .unwrap();
+    assert_eq!(count, expected);
+    let public_path = root.join("prefix-features.jsonl");
+    let restricted_path = root.join("prefix-records.jsonl");
+    let unique = features.finish(&public_path).unwrap();
+    records.finish(&restricted_path).unwrap();
+    assert_eq!(unique > 0, expected > 0);
+    for line in fs::read_to_string(public_path).unwrap().lines() {
+        let row: Value = serde_json::from_str(line).unwrap();
+        assert_eq!(
+            row["feature_id"],
+            super::digest(
+                bounded_json(&row["inputs"], MAX_RECORD_BYTES)
+                    .unwrap()
+                    .as_bytes()
+            )
+        );
+        assert_eq!(
+            row["inputs"]["static_inputs"]["source_factor_base_policy"],
+            config
+                .factor_base_policy
+                .as_ref()
+                .map(|p| policy_projection(&serde_json::to_value(p).unwrap()).unwrap())
+                .unwrap_or(Value::Null)
+        );
+        for forbidden in [
+            "sampling_seed",
+            "construction_status",
+            "construction_counters",
+            "matches_target",
+            "label",
+            "source_capture_sequence",
+            "source_binding_sha256",
+            "known_answer_scalar",
+        ] {
+            assert!(!line.contains(forbidden), "{forbidden}");
+        }
+    }
+    let restricted = fs::read_to_string(restricted_path).unwrap();
+    if outcome["status"] == "unsupported" {
+        assert_eq!(expected, 0);
+        let rows: Vec<Value> = restricted
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect();
+        assert_eq!(rows.len(), 1);
+        assert!(rows[0]["feature_id"].is_null());
+        assert_eq!(
+            rows[0]["record"]["admission_status"],
+            "unsupported_original_profile"
+        );
+    } else {
+        assert!(restricted.contains("matrix_projection_status"));
+    }
+    fs::remove_dir_all(root).unwrap();
+}
+
+fn structural_allowlist_version(plan: &super::DatasetPlan) -> &'static str {
+    if plan.factor_base_policies.is_empty() {
+        "strict-structural-allowlist-v6"
+    } else {
+        "strict-structural-allowlist-v7"
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2937,315 +3247,5 @@ mod tests {
             .contains("recipe or control seed differs from frozen config"));
         assert!(!out.join("prefix-features.jsonl").exists());
         assert!(!out.join("manifest.json").exists());
-    }
-}
-
-/// Deliberate public recipe fields only. New provenance or enum fields cannot
-/// enter model inputs through a whole-object copy.
-pub(super) fn policy_projection(value: &Value) -> Result<Value, String> {
-    use super::types::FactorBasePolicy;
-    let policy: FactorBasePolicy =
-        serde_json::from_value(value.clone()).map_err(|e| e.to_string())?;
-    Ok(match policy {
-        FactorBasePolicy::Legacy {} => json!({"kind":"legacy"}),
-        FactorBasePolicy::SampledXProjectedControl { candidate_limit } => {
-            json!({"kind":"sampled_x_projected_control","candidate_limit":candidate_limit})
-        }
-        FactorBasePolicy::BinarySubspaceIntersection {
-            basis,
-            candidate_limit,
-        } => {
-            json!({"kind":"binary_subspace_intersection","basis":basis,"candidate_limit":candidate_limit})
-        }
-        FactorBasePolicy::BinaryFrobeniusUnionIntersection {
-            basis,
-            candidate_limit,
-        } => {
-            json!({"kind":"binary_frobenius_union_intersection","basis":basis,"candidate_limit":candidate_limit})
-        }
-    })
-}
-
-fn export_koblitz_prefix_rows(
-    dir: &Path,
-    config: &super::types::CaseConfig,
-    outcome: &Value,
-    artifacts: &[Artifact],
-    target_id: &str,
-    group: &str,
-    partition: &str,
-    prefix_features: &mut Sorter,
-    prefix_records: &mut Sorter,
-    prefix_occurrences: &mut u64,
-) -> Result<(), String> {
-    // This call verifies original recipe, central semantics, complete
-    // committed custody and all retained group additions before callbacks.
-    // Source descriptors and replay summaries remain restricted.
-    let source_artifacts: Vec<_> = artifacts
-        .iter()
-        .filter(|a| {
-            matches!(
-                a.path.as_str(),
-                "live/events.jsonl"
-                    | "live/committed.json"
-                    | "capture-binding.json"
-                    | "capture-limits.json"
-            )
-        })
-        .collect();
-    let mut occurrence = 0u64;
-    let replay = super::solvers::project_koblitz_m3_prefixes(
-        dir,
-        config,
-        outcome,
-        artifacts,
-        &mut |feature, record| {
-            occurrence += 1;
-            let record_id = super::digest(
-                format!("{target_id}\nkoblitz-prefix-record\n{occurrence}").as_bytes(),
-            );
-            let prefix_id = if let Some(feature) = feature {
-                let prefix_id = super::digest(bounded_json(&feature, MAX_RECORD_BYTES)?.as_bytes());
-                prefix_features.push(&prefix_id, &json!({"schema":"ml-dataset.prefix-features/v1",
-                                        "feature_id":prefix_id,"split_component":group,"split":partition,"inputs":feature}))?;
-                *prefix_occurrences += 1;
-                Some(prefix_id)
-            } else {
-                None
-            };
-            prefix_records.push(&record_id, &json!({"schema":"ml-dataset.restricted-prefix-record/v1",
-                                    "record_id":record_id,"source_target_id":target_id,"source_event_artifacts":source_artifacts,
-                                    "feature_id":prefix_id,"split_component":group,"split":partition,"record":record}))
-        },
-    )?;
-    let record_id = super::digest(format!("{target_id}\nkoblitz-prefix-replay-summary").as_bytes());
-    prefix_records.push(&record_id, &json!({"schema":"ml-dataset.restricted-prefix-record/v1",
-                            "record_id":record_id,"source_target_id":target_id,"source_event_artifacts":source_artifacts,
-                            "feature_id":null,"split_component":group,"split":partition,"record":replay}))?;
-    Ok(())
-}
-
-/// Uses the production replay, row assembly, hashing and external-sort path.
-/// It does not substitute synthetic events or manufacture a whole-cell seal.
-#[cfg(test)]
-pub(super) fn check_native_export_rows(
-    dir: &Path,
-    config: &super::types::CaseConfig,
-    outcome: &Value,
-    artifacts: &[Artifact],
-    expected: u64,
-) {
-    let root = dir.join("native-export-software-control");
-    fs::create_dir(&root).unwrap();
-    let mut features = Sorter::new(&root, "native-feature");
-    let mut records = Sorter::new(&root, "native-record");
-    let mut count = 0;
-    let (group, partition) = split_for_size(config.n as u64);
-    export_koblitz_prefix_rows(
-        dir,
-        config,
-        outcome,
-        artifacts,
-        "software-control",
-        &group,
-        partition,
-        &mut features,
-        &mut records,
-        &mut count,
-    )
-    .unwrap();
-    assert_eq!(count, expected);
-    let public_path = root.join("prefix-features.jsonl");
-    let restricted_path = root.join("prefix-records.jsonl");
-    let unique = features.finish(&public_path).unwrap();
-    records.finish(&restricted_path).unwrap();
-    assert_eq!(unique > 0, expected > 0);
-    for line in fs::read_to_string(public_path).unwrap().lines() {
-        let row: Value = serde_json::from_str(line).unwrap();
-        assert_eq!(
-            row["feature_id"],
-            super::digest(
-                bounded_json(&row["inputs"], MAX_RECORD_BYTES)
-                    .unwrap()
-                    .as_bytes()
-            )
-        );
-        assert_eq!(
-            row["inputs"]["static_inputs"]["source_factor_base_policy"],
-            config
-                .factor_base_policy
-                .as_ref()
-                .map(|p| policy_projection(&serde_json::to_value(p).unwrap()).unwrap())
-                .unwrap_or(Value::Null)
-        );
-        for forbidden in [
-            "sampling_seed",
-            "construction_status",
-            "construction_counters",
-            "matches_target",
-            "label",
-            "source_capture_sequence",
-            "source_binding_sha256",
-            "known_answer_scalar",
-        ] {
-            assert!(!line.contains(forbidden), "{forbidden}");
-        }
-    }
-    assert!(fs::read_to_string(restricted_path)
-        .unwrap()
-        .contains("matrix_projection_status"));
-    fs::remove_dir_all(root).unwrap();
-}
-
-fn export_ordinary_prefix_rows(
-    dir: &Path,
-    config: &super::types::CaseConfig,
-    outcome: &Value,
-    artifacts: &[Artifact],
-    target_id: &str,
-    group: &str,
-    partition: &str,
-    prefix_features: &mut Sorter,
-    prefix_records: &mut Sorter,
-    prefix_occurrences: &mut u64,
-) -> Result<(), String> {
-    // This call verifies original recipe, central semantics, complete
-    // committed custody and all retained group additions before callbacks.
-    // Source descriptors and replay summaries remain restricted.
-    let source_artifacts: Vec<_> = artifacts
-        .iter()
-        .filter(|a| {
-            matches!(
-                a.path.as_str(),
-                "live/events.jsonl"
-                    | "live/committed.json"
-                    | "capture-binding.json"
-                    | "capture-limits.json"
-            )
-        })
-        .collect();
-    let mut occurrence = 0u64;
-    let replay = super::solvers::project_ordinary_m3_prefixes(
-        dir,
-        config,
-        outcome,
-        artifacts,
-        &mut |feature, record| {
-            occurrence += 1;
-            let record_id = super::digest(
-                format!("{target_id}\nordinary-prefix-record\n{occurrence}").as_bytes(),
-            );
-            let prefix_id = if let Some(feature) = feature {
-                let prefix_id = super::digest(bounded_json(&feature, MAX_RECORD_BYTES)?.as_bytes());
-                prefix_features.push(&prefix_id, &json!({"schema":"ml-dataset.prefix-features/v1",
-                                        "feature_id":prefix_id,"split_component":group,"split":partition,"inputs":feature}))?;
-                *prefix_occurrences += 1;
-                Some(prefix_id)
-            } else {
-                None
-            };
-            prefix_records.push(&record_id, &json!({"schema":"ml-dataset.restricted-prefix-record/v1",
-                                    "record_id":record_id,"source_target_id":target_id,"source_event_artifacts":source_artifacts,
-                                    "feature_id":prefix_id,"split_component":group,"split":partition,"record":record}))
-        },
-    )?;
-    let record_id =
-        super::digest(format!("{target_id}\nordinary-prefix-replay-summary").as_bytes());
-    prefix_records.push(&record_id, &json!({"schema":"ml-dataset.restricted-prefix-record/v1",
-                            "record_id":record_id,"source_target_id":target_id,"source_event_artifacts":source_artifacts,
-                            "feature_id":null,"split_component":group,"split":partition,"record":replay}))?;
-    Ok(())
-}
-
-/// Uses the production replay, row assembly, hashing and external-sort path.
-/// It does not substitute synthetic events or manufacture a whole-cell seal.
-#[cfg(test)]
-pub(super) fn check_ordinary_export_rows(
-    dir: &Path,
-    config: &super::types::CaseConfig,
-    outcome: &Value,
-    artifacts: &[Artifact],
-    expected: u64,
-) {
-    let root = dir.join("ordinary-export-software-control");
-    fs::create_dir(&root).unwrap();
-    let mut features = Sorter::new(&root, "native-feature");
-    let mut records = Sorter::new(&root, "native-record");
-    let mut count = 0;
-    let (group, partition) = split_for_size(config.n as u64);
-    export_ordinary_prefix_rows(
-        dir,
-        config,
-        outcome,
-        artifacts,
-        "software-control",
-        &group,
-        partition,
-        &mut features,
-        &mut records,
-        &mut count,
-    )
-    .unwrap();
-    assert_eq!(count, expected);
-    let public_path = root.join("prefix-features.jsonl");
-    let restricted_path = root.join("prefix-records.jsonl");
-    let unique = features.finish(&public_path).unwrap();
-    records.finish(&restricted_path).unwrap();
-    assert_eq!(unique > 0, expected > 0);
-    for line in fs::read_to_string(public_path).unwrap().lines() {
-        let row: Value = serde_json::from_str(line).unwrap();
-        assert_eq!(
-            row["feature_id"],
-            super::digest(
-                bounded_json(&row["inputs"], MAX_RECORD_BYTES)
-                    .unwrap()
-                    .as_bytes()
-            )
-        );
-        assert_eq!(
-            row["inputs"]["static_inputs"]["source_factor_base_policy"],
-            config
-                .factor_base_policy
-                .as_ref()
-                .map(|p| policy_projection(&serde_json::to_value(p).unwrap()).unwrap())
-                .unwrap_or(Value::Null)
-        );
-        for forbidden in [
-            "sampling_seed",
-            "construction_status",
-            "construction_counters",
-            "matches_target",
-            "label",
-            "source_capture_sequence",
-            "source_binding_sha256",
-            "known_answer_scalar",
-        ] {
-            assert!(!line.contains(forbidden), "{forbidden}");
-        }
-    }
-    let restricted = fs::read_to_string(restricted_path).unwrap();
-    if outcome["status"] == "unsupported" {
-        assert_eq!(expected, 0);
-        let rows: Vec<Value> = restricted
-            .lines()
-            .map(|line| serde_json::from_str(line).unwrap())
-            .collect();
-        assert_eq!(rows.len(), 1);
-        assert!(rows[0]["feature_id"].is_null());
-        assert_eq!(
-            rows[0]["record"]["admission_status"],
-            "unsupported_original_profile"
-        );
-    } else {
-        assert!(restricted.contains("matrix_projection_status"));
-    }
-    fs::remove_dir_all(root).unwrap();
-}
-
-fn structural_allowlist_version(plan: &super::DatasetPlan) -> &'static str {
-    if plan.factor_base_policies.is_empty() {
-        "strict-structural-allowlist-v6"
-    } else {
-        "strict-structural-allowlist-v7"
     }
 }
