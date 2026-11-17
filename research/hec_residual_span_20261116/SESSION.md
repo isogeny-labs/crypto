@@ -2023,3 +2023,10 @@ What was done: sparsefullcolumn rows+witnesses withsamepivots/contradiction, exa
 Decisions made: controlledengineering step before triangularcontradiction specialization;24completecalls/12targets/all4branches charged, permoduluscontrols, Gitfreeze beforeone120CPU invocation. Assertions [pcc:unverified].
 Open threads: executeafterpush, assess remainingcost versus densecover/triangular/botharms.
 Errors: onlyunusedwarnings,no scientificexecutionyet.
+
+## Sparse exact eigen-cover qualified
+
+What was done: freeze33e4355a9cd once-onlyexit0;24calls/12targets byteexactfullpackets/all4witnesses/producer-controlvectors/repeats pass; bothverifiers216mutations rejected. P601dense/sparse subgroup5.655-8.680, baseunchanged. Assertions [pcc:unverified].
+Decisions made: retainexactpacketcontrol, still6.194-8.180x subgrouptriangular baseline so10xgatefails. Nextstructural2variablebranchproof mustreturncontradiction provenance notpanic.
+Open threads: frozen triangularfourcomponent proof/cost gate; originalgenus2+10xgoal, independentreview/publicationartifacts/genus3/4coverage.
+Errors: none in execution,no retry/S3/cloud.
