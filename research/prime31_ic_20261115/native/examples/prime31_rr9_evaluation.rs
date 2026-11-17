@@ -359,6 +359,81 @@ fn rr9_poly_pow_mod(
     Ok(acc)
 }
 
+/// Polynomial quotient/remainder over the *original* prime field.
+//// All inputs are ascending order; zero polynomial has representation [0].
+/// No elliptic point enumeration or discrete-log arithmetic.
+fn rr9_poly_trim(mut v: Vec<u64>) -> Vec<u64> {
+    while v.len() > 1 && v.last() == Some(&0) { v.pop(); }
+    v
+}
+fn rr9_poly_div_rem(numerator: &[u64], denominator: &[u64])
+    -> Result<(Vec<u64>, Vec<u64>), String>
+{
+    if numerator.is_empty() || denominator.is_empty()
+        || numerator.iter().chain(denominator.iter()).any(|&z| z >= P)
+    {
+        return Err("empty or noncanonical polynomial".into());
+    }
+    let mut n = rr9_poly_trim(numerator.to_vec());
+    let d = rr9_poly_trim(denominator.to_vec());
+    if d == [0] { return Err("division by zero polynomial".into()); }
+    let inv_lc = fp_pow(*d.last().unwrap(), P - 2);
+    let mut q = vec![0u64; n.len().saturating_sub(d.len()) + 1];
+    while n != [0] && n.len() >= d.len() {
+        let offset = n.len() - d.len();
+        let c = fp_mul(*n.last().unwrap(), inv_lc);
+        q[offset] = c;
+        for (j, &dj) in d.iter().enumerate() {
+            n[offset+j] = fp_sub(n[offset+j], fp_mul(c, dj));
+        }
+        n = rr9_poly_trim(n);
+    }
+    Ok((rr9_poly_trim(q), n))
+}
+
+/// Make gcd monic to identify *distinct* factors, including multiplicities.
+fn rr9_poly_gcd_monic(left: &[u64], right: &[u64]) -> Result<Vec<u64>, String> {
+    if left.is_empty() || right.is_empty() {
+        return Err("empty polynomial in gcd".into());
+    }
+    let mut a = rr9_poly_trim(left.to_vec());
+    let mut b = rr9_poly_trim(right.to_vec());
+    while b != [0] {
+        let (_, rem) = rr9_poly_div_rem(&a, &b)?;
+        a = b;
+        b = rem;
+    }
+    if a == [0] { return Err("gcd(0,0) undefined".into()); }
+    let inv_lc = fp_pow(*a.last().unwrap(), P-2);
+    Ok(a.iter().map(|&z| fp_mul(z, inv_lc)).collect())
+}
+
+/// Characteristic p>8, monic degree-eight M and squarefree H:
+/// M | H^8 iff rad(M)=M/gcd(M,M') divides H.
+/// This membership oracle is exact for all eight-root multiplicity partitions.
+/// It DOES NOT recover M or the seven signed-chart coefficients from public R.
+fn rr9_radical_support(m: &[u64], h: &[u64]) -> Result<(bool, usize), String> {
+    if m.len() != 9 || m[8] != 1 || h.len() < 2 || h.last() != Some(&1)
+        || m.iter().chain(h.iter()).any(|&z| z >= P)
+    {
+        return Err("expected canonical monic degree-eight M and squarefree monic H".into());
+    }
+    let hd: Vec<u64> = (1..h.len())
+        .map(|i| fp_mul(h[i], i as u64 % P)).collect();
+    if rr9_poly_gcd_monic(h, &hd)? != [1] {
+        return Err("factor-base x polynomial H is not squarefree".into());
+    }
+    let md: Vec<u64> = (1..m.len())
+        .map(|i| fp_mul(m[i], i as u64)).collect();
+    let gcd = rr9_poly_gcd_monic(m, &md)?;
+    let (rad, remainder) = rr9_poly_div_rem(m, &gcd)?;
+    if remainder != [0] || rad.last() != Some(&1) || rad.len() < 2 {
+        return Err("invalid monic squarefree radical of degree-eight M".into());
+    }
+    let (_, h_rem) = rr9_poly_div_rem(h, &rad)?;
+    Ok((h_rem == [0], rad.len()-1))
+}
+
 /// Public coefficient-only support test (NOT a coefficient extractor).
 ///
 /// Input F=U+yV is already supplied, as are public R and H_B. The test
@@ -576,6 +651,10 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
             .expect("direct signed monic eight-factor");
         assert!(rr9_poly_pow_mod(&h, 8, &chart_factor)
             .expect("direct M divides public H^8").iter().all(|&z| z == 0));
+        let (radical_supported, radical_degree) = rr9_radical_support(&chart_factor, &h)
+            .expect("independent radical support on distinct-leaf prime31 M");
+        assert!(radical_supported, "radical gate rejected valid public signed support");
+        assert_eq!(radical_degree, 8, "distinct leaf x-coordinates must be squarefree");
         let chart_coeff = rr9_from_signed_chart(&chart_a, &chart_v, r).unwrap();
         let normalized_norm = rr9_norm(&chart_coeff);
         let mut quotient = [0u64; 9];
@@ -596,6 +675,9 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
         assert_ne!(altered_factor, chart_factor, "altered F has unchanged norm factor");
         assert!(rr9_poly_pow_mod(&h, 8, &altered_factor)
             .unwrap().iter().any(|&z| z != 0));
+        assert!(!rr9_radical_support(&altered_factor, &h)
+            .expect("independent radical mutated coefficient negative").0,
+            "radical oracle accepted a target-preserving unsupported M");
         assert!(!rr9_public_norm_support(&changed_coeff, r, &h)
             .expect("same-target altered F support test"),
             "altered F unexpectedly has eight factor-base x roots");
@@ -676,6 +758,10 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
             .expect("direct repeated-point chart factor");
         assert!(rr9_poly_pow_mod(&h, 8, &chart_factor)
             .unwrap().iter().all(|&z| z == 0));
+        let (radical_supported, radical_degree) = rr9_radical_support(&chart_factor, &h)
+            .expect("independent repeated-point radical membership");
+        assert!(radical_supported, "radical oracle missed repeated valid leaf support");
+        assert_eq!(radical_degree, if multiplicity == 8 { 1 } else { 2 });
         let norm = rr9_norm(&rr9_from_signed_chart(&chart_a, &chart_v, true_r).unwrap());
         let rx = true_r.unwrap().0;
         let mut quotient = [0u64; 9];
@@ -695,6 +781,8 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
             .expect("confluent changed monic factor");
         assert_ne!(altered_factor, chart_factor);
         assert!(rr9_poly_pow_mod(&h, 8, &altered_factor).unwrap().iter().any(|&z| z != 0));
+        assert!(!rr9_radical_support(&altered_factor, &h)
+            .expect("repeated altered coefficient radical negative").0);
         assert!(!rr9_public_norm_support(&changed_coeff, true_r, &h)
             .expect("altered repeated support check"));
         higher_controls.push(json!({
@@ -799,6 +887,57 @@ mod tests {
         assert_ne!(rr9_poly_pow_mod(&h, 7, &m).unwrap(), vec![0; 8]);
         assert!(rr9_poly_rem_monic(vec![1], &[1]).is_err());
         assert!(rr9_poly_rem_monic(vec![2], &[1, 2]).is_err());
+    }
+    #[test]
+    fn rr9_radical_support_partitions_and_negative_controls() {
+        // Eight x-roots, with repetitions, deliberately selected from the
+        // original F_p. This tests the exact polynomial iff theorem independent
+        // of the coefficient interpolation and original-curve group arithmetic.
+        let roots = [7u64, 11, 19, 23, 29, 31, 37, 41];
+        let mut h = vec![1u64];
+        for &x in &roots {
+            h = rr9_poly_mul(&h, &[fp_sub(0, x), 1]);
+        }
+        for (mults, expected_degree) in [
+            (&[8usize][..], 1usize),
+            (&[4usize, 4][..], 2usize),
+            (&[5usize, 2, 1][..], 3usize),
+            (&[1usize, 1, 1, 1, 1, 1, 1, 1][..], 8usize),
+        ] {
+            let mut m = vec![1u64];
+            for (i, &count) in mults.iter().enumerate() {
+                for _ in 0..count {
+                    m = rr9_poly_mul(&m, &[fp_sub(0, roots[i]), 1]);
+                }
+            }
+            assert_eq!(m.len(), 9);
+            let (fast, degree) = rr9_radical_support(&m, &h).unwrap();
+            assert!(fast);
+            assert_eq!(degree, expected_degree);
+            assert!(rr9_poly_pow_mod(&h, 8, &m).unwrap().iter().all(|&z| z == 0));
+            if expected_degree == 8 {
+                // The discriminant-nonzero stratum has no H^8 power gate:
+                // membership reduces directly to eight remainder equations H mod M.
+                assert!(rr9_poly_rem_monic(h.clone(), &m).unwrap().iter().all(|&z| z == 0));
+            }
+            let mut h_omit = vec![1u64];
+            for &x in roots.iter().skip(1) {
+                h_omit = rr9_poly_mul(&h_omit, &[fp_sub(0, x), 1]);
+            }
+            assert!(!rr9_radical_support(&m, &h_omit).unwrap().0);
+            assert!(rr9_poly_pow_mod(&h_omit, 8, &m).unwrap().iter().any(|&z| z != 0));
+        }
+        // M contains eight roots but its degree/order and canonicality are
+        // checked independently of the x-factor-base polynomial.
+        assert!(rr9_radical_support(&[1, 1], &h).is_err());
+        let mut malformed = [0u64; 9];
+        malformed[0] = P;
+        malformed[8] = 1;
+        assert!(rr9_radical_support(&malformed, &h).is_err());
+        let double_root_h = rr9_poly_mul(
+            &[fp_sub(0, 7), 1], &[fp_sub(0, 7), 1]);
+        assert!(rr9_radical_support(&malformed.map(|z| if z == P { 0 } else { z }), &double_root_h).is_err());
+        assert!(rr9_poly_div_rem(&[1], &[0]).is_err());
     }
     #[test]
     fn rr9_public_support_rejects_infinity_and_invalid_coefficients() {
