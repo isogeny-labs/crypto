@@ -1897,3 +1897,10 @@ What was done: built three-kernel exact component comparison, original12targets/
 Decisions made: before a gcd collector measure implemented construction alone; no universal norm lower bound, no total-speed claim. Assertions [pcc:unverified]. Sources: previous orbit-incidence derivation/KB receipt and batched/inverse.rs.
 Open threads: push freeze, one120CPU invocation, assess construction hurdle and subsequent incidence mechanism.
 Errors: none in compile, no scientific execution yet.
+
+## Orbit constructor cost screened
+
+What was done: freezec02d12d4c28 once-onlyexit0;72 kernel calls/12 targets exact products/parameter roots/repeats. Norm construction4.611-4.731x explicitREDC; directproduct1.265-1.284x. Assertions [pcc:unverified].
+Decisions made: measured norm constructor not admitted for a gcd collector; not a universal lowerbound. Next standardVieta specialization x3=t²+u1-x1-x2 removes residual polynomial divisions while requiring full trace/certificate equality.
+Open threads: prospectively freeze Vieta producer equivalence/cold-cost gate; extend residualcoefficient extraction to g3/4 separately; original10xgoal unchanged.
+Errors: no execution errors; no retry/S3/cloud.
