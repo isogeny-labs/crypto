@@ -2121,3 +2121,10 @@ What was done: freezea21453fe317 once-onlyexit0;24calls/12targets allproducer/co
 Decisions made: retaincompletecoldreduction; mixedsourcecomparison/10xgatefails, verificationoptimizationsalone notmathematicalbreakthrough.
 Open threads: newcollection/setup/relation mechanism withactualcostcase andpriornegative/rankscreens, originalgenus2+10x/review/publication/genus3/4coverage.
 Errors: none,no retry/S3/cloud.
+
+## Public-core anchor-step gate frozen
+
+What was done: derived publicD=sC anchorT+aC withconstantsa/s, implementedcollector/rowbuilder/bothverifiers consistently. OriginalD,T/scalarunchanged, diagnosticnativeprimitivegroupchecks andsource1exactREDC controls declared.
+Decisions made: unchanged16anchors/1..3seedbudget,24calls/12targets/allproof/sourcebindingcost charged, source17streamallowedchangebutfailuresretained. Assertions [pcc:unverified]. SourcesKB source:91b6bbe9fb73267bbeb5d7c97f493b26 andsource:18b3900e10b174cccc5479567bfc0b84 backgroundonly; localpublicnormalization priorrecordsscreened,no noveltyclaim.
+Open threads: pushfreeze thenone120CPU invocation, examinecompletecost andstopping ratherthanassumeanchorcostbenefit.
+Errors: onlyunusedwarning,no scienceyet.
