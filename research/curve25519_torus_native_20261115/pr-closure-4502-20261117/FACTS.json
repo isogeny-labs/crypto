@@ -1,0 +1,142 @@
+{
+  "schema": "curve25519.pr-closure-facts/v1",
+  "pr": 4502,
+  "created_at": "2026-11-17T04:27:24Z",
+  "merged_at": "2026-11-17T04:27:58Z",
+  "merged_by": "aburan28",
+  "initial_published_head": "7d7f9190b5c304a9bb38b65c98215690caf6e5a7",
+  "final_head": "615f688d9582e167ac12583b61727d5c8da4caae",
+  "merge": "d0c23646e50cdc4e0a5b6758ae764ba66c5426e5",
+  "actual_merge_parents": [
+    "f668a7a78aca78b122ea0fc87eb3b8f9c3669614",
+    "615f688d9582e167ac12583b61727d5c8da4caae"
+  ],
+  "final_head_parents": [
+    "7d7f9190b5c304a9bb38b65c98215690caf6e5a7",
+    "f668a7a78aca78b122ea0fc87eb3b8f9c3669614"
+  ],
+  "owned_claims_and_subjects_checked": 34,
+  "changed_paths": {
+    "615f688d9582e167ac12583b61727d5c8da4caae": [],
+    "d0c23646e50cdc4e0a5b6758ae764ba66c5426e5": [],
+    "4a8a05e583ff3a9e2120d03e4eef4dd89cd54888": []
+  },
+  "published_ledger_retention": {
+    "615f688d9582e167ac12583b61727d5c8da4caae": {
+      "published_prefix_retained": false,
+      "rows": 1352,
+      "common_prefix_rows": 1290,
+      "missing_published_event_hashes": [
+        "f74e3b96ae26a991d4b5fdaf75183ec181a63e7252cea36e2426321cd7e0e6bd",
+        "32093c9b93d6f362b0531f97523ecf56017f692f63df9f2946c4c1eb98a67a70",
+        "712f2b2ca33a68e4e89d5c61832b04fd93ae8b9563a8f32bce671af60b8bb0cb"
+      ],
+      "missing_claim_registrations": []
+    },
+    "d0c23646e50cdc4e0a5b6758ae764ba66c5426e5": {
+      "published_prefix_retained": false,
+      "rows": 1352,
+      "common_prefix_rows": 1290,
+      "missing_published_event_hashes": [
+        "f74e3b96ae26a991d4b5fdaf75183ec181a63e7252cea36e2426321cd7e0e6bd",
+        "32093c9b93d6f362b0531f97523ecf56017f692f63df9f2946c4c1eb98a67a70",
+        "712f2b2ca33a68e4e89d5c61832b04fd93ae8b9563a8f32bce671af60b8bb0cb"
+      ],
+      "missing_claim_registrations": []
+    },
+    "4a8a05e583ff3a9e2120d03e4eef4dd89cd54888": {
+      "published_prefix_retained": false,
+      "rows": 1352,
+      "common_prefix_rows": 1290,
+      "missing_published_event_hashes": [
+        "f74e3b96ae26a991d4b5fdaf75183ec181a63e7252cea36e2426321cd7e0e6bd",
+        "32093c9b93d6f362b0531f97523ecf56017f692f63df9f2946c4c1eb98a67a70",
+        "712f2b2ca33a68e4e89d5c61832b04fd93ae8b9563a8f32bce671af60b8bb0cb"
+      ],
+      "missing_claim_registrations": []
+    }
+  },
+  "published_source_suffix_archived_never_replayed": true,
+  "source_actions_this_continuation": [
+    "Created regular PR4502",
+    "Issued gh pr merge4502 --auto --merge --match-head-commit7d7f9190"
+  ],
+  "merge_action_attribution": "Timeline has MergedEvent byaburan28 and no AutoMergeEnabledEvent. Cannot claim our command only queued or that this continuation issued no merge; exact fulfillment attribution remains unavailable.",
+  "all_green_at_merge_established": false,
+  "named_merge_set_at_0431_snapshot": [
+    {
+      "name": "artifacts",
+      "id": 133818406128,
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-11-17T04:28:00Z",
+      "completed_at": null
+    },
+    {
+      "name": "gate",
+      "id": 133818405648,
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-11-17T04:28:00Z",
+      "completed_at": null
+    },
+    {
+      "name": "size",
+      "id": 133818405583,
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-11-17T04:28:00Z",
+      "completed_at": null
+    }
+  ],
+  "required_gates_started_after_merge": true,
+  "other_completed_failures_read_in_full": [
+    "names:InvalidAccessKeyId during docs/curves hydration",
+    "parity:artifacts.py digest differs from shared-code lock",
+    "recompute/current:InvalidAccessKeyId during inherited hydration"
+  ],
+  "failure_subject_blobs_identical_to_actual_base": {
+    ".artifacts.json": "52a224ca9141900ae3779a85a56f3e810251d6d3",
+    ".artifacts/config.json": "0107d653df775d5ff4356bd1baac66b0c3a593a4",
+    "tools/artifacts/artifacts.py": "8684fb9746131fa77a32a976e88fb6859613c325",
+    "docs/shared-code.lock.json": "81d2a84d4be5c96ee69c44e9cd184dc0ea583286"
+  },
+  "later_pending_outcomes_not_queried_or_inferred": true,
+  "full_decoded_logs": [
+    {
+      "job": 133818406355,
+      "decoded_utf8_bytes": 28867,
+      "sha256": "62b791ee0a6076f5732b7b4b8b52339db509ddfb9f73a4c5de8be7d6e1d203ac",
+      "lossless_xz_bytes": 5828,
+      "raw_http_or_signed_receipt": false
+    },
+    {
+      "job": 133818405930,
+      "decoded_utf8_bytes": 20523,
+      "sha256": "d216028d09f7c948d3d0b1ef171979eedf8452ec6469c1315116533add8529db",
+      "lossless_xz_bytes": 4496,
+      "raw_http_or_signed_receipt": false
+    },
+    {
+      "job": 133818405562,
+      "decoded_utf8_bytes": 416301,
+      "sha256": "1de135b58a0be17a365c11931a34287370a83db5e76a69cb485557cf5b428a02",
+      "lossless_xz_bytes": 42812,
+      "raw_http_or_signed_receipt": false
+    },
+    {
+      "job": 133818405284,
+      "decoded_utf8_bytes": 411401,
+      "sha256": "2b24d148dbec8a385bca8eb031bfb50d72af2cd4b8d9ada469a8d800078e9f15",
+      "lossless_xz_bytes": 42236,
+      "raw_http_or_signed_receipt": false
+    }
+  ],
+  "scope": "publication-only04:27:24->04:27:58; not whole-session or science validation",
+  "known_coverage_gaps": [
+    "Original prompt/human-message times",
+    "Full-session intervention/recovery/cost coverage"
+  ],
+  "empty_incident_metadata_is_not_zero_incidents": true,
+  "revert_due_after": "2026-12-01T04:27:58Z"
+}

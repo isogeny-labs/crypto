@@ -4,12 +4,20 @@ import importlib.util
 import json
 from pathlib import Path
 import subprocess
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--receipt-name", default="maps-main-validation.json")
+parser.add_argument("--run", action="append", dest="runs")
+parser.add_argument("--base", default="MERGE_HEAD")
+args = parser.parse_args()
+assert Path(args.receipt_name).name == args.receipt_name
 
 root = Path.cwd()
 spec = importlib.util.spec_from_file_location("pcc_api", root / "tools/pcc/pcc.py")
 pcc = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(pcc)
-base = subprocess.check_output(["git", "rev-parse", "MERGE_HEAD"], text=True).strip()
+base = subprocess.check_output(["git", "rev-parse", args.base], text=True).strip()
 base_text = subprocess.check_output(["git", "show", f"{base}:pcc/ledger.jsonl"], text=True)
 base_entries = pcc.read_ledger_text(base_text)
 head_entries = pcc.read_ledger(root / "pcc/ledger.jsonl")
@@ -39,6 +47,8 @@ runs = [
     "complete-maps-v1", "transpose-maps-v1", "closed-transpose-v1",
     "moving-transpose-v1", "pole-cases-v1", "complete-km-v3",
 ]
+if args.runs:
+    runs = args.runs
 study = root / "research/nist_cover_three_tests_20261116"
 receipts = []
 for name in runs:
@@ -66,7 +76,7 @@ out = {
     "native_pre_call_bindings": receipts,
     "standing": "metadata checks; no independent mathematical verification",
 }
-target = study / "evidence/maps-main-validation.json"
+target = study / "evidence" / args.receipt_name
 assert not target.exists(), "new metadata receipt required"
 target.write_text(json.dumps(out, indent=2) + "\n")
 print(json.dumps({key: val for key, val in out.items() if key != "diagnostics"}, indent=2))
