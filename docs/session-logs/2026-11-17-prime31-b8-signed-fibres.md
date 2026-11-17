@@ -38,3 +38,22 @@
  
 ### Errors (what went wrong, how it was handled)
 - Two local compiler type errors in new helper functions; source-specific compiler identified precise lines. No relaxation of scientific gates.
+
+## 2026-11-17 ~09:37Z — passing exact-source Rust validation and publication
+
+### What was done (commands, files, features)
+- [Corrected exact-source GitHub Actions #44056622448](https://github.com/isogeny-labs/crypto/actions/runs/44056622448) completed with conclusion **success** on tested source SHA `8b0364f005370c7d1eeaf7544759526e52c78cc0`, native pinned Rust 1.100.0. Full job logs show **40/40 original library tests**, **7/7 RR9 example tests** including `rr9_b8_full_signed_fibre_equivalence`, and separately executed 128/128 original prime31 determinant true/false checks. The complete B8 test checked all admissible distinct public residual fibres against 256-sign original-curve sums and four negatives, with 256×8 split-quadric identity controls; individual counts live in raw JSON rather than inferred from stdout.
+- Raw JSON artifact is [#14315968389](https://github.com/isogeny-labs/crypto/actions/runs/44056622448/artifacts/14315968389), ZIP SHA256 `699b7b08001b86c94f84392212d1e6e405014e8d3af08246612e3ab1470a4a36`.
+- Failed [precursor #44055897564](https://github.com/isogeny-labs/crypto/actions/runs/44055897564) was preserved. Source had two E0308 errors `Err(&str)` where `String` was needed; repaired only the conversions. Never reran against changed protocol or a different target roster.
+- Updated the mathematical result report, prior-lead review and methodology with source-CI receipt, negative evidence, scope and artifact link.
+
+### Decisions made (and why)
+- Scoped task is completed at **producer exact-source Rust** level: the B8 system decomposes into signed linear fibres and the Rust exact-fibre falsifier passes. No claimed public-only coefficient extractor, complete unknown-Q logarithm, improved B31 runtime, or signed PCC. Keep scientific lead open with its explicit nonenumerative extraction dependency.
+- Mark PR #4545 ready for review only after recorded evidence; parent #4541/#4539 still unmerged, so no auto-merge or retarget yet.
+
+### Open threads (unfinished, pick up next time)
+- Develop truly public-only B31 coefficient extraction without sign enumeration, handling repeated and exceptional x(R) strata, and complete ECDLP measurement against same-target cached generic BSGS, tuned rho, existing external IC.
+- Independent signed PCC verification and repeat hosted tests; reconcile #4545 parent once #4541 and #4539 land.
+
+### Errors (what went wrong, how it was handled)
+- Initial CI type mismatch resolved without scientific change; corrected run succeeded. No observed algebraic test failure.
