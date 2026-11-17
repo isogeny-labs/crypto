@@ -1095,3 +1095,17 @@ No unjustifiednewlargefieldcampaign. A construction with credible completecostca
 
 ### Errors
 No runtime/gatefailureorretry. Existingownleaseclaimrenewalattemptreturnedbudgetexhaustedwhiletheliveleasecontinued; no competingclaim taken. NoS3/cloud.
+
+## Short-residual geometry constrained across retained genera
+
+### What was done
+Derived genus2degree2Riemann–Roch dichotomy and generalized the useful-row obstruction using hyperelliptic-pair removal plus reduced Mumford uniqueness for degrees<=g. Applied it to the proposed genus2singular-plane-quartic projection pencil. Read finite-characteristic StacksRiemann–Roch and classical reduced-divisor source; recorded KBscope.
+
+### Decisions made
+Do not treat a lowdegreefixed-anchor family as a new source of independent rows when it only varies cancelling pairs. Newanchors,degree>gresiduals,qualifiedtransport oractualsharedarithmetic remain eligible. No universalruntime/novelty/10xclaim. Goalactive.
+
+### Open threads
+A mechanism satisfying those concrete admission conditions is needed; no implication that nonhyperellipticgenus3results covergenus2.
+
+### Errors
+No execution/failure/retry. Priorleaseexpired; newdistinctT7050claimed for geometric screen. NoS3/cloud.
