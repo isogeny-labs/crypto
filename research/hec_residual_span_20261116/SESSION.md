@@ -815,3 +815,17 @@ GeneralGaussianHdetproofaudit; relationgenerationmechanismwithcostcaseforbroadge
 
 ### Errors
 OriginalrisatprimaryPDFredirectinaccessible; recoveredoriginalsarxiv. KBexactscopequeryunhelpful,nopriorityorabsenceclaim.
+
+## One-orbit core walk prepared after prior-art collision
+
+### What was done
+KBknown-log+sparserowleadcollidedwithexistingRESEARCH_HYPERELLIPTIC_IC_RHO(source:b3c90d39a347ef661ccf10680a742186),metadata/context/relatedread. PrimaryGTTDweightedgraphsectionread. Preparedrank1orbit-historywalkinstead; genericSparseFullincrementalLP-first/nonzero-onlycontrolandOnline exactprefixgate,oldfoldedwalk/bestpencilcontrols. Fixed5prime-orderg2/3models,20freshworkloads/160calls. Noexecutionyet.
+
+### Decisions made
+Do notmarketknown-logwalkasnew. One-orbitstepdiversityvsunknown-historyrankhasanexplicitcostcasebutmixing/rankarrivalunknown; usefreshfalsifierandstrongsparsecontrol. Allsource-normalizationinfo retainedincoreset; genus3filteredpartialschargeallrejections. Previousgoalturnprogress(integratedGaussianchecks).
+
+### Open threads
+Freeze/push/runonce; classifyfullvectors/trialexcess/pencilcomparison. Genuinebroader10xgoalactive.
+
+### Errors
+Pre-freezecopyhadrelative source.rs path; fixedtoretainednormalized/source.rsbeforebuild. No scientificrun/retry. OldConductorleaseexpired; newtaskT7038claimed. KBrevision9b2119e8fbac482b98b50521c0d604bbrefresh06:15predatesnewwork,lexicalonly. Prioradjacentproposal:b2948c1f2af904530de97fdb05ec1589notameasurement.
