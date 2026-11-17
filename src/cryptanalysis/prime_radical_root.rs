@@ -26,7 +26,12 @@ pub struct RadicalRoots {
 }
 
 fn frobenius_roots(p: u64, poly: &[u64]) -> Result<Vec<u64>, String> {
-    let limits = RootLimits { field_work: MAX_WORK, split_attempts: 1000, events: 100_000, degree: 8 };
+    let limits = RootLimits {
+        field_work: MAX_WORK,
+        split_attempts: 1000,
+        events: 100_000,
+        degree: 8,
+    };
     let r = solve(poly, p, 0x5eed, limits, &mut |_| Ok(()))?;
     if r.stop != RootStop::Complete {
         return Err(format!("frobenius fallback incomplete: {:?}", r.stop));
@@ -35,20 +40,52 @@ fn frobenius_roots(p: u64, poly: &[u64]) -> Result<Vec<u64>, String> {
 }
 
 #[derive(Clone, Copy)]
-pub(crate) struct Fp { pub p: u64 }
+pub(crate) struct Fp {
+    pub p: u64,
+}
 impl Fp {
-    pub fn new(p: u64) -> Self { Fp { p } }
-    #[inline] pub fn add(&self, a: u64, b: u64) -> u64 { ((a as u128 + b as u128) % self.p as u128) as u64 }
-    #[inline] pub fn sub(&self, a: u64, b: u64) -> u64 { ((a as u128 + self.p as u128 - b as u128) % self.p as u128) as u64 }
-    #[inline] pub fn neg(&self, a: u64) -> u64 { if a == 0 { 0 } else { self.p - a } }
-    #[inline] pub fn mul(&self, a: u64, b: u64) -> u64 { ((a as u128 * b as u128) % self.p as u128) as u64 }
-    #[inline] pub fn sqr(&self, a: u64) -> u64 { self.mul(a, a) }
+    pub fn new(p: u64) -> Self {
+        Fp { p }
+    }
+    #[inline]
+    pub fn add(&self, a: u64, b: u64) -> u64 {
+        ((a as u128 + b as u128) % self.p as u128) as u64
+    }
+    #[inline]
+    pub fn sub(&self, a: u64, b: u64) -> u64 {
+        ((a as u128 + self.p as u128 - b as u128) % self.p as u128) as u64
+    }
+    #[inline]
+    pub fn neg(&self, a: u64) -> u64 {
+        if a == 0 {
+            0
+        } else {
+            self.p - a
+        }
+    }
+    #[inline]
+    pub fn mul(&self, a: u64, b: u64) -> u64 {
+        ((a as u128 * b as u128) % self.p as u128) as u64
+    }
+    #[inline]
+    pub fn sqr(&self, a: u64) -> u64 {
+        self.mul(a, a)
+    }
     pub fn powm(&self, mut a: u64, mut e: u64) -> u64 {
-        let mut r = 1u64 % self.p; a %= self.p;
-        while e > 0 { if e & 1 == 1 { r = self.mul(r, a); } a = self.sqr(a); e >>= 1; }
+        let mut r = 1u64 % self.p;
+        a %= self.p;
+        while e > 0 {
+            if e & 1 == 1 {
+                r = self.mul(r, a);
+            }
+            a = self.sqr(a);
+            e >>= 1;
+        }
         r
     }
-    pub fn inv(&self, a: u64) -> u64 { self.powm(a, self.p - 2) }
+    pub fn inv(&self, a: u64) -> u64 {
+        self.powm(a, self.p - 2)
+    }
 }
 
 // ---------- generic finite-field ring for the AMM cube root ----------
@@ -57,24 +94,41 @@ pub(crate) trait Ring {
     fn zero(&self) -> Self::E;
     fn one(&self) -> Self::E;
     fn mul(&self, a: Self::E, b: Self::E) -> Self::E;
-    fn order(&self) -> u128;            // |K^*|
-    fn cand(&self, k: u64) -> Self::E;  // k-th nonzero candidate (for non-cube search)
+    fn order(&self) -> u128; // |K^*|
+    fn cand(&self, k: u64) -> Self::E; // k-th nonzero candidate (for non-cube search)
 }
 impl Ring for Fp {
     type E = u64;
-    fn zero(&self) -> u64 { 0 }
-    fn one(&self) -> u64 { 1 }
-    fn mul(&self, a: u64, b: u64) -> u64 { Fp::mul(self, a, b) }
-    fn order(&self) -> u128 { (self.p - 1) as u128 }
-    fn cand(&self, k: u64) -> u64 { (k + 2) % self.p }
+    fn zero(&self) -> u64 {
+        0
+    }
+    fn one(&self) -> u64 {
+        1
+    }
+    fn mul(&self, a: u64, b: u64) -> u64 {
+        Fp::mul(self, a, b)
+    }
+    fn order(&self) -> u128 {
+        (self.p - 1) as u128
+    }
+    fn cand(&self, k: u64) -> u64 {
+        (k + 2) % self.p
+    }
 }
 // F_{p^2} = F_p[i]/(i^2 - n), n a fixed quadratic non-residue.
 #[derive(Clone, Copy)]
-pub(crate) struct Fq2 { pub f: Fp, pub n: u64 }
+pub(crate) struct Fq2 {
+    pub f: Fp,
+    pub n: u64,
+}
 impl Ring for Fq2 {
     type E = (u64, u64);
-    fn zero(&self) -> (u64, u64) { (0, 0) }
-    fn one(&self) -> (u64, u64) { (1, 0) }
+    fn zero(&self) -> (u64, u64) {
+        (0, 0)
+    }
+    fn one(&self) -> (u64, u64) {
+        (1, 0)
+    }
     fn mul(&self, x: (u64, u64), y: (u64, u64)) -> (u64, u64) {
         let f = &self.f;
         let ac = f.mul(x.0, y.0);
@@ -83,59 +137,129 @@ impl Ring for Fq2 {
         let s = f.mul(f.add(x.0, x.1), f.add(y.0, y.1));
         (f.add(ac, nbd), f.sub(f.sub(s, ac), bd))
     }
-    fn order(&self) -> u128 { (self.f.p as u128) * (self.f.p as u128) - 1 }
-    fn cand(&self, k: u64) -> (u64, u64) { (k % self.f.p, 1) }
+    fn order(&self) -> u128 {
+        (self.f.p as u128) * (self.f.p as u128) - 1
+    }
+    fn cand(&self, k: u64) -> (u64, u64) {
+        (k % self.f.p, 1)
+    }
 }
 pub(crate) fn rpow<R: Ring>(r: &R, a: R::E, mut e: u128) -> R::E {
-    let mut acc = r.one(); let mut b = a;
-    while e > 0 { if e & 1 == 1 { acc = r.mul(acc, b); } e >>= 1; if e > 0 { b = r.mul(b, b); } }
+    let mut acc = r.one();
+    let mut b = a;
+    while e > 0 {
+        if e & 1 == 1 {
+            acc = r.mul(acc, b);
+        }
+        e >>= 1;
+        if e > 0 {
+            b = r.mul(b, b);
+        }
+    }
     acc
 }
 
 /// Adleman-Manders-Miller cube root in a finite field K with group order N = |K^*|.
 /// Per-field precomputation (non-cube, Sylow generator) is done once in `new`.
 pub(crate) struct Cube<R: Ring> {
-    pub r: R, n: u128, s: u32, e3: u128, c: R::E, pub w: R::E, p3s: u128,
+    pub r: R,
+    n: u128,
+    s: u32,
+    e3: u128,
+    c: R::E,
+    pub w: R::E,
+    p3s: u128,
 }
 impl<R: Ring> Cube<R> {
     pub fn new(r: R) -> Self {
         let n = r.order();
         let (mut t, mut s) = (n, 0u32);
-        while t % 3 == 0 { t /= 3; s += 1; }
+        while t % 3 == 0 {
+            t /= 3;
+            s += 1;
+        }
         if s == 0 {
             // cubing is a bijection: root = a^(3^{-1} mod N)
-            let e3 = if n % 3 == 1 { (2 * n + 1) / 3 } else { (n + 1) / 3 };
+            let e3 = if n % 3 == 1 {
+                (2 * n + 1) / 3
+            } else {
+                (n + 1) / 3
+            };
             let one = r.one();
-            return Cube { r, n, s, e3, c: one, w: one, p3s: 1 };
+            return Cube {
+                r,
+                n,
+                s,
+                e3,
+                c: one,
+                w: one,
+                p3s: 1,
+            };
         }
         let mut k = 0u64;
-        let g = loop { let g = r.cand(k); if rpow(&r, g, n / 3) != r.one() { break g; } k += 1; };
-        let c = rpow(&r, g, t);                       // generator of the 3-Sylow, order 3^s
+        let g = loop {
+            let g = r.cand(k);
+            if rpow(&r, g, n / 3) != r.one() {
+                break g;
+            }
+            k += 1;
+        };
+        let c = rpow(&r, g, t); // generator of the 3-Sylow, order 3^s
         let p3s = 3u128.pow(s);
-        let w = rpow(&r, c, p3s / 3);                 // primitive cube root of unity
-        let e3 = if t % 3 == 1 { (2 * t + 1) / 3 } else { (t + 1) / 3 }; // 3*e3 = 1 mod t
-        Cube { r, n, s, e3, c, w, p3s }
+        let w = rpow(&r, c, p3s / 3); // primitive cube root of unity
+        let e3 = if t % 3 == 1 {
+            (2 * t + 1) / 3
+        } else {
+            (t + 1) / 3
+        }; // 3*e3 = 1 mod t
+        Cube {
+            r,
+            n,
+            s,
+            e3,
+            c,
+            w,
+            p3s,
+        }
     }
-    pub fn bijective(&self) -> bool { self.s == 0 }
+    pub fn bijective(&self) -> bool {
+        self.s == 0
+    }
     /// One cube root of `a`, or None if `a` is not a cube.
     pub fn root(&self, a: R::E) -> Option<R::E> {
         let r = &self.r;
-        if a == r.zero() { return Some(a); }
-        if self.s == 0 { return Some(rpow(r, a, self.e3)); }
-        if rpow(r, a, self.n / 3) != r.one() { return None; }
-        let x0 = rpow(r, a, self.e3);                 // x0^3 = a * h, h in the 3-Sylow
+        if a == r.zero() {
+            return Some(a);
+        }
+        if self.s == 0 {
+            return Some(rpow(r, a, self.e3));
+        }
+        if rpow(r, a, self.n / 3) != r.one() {
+            return None;
+        }
+        let x0 = rpow(r, a, self.e3); // x0^3 = a * h, h in the 3-Sylow
         let h = rpow(r, a, 3 * self.e3 - 1);
         let w2 = r.mul(self.w, self.w);
-        let mut l: u128 = 0;                          // h = c^l, l found digit by digit
+        let mut l: u128 = 0; // h = c^l, l found digit by digit
         for j in 0..self.s {
-            let corr = rpow(r, self.c, (self.p3s - l) % self.p3s);   // c^{-l}
+            let corr = rpow(r, self.c, (self.p3s - l) % self.p3s); // c^{-l}
             let x = r.mul(h, corr);
-            let z = rpow(r, x, 3u128.pow(self.s - 1 - j));           // w^digit
-            let d = if z == r.one() { 0 } else if z == self.w { 1 } else if z == w2 { 2 } else { return None };
+            let z = rpow(r, x, 3u128.pow(self.s - 1 - j)); // w^digit
+            let d = if z == r.one() {
+                0
+            } else if z == self.w {
+                1
+            } else if z == w2 {
+                2
+            } else {
+                return None;
+            };
             l += d * 3u128.pow(j);
         }
-        if l % 3 != 0 { return None; }
-        let y_inv = rpow(r, self.c, (self.p3s - l / 3) % self.p3s);  // c^{-l/3}
+        if l % 3 != 0 {
+            return None;
+        }
+        let y_inv = rpow(r, self.c, (self.p3s - l / 3) % self.p3s); // c^{-l/3}
         Some(r.mul(x0, y_inv))
     }
 }
@@ -143,12 +267,18 @@ impl<R: Ring> Cube<R> {
 /// Per-prime context: one-time precomputation (non-residues, 3-Sylow generators, constants).
 pub struct RadicalRootCtx {
     pub f: Fp,
-    inv2: u64, inv3: u64, inv4: u64, inv27: u64, inv_n: u64,
-    n: u64,                     // quadratic non-residue
-    s2: u32, t2: u64, zc: u64,  // Tonelli-Shanks: p-1 = 2^s2 t2, zc = n^t2
+    inv2: u64,
+    inv3: u64,
+    inv4: u64,
+    inv27: u64,
+    inv_n: u64,
+    n: u64, // quadratic non-residue
+    s2: u32,
+    t2: u64,
+    zc: u64, // Tonelli-Shanks: p-1 = 2^s2 t2, zc = n^t2
     cube_p: Cube<Fp>,
     cube_q: Cube<Fq2>,
-    w2: (u64, u64),             // primitive cube root of unity in F_{p^2}
+    w2: (u64, u64), // primitive cube root of unity in F_{p^2}
 }
 impl RadicalRootCtx {
     pub fn new(p: u64) -> Result<Self, String> {
@@ -156,34 +286,76 @@ impl RadicalRootCtx {
             return Err("radical root finder needs a prime 5 <= p <= 2^61-1".into());
         }
         let f = Fp::new(p);
-        let n = { let mut z = 2u64; while f.powm(z, (p - 1) / 2) == 1 { z += 1; } z };
+        let n = {
+            let mut z = 2u64;
+            while f.powm(z, (p - 1) / 2) == 1 {
+                z += 1;
+            }
+            z
+        };
         let (mut t2, mut s2) = (p - 1, 0u32);
-        while t2 & 1 == 0 { t2 >>= 1; s2 += 1; }
+        while t2 & 1 == 0 {
+            t2 >>= 1;
+            s2 += 1;
+        }
         let zc = f.powm(n, t2);
         let cube_p = Cube::new(f);
         let cube_q = Cube::new(Fq2 { f, n });
         let w2 = cube_q.w;
-        let i4 = f.inv(4 % p); let i27 = f.inv(27 % p);
-        Ok(RadicalRootCtx { f, inv2: f.inv(2), inv3: f.inv(3), inv4: i4, inv27: i27, inv_n: f.inv(n), n, s2, t2, zc, cube_p, cube_q, w2 })
+        let i4 = f.inv(4 % p);
+        let i27 = f.inv(27 % p);
+        Ok(RadicalRootCtx {
+            f,
+            inv2: f.inv(2),
+            inv3: f.inv(3),
+            inv4: i4,
+            inv27: i27,
+            inv_n: f.inv(n),
+            n,
+            s2,
+            t2,
+            zc,
+            cube_p,
+            cube_q,
+            w2,
+        })
     }
     /// Square root in F_p (p%4==3: one pow; else Tonelli-Shanks), None for non-residues.
     pub fn sqrt(&self, a: u64) -> Option<u64> {
-        let f = &self.f; let p = f.p;
-        if a == 0 { return Some(0); }
+        let f = &self.f;
+        let p = f.p;
+        if a == 0 {
+            return Some(0);
+        }
         if p % 4 == 3 {
             let r = f.powm(a, (p + 1) / 4);
             return if f.sqr(r) == a { Some(r) } else { None };
         }
-        if f.powm(a, (p - 1) / 2) != 1 { return None; }
-        let mut m = self.s2; let mut c = self.zc;
-        let mut t = f.powm(a, self.t2); let mut r = f.powm(a, (self.t2 + 1) / 2);
+        if f.powm(a, (p - 1) / 2) != 1 {
+            return None;
+        }
+        let mut m = self.s2;
+        let mut c = self.zc;
+        let mut t = f.powm(a, self.t2);
+        let mut r = f.powm(a, (self.t2 + 1) / 2);
         loop {
-            if t == 1 { return Some(r); }
-            let mut i = 0u32; let mut t2 = t;
-            while t2 != 1 && i < m { t2 = f.sqr(t2); i += 1; }
-            if i == m { return None; }
+            if t == 1 {
+                return Some(r);
+            }
+            let mut i = 0u32;
+            let mut t2 = t;
+            while t2 != 1 && i < m {
+                t2 = f.sqr(t2);
+                i += 1;
+            }
+            if i == m {
+                return None;
+            }
             let b = f.powm(c, 1u64 << (m - i - 1));
-            m = i; c = f.sqr(b); t = f.mul(t, c); r = f.mul(r, b);
+            m = i;
+            c = f.sqr(b);
+            t = f.mul(t, c);
+            r = f.mul(r, b);
         }
     }
     /// Distinct roots of monic y^2 + b y + c.
@@ -195,7 +367,10 @@ impl RadicalRootCtx {
             Some(0) => vec![f.mul(f.neg(b), self.inv2)],
             Some(s) => {
                 let nb = f.neg(b);
-                vec![f.mul(f.add(nb, s), self.inv2), f.mul(f.sub(nb, s), self.inv2)]
+                vec![
+                    f.mul(f.add(nb, s), self.inv2),
+                    f.mul(f.sub(nb, s), self.inv2),
+                ]
             }
         }
     }
@@ -204,19 +379,28 @@ impl RadicalRootCtx {
         let f = &self.f;
         let ia = f.inv(a);
         let mut v = self.quad_monic(f.mul(b, ia), f.mul(c, ia));
-        v.sort_unstable(); v.dedup(); v
+        v.sort_unstable();
+        v.dedup();
+        v
     }
     /// F_p-roots of the depressed cubic t^3 + P t + Q = 0 (Cardano; F_{p^2} when D is a non-residue).
     pub fn cubic_depressed(&self, pp: u64, q: u64) -> Vec<u64> {
         let f = &self.f;
         if pp == 0 {
-            if q == 0 { return vec![0]; }
+            if q == 0 {
+                return vec![0];
+            }
             return match self.cube_p.root(f.neg(q)) {
                 None => vec![],
-                Some(u) => if self.cube_p.bijective() { vec![u] } else {
-                    let w = self.cube_p.w; let uw = f.mul(u, w);
-                    vec![u, uw, f.mul(uw, w)]
-                },
+                Some(u) => {
+                    if self.cube_p.bijective() {
+                        vec![u]
+                    } else {
+                        let w = self.cube_p.w;
+                        let uw = f.mul(u, w);
+                        vec![u, uw, f.mul(uw, w)]
+                    }
+                }
             };
         }
         let q2 = f.mul(q, self.inv2);
@@ -230,7 +414,7 @@ impl RadicalRootCtx {
             return vec![r1, r2];
         }
         let nq2 = f.neg(q2);
-        let m = f.neg(f.mul(pp, self.inv3));  // -P/3
+        let m = f.neg(f.mul(pp, self.inv3)); // -P/3
         match self.sqrt(d) {
             Some(sg) => {
                 let u3 = f.add(nq2, sg);
@@ -238,12 +422,16 @@ impl RadicalRootCtx {
                     None => vec![],
                     Some(u) => {
                         let v = f.mul(m, f.inv(u));
-                        if self.cube_p.bijective() { vec![f.add(u, v)] } else {
-                            let w = self.cube_p.w; let w_2 = f.sqr(w);
+                        if self.cube_p.bijective() {
+                            vec![f.add(u, v)]
+                        } else {
+                            let w = self.cube_p.w;
+                            let w_2 = f.sqr(w);
                             let (mut uk, mut vk) = (u, v);
                             let mut out = vec![f.add(u, v)];
                             for _ in 0..2 {
-                                uk = f.mul(uk, w); vk = f.mul(vk, w_2);
+                                uk = f.mul(uk, w);
+                                vk = f.mul(vk, w_2);
                                 out.push(f.add(uk, vk));
                             }
                             out
@@ -253,24 +441,35 @@ impl RadicalRootCtx {
             }
             None => {
                 // casus irreducibilis route: sqrt(D) = i * sqrt(D/n) in F_{p^2}
-                let sg = self.sqrt(f.mul(d, self.inv_n)).expect("D/n must be a residue");
+                let sg = self
+                    .sqrt(f.mul(d, self.inv_n))
+                    .expect("D/n must be a residue");
                 let u3 = (nq2, sg);
                 let k = &self.cube_q;
-                let u = match k.root(u3) { None => return vec![], Some(u) => u };
+                let u = match k.root(u3) {
+                    None => return vec![],
+                    Some(u) => u,
+                };
                 // 1/u = conj(u)/N(u)
                 let nrm = f.sub(f.sqr(u.0), f.mul(self.n, f.sqr(u.1)));
                 let ni = f.inv(nrm);
                 let uinv = (f.mul(u.0, ni), f.mul(f.neg(u.1), ni));
                 let v = (f.mul(m, uinv.0), f.mul(m, uinv.1));
-                let w = self.w2; let w_2 = k.r.mul(w, w);
+                let w = self.w2;
+                let w_2 = k.r.mul(w, w);
                 let mut out = vec![];
                 let (mut uk, mut vk) = (u, v);
                 for kk in 0..3 {
-                    if kk > 0 { uk = k.r.mul(uk, w); vk = k.r.mul(vk, w_2); }
+                    if kk > 0 {
+                        uk = k.r.mul(uk, w);
+                        vk = k.r.mul(vk, w_2);
+                    }
                     let im = f.add(uk.1, vk.1);
-                    if im == 0 { out.push(f.add(uk.0, vk.0)); }
+                    if im == 0 {
+                        out.push(f.add(uk.0, vk.0));
+                    }
                 }
-                        out
+                out
             }
         }
     }
@@ -284,14 +483,27 @@ impl RadicalRootCtx {
         let t2 = f.mul(f.mul(c1, c2), self.inv3);
         let q = f.add(f.sub(t1, t2), c0);
         let sh = f.mul(c2, self.inv3);
-        self.cubic_depressed(pp, q).into_iter().map(|t| f.sub(t, sh)).collect()
+        self.cubic_depressed(pp, q)
+            .into_iter()
+            .map(|t| f.sub(t, sh))
+            .collect()
     }
     /// Distinct F_p roots of a x^4 + b x^3 + c x^2 + d x + e (a != 0). Returns (sorted roots, used_fallback).
-    pub(crate) fn quartic(&self, a: u64, b: u64, c: u64, d: u64, e: u64) -> Result<(Vec<u64>, bool), String> {
+    pub(crate) fn quartic(
+        &self,
+        a: u64,
+        b: u64,
+        c: u64,
+        d: u64,
+        e: u64,
+    ) -> Result<(Vec<u64>, bool), String> {
         let f = &self.f;
         // monic
-        let (b1, c1, d1, e1) = if a == 1 { (b, c, d, e) } else {
-            let ia = f.inv(a); (f.mul(b, ia), f.mul(c, ia), f.mul(d, ia), f.mul(e, ia))
+        let (b1, c1, d1, e1) = if a == 1 {
+            (b, c, d, e)
+        } else {
+            let ia = f.inv(a);
+            (f.mul(b, ia), f.mul(c, ia), f.mul(d, ia), f.mul(e, ia))
         };
         // x = y - B, B = b1/4
         let bb = f.mul(b1, self.inv4);
@@ -299,16 +511,30 @@ impl RadicalRootCtx {
         let pp = f.sub(c1, f.mul(6, b2));
         let b3 = f.mul(b2, bb);
         let qq = f.add(f.sub(d1, f.mul(f.mul(2, bb), c1)), f.mul(8, b3));
-        let rr = f.sub(f.add(f.sub(e1, f.mul(bb, d1)), f.mul(b2, c1)), f.mul(3, f.sqr(b2)));
+        let rr = f.sub(
+            f.add(f.sub(e1, f.mul(bb, d1)), f.mul(b2, c1)),
+            f.mul(3, f.sqr(b2)),
+        );
         let mut ys: Vec<u64> = vec![];
         let mut fallback = false;
         if qq == 0 {
             for z in self.quad_monic(pp, rr) {
-                match self.sqrt(z) { None => {}, Some(0) => ys.push(0), Some(s) => { ys.push(s); ys.push(f.neg(s)); } }
+                match self.sqrt(z) {
+                    None => {}
+                    Some(0) => ys.push(0),
+                    Some(s) => {
+                        ys.push(s);
+                        ys.push(f.neg(s));
+                    }
+                }
             }
         } else {
             // resolvent in z = (r1+r2)^2:  z^3 + 2P z^2 + (P^2 - 4R) z - Q^2 = 0
-            let zs = self.cubic_monic(f.mul(2, pp), f.sub(f.sqr(pp), f.mul(4, rr)), f.neg(f.sqr(qq)));
+            let zs = self.cubic_monic(
+                f.mul(2, pp),
+                f.sub(f.sqr(pp), f.mul(4, rr)),
+                f.neg(f.sqr(qq)),
+            );
             if zs.is_empty() {
                 // Frobenius type (1,3): no rational pairing; the unique root needs F_{p^3} radicals.
                 // Use the distinct-degree (CZ) path on the depressed quartic - NOT radical.
@@ -330,11 +556,11 @@ impl RadicalRootCtx {
             }
         }
         let mut xs: Vec<u64> = ys.into_iter().map(|y| f.sub(y, bb)).collect();
-        xs.sort_unstable(); xs.dedup();
+        xs.sort_unstable();
+        xs.dedup();
         Ok((xs, fallback))
     }
 }
-
 
 impl RadicalRootCtx {
     /// Distinct F_p roots of `f` (coefficients low to high, any trailing zeros allowed).
@@ -342,8 +568,15 @@ impl RadicalRootCtx {
     pub fn roots(&self, f: &[u64]) -> Result<RadicalRoots, String> {
         let fp = &self.f;
         let mut c: Vec<u64> = f.iter().map(|&x| x % fp.p).collect();
-        while c.last() == Some(&0) { c.pop(); }
-        let ok = |roots: Vec<u64>| Ok(RadicalRoots { roots, frobenius_fallback: false });
+        while c.last() == Some(&0) {
+            c.pop();
+        }
+        let ok = |roots: Vec<u64>| {
+            Ok(RadicalRoots {
+                roots,
+                frobenius_fallback: false,
+            })
+        };
         match c.len() {
             0 => Err("zero polynomial".into()),
             1 => ok(vec![]),
@@ -352,10 +585,17 @@ impl RadicalRootCtx {
             4 => {
                 let ia = fp.inv(c[3]);
                 let mut v = self.cubic_monic(fp.mul(c[2], ia), fp.mul(c[1], ia), fp.mul(c[0], ia));
-                v.sort_unstable(); v.dedup();
+                v.sort_unstable();
+                v.dedup();
                 ok(v)
             }
-            5 => { let (roots, fb) = self.quartic(c[4], c[3], c[2], c[1], c[0])?; Ok(RadicalRoots { roots, frobenius_fallback: fb }) }
+            5 => {
+                let (roots, fb) = self.quartic(c[4], c[3], c[2], c[1], c[0])?;
+                Ok(RadicalRoots {
+                    roots,
+                    frobenius_fallback: fb,
+                })
+            }
             _ => Err("radical root finder supports degree <= 4".into()),
         }
     }
@@ -366,14 +606,25 @@ mod tests {
     use super::*;
 
     fn eval(p: u64, poly: &[u64], x: u64) -> u64 {
-        poly.iter().rev().fold(0u64, |a, &b| (((a as u128 * x as u128) + b as u128) % p as u128) as u64)
+        poly.iter().rev().fold(0u64, |a, &b| {
+            (((a as u128 * x as u128) + b as u128) % p as u128) as u64
+        })
     }
-    fn brute(p: u64, poly: &[u64]) -> Vec<u64> { (0..p).filter(|&x| eval(p, poly, x) == 0).collect() }
-    fn lcg(s: &mut u64) -> u64 { *s = s.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407); *s >> 33 }
+    fn brute(p: u64, poly: &[u64]) -> Vec<u64> {
+        (0..p).filter(|&x| eval(p, poly, x) == 0).collect()
+    }
+    fn lcg(s: &mut u64) -> u64 {
+        *s = s
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
+        *s >> 33
+    }
 
     #[test]
     fn rejects_bad_primes() {
-        for p in [0u64, 1, 2, 3, 4, 9, 15, MAX_PRIME + 2] { assert!(RadicalRootCtx::new(p).is_err(), "{p}"); }
+        for p in [0u64, 1, 2, 3, 4, 9, 15, MAX_PRIME + 2] {
+            assert!(RadicalRootCtx::new(p).is_err(), "{p}");
+        }
     }
 
     #[test]
@@ -394,15 +645,20 @@ mod tests {
                 let n = (2..p).find(|&z| f.powm(z, (p - 1) / 2) != 1).unwrap();
                 let r = Fq2 { f, n };
                 let kq = Cube::new(r);
-                let cs: HashSet<(u64, u64)> = (0..p).flat_map(|x| (0..p).map(move |y| (x, y))).map(|e| r.mul(e, r.mul(e, e))).collect();
-                for x in 0..p { for y in 0..p {
-                    let e = (x, y);
-                    match (kq.root(e), cs.contains(&e)) {
-                        (Some(t), true) => assert_eq!(r.mul(t, r.mul(t, t)), e),
-                        (None, false) => {}
-                        other => panic!("Fq2 p={p} e={e:?} {other:?}"),
+                let cs: HashSet<(u64, u64)> = (0..p)
+                    .flat_map(|x| (0..p).map(move |y| (x, y)))
+                    .map(|e| r.mul(e, r.mul(e, e)))
+                    .collect();
+                for x in 0..p {
+                    for y in 0..p {
+                        let e = (x, y);
+                        match (kq.root(e), cs.contains(&e)) {
+                            (Some(t), true) => assert_eq!(r.mul(t, r.mul(t, t)), e),
+                            (None, false) => {}
+                            other => panic!("Fq2 p={p} e={e:?} {other:?}"),
+                        }
                     }
-                }}
+                }
             }
         }
     }
@@ -414,9 +670,15 @@ mod tests {
             for deg in 1..=4usize {
                 let n = (p as usize).pow(deg as u32 + 1);
                 for code in 0..n {
-                    let mut c = vec![0u64; deg + 1]; let mut t = code;
-                    for x in c.iter_mut() { *x = (t % p as usize) as u64; t /= p as usize; }
-                    if c[deg] == 0 { continue; }
+                    let mut c = vec![0u64; deg + 1];
+                    let mut t = code;
+                    for x in c.iter_mut() {
+                        *x = (t % p as usize) as u64;
+                        t /= p as usize;
+                    }
+                    if c[deg] == 0 {
+                        continue;
+                    }
                     let got = ctx.roots(&c).unwrap();
                     assert_eq!(got.roots, brute(p, &c), "p={p} poly={c:?}");
                 }
@@ -426,10 +688,21 @@ mod tests {
 
     #[test]
     fn matches_prime_root_trace_on_random_large_instances() {
-        let limits = || RootLimits { field_work: MAX_WORK, split_attempts: 1000, events: 100_000, degree: 8 };
+        let limits = || RootLimits {
+            field_work: MAX_WORK,
+            split_attempts: 1000,
+            events: 100_000,
+            degree: 8,
+        };
         let mut seed = 1u64;
         let (mut fb, mut classes) = (0, [0u32; 5]);
-        for &p in &[1_000_003u64, 1_000_000_007, 998_244_353, 2_147_483_647, MAX_PRIME] {
+        for &p in &[
+            1_000_003u64,
+            1_000_000_007,
+            998_244_353,
+            2_147_483_647,
+            MAX_PRIME,
+        ] {
             let ctx = RadicalRootCtx::new(p).unwrap();
             for it in 0..60 {
                 let poly: Vec<u64> = if it % 3 == 0 {
@@ -440,23 +713,38 @@ mod tests {
                         let mut np = vec![0u64; pl.len() + 1];
                         for (i, &cf) in pl.iter().enumerate() {
                             np[i + 1] = (np[i + 1] + cf) % p;
-                            np[i] = ((np[i] as u128 + p as u128 - (cf as u128 * r as u128 % p as u128)) % p as u128) as u64;
+                            np[i] = ((np[i] as u128 + p as u128
+                                - (cf as u128 * r as u128 % p as u128))
+                                % p as u128) as u64;
                         }
                         pl = np;
                     }
                     pl
                 } else {
-                    (0..5).map(|i| if i == 4 { 1 + lcg(&mut seed) % (p - 1) } else { lcg(&mut seed) % p }).collect()
+                    (0..5)
+                        .map(|i| {
+                            if i == 4 {
+                                1 + lcg(&mut seed) % (p - 1)
+                            } else {
+                                lcg(&mut seed) % p
+                            }
+                        })
+                        .collect()
                 };
                 let want = solve(&poly, p, 3, limits(), &mut |_| Ok(())).unwrap();
                 assert_eq!(want.stop, RootStop::Complete);
                 let got = ctx.roots(&poly).unwrap();
                 assert_eq!(got.roots, want.roots, "p={p} poly={poly:?}");
-                if got.frobenius_fallback { fb += 1; }
+                if got.frobenius_fallback {
+                    fb += 1;
+                }
                 classes[want.roots.len()] += 1;
             }
         }
-        assert!(classes[0] > 0 && classes[1] > 0 && classes[2] > 0 && classes[4] > 0, "{classes:?}");
+        assert!(
+            classes[0] > 0 && classes[1] > 0 && classes[2] > 0 && classes[4] > 0,
+            "{classes:?}"
+        );
         assert!(fb > 0, "the (1,3) class must be exercised");
     }
 }
