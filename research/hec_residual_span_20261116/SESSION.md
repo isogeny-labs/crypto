@@ -675,3 +675,17 @@ Build/freeze/execute a bounded comparison. General10xbreakthrough unfulfilled.
 
 ### Errors
 None. KB ready but refresh2026-11-14predatesnewwork; use current Git records as authoritative. KB revision9141e386254340a9bdba3036f2bb706a; lexical only. Sources checked(KB):source:a99a3a2fcb07f95da98f94e175a602f6 crypto-autoresearcher:ledger/proposals/IDEA-20260807-b42544.yaml identifies classical quotient arithmetic; source:34884c18abb08beff2ee71990c9dd502 ledger/proposals/IDEA-20260918-5a9a51.yaml identifies function-first/Sarkar-Singh priorart. Metadata/context/related inspected. Primary Improved sieving on algebraic curves https://www-fourier.univ-grenoble-alpes.fr/~viva/research/articles/SievingB.pdf and GTTD https://cacr.uwaterloo.ca/techreports/2004/corr2004-29.pdf accessed; use established sieve/quotient as controls rather than claim a new mechanism.
+
+## C4 solve comparison prepared
+
+### What was done
+Adapted existing folded/expandedwalk and batchpencil to a shared publicN=2ellC4setup. No binomial setup import. Counts per-fresh-targetsetup/relation/LA/internalcheck; fixed72calls/12workloads,128anchors/200000trials, exactrepeat and firstprefix gates. Protocol retains all censoring. Compiles; scientific execution not started.
+
+### Decisions made
+Classicalroute falsifier, not newmath. C4orbitreduction2alone does not imply10x. Scalar action oncyclic rationalellsubgroup follows from checkednonzerosource andexactN; no per-orbit expensivequalification replay inside solver, priorseparatereceiptsremain.
+
+### Open threads
+Freeze/push/run boundedcomparison, classify vectorcost and failures, then choose genuinely new mechanism using observed bottleneck.
+
+### Errors
+Unused copied imports removed; retained diagnostic reports alloweddeadcode. No scientific retries.
