@@ -100,9 +100,13 @@ RF_HD int u256_is_zero(const U256x64 &a) {
     return (a.v[0] | a.v[1] | a.v[2] | a.v[3]) == 0;
 }
 
-/* acc = cur + a*b + carry, as (hi, lo).  The 64x64->128 product is the
- * one place the device and host differ (see rf_mulhi64). */
+/* acc = cur + a*b + carry, as (hi, lo).
+ * Host: let the compiler lower a single 128-bit multiply/accumulate into
+ * MUL/ADC instructions.  This is equivalent to the explicit carry chain.
+ * Device: preserve the original 64-bit implementation and register use.
+ * The maximum sum is 2^128-1, so the wide host accumulator cannot wrap. */
 RF_HD void u64_mac(uint64_t cur, uint64_t a, uint64_t b, uint64_t carry, uint64_t &lo, uint64_t &hi) {
+#ifdef __CUDA_ARCH__
     uint64_t plo = a * b;
     uint64_t phi = rf_mulhi64(a, b);
     uint64_t s1 = plo + cur;
@@ -111,6 +115,11 @@ RF_HD void u64_mac(uint64_t cur, uint64_t a, uint64_t b, uint64_t carry, uint64_
     phi += (s2 < s1);
     lo = s2;
     hi = phi;
+#else
+    const unsigned __int128 sum = (unsigned __int128)a * b + cur + carry;
+    lo = (uint64_t)sum;
+    hi = (uint64_t)(sum >> 64);
+#endif
 }
 
 /* --- field operations ------------------------------------------------ */
