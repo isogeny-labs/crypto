@@ -105,7 +105,10 @@ impl LinearDecomposer {
         let n = gf.n;
         let k = basis.len();
         assert!(n <= 62, "Gf2 solver is for n <= 62");
-        assert!(k <= 62 && rank(basis.iter().copied()) == k, "basis must be independent");
+        assert!(
+            k <= 62 && rank(basis.iter().copied()) == k,
+            "basis must be independent"
+        );
         assert!(b != 0, "curve singular at b = 0");
 
         let unit = |i: u32| 1u64 << i;
@@ -194,8 +197,20 @@ impl LinearDecomposer {
         }
 
         LinearDecomposer {
-            n, a, b, basis: basis.to_vec(), k, dim_v2, w: free + 1,
-            sqrtb, trmask, q, chk, pi, wv, trv,
+            n,
+            a,
+            b,
+            basis: basis.to_vec(),
+            k,
+            dim_v2,
+            w: free + 1,
+            sqrtb,
+            trmask,
+            q,
+            chk,
+            pi,
+            wv,
+            trv,
         }
     }
 
@@ -385,13 +400,20 @@ impl LinearDecomposer {
         let mut x = 0u64;
         for g in 0..span {
             if g != 0 {
-                x ^= self.basis[(g ^ (g >> 1) ^ ((g - 1) ^ ((g - 1) >> 1))).trailing_zeros() as usize];
+                x ^= self.basis
+                    [(g ^ (g >> 1) ^ ((g - 1) ^ ((g - 1) >> 1))).trailing_zeros() as usize];
             }
             let Some(p0) = self.lift(gf, x) else { continue };
-            let signs = if x == 0 { vec![p0] } else { vec![p0, self.neg(p0)] };
+            let signs = if x == 0 {
+                vec![p0]
+            } else {
+                vec![p0, self.neg(p0)]
+            };
             for p3 in signs {
                 scanned += 1;
-                let Some(t) = self.add(gf, Some(r), Some(self.neg(p3))) else { continue };
+                let Some(t) = self.add(gf, Some(r), Some(self.neg(p3))) else {
+                    continue;
+                };
                 if t.0 == 0 {
                     // the one abscissa the linear step misses: enumerate this rare case over V
                     for gg in 0..span {
@@ -477,10 +499,18 @@ impl LinearDecomposer {
                     acc ^= self.basis[b];
                 }
             }
-            let Some(p0) = self.lift(gf, acc) else { continue };
-            let signs = if acc == 0 { vec![p0] } else { vec![p0, self.neg(p0)] };
+            let Some(p0) = self.lift(gf, acc) else {
+                continue;
+            };
+            let signs = if acc == 0 {
+                vec![p0]
+            } else {
+                vec![p0, self.neg(p0)]
+            };
             for p3 in signs {
-                let Some(t) = self.add(gf, Some(r), Some(self.neg(p3))) else { continue };
+                let Some(t) = self.add(gf, Some(r), Some(self.neg(p3))) else {
+                    continue;
+                };
                 if t.0 == 0 {
                     continue;
                 }
@@ -541,7 +571,8 @@ mod tests {
         // lowest-weight trinomial x^n + x^k + 1, else a pentanomial; irreducibility by Rabin on bit vectors
         let irreducible = |low: &[u32]| -> bool {
             // represent polynomials as u128 bit vectors (n <= 62 here, products fit)
-            let modp: u128 = (1u128 << n) | low.iter().fold(0u128, |acc, &e| acc | (1u128 << e)) | 1;
+            let modp: u128 =
+                (1u128 << n) | low.iter().fold(0u128, |acc, &e| acc | (1u128 << e)) | 1;
             let degree = |p: u128| -> i32 { 127 - p.leading_zeros() as i32 };
             let rem = |mut p: u128, m: u128| -> u128 {
                 let dm = degree(m);
@@ -610,14 +641,20 @@ mod tests {
         };
         for k in 1..n {
             if irreducible(&[k]) {
-                return IrreduciblePoly { degree: n, low_terms: vec![0, k] };
+                return IrreduciblePoly {
+                    degree: n,
+                    low_terms: vec![0, k],
+                };
             }
         }
         for k3 in 3..n {
             for k2 in 2..k3 {
                 for k1 in 1..k2 {
                     if irreducible(&[k1, k2, k3]) {
-                        return IrreduciblePoly { degree: n, low_terms: vec![0, k1, k2, k3] };
+                        return IrreduciblePoly {
+                            degree: n,
+                            low_terms: vec![0, k1, k2, k3],
+                        };
                     }
                 }
             }
@@ -722,7 +759,10 @@ mod tests {
                 }
             }
         }
-        assert!(total > 100 && decomposable > 10, "total={total} decomposable={decomposable}");
+        assert!(
+            total > 100 && decomposable > 10,
+            "total={total} decomposable={decomposable}"
+        );
     }
 
     #[test]
@@ -749,10 +789,17 @@ mod tests {
                     };
                     let lrf = d.decompose3(&gf, r).0.is_some();
                     let brute = d.decomposes3_brute(&gf, r);
-                    assert_eq!(lrf, brute, "LRF vs independent brute, n={n} a={a} xR={}", r.0);
+                    assert_eq!(
+                        lrf, brute,
+                        "LRF vs independent brute, n={n} a={a} xR={}",
+                        r.0
+                    );
                     let absc = oracle.decompose(r.0, &gf).0.is_some();
                     // abscissa oracle accepts everything rational, plus twist-only solutions
-                    assert!(absc || !brute, "abscissa oracle must accept every rational decomposition");
+                    assert!(
+                        absc || !brute,
+                        "abscissa oracle must accept every rational decomposition"
+                    );
                     if absc && !brute {
                         twist_only += 1;
                     }
@@ -762,6 +809,9 @@ mod tests {
         }
         assert!(checked > 200);
         // twist-only hits exist (that is the point), but are a minority
-        assert!(twist_only > 0, "expected some twist-only abscissa solutions to exercise the distinction");
+        assert!(
+            twist_only > 0,
+            "expected some twist-only abscissa solutions to exercise the distinction"
+        );
     }
 }

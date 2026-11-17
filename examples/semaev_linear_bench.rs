@@ -144,7 +144,10 @@ fn main() {
         }
         let (f, low) = find_modulus(n);
         let _ = f;
-        let irr = IrreduciblePoly { degree: n, low_terms: low.clone() };
+        let irr = IrreduciblePoly {
+            degree: n,
+            low_terms: low.clone(),
+        };
         let gf = Gf2::new(&irr);
         let lin = LinearDecomposer::low_order(&gf, a, b, l);
         let oracle = SubspaceOracle::low_order(l, b, &gf);
@@ -173,7 +176,10 @@ fn main() {
         let (pairs_unit, scanned_unit) = if let Some(r) = worst {
             let (w1, pairs) = oracle.decompose(r.0, &gf);
             let (w2, scanned) = lin.decompose3(&gf, r);
-            assert!(w1.is_none() && w2.is_none(), "worst-case target must not decompose");
+            assert!(
+                w1.is_none() && w2.is_none(),
+                "worst-case target must not decompose"
+            );
             (pairs, scanned)
         } else {
             (0, 0)
@@ -203,36 +209,71 @@ fn main() {
                     acc = lin.add(&gf, acc, Some(p));
                 }
                 assert_eq!(acc, Some(r), "linearized witness sums to R");
-                assert_eq!(eval_s4_general(tri[0].0, tri[1].0, tri[2].0, r.0, b, &gf), 0);
+                assert_eq!(
+                    eval_s4_general(tri[0].0, tri[1].0, tri[2].0, r.0, b, &gf),
+                    0
+                );
                 rat += 1;
             }
             if brute_ok {
-                assert_eq!(w_lin.is_some(), lin.decomposes3_brute(&gf, r),
-                    "LRF disagrees with the independent brute at l = {l}");
+                assert_eq!(
+                    w_lin.is_some(),
+                    lin.decomposes3_brute(&gf, r),
+                    "LRF disagrees with the independent brute at l = {l}"
+                );
             }
             // every rational decomposition is also an abscissa solution
-            assert!(w_loop.is_some() || w_lin.is_none(), "pair loop missed a rational decomposition");
+            assert!(
+                w_loop.is_some() || w_lin.is_none(),
+                "pair loop missed a rational decomposition"
+            );
             if let Some(w) = w_loop {
                 assert_eq!(eval_s4_general(w[0], w[1], w[2], r.0, b, &gf), 0);
             }
         }
         let per_loop = t_loop / samples as f64;
         let per_lin = t_lin / samples as f64;
-        let unit_x = if scanned_unit > 0 { pairs_unit as f64 / scanned_unit as f64 } else { f64::NAN };
+        let unit_x = if scanned_unit > 0 {
+            pairs_unit as f64 / scanned_unit as f64
+        } else {
+            f64::NAN
+        };
         println!(
             "  {:>2} {:>3} {:>8} {:>12} {:>12} {:>8.1}x {:>8.1} {:>8.1}",
-            l, n, 1u64 << l, pairs_unit, scanned_unit, unit_x,
-            100.0 * absc as f64 / samples as f64, 100.0 * rat as f64 / samples as f64
+            l,
+            n,
+            1u64 << l,
+            pairs_unit,
+            scanned_unit,
+            unit_x,
+            100.0 * absc as f64 / samples as f64,
+            100.0 * rat as f64 / samples as f64
         );
         time_rows.push((l, n, per_loop, per_lin, per_loop / per_lin.max(1e-12)));
     }
 
     println!("\n  per-target wall time (median target is a decide; mixed decomposable/not):\n");
-    println!("  {:>2} {:>3} {:>14} {:>14} {:>10}", "l", "n", "pair loop", "linearized", "speed-up");
+    println!(
+        "  {:>2} {:>3} {:>14} {:>14} {:>10}",
+        "l", "n", "pair loop", "linearized", "speed-up"
+    );
     println!("  {}", "-".repeat(50));
     for (l, n, pl, pli, sp) in &time_rows {
-        let fmt = |s: f64| if s >= 1e-3 { format!("{:.3} ms", s * 1e3) } else { format!("{:.1} us", s * 1e6) };
-        println!("  {:>2} {:>3} {:>14} {:>14} {:>9.1}x", l, n, fmt(*pl), fmt(*pli), sp);
+        let fmt = |s: f64| {
+            if s >= 1e-3 {
+                format!("{:.3} ms", s * 1e3)
+            } else {
+                format!("{:.1} us", s * 1e6)
+            }
+        };
+        println!(
+            "  {:>2} {:>3} {:>14} {:>14} {:>9.1}x",
+            l,
+            n,
+            fmt(*pl),
+            fmt(*pli),
+            sp
+        );
     }
     println!(
         "\n  The linearized solver is exact and complete for RATIONAL decompositions (checked against an\n  \
