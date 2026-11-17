@@ -2967,24 +2967,35 @@ mod tests {
                 rows.push(make_row(bits));
             }
 
+            let reducer_space: Vec<Vec<u64>> = rows[..reducer_count]
+                .iter()
+                .map(|row| row.bits.clone())
+                .collect();
             let mut reference_stats = F4Stats::default();
             let reference =
                 echelon_block_tables(rows.clone(), n_cols, &mut reference_stats, None).unwrap();
-            let reference_new: Vec<Vec<u64>> = reference
-                .into_iter()
+            let reference_new_leads: Vec<usize> = reference
+                .iter()
                 .filter(|(lead, _)| reducer_leads.binary_search(lead).is_err())
-                .map(|(_, row)| row.bits)
+                .map(|(lead, _)| *lead)
                 .collect();
+            let reference_space: Vec<Vec<u64>> =
+                reference.into_iter().map(|(_, row)| row.bits).collect();
 
             let mut candidate_stats = F4Stats::default();
             let candidate =
                 echelon_fl(rows, n_cols, reducer_count, &mut candidate_stats, None).unwrap();
-            let candidate_new: Vec<Vec<u64>> =
-                candidate.into_iter().map(|(_, row)| row.bits).collect();
+            let candidate_new_leads: Vec<usize> = candidate.iter().map(|(lead, _)| *lead).collect();
+            let mut candidate_space = reducer_space;
+            candidate_space.extend(candidate.into_iter().map(|(_, row)| row.bits));
             assert_eq!(
-                canonical_rref(candidate_new, n_cols),
-                canonical_rref(reference_new, n_cols),
-                "shape reducers={reducer_count} pairs={pair_count} cols={n_cols}"
+                candidate_new_leads, reference_new_leads,
+                "new pivots for shape reducers={reducer_count} pairs={pair_count} cols={n_cols}"
+            );
+            assert_eq!(
+                canonical_rref(candidate_space, n_cols),
+                canonical_rref(reference_space, n_cols),
+                "row space for shape reducers={reducer_count} pairs={pair_count} cols={n_cols}"
             );
             assert_eq!(candidate_stats.fl_matrices, 1);
             assert_eq!(candidate_stats.fl_reducer_rows, reducer_count as u64);
