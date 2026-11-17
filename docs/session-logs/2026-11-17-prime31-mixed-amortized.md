@@ -72,3 +72,24 @@
 
 ### Errors
 - After fixing `n` vs canonical `0` row, first sparse build omitted two source modules: [run 44024807315](https://github.com/isogeny-labs/crypto/actions/runs/44024807315) failed on missing `src/cryptanalysis/f4_fp_tower.rs`, not cryptanalysis. Corrected immutable checkout to include original `src/cryptanalysis` source only (SHA `52b977c`) without changing solver. Successful source-specific results above; failed runs retained.
+
+
+## 2026-11-17 05:39–05:41 UTC — 1024 Q same-runner exact native rho comparison
+
+### What was done (commands, files, features)
+- Preregistered new exact-source native rho protocol in commit `a85ddac7` **before coding**; comparator suffix from source commit `7f451945` moved to non-Cargo-autodiscovered `mixed_base/prime31_amortized_rho_1024q_suffix.rsfrag`. CI `.github/workflows/prime31-mixed-amortized-rho1024.yml` at commit `533c6fd40d3bf36e3fb559255128f317e70d1aef` takes immutable actual Rust `prime31_aps_one_relation.rs`, renames only its old unused main, appends wrapper, and invokes unchanged optimized original `neg_rho_cold_policy`. Same 1024 public Q as the reusable IC run, 32-lane unfolded and folded modes, per-target execution order rotated, caps 2m rho steps, watchdog512, 64-case A/A. All cold costs charged and all incomplete cases retained.
+- Source-specific [Actions #44025539872](https://github.com/isogeny-labs/crypto/actions/runs/44025539872) **SUCCESS**: 40/40 original library tests, 3/3 IC tests; **1024/1024 IC, unfolded rho32 and folded rho32 all complete, 64/64 rho32 A/A**. Raw artifact [14302284807](https://github.com/isogeny-labs/crypto/actions/runs/44025539872/artifacts/14302284807), SHA256 `a720f5f0533d384ee7526455453fae5e5dfb39e129914c924a2e3649ca098f93`.
+- Actual same-run costs: IC setup **1655.699049 ms** + 1024 IC descent **1029.098499 ms** = **2684.797548 ms**; native original unfolded rho32 **3017.608361 ms**, folded negation rho32 **5625.174017 ms**. Fully charged IC / fastest tested native rho **0.8897104020**: **11.03% lower wall time** on the identical 1024-Q batch. Per-target IC descent-only paired wins 913/1024 vs unfolded and 979/1024 vs folded. A/A 64-case aggregate drift **0.4452%**.
+- Independently downloaded exact GitHub ZIP, reconstructed actual first-31 and Dickson seed=3 bases and original-curve group law, verified 61 base `[ell]G` points, all 61 Q-independent relation witnesses and modular rows, all 1024 public target relation group witnesses, 1024 IC candidate logs, 1024 unfolded, 1024 folded, 64 A/A rho logs. 1024 attempted target residuals, **0 misses**, all caller k distinct. Checked ZIP SHA256 against GitHub metadata. Ran 25,000 paired resamples of 1024 targets with **fixed setup fully charged**: IC/unfolded ratio 95% percentile **[0.85818,0.92276]**, IC/folded **[0.45971,0.49584]**. Conditional resampling intervals omit host/clock/CI-run uncertainty. Independent readback is an *auditor*, not an alternative Python ECDLP solver or signed PCC.
+- Committed `MIXED_IC_VS_NATIVE_RHO_1024Q_RESULT_20261117.md` (commit `7ebaee16`) and `MIXED_IC_VS_NATIVE_RHO_1024Q_INDEPENDENT_AUDIT_20261117.json` (commit `7e860c25`). Preserve raw linked artifact and exact protocols.
+
+### Decisions made (and why)
+- This **is** a documented, completely correct *multi-target* index-calculus-derived ECDLP implementation cheaper than the **specific tested native rho32 controls** in one source-specific same-runner 1024-Q batch. It is **not** faster at one cold target, a new non-generic factor extractor or strongest-rho/external-IC victory. The method is generic 4+4 MITM-equivalent and classical amortization; strongest precomputed generic BSGS is missing, as is corrected WZ and external published frontier.
+- The 11.03% measured batch advantage and paired-target bootstrap are worth reporting as a restricted real result. No hardware-isolated independent PCC, no largest-scale extrapolation, no promotion.
+
+### Open threads
+- Next *decisive* benchmark: **same Q shared-precomputed BSGS** and memory/RSS, and isolated CPU repeated ABBA paired native rho/WZ run; even optimized single-query rho can lose unfairly to a cache-enabled multi-target method.
+- Next *cryptanalytic* target: eliminate unknown eight-leaf `f` directly from public `R` in RR9/S9 quotient, original-ideal-certified B4/B8 then complete B31, without the MITM support table.
+
+### Errors
+- Matched CI passed. Prior unrelated repository-wide root CI and pinned WZ compilation failures are neither rho results nor algorithmic negative examples. Auto-merge connector defaulted to forbidden squash merge, so PR remains open and unmerged.
