@@ -647,3 +647,17 @@ Source/orbit replay, then actual C4 solver cold-cost comparison. Independent ext
 
 ### Errors
 No arithmetic replay failures. Remote branch was deleted by parent merge and recreated by checkpoint push; no cleanup or rerun.
+
+## Source/orbit replay prepared
+
+### What was done
+Separate source/orbit verifier compiled; deserializes exact source Mumford records and checks action directly on points rather than producer's coefficient transformation. All211orbitrecords required. No scientific execution yet.
+
+### Decisions made
+Retain sharedgroup arithmetic limitation; freeze/push before once-only run. Parent4507mergedexternally; successor4518open for exact-order/source follow-up.
+
+### Open threads
+Execute source gate; then solver experiment with all cold costs, exact target identities and public metadata contract.
+
+### Errors
+None.
