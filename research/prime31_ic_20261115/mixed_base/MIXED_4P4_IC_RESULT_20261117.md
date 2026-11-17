@@ -32,6 +32,10 @@ For two B31 bases sharing one point, the separate exact counting derivation (see
 
 Other previously rejected or pending leads: allocation reuse #4484 (no gain), linear chord #4486 (0.825% unqualified), anchored m6/m8 F4 #4373 (censored), Vieta #4410 (no complete advantage), autoresearcher #3301/#3305, cryptanalysis #1536; tuned WZ workflow #43994897230 was blocked by an unrelated `sat.rs` unclosed delimiter, so there is still **no strongest rho measurement**. Literature and classical prior art: APS 2018 DOI 10.1016/j.ffa.2018.01.009 and PKM 2016 DOI 10.1007/978-3-662-49387-8_1.
 
+## Separate exact-support Rust CI closure (2026-11-17 UTC)
+
+The follow-up free-integer-lattice theorem [#4505](https://github.com/isogeny-labs/crypto/pull/4505) also passed [exact-source Rust Actions #44018093813](https://github.com/isogeny-labs/crypto/actions/runs/44018093813), including the recomputed **381,434,284,809** mixed formal signed 4+4 net count, 383,018,643,225 ordered half pairs, and brute-force B2/B3/B4 one-overlap versus disjoint small-base controls. [Raw theorem artifact #14298884847](https://github.com/isogeny-labs/crypto/actions/runs/44018093813/artifacts/14298884847). This is a checked combinatorial component; the formal-net count is **not** a speedup or group coverage proof. Both CI runs remain producer-side [pcc:unverified].
+
 ## Standing and next experiment
 
 All results are producer tests and replay, **[pcc:unverified]** with no CI-main signed execution verdict. This is an honest completed experimental rung, not a claimed world-record or non-generic ECDLP advantage. The next preregistered Rust run should avoid the two 618,885-entry generic tables entirely and test target-conditioned algebraic extraction; only after that succeeds should a 96-Q full cold performance panel be scheduled. Preserve raw artifacts (currently 30-day Actions retention) for independent validation before expiration.
