@@ -1630,3 +1630,10 @@ What was done: freeze2bc699d39dc single invocation exits0, input hashes match;80
 Decisions made: sixkernel admission supported without choosing arbitrary pairing; one proposed cyclotomic sqrt5 self-loop, remaining5need quotient classification and lost orbit compression costs.
 Open threads: polarized quotient classes/maps and complete-cost case; p251l19 independent count and genus3 independent review.
 Errors: none, no rerun/S3/cloud.
+
+## Ramified five orbit/order gate frozen
+
+What was done: compiled separate followup preserving old l5assertions, sigma permutation, rho²5 and125/625stabilizer/conductor predictions.
+Decisions made: expect orbit1+5, at mostone nonself quotient class fromfivekernels; localorder index5would distinguishsource. All assertions [pcc:unverified], quotient equations not computed.
+Open threads: pushfreeze and once-only120CPU invocation, then exactorder/automorphism costcase.
+Errors: copiedunusedhelpers warnings; no scientific execution. KB source5f3331ba699891737b6895c6d423edbc ellipticanalogy notproof; primary Brooks-Jetchev-Wesolowski sections1and6checked.
