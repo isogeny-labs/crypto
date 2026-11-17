@@ -124,3 +124,30 @@ The orbit arm still pays for primitive-root searches, nine eigenvalue scalar mul
 Tsakou–Ionica2021, Index calculus attacks on hyperelliptic Jacobians with efficient endomorphisms, describes orbit representatives and eigenvalue-power weights. Guralnick–Howe2008Theorem1describes characteristic polynomials of hyperelliptic automorphisms. Primary text and exact KB receipts are in orbit/THEORY.md. The present prime-field one-orbit implementation is an adaptation of that established principle.
 
 Rational roots of unity, subgroup action and full catalogue coverage are necessary here. Generic curves lack this automorphism; larger fields can have multiple independent point orbits. This is not a mathematical novelty, generic genus2/3/4result, new exponent or complete tenfold speedup. The implementation gives a concrete cheaper preparation candidate for full accounting, while preserving all earlier negative controls and failures.
+
+#pagebreak()
+= Complete cold cost: native tenfold premise fails
+Pushed execution checkpoint36305a2acc3 · exit0 · 960 / 960 calls verified
+
+A prospective protocol compared cached, orbit, native and identical native_AAarms across five batches of16fresh algorithm setups for each of three independent single-target fixtures. Arm order rotates. Every interval includes factor-base/setup, required checks, all generation or eigenvalue/reconstruction work, descent, source verification and deallocation. Public fixture construction/validation is excluded equally. No call shares algorithm data with another.
+
+#table(columns:6,inset:4pt,align:center,
+[target],[cached ms],[orbit ms],[native ms],[cached/orbit],[native/orbit],
+[37],[9.627263],[0.423458],[0.732841],[22.7349],[1.7306],
+[2026],[9.591495],[0.429331],[0.592969],[22.3406],[1.3811],
+[7001],[9.567995],[0.414276],[0.812669],[23.0957],[1.9617])
+
+Each value is a per-target median of five batch means, with16fresh calls per mean. Targets are never pooled into multi-target throughput. Raw per-call outcomes and all batches remain available.
+
+== Frozen local noise controls pass
+Every arm/target spread is below1.25; the worst max/min batch-mean spread is1.041079. Native/native_AAmedian ratios1.013652,1.012405and1.007132pass the0.90–1.10range. Those are local noise gates, not independent scientific admission or an exclusive-machine guarantee. All960scalars verify.
+
+== The stronger completing control changes the interpretation
+Orbit is22–23times faster than the exhaustive cached-relation reference in these local wall observations. Against native IC, the improvement is only1.38–1.96times. The frozen numerical tenfold condition fails on every target. Selecting the slower cached reference would not establish the requested objective.
+
+Root discovery, nine eigenvalue scalar checks and nine projected point reconstructions remain real orbit costs. The observation motivates reducing those costs through a separately justified mathematical mechanism, followed by another prospective complete comparison. It does not justify an unchanged rerun or a generic-genus claim.
+
+== Measurement and custody limits
+Shared AppleM4Pro ARM/macOS27.2/Rust1.99.1, L0: no core isolation or fixed-frequency guarantee. Warm process, cold algorithm setup. No fastest-external/automorphism-aware external comparison, counted-operation primary result, independent VALIDATION.json or leaderboard admission. These are diagnostic local wall observations on a known special-curve optimization, not a new exponent or tenfold mathematical breakthrough.
+
+Record20261117T0230Z-hec-orbit-coldretains rawhashes, source checkpoint, commands, full metrics, qualification and authorized Gitcustody during S3outage. No S3upload is claimed. Cost/PROTOCOL.md, RESULTS.md, CONTROL.tsv, SUMMARY.tsv and Rustsummarizer retain the exact boundaries. Prior failures, amended fixtures, zero gains and all correctness stages remain intact.
