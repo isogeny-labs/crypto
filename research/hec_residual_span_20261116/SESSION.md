@@ -2492,3 +2492,10 @@ What was done: inspected strongest retained production/prefix/verification evide
 Decisions made: four complex-distinct quotient modules alone do not justify additional cheap relation channels; require an explicit paid cross-base/rank mechanism before expensive CM reconstruction. Preserve scope and distinguish bound from universal impossibility/performance claim. Proof note [pcc:unverified], independent review pending; no scientific run needed for this deduction.
 Open threads: useful-rank/nonuniform relation construction that changes producer and final-verification costs; genus-three finite-field reduction bridge and genus-four mechanism. Full10x objective remains active and incomplete.
 Errors: browser improved-sieving PDF timed out; current PENCIL-NEXT.md already documents primary prior-art collision, preventing duplicate proposal. Existing own T-7093 scope check allows; attach reports own reservation as before. No S3/cloud/merge.
+
+## Transport hypergraph equivalence and pair-energy census frozen
+
+What was done: derived exact all-length indexed-tuple equivalence under subgroup-injective transport, and full signed affine hyperelliptic pair histogram/energy3m²-3m+w for every genus>=2. Compiled bounded Rust all-pairs census on retained g2p251c18,g3p421c2,g4p271c2 with validity/count controls; no subgroup projection.
+Decisions made: distinguish group energy from coordinate-field energy and uniform success from solving cost. No actual quotient maps or Jacobian orders supplied. One120CPU execution after Git freeze. KB/current references and existing normalization/production controls reviewed; no novelty claim.
+Open threads: execute census, then require concrete cheaper solving circuit or genuinely different paid base/sampling/rank mechanism rather than transported combinatorics.
+Errors: none at compile. Conflict check allows; attach reports existing own T-7093 reservation, verified still active. No S3/cloud/merge.
