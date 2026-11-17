@@ -6,3 +6,7 @@
 - First source commit bf130931 contained a Rust return-type alias typo (Point is already Option<(u64,u64)>); immediately corrected without changing the gate in 2206f458. Exact-source Rust workflow #44074341581 is precursor and #44074481999 is corrected-head validation. Both were still running when this note was prepared; do not claim CI passed until observed.
 - No paid compute, no new complete unknown-target ECDLP, no merge/leaderboard change, no independent signed PCC.
 - Next: review CI, fix only errors without relaxing the correctness oracle; then attempt *public-only* RR9 coefficient-ideal F4/quotient on B8 before large B31 run.
+
+## Final source-specific verification (late addition)
+- Correction commit d91be2fc fixes only Rust E0499 mutable borrow and an unused variable; preserves all predeclared mathematical tests. [Pinned Rust 1.100 exact-source CI #44075156178](https://github.com/isogeny-labs/crypto/actions/runs/44075156178) completed **SUCCESS**, 40/40 library, 9/9 RR9 example tests (including full seven-anchor equivalence) and 64/64 positive plus 64/64 negative original-curve determinant controls.
+- Raw JSON artifact https://github.com/isogeny-labs/crypto/actions/runs/44075156178/artifacts/14324307382. This is test-level producer evidence, not independent signed PCC or a novel solver. Source-specific failures #44074341581 and #44074481999 were retained; the successful run is the final corrected Rust source. No new paid compute.
