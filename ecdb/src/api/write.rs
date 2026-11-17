@@ -49,6 +49,46 @@ async fn agent_provenance(client: &tokio_postgres::Client, agent: &Agent, contex
     Ok(prov)
 }
 
+fn fact_status(status: Option<&str>) -> ApiResult<&str> {
+    let status = status.unwrap_or("unknown");
+    const ALLOWED: &[&str] = &[
+        "proved",
+        "probable",
+        "bounded",
+        "heuristic",
+        "conjectural",
+        "refuted",
+        "unknown",
+        "not_evaluated",
+        "not_applicable",
+    ];
+    ALLOWED.contains(&status).then_some(status).ok_or_else(|| ApiError::bad_request("invalid fact status"))
+}
+
+fn sha256(s: &str, label: &str) -> ApiResult<String> {
+    let lower = s.to_ascii_lowercase();
+    (lower.len() == 64 && lower.bytes().all(|b| b.is_ascii_hexdigit()))
+        .then_some(lower)
+        .ok_or_else(|| ApiError::bad_request(format!("{label} must be 64 hexadecimal digits")))
+}
+
+async fn resolve_factor_base(client: &tokio_postgres::Client, key: &str) -> ApiResult<i64> {
+    let rows = client
+        .query(
+            "SELECT fb.id FROM ec.factor_base fb WHERE fb.key = $1::text
+             UNION SELECT a.factor_base_id FROM ec.factor_base_alias a WHERE a.value = $1::text
+             UNION SELECT fb.id FROM ec.factor_base fb
+                    WHERE $1::text ~ '^[0-9]+$' AND fb.id = $1::text::bigint",
+            &[&key],
+        )
+        .await?;
+    match rows.len() {
+        0 => Err(ApiError::not_found(format!("no factor base {key:?}"))),
+        1 => Ok(rows[0].get(0)),
+        n => Err(ApiError::new(StatusCode::CONFLICT, format!("{key:?} names {n} factor bases"))),
+    }
+}
+
 #[derive(Deserialize)]
 pub struct EvidenceRequest {
     pub curve: String,
@@ -181,5 +221,251 @@ pub async fn isogeny(
     match row {
         Some(r) => Ok((StatusCode::CREATED, Json(json!({ "id": r.get::<_, i64>(0), "status": status })))),
         None => Ok((StatusCode::OK, Json(json!({ "duplicate": true })))),
+    }
+}
+
+#[derive(Deserialize)]
+pub struct FeatureObservationRequest {
+    /// Exactly one subject must be named. This endpoint currently supports
+    /// curve, factor-base and FBM1 observations.
+    pub curve: Option<String>,
+    pub factor_base: Option<String>,
+    pub fbm_id: Option<String>,
+    pub feature_key: String,
+    pub version: Option<i32>,
+    pub value: Option<Value>,
+    pub missing_reason: Option<String>,
+    #[serde(default = "empty_object")]
+    pub context: Value,
+    pub status: Option<String>,
+    pub observed_at: Option<String>,
+    pub agent: Agent,
+}
+
+fn empty_object() -> Value {
+    json!({})
+}
+
+fn feature_type_ok(kind: &str, value: &Value) -> bool {
+    match kind {
+        "integer" => match value {
+            Value::Number(n) => !n.to_string().contains(['.', 'e', 'E']),
+            Value::String(s) => {
+                let digits = s.strip_prefix('-').unwrap_or(s);
+                !digits.is_empty() && digits.bytes().all(|b| b.is_ascii_digit())
+            }
+            _ => false,
+        },
+        "number" => {
+            value.is_number() || value.as_str().is_some_and(|s| s.parse::<f64>().is_ok_and(|number| number.is_finite()))
+        }
+        "boolean" => value.is_boolean(),
+        "string" | "category" => value.is_string(),
+        "object" => value.is_object(),
+        "array" => value.is_array(),
+        _ => false,
+    }
+}
+
+pub async fn feature_observation(
+    State(state): State<Shared>,
+    Json(req): Json<FeatureObservationRequest>,
+) -> ApiResult<(StatusCode, Json<Value>)> {
+    let pool = state.write.as_ref().ok_or_else(|| ApiError::new(StatusCode::FORBIDDEN, "writes are disabled"))?;
+    let client = pool.get().await?;
+    if !req.context.is_object() {
+        return Err(ApiError::bad_request("context must be an object"));
+    }
+    if usize::from(req.curve.is_some()) + usize::from(req.factor_base.is_some()) + usize::from(req.fbm_id.is_some())
+        != 1
+    {
+        return Err(ApiError::bad_request("exactly one of curve, factor_base or fbm_id is required"));
+    }
+    let version = req.version.unwrap_or(1);
+    let definition = client
+        .query_opt(
+            "SELECT id,scope,data_type,nullable FROM ec.feature_definition WHERE feature_key=$1 AND version=$2",
+            &[&req.feature_key, &version],
+        )
+        .await?
+        .ok_or_else(|| ApiError::bad_request("unknown feature_key/version"))?;
+    let definition_id: i64 = definition.get(0);
+    let scope: String = definition.get(1);
+    let data_type: String = definition.get(2);
+    let nullable: bool = definition.get(3);
+    let (curve_id, factor_base_id, measurement_id, supplied_scope) = if let Some(reference) = &req.curve {
+        (Some(resolve(&client, reference).await?), None, None, "curve")
+    } else if let Some(key) = &req.factor_base {
+        (None, Some(resolve_factor_base(&client, key).await?), None, "factor_base")
+    } else {
+        let fbm_id = req.fbm_id.as_deref().unwrap_or_default();
+        let id = client
+            .query_opt("SELECT id FROM ec.factor_base_measurement WHERE fbm_id=$1", &[&fbm_id])
+            .await?
+            .ok_or_else(|| ApiError::not_found(format!("no factor-base measurement {fbm_id:?}")))?
+            .get::<_, i64>(0);
+        (None, None, Some(id), "factor_base_measurement")
+    };
+    if scope != supplied_scope {
+        return Err(ApiError::bad_request(format!(
+            "feature {} v{} has scope {scope}, not {supplied_scope}",
+            req.feature_key, version
+        )));
+    }
+    if req.value.is_some() && req.missing_reason.is_some() {
+        return Err(ApiError::bad_request("value and missing_reason are mutually exclusive"));
+    }
+    if let Some(value) = &req.value {
+        if !feature_type_ok(&data_type, value) {
+            return Err(ApiError::bad_request(format!("value does not match feature data_type {data_type}")));
+        }
+    } else if !nullable && req.missing_reason.is_none() {
+        return Err(ApiError::bad_request("a non-nullable feature needs a value or explicit missing_reason"));
+    }
+    let status = fact_status(req.status.as_deref())?;
+    let provenance = agent_provenance(&client, &req.agent, "feature observation").await?;
+    let row = client
+        .query_opt(
+            "INSERT INTO ec.feature_observation
+             (feature_definition_id,curve_id,factor_base_id,factor_base_measurement_id,
+              value,missing_reason,context,status,observed_at,provenance_id)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8::text::ec.fact_status,$9::text::timestamptz,$10)
+             ON CONFLICT DO NOTHING RETURNING id",
+            &[
+                &definition_id,
+                &curve_id,
+                &factor_base_id,
+                &measurement_id,
+                &req.value,
+                &req.missing_reason,
+                &req.context,
+                &status,
+                &req.observed_at,
+                &provenance,
+            ],
+        )
+        .await?;
+    match row {
+        Some(row) => Ok((StatusCode::CREATED, Json(json!({"id":row.get::<_,i64>(0),"scope":scope,"status":status})))),
+        None => Ok((StatusCode::OK, Json(json!({"scope":scope,"duplicate":true})))),
+    }
+}
+
+#[derive(Deserialize)]
+pub struct FactorBaseArtifactRequest {
+    pub factor_base: String,
+    pub role: String,
+    #[serde(default)]
+    pub is_primary: bool,
+    pub sha256: String,
+    pub size_bytes: Option<i64>,
+    pub media_type: Option<String>,
+    pub storage_uri: String,
+    pub repo_path: Option<String>,
+    pub description: Option<String>,
+    pub agent: Agent,
+}
+
+/// Link an already-uploaded content-addressed object to an existing factor
+/// base. The API records identity and location; it does not upload or verify
+/// the remote bytes.
+pub async fn factor_base_artifact(
+    State(state): State<Shared>,
+    Json(req): Json<FactorBaseArtifactRequest>,
+) -> ApiResult<(StatusCode, Json<Value>)> {
+    let pool = state.write.as_ref().ok_or_else(|| ApiError::new(StatusCode::FORBIDDEN, "writes are disabled"))?;
+    let client = pool.get().await?;
+    let factor_base_id = resolve_factor_base(&client, &req.factor_base).await?;
+    const ROLES: &[&str] = &["dump", "matrix", "relations", "log_table", "certificate", "manifest", "dataset", "other"];
+    if !ROLES.contains(&req.role.as_str()) {
+        return Err(ApiError::bad_request(format!("role must be one of {ROLES:?}")));
+    }
+    if req.size_bytes.is_some_and(|n| n < 0) {
+        return Err(ApiError::bad_request("size_bytes must be non-negative"));
+    }
+    if !(req.storage_uri.starts_with("s3://") || req.storage_uri.starts_with("https://")) {
+        return Err(ApiError::bad_request("storage_uri must be an s3:// or https:// object URI"));
+    }
+    let digest = sha256(&req.sha256, "sha256")?;
+    if req.is_primary {
+        let existing = client
+            .query_opt(
+                "SELECT a.artifact_id FROM ec.factor_base_artifact a
+                  WHERE a.factor_base_id=$1 AND a.role=$2 AND a.is_primary",
+                &[&factor_base_id, &req.role],
+            )
+            .await?;
+        if let Some(row) = existing {
+            let existing_id: i64 = row.get(0);
+            let same: bool = client
+                .query_one("SELECT sha256::text=$2 FROM ec.artifact WHERE id=$1", &[&existing_id, &digest])
+                .await?
+                .get(0);
+            if !same {
+                return Err(ApiError::bad_request(format!(
+                    "factor base already has a different primary {} artifact",
+                    req.role
+                )));
+            }
+        }
+    }
+    let artifact_id: i64 =
+        match client.query_opt("SELECT id,storage_uri FROM ec.artifact WHERE sha256::text=$1", &[&digest]).await? {
+            Some(row) => {
+                let id: i64 = row.get(0);
+                let uri: Option<String> = row.get(1);
+                if uri.as_deref().is_some_and(|u| u != req.storage_uri) {
+                    return Err(ApiError::bad_request("artifact sha256 already has a different storage_uri"));
+                }
+                client
+                    .execute(
+                        "UPDATE ec.artifact SET storage_uri=coalesce(storage_uri,$2),
+                      size_bytes=coalesce(size_bytes,$3),media_type=coalesce(media_type,$4),
+                      repo_path=coalesce(repo_path,$5),description=coalesce(description,$6) WHERE id=$1",
+                        &[&id, &req.storage_uri, &req.size_bytes, &req.media_type, &req.repo_path, &req.description],
+                    )
+                    .await?;
+                id
+            }
+            None => client
+                .query_one(
+                    "INSERT INTO ec.artifact (sha256,size_bytes,media_type,storage_uri,repo_path,description)
+                 VALUES ($1::text,$2,$3,$4,$5,$6) RETURNING id",
+                    &[&digest, &req.size_bytes, &req.media_type, &req.storage_uri, &req.repo_path, &req.description],
+                )
+                .await?
+                .get(0),
+        };
+    let provenance = agent_provenance(&client, &req.agent, "factor-base artifact link").await?;
+    let inserted = client
+        .execute(
+            "INSERT INTO ec.factor_base_artifact
+             (factor_base_id,artifact_id,role,is_primary,description,provenance_id)
+             VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING",
+            &[&factor_base_id, &artifact_id, &req.role, &req.is_primary, &req.description, &provenance],
+        )
+        .await?;
+    let status = if inserted == 1 { StatusCode::CREATED } else { StatusCode::OK };
+    Ok((
+        status,
+        Json(json!({
+            "factor_base_id":factor_base_id,"artifact_id":artifact_id,
+            "role":req.role,"is_primary":req.is_primary,"duplicate":inserted == 0
+        })),
+    ))
+}
+
+#[cfg(test)]
+mod research_tests {
+    use super::*;
+
+    #[test]
+    fn exact_integer_feature_values() {
+        assert!(feature_type_ok("integer", &json!(42)));
+        assert!(feature_type_ok("integer", &json!("115792089237316195423570985008687907852837")));
+        assert!(!feature_type_ok("integer", &json!(1.5)));
+        assert!(feature_type_ok("number", &json!("1.25e-3")));
+        assert!(!feature_type_ok("number", &json!("NaN")));
+        assert!(!feature_type_ok("number", &json!("inf")));
     }
 }
