@@ -1,0 +1,546 @@
+{
+  "status": "compile_failed",
+  "scope": "actual root release library unit-test target, no-default-features; different target from successful non-test check141 and adapter142/144",
+  "command": "CARGO_BUILD_JOBS=1 CARGO_TARGET_DIR=/workspace/crypto-integrate/target RAYON_NUM_THREADS=1 RUST_TEST_THREADS=1 taskset -c0 cargo test --release --locked --lib --no-default-features",
+  "reported_errors": 107,
+  "diagnostics": [
+    {
+      "code": null,
+      "message": "couldn't read `/workspace/relation-fusion-live/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/binary_field_basis.rs:281:62"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `/workspace/relation-fusion-live/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/binary_field_basis.rs:349:22"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `/workspace/relation-fusion-live/research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/binary_velu.rs:1635:21"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `/workspace/relation-fusion-live/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/binary_velu.rs:1734:62"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `/workspace/relation-fusion-live/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/binary_velu.rs:1815:22"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `/workspace/relation-fusion-live/research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/binary_velu.rs:1911:71"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/../../docs/units/bitop-v1.vectors.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/bitops.rs:598:34"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/../../docs/units/bitop-v2.vectors.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/bitops.rs:607:34"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/chained_transfer/../../../research/chained_transfer_next_20261115/select_only.tsv`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/chained_transfer/quartic_ic.rs:2491:9"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/curve_traits/../../../docs/curves/traits.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/curve_traits/query.rs:150:30"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/curve_traits/../../../docs/curves/factor-hints.txt`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/curve_traits/query.rs:161:46"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/curve_traits/../../../docs/curves/trait-sources.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/curve_traits/query.rs:162:48"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/curve_traits/../../../research/isogeny_walk_20261004/runs/p256-ell31-radius2/isogeny_routes.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/curve_traits/query.rs:165:17"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/curve_traits/../../../research/isogeny_walk_20261004/runs/p224-ell61-radius2/isogeny_routes.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/curve_traits/query.rs:169:17"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/curve_traits/../../../docs/curves/ic/curves.yaml`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/curve_traits/query.rs:171:44"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/aps/../../../../research/aps_measurement_20261029/spec-controls.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/aps/tests.rs:416:9"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/aps/../../../../research/aps_measurement_20261029/spec-orbit-controls.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/aps/tests.rs:417:9"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/session.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/audit.rs:2186:13"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/spec.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/audit.rs:2190:13"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/plan.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/audit.rs:2194:13"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/host.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/audit.rs:2198:13"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/records.jsonl`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/audit.rs:2202:13"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_factor_bases_20261013/sessions/prime20/session.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/audit.rs:2361:13"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_factor_bases_20261013/sessions/prime20/spec.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/audit.rs:2367:13"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_factor_bases_20261013/sessions/prime20/plan.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/audit.rs:2373:13"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_factor_bases_20261013/sessions/prime20/host.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/audit.rs:2379:13"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_factor_bases_20261013/sessions/prime20/records.jsonl`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/audit.rs:2385:13"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/curve25519_algebraic_ecbench_20261102/fixtures/pkm_iso_t6_g4_target3.record.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/band.rs:1132:20"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/curve25519_algebraic_ecbench_20261102/fixtures/pkm_iso_t6_g4_target3.record.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/band.rs:1162:20"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/curve25519_f1_targetwalk_20261108/data/band-k20-s0.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/band.rs:1210:65"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/curve25519_f1_targetwalk_20261108/data/band-k20-s0.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/band.rs:1280:65"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/claim.rs:2198:36"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/compare/../../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/session.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/compare/pooled.rs:616:27"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/compare/../../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/compare/pooled.rs:619:27"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/session.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/compare.rs:2193:49"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/compare.rs:2215:20"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_rootfind_parity_20261013/sessions/claim-n13-v2/comparisons/rho-strong__ic-c2-frob-counted-m2.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/compare.rs:2710:51"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ecbench/runner.rs:2008:27"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ic_framework/../../../docs/ic/archive-comparison-v1.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ic_framework/archive_tests.rs:658:17"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ic_framework/../../../docs/ic/archive-comparison-v1.json.sha256`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ic_framework/archive_tests.rs:659:19"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ic_framework/../../../docs/ic/archive-technique-comparison-v2.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ic_framework/archive_tests.rs:672:20"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/ic_framework/../../../docs/ic/archive-technique-comparison-v2.json.sha256`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/ic_framework/archive_tests.rs:673:22"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/../../docs/identity-certificates/schoenhage-10mult.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/identity_certificate.rs:832:20"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/jacobian_transfer/../../../docs/curves/cover-catalog.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/jacobian_transfer/mod.rs:1097:27"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/../../research/f4_linear_algebra_20260914/contract.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/f4_rref_tests.rs:814:60"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/../../research/ghs_cubic_genus3_build_20261012/results/run-20261013T0320Z.jsonl`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/plane_quartic_pic.rs:2251:20"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/../../research/quartic_pic_canonical_20261018/results/v4_dump_q5.jsonl`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/plane_quartic_pic.rs:3495:17"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/../../research/quartic_pic_canonical_20261018/results/v4_dump_q7.jsonl`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/plane_quartic_pic.rs:3501:17"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/../../research/quartic_pic_canonical_20261018/results/v4_dump_q11.jsonl`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/plane_quartic_pic.rs:3507:17"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-ic-state-v1/sat-preparation.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/prepared_sat_control.rs:620:24"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/manifest.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/prepared_sat_control.rs:621:28"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/instance.anf`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/prepared_sat_control.rs:622:23"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/instance.xor.cnf`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/prepared_sat_control.rs:623:23"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/cryptanalysis/../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/result.json`: No such file or directory (os error 2)",
+      "location": "src/cryptanalysis/prepared_sat_control.rs:624:25"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/ml_dataset/../../research/ml_dataset_cli_generator_preservation_20261101/fixtures/root-systems.json`: No such file or directory (os error 2)",
+      "location": "src/ml_dataset/prime_chain_prefix.rs:1121:30"
+    },
+    {
+      "code": "E0428",
+      "message": "the name `supervisor_guard_reaps_child_on_error_path` is defined multiple times",
+      "location": "src/ml_dataset/mod.rs:7856:5"
+    },
+    {
+      "code": null,
+      "message": "couldn't read `src/prime_ecc/efd/../../../research/efd_coordinate_charts_20261108/Charts.lean`: No such file or directory (os error 2)",
+      "location": "src/prime_ecc/efd/tests.rs:920:16"
+    },
+    {
+      "code": "E0432",
+      "message": "unresolved imports `crate::cryptanalysis::genus_ladder::run_ic_ext`, `crate::cryptanalysis::genus_ladder::IcExt`",
+      "location": "src/cryptanalysis/genus_ladder_sieve.rs:901:51"
+    },
+    {
+      "code": "E0425",
+      "message": "cannot find function `check_ordinary_export_rows` in module `crate::ml_dataset::export`",
+      "location": "src/ml_dataset/binary_m3_worker.rs:717:48"
+    },
+    {
+      "code": "E0425",
+      "message": "cannot find function `check_ordinary_export_rows` in module `crate::ml_dataset::export`",
+      "location": "src/ml_dataset/binary_m3_worker.rs:1075:48"
+    },
+    {
+      "code": "E0425",
+      "message": "cannot find function `check_native_export_rows` in module `crate::ml_dataset::export`",
+      "location": "src/ml_dataset/koblitz_m3.rs:12554:48"
+    },
+    {
+      "code": "E0433",
+      "message": "cannot find type `Command` in this scope",
+      "location": "src/ml_dataset/mod.rs:7588:21"
+    },
+    {
+      "code": "E0603",
+      "message": "function `phase_of` is private",
+      "location": "src/cryptanalysis/ic_framework/mod.rs:2966:54"
+    },
+    {
+      "code": "E0609",
+      "message": "no field `registry_sha256` on type `curve_traits::TraitFile`",
+      "location": "src/cryptanalysis/curve_traits/query.rs:183:25"
+    },
+    {
+      "code": "E0560",
+      "message": "struct `curve_traits::TraitFile` has no field named `registry_sha256`",
+      "location": "src/cryptanalysis/curve_traits/mod.rs:2267:13"
+    },
+    {
+      "code": "E0063",
+      "message": "missing field `representation` in initializer of `ic_boundary::PrimeInstance`",
+      "location": "src/cryptanalysis/ecbench/hashed_native.rs:499:9"
+    },
+    {
+      "code": "E0308",
+      "message": "mismatched types",
+      "location": "src/cryptanalysis/ecbench/hashed_native.rs:520:37"
+    },
+    {
+      "code": "E0599",
+      "message": "no variant named `HecThread` found for enum `ecbench::workload::CurveSpec`",
+      "location": "src/cryptanalysis/ecbench/hec.rs:471:31"
+    },
+    {
+      "code": "E0308",
+      "message": "mismatched types",
+      "location": "src/cryptanalysis/ecbench/hec.rs:474:31"
+    },
+    {
+      "code": "E0308",
+      "message": "mismatched types",
+      "location": "src/cryptanalysis/ecbench/hec.rs:487:47"
+    },
+    {
+      "code": "E0599",
+      "message": "no variant named `HecThread` found for enum `ecbench::workload::CurveSpec`",
+      "location": "src/cryptanalysis/ecbench/hec.rs:532:31"
+    },
+    {
+      "code": "E0599",
+      "message": "no variant, associated function, or constant named `PlantedHecThread` found for enum `ecbench::workload::TargetKind` in the current scope",
+      "location": "src/cryptanalysis/ecbench/hec.rs:533:63"
+    },
+    {
+      "code": "E0308",
+      "message": "mismatched types",
+      "location": "src/cryptanalysis/ecbench/hec.rs:534:31"
+    },
+    {
+      "code": "E0599",
+      "message": "no variant, associated function, or constant named `PlantedHecThread` found for enum `ecbench::workload::TargetKind` in the current scope",
+      "location": "src/cryptanalysis/ecbench/hec.rs:535:42"
+    },
+    {
+      "code": "E0599",
+      "message": "no variant, associated function, or constant named `PlantedHecThread` found for enum `ecbench::workload::TargetKind` in the current scope",
+      "location": "src/cryptanalysis/ecbench/hec.rs:541:59"
+    },
+    {
+      "code": "E0308",
+      "message": "mismatched types",
+      "location": "src/cryptanalysis/ecbench/orbit_ic.rs:541:42"
+    },
+    {
+      "code": "E0308",
+      "message": "mismatched types",
+      "location": "src/cryptanalysis/ecbench/orbit_ic.rs:593:35"
+    },
+    {
+      "code": "E0308",
+      "message": "mismatched types",
+      "location": "src/cryptanalysis/gaudry_quartic_bin_wide/tests.rs:101:42"
+    },
+    {
+      "code": "E0308",
+      "message": "mismatched types",
+      "location": "src/cryptanalysis/ic_framework/mod.rs:2984:26"
+    },
+    {
+      "code": "E0308",
+      "message": "mismatched types",
+      "location": "src/cryptanalysis/ic_framework/mod.rs:2985:16"
+    },
+    {
+      "code": "E0308",
+      "message": "mismatched types",
+      "location": "src/cryptanalysis/ic_framework/mod.rs:2986:23"
+    },
+    {
+      "code": "E0062",
+      "message": "field `factor_base_policies` specified more than once",
+      "location": "src/ml_dataset/capture.rs:3250:13"
+    },
+    {
+      "code": "E0063",
+      "message": "missing field `channels` in initializer of `ml_dataset::DatasetPlan`",
+      "location": "src/ml_dataset/live.rs:1081:24"
+    },
+    {
+      "code": "E0062",
+      "message": "field `factor_base_policy` specified more than once",
+      "location": "src/ml_dataset/prime_chain_graph.rs:760:13"
+    },
+    {
+      "code": "E0063",
+      "message": "missing fields `channels` and `factor_base_policies` in initializer of `ml_dataset::DatasetPlan`",
+      "location": "src/ml_dataset/export.rs:1295:24"
+    },
+    {
+      "code": "E0062",
+      "message": "field `factor_base_policy` specified more than once",
+      "location": "src/ml_dataset/relations_generic.rs:812:13"
+    },
+    {
+      "code": "E0063",
+      "message": "missing field `channels` in initializer of `ml_dataset::types::CaseConfig`",
+      "location": "src/ml_dataset/relations_generic.rs:1730:9"
+    },
+    {
+      "code": "E0062",
+      "message": "field `factor_base_policy` specified more than once",
+      "location": "src/ml_dataset/relations.rs:959:13"
+    },
+    {
+      "code": "E0063",
+      "message": "missing field `channels` in initializer of `ml_dataset::DatasetPlan`",
+      "location": "src/ml_dataset/report.rs:883:24"
+    },
+    {
+      "code": "E0062",
+      "message": "field `factor_base_policies` specified more than once",
+      "location": "src/ml_dataset/restore.rs:574:17"
+    },
+    {
+      "code": "E0062",
+      "message": "field `factor_base_policy` specified more than once",
+      "location": "src/ml_dataset/prime_f4_wide.rs:1549:13"
+    },
+    {
+      "code": "E0062",
+      "message": "field `factor_base_policy` specified more than once",
+      "location": "src/ml_dataset/prime_f4_wide_m3.rs:1466:13"
+    },
+    {
+      "code": "E0062",
+      "message": "field `factor_base_policy` specified more than once",
+      "location": "src/ml_dataset/binary_roots.rs:617:13"
+    },
+    {
+      "code": "E0063",
+      "message": "missing fields `channels` and `factor_base_policy` in initializer of `ml_dataset::types::CaseConfig`",
+      "location": "src/ml_dataset/solvers.rs:6881:22"
+    },
+    {
+      "code": "E0062",
+      "message": "field `factor_base_policies` specified more than once",
+      "location": "src/ml_dataset/startup_gate.rs:1458:17"
+    },
+    {
+      "code": "E0062",
+      "message": "field `factor_base_policy` specified more than once",
+      "location": "src/ml_dataset/telemetry.rs:105:13"
+    },
+    {
+      "code": "E0560",
+      "message": "struct `ml_dataset::DatasetArgs` has no field named `owned_replay_policy`",
+      "location": "src/ml_dataset/sat_replay_caller.rs:538:17"
+    },
+    {
+      "code": "E0560",
+      "message": "struct `ml_dataset::DatasetArgs` has no field named `owned_replay_receipt`",
+      "location": "src/ml_dataset/sat_replay_caller.rs:539:17"
+    },
+    {
+      "code": "E0560",
+      "message": "struct `ml_dataset::DatasetArgs` has no field named `owned_replay_policy`",
+      "location": "src/ml_dataset/affine_replay_caller.rs:552:17"
+    },
+    {
+      "code": "E0560",
+      "message": "struct `ml_dataset::DatasetArgs` has no field named `owned_replay_receipt`",
+      "location": "src/ml_dataset/affine_replay_caller.rs:553:17"
+    },
+    {
+      "code": "E0560",
+      "message": "struct `ml_dataset::DatasetArgs` has no field named `owned_replay_policy`",
+      "location": "src/ml_dataset/search_replay_caller.rs:553:17"
+    },
+    {
+      "code": "E0560",
+      "message": "struct `ml_dataset::DatasetArgs` has no field named `owned_replay_receipt`",
+      "location": "src/ml_dataset/search_replay_caller.rs:554:17"
+    },
+    {
+      "code": "E0560",
+      "message": "struct `ml_dataset::SupervisedChild` has no field named `finished`",
+      "location": "src/ml_dataset/mod.rs:7597:13"
+    },
+    {
+      "code": "E0063",
+      "message": "missing field `population` in initializer of `ml_dataset::PlanArgs`",
+      "location": "src/ml_dataset/mod.rs:8222:43"
+    },
+    {
+      "code": "E0277",
+      "message": "the size for values of type `str` cannot be known at compilation time",
+      "location": "src/prime_ecc/efd/tests.rs:960:10"
+    },
+    {
+      "code": "E0277",
+      "message": "the size for values of type `str` cannot be known at compilation time",
+      "location": "src/prime_ecc/efd/tests.rs:960:25"
+    },
+    {
+      "code": "E0277",
+      "message": "the size for values of type `str` cannot be known at compilation time",
+      "location": "src/prime_ecc/efd/tests.rs:961:48"
+    }
+  ],
+  "stderr_sha256": "71e7f5738a2c94801fe1c34d173adc17f8f086ab411638aab131645d026fc02f",
+  "tests_executed": false,
+  "no_tests_disabled": true
+}
