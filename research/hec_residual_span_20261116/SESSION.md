@@ -2534,3 +2534,10 @@ What was done: freeze3d22845ebc7 hashes passed, sole run exit0. Projection reps2
 Decisions made: do not build full alias-map solver around existing scalar projector; even optimistic setup fails tenfold basecount boundary. Preserve genuine compression result separately from cost failure. Alternative projector circuits not ruled out, but need new cost case and cannot improve original h1genus-two instance via projection compression.
 Open threads: materially different useful-rank/coordinate circuit or genus-three finite-field geometric route with complete-cost evidence; original fullgenus2+10xgoal open. Do not repeat scalar-map floor or promote component count into runtime.
 Errors: none in scientific run; no S3/cloud/merge. Internal shared implementation/counter evidence remains [pcc:unverified].
+
+## Short automorphism projector alternative frozen
+
+What was done: implemented exact greedy cyclic R=P-1/S orbit-norm reduction with integer witness, and joint-binary evaluation using rotated raw points/add_place. Compiled same five tuples, all-point R/S/scalar controls before counted kernel, scalar/polynomial2repeat intervals on fixed raw orbit representatives.
+Decisions made: use X^n-1 not Phi9 on full genus-four points; no global shortest/novelty claim. Same optimistic free preparation as scalar floor; retain all80complete-count inequalities and reference replay. One120CPU invocation after Git freeze.
+Open threads: execute new arithmetic kernel; a passing equivalence or component gain does not imply full10x or improve h1case.
+Errors: only inherited two unused root-helper warnings, no scientific execution yet. Own scope check allows, attach reports existing reservation. No S3/cloud/merge.
