@@ -1504,3 +1504,10 @@ What was done:ccc05211dabone invocation exits0;8scenarios19prefixes76independent
 Decisions made: currentproducercontracts/costsunchanged; integrationrequirescertifiedmodelguard,retainedfinaltargetcheck,strict-vs-consensuscoldqualification. No synthetic10x/proof-formalizationclaim.
 Open threads: integrateconsensusunderprospectivevalidationcontractandmeasurecompletecost; originalgenus2+goalopen.
 Errors: none,no scientificretry/S3/cloud.
+
+## Certified consensus producer comparison frozen
+
+What was done:compiled strict-vs-consensus modes,same12oldcoldinputs,48alternatingcalls; exactmodel/order/nonzero-sourceguard andretainedfinaltargetcheck. Strict48modulusvectorsmustreplayolddata beforebaselinecounterreuse. Diagnosticgates,labelchecks,tracerepeatsandmulti-actionstoppingrecorded. Hashesfrozen.
+Decisions made: explicitchangedvalidationcontract justifiedbyconditionalproof,notposthocolddataomission; base/ellseparate,noCPU/10xclaim.
+Open threads: executesinglematchedgateandpricefullconsensuspipeline.
+Errors: none, nosciencebeforepushedfreeze.
