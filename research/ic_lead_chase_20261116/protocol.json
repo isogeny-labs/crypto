@@ -11,7 +11,10 @@
   "links": {
     "lead": "research/ecbench_lazy_orbit_members_20261018",
     "source_preregistration": "research/ic_lead_chase_20261116/preregistrations/lazy_orbit.md",
-    "session_log": "docs/session-logs/2026-11-16.md"
+    "session_log": "docs/session-logs/2026-11-16.md",
+    "specs": "research/ic_lead_chase_20261116/specs",
+    "spec_generator": "research/ic_lead_chase_20261116/make_specs.sh",
+    "analysis": "research/ic_lead_chase_20261116/analyze.sh"
   },
   "question": "Can the lazy orbit-member oracle at a tuned factor-base column count c in {1,2,3} drive the Koblitz index-calculus arm at n in {17,29,31} defensibly below its matched strong-rho reference, i.e. with a paired 95% CI that excludes 1 AND an arm order that holds at every §5a pricing weight {0,0.1,1} GAE and at the calibrated weights {0,w_cal,10*w_cal}?",
   "claims": [
@@ -93,7 +96,7 @@
       "description": "rho.signed_frobenius_full on the same curve and public targets; A/A partner for rho-frob-aa.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "3658d3aa2635ba602740cc0ebf62a678b74236c3",
         "build": [
           [
             "cargo",
@@ -113,7 +116,7 @@
       "description": "rho.signed_frobenius_full again with a harness-derived A/A seed; noise floor for the rho side.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "3658d3aa2635ba602740cc0ebf62a678b74236c3",
         "build": [
           [
             "cargo",
@@ -133,7 +136,7 @@
       "description": "rho.signed_frobenius_strong_full: the matched strong-rho parity target for H3.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "3658d3aa2635ba602740cc0ebf62a678b74236c3",
         "build": [
           [
             "cargo",
@@ -150,10 +153,10 @@
     {
       "id": "ic-orbit-c1-renew",
       "role": "baseline",
-      "description": "ic.pipeline_full, factor_base=compact-orbit-scan:columns=1, oracle=mitm-frobenius-counted:m=1, targets=stride-renew (eager oracle).",
+      "description": "ic.pipeline_full, factor_base=compact-orbit-scan:columns=1, oracle=mitm-frobenius-counted:m=2, targets=stride-renew (eager oracle).",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "3658d3aa2635ba602740cc0ebf62a678b74236c3",
         "build": [
           [
             "cargo",
@@ -170,10 +173,10 @@
     {
       "id": "ic-orbit-c1-renew-lazy",
       "role": "candidate",
-      "description": "Same as ic-orbit-c1-renew with oracle=mitm-frobenius-lazy-counted:m=1 (lazy orbit-member index).",
+      "description": "Same as ic-orbit-c1-renew with oracle=mitm-frobenius-lazy-counted:m=2 (lazy orbit-member index).",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "3658d3aa2635ba602740cc0ebf62a678b74236c3",
         "build": [
           [
             "cargo",
@@ -193,7 +196,7 @@
       "description": "ic.pipeline_full, factor_base=compact-orbit-scan:columns=2, oracle=mitm-frobenius-counted:m=2, targets=stride-renew (eager oracle).",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "3658d3aa2635ba602740cc0ebf62a678b74236c3",
         "build": [
           [
             "cargo",
@@ -213,7 +216,7 @@
       "description": "Same as ic-orbit-c2-renew with oracle=mitm-frobenius-lazy-counted:m=2 (lazy orbit-member index). Also the positive control at n=31: it must replicate the recorded eager/lazy direction.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "3658d3aa2635ba602740cc0ebf62a678b74236c3",
         "build": [
           [
             "cargo",
@@ -230,10 +233,10 @@
     {
       "id": "ic-orbit-c3-renew",
       "role": "baseline",
-      "description": "ic.pipeline_full, factor_base=compact-orbit-scan:columns=3, oracle=mitm-frobenius-counted:m=3, targets=stride-renew (eager oracle).",
+      "description": "ic.pipeline_full, factor_base=compact-orbit-scan:columns=3, oracle=mitm-frobenius-counted:m=2, targets=stride-renew (eager oracle).",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "3658d3aa2635ba602740cc0ebf62a678b74236c3",
         "build": [
           [
             "cargo",
@@ -250,10 +253,10 @@
     {
       "id": "ic-orbit-c3-renew-lazy",
       "role": "candidate",
-      "description": "Same as ic-orbit-c3-renew with oracle=mitm-frobenius-lazy-counted:m=3 (lazy orbit-member index).",
+      "description": "Same as ic-orbit-c3-renew with oracle=mitm-frobenius-lazy-counted:m=2 (lazy orbit-member index).",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "3658d3aa2635ba602740cc0ebf62a678b74236c3",
         "build": [
           [
             "cargo",
@@ -472,14 +475,14 @@
   },
   "sample_size": {
     "instances": 64,
-    "replicates": 3,
+    "replicates": 5,
     "power": {
       "method": "paired_bootstrap",
       "alpha": 0.05,
-      "tests_in_family": 6,
-      "correction": "holm",
+      "tests_in_family": 1,
+      "correction": "none",
       "passes": false,
-      "note": "No formal power computation. Sizing from the committed c=2 n=31 cell (32 targets x 3 rounds, CI half-width ~0.077): doubling targets should shrink it to ~0.055, so H3(i) is decidable only for true effects of roughly 6% or more."
+      "note": "No formal power computation. Sizing from the committed c=2 n=31 cell (32 targets x 3 rounds, CI half-width ~0.077): 64 targets x 5 rounds should shrink it to roughly 0.05, so H3(i) is decidable only for true effects of roughly 5-6% or more. Each (curve,c) cell is its own test (see amendment A4)."
     },
     "preflight_runtime": {
       "fixed_seconds": null,
@@ -585,6 +588,13 @@
     "retries": {
       "infrastructure_only": true,
       "max_attempts": 2
+    },
+    "placement": {
+      "cpus": 4,
+      "memory_mb": 8192,
+      "spot": true,
+      "pool": "cpu-l2-spot",
+      "jobs": "one isolab benchmark job per curve (three jobs), each one ecbench session from specs/lazycol-a<a>-n<n>.json"
     }
   },
   "stopping_rules": [
@@ -605,7 +615,7 @@
     }
   ],
   "decision_rule": {
-    "text": "H2 holds per (curve,c) iff the eager/lazy CI lower bound > 1 at w=0. H3 'defensibly-below-rho-strong' per (curve,c) iff (i) the lazy/rho-strong CI excludes 1 with upper bound < 1, (ii) lazy<rho-strong holds at every w in {0,0.1,1}, and (iii) at every w in {0,w_cal,10*w_cal}. If the order flips at any weight the verdict is 'parity-unresolved' (§5a); if (i) fails it is 'parity-unresolved' or 'rho-strong-ahead' by the point estimate. Each row reports the gap to matched rho as the distance remaining.",
+    "text": "H2 holds per (curve,c) iff the eager/lazy CI lower bound > 1 at w=0. H3 'defensibly-below-rho-strong' per (curve,c) iff (i) the lazy/rho-strong CI excludes 1 with upper bound < 1, (ii) lazy<rho-strong holds at every w in {0,0.1,1}, and (iii) at every w in {0,w_cal,10*w_cal}. If the order flips at any weight the verdict is 'parity-unresolved' (§5a); if (i) fails it is 'parity-unresolved' or 'rho-strong-ahead' by the point estimate. Each row reports the gap to matched rho as the distance remaining. Each (curve,c) cell is decided on its own interval and every cell is reported; no family-wise statement is made.",
     "comparison_ids": [
       "h2-c1",
       "h2-c2",
@@ -614,9 +624,9 @@
       "h3-c2",
       "h3-c3"
     ],
-    "statistic": "Ratio of mean counted GAE, paired by target",
-    "interval": "95% cluster bootstrap over targets",
-    "multiple_comparison_correction": "holm",
+    "statistic": "Ratio of total counted GAE (S·sqrt(r)), paired by target, from ecbench compare (schema v2)",
+    "interval": "ecbench compare primary ci95: linearised (delta-method) t(K-1) interval over K=64 target workloads; ci95_bootstrap reported beside it",
+    "multiple_comparison_correction": "none",
     "effect_size_measure": "ratio of means",
     "verdict_vocabulary": [
       "lazy-wins-over-eager",
@@ -628,9 +638,12 @@
     ]
   },
   "analysis_plan": {
-    "script": null,
+    "script": {
+      "path": "research/ic_lead_chase_20261116/analyze.sh",
+      "sha256": "4f3073f7b66c99c92d9f992689bc12ca63d5f644e09bdb3c54ecbbebaff9370d"
+    },
     "blinded": true,
-    "frozen_before_data": false
+    "frozen_before_data": true
   },
   "reporting": {
     "export_schema": "experiment.export/v1",
@@ -641,7 +654,8 @@
     "Any statement about ECC2K-130, GF(2^83) or deployed curves.",
     "A general 'index calculus beats rho' statement; a positive H3 is a per-curve, per-host, fully priced distance on cold public Koblitz targets.",
     "Wall-time conclusions; the primary unit is counted GAE.",
-    "A leaderboard or benchmarks/ row without the validation gate (replay certificate, validator report, matched rho with the §5a band)."
+    "A leaderboard or benchmarks/ row without the validation gate (replay certificate, validator report, matched rho with the §5a band).",
+    "Any family-wise statement over the nine (curve,c) cells, e.g. 'some column count beats strong rho'; cells carry no multiplicity correction (amendment A4)."
   ],
   "literature": [
     {
@@ -655,12 +669,61 @@
       "claim": "Re-derived §5a band at n=31: 0.985 (w=0), 1.028 (w=0.1), 1.286 (w=1); order flips, so parity is unresolved. [pcc:unverified]"
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "A1",
+      "filed": "2026-11-17",
+      "filed_before_affected_data": true,
+      "reason": "The draft named the MITM oracle arity m=<c>. The incumbent study (research/ecbench_lazy_orbit_members_20261018/make_specs.sh) uses m=2 for every column count; m is the meet-in-the-middle arity, not the column count.",
+      "changes": [
+        "IC arm oracles are mitm-frobenius-counted:m=2 and mitm-frobenius-lazy-counted:m=2 at every c; only columns=<c> varies."
+      ]
+    },
+    {
+      "id": "A2",
+      "filed": "2026-11-17",
+      "filed_before_affected_data": true,
+      "reason": "The isolab ecbench L2 admission path requires at least five measured rounds and a warmup.",
+      "changes": [
+        "sample_size.replicates 3 -> 5 (5 measured rounds + 1 warmup per spec)."
+      ]
+    },
+    {
+      "id": "A3",
+      "filed": "2026-11-17",
+      "filed_before_affected_data": true,
+      "reason": "The experiment queue requires execution.placement with the CPU count of the registration; benchmark jobs use 4 CPUs and at most 3600 s.",
+      "changes": [
+        "Added execution.placement {cpus 4, memory_mb 8192, spot, pool cpu-l2-spot}; one job per curve; timeout 3600 s."
+      ]
+    },
+    {
+      "id": "A4",
+      "filed": "2026-11-17",
+      "filed_before_affected_data": true,
+      "reason": "The native ecbench compare emits a primary linearised t(K-1) ci95 with a bootstrap interval beside it, but no p-value, so a Holm correction cannot be computed by the frozen instrument.",
+      "changes": [
+        "multiple_comparison_correction holm -> none; each (curve,c) cell decided on its own ci95; family-wise statements made inadmissible.",
+        "statistic and interval wording aligned with ecbench compare schema v2."
+      ]
+    },
+    {
+      "id": "A5",
+      "filed": "2026-11-17",
+      "filed_before_affected_data": true,
+      "reason": "Bind the instrument and analysis before data. The ecbench binary did not compile at main 3b0840b6f2 (retained_chain_study.rs missing PrimeInstance.representation); the bound source includes the output-identical fix.",
+      "changes": [
+        "instrument.commit bound to the tested source commit (ecbench builds there; specs validated with ecbench plan).",
+        "analysis_plan.script bound to analyze.sh by sha256 and exercised end to end on a local L0 smoke session (not a measurement); frozen_before_data true.",
+        "binary_sha256 stays null here: the admitted binary hash is the one built from the bound commit inside the isolab image and recorded in the queue registration (image.ecbench_sha256)."
+      ]
+    }
+  ],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": null
+    "status": "frozen",
+    "protocol_sha256": "19116bb1970ff8cb24ce14c7b028bb7f052e38cff954788df3bcf79c05dfbdb0",
+    "commit": "3658d3aa2635ba602740cc0ebf62a678b74236c3",
+    "frozen_at": "2026-11-17T15:34:55Z",
+    "filed_before_affected_data": true
   }
 }
