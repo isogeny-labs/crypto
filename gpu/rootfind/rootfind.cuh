@@ -236,8 +236,13 @@ RF_HD void rf_pair_run(const Fp64Ctx &f, uint64_t a_m, const uint64_t *x, const 
     const uint64_t x1 = x[ai], y1 = y[ai];
     uint64_t d[RF_PAIR_CHUNK], pre[RF_PAIR_CHUNK];
     uint32_t bad = 0;
-    uint64_t acc = F::one(f);
-    for (uint32_t k = 0; k < m; k++) {
+    /* m >= 1.  Seed the prefix with d[0], not 1*d[0], and avoid the
+     * unused final unwind multiplication: two field muls saved per run. */
+    uint64_t d0 = (b0 == ai) ? F::add(f, y1, y1) : F::sub(f, x[b0], x1);
+    if (d0 == 0) { bad |= 1u; d0 = F::one(f); }
+    d[0] = pre[0] = d0;
+    uint64_t acc = d0;
+    for (uint32_t k = 1; k < m; k++) {
         const uint32_t bi = b0 + k;
         uint64_t dk = (bi == ai) ? F::add(f, y1, y1) : F::sub(f, x[bi], x1);
         if (dk == 0) { bad |= 1u << k; dk = F::one(f); }
@@ -246,11 +251,12 @@ RF_HD void rf_pair_run(const Fp64Ctx &f, uint64_t a_m, const uint64_t *x, const 
         pre[k] = acc;
     }
     uint64_t inv = F::inv(f, acc);
-    for (uint32_t k = m; k-- > 0;) {
-        const uint64_t ik = k ? F::mul(f, inv, pre[k - 1]) : inv;
-        inv = F::mul(f, inv, d[k]);
-        d[k] = ik;
+    for (uint32_t k = m; k-- > 1;) {
+        const uint64_t dk = d[k];
+        d[k] = F::mul(f, inv, pre[k - 1]);
+        inv = F::mul(f, inv, dk);
     }
+    d[0] = inv;
     const uint64_t base = rf_pair_offset(ai, n);
     for (uint32_t k = 0; k < m; k++) {
         const uint32_t bi = b0 + k;
@@ -523,9 +529,11 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
     }
     RF_PROF_STEP(0);
     /* Montgomery's trick: prefix products, one inversion, unwind. */
-    elt acc = one;
+    /* CHUNK >= 8.  Eliminate first 1*d[0] and final two 1*inv_acc
+     * products.  The inverse vector is bit-identical in Montgomery form. */
+    elt acc = d[0];
 #pragma unroll
-    for (int w = 0; w < CHUNK; w++) {
+    for (int w = 1; w < CHUNK; w++) {
         pre[w] = acc;
         acc = F::mul(f, acc, d[w]);
     }
@@ -533,11 +541,12 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
     elt inv_acc = F::inv(f, acc);
     RF_PROF_STEP(2);
 #pragma unroll
-    for (int w = CHUNK - 1; w >= 0; w--) {
+    for (int w = CHUNK - 1; w > 0; w--) {
         elt dw = d[w];
         d[w] = F::mul(f, inv_acc, pre[w]);
         inv_acc = F::mul(f, inv_acc, dw);
     }
+    d[0] = inv_acc;
     RF_PROF_STEP(3);
 
     /* The sweep.  Factor-base loads are warp-uniform (every lane holds
