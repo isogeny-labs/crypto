@@ -1378,3 +1378,10 @@ What was done: derived new two-promoted+one-core family with orbit support multi
 Decisions made: quotient scalar-copy triples by fixing singleton, no duplicate orbit-rank accounting. Structural useful-rank qualification before shared arithmetic/cost. Push before run.
 Open threads: once-only gate and comparison with original40trial family; complete genus2+objective open.
 Errors: none; T7071claimed, no science run yet.
+
+## Mixed-orbit harvesting qualified with incomplete arm
+
+What was done: frozen3338194d4da exits0,200trials/99splitgrouprelations,allpromoted orbit labels/polynomials/three-solver prefixes pass. Firstk6/9/27/7/undetermined versus old9/18/25/5/38;4of5eligible complete, sixth no-trigger kept. p601source17adds23rank without pinningk. Raw/exit/hashes/results retained.
+Decisions made: no speed ratio for incomplete arm or promotion from larger point pool/split count/rank. Different orbit multiplicities give valid new rows but standalone replacement not justified.
+Open threads: a combined adaptive-label pool needs new useful-rank/cost case before cold campaign; broader original genus2+tenfold objective remains open.
+Errors: no runtime/assertion errors; incomplete identification is scientific outcome, not retried. No S3/cloud.
