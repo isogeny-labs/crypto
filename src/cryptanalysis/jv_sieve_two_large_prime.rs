@@ -58,6 +58,15 @@ pub use extension_quadratic_pair_dlp::{
     DiscriminantPairDlpOptions, QuadraticPairDlpOptions,
 };
 
+/// Deferred activation keeps checked ungrounded edges until a unit anchor arrives.
+#[path = "jv_deferred_pair_graph.rs"]
+pub mod deferred_pair_graph;
+#[path = "jv_extension_deferred_pair_dlp.rs"]
+mod extension_deferred_pair_dlp;
+pub use extension_deferred_pair_dlp::{
+    run_extension_deferred_pair_dlp_on, DeferredPairDlpOptions,
+};
+
 #[path = "jv_homogeneous_quotient.rs"]
 mod homogeneous_quotient;
 
