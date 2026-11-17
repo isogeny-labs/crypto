@@ -1,0 +1,28 @@
+This research branch adds arbitrary-public-target hyperelliptic index-calculus controls on the **initial mixed-term genus-2, genus-3 and genus-4 benchmark families**, with exact correctness and complete operation-count records. The requested 10× mathematical speedup is **not established**.
+
+The generic path now includes a weighted two-large-prime walk, a Riemann–Roch pencil collector, and an exact leading-coefficient formula that extracts the remaining quadratic without constructing the full norm polynomial. Source/target coefficients, signs, repeated roots, and weighted cycles that leave one large-prime variable are retained. Every returned scalar is checked against the original public source and target. The public solver API receives no expected scalar, point-log table, or hidden cofactor.
+
+A conservative Hasse/order check restricts this control to a unique cyclic prime-order component. Generic whole-field root tables and finite-difference catalogue construction are offered **equally to all six solver arms**, built fresh inside every call. The table variant is bounded to p≤65537; it is not an arbitrary-size field algorithm.
+
+Validation and evidence:
+
+- All 11 initial curve/subgroup identities are retained, with 22 fixed public source/target fixtures. The general pencil completes all 22; genus four needs 145–268 anchors under the prospectively frozen 512-anchor limit.
+- The pencil correctness gate checks 14,089 queried norm/root products, 6,742 native principal relations, repeated roots and anchor overlaps, plus dense weighted-elimination prefixes. The cheap-tail gate exactly reproduces every queried quotient and all final reports.
+- Root/catalogue/oracle qualification matches legacy semantics on all initial catalogues, all field residues, 19,687 exhaustive small-field monic polynomials and 5,632 additional seeded polynomials.
+- The latest shared-preparation gate completes 264 fresh calls across Fast/Dense/Hybrid full-base, 2LP walk, full-norm pencil and tail pencil. Prior outcome streams and subgroup-field vectors replay exactly; repeat vectors and lookup counts match. All setup and internal final verification are included under the recorded valid-public-instance contract.
+
+Against the lowest relevant counts among shared-prepared walk/full-base controls, tail-pencil base-field REDC ratios are 1.40–2.58× at genus two, 1.81–4.34× at genus three and 1.09–2.39× at genus four. Subgroup-field ratios are reported separately. One genus-four subgroup regression remains. These are field-count results, **not wall-time gains, a mixed-field cost estimate, or a 10× result**. Root lookups, field additions, integer work and memory remain explicit; independent review is pending (`[pcc:unverified]`). The methods reproduce classical 2LP/pencil/Vieta machinery rather than claim mathematical novelty.
+
+Review entry points:
+
+- [Initial-instance applicability and scope](research/hec_residual_span_20261116/native-scope-audit/RESULTS.md)
+- [Arbitrary-target weighted 2LP API and correctness](research/hec_residual_span_20261116/native-public-2lp/RESULTS.md)
+- [General pencil identities and coverage](research/hec_residual_span_20261116/native-pencil-2lp/RESULTS.md)
+- [Quadratic-tail derivation](research/hec_residual_span_20261116/native-pencil-2lp/QUADRATIC-TAIL.md) and [exact implementation gate](research/hec_residual_span_20261116/native-pencil-tail/RESULTS.md)
+- [Prepared oracle qualification](research/hec_residual_span_20261116/native-prepared-oracle/RESULTS.md)
+- [Latest fair all-six-arm count results](research/hec_residual_span_20261116/native-prepared-solvers/RESULTS.md)
+- [Working journal and retained failures](research/hec_residual_span_20261116/SESSION.md)
+
+The branch also retains the earlier **special binomial-family** automorphism and CM-quotient investigations. Their “original targets” mean the targets within those frozen special-family panels, not the initial mixed-term benchmarks. No checked transport makes those results apply to the initial families. Keeping exact polynomial and subgroup identity is mandatory; matching genus/field/constant alone is insufficient.
+
+Protocols, source/binary/input hashes, raw outputs and failure records are in Git while S3 is unavailable. No S3 upload or external independent admission is claimed. Keep the PR open for review; no merge or auto-merge is authorized. Remaining research must demonstrate a genuinely stronger complete-cost mechanism and qualified runtime evidence across the intended scope before the full goal can be marked achieved.

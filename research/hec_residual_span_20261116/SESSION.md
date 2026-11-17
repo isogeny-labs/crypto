@@ -2709,3 +2709,10 @@ What was done: portedall6algorithms toexplicitPreparedargument, commonwrapperval
 Decisions made: no globalcache/single-armadvantage; allbaselinechoicespreparedsameway. Countedbaseprimitivesnotwalltime, explicitlookupcost/memoryandintegeromissions; nogoalcompletionfromREDCdrop. One600CPUrunafterGitfreeze.
 Open threads: executeintegration, compareSHARED-preparedcontrols,retainallregressionsandold/newqualificationboundaries.
 Errors: compilepasseswithinheritedunusedimport/report/helperwarnings, no scientificrunyet. PriorEOFblankstrippedonlyinnewprospectivecopybeforefreeze, oldhashedsourceuntouched. No S3/cloud/merge.
+
+## Shared prepared all-sixintegration qualifies, comparator/report consolidated
+
+What was done: freeze315093e0895 hashespass,264completecalls exit0, allnativeverified/oldoutcomes/subgroup16vectorsreplay; newcounts/lookups/memoryrepeat exact. Sharedcontrol/tailbase ratiosg21.399-2.580,g31.814-4.343,g41.091-2.395; subgroupunchangedpriorrange/regression.44envelopes/220comparisons/132lookuprecords retained.
+Decisions made: freshO(p)tablepaidallarms, rootbytesnotRSS, cap65537andlookup/integerlimitations explicit; no REDC-to-wall or10xclaim. RewrotePRbodyaroundfinalgenericcontrols/evidence/scopemap ratherthanappendmorechronologicalstages, keptspecialbinomialresearchseparate. Bothold/newrecordsretained; futurestrongcontrolmustsharepreparation.
+Open threads: nextweightedLP/producermechanismorqualifiedruntimecheckwithalllookupwork; independentreview/fullgenus2+10xgoalopen.
+Errors: no scientificfailure, inheritedunusedhelper/importwarnings only. No S3/cloud/merge.
