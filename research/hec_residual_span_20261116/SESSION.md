@@ -2590,3 +2590,10 @@ What was done: freezec021e49f65c hashes pass, sole run exit0.192complete calls/2
 Decisions made: g3all32arm/workloads improve1.090-1.814x; g2range0.973-1.085with8armregressions; g4range0.836-1.281with16armregressions(allp271). Keep BOTH verifiers as controls; no unconditional default or post-hoc fallback, no uniform generalization of earlier original-g2gains. Conditional operator/genus4subgroup/unpricedinteger/independent-review scopes unchanged.
 Open threads: full producer/preparation mechanism against stronger available verification controls; potential prospective public-cost selector is separate, not a10xgoal substitute. Fullgenus2+goal active/unachieved.
 Errors: no scientific failure; inherited unused-import/report warnings only. No S3/cloud/merge.
+
+## Exact fixed-target simultaneous-phase analysis frozen
+
+What was done: inspected lazy-indexing/streaming/restricted-scan prior results and did not repeat rejected producers. Compiled deterministic Rust enumeration of all32free-phase subsets on12actual integrated totals, with original fixed reference and stronger current comparator budgets separate.
+Decisions made: retain original10xtarget, do not move it after verifier improvement. Require phase sums reconcile actual integrated raw16vectors; count constraints are necessary implementation-specific conditions, not universal lowerbounds or runtime. One post-analysis invocation after Git freeze, no new measurements.
+Open threads: inspect minimal joint-change requirements and use them to reject isolated-phase mechanisms before more prototypes.
+Errors: none in compilation. Conflict check allows; attach same existing reservation. No S3/cloud/merge.
