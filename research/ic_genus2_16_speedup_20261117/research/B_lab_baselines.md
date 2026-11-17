@@ -382,3 +382,31 @@ time** (L0), rho = matched rho on the source subgroup (crate's scalar rho,
 - levers 2026-11-16: relation phase x0.042, LA x0.29; comb/base t_ic 0.184,
   0.182, 0.170 at q = 16001, 24001, 32003 (no new rho ratio quoted in README).
 Genus 5 *generic hyperelliptic* data is only in genus_ladder (sec. 2.1, 2.3).
+
+### 2.11 Older genus-2 reference
+
+`c0b657b6d5:research/notes/index-calculus/RESEARCH_HYPERELLIPTIC_IC_RHO.md`
+(`hyperelliptic_index_calculus.rs` + `hyperelliptic_ic_bench.rs`, unit
+`S = group ops / sqrt N`, LA converted at measured `c` ~2,200-2,660 mul-mods
+per group op; rho = 16-adding Teske walk + Floyd): genus 2, p = 41..251,
+S_ic/S_rho = 3.0, 4.2, 5.5, 7.9, 8.8, 8.5 -- "loses harder as p grows";
+S_ic/floor 32-49. Class: accounting.
+
+### 2.12 Yesterday's leads that carry a measurement (`research/g2plus_leads_20261116/`)
+
+All Python or standalone instruments, `[pcc:unverified]`, counted FPM:
+- L01 (g=2, 3): relation-phase FPM/relation 30-70x below generic Cantor walk,
+  5-12x below explicit formulas, 3.3-3.9x with pencil set-up charged; descent
+  and LA not charged; pencil rows 16-465x dearer to eliminate. Follow-up F3
+  (`research/g2plus_followups_20261117/F3_L01_pencil_end_to_end/`) frozen,
+  pilot only, no RESULTS yet.
+- L02: `y^2 = x^5 + a` IC/rho improves 2.46x [2.23, 2.75] (orbit base, rho
+  also uses the automorphism, rho_gain 1.61 pooled); `y^2 = x^7 + a` 1.10x
+  [0.91, 1.34] (killed). Setup-free: 1.6-2.0x.
+- L03 (g=3): 2LP base constant cc 2 -> 1 cuts counted cost 36-40% in a
+  simulator; F1 (`.../F1_L03_base_constant_lab_instrument/`) re-measures in
+  genus_ladder; frozen, pilot only, no RESULTS yet.
+- L08 (nodal plane quintic g=4, sextic g=6 `d6_m4`, Python): A_2LP slopes
+  e.g. 0.981 (g=4 one model), 1.11-1.17 (g=6) -- **void**: duplicate lines
+  counted as relations (INCONCLUSIVE-instrument). This is the only genus-6
+  relation collection found anywhere, and it is invalid.
