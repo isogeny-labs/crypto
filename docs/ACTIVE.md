@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Audit seven-of-eight RR9 quotient splitting on actual prime31 B8; native Rust exact controls and cost gate (automation, started 2026-11-17, branch automation/prime31-rr9-seven-quotient-split-20261117, PR #4581)
+- [x] Audit seven-of-eight RR9 quotient splitting on actual prime31 B8; source-specific Rust CI PASSED 40+1 and split quotient Fp^128 established (automation, started 2026-11-17, branch automation/prime31-rr9-seven-quotient-split-20261117, PR #4581)
 
 - [x] Freeze and audit #4556 exact-source public B8 RR9 result with native JSON receipt (automation, started 2026-11-17, branch research/prime31-barycentric-evidence-20261117, PR #4558)
 
