@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Reassess and continue the index-calculus lead portfolio from the November 2 evidence against current KB, atlas, claim standing, and November 17 results (Codex, started 2026-11-17, branch codex/index-calculus-resume-20261117)
+- [ ] Reassess and continue the index-calculus lead portfolio from the November 2 evidence against current KB, atlas, claim standing, and November 17 results (Codex, started 2026-11-17, branch codex/index-calculus-resume-20261117, PR #4594)
 
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
