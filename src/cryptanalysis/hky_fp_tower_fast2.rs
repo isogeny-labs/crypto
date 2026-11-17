@@ -55,7 +55,9 @@ use std::time::Instant;
 
 use rayon::prelude::*;
 
-use crate::cryptanalysis::hky_fp_tower::{count_monomials, Closure, FallDegrees, HkyLimits, HkyRing, NfPoly};
+use crate::cryptanalysis::hky_fp_tower::{
+    count_monomials, Closure, FallDegrees, HkyLimits, HkyRing, NfPoly,
+};
 use crate::cryptanalysis::hky_fp_tower_fast::{
     axpy_dense, barrett, check_symmetry, detect_simd, normalise, sparse_bucket, Row, RowS, Simd,
     Space, NONE,
@@ -508,7 +510,9 @@ pub fn closure_fast2(
         })
         .collect();
     let n_buckets: usize = 66 + opts.deg_weight * (c as usize + 1);
-    let bucket_of = |nnz: usize, d: u32| (sparse_bucket(nnz, 1) + opts.deg_weight * d as usize).min(n_buckets - 1);
+    let bucket_of = |nnz: usize, d: u32| {
+        (sparse_bucket(nnz, 1) + opts.deg_weight * d as usize).min(n_buckets - 1)
+    };
     let mut queue: Vec<Vec<Item>> = (0..n_buckets).map(|_| Vec::new()).collect();
     for (g, &sign) in live.iter().zip(&signs) {
         if HkyRing::degree(g) <= c {
@@ -542,11 +546,17 @@ pub fn closure_fast2(
             break;
         };
         if started.elapsed() > limits.budget {
-            let entries: u64 = ech.iter().flat_map(|e| &e.rows).map(|r| r.nnz() as u64).sum();
+            let entries: u64 = ech
+                .iter()
+                .flat_map(|e| &e.rows)
+                .map(|r| r.nnz() as u64)
+                .sum();
             return censored("budget", rows_reduced, entries, stats);
         }
-        let want = ((opts.target_pivots as u64 * 65536).div_ceil(yield_q16.max(1)) as usize)
-            .clamp(opts.batch_min.max(1), opts.batch_max.max(opts.batch_min).max(1));
+        let want = ((opts.target_pivots as u64 * 65536).div_ceil(yield_q16.max(1)) as usize).clamp(
+            opts.batch_min.max(1),
+            opts.batch_max.max(opts.batch_min).max(1),
+        );
         let take = queue[b].len().min(want);
         let at = queue[b].len() - take;
         let batch: Vec<Item> = queue[b].drain(at..).collect();
@@ -732,7 +742,8 @@ pub fn closure_fast2(
         for &(q, ri) in &inserted {
             let qi = q as usize;
             let n_q = ech[qi].pivot.len();
-            let RowS::Sparse(r) = std::mem::replace(&mut ech[qi].rows[ri as usize], RowS::Sparse(Vec::new()))
+            let RowS::Sparse(r) =
+                std::mem::replace(&mut ech[qi].rows[ri as usize], RowS::Sparse(Vec::new()))
             else {
                 unreachable!("rows are inserted sparse");
             };
@@ -789,7 +800,10 @@ pub fn closure_fast2(
             break 'outer;
         }
         let entries_now: u64 = if stats.stored_words > limits.max_entries {
-            ech.iter().flat_map(|e| &e.rows).map(|r| r.nnz() as u64).sum()
+            ech.iter()
+                .flat_map(|e| &e.rows)
+                .map(|r| r.nnz() as u64)
+                .sum()
         } else {
             0
         };
@@ -850,14 +864,18 @@ pub fn closure_fast2(
             stats.interreduce_muladds += ir_ops;
             stats.interreductions += 1;
             if opts.rebucket {
-                let old: Vec<Vec<Item>> = std::mem::replace(&mut queue, (0..n_buckets).map(|_| Vec::new()).collect());
+                let old: Vec<Vec<Item>> =
+                    std::mem::replace(&mut queue, (0..n_buckets).map(|_| Vec::new()).collect());
                 for (bi, items) in old.into_iter().enumerate() {
                     for it in items {
                         let nb = match &it {
                             Item::Row(..) => bi,
                             Item::Prod { part, row, .. } => {
                                 let r = &ech[*part as usize].rows[*row as usize];
-                                bucket_of(r.nnz(), u32::from(space.parts[*part as usize].deg[lead_of(r) as usize]))
+                                bucket_of(
+                                    r.nnz(),
+                                    u32::from(space.parts[*part as usize].deg[lead_of(r) as usize]),
+                                )
                             }
                         };
                         queue[nb].push(it);
@@ -881,7 +899,11 @@ pub fn closure_fast2(
         let _ = f.flush();
     }
     stats.part_rank = ech.iter().map(|e| e.rows.len() as u64).collect();
-    let entries: u64 = ech.iter().flat_map(|e| &e.rows).map(|r| r.nnz() as u64).sum();
+    let entries: u64 = ech
+        .iter()
+        .flat_map(|e| &e.rows)
+        .map(|r| r.nnz() as u64)
+        .sum();
     let mut dims = vec![0u64; c as usize + 1];
     if contains_one {
         for part in &space.parts {
@@ -902,7 +924,11 @@ pub fn closure_fast2(
         dims[d] += dims[d - 1];
     }
     if contains_one {
-        assert_eq!(u128::from(dims[c as usize]), n_cols, "hky_fp_tower_fast2: full space");
+        assert_eq!(
+            u128::from(dims[c as usize]),
+            n_cols,
+            "hky_fp_tower_fast2: full space"
+        );
     }
     (
         Closure {
@@ -1195,7 +1221,11 @@ mod tests {
             for sym in [false, true] {
                 let o = Fast2Options {
                     fault,
-                    symmetry: if sym { swap_first_two_blocks(t, 2) } else { None },
+                    symmetry: if sym {
+                        swap_first_two_blocks(t, 2)
+                    } else {
+                        None
+                    },
                     interreduce: 0.05,
                     interreduce_min: 1,
                     ..Fast2Options::default()
