@@ -7,6 +7,7 @@
 //!
 //! cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle
 //! cargo +1.100.0 run  --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle
+#![recursion_limit = "512"] // JSON transcript has 1024 case records
 use prime31_algebraic_ic::{check_curve, Arithmetic, Base, Point, PRIME31};
 use serde_json::json;
 use std::collections::{hash_map::Entry, HashMap, HashSet};
