@@ -2359,3 +2359,10 @@ What was done: compilep-adicCMtype/positivecodifferentform, sourceTraceGram, CRT
 Decisions made: exactordinarymoduledescriptor notcurve/pointmap/theta/speed; geometryidentificationreviewpending. PrimaryMarseglia5.1/5.4/section8 read. Gitfreeze beforeone120CPU.
 Open threads: executechecks thenadmitboundedperiod/reconstructionroute, preserveoriginal10x/fullgenus2/4scope.
 Errors: prefreezeborrow compileerror corrected; unusedcopiedhelpers warnings only, no scientificexecutionyet/S3/cloud/merge.
+
+## Exact659 polarized quotientmodules and isometry qualified
+
+What was done: pushedfreeze8d9f68abeba, hashespass, oneexit0; sourceCMtype[1,2,3]/xi exponent1 principalTraceGram;2CRTquotientlattices integralprincipalGram, F/V/Q integral, FV421, char retained/Fsimilitude, Qdegree659³/pullback/sourceFintertwining, sigmanotintegral. PartnerU determinant1/Gisometry/Fintertwining exact.
+Decisions made: concreteordinarymoduleisogenydescriptor notfinitefieldcurve/pointmap; geometricinterpretationandcategorypremisesindependentlyunreviewed. Sourceidentificationnotfromunimodularityalone. [pcc:unverified].
+Open threads: exactsymplecticbasis/canonical-liftperioddescriptor withconditioning thenboundedfinitefieldreconstruction/targettransport/cost; original10x/fullgenus2/4andindependentvalidation.
+Errors: prefreezeborrowcompilefixonly; no runfailure/retry/S3/cloud/merge.
