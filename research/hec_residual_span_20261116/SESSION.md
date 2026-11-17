@@ -129,3 +129,17 @@ A genuinely distinct relation-generation/reuse mechanism needs a full rank and c
 
 ### Errors
 Browser fetch timed out twice; direct curl retrieved the primary PDF. No experimental rerun or threshold change.
+
+## Classical pencil gate prepared
+
+### What was done
+Implemented independent all-parameter polynomial division versus point buckets, shared/multiple-root rejection receipts, exact polynomial reconstruction, original Jacobian relation checks, orbit row assembly and independent dense prefix ranks. Fixed eighteen source/target cases and sixteen anchors per case before execution.
+
+### Decisions made
+This is correctness and useful-rank qualification of a known baseline, not a novel mechanism or timing claim. Require all eighteen completions; retain misses without extending anchor budget. Freeze imports/native/binary and push before once-only execution under Git custody.
+
+### Open threads
+Run gate after release build/source checkpoint; performance and stronger reuse mechanisms remain open.
+
+### Errors
+No runtime experiment executed yet.
