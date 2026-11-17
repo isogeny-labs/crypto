@@ -258,7 +258,7 @@ fn public_macaulay(residual:Point, xs:&[u64;8], h:&[u64;9], degree:u8)->Result<V
     } else { None };
     if let Some(values)=extracted {
         let m=independent_direct_m(&values,r,s);
-        assert_eq!(m,h.clone(),"recovered coefficients do not reconstruct public factor polynomial");
+        assert_eq!(m,*h,"recovered coefficients do not reconstruct public factor polynomial");
     }
     Ok(json!({
         "candidate_chart_coefficients":extracted,
