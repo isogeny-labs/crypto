@@ -2786,3 +2786,10 @@ What was done: derived normalizedellprojection onwholeJ from sourceorder/uniquee
 Decisions made: failurepathchangeexplicit (lateNone/rejectedinsteadpreflightabort), notfreecertifiedmembershipornewmath/10x. One600CPUrun afterGitfreeze, negativeunavailabilityretained.
 Open threads: executesoundness/costgate, retainallnegativeoutcomes andfullcostratio;LPcostcase stillopen.
 Errors: inheritedunusedsource/importwarnings only;no scientificexecutionbeforefreeze.No S3/cloud/merge.
+
+## Deferred membership passes native adversarial controls and exact cost identity
+
+What was done: freeze4c221ffb642 hashespass/exit0;44successfulfreshcalls repeat/replay/nativeanswerpass, new+omittedtargetmul=old forALL16counters/moduli.16offsubgroupcontrols allfinal_rejectedtrue/None withnativeprincipalaudits;6outsidecataloguecontrolsunavailable.11900abstractdirectproductcasespass, zero/compositecontrolsall22, wrongordersourcecontrols16.
+Decisions made: source-onlyeligible/finalcheckcontract soundundergroupdecompositionpremises, butfailurelatencydiffersandexplicit. Baseimage/deferredratiosg21.056-1.272,g31.095-1.278,g41.055-1.136; subgroupunchanged. No10x/runtime/newattackclaim. Futurestrongcontrolincludesimages+latevalidation.
+Open threads: LPpayload/finalmatrixconstruction costcase, full10xgenus2+goalactive/independentreviewopen.
+Errors: systemRuby tally unsupported inbookkeeping, subsequent explicitcount found16rejections/6unavailable; no scientificrerun. No S3/cloud/merge.
