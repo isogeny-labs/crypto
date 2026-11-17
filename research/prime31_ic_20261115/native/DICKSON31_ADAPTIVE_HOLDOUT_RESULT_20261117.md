@@ -14,6 +14,8 @@ prime order \`n=2147446831\`, \`G=(625037715,2100627251)\`.
 - Exact source at **4dcbbce6e3480c55d97e115d802833062955c1d1**, immutable native arithmetic base \`1df714645aa683cf975bc76fcacb9842cb4780fd\`, pinned Rust 1.100.0, Ubuntu 24.04 GitHub-hosted runner.
 - **PASS** [source-specific GitHub Actions #44169834979](https://github.com/isogeny-labs/crypto/actions/runs/44169834979): original native Rust library tests **40/40**, new isolated Rust holdout **1/1**; parsed JSON boundary assertions. [Raw full transcript artifact #14366792594](https://github.com/isogeny-labs/crypto/actions/runs/44169834979/artifacts/14366792594). GitHub metadata reports ZIP digest \`sha256:1d957459b4e1b55230b7fc8ad96ee9cf133a6564556305573140c40dd43027a5\`; archive **not independently rehashed**. Earlier source version before adding setup accounting also passed [#44169385150](https://github.com/isogeny-labs/crypto/actions/runs/44169385150). Its entire 98-case cohort, public point inputs, signed witnesses, probe counts and native operation counts are identical to the final run; only diagnostic time/setup fields differ.
 
+**Durable frozen case-by-case evidence:** [all 98 cases / 109 signed-control attempts in JSON](DICKSON31_ADAPTIVE_HOLDOUT_RAW_20261117.json) was also committed to this PR, so the raw witness/probe transcript remains available after GitHub's 30-day workflow-artifact retention window.
+
 ## Exact observed outcomes
 
 | Dickson31 public target panel | No shift a=0 | First retry a=1 | Second retry a=2 | Still unresolved by a=8 |
