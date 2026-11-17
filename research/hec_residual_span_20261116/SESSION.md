@@ -801,3 +801,17 @@ GeneralHdetreview; genus2C4geometric-splittingobstruction; choosebroadrelation-g
 
 ### Errors
 None; no runtimefailureorretry.
+
+## Genus2C4geometric scope obstruction recorded
+
+### What was done
+Derivedexplicitreciprocalinvolutiontau(x,y)=(u²/x,u³y/x³),u4=b,forall smoothgenus2y²=x5+a*x3+b*x. Exactsubstitution,tau²andtwofixedpointscountgivegenus1quotientbyRiemannHurwitz. ReadprimaryShaskaVoelkleinmath/0107142andCardonaQuermath/0203165; klassicalscope, notnewpriority. [pcc:unverified]
+
+### Decisions made
+Do notsubstitutegenus2C4familyforgeneralabsolutelysimplegenus2coverage. GeometricquotientdoesnotimplyFpdescentorDLPspeedup. Retaincurrentgenus4gainandturnbroadersearchtowardmechanismsusableonprime-ordergenus2/3controls.
+
+### Open threads
+GeneralGaussianHdetproofaudit; relationgenerationmechanismwithcostcaseforbroadgenus2+10xobjective.
+
+### Errors
+OriginalrisatprimaryPDFredirectinaccessible; recoveredoriginalsarxiv. KBexactscopequeryunhelpful,nopriorityorabsenceclaim.
