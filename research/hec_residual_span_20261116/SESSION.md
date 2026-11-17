@@ -1518,3 +1518,10 @@ What was done:6967ac38dacsingle invocation exits0;48calls exactrepeats,strict48m
 Decisions made: proof-backedvalidationoptimizationqualifiedbutnot10x; nofurtherfixed-small-poolcampaign withoutscaledrank/costcase. Forfixedanchors/restarts,necessarypoolscalesq^(1-1/g),notgeneralsolverlowerbound.
 Open threads: multivariablesymbolicinactivation/component-awareproduction withscalingandcost; originalgenus2+goalunresolved.
 Errors: none,no scientificretry/S3/cloud.
+
+## Sparse dependency operator and target certificate frozen
+
+What was done:literature-first scaling screen distinguishes firsthit fromgrowth; meanfieldbalance matchesclassicalexponent,notnovelattack. Implemented unittriangularDAG forward/transposeSchur, exactRHScorrection,originalrowbasis/offsetreplay,densecomparison,adjoints,andtargetrowspacewitness verification. Compiled18panels onretained6streams; hashesfrozen.
+Decisions made: avoiddense-labelseed-widthfactorbeforelargerpoolprototype; witnessgenerationdense referenceonly,no productioncost/10xclaim. KnownfieldoperatornotringKrylovqualification.
+Open threads: executeonce; efficienttargetwitnesssolver/fullscaledproducerremainrequired.
+Errors: none,nosciencebeforepushedfreeze.
