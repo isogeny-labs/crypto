@@ -18,11 +18,11 @@ variable count and final Gröbner-basis degree alone do not meet this goal.
 
 ## Active items (top = next)
 
-- [x] Freeze the ideal-module regularity definition and comparison protocol (codex, started 2026-11-17, branch lane/p256-complete-law-dreg-20261117, PR #4583; merged component PR #4567; tracking4555 merged before research publication)
-- [ ] Establish a complete-system baseline on the frozen finite depth4 cell, preserving the original depth8 workload (codex, PR #4583; merged component PR #4567; four native cells censored; no admitted full D)
-- [ ] Extend retained membership certificates (signed D8→4 and16→5) to complete baseline/candidate relation ideals (codex, PR #4583; merged component PR #4567; full-system certificate pending)
-- [ ] Establish a candidate with D_candidate <= D_baseline/2, preserving exact relations and charging auxiliary variables/covers (codex, PR #4583; merged component PR #4567)
-- [ ] Validate m=2–7 and record scope, replay, costs and remaining obligations (codex, PR #4583; merged component PR #4567; 48 paired exports/12 planted replays checked; full solve/depth8 pending)
+- [x] Freeze the ideal-module regularity definition and comparison protocol (codex, started 2026-11-17, branch lane/p256-complete-law-dreg-20261117, PR #4590; merged component PR #4567; tracking4555 merged before research publication)
+- [ ] Establish a complete-system baseline on the frozen finite depth4 cell, preserving the original depth8 workload (codex, PR #4590; merged component PR #4567; four native cells censored; no admitted full D)
+- [ ] Extend retained membership certificates (signed D8→4 and16→5) to complete baseline/candidate relation ideals (codex, PR #4590; merged component PR #4567; full-system certificate pending)
+- [ ] Establish a candidate with D_candidate <= D_baseline/2, preserving exact relations and charging auxiliary variables/covers (codex, PR #4590; merged component PR #4567)
+- [ ] Validate m=2–7 and record scope, replay, costs and remaining obligations (codex, PR #4590; merged component PR #4567; 48 paired exports/12 planted replays checked; full solve/depth8 pending)
 
 - [ ] Add a Faugère–Lachartre reducer/free-column split to Boolean F4 for Semaev systems (Codex, started 2026-11-17, branch codex/semaev-f4-subset-reducers, PR #4562)
 
