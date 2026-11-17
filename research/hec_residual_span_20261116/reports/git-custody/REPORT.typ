@@ -68,3 +68,32 @@ Thus seven increments survive at a verified subgroup modulus, leaving the expect
 Rank8can determine relative catalogue logs once a nonzero source coordinate is fixed. The diagnostic's explicit coordinate enumeration must not supply those logs to a production implementation. Public-target descent, sparse scalar recovery, source/target verification and every preparation/cache/elimination/unused-tail cost still need integration and a completing matched baseline. The planned candidate schedules alone are2016cached versus2688direct; that difference is not a tenfold premise.
 
 This is a positive finite useful-rank result on a special curve, not a generic theorem about useful rank, novelty, fastest-tool or tenfold complete-cost result. The genus2/F251zero-gain outcome is retained. Subgroup/PROTOCOL.md, RESULTS.md, raw output and output hashes preserve the exact boundary. Both prior pages remain historical stage reports; their generic-scalar limitation is resolved for this specific follow-up, not for the whole earlier panel.
+
+#pagebreak()
+= Supplied-target integration: three verified recoveries
+Execution checkpoint904767f2ed6 · unchanged public curve/source/subgroup · exit0
+
+The candidate rebuilds its full candidate/cache/log state for each of three independent known-answer single-target inputs. It computes relative catalogue logs from the relation matrix plus source normalization; it contains no diagnostic coordinate table, BSGS or subgroup-coordinate enumeration. All nine computed logs reconstruct their projected public points. Expected scalars are confined to fixture construction and final comparison.
+
+== Full setup retained
+Each case generates2016subset/sign norm candidates,126split rows,1890nonsplit rows,1881stored labels and9nonzero collision rows. Split rank1becomes augmented rank8. Gaussian normalized log recovery uses1803counted multiplications per case. All original principal and collision identities remain checked; every candidate tail is charged to its case. No target shares setup with another target.
+
+#table(columns:5,inset:5pt,align:center,
+[case],[verified scalar],[descent trials],[native trials],[native solve mulmods],
+[0],[37],[11],[469],[584],
+[1],[2026],[9],[366],[630],
+[2],[7001],[2],[519],[460])
+
+Native controls use the same public source and target, fresh default setup, declared fixed seeds and a200000trial cap. Every control completes and verifies. Native precomputation is1group operation per case; reported group totals are470,367and520. These group operations and candidate norm/linear-algebra counters have different units and are not a speed ratio.
+
+== Projection and final scalar verification
+For R=T+aD, a split reduced divisor gives an original rational-place decomposition whose group sum is checked exactly. Recovered catalogue logs describe13P, so applying the same projection to the entire equation gives log(13R)=13(k+a). The solver recovers
+
+$k=13^(-1) L-a mod 8623.$
+
+Every scalar verifies against the original public source and target. This prevents a one-sided projection mistake; no expected scalar is consulted by catalogue generation, log elimination or descent.
+
+== Decision
+The useful-rank example now supports a complete relation-log/descent recovery path, not just a matrix rank observation. The short descent excludes none of the preceding setup. Its2016candidates and1881labels remain a substantial burden, while native scalar elimination uses fewer counted multiplications in every control. No measured or complete-cost tenfold premise has been established.
+
+A cheaper mathematical preparation mechanism or a useful earlier prefix is needed before a full-cost campaign is justified. Preserve this exhaustive implementation as the correctness reference. The fixed special curve, three known-answer controls and native rather than fastest-external comparison limit the claim. Genus2zero gain and the complete history of failures/amendments remain retained. Target/PROTOCOL.md and RESULTS.md contain exact source/custody and operation boundaries.
