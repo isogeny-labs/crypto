@@ -619,3 +619,17 @@ Independent exact point-order/interval/source replay remains pending before stro
 
 ### Errors
 None in this replay. Toolchain uses Homebrew rustc1.93.1; no cross-toolchain timing claims.
+
+## Exact-order replay prepared
+
+### What was done
+Created a separate verifier for all39exactpointorders,LCMs,intervals,basecounts,andthreeWeilreconstructions. Uses shared native Cantor arithmetic, separate sqrt/interval/Newton/factorization code; extension counts explicitly not re-enumerated. Build passes onHomebrew1.93.1. No scientific execution yet.
+
+### Decisions made
+Freeze and push before once-only replay. Additional large-prime Hasse argument documented separately, without mutating producer protocol. Prior turn classified progress because authoritative Git/PR evidence changed.
+
+### Open threads
+Run replay and retain results, then establish actual solver cost on C4 inputs.
+
+### Errors
+Previous coordination task lease retry budget exhausted; released it and claimed separate replay taskT7017. No arithmetic run failure.
