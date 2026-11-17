@@ -48,7 +48,7 @@ jobs:
 
       - name: Build and verify shared rootfinder headers
         run: |
-          make -C gpu/rootfind test bench_host_inv bench_host_inv256 bench-batch-core bench-mul256 bench-sparse256
+          make -C gpu/rootfind test bench_host_inv bench_host_inv256 bench-batch-core bench-mul256 bench-sparse256 bench-carry256
 
       - name: Record before and after perf counters when accessible
         shell: bash
@@ -93,6 +93,12 @@ jobs:
           for arm in before after; do
             perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/sparse256-${arm}.txt" \
               -- taskset -c "$cpu" gpu/rootfind/bench_sparse256 "--perf-$arm"
+          done
+          # Isolated 256-bit host carry/borrow chains. They use the same
+          # deterministic operand corpus for before and after.
+          for arm in adc-before adc-after sbb-before sbb-after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/carry256-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_carry256 "--perf-$arm"
           done
           # Inversion-core arms are in addition to the field-inversion arms.
           for arm in oracle16-before oracle16-after oracle32-before oracle32-after \
