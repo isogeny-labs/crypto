@@ -2807,3 +2807,10 @@ What was done: freezea1fcba10646 hashespass/exit0;22audit+44freshcalls/nativeans
 Decisions made: keepbuffered/streambothcontrols; naturalpivotsregressdespiteearliertermination, no10x/uniformreplacement/newmathclaim. Frozenstderr old_outcomesreplay phraseclarifiedinRESULTS aspublicscalar/newauditReportagreement, notoldprefixidentity.
 Open threads: deferredpayload/pivotstructure with credible integratedcost, fullgenus2+10xgoalactive/independentreviewopen.
 Errors: no scientificfailure, inheritedunusedimport/helperwarnings only.No S3/cloud/mergeorunchangedrerun.
+
+## Generic weighted affine forest sparse payload gate frozen
+
+What was done: inspected existingaffine-lp/genus2onecore priorart andgeneralizedparentpotentiallabels tosparsearbitrarysmallFB/target/constant maps; unionbysize/groundsentinel/nonunitcycles preserved. Retainedsharedimages/latevalidation/smalltargetSparse. Preparedsyntheticcycle/unary and22audit+44count+16negativecalls; first128anddeterminingfullrawprefixnativeFastcomparison.
+Decisions made: materializedsparsepayloadforest notfullydeferredDAG; classicaladaptationnotnovelty. Comparebothstrongstream/bufferedcontrols, retainallregressions. One600CPUprocessafterGitfreeze.
+Open threads: execute/measureforest;full10xgenus2+objectiveactiveunachieved.
+Errors: inheritedunusedhelper/importwarnings only;no scientificexecutionbeforefreeze.No S3/cloud/merge.
