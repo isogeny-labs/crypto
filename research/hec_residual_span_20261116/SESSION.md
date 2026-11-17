@@ -2863,3 +2863,10 @@ What was done: freeze1d9d7dec517 inputhashpass/exit0;44freshcalls alloldReport/F
 Decisions made: restrictedall-groundedrowsonlyneedkerBsignature soexactscalartestapplicableatrho1 despiteq>0; arbitraryrowsstillneedfreerootcoordinates. Availabilitynotdualconstruction/performance/10x. Nextcostcasepublicsource/targetdecompositionsbeforeexpandedscan, retainnonsplit/duplicate/ungroundedcasesandchargeallwork.
 Open threads: qualify/publicsource-targetnormalizationandprice exactlowdimensionalfinisher againststaticforest;fullgoalactiveunachieved/independentreviewopen.
 Errors: none;frozennegative_calls0 meansnonegativeexecutionhere/inheritedtrueflagvacuous, clarifiedinRESULTS. No S3/cloud/merge orunchangedperformance rerun.
+
+## Public source target decomposition control frozen
+
+What was done: addedchargedpublicD/Tsplits andsignedrows sumFB=1/sumFB-k=0, noexpectedlogs. Twooptionalrowssourcefirstqueuedateachanchorboundary, heldpendinguntilatmost2ungroundedcomponents; forestassertafterfullaggregation. Newsplit/insert/pending/probestats. Prepared22audit+44count+16negativecalls withnativepublicDivreconstruction/prefixFastchecks/repeatednewauditReports.
+Decisions made: classicalstrongbaseline/source-normalizationnotnovelty, countallnewworkandnonsplit/pendingcases. One600CPUrun afterGitfreeze,512anchorbudgetunchanged, beforetryingselectivelowdimfinisher.
+Open threads: execute/measure againststaticforest;full10xgoalactiveunachieved/independentreviewpending.
+Errors: inheritedunusedsource/helperwarningsonly;no scientificexecutionbeforefreeze. No S3/cloud/merge.
