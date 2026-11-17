@@ -58,15 +58,6 @@ static inline Fp256Ctx fp256_ctx_p256() {
 
 /* r = a + b, returns carry (0/1). */
 RF_HD uint64_t u256_adc(U256x64 &r, const U256x64 &a, const U256x64 &b) {
-#if defined(__x86_64__) && !defined(__CUDACC__)
-    unsigned char c = 0;
-    for (int i = 0; i < 4; i++) {
-        unsigned long long sum;
-        c = _addcarry_u64(c, a.v[i], b.v[i], &sum);
-        r.v[i] = (uint64_t)sum;
-    }
-    return c;
-#else
     uint64_t c = 0;
 #pragma unroll
     for (int i = 0; i < 4; i++) {
@@ -78,7 +69,6 @@ RF_HD uint64_t u256_adc(U256x64 &r, const U256x64 &a, const U256x64 &b) {
         c = c1 | c2;
     }
     return c;
-#endif
 }
 
 /* r = a - b, returns borrow (0/1). */
