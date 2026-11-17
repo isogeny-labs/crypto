@@ -829,3 +829,17 @@ Freeze/push/runonce; classifyfullvectors/trialexcess/pencilcomparison. Genuinebr
 
 ### Errors
 Pre-freezecopyhadrelative source.rs path; fixedtoretainednormalized/source.rsbeforebuild. No scientificrun/retry. OldConductorleaseexpired; newtaskT7038claimed. KBrevision9b2119e8fbac482b98b50521c0d604bbrefresh06:15predatesnewwork,lexicalonly. Prioradjacentproposal:b2948c1f2af904530de97fdb05ec1589notameasurement.
+
+## One-orbit core route completed and failed tenfold cost gate
+
+### What was done
+At07a6025bf46once-onlyrunexits0;160calls/20freshworkloadsallsolve,420prefixrank/kchecksOnlinevsSparseFullmatch,allrepeats/reductionidentities/scalars pass. g2p601oldfold/candidateellREDC35.713–56.331butpencil/candidatepREDC0.629–0.729;allg3casesalso losepencilpREDC. GeneralSparseFullmatchesorimprovesOnlinearithmeticonallcases. Localobservations. [pcc:unverified]
+
+### Decisions made
+Closeone-orbithistoryasasupported10xrouteonpanel,notabroadimpossibilityclaim. Do notattributecombinedgenerator+incrementalLAgainsolelytogenerator. RetainSparseFullasstrongbaseline; futurepencilLAcomparisonsneedincrementalsparsecontrol. Generalmathematicalgoalactive.
+
+### Open threads
+Integrateincrementalsparsepencilasbaselineengineeringifneeded,thennewrelation-generationleadwithg2+costcase. C4determinantlemma/generalproofgapremainseparate.
+
+### Errors
+No runtimefailures/censoring/retries;9g3p421smoothrowsfilter-rejectedandcharged. Historicalknown-logwalkcollisionpreventedfalsepriorityclaim.
