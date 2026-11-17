@@ -16,6 +16,7 @@
 //
 // Output: one optlevel.ops/v1 JSON line per class.
 //   nvcc -O3 -std=c++17 gpu_calib.cu -o gpu_calib && ./gpu_calib
+#include <cstring>
 #include <chrono>
 #include <cstdint>
 #include <cstdio>
@@ -90,7 +91,10 @@ static double now() {
     return std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch()).count();
 }
 
-int main() {
+int main(int argc, char **argv) {
+    // Optional argument: run one operation class only (a name from name[] or "triad"), so that a
+    // single kernel can be measured and profiled as a positive control.
+    const char *only = argc > 1 ? argv[1] : nullptr;
     cudaDeviceProp prop;
     CK(cudaGetDeviceProperties(&prop, 0));
     const int block = 256;
@@ -99,6 +103,7 @@ int main() {
     uint64_t *out;
     CK(cudaMalloc(&out, sizeof(uint64_t) * threads));
     for (int k = 0; k < NCLS; k++) {
+        if (only && strcmp(only, name[k]) != 0) continue;
         uint32_t rounds = 1u << 12;
         double secs = 0;
         for (;;) {                                           // grow until one launch lasts at least 0.5 s
@@ -118,6 +123,7 @@ int main() {
                "\"bytes_declared\":0,\"threads\":%u,\"device\":\"%s\"}\n",
                name[k], (unsigned long long)threads * rounds * CHAINS, secs, threads, prop.name);
     }
+    if (only && strcmp(only, "triad") != 0) return 0;
     const size_t n = (size_t)32 << 20;                       // 256 MiB per array
     double *a, *b, *c;
     CK(cudaMalloc(&a, 8 * n)); CK(cudaMalloc(&b, 8 * n)); CK(cudaMalloc(&c, 8 * n));

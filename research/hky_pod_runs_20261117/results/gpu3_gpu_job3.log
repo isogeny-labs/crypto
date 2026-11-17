@@ -1,0 +1,106 @@
+2026-11-17T16:26:16Z
+apt rc=0
+=== profile probe with ncu control
+profile: cpu sampling: none; topdown: false; callgrind: false; gpu: true; ncu: true; nsys: false
+        "index": 0,
+        "name": "NVIDIA RTX 2000 Ada Generation",
+        "driver": "595.112.07",
+        "compute_cap": "8.9",
+        "max_sm_clock_mhz": 3105,
+        "max_mem_clock_mhz": 7001,
+        "power_limit_w": 70.00,
+        "memory_mib": 16380,
+        "persistence": "Enabled"
+      }
+    ]
+  },
+  "tools": {
+    "ncu": {
+      "path": "/usr/local/cuda/bin/ncu",
+      "version": "Version 2025.1.1.0 (build 35528883) (public-release)"
+    }
+  },
+  "capabilities": {
+    "cpu_sampling_software": null,
+    "cpu_hardware_counters": null,
+    "cpu_sampling": "none",
+    "callgrind": false,
+    "topdown": false,
+    "gpu_present": true,
+    "ncu": true,
+    "nsys": false,
+    "nvcc": true,
+    "nvidia_profiling_admin_only": true,
+    "ncu_control_kernel": {
+      "built": true,
+      "ran_and_checked": true,
+      "ncu_profiled": false,
+      "counter_permission_denied": true,
+      "failed_to_prepare": false,
+      "log_tail": "nvcc warning : Support for offline compilation for architectures prior to '<compute/sm/lto>_75' will be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).\ncontrol: ok\n==PROF== Connected to process 7229 (/tmp/tmp.gj0GNH9iPr/control)\n==ERROR== ERR_NVGPUCTRPERM - The user does not have permission to access NVIDIA GPU Performance Counters on the target device 0. For instructions on enabling permissions and to get more information see https://developer.nvidia.com/ERR_NVGPUCTRPERM\ncontrol: ok\n==PROF== Disconnected from process 7229"
+    },
+    "inferno_flamegraph": false
+  }
+}
+nvcc warning : Support for offline compilation for architectures prior to '<compute/sm/lto>_75' will be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).
+calibrate rc=0
+=== muladd_u32
+{"schema":"optlevel.ops/v1","op_class":"muladd_u32","ops":3023656976384,"kernel_seconds":0.958687492,"bytes_declared":0,"threads":45056,"device":"NVIDIA RTX 2000 Ada Generation"}
+ncu rc=3
+profile: unsupported on this host: ERR_NVGPUCTRPERM: the driver withholds GPU performance counters from this user (NVreg_RestrictProfilingToAdminUsers=0, or run with the provider's profiling capability)
+command.stderr
+command.stdout
+manifest.json
+measure rc=0
+gpu-muladd_u32  [T-gpu-timing]  class muladd_u32
+  attainment single 0.994 [0.994, 0.994]  of 3.157e+12 ops/s (compute (traffic unknown) roof, 1 thread(s))
+  grade      A (score 0.994, scope single-thread only)
+  limiting   none above threshold: near the roofline; what remains is the algorithmic axis  [roofline]
+  noise      A/A 0.000 over 5 pairs
+  flags      CALIBRATION_GPU_CEILING_UNVALIDATED_BY_AUTHOR, INTENSITY_UNKNOWN
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+score rc=0
+/workspace/out/gpu3/muladd_u32.record.json: ok
+validate rc=0
+{"tier": "T-gpu-timing", "grade": {"invalid": [], "letter": "A", "letter_range": "A", "limiting_basis": "roofline", "limiting_factor": "none above threshold: near the roofline; what remains is the algorithmic axis", "rule": "sqrt(A_single * A_full); letters A>=0.70 B>=0.40 C>=0.20 D>=0.08 E", "scope": "single-thread only", "score": 0.9943081930428763}, "score": null, "limiting_factor": null, "flags": ["CALIBRATION_GPU_CEILING_UNVALIDATED_BY_AUTHOR", "INTENSITY_UNKNOWN"], "attainment": {"single": {"high": 0.9944418990884153, "low": 0.9941242355381633, "value": 0.9943081930428763}}}
+=== fma_f64
+{"schema":"optlevel.ops/v1","op_class":"fma_f64","ops":47244640256,"kernel_seconds":0.515216267,"bytes_declared":0,"threads":45056,"device":"NVIDIA RTX 2000 Ada Generation"}
+ncu rc=3
+profile: unsupported on this host: ERR_NVGPUCTRPERM: the driver withholds GPU performance counters from this user (NVreg_RestrictProfilingToAdminUsers=0, or run with the provider's profiling capability)
+command.stderr
+command.stdout
+manifest.json
+measure rc=0
+gpu-fma_f64  [T-gpu-timing]  class fma_f64
+  attainment single 0.994 [0.994, 1.000]  of 9.280e+10 ops/s (compute (traffic unknown) roof, 1 thread(s))
+  grade      A (score 0.994, scope single-thread only)
+  limiting   none above threshold: near the roofline; what remains is the algorithmic axis  [roofline]
+  noise      A/A 0.000 over 5 pairs
+  flags      CALIBRATION_GPU_CEILING_UNVALIDATED_BY_AUTHOR, INTENSITY_UNKNOWN
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+score rc=0
+/workspace/out/gpu3/fma_f64.record.json: ok
+validate rc=0
+{"tier": "T-gpu-timing", "grade": {"invalid": [], "letter": "A", "letter_range": "A", "limiting_basis": "roofline", "limiting_factor": "none above threshold: near the roofline; what remains is the algorithmic axis", "rule": "sqrt(A_single * A_full); letters A>=0.70 B>=0.40 C>=0.20 D>=0.08 E", "scope": "single-thread only", "score": 0.9940984020483077}, "score": null, "limiting_factor": null, "flags": ["CALIBRATION_GPU_CEILING_UNVALIDATED_BY_AUTHOR", "INTENSITY_UNKNOWN"], "attainment": {"single": {"high": 1.0000295081613988, "low": 0.9940825127419255, "value": 0.9940984020483077}}}
+=== triad
+{"schema":"optlevel.ops/v1","op_class":"triad","ops":4362076160,"kernel_seconds":0.502549754,"bytes_declared":104689827840,"device":"NVIDIA RTX 2000 Ada Generation"}
+ncu rc=3
+profile: unsupported on this host: ERR_NVGPUCTRPERM: the driver withholds GPU performance counters from this user (NVreg_RestrictProfilingToAdminUsers=0, or run with the provider's profiling capability)
+command.stderr
+command.stdout
+manifest.json
+measure rc=0
+gpu-triad  [T-gpu-timing]  class fma_f64
+  attainment single 1.000 [1.000, 1.000]  of 8.683e+09 ops/s (memory roof, 1 thread(s))
+  grade      A (score 1.000, scope single-thread only)
+  limiting   at the memory-bandwidth roof: only higher arithmetic intensity (blocking, packing, fewer bytes per operation) or a different algorithm helps  [roofline]
+  noise      A/A 0.000 over 5 pairs
+  flags      CALIBRATION_GPU_CEILING_UNVALIDATED_BY_AUTHOR
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+score rc=0
+/workspace/out/gpu3/triad.record.json: ok
+validate rc=0
+{"tier": "T-gpu-timing", "grade": {"invalid": [], "letter": "A", "letter_range": "A", "limiting_basis": "roofline", "limiting_factor": "at the memory-bandwidth roof: only higher arithmetic intensity (blocking, packing, fewer bytes per operation) or a different algorithm helps", "rule": "sqrt(A_single * A_full); letters A>=0.70 B>=0.40 C>=0.20 D>=0.08 E", "scope": "single-thread only", "score": 0.9998724372009063}, "score": null, "limiting_factor": null, "flags": ["CALIBRATION_GPU_CEILING_UNVALIDATED_BY_AUTHOR"], "attainment": {"single": {"high": 1.0001280450161703, "low": 0.9997418752172811, "value": 0.9998724372009063}}}
+plot rc=0
+=== ALL DONE
+2026-11-17T16:28:44Z

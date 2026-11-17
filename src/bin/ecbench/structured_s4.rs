@@ -321,6 +321,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for StructuredOracle<'_> {
             solving_degree: None,
             timed_out: exhausted,
             extra,
+            ..Default::default()
         };
         self.totals.absorb(&shape, Some(&cost), exhausted);
         relation
