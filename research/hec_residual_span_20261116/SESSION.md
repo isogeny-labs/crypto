@@ -1305,3 +1305,13 @@ Changedkernel/bootstrap/producerorgenuinegeometry;correctnessandlogicalsetupdefe
 
 ### Errors
 No build/scientificfailureorretry/S3/cloud. No hiddenfreeproducerworkorweightedmoduluscancellation.
+
+## Rational genus-three isogeny screen derived
+
+What was done: read Smith's original sections 1/3 and Milne polarization background; wrote isogeny-screen/DERIVATION.md. Derived conditional exhaustion of rational (2,2,2) kernels for irreducible x7+c with rational seventh roots of unity. Explicit Gaussian periods A,B satisfy AB=2 and are Rosati adjoints, so the only two rational maximal isotropic kernels give polarized self-isogenies.
+
+Decisions made: do not build Smith transport on these binomial controls without first checking the irreducibility hypothesis and exact F2 module. This is a restricted obstruction, not a global impossibility or performance result. Git custody retained; no S3 access.
+
+Open threads: prospectively frozen Rust qualification on both retained genus-three models; broader genus2+ tenfold objective remains unresolved.
+
+Errors: stale T-7062 retry budget exhausted; released own old task, created and successfully claimed T-7071 via CLI. Connector principal still reports own CLI reservation as a conflict. No scientific producer was executed.
