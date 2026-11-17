@@ -1,5 +1,26 @@
 # Vieta Rust port: continuation receipt
 
+## Results publication tracking — PR4525
+
+Full results are pushed; draft PR4525 tracks remaining official record/publication
+blockers under the newly merged draft-first AGENTS.md rule. No measurement is
+active and no benchmark should be rerun. All source/protocol/binary pins match.
+Record0418 is still OPEN because the official censored-close is blocked by
+unchanged main historical0828 archive command1; scoped open-record audit0findings
+for1301raw/6metrics/2successful supervised commands. Future closure must use the
+official helper after the inherited blocker is repaired, never a local exclusion
+or status mutation. Canonical exports deliberately retain360/60 seed failures.
+New data PCC-20261117-dcce99 is unverified, with explicit registration/clock scope.
+Exact main ledger prefix plus1 unchanged local body uses official append_entry;
+chain/prefix0errors;151 inherited claim_type errors identical on base/head.
+Full journal block multisets include both PR4509 automated merge parents and
+all local/main publication blocks. Official artifact bot must handle9 policy
+files (8PNG and1derived control log); audit its diff against exact parent blobs
+and manifests without a local S3 availability claim. No rebase/force push/admin,
+empty refresh, gate weakening, protected promotion or unrelated record repair.
+Original terminal automation remains disabled. Monitor current head gate/size/
+artifacts/reviews; keep bounded4h cadence and stop after3 unchanged check-ins.
+
 ## Speed matrix finished — 17 November, final local result
 
 No measurement is active. speed-20261117 completed504/504 primary calls,72warmups,
