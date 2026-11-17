@@ -14,6 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
+- [ ] Publish prime-field coverage, Split4 and RR9 follow-up evidence (Codex, started 2026-11-17, branch research/prime-field-followup-20261117)
 
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
