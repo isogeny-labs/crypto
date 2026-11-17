@@ -2072,3 +2072,10 @@ What was done: Stoll fallbackPDF also returned502; protocol corrected to say nei
 Decisions made: preserve failedretrieval scope explicitly, sourcefreeze amendment before scientificexecution.
 Open threads: once-onlygate aftercorrectedfreeze push.
 Errors: previousprospective text assumed fallbackretrievalsuccess; corrected,hasesupdated,noscienceexecuted.
+
+## Polynomial anchor certificates qualified
+
+What was done: freezed77d601fbc3 once-onlyexit0;192originalsteps, sharedsupport/cancellation/identity controls,1156mutations, exactnativeoutputs/costrepeats pass.7fallbacksincluding6synthetic+1original,3compatiblesharedsupport controls. Verify2.737-3.018xlowerbaseREDC than nativeadd+validity. Assertions [pcc:unverified].
+Decisions made: retainproofcomponent; constructioncharged separately, build+verify/single-native ratio notcoldpipeline comparison sinceoldproduceralsobuildsanchors. Needexactintegrationwithproducer-emittedcerts.
+Open threads: completeoriginaltarget collector/verifier certificateemission gate withfallbacks/sourcebinding/principalgeometry charged, original10xscope andreview/genus3/4coverage.
+Errors: externalPDF403/502gapexplicit,no scientificfailure/retry/S3/cloud.
