@@ -745,3 +745,17 @@ RecordphasePRsuccessor(parent4523mergedexternallyatc0f639385eechead565181f737f).
 
 ### Errors
 None. No arithmetic changes or timingmeasurements.
+
+## Gaussian C4 reconstruction candidate prepared
+
+### What was done
+DerivedorientedtwistedtraceviaFpcharacters; enumeratedGaussian normcircle/line intersections underexplicitHdet(unit*p²determinant)hypothesis. Candidatecoretakesonlycurve,N,ell,i; no source/F/lambda. QualificationrequiresfullretainedWeilnormandallcatalogueactionchecks,bothorientations,exactrepeats. Compiled;notexecuted.
+
+### Decisions made
+RetainHdetgeneralproofgap; actualnormfactor/trace/groupcertificatescanqualifyselectedmodelswithoutclaiminggeneraltheorem. Unique-candidategateprecedesanysolverintegration. Componentalonecannotgive10x. PrimaryParkJeongLim2002section3Example2and4.1readinauthorfulltext; automorphism/GLVclassical, nopriorityclaim. IACRPDFfetchunavailable/403.
+
+### Open threads
+Freeze/push/run6orientations×2reps; retainambiguities/failure. Independentlyauditdeterminantlemmaandoperatororientationbeforegeneralpromotion.
+
+### Errors
+None. KBrevisionchangedto9b2119e8fbac482b98b50521c0d604bbduringsearch; newGaussian/eigenspacequeriesproducednoload-bearingexactlead, notabsenceproof.
