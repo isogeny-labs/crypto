@@ -1137,3 +1137,17 @@ No demonstrated mechanismyetmeets theseconditions. Existingfailure isclosedwitho
 
 ### Errors
 No scientificrun orS3access. Do not infer entire128anchorpanelincidence from oldbaselinewhichstopsatfirstsolution.
+
+## Fresh fixed-core oracle incidence bound measured
+
+### What was done
+Frozen e6655cd3dd1 retains5785exactgroup-verified genus2residual supports on6freshworkloads,16anchors each. All204possiblecore sizes analyzed with topincidencedegreeupperbound and sumdegrees=3M. Maxbounds perworkload3.377–3.665,allbelow10. [pcc:unverified]
+
+### Decisions made
+Reject10xfromfixedorbitcoreconcentrationalone onthesecompletepanels,evenfreeoracle; donotpromoteboundstoattainableperformance orotheranchorlaws. Source/targetscalaroutsideprobe;fullselection/setup/factor/LAcostnotclaimedfree. Newcandidate requiresdifferentmechanism. Broadgoalactive.
+
+### Open threads
+Adaptiveperanchorcores,otheranchorlaws,qualifiedtransport or independentrank/matrixadvantage needexplicitconstructivecostcase. Existingrawsupportenablesfuturepostanalysiswithoutproducer rerun.
+
+### Errors
+Retainedoldfileslackedroot supports, so no incidenceinferredfromranktotals. ReleasedownexpiredgeometrictaskandclaimedT7051; no competingagentworktouched. No scientificfailure/retry,S3/cloud.
