@@ -2478,3 +2478,10 @@ What was done: derived full-base reduced-pair count S=1+m+(m²-w)/2 and conditio
 Decisions made: test probability-only isogeny gain before further expensive CM reconstruction. Bound does not cover arithmetic/rank/nonuniform/truncated-base improvements. One120CPU invocation after Git freeze/push, no wall benchmark.
 Open threads: execute and use exact density to prioritize a mechanism capable of10x.
 Errors: pre-freeze missing-borrow compile error corrected; no scientific failure/run occurred during compilation.
+
+## Exact target-subgroup census limits the smoothness-only mechanism
+
+What was done: freezedb3d1166dbb hashes passed, complete67931class census exit0; smooth36721/non31210, degree counts1/270/67660, combinatorial count matches. Derived uniform success-probability ceiling67931/36721=1.849922387735, no timing claim.
+Decisions made: deprioritize further expensive genus-two CM curve reconstruction absent an additional arithmetic/rank/sampling mechanism; four distinguished quotients alone cannot establish10x via acceptance probability here. Restrict bound to uniform full-base model; no actual-walk mixing or general impossibility claim.
+Open threads: construct/prove a cheaper useful-rank mechanism or nonuniform sampler for genus-two; certified genus-three reduction bridge and genus-four construction remain open. Goal active, no10x result asserted.
+Errors: none in scientific run; native shared implementation means independent review remains pending.
