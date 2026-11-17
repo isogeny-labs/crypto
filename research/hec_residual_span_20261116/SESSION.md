@@ -1777,3 +1777,10 @@ What was done: compiled12originaltargets/24calls withunchangedqualified verifier
 Decisions made: candidatecost explicitly producer-nativecontrol+fullverifier; no checkomission/freecertificate. Producerbasevectors mustmatcholdsourceexact, repeats/sums exact. Assertions [pcc:unverified].
 Open threads: pushfreeze then single120CPU costinvocation.
 Errors: none in compile, no science yet.
+
+## First certificate cost rejected
+
+What was done: freeze18d7f02a248 once-onlyexit0;24calls certificates/replay/phases/repeats pass. Derivedcandidate losesbothmoduli allcases; p601base10.164-11.362x,ell28.502-42.298xsource. Exampleverifier149250=10296binding+142anchors+138812relations. Assertions [pcc:unverified].
+Decisions made: no freeverifier claim; both orbitlookup and nativeactionbinding needchange, solverwitnessalone insufficient. Retain soundnessprototype andnegativecosts.
+Open threads: orbitindex verifier and independentlyqualifiedFrobenius/Bezoutaction proof withfullcost; changedproducer stillrequired.
+Errors: none,no rerun/S3/cloud.
