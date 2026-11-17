@@ -55,6 +55,20 @@ jobs:
             sed -i '/^pub mod joint;/a pub mod metrics;' aps-pinned/crates/hashed-ecdl-tensor/src/lib.rs
           fi
           grep -q '^pub mod metrics;' aps-pinned/crates/hashed-ecdl-tensor/src/lib.rs
+          # Exact-source compile repair: pinned ecbench workload has an
+          # accidental duplicated match arm. Require that exact text;
+          # do not modify arithmetic, WZ trajectories or APS source.
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("aps-pinned/src/cryptanalysis/ecbench/workload.rs")
+          s = path.read_text()
+          extra = "                Instance::Wide(_) | Instance::Fp4(_) | Instance::ThreeLeads(_) | Instance::Hyper(_) => {" + chr(10)
+          assert s.count(extra) == 1, "immutable workload changed: refuse repair"
+          s = s.replace(extra, "", 1)
+          assert ("                Instance::Wide(_)" + chr(10) + "                | Instance::Fp4(_)") in s
+          path.write_text(s)
+          print("Removed 1 duplicate ecbench branch; existing Rust APS/WZ code intact")
+          PY
 
       - name: Test pinned repository WZ runner and existing native Rust solver
         run: |
