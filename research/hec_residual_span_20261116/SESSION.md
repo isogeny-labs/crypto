@@ -2051,3 +2051,10 @@ What was done: sixexclusive countertaps binding/rootcover/orbitindex/anchors/geo
 Decisions made: descriptiveinstrumentation noalgorithmchange;24calls/12targets/both216mutation gates/exactrepeats, sumphasevectors=verifier,Gitfreeze beforeone120CPU. Assertions [pcc:unverified].
 Open threads: executeafterpush, useactualphasecosts toselect materialproofsuccessor.
 Errors: onlyunusedwarnings,no scientificexecutionyet.
+
+## Cover verifier phase replay qualified
+
+What was done: freezec99762b59f7 once-onlyexit0;24calls/12targets allwholevectors replay, sixexclusivephases sumexactly/verifier, repeats/both216mutations pass. P601anchor1058-2838REDC,geometry1472-2176,binding370-1340; branchbasezero. Assertions [pcc:unverified].
+Decisions made: unchangedanchorverifier >0.1arm0base on3of4p601targets, so10xrequireschangedanchorproof/collection, notonlysubgroupproof. No universalbound.
+Open threads: exact divisor-class anchorcertificates/cancellation/sharedsupport costcase; originalgenus2+10x andreview/publicationcoverage.
+Errors: summarynil lookup forabsentzero-phase/modulus correctedtozero;rawunaffected,partialrawcommitdda9be93083 retained,no scientificretry/S3/cloud.
