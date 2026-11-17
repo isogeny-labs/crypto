@@ -1959,11 +1959,11 @@ pub fn groebner_basis_f4(
 /// distinct leading variable.  Under a degree ordering an element whose
 /// leading monomial is a variable is affine, so each such element fixes
 /// its leading variable once the smaller ones are fixed.
-fn pinned_variables(lm: &[u64], active: &[bool]) -> u64 {
+fn pinned_variables(lm: &[Mask], active: &[bool]) -> Mask {
     lm.iter()
         .zip(active)
         .filter(|(m, a)| **a && m.count_ones() == 1)
-        .fold(0u64, |acc, (m, _)| acc | m)
+        .fold(0 as Mask, |acc, (m, _)| acc | m)
 }
 
 /// [`groebner_basis_f4`], stopping after the first step at which the
@@ -2617,17 +2617,17 @@ pub fn solutions_from_linear_part(
     max_free: usize,
     tests: &mut u64,
     xors: &mut u64,
-) -> Option<Vec<u64>> {
+) -> Option<Vec<Mask>> {
     if basis.iter().any(is_one) {
         return Some(Vec::new());
     }
     // Rows: (variable mask, constant).  Reduce to one pivot per variable.
-    let mut rows: Vec<(u64, u64)> = Vec::new();
+    let mut rows: Vec<(Mask, u64)> = Vec::new();
     for g in basis {
         if degree(g) > 1 {
             continue;
         }
-        let mut mask = 0u64;
+        let mut mask: Mask = 0;
         let mut c = 0u64;
         for t in &g.terms {
             if t.mask == 0 {
@@ -2638,7 +2638,7 @@ pub fn solutions_from_linear_part(
         }
         rows.push((mask, c));
     }
-    let mut pivots: Vec<(usize, u64, u64)> = Vec::new();
+    let mut pivots: Vec<(usize, Mask, u64)> = Vec::new();
     for (mut mask, mut c) in rows {
         for &(v, pm, pc) in &pivots {
             if (mask >> v) & 1 == 1 {
@@ -2663,25 +2663,25 @@ pub fn solutions_from_linear_part(
         }
         pivots.push((v, mask, c));
     }
-    let pinned = pivots.iter().fold(0u64, |acc, p| acc | (1u64 << p.0));
+    let pinned = pivots.iter().fold(0 as Mask, |acc, p| acc | ((1 as Mask) << p.0));
     let free: Vec<usize> = (0..n_vars).filter(|&v| (pinned >> v) & 1 == 0).collect();
     if free.len() > max_free {
         return None;
     }
     let mut out = Vec::new();
     for a in 0u64..(1u64 << free.len()) {
-        let mut point = 0u64;
+        let mut point: Mask = 0;
         for (bit, &v) in free.iter().enumerate() {
             if (a >> bit) & 1 == 1 {
-                point |= 1u64 << v;
+                point |= (1 as Mask) << v;
             }
         }
         // Each pivot row is v + (free variables) + c, fully reduced.
         for &(v, m, c) in &pivots {
             *tests += 1;
-            let rest = m & !(1u64 << v);
+            let rest = m & !((1 as Mask) << v);
             if ((point & rest).count_ones() as u64 + c) & 1 == 1 {
-                point |= 1u64 << v;
+                point |= (1 as Mask) << v;
             }
         }
         let mut ok = true;
@@ -2718,7 +2718,7 @@ mod tests {
         let mut rng = StdRng::seed_from_u64(29);
         for case in 0..40 {
             let n = 8 + case % 7;
-            let planted = (case % 3 != 0).then(|| rng.gen::<u64>() & ((1u64 << n) - 1));
+            let planted = (case % 3 != 0).then(|| mask_from64(rng.gen::<u64>() & ((1u64 << n) - 1)));
             let m = n + 2 + case % 4;
             let eqs: Vec<F2BoolPoly> = (0..m)
                 .map(|_| {
@@ -2726,7 +2726,7 @@ mod tests {
                     for a in 0..n {
                         for b in a..n {
                             if rng.gen_bool(0.5) {
-                                masks.push((1u64 << a) | (1u64 << b));
+                                masks.push(bit(a as u32) | bit(b as u32));
                             }
                         }
                     }
