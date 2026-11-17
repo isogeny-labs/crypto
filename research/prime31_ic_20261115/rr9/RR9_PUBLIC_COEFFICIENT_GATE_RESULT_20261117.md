@@ -6,6 +6,16 @@
 
 Extended the existing native Rust `prime31_rr9_evaluation.rs` code from a witness checker that was given eight signed leaves to a *coefficient-only* support predicate, called with `(F,R,H_B)` and **no leaves**. It computes `N_F=U^2-(X^3+aX+b)V^2`, performs exact synthetic division by `X-x(R)`, normalizes to a monic degree-eight `M_F`, and tests **`H_B^8 mod M_F = 0`** using polynomial binary exponentiation. No group additions, generic four-sum lookups or square-root enumeration occur inside this predicate. It is a verification oracle for a supplied `F`, **not** a method for finding `F` from an unknown public target.
 
+## Additional result: seven-variable signed public-target chart
+
+The same existing Rust example now contains `rr9_to_signed_chart` and `rr9_from_signed_chart`. For any nonidentity `R=(r,s)`, the signed equation `F(-R)=0` is equivalent to `U(r)-sV(r)=0`, hence to the unique polynomial quotient `U(X)-sV(X)=(X-r)A(X)` with `deg A<=3`. Therefore
+```
+F(X,Y) = (X-r) A(X) + (Y+s) V(X),  deg A,deg V <=3.
+```
+For a true nonidentity eight-leaf relation, `V_3` cannot vanish, so normalize `V_3=1`: precisely **seven** scalar unknowns `(A_0..A_3,V_0..V_2)`. This removes the signed constraint identically rather than asking a polynomial solver to rediscover it. The new tests round-trip each planted F and its deliberately altered same-target F through this chart and reject lower-pole / identity branches. This is a more useful starting system for actual algebraic extraction: `H_B^8 mod M(A,V)=0` has eight coefficient constraints in these seven variables, where `M` is the degree-eight monic x-norm quotient.
+
+The chart construction and round-trip are algebraic reductions, **not** an elimination algorithm recovering the seven variables from R. The source commit is `67a3f6302cf2d72eee3b56946c27902625596e67`; exact-source CI on that commit is required before asserting passing numerical tests.
+
 The original signed norm interpolator, Hermite jets, determinant gates, actual cofactor-one `p=2147483647` curve, first-x31 and Dickson-depth-six31 bases are reused byte-for-byte outside this addition. The existing GitHub Action uses pinned original native Rust 1.100 source as main's old native package is incomplete.
 
 ### Exact equivalence, not a complexity theorem
