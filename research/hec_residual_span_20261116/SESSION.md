@@ -479,3 +479,17 @@ Needprospective strong-subgroupg2/g3anddifferentjustifiedg4classbeforegenericcla
 
 ### Errors
 No scientificfailures/retries. Weaksubgroupsretainedasregisteredratherthanreplaced. No boundsorbudgets changedafterexecution.
+
+## Strongwhole-Jacobiansubgroup screen frozen
+
+### What was done
+Preparedfixed8g2/g3fields,c1..32firsteligibilityplus4ell≥U=(ceil√p+1)^(2g),exactintegerconservativeHasseupperbound. ThisguaranteeswholeJacobiancofactor≤4withoutassertingpoint-LCM=#J. PositivecontrolF101g2ell7481/F421g3ell77152909,retainallnoeligiblefields. No targetsolves/performanceexperiment.
+
+### Decisions made
+Do notreplaceweakfieldsafteroutcomes;classifyall8. Genus4separatestructuralrouteauditneedsdifferentclass. ReadGutierrezShaskaprimaryextra-involutionnormalforms/branchorbitaction;do notcallknownsplittinganewattack. Freeze/pushbeforeonce-onlyscreen.
+
+### Open threads
+Runstrengthscreen,completegenus4odd-automorphismobstruction/alternativeclassproof. Broadgoalopen.
+
+### Errors
+OldT7008claimretrybudgetexhausted;itsinitialrankworkmerged,markedoldtaskdoneandclaimedT7010forthiscoverageworkbeforeedits. No scientificrunyet.
