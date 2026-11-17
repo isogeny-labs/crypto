@@ -43,3 +43,19 @@
 
 ### Errors
 - No additional execution; this was read-only cross-repository triage and does not revise a frozen experiment or result.
+
+
+## Pre-measurement correctness hardening (separate source commit)
+
+### What was done
+- Hardened the Rust ABBA auditor to independently reconstruct every `Q=[k]G` equation using a separately written affine Weierstrass group law (`u128` modular products, Fermat inversion) rather than trusting the original APS source/caller-only known labels. The standalone checker is not the solver and runs *after* all four timed solver panels. Test controls cover generator on-curve, identity, double, opposite points and `[n]G=O`. Commit `0cc827ce70424f521eb4b93bf8481dbd06f4561a`.
+- Sanity-checked the public curve constants outside GitHub Actions; (G) lies on the curve, ([n]G=O), and ([2]G=(1923055775,307731458)). This is a producer-side arithmetic check, [pcc:unverified]; exact Rust build/tests remain pending.
+
+### Decisions made
+- Require independent recomputation of all 576 recorded recovered scalars (4 panels × 24 targets × 6 complete solvers) against original-curve group arithmetic and reject any mismatch. The frozen target seed, experiment comparison design, cohort and oracle implementation are unmodified.
+
+### Open threads
+- Inspect newly triggered CI on the hardened source head and preserve earlier source-specific run as pre-hardening evidence. Advance to performance reporting only if every correctness gate passes.
+
+### Errors
+- No new runtime benchmark or performance data yet.
