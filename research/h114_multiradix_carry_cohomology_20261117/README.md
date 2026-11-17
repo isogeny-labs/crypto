@@ -72,7 +72,13 @@ Implementation follows the freeze. Measurement additionally requires a
 pushed source revision, immutable image digest, uploaded checkpoint, and the
 frozen EKS Spot budget/deadline. If that infrastructure gate is unavailable,
 the absence of data is reported as a blocked measurement rather than silently
-replaced with local results.
+replaced with local results. The current access failure and exact recovery
+condition are retained in [`RUN_BLOCKED.md`](RUN_BLOCKED.md) and the shared
+[launch-gate problem record](../../problems/arity-completion-launch-gates.md).
+The filled branch-specific handoff is retained in
+[`CHECKPOINT_RESUME.md`](CHECKPOINT_RESUME.md).
+The exact deferred run is registered as backlog card
+[`XP-20261117-h114-multiradix-carry`](../../backlog/XP-20261117-h114-multiradix-carry/README.md).
 
 The source can be checked without scoring the frozen candidate:
 

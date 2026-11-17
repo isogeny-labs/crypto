@@ -6,10 +6,11 @@
 - **Affected work:** `research/arity_completion_20261104/` (prime-tower m = 5
   cells; Koblitz chained-S3 m = 5, 6 cells at n = 23..41 and the n = 83 cap
   lift); `research/dreg_high_arity_20261101/` (protocol v4 refreeze and
-  execution)
+  execution); `research/h114_multiradix_carry_cohomology_20261117/` (one
+  checkpoint-gated exhaustive H114 multiradix carry/cohomology run)
 - **Next action owner:** owner (credentials and budget); then the session that
   holds them runs the frozen cards
-- **Last updated:** 2026-11-06
+- **Last updated:** 2026-11-17
 
 ## Problem
 
@@ -238,3 +239,33 @@ been asked for an existing runner/profile location, not credential text.
 This addition does not change the older arity/dreg findings or assert anything
 about their current credentials. Recheck when this session receives a configured
 runner/profile or checkpoint transport. The shared obstruction remains open.
+
+## 2026-11-17: H114 multiradix carry/cohomology measurement
+
+Crypto draft PR #4622 at revision
+`4ceb5c032917a5f72a15046eee5aa4aad327a93c` and cryptanalysis draft PR
+#1736 at revision `f18430232e2814922d95f67e97abdda5d6ff44f6` publish the
+frozen H114 producer and source-independent verifier before measurement. The
+complete resume note names the exact protocol/curve/source hashes, commands,
+controls, USD 1.00 cap, 1,800-second deadline and zero scientific retries.
+
+Observed in this managed workspace: `aws` is absent; neither
+`CHECKPOINT_UPLOAD_TOKEN` nor
+`/home/agent/.config/checkpoint/upload-token` exists. Both
+`scripts/checkpoint.sh push` and `scripts/checkpoint.sh gate` exit 1 with:
+
+```text
+checkpoint: no way to upload: no AWS profile 'ecc-challenges-new', no CHECKPOINT_UPLOAD_TOKEN, no /home/agent/.config/checkpoint/upload-token
+checkpoint: cannot upload, so nothing was checkpointed
+```
+
+The scoped receipt is
+`research/h114_multiradix_carry_cohomology_20261117/RUN_BLOCKED.md`. No
+candidate-scoring mode, EKS build or EKS Job was invoked. This is an access
+observation only; it supplies no evidence for or against the candidate.
+
+The next discriminating action remains the unchanged frozen run: bind an
+authorized upload transport, make `scripts/checkpoint.sh gate` pass, build the
+producer revision into a digest-pinned Isolab image, confirm the frozen budget,
+then launch exactly one exhaustive run and verify its exact bytes plus all five
+tamper classes. A local scoring substitute is not accepted by the protocol.
