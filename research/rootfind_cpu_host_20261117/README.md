@@ -189,3 +189,10 @@ The perf modes include deterministic corpus generation and standard
 benchmark-loop overhead; report this fact, and also use
 `perf record -g` to identify actual hotspots before interpreting
 whole-call impact. No `perf` counter numbers are claimed for this run.
+
+An additional `clang++ -O2 -std=c++17` build of the same local
+reproduction produced **1.297×** for P-256 host inversion
+(20,851 → 16,083 ns) and **1.259×** for batch-32
+(24,669 → 19,597 ns), with identical public-input correctness checks.
+Compiler sensitivity reinforces that the measurements are indicative,
+not deployment-level numbers.
