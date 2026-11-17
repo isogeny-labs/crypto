@@ -1644,3 +1644,10 @@ What was done: freeze67f0120c9e7 once-only exits0;120orbit/order rows match orbi
 Decisions made: conditional exactlytwo polarized quotient classes (self plus one index5order class); five nonfixed kernels notfiveindependent endpoints. Transported order5auto absent; price lostcompression before mapcampaign.
 Open threads: one quotientmodel/map and concretecomplete-cost mechanism; p251l19 separate classification; independentreview.
 Errors: stdout mixes inherited summary and orbit records; explicit dualschema in RUN, raw retained unchanged. No retry/S3/cloud.
+
+## Rational twist kernel prerequisite frozen
+
+What was done: read general Kummer oddisogeny construction Corte-RealSantos/Flynn section5; source pi acts-1on admitted kernels, twist makes generatorsrational. Compiled deterministic first32projection by2531 on auxiliary twist, order5/125span/sixkernel orbit checks.
+Decisions made: auxiliarytwist onlyconstructiondevice, originaltargetunchanged; generalKummer route avoids assuming rational2torsion. Assertions [pcc:unverified].
+Open threads: pushfreeze then single invocation, explicit quotient/map and completecostcase remain.
+Errors: none in compile; no science yet.
