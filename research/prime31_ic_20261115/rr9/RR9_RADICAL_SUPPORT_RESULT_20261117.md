@@ -82,10 +82,21 @@ negatives, a squarefree shortcut, noncanonical input and nonsquarefree
 H rejection. Existing Hermite jet and original-group witness checks
 remain unchanged.
 
-**Source-specific CI status:** pending until the run finishes; source
-commit `02e76e640aaf7407280de86ce81ba5f60a115347`, exact-source
-Actions [#44046676997](https://github.com/isogeny-labs/crypto/actions/runs/44046676997).
-No pass or performance number is inferred from an in-progress run.
+**Source-specific CI: SUCCESS**, immutable source commit
+`02e76e640aaf7407280de86ce81ba5f60a115347` on pinned
+Rust 1.100.0, [Actions #44046676997](https://github.com/isogeny-labs/crypto/actions/runs/44046676997),
+job `133913970897` at 2026-11-17 08:29 UTC. Logs show **40/40** native
+library tests, **6/6** RR9 example tests (including the new radical
+multiplicity control), and **64/64** distinct positive + **64/64**
+distinct negative determinant-panel decisions. The example's on-curve
+assertions additionally check all **70** valid support cases and **70**
+target-preserving altered support negatives through the new radical
+predicate alongside the old H^8 power predicate, plus original Hermite
+repeated-root and ninth-jet controls. The [raw original-curve
+128-case artifact](https://github.com/isogeny-labs/crypto/actions/runs/44046676997/artifacts/14312111559)
+has artifact id `14312111559` (13,662 bytes). This is source-specific
+producer CI only, **[pcc:unverified]**, not signed independent PCC or a
+new complete-log benchmark.
 
 ## Cost frontier, prior searches, and next experiment
 
