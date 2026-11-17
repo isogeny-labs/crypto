@@ -2716,3 +2716,10 @@ What was done: freeze315093e0895 hashespass,264completecalls exit0, allnativever
 Decisions made: freshO(p)tablepaidallarms, rootbytesnotRSS, cap65537andlookup/integerlimitations explicit; no REDC-to-wall or10xclaim. RewrotePRbodyaroundfinalgenericcontrols/evidence/scopemap ratherthanappendmorechronologicalstages, keptspecialbinomialresearchseparate. Bothold/newrecordsretained; futurestrongcontrolmustsharepreparation.
 Open threads: nextweightedLP/producermechanismorqualifiedruntimecheckwithalllookupwork; independentreview/fullgenus2+10xgoalopen.
 Errors: no scientificfailure, inheritedunusedhelper/importwarnings only. No S3/cloud/merge.
+
+## 2026-11-17T21:06Z — General anchor-degree interpolation screen
+
+What was done: derived exact residual degree N=2g+1-d and interpolation parameter count r=g-d+1 for deg(w)<=g; leaving degree s gives k-r=g-s independent of anchor degree. Higher deg(w)=L gives k-r=L-s-1. Reparsed existing 22-case pencil record: 1344 anchors,21 degree skips,max8; no scientific rerun. Read classical primary context and KB higher-LP implementation pointer.
+Decisions made: do not implement skipped anchors on an unsupported parameter advantage. Cubic residual could reduce interpolation consistency conditions by one but requires qualified arbitrary-hyperedge elimination; existing implementation must be inspected before duplication. Documented concrete complete-cost/rank falsifier and genus2 zero-known-root scheduling distinction.
+Open threads: inspect current large_prime_filter and derive a fully charged cubic-tail adapter/schedule before any frozen execution; 10x mathematical goal remains active and unachieved.
+Errors: first output-manifest check in preceding turn used stage directory for repository-relative paths; rerun from root passed all8. Coordination check allows; attach reports own existing T-7093 scope, CLI confirms claimed owner/executor. No S3/cloud/merge or new experiment.
