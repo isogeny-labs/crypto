@@ -1911,3 +1911,10 @@ What was done: compiled isolated coefficient-root producer; diagnostic old quoti
 Decisions made: standardVieta identity x3=t²+u1-x1-x2, notnovelty; original12g2targets/24measuredcalls, Gitfreeze before one120CPU invocation. Assertions [pcc:unverified].
 Open threads: execute after push, compare producer and complete costs against both retained arms and oldcompletecandidate.
 Errors: traceprefix escaping corrected before freeze; no science yet.
+
+## Vieta producer qualified
+
+What was done: freeze0a15e66fd7a once-onlyexit0;24calls/12targets full traces/packets/native quotient/group/subgroup replay,84mutations each verifier, phase/repeat checks pass. Producerbase5.1-10.6percent fewerREDC, completebase2.9-7.2percent fewer, subgroup unchanged. Assertions [pcc:unverified].
+Decisions made: retain exact local extraction; full10x gatefails. Derived unexecuted g3/4 residualleadingcoefficient recurrence in GENERALIZATION.md, noimplicit performance coverage.
+Open threads: qualify g3/4 truncated exactquotients and residualsplit costs; change dominant certificate construction/setup/collection toward original10xobjective.
+Errors: none in run,no retry/S3/cloud.
