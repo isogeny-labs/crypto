@@ -2429,3 +2429,10 @@ What was done: pushedfreeze4577bfddc0d, inputhashpass,4onceCexit0.256/512period/
 Decisions made: portableballscalarsnotexactalgebraicrecognitionor421-adicvaluation; no roundedfit. Sufficientreductioncriterionv421(R)<=0needsintegralnormalization/finitecharpremises; remainsuncomputed. No curve/transport/speedclaim. [pcc:unverified].
 Open threads: exactalgebraic/padicbridgewithheight/denomboundsorfinitefieldgeometrickernel, Serreobstruction andfull10x/genus2/4cost/independentvalidation.
 Errors: originalsourceJdomainfailure preserved, v2properdomainhandlingpasses; no overwrite/S3/cloud/merge.
+
+## Original genus-two exceptional19 gate frozen
+
+What was done: resumed authoritative Git state; prior summary's freeze/run had not occurred. Compiled retained Rust checker with overflow checks; added prospective protocol/theory for full362-line enumeration,20 isotropic kernels/four symmetry orbits and exact principal quotient-module checks.
+Decisions made: original p251,c18 preserved; actual source only reports predicted order discriminant, so no independent order-discriminant claim. Git custody while S3 unavailable; one120CPU invocation after push. Existing own T-7093 reservation verified; conflict check allows, attach reports same own reservation.
+Open threads: execute/check module certificate, then geometric invariants and finite-field maps; original broader speed objective remains open.
+Errors: summary overstated prior filesystem state; no prior run exists and no measurement was repeated. Two unused-helper build warnings.
