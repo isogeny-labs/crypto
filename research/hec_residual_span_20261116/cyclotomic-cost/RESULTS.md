@@ -17,11 +17,11 @@ Ratiosbelow1areregressions. BasefieldREDCfalls1.058–1.251; subgroupREDCrisesin
 
 Immutablegeometry/supportrowsareparsedoutsidebothintervals. Pointscans,quadraticfactoringandanchorconstructionforthoserowsareEXCLUDED. Theircostdoesnotdisappearinafullsolver; candidate's1–8extrarowsarevisibleandmustbegenerated. This ispreparation-plus-linear-plus-finalverificationarithmetic,notcompletecoldICorCPU/wallruntime.
 
-ForanycommonnonnegativeweightingoftheTWOrecordedREDCtotalswithpositivedenominator,theeager/ringstage-ratioisatmost1.251404onthispanel. Thisfollowsbecauseratiosofweightednonnegativesumsliebetweentheper-modulusratios. Itisnotanall-counterorCPUbound.
+ForanycommonnonnegativeweightingoftheTWOrecordedREDCtotalswithpositivedenominator,theeager/ringstage-ratioisatmost891/712(<1.252)onthispanel. Thisfollowsbecauseratiosofweightednonnegativesumsliebetweentheper-modulusratios. Itisnotanall-counterorCPUbound.
 
 For anUNCHANGEDfixedcorecollectorfeedingtheSAMEorderedrowstream,ringstopsnoearlierthan knownaction. IfC iscommoncollectorcostthroughtheeagerstopandE>=0isextracandidatecollection,then for eachdeclaredweightedREDCmodel
 
-    (A+C)/(B+C+E) <= max(1,A/B) <= 1.251404.
+    (A+C)/(B+C+E) <= max(1,A/B) <= 891/712 < 1.252.
 
 Thus integratingthisunchangedstagewiththatcommonprefixcollector cannotproduce10xinthatcountermodel; nofullcampaignisjustifiedonthatpremise. Thisisconditionalalgebra,notameasuredfullsolveorboundonchangedanchorlaws,adaptivecollection,betterringkernels,othermodelsorCPU/memory. Theknown-actionreferencehereisthesameone-coremethod,notaclaimofuniversalexternalfastestperformance.
 
