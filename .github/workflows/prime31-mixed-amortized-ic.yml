@@ -29,6 +29,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples
       - name: Checkout complete immutable previously-merged native Rust baseline
         uses: actions/checkout@v4
         with:
