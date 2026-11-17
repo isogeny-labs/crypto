@@ -16,6 +16,8 @@ Files frozen before execution:
 - `PROTOCOL.json`: machine-readable freeze.
 - `CURVES.json`: exact ICV1 identities and exhaustive toy cohort.
 - `h113-binary-trinary-winding-flow.svg`: editable mechanism diagram.
+- `h113-binary-trinary-winding-flow.png`: inspected compact raster rendering.
+- `RUN_BLOCKED.md`: exact admission failure and zero-run accounting.
 
 The standalone Rust producer is `h113_winding_lab.rs`. It serializes every
 point-level carry, all `6 x 6` contingency matrices, tied best/exact predicate
@@ -30,11 +32,12 @@ rustc --edition=2021 -D warnings -O h113_winding_lab.rs -o h113_winding_lab
 The independent verifier is implemented in paired cryptanalysis PR #1733.
 `H113BinaryTrinaryWinding.lean` proves the generic carry diamond, canonical
 representative range, conditional base-six reconstruction, inverse-six group
-update, and final uniqueness endpoint. `PROOF_MAP.md` records the instance
-gate and claim boundary; `proof-gate-v1/` passes 14 declarations with zero
-trusted-native. The raw artifact, measured report, and rendered visual report
-remain pending. A protocol, compiling implementation, and conditional Lean
-proof do not establish the candidate identity or an ECDLP algorithm.
+update, the concrete cyclic-subgroup inverse certificate, and final uniqueness
+endpoint. `PROOF_MAP.md` records the instance gate and claim boundary;
+`proof-gate-v1/` passes 16 declarations with zero trusted-native. The raw
+artifact, measured report, and rendered visual report remain pending. A
+protocol, compiling implementation, and conditional Lean proof do not
+establish the candidate identity or an ECDLP algorithm.
 [pcc:unverified]
 
 ## Sources checked

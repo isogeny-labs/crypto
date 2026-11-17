@@ -946,6 +946,15 @@ fn public_digit(
     permutation[channels[channel] as usize]
 }
 
+fn inverse_six_certificate(curve: Curve) -> (u64, u64) {
+    let inv6 = inv_plain(6, curve.r);
+    let inverse_product = inv6.checked_mul(6).expect("inverse-six product overflow");
+    assert_eq!(inverse_product % curve.r, 1);
+    let inverse_quotient = (inverse_product - 1) / curve.r;
+    assert_eq!(inverse_product, 1 + inverse_quotient * curve.r);
+    (inv6, inverse_quotient)
+}
+
 fn decode_target(
     curve: Curve,
     generator: Point,
@@ -953,7 +962,7 @@ fn decode_target(
     predicate: &str,
     counts: &mut Counts,
 ) -> (u64, u64, bool) {
-    let inv6 = inv_plain(6, curve.r);
+    let (inv6, _) = inverse_six_certificate(curve);
     let mut current = Some(target);
     let mut recovered = 0u64;
     let mut place = 1u64;
@@ -1536,6 +1545,7 @@ fn self_test() {
     assert_eq!(all_permutations().len(), 720);
     let mut counts = Counts::default();
     let curve = CURVES[0];
+    assert_eq!(inverse_six_certificate(curve), (14, 1));
     let base = curve.first_point(&mut counts);
     let points = curve.orbit(base, &mut counts);
     let rec = winding_at_index(curve, &points, 1, &Section::Canonical, &mut counts);
