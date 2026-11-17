@@ -29,6 +29,7 @@ pub mod levels57;
 pub mod lmfdb;
 pub mod pack;
 pub mod registry;
+pub mod research;
 pub mod results;
 pub mod richelot;
 pub mod schoof;
@@ -239,6 +240,8 @@ pub enum Selection {
     ClassGroups,
     /// Ciani plane quartics (genus 3, non-hyperelliptic) and their three elliptic quotients (src/import/ciani.rs).
     CianiQuartics,
+    /// Versioned curve sweeps, feature definitions and model-ready dataset recipes.
+    Research,
 }
 
 /// Run the selected importers; `walk_files` overrides the default walk outputs.
@@ -319,6 +322,11 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     // After ecbench, results and siblings: it links their rows.
     if all || what == Selection::FactorBases {
         reports.push(factor_bases::import(ctx).await?);
+    }
+    // After factor bases: dataset recipes and views may select their identities,
+    // though importing the recipes does not freeze any samples.
+    if all || what == Selection::Research {
+        reports.extend(research::import(ctx).await?);
     }
     Ok(reports)
 }
