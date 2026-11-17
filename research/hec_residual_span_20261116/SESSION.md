@@ -367,3 +367,17 @@ Qualifyexacthelperformula/prefixes andinspectcompletefieldvectortradeoff. Broadg
 
 ### Errors
 GenerationstringindentmismatchandRustnestedmodulepathcaughtbeforefreeze/run, fixed; finalreleasebuilds. Unusedimports/reportwarningsretained. No scientificretry.
+
+## Batch inversion qualifies exact stream and tradeoff
+
+### What was done
+At pushed71060297990,774helperexactness/costformulacasesand144sourceverifiedsolvespassEXIT0. Batch/scalarfirstprefixesagreeall18, repeats/REDCgatespass. Basefieldaddedmul=3savedinv,addedREDC=6savedinvverifiedeachcase;ellvectorsunchanged. Savedinv32–68g2,239–277g3,245–431g4. Rawhashesverify.
+
+### Decisions made
+Fullvectortradeoffretained,notcomponenttenfoldpromotion. Folded/BatchREDCranges1.19–1.71g2,2.18–7.82g3,2.38–6.00g4. Classicaloptimization/conditionalI>3Mlocalbreak-even,notcalibratedwall/newmathclaim.
+
+### Open threads
+Needstrongercompletecost/relationmechanismespeciallyg2;broadgoalopen. Keepinformationequalandfailedwallrununqualified.
+
+### Errors
+No scientificgatefailures/retries. Pre-freezegeneration/modulepatherrorsfixed; finalbuildwarningsretained.
