@@ -336,6 +336,16 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
         }));
     }
 
+    // Ninth-jet falsifier: nine copies of P cannot sum to infinity,
+    // since P != O and the group has prime order not dividing nine.
+    let all_one: [Point; 8] = [Some(base[0]); 8];
+    let fake_residual = neg(Some(base[0]));
+    let real_residual = group_sum(ar, &all_one);
+    assert_ne!(real_residual, fake_residual);
+    let ninth_jet_wrong_det = relation_determinant_hermite(&all_one, fake_residual)
+        .expect("nine identical affine points require Taylor orders zero through eight");
+    assert_ne!(ninth_jet_wrong_det, 0, "nine equal points falsely satisfy RR9");
+
     json!({
         "base":label, "factor_base":base, "seed":format!("{SEED:#x}"),
         "accepted_positive":NCASES, "accepted_negative":NCASES,
@@ -348,6 +358,8 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
         "confluent_hermite_repeated_false_det":hermite_false,
         "confluent_hermite_double_control":true,
         "confluent_hermite_higher_controls":higher_controls,
+        "ninth_jet_wrong_det":ninth_jet_wrong_det,
+        "ninth_jet_original_curve_negative":true,
         "no_unknown_ecdlp_solved":true, "cases":records
     })
 }
@@ -420,6 +432,8 @@ mod tests {
                 assert_eq!(h[i]["true_det"], 0);
                 assert_ne!(h[i]["wrong_det"], 0);
             }
+            assert_ne!(panel["ninth_jet_wrong_det"], 0);
+            assert_eq!(panel["ninth_jet_original_curve_negative"], true);
         }
     }
 }
