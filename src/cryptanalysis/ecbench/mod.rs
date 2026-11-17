@@ -83,6 +83,7 @@ pub mod full_price;
 pub mod generic;
 pub mod ghs_cover;
 pub mod gpu;
+pub mod growth;
 pub mod hashed_native;
 pub mod hec;
 pub mod host;
