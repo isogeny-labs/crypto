@@ -59,3 +59,12 @@ Checks and predictions written before the sweep's new cells:
 - **Error, GPU job 2:** `tools/profile.sh ncu` exited 2, "needs gawk"; the triad could not be scored because the GPU
   calibration has no class `triad`. Job `gpu3` (`gpu_job3.sh`) installs gawk and scores the triad as `fma_f64` at
   24 bytes per operation. Its last line archives the wrong directory; the files are fetched one by one.
+
+## 16:34 UTC
+
+- GPU pod `qkscc4xn0nnj2o` terminated after job `gpu3` (GET returns 404). `tools/profile.sh ncu` exits 3 on it:
+  `ERR_NVGPUCTRPERM`, the driver withholds GPU performance counters from container users. Records of the three
+  GPU kernels are T-gpu-timing (`results/gpu3_*`).
+- m = 9 and m = 8 at depth 2/3 were censored by `--hky-max-cols 3000000` (3,981,645 columns at (9,2) D = 8;
+  3,947,416 at (8,3) D = 7). Reruns `sweep2` on `msweep-m9` (16:28) and `msweep-m8` (16:34) with a 12,000,000 cap,
+  output tag `-cols12M`. `msweep_job.sh` now takes the cap and a tag as arguments.
