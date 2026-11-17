@@ -1553,3 +1553,10 @@ What was done:compiled18panelsfirst-completingoriginalSparseprefixes,72alternati
 Decisions made: optimisticprefixselectionfreeboth,notonlineproduction; knownfieldsolverstageonly,no10x/CPUclaim. Unknownsretainedcensored.
 Open threads: executeonceandcomparesubgroupworkbeforebackendintegration.
 Errors: none,nosciencebeforepushedfreeze.
+
+## Matched-prefix Krylov cost completed
+
+What was done:ccc5d0e1fc6one invocation exits0;18panels72calls144modulusrecords complete/exactrepeat/allchecks. SubgroupKrylov3.691-63.372xmoreREDC,all18regress; basevectorsidentical18of18. Prefix4-66rows,optimisticstoporaclechargedgraph/solver/finalverify. Raw/summary/hashesretained.
+Decisions made: notdefaultbackend,no10xclaimfromlowerstorage. Biggercrossoverneedsnewcostcase. Auditedsourcegeometricrootsearchlinear; power-map/canonicalorbitreplacementnext,controlmustoptimizeequally.
+Open threads: qualifycanonicalgeometricrootreplacementandcompletecost,notanotherunpricedbackendcampaign; originalgenus2+goalopen.
+Errors: none,no scientificretry/S3/cloud.
