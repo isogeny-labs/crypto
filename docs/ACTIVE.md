@@ -15,6 +15,8 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [ ] Verify B8 RR9 signed-fibre extractor against native 4+4 generic MITM with 1024 public residuals (automation, started 2026-11-17, branch automation/prime31-b8-mitm-control-20261117)
+
 - [x] Freeze and audit #4556 exact-source public B8 RR9 result with native JSON receipt (automation, started 2026-11-17, branch research/prime31-barycentric-evidence-20261117, PR #4558)
 
 - [ ] Build TorsionGuard finite-primary-module soundness analyzer (Codex, started 2026-11-17, branch codex/torsionguard-core-20261117, PR #4554)
