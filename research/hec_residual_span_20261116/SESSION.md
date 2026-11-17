@@ -1847,3 +1847,10 @@ What was done: freeze47bb75c8634 once-onlyexit0; fullpackets sameasdense,12cert/
 Decisions made: exactcertificatepreserved, no fullgain. Nextlazycore primitivecertificate integration musthandle residualmultiplicities/anchorintersection, nottrustlabels/discardrows.
 Open threads: lazyproducer primitivepacket/witness withexactfallback/fullcost againstbothsourcearms; whole10xgoalunchanged.
 Errors: none,no rerun/S3/cloud.
+
+## Lazy producer certificate frozen
+
+What was done: recorded original lazy primitives; explicit action-folded rows and sparse witness, exact multiplicity fallback; compiled with overflow checks.
+Decisions made: Git custody while S3 unavailable; same 12 targets and counters, 84 mutation gate, once-only 120 CPU seconds after push. Assertions [pcc:unverified].
+Open threads: qualify certificates, then register full-cost measurement separately.
+Errors: duplicate helper name corrected before freeze; no scientific execution yet.
