@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Achieve a matched 2x reduction in degree of regularity for P-256 factor-base relation systems (codex, started 2026-11-17, branch lane/p256-dreg-half-20261117)
+- [ ] Build TorsionGuard finite-primary-module soundness analyzer (Codex, started 2026-11-17, branch codex/torsionguard-core-20261117, PR #4554)
 
 - [ ] Publish Vieta Rust speed results and resolve official record/publication blockers (codex, started 2026-11-17, branch lane/vieta-speed-20261117, PR #4525)
 
