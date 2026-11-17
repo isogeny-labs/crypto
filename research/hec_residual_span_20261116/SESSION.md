@@ -1455,3 +1455,10 @@ What was done:12fresh targetsseed2026112900,source1/17,48alternatingcoldcalls; b
 Decisions made: sourcepromise explicit andequal; controlalsoretainsderivedsmoothsourceequation. Fixedseed1and16anchors, stallsretained,no arbitrarycounterweights.
 Open threads: execute once andevaluatecompletions/fullcounts,notpointvisitgain.
 Errors: noneinbuild, nosciencebeforepushedfreeze.
+
+## Fresh sparse inactivation cold gate completed
+
+What was done:7d8f6edb2d4single invocation exits0;48calls exactrepeats,12freshworkloads. Reference12/12candidate11/12; p601source1case1stalls bothrepeats,counts censored. CompletedbaseREDCratios0.670-1.087(10regressions,1smallwin),ell1.039-6.002. Bothdiagnosticgates/finalscalarchecks pass; raw/summary/hashesretained.
+Decisions made: unchangedcandidatefails10xcase; original6fixtureproduction success notfreshcostclaim. Equalexplicitpublicsourcenormalization,allsetup/16candidateanchors/labels/constraints/finalchecks charged; no arbitrarymodulusweighting.
+Open threads: newcomplete-costmechanism; eageranchorsengineeringnotdemonstrated10x. Originalgenus2+goalopen,genus3/4unqualified.
+Errors: no runtimeassertionfailures,retries,S3/cloud; oneincomplete scientificarmretained.
