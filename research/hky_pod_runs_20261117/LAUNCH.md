@@ -98,3 +98,7 @@ Checks and predictions written before the sweep's new cells:
 ## 19:29 UTC
 
 - Depth 14 c = 6: 1 h 43 min in, peak RSS 14.8 GB. (6,3) D = 8: 2 h 01 min in, peak RSS 90.4 GB. No new closure line.
+
+## 20:21 UTC
+
+- Depth 14 c = 6: 2 h 34 min in, peak RSS 19.8 GB. (6,3) D = 8: 2 h 52 min in, peak RSS 109.4 GB, host load average 126 to 195. No new closure line.
