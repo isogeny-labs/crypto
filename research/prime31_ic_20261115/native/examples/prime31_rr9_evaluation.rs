@@ -838,7 +838,7 @@ fn rr9_b8_signed_linear_solve(
     let (r, s) = residual.ok_or("B8 solver excludes infinity residual")?;
     let mut rows = [[0u64; 8]; 8];
     for (i, &(x, y)) in base.iter().enumerate() {
-        if x == r { return Err("B8 exceptional coordinate x_i=r"); }
+        if x == r { return Err("B8 exceptional coordinate x_i=r".into()); }
         let signed_y = if ((signs >> i) & 1) == 1 { fp_sub(0, y) } else { y };
         let t = fp_sub(x, r);
         let w = fp_add(s, signed_y);
@@ -887,7 +887,7 @@ fn rr9_b8_factor_identity_at(
 ) -> Result<(u64, u64), String> {
     let (r, s) = residual.ok_or("B8 factor identity needs affine residual")?;
     let (x, y) = q;
-    if x == r { return Err("B8 identity cannot detect M(r)=0"); }
+    if x == r { return Err("B8 identity cannot detect M(r)=0".into()); }
     let x2 = fp_mul(x, x);
     let x3 = fp_mul(x2, x);
     let eval = |coeff: &[u64; 4]| {
