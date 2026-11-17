@@ -2625,3 +2625,10 @@ What was done: read primary2005three-author paper sections2.3/3.1(weighted cycle
 Decisions made: known2LPbaseline restoration, no novelty/speed/10xclaim; targetk never enters solver. No per-place order/projection discovery under provedell²>Hasseupper validinstance restriction. One600CPU process/per-solver200000trials after Gitfreeze; all failed/censored cases retained.
 Open threads: execute correctness across originalfamilies; only then separately freeze completecost protocol with diagnostics/qualification boundaries explicit.
 Errors: compilation passes without warnings. Existing own scope check allows, attach same reservation. No S3/cloud/merge.
+
+## Original-family public2LPcontrol passes22public-target solves
+
+What was done: freeze85f76e74bd3 hashes pass, sole correctness run exit0. All11initialmixed-term models and22new source/targetfixtures complete within200000trials; every answer native/publicsource verified and same-input fullbase control completes. Sparse/dense weightedLPaugmented rows and native decompositions agree on declared128prefixes. No expectedscalar/cofactor/pointlogtable solverinput.
+Decisions made: scope restored to initialfamilies, no automorphismassumption. Hasse uniqueellrestriction explicit. g3/g4smallbase increasestrials, retained; matrixsize/trialcounts not priced as speed. Knownclassical2LPbaseline/APIwork, not10xbreakthrough. Next separatelyfrozen completecost comparison includes Fast/Dense/Hybrid fullbase modes and matchedvalidation, diagnostics disabled.
+Open threads: completecost gate on same22fixtures; then fresh workload/baseline qualification and genuinely newfull10xmechanism. Goal active/unachieved.
+Errors: none in scientific run; all22control andcandidate outcomes retained, no retry/S3/cloud/merge. Shared native arithmetic independently unreviewed.
