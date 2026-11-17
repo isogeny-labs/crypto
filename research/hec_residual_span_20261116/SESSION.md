@@ -1918,3 +1918,10 @@ What was done: freeze0a15e66fd7a once-onlyexit0;24calls/12targets full traces/pa
 Decisions made: retain exact local extraction; full10x gatefails. Derived unexecuted g3/4 residualleadingcoefficient recurrence in GENERALIZATION.md, noimplicit performance coverage.
 Open threads: qualify g3/4 truncated exactquotients and residualsplit costs; change dominant certificate construction/setup/collection toward original10xobjective.
 Errors: none in run,no retry/S3/cloud.
+
+## Three-genus quotient gate frozen
+
+What was done: built g2/3/4 truncated coefficient recurrence vs exact division plus same residual split oracle; deterministic32anchor algebra fixtures, original principal identity/brute roots/native split-group diagnostics.
+Decisions made: fixed g4fixture is algebra-only, no subgroup order/target solve inference; two measured repeats, all nonsplits retained, Gitfreeze before once-only120CPU invocation. Assertions [pcc:unverified]. Sources: vieta GENERALIZATION and KB source:91b6bbe9fb73267bbeb5d7c97f493b26 crypto:docs/ecbench/README.md, revision9b2119e8fbac482b98b50521c0d604bb.
+Open threads: run after push, inspect multiplicity and component costs; full originalgenus2+10xgoal unchanged.
+Errors: signed degree comparison compile error fixed before freeze; nonzero-x base rule declared before execution to avoid fixed-orbit base.
