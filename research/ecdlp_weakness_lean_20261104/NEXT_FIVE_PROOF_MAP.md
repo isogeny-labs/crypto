@@ -9,13 +9,13 @@ parameterized protocol.
 
 ## Requirement-to-evidence map
 
-| Requested target | Lean module | Counterexample endpoint | Repair endpoint |
+| Requested target | Lean module | Counterexample endpoint | Positive/boundary endpoint |
 |---|---|---|---|
 | ZK separation | `ZKSeparation` | perfect deterministic transcript simulation and completeness coexist with failed soundness and failed global accepted-transcript extraction | global accepted-transcript extraction implies soundness |
-| Schnorr group/scalar bridge | `SchnorrScalarBridge` | the scalar map `k ↦ k * 2` on `ZMod 6` is noninjective | over prime `ZMod q`, multiplication by a nonzero generator scalar is injective |
-| Fiat–Shamir transcript encoding | `FiatShamirEncoding` | two distinct typed pairs have the same raw concatenation and therefore the same hash input for every hash function | a tagged, length-framed codec has a left inverse and hence is injective |
+| Schnorr group/scalar bridge | `SchnorrScalarBridge` | the scalar map `k ↦ k * 2` on `ZMod 6` is noninjective | over prime `ZMod q`, multiplication by a nonzero generator scalar is injective; the pre-existing exact-order group theorem supplies the abstract bridge |
+| Fiat–Shamir transcript encoding | `FiatShamirEncoding` | two distinct typed pairs have the same raw concatenation and therefore produce the same output under every hash function | a tagged, length-framed codec has a left inverse and hence is injective |
 | KZG toxic waste | `KZGToxicWaste` | knowing `tau` constructs an accepting opening for any claimed value when `z ≠ tau` | verification at `z = tau` is equivalent to `commitment = value`, independent of the proof |
-| Survival tail versus expectation | `SurvivalTailExpectation` | `1/(n+1)` tends to zero while its partial sums diverge | a uniform lower stopping hazard gives a geometric survival upper bound and finite truncated-tail bound |
+| Survival tail versus expectation | `SurvivalTailExpectation` | `1/(n+1)` tends to zero while its partial sums diverge | a positive uniform lower stopping hazard gives a geometric survival upper bound and a uniform truncated-tail bound |
 
 ## Lean instance gate
 
@@ -36,11 +36,13 @@ parameterized protocol.
    accepted transcript, apply it to any accepted transcript and conclude that
    the statement lies in the relation's language.
 5. **Missing components only.** Definitions of completeness, deterministic
-   perfect transcript simulation, soundness, and the deliberately stronger
-   global extraction property; evaluation of the two-element model.
-6. **Inheritance.** Function equality is `funext`; finite propositions close
-   by `decide`/`simp`; the verdict-only separation is inherited from the
-   existing theorem.
+   perfect transcript simulation, soundness, and the global extraction
+   property; evaluation of the two-element model. The global property is
+   stronger than Bellare--Goldreich only in false-instance and per-transcript
+   coverage, while omitting their computational obligations.
+6. **Inheritance.** Simulation equality is pointwise and closes by `rfl`;
+   finite propositions close by `decide`/`simp`; the verdict-only separation
+   is inherited from the existing theorem.
 
 ### 2. Schnorr group/scalar bridge
 
@@ -50,35 +52,40 @@ parameterized protocol.
 2. **Theorem used as stated.** `mul_right_cancel₀` supplies injectivity over a
    field once the generator scalar is nonzero.
 3. **Object as instance.** `ZMod 6` with generator scalar `2` is the negative
-   instance; prime `ZMod q` with nonzero generator scalar is the repair.
+   instance; prime `ZMod q` with nonzero generator scalar is the
+   normalized-coordinate positive instance.
 4. **Assembly probe.** `3 ≠ 0` but `3 * 2 = 0 * 2` in `ZMod 6`; over prime
    modulus, cancel a nonzero right factor.
 5. **Missing components only.** The named scalar map and its two endpoints.
 6. **Inheritance.** Ring operations and normalization come from `ZMod`;
-   cancellation comes from its field instance under `[Fact q.Prime]`.
+   cancellation comes from its field instance under `[Fact q.Prime]`. The
+   abstract exact-order-group bridge is already proved separately by
+   `JKSSTCyclicECDLP.orderScalarMap_injective`; this module isolates the
+   coordinate omission countermodel and normalized-coordinate endpoint.
 
 ### 3. Fiat–Shamir transcript encoding
 
 1. **Structure above.** Lists, products, `Function.LeftInverse`, and
    `Function.Injective` from Mathlib.
 2. **Theorem used as stated.** `Function.LeftInverse.injective`.
-3. **Object as instance.** A transcript contains four byte-list fields and a
-   finite domain tag. Encoding frames every field by a tag and its natural
-   length. Decoding consumes the exact ordered frames and rejects trailing
-   input.
+3. **Object as instance.** A transcript contains three natural-token-list
+   fields and a finite domain tag. Encoding frames the encoded domain and every
+   list field by an ordered tag and its natural-token length. Decoding consumes
+   the exact ordered frames and rejects trailing input.
 4. **Assembly probe.** Prove `decode (encode t) = some t`; injectivity is then
    exactly `Function.LeftInverse.injective` after removing `some`.
 5. **Missing components only.** Raw concatenation alias, framed encoder,
    frame parser, and the left-inverse lemma.
 6. **Inheritance.** List append and length are inherited; domain equality is
-   decidable; no hash property is assumed. Equal encodings imply equal inputs
-   for every hash function by congruence.
+   decidable; no hash property is assumed. Equal raw encodings give equal hash
+   outputs by congruence; the framed decoder's left inverse recovers equal
+   typed inputs from equal framed encodings.
 
 ### 4. KZG toxic waste
 
-1. **Structure above.** A field for the scalarized verification equation and,
-   separately, an additive commutative group/module for the group-form
-   constructor.
+1. **Structure above.** A field for the scalar-coordinate surrogate and,
+   separately, an additive commutative group/module for a pairing-free linear
+   surrogate. No equivalence to the pairing verifier is asserted.
 2. **Theorem used as stated.** Field inverse/cancellation (`inv_mul_cancel₀`,
    `eq_div_iff`) and module distributivity.
 3. **Object as instance.** Verification is
@@ -100,17 +107,21 @@ parameterized protocol.
    `Real.tendsto_sum_range_one_div_nat_succ_atTop`, and
    `geom_sum_mul_neg`.
 3. **Object as instance.** The negative sequence is `S n = 1/(n+1)`. The
-   repaired structure is a nonnegative normalized survival sequence satisfying
+   sufficient positive-hazard structure is a nonnegative normalized survival
+   sequence satisfying
    `S(n+1) ≤ (1-delta) S(n)`.
-4. **Assembly probe.** Pair the two existing harmonic theorems. For the repair,
+4. **Assembly probe.** Pair the two existing harmonic theorems. For the
+   sufficient positive-hazard endpoint,
    induct to `S n ≤ (1-delta)^n`, sum pointwise, and close the finite geometric
    identity.
 5. **Missing components only.** The paired counterexample endpoint and generic
    finite-horizon recurrence theorem.
 6. **Inheritance.** Limits and harmonic divergence are inherited verbatim from
-   Mathlib. Calling the tail sum an expectation still requires a probability
-   space, a waiting-time variable, and a tail-sum integral theorem; those are
-   not silently assumed.
+   Mathlib. Identifying the abstract sequence with a waiting-time tail needs a
+   probabilistic realization and a tail-sum theorem;
+   `JKSSTExpectedTrials.truncated_expectation_eq_survival_sum` supplies the
+   finite truncated-wait identity, while the infinite/nontermination bridge
+   remains open.
 
 ## Statement classification
 
@@ -123,7 +134,7 @@ parameterized protocol.
 | Framed codec left inverse | instance obligation | study | typed transcript codec |
 | KZG trapdoor constructor | generic law | study | arbitrary field/module |
 | Harmonic tail pair | endpoint of Mathlib theorems | study | `ℕ → ℝ` |
-| Geometric survival repair | generic law | study | arbitrary real sequence |
+| Geometric survival upper endpoint | generic law | study | arbitrary real sequence |
 
 No theorem here is a curve-specific restatement of a generic elliptic-curve
 law. There are no new syntax trees, custom axioms, heartbeat overrides, or
