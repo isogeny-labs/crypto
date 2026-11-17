@@ -1,4 +1,4 @@
-# Results so far (2026-11-17, 17:35 UTC) — all `[pcc:unverified]`, single instrument unless stated
+# Results so far (2026-11-17, 17:56 UTC) — all `[pcc:unverified]`, single instrument unless stated
 
 Instrument: frozen `pilot_candidate` (sha256 47d6c281…), `--engine hky2`, prime 2013265921, Kummer tower
 (split presentation). "value" = least degree c with 1 in V_c on every target run; a closure that ends without 1
@@ -9,10 +9,12 @@ gives "at least c + 1". Records: `results/`. Hosts were shared and loaded; times
 | target | c = 5 | c = 6 | wall of c = 6 | muladds of c = 6 | peak RSS |
 |---|---|---|--:|--:|--:|
 | draw 0 | dim 39,657 of 83,682, no 1 | 1 enters (313,912 columns) | 2,446 s | 2.394e13 | 10.4 GB (whole run so far) |
-| draw 1 | dim 39,657 of 83,682, no 1 | running at 17:27 | | | |
+| draw 1 | dim 39,657 of 83,682, no 1 | 1 enters (313,912 columns) | 2,367 s | 2.394e13 | 11.2 GB (whole run) |
 
 Draw 0 repeats the container run (4 vCPU: 11,775 s, 2.422e13 muladds): same dims, same answer. The muladd counts
-differ by 1.1 %, so the schedule depends on the thread count. Depth 14 follows draw 1.
+differ by 1.1 %, so the schedule depends on the thread count. Both targets give last fall degree 6 at depth 13.
+
+Depth 14 (target 0, c <= 6) started 17:46 UTC: c = 5 closed without 1, dimension 47,849 of 122,438 (3.5 s); c = 6 (499,178 columns) running.
 
 ## m-sweep (two targets per cell unless stated)
 
@@ -23,7 +25,7 @@ differ by 1.1 %, so the schedule depends on the thread count. Depth 14 follows d
 | 6 | 7 (certified 7), 61,183 columns, 10 s | at least 8: D = 7 closed without 1 (440,772 columns, 2 s); D = 8 (1,136,799 columns) hit the 2,400 s budget on target 0; rerun on one target with an 18,000 s budget started 17:31 |
 | 7 | 8, at 471,041 columns, 935 s and 934 s | at least 8: D = 8 (4,384,467 columns) not run (column cap) |
 | 8 | 8, at 1,466,345 columns, about 200 s; same from two hosts | at least 8: D = 7 closed without 1 (3,947,416 columns, 180 s); D = 8 (13,962,982 columns) abandoned |
-| 9 | at least 9: D = 8 closed without 1 on target 0 (3,981,645 columns, 639 s); D = 9 (11,075,610 columns) hit the 2,400 s budget; target 1 running | not emitted by the driver |
+| 9 | at least 9: D = 8 closed without 1 on both targets (3,981,645 columns, dimension 1,047,766, 639 s each); D = 9 (11,075,610 columns) hit the 2,400 s budget on target 0 and was not waited for on target 1 | not emitted by the driver |
 
 Calibration: the five cells with certified values (lfd-summation-systems `experiments/ic-bounds-split-m`) are
 reproduced. New cells have no closure verification pass and no second instrument.
