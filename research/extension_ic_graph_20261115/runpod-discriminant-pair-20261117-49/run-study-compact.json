@@ -1,0 +1,350 @@
+{
+  "checkpoint_inner_wall_ns": [
+    [
+      "42529515"
+    ],
+    [
+      "42358498"
+    ]
+  ],
+  "checkpoint_records_equal_except_inner_wall_ns": true,
+  "complete_cost": false,
+  "complete_total": null,
+  "full_analysis_local_sha256": "dfac3217dd9e1ac1cbdfdc92caeb9594a1fa4b84ff0c73ce59a167c75cc46d3d",
+  "full_replay_sha256": "eb1a7020360778d20dd8faf7e6dd27ae8b1272f02fde364e8edba8acd23d9f0b",
+  "original_failure_preserved": true,
+  "original_qualifier_exit_code": 1,
+  "original_qualifier_failure": "Error: \"paired exact geometry rank_checks\"",
+  "outcomes": [
+    {
+      "actual_scalar": 242624768583643540,
+      "capped": false,
+      "counts": null,
+      "descent_residuals": 1728,
+      "early_refusals": null,
+      "graph_stats": null,
+      "inner_wall_ns_practicality_only": 18427745565,
+      "mode": "original-ic",
+      "observed_incomplete_bitops": "4525556132414",
+      "original_sha256": "06673ce49dec1e5cd1696c40a0d48980ae996ea4203b7394ad81a864d4de2031",
+      "phases": [
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "unattributed"
+        },
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "walk"
+        },
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "transport"
+        },
+        {
+          "observed_incomplete_bitops": "546251740",
+          "phase": "model"
+        },
+        {
+          "observed_incomplete_bitops": "691123606",
+          "phase": "factor_base"
+        },
+        {
+          "observed_incomplete_bitops": "2444913670026",
+          "phase": "relations"
+        },
+        {
+          "observed_incomplete_bitops": "1734424925904",
+          "phase": "descent"
+        },
+        {
+          "observed_incomplete_bitops": "344888797878",
+          "phase": "linear_algebra"
+        },
+        {
+          "observed_incomplete_bitops": "91363260",
+          "phase": "verification"
+        }
+      ],
+      "producer_verified": true,
+      "projections": null,
+      "rank_checks": null,
+      "screen_calls": null,
+      "slow_split_records": null,
+      "sources": null,
+      "stop": null
+    },
+    {
+      "actual_scalar": 242624768583643540,
+      "capped": false,
+      "counts": {
+        "b_count": 225280,
+        "candidates": 11849,
+        "collisions": 217,
+        "duplicates": 0,
+        "full_rows": 299,
+        "lines": 113173,
+        "normalization_products": 0,
+        "partial_rows": 11523,
+        "products": 0,
+        "rank": 508,
+        "refused": 27,
+        "subtractions": 0,
+        "vertices": 11306
+      },
+      "descent_residuals": 3415,
+      "early_refusals": null,
+      "graph_stats": null,
+      "inner_wall_ns_practicality_only": 14895442733,
+      "mode": "quadratic-table",
+      "observed_incomplete_bitops": "5230830441710",
+      "original_sha256": "e45c3272fc5050e37d8be9cbdf1a4ebdaf412140904347c5544c8f36e27c49ab",
+      "phases": [
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "unattributed"
+        },
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "walk"
+        },
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "transport"
+        },
+        {
+          "observed_incomplete_bitops": "586808692",
+          "phase": "model"
+        },
+        {
+          "observed_incomplete_bitops": "719628892",
+          "phase": "factor_base"
+        },
+        {
+          "observed_incomplete_bitops": "1476022439520",
+          "phase": "relations"
+        },
+        {
+          "observed_incomplete_bitops": "3426280619436",
+          "phase": "descent"
+        },
+        {
+          "observed_incomplete_bitops": "327129581910",
+          "phase": "linear_algebra"
+        },
+        {
+          "observed_incomplete_bitops": "91363260",
+          "phase": "verification"
+        }
+      ],
+      "producer_verified": true,
+      "projections": 516,
+      "rank_checks": [
+        {
+          "b_count": 225280,
+          "inner_wall_ns": "37475118",
+          "observed_incomplete_subtotal": "327128033886",
+          "rank_certificate": 508,
+          "rows": 516
+        }
+      ],
+      "screen_calls": null,
+      "slow_split_records": null,
+      "sources": 11822,
+      "stop": "sparse homogeneous rank certified at complete batch"
+    },
+    {
+      "actual_scalar": 242624768583643540,
+      "capped": false,
+      "counts": {
+        "b_count": 185344,
+        "candidates": 353012,
+        "collisions": 272,
+        "duplicates": 0,
+        "full_rows": 250,
+        "lines": 93079,
+        "normalization_products": 0,
+        "one_class_rows": 9535,
+        "partial_rows": 107808,
+        "products": 0,
+        "rank": 508,
+        "refused": 244954,
+        "subtractions": 0,
+        "two_class_rows": 98273,
+        "vertices": 13896
+      },
+      "descent_residuals": 3415,
+      "early_refusals": null,
+      "graph_stats": {
+        "anchored_cycles": 272,
+        "discarded_ungrounded": 93640,
+        "full_rows": 250,
+        "max_emitted_witness": 7,
+        "max_stored_witness": 6,
+        "one_class_anchors": 9334,
+        "sources": 108058,
+        "two_class_extensions": 4562,
+        "vertex_refusals": 0,
+        "vertices": 13896,
+        "witness_refusals": 0
+      },
+      "inner_wall_ns_practicality_only": 31220210045,
+      "mode": "pair-unscreened",
+      "observed_incomplete_bitops": "6441136952022",
+      "original_sha256": "d5d19675fea6fb5fb8ae5787513844eb45ed9714da07545cdd26621043d7e8bc",
+      "phases": [
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "unattributed"
+        },
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "walk"
+        },
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "transport"
+        },
+        {
+          "observed_incomplete_bitops": "586808692",
+          "phase": "model"
+        },
+        {
+          "observed_incomplete_bitops": "719628892",
+          "phase": "factor_base"
+        },
+        {
+          "observed_incomplete_bitops": "2633725453362",
+          "phase": "relations"
+        },
+        {
+          "observed_incomplete_bitops": "3426280619436",
+          "phase": "descent"
+        },
+        {
+          "observed_incomplete_bitops": "379733078380",
+          "phase": "linear_algebra"
+        },
+        {
+          "observed_incomplete_bitops": "91363260",
+          "phase": "verification"
+        }
+      ],
+      "producer_verified": true,
+      "projections": 522,
+      "rank_checks": [
+        {
+          "b_count": 185344,
+          "inner_wall_ns": "42529515",
+          "observed_incomplete_subtotal": "379731530356",
+          "rank_certificate": 508,
+          "rows": 522
+        }
+      ],
+      "screen_calls": null,
+      "slow_split_records": 298778,
+      "sources": 108058,
+      "stop": "sparse homogeneous rank certified at complete batch"
+    },
+    {
+      "actual_scalar": 242624768583643540,
+      "capped": false,
+      "counts": {
+        "b_count": 185344,
+        "candidates": 353012,
+        "collisions": 272,
+        "duplicates": 0,
+        "full_rows": 250,
+        "lines": 93079,
+        "normalization_products": 0,
+        "one_class_rows": 9535,
+        "partial_rows": 107808,
+        "products": 0,
+        "rank": 508,
+        "refused": 244954,
+        "subtractions": 0,
+        "two_class_rows": 98273,
+        "vertices": 13896
+      },
+      "descent_residuals": 3415,
+      "early_refusals": 198848,
+      "graph_stats": {
+        "anchored_cycles": 272,
+        "discarded_ungrounded": 93640,
+        "full_rows": 250,
+        "max_emitted_witness": 7,
+        "max_stored_witness": 6,
+        "one_class_anchors": 9334,
+        "sources": 108058,
+        "two_class_extensions": 4562,
+        "vertex_refusals": 0,
+        "vertices": 13896,
+        "witness_refusals": 0
+      },
+      "inner_wall_ns_practicality_only": 29181113508,
+      "mode": "pair-discriminant",
+      "observed_incomplete_bitops": "6235988188572",
+      "original_sha256": "e767e8a175a475645b3a899a32c2f0643ce20a750693aaa8797697934eb4bc56",
+      "phases": [
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "unattributed"
+        },
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "walk"
+        },
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "transport"
+        },
+        {
+          "observed_incomplete_bitops": "586808692",
+          "phase": "model"
+        },
+        {
+          "observed_incomplete_bitops": "719628892",
+          "phase": "factor_base"
+        },
+        {
+          "observed_incomplete_bitops": "2428576689912",
+          "phase": "relations"
+        },
+        {
+          "observed_incomplete_bitops": "3426280619436",
+          "phase": "descent"
+        },
+        {
+          "observed_incomplete_bitops": "379733078380",
+          "phase": "linear_algebra"
+        },
+        {
+          "observed_incomplete_bitops": "91363260",
+          "phase": "verification"
+        }
+      ],
+      "producer_verified": true,
+      "projections": 522,
+      "rank_checks": [
+        {
+          "b_count": 185344,
+          "inner_wall_ns": "42358498",
+          "observed_incomplete_subtotal": "379731530356",
+          "rank_certificate": 508,
+          "rows": 522
+        }
+      ],
+      "screen_calls": 298778,
+      "slow_split_records": 99930,
+      "sources": 108058,
+      "stop": "sparse homogeneous rank certified at complete batch"
+    }
+  ],
+  "postexecution_analysis_only": true,
+  "ratios": null,
+  "rho_parity": false,
+  "schema": "cover.discriminant-pair.run-study-compact/v1",
+  "screen_observed_subtotal_reduction": "205148763450",
+  "screen_observed_subtotal_reduction_percent": 3.184977512170421,
+  "signed_independent_verdict": false,
+  "source_revision": "bd69a76db876fa1da120de0edf1033489327d937"
+}

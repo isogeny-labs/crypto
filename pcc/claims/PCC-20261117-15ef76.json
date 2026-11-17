@@ -1,0 +1,23 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-17T09:14:32Z",
+ "id": "PCC-20261117-15ef76",
+ "kind": "statement",
+ "producer": {
+  "commit": "e319b1bacf5cd54e5816179d64c95b8082941999",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/reports/section-search-v1/ERRATA.md",
+    "sha256": "c420d0cdc294d93b108cb13076aa67668bfde00c35a3f7560ab17c09319feb40"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "section-search cost erratum and explicit uniform-trial model",
+ "statement": "Corrects needs/requires wording: chi+theta/2<3 is a sufficient conservative per-seed upper-bound budget, not a necessary lower bound or route exclusion. Uniform-sampler rejection is limited to explicitly generated/tested uniform chart trials with ordinary per-trial cost; the divisor count gives the separate trial-count lower bound. Compact bulk-family search and tighter complete cost bounds remain open under unchanged criteria. No coefficient-search data was relabelled."
+}

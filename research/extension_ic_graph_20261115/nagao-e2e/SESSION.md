@@ -40,3 +40,18 @@ Publish the frozen branch and public-input manifest, then invoke the one bounded
 
 ### Errors
 First historical build lacked six sparse include fixtures; restored exact tracked files and the second library build passed. Native builds initially needed explicit sha2@0.10.9 selection and blake3. Scoped lint exposed duplicate frozen modules and an unused re-export; corrected only the wrapper visibility/attributes, preserving original checker files. Earlier failed logs remain retained.
+
+
+## 2026-11-17T06:27:32Z — Measured E2E recovery: no demonstrated new-finder gain
+
+### What was done
+The sole native cohort completed all24planned fresh recoveries, valid local isolation and A/A controls, independent collection/kernel/descent/endpoint replay, deterministic repeats and zero foreign hooks. Five measured processes per arm have medians20.71449s baseline graph IC,21.10177s five-variable graph IC,111.40204s registered plain/batch16rho. Paired new/old geometric ratio0.99832, bootstrap95 interval0.96725–1.02717; no E2E improvement demonstrated on this case. Original data6432aa and canonicale9f39d remain unverified. [pcc:unverified]
+
+### Decisions made
+Keep all timings, including the slower baseline in round1. Do not promote the earlier27.7% incomplete component subtotal into an E2E result. Preserve frozen source7802b7f86459, inputc1b9bd4e8753, binary hashes and all109raw payload members in the19071290-byte local archive. Local runtime has no authenticated AWS identity; no S3upload claimed. Python only renders Rust-computed statistics. No new paid allocation or scientific retry. [pcc:unverified]
+
+### Open threads
+Publish the compact result/report on a fresh result lane because sourcePR4515 merged. Signed standing, artifact-store custody, broader target/family sampling and strongest-external/general-parity obligations remain outside this completed fixed-case measurement.
+
+### Errors
+The measured cohort itself has no failed/capped/contended/missing call. Preserve earlier build/preflight failures separately. The PDF is losslessly compressed below64KiB; both final pages exactly match visually inspected page pixels. Original ledger subjects and two-entry suffix are unchanged; canonical registration appends to actual main. [pcc:unverified]
