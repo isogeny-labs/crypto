@@ -149,7 +149,7 @@ impl LinearDecomposer {
                 piv.push((pb, im, pre));
             }
         }
-        piv.sort_by(|x, y| y.0.cmp(&x.0));
+        piv.sort_by_key(|x| core::cmp::Reverse(x.0));
         let qimg: Vec<u64> = (0..n)
             .map(|bit| {
                 let (mut v, mut pre) = (unit(bit), 0u64);
@@ -173,7 +173,7 @@ impl LinearDecomposer {
         let v2: Vec<u64> = echelon(prods).into_iter().map(|(_, v)| v).collect();
         let dim_v2 = v2.len();
         let (pi, free) = quotient_map(&v2, n);
-        assert!(free + 1 <= 62, "n - dim V2 must be at most 61");
+        assert!(free < 62, "n - dim V2 must be at most 61");
         let (chk, _) = quotient_map(basis, n);
 
         let sqrt_img: Vec<u64> = (0..n)
@@ -417,15 +417,12 @@ impl LinearDecomposer {
                 if t.0 == 0 {
                     // the one abscissa the linear step misses: enumerate this rare case over V
                     for gg in 0..span {
-                        let mut xx = 0u64;
                         let mut acc = 0u64;
                         for b in 0..self.k {
                             if (gg >> b) & 1 == 1 {
                                 acc ^= self.basis[b];
                             }
                         }
-                        xx = acc;
-                        let _ = xx;
                         if let Some(pp) = self.lift(gf, acc) {
                             for q in [pp, self.neg(pp)] {
                                 if let Some(s) = self.add(gf, Some(t), Some(self.neg(q))) {
@@ -610,9 +607,9 @@ mod tests {
             let mut q = 2;
             let mut primes = vec![];
             while q * q <= m {
-                if m % q == 0 {
+                if m.is_multiple_of(q) {
                     primes.push(q);
-                    while m % q == 0 {
+                    while m.is_multiple_of(q) {
                         m /= q;
                     }
                 }
