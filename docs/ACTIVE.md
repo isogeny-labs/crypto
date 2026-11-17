@@ -15,6 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [ ] Faster HKY closure engine (hky2) for depth 13+ and the optlevel roofline metric (claude, started 2026-11-17, branch claude/lfd-ffd-paper-eprint-status-qq8fit; instrument work, unverified, in review)
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 
 <!-- One line per task, added as the task's first step with its draft PR:
