@@ -17,17 +17,17 @@ study result, and no leaderboard or `benchmarks/README.md` row is claimed. Label
   t = 8: 10.27 s → 0.304 s (34×); t = 9: 38.96 s → 1.507 s (26×); **t = 10 (60,460 columns,
   the largest depth run with both engines): 999.9 s → 42.9 s (23×)**. Section 4.
 - **Runs beyond the reference's reach on this machine (measured, new engine only):**
-  t = 11 in 241 s; t = 12 (190,051 columns) in T12_WALL, 1 enters at c = 6 as the reference found
-  on rented pods in 6,857 s and 7,269 s on 16 vCPU; T13_SUMMARY. Section 8.
+  t = 11 in 241 s; t = 12 (190,051 columns) in 1,732 s, 1 enters at c = 6 as the reference found
+  on rented pods in 6,857 s and 7,269 s on 16 vCPU (**given**); **t = 13 (313,912 columns) in 11,788 s (3 h 16 min) with 9.6 GB: 1 enters at c = 6**, the value the other repository's engine gives; the reference timed out at 14,400 s on 16 vCPU on one draw and aborted on the other (**given**). Section 8.
 - Where the time went in the reference (section 3) is **not** what was assumed. The stored rows
   are 6 % to 8 % dense at t = 8..10, not dense. The three costs are: a schedule (batches of 4,096
-  products, last in first out) that reduces 5 to 10 times more products than needed and makes
+  products, last in first out) that reduces 4 to 6 products per pivot found (t = 8, 9) and makes
   denser rows; a sequential second pass inside every batch (41 % of the wall time at t = 9 on 4
   threads, so most of it on 16); and a division per multiply-add.
 - What paid, in the order measured (t = 9, section 4): delayed reduction 1.9×; no heap 1.6×;
   products formed in the parallel section 1.3×; dense rows with a SIMD loop 1.24×; the
-  summand-swap split 1.15× alone and 2.1× with the schedule; **the schedule (sparsest rows first,
-  small batches) 2.5× alone**. What did not pay: dense rows and SIMD beyond that 1.24× (the
+  summand-swap split 1.15× under the reference's schedule and 2.15× under the new one; **the
+  schedule (sparsest rows first, small batches) 2.5× alone**. What did not pay: dense rows and SIMD beyond that 1.24× (the
   threshold does not matter, AVX-512 against the portable loop is 6 %), lead-only reduction
   (3 times more work), low-degree-first order, finer priority buckets. Section 6.
 - The degree lift of the other repository carries over to the Kummer tower ring of the study
@@ -220,7 +220,7 @@ and `censored`; the same `falls`, `first_fall_degree`, `last_fall_degree`, `cens
 | `p0-kummer-isogeny` | 36 | p = 786433, Kummer and isogeny towers (general rule `y² = a·y·y′ + b·y′ + c·y + d`), t = 1..6 | mixed |
 | `censor-max-cols` | 2 | `--hky-max-cols 1500`: the same closure is censored for `max_cols` in both | censored at c = 5 (t = 7) |
 | t = 6..9 A/B | 4 × 27 files | section 4 | |
-| t = 9, 10 | 4 + 1 | both draws at t = 9, 10 against the contended reference rows; the clean t = 10 run | d_F = 5, 6 |
+| t = 9, 10 (`raw/gate-t9-10`) | 4 + 1 | both draws at t = 9, 10 against the reference rows of `raw/baseline_contended_t9_t10.jsonl` (contention changes time, not rows); the clean t = 10 pair of section 4 | d_F = 5, 6 |
 
 Result: **every set `EQUAL` (104 cells in the script, plus the A/B files) for the default and for
 each of** `L0`, `L1`, `L2`, `L3`, `L4`, `L4sym`, low-degree-first with batch 64, lead-only, and the
@@ -258,32 +258,37 @@ cell is censored by them in either engine.
 The space does not depend on the order in which the queue is served. The work does, by a factor of
 several, and not monotonically. `muladds` of one closure (deterministic), split, level 4:
 
-| order | batch | t = 8, c = 5 (1 enters) | t = 9, c = 5 (1 enters) | t = 10, c = 5 (fixpoint, 31,631 items) |
+| order (split unless noted) | batch | t = 8, c = 5 (1 enters) | t = 9, c = 5 (1 enters) | t = 10, c = 5 (fixpoint, every product reduced) |
 |:--|--:|--:|--:|--:|
-| reference: last in first out, unsplit | 4096 | 7.23e9 | 2.59e10 | 6.29e10 |
+| reference schedule: last in first out, **unsplit** | 4096 | 7.23e9 | 2.59e10 | 6.29e10 |
 | last in first out | 4096 | 3.34e9 | 1.94e10 | 2.67e10 |
 | last in first out | 256 | 9.58e8 | 8.40e9 | 6.17e10 |
 | last in first out | 64 | 1.51e9 | 6.65e9 | 5.48e10 |
-| last in first out | 16 | | 2.35e10 | 1.42e11 |
-| lowest degree first | 64 | | 1.08e10 | 7.98e10 |
-| **sparsest source row first** (one bucket per doubling of the row's terms) | 32 | **4.47e8** | **3.38e9** | **2.38e10** |
-| sparsest first | 128 | 5.35e8 | 3.54e9 | |
+| last in first out | 16 | 7.75e8 | 2.35e10 | 1.42e11 |
+| lowest degree first | 64 | 1.00e9 | 1.08e10 | 7.98e10 |
+| **sparsest source row first** (one bucket per doubling of the row's terms) — the default | 32 | **4.47e8** | **3.38e9** | **2.38e10** |
+| sparsest first | 128 | 5.35e8 | 3.54e9 | 2.32e10 |
 | sparsest first | 4096 | 1.81e9 | 9.08e9 | 2.36e10 |
-| sparsest first, 8 buckets per doubling | 32 | 6.21e8 | 4.47e9 | |
-| sparsest first, one bucket per 4× / 8× / 16× | 32 | 8.86e8 / 7.54e8 / 1.59e9 | 5.81e9 / 8.16e9 / 7.22e9 | |
+| sparsest first, **unsplit** | 32 | 1.12e9 | 9.53e9 | 8.19e10 |
+| sparsest first, one bucket per 4× / 8× / 16× | 32 | 8.86e8 / 7.54e8 / 1.59e9 | 5.81e9 / 8.16e9 / 7.22e9 | 3.50e10 / 4.35e10 / 4.72e10 |
+| sparsest first, 8 buckets per doubling (interactive run, code since removed, rows not kept) | 32 | 6.21e8 | 4.47e9 | |
+| last in first out, lead-only reduction | 64 | 1.93e9 | 2.27e10 | 1.86e11 |
+
+`./run_schedule_sweep.sh raw/schedule` regenerates every row but one (`raw/schedule.out`, level 4).
 
 Reading: a stored row is reduced against the pivots that existed when it entered, so the order of
 insertion decides how dense the rows are (stored words at t = 10, c = 5: 1.01e7 to 2.62e7 across
 the table), and stale large batches reduce products that turn out redundant. "Sparsest first" is
 the only order that was at or near the best in all three columns and insensitive to the batch
-size. The default batch is `max(32, 2 × threads)`. This is a heuristic chosen on t = 8..10; nothing
+size. It is not uniformly better: unsplit, on the fixpoint closure at t = 10, it does 1.3 times
+more work than the reference's schedule (8.19e10 against 6.29e10). The default batch is `max(32, 2 × threads)`. This is a heuristic chosen on t = 8..10; nothing
 proves it is good at t = 13.
 
 Rejected, with numbers:
 
 | idea | measurement | verdict |
 |:--|:--|:--|
-| lead-only reduction (`--hky2-lead-only on`: stop at the first non-pivot column, keep the tail unreduced, so a product with a new leading monomial enters as it is) | t = 9, split, last in first out, batch 64: 2.27e10 muladds and 2.97e7 stored words against 6.65e9 and 7.1e6 | 3.4 times more work: the unreduced tails are denser, not sparser. Kept as an option, off |
+| lead-only reduction (`--hky2-lead-only on`: stop at the first non-pivot column, keep the tail unreduced, so a product with a new leading monomial enters as it is) | split, last in first out, batch 64: t = 8: 1.93e9 against 1.51e9 muladds; t = 9: 2.27e10 against 6.65e9 (stored words 2.97e7 against 7.1e6); t = 10, c = 5: 1.86e11 against 5.48e10 | 1.3 to 3.4 times more work: the unreduced tails are denser, not sparser. Kept as an option, off |
 | dense rows as the main lever (idea 1/2 of the task) | threshold 1/2, 1/3, 1/5, 9/10 at t = 9: 1454, 1502, 1474, 1519 ms; AVX-512 1502 ms, AVX2 1541 ms, portable 1601 ms (`raw/scaling/times.md`) | inside the noise; SIMD is worth 6 %. 17 % of the rows are dense at t = 9, 6 % at t = 11 |
 | bitmap of touched columns instead of the heap | single thread, t = 8, reference schedule, machine loaded (interactive runs, rows not kept): 16.4 s against 15.2 s for the heap with delayed reduction | no gain (probably the read-modify-write chain on the bitmap word; no counters to confirm); replaced by the plain scan of the accumulator, 10.2 s against 15.7 s in the next pair |
 | low-degree-first order, to find 1 early | table above | worse than sparsest first |
@@ -314,14 +319,53 @@ variables only one is applied and the product is projected to both parts). Colum
 t = 13, c = 6: 157,145 and 156,767 of 313,912.
 
 Effect (section 4 and 6): the multiply-adds fall by 2.2× under the reference schedule at t = 8
-(7.23e9 → 3.34e9), 1.3× at t = 9, and by 2.5× to 2.8× under the sparse-first schedule (t = 8:
-1.12e9 → 4.47e8; t = 9: 9.53e9 → 3.38e9). **Not the 4× of dense elimination**: the rows are
+(7.23e9 → 3.34e9), 1.3× at t = 9, and by 2.5× to 3.4× under the sparse-first schedule (t = 8:
+1.12e9 → 4.47e8; t = 9: 9.53e9 → 3.38e9; t = 10, c = 5: 8.19e10 → 2.38e10). **Not the 4× of dense elimination**: the rows are
 sparse, so the cost is in the number of terms, not in n². Stored entries fall by 1.6× (t = 9, reference → `hky2`:
 6.24e6 → 3.83e6).
 
 ## 8. Beyond the reference: t = 11, 12, 13 — measured, new engine only
 
-T12_T13_SECTION
+`bin/pilot_candidate --p 2013265921 --ladder-t none --planted 0 --random 1 --engine hky2
+--hky-cmax 6 --budget … --hky-max-cols 2000000 --hky-max-entries 14000000000 --kinds kummer --m 2
+--controls tower --t-min T --max-t T --hky-progress raw/tT/progress.jsonl --out raw/tT/hky2.jsonl`
+(t = 11 with `--hky-cmax 7`), draw 0 (`x_r` = 150938225 at t = 12, the study's draw 0), 4 threads,
+the neighbour job running. These are instrument runs, not study rows (section 11.6).
+
+| t | c | columns | part columns | dims / rank | 1 ∈ V | rows reduced | muladds | stored words | wall s | parallel / sequential s |
+|--:|--:|--:|:--|:--|:--|--:|--:|--:|--:|:--|
+| 11 | 4 | 9,109 | 4,588 / 4,521 | 0, 0, 2, 131, 1805 | no | 1,442 | 3,718,432 | 112,273 | 0.014 | |
+| 11 | 5 | 35,443 | 17,755 / 17,688 | dim 25,033 | no | 37,852 | 24,926,440,157 | 14,702,864 | 9.8 | 9.5 / 0.3 |
+| 11 | 6 | 110,056 | 55,144 / 54,912 | whole space | **yes** | 262,484 | 539,254,650,848 | 111,433,956 | 231.1 | 227.4 / 3.7 |
+| 12 | 4 | 12,951 | 6,515 / 6,436 | 0, 0, 2, 135, 2069 | no | 1,621 | 3,728,860 | 123,586 | 0.019 | |
+| 12 | 5 | 55,455 | 27,767 / 27,688 | 0, 0, 2, 146, 3727, 32057 | no | 44,725 | 25,954,076,158 | 18,941,587 | 9.8 | 9.4 / 0.3 |
+| 12 | 6 | 190,051 | 95,175 / 94,876 | whole space | **yes** | 436,789 | 3,690,966,694,706 | 352,689,051 | 1,722.4 | 1,712.6 / 9.7 |
+| 13 | 4 | 17,902 | 8,997 / 8,905 | 0, 0, 2, 139, 2341 | no | 1,808 | 3,770,769 | 139,597 | 0.022 | |
+| 13 | 5 | 83,682 | 41,887 / 41,795 | 0, 0, 2, 150, 4021, 39657 | no | 52,274 | 26,162,190,291 | 22,305,343 | 12.9 | 12.4 / 0.5 |
+| 13 | 6 | 313,912 | 157,145 / 156,767 | whole space | **yes** | 683,496 | 24,217,016,013,719 | 1,070,913,677 | 11,774.7 | 11,743.8 / 30.8 |
+
+- **t = 11** (`raw/hky2_first_t11.jsonl`): whole cell 241 s. Falls 4, 5, 6; last fall degree 6. The
+  dimension 25,033 of `V_5` equals the other repository's `k11d4` value (**given**, `LIFT.md` section 5).
+- **t = 12** (`raw/t12/`): whole cell **1,732 s** on 4 shared vCPU; peak resident memory 3.2 GB
+  (`raw/t12/rss.log`). 1 enters at c = 6 with 190,051 columns, falls 4, 5, 6 — the reference's
+  answer on the pods (6,857 s and 7,269 s on 16 vCPU, **given**). When the engine stopped it had
+  95,161 + 94,863 of 190,051 pivots. This is the one cell above t = 10 where the new engine's
+  answer can be compared with the reference's, and only through the given record: the two were
+  not run on the same machine.
+- **t = 13** (`raw/t13/`, draw 0, `x_r` = 1118191946): whole cell **11,788 s (3 h 16 min)** on 4
+  shared vCPU (1-minute load 3.2 to 4.8 through the run), peak resident memory **9.6 GB**
+  (`raw/t13/rss.log`). **1 enters at c = 6**; `V_5` has dimension 39,657 of 83,682 and does not
+  contain 1; falls 4, 5, 6, first fall degree 4, last fall degree 6. This is the value expected
+  from the other repository's engine (**given**: last fall degree 6 at t = 13). There is no
+  reference run to compare with: on the pods the reference hit its 14,400 s limit on one draw and
+  aborted on the other (**given**). `1` was again the last pivot: the echelon held all 313,912
+  pivots when the engine stopped.
+- **What this run is not.** One draw, one schedule, one machine, no second instrument at this
+  size. "1 enters" rests on the arithmetic of this closure, which the dims comparison cannot check
+  (section 5); the supporting evidence is the agreement at t ≤ 10 with the reference, at t = 11, 12
+  with the given values, and the planted and fault controls. A second run with another schedule
+  (`--hky2-order lifo --hky2-sym off`) or a capped-F4 bracket would be the independent check; it
+  was not made (another 3 hours or more here).
 
 ## 9. The degree lift: does the theorem carry over?
 
@@ -382,9 +426,9 @@ Columns `n = Σ_{k ≤ c} C(2t, k)`; split parts `n₊ = (n + s)/2`, `n₋ = (n 
 | dense `u32`, rows from their leading column (triangle), split | 99 GB | 249 GB | 2.8 TB | arithmetic |
 | reduced echelon on free columns, dense `u32`, split: peak `n₊²/4` entries per part during a closure; final r × f | 49 GB peak | 125 GB peak; **45 GB** final | 1.4 TB peak | arithmetic; final value **given** (LIFT.md: 21 + 21 GB) |
 | reference: sparse rows, 8 bytes per entry, plus every pending product materialised in the queue | echelon about 3e9 entries = 24 GB at the density of section 2 (0.057 n²/2); queue unbounded — one draw aborted (exit 134, **given**) | | | estimate |
-| **this engine** (hybrid rows, 8 bytes per sparse entry, 4 per dense slot; the queue holds 8-byte (row, variable) items; 8 n₊ bytes of scratch per thread) | T13_MEM | 1.7e9 to 5.4e9 words: **14 to 43 GB** | 5.7e9 to 2.5e10 words: **45 to 200 GB** | t = 13: T13_MEM_STATUS; t = 14: estimate, see 10.3 |
+| **this engine** (hybrid rows, 8 bytes per sparse entry, 4 per dense slot; the queue holds 8-byte (row, variable) items; 8 n₊ bytes of scratch per thread) | 1.07e9 words, **9.6 GB resident** (peak) | 1.7e9 to 5.4e9 words: **14 to 43 GB** | 5.7e9 to 2.5e10 words: **45 to 200 GB** | t = 13: **measured**; t = 14: estimate, see 10.3 |
 
-What fits (this engine): t = 13 in 16 GB (T13_FITS); t = 14, c = 6 in 128 GB if the estimate
+What fits (this engine): t = 13 in 16 GB (measured: 9.6 GB); t = 14, c = 6 in 128 GB if the estimate
 holds, 256 GB with margin; t = 14, c = 7 directly needs 256 GB at the low end of the estimate and
 does not fit 256 GB at the high end: 512 GB.
 
@@ -401,7 +445,31 @@ The dominant term is the reduction of products against sparse pivot rows; n₊³
 fits the two points within 3 %. The prediction for t = 12 and t = 13 was written and committed
 (`PREDICTION_t12_t13.md`, commit `64fb066690`) **before** either was run:
 
-T12_PREDICTION_CHECK
+| t = 12, closure c = 6 | predicted | band | measured | verdict |
+|:--|--:|:--|--:|:--|
+| answer | 1 enters at c = 6 | | 1 enters at c = 6 | as predicted |
+| multiply-adds | 2.81e12 | 2.0e12 – 3.7e12 | 3.69e12 | inside, at the upper edge |
+| wall | 1,210 s | 850 – 1,700 s | 1,722 s | **outside by 1.3 %: refuted on time** |
+| stored words | 3.4e8 | | 3.53e8 | 4 % above |
+
+So κ is not constant: 0.00166, 0.00161, **0.00214** at t = 10, 11, 12, and ρ rose to 0.467 ns.
+The model was revised before the t = 13 closure had run (`PREDICTION_t12_t13.md`, second part,
+commit `08a4fb3b0c`): `M ∝ n₊^3.22` (least squares on three points; the last step alone has
+exponent 3.52), 1.75e13 to 2.16e13 multiply-adds and 8,200 s to 10,800 s at t = 13 on this
+machine.
+
+| t = 13, closure c = 6 | revised prediction | measured | verdict |
+|:--|--:|--:|:--|
+| answer | 1 enters at c = 6 | 1 enters at c = 6 | as predicted |
+| multiply-adds | 1.75e13 – 2.16e13 | 2.42e13 | 12 % above the upper value |
+| wall | 8,200 – 10,800 s (refuted above 13,000 s) | 11,775 s | 9 % above the range, below the bound |
+| stored words | 9.3e8 | 1.07e9 | 15 % above |
+| resident memory | about 9 GB | 9.6 GB | |
+
+**Both held-out predictions erred low.** κ is 0.00166, 0.00161, 0.00214, 0.00312 at t = 10..13;
+the local exponent of M in n₊ is 2.95, 3.52, 3.75. ρ rose from 0.43 to 0.49 ns. A fixed-exponent
+model underestimates; the estimates of 10.3 inherit that bias and should be read with a factor of
+2 added on the high side.
 
 ### 10.3 t = 14 — estimate, two analogues only
 
@@ -412,35 +480,43 @@ every product of every row of degree < 6 is reduced) and c = 7 (1 expected to en
   (t = 6, c = 4): κ = 0.0229, w = 0.064, rank/n = 0.76; (t = 10, c = 5): κ = 0.00925, w = 0.0215,
   rank/n = 0.856. (t = 14, c = 6) is the next "first depth of its degree", rank/n = 0.899. κ and w
   fall by 2.5× and 3× per degree; taking κ between 0.004 and 0.00925 gives
-  `M = 2 κ (249,824)³` = **1.2e14 to 2.9e14 multiply-adds**, 10 to 23 times the t = 13 closure.
-  Within one degree the fixpoint closure grows slowly (c = 5: 2.38e10, 2.49e10 at t = 10, 11), so
-  the high end is the safer reading.
+  `M = 2 κ (249,824)³` = 1.2e14 to 2.9e14 multiply-adds.
+  A second reading, by items: a fixpoint closure reduces one item per (row of degree < c, variable
+  of the first tower). At (t = 10, c = 5) that is 3,163 rows × 10 = 31,631 items at 7.5e5
+  multiply-adds each, 7.4 % of the stored words per item. At (t = 14, c = 6) the rows of degree
+  ≤ 5 are 73,587 (**given**), so 1.03e6 items, and 7.4 % of 1.7e9 to 5.4e9 stored words (10.1)
+  each: 1.3e14 to 4.1e14. Taken together: **1.2e14 to 4e14 multiply-adds**, 5 to 17 times the
+  measured t = 13 closure. (Inside one degree the fixpoint closure barely grows: c = 5 costs
+  2.38e10, 2.49e10, 2.60e10, 2.62e10 at t = 10..13.)
 - **c = 7, direct, 1 entering.** κ of the closure in which 1 enters at the first depth of its
   degree: c = 5 (t = 6): 0.0103; c = 6 (t = 10): 0.00166. With κ between 0.0003 and 0.0016:
   `M = 2 κ (841,853)³` = **3.6e14 to 1.9e15**.
 - The other repository's engine did the c = 6 closure in 4.69e15 multiply-adds (dense, GPU,
-  **given**); the estimate here is 16 to 40 times fewer, which is the ratio already seen at
-  smaller sizes between a sparse and a dense elimination, not a new claim.
+  **given**); the estimate here is 12 to 40 times fewer. A ratio of that order between the two
+  kinds of elimination is plausible but was not measured on a common case.
 
 ### 10.4 What machine, how long — estimate
 
-Rate: ρ = 0.43 ns per multiply-add on this machine with 4 threads and a neighbour, i.e. about
-1.5 to 1.7 core-ns. Per-core speed of another machine and scaling beyond 4 threads are **not
+Rate: ρ = 0.43 to 0.49 ns per multiply-add on this machine with 4 threads and a neighbour
+(0.486 at t = 13), i.e. at most 1.94 core-ns, the value used below (the neighbour took part of
+the 4 vCPUs, so the true per-core cost is lower). Per-core speed of another machine and scaling beyond 4 threads are **not
 measured**. Two readings are given: linear scaling to the core count, and a bandwidth-limited one
-(a sparse entry is 8 bytes read per multiply-add; at 1.6 core-ns that is 5 GB/s per core, so about
-30 cores saturate a 150 GB/s memory system).
+(a sparse entry is 8 bytes read per multiply-add; at 1.9 core-ns that is 4 GB/s per core, so about
+30 to 40 cores saturate a 150 GB/s memory system; 30 is used).
 
 | problem | multiply-adds | 16 cores | 64 cores, linear | 64 cores, bandwidth-limited (30 effective) | RAM |
 |:--|--:|--:|--:|--:|:--|
-| t = 13, c ≤ 6 (1 enters at 6) | T13_M | T13_16 | T13_64 | T13_64B | 16 GB |
-| t = 14, c = 6 | 1.2e14 – 2.9e14 | 3.5 – 8.6 h | 0.9 – 2.1 h | 1.9 – 4.6 h | 128 – 256 GB |
-| t = 14, c = 7 direct | 3.6e14 – 1.9e15 | 11 – 56 h | 2.7 – 14 h | 5.7 – 30 h | 256 – 512 GB |
+| t = 13, c ≤ 6 (1 enters at 6) | 2.42e13 (**measured**; 11,788 s here on 4 shared vCPU) | 49 min | 12 min | 26 min | 9.6 GB measured; 16 GB |
+| t = 14, c = 6 | 1.2e14 – 4e14 | 4 – 13.5 h | 1 – 3.4 h | 2.2 – 7.2 h | 128 – 256 GB |
+| t = 14, c = 7 direct | 3.6e14 – 1.9e15 | 12 – 64 h | 3 – 16 h | 6.5 – 34 h | 256 – 512 GB |
 | t = 14, c = 7 by lift | not implemented here | | | | 256 – 512 GB (followers), **given** 751 – 4,679 s on one H200 GPU |
 
-**Honest statement.** t = 13: T13_HONEST. t = 14: expected to finish on one 64-core machine with
-512 GB in about a day (c = 6 and c = 7 direct), **if** the two-point trends of 10.3 hold; they are
-extrapolations across degrees with one analogue each, and can be wrong by a factor of 3 either
-way. The c = 6 closure alone (which decides `1 ∉ V_6`, i.e. `d_F ≥ 7`) is the better-founded half.
+**Honest statement.** t = 13: **done on this 4-vCPU, 16 GB machine in 3 h 16 min** (one draw); on a 16-core machine about 50 minutes per draw if the rate scales with cores, which was not measured. t = 14: expected to finish on one 64-core machine with
+512 GB in one to three days (c = 6 and c = 7 direct), **if** the two-point trends of 10.3 hold; they
+are extrapolations across degrees with one analogue each, both held-out predictions inside one
+degree erred low (10.2), and they can be wrong by a factor of 3 or more. The c = 6 closure alone
+(which decides `1 ∉ V_6`, i.e. `d_F ≥ 7`) is the better-founded half: a 64-core, 256 GB machine,
+an afternoon to a day. Nothing at t = 14 was run.
 
 ## 11. What a study amendment would have to say (not written, preregistration not edited)
 
@@ -482,6 +558,13 @@ The engine is an instrument. An amendment to `research/prime_fall_degree_2026102
 - **Unchecked indexing, prefetch, Montgomery form** in the sparse loop: single-thread cost is
   about 1.45 ns per multiply-add at t = 9 including products; without cycle counters a 10 %
   change cannot be told from the neighbour's load.
+- **A commutation (syzygy) criterion.** At t = 13 the engine reduced 1,366,992 products to find
+  313,912 pivots; 77 % reduce to zero. `x_i·(x_j·g)` and `x_j·(x_i·g)` are the same element, and
+  a signature-style rule could skip most of the repeats, as `sig_fp_tower` does for F4. It needs
+  an ordering argument for soundness (a fall invalidates the naive rule) and was not attempted.
+- **Per-batch scratch.** Each rayon job of each batch allocates and zeroes an accumulator of
+  8 n₊ bytes; a few per cent at most at t = 12, not removed.
+- **A second schedule at t = 13** as an independent check of "1 enters" (section 8).
 - **Reference at t = 11, 12**: hours on this machine; the pods' t = 12 result is taken as given.
 - **Isolation** (`tools/isolated_bench.py`), instruction counts, a `bench.record/v1` record, S3
   upload, leaderboard, `benchmarks/` copy, PDF and graphs: the tools need services not present

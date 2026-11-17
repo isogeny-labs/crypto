@@ -50,3 +50,18 @@ constant-κ model is too optimistic. Revised (**estimate**):
 
 Refuted if the closure takes more than 13,000 s or fewer than 6,500 s, or if 1 does not enter at
 c = 6.
+
+## Outcome at t = 13
+
+Appended 2026-11-17 11:55 UTC, after the run (`raw/t13/`, started 08:33:18, ended 11:49:46 UTC).
+
+| quantity (closure c = 6, t = 13) | revised prediction | measured | verdict |
+|:--|--:|--:|:--|
+| answer | 1 enters at c = 6 | 1 enters at c = 6, 313,912 columns; falls 4, 5, 6 | as predicted |
+| multiply-adds M | 1.75e13 .. 2.16e13 | 24,217,016,013,719 | **12 % above the upper value** |
+| wall of the closure | 8,200 .. 10,800 s; refuted above 13,000 s | 11,775 s (load 3.2 to 4.8) | above the stated range by 9 %, below the refutation bound |
+| stored words | about 9.3e8 | 1,070,913,677 (1,034,680,005 entries) | 15 % above |
+| peak resident memory | about 9 GB | 9.6 GB | |
+
+κ = 0.00312 and the local exponent of M in n₊ from t = 12 to t = 13 is 3.75 (2.95, 3.52 before).
+Both predictions erred low. A model with a fixed exponent underestimates this engine's work.
