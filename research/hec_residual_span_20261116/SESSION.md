@@ -2569,3 +2569,10 @@ What was done: copied retained source-phases solver and replaced only final veri
 Decisions made: integration replay not a new wall study or10x claim; conditional operator premise retained, unchanged producer and no other phase removal. One120CPU invocation after Git freeze/push.
 Open threads: inspect fullcount replay and remaining phase budgets.
 Errors: inherited unused phase snapshot warning only; no scientific execution yet. No S3/cloud/merge.
+
+## Complete short-verification solver passes24calls and exact fullcount replay
+
+What was done: freeze56ffb4fc245 hashes passed; one complete-solver invocation exit0,24calls/12unchangedoriginaltargets. All scalars native-verified, all complete base16vectors match derived totals, subgroup16vectors exactly unchanged, repeats exact. Observed complete baseREDC ratios1.239480-2.470857.
+Decisions made: retain integrated solver as stronger original-genus-two source baseline, not a10x/runtime/independent-verification claim. Conditional admitted Frobenius premise explicit. Future producer comparisons must not hide this stronger verification option.
+Open threads: genus3/4 generic evaluator/complete-control extension with full costs and operator qualification; remaining producer/setup work and full10xmathematical goal active/unachieved.
+Errors: none in scientific integration; inherited unused snapshot warning only. No S3/cloud/merge.
