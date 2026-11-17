@@ -1,0 +1,142 @@
+import TwistGroupMap
+import Mathlib.Data.Rat.Cast.Order
+
+/-! Exact coefficient-set transport, not a claim about unmatched rational
+factor bases or the probability that a row increases rank. -/
+namespace RelationYield
+
+open scoped BigOperators
+
+variable {ι G H : Type*} [Fintype ι] [AddCommGroup G] [AddCommGroup H]
+
+def zeroRelation (B : ι → G) (c : ι → ℤ) : Prop := ∑ i, c i • B i = 0
+
+noncomputable def relationRows (B : ι → G) (C : Finset (ι → ℤ)) : Finset (ι → ℤ) := by
+  classical
+  exact C.filter (zeroRelation B)
+
+noncomputable def usefulRows (B : ι → G) (C : Finset (ι → ℤ))
+    (Useful : (ι → ℤ) → Prop) : Finset (ι → ℤ) := by
+  classical
+  exact (relationRows B C).filter Useful
+
+/-- Empty candidate sets have yield zero by convention; comparisons need positive rates. -/
+noncomputable def rawYield (B : ι → G) (C : Finset (ι → ℤ)) : ℚ :=
+  (relationRows B C).card / (C.card : ℚ)
+
+noncomputable def usefulYield (B : ι → G) (C : Finset (ι → ℤ))
+    (Useful : (ι → ℤ) → Prop) : ℚ := (usefulRows B C Useful).card / (C.card : ℚ)
+
+theorem relation_iff (f : G →+ H) (hf : Function.Injective f)
+    (B : ι → G) (c : ι → ℤ) :
+    zeroRelation (fun i => f (B i)) c ↔ zeroRelation B c := by
+  have hs : (∑ i, c i • f (B i)) = f (∑ i, c i • B i) := by simp
+  unfold zeroRelation
+  rw [hs]
+  constructor
+  · intro h
+    apply hf
+    simpa using h
+  · intro h
+    rw [h, map_zero]
+
+theorem relationRows_transport (f : G →+ H) (hf : Function.Injective f)
+    (B : ι → G) (C : Finset (ι → ℤ)) :
+    relationRows (fun i => f (B i)) C = relationRows B C := by
+  classical
+  ext c
+  simp only [relationRows, Finset.mem_filter, relation_iff f hf]
+
+theorem rawYield_transport (f : G →+ H) (hf : Function.Injective f)
+    (B : ι → G) (C : Finset (ι → ℤ)) :
+    rawYield (fun i => f (B i)) C = rawYield B C := by
+  unfold rawYield
+  rw [relationRows_transport f hf]
+
+theorem usefulRows_transport (f : G →+ H) (hf : Function.Injective f)
+    (B : ι → G) (C : Finset (ι → ℤ)) (Useful : (ι → ℤ) → Prop) :
+    usefulRows (fun i => f (B i)) C Useful = usefulRows B C Useful := by
+  unfold usefulRows
+  rw [relationRows_transport f hf]
+
+theorem usefulYield_transport (f : G →+ H) (hf : Function.Injective f)
+    (B : ι → G) (C : Finset (ι → ℤ)) (Useful : (ι → ℤ) → Prop) :
+    usefulYield (fun i => f (B i)) C Useful = usefulYield B C Useful := by
+  unfold usefulYield
+  rw [usefulRows_transport f hf]
+
+/-- A cheaper destination DLP solves the source DLP only after this bridge is supplied. -/
+theorem scalar_solution_iff (f : G →+ H) (hf : Function.Injective f)
+    (P Q : G) (n : ℤ) : f Q = n • f P ↔ Q = n • P := by
+  rw [← map_zsmul]
+  exact hf.eq_iff
+
+section FullFactorBase
+
+variable [Fintype G] [DecidableEq G] [DecidableEq ι]
+
+abbrev CompleteRelation := {v : (ι → G) × G // (∑ i, v.1 i) + v.2 = 0}
+
+/-- Every ordered prefix has exactly one final point completing a zero sum. -/
+def completeRelationEquiv : (ι → G) ≃ CompleteRelation (ι := ι) (G := G) where
+  toFun p := ⟨(p, -(∑ i, p i)), add_neg_cancel _⟩
+  invFun v := v.val.1
+  left_inv _ := rfl
+  right_inv v := by
+    apply Subtype.ext
+    apply Prod.ext
+    · rfl
+    · change -(∑ i, v.val.1 i) = v.val.2
+      symm
+      apply eq_neg_iff_add_eq_zero.mpr
+      simpa only [add_comm] using v.property
+
+theorem full_relation_count :
+    Fintype.card (CompleteRelation (ι := ι) (G := G)) =
+      Fintype.card G ^ Fintype.card ι := by
+  rw [← Fintype.card_congr (completeRelationEquiv (ι := ι) (G := G)), Fintype.card_fun]
+
+/-- Uniform independent points from the WHOLE finite group: exact raw zero-sum rate. -/
+theorem full_factor_base_yield :
+    (Fintype.card (CompleteRelation (ι := ι) (G := G)) : ℚ) /
+      Fintype.card ((ι → G) × G) = 1 / (Fintype.card G : ℚ) := by
+  rw [full_relation_count, Fintype.card_prod, Fintype.card_fun]
+  have hn : (Fintype.card G : ℚ) ≠ 0 := by exact_mod_cast Fintype.card_ne_zero
+  push_cast
+  field_simp [hn]
+
+end FullFactorBase
+
+section ActualTwist
+
+open TwistEmbedding TwistGroupMap
+variable {k K : Type*} [Field k] [Field K] [Algebra k K]
+  [DecidableEq k] [DecidableEq K]
+
+/-- The actual target is the image in E(K), not an assumed equality with E(k). -/
+theorem twist_relationRows (a b d : k) [(short a b).IsElliptic]
+    (hd : d ≠ 0) (u : K) (hu : u ^ 2 = algebraMap k K d)
+    (B : ι → (twist a b d).Point) (C : Finset (ι → ℤ)) :
+    relationRows (fun i => lift a b d hd u hu (B i)) C = relationRows B C := by
+  exact relationRows_transport (liftHom a b d hd u hu) (lift_injective a b d hd u hu) B C
+
+theorem twist_rawYield (a b d : k) [(short a b).IsElliptic]
+    (hd : d ≠ 0) (u : K) (hu : u ^ 2 = algebraMap k K d)
+    (B : ι → (twist a b d).Point) (C : Finset (ι → ℤ)) :
+    rawYield (fun i => lift a b d hd u hu (B i)) C = rawYield B C := by
+  exact rawYield_transport (liftHom a b d hd u hu) (lift_injective a b d hd u hu) B C
+
+end ActualTwist
+
+#print axioms relation_iff
+#print axioms relationRows_transport
+#print axioms rawYield_transport
+#print axioms usefulRows_transport
+#print axioms usefulYield_transport
+#print axioms scalar_solution_iff
+#print axioms full_relation_count
+#print axioms full_factor_base_yield
+#print axioms twist_relationRows
+#print axioms twist_rawYield
+
+end RelationYield

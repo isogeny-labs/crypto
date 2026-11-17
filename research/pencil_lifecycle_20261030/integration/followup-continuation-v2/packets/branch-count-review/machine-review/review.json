@@ -1,0 +1,136 @@
+{
+  "schema": "formal.machine-review/v1",
+  "task": "T-1359",
+  "subject_commit": "5342909fbcaffae8f8bce2b290bdc095d47eccb6",
+  "machine_status": "passed",
+  "fidelity": "not_reviewed",
+  "review_outcome": "inconclusive",
+  "outcome_reason": "This task owns machine verification only; separate source-fidelity review is required.",
+  "fresh_modules": [
+    "CountHelpers",
+    "CountDispatch",
+    "CounterUpdate",
+    "BranchControls",
+    "BranchReadback"
+  ],
+  "main_declarations": 11,
+  "controls": 8,
+  "named_readbacks": 19,
+  "false_control_exit": 1,
+  "malformed_inventory_controls": {
+    "empty": "rejected",
+    "wrong_name": "rejected",
+    "sorryAx": "rejected"
+  },
+  "source_unchanged": true,
+  "all_attempt_bindings_unchanged": true,
+  "initial_infrastructure_failure": "CountHelpers-replay-TBy7UDM2: copied union roots lacked nested modules and .olean.server sidecars; repaired isolated snapshot, source unchanged.",
+  "compiler_version": "Lean4.34.1 commit5045d0056413266e57c625dcd7c365b10e377c52",
+  "compiler_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+  "lean_envelope": {
+    "timeout_seconds": 120,
+    "memory_MiB": 4096,
+    "threads": 1
+  },
+  "dependency_snapshot_files": 28922,
+  "expanded_source_copy_matches": 28637,
+  "independent_binary_rechecker": false,
+  "scientific_runs": 0,
+  "claims": [
+    {
+      "declaration": "BranchCount.constraint_projection",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchCount.anchor_projection",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchCount.same_projection",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchCount.constraint_bound",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchCount.anchor_bound",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchCount.same_bound",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchCount.union_projection",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchCount.union_bound",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchCount.run_projection",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchCount.run_bounds",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchCount.update_exact",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchControls.fresh_counts",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchControls.redundant_counts",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchControls.identical_returns_different_zero_counts",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchControls.inconsistent_preassert_increment",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchControls.answer_no_zero_increment",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchControls.existing_anchor_zero_increment",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchControls.distinct_unanchored",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    },
+    {
+      "declaration": "BranchControls.distinct_anchored_zero",
+      "machine_status": "passed",
+      "fidelity": "not_reviewed"
+    }
+  ]
+}

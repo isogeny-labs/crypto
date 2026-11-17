@@ -1,0 +1,438 @@
+{
+  "card_id": "CARD-prime-medium-rho-p4-confirm-20261108-V-M9",
+  "card_path": "research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-V-M9.yaml",
+  "card_sha256": "3d093dfadddc3b0bd0b5bf2de922e8b169fe51447212fc01f9b64e465a9f2652",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "75cf6c230728b6e9cefe30f175402bad1af7ccb4",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.014,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-ancestor",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.014,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--quiet",
+        "75cf6c230728b6e9cefe30f175402bad1af7ccb4",
+        "HEAD",
+        "--",
+        "research/prime_medium_rho_p4_confirm_20261108",
+        ":(exclude)research/prime_medium_rho_p4_confirm_20261108/cards",
+        ":(exclude)research/prime_medium_rho_p4_confirm_20261108/receipts",
+        ":(exclude)research/prime_medium_rho_p4_confirm_20261108/sessions",
+        "taskq/",
+        "tools/task_card.py",
+        "tools/benchrec.py"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-paths-unchanged",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/primefield-companion-schur-20261101/tools/experiment_protocol.py",
+        "validate",
+        "research/prime_medium_rho_p4_confirm_20261108/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.197,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-check",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.197,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "2c8fb1a0ceabccb482fbe45df810f70e8432af7a7b638bd264efef75f67c4e93",
+      "stdout_tail": [
+        "OK: experiment.protocol/v1 research/prime_medium_rho_p4_confirm_20261108/protocol.json (0 finding(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "26fd5c574d585f57d39cf298dbfb48b3569d952c1693526e253853bfca02ae0c",
+        ".freeze.status == \"frozen\" and .freeze.protocol_sha256 == $h",
+        "research/prime_medium_rho_p4_confirm_20261108/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-frozen-hash",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "-c",
+        "research/prime_medium_rho_p4_confirm_20261108/cards/frozen-ecbench.sha256"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.077,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "frozen-ecbench-sha",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.077,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "42ec20be7c7d947cb56e6ba9f9ca72289e84c004bdc796ac323c9c781116f18a",
+      "stdout_tail": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench: OK"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "s",
+        "1514deb4793dc4fe4ae14f55876dbe6e8d358c0d",
+        ".schema == \"isolab.git-publication/v1\" and .source_revision == $s",
+        "research/prime_medium_rho_p4_confirm_20261108/receipts/publication-receipt.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "publication-receipt-identity",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "-n",
+        "--arg",
+        "i",
+        "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5",
+        "--arg",
+        "s",
+        "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "--arg",
+        "b",
+        "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "[inputs | .job.build == {image_uri:$i, source_revision:$s, ecbench_sha256:$b} and .provenance.source_revision == $s] | length == 1 and all",
+        "research/prime_medium_rho_p4_confirm_20261108/requests/M9.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build-identity",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        ".job_name == \"prime-medium-rho-p4-20261108-m9\" and .admitted_for_counts == true and .expected_executions == 336 and .audit_records == 336 and (.results_uri | length) > 0",
+        "research/prime_medium_rho_p4_confirm_20261108/receipts/M9/admission.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "admission-identity",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "b",
+        "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "--arg",
+        "s",
+        "ECS1hfd3fcb2396dc",
+        "--argjson",
+        "n",
+        "336",
+        ".binary_sha256 == $b and .spec_id == $s and .status == \"complete\" and .executions_planned == $n and .records_written == $n",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M9/session.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "session-identity-m9",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "verify",
+        "--dir",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M9",
+        "--replay-all",
+        "--out",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M9.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1485.723,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-m9",
+      "index": 10,
+      "outputs": {
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M9.audit.json": "36245d7f27d88ac404b8015efa72740f21001620b5e0cc73e0e2eefab8c9d91d"
+      },
+      "seconds": 1485.723,
+      "stderr_sha256": "50a27d4e9de5c58b064371f257dd25ef953e99655cf5e1a6a34c31197c8a4fd3",
+      "stderr_tail": [
+        "receipt sha256 36245d7f27d88ac404b8015efa72740f21001620b5e0cc73e0e2eefab8c9d91d",
+        "audit OK: 336 records, 336 verified, 288 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "36245d7f27d88ac404b8015efa72740f21001620b5e0cc73e0e2eefab8c9d91d",
+      "stdout_tail": [
+        "      \"seq\": 335,",
+        "      \"record_id\": \"ECR1h3272790b1ba5\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"replay_selection\": \"all\",",
+        "  \"replay_candidates\": 288,",
+        "  \"files\": {",
+        "    \"host.json\": \"6e8393676201fb25d2ff32124ef81e0dd16799c16322b71be529c583f1327240\",",
+        "    \"plan.json\": \"fb6f9077bdd3dd7da9796449f4f8dd495ebfbeed40116d3e55d1676863d03a53\",",
+        "    \"records.jsonl\": \"9345bbed77cf1a1c646ea2ff072ba16531847f675e3cb9c95a6da9282bd632ca\",",
+        "    \"session.json\": \"a3317d731ef6f3b08771b39f89d6743a191b4daea1904307490ab4022941c5bc\",",
+        "    \"spec.json\": \"77b8a775a990a1483cc5ea5a88f0613f947c2f7aa741559735804bd27fa78401\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h8d80c7bc4dfc\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1he9e33daae9e7\",",
+        "  \"audited_unix_ms\": 1794141582171",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--argjson",
+        "n",
+        "336",
+        ".ok == true and .session_status == \"complete\" and (.problems | length) == 0 and .planned_executions == $n and .records == $n",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M9.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit-pass-m9",
+      "index": 11,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/prime_medium_rho_p4_confirm_20261108/cards/record_raw.sh",
+        "M9"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.058,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "add-raw-m9",
+      "index": 12,
+      "outputs": {},
+      "seconds": 0.058,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "2900a7f11392bbadf8832d80ca76f6d37f35fce0844fdffd9ebc65f659dbf875",
+      "stdout_tail": [
+        "20 raw file(s) recorded"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 12,
+  "commit": "fa94ef6e643dd33fc0d99d7b8849a487d9f86548",
+  "dirty_after": [
+    "benchmarks/records/20261108T0512Z-prime-medium-rho-p4-confirm.json",
+    "enchmarks/records/20261108T0449Z-minors-gd-panel.json"
+  ],
+  "dirty_before": [
+    "research/minors_guess_determine_20261107/cards/CARD-minors-guess-determine-20261107-RB-1.yaml",
+    "research/minors_guess_determine_20261107/cards/status_request_b.json",
+    "research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-V-M9.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

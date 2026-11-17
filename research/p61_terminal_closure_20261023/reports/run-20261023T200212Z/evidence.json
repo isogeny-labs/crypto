@@ -1,0 +1,132 @@
+{
+  "schema": "crypto/p61-terminal-closure-run-evidence/v1",
+  "status": "pass",
+  "run_id": "run-20261023T200212Z",
+  "curve_id": "p61-i0025",
+  "field_p": "2305843009213693951",
+  "source_commit": "3b66e5cae94ab709f2ba2169e181eb0d3ac1c9e2",
+  "result": {
+    "x_start": 19890496,
+    "x_end": 19894128,
+    "lanes": 18,
+    "nodes": 65376,
+    "closures": 18,
+    "complete_class_vertices": 358094304,
+    "record_chain_sha256": "c8a0499eea65009e87beba9b24d348b44f7d90f8e26a8d3522b7a4d676eaf247"
+  },
+  "timing_ms": {
+    "generation": 35134,
+    "native_replay": 31059,
+    "terminal_follower": 5986
+  },
+  "dispatch_resources": {
+    "load_one": 10.66650390625,
+    "max_load_one": 12.0,
+    "free_bytes": 6753151533056,
+    "min_free_bytes": 1500000000000
+  },
+  "bindings": {
+    "predecessor_checkpoint": {
+      "path": "/Volumes/data/ec-hardness-atlas-20261012/p61-class-streaming-v1/checkpoints/campaign-v1-checkpoint-000019890496.json",
+      "sha256": "142b06f99f69d7124f2ef22259fc8c36ea80656f51349c363b87f134e0bcec25"
+    },
+    "successor_binary": {
+      "path": "/Volumes/data/ec-hardness-atlas-20261012/p61-class-streaming-v1/supervisor/p61-terminal-closure-v2/bin/p61_isogeny_class-darwin-arm64-3b66e5cae",
+      "bytes": 2076944,
+      "sha256": "353afbd71fdc09dc44501d62deb72eb695ed2868b8256070615b01299aeadf23"
+    },
+    "source_bundle": {
+      "path": "/Volumes/data/ec-hardness-atlas-20261012/p61-class-streaming-v1/supervisor/p61-terminal-closure-v2/source/crypto-p61-terminal-closure-3b66e5cae.bundle",
+      "bytes": 7145,
+      "sha256": "52da2845915eb572e10aa94499512a2edea92a5ebf33fed73a93c7687f9d6b33"
+    },
+    "segment": {
+      "path": "/Volumes/data/ec-hardness-atlas-20261012/p61-class-streaming-v1/segments/campaign-v1-segment-000019890496-000019894128.jsonl.gz",
+      "bytes": 8306946,
+      "sha256": "1b576b189b7354bb9c025f17a14409cb1a4118c8c84c7bfbfb7229f5505fee32"
+    },
+    "terminal_checkpoint": {
+      "path": "/Volumes/data/ec-hardness-atlas-20261012/p61-class-streaming-v1/checkpoints/campaign-v1-checkpoint-000019894128.json",
+      "bytes": 7311,
+      "sha256": "ef9c6857a84a497bc99a4de534f2cf548bcea393896dbf6085d7b5bfe3e9ea74"
+    },
+    "generation_receipt": {
+      "path": "/Volumes/data/ec-hardness-atlas-20261012/p61-class-streaming-v1/receipts/campaign-v1-generate-000019890496-000019894128.json",
+      "bytes": 9783,
+      "sha256": "eec5774ebd9ea7b0da959324bf3a6a5288cd7b0980678142c62d5359d0cb813d"
+    },
+    "verification_receipt": {
+      "path": "/Volumes/data/ec-hardness-atlas-20261012/p61-class-streaming-v1/verification/campaign-v1-verify-000019890496-000019894128.json",
+      "bytes": 1220,
+      "sha256": "94ec6052a4e6461f518bcee6637561c893154347d2925ae02effedba012f633f"
+    },
+    "admission_manifest": {
+      "path": "/Volumes/data/ec-hardness-atlas-20261012/p61-class-streaming-v1/manifests/campaign-v1-admission-000019890496-000019894128.json",
+      "bytes": 1943,
+      "sha256": "f3c03ef4965a4980e403d2e187ed4b45cf96400d4b82790c2c36d0bb91e52129"
+    },
+    "terminal_structural_audit": {
+      "path": "/Volumes/data/workspaces/ml-cryptanalysis/isogeny-volcano-corpus-v1/p61-cairn-v1/runtime/census-terminal-audit-follower-v2/TERMINAL-AUDIT.json",
+      "bytes": 2521,
+      "sha256": "a165b95e5c26c9cad590a427fbc8b556e096f7dca7eea78e7cd24d75ba86d5f1"
+    },
+    "last_ordinary_audit": {
+      "path": "/Volumes/data/workspaces/ml-cryptanalysis/isogeny-volcano-corpus-v1/p61-cairn-v1/audits/census-independent-follower-v1/p61-independent-census-admission-audit-x19874112-x19890496-follower-v1.json",
+      "bytes": 3939,
+      "sha256": "6eb336a1123bc47b1c4a493b17858bee40c069a574a36abc559eb6f1a0707229"
+    }
+  },
+  "control_plane": {
+    "spec_version": 31,
+    "spec_sha256": "bc86139a03933a5d9f5b734d35099edb49c637b8df1040f13c47b5ad2e0dfec0",
+    "launcher_sha256": "96ce4d73edf1e466cc726423b45ca6078d2b9385363120b0c3049082aa768a3c",
+    "python_3_13_sha256": "20c9c2144a9f5202177620417e67643fb551aa31586e5d3c1361627b920cadb0",
+    "generation_gate_status": "complete",
+    "terminal_audit_status": "complete"
+  },
+  "validation": {
+    "source_head_release_lib": {
+      "command": "RUST_TEST_THREADS=1 cargo test --release --lib",
+      "passed": 4081,
+      "failed": 0,
+      "ignored": 114,
+      "elapsed_seconds": 554.47
+    },
+    "current_main_release_lib": {
+      "status": "pass",
+      "base_commit": "d7daaa6b42e7b5209e78c2407b2eaf35da25fbe4",
+      "code_head_commit": "fb5e3a4479536aa5436bece7e1ea177ac306734b",
+      "focused_passed": 6,
+      "focused_failed": 0,
+      "command": "RUST_TEST_THREADS=1 cargo test --release --lib",
+      "passed": 4479,
+      "failed": 0,
+      "ignored": 119,
+      "elapsed_seconds": 592.14
+    }
+  },
+  "downstream_snapshot": {
+    "recorded_utc": "2026-10-23T20:44:38Z",
+    "pipeline_state_sha256": "5817ed4f041169875fd5495d959ca50f766f07407a348f6ba045b71e8660dd42",
+    "census_rows_admitted": 19894128,
+    "census_rows_target": 19894128,
+    "census_vertices_admitted": 358094304,
+    "census_vertices_target": 358094304,
+    "census_contiguous_prefix": 19894128,
+    "census_gaps": [],
+    "adjacency_vertices_admitted": 5314176,
+    "adjacency_vertices_target": 358094304,
+    "adjacency_contiguous_prefix": 4134528,
+    "adjacency_directed_edges": 37199232,
+    "adjacency_directed_edges_target": 2506660128
+  },
+  "open_gates": [
+    "global_external_uniqueness",
+    "complete_selected_degree_adjacency",
+    "dense_endpoint_resolution",
+    "per_degree_reciprocity_and_multiplicity",
+    "attack_context_labels_and_masks",
+    "held_out_partitions",
+    "null_controls_and_m7_confirmation"
+  ]
+}

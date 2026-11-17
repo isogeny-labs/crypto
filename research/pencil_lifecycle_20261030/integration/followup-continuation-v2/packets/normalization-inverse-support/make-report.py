@@ -1,0 +1,22 @@
+from pathlib import Path
+p=Path(__file__).parent
+body='''Reversible normalization and signed support
+
+T-1185; 2026-10-31. Producer proof checks; independent source-fidelity review pending.
+
+Polynomial normalization T_n(h)=a^(-n) h(aX+b) is reversible for a nonzero. The inverse uses parameters a^(-1), -b/a. Both compositions equal the original polynomial, and T_n is injective. Applying this inverse to the preceding validity transport proves an equivalence: Valid(T_6(f),T_deg(u)(u),T_3(v)) if and only if Valid(f,u,v). Here Valid means monic u, degree at most two, ordinate degree strictly below u, and u dividing f-v^2.
+
+The signed affine map sends (x,y) to ((x-b)/a,y/a^3), with inverse (x,y) to (ax+b,a^3y). Both round trips are identities. Curve membership y^2=f(x) and signed support membership u(x)=0,y=v(x) are equivalent across the maps. Polynomial ordinate negation and point negation commute with normalization. These theorems hold over an arbitrary field with a nonzero; no prime-word bound is needed for this algebraic component.
+
+Fourteen main declarations and eight controls are separately exposed for axiom readback. Rational fixtures use a=2,b=3: (5,8) maps to (1,1), (5,-8) to (1,-1), and the inverse recovers (5,8). Omitting y scaling fails the constant-polynomial curve condition; a=0 makes the point map noninjective. The constant-polynomial negative control is an algebraic equation fixture, not a smooth genus-two curve. Support u=X-5,v=8 is checked before and after transformation; a polynomial round trip is checked explicitly.
+
+This establishes reversible affine coordinates and signed support predicates, not a Picard/Jacobian group isomorphism. Multiplicities, extension of the affine map at infinity, and principal-divisor transport remain the geometric construction to connect next. The source-level word/storage composition is in the preceding stored-divisor-validity packet. Existing compiled upstream proof dependencies remain in the trust boundary. This producer check does not supply independent review.
+
+Sources: the prior Transport, Validity and Stored modules; canonical genus2_model_gate.rs with corrected named extraction; and Mathlib's polynomial algebra-map documentation (algEquivCMulXAddC and inverse substitution), https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Polynomial/AlgebraMap.html. Elementary pinned polynomial composition identities were used without fetching compiled dependencies. No novelty claim.
+
+All four final native checks passed with unchanged input hashes. Separate readback of all 22 declarations found only propext, Classical.choice and Quot.sound; status.json records the outcomes. The first Support attempt left a negated-division simplification unresolved; the explicit neg_div lemma fixes it. Receipts retain the failed attempt and nonfatal linter warnings. No scientific executions, timing observations or cost ratios.
+'''
+(p/'REPORT.md').write_text('# '+body)
+s=body.replace('https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Polynomial/AlgebraMap.html','Mathlib.Algebra.Polynomial.AlgebraMap (linked in REPORT.md)').replace('_',r'\_').replace('^',r'\textasciicircum{}')
+(p/'report.tex').write_text(r'\documentclass[10pt]{article}\usepackage[margin=.7in]{geometry}\usepackage[T1]{fontenc}\setlength{\parindent}{0pt}\setlength{\parskip}{8pt}\begin{document}'+s+r'\end{document}')
+(p/'flow.svg').write_text('''<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="350"><rect width="1100" height="350" fill="white"/><g font-family="sans-serif" fill="#17364a" text-anchor="middle"><text x="550" y="30" font-size="22">Reversible normalization with signed support · T-1185</text><g stroke="#17364a" fill="#edf5f7"><rect x="30" y="70" width="360" height="100"/><rect x="710" y="70" width="360" height="100"/></g><text x="210" y="99">Source: f, u, v; point (x,y)</text><text x="210" y="130">u(x)=0 and y=v(x)</text><text x="890" y="99">Destination: T₆(f), T_d(u), T₃(v)</text><text x="890" y="130">((x−b)/a, y/a³)</text><path d="M390 110H710M390 140H710" stroke="#17364a"/><text x="550" y="95">forward →</text><text x="550" y="165">← inverse</text><text x="550" y="220">Nonzero a · validity equivalence · both round trips · negation commutes</text><text x="550" y="270">14 main declarations + 8 controls + separate axiom readback</text><text x="550" y="320">Next geometric connection: multiplicities, infinity and principal divisors</text></g></svg>''')

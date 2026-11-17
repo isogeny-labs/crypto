@@ -1,0 +1,431 @@
+{
+  "UTC_date": "2026-10-20",
+  "audited_project_theorems": 206,
+  "client_date": "2026-10-19 America/Los_Angeles",
+  "corrections": [
+    "Round11 proof map said three independent AS characters;there are two independent characters and their nonzero sum,the three nontrivial characters of a rank2 group;genus3 unchanged",
+    "Previous status misread expected TODO negative-test output as the backlog failure;actual failure is concurrent_claims_resolve_to_one_holder_after_sync",
+    "Initial S18 antidiagonal lower bound used only one branch's modular stabilizer;correct minimum gives520 before exact local contact computation740",
+    "Initial Q10c max depth omitted scaling relations;final full maximum is5,with prior export retained"
+  ],
+  "failed_and_partial_runs": [
+    {
+      "files": [
+        "lean-build-02.log"
+      ],
+      "reason": "nested-power normalization was missing in the parameter factorization;explicit pow_mul rewrite fixes the elaboration"
+    },
+    {
+      "files": [
+        "root-tests.log",
+        "root-timer-isolated.log",
+        "root-tests-serial.log"
+      ],
+      "reason": "parallel root run observed shared profiling counter calls2 instead of1;isolated test passes;full serial result retained without weakening any test"
+    },
+    {
+      "files": [
+        "s18-initial-lower-bound-attempt.json",
+        "ss49-01.log"
+      ],
+      "reason": "one-branch stabilizer not a valid lower bound under non-modular elliptic negation"
+    },
+    {
+      "files": [
+        "s18-eight-jet-attempt.json",
+        "ss49-02.log"
+      ],
+      "reason": "20 diagonal order14 points censored at8;expanded to16 under frozen amendment"
+    },
+    {
+      "files": [
+        "lean-boundary-build-01.log",
+        "lean-build-01.log",
+        "Boundary-before-minimal-import.lean"
+      ],
+      "reason": "duplicate dependent builds/import overhead interrupted;regenerated minimal boundary module and built sequentially"
+    },
+    {
+      "files": [
+        "q10c-before-depth-crosscheck.json"
+      ],
+      "reason": "aggregate depth initially counted constant nodes only;corrected to include all linear scaling relations"
+    },
+    {
+      "reason": "runtime migration lacks CLI GitHub credentials;publication uses the authorized GitHub connector,without reading or copying secrets"
+    }
+  ],
+  "identity_certificates": [
+    {
+      "extra_checker_points": 128,
+      "file": "identity-constant-gate-saturation.json",
+      "id": "IDC1h8e24e428b32f23f7",
+      "issuer_points": 64
+    },
+    {
+      "extra_checker_points": 128,
+      "file": "identity-velu-discriminant-residual.json",
+      "id": "IDC1h1d00dd28c993692c",
+      "issuer_points": 64
+    }
+  ],
+  "new_named_lean_theorems": 24,
+  "parent_commit": "539325b5e66719f4cea7ee1315659808103d5bcb",
+  "performance_measured": false,
+  "raw_sha256": {
+    "Boundary-before-minimal-import.lean": "3b8454448d914ed507df456b20dc30ac890dd81559b52d6140e9ffac9de0c57c",
+    "KoblitzRound12Boundary.lean": "3815da578fe9224f28c80db836e3aa40e9419657906c0b7b893fdc31be27be82",
+    "boundary-01.log": "a1066724ba4e72446643fe05757b6d57fe0f4cb23b22ebabffd532d2d7fcdb7d",
+    "boundary-lean-01.log": "7504b9f89473702eacf2b51517896f75506b9fe13a095f5467e3bb94b2df30d1",
+    "boundary-lean-02.log": "7504b9f89473702eacf2b51517896f75506b9fe13a095f5467e3bb94b2df30d1",
+    "build-01.log": "594dbbfc1cf77342c458f356779e0b0a44cd30d3d46ecbe33c3a12a504c5827c",
+    "build-02.log": "721f23be5d5ba3720730e52bb8fc416545ff3224df2a3bf6dab67ad286298f5c",
+    "build-03.log": "134cb21a7fdd38cbee385d0eac717417b879f51389890321259bbc6bc303f8d2",
+    "build-04.log": "ce0f28f9f646274de398442bd27d80b1d55fea967c34b6d126c8a33eabdd91b9",
+    "build-05.log": "71c6751d62845ef70e0bcd26f6d2f0374932b627cc80432dc131dd3afc5318bf",
+    "build-06.log": "5e344e9f963c036f85c1f580accde1f350b8e26e85af83ce1b5e6b5a350f138a",
+    "build-07.log": "21d52c087b364feab9b0c33974c262c2aef4adc0aae80e7909607e60e7721258",
+    "build-08.log": "16803bac41f7926ca2f7728cfef87c8c05197924573a66383bd527b2fc4901dd",
+    "ci-old-head-backlog.log": "997fca410297d60d79a494e3351f71d03a2fd63ec80748d5d1ed3d329aab37b3",
+    "ci-old-head-sea-lean.log": "db73f4e9c7267a3a1e7329ad36422589720d9f6c69edea9c8320fa59cf05691f",
+    "constant-saturation-01.log": "644163510352172b5949ec8f8a5abfa87bcac9ec38535d9284e846a53c06524c",
+    "constant-saturation-02.log": "883efaf86399ef25657fc4a31f8319ecb3fd431d918050a9f9eab1bed02e2f2f",
+    "dashboard-check.log": "f0c4941e52d412a29f1819726d378a41946001831ecd9a6cef11f627ff5e42d3",
+    "dashboard-render.log": "6c744b1b4f2669263260eb6f865c638d6429cfec0648633287b7a675c249babb",
+    "identity-constant-gate-before-audit-receipt.json": "06f683343d6056e3b0345d7d8ce71e713d26a0b9ab6c4200ea428981c3a24d8c",
+    "identity-velu-before-audit-receipt.json": "89335b330fca6ad15c29b26c02e01cd6e1cd27dcaa40ff9d616aa7e253465b51",
+    "lean-boundary-build-01.log": "0383dbbf4cab5c16119ff53e10c394a6f8e22cd16d892716d29498c4705ca508",
+    "lean-boundary-build-02.log": "a0035986b212320bf961cb30530d44b09d50a4f4d22a087c9c3c2bd2ccf5f5c8",
+    "lean-build-01.log": "a12addde5037978afb46a91f8f6040a2a13f253597d7643c25be9bd42969331b",
+    "lean-build-02.log": "4900bac69d3cb5060ec3ee89d5f7f19d8ad3f95a86f002567c760ed6ed2ea0aa",
+    "lean-build-03.log": "01adb5abf1b112d32b38bd37bc05018c04e29a6c3c54667467a8ad3f653035af",
+    "lean-build-04.log": "bd981f1a688b630c818c1e5289c84bebd9d0c96050f057891e33bea8d52411ce",
+    "lean-full-audit.log": "ff2a3632d91e46b0017c2e5294f769298dfb75f2b1fa72926af1cd595a8c9b30",
+    "lean-full-build.log": "61890d1c8d04dc0dd537a344786a51ac5de196331bc4f941776c36dc365baa7e",
+    "lean-full-cache.log": "f6d8cc880b7be12c607f72c5eb4002cbaf461b2e742c4e38057fa8fbe385c36a",
+    "lean-full-status.log": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431",
+    "lean-proof-gate.log": "c55feaa7c3b148d39d2dd0762a9433d346492b1219e6a393a008d81014dea4d7",
+    "lean4checker-availability.log": "b5b34fdd826c4e340220bcbfaf8a5c1de76a4fcdaa9d803b78df214b07e61db0",
+    "m15-supersingular-diagonal-component.json": "e7dc2917e7deca1e39f43109aacb195de36e521ddf795b8984f88f686dad7947",
+    "m16-local-diagonal-contacts.json": "4b9fbb655979aae20fda80b69312c02c602aef9719eca36b009191165b682d6b",
+    "native-tests.log": "eea60d0011d7228929791714d0a3950a00cfb7daaf1c786344cce14bd717fc19",
+    "parsed-01.log": "130c72b7575f0c9eb7cb39f1b5db6f4a7f19e862e938260db70001f12c890ccc",
+    "parsed-02.log": "130c72b7575f0c9eb7cb39f1b5db6f4a7f19e862e938260db70001f12c890ccc",
+    "q10-full-homogenized-boundary-counterpoints.json": "226bce61af886d80b1105e05853eb22bbc4f6dd542ec0ef33767b255ca3c6ea3",
+    "q10c-before-depth-crosscheck.json": "0a4fe37f2e49c823a60fe734f6eed6e602bf3a348b476b8d1246408ebdee2207",
+    "q10c-constant-gate-saturation-step.json": "162fc191a060e18d25754d990a228001f95f3d9b13f3ea597a51569d5ebcf88e",
+    "q8-F2-polynomial-templates.json": "a449e78f8130bd2b0ebb62b174618de85039ea48355976c70202be9f2d383dd9",
+    "q8-graph-0-F2-relations.json": "55d032fc5a46d1931efa84fdb558d2da0620fd4e0dc2e2114cdbfc973dcc1c77",
+    "q8-graph-1-F2-relations.json": "e1089fa77670416e28fa55573099f1a5795f3e00430a42f901424a2717c7b372",
+    "q8-graph-2-F2-relations.json": "a7ac2e4d3287bf52f08bbb86aeb04ff3740534b8194e17da9805894c5d8e63b5",
+    "q8-graph-3-F2-relations.json": "d18cd33b41dceb630b6c9e39e063f14b64bb76cbe78f2038021aeac672bc7a65",
+    "replay-final-source.log": "a9aba6273b7050ea108f29ae5aa9013847bc04e977972107b42dc60aff551fa9",
+    "replay-new.log": "5e19aa2ee44691e920ec22677362646729fbf6b963861378f9149136c2e9b3d7",
+    "replay-prior11.log": "dee73229662a28b4dcee47989a27fb41b166c37bbb5e48f34dcf36db65812ce0",
+    "root-tests-serial.log": "c04b5511be90636c87ac51d42d4d5bb8ac6cd4ad41d7659379ec954ef29d6b64",
+    "root-tests.log": "92ac582b7b1bdd2fdaf5b0dd99835e93d44900583f8b4bc6b90112fe74c24a62",
+    "root-timer-isolated.log": "b4d7662a19d59a15d0e101d5533de97cb87b3206b070c47ded571398840655ea",
+    "s18-before-full-jet-export.json": "388ac3495b1d6ef980acedaf5ee8598e27d14305ef99596ce3ad0850a72b981e",
+    "s18-eight-jet-attempt.json": "5ab77b99b6324ebf158199f15f87562499019738833a32403f0362d10e9de1a9",
+    "s18-initial-lower-bound-attempt.json": "260a638d28ab7227c06cf4a44b867fe5944ed8bb5ad96ee0f3dbf36d41d6ad2d",
+    "s18-sixteen-jet-before-metadata.json": "e95b44359562f0f2e3f9d04612205b79f1cabafbc92aaacde8457c837badfc7d",
+    "s18-supersingular49-coordinate-adapter.json": "388ac3495b1d6ef980acedaf5ee8598e27d14305ef99596ce3ad0850a72b981e",
+    "s19-before-full-jet-export.json": "4ccd65d865f19b179382a17a7e4effec630fc067524e42fffa5b803c648ffdff",
+    "s19-complete-supersingular-divisor-strata.json": "d2150744c1dd51574d05d44d6835539812c9da91db549ab2d02dd2849c2b5031",
+    "s19-sixteen-jet-before-parser.json": "4ccd65d865f19b179382a17a7e4effec630fc067524e42fffa5b803c648ffdff",
+    "s20-before-full-jet-export.json": "71b57cab932f0e4683bd22b082698303129dc6801f634ee891516044b436db1b",
+    "s20-parsed-local-and-divisor-check.json": "71b57cab932f0e4683bd22b082698303129dc6801f634ee891516044b436db1b",
+    "site-tests.log": "acf6bfb321ba72c0f2eb6e5cee154747b8a13b871fb1960eb7bbca68553e5979",
+    "ss49-01.log": "e7ef850ce91ccaed8c571cd3ad3ebaadd14966485bfd6daced6f777fc07ec6d7",
+    "ss49-02.log": "6b4bab5628f38ee6b4408983eebd48c5aa488a9ce379eaadc58e6aceba960481",
+    "ss49-03.log": "01b203445236296ab8c1bd968e9c1281fca99b86d21839ed1a24cfeec37867ca",
+    "ss49-04.log": "c3a4d0d9acac90207a005490d0ce6b7332fb78e0c820e70346feb402e3ae9dc8",
+    "ss49-05.log": "c3a4d0d9acac90207a005490d0ce6b7332fb78e0c820e70346feb402e3ae9dc8",
+    "workflow-tests.log": "9f80cdff58e52c869f95f44e48051a5b16ef911979d088fa7740a59c5aa8a8d3"
+  },
+  "requirements": [
+    {
+      "open": "complete saturated ideals and all proper quotient boundaries",
+      "status": "partial",
+      "track": "projective saturation",
+      "verified": "counterpoints on all four full homogenized systems,all scalar equations checked;592 generated K-linear saturation relations with membership depth<=5"
+    },
+    {
+      "open": "proper polarized closed projective quotient models",
+      "status": "partial",
+      "track": "closed embeddings",
+      "verified": "four affine open embeddings retained;new actual linear relations identify removable auxiliary boundary artifacts"
+    },
+    {
+      "open": "ordinary supports of degrees500,1760,1880,2760,580,1370,2180;no whole new principal row",
+      "status": "partial",
+      "track": "seven noncuspidal divisors",
+      "verified": "complete supersingular closed supports and exact local multiplicities of all eight functions;ordinary degrees split exactly"
+    },
+    {
+      "open": "ordinary contribution500",
+      "status": "partial",
+      "track": "antidiagonal",
+      "verified": "complete SS contribution740 on52 degree10 closed points,contacts1,2,4;old diagonal860 reproduced"
+    },
+    {
+      "open": "full global moduli formalization and explicit49 torsion points",
+      "status": "verified complete under written moduli bridge",
+      "track": "460 diagonal gap",
+      "verified": "all400 round11 local contacts independently reconstructed using local49 coordinates"
+    },
+    {
+      "open": "native field semantics and complete modular/local deformation geometry remain written",
+      "status": "partial",
+      "track": "Lean proofs",
+      "verified": "24 new named proofs,including8 actual full-circuit finite certificates and structural saturation/order/primary-image implications"
+    },
+    {
+      "reason": "user assesses;no timings,solver run or rank promotion",
+      "status": "not attempted",
+      "track": "IC efficiency"
+    }
+  ],
+  "retained_rank": {
+    "columns": 1308,
+    "evaluated": 12,
+    "nonzero_columns": [
+      1165,
+      1160
+    ],
+    "nonzero_image_rank": 11,
+    "promoted": false
+  },
+  "saturation": {
+    "actual_boundary_data_kernel_theorems": 8,
+    "full_equations_checked": 1679760,
+    "full_h_saturation": false,
+    "full_system_counterpoints": 4,
+    "generated_scalar_linear_relations": 213120,
+    "independence_claimed": false,
+    "maximum_h_power_membership_depth": 5,
+    "new_K_linear_relation_blocks": [
+      150,
+      150,
+      146,
+      146
+    ],
+    "proper_quotient_embedding": false
+  },
+  "schema": "koblitz.round12-ledger/v1",
+  "scope": "same-agent native construction and parsed substitutions share primitives;fresh replay and partial Lean formalization;global modular/etale bridges written;no external audit or IC efficiency claim",
+  "source_sha256": {
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRelations.lean": "38febde27b80bc8783c9fc014f39ef36a4c2c00ac32b19f1aafb1f5c30719835",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound03.lean": "cbf32205f263a982b80c0ac50c9148d042355ddbb9cd1038b2871abc8d25925c",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound04.lean": "dd6466228c1ccbb86717ef967056a5ad66ceea77f3e42bebc2bbf011077a3489",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound05.lean": "3851b3c2e8792fefc7c570dff66d6b41663e4c6652cffdc6e89d1514f2e6a904",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound05Quotients.lean": "21277858836a0a1975e70122641817fd798659c4484ace56da089c16f2a8d3a3",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound06.lean": "12351319504ded38db74c4c88ac1a817d44087621c9aee15ceab38c63e6e3e8d",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound06Matrices.lean": "31eef6aad8b21310d803b001710bf34bc9e2ae3471e09cf165d2a052db62996f",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound07.lean": "5134bf37042f4bc93069ed0be9a1bbf30c32a0e7e2e5fd3c67ddf0bb81943d97",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound07Cofactor.lean": "f3b8fa05054caf55024ad479bdc59545567894bec41aa3faa629a45bfdc29787",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound08.lean": "dfae13c82c955eed366fb2bceaf2c6863624a065a5065dfb32a5b0df11154bf9",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound09.lean": "093e2978e7fc695f7ee60cf151bcb4dc5a7f667d41f9e9d20c76036f7556a3b4",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound10.lean": "e999b42fa3f64c55c24659a19ba14c6230c4ab8463d017dd3fc3aaa02291b127",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound11.lean": "5df97051cfad5ed166a52cec78fbd1efe9131b85b2800c39cc12faaff89bf54c",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound12.lean": "930905301f3c8d4fd06d92de7eae5ab205d813fb24f41f613928bf7ee486676c",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound12Boundary.lean": "3815da578fe9224f28c80db836e3aa40e9419657906c0b7b893fdc31be27be82",
+    "research/koblitz_modular_ic_20261018/lean/lake-manifest.json": "dd6855f919d952755062d0a96ab10b510c4e8bdcd237b1926cef3787bbb1fc4e",
+    "research/koblitz_modular_ic_20261018/lean/lakefile.toml": "6ef42134818fe26d60769287f18e94aa6f1015963703d1aa0fd4f7a33ddf2502",
+    "research/koblitz_modular_ic_20261018/lean/lean-toolchain": "d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b",
+    "research/koblitz_modular_ic_20261018/native/Cargo.lock": "faa6768a05ea62e43872b76d917c03daa005e3e66fb411e1acbad983d5d447cf",
+    "research/koblitz_modular_ic_20261018/native/Cargo.toml": "e40f354535b1dfdba71099cea508ba2adc9d2a69c5958b72774302aeaa7d80c1",
+    "research/koblitz_modular_ic_20261018/native/src/boundary12.rs": "a625d06bbd2b4600cd275299d79bf7126119a1b460575eebb2c6cc5557778247",
+    "research/koblitz_modular_ic_20261018/native/src/census.rs": "d0aa1d5e1990f23d98e6a8534131fbaeaa01a371068213f273261af29b4d1b16",
+    "research/koblitz_modular_ic_20261018/native/src/cofactor07.rs": "466558f678c8fc7809241832539371de5a194d5c2b41cc4dd2a57159bc076b06",
+    "research/koblitz_modular_ic_20261018/native/src/collision10.rs": "268812788d751b290f6a69d143b18d17cab94b4cdbe1f69a8c16a4e199ef41d9",
+    "research/koblitz_modular_ic_20261018/native/src/controls09.rs": "e4232279b3c41432e5856e6375105080a7b5475ddb06d8456748b11a1e3a17ef",
+    "research/koblitz_modular_ic_20261018/native/src/delpezzo.rs": "61997725ce39c1dbefc2c333a5849002b338748f2c50de68a30437f6cb0f5fac",
+    "research/koblitz_modular_ic_20261018/native/src/delpezzo_conic.rs": "8fd0d10cba53383d5558735738dfdb422157201c2892da94b4e11043a7b248c8",
+    "research/koblitz_modular_ic_20261018/native/src/descent09.rs": "4b5f6f3ba219e4d6c2e595eb2663bac6d73cf77f6ce2299d1508dd4d57dffbfc",
+    "research/koblitz_modular_ic_20261018/native/src/divisors10.rs": "33c4d677f4851425df240bb3467180533c6715ebf7528bfe0a443d2fa167aa04",
+    "research/koblitz_modular_ic_20261018/native/src/forward07.rs": "38613d2eb8adc00397d533d04335c8f37bc7c1ae8279927194b574451d7736b9",
+    "research/koblitz_modular_ic_20261018/native/src/gluing.rs": "b0a85d943bc93bf836089df4c58ed3a47c6619f25e24225aad35c6fefada2d53",
+    "research/koblitz_modular_ic_20261018/native/src/klein_transfer.rs": "007814c025dd856c198754a9bff53c1c22313424b8e72a33caa10893f071cc12",
+    "research/koblitz_modular_ic_20261018/native/src/kummer08.rs": "47896070c7d26f780f49fbe50f146161a5016f2a8eacb03467a17085dd5dfdd4",
+    "research/koblitz_modular_ic_20261018/native/src/large_field.rs": "5c3065650d2e14bb0d2c4b67e022440932614bfe9285445c2ea344bd6de4140a",
+    "research/koblitz_modular_ic_20261018/native/src/local11.rs": "3dce36a726c36e7c0459890cb869718b8d8132735632ae380bfed40fd7d451f0",
+    "research/koblitz_modular_ic_20261018/native/src/main.rs": "19a780648699ee995eaf29608c261c082e729dd415d6e908ddba2004f78fe81e",
+    "research/koblitz_modular_ic_20261018/native/src/modular_geometry.rs": "48a9846f64555b6956dda3079a769e3bcb8a2ab72c2809e0b2d081e31b53549e",
+    "research/koblitz_modular_ic_20261018/native/src/modular_screen.rs": "05bdf66c216a9cc4464c26b0aca72dac5a2f480b34c2c600e2c4c2f1f996763d",
+    "research/koblitz_modular_ic_20261018/native/src/n5_relations.rs": "180df20d5738d2c4b4fe43114c18fa31239450d6865577eeb1b451c267f4ea8d",
+    "research/koblitz_modular_ic_20261018/native/src/odd07.rs": "7f926a55d412c55e90b719e1f8666929fe4d9e5428a762ce564b479fb894fb69",
+    "research/koblitz_modular_ic_20261018/native/src/polarized.rs": "acc7e659b66a2717eb1ffe840deeb779cda3776744a5b53dffc4f20259f588be",
+    "research/koblitz_modular_ic_20261018/native/src/polynomial10.rs": "0c411e734da4dd9be1fdeb87ff0d3ee75efebb7d977f3c86cf74164c190cf789",
+    "research/koblitz_modular_ic_20261018/native/src/quotient_geometry.rs": "0c43e248899f0a432330b796eac8cc8ade400504c1ac26fc89aad1db83b77d82",
+    "research/koblitz_modular_ic_20261018/native/src/quotients06.rs": "72b3e213870ee0b01446370665d46bee68dc706cf9dffa0359fb088ea8dea43d",
+    "research/koblitz_modular_ic_20261018/native/src/quotients07.rs": "ec7d97d0058a94e9d5166c83169abab27bc7619b37d4b41d6e81bd8872b47e3e",
+    "research/koblitz_modular_ic_20261018/native/src/relations08.rs": "982780b8403bbb26a9565fd4102088eca8fb307bc8277226ed870930e21a84e7",
+    "research/koblitz_modular_ic_20261018/native/src/relations11.rs": "bc975a2930143f017a473b698bb1e54f0da5ca27c2eeadaf9882f2529b57506d",
+    "research/koblitz_modular_ic_20261018/native/src/reverse06.rs": "8163028dfb31ed4d987724228f50db52e1803adf77ff2db81d1031f78a045bb3",
+    "research/koblitz_modular_ic_20261018/native/src/round02.rs": "57edff50eba8d500f6bb8c41c5b9d3e6a8ca26644ac985a399ccf838e15d2c02",
+    "research/koblitz_modular_ic_20261018/native/src/round03_record.rs": "f1a8ed8032d3ee5e1322baa9bb90e15a2a10c70ac7e24a4d5736e0bd1b7fe79c",
+    "research/koblitz_modular_ic_20261018/native/src/round04.rs": "e5218295472d9a0a856883feab99618e945215783818a5e464d07602353d642b",
+    "research/koblitz_modular_ic_20261018/native/src/round04_record.rs": "e20e8f45555a9e508f79f2b749860e22e534d3dafc68e5bc0fabc411826a24a7",
+    "research/koblitz_modular_ic_20261018/native/src/round04_verify.rs": "a92696d7b480e8e16f503003909f222f7bf132eb85c47468ac1e187c42737265",
+    "research/koblitz_modular_ic_20261018/native/src/round05.rs": "d4dab2e06a977ad9d9ad8fde4d1194cb598047270b7c2eaf679544c54739424e",
+    "research/koblitz_modular_ic_20261018/native/src/round05_record.rs": "b7480de28b751c803b2aa66629acece6488d5a21046a753ee1c92157fbd57a28",
+    "research/koblitz_modular_ic_20261018/native/src/round06.rs": "31969068a29455e452ab4723a13f3c7837dc38ee86dd7df928c39e6a8ae3f629",
+    "research/koblitz_modular_ic_20261018/native/src/round06_record.rs": "29619bd535365cd08e6f078916b81694cf4c6284861cf24559db6f6591f7be8e",
+    "research/koblitz_modular_ic_20261018/native/src/round07_record.rs": "3e19baecd1c1a3519305a4ef70121342ef0579c8472d4760c602f2f095868174",
+    "research/koblitz_modular_ic_20261018/native/src/round08_record.rs": "88266811e4e66102858030c509e8c15cf72f4e23c3fb9dce5eb4565697ddc4c5",
+    "research/koblitz_modular_ic_20261018/native/src/round09_record.rs": "217dab35209210615fcce71c63f79e7260870f7320336d1f48406b8bd558f850",
+    "research/koblitz_modular_ic_20261018/native/src/round10_record.rs": "9f94f99f41d5749e5e9514df1e567ad9032b730f588e0ed96967aa42f030b891",
+    "research/koblitz_modular_ic_20261018/native/src/round11_record.rs": "4b53c5b80db33e645d06176db33e84d10c1f0ac7fc57c231616eb48988c7a73d",
+    "research/koblitz_modular_ic_20261018/native/src/round12_record.rs": "4571dfd7a48f4b99a0c3f7fdeda939106af0966199f4dd5f805723d146db8896",
+    "research/koblitz_modular_ic_20261018/native/src/round_record.rs": "1df832a5136ae05c423efc8d2a8c6b5f4d59f85836468d766cd986502f1f9502",
+    "research/koblitz_modular_ic_20261018/native/src/saturation10.rs": "418ca0ec74550966a2188f24c3e8623bc7cbc3b291c3618b0715ecbbe96b3e08",
+    "research/koblitz_modular_ic_20261018/native/src/saturation11.rs": "6d0d8f101e4936b076836f3cd19f8c8a12219a10fc70b6c9ee053fd0bbf5c530",
+    "research/koblitz_modular_ic_20261018/native/src/ss10.rs": "c7baee2f3555afc278bdb5a21567109721c19d78aa3a69ff0fade9df6834d70d",
+    "research/koblitz_modular_ic_20261018/native/src/ss12.rs": "35a3425519a007c6a26c8a67488c1cd9b562d78dc03595ded8a57249a55aaa1b",
+    "research/koblitz_modular_ic_20261018/rounds/12/PROTOCOL.md": "6e20b8a2c01acbc52b598ec96fc2b7c2a8fb923dd2f8c924e075eee1d0d0455f",
+    "research/koblitz_modular_ic_20261018/rounds/12/REPLAY.sh": "3853d3d408ed31b8865d10ee815dedb72df02ca43e96d1a4528a7858ffcbaa43",
+    "src/binary_ecc/cover_transfer.rs": "6e801f14abf087b2a6610aa320faf602d176ac764f5eee8e9d88611cdacfa896",
+    "src/binary_ecc/curve.rs": "ceb94d849e17ec0ae678463f2d8a0a3f970f6de6713003abf0544395eb1dcd62",
+    "src/binary_ecc/f2m.rs": "cd25cffcb1d904be8fd8da059f4f0379c1bb60e566592f741e5ca3ee68223548",
+    "src/binary_ecc/hyperelliptic.rs": "09ce8a689aa8e190f51c871f9e94467271ea731b9629f69d322ae716de507c5c",
+    "src/binary_ecc/mod.rs": "84ece02cbf6f897317b236239c47efb0738d0e8e9f3d8530d2d4793609426099",
+    "src/binary_ecc/poly_f2m.rs": "4d76cd2e1fefe1a0decc2b118b12b896577e1fed30c9ee37fece6104487ce55c",
+    "src/cryptanalysis/curve_construction/gf2k.rs": "5c65e8789ce137643e7d256b11b0d1fca9a7770b34d492527749d8ff8efe011e",
+    "src/cryptanalysis/curve_construction/lpoly.rs": "d49576745ec42d9090807a88edb89b6372bfa2c43532240a66017becd31c5ccf",
+    "src/cryptanalysis/curve_construction/modular.rs": "048d106dec860cfbd5ef7b0a49095132c35c07a3ea2265e4c3995dfd5c970871",
+    "src/cryptanalysis/curve_construction/weil.rs": "9f1148e1ecd60e8d77470380639c8dd73856bb22ae2163a2fca23d6e37ddabf4",
+    "src/cryptanalysis/identity_certificate.rs": "d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270",
+    "src/hash/sha256.rs": "2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf"
+  },
+  "supersingular": {
+    "Hauptmodul_precision": 64,
+    "actual7_isogeny_bindings": 8,
+    "actual7_points": 49,
+    "all_target_points_killed_by8": true,
+    "antidiagonal_SS_degree": 740,
+    "closed_degrees": 10,
+    "closed_divisor_counts": [
+      92,
+      56,
+      92,
+      56,
+      0,
+      108,
+      140,
+      68
+    ],
+    "closed_points": 308,
+    "complete_SS_under_written_moduli_bridge": true,
+    "contact_histograms": [
+      {
+        "1": 680,
+        "14": 20,
+        "2": 140,
+        "4": 60,
+        "6": 20
+      },
+      {
+        "1": 420,
+        "2": 80,
+        "3": 60
+      },
+      {
+        "1": 680,
+        "14": 20,
+        "2": 140,
+        "3": 60,
+        "6": 20
+      },
+      {
+        "1": 400,
+        "2": 80,
+        "3": 40,
+        "8": 20,
+        "9": 20
+      },
+      {},
+      {
+        "1": 740,
+        "2": 160,
+        "4": 60,
+        "6": 100,
+        "8": 20
+      },
+      {
+        "1": 1080,
+        "14": 20,
+        "2": 240,
+        "3": 40,
+        "6": 20
+      },
+      {
+        "1": 220,
+        "2": 180,
+        "3": 200,
+        "6": 40,
+        "7": 20,
+        "8": 20
+      }
+    ],
+    "explicit49_torsion_coordinates": false,
+    "level49_lines": 56,
+    "new_11_primary_nonzero_images": 0,
+    "norm7_elements": 192,
+    "ordinary_antidiagonal_degree": 500,
+    "ordinary_zero_degrees_remaining": [
+      500,
+      1760,
+      1880,
+      2760,
+      0,
+      580,
+      1370,
+      2180
+    ],
+    "parser": {
+      "Hauptmodul_coefficients": 8192,
+      "complete_SS_points": 3080,
+      "eight_function_coefficients": 394240,
+      "external_audit": false,
+      "normalization_coefficients": 768,
+      "root_coefficients": 27648,
+      "schema": "koblitz.round12/s20-v1",
+      "shared_primitives": true,
+      "zero_degrees": [
+        1600,
+        760,
+        1540,
+        1020,
+        0,
+        2060,
+        2080,
+        1720
+      ]
+    },
+    "quaternion_Velu_point_checks": 31696,
+    "round11_contacts_reproduced": 400,
+    "seven_whole_divisors_complete": false,
+    "source_points": 3080,
+    "target49_orbit_sizes": [
+      12,
+      12,
+      12,
+      12,
+      4,
+      4
+    ],
+    "target_coordinate_precision": 16,
+    "torsion_precision": 128,
+    "zero_degrees": [
+      1600,
+      760,
+      1540,
+      1020,
+      0,
+      2060,
+      2080,
+      1720
+    ]
+  }
+}

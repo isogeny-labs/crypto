@@ -1,0 +1,58 @@
+{
+  "schema": "runtime.accounting-reconciliation/v1",
+  "observer": "/root/witness_independent_review_v2",
+  "observed_utc": "2026-11-03T18:28:59Z",
+  "scope": "saved lineage plus attempted scoped Kubernetes identity read",
+  "source_files": [
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/planning-20261103/planning-limits.json",
+      "sha256": "4079023e620b18b8ca6ab650362c83c8bdc4b81d8f0728bf313a6e011d789631",
+      "root_hash_verified": true
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/signed-stream/planning-limits.json",
+      "sha256": "a22281969ee391b847b971c1dce84dd62ce3a4c0f7ef003c0d0194677b9974cf",
+      "root_hash_verified": true
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/continuation-reconciliation/budget-and-known-data.json",
+      "sha256": "46ef1ce7062c94e9b0f19e774d34d1817f2b750fc2a3c0295576b599b767d66d",
+      "root_hash_verified": true
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/runs/p186379-gate-20261030-c1/terminal-g18-observations/native-analysis/resource-observations.json",
+      "sha256": "5a6f190e1677b3cc8e2bf8e885bf1c7ecfb54195a01849f79e62675ff3193dd2",
+      "root_hash_verified": true
+    }
+  ],
+  "planning_worker_seconds": 25200,
+  "planning_deadline_utc": "2026-11-04T06:00:00Z",
+  "spent_active_worker_seconds": null,
+  "remaining_active_worker_seconds": null,
+  "outstanding_reservations_seconds": null,
+  "current_pencil_job_closure_verified": false,
+  "saved_C1_worker_termination_verified": false,
+  "live_read": {
+    "command": [
+      "timeout",
+      "25s",
+      "kubectl",
+      "--kubeconfig",
+      "/home/ec2-user/.kube/config",
+      "--context",
+      "spot-job-submitter",
+      "--request-timeout=15s",
+      "auth",
+      "whoami",
+      "-o",
+      "json"
+    ],
+    "result": "AccessDenied before Kubernetes read: configured host worker role cannot sts:AssumeRole into existing scoped launcher role",
+    "observed_by_delegate": true,
+    "root_reran": false,
+    "alternate_role_retry": false
+  },
+  "cloud_mutations": 0,
+  "execution_admitted": false,
+  "interpretation": "New planning allowance is not an authenticated remaining balance; prior unknown consumption and owner closure are preserved."
+}

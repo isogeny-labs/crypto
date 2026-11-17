@@ -1,5 +1,7 @@
 # Next: identify the recorded kernel by an exact principal-divisor test
 
+Update:the complete26-member test and outside control now pass(PCC-20261116-3f440b). The later [quotient proof](POLARIZED_QUOTIENT.md) supplies the degree27/polarization3 argument with exact heights(PCC-20261116-ce4a7b,PCC-20261116-8559fc). The design below is retained as the original plan. [pcc:unverified]
+
 Unexecuted continuation,2026-11-16. The global correspondence and original-field source-class evaluator now pass PCC-20261116-fe2b13/PCC-20261116-b54698. Their differential and public bridge do not identify the full kernel. The next functional unit should test the actual recorded kernel3 points over the archived degree8 field. Freeze an implementation protocol before its data. Source review:the existing actual Weil-kernel archive,Tian4.3 representation,the source Cantor implementation and the explicit Riemann--Roch argument below. KB unavailable;no novelty claim.
 
 Use `QuotientSection::source_kernel` as the recorded27-element list,read from the exact kernel3 study. Preserve its actual Mumford representatives and original field modulus. Check distinctness,closure/order3 and Frobenius membership against the archived input. Include one actual3-torsion source point outside this list as a negative control. Test every nonzero recorded member,not just three differential directions.

@@ -1,0 +1,175 @@
+{
+  "branch": "claude/rho-medium-cpc-20261109",
+  "closed_utc": "2026-11-09T08:01:22+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/prime_medium_rho_cpc_20261109/analysis.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-09T07:28:01+00:00",
+      "wall_s": 1992.689
+    }
+  ],
+  "commit": "af57447bd32fbb0218215d124353468136e1e7ae",
+  "commit_dirty": true,
+  "created_utc": "2026-11-09T07:19:43+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
+  },
+  "id": "20261109T0719Z-prime-medium-rho-cpc",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 432,
+      "name": "rho_neg_medium_const_w0",
+      "note": "primary M over the sqrt(pi/4) floor at w = 0; verdict setup_excess, all gates pass",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9993679069475537,
+        1.1340932095392897
+      ],
+      "unit": "ratio",
+      "value": 1.0669979891370174
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 432,
+      "name": "rho_neg_medium_const_w0_1",
+      "note": "w = 0.1",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0990500729413477,
+        1.2472865950916228
+      ],
+      "unit": "ratio",
+      "value": 1.1735243847562682
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 432,
+      "name": "rho_neg_medium_const_w1",
+      "note": "w = 1",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.997020452718437,
+        2.2665020861591647
+      ],
+      "unit": "ratio",
+      "value": 2.132261945329537
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 432,
+      "name": "rho_plain_medium_const_w0",
+      "note": "rho.plain over the negation floor",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.3919994464313545,
+        1.5772604962961947
+      ],
+      "unit": "ratio",
+      "value": 1.4868071869151396
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 912,
+      "name": "rho_neg_medium_const_pooled_w0",
+      "note": "parents J1-J6 plus this study",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.03266673650344,
+        1.1304093509352193
+      ],
+      "unit": "ratio",
+      "value": 1.080910013929603
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 576,
+      "name": "pc_bsgs_tb_over_neg",
+      "note": "positive control; 1728/1728 records match the closed form",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.4634973814266177,
+        1.5155252476394052
+      ],
+      "unit": "ratio",
+      "value": 1.4892841338731158
+    }
+  ],
+  "problem": "rho:prime_medium_tier_bound",
+  "raw": [
+    {
+      "bytes": 11441989,
+      "path": "research/prime_medium_rho_cpc_20261109/sessions/PC/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/83/8364b2548e096f6b3edc104af19492a2a46618298c2b526e3135bfb4c59e1d3e",
+      "sha256": "8364b2548e096f6b3edc104af19492a2a46618298c2b526e3135bfb4c59e1d3e",
+      "uploaded": true
+    },
+    {
+      "bytes": 8375084,
+      "path": "research/prime_medium_rho_cpc_20261109/sessions/M1/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f5/f5eec54c221fba96d1e2e05452de18e0daded6720015888b5c7f4b9a472390d1",
+      "sha256": "f5eec54c221fba96d1e2e05452de18e0daded6720015888b5c7f4b9a472390d1",
+      "uploaded": true
+    },
+    {
+      "bytes": 2837028,
+      "path": "research/prime_medium_rho_cpc_20261109/sessions/M2/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/34/34c6f46d658fcb062bb5c7ae15e73fb9b37e26408745fbb4ea3a9809c306e4da",
+      "sha256": "34c6f46d658fcb062bb5c7ae15e73fb9b37e26408745fbb4ea3a9809c306e4da",
+      "uploaded": true
+    },
+    {
+      "bytes": 717944,
+      "path": "research/prime_medium_rho_cpc_20261109/sessions/M3/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9b/9babcf81bd558462a3ea682c02eaaa4a93df8a0afcbad4b63a3b03049c54775f",
+      "sha256": "9babcf81bd558462a3ea682c02eaaa4a93df8a0afcbad4b63a3b03049c54775f",
+      "uploaded": true
+    },
+    {
+      "bytes": 719354,
+      "path": "research/prime_medium_rho_cpc_20261109/sessions/M4/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ab/ab31cc0a76403a2a69b84ac55ae011660246fd8ec485ed616d72dbaf3aa7d4bd",
+      "sha256": "ab31cc0a76403a2a69b84ac55ae011660246fd8ec485ed616d72dbaf3aa7d4bd",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/prime_medium_rho_cpc_20261109/RESULTS.md",
+    "png": [
+      "research/prime_medium_rho_cpc_20261109/figures/result.png"
+    ],
+    "svg": [
+      "research/prime_medium_rho_cpc_20261109/figures/result.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "prime-medium-rho-cpc",
+  "status": "measured",
+  "summary": "rho.negation prime medium-tier constant 1.067 [0.999, 1.134] x floor (432 runs, 10 sizes), verdict setup_excess; all gates pass incl. conditional positive control 1728/1728. The five isolab launches ran through task cards without BENCHREC (receipts: research/prime_medium_rho_cpc_20261109/cards/*.receipt.json); the recorded command is the analysis. [pcc:unverified]",
+  "validation": null
+}

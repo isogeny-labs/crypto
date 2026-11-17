@@ -1,0 +1,13 @@
+digraph count {
+ graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.3", ranksep="0.4"];
+ node [shape=box, style="rounded,filled", fillcolor="#edf4fc", color="#305f90", fontname="Helvetica", fontsize=13, margin="0.18"];
+ edge [color="#305f90", fontname="Helvetica", fontsize=11];
+ a [label="ALL weighted exponents e\nSum w_i e_i <= D"];
+ b [label="Attach independent digits\n0 <= t_i < w_i"];
+ c [label="Injective radix map\ny_i = w_i e_i + t_i\nSum y_i <= D + Sum(w_i - 1)"];
+ d [label="Slack multiset + stars and bars\nM * product(w_i) <= choose(D + Sum w_i, v)"];
+ e [label="Consecutive weights 1,...,v\nM(v,D) * (v!)^2 <= (D + v^2)^v"];
+ a -> b -> c -> d -> e;
+ f [label="OPEN application obligations\nActual growing input weights\nSmall full-closure cutoff\nCoverage, extraction, retries, total bit cost", fillcolor="#fff3dc", color="#a07020"];
+ e -> f [style=dashed, label="does not establish"];
+}

@@ -1,0 +1,194 @@
+{
+  "schema": "prime-ic-lead-review/v1",
+  "created": "2026-10-31",
+  "repository": {
+    "name": "isogeny-labs/crypto",
+    "commit": "2c03791383f4bb4ce200e84bdef4309065c61e7f",
+    "correction_base": "c5d13654"
+  },
+  "correction": {
+    "decisions": [
+      "DEC-20261031-b51282",
+      "DEC-20261101-26f1fa"
+    ],
+    "record": "research/prime_ic_lead_review_20261031/PDP_ARITY_CORRECTION.md",
+    "provenance_note": "DEC-20261031-cd6460 is an unrelated checker-defect decision",
+    "cost_bridge": "a < m/2 and e < m/2 - 1",
+    "first_relevant_fixed_arity": 3,
+    "m3_strict_exponent_gate": 0.5,
+    "m3_strict_setup_gate": 1.5,
+    "solver_model": "proof-eligible hybrid CDCL(T) with F_p theory; QF_FF is diagnostic at the inspected source; pure CNF is a scoped encoding-cost control"
+  },
+  "atlas": {
+    "repository": "crypto-autoresearcher",
+    "commit": "5338aead98855d578d444fa6d8b507370847217c",
+    "counts": {
+      "total": 153,
+      "closed_named_obstruction": 74,
+      "open_decided_next_step": 53,
+      "blocked": 17,
+      "unexamined": 9
+    },
+    "disposition_changed_by_this_review": false
+  },
+  "primary_sources": [
+    {
+      "name": "Akshima et al., A Subexponential Time Algorithm for Elliptic Curve Discrete Logarithm, v0.2",
+      "pin": "bochum-crypto/subexponential-ecdl@1ee44e562b1b9a50ea339f3b8f81112b5a24b96f",
+      "sha256": "82e273629b437660607117d5e99f400141ed7aa78b25c6749b03651f42deaa11"
+    },
+    {
+      "name": "OpenAI, The Exponential Time Hypothesis is False, Appendix D",
+      "pin": "openai/math@7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a",
+      "sha256": "5b1612dc2eebb2cad5b4cbe62d1fed2982f01ab1908c26f70010a651487e8123"
+    },
+    {
+      "name": "Petit, Kosters and Messeng, Algebraic Approaches for the Elliptic Curve Discrete Logarithm Problem over Prime Fields",
+      "pin": "https://people.maths.ox.ac.uk/petit/files/16PKC_primeECDLP.pdf",
+      "sha256": "a53030a6cde720c354aebfb65b1eb01e07766ce2d26e543d77f2516c0a49ef5b"
+    }
+  ],
+  "ranking_basis": "Expected information gain toward a non-generic prime-field relation oracle; not implementation convenience or a performance claim.",
+  "best_overall": "hashed-factor-base-btn-contraction",
+  "best_practical_sat_screen": "m3-chained-s3-cdclt-exponent-screen",
+  "best_algebraic_control": "pkm-m4-generalized-root-finding",
+  "leads": [
+    {
+      "rank": 1,
+      "id": "hashed-factor-base-btn-contraction",
+      "atlas_id": "LEAD-EXO-hashed-factor-base-tensor-ecdl",
+      "class": "conditional_theorem_chain",
+      "track": "algebraic",
+      "claim_scope": "conditional end-to-end prime-field index calculus",
+      "current_evidence": [
+        "Bochum v0.2 gives an O(mb)-edge BTN reduction and a conditional 2^{O(b/(log b)^(1/4))} ECDLP bound",
+        "OpenAI Appendix D states the exact contraction theorem used by the reduction",
+        "the native Rust implementation passes bounded direct-versus-forced-recursive controls"
+      ],
+      "open_obligations": [
+        "independent proof audit of the contraction theorem and ECDLP bridge",
+        "general code-correspondence and bit-cost audit",
+        "public recursion is unreachable with the current usize parameter representation",
+        "no admitted practical complete-cost result"
+      ],
+      "next_experiment": "proof-guided theorem-to-code differential audit; separately execute the frozen 84-case finite panel",
+      "ordinary_cdcl_equivalent": false
+    },
+    {
+      "rank": 2,
+      "id": "m3-chained-s3-cdclt-exponent-screen",
+      "atlas_id": "LEAD-ICP-shared-coefficient-membership",
+      "class": "open_unexamined_hybrid_solver_mechanism",
+      "track": "algebraic",
+      "claim_scope": "fixed-arity-three PDP exponent measurement; no complexity bound",
+      "current_evidence": [
+        "the cost bridge requires e<0.5 at m=3 and makes m=2 structurally irrelevant",
+        "the complete bridge also requires reusable setup exponent a<1.5",
+        "the guarded disjoint-window argument gives rationality at m=3",
+        "the rational lambda lift has discriminant 16 t^2 f(x)",
+        "cryptanalysis#1347 merges a passing native small-field development oracle and exact one-hot sizing",
+        "no measured arity-three PDP exponent exists"
+      ],
+      "open_obligations": [
+        "production typed chained-S3 IR and hybrid solver exporters beyond the development fixture",
+        "exact CaDiCaL external-propagator source binding and explanation checker",
+        "exceptional-chart, signed-lift and compact range accounting",
+        "natural-only complete-panel query and setup exponents on s=6..14 against enumeration and the curve-free null",
+        "a compact-selector equivalence/resource amendment before any s=15..27 continuation",
+        "complete relation extraction and group replay"
+      ],
+      "next_experiment": "implement and exhaustively check the source-bound F_p trail theory and explanation/proof replay, then freeze the m=3, s=6..14 complete-natural-panel screen",
+      "ordinary_cdcl_equivalent": false
+    },
+    {
+      "rank": 3,
+      "id": "pkm-m4-generalized-root-finding",
+      "atlas_id": "LEAD-ICP-pkm-tower-algebraic-oracle",
+      "class": "open_blocked_algebraic_lane",
+      "track": "algebraic",
+      "claim_scope": "published factor-base construction with unknown relation-solver complexity",
+      "current_evidence": [
+        "the generic cost bridge is e<m/2-1; m=3 is relevant if e<0.5",
+        "measured F4 solving degrees are 6,7,7 at N=8,12,16",
+        "the m=4 degree threshold for not losing to rho is at most 4",
+        "N=20 is projected to require 240-380 GB under the existing F4 route"
+      ],
+      "open_obligations": [
+        "registered N=20 closure/last-fall cell",
+        "SAT encoding of identical, not regenerated, systems",
+        "natural successful target and root-extraction controls"
+      ],
+      "next_experiment": "complete N=20 closure and compare hybrid CDCL(T)/QF_FF/F4 on the canonical same systems",
+      "ordinary_cdcl_equivalent": false
+    },
+    {
+      "rank": 4,
+      "id": "target-parametric-state-reuse",
+      "atlas_id": null,
+      "class": "open_amortization_mechanism",
+      "track": "algebraic",
+      "claim_scope": "relation-collection amortization only; one-target result remains primary",
+      "current_evidence": [
+        "identified as a candidate in prime_ic_zero_filter_20261030",
+        "no controlled prime-field target-reuse measurement"
+      ],
+      "open_obligations": [
+        "dependency provenance for retained clauses/messages",
+        "cold one-target control",
+        "independent replay of every relation"
+      ],
+      "next_experiment": "1/8/64/512-target cold/reset/reuse factorial panel",
+      "ordinary_cdcl_equivalent": true
+    },
+    {
+      "rank": 5,
+      "id": "special-j-solinas-chart",
+      "atlas_id": "LEAD-ICP-xline-symmetry-special-j",
+      "class": "open_constant_factor_screen",
+      "track": "algebraic",
+      "claim_scope": "representation and arithmetic constants unless a slope change is measured",
+      "current_evidence": [
+        "special curves and primes give sparse formulas and cheaper reductions",
+        "no matched evidence of an exponent change"
+      ],
+      "open_obligations": [
+        "matched subgroup order/cofactor controls",
+        "factorial separation of prime, curve, chart and solver"
+      ],
+      "next_experiment": "four-size factorial CNF/XOR panel",
+      "ordinary_cdcl_equivalent": true
+    }
+  ],
+  "deprioritized": [
+    {
+      "id": "direct-semaev-qfbv-qfff",
+      "reason": "20-bit cvc5 arms returned unknown at 120 seconds and later Z3 probes showed no clean scaling; unchanged repetition has low information value"
+    },
+    {
+      "id": "split-graph-m2-as-exponent-lead",
+      "reason": "all accepted split-graph theorems and measurements are two-summand component results; e<0 would be required to beat rho at m=2"
+    },
+    {
+      "id": "lq-cdcl-lattice",
+      "reason": "the proposed propagation step is a lattice call in disguise and the recorded analytic cost remains above rho under its assumptions"
+    },
+    {
+      "id": "generic-pair-table",
+      "reason": "useful generic-decomposition reference, but subject to generic bounds and already measured above matched rho"
+    },
+    {
+      "id": "convex-single-block-coppersmith",
+      "reason": "closed for the tested construction by reach bounds; joint/nonconvex constructions remain outside that closure"
+    },
+    {
+      "id": "simple-low-degree-locus",
+      "reason": "yield/degree conservation obstructs a simple univariate factor-base locus of size B"
+    }
+  ],
+  "execution": {
+    "new_data_taken": false,
+    "protocol_frozen": false,
+    "reason": "The new native generator, solver hashes, preflight power/runtime and analysis script do not yet exist; taking data would violate preregistration.",
+    "aws_identity_available": false
+  }
+}

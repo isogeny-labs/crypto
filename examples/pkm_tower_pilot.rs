@@ -1,0 +1,4119 @@
+//! **Design-validation pilot for the PKM tower oracle.**
+//!
+//! `research/notes/index-calculus/RESEARCH_PKM_TOWER_ORACLE.md` designs an
+//! algebraic decomposition oracle for prime-field curves on
+//! Petit–Kosters–Messeng tower factor bases, and pre-registers (§5.2) the one
+//! measurement that decides whether to build it: how the F4 solving degree
+//! of a tower system grows with the number of tower unknowns `N = m·t`.
+//! This example runs a small subset of those cells with the repository's
+//! degree-bounded F4 (`f4_fp`), with the §5.3 controls that fit a pilot:
+//!
+//! - `tower`: PKM's system, i.e. `S₃` (or the `S₃` chain at `m ≥ 3`) plus
+//!   the tower equations, raw presentation;
+//! - `ladder`: the same system plus `g − 1` random quadrics that vanish at
+//!   the planted solution (the generator-count ladder, instrument power);
+//! - `naive`: the same `V`, membership as one univariate `x^{2^t} = g^{2^t}`
+//!   (Kummer only);
+//! - `null`: `S₃`'s monomial support with random coefficients and a
+//!   planted zero, under the same tower;
+//! - `multiples`: the `tower` system plus the "doubled relation"
+//!   consequences of `R = P_1 + … + P_m`, appended after the tower
+//!   equations: at `m = 2` the one polynomial
+//!   `D_1²D_2²·S₃(N(x_1)/D(x_1), N(x_2)/D(x_2), x([2]R))`; at `m ≥ 3` the
+//!   `m − 2` free unknowns `u'_k = x([2](P_1 + … + P_{k+2}))`, the links
+//!   `D(u_k)u'_k − N(u_k)` and the doubled chain cleared of the doubling
+//!   denominators (`N/D` is the doubling map on abscissae). Every appended
+//!   equation vanishes at every planted solution, so the zero set over `F_p`
+//!   is that of `tower`; only the presentation changes. The ring has
+//!   `m − 2` extra free variables at `m ≥ 3`, which the sparse tower
+//!   engines (`tower`, `sig`, `generic`) and `--wide` do not take: the
+//!   control runs under `--engine hky` and `--engine f4` only and is
+//!   skipped (with a printed line) by the others.
+//!
+//! Every tower, every Vélu map and every planted decomposition is checked
+//! before anything is measured, so a construction bug stops the run instead
+//! of reading as a degree.
+//!
+//! It is a stage diagnostic of the solver axis (`AGENTS.md` §2): it prices
+//! no pipeline, reports no `S`, and decides nothing on its own. Stage A of
+//! the note decides, on its full ladder.
+//!
+//! `--engine tower` runs the same systems on the sparse tower engine
+//! `f4_fp_tower` instead (note §11): the tower equations become its
+//! rewriting rules, the other equations its input in normal form (the
+//! `reduced` presentation), and the naive control, which has no tower, is
+//! skipped. `--max-nnz` stops a system whose matrices grow past a size, and
+//! `--trace` prints its step trace, with the step a stop cut off as a
+//! `tower stop in step` line. `--targets 1` measures target 1 alone: every
+//! target is still drawn, so it is the system a full run gives it.
+//!
+//! `--kinds dickson-torus` builds the Dickson tower in its torus case
+//! (`2^t | p + 1`, `u` and `μ_{2^t}` in the norm-1 torus of `F_{p²}`; note
+//! §2.1), checked by `check_torus` before anything is measured.
+//! `--radix 4` (or 8, 16; `--engine tower` with Kummer or Dickson towers)
+//! grades every block of `k` tower levels with weights `1, 2, …, 2^{k−1}`: the
+//! radix-`2^k` presentation of the same tower, same ring and same systems,
+//! with only F4's degree order changed (`TowerWeights`;
+//! `research/pkm_radix_grading_20261104/`). Rows then carry `radix` and
+//! `weights`, and `solving_degree_max` is a weighted degree. Without the
+//! flag every row is as before (`radix: 2`).
+//! `--null-chain` runs the null control at `m ≥ 3` as well, with every `S₃`
+//! link of the chain given random coefficients on its own support
+//! (`research/pkm_dickson_torus_20261015/`).
+//! `--null-width W` (1..=4) changes the null control's support: every
+//! summation equation is replaced by a random polynomial on the full box of
+//! exponents `0..=W` on the variables that equation uses (at `m = 2`, the
+//! two top tower variables `y_{1,0}`, `y_{2,0}` and `x_R`'s slot, i.e. the
+//! raw indices `0` and `t`), coefficients uniform in `1..p` and the planted
+//! value subtracted as before. At `m = 2` the box has 4, 9, 16, 25 monomials
+//! for `W = 1, 2, 3, 4`. `W = 2` is *not* the default null: the default
+//! support is `S₃`'s own 9 monomials, which are not the 9-monomial box.
+//! Every row (all controls) then carries `null_width`; without the flag
+//! the null control draws and builds exactly what it did before.
+//!
+//! The committed runs, their exact flags and the scripts that tabulate and
+//! cross-check them are in `research/pkm_tower_pilot_20260924/` (the pilot,
+//! `f4_fp`) and `research/pkm_tower_round2_20260925/` (round 2,
+//! `f4_fp_tower`).
+//!
+//! `--export-magma-rows ROWS.jsonl[,…] --export-dir DIR` measures nothing: it
+//! rebuilds the Kummer `tower` system of every committed row (from the row's
+//! `p`, curve, `g`, `m`, `t` and `x_r`, through the same `system` the row
+//! was measured on) and writes it as a Magma script that times
+//! `GroebnerBasis` (F4, Magma's default over a prime field) and reports
+//! whether the ideal is the unit ideal, which the row's `inconsistent` must
+//! match (`research/magma_f4_comparison_20261013/`).
+//!
+//! ```bash
+//! `--engine hky --hky-progress PATH` appends each closure `V_{F,c}` to PATH
+//! as it finishes (flushed and synced); a stopped run resumes with
+//! `--hky-cmin` at the first undecided degree.
+//!
+//! cargo run --release --example pkm_tower_pilot -- --out pilot.jsonl
+//! cargo run --release --example pkm_tower_pilot -- --kinds kummer --max-t 6 --budget 30
+//! # What F4 knows at degree 4 on one N = 16 system: its basis elements of
+//! # degree at most 3 (`--cap` bounds the degree, `--dump` prints the basis).
+//! cargo run --release --example pkm_tower_pilot -- --kinds kummer --m 2 --controls tower \
+//!     --t-min 8 --max-t 8 --planted 0 --random 1 --cap 4 --dump 3 --ladder-t none
+//! # The same system on the tower engine, with its step trace.
+//! cargo run --release --example pkm_tower_pilot -- --engine tower --kinds kummer --m 2 \
+//!     --controls tower --t-min 8 --max-t 8 --planted 0 --random 1 --ladder-t none --trace
+//! ```
+
+#![recursion_limit = "256"]
+
+use std::collections::BTreeMap;
+use std::fs::File;
+use std::io::Write;
+use std::time::{Duration, Instant};
+
+use crypto_lib::cryptanalysis::f4_fp::{self, F4Options, F4Report, Ordering, Poly};
+use crypto_lib::cryptanalysis::f4_fp_tower::{
+    self, RPoly, SquareRule, TowerF4Options, TowerRing, TowerWeights,
+};
+use crypto_lib::cryptanalysis::f4_tower_generic::{f4_tower_generic, GPoly, GTowerRing};
+use crypto_lib::cryptanalysis::fp_backend::{Fp224, Fp256, Fp32, Fp64, FpP192, FpWide, PrimeField};
+use crypto_lib::cryptanalysis::fp_backend_ifma::Fp52;
+use crypto_lib::cryptanalysis::hky_fp_tower::{self, HkyLimits, HkyRing};
+use crypto_lib::cryptanalysis::hky_fp_tower_fast::{self, FastOptions, QueueOrder};
+use crypto_lib::cryptanalysis::ic_boundary::{CountedGroup, GroupOps, PrimeCurve, PrimePoint};
+use crypto_lib::cryptanalysis::sig_fp_tower;
+use num_bigint::BigUint;
+use rand::rngs::StdRng;
+use rand::{Rng, SeedableRng};
+use serde_json::{json, Value};
+
+#[path = "pkm_tower_wide/wide.rs"]
+mod wide;
+
+/// Runs `$body` with `$f` bound to the backend `$b` at the prime `$p`
+/// (a `BigUint`).
+macro_rules! with_backend {
+    ($b:expr, $p:expr, |$f:ident| $body:expr) => {{
+        let p_big: &BigUint = $p;
+        let small = || u64::try_from(p_big).expect("the backend needs p below 2^64");
+        match resolve_backend($b, p_big) {
+            Backend::Fp32 => {
+                let $f = Fp32::new(small());
+                $body
+            }
+            Backend::Fp64 => {
+                let $f = Fp64::new(small());
+                $body
+            }
+            Backend::Fp52 => {
+                let $f = Fp52::new(small());
+                $body
+            }
+            Backend::Wide1 => {
+                let $f = FpWide::<1>::new(p_big);
+                $body
+            }
+            Backend::Wide3 => {
+                let $f = FpWide::<3>::new(p_big);
+                $body
+            }
+            Backend::P192 => {
+                assert_eq!(Some(p_big), nist("P-192").as_ref(), "FpP192 is P-192 only");
+                let $f = FpP192::new();
+                $body
+            }
+            Backend::Fp224 => {
+                let $f = Fp224::new(p_big);
+                $body
+            }
+            Backend::Wide4 => {
+                let $f = Fp256::new(p_big);
+                $body
+            }
+            Backend::Auto => unreachable!(),
+        }
+    }};
+}
+
+// ── Field arithmetic ───────────────────────────────────────────────
+
+fn mulm(a: u64, b: u64, p: u64) -> u64 {
+    ((a as u128 * b as u128) % p as u128) as u64
+}
+
+fn addm(a: u64, b: u64, p: u64) -> u64 {
+    (a + b) % p
+}
+
+fn subm(a: u64, b: u64, p: u64) -> u64 {
+    (a + p - b % p) % p
+}
+
+fn powm(mut a: u64, mut e: u64, p: u64) -> u64 {
+    let mut r = 1u64;
+    a %= p;
+    while e > 0 {
+        if e & 1 == 1 {
+            r = mulm(r, a, p);
+        }
+        a = mulm(a, a, p);
+        e >>= 1;
+    }
+    r
+}
+
+fn invm(a: u64, p: u64) -> u64 {
+    assert!(!a.is_multiple_of(p), "inverse of zero");
+    powm(a, p - 2, p)
+}
+
+// ── Polynomials while building a system ────────────────────────────
+
+/// A polynomial over `F_p` in `n` variables, as a map from exponent
+/// vectors to non-zero coefficients.
+#[derive(Clone, Debug)]
+struct Pol {
+    n: usize,
+    terms: BTreeMap<Vec<u32>, u64>,
+}
+
+impl Pol {
+    fn zero(n: usize) -> Self {
+        Pol {
+            n,
+            terms: BTreeMap::new(),
+        }
+    }
+
+    fn constant(n: usize, c: u64, p: u64) -> Self {
+        let mut f = Pol::zero(n);
+        if !c.is_multiple_of(p) {
+            f.terms.insert(vec![0; n], c % p);
+        }
+        f
+    }
+
+    fn var(n: usize, i: usize) -> Self {
+        let mut e = vec![0; n];
+        e[i] = 1;
+        let mut f = Pol::zero(n);
+        f.terms.insert(e, 1);
+        f
+    }
+
+    fn add(&self, o: &Pol, p: u64) -> Pol {
+        let mut f = self.clone();
+        for (e, c) in &o.terms {
+            let v = f.terms.entry(e.clone()).or_insert(0);
+            *v = addm(*v, *c, p);
+        }
+        f.terms.retain(|_, c| *c != 0);
+        f
+    }
+
+    fn scale(&self, k: u64, p: u64) -> Pol {
+        let mut f = Pol::zero(self.n);
+        for (e, c) in &self.terms {
+            let v = mulm(*c, k, p);
+            if v != 0 {
+                f.terms.insert(e.clone(), v);
+            }
+        }
+        f
+    }
+
+    fn sub(&self, o: &Pol, p: u64) -> Pol {
+        self.add(&o.scale(p - 1, p), p)
+    }
+
+    fn mul(&self, o: &Pol, p: u64) -> Pol {
+        let mut f = Pol::zero(self.n);
+        for (e1, c1) in &self.terms {
+            for (e2, c2) in &o.terms {
+                let e: Vec<u32> = e1.iter().zip(e2).map(|(a, b)| a + b).collect();
+                let v = f.terms.entry(e).or_insert(0);
+                *v = addm(*v, mulm(*c1, *c2, p), p);
+            }
+        }
+        f.terms.retain(|_, c| *c != 0);
+        f
+    }
+
+    fn eval(&self, x: &[u64], p: u64) -> u64 {
+        let mut acc = 0u64;
+        for (e, c) in &self.terms {
+            let mut t = *c;
+            for (i, k) in e.iter().enumerate() {
+                if *k > 0 {
+                    t = mulm(t, powm(x[i], *k as u64, p), p);
+                }
+            }
+            acc = addm(acc, t, p);
+        }
+        acc
+    }
+
+    fn degree(&self) -> u32 {
+        self.terms
+            .keys()
+            .map(|e| e.iter().sum::<u32>())
+            .max()
+            .unwrap_or(0)
+    }
+
+    fn to_poly(&self, p: u64) -> Poly {
+        let terms: Vec<(Vec<u32>, u64)> = self.terms.iter().map(|(e, c)| (e.clone(), *c)).collect();
+        f4_fp::normalise(&terms, p, Ordering::Grevlex)
+    }
+}
+
+/// Semaev's third summation polynomial for `y² = x³ + ax + b`, on three
+/// polynomial arguments:
+/// `(X1 − X2)²X3² − 2((X1 + X2)(X1X2 + a) + 2b)X3 + (X1X2 − a)² − 4b(X1 + X2)`.
+fn s3(x1: &Pol, x2: &Pol, x3: &Pol, a: u64, b: u64, p: u64) -> Pol {
+    let n = x1.n;
+    let d = x1.sub(x2, p);
+    let t1 = d.mul(&d, p).mul(x3, p).mul(x3, p);
+    let s = x1.add(x2, p);
+    let pr = x1.mul(x2, p);
+    let inner = s
+        .mul(&pr.add(&Pol::constant(n, a, p), p), p)
+        .add(&Pol::constant(n, mulm(2, b, p), p), p);
+    let t2 = inner.mul(x3, p).scale(p - 2, p);
+    let q = pr.sub(&Pol::constant(n, a, p), p);
+    let t3 = q.mul(&q, p).sub(&s.scale(mulm(4, b, p), p), p);
+    t1.add(&t2, p).add(&t3, p)
+}
+
+// ── Towers ─────────────────────────────────────────────────────────
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Kind {
+    Kummer,
+    Dickson,
+    Isogeny,
+    /// The Dickson tower in its torus case (`2^t | p + 1`). Last, so the
+    /// cell seeds of the other kinds (`kind as u64`) are unchanged.
+    DicksonTorus,
+}
+
+impl Kind {
+    fn name(self) -> &'static str {
+        match self {
+            Kind::Kummer => "kummer",
+            Kind::Dickson => "dickson",
+            Kind::Isogeny => "isogeny",
+            Kind::DicksonTorus => "dickson-torus",
+        }
+    }
+}
+
+/// One level of a tower: how `y_{j+1}` (or the final constant) follows
+/// from `y_j`.
+#[derive(Clone, Copy, Debug)]
+enum Step {
+    /// `y_{j+1} = y_j²` (Kummer).
+    Square,
+    /// `y_{j+1} = y_j² − 2` (Dickson `D_2`).
+    Dickson,
+    /// `y_{j+1} = y_j + τ/(y_j − ξ)`, the x-map of a 2-isogeny with
+    /// kernel `(ξ, 0)`.
+    Velu { xi: u64, tau: u64 },
+}
+
+struct Tower {
+    kind: Kind,
+    t: usize,
+    /// The factor-base abscissa set, `2^t` distinct elements of `F_p`.
+    v: Vec<u64>,
+    /// `x = scale · y_0` (Kummer: the coset representative `g`).
+    scale: u64,
+    steps: Vec<Step>,
+    /// The value the last step must reach.
+    c: u64,
+    info: Value,
+    /// `--cover-map`: the factor base is `x∘φ(V)`, not `V` (see [`CoverMap`]).
+    /// `None` for every tower unless the flag is given.
+    cover: Option<CoverMap>,
+}
+
+impl Tower {
+    fn apply(&self, j: usize, y: u64, p: u64) -> u64 {
+        match self.steps[j] {
+            Step::Square => mulm(y, y, p),
+            Step::Dickson => subm(mulm(y, y, p), 2, p),
+            Step::Velu { xi, tau } => addm(y, mulm(tau, invm(subm(y, xi, p), p), p), p),
+        }
+    }
+
+    /// `y_0 … y_{t−1}` for an abscissa of `V`.
+    fn values(&self, x: u64, p: u64) -> Vec<u64> {
+        let mut y = vec![0u64; self.t];
+        y[0] = mulm(x, invm(self.scale, p), p);
+        for j in 0..self.t - 1 {
+            y[j + 1] = self.apply(j, y[j], p);
+        }
+        y
+    }
+
+    /// The `t` equations of one block whose variables start at `base`.
+    fn equations(&self, n: usize, base: usize, p: u64) -> Vec<Pol> {
+        (0..self.t)
+            .map(|j| {
+                let yj = Pol::var(n, base + j);
+                let next = if j + 1 < self.t {
+                    Pol::var(n, base + j + 1)
+                } else {
+                    Pol::constant(n, self.c, p)
+                };
+                let sq = yj.mul(&yj, p);
+                match self.steps[j] {
+                    Step::Square => next.sub(&sq, p),
+                    Step::Dickson => next.sub(&sq.sub(&Pol::constant(n, 2, p), p), p),
+                    Step::Velu { xi, tau } => {
+                        let lhs = next.mul(&yj.sub(&Pol::constant(n, xi, p), p), p);
+                        let rhs = sq
+                            .sub(&yj.scale(xi, p), p)
+                            .add(&Pol::constant(n, tau, p), p);
+                        lhs.sub(&rhs, p)
+                    }
+                }
+            })
+            .collect()
+    }
+
+    /// The tower equations of one block (variables from `base`) as the
+    /// square rules of [`f4_fp_tower`]: each equation solved for `y_j²`.
+    fn square_rules(&self, base: usize, p: u64) -> Vec<SquareRule> {
+        (0..self.t)
+            .map(|j| {
+                let top = j + 1 == self.t;
+                let next = (!top).then_some((base + j + 1) as u8);
+                match (self.steps[j], top) {
+                    // y_{j+1} = y_j²; on top, y_j² = c
+                    (Step::Square, false) => SquareRule {
+                        next,
+                        a: 0,
+                        b: 1,
+                        c: 0,
+                        d: 0,
+                    },
+                    (Step::Square, true) => SquareRule {
+                        next,
+                        a: 0,
+                        b: 0,
+                        c: 0,
+                        d: self.c % p,
+                    },
+                    // y_{j+1} = y_j² − 2; on top, y_j² = c + 2
+                    (Step::Dickson, false) => SquareRule {
+                        next,
+                        a: 0,
+                        b: 1,
+                        c: 0,
+                        d: 2 % p,
+                    },
+                    (Step::Dickson, true) => SquareRule {
+                        next,
+                        a: 0,
+                        b: 0,
+                        c: 0,
+                        d: addm(self.c, 2, p),
+                    },
+                    // y_{j+1}(y_j − ξ) = y_j² − ξ·y_j + τ, so
+                    // y_j² = y_j·y_{j+1} − ξ·y_{j+1} + ξ·y_j − τ
+                    (Step::Velu { xi, tau }, false) => SquareRule {
+                        next,
+                        a: 1,
+                        b: subm(0, xi, p),
+                        c: xi,
+                        d: subm(0, tau, p),
+                    },
+                    // c·(y_j − ξ) = y_j² − ξ·y_j + τ, so
+                    // y_j² = (c + ξ)·y_j − (c·ξ + τ)
+                    (Step::Velu { xi, tau }, true) => SquareRule {
+                        next,
+                        a: 0,
+                        b: 0,
+                        c: addm(self.c, xi, p),
+                        d: subm(0, addm(mulm(self.c, xi, p), tau, p), p),
+                    },
+                }
+            })
+            .collect()
+    }
+
+    /// Every element of `V` satisfies the tower, `|V| = 2^t` and the
+    /// elements are distinct.  Panics otherwise: a wrong tower would make
+    /// every degree below meaningless.
+    fn check(&self, p: u64) {
+        let mut sorted = self.v.clone();
+        sorted.sort_unstable();
+        sorted.dedup();
+        assert_eq!(sorted.len(), 1 << self.t, "{:?}: V has repeats", self.kind);
+        let n = self.t;
+        let eqs = self.equations(n, 0, p);
+        for &x in &self.v {
+            let y = self.values(x, p);
+            for (j, e) in eqs.iter().enumerate() {
+                assert_eq!(
+                    e.eval(&y, p),
+                    0,
+                    "{:?}: level {j} fails at x = {x}",
+                    self.kind
+                );
+            }
+        }
+    }
+}
+
+/// An element of exact order `2^t` in `F_p^*`.
+fn root_of_unity(p: u64, t: usize, rng: &mut StdRng) -> u64 {
+    assert!(
+        (p - 1).is_multiple_of(1u64 << t),
+        "2^{t} does not divide p − 1"
+    );
+    loop {
+        let h = rng.gen_range(2..p);
+        if powm(h, (p - 1) / 2, p) == p - 1 {
+            return powm(h, (p - 1) >> t, p);
+        }
+    }
+}
+
+fn kummer(p: u64, t: usize, rng: &mut StdRng) -> Tower {
+    let zeta = root_of_unity(p, t, rng);
+    let g = rng.gen_range(2..p);
+    let v: Vec<u64> = (0..1u64 << t)
+        .map(|k| mulm(g, powm(zeta, k, p), p))
+        .collect();
+    Tower {
+        kind: Kind::Kummer,
+        t,
+        v,
+        scale: g,
+        steps: vec![Step::Square; t],
+        c: 1,
+        info: json!({"g": g, "zeta": zeta}),
+        cover: None,
+    }
+}
+
+fn dickson(p: u64, t: usize, rng: &mut StdRng) -> Tower {
+    let zeta = root_of_unity(p, t, rng);
+    loop {
+        let u = rng.gen_range(2..p);
+        if powm(u, 1u64 << (t + 1), p) == 1 {
+            continue;
+        }
+        let v: Vec<u64> = (0..1u64 << t)
+            .map(|k| {
+                let w = mulm(u, powm(zeta, k, p), p);
+                addm(w, invm(w, p), p)
+            })
+            .collect();
+        let mut s = v.clone();
+        s.sort_unstable();
+        s.dedup();
+        if s.len() != 1 << t {
+            continue;
+        }
+        let ut = powm(u, 1u64 << t, p);
+        return Tower {
+            kind: Kind::Dickson,
+            t,
+            v,
+            scale: 1,
+            steps: vec![Step::Dickson; t],
+            c: addm(ut, invm(ut, p), p),
+            info: json!({"u": u, "zeta": zeta}),
+            cover: None,
+        };
+    }
+}
+
+// ── The Dickson torus case (note §2.1, `2^t | p + 1`) ───────────────
+//
+// `F_{p²} = F_p(i)` with `i² = −1`, which is a field because `p ≡ 3 mod 4`
+// whenever `4 | p + 1`. An element is `(re, im)`. The norm-1 torus
+// `T = {w : w·w̄ = 1}` is cyclic of order `p + 1`; on it `w̄ = w^p = w^{−1}`,
+// so `w + w^{−1} = 2·re(w)` lies in `F_p`.
+
+type Fp2 = (u64, u64);
+
+fn fp2_mul(x: Fp2, y: Fp2, p: u64) -> Fp2 {
+    (
+        subm(mulm(x.0, y.0, p), mulm(x.1, y.1, p), p),
+        addm(mulm(x.0, y.1, p), mulm(x.1, y.0, p), p),
+    )
+}
+
+fn fp2_pow(mut x: Fp2, mut e: u64, p: u64) -> Fp2 {
+    let mut r = (1u64, 0u64);
+    while e > 0 {
+        if e & 1 == 1 {
+            r = fp2_mul(r, x, p);
+        }
+        x = fp2_mul(x, x, p);
+        e >>= 1;
+    }
+    r
+}
+
+/// `x^{−1} = x̄ / N(x)`, for any non-zero `x` (not only torus elements).
+fn fp2_inv(x: Fp2, p: u64) -> Fp2 {
+    let n = addm(mulm(x.0, x.0, p), mulm(x.1, x.1, p), p);
+    let ni = invm(n, p);
+    (mulm(x.0, ni, p), mulm(subm(0, x.1, p), ni, p))
+}
+
+/// A random element of the torus `T`: `z^{p−1} = z̄/z` for a random
+/// `z ∈ F_{p²}^*`.
+fn torus_element(p: u64, rng: &mut StdRng) -> Fp2 {
+    loop {
+        let z = (rng.gen_range(0..p), rng.gen_range(0..p));
+        if z == (0, 0) {
+            continue;
+        }
+        let w = fp2_pow(z, p - 1, p);
+        debug_assert_eq!(fp2_mul(w, fp2_pow(w, p, p), p), (1, 0));
+        return w;
+    }
+}
+
+/// The checks of note §2.1 for a torus tower, beyond [`Tower::check`]
+/// (which checks `|V| = 2^t`, distinctness and every level equation):
+/// - `V ⊂ F_p`: `w + w^{−1}` has no `i`-part for every `w ∈ u·μ_{2^t}`;
+/// - the case is the torus one: `y² − 4` is a non-residue for every
+///   `y ∈ V` (so `X² − yX + 1` has its roots in `T \ F_p`);
+/// - the tower is unramified: `y_j ≠ 0` at every level on `V` (`c` avoids
+///   the critical value `−2` along the chain), and `c ≠ ±2`.
+///
+/// Panics otherwise.
+fn check_torus(tower: &Tower, u: Fp2, zeta: Fp2, p: u64) {
+    let t = tower.t;
+    assert_eq!(p % 4, 3, "the torus case needs p ≡ 3 mod 4");
+    assert!(
+        (p + 1).is_multiple_of(1u64 << t),
+        "2^{t} does not divide p + 1"
+    );
+    // ζ has exact order 2^t in T; u is in T and u² ∉ μ_{2^t}.
+    assert_eq!(fp2_pow(zeta, 1u64 << t, p), (1, 0), "ζ^(2^t) ≠ 1");
+    assert_eq!(
+        fp2_pow(zeta, 1u64 << (t - 1), p),
+        (p - 1, 0),
+        "ζ does not have exact order 2^t"
+    );
+    assert_eq!(fp2_pow(u, p + 1, p), (1, 0), "u is not in the torus");
+    assert_ne!(u.1, 0, "u lies in F_p: the split case, not the torus");
+    assert_ne!(fp2_pow(u, 1u64 << (t + 1), p), (1, 0), "u² ∈ μ_{{2^t}}");
+    let mut w = u;
+    for (k, &x) in tower.v.iter().enumerate() {
+        // By the general inverse, not by the conjugate the builder used.
+        let wi = fp2_inv(w, p);
+        let sum = (addm(w.0, wi.0, p), addm(w.1, wi.1, p));
+        assert_eq!(sum.1, 0, "w + 1/w ∉ F_p at k = {k}");
+        assert_eq!(sum.0, x, "V[{k}] is not w + 1/w");
+        let disc = subm(mulm(x, x, p), 4, p);
+        assert_eq!(
+            powm(disc, (p - 1) / 2, p),
+            p - 1,
+            "y² − 4 is not a non-residue at V[{k}]: not the torus case"
+        );
+        let y = tower.values(x, p);
+        assert!(y.iter().all(|&yj| yj != 0), "a level is ramified at V[{k}]");
+        w = fp2_mul(w, zeta, p);
+    }
+    assert!(tower.c != 2 && tower.c != p - 2, "c = ±2");
+}
+
+/// The Dickson tower in its torus case: `V = {w + w^{−1} : w ∈ u·μ_{2^t}}`
+/// with `u` and `μ_{2^t}` in the norm-1 torus `T ⊂ F_{p²}^*`, which needs
+/// `2^t | p + 1`. The step is `y ↦ y² − 2` and `c = u^{2^t} + u^{−2^t}`,
+/// as in the split case: only the numbers change, never the equations.
+fn dickson_torus(p: u64, t: usize, rng: &mut StdRng) -> Tower {
+    assert!(
+        p % 4 == 3 && (p + 1).is_multiple_of(1u64 << t),
+        "the torus case needs 2^{t} | p + 1 (and p ≡ 3 mod 4)"
+    );
+    // A primitive 2^t-th root of unity in T: h^{(p+1)/2^t} for an h ∈ T
+    // that is not a square in T.
+    let zeta = loop {
+        let h = torus_element(p, rng);
+        if fp2_pow(h, p.div_ceil(2), p) == (p - 1, 0) {
+            break fp2_pow(h, (p + 1) >> t, p);
+        }
+    };
+    loop {
+        let u = torus_element(p, rng);
+        if u.1 == 0 || fp2_pow(u, 1u64 << (t + 1), p) == (1, 0) {
+            continue;
+        }
+        let mut v = Vec::with_capacity(1 << t);
+        let mut w = u;
+        for _ in 0..1u64 << t {
+            // On T, w^{−1} = w̄, so w + w^{−1} = 2·re(w).
+            v.push(addm(w.0, w.0, p));
+            w = fp2_mul(w, zeta, p);
+        }
+        let mut s = v.clone();
+        s.sort_unstable();
+        s.dedup();
+        if s.len() != 1 << t {
+            continue;
+        }
+        let ut = fp2_pow(u, 1u64 << t, p);
+        let c = addm(ut.0, ut.0, p);
+        let tower = Tower {
+            kind: Kind::DicksonTorus,
+            t,
+            v,
+            scale: 1,
+            steps: vec![Step::Dickson; t],
+            c,
+            info: json!({"case": "torus", "u": [u.0, u.1], "zeta": [zeta.0, zeta.1], "c": c}),
+            cover: None,
+        };
+        check_torus(&tower, u, zeta, p);
+        return tower;
+    }
+}
+
+fn random_point(curve: &PrimeCurve, rng: &mut StdRng) -> PrimePoint {
+    loop {
+        let x = rng.gen_range(0..curve.p);
+        let r = curve.rhs(x);
+        if r == 0 {
+            continue;
+        }
+        if let Some(y) = curve.sqrt(r) {
+            let y = if rng.gen::<bool>() { y } else { curve.p - y };
+            return PrimePoint::affine(x, y);
+        }
+    }
+}
+
+/// The 2-isogeny with kernel `(ξ, 0)`, on a point (Vélu).
+fn velu_map(pt: PrimePoint, xi: u64, tau: u64, p: u64) -> PrimePoint {
+    if pt.infinity || pt.x == xi {
+        return PrimePoint::INFINITY;
+    }
+    let d = invm(subm(pt.x, xi, p), p);
+    let x = addm(pt.x, mulm(tau, d, p), p);
+    let y = mulm(pt.y, subm(1, mulm(tau, mulm(d, d, p), p), p), p);
+    PrimePoint::affine(x, y)
+}
+
+fn nonsingular(a: u64, b: u64, p: u64) -> bool {
+    let d = addm(
+        mulm(4, mulm(mulm(a, a, p), a, p), p),
+        mulm(27, mulm(b, b, p), p),
+        p,
+    );
+    d != 0
+}
+
+/// How [`isogeny`] computes `#E'`. `Naive` is the frozen `O(p)` Legendre
+/// count (`PrimeCurve::point_count`), the default. `Mestre` is the exact
+/// `O(p^{1/4})` order of [`mestre_exact_order`]; it consumes no draw of the
+/// cell's random stream, so both methods select the same `E'`, `Q`, `R'`
+/// and `V` for the same seed whenever they agree on `#E'` (they must: both
+/// are exact). `--aux-order mestre` exists so the isogeny arm can run at
+/// primes where the naive count is too slow (P1 = 2013265921).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum AuxOrder {
+    Naive,
+    Mestre,
+}
+
+static AUX_ORDER_MESTRE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+/// Set only by `--aux-search`: adds the search's and the chain's group
+/// operations to an isogeny tower's `info`, so tower rows stay unchanged.
+static AUX_SEARCH_STATS: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+fn aux_order_method() -> AuxOrder {
+    if AUX_ORDER_MESTRE.load(std::sync::atomic::Ordering::Relaxed) {
+        AuxOrder::Mestre
+    } else {
+        AuxOrder::Naive
+    }
+}
+
+fn isqrt_u64(n: u64) -> u64 {
+    let mut r = (n as f64).sqrt() as u64;
+    while r.saturating_mul(r) > n {
+        r -= 1;
+    }
+    while (r + 1).saturating_mul(r + 1) <= n {
+        r += 1;
+    }
+    r
+}
+
+fn distinct_prime_factors(mut n: u64) -> Vec<u64> {
+    let mut out = Vec::new();
+    let mut q = 2u64;
+    while q * q <= n {
+        if n.is_multiple_of(q) {
+            out.push(q);
+            while n.is_multiple_of(q) {
+                n /= q;
+            }
+        }
+        q += if q == 2 { 1 } else { 2 };
+    }
+    if n > 1 {
+        out.push(n);
+    }
+    out
+}
+
+fn gcd_u64(mut a: u64, mut b: u64) -> u64 {
+    while b != 0 {
+        (a, b) = (b, a % b);
+    }
+    a
+}
+
+/// Some `k ∈ [lo, hi]` with `[k]P = O`, by baby-step giant-step, or `None`.
+fn bsgs_multiple_in(
+    e: &PrimeCurve,
+    ops: &mut GroupOps,
+    pt: PrimePoint,
+    lo: u64,
+    hi: u64,
+) -> Option<u64> {
+    let len = hi - lo + 1;
+    let w = isqrt_u64(len) + 1;
+    let key = |q: &PrimePoint| (q.infinity, q.x, q.y);
+    let mut table = std::collections::HashMap::with_capacity(w as usize);
+    let mut acc = PrimePoint::INFINITY;
+    for j in 0..w {
+        table.entry(key(&acc)).or_insert(j);
+        acc = e.add(ops, acc, pt);
+    }
+    // acc = [w]P. Giant steps S_g = [lo + g·w]P; a hit is −S_g = [j]P.
+    let giant = acc;
+    let mut s = e.mul(ops, pt, lo);
+    let mut base = lo;
+    while base <= hi {
+        if let Some(&j) = table.get(&key(&e.neg(s))) {
+            if base + j <= hi {
+                return Some(base + j);
+            }
+        }
+        base += w;
+        s = e.add(ops, s, giant);
+    }
+    None
+}
+
+/// The exact order of `P`, from any `k` with `[k]P = O`.
+fn exact_point_order(e: &PrimeCurve, ops: &mut GroupOps, pt: PrimePoint, mut k: u64) -> u64 {
+    for q in distinct_prime_factors(k) {
+        while k.is_multiple_of(q) && e.mul(ops, pt, k / q).infinity {
+            k /= q;
+        }
+    }
+    k
+}
+
+/// `#E(F_p)` exactly, by Mestre's method on `E` and its quadratic twist
+/// `E^d` (`#E + #E^d = 2p + 2`): the least common multiples `L` and `L^d` of
+/// point orders on each narrow the Hasse interval until one `n` is left
+/// with `L | n` and `L^d | 2p + 2 − n` (unique for `p > 229`, Mestre).
+/// Points come from a private stream seeded by `(p, a, b)`, not from the
+/// cell's stream. Panics if 64 points leave it ambiguous.
+fn mestre_exact_order(e: &PrimeCurve, ops: &mut GroupOps) -> u64 {
+    let p = e.p;
+    assert!(p > 229, "Mestre's method needs p > 229");
+    let r = isqrt_u64(4 * p); // ⌊2√p⌋
+    let (lo, hi) = (p + 1 - r, p + 1 + r);
+    let d = (2..p)
+        .find(|&d| e.legendre(d) == -1)
+        .expect("a non-residue");
+    let tw = PrimeCurve {
+        p,
+        a: mulm(e.a, mulm(d, d, p), p),
+        b: mulm(e.b, mulm(d, mulm(d, d, p), p), p),
+    };
+    let mut rng =
+        StdRng::seed_from_u64(p ^ e.a.rotate_left(21) ^ e.b.rotate_left(42) ^ 0x4D45_5354_5245_u64);
+    let (mut l_e, mut l_t) = (1u64, 1u64);
+    for i in 0..64 {
+        let twist = i % 2 == 1;
+        let c = if twist { &tw } else { e };
+        let pt = random_point(c, &mut rng);
+        let k =
+            bsgs_multiple_in(c, ops, pt, lo, hi).expect("#E is a multiple in the Hasse interval");
+        let o = exact_point_order(c, ops, pt, k);
+        if twist {
+            l_t = l_t / gcd_u64(l_t, o) * o;
+        } else {
+            l_e = l_e / gcd_u64(l_e, o) * o;
+        }
+        let mut found = None;
+        let mut count = 0;
+        let mut n = lo.div_ceil(l_e) * l_e;
+        while n <= hi {
+            if (2 * p + 2 - n).is_multiple_of(l_t) {
+                count += 1;
+                found = Some(n);
+                if count > 1 {
+                    break;
+                }
+            }
+            n += l_e;
+        }
+        if count == 1 && i >= 1 {
+            return found.unwrap();
+        }
+    }
+    panic!(
+        "Mestre: #E ambiguous after 64 points (p = {p}, a = {}, b = {})",
+        e.a, e.b
+    );
+}
+
+/// A tower of 2-isogenies on an auxiliary curve `E'` with a rational
+/// point `Q` of order `2^t`; `V = x(R' + ⟨Q⟩)`.  The search for `E'` is
+/// the per-curve precomputation the oracle's base charges; here it is
+/// only reported.
+fn isogeny(p: u64, t: usize, rng: &mut StdRng) -> Tower {
+    isogeny_with(p, t, rng, aux_order_method())
+}
+
+fn isogeny_with(p: u64, t: usize, rng: &mut StdRng, method: AuxOrder) -> Tower {
+    let two_t = 1u64 << t;
+    let mut ops = GroupOps::default();
+    let mut curves_tried = 0u64;
+    loop {
+        curves_tried += 1;
+        let a = rng.gen_range(0..p);
+        let b = rng.gen_range(1..p);
+        if !nonsingular(a, b, p) {
+            continue;
+        }
+        let e = PrimeCurve { p, a, b };
+        let n = match method {
+            AuxOrder::Naive => e.point_count(),
+            AuxOrder::Mestre => mestre_exact_order(&e, &mut ops),
+        };
+        if !n.is_multiple_of(two_t) {
+            continue;
+        }
+        // Q of exact order 2^t.
+        let mut q = None;
+        for _ in 0..16 {
+            let cand = e.mul(&mut ops, random_point(&e, rng), n / two_t);
+            let half = e.mul(&mut ops, cand, two_t / 2);
+            if !half.infinity && e.mul(&mut ops, cand, two_t).infinity {
+                q = Some(cand);
+                break;
+            }
+        }
+        let Some(q) = q else { continue };
+        let multiples: Vec<PrimePoint> = (0..two_t).map(|k| e.mul(&mut ops, q, k)).collect();
+        // R' with 2R' outside <Q>, so R' + <Q> and its negative are disjoint.
+        let r0 = loop {
+            let r = random_point(&e, rng);
+            let r2 = e.double(&mut ops, r);
+            if !multiples.contains(&r2) {
+                break r;
+            }
+        };
+        let v: Vec<u64> = multiples
+            .iter()
+            .map(|&m| e.add(&mut ops, r0, m))
+            .filter(|pt| !pt.infinity)
+            .map(|pt| pt.x)
+            .collect();
+        let mut s = v.clone();
+        s.sort_unstable();
+        s.dedup();
+        if s.len() != two_t as usize {
+            continue;
+        }
+        let ops_search = ops;
+        // The chain: kernel of step j is [2^{t−1−j}] Q_j on E'_j.
+        let (mut aj, mut bj) = (a, b);
+        let (mut qj, mut rj) = (q, r0);
+        let mut steps = Vec::with_capacity(t);
+        for j in 0..t {
+            let cj = PrimeCurve { p, a: aj, b: bj };
+            let kj = cj.mul(&mut ops, qj, 1u64 << (t - 1 - j));
+            assert!(
+                !kj.infinity && kj.y == 0,
+                "step {j}: kernel point is not 2-torsion"
+            );
+            let xi = kj.x;
+            let tau = addm(mulm(3, mulm(xi, xi, p), p), aj, p);
+            steps.push(Step::Velu { xi, tau });
+            qj = velu_map(qj, xi, tau, p);
+            rj = velu_map(rj, xi, tau, p);
+            aj = subm(aj, mulm(5, tau, p), p);
+            bj = subm(bj, mulm(7, mulm(xi, tau, p), p), p);
+            let next = PrimeCurve { p, a: aj, b: bj };
+            assert!(
+                next.is_on_curve(qj),
+                "step {j}: Vélu image of Q is off the codomain"
+            );
+            assert!(
+                next.is_on_curve(rj),
+                "step {j}: Vélu image of R' is off the codomain"
+            );
+        }
+        // V itself, since it cannot be rebuilt from two numbers: the
+        // exhaustive cross-check (`verify.py`) needs it.
+        let mut info = json!({"aux_a": a, "aux_b": b, "aux_order": n, "aux_curves_tried": curves_tried, "v": &v});
+        if method == AuxOrder::Mestre {
+            // Only under `--aux-order mestre`, so default rows stay byte-identical.
+            info["aux_order_method"] = json!("mestre");
+        }
+        if AUX_SEARCH_STATS.load(std::sync::atomic::Ordering::Relaxed) {
+            let o = |g: &GroupOps| json!({"adds": g.adds, "doubles": g.doubles, "scalar_mults": g.scalar_mults});
+            let chain = GroupOps {
+                adds: ops.adds - ops_search.adds,
+                doubles: ops.doubles - ops_search.doubles,
+                scalar_mults: ops.scalar_mults - ops_search.scalar_mults,
+                ..GroupOps::default()
+            };
+            info["aux_ops_search"] = o(&ops_search);
+            info["aux_ops_chain"] = o(&chain);
+        }
+        return Tower {
+            kind: Kind::Isogeny,
+            t,
+            v,
+            scale: 1,
+            steps,
+            c: rj.x,
+            info,
+            cover: None,
+        };
+    }
+}
+
+// ── Cover-image factor bases (`--cover-map`) ───────────────────────
+
+/// The shape of the degree-2 map `x∘φ(u) = N(u)/D(u)` of `--cover-map`.
+///
+/// A degree-2 map `u ↦ X` pulls `E: Y² = f(X)` back to the double cover
+/// `C: v² = h(u)`, `h = D⁴·f(N/D)`, with `φ(u, v) = (N/D, v/D²)`. Its genus
+/// is set by where the map's two critical values fall: both on branch points
+/// of `E` (∞ and a rational root of `f`) gives genus 1, a 2-isogeny (PKM's
+/// Vélu step); one at ∞ (a quadratic polynomial) gives a sextic `h`, genus 2;
+/// neither gives an octic `h`, genus 3. Prime-order curves have no rational
+/// root of `f`, so genus 2 is the smallest cover of this kind that is not an
+/// isogeny.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum CoverKind {
+    /// `X = u²`: genus 2, and the positive control. On a Kummer tower it is
+    /// the tower's own first step, so `x∘φ(V)` is the depth-`t − 1` tower.
+    Square,
+    /// `X = λ(u − α)² + β`, `α, β, λ` random: genus 2.
+    Quad,
+    /// `X = N(u)/D(u)`, random coprime quadratics: genus 3.
+    Generic,
+    /// `X = u⁴`: genus 5, the second positive control. On a Kummer tower it
+    /// is the tower's first two steps, so `x∘φ(V)` is the depth-`t − 2` tower.
+    Fourth,
+    /// `X = u³ + c₂u² + c₁u + c₀`, random: `h = f(X(u))` of degree 9, genus 4.
+    Cubic,
+    /// `X = u⁴ + c₃u³ + … + c₀`, random: `h` of degree 12, genus 5.
+    Quart,
+    /// `X = N(u)/D(u)`, random coprime cubics: `h = D⁴f(N/D)` of degree 12,
+    /// genus 5.
+    Generic3,
+}
+
+impl CoverKind {
+    fn name(self) -> &'static str {
+        match self {
+            CoverKind::Square => "square",
+            CoverKind::Quad => "quad",
+            CoverKind::Generic => "generic",
+            CoverKind::Fourth => "fourth",
+            CoverKind::Cubic => "cubic",
+            CoverKind::Quart => "quart",
+            CoverKind::Generic3 => "generic3",
+        }
+    }
+}
+
+/// The largest degree of `N` and `D` in [`CoverMap`], plus one.
+const COVER_COEFFS: usize = 5;
+
+/// `x∘φ(u) = N(u)/D(u)`, coefficients from degree 0 up, zero-padded.
+#[derive(Clone, Copy, Debug)]
+struct CoverMap {
+    kind: CoverKind,
+    num: [u64; COVER_COEFFS],
+    den: [u64; COVER_COEFFS],
+}
+
+/// Zero-pads `c` to [`COVER_COEFFS`] coefficients.
+fn cover_coeffs(c: &[u64]) -> [u64; COVER_COEFFS] {
+    let mut out = [0u64; COVER_COEFFS];
+    out[..c.len()].copy_from_slice(c);
+    out
+}
+
+fn upoly_eval(c: &[u64], u: u64, p: u64) -> u64 {
+    c.iter()
+        .rev()
+        .fold(0, |acc, &k| addm(mulm(acc, u, p), k, p))
+}
+
+fn upoly_trim(mut a: Vec<u64>) -> Vec<u64> {
+    while a.last() == Some(&0) {
+        a.pop();
+    }
+    a
+}
+
+fn upoly_mul(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    if a.is_empty() || b.is_empty() {
+        return Vec::new();
+    }
+    let mut r = vec![0u64; a.len() + b.len() - 1];
+    for (i, &x) in a.iter().enumerate() {
+        for (j, &y) in b.iter().enumerate() {
+            r[i + j] = addm(r[i + j], mulm(x, y, p), p);
+        }
+    }
+    upoly_trim(r)
+}
+
+fn upoly_add(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    let mut r = vec![0u64; a.len().max(b.len())];
+    for (i, &x) in a.iter().enumerate() {
+        r[i] = x;
+    }
+    for (i, &y) in b.iter().enumerate() {
+        r[i] = addm(r[i], y, p);
+    }
+    upoly_trim(r)
+}
+
+/// `a mod b` (`b` non-zero).
+fn upoly_rem(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    let mut r = upoly_trim(a.to_vec());
+    let lead = invm(*b.last().expect("non-zero divisor"), p);
+    while r.len() >= b.len() {
+        let q = mulm(*r.last().unwrap(), lead, p);
+        let shift = r.len() - b.len();
+        for (i, &y) in b.iter().enumerate() {
+            r[shift + i] = subm(r[shift + i], mulm(q, y, p), p);
+        }
+        r = upoly_trim(r);
+    }
+    r
+}
+
+fn upoly_gcd_degree(a: &[u64], b: &[u64], p: u64) -> usize {
+    let (mut x, mut y) = (upoly_trim(a.to_vec()), upoly_trim(b.to_vec()));
+    while !y.is_empty() {
+        let r = upoly_rem(&x, &y, p);
+        x = y;
+        y = r;
+    }
+    x.len().saturating_sub(1)
+}
+
+impl CoverMap {
+    fn draw(kind: CoverKind, p: u64, rng: &mut StdRng) -> CoverMap {
+        match kind {
+            CoverKind::Square => CoverMap {
+                kind,
+                num: cover_coeffs(&[0, 0, 1]),
+                den: cover_coeffs(&[1]),
+            },
+            CoverKind::Fourth => CoverMap {
+                kind,
+                num: cover_coeffs(&[0, 0, 0, 0, 1]),
+                den: cover_coeffs(&[1]),
+            },
+            CoverKind::Cubic | CoverKind::Quart => {
+                let deg = if kind == CoverKind::Cubic { 3 } else { 4 };
+                let mut num: Vec<u64> = (0..deg).map(|_| rng.gen_range(0..p)).collect();
+                num.push(1);
+                CoverMap {
+                    kind,
+                    num: cover_coeffs(&num),
+                    den: cover_coeffs(&[1]),
+                }
+            }
+            CoverKind::Generic3 => loop {
+                let num = [
+                    rng.gen_range(0..p),
+                    rng.gen_range(0..p),
+                    rng.gen_range(0..p),
+                    1,
+                ];
+                let den = [
+                    rng.gen_range(1..p),
+                    rng.gen_range(0..p),
+                    rng.gen_range(0..p),
+                    rng.gen_range(1..p),
+                ];
+                if upoly_gcd_degree(&num, &den, p) == 0 {
+                    break CoverMap {
+                        kind,
+                        num: cover_coeffs(&num),
+                        den: cover_coeffs(&den),
+                    };
+                }
+            },
+            CoverKind::Quad => {
+                // λ(u − α)² + β = λu² − 2λα·u + λα² + β.
+                let (al, be, la) = (
+                    rng.gen_range(1..p),
+                    rng.gen_range(0..p),
+                    rng.gen_range(1..p),
+                );
+                CoverMap {
+                    kind,
+                    num: cover_coeffs(&[
+                        addm(mulm(la, mulm(al, al, p), p), be, p),
+                        subm(0, mulm(2, mulm(la, al, p), p), p),
+                        la,
+                    ]),
+                    den: cover_coeffs(&[1]),
+                }
+            }
+            CoverKind::Generic => loop {
+                let num = [rng.gen_range(0..p), rng.gen_range(0..p), 1];
+                let den = [
+                    rng.gen_range(1..p),
+                    rng.gen_range(0..p),
+                    rng.gen_range(1..p),
+                ];
+                if upoly_gcd_degree(&num, &den, p) == 0 {
+                    break CoverMap {
+                        kind,
+                        num: cover_coeffs(&num),
+                        den: cover_coeffs(&den),
+                    };
+                }
+            },
+        }
+    }
+
+    /// `x∘φ(u)`, or `None` at a pole.
+    fn eval(&self, u: u64, p: u64) -> Option<u64> {
+        let d = upoly_eval(&self.den, u, p);
+        (d != 0).then(|| mulm(upoly_eval(&self.num, u, p), invm(d, p), p))
+    }
+
+    /// `x∘φ(u)` as an argument of [`s3_dbl_args`], `u` a polynomial.
+    fn arg(&self, u: &Pol, n: usize, p: u64) -> Arg {
+        let lift = |c: &[u64; COVER_COEFFS]| {
+            let c = upoly_trim(c.to_vec());
+            let mut f = Pol::constant(n, c.first().copied().unwrap_or(0), p);
+            let mut pw = u.clone();
+            for &k in c.iter().skip(1) {
+                f = f.add(&pw.scale(k, p), p);
+                pw = pw.mul(u, p);
+            }
+            f
+        };
+        if upoly_trim(self.den.to_vec()) == [1] {
+            Arg::Plain(lift(&self.num))
+        } else {
+            Arg::Frac(lift(&self.num), lift(&self.den))
+        }
+    }
+
+    /// `h = D⁴·f(N/D) = N³D + a·N·D³ + b·D⁴`, the cover `C: v² = h(u)`.
+    fn h(&self, a: u64, b: u64, p: u64) -> Vec<u64> {
+        let (nn, dd) = (upoly_trim(self.num.to_vec()), upoly_trim(self.den.to_vec()));
+        let n3 = upoly_mul(&upoly_mul(&nn, &nn, p), &nn, p);
+        let d2 = upoly_mul(&dd, &dd, p);
+        let d3 = upoly_mul(&d2, &dd, p);
+        let d4 = upoly_mul(&d2, &d2, p);
+        let t1 = upoly_mul(&n3, &dd, p);
+        let t2: Vec<u64> = upoly_mul(&nn, &d3, p)
+            .iter()
+            .map(|&c| mulm(c, a, p))
+            .collect();
+        let t3: Vec<u64> = d4.iter().map(|&c| mulm(c, b, p)).collect();
+        upoly_add(&upoly_add(&t1, &upoly_trim(t2), p), &upoly_trim(t3), p)
+    }
+
+    /// The genus of `v² = h(u)` when `h` is squarefree, else `None`.
+    fn genus(&self, a: u64, b: u64, p: u64) -> Option<usize> {
+        let h = self.h(a, b, p);
+        let dh: Vec<u64> = h
+            .iter()
+            .enumerate()
+            .skip(1)
+            .map(|(i, &c)| mulm(i as u64 % p, c, p))
+            .collect();
+        (h.len() >= 2 && upoly_gcd_degree(&h, &upoly_trim(dh), p) == 0)
+            .then(|| (h.len() - 1 - 1) / 2)
+    }
+
+    /// The factor base's abscissae `x∘φ(V)`, distinct, poles dropped.
+    fn image(&self, v: &[u64], p: u64) -> Vec<u64> {
+        let mut out: Vec<u64> = v.iter().filter_map(|&u| self.eval(u, p)).collect();
+        out.sort_unstable();
+        out.dedup();
+        out
+    }
+}
+
+fn build_tower(kind: Kind, p: u64, t: usize, rng: &mut StdRng) -> Tower {
+    let tower = match kind {
+        Kind::Kummer => kummer(p, t, rng),
+        Kind::Dickson => dickson(p, t, rng),
+        Kind::Isogeny => isogeny(p, t, rng),
+        Kind::DicksonTorus => dickson_torus(p, t, rng),
+    };
+    tower.check(p);
+    tower
+}
+
+// ── Targets ────────────────────────────────────────────────────────
+
+/// A target and, when planted, the full solution of its system.
+struct Target {
+    planted: bool,
+    x_r: u64,
+    /// Values of every variable at the planted solution.
+    solution: Option<Vec<u64>>,
+    /// The planted abscissae, for the naive control.
+    xs: Vec<u64>,
+}
+
+/// Plant `R = P_1 + … + P_m` over distinct base abscissae with random
+/// signs; `None` when the partial sums hit the identity.
+fn plant(
+    curve: &PrimeCurve,
+    tower: &Tower,
+    m: usize,
+    on: &[u64],
+    rng: &mut StdRng,
+) -> Option<Target> {
+    let p = curve.p;
+    let mut ops = GroupOps::default();
+    let mut pick: Vec<u64> = Vec::with_capacity(m);
+    // With `--cover-map`, `pick` holds tower values u and `abs` their images
+    // x∘φ(u), distinct; without it the two are the same.
+    let mut abs: Vec<u64> = Vec::with_capacity(m);
+    while pick.len() < m {
+        let u = on[rng.gen_range(0..on.len())];
+        let x = match &tower.cover {
+            Some(cv) => cv.eval(u, p).expect("on holds no pole"),
+            None => u,
+        };
+        if !abs.contains(&x) {
+            pick.push(u);
+            abs.push(x);
+        }
+    }
+    let pts: Vec<PrimePoint> = abs
+        .iter()
+        .map(|&x| {
+            let y = curve.sqrt(curve.rhs(x)).expect("abscissa on the curve");
+            PrimePoint::affine(x, if rng.gen::<bool>() { y } else { p - y })
+        })
+        .collect();
+    let mut acc = pts[0];
+    let mut partial = Vec::new();
+    for pt in &pts[1..] {
+        acc = curve.add(&mut ops, acc, *pt);
+        if acc.infinity {
+            return None;
+        }
+        partial.push(acc.x);
+    }
+    let x_r = acc.x;
+    let t = tower.t;
+    let mut sol = vec![0u64; m * t + (m - 2)];
+    for (i, &x) in pick.iter().enumerate() {
+        sol[i * t..(i + 1) * t].copy_from_slice(&tower.values(x, p));
+    }
+    // The chain's free unknowns are the partial-sum abscissae x(P_1 + … + P_{k+1}).
+    for k in 0..m - 2 {
+        sol[m * t + k] = partial[k];
+    }
+    Some(Target {
+        planted: true,
+        x_r,
+        solution: Some(sol),
+        xs: abs,
+    })
+}
+
+fn random_target(curve: &PrimeCurve, rng: &mut StdRng) -> Target {
+    let x_r = random_point(curve, rng).x;
+    Target {
+        planted: false,
+        x_r,
+        solution: None,
+        xs: Vec::new(),
+    }
+}
+
+// ── Systems ────────────────────────────────────────────────────────
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Control {
+    Tower,
+    Ladder,
+    Naive,
+    Null,
+    Multiples,
+    /// A random factor base of the same size: two unknowns `x_1, x_2`,
+    /// membership `∏_{f ∈ F}(x_i − f)`, `F` random abscissae on the curve
+    /// (with the planted ones), `|F|` that of the cell's base (m = 2 only).
+    RandBase,
+}
+
+impl Control {
+    fn name(self) -> &'static str {
+        match self {
+            Control::Tower => "tower",
+            Control::Ladder => "ladder",
+            Control::Naive => "naive",
+            Control::Null => "null",
+            Control::Multiples => "multiples",
+            Control::RandBase => "randbase",
+        }
+    }
+}
+
+/// The summation part: `S₃(x_1, x_2, x_R)` at `m = 2`; for `m ≥ 3` the
+/// chain `S₃(x_1, x_2, u_1)`, `S₃(u_k, x_{k+2}, u_{k+1})`,
+/// `S₃(u_{m−2}, x_m, x_R)`, whose free unknowns `u_k` are the abscissae of
+/// the partial sums.
+fn summation(tower: &Tower, curve: &PrimeCurve, m: usize, n: usize, x_r: u64) -> Vec<Pol> {
+    let p = curve.p;
+    let (a, b) = (curve.a, curve.b);
+    let x = |i: usize| Pol::var(n, i * tower.t).scale(tower.scale, p);
+    let xr = Pol::constant(n, x_r, p);
+    if let Some(cv) = &tower.cover {
+        // S₃ at x∘φ(u_i), cleared of φ's denominators.
+        let xa = |i: usize| cv.arg(&x(i), n, p);
+        if m == 2 {
+            return vec![s3_dbl_args([xa(0), xa(1), Arg::Plain(xr)], a, b, p)];
+        }
+        let u = |k: usize| Arg::Plain(Pol::var(n, m * tower.t + k));
+        let mut eqs = vec![s3_dbl_args([xa(0), xa(1), u(0)], a, b, p)];
+        for k in 1..m - 2 {
+            eqs.push(s3_dbl_args([u(k - 1), xa(k + 1), u(k)], a, b, p));
+        }
+        eqs.push(s3_dbl_args([u(m - 3), xa(m - 1), Arg::Plain(xr)], a, b, p));
+        return eqs;
+    }
+    if m == 2 {
+        return vec![s3(&x(0), &x(1), &xr, a, b, p)];
+    }
+    let u = |k: usize| Pol::var(n, m * tower.t + k);
+    let mut eqs = vec![s3(&x(0), &x(1), &u(0), a, b, p)];
+    for k in 1..m - 2 {
+        eqs.push(s3(&u(k - 1), &x(k + 1), &u(k), a, b, p));
+    }
+    eqs.push(s3(&u(m - 3), &x(m - 1), &xr, a, b, p));
+    eqs
+}
+
+/// An argument of `s3_dbl_args`: a plain polynomial, or a fraction `N/D`
+/// whose denominator the call clears.
+enum Arg {
+    Plain(Pol),
+    Frac(Pol, Pol),
+}
+
+impl Arg {
+    fn parts(&self, n: usize, p: u64) -> (Pol, Pol) {
+        match self {
+            Arg::Plain(f) => (f.clone(), Pol::constant(n, 1, p)),
+            Arg::Frac(num, den) => (num.clone(), den.clone()),
+        }
+    }
+}
+
+/// The numerator and denominator of the doubling map on abscissae,
+/// `x([2]P) = N(x)/D(x)`: `N = x⁴ − 2a x² − 8b x + a²`,
+/// `D = 4(x³ + a x + b)`.
+fn dbl_nd(x: &Pol, a: u64, b: u64, p: u64) -> (Pol, Pol) {
+    let n = x.n;
+    let x2 = x.mul(x, p);
+    let x3 = x2.mul(x, p);
+    let x4 = x2.mul(&x2, p);
+    let num = x4
+        .sub(&x2.scale(mulm(2, a, p), p), p)
+        .sub(&x.scale(mulm(8, b, p), p), p)
+        .add(&Pol::constant(n, mulm(a, a, p), p), p);
+    let den = x3
+        .add(&x.scale(a, p), p)
+        .add(&Pol::constant(n, b, p), p)
+        .scale(4, p);
+    (num, den)
+}
+
+/// `S₃` on three arguments, multiplied by `D_i²` for every `Frac` argument
+/// `N_i/D_i` so that the result is a polynomial. With `(N_i, D_i)` the
+/// parts of each argument (`D_i = 1` for a plain one) the clearing is
+/// `(N₁D₂ − N₂D₁)²N₃² − 2[(N₁D₂ + N₂D₁)(N₁N₂ + aD₁D₂) + 2bD₁²D₂²]N₃D₃
+///  + D₃²[(N₁N₂ − aD₁D₂)² − 4b(N₁D₂ + N₂D₁)D₁D₂]`.
+fn s3_dbl_args(args: [Arg; 3], a: u64, b: u64, p: u64) -> Pol {
+    let n = match &args[0] {
+        Arg::Plain(f) | Arg::Frac(f, _) => f.n,
+    };
+    let (n1, d1) = args[0].parts(n, p);
+    let (n2, d2) = args[1].parts(n, p);
+    let (n3, d3) = args[2].parts(n, p);
+    let n1d2 = n1.mul(&d2, p);
+    let n2d1 = n2.mul(&d1, p);
+    let d1d2 = d1.mul(&d2, p);
+    let n1n2 = n1.mul(&n2, p);
+    let diff = n1d2.sub(&n2d1, p);
+    let sum = n1d2.add(&n2d1, p);
+    let t1 = diff.mul(&diff, p).mul(&n3, p).mul(&n3, p);
+    let inner = sum
+        .mul(&n1n2.add(&d1d2.scale(a, p), p), p)
+        .add(&d1d2.mul(&d1d2, p).scale(mulm(2, b, p), p), p);
+    let t2 = inner.mul(&n3, p).mul(&d3, p).scale(p - 2, p);
+    let q = n1n2.sub(&d1d2.scale(a, p), p);
+    let t3 = q
+        .mul(&q, p)
+        .sub(&sum.mul(&d1d2, p).scale(mulm(4, b, p), p), p)
+        .mul(&d3, p)
+        .mul(&d3, p);
+    t1.add(&t2, p).add(&t3, p)
+}
+
+/// How many equations the `multiples` control appends to the tower system:
+/// one at `m = 2`; at `m ≥ 3` the `m − 2` doubling links and the `m − 1`
+/// doubled chain equations.
+fn multiples_appended(m: usize) -> usize {
+    if m == 2 {
+        1
+    } else {
+        (m - 2) + (m - 1)
+    }
+}
+
+/// `x([2]R) = N(x_R)/D(x_R)` modulo `p`.
+fn double_abscissa(x_r: u64, a: u64, b: u64, p: u64) -> u64 {
+    let xr = Pol::constant(1, x_r, p);
+    let (num, den) = dbl_nd(&xr, a, b, p);
+    let (nv, dv) = (num.eval(&[0], p), den.eval(&[0], p));
+    assert!(
+        dv != 0,
+        "the multiples control: D(x_R) = 0, so R has order 2; the curve order is not odd"
+    );
+    mulm(nv, invm(dv, p), p)
+}
+
+/// The doubled-relation equations of the `multiples` control, in the
+/// variables of the `n`-variable system (`n` includes the `u'` unknowns at
+/// `m ≥ 3`).
+fn multiples_equations(
+    tower: &Tower,
+    curve: &PrimeCurve,
+    m: usize,
+    n: usize,
+    x_r: u64,
+) -> Vec<Pol> {
+    let p = curve.p;
+    let (a, b) = (curve.a, curve.b);
+    let x = |i: usize| Pol::var(n, i * tower.t).scale(tower.scale, p);
+    let c = Pol::constant(n, double_abscissa(x_r, a, b, p), p);
+    let frac = |i: usize| {
+        let (num, den) = dbl_nd(&x(i), a, b, p);
+        Arg::Frac(num, den)
+    };
+    if m == 2 {
+        let (n1, d1) = dbl_nd(&x(0), a, b, p);
+        let (n2, d2) = dbl_nd(&x(1), a, b, p);
+        return vec![s3_dbl_args(
+            [Arg::Frac(n1, d1), Arg::Frac(n2, d2), Arg::Plain(c)],
+            a,
+            b,
+            p,
+        )];
+    }
+    let u = |k: usize| Pol::var(n, m * tower.t + k);
+    let up = |k: usize| Pol::var(n, m * tower.t + (m - 2) + k);
+    let mut eqs = Vec::new();
+    for k in 0..m - 2 {
+        let (num, den) = dbl_nd(&u(k), a, b, p);
+        eqs.push(den.mul(&up(k), p).sub(&num, p));
+    }
+    eqs.push(s3_dbl_args([frac(0), frac(1), Arg::Plain(up(0))], a, b, p));
+    for k in 1..m - 2 {
+        eqs.push(s3_dbl_args(
+            [Arg::Plain(up(k - 1)), frac(k + 1), Arg::Plain(up(k))],
+            a,
+            b,
+            p,
+        ));
+    }
+    eqs.push(s3_dbl_args(
+        [Arg::Plain(up(m - 3)), frac(m - 1), Arg::Plain(c)],
+        a,
+        b,
+        p,
+    ));
+    eqs
+}
+
+/// A random polynomial of degree at most two in `n` variables that
+/// vanishes at `at`.
+fn random_quadric(n: usize, at: &[u64], p: u64, rng: &mut StdRng) -> Pol {
+    let mut f = Pol::zero(n);
+    for i in 0..n {
+        for j in i..n {
+            let mut e = vec![0u32; n];
+            e[i] += 1;
+            e[j] += 1;
+            f.terms.insert(e, rng.gen_range(1..p));
+        }
+        let mut e = vec![0u32; n];
+        e[i] = 1;
+        f.terms.insert(e, rng.gen_range(1..p));
+    }
+    let c = f.eval(at, p);
+    f.sub(&Pol::constant(n, c, p), p)
+}
+
+/// The exponent vectors of the `--null-width W` support of `eq`: every
+/// vector with exponent `0..=W` on each variable that occurs in `eq` and 0 on
+/// the others, in lexicographic order (`(W+1)^|vars|` of them).
+fn null_box(eq: &Pol, n: usize, w: usize) -> Vec<Vec<u32>> {
+    let mut vars: Vec<usize> = (0..n)
+        .filter(|&i| eq.terms.keys().any(|e| e[i] > 0))
+        .collect();
+    vars.sort_unstable();
+    let mut out = vec![vec![0u32; n]];
+    for &v in vars.iter().rev() {
+        let mut next = Vec::with_capacity(out.len() * (w + 1));
+        for d in 0..=w as u32 {
+            for e in &out {
+                let mut e = e.clone();
+                e[v] = d;
+                next.push(e);
+            }
+        }
+        out = next;
+    }
+    out
+}
+
+/// The system for one (control, target), with its number of variables
+/// and the planted solution in that system's variables.
+fn system(
+    control: Control,
+    tower: &Tower,
+    curve: &PrimeCurve,
+    m: usize,
+    target: &Target,
+    g: usize,
+    null_width: Option<usize>,
+    rng: &mut StdRng,
+) -> (Vec<Pol>, usize, Option<Vec<u64>>, std::ops::Range<usize>) {
+    let p = curve.p;
+    let t = tower.t;
+    if control == Control::Naive {
+        // Two unknowns x_1, x_2 and one univariate membership each.
+        assert_eq!(m, 2);
+        let n = 2;
+        let k = 1u64 << t;
+        let member = |i: usize| {
+            let xi = Pol::var(n, i);
+            let mut pw = Pol::constant(n, 1, p);
+            for _ in 0..k {
+                pw = pw.mul(&xi, p);
+            }
+            pw.sub(&Pol::constant(n, powm(tower.scale, k, p), p), p)
+        };
+        let s = s3(
+            &Pol::var(n, 0),
+            &Pol::var(n, 1),
+            &Pol::constant(n, target.x_r, p),
+            curve.a,
+            curve.b,
+            p,
+        );
+        let sol = target.planted.then(|| target.xs.clone());
+        return (vec![s, member(0), member(1)], n, sol, 0..0);
+    }
+    if control == Control::RandBase {
+        assert_eq!(m, 2, "randbase is written for m = 2");
+        let n = 2;
+        let size = match &tower.cover {
+            Some(cv) => cv.image(&tower.v, p).len(),
+            None => tower.v.len(),
+        };
+        let mut base: Vec<u64> = target.xs.clone();
+        while base.len() < size {
+            let x = rng.gen_range(0..p);
+            if !base.contains(&x) && curve.legendre(curve.rhs(x)) == 1 {
+                base.push(x);
+            }
+        }
+        let member = |i: usize| {
+            let xi = Pol::var(n, i);
+            base.iter().fold(Pol::constant(n, 1, p), |acc, &f| {
+                acc.mul(&xi.sub(&Pol::constant(n, f, p), p), p)
+            })
+        };
+        let s = s3(
+            &Pol::var(n, 0),
+            &Pol::var(n, 1),
+            &Pol::constant(n, target.x_r, p),
+            curve.a,
+            curve.b,
+            p,
+        );
+        let sol = target.planted.then(|| target.xs.clone());
+        return (vec![s, member(0), member(1)], n, sol, 0..0);
+    }
+    let multiples = control == Control::Multiples;
+    // The multiples control adds the m − 2 doubled partial sums u'_k.
+    let n = m * t + (m - 2) + if multiples && m >= 3 { m - 2 } else { 0 };
+    let mut eqs = summation(tower, curve, m, n, target.x_r);
+    if control == Control::Null {
+        // S₃'s support, random coefficients, planted zero: at m = 2 the one
+        // S₃, and at m ≥ 3 (`--null-chain`) every S₃ link of the chain, in
+        // order. At m = 2 the draws are those of the pilot's null.
+        for eq in eqs.iter_mut() {
+            let mut f = Pol::zero(n);
+            match null_width {
+                None => {
+                    for e in eq.terms.keys() {
+                        f.terms.insert(e.clone(), rng.gen_range(1..p));
+                    }
+                }
+                Some(w) => {
+                    // `--null-width`: the full box of exponents 0..=w on
+                    // every variable the equation uses, 0 elsewhere.
+                    for e in null_box(eq, n, w) {
+                        f.terms.insert(e, rng.gen_range(1..p));
+                    }
+                }
+            }
+            if let Some(sol) = &target.solution {
+                let c = f.eval(sol, p);
+                f = f.sub(&Pol::constant(n, c, p), p);
+            }
+            *eq = f;
+        }
+    }
+    let towers_from = eqs.len();
+    for i in 0..m {
+        eqs.extend(tower.equations(n, i * t, p));
+    }
+    let towers = towers_from..eqs.len();
+    let mut sol = target.solution.clone();
+    if multiples {
+        let before = eqs.len();
+        eqs.extend(multiples_equations(tower, curve, m, n, target.x_r));
+        assert_eq!(eqs.len() - before, multiples_appended(m));
+        if let Some(s) = sol.as_mut() {
+            let (a, b) = (curve.a, curve.b);
+            if m >= 3 {
+                // u'_k = x([2](P_1 + … + P_{k+2})) = N(u_k)/D(u_k).
+                for k in 0..m - 2 {
+                    let u = Pol::constant(1, s[m * t + k], p);
+                    let (num, den) = dbl_nd(&u, a, b, p);
+                    let (nv, dv) = (num.eval(&[0], p), den.eval(&[0], p));
+                    assert!(dv != 0, "D(u_{k}) = 0 at the planted solution");
+                    s.push(mulm(nv, invm(dv, p), p));
+                }
+            }
+            for (k, e) in eqs.iter().enumerate() {
+                assert_eq!(
+                    e.eval(s, p),
+                    0,
+                    "multiples equation {k} does not vanish at the planted solution"
+                );
+            }
+        }
+    }
+    if control == Control::Ladder {
+        let sol = target
+            .solution
+            .as_ref()
+            .expect("the ladder runs on planted targets");
+        for _ in 1..g {
+            eqs.push(random_quadric(n, sol, p, rng));
+        }
+    }
+    (eqs, n, sol, towers)
+}
+
+// ── Measuring ──────────────────────────────────────────────────────
+
+struct Measured {
+    report: F4Report,
+    planted_ok: Option<bool>,
+    zero_dim: bool,
+    linear: usize,
+}
+
+fn measure(
+    eqs: &[Pol],
+    n: usize,
+    p: u64,
+    sol: Option<&[u64]>,
+    max_degree: u32,
+    budget: Duration,
+    stop_below: Option<usize>,
+) -> Measured {
+    if let Some(s) = sol {
+        for (k, e) in eqs.iter().enumerate() {
+            assert_eq!(
+                e.eval(s, p),
+                0,
+                "equation {k} does not vanish at the planted solution"
+            );
+        }
+    }
+    let input: Vec<Poly> = eqs
+        .iter()
+        .map(|e| e.to_poly(p))
+        .filter(|f| !f.is_empty())
+        .collect();
+    // Optionally stop once at most `stop_below` candidate points remain: the
+    // steps after that only certify the basis, and on planted systems at
+    // large N it is they, not the solve, that exhaust memory.
+    let mut opts = F4Options::new(Ordering::Grevlex, max_degree).with_budget(budget);
+    if let Some(b) = stop_below {
+        opts = opts.stopping_below(b);
+    }
+    let report = f4_fp::f4(&input, n, p, &opts);
+    let planted_ok =
+        sol.map(|s| !report.inconsistent && report.basis.iter().all(|f| f4_fp::eval(f, s, p) == 0));
+    let pure = |k: usize| {
+        report.basis.iter().any(|f| {
+            f.first()
+                .map(|(e, _)| e.iter().enumerate().all(|(i, &x)| (i == k) == (x > 0)))
+                .unwrap_or(false)
+        })
+    };
+    let zero_dim = report.inconsistent || (0..n).all(pure);
+    let linear = report
+        .basis
+        .iter()
+        .filter(|f| {
+            f.first()
+                .map(|(e, _)| e.iter().sum::<u32>() == 1)
+                .unwrap_or(false)
+        })
+        .count();
+    Measured {
+        report,
+        planted_ok,
+        zero_dim,
+        linear,
+    }
+}
+
+/// What one run reports, in the fields every row carries; `extra` holds
+/// the engine's own fields and is merged into the row.
+struct Outcome {
+    solving_degree_max: u32,
+    last_productive_degree: u32,
+    degree_reached: u32,
+    max_cols_to_solution: usize,
+    steps_to_solution: usize,
+    inconsistent: bool,
+    zero_dim: bool,
+    linear: usize,
+    basis_len: usize,
+    steps: usize,
+    max_rows: usize,
+    max_cols: usize,
+    ms: f64,
+    timed_out: bool,
+    pairs_above_bound: usize,
+    staircase_at_stop: Option<usize>,
+    planted_ok: Option<bool>,
+    extra: Value,
+}
+
+impl Outcome {
+    fn from_f4(r: &Measured) -> Self {
+        Outcome {
+            solving_degree_max: r.report.solving_degree_max,
+            last_productive_degree: r.report.solving_degree,
+            degree_reached: r.report.degree_reached,
+            max_cols_to_solution: r.report.max_cols_to_solution,
+            steps_to_solution: r.report.steps_to_solution,
+            inconsistent: r.report.inconsistent,
+            zero_dim: r.zero_dim,
+            linear: r.linear,
+            basis_len: r.report.basis.len(),
+            steps: r.report.steps,
+            max_rows: r.report.max_rows,
+            max_cols: r.report.max_cols,
+            ms: r.report.ms,
+            timed_out: r.report.timed_out,
+            pairs_above_bound: r.report.pairs_above_bound,
+            staircase_at_stop: r.report.staircase_at_stop,
+            planted_ok: r.planted_ok,
+            extra: json!({"engine": "f4_fp"}),
+        }
+    }
+}
+
+/// The tower quotient ring of an `m`-summand system: `m` blocks of the
+/// tower's rules, then the chain's `m − 2` free unknowns.
+fn tower_ring(tower: &Tower, m: usize, p: u64) -> TowerRing {
+    let mut rules = Vec::with_capacity(m * tower.t);
+    for i in 0..m {
+        rules.extend(tower.square_rules(i * tower.t, p));
+    }
+    TowerRing {
+        p,
+        rules,
+        n_free: m - 2,
+    }
+}
+
+fn raw_terms(e: &Pol) -> Vec<(Vec<u32>, u64)> {
+    e.terms.iter().map(|(k, v)| (k.clone(), *v)).collect()
+}
+
+/// The process's resident memory and its peak so far, in MB, where Linux
+/// reports them.
+fn memory_mb() -> Option<(u64, u64)> {
+    let status = std::fs::read_to_string("/proc/self/status").ok()?;
+    let field = |key: &str| -> Option<u64> {
+        let line = status.lines().find(|l| l.starts_with(key))?;
+        Some(line.split_whitespace().nth(1)?.parse::<u64>().ok()? / 1024)
+    };
+    Some((field("VmRSS:")?, field("VmHWM:")?))
+}
+
+/// One line of a tower run's step trace, with the process's memory when the
+/// step ended.
+fn print_tower_step(k: usize, st: &f4_fp_tower::StepTrace) {
+    eprintln!("tower step {k}: {}", tower_step_fields(st));
+}
+
+/// The step a stop cut off (`TowerF4Report::stopped_step`), as far as it
+/// got, at the moment of the stop: with the process's memory and its
+/// address space, which `ulimit -v` caps. Its prefix differs from a
+/// step's, so that no reader of traces takes it for a finished step.
+fn print_stopped_step(k: usize, oversize: bool, st: &f4_fp_tower::StepTrace) {
+    let why = if oversize {
+        "oversize: --max-nnz"
+    } else {
+        "budget"
+    };
+    let space = address_space_mb().map_or(String::new(), |(size, peak)| {
+        format!(", address space {size} MB (peak {peak} MB)")
+    });
+    let live = live_heap_mb().map_or(String::new(), |mb| format!(", live heap {mb} MB"));
+    eprintln!(
+        "tower stop in step {k} ({why}): {}{space}{live}",
+        tower_step_fields(st)
+    );
+}
+
+/// The bytes the allocator holds for live allocations, in MB: what the run
+/// still uses, without the freed memory the allocator keeps mapped for
+/// reuse, which the address space counts. glibc only.
+#[cfg(all(target_os = "linux", target_env = "gnu"))]
+fn live_heap_mb() -> Option<u64> {
+    // SAFETY: mallinfo2 only reads the allocator's counters.
+    let m = unsafe { libc::mallinfo2() };
+    Some(((m.uordblks + m.hblkhd) >> 20) as u64)
+}
+
+#[cfg(not(all(target_os = "linux", target_env = "gnu")))]
+fn live_heap_mb() -> Option<u64> {
+    None
+}
+
+/// The process's address space and its peak, in MB (`VmSize`, `VmPeak`).
+fn address_space_mb() -> Option<(u64, u64)> {
+    let status = std::fs::read_to_string("/proc/self/status").ok()?;
+    let field = |key: &str| -> Option<u64> {
+        let line = status.lines().find(|l| l.starts_with(key))?;
+        Some(line.split_whitespace().nth(1)?.parse::<u64>().ok()? / 1024)
+    };
+    Some((field("VmSize:")?, field("VmPeak:")?))
+}
+
+fn tower_step_fields(st: &f4_fp_tower::StepTrace) -> String {
+    let memory = memory_mb().map_or(String::new(), |(rss, peak)| {
+        format!(", memory {rss} MB (peak {peak} MB)")
+    });
+    format!(
+        "degree {}, {} critical + {} tower pairs, {} S-rows + {} reducers + {} promoted x {} cols, nnz {}, residue {} x {}, fresh {} (lowest degree {}), basis {}, pairs left {}, {:.1} ms (rows {:.0}, A {:.0}, B {:.0}, update {:.0}), B' {} entries, kept {} elements with {} entries, muladds {}{}{}",
+        st.degree,
+        st.critical_pairs,
+        st.tower_pairs,
+        st.s_rows,
+        st.reducer_rows,
+        st.promoted_rows,
+        st.cols,
+        st.nnz,
+        st.residual_rows,
+        st.residual_cols,
+        st.fresh,
+        st.fresh_min_degree,
+        st.basis_active,
+        st.pairs_left,
+        st.ms,
+        st.ms_rows,
+        st.ms_reduce,
+        st.ms_echelon,
+        st.ms_update,
+        st.dense_entries,
+        st.basis_kept,
+        st.basis_entries,
+        st.muladds,
+        st.full_rank_after.map_or(String::new(), |k| format!(
+            ", full rank after {k} of {} S-rows ({} skipped)",
+            st.s_rows, st.skipped_rows
+        )),
+        memory
+    )
+}
+
+/// One line of a signature-engine run's step trace, with the process's
+/// memory when the step ended.
+fn print_sig_step(k: usize, st: &sig_fp_tower::SigStep) {
+    let memory = memory_mb().map_or(String::new(), |(rss, peak)| {
+        format!(", memory {rss} MB (peak {peak} MB)")
+    });
+    eprintln!(
+        "sig step {}: {}position {} signature degree {}, {} pairs ({} syzygy, {} rewritten), rows {} gen + {} critical + {} tower + {} reducers x {} cols, nnz {}, zero {}, singular {}, fresh {} ({} new leading monomials; lowest degree {}, highest row degree {}), late {}, elements {}, pairs left {}, {:.1} ms (rows {:.0}, reduce {:.0}), muladds {}{}",
+        k,
+        if st.degree > 0 {
+            format!("degree {}, ", st.degree)
+        } else {
+            String::new()
+        },
+        st.position,
+        st.sugar,
+        st.pairs,
+        st.skipped_syzygy,
+        st.skipped_rewrite,
+        st.gen_rows,
+        st.crit_rows,
+        st.tower_rows,
+        st.reducer_rows,
+        st.cols,
+        st.nnz,
+        st.zero_rows,
+        st.singular_rows,
+        st.fresh,
+        st.fresh_lm,
+        st.fresh_min_degree,
+        st.fresh_max_nominal,
+        st.late_pairs,
+        st.elements,
+        st.pairs_left,
+        st.ms,
+        st.ms_rows,
+        st.ms_reduce,
+        st.muladds,
+        memory
+    );
+}
+
+/// Run `f4_fp_tower` on a system: the tower equations become the ring's
+/// rewriting, and the other equations its input in normal form.
+#[allow(clippy::too_many_arguments)]
+/// The HKY closures of one system (`--engine hky`): the system in the tower
+/// quotient's normal form (the tower equations vanish there), `V_{F,c}` for
+/// `c` from the least input degree, and the fall degrees.
+fn measure_hky(
+    eqs: &[Pol],
+    tower: &Tower,
+    cell: &Cell,
+    target_index: usize,
+    n: usize,
+    p: u64,
+    sol: Option<&[u64]>,
+    a: &Args,
+) -> Outcome {
+    let ring = if cell.control == Control::Naive {
+        HkyRing::new(p, Vec::new(), n)
+    } else {
+        HkyRing::new(p, tower_ring(tower, cell.m, p).rules, n - cell.m * tower.t)
+    };
+    let gens: Vec<hky_fp_tower::NfPoly> = eqs
+        .iter()
+        .map(|e| ring.from_raw(&raw_terms(e)))
+        .filter(|g| !g.is_empty())
+        .collect();
+    let planted_ok = sol.map(|s| gens.iter().all(|g| ring.eval(g, s) == 0));
+    let nf_degrees: Vec<u32> = gens.iter().map(HkyRing::degree).collect();
+    let c_min = a
+        .hky_cmin
+        .unwrap_or_else(|| nf_degrees.iter().copied().min().unwrap_or(1));
+    let limits = HkyLimits {
+        max_cols: a.hky_max_cols,
+        max_entries: a.hky_max_entries,
+        budget: Duration::from_secs(a.budget),
+        ..HkyLimits::default()
+    };
+    let started = Instant::now();
+    let progress = |cl: &hky_fp_tower::Closure| {
+        let Some(path) = a.hky_progress.as_deref() else {
+            return;
+        };
+        let line = json!({
+            "schema": "pkm_tower_pilot.hky_progress/v1",
+            "utc_unix_s": std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_secs())
+                .unwrap_or(0),
+            "p": p, "seed": a.seed, "kind": cell.kind.name(), "m": cell.m,
+            "control": cell.control.name(), "t": cell.t, "g": cell.g,
+            "null_width": a.null_width, "target_index": target_index,
+            "hky_cmin": c_min, "hky_cmax": a.hky_cmax,
+            "c": cl.c, "cols": cl.cols as u64, "dims": cl.dims, "one": cl.contains_one,
+            "censored": cl.censored, "rows_reduced": cl.rows_reduced,
+            "entries": cl.entries, "muladds": cl.muladds, "ms": cl.ms,
+        });
+        let mut f = std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(path)
+            .unwrap_or_else(|e| panic!("--hky-progress {path}: {e}"));
+        writeln!(f, "{line}").unwrap_or_else(|e| panic!("--hky-progress {path}: {e}"));
+        f.sync_all()
+            .unwrap_or_else(|e| panic!("--hky-progress {path}: {e}"));
+        eprintln!(
+            "hky progress: t={} target={} c={} one={} censored={:?} {:.0} ms",
+            cell.t, target_index, cl.c, cl.contains_one, cl.censored, cl.ms
+        );
+    };
+    let fast = a.engine == Engine::Hky2;
+    let mut fast_stats: Vec<Value> = Vec::new();
+    let fd = if fast {
+        let mut opts = a.hky2.clone();
+        opts.symmetry = if a.hky2_sym && cell.control != Control::Naive {
+            hky_fp_tower_fast::swap_first_two_blocks(tower.t, cell.m)
+        } else {
+            None
+        };
+        hky_fp_tower_fast::fall_degrees_fast_with(
+            &ring,
+            &gens,
+            c_min,
+            a.hky_cmax,
+            &limits,
+            &opts,
+            |cl, st| {
+                progress(cl);
+                eprintln!(
+                    "hky2 c={} sym={} parts={:?} rank={:?} par={:.2}s seq={:.2}s mul_cpu={:.2}s batches={} dense={} sparse={} words={}",
+                    cl.c, st.symmetry, st.part_cols, st.part_rank, st.parallel_s, st.sequential_s,
+                    st.multiply_cpu_s, st.batches, st.dense_rows, st.sparse_rows, st.stored_words
+                );
+                fast_stats.push(json!({
+                    "c": cl.c, "symmetry": st.symmetry, "part_cols": st.part_cols,
+                    "part_rank": st.part_rank, "setup_s": st.setup_s,
+                    "parallel_s": st.parallel_s, "sequential_s": st.sequential_s,
+                    "multiply_cpu_s": st.multiply_cpu_s, "batches": st.batches,
+                    "dense_rows": st.dense_rows, "sparse_rows": st.sparse_rows,
+                    "stored_words": st.stored_words, "threads": st.threads, "batch": st.batch,
+                    "simd": st.simd,
+                }));
+            },
+        )
+    } else {
+        hky_fp_tower::fall_degrees_with(&ring, &gens, c_min, a.hky_cmax, &limits, progress)
+    };
+    let ms = started.elapsed().as_secs_f64() * 1e3;
+    let closures: Vec<Value> = fd
+        .closures
+        .iter()
+        .map(|c| {
+            json!({"c": c.c, "cols": c.cols as u64, "dims": c.dims, "one": c.contains_one,
+                   "censored": c.censored, "rows_reduced": c.rows_reduced,
+                   "entries": c.entries, "muladds": c.muladds, "ms": c.ms})
+        })
+        .collect();
+    let censored_at = fd
+        .closures
+        .last()
+        .and_then(|c| c.censored.as_ref().map(|_| c.c));
+    eprintln!(
+        "{:8} m={} {:6} t={:2} hky d_F={:?} ffd={:?} falls={:?} censored_at={:?} {:.0} ms",
+        cell.kind.name(),
+        cell.m,
+        cell.control.name(),
+        cell.t,
+        fd.last_fall,
+        fd.first_fall,
+        fd.falls,
+        censored_at,
+        ms
+    );
+    let mut extra = json!({
+        "engine": if fast { "hky_fp_tower_fast" } else { "hky_fp_tower" },
+        "nf_degrees": nf_degrees,
+        "hky_cmin": c_min,
+        "hky_cmax": a.hky_cmax,
+        "last_fall_degree": fd.last_fall,
+        "first_fall_degree": fd.first_fall,
+        "falls": fd.falls,
+        "censored_at": censored_at,
+        "muladds": fd.closures.iter().map(|c| c.muladds).sum::<u64>(),
+        "muladds_last_closure": fd.closures.last().map(|c| c.muladds),
+        "closures": closures,
+    });
+    if fast {
+        // Only rows of the fast instrument carry its options and timers.
+        extra["hky2"] = json!({"level": a.hky2.level, "sym": a.hky2_sym, "batch": a.hky2.batch,
+            "order": format!("{:?}", a.hky2.order), "fault": a.hky2.fault,
+            "lead_only": a.hky2.lead_only, "sparse_width": a.hky2.sparse_width,
+            "dense": [a.hky2.dense_num, a.hky2.dense_den], "stats": fast_stats});
+    }
+    Outcome {
+        solving_degree_max: 0,
+        last_productive_degree: 0,
+        degree_reached: 0,
+        max_cols_to_solution: 0,
+        steps_to_solution: 0,
+        inconsistent: fd.last_fall.is_some(),
+        zero_dim: false,
+        linear: 0,
+        basis_len: 0,
+        steps: 0,
+        max_rows: 0,
+        max_cols: 0,
+        ms,
+        timed_out: censored_at.is_some(),
+        pairs_above_bound: 0,
+        staircase_at_stop: None,
+        planted_ok,
+        extra,
+    }
+}
+
+fn measure_tower(
+    eqs: &[Pol],
+    towers: std::ops::Range<usize>,
+    ring: &TowerRing,
+    sol: Option<&[u64]>,
+    max_degree: u32,
+    budget: Duration,
+    stop_below: Option<usize>,
+    max_nnz: Option<u64>,
+    max_dense: Option<u64>,
+    trace: bool,
+    full_rank_exit: bool,
+    sig: Option<sig_fp_tower::SigOptions>,
+    weights: TowerWeights,
+) -> (Outcome, Vec<RPoly>) {
+    let p = ring.p;
+    if let Some(s) = sol {
+        for (k, e) in eqs.iter().enumerate() {
+            assert_eq!(
+                e.eval(s, p),
+                0,
+                "equation {k} does not vanish at the planted solution"
+            );
+        }
+    }
+    for k in towers.clone() {
+        assert!(
+            ring.from_raw(&raw_terms(&eqs[k])).is_empty(),
+            "tower equation {k} is not zero in the ring: the square rules are wrong"
+        );
+    }
+    let input: Vec<RPoly> = eqs
+        .iter()
+        .enumerate()
+        .filter(|(k, _)| !towers.contains(k))
+        .map(|(_, e)| ring.from_raw(&raw_terms(e)))
+        .filter(|f| !f.is_empty())
+        .collect();
+    let ring_degrees: Vec<u32> = input.iter().map(RPoly::degree).collect();
+    let mut opts = TowerF4Options::new(max_degree).with_budget(budget);
+    if let Some(b) = stop_below {
+        opts = opts.stopping_below(b);
+    }
+    if let Some(c) = max_nnz {
+        opts = opts.with_max_nnz(c);
+    }
+    if let Some(c) = max_dense {
+        opts = opts.with_max_dense(c);
+    }
+    opts.full_rank_exit = full_rank_exit;
+    opts = opts.with_weights(weights);
+    if trace {
+        // Each step as it ends, so that a run that dies leaves its trace,
+        // and a step a stop cuts off when it does.
+        opts = opts.on_step(print_tower_step);
+        opts.on_stop = Some(print_stopped_step);
+        opts.on_sig_step = Some(print_sig_step);
+    }
+    let (r, sig_stats) = if let Some(so) = sig {
+        let s = sig_fp_tower::sig_f4_tower_with(&input, ring, &opts, so);
+        (s.report, Some(s.stats))
+    } else {
+        (f4_fp_tower::f4_tower(&input, ring, &opts), None)
+    };
+    let planted_ok = sol.map(|s| !r.inconsistent && r.basis.iter().all(|f| ring.eval(f, s) == 0));
+    let lms: Vec<u128> = r.basis.iter().filter_map(RPoly::lm).collect();
+    let pure = |k: usize| {
+        lms.iter().any(|&m| {
+            let f = f4_fp_tower::free_of(m);
+            f4_fp_tower::mask_of(m) == 0
+                && (0..f4_fp_tower::MAX_FREE).all(|i| (i == k) == (f[i] > 0))
+        })
+    };
+    let zero_dim = r.inconsistent || (0..ring.n_free).all(pure);
+    // Linear in the variables, whatever the grading: with weights,
+    // `degree_of` is the weighted degree.
+    let linear = lms
+        .iter()
+        .filter(|&&m| {
+            f4_fp_tower::mask_of(m).count_ones()
+                + f4_fp_tower::free_of(m)
+                    .iter()
+                    .map(|&e| u32::from(e))
+                    .sum::<u32>()
+                == 1
+        })
+        .count();
+    let out = Outcome {
+        solving_degree_max: r.solving_degree_max,
+        last_productive_degree: r.last_productive_degree,
+        degree_reached: r.degree_reached,
+        max_cols_to_solution: r.max_cols_to_solution,
+        steps_to_solution: r.steps_to_solution,
+        inconsistent: r.inconsistent,
+        zero_dim,
+        linear,
+        basis_len: r.basis.len(),
+        steps: r.steps,
+        max_rows: r.max_rows,
+        max_cols: r.max_cols,
+        ms: r.ms,
+        // A run stopped for size did not finish either: its degree is a
+        // lower bound, like a timeout's.
+        timed_out: r.timed_out || r.oversize,
+        pairs_above_bound: r.pairs_above_bound,
+        staircase_at_stop: r.staircase_at_stop,
+        planted_ok,
+        extra: json!({
+            "engine": if sig.is_some() { "f4_fp_tower_sig" } else { "f4_fp_tower" },
+            "sig": sig_stats,
+            "sig_order": sig.map(|so| format!("{:?}", so.order)),
+            "sig_rewrite": sig.map(|so| format!("{:?}", so.rewrite)),
+            "sig_steps": sig.map(|so| format!("{:?}", so.steps)),
+            "input_ring_degrees": ring_degrees,
+            "weights": (!weights.is_unit()).then(|| {
+                (0..ring.n_tower() as u32).map(|j| weights.weight(j)).collect::<Vec<_>>()
+            }),
+            "muladds": r.muladds,
+            "max_nnz": r.max_nnz,
+            "max_residual_rows": r.max_residual_rows,
+            "full_rank_exit": sig.is_none().then_some(full_rank_exit),
+            "rows_skipped_full_rank": sig.is_none().then_some(r.rows_skipped),
+            // The largest `B'`, counting a step stopped for it, and that
+            // step as far as it got (both added in round 7).
+            "max_dense_entries": sig.is_none().then_some(r.max_dense_entries),
+            "stopped_step": r.stopped_step,
+            "oversize": r.oversize,
+            "critical_pairs_reduced": r.critical_pairs_reduced,
+            "tower_pairs_reduced": r.tower_pairs_reduced,
+            "pairs_product_skipped": r.pairs_product_skipped,
+            "pairs_chain_skipped": r.pairs_chain_skipped,
+            "reducer_rows": r.reducer_rows,
+        }),
+    };
+    (out, r.basis)
+}
+
+/// Run `f4_tower_generic` over the backend `f` on a system of the `u64`
+/// builder (`p < 2⁶³`): `measure_tower` with the generic engine. The basis
+/// comes back as `RPoly` when its coefficients fit (`p < 2³²`), for
+/// `--dump`; empty otherwise.
+#[allow(clippy::too_many_arguments)]
+fn measure_generic<F: PrimeField>(
+    f: F,
+    eqs: &[Pol],
+    towers: std::ops::Range<usize>,
+    ring: &TowerRing,
+    sol: Option<&[u64]>,
+    max_degree: u32,
+    budget: Duration,
+    max_nnz: Option<u64>,
+    max_dense: Option<u64>,
+    trace: bool,
+    full_rank_exit: bool,
+) -> (Outcome, Vec<RPoly>) {
+    let p = ring.p;
+    if let Some(s) = sol {
+        for (k, e) in eqs.iter().enumerate() {
+            assert_eq!(
+                e.eval(s, p),
+                0,
+                "equation {k} does not vanish at the planted solution"
+            );
+        }
+    }
+    let backend = f.name();
+    let gring = GTowerRing::from_tower_ring(f, ring);
+    let f = &gring.field;
+    let raw = |e: &Pol| -> Vec<(Vec<u32>, F::Elem)> {
+        e.terms
+            .iter()
+            .map(|(k, &v)| (k.clone(), f.from_u64(v)))
+            .collect()
+    };
+    for k in towers.clone() {
+        assert!(
+            gring.from_raw(&raw(&eqs[k])).is_empty(),
+            "tower equation {k} is not zero in the ring: the square rules are wrong"
+        );
+    }
+    let input: Vec<GPoly<F::Elem>> = eqs
+        .iter()
+        .enumerate()
+        .filter(|(k, _)| !towers.contains(k))
+        .map(|(_, e)| gring.from_raw(&raw(e)))
+        .filter(|g| !g.is_empty())
+        .collect();
+    let ring_degrees: Vec<u32> = input.iter().map(GPoly::degree).collect();
+    let mut opts = TowerF4Options::new(max_degree).with_budget(budget);
+    if let Some(c) = max_nnz {
+        opts = opts.with_max_nnz(c);
+    }
+    if let Some(c) = max_dense {
+        opts = opts.with_max_dense(c);
+    }
+    opts.full_rank_exit = full_rank_exit;
+    if trace {
+        opts = opts.on_step(print_tower_step);
+        opts.on_stop = Some(print_stopped_step);
+    }
+    let rep = f4_tower_generic(&input, &gring, &opts);
+    let r = &rep.stats;
+    let planted_ok = sol.map(|s| {
+        let x: Vec<F::Elem> = s.iter().map(|&v| f.from_u64(v)).collect();
+        !r.inconsistent && rep.basis.iter().all(|g| f.is_zero(gring.eval(g, &x)))
+    });
+    let lms: Vec<u128> = rep.basis.iter().filter_map(GPoly::lm).collect();
+    let pure = |k: usize| {
+        lms.iter().any(|&m| {
+            let fr = f4_fp_tower::free_of(m);
+            f4_fp_tower::mask_of(m) == 0
+                && (0..f4_fp_tower::MAX_FREE).all(|i| (i == k) == (fr[i] > 0))
+        })
+    };
+    let zero_dim = r.inconsistent || (0..ring.n_free).all(pure);
+    let linear = lms
+        .iter()
+        .filter(|&&m| f4_fp_tower::degree_of(m) == 1)
+        .count();
+    let out = Outcome {
+        solving_degree_max: r.solving_degree_max,
+        last_productive_degree: r.last_productive_degree,
+        degree_reached: r.degree_reached,
+        max_cols_to_solution: r.max_cols_to_solution,
+        steps_to_solution: r.steps_to_solution,
+        inconsistent: r.inconsistent,
+        zero_dim,
+        linear,
+        basis_len: rep.basis.len(),
+        steps: r.steps,
+        max_rows: r.max_rows,
+        max_cols: r.max_cols,
+        ms: r.ms,
+        timed_out: r.timed_out || r.oversize,
+        pairs_above_bound: r.pairs_above_bound,
+        staircase_at_stop: r.staircase_at_stop,
+        planted_ok,
+        extra: json!({
+            "engine": "f4_tower_generic",
+            "backend": backend,
+            "builder": "u64",
+            "input_ring_degrees": ring_degrees,
+            "muladds": r.muladds,
+            "max_nnz": r.max_nnz,
+            "max_residual_rows": r.max_residual_rows,
+            "full_rank_exit": full_rank_exit,
+            "rows_skipped_full_rank": r.rows_skipped,
+            "max_dense_entries": r.max_dense_entries,
+            "stopped_step": r.stopped_step,
+            "oversize": r.oversize,
+            "critical_pairs_reduced": r.critical_pairs_reduced,
+            "tower_pairs_reduced": r.tower_pairs_reduced,
+            "pairs_product_skipped": r.pairs_product_skipped,
+            "pairs_chain_skipped": r.pairs_chain_skipped,
+            "reducer_rows": r.reducer_rows,
+        }),
+    };
+    let basis = rep
+        .basis
+        .iter()
+        .map(|g| g.to_rpoly(f))
+        .collect::<Option<Vec<RPoly>>>()
+        .unwrap_or_default();
+    (out, basis)
+}
+
+/// The tower cells on the wide builder (`pkm_tower_wide`): Kummer and the
+/// Dickson torus, the tower control and the null, `t` upward until a whole
+/// cell stops.
+fn run_wide(a: &Args, sink: &mut Sink) {
+    let wa = wide::WArgs {
+        seed: a.seed,
+        planted: a.planted,
+        random: a.random,
+        budget: a.budget,
+        max_nnz: a.max_nnz,
+        max_dense: a.max_dense,
+        full_rank_exit: a.full_rank_exit,
+        trace: a.trace.then_some((
+            print_tower_step as fn(usize, &f4_fp_tower::StepTrace),
+            print_stopped_step as fn(usize, bool, &f4_fp_tower::StepTrace),
+        )),
+        targets: a.targets.clone(),
+        verify: a.verify,
+        label: a.p_label.clone(),
+    };
+    for &kind in &a.kinds {
+        let wk = match kind {
+            Kind::Kummer => wide::WKind::Kummer,
+            Kind::DicksonTorus => wide::WKind::DicksonTorus,
+            other => panic!("the wide builder has no {} tower", other.name()),
+        };
+        for &m in &a.ms {
+            let max_t = match m {
+                2 => a.max_t,
+                3 => a.max_t_m3,
+                _ => a.max_t_m4,
+            };
+            let t_min = if m >= 3 { a.t_min.max(2) } else { a.t_min };
+            for &control in &a.controls {
+                let wc = match control {
+                    Control::Tower => wide::WControl::Tower,
+                    Control::Null if m == 2 || a.null_chain => wide::WControl::Null,
+                    _ => continue,
+                };
+                for t in t_min..=max_t {
+                    let cell = wide::WCell {
+                        kind: wk,
+                        m,
+                        control: wc,
+                        t,
+                    };
+                    let (rows, finished) =
+                        with_backend!(a.backend, &a.p_big, |f| wide::run_cell(&f, &cell, &wa));
+                    for r in rows {
+                        sink.push(r);
+                    }
+                    if !finished {
+                        eprintln!(
+                            "-- {} m={m} {}: every run at t = {t} stopped; stopping",
+                            kind.name(),
+                            control.name()
+                        );
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ── Driver ─────────────────────────────────────────────────────────
+
+struct Args {
+    p: u64,
+    kinds: Vec<Kind>,
+    ms: Vec<usize>,
+    controls: Vec<Control>,
+    t_min: usize,
+    max_t: usize,
+    max_t_m3: usize,
+    max_t_m4: usize,
+    planted: usize,
+    /// Above this `t`, cells run refutations only: a planted system keeps
+    /// processing pairs that reduce to zero long after it is solved, and at
+    /// large `N` that tail, not the solve, exhausts memory.
+    planted_max_t: usize,
+    random: usize,
+    /// `--null-chain`: run the null control at `m ≥ 3` too, with every `S₃`
+    /// link of the chain given random coefficients on its own support (off
+    /// by default, so every committed command line runs what it ran).
+    null_chain: bool,
+    /// `--null-width W` (1..=4): the null control's support is the full box
+    /// of exponents `0..=W` on the equation's own variables, not `S₃`'s
+    /// support (off by default).
+    null_width: Option<usize>,
+    /// `--cover-map square|quad|generic`: the factor base is the image
+    /// `x∘φ(V)` of the tower set under a degree-2 cover map (off by default).
+    cover: Option<CoverKind>,
+    budget: u64,
+    seed: u64,
+    ladder_ts: Vec<usize>,
+    ladder_gs: Vec<usize>,
+    out: Option<String>,
+    /// Stop F4 once at most this many candidate points remain (off by
+    /// default; every committed run was made without it).
+    stop_below: Option<usize>,
+    /// Diagnostic: F4's degree bound for every system, in place of
+    /// `n + d + 6`. With `--dump`, shows what F4 knows at a given degree.
+    cap: Option<u32>,
+    /// Diagnostic: print every basis element of degree at most this, with
+    /// tower variables named `y<summand>_<level>`.
+    dump: Option<u32>,
+    /// The engine: `f4_fp` on the raw system (the default, and every
+    /// committed pilot row), `f4_fp_tower` on the tower quotient ring, or
+    /// the signature-based `sig_fp_tower` on the same ring.
+    engine: Engine,
+    /// `f4_fp_tower` only: stop before a matrix with more non-zeros, or a
+    /// `B'` with more entries.
+    max_nnz: Option<u64>,
+    /// `f4_fp_tower` only: the bound on `B'` alone, in place of `--max-nnz`
+    /// (round 7).
+    max_dense: Option<u64>,
+    /// `f4_fp_tower` only: print one line per F4 step.
+    trace: bool,
+    /// `f4_fp_tower` only: skip a step's remaining S-rows once their
+    /// echelon is full (on unless `--no-full-rank-exit`).
+    full_rank_exit: bool,
+    /// `sig_fp_tower` only: the module and rewrite orders.
+    sig: sig_fp_tower::SigOptions,
+    /// Measure only the targets with these indices (`target_index`). Every
+    /// target and system is still drawn, in order, so each one measured is
+    /// the system a run without the flag gives it.
+    targets: Option<Vec<usize>>,
+    /// The prime as given (`--p` takes a decimal number or `P-192`,
+    /// `P-224`, `P-256`); `p` is it when it fits the `u64` builder
+    /// (`p < 2⁶³`), else 0.
+    p_big: BigUint,
+    /// The prime's label in rows (`--p` as given).
+    p_label: String,
+    /// `--engine generic` only: the backend.
+    backend: Backend,
+    /// `--builder wide`: build the systems over the backend
+    /// (`pkm_tower_wide`), Kummer and torus only; forced above `2⁶³`.
+    wide: bool,
+    /// `--verify`: wide builder only, the exhaustive and `BigUint` checks.
+    verify: bool,
+    /// `--engine hky` only: the closure degrees, and the limits of one
+    /// closure (`--budget` is its time limit).
+    hky_cmin: Option<u32>,
+    hky_cmax: u32,
+    hky_max_cols: u128,
+    hky_max_entries: u64,
+    /// `--hky-progress PATH` (`--engine hky` only): append one JSON line per
+    /// closure `V_{F,c}` to PATH as soon as it is computed, flushed and
+    /// synced, so a run stopped during a later closure keeps every decided
+    /// degree. Resume with `--hky-cmin` at the first undecided degree.
+    hky_progress: Option<String>,
+    /// `--engine hky2` only: the instrument's options; `hky2_sym` asks for
+    /// the split by the swap of the first two towers (proved per system).
+    hky2: FastOptions,
+    hky2_sym: bool,
+    /// `--radix 2^k` (`f4_fp_tower` only): grade every block of `k` tower
+    /// levels with weights `1, 2, …, 2^{k−1}`, the radix-`2^k` presentation
+    /// of the same tower (`TowerWeights`). `k = 1`, radix 2, is the unit
+    /// grading of every committed row.
+    radix_k: u32,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Engine {
+    F4,
+    Tower,
+    Sig,
+    /// `f4_tower_generic`, over the backend `--backend` picks.
+    Generic,
+    /// `hky_fp_tower`: the Huang–Kosters–Yeo closures `V_{F,c}` for
+    /// `c = --hky-cmin … --hky-cmax`, and the first and last fall degree
+    /// read off them (`research/prime_fall_degree_20261027/`). No F4 runs;
+    /// the naive control runs too (free variables only).
+    Hky,
+    /// `hky_fp_tower_fast`: the same closures on the faster instrument
+    /// (`research/hky_engine_speed_20261117/`), `--hky2-level`,
+    /// `--hky2-sym`, `--hky2-batch`, `--hky2-order`.
+    Hky2,
+}
+
+/// The prime-field backend of `--engine generic`. `Auto` picks by the
+/// prime's size: `Fp32` below `2³²`, `Fp52` below `2⁵²` on a CPU with
+/// AVX-512 IFMA, `Fp64` below `2⁶³`, `FpP192` at
+/// NIST P-192, `FpWide<3>` to 192 bits, `Fp224` (`FpWide<4>` with a spare
+/// top bit) to 255 bits, `FpWide<4>` above.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Backend {
+    Auto,
+    Fp32,
+    Fp52,
+    Fp64,
+    Wide1,
+    Wide3,
+    P192,
+    Fp224,
+    Wide4,
+}
+
+fn nist(name: &str) -> Option<BigUint> {
+    let one = BigUint::from(1u32);
+    match name {
+        "P-192" | "p192" => Some((&one << 192u32) - (&one << 64u32) - 1u32),
+        "P-224" | "p224" => Some((&one << 224u32) - (&one << 96u32) + 1u32),
+        "P-256" | "p256" => {
+            Some((&one << 256u32) - (&one << 224u32) + (&one << 192u32) + (&one << 96u32) - 1u32)
+        }
+        _ => None,
+    }
+}
+
+/// Deterministic Miller–Rabin for `n < 2⁶⁴` (the first twelve prime bases).
+fn is_prime_u64(n: u64) -> bool {
+    if n < 2 {
+        return false;
+    }
+    const BASES: [u64; 12] = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37];
+    for q in BASES {
+        if n.is_multiple_of(q) {
+            return n == q;
+        }
+    }
+    let mulm = |a: u64, b: u64| ((u128::from(a) * u128::from(b)) % u128::from(n)) as u64;
+    let powm = |mut a: u64, mut e: u64| {
+        let mut r = 1u64;
+        while e > 0 {
+            if e & 1 == 1 {
+                r = mulm(r, a);
+            }
+            a = mulm(a, a);
+            e >>= 1;
+        }
+        r
+    };
+    let s = (n - 1).trailing_zeros();
+    let d = (n - 1) >> s;
+    'bases: for a in BASES {
+        let mut x = powm(a, d);
+        if x == 1 || x == n - 1 {
+            continue;
+        }
+        for _ in 1..s {
+            x = mulm(x, x);
+            if x == n - 1 {
+                continue 'bases;
+            }
+        }
+        return false;
+    }
+    true
+}
+
+/// `proth:K`: the smallest prime `c·2^K + 1` with `c` odd (so
+/// `v₂(p − 1) = K` exactly), for `K ≤ 61`.
+fn proth(spec: &str) -> Option<BigUint> {
+    let k: u32 = spec.strip_prefix("proth:")?.parse().ok()?;
+    assert!((2..=61).contains(&k), "proth:K needs 2 <= K <= 61");
+    (1u64..)
+        .step_by(2)
+        .map(|c| (c << k) + 1)
+        .take_while(|&p| p < 1 << 63)
+        .find(|&p| is_prime_u64(p))
+        .map(BigUint::from)
+}
+
+fn resolve_backend(b: Backend, p: &BigUint) -> Backend {
+    if b != Backend::Auto {
+        return b;
+    }
+    let bits = p.bits();
+    if bits <= 32 {
+        Backend::Fp32
+    } else if bits <= 52 && Fp52::new(u64::try_from(p).unwrap()).uses_ifma() {
+        Backend::Fp52
+    } else if bits <= 63 {
+        Backend::Fp64
+    } else if Some(p) == nist("P-192").as_ref() {
+        Backend::P192
+    } else if bits <= 192 {
+        Backend::Wide3
+    } else if p < &((BigUint::from((1u64 << 63) - 1)) << 192u32) {
+        Backend::Fp224
+    } else {
+        Backend::Wide4
+    }
+}
+
+/// Rows as they are measured: every row reaches `--out` and is flushed
+/// before the next system is built, so a run that exhausts memory on a
+/// large cell keeps every cell before it.
+struct Sink {
+    rows: Vec<Value>,
+    file: Option<File>,
+}
+
+impl Sink {
+    fn push(&mut self, row: Value) {
+        if let Some(f) = self.file.as_mut() {
+            writeln!(f, "{row}").expect("write --out");
+            f.flush().expect("flush --out");
+        }
+        self.rows.push(row);
+    }
+}
+
+fn parse_args() -> Args {
+    let mut a = Args {
+        p: 786_433, // 3·2^18 + 1, so 2^t | p − 1 for every t ≤ 18
+        kinds: vec![Kind::Kummer, Kind::Dickson, Kind::Isogeny],
+        ms: vec![2, 3],
+        controls: vec![Control::Tower, Control::Null, Control::Naive],
+        t_min: 1,
+        max_t: 10,
+        max_t_m3: 5,
+        max_t_m4: 3,
+        planted: 3,
+        planted_max_t: usize::MAX,
+        random: 3,
+        null_chain: false,
+        null_width: None,
+        cover: None,
+        budget: 60,
+        seed: 0x504B_4D54,
+        ladder_ts: vec![4, 6],
+        ladder_gs: vec![1, 2, 4, 8],
+        out: None,
+        stop_below: None,
+        cap: None,
+        dump: None,
+        engine: Engine::F4,
+        max_nnz: None,
+        max_dense: None,
+        trace: false,
+        full_rank_exit: true,
+        sig: sig_fp_tower::SigOptions::default(),
+        targets: None,
+        p_big: BigUint::from(786_433u32),
+        p_label: "786433".into(),
+        backend: Backend::Auto,
+        wide: false,
+        verify: false,
+        hky_cmin: None,
+        hky_cmax: 6,
+        hky_progress: None,
+        hky2: FastOptions::default(),
+        hky2_sym: true,
+        hky_max_cols: 2_000_000,
+        hky_max_entries: 600_000_000,
+        radix_k: 1,
+    };
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    let list = |s: &str| -> Vec<usize> {
+        if s == "none" {
+            return Vec::new();
+        }
+        s.split(',').map(|x| x.parse().expect("a number")).collect()
+    };
+    let mut i = 0;
+    while i < args.len() {
+        if args[i] == "--trace" {
+            a.trace = true;
+            i += 1;
+            continue;
+        }
+        if args[i] == "--null-chain" {
+            a.null_chain = true;
+            i += 1;
+            continue;
+        }
+        if args[i] == "--no-full-rank-exit" {
+            a.full_rank_exit = false;
+            i += 1;
+            continue;
+        }
+        if args[i] == "--verify" {
+            a.verify = true;
+            i += 1;
+            continue;
+        }
+        let v = args.get(i + 1).cloned().unwrap_or_default();
+        match args[i].as_str() {
+            "--p" => {
+                a.p_big = nist(&v)
+                    .or_else(|| proth(&v))
+                    .unwrap_or_else(|| v.parse().expect("--p"));
+                a.p_label = v.clone();
+                a.p = u64::try_from(&a.p_big)
+                    .ok()
+                    .filter(|&p| p < 1 << 63)
+                    .unwrap_or(0);
+            }
+            "--backend" => {
+                a.backend = match v.as_str() {
+                    "auto" => Backend::Auto,
+                    "fp32" => Backend::Fp32,
+                    "fp64" => Backend::Fp64,
+                    "fp52" => Backend::Fp52,
+                    "wide1" => Backend::Wide1,
+                    "wide3" => Backend::Wide3,
+                    "p192" => Backend::P192,
+                    "fp224" => Backend::Fp224,
+                    "wide4" => Backend::Wide4,
+                    other => panic!("unknown backend `{other}`"),
+                }
+            }
+            "--builder" => {
+                a.wide = match v.as_str() {
+                    "wide" => true,
+                    "u64" => false,
+                    other => panic!("unknown builder `{other}`"),
+                }
+            }
+            "--kinds" => {
+                a.kinds = v
+                    .split(',')
+                    .map(|k| match k {
+                        "kummer" => Kind::Kummer,
+                        "dickson" => Kind::Dickson,
+                        "isogeny" => Kind::Isogeny,
+                        "dickson-torus" => Kind::DicksonTorus,
+                        other => panic!("unknown kind `{other}`"),
+                    })
+                    .collect()
+            }
+            "--aux-order" => match v.as_str() {
+                "naive" => AUX_ORDER_MESTRE.store(false, std::sync::atomic::Ordering::Relaxed),
+                "mestre" => AUX_ORDER_MESTRE.store(true, std::sync::atomic::Ordering::Relaxed),
+                other => panic!("unknown --aux-order `{other}` (naive, mestre)"),
+            },
+            "--m" => a.ms = list(&v),
+            "--cover-map" => {
+                a.cover = Some(match v.as_str() {
+                    "square" => CoverKind::Square,
+                    "quad" => CoverKind::Quad,
+                    "generic" => CoverKind::Generic,
+                    "fourth" => CoverKind::Fourth,
+                    "cubic" => CoverKind::Cubic,
+                    "quart" => CoverKind::Quart,
+                    "generic3" => CoverKind::Generic3,
+                    other => panic!(
+                        "unknown --cover-map `{other}` \
+                         (square, quad, generic, fourth, cubic, quart, generic3)"
+                    ),
+                })
+            }
+            "--controls" => {
+                a.controls = v
+                    .split(',')
+                    .map(|c| match c {
+                        "tower" => Control::Tower,
+                        "null" => Control::Null,
+                        "naive" => Control::Naive,
+                        "multiples" => Control::Multiples,
+                        "randbase" => Control::RandBase,
+                        other => panic!("unknown control `{other}` (the ladder has its own flags)"),
+                    })
+                    .collect()
+            }
+            "--t-min" => a.t_min = v.parse().expect("--t-min"),
+            "--max-t" => a.max_t = v.parse().expect("--max-t"),
+            "--max-t-m3" => a.max_t_m3 = v.parse().expect("--max-t-m3"),
+            "--max-t-m4" => a.max_t_m4 = v.parse().expect("--max-t-m4"),
+            "--planted" => a.planted = v.parse().expect("--planted"),
+            "--planted-max-t" => a.planted_max_t = v.parse().expect("--planted-max-t"),
+            "--random" => a.random = v.parse().expect("--random"),
+            "--budget" => a.budget = v.parse().expect("--budget"),
+            "--seed" => a.seed = v.parse().expect("--seed"),
+            "--ladder-t" => a.ladder_ts = list(&v),
+            "--ladder-g" => a.ladder_gs = list(&v),
+            "--out" => a.out = Some(v),
+            "--stop-below" => a.stop_below = Some(v.parse().expect("--stop-below")),
+            "--cap" => a.cap = Some(v.parse().expect("--cap")),
+            "--engine" => {
+                a.engine = match v.as_str() {
+                    "f4" | "f4_fp" => Engine::F4,
+                    "tower" | "f4_fp_tower" => Engine::Tower,
+                    "sig" | "f4_fp_tower_sig" => Engine::Sig,
+                    "generic" | "f4_tower_generic" => Engine::Generic,
+                    "hky" | "hky_fp_tower" => Engine::Hky,
+                    "hky2" | "hky_fp_tower_fast" => Engine::Hky2,
+                    other => panic!("unknown engine `{other}`"),
+                }
+            }
+            "--max-nnz" => a.max_nnz = Some(v.parse().expect("--max-nnz")),
+            "--max-dense" => a.max_dense = Some(v.parse().expect("--max-dense")),
+            "--null-width" => {
+                let w: usize = v.parse().expect("--null-width");
+                assert!((1..=4).contains(&w), "--null-width must be 1..=4");
+                a.null_width = Some(w);
+            }
+            "--radix" => {
+                let r: u32 = v.parse().expect("--radix");
+                assert!(
+                    [2, 4, 8, 16].contains(&r),
+                    "--radix must be 2, 4, 8 or 16 (a radix-2^k grading of the binary tower)"
+                );
+                a.radix_k = r.trailing_zeros();
+            }
+            "--hky-cmin" => a.hky_cmin = Some(v.parse().expect("--hky-cmin")),
+            "--hky-progress" => a.hky_progress = Some(v.clone()),
+            "--hky-cmax" => a.hky_cmax = v.parse().expect("--hky-cmax"),
+            "--hky2-level" => a.hky2.level = v.parse().expect("--hky2-level"),
+            "--hky2-batch" => a.hky2.batch = v.parse().expect("--hky2-batch"),
+            "--hky2-sparse-width" => a.hky2.sparse_width = v.parse().expect("--hky2-sparse-width"),
+            "--hky2-lead-only" => a.hky2.lead_only = v == "on",
+            "--hky2-fault" => a.hky2.fault = v.parse().expect("--hky2-fault"),
+            "--hky2-dense" => {
+                let (n, d) = v.split_once('/').expect("--hky2-dense NUM/DEN");
+                a.hky2.dense_num = n.parse().expect("--hky2-dense");
+                a.hky2.dense_den = d.parse().expect("--hky2-dense");
+            }
+            "--hky2-sym" => {
+                a.hky2_sym = match v.as_str() {
+                    "on" => true,
+                    "off" => false,
+                    other => panic!("--hky2-sym on|off, not `{other}`"),
+                }
+            }
+            "--hky2-order" => {
+                a.hky2.order = match v.as_str() {
+                    "lifo" => QueueOrder::Lifo,
+                    "low-degree-first" => QueueOrder::LowDegreeFirst,
+                    "sparse-first" => QueueOrder::SparseFirst,
+                    other => panic!("--hky2-order lifo|low-degree-first, not `{other}`"),
+                }
+            }
+            "--hky-max-cols" => a.hky_max_cols = v.parse().expect("--hky-max-cols"),
+            "--hky-max-entries" => a.hky_max_entries = v.parse().expect("--hky-max-entries"),
+            "--sig-order" => {
+                a.sig.order = match v.as_str() {
+                    "pot" => sig_fp_tower::ModuleOrder::PositionFirst,
+                    "degree" => sig_fp_tower::ModuleOrder::DegreeFirst,
+                    other => panic!("unknown --sig-order `{other}`"),
+                }
+            }
+            "--sig-rewrite" => {
+                a.sig.rewrite = match v.as_str() {
+                    "ratio" => sig_fp_tower::Rewrite::Ratio,
+                    "insertion" => sig_fp_tower::Rewrite::Insertion,
+                    other => panic!("unknown --sig-rewrite `{other}`"),
+                }
+            }
+            "--sig-steps" => {
+                a.sig.steps = match v.as_str() {
+                    "sugar" => sig_fp_tower::Steps::SignatureDegree,
+                    "signature" => sig_fp_tower::Steps::OneSignature,
+                    "degree" => sig_fp_tower::Steps::PolynomialDegree,
+                    other => panic!("unknown --sig-steps `{other}`"),
+                }
+            }
+            "--dump" => a.dump = Some(v.parse().expect("--dump")),
+            "--targets" => a.targets = Some(list(&v)),
+            other => panic!("unknown flag `{other}`"),
+        }
+        i += 2;
+    }
+    if a.radix_k > 1 {
+        assert!(
+            a.engine == Engine::Tower,
+            "--radix grades the f4_fp_tower engine only (--engine tower)"
+        );
+        assert!(
+            a.kinds
+                .iter()
+                .all(|k| matches!(k, Kind::Kummer | Kind::Dickson | Kind::DicksonTorus)),
+            "--radix needs towers without a y_j·y_next term (kummer, dickson, dickson-torus): \
+             an isogeny step's leading monomial would change"
+        );
+    }
+    if a.cover.is_some() {
+        assert!(
+            a.engine == Engine::F4,
+            "--cover-map runs under --engine f4 only: the tower engines rewrite \
+             the summation by the tower, which no longer starts at x"
+        );
+        assert!(
+            !a.controls
+                .iter()
+                .any(|c| matches!(c, Control::Naive | Control::Multiples)),
+            "--cover-map takes the tower, null and randbase controls"
+        );
+        // The generator-count ladder is not written for cover bases.
+        a.ladder_ts.clear();
+    }
+    if a.p == 0 {
+        // Above 2^63 only the wide builder holds the prime.
+        a.wide = true;
+    }
+    if a.wide {
+        assert!(
+            matches!(a.engine, Engine::Generic),
+            "the wide builder runs `--engine generic` only"
+        );
+    }
+    a
+}
+
+/// A target curve over `F_p` on which at least `need` abscissae of `V`
+/// carry points.
+fn target_curve(p: u64, tower: &Tower, need: usize, rng: &mut StdRng) -> (PrimeCurve, Vec<u64>) {
+    loop {
+        let a = rng.gen_range(0..p);
+        let b = rng.gen_range(1..p);
+        if !nonsingular(a, b, p) {
+            continue;
+        }
+        let curve = PrimeCurve { p, a, b };
+        if let Some(cv) = &tower.cover {
+            // `on` holds the u of V whose image x∘φ(u) carries a point; the
+            // cover must be a smooth curve (h squarefree).
+            if cv.genus(a, b, p).is_none() {
+                continue;
+            }
+            let on: Vec<u64> = tower
+                .v
+                .iter()
+                .copied()
+                .filter(|&u| {
+                    cv.eval(u, p)
+                        .is_some_and(|x| curve.legendre(curve.rhs(x)) == 1)
+                })
+                .collect();
+            let distinct = cv.image(&on, p).len();
+            if distinct >= need {
+                return (curve, on);
+            }
+            continue;
+        }
+        let on: Vec<u64> = tower
+            .v
+            .iter()
+            .copied()
+            .filter(|&x| curve.legendre(curve.rhs(x)) == 1)
+            .collect();
+        if on.len() >= need {
+            return (curve, on);
+        }
+    }
+}
+
+struct Cell {
+    kind: Kind,
+    m: usize,
+    control: Control,
+    t: usize,
+    g: usize,
+}
+
+fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
+    let p = a.p;
+    let cell_seed = a.seed
+        ^ ((cell.kind as u64) << 40)
+        ^ ((cell.m as u64) << 32)
+        ^ ((cell.t as u64) << 16)
+        ^ (cell.g as u64);
+    let mut rng = StdRng::seed_from_u64(cell_seed);
+    let mut tower = build_tower(cell.kind, p, cell.t, &mut rng);
+    if let Some(kind) = a.cover {
+        // Drawn after the tower, so no draw of a run without the flag moves.
+        tower.cover = Some(CoverMap::draw(kind, p, &mut rng));
+    }
+    // A cell with planted targets needs m distinct base abscissae on the
+    // curve. Random targets need none beyond two. Capping the requirement
+    // at |V| changes nothing for a cell that could be drawn before
+    // (`m ≤ |V|`), and stops the search from looping when `m > |V|`
+    // (research/prime_fall_degree_20261027, Amendment 4).
+    let need = if a.planted == 0 && cell.control != Control::Ladder {
+        cell.m.max(2).min(tower.v.len())
+    } else {
+        cell.m.max(2)
+    };
+    let (curve, on) = target_curve(p, &tower, need, &mut rng);
+    let mut targets = Vec::new();
+    let planted = if cell.t > a.planted_max_t && cell.control != Control::Ladder {
+        0
+    } else {
+        a.planted
+    };
+    while targets.len() < planted {
+        if let Some(tg) = plant(&curve, &tower, cell.m, &on, &mut rng) {
+            targets.push(tg);
+        }
+    }
+    if cell.control != Control::Ladder {
+        for _ in 0..a.random {
+            targets.push(random_target(&curve, &mut rng));
+        }
+    }
+    let mut any_finished = false;
+    for (k, target) in targets.iter().enumerate() {
+        let (eqs, n, sol, towers) = system(
+            cell.control,
+            &tower,
+            &curve,
+            cell.m,
+            target,
+            cell.g,
+            a.null_width,
+            &mut rng,
+        );
+        if !matches!(a.engine, Engine::F4 | Engine::Hky | Engine::Hky2)
+            && cell.control == Control::Naive
+        {
+            // The naive control has no tower to rewrite by.
+            continue;
+        }
+        if cell.control == Control::Multiples
+            && !matches!(a.engine, Engine::F4 | Engine::Hky | Engine::Hky2)
+        {
+            // The extra free variables u'_k are not in the tower engines' rings.
+            eprintln!(
+                "-- multiples runs under --engine f4 and --engine hky only; skipping {} m={} t={}",
+                cell.kind.name(),
+                cell.m,
+                cell.t
+            );
+            continue;
+        }
+        if a.targets.as_ref().is_some_and(|ts| !ts.contains(&k)) {
+            continue;
+        }
+        let d_in: Vec<u32> = eqs.iter().map(Pol::degree).collect();
+        let d_max = d_in.iter().copied().max().unwrap_or(1);
+        let max_degree = match (a.cap, cell.control) {
+            (Some(cap), _) => cap,
+            (None, Control::Naive) => 2 * d_max + 8,
+            (None, _) => n as u32 + d_max + 6,
+        };
+        let started = Instant::now();
+        let (r, basis) = match a.engine {
+            Engine::F4 => {
+                let m = measure(
+                    &eqs,
+                    n,
+                    p,
+                    sol.as_deref(),
+                    max_degree,
+                    Duration::from_secs(a.budget),
+                    a.stop_below,
+                );
+                let out = Outcome::from_f4(&m);
+                (out, Dumpable::Raw(m.report.basis))
+            }
+            Engine::Generic => {
+                let ring = tower_ring(&tower, cell.m, p);
+                let (out, basis) = with_backend!(a.backend, &a.p_big, |f| measure_generic(
+                    f,
+                    &eqs,
+                    towers,
+                    &ring,
+                    sol.as_deref(),
+                    max_degree,
+                    Duration::from_secs(a.budget),
+                    a.max_nnz,
+                    a.max_dense,
+                    a.trace,
+                    a.full_rank_exit,
+                ));
+                (out, Dumpable::Ring(basis))
+            }
+            Engine::Hky | Engine::Hky2 => {
+                let out = measure_hky(&eqs, &tower, cell, k, n, p, sol.as_deref(), a);
+                (out, Dumpable::Raw(Vec::new()))
+            }
+            Engine::Tower | Engine::Sig => {
+                let ring = tower_ring(&tower, cell.m, p);
+                let (out, basis) = measure_tower(
+                    &eqs,
+                    towers,
+                    &ring,
+                    sol.as_deref(),
+                    max_degree,
+                    Duration::from_secs(a.budget),
+                    a.stop_below,
+                    a.max_nnz,
+                    a.max_dense,
+                    a.trace,
+                    a.full_rank_exit,
+                    (a.engine == Engine::Sig).then_some(a.sig),
+                    TowerWeights::radix_blocks(cell.m, cell.t, a.radix_k),
+                );
+                (out, Dumpable::Ring(basis))
+            }
+        };
+        let wall = started.elapsed().as_secs_f64();
+        if !r.timed_out {
+            any_finished = true;
+        }
+        let mut row = json!({
+            "kind": cell.kind.name(),
+            "m": cell.m,
+            "control": cell.control.name(),
+            "t": cell.t,
+            "N": cell.m * cell.t,
+            // The grading's radix, `2^k` (`--radix`); 2 is the unit grading
+            // of every row before it.
+            "radix": 1u32 << a.radix_k,
+            "g": cell.g,
+            "n_vars": n,
+            "n_equations": eqs.len(),
+            "input_degrees": d_in,
+            "target": if target.planted { "planted" } else { "random" },
+            "target_index": k,
+            "x_r": target.x_r,
+            "p": p,
+            "curve": {"a": curve.a, "b": curve.b},
+            "tower": tower.info,
+            "max_degree_bound": max_degree,
+            "solving_degree_max": r.solving_degree_max,
+            "last_productive_degree": r.last_productive_degree,
+            "degree_reached": r.degree_reached,
+            "max_cols_to_solution": r.max_cols_to_solution,
+            "steps_to_solution": r.steps_to_solution,
+            "inconsistent": r.inconsistent,
+            "zero_dim": r.zero_dim,
+            "linear_basis_elements": r.linear,
+            "basis_len": r.basis_len,
+            "steps": r.steps,
+            "max_rows": r.max_rows,
+            "max_cols": r.max_cols,
+            "ms": r.ms,
+            "wall_s": wall,
+            "timed_out": r.timed_out,
+            "pairs_above_bound": r.pairs_above_bound,
+            "staircase_at_stop": r.staircase_at_stop,
+            "planted_ok": r.planted_ok,
+        });
+        if let Some(w) = a.null_width {
+            row["null_width"] = json!(w);
+        }
+        if let Some(cv) = &tower.cover {
+            row["cover"] = json!({
+                "map": cv.kind.name(),
+                "num": upoly_trim(cv.num.to_vec()),
+                "den": upoly_trim(cv.den.to_vec()),
+                "genus": cv.genus(curve.a, curve.b, p),
+                "h_degree": cv.h(curve.a, curve.b, p).len() - 1,
+                "base_size": cv.image(&tower.v, p).len(),
+                "base_on_curve": cv.image(&on, p).len(),
+            });
+        }
+        if cell.control == Control::Multiples {
+            row["multiples"] = json!(2);
+            row["appended"] = json!(multiples_appended(cell.m));
+        }
+        if let (Some(obj), Some(extra)) = (row.as_object_mut(), r.extra.as_object()) {
+            for (k, v) in extra {
+                obj.insert(k.clone(), v.clone());
+            }
+            if matches!(a.engine, Engine::Hky | Engine::Hky2) {
+                // No F4 ran: keep only the fields the closure measured.
+                for k in [
+                    "solving_degree_max",
+                    "last_productive_degree",
+                    "degree_reached",
+                    "max_cols_to_solution",
+                    "steps_to_solution",
+                    "inconsistent",
+                    "zero_dim",
+                    "linear_basis_elements",
+                    "basis_len",
+                    "steps",
+                    "max_rows",
+                    "max_cols",
+                    "pairs_above_bound",
+                    "staircase_at_stop",
+                ] {
+                    obj.remove(k);
+                }
+            }
+        }
+        eprintln!(
+            "{:8} m={} {:6} t={:2} N={:2} g={:2} {:7} Dmax={:3} reached={:3} cols_to_sol={:7} cols={:7} {:8.1} ms{}{}",
+            cell.kind.name(),
+            cell.m,
+            cell.control.name(),
+            cell.t,
+            cell.m * cell.t,
+            cell.g,
+            if target.planted { "planted" } else { "random" },
+            r.solving_degree_max,
+            r.degree_reached,
+            r.max_cols_to_solution,
+            r.max_cols,
+            r.ms,
+            if r.timed_out { "  TIMEOUT" } else { "" },
+            if r.planted_ok == Some(false) {
+                "  PLANTED-VIOLATION"
+            } else {
+                ""
+            },
+        );
+        if let Some(k) = a.dump {
+            match &basis {
+                Dumpable::Raw(b) => dump_basis(b, cell, k),
+                Dumpable::Ring(b) => dump_ring_basis(b, cell, k),
+            }
+        }
+        sink.push(row);
+    }
+    any_finished
+}
+
+/// A basis to print with `--dump`, from either engine.
+enum Dumpable {
+    Raw(Vec<Poly>),
+    Ring(Vec<RPoly>),
+}
+
+/// `dump_basis` for a basis in the tower ring: the monomials are masks of
+/// tower variables and free exponents.
+fn dump_ring_basis(basis: &[RPoly], cell: &Cell, k: u32) {
+    let as_raw: Vec<Poly> = basis
+        .iter()
+        .map(|f| {
+            f.monos
+                .iter()
+                .zip(&f.coefs)
+                .map(|(&m, &c)| {
+                    let n_t = cell.m * cell.t;
+                    let mut e = vec![0u32; n_t + cell.m.saturating_sub(2)];
+                    let mask = f4_fp_tower::mask_of(m);
+                    for (j, x) in e.iter_mut().enumerate().take(n_t) {
+                        *x = ((mask >> j) & 1) as u32;
+                    }
+                    let fr = f4_fp_tower::free_of(m);
+                    for k2 in 0..cell.m.saturating_sub(2) {
+                        e[n_t + k2] = u32::from(fr[k2]);
+                    }
+                    (e, u64::from(c))
+                })
+                .collect()
+        })
+        .collect();
+    dump_basis(&as_raw, cell, k);
+}
+
+/// Print the basis elements of degree at most `k`, low degree first, with
+/// tower variables named `y<summand>_<level>` and the chain unknowns
+/// `u<k>`.
+fn dump_basis(basis: &[Poly], cell: &Cell, k: u32) {
+    let name = |v: usize| -> String {
+        if cell.control == Control::Naive {
+            format!("x{v}")
+        } else if v >= cell.m * cell.t {
+            format!("u{}", v - cell.m * cell.t)
+        } else {
+            format!("y{}_{}", v / cell.t, v % cell.t)
+        }
+    };
+    let degree = |f: &Poly| {
+        f.iter()
+            .map(|(e, _)| e.iter().sum::<u32>())
+            .max()
+            .unwrap_or(0)
+    };
+    let mut low: Vec<&Poly> = basis.iter().filter(|f| degree(f) <= k).collect();
+    low.sort_by_key(|f| degree(f));
+    for f in low {
+        let terms: Vec<String> = f
+            .iter()
+            .map(|(e, c)| {
+                let mon: Vec<String> = e
+                    .iter()
+                    .enumerate()
+                    .filter(|&(_, &x)| x > 0)
+                    .map(|(v, &x)| {
+                        if x == 1 {
+                            name(v)
+                        } else {
+                            format!("{}^{x}", name(v))
+                        }
+                    })
+                    .collect();
+                if mon.is_empty() {
+                    c.to_string()
+                } else {
+                    format!("{c}·{}", mon.join("·"))
+                }
+            })
+            .collect();
+        eprintln!("  [deg {}] {}", degree(f), terms.join(" + "));
+    }
+}
+
+/// `--export-magma-rows`: one Magma script per distinct committed Kummer
+/// `tower` row, and one JSON line per script with the row's own F4 result.
+fn export_magma_rows(files: &[String], dir: &str) {
+    std::fs::create_dir_all(dir).expect("create --export-dir");
+    let mut seen = std::collections::BTreeSet::new();
+    for path in files {
+        let text = std::fs::read_to_string(path).expect("read a rows file");
+        for line in text.lines().filter(|l| !l.trim().is_empty()) {
+            let r: Value = serde_json::from_str(line).expect("a JSON row");
+            if r["kind"] != "kummer" || r["control"] != "tower" {
+                continue;
+            }
+            let u = |k: &str| r[k].as_u64().unwrap_or_else(|| panic!("{path}: no {k}"));
+            let (p, m, t, x_r) = (u("p"), u("m") as usize, u("t") as usize, u("x_r"));
+            let (ca, cb) = (
+                r["curve"]["a"].as_u64().unwrap(),
+                r["curve"]["b"].as_u64().unwrap(),
+            );
+            let g = r["tower"]["g"].as_u64().expect("tower.g");
+            if !seen.insert((p, m, t, x_r, g, ca, cb)) {
+                continue;
+            }
+            let tower = Tower {
+                kind: Kind::Kummer,
+                t,
+                v: Vec::new(),
+                scale: g,
+                steps: vec![Step::Square; t],
+                c: 1,
+                info: r["tower"].clone(),
+                cover: None,
+            };
+            let curve = PrimeCurve { p, a: ca, b: cb };
+            let target = Target {
+                planted: false,
+                x_r,
+                solution: None,
+                xs: Vec::new(),
+            };
+            let mut rng = StdRng::seed_from_u64(0);
+            let (eqs, n, _, _) = system(
+                Control::Tower,
+                &tower,
+                &curve,
+                m,
+                &target,
+                1,
+                None,
+                &mut rng,
+            );
+            let name = format!("pkm_kummer_p{p}_m{m}_t{t}_x{x_r}");
+            let mut names: Vec<String> = Vec::new();
+            for i in 0..m {
+                for j in 0..t {
+                    names.push(format!("y{i}_{j}"));
+                }
+            }
+            for k in 0..m.saturating_sub(2) {
+                names.push(format!("u{k}"));
+            }
+            assert_eq!(names.len(), n);
+            let mut out = format!(
+                "// {name}: PKM's Kummer tower system (m = {m}, t = {t}, N = {}, {n} unknowns, {} equations)\n\
+                 // from {path}; written by examples/pkm_tower_pilot.rs --export-magma-rows.\n\
+                 // Ours (that row): engine {}, {} ms, inconsistent = {}, timed out = {}.\n\
+                 K := GF({p});\nP := PolynomialRing(K, {n}, \"grevlex\");\nAssignNames(~P, [{}]);\nF := [P |\n",
+                m * t,
+                eqs.len(),
+                r["engine"].as_str().unwrap_or("f4_fp"),
+                r["ms"],
+                r["inconsistent"],
+                r["timed_out"],
+                names.iter().map(|s| format!("\"{s}\"")).collect::<Vec<_>>().join(", ")
+            );
+            let polys: Vec<String> = eqs
+                .iter()
+                .map(|f| {
+                    let ts: Vec<String> = f
+                        .terms
+                        .iter()
+                        .map(|(e, c)| {
+                            let mut t = c.to_string();
+                            for (i, &k) in e.iter().enumerate() {
+                                if k == 1 {
+                                    t.push_str(&format!("*P.{}", i + 1));
+                                } else if k > 1 {
+                                    t.push_str(&format!("*P.{}^{k}", i + 1));
+                                }
+                            }
+                            t
+                        })
+                        .collect();
+                    format!("  {}", ts.join(" + "))
+                })
+                .collect();
+            out.push_str(&polys.join(",\n"));
+            out.push_str(&format!(
+                "\n];\nI := ideal<P | F>;\n\
+                 t0 := Cputime(); G := GroebnerBasis(I); tg := Cputime(t0);\n\
+                 unit := G eq [P | 1];\n\
+                 printf \"RESULT-GB name={name} p={p} magma_gb_s=%o basis_len=%o unit=%o ours_inconsistent={}\\n\", tg, #G, unit;\n\
+                 if not unit and Dimension(I) eq 0 then\n\
+                 \x20 t1 := Cputime(); V := Variety(I); printf \"RESULT-VAR name={name} magma_variety_s=%o magma_solutions=%o\\n\", Cputime(t1), #V;\n\
+                 end if;\n",
+                r["inconsistent"]
+            ));
+            let file = format!("{dir}/{name}.magma");
+            std::fs::write(&file, &out).expect("write a Magma script");
+            println!(
+                "{}",
+                json!({"name": name, "row_file": path, "p": p, "m": m, "t": t, "N": m * t, "x_r": x_r,
+                       "ours_engine": r["engine"], "ours_ms": r["ms"], "ours_muladds": r["muladds"],
+                       "ours_inconsistent": r["inconsistent"], "ours_timed_out": r["timed_out"],
+                       "script_bytes": out.len()})
+            );
+        }
+    }
+}
+
+/// `--aux-search FILE`: the auxiliary-curve search of `isogeny_with`
+/// alone, under `--aux-order mestre`.  Each input line is `p t seed`; each
+/// output line (stdout, JSONL) is the curve found, the curves tried, and
+/// the group operations of the search and of the Vélu chain.
+fn aux_search(path: &str) {
+    AUX_SEARCH_STATS.store(true, std::sync::atomic::Ordering::Relaxed);
+    let text = std::fs::read_to_string(path).expect("read --aux-search file");
+    for line in text
+        .lines()
+        .filter(|l| !l.trim().is_empty() && !l.starts_with('#'))
+    {
+        let f: Vec<u64> = line
+            .split_whitespace()
+            .map(|x| {
+                if let Some(h) = x.strip_prefix("0x") {
+                    u64::from_str_radix(h, 16).expect("hex")
+                } else {
+                    x.parse().expect("integer")
+                }
+            })
+            .collect();
+        let (p, t, seed) = (f[0], f[1] as usize, f[2]);
+        let started = Instant::now();
+        let tower = isogeny_with(p, t, &mut StdRng::seed_from_u64(seed), AuxOrder::Mestre);
+        let mut info = tower.info.clone();
+        if let Some(o) = info.as_object_mut() {
+            o.remove("v");
+        }
+        println!(
+            "{}",
+            json!({"p": p, "t": t, "seed": seed, "ms": started.elapsed().as_secs_f64() * 1e3, "info": info})
+        );
+    }
+}
+
+fn main() {
+    let argv: Vec<String> = std::env::args().collect();
+    if let Some(i) = argv.iter().position(|x| x == "--export-magma-rows") {
+        let files: Vec<String> = argv[i + 1].split(',').map(String::from).collect();
+        let j = argv
+            .iter()
+            .position(|x| x == "--export-dir")
+            .expect("--export-dir");
+        export_magma_rows(&files, &argv[j + 1]);
+        return;
+    }
+    if let Some(i) = argv.iter().position(|x| x == "--aux-search") {
+        aux_search(&argv[i + 1]);
+        return;
+    }
+    let a = parse_args();
+    let started = Instant::now();
+    let mut sink = Sink {
+        rows: Vec::new(),
+        file: a
+            .out
+            .as_ref()
+            .map(|path| File::create(path).expect("create --out")),
+    };
+    if a.wide {
+        run_wide(&a, &mut sink);
+    }
+    // The tower systems and their naive and null controls, t upward until
+    // a whole cell times out.
+    for &kind in a.kinds.iter().filter(|_| !a.wide) {
+        for &m in &a.ms {
+            let max_t = match m {
+                2 => a.max_t,
+                3 => a.max_t_m3,
+                _ => a.max_t_m4,
+            };
+            // The naive control is written for m = 2 and the Kummer coset
+            // only; the null for m = 2, and for every m with `--null-chain`.
+            let controls: Vec<Control> = a
+                .controls
+                .iter()
+                .copied()
+                .filter(|c| match c {
+                    Control::Tower => true,
+                    Control::Null => m == 2 || a.null_chain,
+                    Control::Naive => m == 2 && kind == Kind::Kummer,
+                    Control::Multiples => true,
+                    Control::RandBase => m == 2,
+                    Control::Ladder => false,
+                })
+                .collect();
+            // m ≥ 3 needs m distinct base abscissae, so |V| = 2^t ≥ 4.
+            let t_min = if m >= 3 { a.t_min.max(2) } else { a.t_min };
+            for control in controls {
+                for t in t_min..=max_t {
+                    let cell = Cell {
+                        kind,
+                        m,
+                        control,
+                        t,
+                        g: 1,
+                    };
+                    if !run_cell(&cell, &a, &mut sink) {
+                        eprintln!(
+                            "-- {} m={m} {}: every run at t = {t} timed out; stopping",
+                            kind.name(),
+                            control.name()
+                        );
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    // The generator-count ladder, on planted targets.
+    for &kind in a.kinds.iter().filter(|_| !a.wide) {
+        for &t in &a.ladder_ts {
+            for &g in &a.ladder_gs {
+                let cell = Cell {
+                    kind,
+                    m: 2,
+                    control: Control::Ladder,
+                    t,
+                    g,
+                };
+                run_cell(&cell, &a, &mut sink);
+            }
+        }
+    }
+    let rows = &sink.rows;
+    let summary = json!({
+        "p": if a.p != 0 { json!(a.p) } else { json!(a.p_label) },
+        "budget_seconds": a.budget,
+        "seed": a.seed,
+        "planted_per_cell": a.planted,
+        "random_per_cell": a.random,
+        "wall_seconds": started.elapsed().as_secs_f64(),
+        "rows": rows.len(),
+        "planted_violations": rows.iter().filter(|r| r["planted_ok"] == json!(false)).count(),
+    });
+    eprintln!("{summary}");
+    if let Some(f) = sink.file.as_mut() {
+        writeln!(f, "{}", json!({ "summary": summary })).expect("write --out");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// `--aux-order mestre` is exact: it equals the naive `O(p)` count on
+    /// random curves at small primes and at P0 = 786433 (both `≡ 1 mod 4`,
+    /// like P1, and one `≡ 3 mod 4`).
+    #[test]
+    fn mestre_exact_order_equals_point_count() {
+        let mut rng = StdRng::seed_from_u64(0x4D45_5354);
+        let mut ops = GroupOps::default();
+        for &(p, curves) in &[
+            (233u64, 300),
+            (1009, 300),
+            (40961, 100),
+            (65519, 60),
+            (786433, 12),
+        ] {
+            let mut done = 0;
+            while done < curves {
+                let (a, b) = (rng.gen_range(0..p), rng.gen_range(1..p));
+                if !nonsingular(a, b, p) {
+                    continue;
+                }
+                let e = PrimeCurve { p, a, b };
+                assert_eq!(
+                    mestre_exact_order(&e, &mut ops),
+                    e.point_count(),
+                    "p = {p}, a = {a}, b = {b}"
+                );
+                done += 1;
+            }
+        }
+    }
+
+    /// The same seed builds the same isogeny tower under both order
+    /// methods (Mestre draws from its own stream, not the cell's).
+    #[test]
+    fn mestre_and_naive_build_the_same_isogeny_tower() {
+        let p = 786433;
+        for t in 1..=5 {
+            for seed in 0..3u64 {
+                let a = isogeny_with(p, t, &mut StdRng::seed_from_u64(seed), AuxOrder::Naive);
+                let b = isogeny_with(p, t, &mut StdRng::seed_from_u64(seed), AuxOrder::Mestre);
+                assert_eq!(a.v, b.v, "t = {t}, seed = {seed}");
+                assert_eq!(a.c, b.c);
+                assert_eq!(a.info["aux_a"], b.info["aux_a"]);
+                assert_eq!(a.info["aux_b"], b.info["aux_b"]);
+                assert_eq!(a.info["aux_order"], b.info["aux_order"]);
+            }
+        }
+    }
+
+    /// `7·2^21 − 1` and `61·2^25 − 1`, the torus primes of
+    /// `research/pkm_dickson_torus_20261015/`.
+    const TORUS_PRIMES: [u64; 2] = [14_680_063, 2_046_820_351];
+
+    #[test]
+    fn torus_tower_has_2t_distinct_values_in_fp() {
+        for &p in &TORUS_PRIMES {
+            for t in 1..=12 {
+                let mut rng = StdRng::seed_from_u64(0x7031 ^ t as u64);
+                // `build_tower` runs `Tower::check`, and `dickson_torus`
+                // runs `check_torus`: both panic on a wrong tower.
+                let tower = build_tower(Kind::DicksonTorus, p, t, &mut rng);
+                assert_eq!(tower.v.len(), 1 << t);
+                let mut s = tower.v.clone();
+                s.sort_unstable();
+                s.dedup();
+                assert_eq!(s.len(), 1 << t, "|V| = 2^t, p = {p}, t = {t}");
+                assert!(s.iter().all(|&x| x < p), "V ⊂ F_p");
+                // Every value climbs the chain to c.
+                for &x in &tower.v {
+                    let y = tower.values(x, p);
+                    assert_eq!(tower.apply(t - 1, y[t - 1], p), tower.c);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn torus_values_are_traces_of_torus_elements() {
+        // Independent of the builder: y ∈ V iff the roots of X² − yX + 1
+        // are a coset element and its inverse in T \ F_p, so y² − 4 is a
+        // non-residue, and D_{2^t}(y) = c.
+        let p = TORUS_PRIMES[0];
+        let t = 8;
+        let mut rng = StdRng::seed_from_u64(5);
+        let tower = build_tower(Kind::DicksonTorus, p, t, &mut rng);
+        for &y in &tower.v {
+            let d = subm(mulm(y, y, p), 4, p);
+            assert_eq!(powm(d, (p - 1) / 2, p), p - 1);
+            let mut z = y;
+            for _ in 0..t {
+                z = subm(mulm(z, z, p), 2, p);
+            }
+            assert_eq!(z, tower.c);
+        }
+        // c itself is not ±2 and D_{2^t} has exactly 2^t roots over c in V.
+        assert!(tower.c != 2 && tower.c != p - 2);
+    }
+
+    #[test]
+    #[should_panic(expected = "the torus case needs")]
+    fn torus_refuses_a_split_prime() {
+        let mut rng = StdRng::seed_from_u64(1);
+        // p₀ = 3·2^18 + 1: p + 1 = 2·393217, so 2^2 ∤ p + 1.
+        dickson_torus(786_433, 2, &mut rng);
+    }
+
+    #[test]
+    fn torus_tower_square_rules_vanish_on_v() {
+        // The f4_fp_tower rewriting rules are the Dickson ones: every tower
+        // equation reduces to zero in the ring, and every element of V^2
+        // satisfies the raw equations.
+        let p = TORUS_PRIMES[1];
+        let t = 6;
+        let mut rng = StdRng::seed_from_u64(9);
+        let tower = build_tower(Kind::DicksonTorus, p, t, &mut rng);
+        let ring = tower_ring(&tower, 2, p);
+        let n = 2 * t;
+        for i in 0..2 {
+            for e in tower.equations(n, i * t, p) {
+                assert!(ring.from_raw(&raw_terms(&e)).is_empty());
+            }
+        }
+    }
+
+    #[test]
+    fn chain_null_keeps_planted_zero() {
+        let p = TORUS_PRIMES[1];
+        let mut rng = StdRng::seed_from_u64(11);
+        let tower = build_tower(Kind::DicksonTorus, p, 3, &mut rng);
+        let (curve, on) = target_curve(p, &tower, 3, &mut rng);
+        let target = loop {
+            if let Some(tg) = plant(&curve, &tower, 3, &on, &mut rng) {
+                break tg;
+            }
+        };
+        let (eqs, _, sol, _) = system(Control::Null, &tower, &curve, 3, &target, 1, None, &mut rng);
+        let sol = sol.expect("planted");
+        assert!(eqs.iter().all(|e| e.eval(&sol, p) == 0));
+        // The null changed every chain link's coefficients.
+        let (tw, _, _, _) = system(
+            Control::Tower,
+            &tower,
+            &curve,
+            3,
+            &target,
+            1,
+            None,
+            &mut rng,
+        );
+        assert_ne!(eqs[0].terms, tw[0].terms);
+        assert_ne!(eqs[1].terms, tw[1].terms);
+    }
+
+    /// `15·2^27 + 1`.
+    const BB_PRIME: u64 = 2_013_265_921;
+
+    #[test]
+    fn doubling_formula_matches_curve_arithmetic() {
+        let p = BB_PRIME;
+        let mut rng = StdRng::seed_from_u64(0xD0B1);
+        let mut checked = 0;
+        while checked < 20 {
+            let curve = PrimeCurve {
+                p,
+                a: rng.gen_range(1..p),
+                b: rng.gen_range(1..p),
+            };
+            let pt = random_point(&curve, &mut rng);
+            if pt.infinity {
+                continue;
+            }
+            let mut ops = GroupOps::default();
+            let two = curve.add(&mut ops, pt, pt);
+            let xr = Pol::constant(1, pt.x, p);
+            let (num, den) = dbl_nd(&xr, curve.a, curve.b, p);
+            let (nv, dv) = (num.eval(&[0], p), den.eval(&[0], p));
+            if dv == 0 {
+                assert!(two.infinity);
+                continue;
+            }
+            assert_eq!(mulm(nv, invm(dv, p), p), two.x);
+            assert_eq!(double_abscissa(pt.x, curve.a, curve.b, p), two.x);
+            checked += 1;
+        }
+    }
+
+    /// A Kummer cell with a planted target, for the `multiples` tests.
+    fn multiples_cell(m: usize, t: usize, seed: u64) -> (Tower, PrimeCurve, Target, StdRng) {
+        let p = BB_PRIME;
+        let mut rng = StdRng::seed_from_u64(seed);
+        let tower = kummer(p, t, &mut rng);
+        let (curve, on) = target_curve(p, &tower, m, &mut rng);
+        let target = loop {
+            if let Some(tg) = plant(&curve, &tower, m, &on, &mut rng) {
+                break tg;
+            }
+        };
+        (tower, curve, target, rng)
+    }
+
+    fn check_multiples_vanish(m: usize, t: usize, seed: u64) {
+        let (tower, curve, target, mut rng) = multiples_cell(m, t, seed);
+        let (tw, n_tw, _, _) = system(
+            Control::Tower,
+            &tower,
+            &curve,
+            m,
+            &target,
+            1,
+            None,
+            &mut rng,
+        );
+        let (eqs, n, sol, _) = system(
+            Control::Multiples,
+            &tower,
+            &curve,
+            m,
+            &target,
+            1,
+            None,
+            &mut rng,
+        );
+        let sol = sol.expect("planted");
+        assert_eq!(sol.len(), n);
+        assert_eq!(eqs.len() - tw.len(), multiples_appended(m));
+        let expect = if m == 2 { 1 } else { (m - 2) + (m - 1) };
+        assert_eq!(eqs.len() - tw.len(), expect);
+        assert_eq!(n, n_tw + if m >= 3 { m - 2 } else { 0 });
+        for (k, e) in eqs.iter().enumerate() {
+            assert_eq!(e.eval(&sol, curve.p), 0, "equation {k}");
+        }
+    }
+
+    #[test]
+    fn multiples_vanish_at_planted_solution_m2() {
+        for seed in 1..=3 {
+            check_multiples_vanish(2, 3, seed);
+        }
+    }
+
+    #[test]
+    fn multiples_vanish_at_planted_solution_m4() {
+        for seed in 1..=3 {
+            check_multiples_vanish(4, 3, seed);
+        }
+    }
+
+    #[test]
+    fn multiples_vanish_at_planted_solution_m3() {
+        check_multiples_vanish(3, 3, 7);
+    }
+
+    #[test]
+    fn multiples_rows_match_tower_on_random_targets_prefix() {
+        for m in [2usize, 4] {
+            let p = BB_PRIME;
+            let mut rng = StdRng::seed_from_u64(0x77 + m as u64);
+            let tower = kummer(p, 3, &mut rng);
+            let (curve, _) = target_curve(p, &tower, m, &mut rng);
+            let target = random_target(&curve, &mut rng);
+            let (tw, _, _, _) = system(
+                Control::Tower,
+                &tower,
+                &curve,
+                m,
+                &target,
+                1,
+                None,
+                &mut rng,
+            );
+            let (mu, n, sol, _) = system(
+                Control::Multiples,
+                &tower,
+                &curve,
+                m,
+                &target,
+                1,
+                None,
+                &mut rng,
+            );
+            assert!(sol.is_none());
+            assert_eq!(mu.len(), tw.len() + multiples_appended(m));
+            for (k, e) in tw.iter().enumerate() {
+                // Same terms, padded to the larger ring's variable count.
+                assert_eq!(e.terms.len(), mu[k].terms.len(), "equation {k}");
+                for (ex, c) in &e.terms {
+                    let mut padded = ex.clone();
+                    padded.resize(n, 0);
+                    assert_eq!(mu[k].terms.get(&padded), Some(c), "equation {k}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn null_width_support_is_the_full_box() {
+        let (tower, curve, target, _) = multiples_cell(2, 3, 12345);
+        let t = tower.t;
+        for (w, count) in [(1usize, 4usize), (2, 9), (3, 16)] {
+            let mut rng = StdRng::seed_from_u64(99);
+            let (eqs, n, sol, _) = system(
+                Control::Null,
+                &tower,
+                &curve,
+                2,
+                &target,
+                1,
+                Some(w),
+                &mut rng,
+            );
+            let f = &eqs[0];
+            // The planted shift can only change the constant's coefficient.
+            assert_eq!(f.terms.len(), count, "W = {w}");
+            for e in f.terms.keys() {
+                for (i, &d) in e.iter().enumerate() {
+                    if i == 0 || i == t {
+                        assert!(d as usize <= w);
+                    } else {
+                        assert_eq!(d, 0, "index {i}");
+                    }
+                }
+            }
+            assert_eq!(
+                f.terms
+                    .keys()
+                    .filter(|e| e[0] as usize == w && e[t] as usize == w)
+                    .count(),
+                1
+            );
+            if let Some(s) = sol {
+                assert_eq!(f.eval(&s, curve.p), 0);
+            }
+            assert_eq!(n, 2 * t);
+        }
+    }
+
+    #[test]
+    fn null_width_keeps_targets_and_tower() {
+        let (tower, curve, target, rng) = multiples_cell(2, 3, 777);
+        let mut r1 = rng.clone();
+        let mut r2 = rng;
+        let (tw, n1, _, rg1) = system(Control::Tower, &tower, &curve, 2, &target, 1, None, &mut r1);
+        let (nu, n2, _, rg2) = system(
+            Control::Null,
+            &tower,
+            &curve,
+            2,
+            &target,
+            1,
+            Some(3),
+            &mut r2,
+        );
+        assert_eq!((n1, rg1.clone()), (n2, rg2.clone()));
+        for (a, b) in tw[rg1].iter().zip(&nu[rg2]) {
+            assert_eq!(a.terms, b.terms);
+        }
+        assert_eq!(tw.len(), nu.len());
+        assert_ne!(tw[0].terms, nu[0].terms);
+    }
+
+    #[test]
+    fn null_default_unchanged() {
+        // Expected values computed with the code before `--null-width`.
+        let (tower, curve, target, mut rng) = multiples_cell(2, 3, 12345);
+        let (eqs, _, _, _) = system(Control::Null, &tower, &curve, 2, &target, 1, None, &mut rng);
+        assert_eq!(eqs.len(), 7);
+        assert_eq!(eqs[0].terms.len(), 9);
+        let sum = eqs[0].terms.values().fold(0u64, |a, &c| (a + c) % curve.p);
+        assert_eq!(sum, 1_862_312_789);
+    }
+}

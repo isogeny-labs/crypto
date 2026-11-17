@@ -1,0 +1,27 @@
+# m = 4 two-plus-two MITM scaling
+
+
+=== planted m=4 decomposition (table + query until hit) ===
+bits    |F|    pairs   adds/tgt      verified       ms
+  24     28      406         108.1    40/40      0.7
+  28     49     1225         441.7    40/40      2.9
+  32     84     3570        1062.0    40/40      8.4
+  36    147    10878        4215.4    40/40     34.3
+  40    256    32896       13090.8    40/40    117.0
+  44    446    99681       35747.6    40/40    353.0
+  48    776   301476      109172.0    40/40   1150.7
+  52   1351   913276      356864.2    40/40   4667.6
+
+planted solve exponent (log2 adds per target vs log2 p) = 0.412 (R^2 0.9986, 8 sizes)
+
+=== uniform m=4 relation (full scans until a decomposition) ===
+bits    |F|      adds/rel   verified       ms
+  24     28      101465.5       true     30.5
+  28     49     1296972.0       true    427.0
+  32     84     3995574.0       true   1675.1
+  36    147    13507015.5       true   7169.6
+  40    256    20875915.0       true  11601.8
+
+uniform relation exponent (log2 adds per relation vs log2 p) = 0.469 (R^2 0.9264, 5 sizes)
+
+expected: planted ~ 2/5 = 0.400, uniform ~ 3/5 = 0.600; the gap is the table B^2 and the B^4/p rarity

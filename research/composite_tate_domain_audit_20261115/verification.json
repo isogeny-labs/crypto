@@ -1,0 +1,85 @@
+{
+  "schema": "known-composite-tate-verification/v1",
+  "source_commit": "10ffae4509497fea860db70525e79012405bbb3f",
+  "claim_id": "PCC-20261115-e2a305",
+  "declaration_sha256": "c0b96f82c9239660a8c2dd7e8d1f5eafad909f0cf6431d8a3a1cc3f49fda1371",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 7,
+  "gate_declarations": 53,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 109,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-e2a305",
+    "claim_sha256": "05f70a564b263322847916d785a09954905cf6916681020d5ea75c530d2350df",
+    "commit": "10ffae4509497fea860db70525e79012405bbb3f",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/composite_tate_domain_audit_20261115/lean (CompositeTateCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T03:43:24Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-e2a305",
+    "claim_sha256": "05f70a564b263322847916d785a09954905cf6916681020d5ea75c530d2350df",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47274,
+    "sha256": "f1de36f1367da35347aacebbc9acd70532089975824e3d46d74ee8edcf704c90",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 53,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_log_advisories": 0,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "known_negative_control_reconstruction": true,
+    "prior_claim": "PCC-20261110-5e63e9",
+    "new_source_coverage": false,
+    "new_all14_gap_closure": false,
+    "no_prior_customproof_modules_imported": true,
+    "independent_implementation_or_physicalhost_validation": false,
+    "actual_kernel_curvequotient_unitpowerquotient_defined": true,
+    "actual_domain_target_counts_derived": [
+      6,
+      6,
+      2
+    ],
+    "actual_both_nonzero_radical_witnesses_proved": true,
+    "prime_nonidentity_root_arithmetic_proved": true,
+    "general_primitive_root_qualified_Tate_positive_proof": false,
+    "canonical_divisor_Miller_identification_proved": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

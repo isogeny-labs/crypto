@@ -1,0 +1,32 @@
+import GlobalSmooth
+import Mathlib.Algebra.Field.ZMod
+set_option autoImplicit false
+namespace SameUGlobalControls
+open Polynomial SameUGlobal
+instance : Fact (Nat.Prime 5) := ⟨by decide⟩
+@[simp] theorem five_zero : (5 : ZMod 5)=0 := by decide
+example (x : ZMod 5) :
+ (WeightedDoubling.curve 0 (-1) 0 0).derivative.eval x = -1 := by
+ rw [curve_derivative_eval];norm_num [WeightedDoubling.deriv]
+ <;> simp only [five_zero, true_or]
+example : IsCoprime (WeightedDoubling.curve (0:ZMod 5) (-1) 0 0)
+ (WeightedDoubling.curve (0:ZMod 5) (-1) 0 0).derivative := by
+ refine ⟨0,-1,?_⟩
+ norm_num [WeightedDoubling.curve,derivative_add,derivative_mul,derivative_X_pow]
+ <;> simp only [five_zero, true_or]
+example (x : ZMod 5) : SameULocal.LocalNonsingular 0 (-1) 0 0 x := by
+ apply global_implies_local
+ refine ⟨0,-1,?_⟩
+ norm_num [WeightedDoubling.curve,derivative_add,derivative_mul,derivative_X_pow]
+ <;> simp only [five_zero, true_or]
+example : ¬IsCoprime (WeightedDoubling.curve (0:ZMod 5) 0 0 0)
+ (WeightedDoubling.curve (0:ZMod 5) 0 0 0).derivative := by
+ intro h
+ have hh := global_implies_local _ _ _ _ h 0
+ apply hh
+ norm_num [WeightedDoubling.value,WeightedDoubling.deriv]
+ <;> simp only [five_zero, true_or]
+example : (WeightedDoubling.curve (0:ZMod 5) 0 0 0).derivative=0 := by
+ norm_num [WeightedDoubling.curve,derivative_X_pow]
+ <;> simp only [five_zero, true_or]
+end SameUGlobalControls

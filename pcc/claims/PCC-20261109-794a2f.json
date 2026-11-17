@@ -1,0 +1,57 @@
+{
+ "created_at": "2026-11-09T17:32:09Z",
+ "id": "PCC-20261109-794a2f",
+ "kind": "statement",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round64-p192/report.md",
+    "sha256": "e1ea15e16ccf969d469f016d5d27efcb4ba1dfd92d442985eb5da03c4b6736bd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round64-p192/resultant-proof.md",
+    "sha256": "d5778f121e4ff8bc2e2abf1e33ae09801a1644b04b0c9b64f46b6435c9d3b7c2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round64-p192/norm-controls.json",
+    "sha256": "c17ad6f765ac5b95199bd94dab68817b781342ec824fda4721054b54c001bd22"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round64-p192/audit-summary.json",
+    "sha256": "29df62a089b81ae22d90bddacb2c6aaa55c48d73e3320f99d341810feff85dce"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round64-p192/P192-norms.json",
+    "sha256": "738a980ee6dbfcc4810229c3b2f40b0e18ce464c8753f3e43e0aaaa5eea08745"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round64-p192/validation.json",
+    "sha256": "c50b942433db40aefb0dc6ebf0a966548541cc18a99f15c35bc6829be688b1ba"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "35 synthetic norm controls,381 unchanged decoder cases,22764 matched norm inputs,72 P192 degree4 norms including18 simple roots and54 unit cases. Classical polynomial arithmetic, explicit preparation and references retained; no full P192 response or complete-solver speedup claim.",
+ "statement": "Round64 derives and implements a matrix-free field-resultant first spectral coefficient norm with unit, simple-common-root and multiple-root branches, preserving the complete signed-block decoder output and qualifying full-width P192 baby norms with isolated operation costs."
+}

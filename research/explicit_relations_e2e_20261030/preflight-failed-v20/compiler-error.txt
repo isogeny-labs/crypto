@@ -1,0 +1,22 @@
+error[E0061]: this function takes 7 arguments but 6 arguments were supplied
+    --> ../../src/cryptanalysis/hashed_ecdl.rs:1662:21
+     |
+1662 |                     solve_reduction::<false>(&curve, p, q, &config, &mut Enumerate, &mut untouched)
+     |                     ^^^^^^^^^^^^^^^^^^^^^^^^------------------------------------------------------- argument #7 of type `usize` is missing
+     |
+note: function defined here
+    --> ../../src/cryptanalysis/hashed_ecdl.rs:1056:4
+     |
+1056 | fn solve_reduction<const PROFILE: bool>(
+     |    ^^^^^^^^^^^^^^^
+...
+1063 |     attempts_per_column: usize,
+     |     --------------------------
+help: provide the argument
+     |
+1662 |                     solve_reduction::<false>(&curve, p, q, &config, &mut Enumerate, &mut untouched, /* usize */)
+     |                                                                                                   +++++++++++++
+
+For more information about this error, try `rustc --explain E0061`.
+error: could not compile `explicit-relations-driver` (bin "paper-driver" test) due to 1 previous error
+make: *** [Makefile:52: test] Error 101

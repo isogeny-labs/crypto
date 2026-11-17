@@ -1,0 +1,32 @@
+{
+ "experiment": "L9-124-falls-structure",
+ "date": "2026-11-02",
+ "engine": "src/macdump.c = L1 macclose.c + stop-after-round and per-round dump of W_4 ∩ P<=3 pivot rows; generator N1 lib.system (unchanged)",
+ "P0_reproduce_L1": {"held": true, "n31_A_s2_low_by_round": [31, 1022, 2821, 2945], "deg4_rank_r3": 34224},
+ "round3_falls_A_minus_plateau": {
+   "n31": {"A_s0_SAT": 124, "A_s2_UNSAT": 124, "A_s3_UNSAT": 124, "A_s6_UNSAT": 124, "C1_s1": 0},
+   "n33": {"A_s0": 132, "C1_s0": 0, "plateau": 3201},
+   "n35": {"A_s0": 140, "plateau": 3605},
+   "n29": {"A_s0": 198, "A_s1": 198, "A_s2": 198, "C1_s2": 261, "window_explained_A_s0": 116, "unexplained_A_s0": 82, "A_deg4_rank_r3": 27352, "C30_4": 27405},
+   "n27": {"A_s0": 1233, "A_s1": 1233, "A_s3": 1233, "C1_s0": 1341, "window_explained_A_s1": 431, "note": "degree-4 space full in round 3 for both arms; count-forced falls swamp the structure; 4n not separable here"}
+ },
+ "count_formula": {"statement": "structural round-3 falls of arm A = 4n = n * (4 independent Frobenius-orbits of K-valued cubic relations)",
+   "checked": {"29": [116, 116], "31": [124, 124], "33": [132, 132], "35": [140, 140]},
+   "plateau_formula_n(3N-5)": {"31": 2821, "33": 3201, "35": 3605, "29": 2465}},
+ "deg4_bookkeeping_vs_C1": {"n31": {"deg4_rank_deficit": 248, "total_rank_deficit": 124}, "n33": {"deg4_rank_deficit": 264, "total_rank_deficit": 132}, "reading": "8n extra degree-4 leading cancellations: 4n are falls, 4n are zero syzygies"},
+ "P1_bidegree": {"held_partially": true, "new_leading_monomials_n31_s2": {"(2,1)": 93, "(1,2)": 31}, "all_degree": 3, "note": "LM split is order-dependent (lex favours a-vars); none pure a^3/b^3"},
+ "P2_swap": {"W2_swap_stable": true, "W3_swap_stable": true, "split_62_62": false, "swap_needed": false, "evidence": "A_V1V2 (a in V1, b in V2, no a<->b symmetry) still +124"},
+ "K_relations_window_0123": {"n31_s2": {"dimK_R2": 37, "dimK_R3": 41, "new": 4}, "n31_s3": {"dimK_R2": 37, "dimK_R3": 41, "new": 4}, "n29_s0": {"dimK_R2": 37, "dimK_R3": 41, "new": 4},
+   "window_012_explains": 0, "window_0123_explains": "all (n31,n33,n35); 116 of 198 at n29",
+   "cubic_pivots_of_new_relations": ["a0*a1*b3", "a0*a2*b3", "a0*a3*b1", "a0*a3*b2"],
+   "notation": "ai = a^(2^i) (K-valued F2-linear form of the a-bits), bi likewise; bit-degree of a product of distinct-index forms = number of factors"},
+ "P4_variants_n31_s2": {"A": 124, "A_V1V2": 124, "A_lin": 124, "A_Lrand": 0, "A_randaff": 0,
+   "A_noaff": "not comparable (plateau 2385, +1110)", "A_ab": "not comparable (plateau 2759, +1550)", "A_sq": "not comparable (plateau 2759, +1602)",
+   "reading": "falls need bilinear AND affine parts to be K-semilinear in the same Frobenius coordinates (a,b); a<->b symmetry and the specific affine Frobenius index are not needed"},
+ "hypotheses": {"frobenius_squaring_syzygies": "SUPPORTED (relations are K-valued, live in 4 consecutive Frobenius twists, killed by replacing L or the affine part by non-K-semilinear maps)",
+   "field_equation_interplay": "part of the same mechanism: ai^2=a(i+1) in the Boolean ring is what makes these products low-degree; not separately tested",
+   "symmetry_a_b": "REJECTED as cause (A_V1V2 keeps 124)",
+   "trace_map": "the 4n F2 falls are exactly the trace components Tr(theta*Q) of 4 K-relations Q; trace is the bookkeeping, not an independent cause"},
+ "unexplained_residue": "closed-form (symbolic in z,a6) expression of the 4 relations and the explicit degree-4 syzygy that produces them not derived; 82 non-window falls at n=29 not classified",
+ "security_claims": "none"
+}

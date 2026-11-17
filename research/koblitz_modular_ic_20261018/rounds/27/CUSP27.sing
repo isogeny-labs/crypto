@@ -1,0 +1,27 @@
+// Exact new principal relation, source orders from accepted LAURENT02.
+ring cuspQ=0,(t),lp;
+intvec nu0=32,-51,14,25,12;
+intvec nu1=21,-51,7,14,7;
+poly rel=0;int k;
+for(k=1;k<=5;k++){rel=rel+(nu0[k]-nu1[k])*t^(k-1);}
+poly cyc=t^5+1;
+if(rel!=11+7*t^2+11*t^3+5*t^4){ERROR("actual cusp order binding failed");}
+print("ACTUAL_RAMIFIED_CUSP_RELATION");rel;
+poly detvalue=resultant(cyc,rel,t);
+print("INTEGRAL_NEGACYCLIC_DETERMINANT");detvalue;factorize(detvalue);
+// Full five-column principal-relation module modulo11.
+ring cusp11=11,(t),lp;
+poly rel=imap(cuspQ,rel);poly cyc=imap(cuspQ,cyc);
+ideal original=cyc,rel;ideal gb=std(original);
+print("MOD11_CUSP_RELATION_GCD");gb;
+if(size(gb)!=1 || gb[1]!=t+5){ERROR("cusp residual is not the expected T=6 line");}
+matrix certificate=lift(original,gb);
+matrix residual=matrix(original)*certificate-matrix(gb);
+if(residual[1,1]!=0){ERROR("cusp exact ideal lift failed");}
+print("MOD11_BEZOUT_CERTIFICATE");certificate;
+intvec values=2,6,7,8;
+for(k=1;k<=4;k++){
+ print("PRIMITIVE_DIAMOND_VALUE "+string(values[k]));subst(rel,t,values[k]);
+ if((subst(rel,t,values[k])==0)!=(values[k]==6)){ERROR("primitive residue control failed");}
+}
+print("CUSP27_ALL_CHECKS_PASS");quit;

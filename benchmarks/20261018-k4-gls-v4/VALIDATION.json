@@ -1,0 +1,36 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "3dc0530ddaa572b541a5caaf1e57bda012be3d933320482e4086dc75dbaa8bf5"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "5ee5f6d6a9e821cef59c7dac8747484bc9b50768d58aea5cf7b4f2c64f1bf4ff"
+ },
+ "rho_reference": {
+  "kind": "negation_frobenius",
+  "protocol": "Named by the protocol (RESEARCH_GLV_INVARIANT_FACTOR_BASES.md section 9.15, registered before any E25 code): on each GLS curve the matched rho is the <±psi> walk, psi the GLS endomorphism (the p^2-power Frobenius twisted back to E, psi^2 = -1), so a class {±P, ±psi P} has 4 points; 16 <±psi>, 16 negation and 16 unfolded walks per curve, all run and all verified. S_B / rho = total F_p multiplications of arm B / mean F_p multiplications of the 16 <±psi> walks (set-up and class representatives included); negation and unfolded walks are recorded alongside (rho_negation_muls, rho_unfolded_muls). Strongest available: on all 10 curves j(E) is in F_{p^2} but not in F_p (checked independently of the repository code), so psi is the only Frobenius-type endomorphism over F_{p^4} and Aut(E) = {±1}: <±psi> is the largest fold. Unpriced native work, read from quartic_folds.rs, klein_v4.rs and gaudry_quartic.rs: both arms charge F_p multiplications only; the index calculus leaves unpriced its Macaulay-matrix entry traffic (emitted as macaulay_entries), the solve's F_p inversions (not emitted; at most one per pivot row, far fewer than the entries) and its F_p additions; the walks leave unpriced each step's hash-table lookup and insert, partition hashes and comparisons (emitted as steps). Band (AGENTS.md section 5a, as the protocol states it): S(g) = F_p multiplications + g * GAE * native operations, one native operation per Macaulay entry or walk step, GAE = the curve's measured F_p multiplications per affine addition (97.0 on every record), g = 0, 0.1, 1; native work is unpriced on both arms, so the three values differ. gae_band holds the medians over the 10 curves of arm B's S_IC(g) and of the <±psi> walk's S_rho(g) (per-curve values: validator-report.json gae_band_rows). Order across the band: the <±psi> walk is below the index calculus on every curve of both arms at all three prices (S_B / rho from 1.13e4-2.65e5 at g = 0 to 7.7e4-2.0e6 at g = 1), so rho is ranked ahead everywhere; arm B is below arm A on every curve at every price (S_A / S_B moves by at most 0.06 % across the band); the improvement (S_A / rho_negation) / (S_B / rho_psi) stays above 1 on every curve at every price (1.10-1.70 at g = 1 for p >= 197, against 1.26-1.97 at g = 0).",
+  "unit": "F_p multiplications: both arms counted by the same Fp4 type (an F_{p^4} multiplication 19, an inversion 40), the solve's F_p multiplications counted directly, the Wiedemann matrix at 16 per multiplication mod n; walk set-up included",
+  "binary_or_process": "examples/quartic_pipeline_gls: one process per (p, seed) runs arm A then arm B, and inside each arm's run (quartic_folds::run_k4_gls_pipeline -> collect_and_solve -> rho4_folded) the 16 <±psi>, 16 negation and 16 unfolded walks on the same instance and counters. Recorded binary 46202dc97; replayed from edea86713 (sha256 04553025e6bfd76b02f0dd26821ce60d08cae271f5e9dd9a44a0672ca3a0b5c6) with every deterministic counter identical.",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "order_holds_across_band": true,
+  "gae_band": {
+   "0": {
+    "ic": 49108349813.0,
+    "rho": 1011497.5625
+   },
+   "0.1": {
+    "ic": 99185129976.20001,
+    "rho": 1062777.521875
+   },
+   "1": {
+    "ic": 549876151445.0,
+    "rho": 1524297.15625
+   }
+  }
+ }
+}

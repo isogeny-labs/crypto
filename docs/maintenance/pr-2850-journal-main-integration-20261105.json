@@ -1,0 +1,99 @@
+{
+  "schema": "pr-maintenance/v1",
+  "pr": 2850,
+  "date": "2026-11-05",
+  "standing": "unverified",
+  "head_before": "778cba89da035a70e2e5fa752860fdebd5a9ffe3",
+  "incoming_main": "e6d85d82b7f08a02ccecc91f754fb2dc9b835b00",
+  "merge_base": "369c1a2ad56cfd597313a5ef6a101616f234e15c",
+  "branch_changed_files": 89,
+  "incoming_changed_files": 60,
+  "overlap": [
+    "docs/session-logs/2026-11-05.md"
+  ],
+  "journal": {
+    "head_lines": 350,
+    "main_lines": 331,
+    "merged_lines": 355,
+    "both_complete_parent_sequences_retained": true
+  },
+  "exact_upstream_entries": [
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b0b61ef2e1386aad4e68e11636ef6d0caddfa280"
+    },
+    {
+      "path": "docs/ic",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "75a05dd2da19801f1510af4347dc85afcf52df03"
+    },
+    {
+      "path": "docs/index-calculus-scoreboard.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e5fc015a354493cca84db6f0834b78edd6415565"
+    },
+    {
+      "path": "docs/maintenance/pr-2201-small-conflicts-20261105.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "84feeaa194b6a7e104774405de7412cd011cb0e3"
+    },
+    {
+      "path": "problems",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "bb7b50b3c08c5f3baac909cfbcb2dde48942443a"
+    },
+    {
+      "path": "research/lean_retrospective_20261018",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "67cf3e13a77568dbd90058de03a5af2261a48fcd"
+    },
+    {
+      "path": "research/pencil_early_rejection_20261030",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6197def711622f0bab9db41663eabf366b5b0db7"
+    },
+    {
+      "path": "research/pencil_large_prime_20261029",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e1bcf66712b79c389555b3b8f2a73a3597d08c43"
+    },
+    {
+      "path": "src",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "09a75cc4ada7cc2f838a899247a714161df97feb"
+    },
+    {
+      "path": "tools",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9407db659b80e56c03355b01bcde64cdcdaf6bf0"
+    }
+  ],
+  "preserved_branch_paths": [
+    "benchmarks/records/*icb-large-prime*",
+    "benchmarks/progress/",
+    "research/icb_large_prime_n53_n61_20261029/",
+    ".github/workflows/validation-gate.yml"
+  ],
+  "validation": {
+    "previous": "Local static evidence check valid, Actionlint pass, 41-record benchmark gate/base comparison pass before 778cba89 push.",
+    "reuse_scope": "Main changes do not touch benchmark records, referenced study inputs, progress generator or benchmark-gate implementation; no new trial performed.",
+    "current_head": "CI pending; no local execution result claimed because runtime cannot attach"
+  },
+  "sources": [
+    "AGENTS.md CI/merge rules",
+    "docs/CONDUCTOR.md",
+    "docs/maintenance/pr-2850-records-and-raw-custody-20261105.md",
+    "actual Git compares against common ancestor"
+  ]
+}

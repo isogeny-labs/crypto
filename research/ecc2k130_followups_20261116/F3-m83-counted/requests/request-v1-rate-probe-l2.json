@@ -1,0 +1,59 @@
+{
+  "schema": "isolab.eks.request/v1",
+  "job": {
+    "job_name": "f3-k0n83-wide-rho-rate-l2-20261116",
+    "instance_type": "c8a.2xlarge",
+    "memory": "4Gi",
+    "seconds": 1800,
+    "spec": {
+      "schema": "ecbench.spec/v1",
+      "label": "F3 L2 rate probe: wide strong rho at n=83, capped",
+      "description": "research/ecc2k130_followups_20261116/F3-m83-counted/PROTOCOL.md section 4 (frozen). Step rate only; every run is expected to exhaust its cap. Not a measurement of solve cost.",
+      "workloads": {
+        "curves": [
+          {
+            "kind": "koblitz",
+            "a": 0,
+            "n": 83
+          }
+        ],
+        "targets_per_curve": 2,
+        "target_seed": 20261116303,
+        "target_kind": "public"
+      },
+      "arms": [
+        {
+          "name": "rho-strong",
+          "role": "reference",
+          "method": {
+            "id": "rho.signed_frobenius_strong",
+            "params": {
+              "step_cap_factor": "0"
+            }
+          }
+        },
+        {
+          "name": "rho-strong-aa",
+          "role": "control",
+          "method": {
+            "id": "rho.signed_frobenius_strong",
+            "params": {
+              "step_cap_factor": "0"
+            }
+          }
+        }
+      ],
+      "measurement": {
+        "rounds": 5,
+        "warmup": 1,
+        "order": "alternate",
+        "seed": 20261116304,
+        "isolation_required": "L2",
+        "timeout_seconds": 600
+      }
+    }
+  },
+  "provenance": {
+    "harness": "research/ecc2k130_followups_20261116/F3-m83-counted/PROTOCOL.md"
+  }
+}

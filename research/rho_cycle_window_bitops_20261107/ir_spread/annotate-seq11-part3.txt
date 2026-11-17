@@ -1,0 +1,60 @@
+--------------------------------------------------------------------------------
+Profile data file '/tmp/claude-0/-home-user/0175cce0-2ca5-5248-8a75-97acf3a20a50/scratchpad/acct7/ladder/11.callgrind.3' (creator: callgrind-3.22.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 35162060 - 35452553
+Trigger: Client Request: generic_ic_rho_solve
+Profiled target:  /home/user/crypto/target/release/ecbench exec (PID 20493, part 3)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+Ir                 
+--------------------------------------------------------------------------------
+1,198,020 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                  file:function
+--------------------------------------------------------------------------------
+1,198,020 (100.0%)  ./csu/../csu/libc-start.c:__libc_start_main@@GLIBC_2.34 [/usr/lib/x86_64-linux-gnu/libc.so.6]
+1,198,020 (100.0%)  ./csu/../sysdeps/nptl/libc_start_call_main.h:(below main) [/usr/lib/x86_64-linux-gnu/libc.so.6]
+1,198,020 (100.0%)  ???:(below main) [/home/user/crypto/target/release/ecbench]
+1,198,020 (100.0%)  ???:0x000000000001f540 [/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2]
+1,198,020 (100.0%)  ???:crypto_lib::cryptanalysis::ecbench::methods::solve [/home/user/crypto/target/release/ecbench]
+1,198,020 (100.0%)  ???:crypto_lib::cryptanalysis::ecbench::methods::solve_inner [/home/user/crypto/target/release/ecbench]
+1,198,020 (100.0%)  ???:crypto_lib::cryptanalysis::ecbench::record::child_main [/home/user/crypto/target/release/ecbench]
+1,198,020 (100.0%)  ???:ecbench::main [/home/user/crypto/target/release/ecbench]
+1,198,020 (100.0%)  ???:ecbench::run [/home/user/crypto/target/release/ecbench]
+1,198,020 (100.0%)  ???:main [/home/user/crypto/target/release/ecbench]
+1,198,020 (100.0%)  ???:std::rt::lang_start::<std::process::ExitCode>::{closure#0} [/home/user/crypto/target/release/ecbench]
+1,198,020 (100.0%)  ???:std::rt::lang_start_internal [/home/user/crypto/target/release/ecbench]
+1,198,020 (100.0%)  ???:std::sys::backtrace::__rust_begin_short_backtrace::<fn() -> std::process::ExitCode, std::process::ExitCode> [/home/user/crypto/target/release/ecbench]
+1,197,602 (99.97%)  ???:crypto_lib::cryptanalysis::ic_boundary::signed_frobenius_rho_tuned [/home/user/crypto/target/release/ecbench]
+  605,477 (50.54%)  ???:<crypto_lib::cryptanalysis::ic_boundary::SignedFrobeniusClasses>::new [/home/user/crypto/target/release/ecbench]
+  501,848 (41.89%)  ???:<crypto_lib::cryptanalysis::ic_boundary::TunedWalker<crypto_lib::cryptanalysis::ic_boundary::BinaryGroup, crypto_lib::cryptanalysis::ic_boundary::SignedFrobeniusClasses>>::walk
+  493,698 (41.21%)  ???:<crypto_lib::cryptanalysis::koblitz_fast::FrobeniusPowers>::new [/home/user/crypto/target/release/ecbench]
+  218,664 (18.25%)  ???:<crypto_lib::cryptanalysis::koblitz_fast::FastCurve>::add [/home/user/crypto/target/release/ecbench]
+  193,123 (16.12%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2>::inv [/home/user/crypto/target/release/ecbench]
+  181,970 (15.19%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2>::inv_clmul [/home/user/crypto/target/release/ecbench]
+  123,899 (10.34%)  ???:<crypto_lib::cryptanalysis::ic_boundary::SignedFrobeniusClasses>::canon_parts [/home/user/crypto/target/release/ecbench]
+  110,956 ( 9.26%)  ???:<crypto_lib::cryptanalysis::koblitz_fast::FrobeniusCanon>::new [/home/user/crypto/target/release/ecbench]
+   62,630 ( 5.23%)  ???:crypto_lib::cryptanalysis::ic_boundary::joint_mul::<crypto_lib::cryptanalysis::ic_boundary::BinaryGroup> [/home/user/crypto/target/release/ecbench]
+   51,974 ( 4.34%)  ???:<alloc::vec::Vec<(crypto_lib::cryptanalysis::koblitz_fast::FastPoint, u64, u64)> as alloc::vec::spec_from_iter::SpecFromIter<(crypto_lib::cryptanalysis::koblitz_fast::FastPoint
+   51,867 ( 4.33%)  ???:<core::iter::adapters::map::Map<core::ops::range::Range<usize>, crypto_lib::cryptanalysis::ic_boundary::rho_walk_with<crypto_lib::cryptanalysis::ic_boundary::BinaryGroup, crypt
+   40,500 ( 3.38%)  ???:<crypto_lib::cryptanalysis::koblitz_fast::FastCurve>::double [/home/user/crypto/target/release/ecbench]
+   38,841 ( 3.24%)  ???:<alloc::vec::Vec<[u64; 256]> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<[u64; 256], core::iter::adapters::map::Map<core::ops::range::Range<usize>, <crypto_lib::cr
+   38,237 ( 3.19%)  ???:<alloc::vec::Vec<[u64; 256]> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<[u64; 256], core::iter::adapters::map::Map<core::ops::range::Range<usize>, <crypto_lib::cr
+   37,895 ( 3.16%)  ???:<core::iter::adapters::map::Map<core::ops::range::Range<usize>, <crypto_lib::cryptanalysis::koblitz_fast::FrobeniusCanon>::new::{closure#2}> as core::iter::traits::iterator::It
+   37,895 ( 3.16%)  ???:<core::iter::adapters::map::Map<core::ops::range::Range<usize>, <crypto_lib::cryptanalysis::koblitz_fast::FrobeniusCanon>::new::{closure#3}> as core::iter::traits::iterator::It
+   37,060 ( 3.09%)  ???:<core::iter::adapters::map::Map<core::ops::range::Range<usize>, <crypto_lib::cryptanalysis::koblitz_fast::FrobeniusPowers>::new::{closure#0}> as core::iter::traits::iterator::I
+   28,275 ( 2.36%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2>::mul_fold [/home/user/crypto/target/release/ecbench]
+   26,095 ( 2.18%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2>::sqr_k_fold [/home/user/crypto/target/release/ecbench]
+   15,203 ( 1.27%)  ./string/../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:__memcpy_avx_unaligned_erms [/usr/lib/x86_64-linux-gnu/libc.so.6]
+   14,252 ( 1.19%)  ???:crypto_lib::cryptanalysis::koblitz_fast::gfni_blocks [/home/user/crypto/target/release/ecbench]

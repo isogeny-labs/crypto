@@ -1,0 +1,38 @@
+{
+  "checked_at": "2026-10-21T19:44:37.543045+00:00",
+  "region": "us-east-2",
+  "principal": "arn:aws:iam::104186811093:user/coreuser",
+  "policy_sha256": "8323cd1ee08e96a7dc192e2a3e89b34916304fc67cc341230d1560a26fac4299",
+  "live_policy_version": "v1",
+  "live_policy_matches_committed": true,
+  "attached_users": [
+    "coreuser"
+  ],
+  "attached_roles": [
+    "spot-experiments-WorkerRole-G1FZ84yk3gS6",
+    "InstanceRole"
+  ],
+  "simulation": {
+    "action": "ec2:StartInstances",
+    "resource_arn": "arn:aws:ec2:us-east-2:104186811093:instance/i-0be5a12b50257128d",
+    "spot_market_context": "allowed",
+    "on_demand_market_context": "explicitDeny",
+    "missing_context_values": []
+  },
+  "spot_ec2_dry_run": {
+    "instance": "i-0be5a12b50257128d",
+    "dry_run": true,
+    "exit_code": 254,
+    "stdout": "",
+    "stderr": "\nAn error occurred (DryRunOperation) when calling the StartInstances operation: Request would have succeeded, but DryRun flag is set.\n"
+  },
+  "running_or_stopped_inventory": {
+    "spot": 8,
+    "on_demand": 0
+  },
+  "limits": [
+    "No instance was started and no infrastructure was changed.",
+    "The On-Demand result is IAM simulation with supplied market context; no live On-Demand StartInstances dry-run was possible because the regional running/stopped inventory had no On-Demand instance.",
+    "Authorization is distinct from an actual successful restart, capacity availability, or coverage of other principals and launch paths."
+  ]
+}

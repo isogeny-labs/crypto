@@ -1,0 +1,9 @@
+List.getLast?_eq_getElem?.{u_1} {α : Type u_1} {l : List α} : l.getLast? = l[l.length - 1]?
+List.getLast_eq_getElem.{u_1} {α : Type u_1} {l : List α} (h : l ≠ []) : l.getLast h = l[l.length - 1]
+/var/tmp/pencil-monic-remainder-termination-20261031-v1/Probe.lean:5:7: error(lean.unknownIdentifier): Unknown constant `List.getElem?_length_sub_one`
+ZMod.val_natCast (n a : ℕ) : (↑a).val = a % n
+ZMod.val_natCast_of_lt {n a : ℕ} (h : a < n) : (↑a).val = a
+UInt64.toNat_inj {a b : UInt64} : a.toNat = b.toNat ↔ a = b
+Polynomial.coeff_X_pow_mul.{u} {R : Type u} [Semiring R] (p : R[X]) (n d : ℕ) : (X ^ n * p).coeff (d + n) = p.coeff d
+Polynomial.coeff_X_pow_mul'.{u} {R : Type u} [Semiring R] (p : R[X]) (n d : ℕ) :
+  (X ^ n * p).coeff d = if n ≤ d then p.coeff (d - n) else 0

@@ -1,0 +1,106 @@
+   Compiling ml-dataset-independent-consumer v0.1.0 (/home/ec2-user/crypto-ml-validation-20261028/research/ml_dataset_independent_validation_20261028/native)
+    Finished `release` profile [optimized] target(s) in 21.62s
+     Running unittests src/lib.rs (research/ml_dataset_independent_validation_20261028/native/target/release/deps/ml_dataset_independent_consumer-9932ee73420b72b9)
+
+running 73 tests
+test arithmetic::tests::binary_exceptional_doubling_and_negation ... ok
+test arithmetic::tests::binary_field_fixed_values ... ok
+test arithmetic::tests::binary_pdp_certificate ... ok
+test arithmetic::tests::absent_public_fields_and_wrong_json_types_rejected ... ok
+test arithmetic::tests::binary_scalar_bound_is_not_prime_order_claim ... ok
+test arithmetic::tests::binary_twist_requires_trace_one ... ok
+test arithmetic::tests::binary_polynomial_json_types_and_duplicates_rejected ... ok
+test arithmetic::tests::canonical_point_parser_and_infinity ... ok
+test arithmetic::tests::certificate_generator_bound ... ok
+test arithmetic::tests::decimal_word_overflow_and_non_ascii_rejected ... ok
+test arithmetic::tests::declared_orders_are_not_certified ... ok
+test arithmetic::tests::even_binary_trace_is_not_low_bit ... ok
+test arithmetic::tests::duplicate_empty_or_infinite_factor_bases_rejected ... ok
+test arithmetic::tests::even_binary_twist_requires_absolute_trace ... ok
+test arithmetic::tests::full_word_products_and_discriminant_do_not_overflow ... ok
+test arithmetic::tests::field_metadata_bound ... ok
+test arithmetic::tests::invalid_prime_fields_rejected ... ok
+test arithmetic::tests::invalid_public_points_rejected ... ok
+test arithmetic::tests::koblitz_base_coefficients_checked ... ok
+test arithmetic::tests::malformed_binary_polynomials_rejected ... ok
+test arithmetic::tests::missing_pdp_sum_and_null_override_rejected ... ok
+test arithmetic::tests::p61_arithmetic_boundary ... ok
+test arithmetic::tests::ordinary_domain_is_signed ... ok
+test arithmetic::tests::pdp_domain_and_offcurve_summands_rejected ... ok
+test arithmetic::tests::pkm_alternate_domain_valid ... ok
+test arithmetic::tests::partial_twist_definition_rejected ... ok
+test arithmetic::tests::pkm_cannot_override_other_solver ... ok
+test arithmetic::tests::pkm_domain_not_implicitly_closed_under_negation ... ok
+test arithmetic::tests::prime_field_fixed_values ... ok
+test arithmetic::tests::pdp_sum_target_and_arity_bound ... ok
+test arithmetic::tests::prime_fixed_multiples_and_inverses ... ok
+test arithmetic::tests::prime_pdp_certificate ... ok
+test arithmetic::tests::prime_scalar_certificate ... ok
+test arithmetic::tests::prime_y_zero_doubling_is_infinity ... ok
+test arithmetic::tests::pkm_coset_height_and_points_bound ... ok
+test arithmetic::tests::prime_twist_coefficients_and_relation ... ok
+test arithmetic::tests::public_config_identity_bound ... ok
+test arithmetic::tests::reducible_binary_polynomials_rejected ... ok
+test arithmetic::tests::public_infinity_rejected ... ok
+test arithmetic::tests::public_and_certificate_targets_bound ... ok
+test arithmetic::tests::strong_pseudoprimes_are_rejected ... ok
+test arithmetic::tests::singular_and_noncanonical_curves_rejected ... ok
+test arithmetic::tests::untwisted_prime_metadata_checked ... ok
+test arithmetic::tests::supported_arity_upper_boundary_and_bound_rejection ... ok
+test audit::tests::complete_cycles_do_not_make_incomplete_instruction_timing_exact ... ok
+test audit::tests::mixed_radix_and_checked_plan_count ... ok
+test audit::tests::zero_running_missing_counters_and_saturating_scaling ... ok
+test arithmetic::tests::wrong_or_noncanonical_scalar_rejected ... ok
+test audit::tests::static_features_drop_nested_private_fields_and_all_telemetry ... ok
+test arithmetic::tests::zero_has_no_inverse ... ok
+test common::tests::nested_duplicate_keys_reject ... ok
+test common::tests::json_preserves_integer_and_order ... ok
+test common::tests::atomic_write_does_not_replace ... ok
+test common::tests::path_traversal_and_symlinks_reject ... ok
+test arithmetic::tests::unknown_role_rejected ... ok
+test common::tests::parsed_bytes_are_hash_bound ... ok
+test transport::tests::canonical_remote_validation ... ok
+test common::tests::fifo_and_symlink_sources_reject_without_opening ... ok
+test audit::tests::both_hardware_counters_and_global_mux_are_checked ... ok
+test transport::tests::destination_symlink_rejected_without_touching_target ... ok
+test transport::tests::invalid_receipt_hash_and_duplicate_json_fail_before_creation ... ok
+test transport::tests::object_paths_sizes_and_cas_keys_preflight ... ok
+test transport::tests::reference_count_limit_rejects_before_any_download ... ok
+test transport::tests::replay_failure_does_not_leave_stale_success_label ... ok
+test transport::tests::bounded_process_rejects_oversized_download ... ok
+test transport::tests::replay_requires_exact_coverage_and_records_hashes ... ok
+test transport::tests::failed_or_corrupt_download_retains_incomplete_isolation ... ok
+test transport::tests::replay_detects_verifier_and_dataset_mutation ... ok
+test transport::tests::bounded_process_rejects_output_flood_and_timeout ... ok
+test transport::tests::corrupt_get_is_checked_after_transport_success ... ok
+test transport::tests::replay_rejects_valid_but_changed_manifest_identity ... ok
+test transport::tests::fetch_roundtrip_uses_etag_and_does_not_replace ... ok
+test transport::tests::extra_downloaded_member_is_not_admitted_by_valid_hash_alone ... ok
+
+test result: ok. 73 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+
+     Running unittests src/main.rs (research/ml_dataset_independent_validation_20261028/native/target/release/deps/dataset_consumer-21d7b8ce0dad48b2)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/integration.rs (research/ml_dataset_independent_validation_20261028/native/target/release/deps/integration-55f9f4f66a62bf5d)
+
+running 7 tests
+test contradictory_outcomes_and_duplicate_members_reject ... ok
+test fixture_publication_has_exact_artifacts_and_explicit_scope ... ok
+test incomplete_attempts_and_empty_arithmetic_coverage_remain_explicit ... ok
+test complete_native_arithmetic_export_keeps_labels_separate ... ok
+test false_positive_rehashed_certificate_fails_arithmetic ... ok
+test provenance_transplants_and_false_completion_reject_even_with_valid_hashes ... ok
+test cli_requires_preview_and_rejects_corruption ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+   Doc-tests ml_dataset_independent_consumer
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

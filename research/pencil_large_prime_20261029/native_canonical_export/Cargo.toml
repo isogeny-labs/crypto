@@ -1,0 +1,13 @@
+[package]
+name = "pencil-native-canonical-export"
+version = "0.1.0"
+edition = "2021"
+[workspace]
+[dependencies]
+serde_json = { version = "1", features = ["arbitrary_precision"] }
+sha2 = "0.10"
+jsonschema = { version = "0.33", default-features = false }
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+pencil-accounting-price-draft = { path = "../native_price" }
+[dev-dependencies]
+tempfile = "3"

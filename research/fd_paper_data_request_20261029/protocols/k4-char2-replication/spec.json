@@ -1,0 +1,250 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "K4-CHAR2-REPLICATION-20261029: ic.pipeline (gaudry-d4-bin, Wiedemann) against rho.negation_strong on E/F_(2^m)^4, m = 14-17",
+  "description": "The red team's frozen replication plan (research/gaudry_k4_char2_redteam_20261026/REPORT.md section 3) as protocol.json records it. One fresh f2m4_torsion curve per target: curve seed i of m = first 8 bytes (big-endian) of sha256('gaudry-k4-redteam-v2|<m>|<i>'), i = 0..7, max_cofactor 16, one target per curve. target_seed and measurement.seed are the first 8 bytes of sha256('gaudry-k4-redteam-v2|target_seed') and sha256('gaudry-k4-redteam-v2|measurement_seed'). Arms: ic-wied (candidate), rho-strong (reference, the strong negation-map rho charged in counted F_q multiplications), rho-neg (baseline regression control), rho-neg-aa (A/A).",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "f2m4_torsion",
+        "m": 14,
+        "seed": 100453845123377174,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 14,
+        "seed": 245589792262940038,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 14,
+        "seed": 7691334342388311136,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 14,
+        "seed": 7276805495878880173,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 14,
+        "seed": 4538305417582973751,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 14,
+        "seed": 11639541398570072903,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 14,
+        "seed": 4889263607497934780,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 14,
+        "seed": 2286013002482851884,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 15,
+        "seed": 9545694929857028158,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 15,
+        "seed": 9120738887157190895,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 15,
+        "seed": 10141099417451117258,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 15,
+        "seed": 2653026756062909127,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 15,
+        "seed": 7131819214060381637,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 15,
+        "seed": 1882735852039558445,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 15,
+        "seed": 14044340470493085882,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 15,
+        "seed": 2886160090483318860,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 16,
+        "seed": 10816436521594035734,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 16,
+        "seed": 13985870886007152589,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 16,
+        "seed": 10579605228326941917,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 16,
+        "seed": 7481834881797765978,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 16,
+        "seed": 13534298385710208166,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 16,
+        "seed": 10385885113627480791,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 16,
+        "seed": 5778484102885763668,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 16,
+        "seed": 13470201611855030855,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 17,
+        "seed": 17930173626875418774,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 17,
+        "seed": 10205040286208270166,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 17,
+        "seed": 2128827467011145177,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 17,
+        "seed": 15940453779400482599,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 17,
+        "seed": 17625288115992522259,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 17,
+        "seed": 6270973417026851662,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 17,
+        "seed": 11067512869836865271,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "f2m4_torsion",
+        "m": 17,
+        "seed": 3417181369803324029,
+        "max_cofactor": 16
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 5767072793004074763
+  },
+  "arms": [
+    {
+      "name": "ic-wied",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "bin-t-line",
+          "oracle": "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1,charge_unsolved=1",
+          "linalg": "wiedemann"
+        }
+      }
+    },
+    {
+      "name": "rho-strong",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation_strong",
+        "params": {
+          "lanes": "64",
+          "dp_bits": "auto"
+        }
+      }
+    },
+    {
+      "name": "rho-neg",
+      "role": "baseline",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "shuffle",
+    "seed": 2122451695701588788,
+    "isolation_required": "L2",
+    "timeout_seconds": 43200
+  }
+}

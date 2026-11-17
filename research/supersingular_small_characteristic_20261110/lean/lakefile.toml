@@ -1,0 +1,11 @@
+name = "supersingular_small_characteristic"
+version = "0.1.0"
+defaultTargets = ["SmallCharacteristicAudit"]
+
+[[require]]
+name = "theorem_refutations"
+path = "../../theorem_census_20261109/lean"
+
+[[lean_lib]]
+name = "SmallCharacteristicAudit"
+roots = ["PrimeFieldControls", "AllPrimeFieldModels"]

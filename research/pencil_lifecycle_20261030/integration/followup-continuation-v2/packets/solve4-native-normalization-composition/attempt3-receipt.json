@@ -1,0 +1,115 @@
+{
+  "status": "passed",
+  "error": null,
+  "commands": [
+    {
+      "module": "Narrow",
+      "command": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt3/Narrow.olean",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt3/Narrow.lean"
+      ],
+      "expected_exit": 0,
+      "reaped": true,
+      "pid": 29584,
+      "exit": 0
+    },
+    {
+      "module": "Normalization",
+      "command": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt3/Normalization.olean",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt3/Normalization.lean"
+      ],
+      "expected_exit": 0,
+      "reaped": true,
+      "pid": 29593,
+      "exit": 0
+    },
+    {
+      "module": "Composition",
+      "command": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt3/Composition.olean",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt3/Composition.lean"
+      ],
+      "expected_exit": 0,
+      "reaped": true,
+      "pid": 29646,
+      "exit": 0
+    },
+    {
+      "module": "Controls",
+      "command": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt3/Controls.olean",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt3/Controls.lean"
+      ],
+      "expected_exit": 0,
+      "reaped": true,
+      "pid": 29664,
+      "exit": 0
+    },
+    {
+      "module": "Readback",
+      "command": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt3/Readback.olean",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt3/Readback.lean"
+      ],
+      "expected_exit": 0,
+      "reaped": true,
+      "pid": 29695,
+      "exit": 0
+    },
+    {
+      "module": "ExpectedFailure",
+      "command": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt3/ExpectedFailure.olean",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt3/ExpectedFailure.lean"
+      ],
+      "expected_exit": 1,
+      "reaped": true,
+      "pid": 29707,
+      "exit": 1
+    }
+  ],
+  "elapsed_seconds": 36.35118109598989,
+  "inputs": 28808,
+  "changed_inputs": [],
+  "scientific_runs": 0,
+  "pending_signal": null,
+  "limits": {
+    "outer_seconds": 95,
+    "address_space_bytes": 8589934592,
+    "lean_heap_MiB": 3500,
+    "hard_OS_stack_bytes": 10485760,
+    "lean_stack_KiB": 16384,
+    "workers": 1
+  }
+}

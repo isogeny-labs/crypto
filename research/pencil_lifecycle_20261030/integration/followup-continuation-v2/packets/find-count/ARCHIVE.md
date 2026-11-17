@@ -1,0 +1,1 @@
+Source bytes retained as .lean.txt; restore .lean and pinned paths to replay. Compiled caches and TeX aux files omitted. Logs encoded reversibly with original hashes. One-page PDF inspected. Independent source-fidelity review pending.

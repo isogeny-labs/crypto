@@ -1,0 +1,423 @@
+{
+  "collision": {
+    "degree": 96,
+    "finite_field_gcd_controls": 2046,
+    "operations": 7719,
+    "ordinary_j1_equal_transport_on49": 0,
+    "resultant": "X^88*(X+1)^8"
+  },
+  "coupled_divisors": {
+    "complete_function": "x0*xinf",
+    "complete_functions": 1,
+    "cusps": 480,
+    "functions": [
+      {
+        "complete_closed_ordinary_support": false,
+        "complete_divisor": false,
+        "cuspidal_zero_degree": 420,
+        "function": "x0+xinf",
+        "pole_degree": 2520,
+        "residual_noncuspidal_zero_degree": 2100
+      },
+      {
+        "complete_closed_ordinary_support": false,
+        "complete_divisor": false,
+        "cuspidal_zero_degree": 0,
+        "function": "x0+xinf+1",
+        "pole_degree": 2520,
+        "residual_noncuspidal_zero_degree": 2520
+      },
+      {
+        "complete_closed_ordinary_support": false,
+        "complete_divisor": false,
+        "cuspidal_zero_degree": 360,
+        "function": "y0+yinf",
+        "pole_degree": 3780,
+        "residual_noncuspidal_zero_degree": 3420
+      },
+      {
+        "complete_closed_ordinary_support": false,
+        "complete_divisor": false,
+        "cuspidal_zero_degree": 0,
+        "function": "y0+yinf+1",
+        "pole_degree": 3780,
+        "residual_noncuspidal_zero_degree": 3780
+      },
+      {
+        "complete_closed_ordinary_support": false,
+        "complete_divisor": true,
+        "cuspidal_zero_degree": 2640,
+        "function": "x0*xinf",
+        "pole_degree": 2640,
+        "residual_noncuspidal_zero_degree": 0
+      },
+      {
+        "complete_closed_ordinary_support": false,
+        "complete_divisor": false,
+        "cuspidal_zero_degree": 0,
+        "function": "x0*xinf+1",
+        "pole_degree": 2640,
+        "residual_noncuspidal_zero_degree": 2640
+      },
+      {
+        "complete_closed_ordinary_support": false,
+        "complete_divisor": false,
+        "cuspidal_zero_degree": 450,
+        "function": "x0*yinf+xinf*y0",
+        "pole_degree": 3900,
+        "residual_noncuspidal_zero_degree": 3450
+      },
+      {
+        "complete_closed_ordinary_support": false,
+        "complete_divisor": false,
+        "cuspidal_zero_degree": 0,
+        "function": "x0*yinf+xinf*y0+1",
+        "pole_degree": 3900,
+        "residual_noncuspidal_zero_degree": 3900
+      }
+    ],
+    "new_noncuspidal_columns": 0,
+    "product_closed_points": 22,
+    "product_zero_and_pole_degree": 2640,
+    "rank_promoted": false,
+    "retained_nonzero_image_rank": 11
+  },
+  "date": "2026-10-19 UTC",
+  "diagonal": {
+    "actual_automorphism_point_controls": 225,
+    "antidiagonal_complete": false,
+    "closed_degree_each": 10,
+    "closed_labels": 40,
+    "complete": false,
+    "explicit_torsion_coordinates": false,
+    "matching_geometric_labels": 400,
+    "multiplicity_lower_sum": 400,
+    "norm11_elements": 288,
+    "required_residual_degree": 860,
+    "ss_modular_classes": 3080,
+    "unresolved_multiplicity": 460
+  },
+  "failed_and_partial_runs": [
+    {
+      "files": [
+        "build-01.log"
+      ],
+      "reason": "nonexistent field-element hex method;fixed using canonical native BigUint encoding"
+    },
+    {
+      "files": [
+        "build-05.log"
+      ],
+      "reason": "missing BigUint type annotation and borrowed polynomial slices"
+    },
+    {
+      "files": [
+        "collision-01.log"
+      ],
+      "reason": "specialized polynomial had trailing zero at j=1;small-field gcd received untrimmed coefficients;corrected before accepted resultant"
+    },
+    {
+      "files": [
+        "lean-build-01.log"
+      ],
+      "reason": "inverse cancellation rewrite needed explicit associativity;final proof corrected"
+    },
+    {
+      "files": [
+        "q8b-original-counter-label-attempt.json",
+        "polynomial-check-01.log"
+      ],
+      "reason": "counter labeled8640 coefficient values as blocks;mathematical checks unchanged;canonical record reissued with precise name"
+    },
+    {
+      "files": [
+        "q8p-projective-saturation-prototype.json"
+      ],
+      "reason": "naive homogenization rejected by explicit false boundary point;prototype repaired,full projective quotient not claimed"
+    },
+    {
+      "files": [
+        "m15-supersingular-diagonal-component.json"
+      ],
+      "reason": "degree-exhaustion attempt incomplete:lower sum400 versus860,leaving460 multiplicity"
+    }
+  ],
+  "identity_certificates": [
+    {
+      "extra_checker_points": 128,
+      "file": "identity-homogeneous-saturation.json",
+      "id": "IDC1h9451979b555ea40d",
+      "issuer_points": 64
+    },
+    {
+      "extra_checker_points": 128,
+      "file": "identity-collision-derivative-residual.json",
+      "id": "IDC1hdb93e6399ddadfbc",
+      "issuer_points": 64
+    }
+  ],
+  "new_named_lean_theorems": 23,
+  "parent_commit": "f75e3ddaf54148ffe874a5f927020aae107bc92e",
+  "performance_measured": false,
+  "projective_control": {
+    "Groebner_S_pairs": 3,
+    "naive_false_point": [
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    "saturated_prototype_generators": 3,
+    "scope": "prototype saturation complete;whole quotient projective boundary remains open"
+  },
+  "quotients": {
+    "Jacobian_identification": false,
+    "basis_products_checked": 129600,
+    "closed_affine_open_embeddings": 4,
+    "dual_number_controls": 64,
+    "equation_component_checks": 3359520,
+    "expanded_evaluation_controls": 4608,
+    "expanded_scalar_polynomials": 72,
+    "full_projective_h_saturation": false,
+    "graphs": [
+      {
+        "F2_equations": 424080,
+        "equation_component_checks": 848160,
+        "file": "q8-graph-0-F2-relations.json",
+        "graph": 0,
+        "unit_component_checks": 36720,
+        "variables": 421560
+      },
+      {
+        "F2_equations": 424080,
+        "equation_component_checks": 848160,
+        "file": "q8-graph-1-F2-relations.json",
+        "graph": 1,
+        "unit_component_checks": 36720,
+        "variables": 421560
+      },
+      {
+        "F2_equations": 415800,
+        "equation_component_checks": 831600,
+        "file": "q8-graph-2-F2-relations.json",
+        "graph": 2,
+        "unit_component_checks": 35280,
+        "variables": 413280
+      },
+      {
+        "F2_equations": 415800,
+        "equation_component_checks": 831600,
+        "file": "q8-graph-3-F2-relations.json",
+        "graph": 3,
+        "unit_component_checks": 35280,
+        "variables": 413280
+      }
+    ],
+    "inverse_witness_norm_saturation": true,
+    "maximum_degree": 2,
+    "parsed_checks": [
+      {
+        "graph": 0,
+        "original_input_coefficient_values_checked": 8640,
+        "parsed_equation_component_checks": 848160,
+        "parsed_unit_component_checks": 36720
+      },
+      {
+        "graph": 1,
+        "original_input_coefficient_values_checked": 8640,
+        "parsed_equation_component_checks": 848160,
+        "parsed_unit_component_checks": 36720
+      },
+      {
+        "graph": 2,
+        "original_input_coefficient_values_checked": 8640,
+        "parsed_equation_component_checks": 831600,
+        "parsed_unit_component_checks": 35280
+      },
+      {
+        "graph": 3,
+        "original_input_coefficient_values_checked": 8640,
+        "parsed_equation_component_checks": 831600,
+        "parsed_unit_component_checks": 35280
+      }
+    ],
+    "proper_quotient_closed_embedding": false,
+    "total_F2_equations": 1679760,
+    "total_variables": 1669680,
+    "unit_component_checks": 144000
+  },
+  "raw_sha256": {
+    "build-01.log": "5e3c8aa60db772b0ac7990b15ae3452d71c8dc2174cb8a2e5f5078834c0f4761",
+    "build-02.log": "01aa7cad5356547401990ce0e99aa6dd96bdcd5875240a24a1a90d1691669238",
+    "build-03.log": "5f04e9e644d8c9150fbfe94e88ffad2edbc3dead0b2f4fc3a71ef34722f7d453",
+    "build-04.log": "3b7e88a410b85266f4dee877eb3de2dd860d90a629d7229e27f56c6c89d99f31",
+    "build-05.log": "42f51557ca9a8348854fc2e38c36b1de67309b9b1112e0021f5b6db9bf90de0c",
+    "build-06.log": "763a158ac929d69664dd8946ecf6ec5db759cc69241b112d42498252f3c8e2b8",
+    "build-07.log": "93c8e0510541a0542bb97cde5e18762b1dc07cd21cae9673fe7ee21d7fe8e06e",
+    "build-08.log": "701fcafbf9f9cac5e5ce9546182dfee405c835c33ca465f982791490b1e4e891",
+    "build-09.log": "79efb7c390739cb021e918f13ccad2da0a85a6340d8719d4719c706c5649ea37",
+    "build-10.log": "b948c9ea3b0cfe18923b0b5d2fbee5f0afa9d55f9a21510a2411f9e0d4698981",
+    "collision-01.log": "7be2459f5d201904521de43dd275f5711c6850299eb1ed331c2abbf1ab2902c3",
+    "collision-02.log": "d144237987175b602c0065074b53bc4ea1728c7be5df6c8471be56bf75bb021b",
+    "dashboard-check-01.log": "f0c4941e52d412a29f1819726d378a41946001831ecd9a6cef11f627ff5e42d3",
+    "dashboard-render-01.log": "6c744b1b4f2669263260eb6f865c638d6429cfec0648633287b7a675c249babb",
+    "diagonal-01.log": "9a2a3e34ad83be1ccaf3fac85decc77d5f388264709cfdaa2f4d07cf4996dac4",
+    "divisors-01.log": "8642a754466d714e2d4d643769b5f5c2a7875a5eca19865a8afa5a335350bdb2",
+    "expansion-01.log": "bb43ac3aba7d22adad089c2b5b5eebc5270cce9234452c40e01407bf99161ac0",
+    "lean-axioms-01.log": "d1c13b5cae8c6d945d92092c1b1f256b85d64ee3c3ef5cfd5aeac52faca0d730",
+    "lean-axioms-02.log": "a883294f14262c33e856efe06386115f3247307657f96a43d6365841276ece15",
+    "lean-axioms-03.log": "2f3698569aff3cef50216b471781f107fe343c7caabce21e3a07c1c4f2a1fc0f",
+    "lean-build-01.log": "4d1254de9f2f2b32d09e8c4bf964f6b3f2d9756ca9f09b7b9ee80dc035778119",
+    "lean-build-02.log": "3ce3177cd63e09fa802638eb6cf513f144f9263ef0de1d547714db97aacaf2bd",
+    "lean-build-03.log": "767c330127f2aee772491965e7a75c74bc7ff3b57a938f63678062f2bf52fab2",
+    "lean-build-04.log": "a0b6074ac78410d70c5a4fda0f5724e30a87cc54cf63ac02367e53c603725ff5",
+    "lean-full-gate-01.log": "ad363943d3c0a4d02d7a4d33ecb2cdff14cdd068b90133f3dd89255b52f1c7dd",
+    "lean-full-project-audit-01.log": "3708312e862bd50135b1b261a1fc5e2ad594dc04f17a3fc319503e2c68eb6e13",
+    "lean-full-project-build-01.log": "826f800b38305b5c295fe9a409bac69545e3844a27a0e3a12a56f28510fc5f82",
+    "lean-full-project-cache-01.log": "29e284dc7d8024aa6a333a92d0b23035028d78ada47b37f7dd77d8e1a0293483",
+    "m1-modular-base.json": "d94582df74213ff449aaa7c6d515407a1ddd7a9531cc628807118d8388200f02",
+    "m13-coupled-cusp-valuations.json": "9ee314303d2890558cad8ac7221457a483807148d2cc065c81558ae5439bdbf5",
+    "m13b-complete-product-divisor.json": "1d83550bd7c39c848b708d19c0e62986c084d8acd9627d4dc27b66ac758b6cbc",
+    "m14-Phi11-collision-resultant.json": "2f7087f972fa6a65aa53aaf123e310dc552282f7ee39451ed7ab1b455c92841e",
+    "m15-supersingular-diagonal-component.json": "e7dc2917e7deca1e39f43109aacb195de36e521ddf795b8984f88f686dad7947",
+    "native-tests-01.log": "39449c75304880099292b0fc9ac25da937bf46273c72903bcaa82b39f431e98f",
+    "native-tests-02.log": "f61cbbd99b0abd9eada69611df4b1783487a3a10336455c98fe4bc00cae6b7f8",
+    "polynomial-check-01.log": "ca5b1c8ab199f16b323e7290fbdc9e44202184a509cb378aa848e6aaad50d278",
+    "polynomial-check-02.log": "ca5b1c8ab199f16b323e7290fbdc9e44202184a509cb378aa848e6aaad50d278",
+    "polynomials-01.log": "a845b6df9205116f2bfd7b332b53e034067d3e9d5dab4e3b4ce69d4576b9080a",
+    "prior-round09-replay-01.log": "707de5290f28d561a8ae1cd87a13c6d4bc6924d8dfa3f48037044d0fb861f423",
+    "projective-control-01.log": "7f0bd3481b9ee1e4878d9f6a4b3ef77fccd32bb1000425b1147cddeb4c7f9f23",
+    "q6-intrinsic-Kummer-charts.json": "2980ba6da87406f1756d1cccab68902f2e52bd023a0b12b6b7ec4c8e05263c3d",
+    "q7-Frobenius-coordinate-circuits.json": "f75c4fb6ea485314234171d8b883a810bc1c890747259f93077a28d5a6f9c1d7",
+    "q7c-invariant-rational-generators.json": "72f4dabfc9f91c13511b841b2398ff4e979c2aeb6f7f11361613a6fefb7edb05",
+    "q8-F2-polynomial-templates.json": "a449e78f8130bd2b0ebb62b174618de85039ea48355976c70202be9f2d383dd9",
+    "q8-F2-presentations-summary.json": "0f953be5b18a71da50c6c4f1a5834d23164239ac4fa452cd50661ebb651eb533",
+    "q8-graph-0-F2-relations.json": "55d032fc5a46d1931efa84fdb558d2da0620fd4e0dc2e2114cdbfc973dcc1c77",
+    "q8-graph-1-F2-relations.json": "e1089fa77670416e28fa55573099f1a5795f3e00430a42f901424a2717c7b372",
+    "q8-graph-2-F2-relations.json": "a7ac2e4d3287bf52f08bbb86aeb04ff3740534b8194e17da9805894c5d8e63b5",
+    "q8-graph-3-F2-relations.json": "d18cd33b41dceb630b6c9e39e063f14b64bb76cbe78f2038021aeac672bc7a65",
+    "q8b-original-counter-label-attempt.json": "c7dab47e433404be5c7f0fa43b333e1a3ea8ed982fbb9418b95b3366c22551a2",
+    "q8b-parsed-F2-presentation-check.json": "fd6f5d914a090ffa42afabb27cccd4b3dcc110d9e327db55be3b2063e1368cc1",
+    "q8c-expanded-F2-equations.json": "b7ac1213dc74dc080d02ee61637aa407cf80b629369c611497acc214968fa689",
+    "q8p-projective-saturation-prototype.json": "2552c2edf99bafa21de9c12ef4bbac686152361754ab865b2362aae0ff7a5e7a",
+    "replay-01.log": "d2d4ab1ae78240941c7c0e9f795191afb92278453424b8b0be840c44cf35c31e",
+    "replay-02.log": "d2d4ab1ae78240941c7c0e9f795191afb92278453424b8b0be840c44cf35c31e",
+    "root-lib-tests-01.log": "ded387c2a79ecec20f8008b5f2faa5d3ccf571b7afef4a82c841af3d3c7bf144",
+    "site-tests-01.log": "d9932639ac7ffc078037880896fcd670dbfe0d51385b36426873ba8a912dc108",
+    "workflow-tests-01.log": "ef8666158e1375639c78b86670088f6c1f6e078fddfd014b5e1e8865ebcc7864"
+  },
+  "requirements": [
+    {
+      "open": "smaller invariant-coordinate ideals and all global chart boundaries",
+      "status": "verified complete for specified affine opens",
+      "track": "F2 polynomial relations",
+      "verified": "all four quadratic relation systems in lossless coefficient-block form,with72 literal scalar equations and split-fixture checks"
+    },
+    {
+      "open": "homogenizing-variable saturation of the full quotient ideal",
+      "status": "partial",
+      "track": "saturation",
+      "verified": "norm-denominator saturation by explicit inverse witnesses;complete projective prototype Groebner certificate"
+    },
+    {
+      "open": "closed projective embeddings of the whole proper quotients,all six charts and retained polarization on the model",
+      "status": "partial",
+      "track": "closed embeddings",
+      "verified": "four explicit closed affine embeddings of descended dense opens"
+    },
+    {
+      "open": "seven residual noncuspidal supports;diagonal400 labels lack460 total multiplicity;antidiagonal and point coordinates",
+      "status": "partial",
+      "track": "complete coupled divisors",
+      "verified": "x0*xinf complete on22 closed cusps;all eight pole divisors and all cuspidal zeros"
+    },
+    {
+      "open": "native field semantics,affine Galois-descent scheme equivalence,Tate charts,Hurwitz torsion modules and intersection multiplicities",
+      "status": "partial",
+      "track": "Lean proofs",
+      "verified": "23 new named proofs,including inverse ideals,homogenization,coefficient algebra,ordinary49 exclusion and collision factorization"
+    },
+    {
+      "reason": "user assesses efficiency;no timings or solver run",
+      "status": "not attempted",
+      "track": "IC efficiency"
+    }
+  ],
+  "schema": "koblitz.round10-ledger/v1",
+  "scope": "same-agent exact native checks,fresh replay and parser;shared primitives;global bridges written,partial Lean;no external audit or IC-efficiency claim",
+  "source_sha256": {
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRelations.lean": "38febde27b80bc8783c9fc014f39ef36a4c2c00ac32b19f1aafb1f5c30719835",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound03.lean": "cbf32205f263a982b80c0ac50c9148d042355ddbb9cd1038b2871abc8d25925c",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound04.lean": "dd6466228c1ccbb86717ef967056a5ad66ceea77f3e42bebc2bbf011077a3489",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound05.lean": "3851b3c2e8792fefc7c570dff66d6b41663e4c6652cffdc6e89d1514f2e6a904",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound05Quotients.lean": "21277858836a0a1975e70122641817fd798659c4484ace56da089c16f2a8d3a3",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound06.lean": "12351319504ded38db74c4c88ac1a817d44087621c9aee15ceab38c63e6e3e8d",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound06Matrices.lean": "31eef6aad8b21310d803b001710bf34bc9e2ae3471e09cf165d2a052db62996f",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound07.lean": "5134bf37042f4bc93069ed0be9a1bbf30c32a0e7e2e5fd3c67ddf0bb81943d97",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound07Cofactor.lean": "f3b8fa05054caf55024ad479bdc59545567894bec41aa3faa629a45bfdc29787",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound08.lean": "dfae13c82c955eed366fb2bceaf2c6863624a065a5065dfb32a5b0df11154bf9",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound09.lean": "093e2978e7fc695f7ee60cf151bcb4dc5a7f667d41f9e9d20c76036f7556a3b4",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound10.lean": "e999b42fa3f64c55c24659a19ba14c6230c4ab8463d017dd3fc3aaa02291b127",
+    "research/koblitz_modular_ic_20261018/lean/lake-manifest.json": "dd6855f919d952755062d0a96ab10b510c4e8bdcd237b1926cef3787bbb1fc4e",
+    "research/koblitz_modular_ic_20261018/lean/lakefile.toml": "0dd11355fa2c7dc027ae270769dcd4b97429ede73a049228ed25b6197b60801b",
+    "research/koblitz_modular_ic_20261018/lean/lean-toolchain": "d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b",
+    "research/koblitz_modular_ic_20261018/native/Cargo.lock": "faa6768a05ea62e43872b76d917c03daa005e3e66fb411e1acbad983d5d447cf",
+    "research/koblitz_modular_ic_20261018/native/Cargo.toml": "e40f354535b1dfdba71099cea508ba2adc9d2a69c5958b72774302aeaa7d80c1",
+    "research/koblitz_modular_ic_20261018/native/src/census.rs": "d0aa1d5e1990f23d98e6a8534131fbaeaa01a371068213f273261af29b4d1b16",
+    "research/koblitz_modular_ic_20261018/native/src/cofactor07.rs": "466558f678c8fc7809241832539371de5a194d5c2b41cc4dd2a57159bc076b06",
+    "research/koblitz_modular_ic_20261018/native/src/collision10.rs": "268812788d751b290f6a69d143b18d17cab94b4cdbe1f69a8c16a4e199ef41d9",
+    "research/koblitz_modular_ic_20261018/native/src/controls09.rs": "e4232279b3c41432e5856e6375105080a7b5475ddb06d8456748b11a1e3a17ef",
+    "research/koblitz_modular_ic_20261018/native/src/delpezzo.rs": "61997725ce39c1dbefc2c333a5849002b338748f2c50de68a30437f6cb0f5fac",
+    "research/koblitz_modular_ic_20261018/native/src/delpezzo_conic.rs": "8fd0d10cba53383d5558735738dfdb422157201c2892da94b4e11043a7b248c8",
+    "research/koblitz_modular_ic_20261018/native/src/descent09.rs": "4b5f6f3ba219e4d6c2e595eb2663bac6d73cf77f6ce2299d1508dd4d57dffbfc",
+    "research/koblitz_modular_ic_20261018/native/src/divisors10.rs": "33c4d677f4851425df240bb3467180533c6715ebf7528bfe0a443d2fa167aa04",
+    "research/koblitz_modular_ic_20261018/native/src/forward07.rs": "38613d2eb8adc00397d533d04335c8f37bc7c1ae8279927194b574451d7736b9",
+    "research/koblitz_modular_ic_20261018/native/src/gluing.rs": "b0a85d943bc93bf836089df4c58ed3a47c6619f25e24225aad35c6fefada2d53",
+    "research/koblitz_modular_ic_20261018/native/src/klein_transfer.rs": "007814c025dd856c198754a9bff53c1c22313424b8e72a33caa10893f071cc12",
+    "research/koblitz_modular_ic_20261018/native/src/kummer08.rs": "47896070c7d26f780f49fbe50f146161a5016f2a8eacb03467a17085dd5dfdd4",
+    "research/koblitz_modular_ic_20261018/native/src/large_field.rs": "5c3065650d2e14bb0d2c4b67e022440932614bfe9285445c2ea344bd6de4140a",
+    "research/koblitz_modular_ic_20261018/native/src/main.rs": "9f4cfc87d6116bb6400d93cbc5475a044e542e69f1252fc304c65fea8c4945ff",
+    "research/koblitz_modular_ic_20261018/native/src/modular_geometry.rs": "48a9846f64555b6956dda3079a769e3bcb8a2ab72c2809e0b2d081e31b53549e",
+    "research/koblitz_modular_ic_20261018/native/src/modular_screen.rs": "05bdf66c216a9cc4464c26b0aca72dac5a2f480b34c2c600e2c4c2f1f996763d",
+    "research/koblitz_modular_ic_20261018/native/src/n5_relations.rs": "180df20d5738d2c4b4fe43114c18fa31239450d6865577eeb1b451c267f4ea8d",
+    "research/koblitz_modular_ic_20261018/native/src/odd07.rs": "7f926a55d412c55e90b719e1f8666929fe4d9e5428a762ce564b479fb894fb69",
+    "research/koblitz_modular_ic_20261018/native/src/polarized.rs": "acc7e659b66a2717eb1ffe840deeb779cda3776744a5b53dffc4f20259f588be",
+    "research/koblitz_modular_ic_20261018/native/src/polynomial10.rs": "42442174ca25186284f80a9e2e275ef2518f2377d9ea102ada81c794b958f74a",
+    "research/koblitz_modular_ic_20261018/native/src/quotient_geometry.rs": "0c43e248899f0a432330b796eac8cc8ade400504c1ac26fc89aad1db83b77d82",
+    "research/koblitz_modular_ic_20261018/native/src/quotients06.rs": "72b3e213870ee0b01446370665d46bee68dc706cf9dffa0359fb088ea8dea43d",
+    "research/koblitz_modular_ic_20261018/native/src/quotients07.rs": "ec7d97d0058a94e9d5166c83169abab27bc7619b37d4b41d6e81bd8872b47e3e",
+    "research/koblitz_modular_ic_20261018/native/src/relations08.rs": "982780b8403bbb26a9565fd4102088eca8fb307bc8277226ed870930e21a84e7",
+    "research/koblitz_modular_ic_20261018/native/src/reverse06.rs": "8163028dfb31ed4d987724228f50db52e1803adf77ff2db81d1031f78a045bb3",
+    "research/koblitz_modular_ic_20261018/native/src/round02.rs": "57edff50eba8d500f6bb8c41c5b9d3e6a8ca26644ac985a399ccf838e15d2c02",
+    "research/koblitz_modular_ic_20261018/native/src/round03_record.rs": "f1a8ed8032d3ee5e1322baa9bb90e15a2a10c70ac7e24a4d5736e0bd1b7fe79c",
+    "research/koblitz_modular_ic_20261018/native/src/round04.rs": "e5218295472d9a0a856883feab99618e945215783818a5e464d07602353d642b",
+    "research/koblitz_modular_ic_20261018/native/src/round04_record.rs": "e20e8f45555a9e508f79f2b749860e22e534d3dafc68e5bc0fabc411826a24a7",
+    "research/koblitz_modular_ic_20261018/native/src/round04_verify.rs": "a92696d7b480e8e16f503003909f222f7bf132eb85c47468ac1e187c42737265",
+    "research/koblitz_modular_ic_20261018/native/src/round05.rs": "d4dab2e06a977ad9d9ad8fde4d1194cb598047270b7c2eaf679544c54739424e",
+    "research/koblitz_modular_ic_20261018/native/src/round05_record.rs": "b7480de28b751c803b2aa66629acece6488d5a21046a753ee1c92157fbd57a28",
+    "research/koblitz_modular_ic_20261018/native/src/round06.rs": "31969068a29455e452ab4723a13f3c7837dc38ee86dd7df928c39e6a8ae3f629",
+    "research/koblitz_modular_ic_20261018/native/src/round06_record.rs": "29619bd535365cd08e6f078916b81694cf4c6284861cf24559db6f6591f7be8e",
+    "research/koblitz_modular_ic_20261018/native/src/round07_record.rs": "3e19baecd1c1a3519305a4ef70121342ef0579c8472d4760c602f2f095868174",
+    "research/koblitz_modular_ic_20261018/native/src/round08_record.rs": "88266811e4e66102858030c509e8c15cf72f4e23c3fb9dce5eb4565697ddc4c5",
+    "research/koblitz_modular_ic_20261018/native/src/round09_record.rs": "217dab35209210615fcce71c63f79e7260870f7320336d1f48406b8bd558f850",
+    "research/koblitz_modular_ic_20261018/native/src/round10_record.rs": "9f94f99f41d5749e5e9514df1e567ad9032b730f588e0ed96967aa42f030b891",
+    "research/koblitz_modular_ic_20261018/native/src/round_record.rs": "1df832a5136ae05c423efc8d2a8c6b5f4d59f85836468d766cd986502f1f9502",
+    "research/koblitz_modular_ic_20261018/native/src/saturation10.rs": "418ca0ec74550966a2188f24c3e8623bc7cbc3b291c3618b0715ecbbe96b3e08",
+    "research/koblitz_modular_ic_20261018/native/src/ss10.rs": "7616a1bd9a2a7041a17cf1df2e44d4ee041e52df0a0cc1fa1cbe8bc988dea4bb",
+    "research/koblitz_modular_ic_20261018/rounds/10/PROTOCOL.md": "a8feaf47c1df2a56f549d8c132314c2f3ae39dda72ad6cf2aad7d8bd2f55f939",
+    "research/koblitz_modular_ic_20261018/rounds/10/REPLAY.sh": "597b5a6a86ef2e6103d293185eebec1719745d567aeb9abbf3c6cd16a2c7b1b0",
+    "src/binary_ecc/cover_transfer.rs": "6e801f14abf087b2a6610aa320faf602d176ac764f5eee8e9d88611cdacfa896",
+    "src/binary_ecc/curve.rs": "ceb94d849e17ec0ae678463f2d8a0a3f970f6de6713003abf0544395eb1dcd62",
+    "src/binary_ecc/f2m.rs": "cd25cffcb1d904be8fd8da059f4f0379c1bb60e566592f741e5ca3ee68223548",
+    "src/binary_ecc/hyperelliptic.rs": "09ce8a689aa8e190f51c871f9e94467271ea731b9629f69d322ae716de507c5c",
+    "src/binary_ecc/mod.rs": "84ece02cbf6f897317b236239c47efb0738d0e8e9f3d8530d2d4793609426099",
+    "src/binary_ecc/poly_f2m.rs": "4d76cd2e1fefe1a0decc2b118b12b896577e1fed30c9ee37fece6104487ce55c",
+    "src/cryptanalysis/curve_construction/gf2k.rs": "5c65e8789ce137643e7d256b11b0d1fca9a7770b34d492527749d8ff8efe011e",
+    "src/cryptanalysis/curve_construction/lpoly.rs": "d49576745ec42d9090807a88edb89b6372bfa2c43532240a66017becd31c5ccf",
+    "src/cryptanalysis/curve_construction/modular.rs": "048d106dec860cfbd5ef7b0a49095132c35c07a3ea2265e4c3995dfd5c970871",
+    "src/cryptanalysis/curve_construction/weil.rs": "9f1148e1ecd60e8d77470380639c8dd73856bb22ae2163a2fca23d6e37ddabf4",
+    "src/cryptanalysis/identity_certificate.rs": "d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270",
+    "src/hash/sha256.rs": "2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf"
+  }
+}

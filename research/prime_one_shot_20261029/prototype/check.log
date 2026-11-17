@@ -1,0 +1,10 @@
+PASS fixture m=3 t=4 arm=graeffe variables=25 equations=27 max_input_degree=2 target=(0,6)
+PASS fixture m=3 t=4 arm=remainder variables=33 equations=35 max_input_degree=2 target=(0,6)
+PASS fixture m=5 t=4 arm=graeffe variables=42 equations=44 max_input_degree=2 target=(13,10)
+PASS fixture m=5 t=4 arm=remainder variables=58 equations=60 max_input_degree=2 target=(13,10)
+PASS fixture m=7 t=4 arm=graeffe variables=59 equations=61 max_input_degree=2 target=(0,11)
+PASS fixture m=7 t=4 arm=remainder variables=83 equations=85 max_input_degree=2 target=(0,11)
+PASS scheme distinction: squarefree U=X^2-1, d=2, Graeffe admits tangent epsilon*X; divisibility rejects it
+PASS odd scheme distinction: m=3,d=4, roots 1+epsilon,-1+epsilon,4 pass Graeffe terminal but fail divisibility
+PASS rationality distinction: F17^2 tuple with x={1,12,15,5,6} sums to R=(10,6), but three y coordinates are nonrational
+PASS checks=162 failures=0; local development correctness only; solver_runs=0; timings=not_collected

@@ -1,0 +1,402 @@
+{
+  "schema": "aps.development-checks/v1",
+  "source_commit": "a223c15285edfa4489ea4aadaffed0c67ef84c5f",
+  "source_tree": "a28fdb30393033034f3f872a212ea70017ef973d",
+  "standing": "unverified producer assertions",
+  "observations": [
+    {
+      "id": "nov6-public-corrected/leads",
+      "source_commit": "a223c15285edfa4489ea4aadaffed0c67ef84c5f",
+      "exit": 0,
+      "boundary_note": "Actual public target on the source-only a223 boundary; no benchmark or profiling execution.",
+      "private_log_sha256": "116a183aa8be2234011bcf72be888c2e0a89ef300959f3d2d9a426033dc48c6a",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 6,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "performance_evidence": false,
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --test aps_cost_leads -- --test-threads=2"
+    },
+    {
+      "id": "nov6-public-corrected/existing-bridge",
+      "source_commit": "a223c15285edfa4489ea4aadaffed0c67ef84c5f",
+      "exit": 0,
+      "boundary_note": "Actual public target on the source-only a223 boundary; no benchmark or profiling execution.",
+      "private_log_sha256": "73aef5bb926c1ad2e804fe92c2d252546954ef92417823518dc1d22843d1f885",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "performance_evidence": false,
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --test aps_export_bridge --test aps_ecbench -- --test-threads=2"
+    },
+    {
+      "id": "nov6-public-corrected/examples",
+      "source_commit": "a223c15285edfa4489ea4aadaffed0c67ef84c5f",
+      "exit": 0,
+      "boundary_note": "Actual public target on the source-only a223 boundary; no benchmark or profiling execution.",
+      "private_log_sha256": "3ec5c891ab610cc2616711ec1e63659a53c1c43d01e60d7020e0a78309f66fad",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "performance_evidence": false,
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --example aps_single_relation_check --example aps_scalar_check"
+    },
+    {
+      "id": "nov6-export-final-confirmed/stable",
+      "source_commit": "62a2bc061ef1b43bc5d4f3f7451dcb0305d14b35",
+      "exit": 0,
+      "boundary_note": "Standalone source bytes match a223 exactly; root final suite not implied.",
+      "private_log_sha256": "a26a2366d766ef9520e491770914a6363ba2c41e84a736c00f1305c7c7c01802",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 55,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "performance_evidence": false,
+      "command": "cargo test --release --locked --manifest-path tools/aps-export/Cargo.toml"
+    },
+    {
+      "id": "nov6-export-final-confirmed/rust198",
+      "source_commit": "62a2bc061ef1b43bc5d4f3f7451dcb0305d14b35",
+      "exit": 0,
+      "boundary_note": "Standalone source bytes match a223 exactly; root final suite not implied.",
+      "private_log_sha256": "3b693950219de71a5531296299849f9cfbe8b9379932d274878d833a0621ca9f",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 55,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "performance_evidence": false,
+      "command": "cargo +1.98.0 test --release --locked --manifest-path tools/aps-export/Cargo.toml"
+    },
+    {
+      "id": "nov6-export-final-confirmed/lint-stable",
+      "source_commit": "62a2bc061ef1b43bc5d4f3f7451dcb0305d14b35",
+      "exit": 0,
+      "boundary_note": "Standalone source bytes match a223 exactly; root final suite not implied.",
+      "private_log_sha256": "8c233a54790c4800d3dd585436af679aa838da259bfdb129412e2d51cdb75cdc",
+      "test_summaries": [],
+      "performance_evidence": false,
+      "command": "cargo clippy --locked --manifest-path tools/aps-export/Cargo.toml --all-targets -- -D warnings"
+    },
+    {
+      "id": "nov6-export-final-confirmed/lint-198",
+      "source_commit": "62a2bc061ef1b43bc5d4f3f7451dcb0305d14b35",
+      "exit": 0,
+      "boundary_note": "Standalone source bytes match a223 exactly; root final suite not implied.",
+      "private_log_sha256": "a5f4c585ee974ca44916ac30a98bbc189e067a7e0a6bc6d2e8d6bc525be724af",
+      "test_summaries": [],
+      "performance_evidence": false,
+      "command": "cargo +1.98.0 clippy --locked --manifest-path tools/aps-export/Cargo.toml --all-targets -- -D warnings"
+    },
+    {
+      "id": "nov6-export-final-confirmed/format",
+      "source_commit": "62a2bc061ef1b43bc5d4f3f7451dcb0305d14b35",
+      "exit": 0,
+      "boundary_note": "Standalone source bytes match a223 exactly; root final suite not implied.",
+      "private_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_summaries": [],
+      "performance_evidence": false,
+      "command": "cargo fmt --check --manifest-path tools/aps-export/Cargo.toml"
+    },
+    {
+      "id": "nov6-root-final-serial/lint-198",
+      "source_commit": "62a2bc061ef1b43bc5d4f3f7451dcb0305d14b35",
+      "exit": 0,
+      "boundary_note": "Root source62 boundary. APS selection39/1 includes the refused new positive fixture; corrected at a223 without a production guard change. Other outcomes retain their original boundary.",
+      "private_log_sha256": "87a042319642ec07c679528e106d7595d348700426cd8226584bcdec7d795aef",
+      "test_summaries": [],
+      "performance_evidence": false,
+      "command": "env CARGO_TARGET_DIR=/workspace/aps-root-lint cargo +1.98.0 clippy --release --locked --lib --tests --example aps_single_relation_check --example aps_scalar_check -- -D warnings"
+    },
+    {
+      "id": "nov6-root-final-serial/lint-stable",
+      "source_commit": "62a2bc061ef1b43bc5d4f3f7451dcb0305d14b35",
+      "exit": 0,
+      "boundary_note": "Root source62 boundary. APS selection39/1 includes the refused new positive fixture; corrected at a223 without a production guard change. Other outcomes retain their original boundary.",
+      "private_log_sha256": "d67198a7eae26bb51a80521ecd25bf93904d076ff86d0c9c2b8ea1fd2836600b",
+      "test_summaries": [],
+      "performance_evidence": false,
+      "command": "env CARGO_TARGET_DIR=/workspace/aps-root-lint cargo clippy --release --locked --lib --tests --example aps_single_relation_check --example aps_scalar_check -- -D warnings"
+    },
+    {
+      "id": "nov6-root-final-serial/f4_fp",
+      "source_commit": "62a2bc061ef1b43bc5d4f3f7451dcb0305d14b35",
+      "exit": 0,
+      "boundary_note": "Root source62 boundary. APS selection39/1 includes the refused new positive fixture; corrected at a223 without a production guard change. Other outcomes retain their original boundary.",
+      "private_log_sha256": "1e9a48442816c9565ae35cf9823dcd60c454bf84803452c70a17a889e29f014b",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 76,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-root-final-serial/ecbench-aps",
+      "source_commit": "62a2bc061ef1b43bc5d4f3f7451dcb0305d14b35",
+      "exit": 0,
+      "boundary_note": "Root source62 boundary. APS selection39/1 includes the refused new positive fixture; corrected at a223 without a production guard change. Other outcomes retain their original boundary.",
+      "private_log_sha256": "c1880445c55d8fccdc7751dbbeed9e5ad8643771da03b44993c2bd501c1135e8",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 14,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-root-final-serial/ecbench-callgrind",
+      "source_commit": "62a2bc061ef1b43bc5d4f3f7451dcb0305d14b35",
+      "exit": 0,
+      "boundary_note": "Root source62 boundary. APS selection39/1 includes the refused new positive fixture; corrected at a223 without a production guard change. Other outcomes retain their original boundary.",
+      "private_log_sha256": "44d8f8e77423fd82ba74c0de37b49a71551cb7918fbc819e6b9011070557365e",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-root-final-serial/glv_invariant_base",
+      "source_commit": "62a2bc061ef1b43bc5d4f3f7451dcb0305d14b35",
+      "exit": 0,
+      "boundary_note": "Root source62 boundary. APS selection39/1 includes the refused new positive fixture; corrected at a223 without a production guard change. Other outcomes retain their original boundary.",
+      "private_log_sha256": "5319020646425dfeafe7e5c61e72391fdfa73c430996d9c74b46b2b2bf38f25b",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 15,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-root-final-serial/aps_single_relation",
+      "source_commit": "62a2bc061ef1b43bc5d4f3f7451dcb0305d14b35",
+      "exit": 101,
+      "boundary_note": "Root source62 boundary. APS selection39/1 includes the refused new positive fixture; corrected at a223 without a production guard change. Other outcomes retain their original boundary.",
+      "private_log_sha256": "df72ff287e26083f10b7b8b7a420698d91582c483cd374e9f844f3f649b006eb",
+      "test_summaries": [
+        {
+          "status": "FAILED",
+          "passed": 39,
+          "failed": 1,
+          "ignored": 0
+        }
+      ],
+      "performance_evidence": false,
+      "command": "/workspace/crypto-target/release/deps/crypto_lib-20ef3354171ae5f3 aps_single_relation --test-threads=2"
+    }
+  ],
+  "source_files": [
+    {
+      "path": ".github/workflows/aps-export.yml",
+      "sha256": "6ae326157fb101f7b5f21c104484188fc72da37dd68545f1a3e3accc0857051c"
+    },
+    {
+      "path": ".github/workflows/aps-single-relation.yml",
+      "sha256": "925dbb8c0c8ec446061b606095d5a2c1eb35c29dd62fc2101c587a5c74e55e3e"
+    },
+    {
+      "path": "docs/ecbench/README.md",
+      "sha256": "0f5f0b74502f0be6567a007b44249388e3acfcc727429aeeb1e1ee4ffe257669"
+    },
+    {
+      "path": "examples/aps_scalar_check.rs",
+      "sha256": "b1589d576e299f02a94cd46c09a44c5fb7e493a4146a36a4cdef4bb078823b76"
+    },
+    {
+      "path": "problems/aps-single-relation-complete-cost.md",
+      "sha256": "598bd333b88058aa69e3468394a6ec7737f5a513923aec4306264c5ed9b20757"
+    },
+    {
+      "path": "research/aps_cost_leads_20261106/ACCOUNTING.md",
+      "sha256": "f291b04ef1a00252cd36a2c636a8fff586d3ae10417e8863bf2ef420c49e5111"
+    },
+    {
+      "path": "research/aps_cost_leads_20261106/PROOFS.md",
+      "sha256": "52ae238203caf5b29752e6a397760a18785c14999ebcf4beb71ada6fd77ced93"
+    },
+    {
+      "path": "research/aps_cost_leads_20261106/PROTOCOL.md",
+      "sha256": "734a496e2debb34ff917e7e550fc43b0ada96eebc5ad8700fda696327acf3df4"
+    },
+    {
+      "path": "research/aps_cost_leads_20261106/lean/Frontier.lean",
+      "sha256": "49b5592f3812c094a860eba7b41108a08997115a1b839eb30837bf907c07dcf1"
+    },
+    {
+      "path": "research/aps_cost_leads_20261106/lean/lean-toolchain",
+      "sha256": "d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b"
+    },
+    {
+      "path": "src/cryptanalysis/aps_single_relation.rs",
+      "sha256": "261d9bc0fb8af0c7088ffb2df383bc6bfe4117a74f618950d25a697b94299c8a"
+    },
+    {
+      "path": "src/cryptanalysis/aps_single_relation/leads.rs",
+      "sha256": "1d091f5c20daf2ca8eb16ee31a0ac90f24ad0ebda9dc81c27e07b39f0f335eac"
+    },
+    {
+      "path": "src/cryptanalysis/ecbench/aps/mod.rs",
+      "sha256": "43bb07b98e8bf0aad94afa4313614a8a7f6e00669969d559630b80ce2c477585"
+    },
+    {
+      "path": "src/cryptanalysis/ecbench/aps/tests.rs",
+      "sha256": "57031a027046ea8b817d5fb701a399814d3cd768548c985fbed4c65b5ef3d9e0"
+    },
+    {
+      "path": "src/cryptanalysis/ecbench/callgrind.rs",
+      "sha256": "64ace681c6ecdca26895f7789164e9225d5d785ec9a620547888a5a44814a724"
+    },
+    {
+      "path": "src/cryptanalysis/ecbench/methods.rs",
+      "sha256": "8ff59b55ceddad6d6edb80fc0e5f9264649214039efff2ef0c44576911392164"
+    },
+    {
+      "path": "src/cryptanalysis/f4_fp.rs",
+      "sha256": "9a917100358d9142be733131cfcdbb816c46dc1d9630c280c8990d7ec90b1ade"
+    },
+    {
+      "path": "src/cryptanalysis/f4_fp/reuse.rs",
+      "sha256": "9db1f3bb6133bbd9cb97ce9e4118d1592f2c5a05ea50fe95fdd0d8fd6178318e"
+    },
+    {
+      "path": "src/cryptanalysis/ic_measurement.rs",
+      "sha256": "b2bc883f7a7cfc194ebcba78991b9aca901285acebf01187f56bd3e6fe57f980"
+    },
+    {
+      "path": "tests/aps_cost_leads.rs",
+      "sha256": "69834ce5b02c340f321cf678e3585441257379b5935bb932d6f7be92d7350908"
+    },
+    {
+      "path": "tools/aps-export/CONTRACT.md",
+      "sha256": "93eb71832517bb22c228da73ce515f41c028d07ca5d73846d3c81b4c2d3d77cc"
+    },
+    {
+      "path": "tools/aps-export/Cargo.lock",
+      "sha256": "d10588947f62d3a834540040a6fc044a124c6b9a7d496ad6480ba63aa6170379"
+    },
+    {
+      "path": "tools/aps-export/Cargo.toml",
+      "sha256": "ad640ffa6ff591d38bae52ca5ca8493567d2ed1ecb5c8126b9ae0fcf8e0f7e43"
+    },
+    {
+      "path": "tools/aps-export/README.md",
+      "sha256": "4d944e80134ac0993cbe0c30db80a144db14e52ed9d6d2b084fe9903ea336655"
+    },
+    {
+      "path": "tools/aps-export/src/audit.rs",
+      "sha256": "1d295d550ee008e93edd06c11638cacebdbdcec56f5c0c3fce3ad7b2024be5f8"
+    },
+    {
+      "path": "tools/aps-export/src/audit/leads.rs",
+      "sha256": "44112b4164a648376262f60a4f1bd5711d0c61a0afcb301296e5179d5626c24e"
+    },
+    {
+      "path": "tools/aps-export/src/inclusive.rs",
+      "sha256": "360c846e5a2d554fa3d4bcffecadac15636345cfa2c1ed2de25b2e505d53be1d"
+    },
+    {
+      "path": "tools/aps-export/src/lib.rs",
+      "sha256": "6933c3c32852d6abae708745cb2b14ea3fe680cc8453c63f4dfad96cf206d779"
+    },
+    {
+      "path": "tools/aps-export/src/main.rs",
+      "sha256": "37cdf55f0a8dd8b2f27f98c3f2556fd211991cb4b8b4f05f21d9150d66b86626"
+    },
+    {
+      "path": "tools/aps-export/src/package.rs",
+      "sha256": "4ab5d63c15784447fe9f1bad8313bb7b28492142f15739ba1d79e8e2ac08b4c5"
+    },
+    {
+      "path": "tools/aps-export/src/tests.rs",
+      "sha256": "092f22a3b189130a8438fe733f5728356afe34fe5073726d85543d04ed910fcd"
+    }
+  ],
+  "full_library_outcome": "separate final receipt; currently in flight",
+  "checkpoint_upload_completed": false,
+  "benchmark_launched": false,
+  "raw_logs_published": false
+}

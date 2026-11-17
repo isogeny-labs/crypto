@@ -1,0 +1,16 @@
+{
+  "schema": "lit-sweep.crossovers/v1",
+  "note": "Crossover points as stated by each paper (reported, not checked here). 'log10_n' is log10 of the stated size; when a paper states 2^k, log10_n = k*log10(2) (layout conversion only). 'unit' is variables (n) or clauses (m).",
+  "rows": [
+    {"label": "OpenAI #k-SAT vs brute force 2^n, C=2", "source": "arXiv:2611.00517 (Dias, Lima), abstract", "stated": "n ~ 10^32", "unit": "variables", "log10_n": 32},
+    {"label": "OpenAI #k-SAT vs brute force 2^n, C=3", "source": "arXiv:2611.00517, abstract", "stated": "n ~ 10^126", "unit": "variables", "log10_n": 126},
+    {"label": "OpenAI #k-SAT vs brute force 2^n, C=10", "source": "arXiv:2611.00517, abstract", "stated": "n ~ 10^3517", "unit": "variables", "log10_n": 3517},
+    {"label": "OpenAI vs PPSZ 2^{0.386n}, C=1 (our estimate)", "source": "crypto literature note, addendum 2026-10-26 (derived here: log n ~ 10^6, natural log)", "stated": "ln n ~ 10^6", "unit": "variables", "log10_n": 434294},
+    {"label": "OpenAI tensor-contraction route, density O(1)", "source": "arXiv:2611.00517, abstract", "stated": "log2(n+m) > 10^9", "unit": "variables+clauses", "log10_n": 301029996},
+    {"label": "OpenAI Appendix D route, clause density 1", "source": "arXiv:2610.41622 (Majdoddin), body", "stated": "~2^(4.4e10) clauses", "unit": "clauses", "log10_n": 13245217908},
+    {"label": "Anthropic #3-SAT, density 1 (previous)", "source": "arXiv:2610.41622, abstract", "stated": "2^33858 clauses", "unit": "clauses", "log10_n": 10192.3},
+    {"label": "Anthropic #3-SAT, density 1 (lowered)", "source": "arXiv:2610.41622, abstract", "stated": "~2^420 clauses", "unit": "clauses", "log10_n": 126.4},
+    {"label": "Anthropic #3-SAT, general (lowered)", "source": "arXiv:2610.41622, abstract", "stated": "2^(8.6e9) variables", "unit": "variables", "log10_n": 2588857971}
+  ],
+  "reference_band": {"label": "practical SAT / point-decomposition instance scale (indicative: 10^2 to 10^5 variables; not measured in this sweep)", "log10_lo": 2, "log10_hi": 5}
+}

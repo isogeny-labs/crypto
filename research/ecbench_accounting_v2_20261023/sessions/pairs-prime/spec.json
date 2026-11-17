@@ -1,0 +1,25 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "accounting v2 study: frozen id beside its v2 id, generic methods on a registered-style 20-bit prime-order curve",
+  "description": "Every frozen generic method of the accounting v2 change beside its v2 id on the same workloads and the same per-(workload, round) algorithm seed (spec.rs derives one seed per workload and round, shared by every arm). Same curve constructor as docs/ecbench/specs/smoke-prime-v2.json (prime_search, 20 bits, seed 59297), eight single-target workloads. rho.plain has no v2 id and is the unchanged-id control; rho-neg-v2-aa repeats the reference as the A/A arm. Counts are the result; wall time is descriptive only.",
+  "workloads": {
+    "curves": [{"kind": "prime_search", "bits": 20, "seed": 59297}],
+    "targets_per_curve": 8,
+    "target_seed": 20261023
+  },
+  "arms": [
+    {"name": "rho-neg-v2", "role": "reference", "method": {"id": "rho.negation_v2"}},
+    {"name": "rho-neg", "role": "baseline", "method": {"id": "rho.negation"}},
+    {"name": "rho-plain", "role": "baseline", "method": {"id": "rho.plain"}},
+    {"name": "bsgs", "role": "baseline", "method": {"id": "bsgs.textbook"}},
+    {"name": "bsgs-v2", "role": "candidate", "method": {"id": "bsgs.textbook_v2"}},
+    {"name": "bsgs-il", "role": "baseline", "method": {"id": "bsgs.interleaved"}},
+    {"name": "bsgs-il-v2", "role": "candidate", "method": {"id": "bsgs.interleaved_v2"}},
+    {"name": "bsgs-neg", "role": "baseline", "method": {"id": "bsgs.negation"}},
+    {"name": "bsgs-neg-v2", "role": "candidate", "method": {"id": "bsgs.negation_v2"}},
+    {"name": "kangaroo", "role": "baseline", "method": {"id": "kangaroo.vow"}},
+    {"name": "kangaroo-v2", "role": "candidate", "method": {"id": "kangaroo.vow_v2"}},
+    {"name": "rho-neg-v2-aa", "role": "control", "method": {"id": "rho.negation_v2"}}
+  ],
+  "measurement": {"rounds": 4, "warmup": 1, "order": "alternate", "seed": 20261023, "isolation_required": "L2", "timeout_seconds": 300}
+}

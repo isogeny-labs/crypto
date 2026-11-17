@@ -1,0 +1,13 @@
+# C67: exact image cells and bounded quintic cell certificates
+
+The finite-algebra image theorem was implemented withoutdivision:for monicH,the characteristic polynomialBofmultiplicationbyL_U(X)onK[X]/Hretains everyrootimage withmultiplicity. If the domain is a union ofUcosets,HsupportedinD iffBsupportedinL_U(D). Generic principal-minor determinants preserve characteristics2,3,5and nonreduced algebras.
+
+Exhaustive independent small-field tests passed6513monic polynomials overF4,F8,F16,F3,F9,F5,including1024quinticsand odd-extensioncases.391supportedpolynomials matched literalroot-image products;allcases satisfiedCayley-Hamilton and exactsupport equivalence. A recorded collision hasH=X^3andH=(X+1)^3mappingtoY^3inF8. Thereforeanimagecell cannotreplace alloriginalpreimages withone representative.
+
+On84frozenGF83quintics,the exactimage support agreed with the independent original repeated-root-safe oracle:36supported,48rejected. The corpus includes32previously rejected samples fromtheactual73parameter normrelaxation,allfourvalidatedconditionalordinary/Koblitzpositive records,andknown-factorcontrols. WithVlow18andUlow13,theimagedomain has32elements;pair-productrank15leavesa68dimensionalquotient. This is a predicate/representation test,not a completedmainfive-source search.
+
+The nextprototype formed exactBooleanANFcoefficients of the projected secondimage-Vieta guard on nested4,5,6,7parameter cells. The actualnormparameter rank is73. Nonconstantcoefficient ranks were15,31,63,68andANFdegrees4,5,6,7. Explicitdualmasks separate theconstant fromallnonconstantcoefficients at widths4/5/6,certifyingentirecells of16/32/64assignmentsunsupported. These nestedcellscover64distinctparameters,not112distinctpoints;rawcertified_points112is the sum ofoverlappingcell-pointoccurrences. The128pointcellalsohadnosupportednormandallguardvaluesnonzero,butitsconstantlayinthesaturatedcoefficientspan,sothelinearcertificatefailed.
+
+All240cell-point evaluations and originalsupport checks were charged. Certificateconstruction enumerates eachcell;no pruningwork reduction orend-to-endgain is claimed. Thelinear-affinehullcertificate is insufficientfor thelargercell,and thefullANFdegrees refute anunqualifiedlow-degree surrogate. The newhypothesis is a quadraticseparator inimage-guardoutputs,with exactBooleancompositionverification and no discardedremainder.
+
+Three frozen90s/4GiB/core0experiments ran throughcheckedresume/run-ready. Sources,inputs,rawresults,hashesandcertificatesremain. No50xgenuineF4/F5/F6gain,twenty-hard many-fieldqualification,noveltyclearance ororiginalglobalquinticcompletionisestablished. Imagecounts816and376992areconditionalimage-multiset counts only;preimage solvingremainsopen. The scientificgoal remainsactive.

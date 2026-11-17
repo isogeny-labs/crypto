@@ -1,0 +1,126 @@
+{
+  "schema": "pencil-accounting-coverage/v1",
+  "source_manifest": "source-manifest.json",
+  "categories": [
+    {
+      "category": "base_field",
+      "candidate_source": "group Field counts plus native pencil base arithmetic",
+      "rho_source": "group Field counts",
+      "coverage": "partial",
+      "pricing": "historical M/S/I normalized by source addition",
+      "disjoint_rule": "Subtract only actual inverse expansion; base-add subtraction convention must match source Field",
+      "change_class": "analyzer + validation coverage rebuild",
+      "required_assertion": "Phase sum and setup total equal disjoint cold arithmetic; positive shared denominator"
+    },
+    {
+      "category": "scalar",
+      "candidate_source": "native arithmetic + symbolic meter",
+      "rho_source": "Ring *_uncharged",
+      "coverage": "raw_asymmetric_normalizer_available",
+      "pricing": "inherited native per atomic add/neg,mul,inv",
+      "disjoint_rule": "Remove pencil inverse internal multiplications exactly once; retain primality powers",
+      "change_class": "analyzer-only for recorded events",
+      "required_assertion": "checked sums/subtraction; per-helper event equivalence and wide-modulus cases"
+    },
+    {
+      "category": "outer_primality",
+      "candidate_source": "engine is_prime(p/r) before setup counters",
+      "rho_source": "audit actual reference dispatch validation; charge actual calls only",
+      "coverage": "unmetered",
+      "pricing": "base vs scalar modular primitives in named validation domain; existing grid",
+      "disjoint_rule": "Do not charge symbolic constructor primality twice; same helper convention both arms",
+      "change_class": "rebuild instrument",
+      "required_assertion": "Fixed prime/composite fixtures match independent loop counts; phase difference includes rejected attempts"
+    },
+    {
+      "category": "symbolic_graph",
+      "candidate_source": "Snapshot arithmetic/map/payload/parent counters",
+      "rho_source": "rho graph/walk counters under its native convention",
+      "coverage": "partial",
+      "pricing": "inherited native semantic units; explicit disjoint registry",
+      "disjoint_rule": "Diagnostic residual updates/inversions overlap primitive counters; not additional arithmetic",
+      "change_class": "rebuild for missing events + analyzer",
+      "required_assertion": "No key suffix auto-summing; whitelist partition with total=category sum"
+    },
+    {
+      "category": "sieve_sets",
+      "candidate_source": "ordinary BTreeSet candidates/exceptional/dedup",
+      "rho_source": "rho own key/hash/set operations",
+      "coverage": "unmetered comparable event layer",
+      "pricing": "native per declared semantic compare/lookup/visit",
+      "disjoint_rule": "No automatic sum API-call and every primitive as same cost event",
+      "change_class": "rebuild instrument",
+      "required_assertion": "Tracked wrapper preserves insertion/iteration/results; independent known-sequence event oracle"
+    },
+    {
+      "category": "node_inventory_vectors",
+      "candidate_source": "LinearSolver new node scan; rational_y clones; sieve bucket/index scans",
+      "rho_source": "rho jump table construction and walk vectors",
+      "coverage": "partial",
+      "pricing": "native per named scan/copy/init event under declared model",
+      "disjoint_rule": "Do not add scalar/base arithmetic again as scan work; memory bytes separate",
+      "change_class": "rebuild instrument",
+      "required_assertion": "Empty/full/sparse fixtures count each visit,allocation-free loop trace oracle"
+    },
+    {
+      "category": "allocation",
+      "candidate_source": "ecbench solve_one None; standalone observer exists",
+      "rho_source": "actual ecbench rho observer not established",
+      "coverage": "unavailable_in_cohort_adapter",
+      "pricing": "no historical GAE price; supplemental requested bytes/events",
+      "disjoint_rule": "Envelope vs phases overlap; allocator bytes not RSS/copied bytes",
+      "change_class": "rebuild only if allocation observations required",
+      "required_assertion": "Independent observer layout/failure tests; symmetric scope; missing stays null"
+    },
+    {
+      "category": "rss",
+      "candidate_source": "child max_rss_kib",
+      "rho_source": "same harness child field",
+      "coverage": "available_metric_not_allocation",
+      "pricing": "no historical GAE price",
+      "disjoint_rule": "Max RSS never sum phases or candidate/reference",
+      "change_class": "analyzer-only",
+      "required_assertion": "Preserve unit/null and process scope"
+    },
+    {
+      "category": "adapter_verification",
+      "candidate_source": "fresh source check and report/calibration after core",
+      "rho_source": "same ecbench adapter",
+      "coverage": "field_checks_counted_other_work_partial",
+      "pricing": "historical fields + explicitly registered native overhead",
+      "disjoint_rule": "Parent audit outside method; source calibration is valuation setup not method arithmetic unless separately included",
+      "change_class": "rebuild if complete logical envelope requested",
+      "required_assertion": "Cold phase totals include exact adapter check; calibration counts separate labelled block"
+    },
+    {
+      "category": "common_cold_wall",
+      "candidate_source": "method_call_wall_ns",
+      "rho_source": "same shared timer",
+      "coverage": "boundary_implemented_qualification_pending",
+      "pricing": "ns not GAE",
+      "disjoint_rule": "Includes whole invocation; excludes harness reconstruction/preparation/serialization/parent audit",
+      "change_class": "no additional counter rebuild prerequisite",
+      "required_assertion": "L2 covers whole interval; independent AA cold admission and non-restored epoch"
+    },
+    {
+      "category": "online_wall",
+      "candidate_source": "five phases online.wall_ns",
+      "rho_source": "same declared phase schema",
+      "coverage": "qualification_pending",
+      "pricing": "ns not GAE",
+      "disjoint_rule": "Partition only; do not add phases to cold",
+      "change_class": "analyzer-only after qualified records",
+      "required_assertion": "checked exact sum; explicit error:null; independent online AA"
+    },
+    {
+      "category": "whole_run",
+      "candidate_source": "process/harness/audit/checkpoints/restores/gates",
+      "rho_source": "same execution flow",
+      "coverage": "export_admission_pending",
+      "pricing": "resource/time/currency only when measured; no historical GAE price",
+      "disjoint_rule": "Process overlaps method; fresh benchmark vs computation separate; no deletion of failed cost",
+      "change_class": "export/analyzer + deployment receipt binding",
+      "required_assertion": "Flow covers planned,attempted,interrupted,resumed,capped,missing with immutable IDs"
+    }
+  ]
+}

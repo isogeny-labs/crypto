@@ -1,0 +1,34 @@
+{
+  "schema": "large-curve-development-checks/v1",
+  "dates": ["2026-10-28", "2026-10-29"],
+  "scope": "Fixed public known-answer correctness fixtures and exact proof replay, with no parameter search or timing comparison.",
+  "implementation_commit": "992fb37fea16540443a341f252f402f2b9bbc40a",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "native_tests": {
+    "command": "cargo test --locked --manifest-path research/guarded_fall_degree_20261028/native/Cargo.toml",
+    "exit_code": 0,
+    "passed": 43,
+    "failed": 0,
+    "log": "native-tests.txt",
+    "breakdown": {"library": 27, "constructive_producer": 5, "repository_identity_records": 11}
+  },
+  "formatting": {"command": "cargo fmt --manifest-path research/guarded_fall_degree_20261028/native/Cargo.toml -- --check", "exit_code": 0},
+  "clippy": {"command": "cargo clippy --locked --manifest-path research/guarded_fall_degree_20261028/native/Cargo.toml --all-targets -- -D warnings", "exit_code": 0, "log": "clippy.txt"},
+  "fixed_fixture_flow": {"planned": 4, "issued": 4, "constructed": 4, "independently_replayed": 4, "failed": 0, "excluded": 0},
+  "fixture_records": "../fixtures/",
+  "openssl": {
+    "command": "c++ -std=c++17 -O2 -Wall -Wextra -Werror openssl_points.cpp -lcrypto -o /tmp/large-curve-openssl-points",
+    "compile_exit_code": 0,
+    "execution_exit_code": 0,
+    "version": "OpenSSL 3.5.7 9 Jun 2026",
+    "curves_checked": 4,
+    "public_points_checked": 112,
+    "all_public_coordinates_match": true,
+    "all_curve_parameters_match": true,
+    "full_output": "openssl-points.json",
+    "comparison_receipts": "../fixtures/*/openssl-recheck.json"
+  },
+  "library_validation": "library-tests.json",
+  "limitations": "Upper DAGs are replayed at degree five; exact degree and first fall use the written uniform theorem. No new lower closure, prime-field GF(2) carry-circuit bound, large binary numerical fixture, full-DLP measurement, or full Lean degree theorem is certified here."
+}

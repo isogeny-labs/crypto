@@ -1,0 +1,54 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "generator-effect E4, curve c7: A/A (gstd, second target seed)",
+ "description": "E4 A/A arm: gstd of c7 again with target_seed 20261020, same arms, 2000 targets.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 12934321,
+    "a": 12934318,
+    "b": 11171511,
+    "group_order": 12928247,
+    "r": 12928247,
+    "gx": 0,
+    "gy": 930954
+   }
+  ],
+  "targets_per_curve": 2000,
+  "target_seed": 20261020,
+  "target_kind": "planted_shared"
+ },
+ "arms": [
+  {
+   "name": "ic-abscissa",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=235",
+     "oracle": "mitm:negation_folded=1,m=2"
+    }
+   }
+  },
+  {
+   "name": "ic-knownlog-random",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "known-log:size=235,scalars=random",
+     "oracle": "mitm:negation_folded=1,m=2"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261019,
+  "isolation_required": "L0",
+  "timeout_seconds": 600
+ }
+}

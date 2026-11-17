@@ -1,0 +1,151 @@
+"""Polynomial-block acceleration of the third-gcd correction recurrence.
+All verification is exact; no runtime benchmark or ECDLP speedup claim.
+"""
+from pathlib import Path
+import importlib.util,json,math
+D=Path(__file__).resolve().parent;R=D.parent
+s=importlib.util.spec_from_file_location('stream',R/'triple-log-derivative/check.py');stream=importlib.util.module_from_spec(s);s.loader.exec_module(stream)
+
+class Poly:
+    def __init__(self,p):
+        self.p=p;self.karatsuba_calls=0;self.newton_steps=0;self.max_length=0
+    def trim(self,a):
+        a=list(a)
+        while len(a)>1 and a[-1]==0:a.pop()
+        if not a:a=[0]
+        self.max_length=max(self.max_length,len(a));return a
+    def add(self,a,b):
+        c=[0]*max(len(a),len(b))
+        for i,x in enumerate(a):c[i]+=x
+        for i,x in enumerate(b):c[i]+=x
+        return self.trim([x%self.p for x in c])
+    def neg(self,a):return self.trim([-x%self.p for x in a])
+    def sub(self,a,b):return self.add(a,self.neg(b))
+    def scale(self,a,c):return self.trim([x*c%self.p for x in a])
+    def mul(self,a,b):
+        a=self.trim(a);b=self.trim(b)
+        if a==[0] or b==[0]:return [0]
+        if min(len(a),len(b))<=12:
+            c=[0]*(len(a)+len(b)-1)
+            for i,x in enumerate(a):
+                for j,y in enumerate(b):c[i+j]=(c[i+j]+x*y)%self.p
+            return self.trim(c)
+        self.karatsuba_calls+=1;k=(max(len(a),len(b))+1)//2
+        a0,a1=a[:k],a[k:];b0,b1=b[:k],b[k:]
+        lo=self.mul(a0,b0);hi=self.mul(a1,b1)
+        middle=self.sub(self.sub(self.mul(self.add(a0,a1),self.add(b0,b1)),lo),hi)
+        return self.add(self.add(lo,[0]*k+middle),[0]*(2*k)+hi)
+    def inv_series(self,a,n):
+        assert n>=1 and a[0]%self.p
+        v=[pow(a[0],-1,self.p)];k=1
+        while k<n:
+            k=min(2*k,n);v=self.mul(v,self.sub([2],self.mul(a[:k],v)[:k]))[:k];v=self.trim(v);self.newton_steps+=1
+        return v
+    def divrem(self,a,b):
+        a=self.trim(a);b=self.trim(b);assert b!=[0]
+        if len(a)<len(b):return [0],a
+        n=len(a)-len(b)+1
+        reverse_q=self.mul(list(reversed(a))[:n],self.inv_series(list(reversed(b)),n))[:n]
+        reverse_q+= [0]*(n-len(reverse_q));q=self.trim(list(reversed(reverse_q)))
+        remainder=self.sub(a,self.mul(q,b));assert len(remainder)<len(b) or remainder==[0]
+        return q,remainder
+    def product_tree(self,points):
+        if len(points)==1:return ([-points[0]%self.p,1],None,None)
+        k=len(points)//2;l=self.product_tree(points[:k]);r=self.product_tree(points[k:])
+        return (self.mul(l[0],r[0]),l,r)
+    def values(self,a,tree):
+        a=self.divrem(a,tree[0])[1]
+        if tree[1] is None:return [a[0]]
+        return self.values(a,tree[1])+self.values(a,tree[2])
+
+def matrix_product(P,A,B):
+    C=[[[0] for _ in range(3)] for _ in range(3)]
+    for i in range(3):
+        for j in range(3):
+            for k in range(3):C[i][j]=P.add(C[i][j],P.mul(A[i][k],B[k][j]))
+    return C
+
+def block_polynomials(P,r,tau,z,lo,hi):
+    h=(r-1)//2
+    if hi-lo==1:
+        j=[lo%r,1];A=P.scale(P.sub([h+1],j),1+tau);C=P.scale(P.sub([2*(h+1)],j),tau)
+        return [[A,C,[0]],[j,[0],[0]],[A,C,P.scale(j,z)]],j
+    middle=(lo+hi)//2;L,dL=block_polynomials(P,r,tau,z,lo,middle);U,dU=block_polynomials(P,r,tau,z,middle,hi)
+    return matrix_product(P,U,L),P.mul(dU,dL)
+
+def correction(r,tau,z):
+    assert r>3 and tau%r not in (0,1)
+    tau%=r;z%=r;m=(r-3)//2;b=math.isqrt(m)
+    if b*b<m:b+=1
+    blocks,tail=divmod(m,b);P=Poly(r)
+    M,d=block_polynomials(P,r,tau,z,1,b+1)
+    points=[k*b%r for k in range(blocks)];tree=P.product_tree(points)
+    matrices=[[P.values(M[i][j],tree) for j in range(3)] for i in range(3)];denoms=P.values(d,tree)
+    state=[1,0,1];denom=1
+    for k in range(blocks):
+        state=[sum(matrices[i][j][k]*state[j] for j in range(3))%r for i in range(3)];denom=denom*denoms[k]%r
+    h=(r-1)//2
+    for j in range(blocks*b+1,m+1):
+        A=(h+1-j)*(1+tau)%r;C=(2*(h+1)-j)*tau%r;q=(A*state[0]+C*state[1])%r
+        state=[q,j*state[0]%r,(q+j*z*state[2])%r];denom=denom*j%r
+    assert denom
+    value=state[2]*pow(denom,-1,r)%r
+    return value,dict(recurrence_length=m,block_size=b,full_blocks=blocks,tail_steps=tail,karatsuba_calls=P.karatsuba_calls,newton_steps=P.newton_steps,max_polynomial_length=P.max_length,normalization=denom)
+
+def evaluate(r,tau,signs,z):
+    # Reuse the already derived endpoint/pole rules, replacing only correction.
+    old=stream.correction
+    try:
+        stream.correction=correction
+        out=stream.evaluate(r,tau,signs,z)
+    finally:stream.correction=old
+    if out['status']=='finite':out['block_certificate']=out.pop('coefficient_steps')
+    else:out.pop('coefficient_steps')
+    return out
+
+def schoolbook(a,b,p):
+    c=[0]*(len(a)+len(b)-1)
+    for i,x in enumerate(a):
+        for j,y in enumerate(b):c[i+j]=(c[i+j]+x*y)%p
+    return stream.v.trim(c)
+
+def algebra_checks():
+    records=[]
+    for p in [5,13,73,257]:
+        P=Poly(p)
+        for n,k in [(1,1),(13,14),(33,27),(64,65)]:
+            a=[(i*i+3*i+1)%p for i in range(n)];b=[(2*i*i+i+2)%p for i in range(k)];b[-1]=1
+            product=P.mul(a,b);assert product==schoolbook(a,b,p)
+            q,rem=P.divrem(product,b);assert q==P.trim(a) and rem==[0]
+            numerator=P.add(product,[2,1]);q,rem=P.divrem(numerator,b)
+            assert numerator==P.add(P.mul(q,b),rem) and (rem==[0] or len(rem)<len(b))
+            points=list(range(min(p,17)));vals=P.values(a,P.product_tree(points))
+            assert vals==[stream.v.horner(a,x,p) for x in points]
+            inverse=P.inv_series([1,2,3],n);check=P.mul([1,2,3],inverse)[:n]
+            assert check[0]==1 and all(x==0 for x in check[1:])
+            records.append(dict(p=p,lengths=[n,k],points=len(points)))
+        assert P.karatsuba_calls and P.newton_steps
+    return records
+
+def main():
+    algebra=algebra_checks();old=json.loads((R/'triple-log-derivative/validation.json').read_text());logs=[];finite=poles=0
+    for row in old['records']:
+        r,tau,signs=row['r'],row['tau'],row['signs'];values=[]
+        for ev in row['results']:
+            out=evaluate(r,tau,signs,ev['z']);assert out['status']==ev['status'] and out['value']==ev['value']
+            finite+=out['status']=='finite';poles+=out['status']=='pole'
+            values.append(dict(z=ev['z'],**out))
+        logs.append(dict(r=r,tau=tau,signs=signs,degree=row['degree'],results=values))
+    longer=[]
+    for r in [127,257,1009,4093]:
+        assert stream.v.ec.prime(r)
+        for tau in [2,3]:
+            for z in [0,1,17,r//2,r-1]:
+                expected,steps=stream.correction(r,tau,z);value,cert=correction(r,tau,z);assert value==expected
+                assert cert['recurrence_length']==steps
+                if r>=4093:assert cert['karatsuba_calls']>0
+                longer.append(dict(r=r,tau=tau,z=z,value=value,certificate=cert))
+    result=dict(scope='Exact polynomial-block recurrence evaluator; sublinear arithmetic upper bound, no timing or ECDLP speedup claim',algebra_checks=algebra,records=logs,finite_checks=finite,pole_checks=poles,longer_recurrence_checks=longer,longer_count=len(longer),new_source_ecdlp_recoveries=0,timing_measurements=0)
+    (D/'validation.json').write_text(json.dumps(result,indent=2)+'\n')
+    print(dict(algebra_checks=len(algebra),finite_checks=finite,pole_checks=poles,longer_checks=len(longer),largest_r=4093))
+if __name__=='__main__':main()

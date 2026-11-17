@@ -1,0 +1,549 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp16-t73-6dc97f36 | 16.00 | bsgs-neg | 80/80 | 1.025 | 1.125 | 2.023 | — |
+| icv1-fp16-t73-6dc97f36 | 16.00 | ic-pair-b32 | 80/80 | 10.394 | 11.045 | 16.906 | — |
+| icv1-fp16-t73-6dc97f36 | 16.00 | ic-pair-rule | 80/80 | 9.991 | 10.754 | 17.621 | — |
+| icv1-fp16-t73-6dc97f36 | 16.00 | ic-rootfind-m3-rule | 80/80 | 16.687 | 18.113 | 30.947 | — |
+| icv1-fp16-t73-6dc97f36 | 16.00 | kangaroo | 80/80 | 2.275 | 2.324 | 2.768 | — |
+| icv1-fp16-t73-6dc97f36 | 16.00 | rho-neg | 80/80 | 1.808 | 1.928 | 3.014 | — |
+| icv1-fp16-t73-6dc97f36 | 16.00 | rho-neg-aa | 80/80 | 1.808 | 1.928 | 3.014 | — |
+| icv1-fp17-t433-f7ba78cd | 17.00 | bsgs-neg | 80/80 | 1.038 | 1.138 | 2.045 | — |
+| icv1-fp17-t433-f7ba78cd | 17.00 | ic-pair-b32 | 80/80 | 9.553 | 10.362 | 17.640 | — |
+| icv1-fp17-t433-f7ba78cd | 17.00 | ic-pair-rule | 80/80 | 10.640 | 11.785 | 22.092 | — |
+| icv1-fp17-t433-f7ba78cd | 17.00 | ic-rootfind-m3-rule | 80/80 | 17.910 | 19.399 | 32.805 | — |
+| icv1-fp17-t433-f7ba78cd | 17.00 | kangaroo | 80/80 | 2.300 | 2.353 | 2.829 | — |
+| icv1-fp17-t433-f7ba78cd | 17.00 | rho-neg | 80/80 | 1.549 | 1.660 | 2.663 | — |
+| icv1-fp17-t433-f7ba78cd | 17.00 | rho-neg-aa | 80/80 | 1.549 | 1.660 | 2.663 | — |
+| icv1-fp18-tm443-965d79a1 | 18.00 | bsgs-neg | 80/80 | 0.989 | 1.086 | 1.960 | — |
+| icv1-fp18-tm443-965d79a1 | 18.00 | ic-pair-b32 | 80/80 | 9.833 | 10.905 | 20.552 | — |
+| icv1-fp18-tm443-965d79a1 | 18.00 | ic-pair-rule | 80/80 | 9.420 | 10.232 | 17.537 | — |
+| icv1-fp18-tm443-965d79a1 | 18.00 | ic-rootfind-m3-rule | 80/80 | 17.944 | 19.574 | 34.248 | — |
+| icv1-fp18-tm443-965d79a1 | 18.00 | kangaroo | 80/80 | 2.020 | 2.063 | 2.451 | — |
+| icv1-fp18-tm443-965d79a1 | 18.00 | rho-neg | 80/80 | 1.419 | 1.529 | 2.525 | — |
+| icv1-fp18-tm443-965d79a1 | 18.00 | rho-neg-aa | 80/80 | 1.419 | 1.529 | 2.525 | — |
+| icv1-fp19-t421-365a7ecd | 19.00 | bsgs-neg | 80/80 | 1.050 | 1.153 | 2.084 | — |
+| icv1-fp19-t421-365a7ecd | 19.00 | ic-pair-b32 | 80/80 | 11.263 | 12.803 | 26.666 | — |
+| icv1-fp19-t421-365a7ecd | 19.00 | ic-pair-rule | 80/80 | 10.488 | 11.821 | 23.822 | — |
+| icv1-fp19-t421-365a7ecd | 19.00 | ic-rootfind-m3-rule | 80/80 | 20.767 | 22.725 | 40.343 | — |
+| icv1-fp19-t421-365a7ecd | 19.00 | kangaroo | 80/80 | 2.946 | 3.020 | 3.686 | — |
+| icv1-fp19-t421-365a7ecd | 19.00 | rho-neg | 80/80 | 1.198 | 1.295 | 2.168 | — |
+| icv1-fp19-t421-365a7ecd | 19.00 | rho-neg-aa | 80/80 | 1.198 | 1.295 | 2.168 | — |
+| icv1-fp20-t383-4f71b2c3 | 20.00 | bsgs-neg | 80/80 | 1.009 | 1.109 | 2.009 | — |
+| icv1-fp20-t383-4f71b2c3 | 20.00 | ic-pair-b32 | 80/80 | 13.991 | 16.250 | 36.572 | — |
+| icv1-fp20-t383-4f71b2c3 | 20.00 | ic-pair-rule | 80/80 | 11.164 | 12.684 | 26.370 | — |
+| icv1-fp20-t383-4f71b2c3 | 20.00 | ic-rootfind-m3-rule | 80/80 | 25.627 | 28.122 | 50.582 | — |
+| icv1-fp20-t383-4f71b2c3 | 20.00 | kangaroo | 80/80 | 2.629 | 2.659 | 2.928 | — |
+| icv1-fp20-t383-4f71b2c3 | 20.00 | rho-neg | 80/80 | 1.266 | 1.376 | 2.368 | — |
+| icv1-fp20-t383-4f71b2c3 | 20.00 | rho-neg-aa | 80/80 | 1.266 | 1.376 | 2.368 | — |
+| icv1-fp21-t1033-c52e1dd8 | 21.00 | bsgs-neg | 80/80 | 1.004 | 1.103 | 1.998 | — |
+| icv1-fp21-t1033-c52e1dd8 | 21.00 | ic-pair-b32 | 80/80 | 16.668 | 19.603 | 46.016 | — |
+| icv1-fp21-t1033-c52e1dd8 | 21.00 | ic-pair-rule | 80/80 | 10.927 | 12.032 | 21.976 | — |
+| icv1-fp21-t1033-c52e1dd8 | 21.00 | ic-rootfind-m3-rule | 80/80 | 23.433 | 25.953 | 48.626 | — |
+| icv1-fp21-t1033-c52e1dd8 | 21.00 | kangaroo | 80/80 | 1.738 | 1.757 | 1.932 | — |
+| icv1-fp21-t1033-c52e1dd8 | 21.00 | rho-neg | 80/80 | 1.236 | 1.348 | 2.355 | — |
+| icv1-fp21-t1033-c52e1dd8 | 21.00 | rho-neg-aa | 80/80 | 1.236 | 1.348 | 2.355 | — |
+| icv1-fp22-t3137-6ad861dc | 22.00 | bsgs-neg | 80/80 | 1.026 | 1.128 | 2.048 | — |
+| icv1-fp22-t3137-6ad861dc | 22.00 | ic-pair-b32 | 80/80 | 21.855 | 25.927 | 62.570 | — |
+| icv1-fp22-t3137-6ad861dc | 22.00 | ic-pair-rule | 80/80 | 11.964 | 13.209 | 24.413 | — |
+| icv1-fp22-t3137-6ad861dc | 22.00 | ic-rootfind-m3-rule | 80/80 | 26.984 | 29.811 | 55.263 | — |
+| icv1-fp22-t3137-6ad861dc | 22.00 | kangaroo | 80/80 | 2.354 | 2.382 | 2.639 | — |
+| icv1-fp22-t3137-6ad861dc | 22.00 | rho-neg | 80/80 | 1.200 | 1.311 | 2.314 | — |
+| icv1-fp22-t3137-6ad861dc | 22.00 | rho-neg-aa | 80/80 | 1.200 | 1.311 | 2.314 | — |
+| icv1-fp23-t2515-d8810008 | 23.00 | bsgs-neg | 80/80 | 1.075 | 1.183 | 2.146 | — |
+| icv1-fp23-t2515-d8810008 | 23.00 | ic-pair-b32 | 80/80 | 29.867 | 35.615 | 87.348 | — |
+| icv1-fp23-t2515-d8810008 | 23.00 | ic-pair-rule | 80/80 | 12.484 | 13.756 | 25.210 | — |
+| icv1-fp23-t2515-d8810008 | 23.00 | ic-rootfind-m3-rule | 80/80 | 34.960 | 38.524 | 70.600 | — |
+| icv1-fp23-t2515-d8810008 | 23.00 | kangaroo | 80/80 | 2.113 | 2.140 | 2.383 | — |
+| icv1-fp23-t2515-d8810008 | 23.00 | rho-neg | 80/80 | 1.099 | 1.196 | 2.071 | — |
+| icv1-fp23-t2515-d8810008 | 23.00 | rho-neg-aa | 80/80 | 1.099 | 1.196 | 2.071 | — |
+| icv1-fp24-tm5099-a6f137c6 | 24.00 | bsgs-neg | 80/80 | 1.000 | 1.099 | 1.996 | — |
+| icv1-fp24-tm5099-a6f137c6 | 24.00 | ic-pair-b32 | 80/80 | 43.153 | 51.607 | 127.690 | — |
+| icv1-fp24-tm5099-a6f137c6 | 24.00 | ic-pair-rule | 80/80 | 14.077 | 15.561 | 28.922 | — |
+| icv1-fp24-tm5099-a6f137c6 | 24.00 | ic-rootfind-m3-rule | 80/80 | 31.906 | 36.232 | 75.166 | — |
+| icv1-fp24-tm5099-a6f137c6 | 24.00 | kangaroo | 80/80 | 2.172 | 2.186 | 2.308 | — |
+| icv1-fp24-tm5099-a6f137c6 | 24.00 | rho-neg | 80/80 | 1.036 | 1.131 | 1.981 | — |
+| icv1-fp24-tm5099-a6f137c6 | 24.00 | rho-neg-aa | 80/80 | 1.036 | 1.131 | 1.981 | — |
+| icv1-fp25-tm7173-b0644037 | 25.00 | bsgs-neg | 80/80 | 0.963 | 1.059 | 1.923 | — |
+| icv1-fp25-tm7173-b0644037 | 25.00 | ic-pair-b32 | 80/80 | 60.764 | 72.772 | 180.845 | — |
+| icv1-fp25-tm7173-b0644037 | 25.00 | ic-pair-rule | 80/80 | 15.101 | 16.671 | 30.797 | — |
+| icv1-fp25-tm7173-b0644037 | 25.00 | ic-rootfind-m3-rule | 80/80 | 38.172 | 42.838 | 84.826 | — |
+| icv1-fp25-tm7173-b0644037 | 25.00 | kangaroo | 80/80 | 3.473 | 3.495 | 3.687 | — |
+| icv1-fp25-tm7173-b0644037 | 25.00 | rho-neg | 80/80 | 1.028 | 1.125 | 1.992 | — |
+| icv1-fp25-tm7173-b0644037 | 25.00 | rho-neg-aa | 80/80 | 1.028 | 1.125 | 1.992 | — |
+| icv1-fp26-t5897-9124aa40 | 26.00 | bsgs-neg | 80/80 | 0.994 | 1.093 | 1.986 | — |
+| icv1-fp26-t5897-9124aa40 | 26.00 | ic-pair-b32 | 80/80 | 82.484 | 98.854 | 246.184 | — |
+| icv1-fp26-t5897-9124aa40 | 26.00 | ic-pair-rule | 80/80 | 16.709 | 18.461 | 34.229 | — |
+| icv1-fp26-t5897-9124aa40 | 26.00 | ic-rootfind-m3-rule | 80/80 | 40.494 | 46.644 | 101.991 | — |
+| icv1-fp26-t5897-9124aa40 | 26.00 | kangaroo | 80/80 | 2.714 | 2.731 | 2.883 | — |
+| icv1-fp26-t5897-9124aa40 | 26.00 | rho-neg | 80/80 | 0.995 | 1.090 | 1.943 | — |
+| icv1-fp26-t5897-9124aa40 | 26.00 | rho-neg-aa | 80/80 | 0.995 | 1.090 | 1.943 | — |
+| icv1-fp27-tm1521-bb102e62 | 27.00 | bsgs-neg | 80/80 | 1.035 | 1.138 | 2.069 | — |
+| icv1-fp27-tm1521-bb102e62 | 27.00 | ic-pair-b32 | 80/80 | 117.534 | 140.920 | 351.387 | — |
+| icv1-fp27-tm1521-bb102e62 | 27.00 | ic-pair-rule | 80/80 | 18.205 | 20.085 | 37.003 | — |
+| icv1-fp27-tm1521-bb102e62 | 27.00 | ic-rootfind-m3-rule | 80/80 | 50.677 | 57.211 | 116.009 | — |
+| icv1-fp27-tm1521-bb102e62 | 27.00 | kangaroo | 80/80 | 1.965 | 1.971 | 2.029 | — |
+| icv1-fp27-tm1521-bb102e62 | 27.00 | rho-neg | 80/80 | 0.943 | 1.034 | 1.854 | — |
+| icv1-fp27-tm1521-bb102e62 | 27.00 | rho-neg-aa | 80/80 | 0.943 | 1.034 | 1.854 | — |
+| icv1-fp28-t28201-65099091 | 28.00 | bsgs-neg | 80/80 | 0.957 | 1.052 | 1.913 | — |
+| icv1-fp28-t28201-65099091 | 28.00 | ic-pair-b32 | 80/80 | 170.205 | 204.112 | 509.276 | — |
+| icv1-fp28-t28201-65099091 | 28.00 | ic-pair-rule | 80/80 | 20.355 | 23.434 | 51.142 | — |
+| icv1-fp28-t28201-65099091 | 28.00 | ic-rootfind-m3-rule | 80/80 | 53.734 | 62.379 | 140.190 | — |
+| icv1-fp28-t28201-65099091 | 28.00 | kangaroo | 80/80 | 2.117 | 2.123 | 2.180 | — |
+| icv1-fp28-t28201-65099091 | 28.00 | rho-neg | 80/80 | 0.901 | 0.988 | 1.778 | — |
+| icv1-fp28-t28201-65099091 | 28.00 | rho-neg-aa | 80/80 | 0.901 | 0.988 | 1.778 | — |
+| icv1-fp29-t3691-ef449c0c | 29.00 | bsgs-neg | 80/80 | 0.996 | 1.096 | 1.992 | — |
+| icv1-fp29-t3691-ef449c0c | 29.00 | ic-pair-rule | 80/80 | 22.009 | 25.308 | 54.998 | — |
+| icv1-fp29-t3691-ef449c0c | 29.00 | kangaroo | 80/80 | 1.930 | 1.936 | 1.991 | — |
+| icv1-fp29-t3691-ef449c0c | 29.00 | rho-neg | 80/80 | 0.979 | 1.076 | 1.942 | — |
+| icv1-fp29-t3691-ef449c0c | 29.00 | rho-neg-aa | 80/80 | 0.979 | 1.076 | 1.942 | — |
+| icv1-fp30-t21791-a644ba69 | 30.00 | bsgs-neg | 80/80 | 1.021 | 1.124 | 2.043 | — |
+| icv1-fp30-t21791-a644ba69 | 30.00 | ic-pair-rule | 80/80 | 24.556 | 28.244 | 61.434 | — |
+| icv1-fp30-t21791-a644ba69 | 30.00 | kangaroo | 80/80 | 2.028 | 2.035 | 2.092 | — |
+| icv1-fp30-t21791-a644ba69 | 30.00 | rho-neg | 80/80 | 0.862 | 0.947 | 1.712 | — |
+| icv1-fp30-t21791-a644ba69 | 30.00 | rho-neg-aa | 80/80 | 0.862 | 0.947 | 1.712 | — |
+| icv1-fp31-tm3989-ae9db972 | 31.00 | bsgs-neg | 80/80 | 1.004 | 1.104 | 2.007 | — |
+| icv1-fp31-tm3989-ae9db972 | 31.00 | ic-pair-rule | 80/80 | 28.179 | 31.105 | 57.438 | — |
+| icv1-fp31-tm3989-ae9db972 | 31.00 | kangaroo | 80/80 | 2.119 | 2.123 | 2.154 | — |
+| icv1-fp31-tm3989-ae9db972 | 31.00 | rho-neg | 80/80 | 0.960 | 1.055 | 1.912 | — |
+| icv1-fp31-tm3989-ae9db972 | 31.00 | rho-neg-aa | 80/80 | 0.960 | 1.055 | 1.912 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | bsgs-neg | 80/80 | 1.020 | 1.122 | 2.041 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | ic-pair-rule | 80/80 | 31.377 | 36.137 | 78.977 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | kangaroo | 80/80 | 1.926 | 1.929 | 1.957 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | rho-neg | 80/80 | 0.988 | 1.087 | 1.971 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | rho-neg-aa | 80/80 | 0.988 | 1.087 | 1.971 | — |
+| icv1-fp33-tm78373-cca7741c | 33.00 | bsgs-neg | 80/80 | 0.978 | 1.076 | 1.956 | — |
+| icv1-fp33-tm78373-cca7741c | 33.00 | ic-pair-rule | 80/80 | 34.809 | 40.079 | 87.511 | — |
+| icv1-fp33-tm78373-cca7741c | 33.00 | kangaroo | 80/80 | 2.300 | 2.304 | 2.336 | — |
+| icv1-fp33-tm78373-cca7741c | 33.00 | rho-neg | 80/80 | 0.951 | 1.046 | 1.897 | — |
+| icv1-fp33-tm78373-cca7741c | 33.00 | rho-neg-aa | 80/80 | 0.951 | 1.046 | 1.897 | — |
+| icv1-fp34-tm105659-9a86130d | 34.00 | bsgs-neg | 80/80 | 1.017 | 1.119 | 2.035 | — |
+| icv1-fp34-tm105659-9a86130d | 34.00 | ic-pair-rule | 80/80 | 39.528 | 43.656 | 80.803 | — |
+| icv1-fp34-tm105659-9a86130d | 34.00 | kangaroo | 80/80 | 2.023 | 2.026 | 2.054 | — |
+| icv1-fp34-tm105659-9a86130d | 34.00 | rho-neg | 80/80 | 0.932 | 1.025 | 1.861 | — |
+| icv1-fp34-tm105659-9a86130d | 34.00 | rho-neg-aa | 80/80 | 0.932 | 1.025 | 1.861 | — |
+| icv1-fp35-t95269-01c9f49d | 35.00 | bsgs-neg | 80/80 | 1.024 | 1.127 | 2.049 | — |
+| icv1-fp35-t95269-01c9f49d | 35.00 | ic-pair-rule | 80/80 | 44.226 | 48.852 | 90.489 | — |
+| icv1-fp35-t95269-01c9f49d | 35.00 | kangaroo | 80/80 | 3.016 | 3.021 | 3.064 | — |
+| icv1-fp35-t95269-01c9f49d | 35.00 | rho-neg | 80/80 | 0.847 | 0.931 | 1.692 | — |
+| icv1-fp35-t95269-01c9f49d | 35.00 | rho-neg-aa | 80/80 | 0.847 | 0.931 | 1.692 | — |
+| icv1-fp36-t454193-44a20818 | 36.00 | bsgs-neg | 80/80 | 0.988 | 1.086 | 1.975 | — |
+| icv1-fp36-t454193-44a20818 | 36.00 | ic-pair-rule | 80/80 | 48.091 | 55.352 | 120.705 | — |
+| icv1-fp36-t454193-44a20818 | 36.00 | kangaroo | 80/80 | 1.779 | 1.780 | 1.792 | — |
+| icv1-fp36-t454193-44a20818 | 36.00 | rho-neg | 80/80 | 0.826 | 0.908 | 1.650 | — |
+| icv1-fp36-t454193-44a20818 | 36.00 | rho-neg-aa | 80/80 | 0.826 | 0.908 | 1.650 | — |
+| icv1-fp37-t428317-60c650c8 | 37.00 | bsgs-neg | 80/80 | 1.053 | 1.158 | 2.106 | — |
+| icv1-fp37-t428317-60c650c8 | 37.00 | ic-pair-rule | 80/80 | 51.704 | 59.412 | 128.776 | — |
+| icv1-fp37-t428317-60c650c8 | 37.00 | kangaroo | 80/80 | 2.672 | 2.674 | 2.692 | — |
+| icv1-fp37-t428317-60c650c8 | 37.00 | rho-neg | 80/80 | 1.012 | 1.113 | 2.022 | — |
+| icv1-fp37-t428317-60c650c8 | 37.00 | rho-neg-aa | 80/80 | 1.012 | 1.113 | 2.022 | — |
+| icv1-fp38-t925069-ef71b7ab | 38.00 | bsgs-neg | 80/80 | 1.006 | 1.106 | 2.011 | — |
+| icv1-fp38-t925069-ef71b7ab | 38.00 | ic-pair-rule | 80/80 | 59.279 | 68.192 | 148.411 | — |
+| icv1-fp38-t925069-ef71b7ab | 38.00 | kangaroo | 80/80 | 1.816 | 1.817 | 1.830 | — |
+| icv1-fp38-t925069-ef71b7ab | 38.00 | rho-neg | 80/80 | 0.887 | 0.975 | 1.772 | — |
+| icv1-fp38-t925069-ef71b7ab | 38.00 | rho-neg-aa | 80/80 | 0.887 | 0.975 | 1.772 | — |
+| icv1-fp39-t776897-fef4eae4 | 39.00 | bsgs-neg | 80/80 | 0.984 | 1.082 | 1.967 | — |
+| icv1-fp39-t776897-fef4eae4 | 39.00 | ic-pair-rule | 80/80 | 65.644 | 75.485 | 164.054 | — |
+| icv1-fp39-t776897-fef4eae4 | 39.00 | kangaroo | 80/80 | 2.532 | 2.534 | 2.551 | — |
+| icv1-fp39-t776897-fef4eae4 | 39.00 | rho-neg | 80/80 | 0.950 | 1.044 | 1.899 | — |
+| icv1-fp39-t776897-fef4eae4 | 39.00 | rho-neg-aa | 80/80 | 0.950 | 1.044 | 1.899 | — |
+| icv1-fp40-tm924137-0ecaaeb9 | 40.00 | bsgs-neg | 80/80 | 0.979 | 1.077 | 1.957 | — |
+| icv1-fp40-tm924137-0ecaaeb9 | 40.00 | ic-pair-rule | 80/80 | 73.606 | 84.652 | 184.073 | — |
+| icv1-fp40-tm924137-0ecaaeb9 | 40.00 | kangaroo | 80/80 | 2.170 | 2.171 | 2.179 | — |
+| icv1-fp40-tm924137-0ecaaeb9 | 40.00 | rho-neg | 80/80 | 0.946 | 1.040 | 1.891 | — |
+| icv1-fp40-tm924137-0ecaaeb9 | 40.00 | rho-neg-aa | 80/80 | 0.946 | 1.040 | 1.891 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp16-t73-6dc97f36 | bsgs-neg vs ic-pair-b32 | bsgs-neg < ic-pair-b32 |
+| icv1-fp16-t73-6dc97f36 | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp16-t73-6dc97f36 | bsgs-neg vs ic-rootfind-m3-rule | bsgs-neg < ic-rootfind-m3-rule |
+| icv1-fp16-t73-6dc97f36 | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp16-t73-6dc97f36 | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| icv1-fp16-t73-6dc97f36 | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| icv1-fp16-t73-6dc97f36 | ic-pair-b32 vs ic-pair-rule | unresolved inside the band |
+| icv1-fp16-t73-6dc97f36 | ic-pair-b32 vs ic-rootfind-m3-rule | ic-pair-b32 < ic-rootfind-m3-rule |
+| icv1-fp16-t73-6dc97f36 | ic-pair-b32 vs kangaroo | kangaroo < ic-pair-b32 |
+| icv1-fp16-t73-6dc97f36 | ic-pair-b32 vs rho-neg | rho-neg < ic-pair-b32 |
+| icv1-fp16-t73-6dc97f36 | ic-pair-b32 vs rho-neg-aa | rho-neg-aa < ic-pair-b32 |
+| icv1-fp16-t73-6dc97f36 | ic-pair-rule vs ic-rootfind-m3-rule | ic-pair-rule < ic-rootfind-m3-rule |
+| icv1-fp16-t73-6dc97f36 | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp16-t73-6dc97f36 | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp16-t73-6dc97f36 | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp16-t73-6dc97f36 | ic-rootfind-m3-rule vs kangaroo | kangaroo < ic-rootfind-m3-rule |
+| icv1-fp16-t73-6dc97f36 | ic-rootfind-m3-rule vs rho-neg | rho-neg < ic-rootfind-m3-rule |
+| icv1-fp16-t73-6dc97f36 | ic-rootfind-m3-rule vs rho-neg-aa | rho-neg-aa < ic-rootfind-m3-rule |
+| icv1-fp16-t73-6dc97f36 | kangaroo vs rho-neg | unresolved inside the band |
+| icv1-fp16-t73-6dc97f36 | kangaroo vs rho-neg-aa | unresolved inside the band |
+| icv1-fp16-t73-6dc97f36 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp17-t433-f7ba78cd | bsgs-neg vs ic-pair-b32 | bsgs-neg < ic-pair-b32 |
+| icv1-fp17-t433-f7ba78cd | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp17-t433-f7ba78cd | bsgs-neg vs ic-rootfind-m3-rule | bsgs-neg < ic-rootfind-m3-rule |
+| icv1-fp17-t433-f7ba78cd | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp17-t433-f7ba78cd | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| icv1-fp17-t433-f7ba78cd | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| icv1-fp17-t433-f7ba78cd | ic-pair-b32 vs ic-pair-rule | ic-pair-b32 < ic-pair-rule |
+| icv1-fp17-t433-f7ba78cd | ic-pair-b32 vs ic-rootfind-m3-rule | ic-pair-b32 < ic-rootfind-m3-rule |
+| icv1-fp17-t433-f7ba78cd | ic-pair-b32 vs kangaroo | kangaroo < ic-pair-b32 |
+| icv1-fp17-t433-f7ba78cd | ic-pair-b32 vs rho-neg | rho-neg < ic-pair-b32 |
+| icv1-fp17-t433-f7ba78cd | ic-pair-b32 vs rho-neg-aa | rho-neg-aa < ic-pair-b32 |
+| icv1-fp17-t433-f7ba78cd | ic-pair-rule vs ic-rootfind-m3-rule | ic-pair-rule < ic-rootfind-m3-rule |
+| icv1-fp17-t433-f7ba78cd | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp17-t433-f7ba78cd | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp17-t433-f7ba78cd | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp17-t433-f7ba78cd | ic-rootfind-m3-rule vs kangaroo | kangaroo < ic-rootfind-m3-rule |
+| icv1-fp17-t433-f7ba78cd | ic-rootfind-m3-rule vs rho-neg | rho-neg < ic-rootfind-m3-rule |
+| icv1-fp17-t433-f7ba78cd | ic-rootfind-m3-rule vs rho-neg-aa | rho-neg-aa < ic-rootfind-m3-rule |
+| icv1-fp17-t433-f7ba78cd | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp17-t433-f7ba78cd | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp17-t433-f7ba78cd | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp18-tm443-965d79a1 | bsgs-neg vs ic-pair-b32 | bsgs-neg < ic-pair-b32 |
+| icv1-fp18-tm443-965d79a1 | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp18-tm443-965d79a1 | bsgs-neg vs ic-rootfind-m3-rule | bsgs-neg < ic-rootfind-m3-rule |
+| icv1-fp18-tm443-965d79a1 | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp18-tm443-965d79a1 | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| icv1-fp18-tm443-965d79a1 | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| icv1-fp18-tm443-965d79a1 | ic-pair-b32 vs ic-pair-rule | ic-pair-rule < ic-pair-b32 |
+| icv1-fp18-tm443-965d79a1 | ic-pair-b32 vs ic-rootfind-m3-rule | ic-pair-b32 < ic-rootfind-m3-rule |
+| icv1-fp18-tm443-965d79a1 | ic-pair-b32 vs kangaroo | kangaroo < ic-pair-b32 |
+| icv1-fp18-tm443-965d79a1 | ic-pair-b32 vs rho-neg | rho-neg < ic-pair-b32 |
+| icv1-fp18-tm443-965d79a1 | ic-pair-b32 vs rho-neg-aa | rho-neg-aa < ic-pair-b32 |
+| icv1-fp18-tm443-965d79a1 | ic-pair-rule vs ic-rootfind-m3-rule | ic-pair-rule < ic-rootfind-m3-rule |
+| icv1-fp18-tm443-965d79a1 | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp18-tm443-965d79a1 | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp18-tm443-965d79a1 | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp18-tm443-965d79a1 | ic-rootfind-m3-rule vs kangaroo | kangaroo < ic-rootfind-m3-rule |
+| icv1-fp18-tm443-965d79a1 | ic-rootfind-m3-rule vs rho-neg | rho-neg < ic-rootfind-m3-rule |
+| icv1-fp18-tm443-965d79a1 | ic-rootfind-m3-rule vs rho-neg-aa | rho-neg-aa < ic-rootfind-m3-rule |
+| icv1-fp18-tm443-965d79a1 | kangaroo vs rho-neg | unresolved inside the band |
+| icv1-fp18-tm443-965d79a1 | kangaroo vs rho-neg-aa | unresolved inside the band |
+| icv1-fp18-tm443-965d79a1 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp19-t421-365a7ecd | bsgs-neg vs ic-pair-b32 | bsgs-neg < ic-pair-b32 |
+| icv1-fp19-t421-365a7ecd | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp19-t421-365a7ecd | bsgs-neg vs ic-rootfind-m3-rule | bsgs-neg < ic-rootfind-m3-rule |
+| icv1-fp19-t421-365a7ecd | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp19-t421-365a7ecd | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| icv1-fp19-t421-365a7ecd | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| icv1-fp19-t421-365a7ecd | ic-pair-b32 vs ic-pair-rule | ic-pair-rule < ic-pair-b32 |
+| icv1-fp19-t421-365a7ecd | ic-pair-b32 vs ic-rootfind-m3-rule | ic-pair-b32 < ic-rootfind-m3-rule |
+| icv1-fp19-t421-365a7ecd | ic-pair-b32 vs kangaroo | kangaroo < ic-pair-b32 |
+| icv1-fp19-t421-365a7ecd | ic-pair-b32 vs rho-neg | rho-neg < ic-pair-b32 |
+| icv1-fp19-t421-365a7ecd | ic-pair-b32 vs rho-neg-aa | rho-neg-aa < ic-pair-b32 |
+| icv1-fp19-t421-365a7ecd | ic-pair-rule vs ic-rootfind-m3-rule | ic-pair-rule < ic-rootfind-m3-rule |
+| icv1-fp19-t421-365a7ecd | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp19-t421-365a7ecd | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp19-t421-365a7ecd | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp19-t421-365a7ecd | ic-rootfind-m3-rule vs kangaroo | kangaroo < ic-rootfind-m3-rule |
+| icv1-fp19-t421-365a7ecd | ic-rootfind-m3-rule vs rho-neg | rho-neg < ic-rootfind-m3-rule |
+| icv1-fp19-t421-365a7ecd | ic-rootfind-m3-rule vs rho-neg-aa | rho-neg-aa < ic-rootfind-m3-rule |
+| icv1-fp19-t421-365a7ecd | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp19-t421-365a7ecd | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp19-t421-365a7ecd | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp20-t383-4f71b2c3 | bsgs-neg vs ic-pair-b32 | bsgs-neg < ic-pair-b32 |
+| icv1-fp20-t383-4f71b2c3 | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp20-t383-4f71b2c3 | bsgs-neg vs ic-rootfind-m3-rule | bsgs-neg < ic-rootfind-m3-rule |
+| icv1-fp20-t383-4f71b2c3 | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp20-t383-4f71b2c3 | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| icv1-fp20-t383-4f71b2c3 | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| icv1-fp20-t383-4f71b2c3 | ic-pair-b32 vs ic-pair-rule | ic-pair-rule < ic-pair-b32 |
+| icv1-fp20-t383-4f71b2c3 | ic-pair-b32 vs ic-rootfind-m3-rule | ic-pair-b32 < ic-rootfind-m3-rule |
+| icv1-fp20-t383-4f71b2c3 | ic-pair-b32 vs kangaroo | kangaroo < ic-pair-b32 |
+| icv1-fp20-t383-4f71b2c3 | ic-pair-b32 vs rho-neg | rho-neg < ic-pair-b32 |
+| icv1-fp20-t383-4f71b2c3 | ic-pair-b32 vs rho-neg-aa | rho-neg-aa < ic-pair-b32 |
+| icv1-fp20-t383-4f71b2c3 | ic-pair-rule vs ic-rootfind-m3-rule | ic-pair-rule < ic-rootfind-m3-rule |
+| icv1-fp20-t383-4f71b2c3 | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp20-t383-4f71b2c3 | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp20-t383-4f71b2c3 | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp20-t383-4f71b2c3 | ic-rootfind-m3-rule vs kangaroo | kangaroo < ic-rootfind-m3-rule |
+| icv1-fp20-t383-4f71b2c3 | ic-rootfind-m3-rule vs rho-neg | rho-neg < ic-rootfind-m3-rule |
+| icv1-fp20-t383-4f71b2c3 | ic-rootfind-m3-rule vs rho-neg-aa | rho-neg-aa < ic-rootfind-m3-rule |
+| icv1-fp20-t383-4f71b2c3 | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp20-t383-4f71b2c3 | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp20-t383-4f71b2c3 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp21-t1033-c52e1dd8 | bsgs-neg vs ic-pair-b32 | bsgs-neg < ic-pair-b32 |
+| icv1-fp21-t1033-c52e1dd8 | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp21-t1033-c52e1dd8 | bsgs-neg vs ic-rootfind-m3-rule | bsgs-neg < ic-rootfind-m3-rule |
+| icv1-fp21-t1033-c52e1dd8 | bsgs-neg vs kangaroo | unresolved inside the band |
+| icv1-fp21-t1033-c52e1dd8 | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| icv1-fp21-t1033-c52e1dd8 | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| icv1-fp21-t1033-c52e1dd8 | ic-pair-b32 vs ic-pair-rule | ic-pair-rule < ic-pair-b32 |
+| icv1-fp21-t1033-c52e1dd8 | ic-pair-b32 vs ic-rootfind-m3-rule | ic-pair-b32 < ic-rootfind-m3-rule |
+| icv1-fp21-t1033-c52e1dd8 | ic-pair-b32 vs kangaroo | kangaroo < ic-pair-b32 |
+| icv1-fp21-t1033-c52e1dd8 | ic-pair-b32 vs rho-neg | rho-neg < ic-pair-b32 |
+| icv1-fp21-t1033-c52e1dd8 | ic-pair-b32 vs rho-neg-aa | rho-neg-aa < ic-pair-b32 |
+| icv1-fp21-t1033-c52e1dd8 | ic-pair-rule vs ic-rootfind-m3-rule | ic-pair-rule < ic-rootfind-m3-rule |
+| icv1-fp21-t1033-c52e1dd8 | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp21-t1033-c52e1dd8 | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp21-t1033-c52e1dd8 | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp21-t1033-c52e1dd8 | ic-rootfind-m3-rule vs kangaroo | kangaroo < ic-rootfind-m3-rule |
+| icv1-fp21-t1033-c52e1dd8 | ic-rootfind-m3-rule vs rho-neg | rho-neg < ic-rootfind-m3-rule |
+| icv1-fp21-t1033-c52e1dd8 | ic-rootfind-m3-rule vs rho-neg-aa | rho-neg-aa < ic-rootfind-m3-rule |
+| icv1-fp21-t1033-c52e1dd8 | kangaroo vs rho-neg | unresolved inside the band |
+| icv1-fp21-t1033-c52e1dd8 | kangaroo vs rho-neg-aa | unresolved inside the band |
+| icv1-fp21-t1033-c52e1dd8 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp22-t3137-6ad861dc | bsgs-neg vs ic-pair-b32 | bsgs-neg < ic-pair-b32 |
+| icv1-fp22-t3137-6ad861dc | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp22-t3137-6ad861dc | bsgs-neg vs ic-rootfind-m3-rule | bsgs-neg < ic-rootfind-m3-rule |
+| icv1-fp22-t3137-6ad861dc | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp22-t3137-6ad861dc | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| icv1-fp22-t3137-6ad861dc | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| icv1-fp22-t3137-6ad861dc | ic-pair-b32 vs ic-pair-rule | ic-pair-rule < ic-pair-b32 |
+| icv1-fp22-t3137-6ad861dc | ic-pair-b32 vs ic-rootfind-m3-rule | unresolved inside the band |
+| icv1-fp22-t3137-6ad861dc | ic-pair-b32 vs kangaroo | kangaroo < ic-pair-b32 |
+| icv1-fp22-t3137-6ad861dc | ic-pair-b32 vs rho-neg | rho-neg < ic-pair-b32 |
+| icv1-fp22-t3137-6ad861dc | ic-pair-b32 vs rho-neg-aa | rho-neg-aa < ic-pair-b32 |
+| icv1-fp22-t3137-6ad861dc | ic-pair-rule vs ic-rootfind-m3-rule | ic-pair-rule < ic-rootfind-m3-rule |
+| icv1-fp22-t3137-6ad861dc | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp22-t3137-6ad861dc | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp22-t3137-6ad861dc | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp22-t3137-6ad861dc | ic-rootfind-m3-rule vs kangaroo | kangaroo < ic-rootfind-m3-rule |
+| icv1-fp22-t3137-6ad861dc | ic-rootfind-m3-rule vs rho-neg | rho-neg < ic-rootfind-m3-rule |
+| icv1-fp22-t3137-6ad861dc | ic-rootfind-m3-rule vs rho-neg-aa | rho-neg-aa < ic-rootfind-m3-rule |
+| icv1-fp22-t3137-6ad861dc | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp22-t3137-6ad861dc | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp22-t3137-6ad861dc | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp23-t2515-d8810008 | bsgs-neg vs ic-pair-b32 | bsgs-neg < ic-pair-b32 |
+| icv1-fp23-t2515-d8810008 | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp23-t2515-d8810008 | bsgs-neg vs ic-rootfind-m3-rule | bsgs-neg < ic-rootfind-m3-rule |
+| icv1-fp23-t2515-d8810008 | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp23-t2515-d8810008 | bsgs-neg vs rho-neg | unresolved inside the band |
+| icv1-fp23-t2515-d8810008 | bsgs-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp23-t2515-d8810008 | ic-pair-b32 vs ic-pair-rule | ic-pair-rule < ic-pair-b32 |
+| icv1-fp23-t2515-d8810008 | ic-pair-b32 vs ic-rootfind-m3-rule | unresolved inside the band |
+| icv1-fp23-t2515-d8810008 | ic-pair-b32 vs kangaroo | kangaroo < ic-pair-b32 |
+| icv1-fp23-t2515-d8810008 | ic-pair-b32 vs rho-neg | rho-neg < ic-pair-b32 |
+| icv1-fp23-t2515-d8810008 | ic-pair-b32 vs rho-neg-aa | rho-neg-aa < ic-pair-b32 |
+| icv1-fp23-t2515-d8810008 | ic-pair-rule vs ic-rootfind-m3-rule | ic-pair-rule < ic-rootfind-m3-rule |
+| icv1-fp23-t2515-d8810008 | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp23-t2515-d8810008 | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp23-t2515-d8810008 | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp23-t2515-d8810008 | ic-rootfind-m3-rule vs kangaroo | kangaroo < ic-rootfind-m3-rule |
+| icv1-fp23-t2515-d8810008 | ic-rootfind-m3-rule vs rho-neg | rho-neg < ic-rootfind-m3-rule |
+| icv1-fp23-t2515-d8810008 | ic-rootfind-m3-rule vs rho-neg-aa | rho-neg-aa < ic-rootfind-m3-rule |
+| icv1-fp23-t2515-d8810008 | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp23-t2515-d8810008 | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp23-t2515-d8810008 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp24-tm5099-a6f137c6 | bsgs-neg vs ic-pair-b32 | bsgs-neg < ic-pair-b32 |
+| icv1-fp24-tm5099-a6f137c6 | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp24-tm5099-a6f137c6 | bsgs-neg vs ic-rootfind-m3-rule | bsgs-neg < ic-rootfind-m3-rule |
+| icv1-fp24-tm5099-a6f137c6 | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp24-tm5099-a6f137c6 | bsgs-neg vs rho-neg | unresolved inside the band |
+| icv1-fp24-tm5099-a6f137c6 | bsgs-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp24-tm5099-a6f137c6 | ic-pair-b32 vs ic-pair-rule | ic-pair-rule < ic-pair-b32 |
+| icv1-fp24-tm5099-a6f137c6 | ic-pair-b32 vs ic-rootfind-m3-rule | ic-rootfind-m3-rule < ic-pair-b32 |
+| icv1-fp24-tm5099-a6f137c6 | ic-pair-b32 vs kangaroo | kangaroo < ic-pair-b32 |
+| icv1-fp24-tm5099-a6f137c6 | ic-pair-b32 vs rho-neg | rho-neg < ic-pair-b32 |
+| icv1-fp24-tm5099-a6f137c6 | ic-pair-b32 vs rho-neg-aa | rho-neg-aa < ic-pair-b32 |
+| icv1-fp24-tm5099-a6f137c6 | ic-pair-rule vs ic-rootfind-m3-rule | ic-pair-rule < ic-rootfind-m3-rule |
+| icv1-fp24-tm5099-a6f137c6 | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp24-tm5099-a6f137c6 | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp24-tm5099-a6f137c6 | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp24-tm5099-a6f137c6 | ic-rootfind-m3-rule vs kangaroo | kangaroo < ic-rootfind-m3-rule |
+| icv1-fp24-tm5099-a6f137c6 | ic-rootfind-m3-rule vs rho-neg | rho-neg < ic-rootfind-m3-rule |
+| icv1-fp24-tm5099-a6f137c6 | ic-rootfind-m3-rule vs rho-neg-aa | rho-neg-aa < ic-rootfind-m3-rule |
+| icv1-fp24-tm5099-a6f137c6 | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp24-tm5099-a6f137c6 | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp24-tm5099-a6f137c6 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp25-tm7173-b0644037 | bsgs-neg vs ic-pair-b32 | bsgs-neg < ic-pair-b32 |
+| icv1-fp25-tm7173-b0644037 | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp25-tm7173-b0644037 | bsgs-neg vs ic-rootfind-m3-rule | bsgs-neg < ic-rootfind-m3-rule |
+| icv1-fp25-tm7173-b0644037 | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp25-tm7173-b0644037 | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| icv1-fp25-tm7173-b0644037 | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| icv1-fp25-tm7173-b0644037 | ic-pair-b32 vs ic-pair-rule | ic-pair-rule < ic-pair-b32 |
+| icv1-fp25-tm7173-b0644037 | ic-pair-b32 vs ic-rootfind-m3-rule | ic-rootfind-m3-rule < ic-pair-b32 |
+| icv1-fp25-tm7173-b0644037 | ic-pair-b32 vs kangaroo | kangaroo < ic-pair-b32 |
+| icv1-fp25-tm7173-b0644037 | ic-pair-b32 vs rho-neg | rho-neg < ic-pair-b32 |
+| icv1-fp25-tm7173-b0644037 | ic-pair-b32 vs rho-neg-aa | rho-neg-aa < ic-pair-b32 |
+| icv1-fp25-tm7173-b0644037 | ic-pair-rule vs ic-rootfind-m3-rule | ic-pair-rule < ic-rootfind-m3-rule |
+| icv1-fp25-tm7173-b0644037 | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp25-tm7173-b0644037 | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp25-tm7173-b0644037 | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp25-tm7173-b0644037 | ic-rootfind-m3-rule vs kangaroo | kangaroo < ic-rootfind-m3-rule |
+| icv1-fp25-tm7173-b0644037 | ic-rootfind-m3-rule vs rho-neg | rho-neg < ic-rootfind-m3-rule |
+| icv1-fp25-tm7173-b0644037 | ic-rootfind-m3-rule vs rho-neg-aa | rho-neg-aa < ic-rootfind-m3-rule |
+| icv1-fp25-tm7173-b0644037 | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp25-tm7173-b0644037 | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp25-tm7173-b0644037 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp26-t5897-9124aa40 | bsgs-neg vs ic-pair-b32 | bsgs-neg < ic-pair-b32 |
+| icv1-fp26-t5897-9124aa40 | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp26-t5897-9124aa40 | bsgs-neg vs ic-rootfind-m3-rule | bsgs-neg < ic-rootfind-m3-rule |
+| icv1-fp26-t5897-9124aa40 | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp26-t5897-9124aa40 | bsgs-neg vs rho-neg | unresolved inside the band |
+| icv1-fp26-t5897-9124aa40 | bsgs-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp26-t5897-9124aa40 | ic-pair-b32 vs ic-pair-rule | ic-pair-rule < ic-pair-b32 |
+| icv1-fp26-t5897-9124aa40 | ic-pair-b32 vs ic-rootfind-m3-rule | ic-rootfind-m3-rule < ic-pair-b32 |
+| icv1-fp26-t5897-9124aa40 | ic-pair-b32 vs kangaroo | kangaroo < ic-pair-b32 |
+| icv1-fp26-t5897-9124aa40 | ic-pair-b32 vs rho-neg | rho-neg < ic-pair-b32 |
+| icv1-fp26-t5897-9124aa40 | ic-pair-b32 vs rho-neg-aa | rho-neg-aa < ic-pair-b32 |
+| icv1-fp26-t5897-9124aa40 | ic-pair-rule vs ic-rootfind-m3-rule | ic-pair-rule < ic-rootfind-m3-rule |
+| icv1-fp26-t5897-9124aa40 | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp26-t5897-9124aa40 | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp26-t5897-9124aa40 | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp26-t5897-9124aa40 | ic-rootfind-m3-rule vs kangaroo | kangaroo < ic-rootfind-m3-rule |
+| icv1-fp26-t5897-9124aa40 | ic-rootfind-m3-rule vs rho-neg | rho-neg < ic-rootfind-m3-rule |
+| icv1-fp26-t5897-9124aa40 | ic-rootfind-m3-rule vs rho-neg-aa | rho-neg-aa < ic-rootfind-m3-rule |
+| icv1-fp26-t5897-9124aa40 | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp26-t5897-9124aa40 | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp26-t5897-9124aa40 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp27-tm1521-bb102e62 | bsgs-neg vs ic-pair-b32 | bsgs-neg < ic-pair-b32 |
+| icv1-fp27-tm1521-bb102e62 | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp27-tm1521-bb102e62 | bsgs-neg vs ic-rootfind-m3-rule | bsgs-neg < ic-rootfind-m3-rule |
+| icv1-fp27-tm1521-bb102e62 | bsgs-neg vs kangaroo | unresolved inside the band |
+| icv1-fp27-tm1521-bb102e62 | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp27-tm1521-bb102e62 | bsgs-neg vs rho-neg-aa | rho-neg-aa < bsgs-neg |
+| icv1-fp27-tm1521-bb102e62 | ic-pair-b32 vs ic-pair-rule | ic-pair-rule < ic-pair-b32 |
+| icv1-fp27-tm1521-bb102e62 | ic-pair-b32 vs ic-rootfind-m3-rule | ic-rootfind-m3-rule < ic-pair-b32 |
+| icv1-fp27-tm1521-bb102e62 | ic-pair-b32 vs kangaroo | kangaroo < ic-pair-b32 |
+| icv1-fp27-tm1521-bb102e62 | ic-pair-b32 vs rho-neg | rho-neg < ic-pair-b32 |
+| icv1-fp27-tm1521-bb102e62 | ic-pair-b32 vs rho-neg-aa | rho-neg-aa < ic-pair-b32 |
+| icv1-fp27-tm1521-bb102e62 | ic-pair-rule vs ic-rootfind-m3-rule | ic-pair-rule < ic-rootfind-m3-rule |
+| icv1-fp27-tm1521-bb102e62 | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp27-tm1521-bb102e62 | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp27-tm1521-bb102e62 | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp27-tm1521-bb102e62 | ic-rootfind-m3-rule vs kangaroo | kangaroo < ic-rootfind-m3-rule |
+| icv1-fp27-tm1521-bb102e62 | ic-rootfind-m3-rule vs rho-neg | rho-neg < ic-rootfind-m3-rule |
+| icv1-fp27-tm1521-bb102e62 | ic-rootfind-m3-rule vs rho-neg-aa | rho-neg-aa < ic-rootfind-m3-rule |
+| icv1-fp27-tm1521-bb102e62 | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp27-tm1521-bb102e62 | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp27-tm1521-bb102e62 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp28-t28201-65099091 | bsgs-neg vs ic-pair-b32 | bsgs-neg < ic-pair-b32 |
+| icv1-fp28-t28201-65099091 | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp28-t28201-65099091 | bsgs-neg vs ic-rootfind-m3-rule | bsgs-neg < ic-rootfind-m3-rule |
+| icv1-fp28-t28201-65099091 | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp28-t28201-65099091 | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp28-t28201-65099091 | bsgs-neg vs rho-neg-aa | rho-neg-aa < bsgs-neg |
+| icv1-fp28-t28201-65099091 | ic-pair-b32 vs ic-pair-rule | ic-pair-rule < ic-pair-b32 |
+| icv1-fp28-t28201-65099091 | ic-pair-b32 vs ic-rootfind-m3-rule | ic-rootfind-m3-rule < ic-pair-b32 |
+| icv1-fp28-t28201-65099091 | ic-pair-b32 vs kangaroo | kangaroo < ic-pair-b32 |
+| icv1-fp28-t28201-65099091 | ic-pair-b32 vs rho-neg | rho-neg < ic-pair-b32 |
+| icv1-fp28-t28201-65099091 | ic-pair-b32 vs rho-neg-aa | rho-neg-aa < ic-pair-b32 |
+| icv1-fp28-t28201-65099091 | ic-pair-rule vs ic-rootfind-m3-rule | ic-pair-rule < ic-rootfind-m3-rule |
+| icv1-fp28-t28201-65099091 | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp28-t28201-65099091 | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp28-t28201-65099091 | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp28-t28201-65099091 | ic-rootfind-m3-rule vs kangaroo | kangaroo < ic-rootfind-m3-rule |
+| icv1-fp28-t28201-65099091 | ic-rootfind-m3-rule vs rho-neg | rho-neg < ic-rootfind-m3-rule |
+| icv1-fp28-t28201-65099091 | ic-rootfind-m3-rule vs rho-neg-aa | rho-neg-aa < ic-rootfind-m3-rule |
+| icv1-fp28-t28201-65099091 | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp28-t28201-65099091 | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp28-t28201-65099091 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp29-t3691-ef449c0c | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp29-t3691-ef449c0c | bsgs-neg vs kangaroo | unresolved inside the band |
+| icv1-fp29-t3691-ef449c0c | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp29-t3691-ef449c0c | bsgs-neg vs rho-neg-aa | rho-neg-aa < bsgs-neg |
+| icv1-fp29-t3691-ef449c0c | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp29-t3691-ef449c0c | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp29-t3691-ef449c0c | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp29-t3691-ef449c0c | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp29-t3691-ef449c0c | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp29-t3691-ef449c0c | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp30-t21791-a644ba69 | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp30-t21791-a644ba69 | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp30-t21791-a644ba69 | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp30-t21791-a644ba69 | bsgs-neg vs rho-neg-aa | rho-neg-aa < bsgs-neg |
+| icv1-fp30-t21791-a644ba69 | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp30-t21791-a644ba69 | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp30-t21791-a644ba69 | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp30-t21791-a644ba69 | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp30-t21791-a644ba69 | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp30-t21791-a644ba69 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp31-tm3989-ae9db972 | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp31-tm3989-ae9db972 | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp31-tm3989-ae9db972 | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp31-tm3989-ae9db972 | bsgs-neg vs rho-neg-aa | rho-neg-aa < bsgs-neg |
+| icv1-fp31-tm3989-ae9db972 | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp31-tm3989-ae9db972 | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp31-tm3989-ae9db972 | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp31-tm3989-ae9db972 | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp31-tm3989-ae9db972 | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp31-tm3989-ae9db972 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp32-t7319-90da43e9 | bsgs-neg vs kangaroo | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp32-t7319-90da43e9 | bsgs-neg vs rho-neg-aa | rho-neg-aa < bsgs-neg |
+| icv1-fp32-t7319-90da43e9 | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp32-t7319-90da43e9 | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp32-t7319-90da43e9 | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp32-t7319-90da43e9 | kangaroo vs rho-neg | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | kangaroo vs rho-neg-aa | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp33-tm78373-cca7741c | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp33-tm78373-cca7741c | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp33-tm78373-cca7741c | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp33-tm78373-cca7741c | bsgs-neg vs rho-neg-aa | rho-neg-aa < bsgs-neg |
+| icv1-fp33-tm78373-cca7741c | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp33-tm78373-cca7741c | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp33-tm78373-cca7741c | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp33-tm78373-cca7741c | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp33-tm78373-cca7741c | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp33-tm78373-cca7741c | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp34-tm105659-9a86130d | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp34-tm105659-9a86130d | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp34-tm105659-9a86130d | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp34-tm105659-9a86130d | bsgs-neg vs rho-neg-aa | rho-neg-aa < bsgs-neg |
+| icv1-fp34-tm105659-9a86130d | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp34-tm105659-9a86130d | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp34-tm105659-9a86130d | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp34-tm105659-9a86130d | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp34-tm105659-9a86130d | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp34-tm105659-9a86130d | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp35-t95269-01c9f49d | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp35-t95269-01c9f49d | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp35-t95269-01c9f49d | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp35-t95269-01c9f49d | bsgs-neg vs rho-neg-aa | rho-neg-aa < bsgs-neg |
+| icv1-fp35-t95269-01c9f49d | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp35-t95269-01c9f49d | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp35-t95269-01c9f49d | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp35-t95269-01c9f49d | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp35-t95269-01c9f49d | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp35-t95269-01c9f49d | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp36-t454193-44a20818 | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp36-t454193-44a20818 | bsgs-neg vs kangaroo | unresolved inside the band |
+| icv1-fp36-t454193-44a20818 | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp36-t454193-44a20818 | bsgs-neg vs rho-neg-aa | rho-neg-aa < bsgs-neg |
+| icv1-fp36-t454193-44a20818 | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp36-t454193-44a20818 | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp36-t454193-44a20818 | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp36-t454193-44a20818 | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp36-t454193-44a20818 | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp36-t454193-44a20818 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp37-t428317-60c650c8 | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp37-t428317-60c650c8 | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp37-t428317-60c650c8 | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp37-t428317-60c650c8 | bsgs-neg vs rho-neg-aa | rho-neg-aa < bsgs-neg |
+| icv1-fp37-t428317-60c650c8 | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp37-t428317-60c650c8 | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp37-t428317-60c650c8 | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp37-t428317-60c650c8 | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp37-t428317-60c650c8 | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp37-t428317-60c650c8 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp38-t925069-ef71b7ab | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp38-t925069-ef71b7ab | bsgs-neg vs kangaroo | unresolved inside the band |
+| icv1-fp38-t925069-ef71b7ab | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp38-t925069-ef71b7ab | bsgs-neg vs rho-neg-aa | rho-neg-aa < bsgs-neg |
+| icv1-fp38-t925069-ef71b7ab | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp38-t925069-ef71b7ab | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp38-t925069-ef71b7ab | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp38-t925069-ef71b7ab | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp38-t925069-ef71b7ab | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp38-t925069-ef71b7ab | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp39-t776897-fef4eae4 | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp39-t776897-fef4eae4 | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp39-t776897-fef4eae4 | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp39-t776897-fef4eae4 | bsgs-neg vs rho-neg-aa | rho-neg-aa < bsgs-neg |
+| icv1-fp39-t776897-fef4eae4 | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp39-t776897-fef4eae4 | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp39-t776897-fef4eae4 | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp39-t776897-fef4eae4 | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp39-t776897-fef4eae4 | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp39-t776897-fef4eae4 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp40-tm924137-0ecaaeb9 | bsgs-neg vs ic-pair-rule | bsgs-neg < ic-pair-rule |
+| icv1-fp40-tm924137-0ecaaeb9 | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp40-tm924137-0ecaaeb9 | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp40-tm924137-0ecaaeb9 | bsgs-neg vs rho-neg-aa | rho-neg-aa < bsgs-neg |
+| icv1-fp40-tm924137-0ecaaeb9 | ic-pair-rule vs kangaroo | kangaroo < ic-pair-rule |
+| icv1-fp40-tm924137-0ecaaeb9 | ic-pair-rule vs rho-neg | rho-neg < ic-pair-rule |
+| icv1-fp40-tm924137-0ecaaeb9 | ic-pair-rule vs rho-neg-aa | rho-neg-aa < ic-pair-rule |
+| icv1-fp40-tm924137-0ecaaeb9 | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp40-tm924137-0ecaaeb9 | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp40-tm924137-0ecaaeb9 | rho-neg vs rho-neg-aa | unresolved inside the band |

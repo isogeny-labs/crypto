@@ -1,0 +1,68 @@
+{
+  "schema": "research-artifact-publication-status/v1",
+  "recorded_date_utc": "2026-10-24",
+  "run": "s3-yield-20261024",
+  "state": "approved-upload-blocked-by-missing-aws-credentials",
+  "approved_manifest": {
+    "path": "research/quadratic_twist_evidence_20261021/validation/s3-yield-20261024/ARTIFACTS_UPLOAD_PENDING.json",
+    "sha256": "ef0f5f60214310f6f4b62747a9d270c8371fec82b89fb610564d8317a3b9d747",
+    "snapshot_commit": "66d3d03c21935d9709e3af5a77569743e1a8471c"
+  },
+  "authorization": {
+    "state": "approved",
+    "scope": "The four unchanged files and exact S3 destination in the manifest, as approved by the user.",
+    "previous_automatic_review_block": "resolved by subsequent explicit user authorization",
+    "requires_repeat_approval": false
+  },
+  "destination": "s3://setec-astronomy-artifacts/store",
+  "total_bytes": 684341,
+  "payloads": [
+    {
+      "path": "research/quadratic_twist_evidence_20261021/validation/s3-yield-20261024/runs.tar.xz",
+      "sha256": "faf8f283b7a47662b2f7cd4cd3fa7c24e39da82e9e0ed3edd62e4f09ab51b212",
+      "bytes": 85956,
+      "intended_object": "s3://setec-astronomy-artifacts/store/sha256/fa/faf8f283b7a47662b2f7cd4cd3fa7c24e39da82e9e0ed3edd62e4f09ab51b212"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/reports/s3-yield-20261024/report.pdf",
+      "sha256": "c69b4e343009e3d09576fb0c0ecf4745c556a33d339e0681ca3487e8c2baa184",
+      "bytes": 363795,
+      "intended_object": "s3://setec-astronomy-artifacts/store/sha256/c6/c69b4e343009e3d09576fb0c0ecf4745c556a33d339e0681ca3487e8c2baa184"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/reports/s3-yield-20261024/bridge.png",
+      "sha256": "de3809423fac606635b345ce15ee18651a4f5bb7f3d71b783e5819932df2b000",
+      "bytes": 137156,
+      "intended_object": "s3://setec-astronomy-artifacts/store/sha256/de/de3809423fac606635b345ce15ee18651a4f5bb7f3d71b783e5819932df2b000"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/reports/s3-yield-20261024/profiles.png",
+      "sha256": "7dbceeae51109caddd24cab8d4eb1aacf1012d71017f343e6ab47e9a1bbc2a52",
+      "bytes": 97434,
+      "intended_object": "s3://setec-astronomy-artifacts/store/sha256/7d/7dbceeae51109caddd24cab8d4eb1aacf1012d71017f343e6ab47e9a1bbc2a52"
+    }
+  ],
+  "payload_integrity": "All four local SHA-256 values match the approved manifest before the attempt.",
+  "upload_attempt": {
+    "tool": "Pinned repository artifacts.py",
+    "tool_git_blob": "4f134496957ccf88d909f5f0b6f000317fa06fad",
+    "tool_sha256": "0054cdc0de842c0c9efc74f1d4fed4951b0e0c0fdc81a7f9308d8b6b8a4b8fe9",
+    "aws_cli": "aws-cli/1.46.2; botocore/1.43.62",
+    "exit_code": 2,
+    "failed_operation": "S3 head-object during AWS credential resolution",
+    "error": "Unable to locate credentials.",
+    "uploaded_files": 0,
+    "remote_hash_verification": "not performed",
+    "remote_hydration_manifests_created": false
+  },
+  "environment": {
+    "observations_current": true,
+    "observed_spec_revision": "135",
+    "network_policy": "unrestricted/enforced",
+    "configured_secret_bindings": 0,
+    "configured_outbound_identities": 0,
+    "oic_identity_manifest": "not configured"
+  },
+  "next_action": "Configure an AWS connection in this execution environment for the approved bucket/prefix, then resume the already approved immutable upload and remote verification. Do not ask again for upload authorization, substitute another destination, change approved bytes or mark objects published before verification.",
+  "preservation": "This record supersedes only the old proposal's authorization/blocker state. The original proposal, all four payload bytes, frozen reports, certificates and existing checksums remain unchanged."
+}

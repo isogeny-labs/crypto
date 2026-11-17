@@ -1,0 +1,1 @@
+Coordination: initial 90-second heartbeat extension expired during source/report work. Reclaim succeeded under the existing coordination attempt allowance at epoch3, with no competing owner and no scientific execution. A bounded ten-cycle 30-second heartbeat helper maintains both leases through publication. This event changes neither source evidence nor experiment attempt limits.

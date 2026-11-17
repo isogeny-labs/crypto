@@ -1,0 +1,50 @@
+{
+ "created_at": "2026-11-08T03:24:36Z",
+ "id": "PCC-20261108-41db53",
+ "kind": "statement",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round59-p192/report.md",
+    "sha256": "91a6883bf7d8becb5925de25057cfbb0d35689cd0dd1bcc1c4e73c6c58e62815"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round59-p192/carrier-theorem.md",
+    "sha256": "3d9736af57b7ddabc08203ceca09a492446b01eb3e23c2eb99061f3ebb080c58"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round59-p192/carriers.json",
+    "sha256": "b67e259467987a94576854d10ff8fb7080d096a8930cf4072f0751c5bc10fc71"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round59-p192/recovery.json",
+    "sha256": "0b89fc22dadd3d8e8f370bf3bf2bf6569732fac1d0403a1d1dfcb3ca90ea305b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round59-p192/validation.json",
+    "sha256": "1bd1388dbe34bf167be9e6523ec8bb6762fefb561fe621995532c676cdaed015"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Round59 specified fixtures, global polynomial or total finite-chart numerator weight; no circuit/baby-subset bound, full P192 trace, timing or novel completed algorithm claim",
+ "statement": "Signed bivariate controls and a conditional carrier-to-scalar decoder are checked on P192; all seven bounded scalar searches match an independent Jacobian generation. A written translation/genus/CM criterion excludes global signed weight<=2048 carriers for three frozen fixtures, and exact labeled-scalar certificates strengthen the bound to2^44 for mu_G and relation_lambda_G. These are unsigned scoped derivations and exact computations."
+}

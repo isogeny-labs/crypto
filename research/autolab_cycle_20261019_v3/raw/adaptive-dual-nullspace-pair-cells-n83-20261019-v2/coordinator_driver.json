@@ -1,0 +1,54 @@
+{
+  "anchor_receipt_sha256": "8ce904d6ae6af46cb9f1542796ac5bb9619debe0ad2e71aa5f98a56de62aebac",
+  "change": "journal memory retention only",
+  "checkpoint_driver_sha256": "6096efbdcc2e0038f5406280013b33e1b5e0bc164eef7ee267a95dc9bfcc51f6",
+  "journal_bytes": 12674068879,
+  "journal_records": 676,
+  "journal_sha256": "93535b0b733741a6f53e616cce4f0e32ea3808257260c94f7b733c66b0f0569d",
+  "last_record_sha256": "0bd3af50eac9f9c2b006357d43a43c199e1fd5a838103ed1eea940427af18102",
+  "original_runner_sha256": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+  "original_runner_unmodified": true,
+  "schema": "rootfinding-checkpoint-driver/v1",
+  "scientific_identity": {
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.adaptive_pair_cells_20261019_v1.launch",
+      "adaptive-dual-nullspace-pair-cells-n83-20261019-v2"
+    ],
+    "cpu": 0,
+    "files_sha256": {
+      "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+      "lab/runner_checkpoint_20261018.py": "6096efbdcc2e0038f5406280013b33e1b5e0bc164eef7ee267a95dc9bfcc51f6",
+      "lab/runner_checkpoint_anchor_20261018.json": "bd3ac09c86deac9947b6cd672b7589184544ea7a54f5201f7e6fea02baaa238d",
+      "lab/runner_stream_20261017.py": "440f59ee94ec09b56115f1e6bb34881369bd600cbec91cc2ea4ead6c3768cb1d",
+      "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+      "research/adaptive_pair_cells_20261019_v1/PROOF.md": "7cb43598016d91ce4bba1447831d82875c7522251e74f0ff0e1f6a3e29fdf65d",
+      "research/adaptive_pair_cells_20261019_v1/field.hpp": "f3d7c4f62ce7bf9eca49ce1b2783bb1bb29b0617c392db13e68c6e3f46324394",
+      "research/adaptive_pair_cells_20261019_v1/launch.py": "31f360cec843848e29c77daa8182a04b397e9642778c1b7876439a4d7b943f6a",
+      "research/adaptive_pair_cells_20261019_v1/native": "3c04be3b66990ed2f02773e7d1f2e45479cfeabfc0fff05bc30c5ecce88d94cb",
+      "research/adaptive_pair_cells_20261019_v1/native.cpp": "49c31e4a40da0b09c6aefd298ae2889930d323a32da4eba4e1028e96f37d79fa"
+    },
+    "hypothesis": "Adaptive directions constructed from an empty point dual certificate give dimension at least65 at n83,d18, and every constructed small-cell member has zero literal S3 pair roots. Exposed training replication, not holdout.",
+    "input_paths": [],
+    "memory_limit_mb": 4096,
+    "process_runner_sha256": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+    "runner_sha256": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+    "source_paths": [
+      "lab/runner.py",
+      "lab/runner_checkpoint_20261018.py",
+      "lab/runner_checkpoint_anchor_20261018.json",
+      "lab/runner_stream_20261017.py",
+      "performance/GATE.md",
+      "research/adaptive_pair_cells_20261019_v1/native.cpp",
+      "research/adaptive_pair_cells_20261019_v1/field.hpp",
+      "research/adaptive_pair_cells_20261019_v1/native",
+      "research/adaptive_pair_cells_20261019_v1/PROOF.md",
+      "research/adaptive_pair_cells_20261019_v1/launch.py"
+    ],
+    "timeout_seconds": 90
+  },
+  "streaming_driver_sha256": "440f59ee94ec09b56115f1e6bb34881369bd600cbec91cc2ea4ead6c3768cb1d",
+  "verification": "raw full-prefix rehash anchored to prior complete canonical validation; terminal and every suffix record verified by original codec",
+  "worker_supervision": "unchanged original run_cold_process"
+}

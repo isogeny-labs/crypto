@@ -1,0 +1,112 @@
+{
+ "lens": "transfers, tori and Weil restriction",
+ "file": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/ideas/transfer_tori.json",
+ "search_note": "No WebSearch run in this pass; all novelty_status = novelty_unverified. Checked against MAP_ideas_corpus.json (ECDLP-IDEA-002/007/009, PRYM context rows, KN-OPEN-095df5) and LEAD_ATLAS rows LEAD-ICB-ecc2k130-jacobian-carrier, LEAD-TRF-miller-cocycle-nonhom-transfer, LEAD-TRF-second-torsion-direction, LEAD-ICB-nonlinear-frob-stable-bases.",
+ "ideas": [
+  {
+   "id": "MP-transfer_tori-1",
+   "title": "Simplicity certificate: Res_{F_{2^n}/F_2}E has no non-product sub-abelian varieties or Prym quotients over F_2 at prime n with 2 primitive",
+   "statement": "For prime n with ord_n(2)=n-1, the F_2-Frobenius phi on R=Res_{F_{2^n}/F_2}E has char poly P_E(T^n) (E/F_{2^n}) resp. (T^2-tT+2)*Psi(T) (E defined over F_2, Psi of degree 2(n-1)). Claim: P_E(T^n) (random E) and Psi (Koblitz) are irreducible over Q, so R (resp. the trace-zero part A) is F_2-simple; every F_2-sub-abelian variety, Prym-type quotient or isogeny factor is 0, R/A or isogenous to the whole thing. Closes the 'non-product sub-abelian variety over F_2' branch of the lens.",
+   "mechanism": "Irreducibility of the Weil polynomial over Q implies simplicity (Tate). For Koblitz, Psi roots are zeta*tau, zeta in mu_n\\{1}; [Q(sqrt-7,zeta_n):Q]=2(n-1) and zeta*tau generates it.",
+   "wall_bypassed": "None (theory item); it sharpens 'No subfield, no low-degree membership' from the Frobenius-subspace statement to the abelian-variety statement and bounds LEAD-ICB-ecc2k130-jacobian-carrier from below (any carrier Jacobian over F_2 has genus >= n-1 and contains A as a factor).",
+   "why_wall_hypotheses_fail": "The subspace closure is about F_2-linear subspaces of F_{2^n}; sub-abelian varieties of R are a different object (could be non-linear in coordinates). This item checks whether that extra room exists. Expected: it does not.",
+   "nongenericity_argument": "None; obstruction/theory. If irreducibility FAILS for some E, a proper F_2-sub-abelian variety A' of dim < n-1 would be a genuine smaller-dimensional descent target (Gaudry/Diem IC on A'(F_2) via a curve in A'), the only way this lens could push B*D^2 below N.",
+   "prior_art": "Tate 1966 (isogeny classes via Weil polynomials); Galbraith-Smart Weil descent; Gaudry-Hess-Smart 2002; Menezes-Qu 2001 (GHS fails for prime n); Diem 2003 (GHS for odd characteristic / prime degree analysis); Lange trace-zero varieties.",
+   "novelty_status": "novelty_unverified (expected known folklore; value is as a filed closure certificate)",
+   "falsifier": {
+    "design": "PARI: for n in {11,13,19,29,37,53,59,61,67,83} (2 primitive mod n), (a) 200 random E/F_{2^n} (ellap via ffinit), build P(T^n)=T^{2n}-a T^n+2^n, polisirreducible; (b) Koblitz a in {0,1}: factor P_{E/F_2}(T^n)/(T^2-tT+2), test irreducible. Control: n=7 (ord=3) and n=17 (ord=8) must show reducibility of Psi.",
+    "toy_params": "n in {11,13,19,29,37,53,59,61,67,83}; 200 curves each; controls n=7,17,31",
+    "tools": "gp -q",
+    "cpu_minutes": 2,
+    "prediction_if_true": "100% irreducible for prime n with 2 primitive (except a=0 supersingular corner, report separately); controls reducible into ord_n(2)-blocks.",
+    "prediction_if_false": "Any reducible instance at 2-primitive n names a proper F_2-sub-abelian variety; then compute its dimension and test whether it carries an evaluable curve (genus = dim) by point-count search."
+   },
+   "expected_class": "theory",
+   "risk": "Low novelty; result almost certainly 'irreducible'."
+  },
+  {
+   "id": "MP-transfer_tori-2",
+   "title": "Prym-factor carrier over F_2: Jacobians of genus g in (n-1, 2(n-1)] having the trace-zero A as an isogeny FACTOR rather than isogenous to it",
+   "statement": "Generalise LEAD-ICB-ecc2k130-jacobian-carrier from 'A ~ Jac(C)' to 'Jac(C) ~ A x B' with C/F_2 of genus g between dim A and 2 dim A (Prym-type). IC in Jac(C)(F_2) at large genus over tiny field is L_{2^g}(1/2); at g~200 roughly 2^53 GAE-equivalents vs rho 2^64.9 (heuristic, setup excluded). Question: is the frequency of curves with A as a factor at genus g larger than the Torelli codimension heuristic for g = dim A, enough to change the 2^-(codim) rarity?",
+   "mechanism": "Divisibility of L_C(T) by the fixed Weil polynomial Psi of A. Isogeny factor = shared L-factor (Tate). The DLP moves via the F_2-rational map A -> Jac(C) (dual of Jac(C)->A), which is a homomorphism, so Transport conservation applies but only to kernel size, not to the destination-arithmetic gain, which is the whole point.",
+   "wall_bypassed": "Torelli-rarity heuristic (8,128) underlying the closure of the Jacobian-carrier lead, and the 'Transport conservation' wall (which explicitly leaves destination arithmetic free).",
+   "why_wall_hypotheses_fail": "The rarity heuristic counts Jacobians ISOGENOUS to A (dim moduli 3g-3 vs dim A_g = g(g+1)/2 at g=dim A). For g>dim A the condition is only that A is a factor; the count of such curves is not governed by that codimension, and Prym loci (double covers) are a natural source.",
+   "nongenericity_argument": "If such C of genus g<=~2 dim A were constructible, Jac(C)(F_2) IC is a field-representation (divisor-smoothness) algorithm, not generic; its L(1/2) cost at g=260 is below rho in the heuristic model. Getting the curve is the obstruction; this idea only measures whether the factor condition is easier than isogeny.",
+   "prior_art": "LEAD-ICB-ecc2k130-jacobian-carrier; Gaudry-Hess-Smart; Menezes-Qu; Diem 'index calculus in class groups of non-hyperelliptic curves'; Enge-Gaudry L(1/2) for large genus over small fields; Kani-Rosen decompositions; Prym constructions (Mumford). ECDLP-IDEA-002 uses split Jacobians over F_p (different: E is the factor at same field).",
+   "novelty_status": "novelty_unverified",
+   "falsifier": {
+    "design": "Toy n=5 (ord_5(2)=4): A = trace-zero of Res E over F_2, Psi degree 8 (dim 4) for E = Koblitz a=0,1 and for 3 random E/F_32. Sample 2*10^5 random hyperelliptic C: y^2+h y=f over F_2 of genus g=4,5,6,7 (and 2*10^4 at g=8); compute #C(F_{2^k}) k=1..g by brute force in numpy, reconstruct L_C, test divisibility by Psi (gp polresultant/ divisibility). Compare hit frequency at g=4 (isogeny) vs g=5..8 (factor), and against random-L baseline from point-count distribution.",
+    "toy_params": "n=5, dim A=4, g=4..8, 2e5 samples per g (2e4 at g=8)",
+    "tools": "python3 numpy + gp",
+    "cpu_minutes": 18,
+    "prediction_if_true": "Hit frequency per curve at g=5..8 is >= that at g=4 (non-decreasing in g), i.e. factor condition does not get rarer with g; extrapolated log2 rarity grows sub-quadratically in dim A.",
+    "prediction_if_false": "Frequency falls with g at least as fast as 2^-(dim A)(something) and zero hits at g>=6; the carrier route stays closed by rarity at all g, Prym generalisation adds nothing."
+   },
+   "expected_class": "advance",
+   "risk": "Hyperelliptic locus has dim 2g-1, far smaller than M_g; hits at n=5 tell little about dim 130. Even a positive toy result gives no construction."
+  },
+  {
+   "id": "MP-transfer_tori-3",
+   "title": "Miller cocycle telescopes to an elliptic-net ratio: U(kP) = c * W(k)/W(k-1) up to N-th roots, so LEAD-TRF-miller-cocycle reduces to Lauter-Stange EDS problems",
+   "statement": "With gcd(N,p-1)=1, U(R)=f_{N,P}(R)^{1/N}. Translation: div(f(.+P)/f) = N div(1/(x-x_P)), so U(R+P)/U(R) = c/(x(R)-x_P) and x(jP)-x_P = -psi_{j-1}psi_{j+1}/psi_j^2 (P). Product over j<k telescopes: U(kP) = C * (W(k)/W(k-1)) * W(1)-normalisation, W the elliptic net at P. Hence U is a function of the point that equals an elliptic-divisibility-sequence ratio; its log carries k-structure iff the EDS residue/association problems are easier than ECDLP, which Lauter-Stange 2008 shows they are not (EDS association equivalent to ECDLP; residue problem reduces to F_p^* DLP only through the Tate pairing, trivial here).",
+   "mechanism": "Explicit identity linking the unexamined Miller-cocycle transfer to elliptic nets (closed as GGM-simulable for computing, KN-FIND), plus a character test of any residual quadratic-exponential structure W(k) -> alpha^{k^2} beta^k W(k).",
+   "wall_bypassed": "Transport conservation (homomorphic only) - U is non-homomorphic, the listed gap.",
+   "why_wall_hypotheses_fail": "Transport-conservation lemma needs a homomorphism; U is not one. The identity shows the gap is filled by the EDS literature + GGM-simulability of elliptic nets, not by Transport conservation.",
+   "nongenericity_argument": "Would be non-generic only if chi_l(U(kP)) or log U(kP) mod small l | p-1 depended on k by a low-degree law; the quasi-period factor of W is the Tate pairing value which is 1 here, so prediction is no structure: closure, accounting class.",
+   "prior_art": "Lauter-Stange 2008 (EDS and ECDLP equivalences); Stange 2007 elliptic nets and Tate pairing; Shipsey thesis 2000; Miller 2004; LEAD-TRF-miller-cocycle-nonhom-transfer; ECDLP-IDEA-007/164.",
+   "novelty_status": "novelty_unverified (identity is standard; its use to close the lead is the contribution)",
+   "falsifier": {
+    "design": "gp/cypari2: 5 prime-order curves over p~2^16..2^18 with gcd(r,p-1)=1. (1) Verify identity U((k+1)P)/U(kP) * (x(kP)-x_P) = const for all k (exact). (2) Compute f_{r,P} values via Miller loop at kP+Q shifted evaluation (avoid poles with random auxiliary Q, compute ratio form), take U; for each small prime l | p-1 (l<=13) compute sequence s_k = chi_l(U(kP)); test (a) fit s_k = chi_l(alpha)^{k^2} chi_l(beta)^k (exhaustive over alpha,beta mod l-th powers), (b) autocorrelation and chi^2 vs uniform over k=1..r-1.",
+    "toy_params": "p in [2^16,2^18], r prime, 5 curves, l in small prime divisors of p-1",
+    "tools": "gp -q or cypari2, numpy",
+    "cpu_minutes": 10,
+    "prediction_if_true": "Identity holds exactly (100%); best quadratic-exponential fit agreement 1/l + O(r^-1/2); autocorrelations within 3/sqrt(r): no structure; lead closes as accounting.",
+    "prediction_if_false": "Any fit agreement > 1/l + 5/sqrt(r) for some l or curve: a residual quadratic character law in k, i.e. a non-homomorphic transfer leaking k mod l -> escalate."
+   },
+   "expected_class": "accounting",
+   "risk": "Pole handling at kP=P,O; use generic translate. Low upside."
+  },
+  {
+   "id": "MP-transfer_tori-4",
+   "title": "CEILIDH/torus factor bases collapse to inverted-affine subspace bases: x = u+1/u with u in T_2 parametrised rationally gives 1/x affine-F_2-linear in the parameter",
+   "statement": "Norm-one torus T_2(F_{2^n}) in F_{2^{2n}}, rational CEILIDH parametrisation u=(a+theta)/(a+theta^q), a in F_{2^n}. Then x=u+1/u = (theta+theta^q)^2/(a^2+s a+N_theta), s=Tr theta, and a -> a^2+s a is F_2-linear. So the torus base {x(u): a in V} for an F_2-subspace V equals {x : c/x in L(V)+N_theta} = an affine subspace in the 1/x coordinate (2-to-1). Every 'torus-based factor base' (XTR/CEILIDH style, including Dickson/mu_M images u+1/u) with subspace-parametrised u is a Mobius-relabelled subspace base. Prediction: same descended solving degree as a plain subspace base in the y=1/x Semaev presentation.",
+   "mechanism": "Additivity of the Artin-Schreier-type map a^2+sa in characteristic 2 linearises the torus parametrisation after inversion.",
+   "wall_bypassed": "Claims to bypass 'No subfield, no low-degree membership' (torus sets are non-subspace in x); this idea shows it does not.",
+   "why_wall_hypotheses_fail": "They do not fail: the torus base is a subspace in 1/x, so Weil descent proceeds exactly as for a subspace base; the residual difference is the presentation (S_3 in 1/x is S_3 transformed by x->1/x, same multidegree 2).",
+   "nongenericity_argument": "Constant factor at best (presentation change of the measured d_F). Classified relabelling; closes torus-parametrised bases with subspace-parameter for lever 6. Only u ranging over non-subspace parameter sets (e.g. mu_M with M | 2^n+1) escapes, and that is the corpus mu_263 / multiplicative-subgroup item.",
+   "prior_art": "Rubin-Silverberg CEILIDH 2003; Lenstra-Verheul XTR 2000; Granger-Vercauteren torus index calculus 2005; Diem/Gaudry subspace descent; Petit-Quisquater; LEAD-ICB-nonlinear-frob-stable-bases (mu_263).",
+   "novelty_status": "novelty_unverified",
+   "falsifier": {
+    "design": "python3 + msolve over F_2: n=13,17 (F_{2^n} via irreducible poly), theta in F_{2^{2n}}\\F_{2^n}, V random l-dim subspace l=3..6. (1) Set check: compute torus base X_T = {x(a): a in V} and W = {c/x : x in X_T}; verify W is an affine subspace of dim l (rank test). (2) Descend S_3(x1,x2,x_R) with x_i in X_T via (a) a-variables (direct), (b) y=1/x subspace variables, (c) plain random subspace base of same size in x; 50 random targets each; record msolve max degree / solving degree and decomposition counts.",
+    "toy_params": "n in {13,17}, l in {3,4,5,6}, 50 targets per cell",
+    "tools": "python3, msolve",
+    "cpu_minutes": 15,
+    "prediction_if_true": "W is affine of dim l in 100% of instances; solving degree of (a)=(b) exactly, and equal to (c) within +-1; decomposition yield matches subspace-base mean within sampling error.",
+    "prediction_if_false": "W not affine (algebra error) or (a)/(b) solving degree strictly below (c) at every l at both n: an inversion-presentation gain worth a lever-1 cell."
+   },
+   "expected_class": "relabelling",
+   "risk": "None meaningful; main value is closing a sub-lens cheaply."
+  },
+  {
+   "id": "MP-transfer_tori-5",
+   "title": "Upward embedding E(F_p) -> E(F_{p^n}) with trace back-projection: base-size accounting shows B >= p for every F_p-linear base, so the descent analogue cannot go below N",
+   "statement": "Decompose R in E(F_p) inside E(F_{p^n}) over a base F_V = {P in E(F_{p^n}) : x(P) in V}, V an F_p-subspace, then apply Tr: E(F_{p^n}) -> E(F_p) to get nR = sum Tr(P_i). The effective base is Tr(F_V) in E(F_p). Integer dim V >= 1 forces |F_V| ~ p^{dim V} >= p ~ r unless V restricted to non-subspace sets, which brings back the prime-field membership wall. Also: for V = c F_p, Tr(P) for P with x in cF_p are points of E(F_p) whose distribution is uniform, so the effective base has size ~min(p,|F_V|).",
+   "mechanism": "Weil restriction of the summation polynomial over F_{p^n}/F_p with target in the subfield; trace as back-transfer (homomorphism, Transport conservation applies to it).",
+   "wall_bypassed": "Attempted: 'No subfield' for prime p by manufacturing a subfield upstairs.",
+   "why_wall_hypotheses_fail": "They hold: the subfield created upstairs is F_p itself, the base must have size p^{integer}; B*D^2 >= p ~ N. Records the obstruction precisely for the lens 'embedding E(F_p) into E(F_{p^n})'.",
+   "nongenericity_argument": "None; accounting. B >= p means B*D^2 >= N regardless of D.",
+   "prior_art": "Gaudry 2009, Diem 2011 (E(F_{p^n}) descent); Semaev 2004; Petit-Kosters-Messeng 2016 (PKM towers, prime field); treatise extension.tex / prog_prime.tex.",
+   "novelty_status": "novelty_unverified (expected folklore)",
+   "falsifier": {
+    "design": "gp: p in {1009, 4099, 65537-range primes}, n=2,3, E/F_p prime order; V = c*F_p (dim 1). Enumerate F_V, compute Tr images in E(F_p); measure |Tr(F_V)|/r and the number of distinct m=2 relations nR = T1+T2 with T_i in Tr(F_V) per target. Compare with a random subset of E(F_p) of equal size.",
+    "toy_params": "p ~ 10^3..2^16, n in {2,3}, m=2",
+    "tools": "gp -q",
+    "cpu_minutes": 5,
+    "prediction_if_true": "|Tr(F_V)|/r in [0.5,1.0]; relation counts equal random-subset baseline within 5%: no sub-p base exists via this route.",
+    "prediction_if_false": "|Tr(F_V)| << r (trace image collapses to a small structured subset) while decompositions persist: would be a genuine small base; escalate."
+   },
+   "expected_class": "accounting",
+   "risk": "Pure closure item."
+  }
+ ]
+}

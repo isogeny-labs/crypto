@@ -1,0 +1,70 @@
+# nc2_stage0 args: r=[33558163, 33554761, 33558059] c=[1, 2] n=2000 seed=20261108 d1=Some((1.0, 8)) d3=true train=1000 restarts=12 steps=50
+
+## r=33558163 C=1 (K=2, sqrt(r)=5792.9) Poisson floor 1.329
+D0  random-jump control (16 jumps): E = 1.3845 +- 0.0109 (n=2000)
+D0i i.i.d. uniform points (diagnostic, not a walk): E = 1.3194 +- 0.0107 (n=2000)
+D0h hash-of-scalar jump (diagnostic): E = 5.8885 +- 0.0967 (n=2000, 1047 censored at cap)
+D1  wwalk x=1 jumps=8 (table+probe): E = 1.6246 +- 0.0117 (n=2000)
+D2  stride tiling (serpentine box; E is a lower bound when censored): E = 9.9999 +- 0.0000 (n=2000, 2000 censored at cap)
+D3  search: 612 evals; winner n=15 sched=Random rules(a,b,e..)=[Quad, Small(1024), One] start=uniform jump_seed=0xc4507b80e65e7b3f stream_seed=0xe99550c4397f941d start_seed=0x6724b7f750338c3
+D3  training E = 1.3407 +- 0.0155 (n=1000)
+D3  HELD-OUT E = 1.3811 +- 0.0111 (n=2000)
+D3  D0/D3 = 1.0024   D3/D0 = 0.9976
+CE  randomised-e control of D3 winner: E = 1.3535 +- 0.0110 (n=2000)
+
+## r=33558163 C=2 (K=3, sqrt(r)=5792.9) Poisson floor 1.662
+D0  random-jump control (16 jumps): E = 1.7108 +- 0.0112 (n=2000)
+D0i i.i.d. uniform points (diagnostic, not a walk): E = 1.6476 +- 0.0114 (n=2000)
+D0h hash-of-scalar jump (diagnostic): E = 7.8497 +- 0.0810 (n=2000, 1477 censored at cap)
+D2  stride tiling (serpentine box; E is a lower bound when censored): E = 9.9999 +- 0.0000 (n=2000, 2000 censored at cap)
+D3  search: 612 evals; winner n=16 sched=Random rules(a,b,e..)=[Uniform, Uniform, One, Quad] start=uniform jump_seed=0x18daef0093424d17 stream_seed=0x328566903109b5d4 start_seed=0xce66670e03c27542
+D3  training E = 1.6836 +- 0.0162 (n=1000)
+D3  HELD-OUT E = 1.7298 +- 0.0113 (n=2000)
+D3  D0/D3 = 0.9890   D3/D0 = 1.0111
+CE  randomised-e control of D3 winner: E = 1.7176 +- 0.0111 (n=2000)
+
+## r=33554761 C=1 (K=2, sqrt(r)=5792.6) Poisson floor 1.329
+D0  random-jump control (16 jumps): E = 1.3905 +- 0.0110 (n=2000)
+D0i i.i.d. uniform points (diagnostic, not a walk): E = 1.3335 +- 0.0110 (n=2000)
+D0h hash-of-scalar jump (diagnostic): E = 5.8115 +- 0.0970 (n=2000, 1031 censored at cap)
+D1  wwalk x=1 jumps=8 (table+probe): E = 1.6292 +- 0.0118 (n=2000)
+D2  stride tiling (serpentine box; E is a lower bound when censored): E = 9.9999 +- 0.0000 (n=2000, 2000 censored at cap)
+D3  search: 612 evals; winner n=15 sched=Random rules(a,b,e..)=[Quad, Small(8), One] start=uniform jump_seed=0xc7f6cf674077462d stream_seed=0xe99550c4397f941d start_seed=0x6724b7f750338c3
+D3  training E = 1.3464 +- 0.0147 (n=1000)
+D3  HELD-OUT E = 1.4058 +- 0.0111 (n=2000)
+D3  D0/D3 = 0.9891   D3/D0 = 1.0110
+CE  randomised-e control of D3 winner: E = 1.3727 +- 0.0112 (n=2000)
+
+## r=33554761 C=2 (K=3, sqrt(r)=5792.6) Poisson floor 1.662
+D0  random-jump control (16 jumps): E = 1.7402 +- 0.0111 (n=2000)
+D0i i.i.d. uniform points (diagnostic, not a walk): E = 1.6576 +- 0.0106 (n=2000)
+D0h hash-of-scalar jump (diagnostic): E = 7.9384 +- 0.0803 (n=2000, 1502 censored at cap)
+D2  stride tiling (serpentine box; E is a lower bound when censored): E = 9.9999 +- 0.0000 (n=2000, 2000 censored at cap)
+D3  search: 612 evals; winner n=15 sched=Random rules(a,b,e..)=[One, Uniform, Quad, Quad] start=e1=1 jump_seed=0xe3214d4339088d0 stream_seed=0x47397281216c824e start_seed=0x4a0244f7476f8eea
+D3  training E = 1.6844 +- 0.0155 (n=1000)
+D3  HELD-OUT E = 1.7041 +- 0.0111 (n=2000)
+D3  D0/D3 = 1.0212   D3/D0 = 0.9793
+CE  randomised-e control of D3 winner: E = 1.7271 +- 0.0115 (n=2000)
+
+## r=33558059 C=1 (K=2, sqrt(r)=5792.9) Poisson floor 1.329
+D0  random-jump control (16 jumps): E = 1.3760 +- 0.0111 (n=2000)
+D0i i.i.d. uniform points (diagnostic, not a walk): E = 1.3286 +- 0.0111 (n=2000)
+D0h hash-of-scalar jump (diagnostic): E = 5.4828 +- 0.0967 (n=2000, 953 censored at cap)
+D1  wwalk x=1 jumps=8 (table+probe): E = 1.6324 +- 0.0115 (n=2000)
+D2  stride tiling (serpentine box; E is a lower bound when censored): E = 9.9999 +- 0.0000 (n=2000, 2000 censored at cap)
+D3  search: 612 evals; winner n=13 sched=Random rules(a,b,e..)=[Uniform, One, Uniform] start=uniform jump_seed=0xc360184db727b4f9 stream_seed=0x1fa53cc9616ad72 start_seed=0xb9e92481b16a374a
+D3  training E = 1.3468 +- 0.0156 (n=1000)
+D3  HELD-OUT E = 1.4127 +- 0.0116 (n=2000)
+D3  D0/D3 = 0.9740   D3/D0 = 1.0267
+CE  randomised-e control of D3 winner: E = 1.3713 +- 0.0112 (n=2000)
+
+## r=33558059 C=2 (K=3, sqrt(r)=5792.9) Poisson floor 1.662
+D0  random-jump control (16 jumps): E = 1.7380 +- 0.0113 (n=2000)
+D0i i.i.d. uniform points (diagnostic, not a walk): E = 1.6576 +- 0.0111 (n=2000)
+D0h hash-of-scalar jump (diagnostic): E = 7.9111 +- 0.0807 (n=2000, 1496 censored at cap)
+D2  stride tiling (serpentine box; E is a lower bound when censored): E = 9.9999 +- 0.0000 (n=2000, 2000 censored at cap)
+D3  search: 612 evals; winner n=16 sched=Random rules(a,b,e..)=[Small(4), Ap, One, Small(1024)] start=e1=1 jump_seed=0x5000b912657fcd67 stream_seed=0x215ba9cec917a0ee start_seed=0xb125f4a28f0451a6
+D3  training E = 1.6852 +- 0.0156 (n=1000)
+D3  HELD-OUT E = 1.7231 +- 0.0113 (n=2000)
+D3  D0/D3 = 1.0086   D3/D0 = 0.9914
+CE  randomised-e control of D3 winner: E = 1.7300 +- 0.0116 (n=2000)

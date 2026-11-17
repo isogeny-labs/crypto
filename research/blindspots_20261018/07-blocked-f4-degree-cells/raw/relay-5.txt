@@ -1,0 +1,29 @@
+card: CARD-BLINDSPOT-07-05 (sha256 ef51095ab4cf7b6ee78827a22a21c4d15f7220624ff5de46c0492553f138ab75)
+commit: b88ad91295fdd4e7b7c057b331ec0f22f19f22ba
+receipt: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/receipt-card-05.json sha256 9c1984426c61a3c9289553af59ce91a01de884bde4f6152b2f5a01642f672321
+status: completed
+command 1 (make-bin-dir): ["mkdir", "-p", "target/blindspots-07/card-05"] exit 0 (0.002 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=7516192768", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "target-cpu=native", "-o", "target/blindspots-07/card-05/b07", "examples/blindspots_07_blocked_closure.rs"] exit 0 (2.766 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (s-13-5-4-i06d14): ["prlimit", "--as=7516192768", "target/blindspots-07/card-05/b07", "closure", "--m", "4", "--n", "13", "--ell", "5", "--basis", "4300,8104,4403,6917,1752", "--xr", "2172", "--from", "3", "--to", "4", "--label", "s-13-5-4-i06d14", "--time-limit", "420", "--expect-solutions", "0"] exit 0 (249.557 s) succeeded
+  stdout sha256 6184187cf8c2f0616ec634c6651e176493bb8efd16c966c380bef5701b2c3c02; last 4 lines:
+    {"tool":"b07","mode":"count","cell":"s-13-5-4-i06d14","solutions":0}
+    {"tool":"b07","cell":"s-13-5-4-i06d14","m":4,"n":13,"ell":5,"n_vars":46,"degree":3,"columns":16262,"status":"saturated","refuted":false,"rank":2019,"products":3045,"seed_rows":39,"chunks":4,"falls":67,"new_pivots":2019,"word_ops":3297519,"word_ops_forward":261221,"word_ops_block":2145213,"word_ops_pass":891085,"hits_forward":3215,"bytes_pass":3054392,"bytes_read_forward":2089768,"basis_bytes_peak":2399072,"rss_peak_kb":8748,"secs":0.016,"secs_forward":0.002,"secs_block":0.006,"secs_pass":0.003,"chunk_rows":4096,"tile_words":256,"order":2}
+    {"tool":"b07","cell":"s-13-5-4-i06d14","m":4,"n":13,"ell":5,"n_vars":46,"degree":4,"columns":179447,"status":"refuted","refuted":true,"rank":173122,"products":481026,"seed_rows":39,"chunks":119,"falls":12961,"new_pivots":173122,"word_ops":269603491579,"word_ops_forward":45570713012,"word_ops_block":19113045211,"word_ops_pass":204919733356,"hits_forward":68749566,"bytes_pass":127488217968,"bytes_read_forward":364565704096,"basis_bytes_peak":1976236040,"rss_peak_kb":2354028,"secs":249.355,"secs_forward":51.255,"secs_block":14.472,"secs_pass":177.119,"chunk_rows":4096,"tile_words":256,"order":2}
+    {"tool":"b07","mode":"closure-summary","cell":"s-13-5-4-i06d14","closure_degree":4,"last_status":"refuted","rss_peak_kb":2354028}
+  stderr last 10 lines:
+      [20s] rank 84521 products 161571 pending 2145 basis 734 MiB vm 826 MiB rss-peak 825 MiB
+      [42s] rank 106112 products 223002 pending 1430 basis 1050 MiB vm 1102 MiB rss-peak 1136 MiB
+      [71s] rank 113712 products 239387 pending 1450 basis 1157 MiB vm 1234 MiB rss-peak 1234 MiB
+      [92s] rank 118848 products 247575 pending 2223 basis 1205 MiB vm 1302 MiB rss-peak 1303 MiB
+      [113s] rank 128820 products 272139 pending 2968 basis 1313 MiB vm 1398 MiB rss-peak 1418 MiB
+      [133s] rank 137749 products 313125 pending 2077 basis 1434 MiB vm 1534 MiB rss-peak 1531 MiB
+      [158s] rank 147393 products 354065 pending 1663 basis 1569 MiB vm 1666 MiB rss-peak 1664 MiB
+      [179s] rank 155467 products 407336 pending 1159 basis 1687 MiB vm 1796 MiB rss-peak 1791 MiB
+      [204s] rank 163314 products 464646 pending 639 basis 1798 MiB vm 1878 MiB rss-peak 1876 MiB
+      [226s] rank 170157 products 476950 pending 743 basis 1872 MiB vm 1992 MiB rss-peak 1991 MiB
+command 4 (remove-bin): ["rm", "-f", "target/blindspots-07/card-05/b07"] exit 0 (0.006 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 5 (remove-bin-dir): ["rmdir", "target/blindspots-07/card-05"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:

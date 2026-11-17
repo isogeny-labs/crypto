@@ -1,0 +1,29 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:s3:::ephemeral-runs-104186811093-us-east-1/jobs/*",
+                "arn:aws:s3:::ephemeral-runs-104186811093-us-east-1/cache/*"
+            ]
+        },
+        {
+            "Action": "s3:ListBucket",
+            "Condition": {
+                "StringLike": {
+                    "s3:prefix": [
+                        "jobs/*",
+                        "cache/*"
+                    ]
+                }
+            },
+            "Effect": "Allow",
+            "Resource": "arn:aws:s3:::ephemeral-runs-104186811093-us-east-1"
+        }
+    ]
+}

@@ -1,0 +1,680 @@
+//! The shared pseudo-random walk and the distinguished-point records
+//! it produces.
+//!
+//! Every peer runs exactly this function on exactly the branch table
+//! derived in [`super::job`], so trails that meet anywhere in the
+//! group stay merged until the next distinguished point — which is
+//! what lets a collision between *any* two peers' walkers solve the
+//! instance.
+
+use num_bigint::BigUint;
+use serde::{Deserialize, Serialize};
+
+use super::job::{hex_of, parse_hex, JobContext};
+use crate::cryptanalysis::ecdlp_variants::{add_mod, neg_mod};
+use crate::ecc::field::FieldElement;
+use crate::ecc::point::Point;
+
+/// A distinguished point reached by one walker, as shipped in a
+/// check-in.  Self-certifying: anyone can check
+/// `a·P + b·Q == (x, y)` and that `(x, y)` is distinguished.
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+pub struct DpRecord {
+    /// Walker index whose trail ended here (audit handle: re-run it).
+    pub walker: u64,
+    /// Steps from the walker's start to this point.
+    pub steps: u64,
+    /// DP coordinates (hex).
+    pub x: String,
+    pub y: String,
+    /// Coefficients (hex, mod `n`) with `a·P + b·Q = (x, y)`.
+    pub a: String,
+    pub b: String,
+}
+
+impl DpRecord {
+    pub fn point(&self, ctx: &JobContext) -> Result<Point, String> {
+        Ok(Point::Affine {
+            x: crate::ecc::field::FieldElement::new(parse_hex(&self.x)?, ctx.p.clone()),
+            y: crate::ecc::field::FieldElement::new(parse_hex(&self.y)?, ctx.p.clone()),
+        })
+    }
+
+    pub fn coefficients(&self) -> Result<(BigUint, BigUint), String> {
+        Ok((parse_hex(&self.a)?, parse_hex(&self.b)?))
+    }
+
+    /// Full verification: parse, on-curve, distinguished, and
+    /// `a·P + b·Q` equals the point.  Cost: two scalar
+    /// multiplications — cheap next to the `2^dp_bits` steps the
+    /// record represents, so peers verify every record they accept.
+    pub fn verify(&self, ctx: &JobContext) -> Result<Point, String> {
+        let pt = self.point(ctx)?;
+        if !ctx.on_curve(&pt) {
+            return Err("DP not on curve".into());
+        }
+        if !ctx.is_dp(&pt) {
+            return Err("point is not distinguished".into());
+        }
+        let (a, b) = self.coefficients()?;
+        if a >= ctx.n || b >= ctx.n {
+            return Err("coefficients not reduced mod n".into());
+        }
+        if ctx.combine(&a, &b) != pt {
+            return Err("a·P + b·Q ≠ claimed point".into());
+        }
+        Ok(pt)
+    }
+}
+
+/// How a single walker's trail ended.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum WalkerOutcome {
+    /// Reached a distinguished point.
+    Dp(DpRecord),
+    /// Hit the step cap (fruitless cycle or unlucky sparse region).
+    DeadTrail { steps: u64 },
+}
+
+/// Branch selector from the low 64 bits of `x`.
+fn branch_index(pt: &Point, r: usize) -> usize {
+    match pt {
+        Point::Infinity => 0,
+        Point::Affine { x, .. } => {
+            let lo = x.value.iter_u64_digits().next().unwrap_or(0);
+            (lo % r as u64) as usize
+        }
+    }
+}
+
+/// Is `pt` the upper `±` representative, `2y > p`?  Compared as
+/// `y > ⌊p/2⌋` against the job's precomputed [`JobContext::half_p`].
+fn needs_flip(pt: &Point, half_p: &BigUint) -> bool {
+    match pt {
+        Point::Affine { y, .. } => y.value > *half_p,
+        Point::Infinity => false,
+    }
+}
+
+/// One step of the walk.  Pure in `(R, a, b)` except for the 2-cycle
+/// escape under the negation map, which also looks at the previous
+/// point.
+pub fn step(
+    ctx: &JobContext,
+    r: &Point,
+    a: &BigUint,
+    b: &BigUint,
+    last: Option<&Point>,
+) -> (Point, BigUint, BigUint) {
+    let n = &ctx.n;
+    let idx = branch_index(r, ctx.branches.len());
+    let br = &ctx.branches[idx];
+    let mut np = r.add_vartime(&br.point, &ctx.a);
+    let mut na = add_mod(a, &br.u, n);
+    let mut nb = add_mod(b, &br.v, n);
+    if ctx.spec.negation_map {
+        if needs_flip(&np, &ctx.half_p) {
+            np = np.neg_vartime();
+            na = neg_mod(&na, n);
+            nb = neg_mod(&nb, n);
+        }
+        // Fruitless 2-cycle A→B→A: the normalised step lands back on the
+        // previous point, so `(na, nb)` now name it.  The comparison has to
+        // follow the flip: `last` is normalised, and the unflipped sum is
+        // `−last`, which never equals it.  Leave by doubling the member
+        // with the smaller x, so a walk entering the cycle at either member
+        // leaves it at the same point.
+        if last == Some(&np) {
+            let (c, ca, cb) = if x_le(r, &np) {
+                (r.clone(), a.clone(), b.clone())
+            } else {
+                (np, na, nb)
+            };
+            np = c.double_vartime(&ctx.a);
+            na = (ca << 1) % n;
+            nb = (cb << 1) % n;
+            if needs_flip(&np, &ctx.half_p) {
+                np = np.neg_vartime();
+                na = neg_mod(&na, n);
+                nb = neg_mod(&nb, n);
+            }
+        }
+    }
+    (np, na, nb)
+}
+
+/// `x(p) ≤ x(q)`, with `O` first: the 2-cycle escape's choice of member.
+fn x_le(p: &Point, q: &Point) -> bool {
+    match (p, q) {
+        (Point::Affine { x: xp, .. }, Point::Affine { x: xq, .. }) => xp.value <= xq.value,
+        (Point::Infinity, _) => true,
+        (_, Point::Infinity) => false,
+    }
+}
+
+/// One independently selected walk state for a synchronous batch step.
+///
+/// The branch selector and distinguished-point rule still see the same
+/// affine point as the serial walker. A caller may choose any batch width;
+/// this function does not change the job's walk or protocol.
+pub struct BatchStepInput<'a> {
+    pub point: &'a Point,
+    pub a: &'a BigUint,
+    pub b: &'a BigUint,
+    pub last: Option<&'a Point>,
+}
+
+/// Advance independent walkers with one field inversion for all ordinary
+/// affine additions. Exceptional additions use the existing point routine.
+///
+/// This is an opt-in arithmetic primitive. The caller must keep the walkers'
+/// scheduling and distinguished-point checks identical to the serial path.
+pub fn step_batch(
+    ctx: &JobContext,
+    inputs: &[BatchStepInput<'_>],
+) -> Vec<(Point, BigUint, BigUint)> {
+    let p = &ctx.p;
+    let mut selected = Vec::with_capacity(inputs.len());
+    let mut denominators = Vec::new();
+    let mut numerators = Vec::new();
+    let mut ordinary_index = Vec::with_capacity(inputs.len());
+    for input in inputs {
+        let branch = &ctx.branches[branch_index(input.point, ctx.branches.len())];
+        selected.push(branch);
+        match (input.point, &branch.point) {
+            (Point::Affine { x: x1, y: y1 }, Point::Affine { x: x2, y: y2 }) if x1 != x2 => {
+                ordinary_index.push(Some(denominators.len()));
+                denominators.push(x2.sub(x1));
+                numerators.push(y2.sub(y1));
+            }
+            _ => ordinary_index.push(None),
+        }
+    }
+
+    let mut inverse_denominators = vec![FieldElement::zero(p.clone()); denominators.len()];
+    if !denominators.is_empty() {
+        let mut prefixes = Vec::with_capacity(denominators.len());
+        let mut product = FieldElement::one(p.clone());
+        for denominator in &denominators {
+            prefixes.push(product.clone());
+            product = product.mul(denominator);
+        }
+        let mut inverse = product
+            .inv_vartime()
+            .expect("ordinary denominators are nonzero");
+        for index in (0..denominators.len()).rev() {
+            inverse_denominators[index] = inverse.mul(&prefixes[index]);
+            inverse = inverse.mul(&denominators[index]);
+        }
+    }
+
+    inputs
+        .iter()
+        .zip(selected.iter())
+        .zip(ordinary_index.iter())
+        .map(|((input, branch), ordinary)| {
+            let mut next = if let Some(index) = ordinary {
+                let (Point::Affine { x: x1, y: y1 }, Point::Affine { x: x2, .. }) =
+                    (input.point, &branch.point)
+                else {
+                    unreachable!("ordinary index requires two affine points")
+                };
+                let lambda = numerators[*index].mul(&inverse_denominators[*index]);
+                let x3 = lambda.mul(&lambda).sub(x1).sub(x2);
+                let y3 = lambda.mul(&x1.sub(&x3)).sub(y1);
+                Point::Affine { x: x3, y: y3 }
+            } else {
+                input.point.add_vartime(&branch.point, &ctx.a)
+            };
+            let mut next_a = add_mod(input.a, &branch.u, &ctx.n);
+            let mut next_b = add_mod(input.b, &branch.v, &ctx.n);
+            if ctx.spec.negation_map {
+                if needs_flip(&next, &ctx.half_p) {
+                    next = next.neg_vartime();
+                    next_a = neg_mod(&next_a, &ctx.n);
+                    next_b = neg_mod(&next_b, &ctx.n);
+                }
+                if input.last == Some(&next) {
+                    let (member, member_a, member_b) = if x_le(input.point, &next) {
+                        (input.point.clone(), input.a.clone(), input.b.clone())
+                    } else {
+                        (next, next_a, next_b)
+                    };
+                    next = member.double_vartime(&ctx.a);
+                    next_a = (member_a << 1) % &ctx.n;
+                    next_b = (member_b << 1) % &ctx.n;
+                    if needs_flip(&next, &ctx.half_p) {
+                        next = next.neg_vartime();
+                        next_a = neg_mod(&next_a, &ctx.n);
+                        next_b = neg_mod(&next_b, &ctx.n);
+                    }
+                }
+            }
+            (next, next_a, next_b)
+        })
+        .collect()
+}
+
+/// Run walker `i` from its derived start until a DP or the step cap.
+pub fn run_walker(ctx: &JobContext, i: u64) -> WalkerOutcome {
+    let (mut a, mut b, mut r) = ctx.walker_start(i);
+    if ctx.spec.negation_map && needs_flip(&r, &ctx.half_p) {
+        r = r.neg_vartime();
+        a = neg_mod(&a, &ctx.n);
+        b = neg_mod(&b, &ctx.n);
+    }
+    let mut last: Option<Point> = None;
+    let mut steps = 0u64;
+    loop {
+        if ctx.is_dp(&r) {
+            let (x, y) = match &r {
+                Point::Affine { x, y } => (hex_of(&x.value), hex_of(&y.value)),
+                Point::Infinity => unreachable!("∞ is never distinguished"),
+            };
+            return WalkerOutcome::Dp(DpRecord {
+                walker: i,
+                steps,
+                x,
+                y,
+                a: hex_of(&a),
+                b: hex_of(&b),
+            });
+        }
+        if steps >= ctx.step_cap {
+            return WalkerOutcome::DeadTrail { steps };
+        }
+        let (np, na, nb) = step(ctx, &r, &a, &b, last.as_ref());
+        last = Some(std::mem::replace(&mut r, np));
+        a = na;
+        b = nb;
+        steps += 1;
+    }
+}
+
+/// Run consecutive independent walkers through the batched addition kernel.
+/// Results remain ordered by walker index, even when trails end at different
+/// depths. A completed lane starts the next unassigned walker on the next
+/// batch step; the serial walk definition and distinguished-point records
+/// remain unchanged.
+pub fn run_walkers_batch(
+    ctx: &JobContext,
+    first: u64,
+    count: usize,
+    width: usize,
+) -> Vec<WalkerOutcome> {
+    struct ActiveWalker {
+        output_index: usize,
+        a: BigUint,
+        b: BigUint,
+        point: Point,
+        last: Option<Point>,
+        steps: u64,
+    }
+
+    assert!(width > 0, "batch width must be positive");
+    let mut active: Vec<Option<ActiveWalker>> = (0..width.min(count)).map(|_| None).collect();
+    let mut results = vec![None; count];
+    let mut assigned = 0usize;
+    let mut completed = 0usize;
+
+    while completed < count {
+        for lane in &mut active {
+            if lane.is_none() && assigned < count {
+                let walker = first
+                    .checked_add(assigned as u64)
+                    .expect("walker index overflow");
+                let (mut a, mut b, mut point) = ctx.walker_start(walker);
+                if ctx.spec.negation_map && needs_flip(&point, &ctx.half_p) {
+                    point = point.neg_vartime();
+                    a = neg_mod(&a, &ctx.n);
+                    b = neg_mod(&b, &ctx.n);
+                }
+                *lane = Some(ActiveWalker {
+                    output_index: assigned,
+                    a,
+                    b,
+                    point,
+                    last: None,
+                    steps: 0,
+                });
+                assigned += 1;
+            }
+        }
+
+        for lane in &mut active {
+            let Some(walker) = lane.as_ref() else {
+                continue;
+            };
+            let outcome = if ctx.is_dp(&walker.point) {
+                let (x, y) = match &walker.point {
+                    Point::Affine { x, y } => (hex_of(&x.value), hex_of(&y.value)),
+                    Point::Infinity => unreachable!("∞ is never distinguished"),
+                };
+                Some(WalkerOutcome::Dp(DpRecord {
+                    walker: first + walker.output_index as u64,
+                    steps: walker.steps,
+                    x,
+                    y,
+                    a: hex_of(&walker.a),
+                    b: hex_of(&walker.b),
+                }))
+            } else if walker.steps >= ctx.step_cap {
+                Some(WalkerOutcome::DeadTrail {
+                    steps: walker.steps,
+                })
+            } else {
+                None
+            };
+            if let Some(outcome) = outcome {
+                results[walker.output_index] = Some(outcome);
+                *lane = None;
+                completed += 1;
+            }
+        }
+
+        if completed == count {
+            break;
+        }
+        let inputs: Vec<_> = active
+            .iter()
+            .filter_map(|lane| {
+                lane.as_ref().map(|walker| BatchStepInput {
+                    point: &walker.point,
+                    a: &walker.a,
+                    b: &walker.b,
+                    last: walker.last.as_ref(),
+                })
+            })
+            .collect();
+        let advanced = step_batch(ctx, &inputs);
+        for (walker, (point, a, b)) in active.iter_mut().flatten().zip(advanced) {
+            walker.last = Some(std::mem::replace(&mut walker.point, point));
+            walker.a = a;
+            walker.b = b;
+            walker.steps += 1;
+        }
+    }
+
+    results.into_iter().map(Option::unwrap).collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::super::job::{demo_curve, JobSpec};
+    use super::*;
+    use num_traits::Zero;
+
+    fn ctx(negation: bool) -> JobContext {
+        let curve = demo_curve("demo-mid").unwrap();
+        let q = curve
+            .generator()
+            .scalar_mul(&BigUint::from(4242u32), &curve.a_fe());
+        let mut spec = JobSpec::new(&curve, &q, "walk", 1).unwrap();
+        spec.dp_bits = 4;
+        spec.negation_map = negation;
+        spec.build().unwrap()
+    }
+
+    #[test]
+    fn walker_records_verify_in_both_modes() {
+        for negation in [false, true] {
+            let c = ctx(negation);
+            let mut dps = 0;
+            for i in 0..64u64 {
+                if let WalkerOutcome::Dp(rec) = run_walker(&c, i) {
+                    dps += 1;
+                    let pt = rec.verify(&c).expect("own record verifies");
+                    assert!(c.is_dp(&pt));
+                    assert_eq!(rec.walker, i);
+                }
+            }
+            assert!(
+                dps > 40,
+                "negation={negation}: only {dps}/64 walkers reached a DP"
+            );
+        }
+    }
+
+    #[test]
+    fn tampered_records_are_rejected() {
+        let c = ctx(false);
+        let rec = (0..64u64)
+            .find_map(|i| match run_walker(&c, i) {
+                WalkerOutcome::Dp(r) => Some(r),
+                _ => None,
+            })
+            .unwrap();
+        let mut bad = rec.clone();
+        bad.a = hex_of(&((parse_hex(&rec.a).unwrap() + 1u32) % &c.n));
+        assert!(bad.verify(&c).unwrap_err().contains("≠"));
+        let mut bad = rec.clone();
+        bad.x = "1".into();
+        assert!(bad.verify(&c).is_err());
+        let mut bad = rec.clone();
+        bad.a = hex_of(&(&c.n + parse_hex(&rec.a).unwrap()));
+        assert!(bad.verify(&c).unwrap_err().contains("reduced"));
+    }
+
+    #[test]
+    fn same_walker_same_trail() {
+        let c1 = ctx(true);
+        let c2 = ctx(true);
+        for i in 0..16u64 {
+            assert_eq!(run_walker(&c1, i), run_walker(&c2, i));
+        }
+    }
+
+    /// A fruitless 2-cycle under the negation map (`R → −(R + M) → R`, the
+    /// second step taking the same branch) is left at once, at the doubling
+    /// of its smaller-x member, whichever member the walk entered it by.
+    #[test]
+    fn fruitless_two_cycles_are_escaped_deterministically() {
+        let c = ctx(true);
+        let mut cycles = 0;
+        for i in 0..1024u64 {
+            let (mut a, mut b, mut r) = c.walker_start(i);
+            if needs_flip(&r, &c.half_p) {
+                r = r.neg();
+                a = neg_mod(&a, &c.n);
+                b = neg_mod(&b, &c.n);
+            }
+            let (r1, a1, b1) = step(&c, &r, &a, &b, None);
+            // Would the walk without an escape step straight back to `r`?
+            let br = &c.branches[branch_index(&r1, c.branches.len())];
+            let back = r1.add_vartime(&br.point, &c.a);
+            let back = if needs_flip(&back, &c.half_p) {
+                back.neg_vartime()
+            } else {
+                back
+            };
+            if back != r {
+                continue;
+            }
+            cycles += 1;
+            let (r2, a2, b2) = step(&c, &r1, &a1, &b1, Some(&r));
+            assert_ne!(r2, r, "walker {i}: the 2-cycle was not left");
+            assert_eq!(c.combine(&a2, &b2), r2, "walker {i}: a·P + b·Q drifted");
+            // From `r` with `r1` behind it the next step would be `r1`: the
+            // same cycle entered at the other member.
+            let (r2_other, a3, b3) = step(&c, &r, &a, &b, Some(&r1));
+            assert_eq!(r2_other, r2, "walker {i}: the exit depends on the entry");
+            assert_eq!(c.combine(&a3, &b3), r2_other);
+        }
+        assert!(cycles >= 4, "only {cycles} 2-cycles among 1024 starts");
+    }
+
+    #[test]
+    fn batched_walkers_replay_serial_outcomes_with_lane_refill() {
+        for negation in [false, true] {
+            for step_cap in [3, 128] {
+                let mut c = ctx(negation);
+                c.step_cap = step_cap;
+                let expected = (7..71).map(|i| run_walker(&c, i)).collect::<Vec<_>>();
+                for width in [1, 2, 7, 32, 128] {
+                    assert_eq!(
+                        run_walkers_batch(&c, 7, expected.len(), width),
+                        expected,
+                        "negation={negation}, step_cap={step_cap}, width={width}"
+                    );
+                }
+                assert!(run_walkers_batch(&c, 7, 0, 8).is_empty());
+            }
+        }
+    }
+
+    #[test]
+    fn batched_secp256k1_walkers_replay_serial_outcomes() {
+        let curve = crate::ecc::curve::CurveParams::secp256k1();
+        let q = curve
+            .generator()
+            .scalar_mul(&BigUint::from(7u32), &curve.a_fe());
+        let mut spec = JobSpec::new(&curve, &q, "batched-walk-secp256k1", 0x71cc_2026_1017)
+            .expect("valid secp256k1 job");
+        spec.dp_bits = 6;
+        spec.num_branches = 32;
+        spec.max_steps_per_walker = 12;
+        let c = spec.build().expect("valid context");
+        let expected = (0..8).map(|i| run_walker(&c, i)).collect::<Vec<_>>();
+        assert_eq!(run_walkers_batch(&c, 0, 8, 4), expected);
+    }
+
+    #[test]
+    fn batched_steps_replay_serial_states_in_both_modes() {
+        for negation in [false, true] {
+            let mut c = ctx(negation);
+            let mut states = (0..16u64)
+                .map(|i| {
+                    let (a, b, point) = c.walker_start(i);
+                    (point, a, b, None::<Point>)
+                })
+                .collect::<Vec<_>>();
+            c.branches[0].point = Point::Infinity;
+            states[0].0 = Point::Infinity;
+            for round in 0..12 {
+                let inputs = states
+                    .iter()
+                    .map(|(point, a, b, last)| BatchStepInput {
+                        point,
+                        a,
+                        b,
+                        last: last.as_ref(),
+                    })
+                    .collect::<Vec<_>>();
+                let batched = step_batch(&c, &inputs);
+                let serial = inputs
+                    .iter()
+                    .map(|input| step(&c, input.point, input.a, input.b, input.last))
+                    .collect::<Vec<_>>();
+                assert_eq!(batched, serial, "negation={negation}, round={round}");
+                for (state, (next, a, b)) in states.iter_mut().zip(batched) {
+                    state.3 = Some(std::mem::replace(&mut state.0, next));
+                    state.1 = a;
+                    state.2 = b;
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn batched_step_replays_doubling_and_cancellation() {
+        let mut c = ctx(false);
+        let point = c.branches[0].point.clone();
+        let a = BigUint::from(3u32);
+        let b = BigUint::from(5u32);
+        for cancellation in [false, true] {
+            let input_point = if cancellation {
+                point.neg()
+            } else {
+                point.clone()
+            };
+            let index = branch_index(&input_point, c.branches.len());
+            c.branches[index].point = point.clone();
+            let input = BatchStepInput {
+                point: &input_point,
+                a: &a,
+                b: &b,
+                last: None,
+            };
+            assert_eq!(
+                step_batch(&c, &[input]).pop().unwrap(),
+                step(&c, &input_point, &a, &b, None)
+            );
+        }
+    }
+
+    #[test]
+    fn step_keeps_the_invariant() {
+        for negation in [false, true] {
+            let c = ctx(negation);
+            let (mut a, mut b, mut r) = c.walker_start(9);
+            if negation && needs_flip(&r, &c.half_p) {
+                r = r.neg();
+                a = neg_mod(&a, &c.n);
+                b = neg_mod(&b, &c.n);
+            }
+            let mut last = None;
+            for _ in 0..200 {
+                let (np, na, nb) = step(&c, &r, &a, &b, last.as_ref());
+                assert_eq!(c.combine(&na, &nb), np, "a·P + b·Q drifted");
+                last = Some(std::mem::replace(&mut r, np));
+                a = na;
+                b = nb;
+            }
+        }
+    }
+
+    /// `add_mod`, `neg_mod`, `needs_flip` and [`JobContext::is_dp`] return
+    /// exactly what the expressions they replaced did, on one-word values
+    /// and on multi-word ones (their `BigUint` fallbacks).
+    #[test]
+    fn step_helpers_match_the_expressions_they_replace() {
+        use num_bigint::RandBigInt;
+        use rand::SeedableRng;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(0xc011ab);
+        let zero = BigUint::zero();
+        for n in [
+            BigUint::from(2u32),
+            BigUint::from(7u32),
+            BigUint::from(u64::MAX - 58),
+            BigUint::from(1u32) << 64,
+            BigUint::from(5u32).pow(60),
+        ] {
+            let mut vals = vec![zero.clone(), BigUint::from(1u32) % &n, &n - 1u32];
+            vals.extend((0..40).map(|_| rng.gen_biguint_below(&n)));
+            let half = &n >> 1;
+            for v in &vals {
+                let old_neg = if v.is_zero() { zero.clone() } else { &n - v };
+                assert_eq!(neg_mod(v, &n), old_neg, "n={n} v={v}");
+                let y = Point::Affine {
+                    x: crate::ecc::field::FieldElement::zero(n.clone()),
+                    y: crate::ecc::field::FieldElement {
+                        value: v.clone(),
+                        modulus: n.clone(),
+                    },
+                };
+                assert_eq!(needs_flip(&y, &half), (v << 1) > n, "n={n} y={v}");
+                for w in vals.iter().step_by(7) {
+                    assert_eq!(add_mod(v, w, &n), (v + w) % &n, "n={n} {v}+{w}");
+                }
+            }
+            let wide = BigUint::from(u64::MAX);
+            assert_eq!(add_mod(&wide, &wide, &n), (&wide + &wide) % &n);
+        }
+        let mut c = ctx(true);
+        let big = BigUint::from(5u32).pow(60);
+        for bits in [0u32, 1, 10, 63, 64, 65, 130] {
+            c.dp_mask = (BigUint::from(1u32) << bits) - 1u32;
+            for i in 0..60u32 {
+                let x = (rng.gen_biguint_below(&big) >> (i % 70)) << (i % 70);
+                let p = Point::Affine {
+                    x: crate::ecc::field::FieldElement {
+                        value: x.clone(),
+                        modulus: big.clone(),
+                    },
+                    y: crate::ecc::field::FieldElement::zero(big.clone()),
+                };
+                assert_eq!(c.is_dp(&p), (&x & &c.dp_mask).is_zero(), "{bits} {x}");
+            }
+        }
+    }
+}

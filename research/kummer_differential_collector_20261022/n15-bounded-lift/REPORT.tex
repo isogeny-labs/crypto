@@ -1,0 +1,77 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.72in]{geometry}
+\usepackage{graphicx,booktabs,amsmath}
+\usepackage[T1]{fontenc}
+\title{N15: Bounded Signed-Lift Gate}
+\author{Source-bound native replay}
+\date{25 October 2026}
+\begin{document}
+\maketitle
+\noindent Three 16-bit frozen subgroups were exhaustively replayed; the
+other 18 frozen models used 1,029 predeclared states each. The fallback
+received only $K(Q)$, $K(Q+G)$, signed $G$, and model constants. The scalar
+$k$ and divisor $Q=kG$ were used only by the independent correctness check.
+
+\begin{center}\small
+\begin{tabular}{lrrrrr}
+\toprule
+Scope & States & Fast fails & Recovered & Final null & Candidates\\
+\midrule
+Three 16-bit groups & 119,573 & 1,063 & 1,063 & 0 & 1,593\\
+Eighteen larger samples & 18,522 & 62 & 62 & 0 & 84\\
+\midrule
+Total & 138,095 & 1,125 & 1,125 & 0 & 1,677\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Direct algebraic inversion selected 988 fallbacks, the identity
+branch 21, and a rational 2-torsion translation 116. Among the tested
+candidates, 163 had $b_1=0$. All 414,285 cached theta xADD outputs matched
+the independent Jacobian oracle; this is exhaustive only for the 16-bit
+groups. The raw state table preserves every branch and cost.
+
+\noindent For a generic degree-two divisor with
+$u=x^2+a_1x+a_0$ and $v=b_1x+b_0$, the Kummer inverse supplies $a_0,a_1$
+and $b_1^2$. Writing $f\bmod u=R_0+R_1x$, the candidate equations are
+\[
+ b_0^2-a_0b_1^2=R_0,\qquad 2b_0b_1-a_1b_1^2=R_1.
+\]
+For $b_1\ne0$, the second equation fixes $b_0$ after a modular square
+root. For $b_1=0$, require $R_1=0$ and solve $b_0^2=R_0$. Each generic
+branch has at most two candidates. Identity is explicit, and a degree-one
+class becomes degree two after a suitable rational branch-point
+translation. Projective checks against both supplied Kummer inputs select
+the sign for odd-order $G$. This gives at most six conversions, twelve square
+roots, and thirteen candidate checks, conditional on the frozen action and
+projection identities. Those identities have finite source checks but no
+all-state symbolic certificate in this packet.
+
+\noindent A later exact 21-model basis audit confirms that the direct
+degree-two matrix $C_2$ and the matrix $C_1$ inverted by \texttt{general()}
+encode the same chart. With $\sigma=1+\lambda+\mu+\nu$,
+$C_2(1,-a_1,-a_0,q_3)^T=C_1(1,-a_1,a_0,q_3+\sigma a_0)^T$.
+The third entry recovered by the source is therefore $a_0$ as expected.
+An interim inversion-mismatch concern is withdrawn; the finite rows and
+cost counters are unchanged. Geometric projection and the all-state
+mixed-xADD fallback remain unproved.
+
+\noindent After one-time inverse setup, the safe-path signed module counted
+50,592,561 M, 38,978,317 A and 2,627,310 I. Native Jacobian checks add
+9,834,278 M, 414,369 S, 147,036 I, 15,791,770 field additions and
+139,720 Jacobian additions. These are operation counts only. Collector,
+labels, relation processing, final target verification, elapsed time and
+rho are absent. The matched rho ratio is null.
+
+\newpage
+\begin{center}
+\includegraphics[width=\linewidth]{research/kummer_differential_collector_20261022/n15-bounded-lift/status-graph.png}\\
+\small Fast-law failures recovered by the bounded fallback; final nulls
+are zero in every recorded model.
+\end{center}
+\noindent Evidence: \texttt{PROTOCOL.md}, \texttt{results/states.csv},
+\texttt{results/summary.json}, and \texttt{SHA256SUMS}. The native validator
+recomputes frozen scalar sets, all status and operation totals, and digests.
+No 1,260-target cohort or external job was launched. The full collector
+cost and all-state model certificate remain open.
+\end{document}

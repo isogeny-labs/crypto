@@ -1,0 +1,153 @@
+// Actual selected pair in coefficient field F_(2^sourceDegree30), variables X,Z.
+proc checkPoint30(number xx,number yy){
+ if(yy^2+xx*yy+xx^3+xx^2+1!=0){ERROR("actual selected point off E49");}
+}
+proc triple30(number xx,number yy){
+ checkPoint30(xx,yy);
+ number eta30=(xx^2+xx+1)*yy+xx+1;
+ if(eta30==0){ERROR("actual pair meets exceptional eta denominator");}
+ number t30=xx^4/eta30;number a30=(t30^2+t30+1)^4;number b30=(eta30^2+eta30+1)^4;
+ if(a30/t30!=b30/eta30^7){ERROR("source actual7 triple identity failed");}
+ return(list(a30/t30^7,a30/t30,b30/eta30));
+}
+proc linearRoots30(poly ff){
+ list factors30=factorize(ff);poly product30=1;list roots30;int ii30;
+ for(ii30=1;ii30<=size(factors30[1]);ii30++){
+  poly factor30=factors30[1][ii30];product30=product30*factor30^factors30[2][ii30];
+  if(deg(factor30)==1){roots30[size(roots30)+1]=number(subst(factor30,X,0)/leadcoef(factor30));}
+ }
+ if(product30!=ff){ERROR("common polynomial factor product mismatch");}
+ print("COLOR31_ROOT_EXHAUSTION degree="+string(deg(ff))+" rational="+string(size(roots30)));
+ if(deg(ff)!=size(roots30)){ERROR("COLOR31_NONRATIONAL_OR_NONSEPARABLE_ROOT_GAP");}
+ return(roots30);
+}
+proc common30(number jj,number kk){return(linearRoots30(gcd(phi30(jj),phi30(kk))));}
+proc parameters30(number jj,number kk){return(linearRoots30(gcd(X^8+X^4+1+jj*X^7,X^8+X^4+1+kk*X)));}
+proc inverse30(poly aa30,poly pp30){
+ ideal generators30=pp30,aa30;
+ if(std(generators30)[1]!=1){ERROR("nonunit kernel denominator");return(poly(0));}
+ matrix witness30=lift(generators30,ideal(1));poly answer30=reduce(witness30[2,1],std(ideal(pp30)));
+ if(reduce(aa30*answer30+1,std(ideal(pp30)))!=0){ERROR("kernel inverse witness failed");}
+ return(answer30);
+}
+proc division30(number bb30,int ell30){
+ list dd30;dd30[1]=poly(1);dd30[2]=X;dd30[3]=X^4+X^3+bb30;dd30[4]=X^6+bb30*X^2;
+ int jj30;int mm30;
+ for(jj30=5;jj30<=ell30;jj30++){
+  mm30=jj30 div 2;
+  if(jj30%2==1){dd30[jj30]=dd30[mm30+2]*dd30[mm30]^3+dd30[mm30-1]*dd30[mm30+1]^3;}
+  else{dd30[jj30]=(dd30[mm30]*(dd30[mm30+2]*dd30[mm30-1]^2+dd30[mm30-2]*dd30[mm30+1]^2))/X;}
+ }
+ return(poly(dd30[ell30]));
+}
+proc quotientB30(number bb30,poly gg30){
+ int ss30=deg(gg30);poly cc30=jet(gg30,ss30-1)-jet(gg30,ss30-2);
+ number coefficient30=number(cc30/X^(ss30-1));return(bb30+coefficient30+coefficient30^2);
+}
+proc kernels30(number bb30,int ell30){
+ poly dp30=division30(bb30,ell30);int ss30=(ell30-1) div 2;
+ if(deg(dp30)!=(ell30*ell30-1) div 2 || gcd(dp30,diff(dp30,X))!=1){ERROR("division polynomial degree or separability failed");}
+ list factors30=factorize(dp30);poly product30=1;list candidates30;int ii30;int jj30;
+ for(ii30=1;ii30<=size(factors30[1]);ii30++){
+  poly ff30=factors30[1][ii30];product30=product30*ff30^factors30[2][ii30];
+  if(deg(ff30)==ss30){candidates30[size(candidates30)+1]=ff30/leadcoef(ff30);}
+  if(deg(ff30)==1){
+   number root30=number(subst(ff30,X,0)/leadcoef(ff30));number start30=root30;poly kernel30=1;
+   for(jj30=0;jj30<ss30;jj30++){if(root30==0){ERROR("zero odd-torsion abscissa");}kernel30=kernel30*(X+root30);root30=root30^2+bb30/root30^2;}
+   if(root30==start30){candidates30[size(candidates30)+1]=kernel30;}
+  }
+ }
+ if(product30!=dp30){ERROR("division factor product failed");}
+ list answer30;int duplicate30;
+ for(ii30=1;ii30<=size(candidates30);ii30++){
+  poly gg30=candidates30[ii30];ideal ig30=std(ideal(gg30));
+  if(reduce(dp30,ig30)==0){
+   poly doubling30=reduce(X^2+bb30*inverse30(X^2,gg30),ig30);
+   if(reduce(subst(gg30,X,doubling30),ig30)==0){
+    duplicate30=0;for(jj30=1;jj30<=size(answer30);jj30++){if(answer30[jj30]==gg30){duplicate30=1;}}
+    if(duplicate30==0){answer30[size(answer30)+1]=gg30;}
+   }
+  }
+ }
+ print("COLOR30_RATIONAL_KERNEL_COUNT ell="+string(ell30)+" count="+string(size(answer30)));
+ return(answer30);
+}
+proc choose30(number bb30,list kernels30,number targetJ30){
+ poly found30;int count30;int ii30;
+ for(ii30=1;ii30<=size(kernels30);ii30++){if(quotientB30(bb30,kernels30[ii30])==1/targetJ30){found30=kernels30[ii30];count30++;}}
+ if(count30!=1){ERROR("requested cyclic kernel not uniquely identified");}return(found30);
+}
+proc velux30(poly kernel30,poly modulus30){
+ ideal ig30=std(ideal(modulus30));poly z30=reduce(diff(kernel30,X)*inverse30(kernel30,modulus30),ig30);
+ return(reduce(X+X*z30+X^2*z30^2,ig30));
+}
+proc normpoly30(poly image30,poly modulus30){
+ poly nn30=resultant(modulus30,Z+image30,X);nn30=subst(nn30,Z,X);
+ if(deg(nn30)!=deg(modulus30) || leadcoef(nn30)!=1){ERROR("transported kernel norm degree/monic failed");}
+ return(nn30);
+}
+proc transport30(number bb30,number b730,poly k730,poly k4930,poly k1130){
+ number b030=quotientB30(bb30,k1130);
+ poly tk730=normpoly30(velux30(k1130,k730),k730);
+ poly tk1130=normpoly30(velux30(k730,k1130),k1130);
+ number b7030=quotientB30(b730,tk1130);number b7130=quotientB30(b030,tk730);
+ if(b7030!=b7130){ERROR("actual7/11commuting square failed");}
+ poly tk4930=normpoly30(velux30(tk1130,k4930),k4930);
+ number b4930=quotientB30(b7030,tk4930);
+ return(list(1/b030,1/b7030,1/b4930));
+}
+proc scalarColor30(number bb30,poly kernel30){
+ ideal ig30=std(ideal(kernel30));poly qx30=X;int ii30;
+ for(ii30=0;ii30<sourceDegree30;ii30++){qx30=reduce(qx30^2,ig30);}
+ poly doubling30=reduce(X^2+bb30*inverse30(X^2,kernel30),ig30);
+ poly scalar30=X;int offset30=-1;int count30;int corruptCount30;
+ for(ii30=0;ii30<5;ii30++){
+  if(scalar30==qx30){offset30=ii30;count30++;}
+  if(scalar30==reduce(qx30+1,ig30)){corruptCount30++;}
+  scalar30=reduce(subst(scalar30,X,doubling30),ig30);
+ }
+ if(scalar30!=X || count30!=1 || corruptCount30!=0){ERROR("scalarC5 Frobenius/control failed");}
+ print("COLOR30_KERNEL offset_2_mod_sign="+string(offset30)+" fiber_orbit_degree="+string(1+4*(offset30!=0)));
+ print("COLOR30_KERNEL_POLYNOMIAL");kernel30;
+ return(offset30);
+}
+list sourceTriple30=triple30(firstX,firstY);list targetTriple30=triple30(secondX,secondY);
+list common030=common30(sourceTriple30[1],targetTriple30[1]);
+list common730=common30(sourceTriple30[2],targetTriple30[2]);
+list common4930=common30(sourceTriple30[3],targetTriple30[3]);
+print("COLOR30_COMMON_COUNTS");size(common030);size(common730);size(common4930);
+int ii30;int jj30;int kk30;int tt30;int uu30;int verified30;int candidates30;int squareSteps30;
+for(ii30=1;ii30<=size(common030);ii30++){
+ for(jj30=1;jj30<=size(common730);jj30++){
+  list t030=parameters30(common030[ii30],common730[jj30]);
+  for(kk30=1;kk30<=size(common4930);kk30++){
+   list t730=parameters30(common730[jj30],common4930[kk30]);
+   for(tt30=1;tt30<=size(t030);tt30++){for(uu30=1;uu30<=size(t730);uu30++){
+    number midX30=t030[tt30]*t730[uu30];
+    for(squareSteps30=0;squareSteps30<sourceDegree30-2;squareSteps30++){midX30=midX30^2;}
+    if(midX30^2+midX30+1!=0){
+     number midY30=(t730[uu30]+midX30+1)/(midX30^2+midX30+1);
+     list gotTriple30=triple30(midX30,midY30);
+     if(gotTriple30[1]!=common030[ii30] || gotTriple30[2]!=common730[jj30] || gotTriple30[3]!=common4930[kk30]){ERROR("middle triple reconstruction failed");}
+     candidates30++;print("COLOR30_MIDDLE_CANDIDATE "+string(candidates30));midX30;midY30;
+     number b030=1/gotTriple30[1];number b730=1/gotTriple30[2];
+     list kernels730=kernels30(b030,7);list kernels4930=kernels30(b730,7);list kernels1130=kernels30(b030,11);
+     poly k730=choose30(b030,kernels730,gotTriple30[2]);poly k4930=choose30(b730,kernels4930,gotTriple30[3]);
+     poly firstKernel30=choose30(b030,kernels1130,sourceTriple30[1]);poly secondKernel30=choose30(b030,kernels1130,targetTriple30[1]);
+     list firstTransport30=transport30(b030,b730,k730,k4930,firstKernel30);
+     list secondTransport30=transport30(b030,b730,k730,k4930,secondKernel30);
+     if(firstTransport30[1]!=sourceTriple30[1] || firstTransport30[2]!=sourceTriple30[2] || firstTransport30[3]!=sourceTriple30[3]){ERROR("first actual fulllevel49transport failed");}
+     if(secondTransport30[1]!=targetTriple30[1] || secondTransport30[2]!=targetTriple30[2] || secondTransport30[3]!=targetTriple30[3]){ERROR("second actual fulllevel49transport failed");}
+     print("COLOR30_TRANSPORTED_ACTUAL49_PAIR_PASS");
+     int firstColor30=scalarColor30(b030,firstKernel30);int secondColor30=scalarColor30(b030,secondKernel30);
+     if((firstColor30+secondColor30)%5!=sourceDegree30%5){ERROR("COLOR31_DETERMINANT_CHARACTER_MISMATCH");}
+     print("COLOR30_VERIFIED_COLORS first,second");firstColor30;secondColor30;verified30++;
+    }
+   }}
+  }
+ }
+}
+print("COLOR30_TOTAL_CANDIDATES_AND_VERIFIED");candidates30;verified30;
+if(candidates30==0 || candidates30!=verified30){ERROR("COLOR31_NO_POSITIVE_FULL_TRANSPORT_RESULT");}
+print("COLOR31_SCOPE completefiniteordinarymiddleenumeration; originalsource/Picard/descent binding remains separate");
+print("COLOR31_ALL_CHECKS_PASS");quit;

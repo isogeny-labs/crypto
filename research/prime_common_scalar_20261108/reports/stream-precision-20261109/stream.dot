@@ -1,0 +1,12 @@
+digraph stream {
+ graph[rankdir=TB,bgcolor="white",pad="0.2"];
+ node[shape=box,style="rounded,filled",fillcolor="#edf4fb",fontname="Helvetica"];
+ A[label="Actual local error theorem\nK >= every child precision overhead"];
+ B[label="Integral coefficients\ng_(t,j)=2^K E_t(0)(-t/alpha)^j"];
+ C[label="Finite integral scaled functional G(J)\nValue = 2^K * actual rational recovery"];
+ D[label="Actual computed finite quotient buffers\nOriginal source precision"];
+ E[label="Scaled target congruence at p+K\nNo target input to the functional",fillcolor="#d9f0dc"];
+ F[label="Cross-precision cancellation\nUnscaled target residue at p",fillcolor="#d9f0dc"];
+ O[label="Open native refinement: low-bit extraction,\ncoefficient generation, retained state and recomputation",fillcolor="#fff1d6"];
+ A->B;B->C;C->E;D->E;E->F;F->O;
+}

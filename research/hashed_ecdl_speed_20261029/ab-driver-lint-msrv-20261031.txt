@@ -1,0 +1,11 @@
+$ cargo fmt --check
+exit=0
+$ cargo clippy --locked --all-targets -- -D warnings
+    Checking hashed-ecdl-tensor v0.1.0 (/home/user/wt-ab-driver/crates/hashed-ecdl-tensor)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.49s
+exit=0
+$ cargo +1.78 check --locked --all-targets   (RUSTUP_HOME=/dev/shm/rustup, rustc 1.78.0 9b00956e5)
+warning: unused manifest key: lints.rust.unexpected_cfgs.check-cfg
+    Checking hashed-ecdl-tensor v0.1.0 (/home/user/wt-ab-driver/crates/hashed-ecdl-tensor)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.16s
+exit=0

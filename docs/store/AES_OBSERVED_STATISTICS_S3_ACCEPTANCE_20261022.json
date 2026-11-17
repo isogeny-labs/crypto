@@ -1,0 +1,100 @@
+{
+  "bucket": "setec-astronomy-artifacts",
+  "checks": {
+    "aws_identity": true,
+    "cleanup_count": 2,
+    "final_head_404": true,
+    "fresh_cache_sha256": true,
+    "fresh_pull_aes-differential-statistics": true,
+    "fresh_pull_aes-linear-statistics": true,
+    "fresh_store_replay_aes-differential-statistics": true,
+    "fresh_store_replay_aes-linear-statistics": true,
+    "head_exists": true,
+    "push_aes-differential-statistics": true,
+    "push_aes-linear-statistics": true,
+    "remote_verify": true,
+    "two_isolated_objects": true
+  },
+  "date_utc": "2026-10-22T06:14:40.168401+00:00",
+  "object_keys": [
+    "ic/v1/acceptance/aes-observed-statistics-20261022T061440Z-3bb7ec51/sha256/96/968ebd7ff8551032acfac7536011c3ff4369e1821179b8bb2977ec780c5d2329",
+    "ic/v1/acceptance/aes-observed-statistics-20261022T061440Z-3bb7ec51/sha256/e6/e6305f6c8d43b86dfdaab178c5eefb45cd3b756ede4a6ef3c54afea67b4d6ac2"
+  ],
+  "objects": [
+    {
+      "bytes": 522,
+      "file": "docs/ic/fixtures/aes_differential_statistics_public.json",
+      "name": "aes-observed/public-differential.json",
+      "push_report": {
+        "bytes": 522,
+        "cached": true,
+        "name": "aes-observed/public-differential.json",
+        "replaced": false,
+        "sha256": "e6305f6c8d43b86dfdaab178c5eefb45cd3b756ede4a6ef3c54afea67b4d6ac2",
+        "uploaded": true
+      },
+      "result": {
+        "distinct_plaintexts": 4,
+        "input_active_bytes": 1,
+        "input_difference_hex": "01000000000000000000000000000000",
+        "method": "observed-aes-block-differential-activity",
+        "one_active_output_pairs": 0,
+        "output_active_byte_histogram": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2
+        ],
+        "pairs_used": 2,
+        "schema_version": 1,
+        "status": "measured"
+      },
+      "sha256": "e6305f6c8d43b86dfdaab178c5eefb45cd3b756ede4a6ef3c54afea67b4d6ac2"
+    },
+    {
+      "bytes": 657,
+      "file": "docs/ic/fixtures/aes_linear_statistics_public.json",
+      "name": "aes-observed/public-linear.json",
+      "push_report": {
+        "bytes": 657,
+        "cached": true,
+        "name": "aes-observed/public-linear.json",
+        "replaced": false,
+        "sha256": "968ebd7ff8551032acfac7536011c3ff4369e1821179b8bb2977ec780c5d2329",
+        "uploaded": true
+      },
+      "result": {
+        "distinct_plaintexts": 4,
+        "input_mask_hex": "01000000000000000000000000000000",
+        "method": "observed-aes-block-linear-parity",
+        "observed_bias": -0.25,
+        "observed_correlation": -0.5,
+        "one_parity_pairs": 3,
+        "output_mask_hex": "02000000000000000000000000000000",
+        "pairs_used": 4,
+        "schema_version": 1,
+        "signed_parity_count": -2,
+        "status": "measured",
+        "zero_parity_pairs": 1
+      },
+      "sha256": "968ebd7ff8551032acfac7536011c3ff4369e1821179b8bb2977ec780c5d2329"
+    }
+  ],
+  "region": "us-east-2",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/aes-observed-statistics-20261022T061440Z-3bb7ec51",
+  "schema": "crypto.aes-observed-statistics-s3-acceptance/v1",
+  "source_parent_commit": "89c6eb71625276c7fed33d38065c8517441b386e"
+}

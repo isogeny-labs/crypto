@@ -1,0 +1,1 @@
+Byte-preserved .lean sources are archived as .lean.txt; restore suffixes and dependency paths for replay. Compiled caches and TeX aux files are omitted; logs are reversible base64 with original hashes. One-page PDF visually inspected. Independent source-fidelity review remains pending.

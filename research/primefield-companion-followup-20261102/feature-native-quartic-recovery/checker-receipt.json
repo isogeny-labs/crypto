@@ -1,0 +1,63 @@
+{
+  "recorded_at": "2026-11-05T18:43:20.444189+00:00",
+  "steps": [
+    {
+      "step": "checker-build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-recovery/check.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-quartic-recovery-20261105/checker"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "checker-positive",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-quartic-recovery-20261105/checker",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-recovery/program.tsv",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-recovery/corrections.tsv",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-recovery/recovery.tsv"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "checker-negative-rule",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-quartic-recovery-20261105/checker",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-recovery/program.tsv",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-recovery/negative-corrections.tsv",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-recovery/recovery.tsv"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 101
+    },
+    {
+      "step": "checker-negative-recovery",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-quartic-recovery-20261105/checker",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-recovery/program.tsv",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-recovery/corrections.tsv",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-recovery/negative-recovery.tsv"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 101
+    }
+  ],
+  "binary_sha256": "430cf804d0cc3bdf48630470b09a0038d4ea9a949bd1e9fb28a55c9cef6fae19",
+  "source_sha256": "7a5a833f134fc8a84fe1ac3c0699d2de0e0de935be8aa3b3e4859ef49f969430",
+  "inputs": {
+    "recovery.tsv": "24841a467145ec50b9d6730860a40ab3e9e0400170a338c8b9b919f7792719ef",
+    "negative-recovery.tsv": "73b511cca85fef458bc33454b30ca35a70020dfddc8e371b2d0ec0ca0886da44",
+    "negative-corrections.tsv": "840889e014f2c3b281279bb7f19e6fc47a321d0adce14a271e3cf30170886eb1",
+    "corrections.tsv": "810d9f69f4ee11864d3ef4bc01c66f98b3f6a6b0bb5eb4130aff87318dbf417d",
+    "program.tsv": "5abcccfd3b9fcd250cdf3bac720f08e953624855500632bdfdfb6b07b237b4fb"
+  },
+  "producer_imports": 0
+}

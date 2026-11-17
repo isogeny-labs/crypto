@@ -1,0 +1,230 @@
+   Compiling autocfg v1.5.1
+   Compiling num-traits v0.2.19
+   Compiling zmij v1.0.23
+   Compiling serde_core v1.0.229
+   Compiling serde_json v1.0.154
+   Compiling num-integer v0.1.47
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling num-bigint v0.4.8
+   Compiling signed-baby-response v0.1.0 (/home/ec2-user/research/cm-isogeny-attack-20261107/round63-p192/native)
+error[E0284]: type annotations needed
+   --> src/main.rs:160:20
+    |
+160 |     let one = vec![F::c(1)];
+    |                    ^^^^ cannot infer the value of the const parameter `P` declared on the struct `F`
+    |
+note: required by a const generic parameter in `F`
+   --> src/helpers.rs:13:10
+    |
+ 13 | struct F<const P: i64, const D: i64>(i64, i64);
+    |          ^^^^^^^^^^^^ required by this const generic parameter in `F`
+help: consider specifying the generic arguments
+    |
+160 |     let one = vec![F::<P, D>::c(1)];
+    |                     ++++++++
+
+error[E0284]: type annotations needed
+   --> src/main.rs:160:20
+    |
+160 |     let one = vec![F::c(1)];
+    |                    ^^^^ cannot infer the value of the const parameter `D` declared on the struct `F`
+    |
+note: required by a const generic parameter in `F`
+   --> src/helpers.rs:13:24
+    |
+ 13 | struct F<const P: i64, const D: i64>(i64, i64);
+    |                        ^^^^^^^^^^^^ required by this const generic parameter in `F`
+help: consider specifying the generic arguments
+    |
+160 |     let one = vec![F::<P, D>::c(1)];
+    |                     ++++++++
+
+error[E0284]: type annotations needed
+   --> src/main.rs:160:20
+    |
+160 |     let one = vec![F::c(1)];
+    |                    ^^^^ cannot infer the value of the const parameter `P` declared on the struct `F`
+    |
+note: required by a const generic parameter in `F::<P, D>::c`
+   --> src/helpers.rs:14:6
+    |
+ 14 | impl<const P: i64, const D: i64> F<P, D> {
+    |      ^^^^^^^^^^^^ required by this const generic parameter in `F::<P, D>::c`
+...
+ 18 |     fn c(a: i64) -> Self {
+    |        - required by a bound in this associated function
+help: consider specifying the generic arguments
+    |
+160 |     let one = vec![F::<P, D>::c(1)];
+    |                     ++++++++
+
+error[E0284]: type annotations needed
+   --> src/main.rs:160:20
+    |
+160 |     let one = vec![F::c(1)];
+    |                    ^^^^ cannot infer the value of the const parameter `D` declared on the struct `F`
+    |
+note: required by a const generic parameter in `F::<P, D>::c`
+   --> src/helpers.rs:14:20
+    |
+ 14 | impl<const P: i64, const D: i64> F<P, D> {
+    |                    ^^^^^^^^^^^^ required by this const generic parameter in `F::<P, D>::c`
+...
+ 18 |     fn c(a: i64) -> Self {
+    |        - required by a bound in this associated function
+help: consider specifying the generic arguments
+    |
+160 |     let one = vec![F::<P, D>::c(1)];
+    |                     ++++++++
+
+error[E0284]: type annotations needed
+   --> src/main.rs:161:18
+    |
+161 |     let t = vec![F::c(0), F::c(1)];
+    |                  ^^^^ cannot infer the value of the const parameter `P` declared on the struct `F`
+    |
+note: required by a const generic parameter in `F`
+   --> src/helpers.rs:13:10
+    |
+ 13 | struct F<const P: i64, const D: i64>(i64, i64);
+    |          ^^^^^^^^^^^^ required by this const generic parameter in `F`
+help: consider specifying the generic arguments
+    |
+161 |     let t = vec![F::<P, D>::c(0), F::c(1)];
+    |                   ++++++++
+
+error[E0284]: type annotations needed
+   --> src/main.rs:161:18
+    |
+161 |     let t = vec![F::c(0), F::c(1)];
+    |                  ^^^^ cannot infer the value of the const parameter `D` declared on the struct `F`
+    |
+note: required by a const generic parameter in `F`
+   --> src/helpers.rs:13:24
+    |
+ 13 | struct F<const P: i64, const D: i64>(i64, i64);
+    |                        ^^^^^^^^^^^^ required by this const generic parameter in `F`
+help: consider specifying the generic arguments
+    |
+161 |     let t = vec![F::<P, D>::c(0), F::c(1)];
+    |                   ++++++++
+
+error[E0284]: type annotations needed
+   --> src/main.rs:161:18
+    |
+161 |     let t = vec![F::c(0), F::c(1)];
+    |                  ^^^^ cannot infer the value of the const parameter `P` declared on the struct `F`
+    |
+note: required by a const generic parameter in `F::<P, D>::c`
+   --> src/helpers.rs:14:6
+    |
+ 14 | impl<const P: i64, const D: i64> F<P, D> {
+    |      ^^^^^^^^^^^^ required by this const generic parameter in `F::<P, D>::c`
+...
+ 18 |     fn c(a: i64) -> Self {
+    |        - required by a bound in this associated function
+help: consider specifying the generic arguments
+    |
+161 |     let t = vec![F::<P, D>::c(0), F::c(1)];
+    |                   ++++++++
+
+error[E0284]: type annotations needed
+   --> src/main.rs:161:18
+    |
+161 |     let t = vec![F::c(0), F::c(1)];
+    |                  ^^^^ cannot infer the value of the const parameter `D` declared on the struct `F`
+    |
+note: required by a const generic parameter in `F::<P, D>::c`
+   --> src/helpers.rs:14:20
+    |
+ 14 | impl<const P: i64, const D: i64> F<P, D> {
+    |                    ^^^^^^^^^^^^ required by this const generic parameter in `F::<P, D>::c`
+...
+ 18 |     fn c(a: i64) -> Self {
+    |        - required by a bound in this associated function
+help: consider specifying the generic arguments
+    |
+161 |     let t = vec![F::<P, D>::c(0), F::c(1)];
+    |                   ++++++++
+
+error[E0284]: type annotations needed
+   --> src/main.rs:161:18
+    |
+161 |     let t = vec![F::c(0), F::c(1)];
+    |                  ^^^^     - type must be known at this point
+    |                  |
+    |                  cannot infer the value of the const parameter `P` declared on the struct `F`
+    |
+note: required by a const generic parameter in `F`
+   --> src/helpers.rs:13:10
+    |
+ 13 | struct F<const P: i64, const D: i64>(i64, i64);
+    |          ^^^^^^^^^^^^ required by this const generic parameter in `F`
+help: consider specifying the generic arguments
+    |
+161 |     let t = vec![F::<P, D>::c(0), F::c(1)];
+    |                   ++++++++
+
+error[E0284]: type annotations needed
+   --> src/main.rs:161:18
+    |
+161 |     let t = vec![F::c(0), F::c(1)];
+    |                  ^^^^     - type must be known at this point
+    |                  |
+    |                  cannot infer the value of the const parameter `D` declared on the struct `F`
+    |
+note: required by a const generic parameter in `F`
+   --> src/helpers.rs:13:24
+    |
+ 13 | struct F<const P: i64, const D: i64>(i64, i64);
+    |                        ^^^^^^^^^^^^ required by this const generic parameter in `F`
+help: consider specifying the generic arguments
+    |
+161 |     let t = vec![F::<P, D>::c(0), F::c(1)];
+    |                   ++++++++
+
+error[E0284]: type annotations needed
+   --> src/main.rs:161:18
+    |
+161 |     let t = vec![F::c(0), F::c(1)];
+    |                  ^^^^     ------- type must be known at this point
+    |                  |
+    |                  cannot infer the value of the const parameter `P` declared on the struct `F`
+    |
+note: required by a const generic parameter in `F::<P, D>::c`
+   --> src/helpers.rs:14:6
+    |
+ 14 | impl<const P: i64, const D: i64> F<P, D> {
+    |      ^^^^^^^^^^^^ required by this const generic parameter in `F::<P, D>::c`
+...
+ 18 |     fn c(a: i64) -> Self {
+    |        - required by a bound in this associated function
+help: consider specifying the generic arguments
+    |
+161 |     let t = vec![F::<P, D>::c(0), F::c(1)];
+    |                   ++++++++
+
+error[E0284]: type annotations needed
+   --> src/main.rs:161:18
+    |
+161 |     let t = vec![F::c(0), F::c(1)];
+    |                  ^^^^     ------- type must be known at this point
+    |                  |
+    |                  cannot infer the value of the const parameter `D` declared on the struct `F`
+    |
+note: required by a const generic parameter in `F::<P, D>::c`
+   --> src/helpers.rs:14:20
+    |
+ 14 | impl<const P: i64, const D: i64> F<P, D> {
+    |                    ^^^^^^^^^^^^ required by this const generic parameter in `F::<P, D>::c`
+...
+ 18 |     fn c(a: i64) -> Self {
+    |        - required by a bound in this associated function
+help: consider specifying the generic arguments
+    |
+161 |     let t = vec![F::<P, D>::c(0), F::c(1)];
+    |                   ++++++++
+
+For more information about this error, try `rustc --explain E0284`.
+error: could not compile `signed-baby-response` (bin "signed-baby-response") due to 12 previous errors

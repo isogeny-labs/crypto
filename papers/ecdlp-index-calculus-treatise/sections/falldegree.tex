@@ -1,0 +1,1182 @@
+\chapter{Fall degrees of point-decomposition systems}\label{ch:falldegree}
+
+Every claim that elliptic-curve index calculus can be subexponential rests
+on the cost of solving the point-decomposition system. In practice that
+means its \emph{solving degree}: the largest degree a Gröbner-basis
+computation reaches. Petit and Quisquater~\cite{petit2012} conjectured that
+the solving degree stays close to the \emph{first fall degree}, which is
+small and easy to compute. Semaev~\cite{semaev2015} assumed it is at
+most 4 for his chained systems. Kosters and Yeo~\cite{kosters2015notes},
+Huang, Kosters and Yeo~\cite{hky2015} and Kousidis and
+Wiemers~\cite{kousidis2019} gave reasons and experiments to doubt this. All
+three name rigorous bounds on the \emph{last} fall degree, which equals the
+solving degree for the systems that matter, as the open problem.
+
+This chapter collects what the programme proved and certified about these
+degrees, in three presentations of the decomposition system:
+\begin{itemize}
+\item binary Weil descent;
+\item explicit membership over any field;
+\item prime-field Kummer towers.
+\end{itemize}
+The message is the same in all three. The first fall degree is a constant
+of the presentation, whereas the last fall degree is not. Where the last
+fall degree rises above 4, the chapter gives a certificate that a separate
+program checks without trusting the producer.
+
+\section{Definitions}\label{sec:fd-defs}
+
+Let $F=\{f_1,\ldots,f_M\}\subset R=k[x_1,\ldots,x_N]$, graded by total
+degree.
+\begin{itemize}
+\item \emph{Closure.} $V_{F,d}$ is the smallest $k$-subspace of $R_{\le d}$
+  that contains $F\cap R_{\le d}$ and is closed under $g\mapsto hg$
+  whenever $\deg(hg)\le d$~\cite{hky2015,caminata2023}.
+\item \emph{Last fall degree.} $d_F=\min\{d: f\in V_{F,\max(d,\deg f)}\
+  \forall f\in(F)\}$.
+\item \emph{First fall degree.} We use the Caminata--Gorla
+  convention~\cite{caminata2023}: $d_{\rm ff}(F)$ is the least $d$ at
+  which the top-form syzygies modulo the trivial (Koszul and field)
+  syzygies are non-zero.
+\item \emph{Boolean closure.} Over $\FF_2$ with field equations it is
+  convenient to work in $B=\FF_2[x]/(x_i^2+x_i)$. There $W_d(F)$ is the
+  same closure computed on multilinear representatives, and $M_d(F)$ is
+  the Macaulay space spanned by the products $mf$ with
+  $\deg m+\deg f\le d$.
+\end{itemize}
+
+\begin{remark}[Definitions matter]\label{rem:defs}
+Three readings of ``first fall degree'' are in use. They are:
+\begin{itemize}
+\item Petit--Quisquater: a combination $\sum g_if_i\ne0$ whose degree
+  drops below $\max\deg(g_if_i)$;
+\item Caminata--Gorla: non-trivial syzygies of the top forms;
+\item operational: the least $c$ with
+  $V_{F,c}\cap R_{\le c-1}\ne V_{F,c-1}$.
+\end{itemize}
+They can disagree. Two documented cases follow.
+\begin{itemize}
+\item Nagao's ePrint 2015/984~\cite{nagao2015} defines a ``fake'' first
+  fall degree $d'_F$ computed modulo the field equations, and states
+  $d_F\le d'_F$ as its Lemma 4. Under the equality reading of its
+  condition (1) the lemma fails over $\FF_2$:
+  \begin{itemize}
+  \item $\{X^2Y,\,XY+X\}$ has $d'_F=2<d_F=3$, and so does
+    $\{X_1X_2+X_3,\,X_1X_3+X_2\}$;
+  \item 94 of 400 random multilinear pairs in three variables violate it.
+  \end{itemize}
+  The paper's own applications check the unreduced degrees instance by
+  instance, so they are unaffected
+  (\art{crypto-autoresearcher:papers/nagao-lemma4-note/},
+  \texttt{KN-FIND-936151}; two implementations, 15 tests).
+\item A finite descent of $\Sem3$ over $\FF_{2^4}$ ($n=n'=4$, seed 32201,
+  $x_R=1$, basis $[9,3,2,12]$) has operational first fall 3. Its closure
+  dimensions are $\dim V_D=1,11,53$ and
+  $\dim(V_D\cap R_{\le D-1})=0,1,12$ for $D=1,2,3$. Lean finite
+  certificates check the ranks, the semantics on all 256 assignments, and
+  an explicit witness. The literal Petit--Quisquater reading of the same
+  system gives 2, through a field-equation identity.
+  \begin{itemize}
+  \item This refutes an internal claim of a uniform degree-2 first fall,
+    since withdrawn.
+  \item It contradicts no published theorem: Kosters and Yeo say ``usually
+    2''~\cite{kosters2015notes}.
+  \item Source: \art{crypto-autoresearcher:docs/reports/2026-10-22-semaev-first-fall-replay/}.
+  \end{itemize}
+\end{itemize}
+Every statement below names its convention.
+\end{remark}
+
+\section{General closure facts}
+
+The following hold for any Boolean system $F$, with $\tilde F$ its lift to
+$R$ together with the field equations. They are proved in
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/theorem-dossier.md}, \S1.
+
+\begin{proposition}[Bridges]\label{prop:bridges}
+\begin{enumerate}
+\item $\pi(V_{\tilde F,d})=W_d(F)$, where $\pi:R\to B$ is the quotient map.
+  In particular $1\in V_{\tilde F,d}$ if and only if $1\in W_d(F)$.
+\item If $F$ has no Boolean zero, then
+  $d_{\tilde F}=d_{\rm ref}(F):=\min\{d:1\in W_d(F)\}$. This also equals
+  the solving degree for every degree-compatible order (Caminata--Gorla,
+  reduced basis $\{1\}$).
+\item If $F$ has no Boolean zero, then \emph{every} F4 run on $\tilde F$,
+  under any selection strategy, produces a polynomial of degree
+  $\ge d_{\rm ref}(F)$.
+\item If $F$ has Boolean zero set $S$ and
+  $\operatorname{codim}W_d(F)>|S|$, then $d_{\tilde F}\ge d+1$, and every
+  F4 run reaches degree $d+1$.
+\end{enumerate}
+\end{proposition}
+
+\begin{lemma}[Branching]\label{lem:branch}
+If both restrictions $F|_{x=0}$ and $F|_{x=1}$ satisfy $1\in W_d$, then
+$1\in W_{d+1}(F)$.
+\end{lemma}
+
+\begin{proposition}[Dual certificate]\label{prop:cert}
+Let $\pi:B_{\le d}\to Z$ be linear and onto, with kernel $U$. Suppose:
+\begin{enumerate}
+\item[(i)] $\pi(f)=0$ for every $f\in F$ of degree $\le d$;
+\item[(ii)] $\pi(xu)=0$ for every variable $x$ and every $u\in U$ of degree
+  $\le d-1$.
+\end{enumerate}
+Then $W_d(F)\subseteq U$, so $\operatorname{codim}W_d(F)\ge\dim Z$. If
+moreover $\pi(1)\ne0$, then $1\notin W_d(F)$. Conversely, the quotient map
+$B_{\le d}\to B_{\le d}/W_d(F)$ is such a certificate whenever
+$1\notin W_d(F)$.
+\end{proposition}
+
+Proposition~\ref{prop:cert} is what makes the lower bounds below
+checkable. A certificate is a matrix. Checking it needs the curve
+parameters, an independent descent of the system, and three linear-algebra
+tests: (i), (ii) and $\pi(1)\ne0$. Nothing about how the certificate was
+found has to be trusted. With Proposition~\ref{prop:bridges}(3), one
+accepted certificate for $1\notin W_4(F)$ proves that \emph{no} F4 run on
+that instance stays at degree 4. This is a statement about the system, not
+about a solver run.
+
+\section{Binary Weil descent of $\Sem3$}\label{sec:fd-binary}
+
+\paragraph{Setting.}
+\begin{itemize}
+\item The field is $K=\FF_{2^n}$ with trace $\operatorname{Tr}$, and
+  $K_0=\ker\operatorname{Tr}$.
+\item The curve is $E:y^2+xy=x^3+a_2x^2+a_6$ with $a_6\ne0$.
+\item The target abscissa is $z\in K^\times$.
+\item $V\subset K$ is an $\FF_2$-subspace of dimension $k$; Semaev's
+  diagonal is $k=\lceil n/2\rceil$.
+\item $X_1=\sum a_jv_j$ and $X_2=\sum b_jv_j$ are linear in the $N=2k$
+  Boolean variables.
+\item The system $F$ is the Weil descent of $S=\Sem3(X_1,X_2,z)$: the
+  coordinates $\operatorname{Tr}(\gamma_iS)$. This is Semaev's system (5)
+  for $m=t=2$.
+\end{itemize}
+Fix $\vartheta$ with $\operatorname{Tr}\vartheta=1$, and an Artin--Schreier
+section $G$ (the half-trace for odd $n$). Put
+\[
+  w=\frac{X_1X_2}{z}+G(s^2)+G(a_6/z^2),\qquad s=X_1+X_2,\qquad
+  \ell_0=\operatorname{Tr}(s)+\operatorname{Tr}(a_6/z^2).
+\]
+
+\begin{theorem}[Exact reformulation]\label{thm:reform}
+For every $n$, $V$ and $z$:
+\begin{enumerate}
+\item $S=z^2(w^2+w+\ell_0\vartheta)$;
+\item $\operatorname{span}_{\FF_2}F=\{\operatorname{Tr}(\delta w):\delta\in K_0\}+\FF_2\ell_0$;
+\item in particular, the affine-linear form
+  $\ell_0=\operatorname{Tr}(S/z^2)$ always lies in the span of the
+  equations.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Squaring is a ring endomorphism, so
+$S=z^2(u^2+u+s^2+a_6/z^2)$ with $u=X_1X_2/z$, and
+$h=G(s^2+a_6/z^2)$ satisfies
+$h^2+h=s^2+a_6/z^2+\operatorname{Tr}(s^2+a_6/z^2)\vartheta$, with
+$\operatorname{Tr}(s^2)=\operatorname{Tr}(s)$.
+(2) Put $\gamma'=\gamma z^2$. Then
+$\operatorname{Tr}(\gamma S)=\operatorname{Tr}((\gamma'^{1/2}+\gamma')w)+\operatorname{Tr}(\gamma'\vartheta)\ell_0$,
+and $\gamma'\mapsto(\gamma'^{1/2}+\gamma',\operatorname{Tr}(\gamma'\vartheta))$
+is a bijection $K\to K_0\times\FF_2$.
+(3) Take $\gamma'=1$.
+\end{proof}
+
+Part (3) is Kosters and Yeo's Corollary 4.11~\cite{kosters2015notes}, seen
+through a different coordinate. The reformulation makes the falls
+explicit. The algebraic identity behind part (3) is checked in Lean 4 over
+any commutative ring of characteristic 2 with an additive trace satisfying
+$\operatorname{Tr}(a^2)=\operatorname{Tr}a$: if $x_3w=1$ then
+$\operatorname{Tr}(\Sem3(X_1,X_2,x_3)w^2)=\operatorname{Tr}X_1+\operatorname{Tr}X_2+\operatorname{Tr}(a_6w^2)$,
+this functional is an $\FF_2$-combination of the coordinate functionals of
+$\Sem3$, and it is affine in the bits (\texttt{traceRelation},
+\texttt{traceRelation\_in\_span}, \texttt{affineInBits}; axioms
+\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}; no
+\texttt{sorry}). The Weil descent, degrees, the first fall degree and the
+concrete trace of $\FF_{2^n}$ are not formalised
+(\art{research/first_fall_closure_20261111/propA_lean/NOTE.md}; unverified,
+no pcc claim).
+
+\begin{corollary}[First fall degree 2, for every $n$]\label{cor:ffd2}
+Suppose every descended equation has degree exactly 2; this held on
+every instance computed. Then:
+\begin{itemize}
+\item $d_{\rm ff}(F)=2$ in the Caminata--Gorla sense, for every $n\ge3$
+  and every $V$;
+\item if moreover $\ell_0\ne0$, the Petit--Quisquater first fall degree
+  is also 2.
+\end{itemize}
+The same holds for Semaev's chained system (5) for \emph{every} $t\ge2$:
+the last equation $\Sem3(y,x_t,R_X)$ always contributes the linear form
+$\operatorname{Tr}(Y+X_t)+\operatorname{Tr}(a_6/R_X^2)$.
+\end{corollary}
+
+Semaev states the value 4 for the first fall degree of his
+systems~\cite[\S4.5]{semaev2015}. His argument concerns only the cubic
+equations of the chain. Under the definition he quotes, the trace relation
+makes the value 2.
+
+\paragraph{Subfield bases: the exact count of linear relations.} For
+$n=2n'$ and $V=\FF_{2^{n'}}$, write $\Sem3=(s_2+x_3s_1)^2+x_3s_2+b$ with
+$s_1=X_1+X_2$, $s_2=X_1X_2$, and let $N$ be the dimension of the degree-$\le1$
+part of $\operatorname{span}_{\FF_2}F$. Then $N=n'-1+\operatorname{Tr}(b/x_3^2)$
+when $x_3\notin V$, and the constant 1 lies in the span if and only if
+$\operatorname{Tr}(b/x_3^2)=1$. On the exceptional set $x_3\in V^\times$,
+$N=1$ if $b\in V$ and $N=2$ otherwise. The proof is written in prose; an
+exhaustive check of 122{,}752 pairs $(x_3,b)$ at $n'=2,\ldots,6$ found no
+disagreement, and the one earlier outlier draw ($n=16$, $N=2$) has
+$x_3\in V$ and $b\notin V$
+(\art{research/first_fall_closure_20261111/propB_exact_count/NOTE.md};
+unverified, no pcc claim).
+
+\begin{lemma}[Explicit degree-3 falls]\label{lem:deg3}
+Let $V^\perp$ be the trace-orthogonal of $V$, and
+$\omega=\operatorname{Tr}(\mu w)$ for any $\mu$ with $\operatorname{Tr}\mu=1$.
+\begin{itemize}
+\item For $\lambda\in V^\perp$ and $i\in\{1,2\}$, $\operatorname{Tr}(\lambda X_iw)$
+  lies in $M_3(F)$ and has degree $\le2$.
+\item $\operatorname{Tr}(sw)+\operatorname{Tr}(a_6/z^2)\,\omega$ lies in
+  $W_3(F)$ and has degree $\le2$.
+\end{itemize}
+These are $2(n-k)+1$ explicit degree-3 falls, independent of $n$ in form.
+On random subspaces they span the whole degree-$\le2$ part of $W_3$, of
+dimension exactly $3n$; this was checked on six instances with
+$n\in\{23,25,27\}$. Polynomial subspaces $\langle1,t,\ldots,t^{k-1}\rangle$
+have $2n-1$ further falls, which is why they resist longer.
+\end{lemma}
+
+\begin{theorem}[Upper bound]\label{thm:upper}
+If $F$ has no Boolean zero, then $1\in M_{k+2}(F)$. So $d_{\tilde F}\le k+2$,
+which is $\lceil n/2\rceil+2$ on the diagonal. For Semaev's chained system
+(5) with $t$ summands the bound is $d_{\tilde F}\le(t-1)k+t$: each
+auxiliary variable adds 1, not $n$.
+\end{theorem}
+
+\begin{proof}[Proof for $t=2$]
+Substitute $c_j=a_j+b_j$. Then
+$S=X_1^4+X_1^2s^2+z^2s^2+zX_1^2+zX_1s+a_6$ is at most linear in $a$ and in
+$c$, so each $f_i=\sum_ja_jL_{ij}(c)+M_i(c)$. For each
+$\sigma\in\FF_2^k$ the affine system $f_i(a,\sigma)$ in $a$ is
+inconsistent, so some combination $\sum_i\lambda_i^\sigma f_i(a,\sigma)=1$.
+With the indicators $e_\sigma=\prod_j(c_j+\sigma_j+1)$,
+\[
+  1=\sum_\sigma\sum_i\lambda_i^\sigma e_\sigma f_i\in M_{k+2}(F). \qedhere
+\]
+\end{proof}
+
+\begin{proposition}[Lower bound $d_{\tilde F}\ge3$]\label{prop:lower3}
+Under two explicit genericity conditions on $V$ and $z$, which a script
+checks and which held on every random-subspace instance, together with
+$\ell_0\ne1$:
+\begin{itemize}
+\item $W_2(F)=\operatorname{span}F+\ell_0B_{\le1}$, and its degree-$\le1$
+  part is $\FF_2\ell_0$;
+\item so an unsatisfiable $F$ has $d_{\tilde F}\ge3=d_{\rm ff}+1$.
+\end{itemize}
+The bound is attained at $n=17,19$.
+\end{proposition}
+
+\paragraph{Computer-verified instances.}
+\begin{itemize}
+\item \emph{Implementations.}
+  \begin{itemize}
+  \item Implementation~A: a C closure over M4RI,
+    \texttt{code/lfdclose2.c}.
+  \item Implementation~B: independent Python sharing no code with A;
+    \texttt{verify/b\_sweep.py} and \texttt{verify/indep\_verify.py}.
+  \item Certificate checker: \texttt{verify/cert\_check.py}, which
+    rebuilds $F$ from the curve parameters by its own Möbius interpolation
+    of $\Sem3$ values.
+  \item Implementation~C: a native Rust closure in this repository,
+    \art{examples/fd_m2_degrees.rs}, sharing no code with A or B. It
+    builds the descent in the repository's Boolean-ring library and runs
+    the full MutantXL closure ($=W_D$) and Boolean F4. In a pilot on a
+    4-core development host, which is not a measurement and has not been
+    independently checked, it reproduced the recorded $d_{\tilde F}$ of
+    eight instances (R11a, R13a, R15a, R19a, P17a, P21a, P21c, U33a) and
+    $1\notin W_4$ on T33a with $\operatorname{rank}W_4=48{,}068$, as
+    recorded. Planted solvable controls were never refuted up to $D=5$.
+    The calibration stage of the frozen protocols below repeats this
+    check before any new row is read.
+  \end{itemize}
+\item \emph{Instances.}
+  \begin{itemize}
+  \item Every instance on the diagonal $k=\lceil n/2\rceil$, other than the
+    two satisfiable ones, was shown unsatisfiable by exhaustive count, and
+    the count was repeated by B.
+  \item B reproduced all 61 instances with $n\le29$: the same solution
+    count, the same dimensions of $W_{d-1}\cap B_{\le e}$ for every $e$,
+    and $1\in W_d$.
+  \end{itemize}
+\end{itemize}
+Figure~\ref{fig:fd} shows the result: as $n$ grows, the first fall degree
+stays at 2 while the last fall degree climbs.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-fall-degrees.pdf}
+\caption[]{\emph{Left:} binary Semaev $m=2$ descent. The first fall degree
+is 2 (Corollary~\ref{cor:ffd2}, proved). Filled marks are exact last fall
+degrees per unsatisfiable instance. Open triangles are certified lower
+bounds $d_{\tilde F}\ge5$ (Theorem~\ref{thm:lfd5}). The dotted line is the
+proved upper bound $k+2$. \emph{Right:} prime-field Kummer tower, $m=2$
+(\S\ref{sec:fd-pkm}). The session-reported last fall degree lies on the
+corrected degree of regularity of PKM 2016, Table~4. The first fall degree
+is 4 (proved). Values and sources: \art{figures/data-new.json}.}
+\label{fig:fd}
+\end{figure}
+
+\begin{theorem}[Exact last fall degrees; computer-verified on instances]\label{thm:lfdexact}
+On the diagonal $k=\lceil n/2\rceil$:
+\begin{itemize}
+\item $d_{\tilde F}=3$ on all six random-subspace instances at $n=11,13$
+  and on all ten polynomial-subspace instances at $n=17,19$;
+\item $d_{\tilde F}=4$ on all 29 random-subspace instances with
+  $15\le n\le33$, and on all 25 polynomial-subspace instances with
+  $23\le n\le35$ or $n=41,43$;
+\item $d_{\tilde F}=4$ on Semaev's own cell ($n=40$, $k=20$, uniform $z$),
+  matching his reported $d_{F4}=4$;
+\item $d_{\tilde F}=5$ exactly on instance R35a ($n=35$, $k=18$, random
+  $V$): $1\notin W_4$, and both restrictions $a_1=0,1$ are refuted at
+  $W_4$ (Lemma~\ref{lem:branch}).
+\end{itemize}
+\end{theorem}
+
+Table~\ref{tab:fd-binary} gives every instance behind
+Theorems~\ref{thm:lfdexact} and~\ref{thm:lfd5}, one row per subspace family
+and $n$, in the layout of Kousidis and Wiemers' Table~1.
+
+\begin{table}[p]
+\centering\small
+\input{figures/tab-fd-binary}
+\caption[]{Binary Weil descent of $\Sem3$ ($m=2$, $k=\lceil n/2\rceil$): the
+first fall degree $D_{\rm ff}=2$ (Corollary~\ref{cor:ffd2}, proved for
+every $n$) beside the last fall degree $d_{\tilde F}$, the least $D$ with
+$1\in W_D$, for each instance. Subspace families: P, Semaev's polynomial
+subspace $\langle1,t,\ldots,t^{k-1}\rangle$; S, the same with uniform $z$
+(Semaev's own cell); R, random; U, random with uniform $z$; T, random inside
+$\ker\operatorname{Tr}$. ``$\ge5$'' means $1\notin W_4$; R35a is exactly 5
+(Theorem~\ref{thm:lfdexact}). Columns: instances; columns of the degree-4 closure
+matrix; median closure wall time at
+$D=4$ in seconds, over the instances run to that degree (host not
+recorded); certified codimension of $W_4$ where an independent certificate
+was checked. Source:
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/},
+laid out by \art{figures/make_tab_fall_degrees.py} from
+\art{figures/data-falldegree-instances.json}.}
+\label{tab:fd-binary}
+\end{table}
+
+\begin{theorem}[Certified $d_{\tilde F}\ge5$]\label{thm:lfd5}
+For each instance below, a certificate (Proposition~\ref{prop:cert}) for
+$1\notin W_4(F)$ was accepted by the independent checker. Hence
+$d_{\tilde F}\ge5$, and every F4 run reaches degree $\ge5$.
+
+\smallskip\noindent
+\begin{tabular}{@{}lllll@{}}
+\toprule
+instance & $n$ & $k$ & subspace & certified $\operatorname{codim}W_4\ge$ \\
+\midrule
+T33a, T33b & 33 & 17 & random $\subset K_0$ & 4{,}888 \\
+R35a, R35b, U35a, U35b & 35 & 18 & random (U: uniform $z$) & 5{,}287 \\
+Q35a, Q35b (satisfiable) & 35 & 18 & random & 5{,}287 \\
+R37a, R37b & 37 & 19 & random & 10{,}066 \\
+P45a & 45 & 23 & Semaev's default $\langle1,t,\ldots,t^{22}\rangle$ & 12{,}742 \\
+C19a, C19b (chain $m=t=3$) & 19 & 7 & random & 9{,}253, 6{,}817 \\
+\bottomrule
+\end{tabular}
+
+\smallskip\noindent
+Two further instances, R39a and R39b ($n=39$), and C21a and C21b (the
+chain at $n=21$) have $1\notin W_4$ by implementation~A alone.
+\end{theorem}
+
+For Q35a and Q35b, which have 6 and 2 Boolean solutions, the bound follows
+from Proposition~\ref{prop:bridges}(4), since $5{,}287\gg|S|$. The P45a
+closure stalls after three rounds at
+$\dim W_4\cap B_{\le d}=(0,1,224,8950,166705)$, out of 179{,}447
+monomials. Its quadratic part, $224=5n-1$, is exactly the
+polynomial-subspace count of Lemma~\ref{lem:deg3}: at degree 4 the closure
+finds no new falls.
+
+\begin{corollary}[Semaev's Assumption 1 fails as stated]\label{cor:assump}
+Semaev's Assumption~1~\cite[\S4.5]{semaev2015} asserts $d_{F4}\le4$ for
+Boolean systems equivalent to his system (5), for $q=2^n$,
+$k=\lceil n/m\rceil$, any subspace of dimension $k$ and any $2\le t\le m$.
+Theorem~\ref{thm:lfd5} contradicts it in three cells:
+\begin{itemize}
+\item $(n,m,t,k)=(35,2,2,18)$, with random subspaces;
+\item $(45,2,2,23)$, with his own default subspace;
+\item $(19,3,3,7)$, inside the parameter range of his tables, where his
+  polynomial subspace gives 4 and random subspaces do not.
+\end{itemize}
+Implementation~A alone also gives $1\notin W_4$ at $(21,3,3,7)$, with no
+checked certificate.
+\end{corollary}
+
+Table~\ref{tab:fd-chain} lists the chain instances. With Semaev's
+polynomial subspace the closure refutes at degree~4 in every cell; with
+random subspaces it does not at $n=19,21$.
+
+\begin{table}[t]
+\centering\small
+\input{figures/tab-fd-chain}
+\caption[]{Chained system, $m=t=3$, $k=\lceil n/3\rceil$: closure at $D=4$
+per instance. ``$\le4$'' means $1\in W_4$; ``$\ge5$'' means $1\notin W_4$.
+Certified codimensions as in Table~\ref{tab:fd-binary}; C21a and C21b have
+no checked certificate: $1\notin W_4$ by implementation~A alone. Source:
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/instances_t3.json}.}
+\label{tab:fd-chain}
+\end{table}
+
+\paragraph{Per-instance records.} Tables~\ref{tab:bin-fd-inst-a}
+and~\ref{tab:bin-fd-inst-b} list all 93 committed $m=2$ instances behind
+Table~\ref{tab:fd-binary}, one row each, at the highest closure degree run.
+Table~\ref{tab:bin-fd-certs} lists the 13 certificate checks.
+Figure~\ref{fig:bin-fd-closure} plots the column count and the wall time per
+instance. At $D=4$ every recorded column count is a function of $k$ alone
+($n=39$ and $n=40$, both $k=20$, read 102{,}091), from 2{,}517 at $n=15$ to
+179{,}447 at $n=45$. The recorded wall time at the top degree runs from
+0.0\,s (R11b) to 2{,}001.3\,s (P43a). The certificate closures were
+separate runs and time a different job. For P45a the sources give three
+wall times, none with a recorded host:
+\begin{itemize}
+\item 1{,}850.7\,s in \texttt{instances.json}: the degree-4 closure
+  \texttt{lfdclose2} alone, without certificate export, imported from the
+  batch log \texttt{log3\_poly\_curve\_n45.txt} (its \texttt{provenance}
+  field; \texttt{tabulate.py} times the same call with \texttt{time.time()});
+\item about 6{,}000\,s in \texttt{certificates.txt}: the
+  \texttt{closure[\ldots]} field of \texttt{verify/cert\_batch.py}, which
+  times \texttt{mksys.py} plus \texttt{lfdclose2} with the certificate
+  path, so it includes the back-substitution that writes the 288{,}550{,}808-byte quotient
+  map; the script runs instances in a thread pool of a given worker count and
+  prints whole seconds, so the ``$\sim$'' entry was written by hand and the
+  worker count is not recorded;
+\item 2{,}950.6\,s in the 2026-10-29 replay receipt
+  \texttt{P45a.receipt.json}: the certificate-producing closure step
+  (\texttt{elapsed\_seconds}), isolation L0, \texttt{wall\_valid} false;
+  its check step took 229.1\,s, against 787\,s in
+  \texttt{certificates.txt}.
+\end{itemize}
+The first number excludes the certificate export and the other two include
+it. The sources do not split the export from the closure, and they record no
+host or concurrency, so the spread between the three is not explained further.
+Sources: \art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/verify/cert_batch.py},
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/code/tabulate.py},
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/submission-20261029/archive/P45a.receipt.json}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-bin-fd-closure.pdf}
+\caption[]{Binary $\Sem3$ descent, $m=2$, $k=\lceil n/2\rceil$, one marker per
+instance (families offset horizontally by $\pm0.3$ for legibility). Left:
+monomial columns of the degree-4 closure matrix, instances run to $D=4$.
+Right: recorded wall time of the closure at the highest degree run (3 or 4),
+log scale; 0.0\,s values plotted at 0.05\,s. Filled markers refute
+($1\in W_D$), open markers do not ($d_{\tilde F}\ge5$). Host not recorded.
+Data: \art{figures/data-bin-fd-instances.json}, from
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/instances.json};
+plot: \art{figures/make_fig_bin_fd_closure.py}.}
+\label{fig:bin-fd-closure}
+\end{figure}
+
+\begin{table}[p]
+\centering\scriptsize\setlength{\tabcolsep}{3.5pt}
+\input{figures/tab-bin-fd-instances-a}
+\caption[Per-instance closures, polynomial subspaces]{Per-instance closures
+of the binary $m=2$ descent, polynomial subspaces (P: curve-derived $z$; S:
+uniform $z$, Semaev's cell). $D$ is the highest closure degree run;
+$\dim W_D$ and the column count are as recorded; codim $=$ columns $-\dim W_D$
+(derived; given where $1\notin W_D$); ``$1\in W_D$'' marks refutation at
+$D$. Seconds: recorded wall time at degree $D$, host not recorded.
+$d_{\tilde F}$: last fall degree, exact or a lower bound. cert.: first eight
+hex digits of the SHA-256 of a VALID independent check of $1\notin W_4$
+(Table~\ref{tab:bin-fd-certs}). Laid out by
+\art{figures/make_fig_bin_tables.py} from
+\art{figures/data-bin-fd-instances.json}, which copies
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/instances.json}
+and \art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/certificates.txt}.}
+\label{tab:bin-fd-inst-a}
+\end{table}
+
+\begin{table}[p]
+\centering\scriptsize\setlength{\tabcolsep}{3.5pt}
+\input{figures/tab-bin-fd-instances-b}
+\caption[Per-instance closures, random subspaces]{Per-instance closures of
+the binary $m=2$ descent, random subspaces (R: curve-derived $z$; U: uniform
+$z$; T: inside $\ker\operatorname{Tr}$). Columns as in
+Table~\ref{tab:bin-fd-inst-a}. R35a is listed as $\ge5$, as recorded in
+\texttt{instances.json}; Theorem~\ref{thm:lfdexact} makes it exactly 5 by
+branching (Lemma~\ref{lem:branch}). R39a and R39b have no certificate.}
+\label{tab:bin-fd-inst-b}
+\end{table}
+
+\begin{table}[t]
+\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\input{figures/tab-bin-fd-certs}
+\caption[]{The 13 VALID certificate checks of $1\notin W_4(F)$: $m=2$
+instances (Q: the two satisfiable random-subspace instances, with their
+Boolean solution counts) and the $m=t=3$ chain instances C19a, C19b.
+$\dim W_d$ is the cumulative dimension of $W_4\cap B_{\le d}$; ``codim
+$\ge$'' is the certified bound; closure and check seconds as printed by
+\texttt{verify/cert\_batch.py} (wall time of system generation, closure and
+certificate export; P45a's entry is a hand-written approximation; see the
+text for its other two timings). Data:
+\art{figures/data-bin-fd-instances.json}, from
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/certificates.txt}
+and \texttt{instances\_sat.json}.}
+\label{tab:bin-fd-certs}
+\end{table}
+
+\paragraph{What is new, and what is not.} That the degree of regularity
+reaches 5 has been \emph{observed} before:
+\begin{itemize}
+\item Kosters and Yeo saw Magma step degrees of $\ge5$ at $n=40$ and
+  $n=45$~\cite{kosters2015notes};
+\item Kousidis and Wiemers saw F4 at step degree 5 for $n=37$--$48$, $m=2$,
+  and wrote that a lower bound on the degree of regularity ``can
+  potentially answer an open question''~\cite{kousidis2019}.
+\end{itemize}
+Table~\ref{tab:fd-kw} sets their $m=2$ rows beside ours at the same
+$n$. The quantities differ: $D_{\rm reg}$ is the highest step degree of
+their F4 runs, while $d_{\tilde F}$ is the closure degree of the system,
+and no F4 run refutes below it. So their $5$ at $n=41,43$ against our $4$
+on polynomial subspaces is not a contradiction; F4 overshoots the closure
+there. At $n=35$ their $D_{\rm reg}=4$ agrees with our polynomial subspace
+and differs from every random subspace we drew, which are all $\ge5$:
+which subspace a table uses decides the degree it reports. At $n=45$ both
+reach 5.
+
+\begin{table}[t]
+\centering\small
+\input{figures/tab-fd-kw}
+\caption[]{The $m=2$ rows of Kousidis and Wiemers' Table~1~\cite{kousidis2019}
+(F4, averages over ten repetitions; $n'=\lceil n/2\rceil$; time in
+seconds, memory in GB), transcribed from the published table, beside the
+last fall degree of our instances at the same $n$
+(Table~\ref{tab:fd-binary}). Superscripts give the subspace family. Their
+$m=3,4$ rows ($D_{\rm ff}=D_{\rm reg}=7$ and $13$, $n\le21$) concern
+$\Sem4$ and $\Sem5$; the $m=3$ first fall degree is reproduced in
+\S\ref{sec:fd-kw3}.}
+\label{tab:fd-kw}
+\end{table}
+
+Those are properties of solver runs. Theorem~\ref{thm:lfd5} is a property
+of the systems, carried by a certificate any reader can check. With
+Corollary~\ref{cor:ffd2} it makes the separation between first and last
+fall degree rigorous on named instances. What remains open is the same
+as before: a proof that $d_{\tilde F}\to\infty$. Semaev's asymptotics
+survive if the regularity degree is $o(\sqrt{n/\ln n})$, so only a growing
+lower bound bears on the subexponential claim.
+
+\paragraph{Re-verification.} For this treatise, the T33a certificate was
+regenerated from the committed producer (M4RI 20200125, 4\,min 40\,s on
+4~vCPUs) and checked with \texttt{cert\_check.py}:
+\begin{itemize}
+\item the certificate is byte-identical to the recorded SHA-256
+  \texttt{cf9dcae8\ldots22cf};
+\item the checker reports ``1 is not in $W_4(F)$, and
+  $\operatorname{codim}W_4(F)\ge4888$'' (38.8\,s);
+\item the closure dimensions $(0,0,64,2968,48068)$ match the record.
+\end{itemize}
+Source: \art{research/paper_opportunities_20261029/REPORT.md}, \S6.
+
+\section{The first fall degree at $m=3$: Kousidis--Wiemers' bound}\label{sec:fd-kw3}
+
+Kousidis and Wiemers prove $d_{\rm ff}\le m^2-m+1$ for the Weil descent of
+$\Sem{m+1}$ and believe the bound sharp for $m\ge3$~\cite{kousidis2019}. A
+study of 11 November reproduces their $m=3$ value and states where it holds
+(\art{research/first_fall_closure_20261111/kw_sharpness/NOTE.md}; every
+number unverified, no pcc claim). Write $n'=\dim V$, $N=3n'$, $\nu_1,\ldots,\nu_{n'}$
+a basis of $V$, and $e_{ab}=\nu_a\nu_b(\nu_a+\nu_b)$.
+\begin{itemize}
+\item The coefficient of $x_1^3x_2^3x_3^3$ in $\Sem4$ is exactly $x_4$, and
+  this is the unique monomial of descended degree 6. The top form of every
+  descended equation is therefore $c\prod_{i=1}^3L_{i,0}L_{i,1}$ with
+  $L_{i,j}=\sum_l\nu_l^{2^j}y_{il}$, up to Frobenius conjugation.
+\item \emph{Theorem A} (proved, given KW's Lemma~3.1, which the study
+  re-derived symbolically for $m=3$). In the top-form convention
+  $d_{\rm ff}\in\{6,7\}$, and $d_{\rm ff}=7$ if and only if
+  $\dim_{\FF_2}\operatorname{span}\{e_pe_qe_r\}=\dim V_F$. Each conjugate is
+  annihilated by six linear forms, which gives at least $6n$ non-trivial
+  syzygies in degree 7.
+\item \emph{Corollary B} (proved). $\dim\operatorname{span}\{e_pe_qe_r\}\le\rho(n')$
+  with $\rho(3,\ldots,7)=10,49,170,475,1141$. Hence $d_{\rm ff}=6$ whenever
+  $n>\rho(n')$, and whenever $V$ lies in a proper subfield. The unqualified
+  reading ``sharp for $n'\ge m$'' is false.
+\item \emph{Open.} That a generic $V$ meets the rank condition for
+  $n\le\rho(n')$, in particular for KW's $n'=\lceil n/3\rceil$. Deligne's
+  bound would suffice numerically for $n'\ge5$, but every member of the
+  relevant degree-9 linear system is singular on a common base locus.
+\end{itemize}
+Table~\ref{tab:fd-kw3} gives the measurements. Wherever the top forms are
+independent (1{,}276 of 2{,}400 instances, every KW cell among them) both
+the top-form and the operational first fall degree are 7 and the degree-7
+nullity is exactly $6n$ for $n'\ge4$. All 1{,}124 dependent instances have
+top-form value 6. At $n'=3$ the share of independent instances falls from
+330 of 330 at $n=7$ to 0 at $n\ge11=\rho(3)+1$. Nothing here bears on the
+degree of regularity or the last fall degree.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrrrll@{}}
+\toprule
+$n$ & $n'$ & $N$ & instances & independent & $d_{\rm ff}$, top form & $d_{\rm ff}$, operational \\
+\midrule
+\multicolumn{7}{@{}l}{\emph{KW's Table~1 cells, $n'=\lceil n/3\rceil$; degree-7 nullity $6n$ in every instance}} \\
+13--15 & 5 & 15 & 20 each & all & 7 (all) & 7 (all) \\
+16--18 & 6 & 18 & 6 each & all & 7 (all) & 7 (all) \\
+19--21 & 7 & 21 & 2 each & all & 7 (all) & 7 (all) \\
+\addlinespace
+\multicolumn{7}{@{}l}{\emph{Smallest admissible base, $n'=3$, $\rho(3)=10$}} \\
+7 & 3 & 9 & 330 & 330 & 7:330 & 7:330 \\
+8 & 3 & 9 & 330 & 277 & 6:53, 7:277 & 6:1, 7:329 \\
+9 & 3 & 9 & 330 & 243 & 6:87, 7:243 & 7:330 \\
+10 & 3 & 9 & 330 & 116 & 6:214, 7:116 & 6:21, 7:309 \\
+11 & 3 & 9 & 330 & 0 & 6:330 & 6:77, 7:253 \\
+12 & 3 & 9 & 330 & 0 & 6:330 & 6:189, 7:141 \\
+\bottomrule
+\end{tabular}
+\caption[]{First fall degree of the Weil descent of $\Sem4$ ($m=3$; KW's
+bound $m^2-m+1=7$), random curve, random subspace, $x_4$ the abscissa of a
+random point. ``Independent'': the top forms are linearly independent,
+equivalently $\dim\operatorname{span}\{e_pe_qe_r\}=n$ (Theorem~A). Entries
+$v{:}c$ count instances with value $v$. Further cells at $n'=4,5,6$ ($n=9$--20)
+are all independent with value 7 in both readings. Unverified, no pcc claim.
+Source: \art{research/first_fall_closure_20261111/kw_sharpness/table_measured.md}.}
+\label{tab:fd-kw3}
+\end{table}
+
+\section{Attempts at a growing lower bound}\label{sec:fd-growth}
+
+The treatise's open problem is a last-fall lower bound for the binary
+descent of $\Sem3$ that grows with $n$. A note of 11--12 November attempts
+it and records where each route stops
+(\art{research/lfd_lower_bound_20261111/NOTE.md}). No growing lower bound on
+$d_{\tilde F}$ is proved. Every statement below is unverified (no pcc claim
+exists); the labels proved, measured and conjectured are the note's.
+
+\paragraph{Presentation.} The literal question ``for any presentation'' has
+a negative answer (proved). Add a variable $y_m$ for every monomial $m$ with
+$2\le\abs m\le D$, the instance-independent quadratic axioms
+$x_iY(m)+Y(m\cup\{i\})$, and the linearised generators. The new system has
+the same Boolean solutions and $1\in W_2$, at the cost of
+$\sum_{j=2}^{D}\binom Nj$ extra variables. The check gave $1\notin W_1$ and
+$1\in W_2$ on six instances at $n=7,9,11$ (92--298 variables). A meaningful
+bound must fix the presentation or bound its size. Within the orbit of
+re-encodings (bases of $K$ and $V$, affine changes of variable, bases of the
+equation span) $d_{\tilde F}$ is one number (proved).
+
+\paragraph{Three routes with barriers.}
+\begin{itemize}
+\item \emph{Generator degree} (proved): if every generator outside a
+  satisfiable part has degree $\ge D_1$, then $d_F\ge D_1$. This is the
+  mechanism of every growing bound in the repository, the guarded chain's
+  $B+1$ (Theorem~\ref{thm:guarded}) and the naive Kummer presentation's
+  $2^t$ (Theorem~\ref{thm:pkm}(5)). It gives nothing for a quadratic system.
+\item \emph{Restriction} (proved): $d_F$ is monotone in $V$, and a
+  restriction of $c$ to a $j$-flat has $d_F\le j+2$, so restriction can
+  transfer a lower bound but not create one.
+\item \emph{Locality} (proved invariant, measured size): every non-trivial
+  generator, in any coordinates of the orbit, depends on at least
+  $2\min_\delta\operatorname{rank}M_\delta$ variables. The measured minimum
+  rank is 1--2, 2, 2--3, 2--3 and 3--4 at $(n,k)=(7,4)$, $(9,5)$, $(11,6)$,
+  $(13,7)$, $(15,8)$. The expansion method of Alekhnovich--Razborov and
+  Ben-Sasson--Impagliazzo has no constant-arity presentation to work on.
+\end{itemize}
+
+\paragraph{The selector proof system.} The proof of
+Theorem~\ref{thm:upper} refutes with multipliers in $c=a+b$ only. Let
+$e_{\min}$ be the least multiplier degree of such a refutation and
+$d_{\rm SEL}=e_{\min}+2$. Then
+$d_{\tilde F}\le d_{\rm NS}\le d_{\rm SEL}\le k+2$. Proposition~S (proved)
+recasts the selector system as a field statement over the $2^k$ points of
+$V$, and Proposition~S$^*$ (proved) gives its exact dual. A conjecture
+$e_{\min}\ge\lceil k/3\rceil$ on the diagonal fitted $k=4$--12 and failed at
+$k=13$ (Table~\ref{tab:fd-selector}). At $n=25$ both instances have
+$e_{\min}=4<5$, certified in both directions: a degree-4 selector satisfying
+all $114{,}688$ constraints, re-checked by separate field arithmetic, and an
+infeasible degree-3 system (838 points; coefficient rank $9{,}371$, augmented
+rank $9{,}372$, by a second row builder with PLUQ elimination). At $k=14,15$
+the value is back at $\lceil k/3\rceil$. On a 128\,GB RunPod pod
+(12 November) the selector degree is exact at $n=31$ and 33: $e_{\min}=5$ on
+4 of 4 and 3 of 3 instances, below $\lceil k/3\rceil=6$ in both cells, every feasible degree-5 selector checked on a
+second machine and every degree-4 infeasibility re-ranked by the PLUQ path
+(\art{research/lfd_lower_bound_20261111/out/c_runpod/RESULT.md}). At
+$n=33$, $5<\lceil(k-1)/3\rceil=6$, so the weaker form
+$e_{\min}\ge\lceil(k-1)/3\rceil$ is also falsified. The preregistered
+counting model (below) predicted 5 at $n=31$ and held; at $n=33$ it was
+ambiguous and is not scored. At $n=35$ the degree-5 system (441{,}560
+columns) aborted after about 5\,h on a 32-bit row-offset overflow in M4RI
+20200125, so $n\ge35$ remain lower bounds. The selector degree bounds a weaker proof
+system than the closure, and the measured $d_{\tilde F}$ lies one or two
+below it (Table~\ref{tab:fd-selector-gap}).
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrlrr@{}}
+\toprule
+$n$ & $k$ & $e_{\min}$ (per instance) & $\lceil k/3\rceil$ & instances \\
+\midrule
+7 & 4 & 2 ($\times5$), 1 ($\times1$) & 2 & 6 \\
+9 & 5 & 2 & 2 & 6 \\
+11 & 6 & 2--3 & 2 & 6 \\
+13 & 7 & 3 & 3 & 4 \\
+15 & 8 & 3 & 3 & 4 \\
+17 & 9 & 3 & 3 & 4 \\
+19 & 10 & 4 & 4 & 3 \\
+21 & 11 & 4 & 4 & 2 \\
+23 & 12 & 4, 4 & 4 & 2 \\
+\textbf{25} & \textbf{13} & \textbf{4, 4} & \textbf{5} & 2 \\
+27 & 14 & 5, 5 & 5 & 2 \\
+29 & 15 & 5, 5 & 5 & 2 \\
+\textbf{31} & \textbf{16} & \textbf{5 ($\times4$)} & \textbf{6} & 4 \\
+\textbf{33} & \textbf{17} & \textbf{5 ($\times3$)} & \textbf{6} & 3 \\
+35 & 18 & $>4$ & 6 & 2 \\
+37, 39, 41 & 19, 20, 21 & $>3$ & 7 & 2 each \\
+\bottomrule
+\end{tabular}
+\caption[]{Selector degree $e_{\min}$ on the diagonal $k=\lceil n/2\rceil$,
+first unsatisfiable seeds. Rows $n\le23$ pool the Python computation and
+the C port; $n\ge25$ are the C port, every feasible selector re-checked and
+every infeasible point set re-ranked by a second code path; $n=31$ and
+33 ran on a 128\,GB pod. Bold: the
+counterexamples to $e_{\min}\ge\lceil k/3\rceil$. The $n=7$ value 1 is an
+instance with $d_{\tilde F}=2$. Rows $n\ge35$ are lower bounds only (memory,
+container restarts and, at $n=35$, an M4RI index overflow). Unverified, no
+pcc claim. Source: \art{research/lfd_lower_bound_20261111/NOTE.md}, \S6, and
+\art{research/lfd_lower_bound_20261111/out/c_runpod/RESULT.md}.}
+\label{tab:fd-selector}
+\end{table}
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrrrr@{}}
+\toprule
+$n$ & $k$ & $d_{\tilde F}$ & $d_{\rm PCc}$ & $d_{\rm NS}$ & $d_{\rm SEL}$ \\
+\midrule
+7 & 4 & 3 (one instance 2) & 3 & 4 (2) & 4 (3) \\
+9 & 5 & 3 & 3 & 4 & 4 \\
+11 & 6 & 3 & 3 & 4 & 4--5 \\
+13 & 7 & 3 & 4 & 4 & 5 \\
+15 & 8 & 4 & 4 & 5 & 5 \\
+17 & 9 & 4 & 4 & 5 & 5 \\
+19 & 10 & 4 & 4 & 5 & 6 \\
+21 & 11 & 4 & --- & --- & 6 \\
+\bottomrule
+\end{tabular}
+\caption[]{Four refutation degrees on the same diagonal instances:
+the closure $d_{\tilde F}$, the closure that multiplies by $c$-variables
+only ($d_{\rm PCc}$), the Macaulay degree $d_{\rm NS}$, and the selector
+degree $d_{\rm SEL}$. At $n=13$ the gap $d_{\rm PCc}>d_{\tilde F}$ is made
+by the $a$-multiplied falls of Lemma~\ref{lem:deg3}, which no selector
+produces. The $d_{\tilde F}$ column re-computes
+Theorem~\ref{thm:lfdexact} at sizes it covers and is not evidence about
+growth. Unverified, no pcc claim. Source:
+\art{research/lfd_lower_bound_20261111/NOTE.md}, \S6.}
+\label{tab:fd-selector-gap}
+\end{table}
+
+\paragraph{The selector kernel at $e_{\min}$ (12 November).} Two
+preregistered follow-ups measured the homogeneous selector system.
+\begin{itemize}
+\item \emph{Nullity.} A conjectured kernel dimension $M(k-1,e-1)$ (a
+  trivial family $T_e$) held in four of six cells at $n=23,25,27$ and failed
+  in two: at $(n,e)=(23,4)$ and $(25,4)$ the nullity was $1{,}143$--$1{,}145$
+  and $740$--$741$ against 232 and 299
+  (\art{research/lfd_lower_bound_20261111/out/lead_A1/RESULT.md}).
+\item \emph{Where the excess appears.} Over 37 cells at $n=15$--27 the
+  excess over $T_e$ is 0 at all 18 instances with $e=e_{\min}-1$ and
+  positive at all 19 with $e=e_{\min}$, as preregistered; no bug condition
+  fired. The instance-to-instance variation is exactly $h$, the number of
+  $C\in V$ with $C=X_1+X_2$, $X_1,X_2\in V$, $X_1X_2=z$, which follows from
+  the factorisation $\Phi^*_C(A)=A(A+C)(A^2+CA+z)$. A post-hoc prediction
+  for $n=27$, seed 6 (kernel dimension $10{,}401$) held. A duality
+  identity, proved by hand and checked in 20 of 20 cells, writes the nullity
+  through sections of the annihilator bundle
+  (\art{research/lfd_lower_bound_20261111/out/lead_A1_syzygies/RESULT.md}).
+\item \emph{Feasibility threshold.} A counting ratio
+  $(k+1)M(k,e+1)/(nM(k,e))$ predicted 4 of 5 decided cells on random $V$
+  against 2 of 8 for a Koszul-corrected model, so the preregistered rule
+  chose the counting model. Its one miss is $V\subset\ker\operatorname{Tr}$:
+  $k=13$, $e=4$ is infeasible on all three such instances and feasible on
+  random $V$ (\art{research/lfd_lower_bound_20261111/out/lead_A2/RESULT.md}).
+  The exact values at $n=31$ and 33 narrow its threshold to
+  $\theta\in(1.2634,1.2698)$; its prediction of an infeasible degree 5 at
+  $n=35$ ($\rho=1.3417$) is the open falsifier, blocked by the M4RI
+  overflow. The diagonal now reads $e_{\min}=3,3,4,4,4,4,5,5,5,5$ for
+  $n=15,17,\ldots,33$.
+\end{itemize}
+These describe the selector system only. The note's reason they do not
+extend to $d_{\tilde F}$: the dual object of Proposition~\ref{prop:cert} must
+be closed under multiplication by variables, a condition that is not linear
+in the certificate, so the duality of Proposition~S$^*$ is lost.
+
+\section{Explicit membership over any field: the guarded chain}\label{sec:fd-guarded}
+
+A second presentation encodes factor-base membership directly. Let $S$ be
+a set of $B$ abscissae of rational points, and $g(T)=\prod_{s\in S}(T-s)$.
+The two-$\Sem3$ chain with an inverse guard is
+\[
+  F_S=\{g(x),\ g(y),\ g(z),\ \Sem3(x,y,u),\ \Sem3(u,z,r),\ v(x-y)-1\},
+\]
+with $r=x(R)$. Degrees are ordinary total degrees with explicit inputs.
+The first fall degree is the homogeneous-top syzygy degree modulo Koszul
+syzygies. Source: \art{research/guarded_fall_degree_20261028/}, which holds
+written proofs, independent audits, a native exact replay and partial
+Lean.
+
+\begin{theorem}[Guarded chain]\label{thm:guarded}
+For unsatisfiable instances:
+\begin{enumerate}
+\item Short Weierstrass curves, $p>3$, $B=3$:
+  $(d_{\rm ff},d_F)=(4,5)$, \emph{exactly}, for every $p$.
+\item Same presentation, any $B\ge3$: $d_{\rm ff}=B+1$ and
+  $\max(5,B+1)\le d_F\le3B-4$.
+\item Ordinary binary curves $Y^2+XY=X^3+a_2X^2+a_6$, $B=3$:
+  \begin{itemize}
+  \item $d_F=4$ if and only if $g=T^3+c$, which is possible only for even
+    $n$;
+  \item $d_F=5$ otherwise.
+  \end{itemize}
+  So for odd $n$, which covers every SEC~2 binary size, every
+  unsatisfiable instance has $(4,5)$.
+\item Binary curves, $B\ge4$: $B+1\le d_F\le3B-4$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Proof sketch of (1)]
+\emph{Upper bound.} The divided difference
+$Q=(g(x)-g(y))/(x-y)$ enters $V_4$ through the guard. The pair is then
+replaced by the missing root $w=s_1-x-y$. The two quadratics in $u$ are
+normalised and their resultant extracted in stages inside $V_5$. Finally
+the unit $T(w,z)$ is inverted in $K[w,z]/(g(w),g(z))\cong K^9$.
+
+\emph{Lower bound.} The space $W=(I_0\cap R_{\le4})+Kf_1+Kf_2$ is closed
+under the degree-4 operations and excludes 1. This uses characteristic
+$>3$, through $-3\ne0$.
+\end{proof}
+
+Exact degree-5 refutation DAGs were replayed in native arithmetic on public
+fixtures:
+\begin{itemize}
+\item $p=101$ and $p=5$;
+\item secp256k1, P-256, P-384 and P-521, with $S=\{x(G),x(2G),x(4G)\}$ and
+  $R=16G$; the DAGs have 413--415 nodes, and OpenSSL rechecks the points.
+\end{itemize}
+Twenty polynomial identities used in the proofs are checked in Lean
+(\texttt{FallDegreeIdentities.lean}, \texttt{PrimeBitLocal.lean}; axioms
+\texttt{propext} and \texttt{Quot.sound} only). The degree-4 lower bound
+is now machine-checked: \texttt{GuardedModel.no\_degree\_four\_refutation}
+proves that 1 is not derivable at degree four from the six generators, over
+every field with $6\ne0$ and three distinct base abscissae, and
+\texttt{lastFall\_lower} states the last-fall consequence under an explicit
+unit-ideal hypothesis (\art{research/guarded_fall_degree_20261028/formal/GuardedModel.lean};
+six modules, fresh \texttt{leanchecker} replays and a transitive axiom audit,
+merged in \#2814). The degree-5 upper construction, the bridge from rational
+unsatisfiability to the unit ideal, and the first-fall syzygy statement are
+\emph{not} formalised, so the exact pair $(4,5)$ is not yet a Lean theorem. A
+\texttt{lastFallDegree} definition and Caminata--Gorla's Theorem~2.8 in
+\art{crypto-autoresearcher:formal/CryptoResearch/FallDegree/LastFall.lean}
+are the bridge a complete formalisation would build on.
+
+Two Boolean upper bounds accompany the guarded chain:
+\begin{itemize}
+\item $d_F\le3\ell+1$ for the fully Boolean binary encoding, with $\ell$
+  bits per base coordinate;
+\item $d_F\le3\ell+2$ for a prime-field bit-restricted lookup encoding.
+\end{itemize}
+Both are instances of the standard brute-force refutation in Polynomial
+Calculus~\cite{cei1996}: fix the base bits, and refute the affine residue.
+For the binary chain at $t=3$ they are weaker than Theorem~\ref{thm:upper}'s
+$2k+3$.
+
+\section{Prime-field Kummer towers}\label{sec:fd-pkm}
+
+Petit, Kosters and Messeng~\cite{pkm2016} take the factor base
+$V=\mu_{2^t}$ over $\FF_p$ (with $2^t\mid p-1$). They write membership as a
+tower $y_0=x/g$, $y_{j+1}=y_j^2$, $y_{t-1}^2=1$, and argue the complexity
+from the first fall degree. Source for this section:
+\art{research/prime_fall_degree_20261027/DERIVED.md}, written proofs D1--D8.
+
+\begin{theorem}[Kummer towers, $m=2$]\label{thm:pkm}
+Let $R=\FF_p[y]/T$ be the tower quotient. Items (3)--(5) concern
+\emph{inconsistent} systems, those whose reduced $\Sem3$ is a unit of $R$; a
+satisfiable target has no inverse in $R$, and the refutation bounds do not
+apply to it.
+\begin{enumerate}
+\item $T$ is a Gröbner basis, and $R\cong\FF_p^{V^m}$. So every ideal
+  over $R$ is radical, and an $m=2$ system is inconsistent if and only if
+  the reduced $\Sem3$ is a unit of $R$.
+\item $R=\FF_p[z]/(z^K-1)$ with $K=2^t$. The degree of a monomial $z^k$ is
+  $\operatorname{popcount}(k)$, and degree falls are exactly binary
+  carries.
+\item If $t\ge2$, $g\ne0$, $3x_R^2+a\ne0$ and the system is inconsistent, then $d_{\rm ff}=4$
+  (operational convention), for every $t$. The degree-2 part of $f$ is a
+  bilinear form with $\det M=-2g^6(3x_R^2+a)\ne0$, so nothing falls at 3;
+  the monomial $q=y_{10}y_{11}$ gives a fall at 4.
+\item For an inconsistent system, the no-fall certificate has degree
+  $d_F\le2+\operatorname{popdeg}(f^{-1})\le2t+2$.
+\item For an inconsistent system in the naive presentation
+  $\{\Sem3,\ x_i^K-g^K\}$ of the \emph{same} set, $d_F\ge2^t$. So $d_F$ is not an invariant of the ideal; it depends
+  on the presentation.
+\item A single summand has $d_F=2$ for every $t$. Growth at $m=2$ must
+  therefore come from the genus-one curve $f(z_1,z_2)=0$; no
+  specialisation to finitely many points can show it.
+\end{enumerate}
+\end{theorem}
+
+\paragraph{Measured, and prior.} Table~\ref{tab:fd-pkm} sets the study's
+session-reported median last fall degree for $t=1..10$ at
+$p=2{,}013{,}265{,}921$ beside the corrected degree of regularity in PKM's
+own Table~4 for $n_1=1..11$ (also Figure~\ref{fig:fd}, right). The raw
+records of the first run were never committed (the study's
+\texttt{RESTART.md}). A preregistered relaunch on Iso Lab EKS (job
+\texttt{pfd-a-20261108}, 8 November) recomputed stage A from $t=1$, two
+random targets per $t$, and its medians agree with the first run's at every
+$t\le10$ (3, 4, 4, 4, 4, 5, 5, 5, 5, 6), both draws equal to the median at
+every $t$; the uncapped F4 degree $D$ equals $d_F$ on all 72 draws checked
+(gate G2), and the capped-F4 gate G3 found 0 disagreements in 144 runs
+(\art{research/pkm_falldegree_unblock_20261107/RESULTS.md}). The repeat is
+at median level, since the first run's rows are lost. From $t=2$ on the
+$d_F$ column and PKM's coincide.
+
+\begin{table}[t]
+\centering\small
+\input{figures/tab-fd-pkm}
+\caption[]{Prime-field Kummer tower, $m=2$, factor base $\mu_{2^t}$:
+the proved first fall degree (Theorem~\ref{thm:pkm}(3); it needs $t\ge2$),
+the session-reported median last fall degree at $p=2{,}013{,}265{,}921$
+(raw data not committed), and the corrected degree of regularity
+$D_{\rm reg}^{\rm corr}$ of Petit, Kosters and Messeng, Table~4
+(prime case)~\cite{pkm2016}. Source: \art{figures/data-new.json}, from
+\art{research/prime_fall_degree_20261027/}.}
+\label{tab:fd-pkm}
+\end{table} So the \emph{growth} is prior art. What
+Theorem~\ref{thm:pkm} adds is the proved constant first fall degree beside
+it, and the presentation dependence.
+
+\paragraph{The C-step prediction.} A prediction,
+$c^*(t)=4+\lfloor(t-2)/4\rfloor$, was registered (Amendment~6 of the
+prime fall-degree study) before any $t\ge11$ row. Capped F4 brackets
+decide it per draw: cap 5 not refuting gives $d_F\ge6$, cap 6 refuting
+gives $d_F\le6$. At $p=2{,}013{,}265{,}921$ the readings are: $t=11$, $d_F=6$
+on both draws, which holds but is not blind (round-2 rows had already
+shown it); $t=12$ ($N=24$), $d_F=6$ on both draws, ``holds'', the cap-6 runs
+taking $1{,}824.0$ and $1{,}762.8$\,s and $42{,}213{,}325{,}264{,}923$ and
+$42{,}213{,}325{,}353{,}310$ multiply-adds
+(\art{research/pkm_falldegree_unblock_20261107/RESULTS_T12_BRACKET.md}); $t=13$,
+$d_F=6$ on draw 1 in the bracket run
+(\art{research/pkm_falldegree_unblock_20261107/RESULTS_T13_BRACKET.md}) and
+on draw 0 in a RunPod re-run of 15 November, whose cap-6 closure refutes
+after $12{,}372$\,s, so ``holds''
+(\art{research/pkm_falldegree_unblock_20261107/RESULTS_STAGE_B.md});
+$t=14$, where $c^*=7$, gives $d_F\ge7$ on both draws: a first cap-6 attempt
+stopped oversize at degree 6, and re-runs on larger pods (Amendment 14)
+complete cap 6 without refuting; the cap-7 runs are pending
+(\art{research/prime_fall_degree_20261027/reports/growth-law-20261115/README.md}). Every draw has \texttt{grid\_zeros}
+$=0$, so none is decomposable. Since $c^*(12)=c^*(11)$, the $t=12$ cell
+cannot tell the C-step law from a flat 6, nor can $t=13$; the $t=14$ bound
+is the first cell that rules out a flat 6. These cells ran on RunPod after
+owner decision 10 (\art{research/ic_lead_queue_20261114/README.md}) moved
+them off EC2 Spot. Stage C
+of the same relaunch read ``grows in $m$'' on all six fixed-$t$ ladders
+($t=2,3$; Kummer and 2-isogeny towers; $m$ from 2 up to the largest exact
+median), the median $d_F$ rising by 2 or 3 between $m=2$ and that $m$
+(\art{research/pkm_falldegree_unblock_20261107/RESULTS_STAGE_C.md}). All of
+these are \texttt{[pcc:unverified]}. Since 15 November the $\FF_p$-tower closure
+instrument (\art{src/cryptanalysis/hky_fp_tower.rs}, PR~\#4332) writes each
+closure $V_{F,c}$ to a progress file as it finishes, so a run stopped by a
+timeout keeps its decided degrees and resumes at the first undecided one;
+it changes no measured value.
+
+\paragraph{The no-fall degree at $m=3$.} For the two-$\Sem3$ chain on
+Kummer towers at $m=3$, the Nullstellensatz degree in the tower ring
+satisfies $2t+6\le d_{\rm NS}\le3t+5$ (written proofs D10 and D9 of
+\art{research/prime_fall_degree_20261027/DERIVED.md}; D10 needs a
+per-instance condition, certified on 32 of 32 valid instances at three
+primes, $t=2$--5). Measured $d_{\rm NS}$ with multipliers of any $u$-degree
+is 10 on 6 of 6 instances at $t=2$, which meets the lower bound, and at
+most 13 at $t=3$; with $u$-degree at most 1 it is exactly $3t+5$ at
+$t=2$--5. The measured $d_F$ stays near 5 at $t=2,3$. As at $m=2$, the no-fall
+degree grows linearly while the falls absorb everything above a constant;
+nothing here bounds $d_F$ from below
+(\art{research/kummer_m3_ns_degree_20261115/README.md};
+\texttt{[pcc:unverified]}, local 4-vCPU runs). The step that could turn D10 into a bound on
+$d_F$ is open: whether the dual functional, taken modulo the second
+$\Sem3$, is a closure pseudo-solution.
+
+\paragraph{Other presentations of the same base.} PKM's two ways to find
+the maps $L_j$ (smooth $p-1$, or an isogeny chain on an auxiliary curve) are
+Kummer towers of two tori, $\mathbb{G}_m$ (order $p-1$) and the norm-one
+torus $T_2$ (order $p+1$). The supersingular $j=1728$ Vélu 2-isogeny chain
+is the $T_2$ tower up to a scaling per level, checked numerically on 200
+random points at each of three primes and 20 at P-192; since $2^{64}$, $2^{96}$ and $2^{521}$
+divide $p+1$ at P-192, P-256 and P-521, the auxiliary-curve search phase
+is unnecessary at the NIST primes
+(\art{research/pkm_torus_tower_20261114/README.md}). Its frozen prediction
+P1, that the raw polynomial-calculus degree does not depend on the
+presentation, is refuted on two seeds and two primes
+(Table~\ref{tab:fd-torus}). Rational-doubling coordinates cost one degree
+from $t=2$; polynomial presentations (the circle $u^2+v^2=1$, or the
+Kummer tower with a Möbius link) cost one degree from $t=3$; all rejoin the
+Kummer value at $(m,t)=(2,6)$ and $(3,3)$. The staircase that governs the
+lane is reproduced, not changed. A separate frozen test of the Vélu 2-isogeny tower at $p=1{,}048{,}583$ read
+$d_F=5$ at every $t=4$--8 on both instances (and at $t=9$ on one), against
+the Kummer law $\lfloor(t+14)/4\rfloor$ reproduced on the same engine
+(4, 4, 5, 5, 5); Vélu sits at its generator-weight floor of 5 over the whole
+range, so its first step lies at $t\ge10$
+(\art{research/leads_followup_20261114/item09_velu_tower/RESULTS.md};
+numpy prototype, \texttt{[pcc:unverified]}).
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrccccc@{}}
+\toprule
+$m$ & $t$ & $N$ & K ($p=40{,}961$) & S ($40{,}961$) & T ($8{,}191$) & M ($40{,}961$) & C ($8{,}191$) \\
+\midrule
+2 & 1 & 2 & 4, 4 & 4, 4 & 4, 4 & 4, 4 & 4, 4 \\
+2 & 2 & 4 & 4, 4 & 5, 5 & 5, 5 & 4, 4 & 4, 4 \\
+2 & 3 & 6 & 4, 4 & 5, 5 & 5, 5 & 5, 5 & 5, 5 \\
+2 & 4 & 8 & 4, 4 & 5, 5 & 5, 5 & 5, 5 & 5, 5 \\
+2 & 5 & 10 & 4, 4 & 5, 5 & 5, 5 & 5, 5 & $\ge5$, $\ge5$ \\
+2 & 6 & 12 & 5, 5 & 5, 5 & 5, 5 & 5, 5 & $\ge5$, $\ge5$ \\
+3 & 1 & 3 & 5, 5 & 5, 5 & 5, 5 & 5, 5 & 5, 5 \\
+3 & 2 & 6 & 5, 5 & 6, 6 & 6, 6 & 5, 5 & 5, 5 \\
+3 & 3 & 9 & 6, 6 & 6, 6 & 6, 6 & 6, 6 & --- \\
+\bottomrule
+\end{tabular}
+\caption[]{Raw polynomial-calculus degree of five presentations of the
+same PKM factor base, two random inconsistent targets per cell: K, the
+Kummer tower on $\mathbb{G}_m$; S and T, Möbius (rational-doubling)
+coordinates on $\mathbb{G}_m$ and on $T_2$; M, the Kummer tower with a
+Möbius link; C, the circle presentation of $T_2$. ``$\ge5$'': stopped by the
+column budget or the 1{,}200\,s cap with $1\notin W_4$ certified. Arm T at
+$p=73{,}727$ (one target, $t=2$--5) also reads 5. The native closure agrees
+with an independent Python closure on every per-degree rank in 41 cells
+and on the degrees reached in 7 more; no planted target reached $1\in W_D$.
+Arm K reproduces the earlier certified ladder wherever $D\ge4$. Rows
+$(2,7)$ (K and T: 5) omitted. \texttt{[pcc:unverified]}. Source:
+\art{research/pkm_torus_tower_20261114/README.md}.}
+\label{tab:fd-torus}
+\end{table}
+
+\section{Measured solving degrees in other presentations}
+
+The binary programme measured refutation and closure degrees on many
+presentations; the full record is in~\cite[\S6]{icprogram2026}.
+Table~\ref{tab:fd-other} lists the last fall degree by base-subspace
+dimension $\ell$. It is flat in $n$ at fixed $(m,\ell)$ and rises with
+$\ell$.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrcc@{}}
+\toprule
+$m$ & $\ell$ & $n$ & $d_F$ \\
+\midrule
+3 & 5 & 10--15 & 4 \\
+  & 6 & 16--24 & 4 \\
+  & 7 &        & $\ge5$ (every draw) \\
+\addlinespace
+4 & 3 & 9--14  & 4 \\
+\addlinespace
+5 & 3 & 11--15 & 4 \\
+\bottomrule
+\end{tabular}
+\caption[]{Binary decomposition systems in other presentations: last fall
+degree $d_F$ by $m$ and base-subspace dimension $\ell$, over the measured
+range of $n$. At $(m,\ell)=(3,7)$ every draw is refuted only at degree
+$\ge5$. Source:~\cite[\S6]{icprogram2026}.}
+\label{tab:fd-other}
+\end{table}
+
+The first exact value above 4 in the $(m,\ell)=(3,7)$ cell arrived on
+12 November. Run E14a of the fall-degree study ran the closure engine
+\texttt{hky\_par} at $(m,n,\ell)=(3,21,7)$, 32 threads, on a 32-vCPU
+256\,GB cloud pod. Its draw 0 (42 variables, 42 equations, no solutions)
+reached $1\in W_5$: $d_F=5$ exactly, after $37{,}889.9$\,s, of which
+$37{,}799.0$\,s at degree 5 ($974{,}982$ columns). Its closure dimensions up
+to degree 4 equal the earlier E10 record, so the draw is valid under the
+study's Amendment~20. Draw 1 also read $d_F=5$, in $38{,}240$\,s, with its
+closure up to degree 4 equal to E10; both draws closed degree 5 at full
+rank ($974{,}982$ of $974{,}982$ columns, 4 rounds). The cell rule needs three of
+four draws. Draw 3's record was lost with the pod (check-ins scheduled for
+13 November reached the session only on 14 November, after the pod was
+gone), and draw 4 was cut off by the deadline, so the cell was scored
+``split'' on 14 November; the E14b controls and E14c never started
+(\art{research/fall_degree_bounds_20261008/RESULTS.md}, section E14 r2). A third round
+(Amendment 31) reruns draw 3 alone; it was launched at 00:33Z on
+15 November and had no result at the last commit; a draw-3 reading of 5
+would make the cell read $d_F=5$
+(\art{research/fall_degree_bounds_20261008/e14/RESUME-E14.md}). Two draws,
+producer-reported, no validator report, \texttt{[pcc:unverified]}.
+
+Three further measurements bear on the solver rather than the system:
+\begin{itemize}
+\item \emph{Plain refutation tracks the semi-regular degree.} The plain
+  Macaulay refutation degree stays within one of the semi-regular
+  prediction in all 14 exact cells.
+\item \emph{Closure algorithms refute one or two degrees earlier.} A
+  MutantXL-style closure refutes all 92 unsatisfiable draws at degree 3--4,
+  where XL needs 5--7.
+\item \emph{Guessing variables restores degree 4.} Fixing one or two
+  variables restores degree 4 at $(m,\ell)=(3,7)$, at $1/116$--$1/260$ of
+  the projected degree-5 cost.
+\end{itemize}
+Every observed growth is growth in the size of the factor base: in $\ell$,
+$k$, $t$, $B$, or the digit count $s$ of a prime digit presentation (where
+$d_{\rm ff}=d_F=4+\lfloor s/2\rfloor$ at $m=2$, reproduced by a curve-free
+null). None was observed in $n$ at a fixed base.
+
+\section{What this settles and what it does not}\label{sec:fd-summary}
+
+\begin{itemize}
+\item \emph{Settled.} In the three presentations the programme studied,
+  the first fall degree is a proved constant of the presentation: 2 for
+  binary Weil descent, $B+1$ for explicit membership, 4 for Kummer
+  towers. The last fall degree is not bounded by it.
+  \begin{itemize}
+  \item This is proved for the guarded chain at $B=3$ (exactly 5 against
+    4).
+  \item It is certified on named binary instances: $\ge5$ against 2, at
+    $n=33$--$45$ and in the $m=t=3$ chain.
+  \item It is measured for Kummer towers (6 against 4 at $t=10$ and $t=12$),
+    reproduced at median level by the EKS relaunch of 8 November.
+  \end{itemize}
+  Any complexity argument that substitutes the first fall degree for the
+  solving degree is unsupported for these systems.
+\item \emph{Not settled.} No presentation has a proved last-fall lower
+  bound that grows with $n$. That is the open problem of
+  HKY~\cite{hky2015} and Kousidis--Wiemers~\cite{kousidis2019}, and the
+  only result that would bear on the subexponential claims. The upper
+  bounds $k+2$ and $(t-1)k+t$ are linear in $n$, far above every observed
+  value.
+  The attempt of \S\ref{sec:fd-growth} shows that the question needs a
+  fixed or size-bounded presentation (extension variables bring every
+  instance to $d_{\tilde F}=2$), and that the selector degree, a weaker
+  proof system, is not $\lceil k/3\rceil+2$ in general ($k=13$, 16 and 17). The
+  first fall degree of $\Sem4$ is 6 or 7 by a rank condition, and 6 for all
+  large $n$ at fixed $n'$ (\S\ref{sec:fd-kw3}).
+\item \emph{Missing before submission.} The certificates are committed
+  only as hashes; they regenerate (above) but need public hosting. The
+  sample is small: two instances per $n$ at $n\ge33$, one polynomial
+  instance at $n\ge41$. The written proofs need expert review. The
+  Kummer-tower stage A rows were regenerated on EKS on 8 November
+  (\S\ref{sec:fd-pkm}); the first run's rows remain lost, so the repeat
+  is median-level only
+  (\art{research/paper_opportunities_20261029/}).
+\item \emph{Requested data.} The runs that would enlarge the binary sample
+  and add F4 step degrees beside Table~1 of Kousidis and
+  Wiemers~\cite{kousidis2019} are preregistered as two protocols, frozen
+  before any data: \texttt{FD-BINARY-CLOSURE-EXT} and
+  \texttt{FD-F4-STEP-DEGREE}
+  (\art{research/fd_paper_data_request_20261029/}). Both run on
+  Implementation~C. Each must first pass a calibration stage that
+  reproduces every recorded outcome, an A/A check and a negative
+  control. No run has been made yet. New $d_{\tilde F}\ge5$ rows will be
+  marked \emph{closure only} until an independent certificate is
+  checked.
+\end{itemize}

@@ -1,0 +1,7 @@
+# Exclusive cover-verifier phase accounting
+
+[pcc:unverified] Descriptive exact instrumentation of triangular-eigen-cover, no algorithm change. Same original12targets/24completecalls/repeats/all4proofs, bothverifiers216mutation gate. Six exclusive verifier stages: binding (curve/source/target/representatives/source multiplication), root_cover (completePhi5rootproduct), orbit_index, anchors (construction+validity), geometry (principal identities), branch_witnesses (supportmembership+weighted scalar/exclusion checks). Tap after eachstage; require sumoverstages equals wholeverifier16vectors separately bymodulus. Reset phase observer before uncounted mutation qualification and again before countedverify, preventing previousaccumulator contamination.
+
+Every producer/construction/verifier/nativecontrol/candidate vector must replay triangular-eigen-cover raw exactly; repeats include phasevectors. Samepacket except witness arrays assertion retained; no new performanceclaim. Goal: identify material basefield proof cost and construct sound successor; do not label observation as10x or treat freephase diagnostic bound as actualspeedup. Earlier source-phases/phase.rs reusable observer and triangular-eigen-cover results are primarylocal sources; no new literature mechanism proposed.
+
+Freeze source/native/import/prior/protocol/binarySHA256 andpushGit before one120CPU invocation, retainraw/stderr/exit/hashes, no rerun/S3/cloud. Map/vector costsunpriced, independentreview/genus3/4coverage and originalgenus2+10xgoal remainopen.

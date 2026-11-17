@@ -1,0 +1,66 @@
+theorem PencilWordRefinement.generic_word_preserves : ∀ (p : UInt64) [inst : Fact (Nat.Prime p.toNat)]
+  (a0 a1 a2 : ZMod p.toNat) (a3 : UInt64) (a : WordD1) (b : WeightedWord),
+  5 ≤ p.toNat →
+    p.toNat < 2 ^ 31 →
+      WordD1.canonical p a →
+        WeightedWord.canonical p b →
+          a3.toNat < p.toNat →
+            a.z ≠ 0 →
+              a.w ≠ 0 →
+                b.z ≠ 0 →
+                  b.w ≠ 0 →
+                    WordD1.normalizedValid p (MixedGeneric.curve a0 a1 a2 ↑a3.toNat) a →
+                      WeightedWord.normalizedValid p (MixedGeneric.curve a0 a1 a2 ↑a3.toNat) b →
+                        MixedGeneric.genericK (WordD1.decode p a) (WeightedWord.decodeTwo p b) ≠ 0 →
+                          have c := (genericWords p a b a3).payload;
+                          genericWordDispatch p a b a3 = some c ∧
+                            WeightedWord.canonical p c ∧
+                              c.z ≠ 0 ∧
+                                c.w ≠ 0 ∧ WeightedWord.normalizedValid p (MixedGeneric.curve a0 a1 a2 ↑a3.toNat) c :=
+fun p [Fact (Nat.Prime p.toNat)] a0 a1 a2 a3 a b hfive hbound ha hb h3 haz haw hbz hbw hva hvb hk =>
+  have hp := Decidable.byContradiction fun a => generic_word_preserves._proof_1_1 p a3 hfive hbound a;
+  have az := canonical_word_nonzero p a.z hp ha.right.right.left haz;
+  have aw := canonical_word_nonzero p a.w hp ha.right.right.right haw;
+  have bz := canonical_word_nonzero p b.z hp hb.right.right.right.right.left hbz;
+  have bw := canonical_word_nonzero p b.w hp hb.right.right.right.right.right hbw;
+  And.casesOn (generic_word_decode p hfive hbound a b a3 ha hb h3) fun left right =>
+    And.casesOn right fun hc right =>
+      And.casesOn right fun left hd =>
+        And.casesOn
+          (MixedGeneric.weighted_generic_preserves a0 a1 a2 (↑a3.toNat) (WordD1.decode p a) (WeightedWord.decodeTwo p b)
+            az aw bz bw hk hva hvb)
+          fun fz right =>
+          And.casesOn right fun fw fv =>
+            have hkword := fun hz => hk ((generic_guard_decode p hfive hbound a b a3 ha hb h3).mp hz);
+            have hcz := Eq.mpr (id (congrArg (fun _a => _a.z ≠ 0) hd)) fz;
+            have hcw := Eq.mpr (id (congrArg (fun _a => _a.w ≠ 0) hd)) fw;
+            ⟨of_eq_true
+                (Eq.trans
+                  (congrFun'
+                    (congrArg Eq
+                      (ite_eq_right_of_eq_false none (some (genericWords p a b a3).payload) (eq_false hkword)))
+                    (some (genericWords p a b a3).payload))
+                  (eq_self (some (genericWords p a b a3).payload))),
+              ⟨hc,
+                ⟨fun he =>
+                  hcz
+                    (id
+                      (Eq.mpr (id (congrArg (fun _a => ↑_a.toNat = 0) he))
+                        (of_eq_true
+                          (Eq.trans
+                            (congrFun' (congrArg Eq (Eq.trans (congrArg Nat.cast UInt64.toNat_zero) Nat.cast_zero)) 0)
+                            (eq_self 0))))),
+                  ⟨fun he =>
+                    hcw
+                      (id
+                        (Eq.mpr (id (congrArg (fun _a => ↑_a.toNat = 0) he))
+                          (of_eq_true
+                            (Eq.trans
+                              (congrFun' (congrArg Eq (Eq.trans (congrArg Nat.cast UInt64.toNat_zero) Nat.cast_zero)) 0)
+                              (eq_self 0))))),
+                    id
+                      (Eq.mpr
+                        (id
+                          (congrArg (fun _a => MixedCancellation.validTwo (MixedGeneric.curve a0 a1 a2 ↑a3.toNat) _a)
+                            hd))
+                        fv)⟩⟩⟩⟩

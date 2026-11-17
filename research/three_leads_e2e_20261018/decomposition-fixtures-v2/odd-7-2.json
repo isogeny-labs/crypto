@@ -1,0 +1,68 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.three_leads_plain_v1",
+        "params": {
+          "trial_cap": "100000"
+        }
+      },
+      "name": "rho_plain",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "rho.three_leads_negation_v1",
+        "params": {
+          "trial_cap": "100000"
+        }
+      },
+      "name": "rho_neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.three_leads_decomposition_v2",
+        "params": {
+          "base_seed": "20261018",
+          "oracle": "semaev",
+          "random_base": "0",
+          "trial_cap": "100000"
+        }
+      },
+      "name": "structured_ic",
+      "role": "candidate"
+    }
+  ],
+  "description": "Fresh three-leads counts-only experiment; all cold phases; walls unqualified",
+  "label": "three-leads-odd-7-2-restart-target-v2",
+  "measurement": {
+    "isolation_required": "L2",
+    "order": "shuffle",
+    "rounds": 1,
+    "seed": 2026101801,
+    "timeout_seconds": 1200,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 11,
+        "b": 12,
+        "family": "subfield",
+        "group_order": 40,
+        "gx": 36,
+        "gy": 25,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 7,
+        "parameter": 1,
+        "r": 5
+      }
+    ],
+    "target_seed": 202610181260,
+    "targets_per_curve": 8
+  }
+}

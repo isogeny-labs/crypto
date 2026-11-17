@@ -1,0 +1,43 @@
+{
+ "created_at": "2026-11-08T03:05:18Z",
+ "id": "PCC-20261108-4bd38e",
+ "kind": "statement",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round58-p192/report.md",
+    "sha256": "192fff4c09af36340b0abd7daca788d0c1ac8bfbe42d76262a6a30fb98115ea0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round58-p192/poles.json",
+    "sha256": "8e8fde45798a331912b380bd3aeb3c44aa200e24b86ba224f39e1ed11d08ef40"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round58-p192/P192-poles.json",
+    "sha256": "c5ec5eb6588d60cd47b6a12b031708e9d45784994edd6806329643f17c1e5bf9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round58-p192/validation.json",
+    "sha256": "d54c2eb0ca477ac5c1f788e5a8c4884d4f762696ff3b35f89d4293763dc37ce1"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Round58 specified native panels and written criterion only; no full P192 trace, timing, representation lower bound or novelty claim",
+ "statement": "A pole-compatible signed paired trace extracts its Laurent coefficient using a norm determinant over K[e,s]/(e^3,s^2); exact native checks cover456 complete toy point actions,32 selected P192 block actions, and precision/sign/certificate controls. A written CM correspondence criterion gives4ab<abs(D) implies an integer endomorphism and[a]Q=[u]G. These remain unsigned scoped derivations and computations."
+}

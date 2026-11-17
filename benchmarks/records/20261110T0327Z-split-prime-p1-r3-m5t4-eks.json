@@ -1,0 +1,196 @@
+{
+  "branch": "claude/novel-ecdlp-algorithm-iams4j",
+  "closed_utc": "2026-11-10T03:29:46+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "tools/task_card.py",
+        "run",
+        "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r3-launch.yaml"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "note": "card submitted RR a1 and T a1 to Iso Lab EKS (CodeBuild bridge); both Jobs later lost to Spot interruptions; launcher wall only (the Job ran in the cluster afterwards); receipt status completed",
+      "started_utc": "2026-11-08T20:58:54Z",
+      "wall_s": 1355.389
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/task_card.py",
+        "run",
+        "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r3-launch-rr-a2.yaml"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "note": "RR a2: Pending 10 h, ran 08:36Z\u201311:09Z, Spot loss; launcher wall only (the Job ran in the cluster afterwards); receipt status completed",
+      "started_utc": "2026-11-08T22:18:23Z",
+      "wall_s": 678.471
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/task_card.py",
+        "run",
+        "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r3-launch-t-a2.yaml"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "note": "T a2: ran 02:38Z\u201308:33Z on 2026-11-09, memory cap at 56 GiB (recorded result); launcher wall only (the Job ran in the cluster afterwards); receipt status completed",
+      "started_utc": "2026-11-08T23:25:47Z",
+      "wall_s": 675.531
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/task_card.py",
+        "run",
+        "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r3-launch-rr-a3.yaml"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "note": "RR a3 (last attempt, pinned r6a.4xlarge): ran 23:36Z\u201300:28Z, Spot loss; launcher wall only (the Job ran in the cluster afterwards); receipt status completed",
+      "started_utc": "2026-11-09T23:28:06Z",
+      "wall_s": 664.481
+    }
+  ],
+  "commit": "6450954fc7fb0f32aeabd520cafb346ec38d205c",
+  "commit_dirty": false,
+  "created_utc": "2026-11-10T03:27:37+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "eks:isolab (pods); this container launched only",
+    "isolation": "Iso Lab EKS cpu-spot command Jobs, 2 vCPU Guaranteed, one msolve process per pod (no L2 admission); nodes m7i.4xlarge, r7a.4xlarge, r6a.4xlarge Spot",
+    "platform": "Linux-6.18.44-fc-v338-x86_64-with-glibc2.39"
+  },
+  "id": "20261110T0327Z-split-prime-p1-r3-m5t4-eks",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "t_degree_reached_lower_bound",
+      "note": "T a2 capped at 56 GiB (ulimit -v) after 21,267 s, degree-9 step",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 9.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "t_widest_columns_lower_bound",
+      "note": "columns of the widest F4 matrix; T a2, 847,295 x 1,305,345; round 2 bound was 662,876 at 13 GiB",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 1305345.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "rr_attempts_lost_to_spot",
+      "note": "RR a1/a2/a3 ran 15 min, 2 h 33 min, 52 min; all BidEvictedEvent; RR bound unchanged from round 2 (D >= 6, widest >= 146,277)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 3.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "t_a2_wall",
+      "note": "diagnostic only; single-thread msolve on m7i.4xlarge",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 21266.672
+    }
+  ],
+  "problem": "ic:split-prime-p1-rr-dickson-torus",
+  "raw": [
+    {
+      "bytes": 420,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/t-a2-results/t/t_s2.parse.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/02/029ab05f42e70c989c69eb8c0434d613129aa325df2f6d4d4f39bef5979b7724",
+      "sha256": "029ab05f42e70c989c69eb8c0434d613129aa325df2f6d4d4f39bef5979b7724",
+      "uploaded": false
+    },
+    {
+      "bytes": 4877,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/t-a2-results/t/t_s2.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e0/e0589ff264e50b3e432fb02b65fef0032a1a716d2967c45cf3f74573a5698b38",
+      "sha256": "e0589ff264e50b3e432fb02b65fef0032a1a716d2967c45cf3f74573a5698b38",
+      "uploaded": false
+    },
+    {
+      "bytes": 1044,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/t-a2-results/SHA256SUMS",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fd/fd98d95cb6a740a8e77b195ab3ca634e2ac48cf980d2562163d0ef1714dab3bd",
+      "sha256": "fd98d95cb6a740a8e77b195ab3ca634e2ac48cf980d2562163d0ef1714dab3bd",
+      "uploaded": false
+    },
+    {
+      "bytes": 204,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/t-a2-results/job-exit.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5d/5d3862e34caaa253b56f32be55acdad1332c31b0344fcb5b88bb14d695635923",
+      "sha256": "5d3862e34caaa253b56f32be55acdad1332c31b0344fcb5b88bb14d695635923",
+      "uploaded": false
+    },
+    {
+      "bytes": 3081,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a1-results-partial/rr/rr_s2.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/96/9627bb467f169e057db2ff00d82fb496ccd0462dfa730cfd3b153f3611d395c9",
+      "sha256": "9627bb467f169e057db2ff00d82fb496ccd0462dfa730cfd3b153f3611d395c9",
+      "uploaded": false
+    },
+    {
+      "bytes": 3081,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a2-results-partial/rr/rr_s2.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c6/c671ca9583acd0a0b41813fc7087aa25c517906d01837b4c6f248f1f9c122906",
+      "sha256": "c671ca9583acd0a0b41813fc7087aa25c517906d01837b4c6f248f1f9c122906",
+      "uploaded": false
+    },
+    {
+      "bytes": 3081,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a3-results-partial/rr/rr_s2.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/45/455af1f9ced5d02eb24e30eed731471f1f2d0ed59d352d8a1f9a0d5c8432c688",
+      "sha256": "455af1f9ced5d02eb24e30eed731471f1f2d0ed59d352d8a1f9a0d5c8432c688",
+      "uploaded": false
+    },
+    {
+      "bytes": 1448,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/analysis/derived_r3/decision_r3.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/19/1948b86158eefc932b6d210824aa573f72fac50bd09f28037601a2f3d0f4c16a",
+      "sha256": "1948b86158eefc932b6d210824aa573f72fac50bd09f28037601a2f3d0f4c16a",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/report/REPORT.pdf",
+    "png": [
+      "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/figures/p1_r3_m5t4.png"
+    ],
+    "svg": [
+      "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/figures/p1_r3_m5t4.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "split-prime-p1-r3-m5t4-eks",
+  "status": "measured",
+  "summary": "P1 round 3 (PROTOCOL-R3), T24 m5 t4 on Iso Lab EKS: T capped at 56 GiB after 21,267 s (D >= 9, widest >= 1,305,345); all three RR attempts lost to Spot interruptions; frozen rule 3 still undecided",
+  "validation": null
+}

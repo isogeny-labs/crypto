@@ -1,0 +1,47 @@
+{
+  "at": "2026-10-23T03:15:18.106337+00:00",
+  "result": "deployed and read back",
+  "source_revision": "cc858fd93ab203f877c34b14205a0f22e554bf73",
+  "ordinary_bootstrap": "v4 unchanged",
+  "benchmark_bootstrap": "v6 spec identical to qualified I/J worker",
+  "pools": {
+    "cpu-spot": {
+      "cpu": 32,
+      "memory": "128Gi"
+    },
+    "cpu-l2-spot": {
+      "cpu": 32,
+      "memory": "128Gi"
+    }
+  },
+  "combined_limits": {
+    "cpu": 64,
+    "memory": "256Gi"
+  },
+  "regional_quota": 96,
+  "readiness_checked_as": "isolab:submitters",
+  "launchers": {
+    "remote": {
+      "project": "isolab-experiment-launcher",
+      "key": "inputs/launchers/e9dc81a2076325113d92edef4b612175f803346d50f204dfdc49b893c93b1f1f.zip",
+      "version": "GAbpTmZE8VYoN72rYIOwYqaior1Pj6ep",
+      "sha256": "e9dc81a2076325113d92edef4b612175f803346d50f204dfdc49b893c93b1f1f"
+    },
+    "recovery": {
+      "project": "isolab-recovery-controller",
+      "key": "inputs/recovery-controllers/8342118dc5dd243ce9a3a2057e74e092de8b6170563df9459c9afc2c9c6f1bc9.zip",
+      "version": "FhkDu4kbpsBNUbxuDW16EYHRfTX3OQZe",
+      "sha256": "8342118dc5dd243ce9a3a2057e74e092de8b6170563df9459c9afc2c9c6f1bc9"
+    }
+  },
+  "runtime_archive": "unchanged",
+  "local_install": {
+    "source_revision": "cc858fd93ab203f877c34b14205a0f22e554bf73",
+    "files": {
+      "submit-job": "def41b1a72b6e48dc4e6f8256455be44ccc5100a017f515d8bd2821558abcbce",
+      "isolab-eks-mcp": "f6ad55c6a273237c38d34f25f18fb2453e919a1a11b5460590ba61bf054703c3"
+    },
+    "install": "atomic rename after direct overwrite of the running MCP executable returned ETXTBSY; no running client was killed; new invocations use the new binary and current clients already invoke the updated helper"
+  },
+  "main_github_action": "pending merge and final-head CI/review"
+}

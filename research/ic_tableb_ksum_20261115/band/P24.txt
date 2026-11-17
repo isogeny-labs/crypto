@@ -1,0 +1,43 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-t1577-77336155 | 23.38 | bsgs-neg | 432/432 | 1.046 | 1.150 | 2.088 | — |
+| icv1-fp24-t1577-77336155 | 23.38 | inc-rec | 432/432 | 14.069 | 16.003 | 33.410 | — |
+| icv1-fp24-t1577-77336155 | 23.38 | inc-tb | 432/432 | 12.824 | 14.910 | 33.680 | — |
+| icv1-fp24-t1577-77336155 | 23.38 | inc-w0 | 432/432 | 12.738 | 14.781 | 33.164 | — |
+| icv1-fp24-t1577-77336155 | 23.38 | ksum4 | 432/432 | 6.365 | 7.224 | 14.955 | — |
+| icv1-fp24-t1577-77336155 | 23.38 | ksum5 | 432/432 | 6.383 | 7.158 | 14.132 | — |
+| icv1-fp24-t1577-77336155 | 23.38 | rho-neg | 432/432 | 1.087 | 1.185 | 2.063 | — |
+| icv1-fp24-t1577-77336155 | 23.38 | rho-neg-aa | 432/432 | 1.087 | 1.185 | 2.063 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp24-t1577-77336155 | bsgs-neg vs inc-rec | bsgs-neg < inc-rec |
+| icv1-fp24-t1577-77336155 | bsgs-neg vs inc-tb | bsgs-neg < inc-tb |
+| icv1-fp24-t1577-77336155 | bsgs-neg vs inc-w0 | bsgs-neg < inc-w0 |
+| icv1-fp24-t1577-77336155 | bsgs-neg vs ksum4 | bsgs-neg < ksum4 |
+| icv1-fp24-t1577-77336155 | bsgs-neg vs ksum5 | bsgs-neg < ksum5 |
+| icv1-fp24-t1577-77336155 | bsgs-neg vs rho-neg | unresolved inside the band |
+| icv1-fp24-t1577-77336155 | bsgs-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp24-t1577-77336155 | inc-rec vs inc-tb | unresolved inside the band |
+| icv1-fp24-t1577-77336155 | inc-rec vs inc-w0 | inc-w0 < inc-rec |
+| icv1-fp24-t1577-77336155 | inc-rec vs ksum4 | ksum4 < inc-rec |
+| icv1-fp24-t1577-77336155 | inc-rec vs ksum5 | ksum5 < inc-rec |
+| icv1-fp24-t1577-77336155 | inc-rec vs rho-neg | rho-neg < inc-rec |
+| icv1-fp24-t1577-77336155 | inc-rec vs rho-neg-aa | rho-neg-aa < inc-rec |
+| icv1-fp24-t1577-77336155 | inc-tb vs inc-w0 | inc-w0 < inc-tb |
+| icv1-fp24-t1577-77336155 | inc-tb vs ksum4 | ksum4 < inc-tb |
+| icv1-fp24-t1577-77336155 | inc-tb vs ksum5 | ksum5 < inc-tb |
+| icv1-fp24-t1577-77336155 | inc-tb vs rho-neg | rho-neg < inc-tb |
+| icv1-fp24-t1577-77336155 | inc-tb vs rho-neg-aa | rho-neg-aa < inc-tb |
+| icv1-fp24-t1577-77336155 | inc-w0 vs ksum4 | ksum4 < inc-w0 |
+| icv1-fp24-t1577-77336155 | inc-w0 vs ksum5 | ksum5 < inc-w0 |
+| icv1-fp24-t1577-77336155 | inc-w0 vs rho-neg | rho-neg < inc-w0 |
+| icv1-fp24-t1577-77336155 | inc-w0 vs rho-neg-aa | rho-neg-aa < inc-w0 |
+| icv1-fp24-t1577-77336155 | ksum4 vs ksum5 | unresolved inside the band |
+| icv1-fp24-t1577-77336155 | ksum4 vs rho-neg | rho-neg < ksum4 |
+| icv1-fp24-t1577-77336155 | ksum4 vs rho-neg-aa | rho-neg-aa < ksum4 |
+| icv1-fp24-t1577-77336155 | ksum5 vs rho-neg | rho-neg < ksum5 |
+| icv1-fp24-t1577-77336155 | ksum5 vs rho-neg-aa | rho-neg-aa < ksum5 |
+| icv1-fp24-t1577-77336155 | rho-neg vs rho-neg-aa | unresolved inside the band |

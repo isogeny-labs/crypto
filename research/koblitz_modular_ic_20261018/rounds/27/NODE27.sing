@@ -1,0 +1,62 @@
+if(size(millerP)!=80 || size(millerS)!=80){ERROR("actual Miller coefficient framing failed");}
+proc squareCoefficients(poly input){
+ poly answer=0;int term;
+ for(term=1;term<=size(input);term++){answer=answer+leadcoef(input[term])^2*x^deg(input[term]);}
+ return(answer);
+}
+ideal toric=std(ideal(x*t^2*q+1,y*t^3*q+1));
+int entry27;int term27;int deg27;poly p27;poly s27;poly unit27;poly value27;
+link unitsOut="ASCII:w actual-miller-units.sing";open(unitsOut);
+write(unitsOut,"ideal actualUnits;");
+for(entry27=1;entry27<=80;entry27++){
+ p27=millerP[entry27];s27=millerS[entry27];
+ if(deg(p27)!=9 || deg(s27)!=8 || leadcoef(s27)!=1){ERROR("actual pole19 leading coefficient failed");}
+ if(entry27%5!=0){
+  if(squareCoefficients(p27)!=millerP[entry27+1] || squareCoefficients(s27)!=millerS[entry27+1]){ERROR("actual five coefficient conjugates failed");}
+ }
+ unit27=0;
+ for(term27=1;term27<=size(p27);term27++){
+  deg27=deg(p27[term27]);unit27=unit27+leadcoef(p27[term27])*t^(19-2*deg27)*q^(9-deg27);
+ }
+ for(term27=1;term27<=size(s27);term27++){
+  deg27=deg(s27[term27]);unit27=unit27+leadcoef(s27[term27])*t^(16-2*deg27)*q^(8-deg27);
+ }
+ if(subst(unit27,t,0)!=1){ERROR("actual proper-chart unit residue failed");}
+ value27=t^19*q^9*(p27+y*s27)+unit27;
+ if(reduce(value27,toric)!=0){ERROR("actual proper-chart Miller identity failed");}
+ write(unitsOut,"actualUnits["+string(entry27)+"]="+string(unit27)+";");
+}
+close(unitsOut);
+print("NODE27_ALL80_FUNCTIONS_AND_FIVE_CONJUGATES_BOUND");
+// Exact proper group-law chart for BOTH ordinary curves. Local units are
+// 1+b, D=1+a*m+m^3, and 1+r. Source points p,q; third intersection r; sum s.
+ring chart27=2,(p,q,r,s,m,b,ib,id,ir),dp;
+int aCurve27;poly delta27;ideal chartEq27;ideal enlarged27;matrix lift27;matrix remainder27;
+link chartOut="ASCII:w group-law-chart-certificates.sing";open(chartOut);
+for(aCurve27=0;aCurve27<=1;aCurve27++){
+ delta27=1+aCurve27*m+m^3;
+ chartEq27=delta27*p*q*r+b+b^3,
+  delta27*(p*q+p*r+q*r)+m+b+m*b^2,
+  delta27*(p+q+r)+m+aCurve27*b+m^2*b,
+  s*(1+r)+r,ib*(1+b)+1,id*delta27+1,ir*(1+r)+1;
+ enlarged27=chartEq27,p,q;
+ if(reduce(s,std(enlarged27))!=0){ERROR("proper group-law sum not in (p,q)");}
+ lift27=lift(enlarged27,ideal(s));
+ remainder27=matrix(enlarged27)*lift27-matrix(ideal(s));
+ if(remainder27[1,1]!=0){ERROR("proper group-law chart lift mismatch");}
+ write(chartOut,"// ordinary_a="+string(aCurve27));
+ write(chartOut,string(chartEq27));write(chartOut,string(lift27));
+ // Raising this exact identity to32 in char2 gives s^32 in (p^32,q^32)
+ // modulo the original chart equations. No degree32 Groebner assumption.
+ print("NODE27_EXACT_GROUP_CHART_IDENTITY a="+string(aCurve27));lift27;
+}
+close(chartOut);
+// Boundary nilpotence: t^19=0 implies t^32=0. If U=1+t*w=0,
+// 1=U*geometricSeries32+t^32*w^32 gives an explicit unit certificate.
+ring nilpotent27=2,(t,w),dp;
+poly sum32=0;int power27;
+for(power27=0;power27<32;power27++){sum32=sum32+(t*w)^power27;}
+if((1+t*w)*sum32+t^32*w^32!=1){ERROR("nilpotent unit certificate failed");}
+print("NODE27_NILPOTENT_UNIT_CERTIFICATE");sum32;
+print("NODE27_SCOPE proper local source-bound separator; global original h-power membership NOT extracted");
+print("NODE27_ALL_CHECKS_PASS");quit;

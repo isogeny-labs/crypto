@@ -1,0 +1,8 @@
+import WordIteration
+namespace WordIterationReview
+open WordIteration
+theorem simultaneous_step : iterate 7 1 1 2 3 4 1 = (4,0,0) := by decide
+theorem modulus_one : iterate 1 0 0 0 0 0 4 = (0,0,0) := by decide
+theorem empty_observations : observations 7 1 1 2 3 4 0 = [] := by rfl
+theorem upper_boundary_iteration : iterate 9223372036854775808 9223372036854775807 9223372036854775807 9223372036854775807 9223372036854775807 9223372036854775807 1 = (9223372036854775805,9223372036854775804,9223372036854775806) := by decide
+end WordIterationReview

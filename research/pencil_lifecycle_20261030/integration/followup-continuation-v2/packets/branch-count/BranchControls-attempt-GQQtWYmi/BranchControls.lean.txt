@@ -1,0 +1,26 @@
+import CounterUpdate
+set_option autoImplicit false
+namespace BranchControls
+open SignedWord BranchCount
+def state (fixed : Option (UInt64×UInt64)) : UnionState 2 := ⟨⟨id,fun _=>ident⟩,fun _=>fixed⟩
+def sizes : UnionSize.Sizes 2 := ⟨#[1,1],rfl⟩
+def fresh := run 7 (state none) (state none).graph sizes 0 0 ident ident 1 1 2 0
+def redundant := run 7 (state none) (state none).graph sizes 0 0 ident ident 1 (-1) 0 0
+theorem fresh_counts : fresh.2=⟨1,1,0⟩ := by decide
+theorem redundant_counts : redundant.2=⟨1,0,1⟩ := by decide
+theorem identical_returns_different_zero_counts :
+ fresh.1.result=.none ∧ redundant.1.result=.none ∧ fresh.2.zero≠redundant.2.zero := by decide
+theorem inconsistent_preassert_increment :
+ (run 7 (state none) (state none).graph sizes 0 0 ident ident 1 (-1) 1 0).2=⟨1,0,1⟩ := by decide
+theorem answer_no_zero_increment :
+ (run 7 (state none) (state none).graph sizes 0 0 ident ident 1 (-1) 1 1).2=⟨1,0,0⟩ := by decide
+theorem existing_anchor_zero_increment :
+ (run 7 (state (some (1,0))) (state none).graph sizes 0 0 ident ident 1 1 2 0).2=⟨1,1,1⟩ := by decide
+theorem distinct_unanchored :
+ (run 7 (state none) (state none).graph sizes 0 1 ident ident 1 (-1) 0 0).2=⟨0,0,0⟩ := by
+ simp [run,state,sizes,UnionSize.forward,UnionSize.sizeAt,union]
+theorem distinct_anchored_zero :
+ (run 7 (state (some (1,2))) (state none).graph sizes 0 1 ident ident 1 (-1) 0 0).2=⟨0,0,1⟩ := by
+ simp only [run,state,sizes,UnionSize.forward,UnionSize.sizeAt]
+ decide
+end BranchControls

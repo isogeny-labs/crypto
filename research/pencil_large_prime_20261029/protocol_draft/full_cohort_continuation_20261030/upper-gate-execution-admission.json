@@ -1,0 +1,44 @@
+{
+  "schema": "pencil-upper-gate-execution-admission/v1",
+  "recorded_utc": "2026-10-30T02:42:17Z",
+  "owner": "/root",
+  "scope": "Only exact p186379 target0 gate and its computation/fresh/replay chain; no remaining-cohort admission",
+  "protocol": {
+    "path": "upper-gate-protocol-v2.json",
+    "sha256": "65ad107e3d341e7783ed06942cc82b6c1b3a9084f9d88c92202b31fec7509746",
+    "canonical_sha256": "5762e40132c75a0a3d1cbc9ec6d64b777e2235ebc6d3c3364d9bdd299af45040"
+  },
+  "design_review": {
+    "path": "upper-gate-v2-independent-design-review.json",
+    "sha256": "008e0c48bb06479d417952a59039d31123568e0cb2d60b78755f226fceccd4b1"
+  },
+  "coverage_review": {
+    "path": "upper-gate-v2-coverage-review.json",
+    "sha256": "591cb3555452ac934b3dd5549c6e157b2afc58d7371951f19cb5b0fad2e82582"
+  },
+  "request": {
+    "path": "upper-gate-request-v2.json",
+    "raw_sha256": "19929f222a46d13f02fa50738e31ef7c86e3a0854c4f2041a58f9f6c05c46e28",
+    "native_canonical_sha256": "daf54f696c9283075900b099d244dd8666e581c7726c0e502c536219d0a9a30a"
+  },
+  "client_sha256": "ac7d57132617775679770dc55b6f8b3acc83f4454e31b025a1f35e9b915abc21",
+  "resource": {
+    "active_worker_seconds": 10800,
+    "outer_deadline_utc": "2026-10-30T05:05:50Z",
+    "internal_request_deadline_utc": "2026-10-30T03:28:20Z",
+    "max_active_payloads": 1,
+    "conditions": "Reviewed R900 guard under normal OS/Kubernetes enforcement, bounded kube calls and local/control scheduling slack; no deadline reset. All controls, warmups, computation, fresh runs, replay, recovery and attempts charged."
+  },
+  "reconciliation": {
+    "prior_job": "pencil-p739-20261030-a1-epoch-1",
+    "prior_job_terminal": true,
+    "prior_pods": 0,
+    "prior_controller_builds_terminal": true,
+    "new_request_state": "awaiting_controller_receipt",
+    "duplicate_generator_launched": false
+  },
+  "admission": "Conditional on committed and published frozen protocol and successful integrity reconstruction of diagnostic all-missing package before submission",
+  "timing_qualified": false,
+  "full_cohort_admitted": false,
+  "experiment_started": false
+}

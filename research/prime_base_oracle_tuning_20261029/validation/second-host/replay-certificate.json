@@ -1,0 +1,620 @@
+{
+ "schema": "replay-certificate/v1",
+ "id": "VAL-20261029-7ff9db",
+ "kind": "second-host re-execution of the frozen holdout-P20 spec with a record-by-record match (PROTOCOL.md section 13)",
+ "evidence_dir": "research/prime_base_oracle_tuning_20261029",
+ "rows": [
+  "icv1-fp20-tm565-6d7d1d32"
+ ],
+ "snapshot": {
+  "branch": "claude/pbo-xhost-leaderboard-20261029",
+  "validated_content_commit": "1e7b2b7ed20dcfccaf6f9454281f042508a7d2bd",
+  "note": "Every study file named here is unchanged in the work tree against 1e7b2b7ed (git status clean for the study dir apart from this untracked validation/second-host/ directory, written by the validator). Pointer-stored files (records.jsonl, audit.stdout, run.stderr, the PNG) hash to their .artifacts.json sha256 and the store holds objects of those sizes (artifacts.py verify --remote)."
+ },
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "runs": [
+  {
+   "role": "second-host re-execution",
+   "session_dir": "second-host/eks-results/session",
+   "session_id": "ECBS1h517504d65837",
+   "spec_id": "ECS1h3d7d7d2bd0bc",
+   "records": 2016,
+   "records_sha256": "a9bce342f9910287721eecb3c8e27239c7d8642e7e7b06456d80fc307d395924",
+   "measured_records": 1680,
+   "env_class_id": "ECBENV2h3a51beea0bc2",
+   "binary_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9",
+   "isolation": {
+    "required": "L2",
+    "executions": 2016,
+    "invalid_outcomes": [],
+    "below_l2": [],
+    "grades": [
+     {
+      "level": "L2",
+      "count": 2016
+     }
+    ],
+    "accepted": true
+   },
+   "worker_audit": {
+    "path": "second-host/eks-results/audit.json",
+    "sha256": "e59fe6bae8500c6ffdefb022e987ac6860ee0328244490c66f89eb0ca37fd9f4",
+    "ok": true,
+    "verified_records": 2016,
+    "replays": 1680,
+    "replays_identical": 1680,
+    "auditor_binary_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9",
+    "auditor_env_class_id": "ECBENV2h3a51beea0bc2"
+   },
+   "validator_audit": {
+    "path": "validation/second-host/verify-second-host-session.audit.json",
+    "sha256": "48cce122114a86401a288e4d97a9af7f43439f7180b7b68d18a1b4110ae658ad",
+    "command": "RAYON_NUM_THREADS=1 taskset -c 2 <bf5eec6d binary> verify --dir second-host/eks-results/session --replay-all --exit-code",
+    "ok": true,
+    "checks": {
+     "arms": true,
+     "env_class": true,
+     "executions": true,
+     "host_hash": true,
+     "plan_hash": true,
+     "record_count": true,
+     "records": true,
+     "records_hash": true,
+     "replays": true,
+     "session_complete": true,
+     "spec_id": true,
+     "workloads": true
+    },
+    "verified_records": 2016,
+    "replays": 1680,
+    "replays_identical": 1680,
+    "problems": [],
+    "auditor_binary_sha256": "bf5eec6d61fbe83a7e6911bf73d05d847cc0ab23fd6db3342290a26b9f3807d9",
+    "auditor_env_class_id": "ECBENV3h13e37662a118",
+    "files": {
+     "host.json": "22c01e5cfa3e4664447c82403fd268acbc54016ba943a1470892056a84236a9b",
+     "plan.json": "78337b820dcd7c978a58312d40245d4c06eeef63f6fc8853226ead48e020a1aa",
+     "records.jsonl": "a9bce342f9910287721eecb3c8e27239c7d8642e7e7b06456d80fc307d395924",
+     "session.json": "ccbf4c2ab50850c9da9abae6bf1faa2d5388c648ce6c4d414b4ae325a02abcce",
+     "spec.json": "7d539a9edb20ce39dc890cf796eb273439709ecaabaeb1730fd9096f276458e5"
+    }
+   }
+  },
+  {
+   "role": "original measurement (the session the leaderboard row cites)",
+   "session_dir": "sessions/holdout-P20",
+   "session_id": "ECBS1h685271327a8a",
+   "spec_id": "ECS1h50dfa1822284",
+   "records": 1008,
+   "records_sha256": "9754f196068270bba8b44fe1dda0b147dc4f277ce70cfdac22a744d7a216fc15",
+   "env_class_id": "ECBENV3hc4d998f5ae3f",
+   "binary_sha256": "bf5eec6d61fbe83a7e6911bf73d05d847cc0ab23fd6db3342290a26b9f3807d9",
+   "validator_audit": {
+    "path": "validation/second-host/verify-original-session.audit.json",
+    "sha256": "08687504e6ec61fc6670ed3970f0e5d84e6cbde5efc7b278a490fa2945afe39a",
+    "ok": true,
+    "verified_records": 1008,
+    "replays": 672,
+    "replays_identical": 672,
+    "files": {
+     "host.json": "8552135c7f0843517135f279e7e8b9cfd72678fe59cc3ff7c6bebaa9670ba462",
+     "plan.json": "4774a71ca304e9d7832004ab03cdb802ac41f7203e819354186ad9205169a0a8",
+     "records.jsonl": "9754f196068270bba8b44fe1dda0b147dc4f277ce70cfdac22a744d7a216fc15",
+     "session.json": "1980d379ef18af7662800ab3ec853dfb8d40e565d42626d0592cd73c1ac13d00",
+     "spec.json": "e5f640d0ee37936f38cecbd9c279ec81ba26646da0285eb81ffafc1909820ce2"
+    },
+    "note": "fresh same-host re-audit at this snapshot; the earlier same-host certificate is ../../replay-certificate.json"
+   }
+  }
+ ],
+ "independence": {
+  "replayer": "Validator subagent (claude-opus-5-5), separate from the producer session that launched the EKS job and wrote second-host/README.md and second-host/tools/match_records.py (the latter not read or run by the validator)",
+  "second_host_class_distinct": true,
+  "host_facts": {
+   "original": {
+    "cpu_vendor": "GenuineIntel",
+    "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpu_signature": "6/207/2",
+    "kernel_release": "6.18.44-fc-v185",
+    "virtualization": {
+     "cpu_flag": "hypervisor",
+     "systemd_detect_virt_vm": "kvm"
+    },
+    "logical_cpus": 4
+   },
+   "second_host": {
+    "cpu_vendor": "AuthenticAMD",
+    "cpu_model": "AMD EPYC 9R45",
+    "cpu_signature": "26/2/1",
+    "kernel_release": "6.18.54-121.166.amzn2023.x86_64",
+    "virtualization": {
+     "cpu_flag": "hypervisor",
+     "dmi_product": "c8a.2xlarge",
+     "dmi_vendor": "Amazon EC2"
+    },
+    "logical_cpus": 8
+   }
+  },
+  "env_class_ids": {
+   "original": "ECBENV3hc4d998f5ae3f",
+   "second_host": "ECBENV2h3a51beea0bc2",
+   "note": "the two ids come from different class-id schemes (ECBENV3 in bf5eec6d, ECBENV2 in the older 583e62f0 build), so their inequality alone proves nothing; distinctness rests on the host facts above (Intel Xeon 6/207/2 under KVM vs AMD EPYC 9R45 on an EC2 c8a.2xlarge, different kernels)"
+  },
+  "binaries": {
+   "original": {
+    "sha256": "bf5eec6d61fbe83a7e6911bf73d05d847cc0ab23fd6db3342290a26b9f3807d9",
+    "source_commit": "0e124fb1b207a76ae9ef88c2bffb1f5b8d92b1b6 (PROTOCOL.md section 12; src/ unchanged to the measurement worktree 7df34ba6)"
+   },
+   "second_host": {
+    "sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9",
+    "source_commit": "cb2ec6873f30b683f7885b53c410d69965f02c20",
+    "built_at": "2026-10-19T17:55:04Z",
+    "provenance": "attested by the task image's build-info.json (image isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581); the validator did not rebuild it"
+   },
+   "ecbench_source_distance": "188 commits touch src/cryptanalysis/ecbench between cb2ec687 and 0e124fb1; the algorithm-seed law in spec.rs is the same in both"
+  },
+  "independent_implementation": false,
+  "independent_scalar_check": true,
+  "statement": "Every one of the 1,008 original records was re-executed on a different host class by a different ecbench build and reproduced identically in every counted, band-priced and outcome field. The comparison and the [d]G = Q check are the validator's own code (stdlib Python). Both hosts ran ecbench, so this is not an independent-implementation replication."
+ },
+ "spec_identity": {
+  "frozen_spec": {
+   "path": "specs/holdout-P20.json",
+   "sha256": "e5f640d0ee37936f38cecbd9c279ec81ba26646da0285eb81ffafc1909820ce2",
+   "equals_original_session_spec": true,
+   "frozen_sha256_still_matches": true
+  },
+  "second_host_spec": {
+   "path": "second-host/eks-results/session/spec.json",
+   "sha256": "7d539a9edb20ce39dc890cf796eb273439709ecaabaeb1730fd9096f276458e5",
+   "equals_input_spec_and_request_spec": true
+  },
+  "fields_that_differ": {
+   "label": "descriptive; enters spec_id only",
+   "measurement.rounds": [
+    2,
+    5
+   ],
+   "measurement.isolation_required": [
+    "L0",
+    "L2"
+   ]
+  },
+  "note": "Three fields differ, not two as second-host/README.md says: the label also changed. None of the three enters a workload, a target or an algorithm seed (spec.rs plan: seed = derive_u64(domain, [measurement.seed, workload id, round]))."
+ },
+ "seed_law": {
+  "receipt": "validation/second-host/seed-law.json",
+  "script": "validation/second-host/seed_law.py",
+  "result": [
+   {
+    "records": "sessions/holdout-P20/records.jsonl",
+    "checked": 1008,
+    "mismatches": 0
+   },
+   {
+    "records": "second-host/eks-results/session/records.jsonl",
+    "checked": 2016,
+    "mismatches": 0
+   }
+  ]
+ },
+ "record_match": {
+  "receipt": "validation/second-host/record-compare.json",
+  "script": "validation/second-host/compare_records.py",
+  "pairing_key": "(arm, workload_id, round, warmup)",
+  "original_records": 1008,
+  "original_records_with_partner": 1008,
+  "algorithm_seed_mismatches": 0,
+  "pairs_identical_on_strict_field_set": 1008,
+  "strict_field_set": [
+   "arm",
+   "role",
+   "round",
+   "warmup",
+   "algorithm_seed",
+   "method",
+   "workload",
+   "outcome.status",
+   "outcome.recovered",
+   "outcome.matches_target",
+   "cost",
+   "boundaries",
+   "counters",
+   "phases(no wall_ns, no work_native)",
+   "factor_base",
+   "field_ops",
+   "solver",
+   "detail",
+   "unpriced_counts"
+  ],
+  "priced_s_mismatches_at_w_0_0.1_1": 0,
+  "records_with_uncounted_unpriced_counter": {},
+  "records_with_calibration_pinned_units": 0,
+  "fields_that_differ_on_some_pair": [
+   "binary_sha256",
+   "env_class_id",
+   "isolation.after",
+   "isolation.before",
+   "isolation.blockers[0]",
+   "isolation.foreign_busy_ticks",
+   "isolation.idle_sibling_busy_ticks",
+   "isolation.level",
+   "isolation.node",
+   "isolation.placement",
+   "isolation.run_cpu",
+   "isolation.steal_ticks",
+   "online.phases_ns",
+   "online.wall_ns",
+   "phases[factor_base].wall_ns",
+   "phases[linear_algebra].wall_ns",
+   "phases[oracle_setup].wall_ns",
+   "phases[relations].wall_ns",
+   "phases[verify].wall_ns",
+   "record_id",
+   "session_id",
+   "time.hw_solve",
+   "time.involuntary_switches",
+   "time.max_rss_kib",
+   "time.minor_faults",
+   "time.process_wall_ns",
+   "time.schedstat_solve",
+   "time.solve_wall_ns",
+   "time.sys_ns",
+   "time.user_ns",
+   "time.voluntary_switches"
+  ],
+  "fields_only_in_original": [
+   "allocator.name",
+   "allocator.pre_solve_trim",
+   "allocator.trim_result",
+   "isolation.after",
+   "isolation.before",
+   "isolation.reserved",
+   "phases[factor_base].work_native",
+   "phases[linear_algebra].work_native",
+   "phases[oracle_setup].work_native",
+   "phases[relations].work_native",
+   "time.solve",
+   "work.bitops",
+   "work.bitops_per_sqrt_r",
+   "work.complete",
+   "work.floor_bitops",
+   "work.known_uncounted",
+   "work.log2_bitops",
+   "work.per_target_bitops",
+   "work.phases[0]",
+   "work.phases[1]",
+   "work.phases[2]",
+   "work.phases[3]",
+   "work.phases[4]",
+   "work.ratio_to_floor",
+   "work.reusable_bitops",
+   "work.schema",
+   "work.unit",
+   "work.unpriced",
+   "work.widths"
+  ],
+  "fields_only_in_second_host": [
+   "isolation.after",
+   "isolation.before",
+   "isolation.blockers[1]",
+   "isolation.blockers[2]",
+   "isolation.reserved[0]"
+  ],
+  "reading": "The differing fields are identity (record_id, session_id, binary_sha256, env_class_id), host observations (isolation.*, time.*) and wall clocks (online.wall_ns, online.phases_ns, phases[].wall_ns). Fields only in the original are the newer build's bitop/v1 `work` block, phases[].work_native, the allocator block and time.solve. No field that band.rs (unpriced_counts, calibrated_native, priced_gae, priced_s), compare.rs (match_pairs, run_s) or the outcome depends on differs or is missing.",
+  "second_host_rounds_1_2_equal_original_band_exactly": true
+ },
+ "scalar_check": {
+  "method": "validator's own affine arithmetic (compare_records.py): a, b derived from G and a target, every target on the curve, [r]G = O, [d]G = Q for every verified record",
+  "second_host": {
+   "p": 803441,
+   "a": 232725,
+   "b": 341758,
+   "r": 804007,
+   "j_invariant": 109888,
+   "p_prime": true,
+   "r_prime": true,
+   "trace": -565,
+   "rG_is_identity": true,
+   "G_and_all_targets_on_curve": true,
+   "targets": 48,
+   "verified_records_checked": 2016,
+   "failures": []
+  },
+  "original": {
+   "p": 803441,
+   "a": 232725,
+   "b": 341758,
+   "r": 804007,
+   "j_invariant": 109888,
+   "p_prime": true,
+   "r_prime": true,
+   "trace": -565,
+   "rG_is_identity": true,
+   "G_and_all_targets_on_curve": true,
+   "targets": 48,
+   "verified_records_checked": 1008,
+   "failures": []
+  }
+ },
+ "analysis_rerun": {
+  "binary_sha256": "bf5eec6d61fbe83a7e6911bf73d05d847cc0ab23fd6db3342290a26b9f3807d9",
+  "commands": "validation/second-host/compare/commands.log",
+  "byte_compare_with_second_host_analysis": [
+   "IDENTICAL compare-inc__inc-aa-w0.1.json",
+   "IDENTICAL compare-inc__inc-aa-w0.json",
+   "IDENTICAL compare-inc__inc-aa-w1.json",
+   "IDENTICAL compare-inc__sel-w0.1.json",
+   "IDENTICAL compare-inc__sel-w0.json",
+   "IDENTICAL compare-inc__sel-w1.json",
+   "IDENTICAL compare-rho-neg__inc-w0.1.json",
+   "IDENTICAL compare-rho-neg__inc-w0.json",
+   "IDENTICAL compare-rho-neg__inc-w1.json",
+   "IDENTICAL compare-rho-neg__sel-w0.1.json",
+   "IDENTICAL compare-rho-neg__sel-w0.json",
+   "IDENTICAL compare-rho-neg__sel-w1.json",
+   "IDENTICAL band.md"
+  ],
+  "extra": "rho-neg-aa vs rho-neg compares at w = 0, 0.1, 1 (not in the producer's analysis) give exactly 1.0 over 240 pairs"
+ },
+ "ratios_second_host_240_pairs": {
+  "0": {
+   "sel/inc": {
+    "ratio": 0.8364170531754714,
+    "ci95_cluster_bootstrap": [
+     0.8064021105570519,
+     0.8660634281836213
+    ],
+    "pairs": 240,
+    "same_seeds": true,
+    "unpaired_runs": 0,
+    "validator_stdlib_recompute": 0.8364170531754712
+   },
+   "sel/rho-neg": {
+    "ratio": 7.9522720696688065,
+    "ci95_cluster_bootstrap": [
+     7.30526075400282,
+     8.644893916412563
+    ],
+    "pairs": 240,
+    "same_seeds": true,
+    "unpaired_runs": 0,
+    "validator_stdlib_recompute": 7.952272069668805
+   },
+   "inc/rho-neg": {
+    "ratio": 9.507544160509248,
+    "ci95_cluster_bootstrap": [
+     8.745861461384234,
+     10.328962016237789
+    ],
+    "pairs": 240,
+    "same_seeds": true,
+    "unpaired_runs": 0,
+    "validator_stdlib_recompute": 9.507544160509248
+   },
+   "inc-aa/inc": {
+    "ratio": 1.0,
+    "ci95_cluster_bootstrap": [
+     1.0,
+     1.0
+    ],
+    "pairs": 240,
+    "same_seeds": true,
+    "unpaired_runs": 0,
+    "validator_stdlib_recompute": 1.0
+   },
+   "rho-neg-aa/rho-neg": {
+    "ratio": 1.0,
+    "ci95_cluster_bootstrap": [
+     1.0,
+     1.0
+    ],
+    "pairs": 240,
+    "same_seeds": true,
+    "unpaired_runs": 0,
+    "validator_stdlib_recompute": 1.0
+   }
+  },
+  "0.1": {
+   "sel/inc": {
+    "ratio": 0.8166378371406973,
+    "ci95_cluster_bootstrap": [
+     0.7861367893322674,
+     0.8469761804724445
+    ],
+    "pairs": 240,
+    "same_seeds": true,
+    "unpaired_runs": 0,
+    "validator_stdlib_recompute": 0.8166378371406968
+   },
+   "sel/rho-neg": {
+    "ratio": 8.237899570382032,
+    "ci95_cluster_bootstrap": [
+     7.558102748582131,
+     8.967488910694774
+    ],
+    "pairs": 240,
+    "same_seeds": true,
+    "unpaired_runs": 0,
+    "validator_stdlib_recompute": 8.237899570382028
+   },
+   "inc/rho-neg": {
+    "ratio": 10.08758007004118,
+    "ci95_cluster_bootstrap": [
+     9.268979575885949,
+     10.974512943289788
+    ],
+    "pairs": 240,
+    "same_seeds": true,
+    "unpaired_runs": 0,
+    "validator_stdlib_recompute": 10.08758007004118
+   },
+   "inc-aa/inc": {
+    "ratio": 1.0,
+    "ci95_cluster_bootstrap": [
+     1.0,
+     1.0
+    ],
+    "pairs": 240,
+    "same_seeds": true,
+    "unpaired_runs": 0,
+    "validator_stdlib_recompute": 1.0
+   },
+   "rho-neg-aa/rho-neg": {
+    "ratio": 1.0,
+    "ci95_cluster_bootstrap": [
+     1.0,
+     1.0
+    ],
+    "pairs": 240,
+    "same_seeds": true,
+    "unpaired_runs": 0,
+    "validator_stdlib_recompute": 1.0
+   }
+  },
+  "1": {
+   "sel/inc": {
+    "ratio": 0.746060262094452,
+    "ci95_cluster_bootstrap": [
+     0.7138072151741669,
+     0.7785934369624194
+    ],
+    "pairs": 240,
+    "same_seeds": true,
+    "unpaired_runs": 0,
+    "validator_stdlib_recompute": 0.7460602620944513
+   },
+   "sel/rho-neg": {
+    "ratio": 9.620189133190149,
+    "ci95_cluster_bootstrap": [
+     8.76541875513979,
+     10.54744204328265
+    ],
+    "pairs": 240,
+    "same_seeds": true,
+    "unpaired_runs": 0,
+    "validator_stdlib_recompute": 9.620189133190141
+   },
+   "inc/rho-neg": {
+    "ratio": 12.894654255117294,
+    "ci95_cluster_bootstrap": [
+     11.782889542099717,
+     14.120134555087278
+    ],
+    "pairs": 240,
+    "same_seeds": true,
+    "unpaired_runs": 0,
+    "validator_stdlib_recompute": 12.894654255117297
+   },
+   "inc-aa/inc": {
+    "ratio": 1.0,
+    "ci95_cluster_bootstrap": [
+     1.0,
+     1.0
+    ],
+    "pairs": 240,
+    "same_seeds": true,
+    "unpaired_runs": 0,
+    "validator_stdlib_recompute": 1.0
+   },
+   "rho-neg-aa/rho-neg": {
+    "ratio": 1.0,
+    "ci95_cluster_bootstrap": [
+     1.0,
+     1.0
+    ],
+    "pairs": 240,
+    "same_seeds": true,
+    "unpaired_runs": 0,
+    "validator_stdlib_recompute": 1.0
+   }
+  }
+ },
+ "ratios_original_96_pairs_validator_recompute": {
+  "0": {
+   "sel/inc": 0.8180336744036392,
+   "sel/rho-neg": 7.747581791100991,
+   "inc/rho-neg": 9.470981493211895
+  },
+  "0.1": {
+   "sel/inc": 0.7978369244854301,
+   "sel/rho-neg": 8.022975228231527,
+   "inc/rho-neg": 10.05590864750462
+  },
+  "1": {
+   "sel/inc": 0.7261189561674933,
+   "sel/rho-neg": 9.35295900931523,
+   "inc/rho-neg": 12.88075311885645
+  }
+ },
+ "launch": {
+  "job": "pbo-p20-xhost-20261029",
+  "job_uid": "b3207fe0-32b1-47b5-a9fb-da09e7ea8282",
+  "pod_uid": "e2064a35-dae6-4576-b8b8-883baa19858b",
+  "launcher": "isolab-experiment-launcher:7569b7f7-fc24-4096-a62a-7a76bf46947e",
+  "results_uri": "s3://isolab-results-104186811093-us-east-2/runs/pbo-p20-xhost-20261029/e2064a35-dae6-4576-b8b8-883baa19858b/",
+  "request_sha256": "cc72e6be9647049e373515d46503c0daafdfc380f63d73abaac4cb967a8944ff",
+  "s3_recheck": "validation/second-host/provenance-checks.txt"
+ },
+ "caveats": [
+  "Form: a new session from the frozen spec on another host class, matched record by record to the original, plus a local `ecbench verify --replay-all` of the new session. It is not an `ecbench verify --replay-all` receipt of the original session's bytes produced on the second host; a `vs_rho` claim through `ecbench claim build --independent-receipt` would need that form.",
+  "Not an independent implementation: both hosts ran ecbench (builds 0e124fb1 and cb2ec687). The validator's [d]G = Q check and stdlib band recompute are the implementation-independent checks.",
+  "The second-host binary's source revision is attested by its image, not rebuilt by the validator.",
+  "The bitop/v1 `work` and phase `work_native` fields are absent from the older build's records, so no bitop/v1 figure is covered by this replay. Wall times are host observations and are not compared.",
+  "Rounds 3-5 add 144 target-round pairs per arm on the same curve with seeds the original never ran. They are post-freeze data, consistent with the frozen 96-pair reading, and do not replace it."
+ ],
+ "files_sha256": {
+  "validation/second-host/build_certificate.py": "33f959f24e5b2f5b92803a63f95a63d534e000e918bd65bcc8168fa8b3bad3a1",
+  "validation/second-host/compare/band-second-host.json": "c548de5f426bcc0c9e597386f0f05c10c002062bda5004057479f7b45a32c5a6",
+  "validation/second-host/compare/band-second-host.md": "f85decf60b74ba78bd8b2f36c758b908f3b7cc63f7a513e167a71340467a665b",
+  "validation/second-host/compare/byte-compare.txt": "13e111b8359ed393de2891936d630f7885e6658e320ffe4283d40a5376c6eeee",
+  "validation/second-host/compare/commands.log": "7f886e4824a0cb0f3be6f6eca3a7f246ad235da9da133c78ebb1182eea156656",
+  "validation/second-host/compare/compare-inc__inc-aa-w0.1.json": "3672f53918da4e707c4b2d2b251561cabc6e7a010a7a50cf0be48bd0f927a497",
+  "validation/second-host/compare/compare-inc__inc-aa-w0.json": "6edfc867f1ab07d88e4fb2d8a8a2de8302e48305bfc72e916e221b927e7acba6",
+  "validation/second-host/compare/compare-inc__inc-aa-w1.json": "ab4b3ae05a373203e466dd4d013f37995414003c28784b37c222437f8c1e5279",
+  "validation/second-host/compare/compare-inc__sel-w0.1.json": "87aefae8f82de2de220d9b5e9cc5975cfb08a5e4bf098fd06814a2656e8d06d5",
+  "validation/second-host/compare/compare-inc__sel-w0.json": "462aeaac6033c190ea7c90a6443d35eb4d6228d8844d39fa010b6b02c939de1a",
+  "validation/second-host/compare/compare-inc__sel-w1.json": "a3337735ca6dcb6a929f23de3b6f565e2b85cea469767026df55a70774953e9e",
+  "validation/second-host/compare/compare-rho-neg__inc-w0.1.json": "1251ef9090beca7b26374906bd248502849ebd51478f65bdf2b681a9a1bf0962",
+  "validation/second-host/compare/compare-rho-neg__inc-w0.json": "b1844d6f9ff6f362aa0c986a4327ca7d27429c5cf386b66f348f34072ebface9",
+  "validation/second-host/compare/compare-rho-neg__inc-w1.json": "9e3184004bafe99d9b1fb06ac0f7a4c87be33a7d35a2be946bd03364bafc0496",
+  "validation/second-host/compare/compare-rho-neg__rho-neg-aa-w0.1.json": "961199e60ac184653f970e497490f62ff3844c46aa1cc87d7b01d4bcffe98efd",
+  "validation/second-host/compare/compare-rho-neg__rho-neg-aa-w0.json": "36bf44e1ccad9614e13de3dbb3594e891c997bbc301664276cbc05f187536a7c",
+  "validation/second-host/compare/compare-rho-neg__rho-neg-aa-w1.json": "bb3f46afacc4046cbedfe40a503251526425849c7f0d2cd02eb587ecb56de322",
+  "validation/second-host/compare/compare-rho-neg__sel-w0.1.json": "cba3d1e659d09f820b56706752df070b5498156355a3b9894afb316b9dc1fb5e",
+  "validation/second-host/compare/compare-rho-neg__sel-w0.json": "386b5b67c340a0e46847d5e6595245705a4d4c3bfe4a03441269b1af7a1bd831",
+  "validation/second-host/compare/compare-rho-neg__sel-w1.json": "ec15e411fd8ad0f1d2545a6a0fff6d855c55c359654468c687098af2f5cdbe45",
+  "validation/second-host/compare_records.py": "d2f83fbfaf262de29503677ab0fbfb8af547f7d8b9105ac63c362010a67c349e",
+  "validation/second-host/provenance-checks.txt": "65a667216945d5a1b7ef9e9081ea19a33294d9d5283c29b862c6894aa9bb8e17",
+  "validation/second-host/record-compare.json": "89b69e5f2a7110e5f8b86dc9952e24b806f515dca14134c50935aca4cdcf0842",
+  "validation/second-host/second-host-session-files.before.sha256": "9878455c76cffe77ccdb29d8be87f523aabfd435ee4e504ad97657d59b0dcab2",
+  "validation/second-host/seed-law.json": "529906edfed31e5a06d9bdf12ca8aaa1da3b0dd7663ea5c3520e144d6458577c",
+  "validation/second-host/seed_law.py": "2d9994188460c119e943a337d5bb881c98de64a56241c00b59d13af0e23ff82d",
+  "validation/second-host/update_validation_json.py": "db8fd32f1dcfd94e0c5b6ecac0a909257b719b980682db68035565355ff282e4",
+  "validation/second-host/verify-original-session.audit.json": "08687504e6ec61fc6670ed3970f0e5d84e6cbde5efc7b278a490fa2945afe39a",
+  "validation/second-host/verify-original-session.log": "74b3912abb09f412a68d2db3f21595b93e622c37b12ca1848001b22a2b0a84de",
+  "validation/second-host/verify-original-session.stderr": "8ec1e882018f850383a3ba9765683165668aba1427bf73f7d1c23a5789c24ff2",
+  "validation/second-host/verify-second-host-session.audit.json": "48cce122114a86401a288e4d97a9af7f43439f7180b7b68d18a1b4110ae658ad",
+  "validation/second-host/verify-second-host-session.log": "3d8839291df5d3d074bb92f5340cd68ff7fa74e4b870323f994707d84e882788",
+  "validation/second-host/verify-second-host-session.stderr": "a66219645746599d3492d62606fd0e342f2272b0668d496bbff4051e872675e5",
+  "second-host/eks-results/session/records.jsonl": "a9bce342f9910287721eecb3c8e27239c7d8642e7e7b06456d80fc307d395924",
+  "second-host/eks-results/session/session.json": "ccbf4c2ab50850c9da9abae6bf1faa2d5388c648ce6c4d414b4ae325a02abcce",
+  "second-host/eks-results/session/spec.json": "7d539a9edb20ce39dc890cf796eb273439709ecaabaeb1730fd9096f276458e5",
+  "second-host/eks-results/session/plan.json": "78337b820dcd7c978a58312d40245d4c06eeef63f6fc8853226ead48e020a1aa",
+  "second-host/eks-results/session/host.json": "22c01e5cfa3e4664447c82403fd268acbc54016ba943a1470892056a84236a9b",
+  "second-host/eks-results/audit.json": "e59fe6bae8500c6ffdefb022e987ac6860ee0328244490c66f89eb0ca37fd9f4",
+  "second-host/eks-results/SHA256SUMS": "4378eb34ac0f96b5754b8e30068c8e1b3d5651398297b61ecdf4d781618617e0",
+  "second-host/eks-results/build-info.json": "49ac9a0bfc0fbe064e3c793393adf599dea344d9e7350b4d2c1a7d086bb16138",
+  "second-host/eks-results/l2-gate.json": "8084a0552f15a8bcda13e2ea6fefef6992679c3d8e592267cabba0aa572171cf",
+  "second-host/launch/request.json": "4cf9306c35cf04cc76feb567148cbda575fac895a0f4a314c1a0990792c7cd6e",
+  "second-host/launch/validated-request.json": "cc72e6be9647049e373515d46503c0daafdfc380f63d73abaac4cb967a8944ff",
+  "second-host/launch/result.json": "ea7e437153e4cfde777a37d3409a99169a03a27d8cf8129d538001c515acca5d",
+  "sessions/holdout-P20/records.jsonl": "9754f196068270bba8b44fe1dda0b147dc4f277ce70cfdac22a744d7a216fc15",
+  "sessions/holdout-P20/session.json": "1980d379ef18af7662800ab3ec853dfb8d40e565d42626d0592cd73c1ac13d00",
+  "sessions/holdout-P20/spec.json": "e5f640d0ee37936f38cecbd9c279ec81ba26646da0285eb81ffafc1909820ce2",
+  "specs/holdout-P20.json": "e5f640d0ee37936f38cecbd9c279ec81ba26646da0285eb81ffafc1909820ce2",
+  "select/FROZEN.sha256": "3d4461e9455d6cd2df387852b348516ec7eeb09655ef5e91b47435d88be37445"
+ }
+}

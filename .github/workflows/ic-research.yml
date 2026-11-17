@@ -1,0 +1,61 @@
+name: ic research framework
+on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
+    paths:
+      - "src/bin/ic.rs"
+      - "src/bin/ic/**"
+      - "tests/ic_*.rs"
+      - "Cargo.toml"
+      - "docs/ic/**"
+      - ".github/workflows/ic-research.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+# A newer push to the same pull request cancels this workflow's run for the older commit.
+# Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
+concurrency:
+  group: ${{ github.event_name == 'push' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+
+jobs:
+  validate-cli:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-research.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-research.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    # A cold release build of `ic` alone takes about 6 minutes; whole runs
+    # took 7-10 minutes in October 2026 and a 10-minute limit cancelled
+    # passing runs mid-test.
+    timeout-minutes: 25
+    steps:
+      - name: Free hosted runner disk before Rust installation
+        if: runner.os == 'Linux' && runner.environment == 'github-hosted'
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h .
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install native zlib linker dependency
+        shell: bash
+        run: |
+          if ! command -v pkg-config >/dev/null || ! pkg-config --exists zlib; then
+            if [ "$(id -u)" -eq 0 ]; then
+              apt-get update
+              apt-get install -y --no-install-recommends pkg-config zlib1g-dev
+            else
+              sudo apt-get update
+              sudo apt-get install -y --no-install-recommends pkg-config zlib1g-dev
+            fi
+          fi
+      - name: Build ic
+        run: cargo build --release --features ic-cli-contracts --bin ic
+      - name: Parameter and synthetic pipeline checks
+        env:
+          IC_TEST_BINARY: ${{ github.workspace }}/target/release/ic
+        # Run all three existing suites against the freshly built production CLI.
+        run: cargo test --release --features ic-cli-contracts --bin ic
+      - name: Inspect supplied example documents
+        run: |
+          target/release/ic inspect --file docs/ic/prime-example.json --json
+          target/release/ic inspect --file docs/ic/binary-example.json --json

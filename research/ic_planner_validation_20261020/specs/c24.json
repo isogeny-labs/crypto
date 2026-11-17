@@ -1,0 +1,124 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "ic planner validation, prime_search bits=24 seed=3: the plan against one-change neighbours",
+  "description": "research/ic_planner_validation_20261020/PROTOCOL.md. plan = ic plan (ic-planner/1) output for this curve; every other IC arm changes one stage.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 24,
+        "seed": 3
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261021
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "plan",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=113",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "half-base",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=57",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "double-base",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=226",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "rootfind",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=113",
+          "oracle": "rootfind-subtract:m=2",
+          "linalg": "incremental-gauss",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "full-rank",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=113",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss-full-rank",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "random-targets",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=113",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss",
+          "targets": "random"
+        }
+      }
+    },
+    {
+      "name": "plan-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=113",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss",
+          "targets": "walk"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261022,
+    "isolation_required": "L2",
+    "timeout_seconds": 1800
+  }
+}

@@ -1,0 +1,42 @@
+The tool printed `status: completed`, every command line ends `succeeded`, and no line ends with FAILED or MISSING. Verbatim output:
+
+```
+card: CARD-BLINDSPOT-10-16-r2 (sha256 7a33c50993e54c0b5c7edb9ddbf8aec395fae5a536891146160a2fb2f32953f3)
+commit: 5cd610150dd329c45651ea93273ad4e4c42f160c
+receipt: research/blindspots_20261018/10-kernel-program-search/raw-r2/receipt-card-16-r2.json sha256 ebaab059fe1f8d4418642340369c870e51594bad151ead63435d0469f87047e4
+status: completed
+command 1 (make-bin-dir): ["mkdir", "-p", "target/blindspots-10/card-16-r2"] exit 0 (0.002 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "target/blindspots-10/card-16-r2/b10", "examples/blindspots_10_kernel_search.rs"] exit 0 (6.684 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (finalists-n31): ["prlimit", "--as=4294967296", "target/blindspots-10/card-16-r2/b10", "finalists", "--n", "31", "--state", "research/blindspots_20261018/10-kernel-program-search/raw-r2/state"] exit 0 (0.013 s) succeeded
+  stdout sha256 9f86775cba2559857a7d771b750bda67d2e3bef7961ec49aff2bd80454ae4f01; last 1 lines:
+    {"b":{"idx":94,"genes":[22,1,0,0,1,1,0,2,1,0],"name":"affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0","q01_train":3.143458e2,"start_q01":4.162218e3,"evaluations":256,"infinite_fitness":10,"families_visited":21,"curve":[[1,4.162218e3],[2,3.236700e3],[4,3.204135e3],[8,7.744119e2],[16,6.695728e2],[32,6.608179e2],[64,3.434846e2],[128,3.143458e2],[256,3.143458e2]]},"c":{"idx":216,"genes":[21,1,0,0,0,0,1,4,0,0],"name":"affine-aligned-s1|lift1|stop0|root0|q0|sqt0|pm1|ab4|bt0|gc0","q01_train":3.620940e2,"start_q01":2.744779e3,"evaluations":256,"infinite_fitness":72,"families_visited":24,"curve":[[1,2.744779e3],[2,6.537287e2],[4,6.537287e2],[8,6.537287e2],[16,6.327502e2],[32,6.327502e2],[64,6.238039e2],[128,5.029295e2],[256,3.620940e2]]},"p":{"idx":64,"genes":[22,1,0,0,1,1,0,2,1,0],"name":"affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0","q01_train":3.143458e2,"start_q01":1.550499e4,"evaluations":256,"infinite_fitness":5,"families_visited":19,"curve":[[1,1.550499e4],[2,3.289697e3],[4,1.216286e3],[8,7.625871e2],[16,6.136539e2],[32,6.136539e2],[64,3.434846e2],[128,3.143458e2],[256,3.143458e2]]}}
+command 4 (ablate-n31): ["prlimit", "--as=4294967296", "target/blindspots-10/card-16-r2/b10", "ablate", "--n", "31", "--ell", "9", "--state", "research/blindspots_20261018/10-kernel-program-search/raw-r2/state", "--out", "research/blindspots_20261018/10-kernel-program-search/raw-r2/ablate-n31.jsonl"] exit 0 (145.347 s) succeeded
+  stdout sha256 1f22d413005accb25561873d6488abaa080ec292d81121ab12abe7e31b304092; last 20 lines:
+    ablate n=31 B-only-fam             affine-aligned-s2|lift0|stop0|root0|q0|sqt0|pm0|ab0|bt0|gc0 q01=1.7010e3 phi=1.000
+    ablate n=31 B-revert-lift          affine-aligned-s2|lift0|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0 q01=1.4019e3 phi=0.896
+    ablate n=31 B-only-lift            sub-low|lift1|stop0|root0|q0|sqt0|pm0|ab0|bt0|gc0          q01=8.7099e2 phi=1.000
+    ablate n=31 B-revert-quartic       affine-aligned-s2|lift1|stop0|root0|q0|sqt1|pm0|ab2|bt1|gc0 q01=3.6124e2 phi=0.896
+    ablate n=31 B-only-quartic         sub-low|lift0|stop0|root0|q1|sqt0|pm0|ab0|bt0|gc0          q01=4.0259e3 phi=1.000
+    ablate n=31 B-revert-sqtab         affine-aligned-s2|lift1|stop0|root0|q1|sqt0|pm0|ab2|bt1|gc0 q01=3.5856e2 phi=0.896
+    ablate n=31 B-only-sqtab           sub-low|lift0|stop0|root0|q0|sqt1|pm0|ab0|bt0|gc0          q01=4.0560e3 phi=1.000
+    ablate n=31 B-revert-abort         affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab0|bt1|gc0 q01=4.2397e2 phi=1.000
+    ablate n=31 B-only-abort           sub-low|lift0|stop0|root0|q0|sqt0|pm0|ab2|bt0|gc0          q01=3.4154e3 phi=0.896
+    ablate n=31 B-revert-batch         affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt0|gc0 q01=3.5671e2 phi=0.896
+    ablate n=31 B-only-batch           sub-low|lift0|stop0|root0|q0|sqt0|pm0|ab0|bt1|gc0          q01=4.0772e3 phi=1.000
+    ablate n=31 C                      affine-aligned-s1|lift1|stop0|root0|q0|sqt0|pm1|ab4|bt0|gc0 q01=3.3946e2 phi=0.333
+    ablate n=31 C-revert-fam           sub-low|lift1|stop0|root0|q0|sqt0|pm1|ab4|bt0|gc0          q01=8.9053e2 phi=0.250
+    ablate n=31 C-only-fam             affine-aligned-s1|lift0|stop0|root0|q0|sqt0|pm0|ab0|bt0|gc0 q01=1.5494e3 phi=1.000
+    ablate n=31 C-revert-lift          affine-aligned-s1|lift0|stop0|root0|q0|sqt0|pm1|ab4|bt0|gc0 q01=1.3249e3 phi=0.292
+    ablate n=31 C-only-lift            sub-low|lift1|stop0|root0|q0|sqt0|pm0|ab0|bt0|gc0          q01=8.7099e2 phi=1.000
+    ablate n=31 C-revert-pairs         affine-aligned-s1|lift1|stop0|root0|q0|sqt0|pm0|ab4|bt0|gc0 q01=3.1842e2 phi=0.333
+    ablate n=31 C-only-pairs           sub-low|lift0|stop0|root0|q0|sqt0|pm1|ab0|bt0|gc0          q01=8.1363e3 phi=1.000
+    ablate n=31 C-revert-abort         affine-aligned-s1|lift1|stop0|root0|q0|sqt0|pm1|ab0|bt0|gc0 q01=8.8571e2 phi=1.000
+    ablate n=31 C-only-abort           sub-low|lift0|stop0|root0|q0|sqt0|pm0|ab4|bt0|gc0          q01=3.8464e3 phi=0.250
+  output research/blindspots_20261018/10-kernel-program-search/raw-r2/ablate-n31.jsonl: 5abd345c59119b7bf99812855ff7c1f761c264d5d32ce98fb0da714e29fbbda5
+command 5 (remove-bin): ["rm", "-f", "target/blindspots-10/card-16-r2/b10"] exit 0 (0.006 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 6 (remove-bin-dir): ["rmdir", "target/blindspots-10/card-16-r2"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+```

@@ -1,0 +1,121 @@
+{
+  "branch": "claude/f4-f5-algorithm-speed-bvp7qd",
+  "closed_utc": "2026-11-14T23:31:45+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/home/user/crypto/research/ic_gw_fasthash_20261114/run-local.sh",
+        "/tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/fh/bins",
+        "/tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/fh/runs",
+        "/tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/wf/timing.lock"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-14T22:08:06+00:00",
+      "wall_s": 4219.516
+    }
+  ],
+  "commit": "9d4e6aebc5f9e802b881e079aea1c00a83de3c45",
+  "commit_dirty": false,
+  "created_utc": "2026-11-14T22:08:00+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261114-ic-gw-fasthash"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261114T2208Z-ic-gw-fasthash",
+  "metrics": [
+    {
+      "baseline": 100.0,
+      "better": "lower",
+      "n": 6,
+      "name": "hash_relations_cpu_pct_q4194271",
+      "note": "HASH/REF relations.cpu, geomean over seeds of pass-means, L0, pcc:unverified; frozen rule: not supported (A/A floor 20.7%)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 62.9
+    },
+    {
+      "baseline": 100.0,
+      "better": "lower",
+      "n": 6,
+      "name": "combo_relations_cpu_pct_q4194271",
+      "note": "COMBO/REF relations.cpu, geomean, L0, pcc:unverified; frozen rule: supported",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 46.3
+    },
+    {
+      "baseline": 100.0,
+      "better": "lower",
+      "n": 6,
+      "name": "combo_total_cpu_pct_q4194271",
+      "note": "COMBO/REF total CPU (DL record), geomean, L0, pcc:unverified",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 79.6
+    },
+    {
+      "baseline": 100.0,
+      "better": "lower",
+      "n": 6,
+      "name": "hash_total_cpu_pct_q4194271",
+      "note": "HASH/REF total CPU, geomean, L0, pcc:unverified",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 85.8
+    },
+    {
+      "baseline": 100.0,
+      "better": "lower",
+      "n": 6,
+      "name": "hash_rss_pct_q4194271",
+      "note": "peak VmHWM HASH/REF, COMBO also 100.0, pcc:unverified",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 100.0
+    }
+  ],
+  "problem": "ic:quartic-dl-ghs-weak",
+  "raw": [
+    {
+      "bytes": 61969,
+      "path": "research/ic_gw_fasthash_20261114/runs-fasthash-20261114.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d9/d9d301a42050b5073f10a8f330eb8e31cbc3c4144bc71dbf9706d2482c01b897",
+      "sha256": "d9d301a42050b5073f10a8f330eb8e31cbc3c4144bc71dbf9706d2482c01b897",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261114-ic-gw-fasthash/REPORT.pdf",
+    "png": [
+      "benchmarks/20261114-ic-gw-fasthash/fasthash.png"
+    ],
+    "svg": [
+      "benchmarks/20261114-ic-gw-fasthash/fasthash.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-gw-fasthash",
+  "status": "measured",
+  "summary": "fast hashing (HASH) and HASH + compiled sqrt (COMBO) at c_D=1.7, L0: counted fields identical; relations.cpu COMBO 0.43-0.56 of REF (supported, A/A floor 0.207), HASH 0.59-0.92 (not supported under the frozen floor); total CPU at k=22 COMBO 0.80, HASH 0.86; pcc:unverified",
+  "validation": null
+}

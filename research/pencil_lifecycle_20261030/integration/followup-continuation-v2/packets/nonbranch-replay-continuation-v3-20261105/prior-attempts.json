@@ -1,0 +1,30 @@
+{
+  "schema": "norm-replay-attempt-budget/v1",
+  "campaign_ceiling_seconds": 46800,
+  "absolute_deadline": "2026-11-06T04:00:00Z",
+  "attempt_number": 3,
+  "total_attempt_ceiling": 3,
+  "conservative_debit_seconds": 1200,
+  "remaining_before_attempt_seconds": 45600,
+  "this_attempt_ceiling_seconds": 2400,
+  "automatic_retries": 0,
+  "charges": [
+    {
+      "attempt": 1,
+      "seconds": 300,
+      "status": "pre_custody_timeout"
+    },
+    {
+      "attempt": 2,
+      "seconds": 900,
+      "status": "full_pre_passed_outer_gc_false_failure_no_compiler"
+    }
+  ],
+  "old_clock_recovery": "source preserved; admission window expired without execution",
+  "bindings": {
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/nonbranch-replay-run-20261105/result.json": "4f5884cb2fe5202f5af5089662d81bbf64a311e2164b6253e65c3328d67255a4",
+    "/home/ec2-user/pencil-native-nonbranch-t1637-v2-20261105/pre-receipt.json": "8b96e3d0b992ee36efe0ffaa181190fc663582399c0443a4ecd1ce480b68eb11",
+    "/home/ec2-user/pencil-native-nonbranch-t1637-v2-20261105.outer/pre-outer-exit.json": "38e7c7eb94106029395944f5995fa254a38a0b6f0b7da8c188ebf339711d6e12"
+  },
+  "pcc": "unverified"
+}

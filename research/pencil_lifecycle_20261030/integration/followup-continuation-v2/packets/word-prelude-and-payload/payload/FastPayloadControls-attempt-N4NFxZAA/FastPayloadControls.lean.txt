@@ -1,0 +1,36 @@
+import FastPayloadPolynomial
+import FastPreludeControls
+set_option autoImplicit false
+namespace FastPayloadControls
+open FastPayload FastPrelude Polynomial
+open FastPreludeControls
+noncomputable def curve : (ZMod (17:UInt64).toNat)[X] := X^5-X^4-X^3+1
+
+theorem literal_payload : slope0 17 sample=12 ∧ slope1 17 sample=8 ∧ inverseLead 17 sample=13 := by decide
+
+theorem curve_degree : curve.natDegree=5 := by
+ have h1 : ((X:(ZMod (17:UInt64).toNat)[X])^5-X^4).natDegree=5 := by
+  rw [natDegree_sub_eq_left_of_natDegree_lt (by simp)];simp
+ have h2 : ((X:(ZMod (17:UInt64).toNat)[X])^5-X^4-X^3).natDegree=5 := by
+  rw [natDegree_sub_eq_left_of_natDegree_lt (by rw [h1];simp),h1]
+ unfold curve
+ rw [natDegree_add_eq_left_of_natDegree_lt (by rw [h2];simp),h2]
+
+theorem complete_word_to_monic :
+ ∃ q, curve-(decodedV 17 small)^2=sourceU 17 small*q ∧ q.natDegree=2 ∧
+ (C ((inverseLead 17 small).toNat : ZMod (17:UInt64).toNat)*q).Monic := by
+ apply source_payload_quotient 17 small (by decide) (by decide)
+  (by unfold Inputs.canonical;decide) (by decide) (by decide) curve curve_degree
+ · refine ⟨X^3-X^2-X,?_⟩
+   norm_num [small,FastCRT.support,FastCRT.delta,curve]
+   ring
+ · refine ⟨X^3-X^2-2*X,?_⟩
+   norm_num [small,FastCRT.support,FastCRT.delta,curve]
+   ring
+
+theorem smallest_prime_payload : slope0 3 small=0 ∧ slope1 3 small=2 ∧ inverseLead 3 small=2 := by decide
+
+theorem missing_negation_differs : inverseLead 17 sample ≠ (leadRatio 17 sample*leadRatio 17 sample)%17 := by decide
+
+theorem source_guard_required : ¬ s1Word 17 ⟨0,0,0,1,0,1,0,2⟩≠0 := by decide
+end FastPayloadControls

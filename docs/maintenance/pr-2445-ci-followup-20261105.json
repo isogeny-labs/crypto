@@ -1,0 +1,15 @@
+{
+  "schema": "pr-maintenance/v1",
+  "pr": 2445,
+  "standing": "unverified",
+  "date": "2026-11-05",
+  "parent": "3f17c646ef5e39f3c200948413e365ab5f72f7da",
+  "change": "Restore an inline nondraft-PR scheduling expression compatible with the separate site test. The complete 12-state event/draft truth table is identical; no test or trigger is removed.",
+  "observed_ci": "Current-head CI parse jobs and all 65 rho-status tests passed; site job 127163635224 failed a second inline-spelling assertion.",
+  "new_validation": "Current-head CI pending; no local pass claimed; exact benchmark inputs unchanged",
+  "sources": [
+    "scripts/site/test_build.py:544",
+    "job 127163635224",
+    "65 passing rho-status tests in the same job"
+  ]
+}

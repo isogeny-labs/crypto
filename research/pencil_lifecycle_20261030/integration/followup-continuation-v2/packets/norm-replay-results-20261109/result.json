@@ -1,0 +1,385 @@
+{
+  "schema": "norm.native-archival-review/v1",
+  "recorded_machine_status": "passed",
+  "source_fidelity": "faithful_scoped_conditional_nonbranch_norm_and_explicit_Q_controls",
+  "independent_kernel_replay": false,
+  "runtime_rerun": false,
+  "freeze_sha256": "aeb16950dcb1e318e12d4c31768bc8e1198f96276ccc6b981fcf13b8a5e33306",
+  "source_hashes": {
+    "Nonbranch": "ef72bcbfc9ea3643ae126dfeba644c2a34a999cb34254f8b17357ddd31d6f9e1",
+    "IndependentControls": "448d5ab601e955b93a9071d6b5f932b38850f5728c9cf2c3fc3eb5b3742bb35d",
+    "Readback": "1cf95c5e60a634a8817b2dbb948c887bd7f1044630676f1089eb5dac5f14c8b2",
+    "ExpectedFailure": "d734382f5c0fdc1d3846ec0cc07d2c9ea1eb951cd47576fef6d67cf410059165"
+  },
+  "readback_names": 30,
+  "readback_axioms": [
+    {
+      "name": "ActualNonbranchNorm.affine_curve",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ActualNonbranchNorm.germ_curve",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ActualNonbranchNorm.point_scalar",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ActualNonbranchNorm.point_affine_eval",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ActualNonbranchNorm.scalar_unit",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ActualNonbranchNorm.numerator_nonunit",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ActualNonbranchNorm.stalk_norm",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ActualNonbranchNorm.concrete_norm_order",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ActualNonbranchNorm.source_norm_identity",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ActualNonbranchNorm.source_actual_norm_order",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.coefficients",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.numerator_value",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.residual_value",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.determinant_nonzero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.valid_first",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.valid_second",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.bezout",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.separable",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.point_plus",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.point_minus",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.branch_plus",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.branch_minus_false",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.exact_source_identity",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.selected_nonunit",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.selected_order",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.rho_unit_iff",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.conjugate_unit",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.conjugate_order_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.conjugate_product_nonunit",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "IndependentNonbranch.conjugate_order_unequal",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/home/ec2-user/pencil-native-nonbranch-successor-20261109/Nonbranch.olean",
+        "/home/ec2-user/pencil-native-nonbranch-successor-20261109/Nonbranch.lean"
+      ],
+      "end_seconds": 101.79505445202813,
+      "exit": 0,
+      "expected_exit": 0,
+      "module": "Nonbranch",
+      "pgid": 4049752,
+      "pid": 4049752,
+      "reaped": true,
+      "remaining_group": [],
+      "start_seconds": 0.266047308978159
+    },
+    {
+      "argv": [
+        "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/home/ec2-user/pencil-native-nonbranch-successor-20261109/IndependentControls.olean",
+        "/home/ec2-user/pencil-native-nonbranch-successor-20261109/IndependentControls.lean"
+      ],
+      "end_seconds": 139.9326791469939,
+      "exit": 0,
+      "expected_exit": 0,
+      "module": "IndependentControls",
+      "pgid": 4056780,
+      "pid": 4056780,
+      "reaped": true,
+      "remaining_group": [],
+      "start_seconds": 101.83528993598884
+    },
+    {
+      "argv": [
+        "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/home/ec2-user/pencil-native-nonbranch-successor-20261109/Readback.olean",
+        "/home/ec2-user/pencil-native-nonbranch-successor-20261109/Readback.lean"
+      ],
+      "end_seconds": 188.1416806189809,
+      "exit": 0,
+      "expected_exit": 0,
+      "module": "Readback",
+      "pgid": 4058920,
+      "pid": 4058920,
+      "reaped": true,
+      "remaining_group": [],
+      "start_seconds": 139.9687604070059
+    },
+    {
+      "argv": [
+        "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/home/ec2-user/pencil-native-nonbranch-successor-20261109/ExpectedFailure.olean",
+        "/home/ec2-user/pencil-native-nonbranch-successor-20261109/ExpectedFailure.lean"
+      ],
+      "end_seconds": 217.06700817600358,
+      "exit": 1,
+      "expected_exit": 1,
+      "module": "ExpectedFailure",
+      "pgid": 4060942,
+      "pid": 4060942,
+      "reaped": true,
+      "remaining_group": [],
+      "start_seconds": 188.18062164698495
+    }
+  ],
+  "phases": [
+    {
+      "phase": "pre",
+      "elapsed_seconds": 164.83639216498705,
+      "limit_seconds": 900,
+      "native_elapsed_seconds": 164.50646329298615,
+      "manager_cpu_nsec": [
+        7195339000
+      ],
+      "invocation": "8017f5cc341c425e9c6a9211c9e4f253",
+      "manager_start_success_join": true
+    },
+    {
+      "phase": "compiler",
+      "elapsed_seconds": 217.6436788199935,
+      "limit_seconds": 600,
+      "native_elapsed_seconds": 217.3664777050144,
+      "manager_cpu_nsec": [
+        14594382000
+      ],
+      "invocation": "2bf519deee9e4a2d87f08d88bc7eeef7",
+      "manager_start_success_join": true
+    },
+    {
+      "phase": "post",
+      "elapsed_seconds": 32.08078653505072,
+      "limit_seconds": 900,
+      "native_elapsed_seconds": 31.809887909970712,
+      "manager_cpu_nsec": [
+        4405432000
+      ],
+      "invocation": "f6cdf34847814dc1b780e95e8e715eb7",
+      "manager_start_success_join": true
+    }
+  ],
+  "outer_elapsed_seconds": 414.67755899898475,
+  "caller_elapsed_seconds": 414.78407207201235,
+  "charged_worker_seconds": 2400,
+  "dependency_files": 16736,
+  "dependency_bytes": 3111892318,
+  "pre_post_dictionary_equal": true,
+  "pre_hash_manifest_sha256": "bd79b0566f9d19dbf1bdecbc1e94cd5dd119bffcf3f0bb639b9d921ff41ed2ad",
+  "post_hash_manifest_sha256": "bd79b0566f9d19dbf1bdecbc1e94cd5dd119bffcf3f0bb639b9d921ff41ed2ad",
+  "expected_failure": "one unsolved False goal, exit1, empty stderr",
+  "warning": "Nonbranch has two letI style warnings; retained stdout",
+  "trust": "Pinned shared caches; pre/post equality does not exclude transient concurrent change. No independent binary/kernel rechecker. Reviewer did not rerun Lean; no validated_scoped formal promotion."
+}

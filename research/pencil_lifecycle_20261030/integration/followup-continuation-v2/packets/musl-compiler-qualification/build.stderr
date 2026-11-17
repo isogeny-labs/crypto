@@ -1,0 +1,5 @@
+src/unistd/getcwd.c: In function 'getcwd':
+cc1: warning: function may return address of local variable [-Wreturn-local-addr]
+src/unistd/getcwd.c:9:14: note: declared here
+    9 |         char tmp[buf ? 1 : PATH_MAX];
+      |              ^~~

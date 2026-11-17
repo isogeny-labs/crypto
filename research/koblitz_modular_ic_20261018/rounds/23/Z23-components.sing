@@ -1,0 +1,74 @@
+// Append to frozen original CM22 circuit prefix and saved closure declaration.
+LIB "primdec.lib";
+ideal original=nn[49],nn[53],nn[239],nn[241],nn[243];
+ideal registeredUnits=nn[1],nn[12],nn[2],nn[2],nn[20],nn[37],nn[65],nn[75];
+ring zb=(2,a),(v),lp;
+minpoly=a5+a4+a3+a2+1;
+number ua=a;
+poly rn=(ua+1)*v+1;
+poly cn=rn+ua^3;
+poly bp=rn*cn/ua^7;
+poly cp=cn/ua^4;
+poly ec=v2+v+ua^3+ua;
+poly de=bp+cp*(1+cp)^3;
+poly selector=gcd(ec,de);
+print("BEGIN_Z23_FIBER");
+print("BASE_POINT_SELECTOR");selector;
+if(deg(selector)!=1){ERROR("Z5 selector is not unique");}
+number vv=leadcoef(subst(selector,v,0))/leadcoef(selector);
+number bb=leadcoef(subst(bp,v,vv));
+number cc=leadcoef(subst(cp,v,vv));
+print("SELECTED_V_B_C");vv;bb;cc;
+print("BASE_POINT_AND_DISCRIMINANT_RESIDUALS");subst(ec,v,vv);bb+cc*(1+cc)^3;
+if(subst(ec,v,vv)!=0 || bb+cc*(1+cc)^3!=0){ERROR("wrong Z5 point");}
+ring zz=(2,a),(n,l),lp;
+minpoly=a5+a4+a3+a2+1;
+number bz=imap(zb,bb);
+number cz=imap(zb,cc);
+map sp=r,n,l,bz,cz;
+ideal oz=sp(original);
+ideal czIdeal=sp(source);
+ideal uz=sp(registeredUnits);
+ideal O=std(oz);
+ideal C=std(czIdeal);
+print("ORIGINAL_FIBER_BASIS_DIMENSION_LENGTH");O;dim(O);vdim(O);
+print("CLOSURE_FIBER_BASIS_DIMENSION_LENGTH");C;dim(C);vdim(C);
+print("ORIGINAL_REGISTERED_UNIT_ENTRIES");uz;
+int k;
+for(k=1;k<=8;k++){
+  print("ORIGINAL_UNIT_"+string(k)+"_VANISHING_LENGTH");
+  vdim(std(O+ideal(uz[k])));
+  print("CLOSURE_UNIT_"+string(k)+"_VANISHING_LENGTH");
+  vdim(std(C+ideal(uz[k])));
+}
+if(dim(C)!=0 || dim(O)!=0){ERROR("Z5 fiber not zero dimensional");}
+LIB "elim.lib";
+list saturation=sat_with_exp(C,ideal(uz[7]));
+ideal keep=std(saturation[1]);
+ideal vanish=std(quotient(C,keep));
+list originalSaturation=sat_with_exp(O,ideal(uz[7]));
+ideal originalKeep=std(originalSaturation[1]);
+ideal originalVanish=std(quotient(O,originalKeep));
+print("COMPLETE_SATURATION_EXPONENTS");saturation[2];originalSaturation[2];
+print("CLOSURE_KEEP_BASIS_LENGTH");keep;vdim(keep);
+print("CLOSURE_VANISH_BASIS_LENGTH");vanish;vdim(vanish);
+print("ORIGINAL_KEEP_BASIS_LENGTH");originalKeep;vdim(originalKeep);
+print("ORIGINAL_VANISH_BASIS_LENGTH");originalVanish;vdim(originalVanish);
+print("COMPONENT_INTERSECTION_RESIDUALS");
+ideal ci=std(intersect(keep,vanish));ideal oi=std(intersect(originalKeep,originalVanish));
+reduce(ci,C);reduce(C,ci);reduce(oi,O);reduce(O,oi);
+if(size(reduce(ci,C))!=0 || size(reduce(C,ci))!=0 || size(reduce(oi,O))!=0 || size(reduce(O,oi))!=0){ERROR("component intersection mismatch");}
+print("COMPONENT_COMAXIMALITY");std(keep+vanish);std(originalKeep+originalVanish);
+if(std(keep+vanish)[1]!=1 || std(originalKeep+originalVanish)[1]!=1){ERROR("components not comaximal");}
+print("CLOSURE_KEEP_RADICAL");ideal kr=std(radical(keep));kr;vdim(kr);
+print("CLOSURE_VANISH_RADICAL");ideal vr=std(radical(vanish));vr;vdim(vr);
+print("RESIDUE_ELIMINANT_FACTORIZATIONS");factorize(kr[1]);factorize(vr[1]);
+print("LAMBDA_NU_UNIT_CHECKS_AT_BOTH_RESIDUES");std(kr+ideal(l));std(kr+ideal(n));std(vr+ideal(l));std(vr+ideal(n));
+for(k=1;k<=8;k++){
+ print("REGISTERED_UNIT_"+string(k)+"_KEEP_VANISH_QUOTIENT_LENGTHS");
+ vdim(std(keep+ideal(uz[k])));vdim(std(vanish+ideal(uz[k])));
+ print("REGISTERED_UNIT_"+string(k)+"_ON_REDUCED_RESIDUES");reduce(uz[k],kr);reduce(uz[k],vr);
+}
+print("COMPONENT_LENGTH_SUM_CONTROLS");vdim(keep)+vdim(vanish);vdim(C);vdim(originalKeep)+vdim(originalVanish);vdim(O);
+if(vdim(keep)+vdim(vanish)!=vdim(C) || vdim(originalKeep)+vdim(originalVanish)!=vdim(O)){ERROR("component length mismatch");}
+print("Z23_COMPONENTS_ALL_CHECKS_PASS");print("END_Z23_COMPONENTS");quit;

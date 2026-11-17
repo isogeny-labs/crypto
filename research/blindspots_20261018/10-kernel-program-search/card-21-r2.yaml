@@ -1,0 +1,68 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-10-21-r2
+experiment_id: BLINDSPOT-10
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/10-kernel-program-search/raw-r2/receipt-card-21-r2.json
+binds:
+  - {path: examples/blindspots_10_kernel_search.rs, sha256: f69bbce49c64a6ff05670fa07ea615ce913f3eb35a5f94597220ca7f363fdb80}
+  - {path: research/blindspots_20261018/10-kernel-program-search/raw-r2/state/n31-b.jsonl, sha256: 8d4e27e9d36d102cb0c94d0bcf8b5994b95f71f0cc9fdd85c8e2632729883e91}
+  - {path: research/blindspots_20261018/10-kernel-program-search/raw-r2/state/n31-c.jsonl, sha256: f7f22c991be995a08f4dfb8c1adbf234a253f3a21d8475b97429811764468692}
+  - {path: research/blindspots_20261018/10-kernel-program-search/raw-r2/state/n31-p.jsonl, sha256: a6f3566c1796da78ad15bdf799f72215b0cd433efde84d0eb9d5e1dfca812557}
+  - {path: research/blindspots_20261018/10-kernel-program-search/raw-r2/state/n37-b.jsonl, sha256: 0641a9866993504371be0e7c79db28b3d2a39888d4fac905b1495a9314e91f48}
+  - {path: research/blindspots_20261018/10-kernel-program-search/raw-r2/state/n37-c.jsonl, sha256: c01d966899abfab436ff2f39df2024c92969062e97a8b7a92f22a40fb492cca2}
+  - {path: research/blindspots_20261018/10-kernel-program-search/raw-r2/state/n41-b.jsonl, sha256: 42b9f8e603eec6a9014171a9ef2bf66b73903696655bfd671344d254cbdc3ab9}
+  - {path: research/blindspots_20261018/10-kernel-program-search/raw-r2/state/n41-c.jsonl, sha256: 91ace09040b79f3013f49e1375fd0d14ea2b4659d65156f905ab4c03598150ca}
+commands:
+  - id: make-bin-dir
+    argv: ["mkdir", "-p", "target/blindspots-10/card-21-r2"]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+  - id: build
+    argv: ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "target/blindspots-10/card-21-r2/b10", "examples/blindspots_10_kernel_search.rs"]
+    timeout_seconds: 40
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/10-kernel-program-search/raw-r2/card-21-r2-build.stdout.log
+    stderr: research/blindspots_20261018/10-kernel-program-search/raw-r2/card-21-r2-build.stderr.log
+  - id: finalists-n31
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-10/card-21-r2/b10", "finalists", "--n", "31", "--state", "research/blindspots_20261018/10-kernel-program-search/raw-r2/state"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/10-kernel-program-search/raw-r2/card-21-r2-finalists-n31.stdout.log
+  - id: finalists-n37
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-10/card-21-r2/b10", "finalists", "--n", "37", "--state", "research/blindspots_20261018/10-kernel-program-search/raw-r2/state"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/10-kernel-program-search/raw-r2/card-21-r2-finalists-n37.stdout.log
+  - id: finalists-n41
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-10/card-21-r2/b10", "finalists", "--n", "41", "--state", "research/blindspots_20261018/10-kernel-program-search/raw-r2/state"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/10-kernel-program-search/raw-r2/card-21-r2-finalists-n41.stdout.log
+  - id: conserve-19-7
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-10/card-21-r2/b10", "conserve", "--n", "19", "--ell", "7", "--targets", "3000", "--families", "1", "--skip-other", "1", "--out", "research/blindspots_20261018/10-kernel-program-search/raw-r2/conserve-19-7.jsonl", "--states", "research/blindspots_20261018/10-kernel-program-search/raw-r2/state"]
+    timeout_seconds: 300
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/10-kernel-program-search/raw-r2/conserve-19-7.log
+    outputs: [research/blindspots_20261018/10-kernel-program-search/raw-r2/conserve-19-7.jsonl]
+  - id: remove-bin
+    argv: ["rm", "-f", "target/blindspots-10/card-21-r2/b10"]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: ["rmdir", "target/blindspots-10/card-21-r2"]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-10
+background: false
+write_scope:
+  - research/blindspots_20261018/10-kernel-program-search/raw-r2/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with timeout 600000."

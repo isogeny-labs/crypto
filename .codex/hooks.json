@@ -1,0 +1,87 @@
+{
+  "hooks": {
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "command": "conductor hook checkpoint --harness codex",
+            "timeout": 30,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "conductor hook pre-tool --auto-reserve --harness codex",
+            "timeout": 15,
+            "type": "command"
+          }
+        ],
+        "matcher": "^(apply_patch|Edit|Write)$"
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "command": "conductor hook session-end --harness codex",
+            "timeout": 3,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "conductor hook session-start",
+            "timeout": 15,
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'exec python3 \"$(git rev-parse --show-toplevel)/scripts/relay.py\" --runtime codex session-start'",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'exec python3 \"$(git rev-parse --show-toplevel)/tools/goal_brief.py\" --hook-json'",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "command": "conductor hook checkpoint --harness codex",
+            "timeout": 30,
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'exec python3 \"$(git rev-parse --show-toplevel)/scripts/relay.py\" --runtime codex snapshot'",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}

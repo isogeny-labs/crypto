@@ -1,0 +1,23 @@
+{
+  "schema": "tr04.artifact-routing-regression/v1",
+  "dependency": "minimatch@9.0.3",
+  "source": "actions/download-artifact@v4 src/download-artifact.ts blob5cc6b1704fb5ef0d4487ed63d910d4f8a9f2fbd2",
+  "old_pattern": "tr04-p*-40973940936-1",
+  "old_includes_preflight": true,
+  "fixed_pattern": "tr04-p[0-9]*-40973940936-1",
+  "accepted_expected": [
+    "tr04-p7-40973940936-1",
+    "tr04-p11-40973940936-1",
+    "tr04-p19-40973940936-1"
+  ],
+  "rejected_unrelated": [
+    "tr04-preflight-40973940936-1",
+    "tr04-summary-40973940936-1",
+    "tr04-delivery-40973940936-1",
+    "tr04-p7-40973940936-2",
+    "tr04-p7-40973940937-1"
+  ],
+  "unexpected_numeric_shard_retained_for_native_rejection": true,
+  "passed": true,
+  "scientific_execution": false
+}

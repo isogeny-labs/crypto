@@ -1,0 +1,41 @@
+{
+  "kind": "local-document-byte-and-visual-review/v1",
+  "date_utc": "2026-10-29T03:49:28.566Z",
+  "render_command": "MPLCONFIGDIR=/tmp/nist-generator-matplotlib XDG_CACHE_HOME=/tmp/nist-generator-fontcache python3 research/nist_skip_criterion_20261025/generator_b_20261029/render.py",
+  "renderer_source_sha256": "54a940627131c9fa1162b3154a664c248fe949d3de5840dd4a55d02cf2e4e49a",
+  "render_exit_status": 0,
+  "pdfs": [
+    {
+      "path": "REPORT.pdf",
+      "sha256": "34d649355e151629ccdb522cc7ab37e01fc29979f12c249b3ecf7bce948a47c3",
+      "bytes": 128284,
+      "pages": 3,
+      "all_pages_visually_inspected": true,
+      "text_readback_checked": true
+    },
+    {
+      "path": "reports/development/REPORT.pdf",
+      "sha256": "a5ee770fe61d3babbda9785a8ef59d0dda9c7acb1b4f15254d3f18b592e5eeac",
+      "bytes": 75687,
+      "pages": 1,
+      "all_pages_visually_inspected": true,
+      "text_readback_checked": true
+    }
+  ],
+  "actual_new_curve_results": false,
+  "remote_delivery_claimed": false,
+  "development_render_errors": [
+    {
+      "attempt": "001",
+      "reason": "svglib unavailable; replaced SVG import with installed matplotlib raster/vector export"
+    },
+    {
+      "attempt": "002",
+      "reason": "ReportLab StyleSheet1 does not support item assignment; removed unused alias assignment"
+    },
+    {
+      "attempt": "staged-diff-check",
+      "reason": "Matplotlib SVG path lines have trailing whitespace. Renderer now strips line endings; plotted geometry and recorded values are unchanged."
+    }
+  ]
+}

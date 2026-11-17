@@ -1,0 +1,45 @@
+import Inverse
+set_option autoImplicit false
+namespace NormalizationInverse
+open Polynomial MumfordNormalization MumfordValidity
+variable {K : Type*} [Field K]
+
+def forward (a b : K) (P : K×K) : K×K := ((P.1-b)/a,P.2/a^3)
+def backward (a b : K) (P : K×K) : K×K := (a*P.1+b,a^3*P.2)
+def onCurve (f : K[X]) (P : K×K) : Prop := P.2^2=f.eval P.1
+def onSupport (u v : K[X]) (P : K×K) : Prop := u.eval P.1=0 ∧ P.2=v.eval P.1
+
+theorem backward_forward (a b : K) (ha : a≠0) (P : K×K) :
+ backward a b (forward a b P)=P := by
+ apply Prod.ext <;> simp only [backward,forward,Prod.fst,Prod.snd] <;> field_simp <;> ring
+
+theorem forward_backward (a b : K) (ha : a≠0) (P : K×K) :
+ forward a b (backward a b P)=P := by
+ apply Prod.ext <;> simp only [backward,forward,Prod.fst,Prod.snd] <;> field_simp <;> ring
+
+theorem curve_iff (a b : K) (ha : a≠0) (f : K[X]) (P : K×K) :
+ onCurve (T 6 a b f) P ↔ onCurve f (backward a b P) := by
+ unfold onCurve backward
+ rw [eval_transport]
+ have hs : (a^3*P.2)^2=a^6*P.2^2 := by ring
+ rw [hs,eq_div_iff (pow_ne_zero 6 ha)]
+ simp only [mul_comm]
+
+theorem support_iff (d : ℕ) (a b : K) (ha : a≠0) (u v : K[X]) (P : K×K) :
+ onSupport (T d a b u) (T 3 a b v) P ↔ onSupport u v (backward a b P) := by
+ unfold onSupport backward
+ rw [root_transport d a b P.1 ha,eval_transport,eq_div_iff (pow_ne_zero 3 ha)]
+ simp only [mul_comm]
+
+theorem forward_curve_iff (a b : K) (ha : a≠0) (f : K[X]) (P : K×K) :
+ onCurve (T 6 a b f) (forward a b P) ↔ onCurve f P := by
+ rw [curve_iff a b ha,backward_forward a b ha]
+
+theorem forward_support_iff (d : ℕ) (a b : K) (ha : a≠0) (u v : K[X]) (P : K×K) :
+ onSupport (T d a b u) (T 3 a b v) (forward a b P) ↔ onSupport u v P := by
+ rw [support_iff d a b ha,backward_forward a b ha]
+
+theorem point_negation (a b : K) (P : K×K) :
+ forward a b (P.1,-P.2)=((forward a b P).1,-(forward a b P).2) := by
+ simp only [forward,neg_div]
+end NormalizationInverse

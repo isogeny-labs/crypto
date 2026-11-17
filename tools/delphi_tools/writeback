@@ -1,0 +1,261 @@
+#!/usr/bin/env bash
+# Delphi program write-back tool.
+# Argument: path of a delphi.program-round/v1 JSON record (args: file).
+# Writes reports/delphi-programs/<pid>/round-<n>.json and LEDGER.md (a path the
+# lead atlas --delta watches), appends a
+# session-log entry, writes a problem record for a blocked round, then (unless
+# DELPHI_TOOLS_NO_GIT=1) commits on delphi/<pid>-r<n>, pushes and opens a PR.
+# Stdout: one JSON line {program_id, round, files, branch, pr}.
+set -euo pipefail
+here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
+command -v jq >/dev/null || { echo "writeback: jq not on PATH" >&2; exit 3; }
+if [ $# -ne 1 ] || [ ! -f "$1" ]; then
+  echo "usage: writeback <round-record.json>" >&2
+  exit 2
+fi
+rec=$(cd "$(dirname "$1")" && pwd)/$(basename "$1")
+
+root=${DELPHI_TOOLS_ROOT:-$(git rev-parse --show-toplevel)}
+cd "$root"
+
+jq -e 'type == "object"' "$rec" >/dev/null || { echo "writeback: record is not a JSON object" >&2; exit 2; }
+pid=$(jq -r '.program_id // empty' "$rec")
+n=$(jq -r '.round // empty' "$rec")
+[[ $pid =~ ^[A-Za-z0-9_-]{1,40}$ ]] || { echo "writeback: bad or missing program_id" >&2; exit 2; }
+[[ $n =~ ^[0-9]{1,6}$ ]] || { echo "writeback: bad or missing round" >&2; exit 2; }
+
+# With git enabled the files are written in a temporary worktree of
+# origin/main, never in the live checkout: a program's other tools may be
+# running from it, and a branch switch under them would corrupt their runs.
+work=$root
+wt=""
+cleanup() {
+  if [ -n "$wt" ]; then
+    git -C "$root" worktree remove --force "$wt" >/dev/null 2>&1 || true
+  fi
+}
+trap cleanup EXIT
+if [ "${DELPHI_TOOLS_NO_GIT:-}" != 1 ]; then
+  git fetch -q origin main >&2
+  # A rerun of a round builds on its existing branch; a new round starts from main.
+  base=origin/main
+  if git fetch -q origin "delphi/$pid-r$n" 2>/dev/null; then
+    base=FETCH_HEAD
+  fi
+  wt=$(mktemp -d "${TMPDIR:-/tmp}/delphi-writeback.XXXXXX")
+  # Sparse: only the paths this tool writes. A full checkout of this
+  # repository does not fit a typical session's disk allowance (the first live
+  # program run failed here with "No space left on device").
+  git worktree add --quiet --detach --no-checkout "$wt" "$base" >&2
+  git -C "$wt" sparse-checkout set --no-cone "/reports/delphi-programs/$pid/" \
+    "/docs/session-logs/" "/problems/delphi-program-$pid-*" >&2
+  git -C "$wt" checkout --quiet >&2
+  work=$wt
+fi
+cd "$work"
+
+
+date=$(date -u +%F)
+now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+outcome=$(jq -r '.review.outcome // "unknown"' "$rec")
+pdir=reports/delphi-programs/$pid
+round_file=$pdir/round-$n.json
+ledger=$pdir/LEDGER.md
+slog=docs/session-logs/$date.md
+problem=problems/delphi-program-$pid-r$n.md
+files=("$round_file" "$ledger" "$slog")
+
+disc="Everything below is the program reviewer's reading of Delphi's records [pcc:unverified]; a claim listed with status verified cites a verifier run, the rest are unverified assertions."
+
+# 1. Round records: this one, plus every earlier round of the program from its
+# directory (actions/r<k>-0.json), so the ledger is complete even when an
+# earlier round's pull request has not merged yet.
+mkdir -p "$pdir"
+program_dir=$(jq -r '.program_dir // empty' "$rec")
+if [ -n "$program_dir" ] && [ -d "$program_dir/actions" ]; then
+  for f in "$program_dir"/actions/r*-0.json; do
+    [ -f "$f" ] || continue
+    k=${f##*/r}
+    k=${k%-0.json}
+    [[ $k =~ ^[0-9]+$ ]] || continue
+    if [ "$k" != "$n" ] && jq -e --arg p "$pid" '.schema == "delphi.program-round/v1" and .program_id == $p' "$f" >/dev/null 2>&1; then
+      cp "$f" "$pdir/round-$k.json"
+      files+=("$pdir/round-$k.json")
+    fi
+  done
+fi
+cp "$rec" "$round_file"
+
+# 1b. Nearest atlas leads. With DELPHI_TOOLS_ATLAS naming a crypto-autoresearcher
+# checkout, the round file gains atlas_matches: the leads and known results the
+# claim collides with (lead_atlas.py --match), so the atlas review that folds
+# this path in starts from them. Read-only; a failure leaves the key out.
+atlas=${DELPHI_TOOLS_ATLAS:-}
+if [ -n "$atlas" ] && [ -f "$atlas/tools/lead_atlas.py" ]; then
+  claim=$(jq -r '.proposal.claim // empty' "$round_file")
+  if [ -n "$claim" ] && m=$(cd "$atlas" && python3 tools/lead_atlas.py --match "$claim" --json --limit 5 2>/dev/null | "$here/first-json") &&
+    jq -e 'type == "array"' <<<"$m" >/dev/null 2>&1; then
+    jq --argjson m "$m" '. + {atlas_matches: ($m | map({id: .[1], disposition: .[2], title: .[3], score: .[0]}))}' \
+      "$round_file" >"$round_file.tmp" && mv "$round_file.tmp" "$round_file"
+  else
+    echo "writeback: lead_atlas.py --match gave nothing usable; atlas_matches omitted" >&2
+  fi
+fi
+
+# 2. Ledger, regenerated from every round file in deterministic order.
+mapfile -t rounds < <(printf '%s\n' "$pdir"/round-*.json | sort -V)
+jq -rs --arg pid "$pid" '
+  def cell: (. // "") | tostring | gsub("[\r\n]+"; " ") | gsub("\\|"; "\\|");
+  def vcount: ((.claims // []) | map(select(.status == "verified")) | length);
+  def ccount: ((.claims // []) | length);
+  sort_by(.round) as $r
+  | "# Delphi program \($pid)\n\n"
+    + "Goal, as given to the program [pcc:unverified]: \($r[-1].goal | cell)\n\n"
+    + "Regenerated by tools/delphi_tools/writeback from the round-*.json files in this directory. "
+    + "Every entry is a proposal until validated [pcc:unverified]; a claim with status verified cites a verifier run.\n\n"
+    + "| round | claim | goal status | claims verified/total | outcome | next | cost USD |\n"
+    + "|---|---|---|---|---|---|---|\n"
+    + ($r | map("| \(.round) | \(.proposal.claim | cell) | \(.goal_status | cell) | \(vcount)/\(ccount) | \(.review.outcome | cell) | \(.review.next | cell) | \(.cost_usd | cell) |") | join("\n"))
+    + "\n"
+    + ($r | map("\n## Round \(.round)\n\n**Learned.** \(.review.learned | cell) [pcc:unverified]\n\n**Feedback.** \(.review.feedback | cell) [pcc:unverified]\n"
+      + (if (.atlas_matches // []) | length > 0
+         then "\n**Nearest atlas leads** (lead_atlas.py --match on the claim; advance a matching lead instead of filing a duplicate):\n"
+           + ((.atlas_matches) | map("- \(.id) (\(.disposition)): \(.title | cell)") | join("\n")) + "\n"
+         else "" end)) | join(""))
+' "${rounds[@]}" >"$ledger"
+
+# 3. Session-log entry.
+mkdir -p docs/session-logs
+[ -f "$slog" ] || printf '# Session log — %s\n' "$date" >"$slog"
+entry=$(jq -r --arg now "$now" --arg disc "$disc" '
+  def s: if . == null then "" else tostring end;
+  def acts: (.actions // []);
+  (.review.outcome // "unknown") as $o
+  | "## \(.finished_at // $now) — Delphi program \(.program_id) round \(.round): \($o)\n\n"
+    + $disc + "\n\n"
+    + "### What was done (commands, files, features)\n\n"
+    + "- Claim (proposal): \(.proposal.claim | s) [pcc:unverified]\n"
+    + "- Goal directory: \(.goal_dir | s); goal status: \(.goal_status | s); goal rounds: \(.goal_rounds | s)\n"
+    + "- Claims with a passing verifier run: \(((.claims // []) | map(select(.status == "verified")) | length)) of \(((.claims // []) | length))\n"
+    + "- Actions: "
+    + (if (acts | length) == 0 then "none\n"
+       else "\n" + (acts | map("  - #\(.index | s) \(.tool | s): status \(.status | s), verdict \(.verdict // "none")") | join("\n")) + "\n" end)
+    + "- Cost: round \(.cost_usd // "n/a") USD, spent \(.spent_usd // "n/a") of \(.budget_usd // "n/a") USD\n"
+    + "- Files: reports/delphi-programs/\(.program_id)/round-\(.round).json and LEDGER.md\n\n"
+    + "### Decisions made (and why)\n\n"
+    + "- Reviewer-reported learning (proposal): \(.review.learned | s) [pcc:unverified]\n\n"
+    + "### Open threads (unfinished, pick up next time)\n\n"
+    + "- Reviewer feedback: \(.review.feedback | s) [pcc:unverified]\n"
+    + (if .review.next == "continue" then "- Next proposal pending\n" else "- Program status: \(.status | s)\n" end)
+    + "\n### Errors (what went wrong, how it was handled)\n\n"
+    + ((acts | map(select(.status == "failed" or .status == "timeout" or .status == "refused"))
+        | map("- #\(.index | s) \(.tool | s): \(.status) (exit \(.exit | s)) \(.reason | s)")) as $e
+       | if ($e | length) == 0 then "None\n" else ($e | join("\n")) + "\n" end)
+' "$rec")
+if grep -qxF "$(printf '%s\n' "$entry" | head -n 1)" "$slog"; then
+  echo "writeback: session-log entry already present, not appended" >&2
+else
+  printf '\n%s\n' "$entry" >>"$slog"
+fi
+
+# 4. Problem record for a blocked round.
+if [ "$outcome" = blocked ]; then
+  mkdir -p problems
+  files+=("$problem")
+  if [ -e "$problem" ]; then
+    printf '\n- %s: write-back ran again for this round; the block is still reported (finished_at %s).\n' \
+      "$date" "$(jq -r '.finished_at // "unknown"' "$rec")" >>"$problem"
+  else
+    jq -r --arg date "$date" '
+      def s: if . == null then "" else tostring end;
+      def bad: ((.actions // []) | map(select(.status == "failed" or .status == "timeout" or .status == "refused")));
+      "# Delphi program \(.program_id) round \(.round) is blocked\n\n"
+      + "- **Status:** `open` (`open`, `investigating`, `resolved`, or `superseded`)\n"
+      + "- **Kind:** access/tool limit (reported by a Delphi program round)\n"
+      + "- **Affected work:** reports/delphi-programs/\(.program_id)/round-\(.round).json and LEDGER.md\n"
+      + "- **Next action owner:** explicitly unassigned\n"
+      + "- **Last updated:** \($date)\n\n"
+      + "## Problem\n\n"
+      + "The program reviewer reported the round as blocked [pcc:unverified]: \(.review.feedback | s)\n\n"
+      + "Program goal [pcc:unverified]: \(.goal | s)\n\nProposal [pcc:unverified]: \(.proposal.claim | s)\n\n"
+      + "## Evidence and uncertainty\n\n"
+      + "- **Observed:** actions that did not complete, from the round record:\n"
+      + (if (bad | length) == 0 then "  - none recorded\n"
+         else (bad | map("  - #\(.index | s) \(.tool | s) status \(.status) exit \(.exit | s): \(.reason | s)") | join("\n")) + "\n" end)
+      + "- **Derived or proved:** not established\n"
+      + "- **Suspected explanation:** the reviewer text above [pcc:unverified]\n"
+      + "- **Missing capability:** unknown\n"
+      + "- **What this evidence does not establish:** the cause of the block; the reviewer text is a proposal\n\n"
+      + "## What would unblock it\n\n"
+      + "- [ ] The cause is identified and the round is re-run to completion; the owner defines the acceptance check.\n\n"
+      + "## Next discriminating step\n\n"
+      + "- **Action or proof obligation:** triage the failed actions listed above\n"
+      + "- **Inputs and controls:** the round record\n"
+      + "- **Execution limits and stop condition:** existing program budget\n"
+      + "- **Outcomes and next actions:** unassigned\n"
+      + "- **Recheck trigger:** next round of this program\n\n"
+      + "## Resolution and history\n\n"
+      + "- \($date): opened by a Delphi program write-back. Unresolved.\n"
+    ' "$rec" >"$problem"
+  fi
+fi
+
+# 5. Git and PR.
+branch=null
+pr=null
+if [ "${DELPHI_TOOLS_NO_GIT:-}" = 1 ]; then
+  echo "writeback: DELPHI_TOOLS_NO_GIT=1, git and gh skipped" >&2
+else
+  br=delphi/$pid-r$n
+  git checkout -q -B "$br" >&2
+  git add -- "${files[@]}" >&2
+  if git diff --cached --quiet; then
+    echo "writeback: nothing new to commit (the round is already on $br)" >&2
+  else
+    git commit -m "delphi program $pid round $n: $outcome" \
+      -m "Co-Authored-By: Delphi program $pid <noreply@anthropic.com>" -- "${files[@]}" >&2
+  fi
+  branch=$(jq -cn --arg b "$br" '$b')
+  if git push -u origin "$br" >&2; then
+    if command -v gh >/dev/null; then
+      body=$(mktemp)
+      {
+        echo "Ledger row for program $pid:"
+        echo
+        grep -E "^\| $n \|" "$ledger" || true
+        echo
+        echo "Learned (reviewer's reading, unverified):"
+        echo
+        jq -r '.review.learned // ""' "$rec"
+        echo
+        echo "Generated by a Delphi program write-back; the records are proposals until validated."
+      } >"$body"
+      # REST, not gh pr create: some environments (Claude Code sessions among
+      # them) refuse GitHub's GraphQL API, which gh pr create uses.
+      slug=$(git remote get-url origin | sed -E 's#^.*github\.com[:/]([^/]+/[^/]+)$#\1#; s#\.git$##')
+      url="" num=""
+      if resp=$(gh api "repos/$slug/pulls" -f title="delphi program $pid round $n: $outcome" \
+        -f head="$br" -f base=main -F body=@"$body" 2>&1); then
+        url=$(jq -r '.html_url // empty' <<<"$resp")
+        num=$(jq -r '.number // empty' <<<"$resp")
+      else
+        echo "writeback: opening the PR failed: $resp" >&2
+      fi
+      rm -f "$body"
+      if [ -n "$url" ]; then
+        pr=$(jq -cn --arg u "$url" '$u')
+        gh pr merge --auto --merge "$num" >&2 2>/dev/null ||
+          gh api -X PUT "repos/$slug/pulls/$num/ccr/auto_merge" -f merge_method=merge >/dev/null 2>&1 ||
+          echo "writeback: auto-merge could not be enabled (ignored)" >&2
+      fi
+    else
+      echo "writeback: gh not on PATH, PR not opened" >&2
+    fi
+  else
+    echo "writeback: git push failed, PR not opened" >&2
+  fi
+fi
+
+printf '%s\n' "${files[@]}" | jq -R . | jq -cs --arg p "$pid" --argjson n "$n" --argjson b "$branch" --argjson pr "$pr" \
+  '{program_id: $p, round: $n, files: ., branch: $b, pr: $pr}'

@@ -1,0 +1,20 @@
+{
+  "schema": "native-fresh-recovery-check/v1",
+  "checked_source_commit": "cf9b5dd4f9d4d8ecb11e3955f20cdd52085c0b6c",
+  "commit_completion_not_awaited_before_tests": true,
+  "source_binding": "check-lock.sha256 fixed before execution and verified afterward",
+  "build_exit": 0,
+  "test_exit": 0,
+  "build_attempts": 1,
+  "test_attempts": 1,
+  "tests_passed": 3,
+  "dependency_tests_filtered": 25,
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "binary_sha256": "d6d8c7d3f6b9d82894c0741ded4d7b6c45a2431a99f445bbf97ef6eb4d95166a",
+  "build_command": "timeout 120 rustc --edition=2021 --test lib.rs -o unit-tests",
+  "test_command": "timeout 30 ./unit-tests recovery_tests:: --test-threads=1 --nocapture",
+  "fresh_verified_recoveries": 8,
+  "removed_repair_term_rejected": true,
+  "full_cohort_executed": false,
+  "cloud_jobs": 0
+}

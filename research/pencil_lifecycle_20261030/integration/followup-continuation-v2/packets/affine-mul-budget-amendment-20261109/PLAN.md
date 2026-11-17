@@ -1,0 +1,19 @@
+# Affine multiplication bounded replay — source-only runner
+
+Exactly133 prerequisite modules and4 final calls (MulAcceptance, Controls, Readback, ExpectedFailure), preserving the source-closure topological order and historical selected import bodies. The132 original archived sources are preserved, including original NatClassifier import/body. One additional retained Mathlib.Algebra.Field.ZMod source supplies the required Field(ZMod p) instance; both its imports are already baseline-bound. The original proposed Basic import substitution was rejected at source review and is retained under initial-proposal/. The additional source compilation requires independent review. All existing source/receipts remain unchanged.
+
+The reviewed candidate and scalar controls remain exact. names.json retains26 named axiom obligations. The expected-failure module retains the noncanonical stored-word rejection. A failure must be the single unsolved False goal, not syntax/import/resource failure; all positive calls reject sorry warnings. The actual26-name parser also rejects omissions, duplicates and forbidden axioms. No proof assumptions are added.
+
+Finite proposed cap:10200seconds total,900pre+8400 shared compiler+900post,1CPU8GiB/no swap,128 tasks,120seconds per module, one manual attempt/no retry. The shared compiler ceiling prevents multiplying137 by120 into a larger allowance. Partial failures and output hashes are retained. Aggregate output remains capped256MiB and individual files16MiB, as in the predecessor wrapper. These are limits, not predictions of completion.
+
+Sources stage just in time with exclusive file creation. Each local import must already be compiled; each external import must be in the exact current baseline. The4 final modules are not staged before prerequisites. This preserves historical AcceptanceControls selection and prevents a later controls name from replacing an earlier prerequisite. The selected133-module graph has no duplicate module names.
+
+Full standard/runtime custody reuses the exact recovered norm closure (16736files,3111892318bytes), pre and post, plus native runtime shared-library pins. All11 external imported module hashes agree with that baseline, including implicit Init.Data.UInt.Bitwise. A current-byte hash replay has NOT run here. The exact closure/baseline/runtime pins and roots are in freeze.json. Pre/post hashing rejects changes; transient concurrent changes are outside this shared-cache isolation claim.
+
+The launcher derives from the existing bounded branch-v2 wrapper: unique output/unit names, explicit captured InvocationID, cgroup terminal checks and bounded cleanup before any next phase. Compiler failure still requires post-custody when terminal ownership is confirmed. Coordinator maintains the live Conductor lease. A release must bind actual current ledger, publication, independent review, serial prior terminal and lease readback. No fresh allocation or execution is authorized in this packet; release-template.json is false and freeze ledger fields remain null.
+
+Absolute deadline2026-11-10T05:11:39Z and campaign ceiling43200seconds are unchanged. No dollar ceiling is invented; existing owner dollar-facts waiver persists. Exact KB service unavailable; this source preparation uses the retained plan, historical import/source closure and actual declaration files as the accepted fallback. No novelty claim.
+
+After independent review: coordinator fills actual ledger/release bindings, publishes and reads back exact bytes, then invokes launch.py once using the frozen hash and release hash. No testing or compilation was performed during source preparation.
+
+Dotted module names map to actual nested source/olean paths under the private workspace. Field.ZMod stages and compiles before NatClassifier. Logs retain dotted names without altering import resolution.

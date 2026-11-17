@@ -1,0 +1,58 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-sparse-la-timing-20261018-1
+experiment_id: sparse_la_timing_20261018
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 6414d157579798e7072a0006827fd623acc84ad3
+receipt: research/sparse_la_timing_20261018/cards/CARD-sparse-la-timing-20261018-1.receipt.json
+binds:
+  - {path: research/sparse_la_timing_20261018/PROTOCOL.md, sha256: 0b6ee280be73cf406576c89e454daec6ece71217912f4b87784deb8a068934b9}
+  - {path: research/sparse_la_timing_20261018/specs/SPEC-prime-scaling.json, sha256: 867a3a490983979c3932b2c187c9fd73faec1b4e80211bc8f20a8a9d742078ca}
+  - {path: research/sparse_la_timing_20261018/specs/SPEC-fp4-p29.json, sha256: 11a4ccce02616e7867caba3626066b59d411d437a3fc77a4dbe82b129a8d5cc0}
+  - {path: ./target/release/ecbench, sha256: 1ecb215410267fb4895a91f5c4fe5403a357d86da1f2576257298573f1dc43a1}
+must_not_exist:
+  - research/sparse_la_timing_20261018/sessions/prime-scaling
+  - research/sparse_la_timing_20261018/sessions/prime-scaling.audit.json
+  - research/sparse_la_timing_20261018/sessions/fp4-p29
+  - research/sparse_la_timing_20261018/sessions/fp4-p29.audit.json
+commands:
+  - id: run-prime-scaling
+    argv: [./target/release/ecbench, run, --wait, --allow-busy, --cpus, auto, --spec, research/sparse_la_timing_20261018/specs/SPEC-prime-scaling.json, --out, research/sparse_la_timing_20261018/sessions/prime-scaling]
+    cwd: .
+    timeout_seconds: 7200
+    success_exit_codes: [0]
+    stdout: research/sparse_la_timing_20261018/receipts/run-prime-scaling.stdout
+    stderr: research/sparse_la_timing_20261018/receipts/run-prime-scaling.stderr
+  - id: verify-prime-scaling
+    argv: [./target/release/ecbench, verify, --dir, research/sparse_la_timing_20261018/sessions/prime-scaling, --replay-all, --out, research/sparse_la_timing_20261018/sessions/prime-scaling.audit.json]
+    cwd: .
+    timeout_seconds: 7200
+    success_exit_codes: [0]
+    stdout: research/sparse_la_timing_20261018/receipts/verify-prime-scaling.stdout
+    stderr: research/sparse_la_timing_20261018/receipts/verify-prime-scaling.stderr
+    outputs: [research/sparse_la_timing_20261018/sessions/prime-scaling.audit.json]
+  - id: run-fp4-p29
+    argv: [./target/release/ecbench, run, --wait, --allow-busy, --cpus, auto, --spec, research/sparse_la_timing_20261018/specs/SPEC-fp4-p29.json, --out, research/sparse_la_timing_20261018/sessions/fp4-p29]
+    cwd: .
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/sparse_la_timing_20261018/receipts/run-fp4-p29.stdout
+    stderr: research/sparse_la_timing_20261018/receipts/run-fp4-p29.stderr
+  - id: verify-fp4-p29
+    argv: [./target/release/ecbench, verify, --dir, research/sparse_la_timing_20261018/sessions/fp4-p29, --replay-all, --out, research/sparse_la_timing_20261018/sessions/fp4-p29.audit.json]
+    cwd: .
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/sparse_la_timing_20261018/receipts/verify-fp4-p29.stdout
+    stderr: research/sparse_la_timing_20261018/receipts/verify-fp4-p29.stderr
+    outputs: [research/sparse_la_timing_20261018/sessions/fp4-p29.audit.json]
+bus_address: executor-mechanical-sparse-la-timing
+background: true
+write_scope:
+  - research/sparse_la_timing_20261018/sessions/
+  - research/sparse_la_timing_20261018/receipts/
+  - research/sparse_la_timing_20261018/cards/
+stop_when:
+  - Any command in the card exits with a status other than 0.
+  - The tool exits with status 2 and prints an IMPEDIMENT line.

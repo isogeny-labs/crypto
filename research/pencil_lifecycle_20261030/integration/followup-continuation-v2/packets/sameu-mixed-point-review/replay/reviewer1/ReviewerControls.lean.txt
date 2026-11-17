@@ -1,0 +1,24 @@
+import WeightedExtract
+open Polynomial MixedCancellation SameUMixed
+def reviewA : D2 ℚ := ⟨0,-16,0,96,2,3⟩
+def reviewB : D2 ℚ := ⟨0,-81,54,0,3,2⟩
+example : (sourcePoint reviewA reviewB).z≠0 ∧ (sourcePoint reviewA reviewB).w≠0 ∧
+ validPoint (X^5-X+1:ℚ[X]) (sourcePoint reviewA reviewB) := by
+ apply source_point_valid
+ · norm_num [reviewA]
+ · norm_num [reviewA]
+ · norm_num [reviewB]
+ · norm_num [reviewB]
+ · norm_num [validTwo,nq,nr,ns,nt,reviewA,MixedCancellation.support,ordinate]
+   refine ⟨X^3+X,?_⟩;ring
+ · norm_num [validTwo,nq,nr,ns,nt,reviewB,MixedCancellation.support,ordinate]
+   refine ⟨X^3+X-1,?_⟩;ring
+ · norm_num [nq,reviewA,reviewB]
+ · norm_num [nr,reviewA,reviewB]
+ · norm_num [ns,reviewA,reviewB]
+ · norm_num [ns,nt,reviewA,reviewB]
+example : WeightedAdd11.nx (sourcePoint reviewA reviewB)=1 ∧
+ WeightedAdd11.ny (sourcePoint reviewA reviewB)=1 := by
+ norm_num [sourcePoint,sourceK,reviewA,reviewB,WeightedAdd11.nx,WeightedAdd11.ny]
+#print SameUMixed.source_point_valid
+#print SameUMixed.extracted_point_valid

@@ -1,0 +1,17 @@
+card: CARD-BLINDSPOT-15-08 (sha256 dc926c07186ea6d986bb7e850aee4b4ce94852e155cc4b46f3405b33b7f8060a)
+commit: 472e514b22944faef33514b5f9098f16da446262
+receipt: research/blindspots_20261018/15-genus3-la-exponent/raw/receipt-card-08.json sha256 884005caef4dc1111ab039f256a7ffad8bf9675733c4195eb79d8ef17f3110a1
+status: completed
+command 1 (make-dirs): ["mkdir", "-p", "research/blindspots_20261018/15-genus3-la-exponent/raw", "target/blindspots-15/card-08"] exit 0 (0.002 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-o", "target/blindspots-15/card-08/b15", "examples/blindspots_15_genus3_la.rs"] exit 0 (14.806 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (run-b20-c2-r2): [run b20 c2 r2, 259.557 s] exit 0 succeeded
+  output research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c2_r2.jsonl: def811ee5c4a31e9c0ead7e0003f5ba090f9b6a39c53cb1cd7e0ece7983bd4d7
+command 4 (gate0-b20): exit 0 (0.004 s) succeeded
+  stdout sha256 8211b3166bbe5c24e1d30cbe10f7423a70838a55e7c9740dc4753538456d5bd8; last 2 lines:
+    GATE MATCH bits=20 curve=2 arm=r2:lpsgebw2@8
+    GATE OK cells=1
+  output research/blindspots_20261018/15-genus3-la-exponent/raw/card-08-gate0-b20.txt: 8211b3166bbe5c24e1d30cbe10f7423a70838a55e7c9740dc4753538456d5bd8
+command 5 (remove-bin): exit 0 succeeded
+command 6 (remove-bin-dir): exit 0 succeeded

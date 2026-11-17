@@ -1,0 +1,59 @@
+{
+ "schema": "e40-validator-build/v1",
+ "recorded": {
+  "source": "experiments/47_macaulay_entries/binary_sha256.txt and binary_commit.txt",
+  "commit": "9b2a47238b (quartic_pipeline_gls, quartic_pipeline_v4, e40_stage_a, e40_checks v1, e40_tables); 86d0f86c25 (e40_checks_v2)",
+  "binary_sha256": {
+   "quartic_pipeline_gls": "487a674037161ac9bf42d102d2d972c0d47ed28cb6ca836c999484fa6d6969bd",
+   "quartic_pipeline_v4": "7b5fb06d91805d0f2859d4566bec355f22ad2d25e17c04c72156d28f9be06d48",
+   "e40_stage_a": "975d2df772b6dde16c1b40afe47b6822a0458180244aa3aa6fcaa029042bb226",
+   "e40_checks": "55e43e56487dfa6868955ee5657fcac05e552a38ad5de0a41c4ed4fb31bb979e",
+   "e40_tables": "3df317895e34eb45c69a27351bce367ca16eea1324ba9d9e84f8d74f074b8b8c",
+   "e40_checks_v2": "91bbd78e9e20e96ad45b09450ac17f1e818474c5e410ca048c5f641aa9ca3e61"
+  }
+ },
+ "repository_state_at_start": "local branch claude/glv-endomorphism-index-calculus-pe7ige at 4ad9692d5a; remote head af58c1af72 (a merge of main on top of 4ad9692d5a that touches no E40, E37 or E27 path: git diff 4ad9692d5a af58c1af72 over src/cryptanalysis, examples, experiments/{47,44,32}, research/e40_*, the note and Cargo files changes only f4_fp_tower.rs and ic_framework/pkm_semaev.rs); untracked files of E39 and E41 present in the checkout, not read except where named. Records were read from a git archive of af58c1af72, not from the working tree.",
+ "export_1": {
+  "commit": "9b2a47238b",
+  "path": "/dev/shm/e40_src (the producer's recorded source path; it did not exist before)",
+  "method": "one `git archive 9b2a47238b -- <215 paths> | tar -x`; the paths computed by the validator's own commands: Cargo.toml, Cargo.lock, src/, examples/, benches/, the six path dependencies (isogeny_algos, crates/hashed-ecdl-tensor, crates/ecdl-tensor-ic, tools/factor-base, tools/volcano-cli, research/pencil_large_prime_20261029), every `path = \"...\"` of Cargo.toml (44) and every literal include_str!/include_bytes! target present at the commit (171; 11 targets inside archived snapshot directories of the pencil crate are absent at the commit and are not compiled). No producer script was used.",
+  "files": 4409,
+  "blob_check": "git hash-object --no-filters over every exported file against git ls-tree 9b2a47238b: 4,409/4,409 equal"
+ },
+ "build_1": {
+  "command": "cd /dev/shm/e40_src && flock <scratchpad>/build.lock env CARGO_TARGET_DIR=/dev/shm/v40 nice -n 5 cargo build --release --offline -j 2 --example quartic_pipeline_gls --example quartic_pipeline_v4 --example e40_stage_a --example e40_checks --example e40_tables",
+  "target_dir": "/dev/shm/v40, fresh and empty (the producer's differed); nothing reused from any other target directory",
+  "window": "2026-11-02T21:48:03Z - 22:08:36Z, `Finished release profile [optimized] target(s) in 20m 32s`, exit 0, no warnings",
+  "binary_sha256": {
+   "quartic_pipeline_gls": "487a674037161ac9bf42d102d2d972c0d47ed28cb6ca836c999484fa6d6969bd",
+   "quartic_pipeline_v4": "7b5fb06d91805d0f2859d4566bec355f22ad2d25e17c04c72156d28f9be06d48",
+   "e40_stage_a": "975d2df772b6dde16c1b40afe47b6822a0458180244aa3aa6fcaa029042bb226",
+   "e40_checks": "55e43e56487dfa6868955ee5657fcac05e552a38ad5de0a41c4ed4fb31bb979e",
+   "e40_tables": "3df317895e34eb45c69a27351bce367ca16eea1324ba9d9e84f8d74f074b8b8c"
+  },
+  "matches_recorded": true
+ },
+ "build_walks": {
+  "command": "same tree and target directory, `cargo build --release --offline -j 2 --example e27_walk --example e37_walk_e24` (3.89 s; links the crypto_lib of build_1)",
+  "purpose": "replay the matched rho (walk (iii)) from the same crypto_lib build as the IC arms; neither binary has a recorded hash at this commit (E27's and E37's records were produced by earlier builds), so the check is on their outputs",
+  "binary_sha256": {
+   "e27_walk": "e526d8b4e39a816119ac40837f9f4ea334da96d0201aca8abfd06d7c612b1af8",
+   "e37_walk_e24": "66ffc5da03ca144df44448dea46f6c4b86b63799e5c113b367aa8f1a3b150a6b"
+  }
+ },
+ "export_2": {
+  "commit": "86d0f86c25",
+  "method": "the four build-input files that differ from 9b2a47238b over the same path rules (examples/e40_checks.rs, examples/e41_run.rs, examples/e41_tables.rs, src/cryptanalysis/twist24_shortfall.rs) written from `git show 86d0f86c25:<path>` into the same export, after build_1's binaries were copied out; Cargo.toml's paths and the include targets are unchanged between the two commits",
+  "blob_check": "4,411/4,411 build-input files equal their 86d0f86c25 blobs"
+ },
+ "build_2": {
+  "command": "same, `cargo build --release --offline -j 2 --example e40_checks` (copied out as e40_checks_v2)",
+  "window": "2026-11-02T22:09:37Z - 22:25:03Z, `Finished ... in 15m 26s`, exit 0",
+  "binary_sha256": {"e40_checks_v2": "91bbd78e9e20e96ad45b09450ac17f1e818474c5e410ca048c5f641aa9ca3e61"},
+  "matches_recorded": true
+ },
+ "byte_identity": "All six recorded binaries are reproduced byte for byte from clean exports of their recorded commits (same source path, same toolchain, a different target directory). The records were therefore produced by code committed after the pre-registration 5a0dd20af9 (9b2a47238b and 86d0f86c25 both descend from it), and the shared, dirty checkout (E39 and E41 editing it) did not reach the builds.",
+ "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0 (c980f4866 2026-06-30); no .cargo/config, no RUSTFLAGS",
+ "host": "Intel(R) Xeon(R) Processor @ 2.10GHz, 4 vCPU, 15.7 GiB RAM, Linux 6.18.44-fc-v185: the local container, shared with E39's end-to-end runs (load 10-17). Not isolab-eks. Operation counts only; no wall time is compared or claimed.",
+ "cleanup": "/dev/shm/v40 deleted after the builds; /dev/shm/e40_src deleted after the replay"
+}

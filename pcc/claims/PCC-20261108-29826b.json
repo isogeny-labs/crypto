@@ -1,0 +1,36 @@
+{
+ "created_at": "2026-11-08T00:25:35Z",
+ "id": "PCC-20261108-29826b",
+ "kind": "statement",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round53-p192/verification.json",
+    "sha256": "5668f2555dfef427222af5431bb077e36a028d0950b10de094ba3ebc89c77692"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round53-p192/export-verification.json",
+    "sha256": "0327bb50080b90f6ecd43fe344bdfe9ff8ce0a78d258d48440f637e1f9b09161"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round53-p192/report.md",
+    "sha256": "8b581bea7215aad3bec096284156648a96859b275d2d069003591726e7348d59"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Written projection argument, emitted P192 polynomial stream and independently checked finite controls; no P192 quotient evaluation or elimination",
+ "statement": "Round53 compiles a compact quartic full mixed-kernel presentation for P-192 and checks actual extension-field Miller, eigenspace, and complete-kernel controls on six public small-field targets."
+}

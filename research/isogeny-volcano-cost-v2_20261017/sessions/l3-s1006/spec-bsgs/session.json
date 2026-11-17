@@ -1,0 +1,158 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h65adde1ea47f",
+  "label": "isogeny volcano: BSGS exactness",
+  "spec_id": "ECS1h0f9438c72bb8",
+  "spec_sha256": "0f9438c72bb8f124e2e45fb72db9a874d473c5e2a40e087d98b46e52dcd0d454",
+  "env_class_id": "ECBENV2ha20a995299c2",
+  "host_sha256": "e3eec57d6a64afb33aa2d539d4fb3bea3b47a74dc8f5d7a12dd11e378f9bc260",
+  "plan_sha256": "442b45f3043950d030f412073480f5648d2b308be9b3c58f65c93107f3f53504",
+  "binary_sha256": "7da27ec3f0dadbae565181b0faa74582eb94a8f36cf6fe806eecc7b4b1fa7a9f",
+  "git_commit": "d4ed77ce0607cc2ba79baaf1b26305eff98c07c9",
+  "git_dirty": false,
+  "options": {
+    "cpus": "inherit",
+    "lock_path": "/tmp/crypto-bench-g2.lock",
+    "wait_for_lock": true,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": {
+    "run_cpu": 3,
+    "reserved": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "node": 0,
+    "request": "inherit",
+    "unreserved_siblings": [],
+    "observed": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  "preflight": {
+    "quiet": false,
+    "reasons": [
+      "CPU 3 was busy 1.980s of the 2.0s settle",
+      "PSI cpu some avg10 55.55 > 5.00"
+    ],
+    "settle_seconds": 2.0,
+    "reserved_busy_seconds": {
+      "0": 0.06,
+      "1": 0.04,
+      "2": 0.03,
+      "3": 1.98
+    },
+    "before": {
+      "unix_ms": 1792245697025,
+      "loadavg": [
+        3.994140625,
+        4.0,
+        4.0
+      ],
+      "psi_cpu_some_avg10": 53.69,
+      "psi_cpu_some_total_us": 15216840300,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "0": {
+          "busy": 194706,
+          "idle": 1597884,
+          "steal": 7639
+        },
+        "1": {
+          "busy": 229438,
+          "idle": 1552973,
+          "steal": 7553
+        },
+        "2": {
+          "busy": 186671,
+          "idle": 1592122,
+          "steal": 7371
+        },
+        "3": {
+          "busy": 1727548,
+          "idle": 45592,
+          "steal": 18750
+        }
+      }
+    },
+    "after": {
+      "unix_ms": 1792245699025,
+      "loadavg": [
+        3.994140625,
+        4.0,
+        4.0
+      ],
+      "psi_cpu_some_avg10": 55.55,
+      "psi_cpu_some_total_us": 15218791818,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "0": {
+          "busy": 194712,
+          "idle": 1598080,
+          "steal": 7640
+        },
+        "1": {
+          "busy": 229442,
+          "idle": 1553166,
+          "steal": 7554
+        },
+        "2": {
+          "busy": 186674,
+          "idle": 1592318,
+          "steal": 7371
+        },
+        "3": {
+          "busy": 1727746,
+          "idle": 45592,
+          "steal": 18752
+        }
+      }
+    }
+  },
+  "eviction": {
+    "moved_count": 0,
+    "failed_user_threads": 54,
+    "failed_kernel_threads": 69
+  },
+  "runner_on_run_cpu": false,
+  "runner_cpus": [
+    0,
+    1,
+    2
+  ],
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1792245699032,
+  "finished_unix_ms": 1792245986451,
+  "status": "complete",
+  "executions_planned": 1024,
+  "records_written": 1024,
+  "records_sha256": "e88a09b3d082cf73d3c5e6c1274511fe9623b40a1c6bfbd48d71ee9018995176",
+  "status_counts": {
+    "verified": 1024
+  }
+}

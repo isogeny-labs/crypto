@@ -1,0 +1,51 @@
+module
+
+public import Mathlib.Algebra.Polynomial.Derivative
+public import Mathlib.Tactic.NormNum
+public import Mathlib.Tactic.Ring
+
+public section
+
+namespace ExteriorWitness
+open Polynomial
+
+def node (j : Nat) : ℚ := (j : ℚ) - 4
+noncomputable def grid : ℚ[X] :=
+  ∏ j ∈ Finset.range 8, (X - C (node j))
+noncomputable def normalizer : ℚ := grid.derivative.eval 0
+
+/-- Actual punctured source polynomial at T=1+8z, not a planted coefficient. -/
+noncomputable def chart (delta : ℚ) : ℚ[X] :=
+  C (normalizer⁻¹) *
+    ∏ j ∈ Finset.range 8,
+      if node j = delta then 1 else ((C 1 + C 8 * X) - C (node j))
+
+theorem source_normalizer : normalizer = -144 := by
+  norm_num [normalizer, grid, node, Finset.prod_range_succ, derivative_mul]
+
+theorem local_node_value : (chart 1).eval 0 = -5 / 3 := by
+  norm_num [chart, source_normalizer, node, Finset.prod_range_succ]
+
+theorem crossing_linear_coefficient : (chart 2).coeff 1 = 40 / 3 := by
+  have h : (chart 2).derivative.eval 0 = 40 / 3 := by
+    norm_num [chart, source_normalizer, node, Finset.prod_range_succ, derivative_mul]
+  simpa only [Polynomial.eval_zero, Polynomial.coeff_derivative,
+    Nat.zero_add, Nat.cast_one, mul_one] using h
+
+theorem passive_product_coefficient :
+    ((chart 2).coeff 1) * ((chart 1).eval 0) = -200 / 9 := by
+  rw [crossing_linear_coefficient, local_node_value]
+  norm_num
+
+theorem passive_product_nonzero :
+    ((chart 2).coeff 1) * ((chart 1).eval 0) ≠ 0 := by
+  rw [passive_product_coefficient]
+  norm_num
+
+#print axioms source_normalizer
+#print axioms local_node_value
+#print axioms crossing_linear_coefficient
+#print axioms passive_product_coefficient
+#print axioms passive_product_nonzero
+
+end ExteriorWitness

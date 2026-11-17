@@ -1,0 +1,30 @@
+{
+ "certificate_canary": {
+  "checked": 200,
+  "true_scalar_passes": 200,
+  "plus_one_rejected": 200,
+  "negated_scalar_rejected": 200
+ },
+ "seal_canary": {
+  "untouched_ok": true,
+  "edited_cost_rejected": true,
+  "edited_differs": true
+ },
+ "calibration_canary": {
+  "records": 100,
+  "nonintegral_with_correct_row_bench_20bit": 0,
+  "nonintegral_with_bench_18bit_row": 100,
+  "nonintegral_with_generated_22bit_row": 100
+ },
+ "t_quantile": {
+  "df10": 2.228138851986248,
+  "expected10": 2.228138851986,
+  "df143": 1.976692197929963,
+  "expected143_approx": 1.97669
+ },
+ "prng_uniformity": {
+  "median": 0.5012167994864285,
+  "q025": 0.02524427290773019,
+  "q975": 0.9775100002007092
+ }
+}

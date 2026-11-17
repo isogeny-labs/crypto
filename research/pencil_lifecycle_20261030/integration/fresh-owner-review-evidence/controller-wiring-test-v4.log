@@ -1,0 +1,113 @@
+   Compiling isolab-eks-recovery v0.1.0 (/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/fresh-owner-proposal/wiring/proposed/taskq/deploy/eks-karpenter/resume/controller)
+error[E0433]: cannot find `campaign` in the crate root
+   --> src/cloud.rs:387:19
+    |
+387 |     epoch: crate::campaign::Epoch,
+    |                   ^^^^^^^^ could not find `campaign` in the crate root
+
+error[E0433]: cannot find `campaign` in the crate root
+   --> src/cloud.rs:388:27
+    |
+388 | ) -> Result<Option<crate::campaign::Reservation>, String> {
+    |                           ^^^^^^^^ could not find `campaign` in the crate root
+
+error[E0433]: cannot find `campaign` in the crate root
+   --> src/cloud.rs:408:29
+    |
+408 |     let mut ledger = crate::campaign::Ledger::from_bytes(raw.as_bytes())?;
+    |                             ^^^^^^^^ could not find `campaign` in the crate root
+
+error[E0433]: cannot find `campaign` in the crate root
+   --> src/cloud.rs:417:16
+    |
+417 |         crate::campaign::AdmissionWindow {
+    |                ^^^^^^^^ could not find `campaign` in the crate root
+
+error[E0433]: cannot find `campaign` in the crate root
+   --> src/cloud.rs:473:19
+    |
+473 |     epoch: crate::campaign::Epoch,
+    |                   ^^^^^^^^ could not find `campaign` in the crate root
+
+error[E0433]: cannot find `campaign` in the crate root
+   --> src/cloud.rs:486:16
+    |
+486 |         crate::campaign::Epoch::Computation => {
+    |                ^^^^^^^^ could not find `campaign` in the crate root
+
+error[E0433]: cannot find `campaign` in the crate root
+   --> src/cloud.rs:499:16
+    |
+499 |         crate::campaign::Epoch::Fresh => {
+    |                ^^^^^^^^ could not find `campaign` in the crate root
+
+error[E0433]: cannot find `campaign` in the crate root
+   --> src/cloud.rs:525:26
+    |
+525 |     reservation: &crate::campaign::Reservation,
+    |                          ^^^^^^^^ could not find `campaign` in the crate root
+
+error[E0433]: cannot find `campaign` in the crate root
+   --> src/cloud.rs:538:48
+    |
+538 |     let reservation = campaign_admit(s, crate::campaign::Epoch::Computation)?;
+    |                                                ^^^^^^^^ could not find `campaign` in the crate root
+
+error[E0433]: cannot find `campaign` in the crate root
+    --> src/cloud.rs:1067:66
+     |
+1067 |     let reservation = match campaign_admit(&stored.state, crate::campaign::Epoch::Fresh) {
+     |                                                                  ^^^^^^^^ could not find `campaign` in the crate root
+
+error[E0433]: cannot find `campaign` in the crate root
+    --> src/cloud.rs:1071:78
+     |
+1071 |                 retain_campaign_terminal_evidence(&stored.state, dir, crate::campaign::Epoch::Fresh)
+     |                                                                              ^^^^^^^^ could not find `campaign` in the crate root
+
+error[E0433]: cannot find `campaign` in the crate root
+    --> src/cloud.rs:1250:20
+     |
+1250 |             crate::campaign::Epoch::Fresh
+     |                    ^^^^^^^^ could not find `campaign` in the crate root
+
+error[E0433]: cannot find `campaign` in the crate root
+    --> src/cloud.rs:1252:20
+     |
+1252 |             crate::campaign::Epoch::Computation
+     |                    ^^^^^^^^ could not find `campaign` in the crate root
+
+error[E0433]: cannot find `campaign` in the crate root
+    --> src/cloud.rs:1293:49
+     |
+1293 |             campaign_admit(&restoration, crate::campaign::Epoch::Computation)?;
+     |                                                 ^^^^^^^^ could not find `campaign` in the crate root
+
+error[E0433]: cannot find `campaign` in the crate root
+    --> src/cloud.rs:1380:69
+     |
+1380 |     if let Some(reservation) = campaign_admit(&stored.state, crate::campaign::Epoch::Computation)? {
+     |                                                                     ^^^^^^^^ could not find `campaign` in the crate root
+
+error[E0433]: cannot find `campaign` in the crate root
+  --> src/contract.rs:59:40
+   |
+59 |     pub worker_campaign: Option<crate::campaign::Binding>,
+   |                                        ^^^^^^^^ could not find `campaign` in the crate root
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `isolab-eks-recovery` (lib) due to 16 previous errors
+warning: build failed, waiting for other jobs to finish...
+error[E0433]: cannot find `campaign` in the crate root
+    --> src/cloud.rs:1962:34
+     |
+1962 |         let reservation = crate::campaign::Reservation {
+     |                                  ^^^^^^^^ could not find `campaign` in the crate root
+
+error[E0433]: cannot find `campaign` in the crate root
+    --> src/cloud.rs:1965:27
+     |
+1965 |             epoch: crate::campaign::Epoch::Computation,
+     |                           ^^^^^^^^ could not find `campaign` in the crate root
+
+error: could not compile `isolab-eks-recovery` (lib test) due to 18 previous errors

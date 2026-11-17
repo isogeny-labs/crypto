@@ -1,0 +1,13 @@
+digraph control {
+ graph [rankdir=TB,bgcolor="white",pad="0.2",ranksep="0.3"];
+ node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=12,margin="0.13",fillcolor="#edf5ff"];
+ edge [fontname="Helvetica",fontsize=10];
+ input [label="Planted input: known A, B=1, f and G over F17\nThis is a certificate-existence control, not a finder",fillcolor="#fff1d5"];
+ moment [label="Verified inverse modulo Ahat\nmu(P)=coeff1(PU mod Ahat)\nMoments (7,11,15,15,0)"];
+ full [label="Actual full moment form: dimension4, rank2"];
+ restricted [label="Actual branch restriction: dimension3, rank2\nIn coefficient-quadrics pencil; all cofactor tests pass",fillcolor="#e8f7e8"];
+ recovery [label="Normalize verified nonzero adjugate column\nRecovered (s,t,u)=(11,5,1)\nActual norm A^2-fB^2=8G checked",fillcolor="#e8f7e8"];
+ missing [label="Still open: general reciprocal-Hankel theorem\nand a fast public-input moment/pencil finder",fillcolor="#fff1d5"];
+ input -> moment -> full -> restricted -> recovery;
+ recovery -> missing [style=dashed];
+}

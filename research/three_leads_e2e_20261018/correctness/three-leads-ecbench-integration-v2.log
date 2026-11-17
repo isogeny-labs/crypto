@@ -1,0 +1,16 @@
+   Compiling crypto v0.1.0 (/home/ec2-user/crypto-leads-audit)
+error: couldn't read `research/full_volcano_graphwide_ic_20261017/execution/PROTOCOL.md`: No such file or directory (os error 2)
+   --> research/full_volcano_graphwide_ic_20261017/execution/driver.rs:214:9
+    |
+214 |         include_str!("PROTOCOL.md"),
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/bin/../../docs/ecdlp-audit/ecdlp-audit-plan.schema.json`: No such file or directory (os error 2)
+  --> src/bin/ecdlp_audit.rs:27:32
+   |
+27 | const PLAN_SCHEMA_JSON: &str = include_str!("../../docs/ecdlp-audit/ecdlp-audit-plan.schema.json");
+   |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: could not compile `crypto` (bin "volcano-ic-driver") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `crypto` (bin "ecdlp-audit") due to 1 previous error

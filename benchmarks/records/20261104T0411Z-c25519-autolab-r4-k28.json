@@ -1,0 +1,117 @@
+{
+  "branch": "claude/curve25519-ic-autolab-round4",
+  "closed_utc": "2026-11-04T04:12:06+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/curve25519_autolab_20261104/round-004/sessions/holdout-k28",
+        "--replay",
+        "8",
+        "--replay-seed",
+        "20261104",
+        "--out",
+        "research/curve25519_autolab_20261104/round-004/analysis/verify-holdout-k28.benchrec-replay.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-04T04:12:04+00:00",
+      "wall_s": 1.643
+    }
+  ],
+  "commit": "8cab67b459d203b9c7828bb4bdbd37af11ce9c46",
+  "commit_dirty": true,
+  "created_utc": "2026-11-04T04:11:47+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v233-x86_64-with-glibc2.39"
+  },
+  "id": "20261104T0411Z-c25519-autolab-r4-k28",
+  "metrics": [
+    {
+      "baseline": 16.73652778630764,
+      "better": "lower",
+      "n": 64,
+      "name": "s_w0_incumbent",
+      "note": "holdout ECBS1h4fa56ebd629d, ksum4-n21 vs mitm2-n203; paired 0.654 [0.636, 0.672]; pcc PCC-20261104-6c0998 unverified",
+      "reference": 1.0153251579240001,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 10.939468556478129
+    }
+  ],
+  "problem": "ic:curve25519-family-k28",
+  "raw": [
+    {
+      "bytes": 3963,
+      "path": "research/curve25519_autolab_20261104/round-004/RESULT.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/35/356e4ad065d98716543d0f3ff9e5147c385e41c3e86cf3033dc0f77fc2d8617f",
+      "sha256": "356e4ad065d98716543d0f3ff9e5147c385e41c3e86cf3033dc0f77fc2d8617f",
+      "uploaded": false
+    },
+    {
+      "bytes": 9108,
+      "path": "research/curve25519_autolab_20261104/round-004/selection.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6d/6d84b4bf69b4df03efbaf3d2d713f49f1f02d335e263c45e7e2f0897e0eab25d",
+      "sha256": "6d84b4bf69b4df03efbaf3d2d713f49f1f02d335e263c45e7e2f0897e0eab25d",
+      "uploaded": false
+    },
+    {
+      "bytes": 3361,
+      "path": "research/curve25519_autolab_20261104/round-004/analysis/band-holdout-k28.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ee/ee8312b8305965de68db837745cf2e9d30ef26213c0e00666f6841517b0da7d4",
+      "sha256": "ee8312b8305965de68db837745cf2e9d30ef26213c0e00666f6841517b0da7d4",
+      "uploaded": false
+    },
+    {
+      "bytes": 2508,
+      "path": "research/curve25519_autolab_20261104/round-004/analysis/verify-holdout-k28.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6b/6b1c0a3f7fc28a45c31c7bb9a197921ee1a4efff121e3eec87243d5396c945bd",
+      "sha256": "6b1c0a3f7fc28a45c31c7bb9a197921ee1a4efff121e3eec87243d5396c945bd",
+      "uploaded": false
+    },
+    {
+      "bytes": 12191,
+      "path": "research/curve25519_autolab_20261104/round-004/analysis/band-train-k28.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7c/7cc08ce5343d685c474e978eb2fdc2a541306032d41c404c84c20ee4438fd6bc",
+      "sha256": "7cc08ce5343d685c474e978eb2fdc2a541306032d41c404c84c20ee4438fd6bc",
+      "uploaded": false
+    },
+    {
+      "bytes": 2508,
+      "path": "research/curve25519_autolab_20261104/round-004/analysis/verify-train-k28.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e8/e864dd0a6062199aaee28da8dad2c980e9f829092a47be28e4d3f7d240e7b114",
+      "sha256": "e864dd0a6062199aaee28da8dad2c980e9f829092a47be28e4d3f7d240e7b114",
+      "uploaded": false
+    },
+    {
+      "bytes": 2497,
+      "path": "research/curve25519_autolab_20261104/round-004/analysis/verify-holdout-k28.benchrec-replay.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/48/486f306dc2ab59b5fe62a55371b2c3d55924a951125039723eb3f31048f52f6f",
+      "sha256": "486f306dc2ab59b5fe62a55371b2c3d55924a951125039723eb3f31048f52f6f",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/curve25519_autolab_20261104/round-004/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/curve25519_autolab_20261104/round-004/round.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "c25519-autolab-r4-k28",
+  "status": "measured",
+  "summary": "ic_autolab round 4, k = 28 holdout ECBS1h4fa56ebd629d: ksum:m=4 N = 21 S(w=0) 10.94 vs incumbent 16.74, matched rho 1.02; recorded after the run with a fresh replay audit (the rule arrived mid-round)",
+  "validation": null
+}

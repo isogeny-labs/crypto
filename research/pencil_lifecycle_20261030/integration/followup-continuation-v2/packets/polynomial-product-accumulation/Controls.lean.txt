@@ -1,0 +1,14 @@
+import Product
+set_option autoImplicit false
+namespace ProductControls
+open ProductPolynomial
+
+theorem two_linear : product 17 [1,2] [3,4]=[3,10,8] := by decide
+theorem internal_zero : product 17 [1,1] [1,16]=[1,0,16] := by decide
+theorem square : product 17 [16,1] [16,1]=[1,15,1] := by decide
+theorem empty_left : product 17 [] [1,2]=[] := by decide
+theorem empty_right : product 17 [1,2] []=[] := by decide
+theorem trailing_zeros : product 17 [2,0,0] [3,0]=[6] := by decide
+theorem zero_polynomial : product 17 [0,0] [2,3]=[] := by decide
+theorem shared_slots : product 17 [1,1,1] [1,1,1]=[1,2,3,2,1] := by decide
+end ProductControls

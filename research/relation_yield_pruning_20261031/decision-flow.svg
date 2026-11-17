@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Risk-controlled relation-yield pruning flow</title>
+  <desc id="desc">Two-level flow from frozen checkpoints through episode decisions and independent terminal episodes to candidate decisions.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#31425b"/></marker>
+    <style>
+      .bg { fill: #f7f9fc; }
+      .box { fill: white; stroke: #31425b; stroke-width: 2; rx: 14; }
+      .gate { fill: #e9f2ff; stroke: #2367a8; stroke-width: 2; rx: 14; }
+      .stop { fill: #fff0ed; stroke: #b44935; stroke-width: 2; rx: 14; }
+      .keep { fill: #edf8ef; stroke: #2f7d43; stroke-width: 2; rx: 14; }
+      .line { fill: none; stroke: #31425b; stroke-width: 2.5; marker-end: url(#arrow); }
+      .dash { fill: none; stroke: #66758b; stroke-width: 2; stroke-dasharray: 7 6; marker-end: url(#arrow); }
+      .h1 { font: 700 28px system-ui, sans-serif; fill: #182332; }
+      .h2 { font: 700 18px system-ui, sans-serif; fill: #182332; }
+      .t { font: 15px system-ui, sans-serif; fill: #263548; }
+      .small { font: 13px system-ui, sans-serif; fill: #58677b; }
+      .label { font: 700 13px system-ui, sans-serif; fill: #31425b; }
+    </style>
+  </defs>
+  <rect class="bg" width="1200" height="700"/>
+  <text class="h1" x="55" y="52">Empirical pruning without promoting stage yield to a speedup</text>
+
+  <rect class="box" x="55" y="95" width="240" height="112"/>
+  <text class="h2" x="75" y="125">Frozen panel</text>
+  <text class="t" x="75" y="151">Candidates · seeds · looks</text>
+  <text class="t" x="75" y="174">rank target · row cap · alpha</text>
+  <text class="small" x="75" y="195">Unused slots remain charged</text>
+
+  <rect class="box" x="355" y="82" width="300" height="138"/>
+  <text class="h2" x="375" y="112">Verified checkpoint</text>
+  <text class="t" x="375" y="138">hit trials + verified rows</text>
+  <text class="t" x="375" y="161">novel rank + factor hits</text>
+  <text class="t" x="375" y="184">charged cost + failure counters</text>
+  <text class="small" x="375" y="207">independent group replay required</text>
+
+  <rect class="gate" x="720" y="82" width="420" height="138"/>
+  <text class="h2" x="740" y="112">Episode gate</text>
+  <text class="t" x="740" y="138">correctness failure → reject</text>
+  <text class="t" x="740" y="161">rank ceiling &lt; target → structural stop</text>
+  <text class="t" x="740" y="184">rank + optimistic future rows &lt; target → futile</text>
+  <text class="small" x="740" y="207">no frozen row cap means statistical fail-open</text>
+
+  <path class="line" d="M295 151 H350"/>
+  <path class="line" d="M655 151 H715"/>
+
+  <rect class="box" x="95" y="325" width="310" height="140"/>
+  <text class="h2" x="115" y="355">Diagnostics only</text>
+  <text class="t" x="115" y="382">coverage · dead columns · entropy</text>
+  <text class="t" x="115" y="406">rows/trial · novel-rank utility · cost</text>
+  <text class="small" x="115" y="436">reported, never a v1 hard-prune trigger</text>
+
+  <rect class="gate" x="480" y="312" width="330" height="166"/>
+  <text class="h2" x="500" y="342">Candidate gate</text>
+  <text class="t" x="500" y="369">independent terminal episodes</text>
+  <text class="t" x="500" y="393">exact full-rank success interval</text>
+  <text class="t" x="500" y="417">minimum-success and dominance tests</text>
+  <text class="small" x="500" y="447">Bonferroni budget covers all planned looks</text>
+
+  <rect class="stop" x="880" y="285" width="260" height="90"/>
+  <text class="h2" x="900" y="318">Prune</text>
+  <text class="t" x="900" y="345">invalid · structural · low success</text>
+
+  <rect class="keep" x="880" y="415" width="260" height="90"/>
+  <text class="h2" x="900" y="448">Continue / keep</text>
+  <text class="t" x="900" y="475">or mark insufficient evidence</text>
+
+  <path class="dash" d="M505 220 V275 H250 V320"/>
+  <text class="label" x="268" y="267">descriptive stream</text>
+  <path class="line" d="M930 220 V260 H645 V307"/>
+  <text class="label" x="667" y="253">terminal outcomes only</text>
+  <path class="line" d="M810 360 H875"/>
+  <path class="line" d="M810 430 H850 V460 H875"/>
+
+  <rect class="box" x="130" y="570" width="940" height="78"/>
+  <text class="h2" x="155" y="600">Claim boundary</text>
+  <text class="t" x="155" y="626">A stop is conditional on this frozen panel. End-to-end IC speedup still requires complete cost, recovery replay, and matched rho.</text>
+  <path class="dash" d="M645 478 V565"/>
+</svg>

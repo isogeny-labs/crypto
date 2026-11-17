@@ -1,0 +1,48 @@
+{
+  "schema": "pencil-terminal-evidence-boundary-review/v1",
+  "reviewer": "/root/four_lead_state",
+  "reviewed_at": "2026-10-30T03:27:26Z",
+  "review_kind": "read_only_source_semantics_not_live_terminal_observation",
+  "run_name": "pencil-p186379-20261030-b1",
+  "internal_deadline": "2026-10-30T03:28:20Z",
+  "outer_authorization_expiry": "2026-10-30T05:05:50Z",
+  "active_worker_budget_seconds": 10800,
+  "budget_reset": false,
+  "source_root": "/home/ec2-user/pencil-controller-review-20261029/source/taskq/deploy/eks-karpenter/resume",
+  "sources": [
+    {"path":"controller/src/supervisor.rs","sha256":"7cae58e46359ff72955ee52ac3e87c82987c68f20ffdf8778492e0e0a606f939"},
+    {"path":"controller/src/cloud.rs","sha256":"ec633a6af0e9475731f0b7f9757828bfdd6b6baab6918ec6d082803a6cd0ec91"},
+    {"path":"controller/src/model.rs","sha256":"fd104ff4c54cf35b6f6b23ea08b38c480e032f60e6e7db2e54f981a9ff483f45"},
+    {"path":"controller/src/main.rs","sha256":"1460d79c9697f750a4a51b36830acfbc48a221cc3139bae7d861b96840bc9be5"},
+    {"path":"run-controller","sha256":"59fd9e1337af8560309cbb52dbb49821ebd2f0a10b19b3b69caef0f84e1d602b"}
+  ],
+  "source_findings": [
+    {"source":"controller/src/supervisor.rs","lines":"628-635","finding":"On loop deadline, SIGKILL recorded process group, save failed status with original UTC deadline expired, and return error. This branch does not update updated or assign exit_code; neither is a precise observed deadline termination receipt."},
+    {"source":"controller/src/model.rs","lines":"143-152","finding":"Controller deadline changes phase to failed and retains original failure reason; no new epoch or budget reset."},
+    {"source":"controller/src/cloud.rs","lines":"783,1012-1027","finding":"Tick deadline triggers durable failure save, best-effort stop RPC, failure.json and state publication. Transport/API errors take a distinct controller-error path; remote upload success must be observed."},
+    {"source":"run-controller","lines":"15-26","finding":"EXIT trap uploads top-level receipts/*.json to recovery/runs/<run>/controllers/<build UUID>/. Nested archives are not included; upload failure sets return code91."},
+    {"source":"controller/src/cloud.rs","lines":"355-391,514-536","finding":"Checkpoint capture is archived, S3 version/hash/size verified, then committed before resuming."},
+    {"source":"controller/src/main.rs","lines":"14","finding":"Checkpoint archive contains compute plus generations/gN; partial session records/stdout/stderr/spec may be present at checkpoint time."},
+    {"source":"controller/src/supervisor.rs","lines":"397-412","finding":"Checkpoint manifest hashes compute and dump files after sync; this establishes bytes, not scientific completion or independent replay."},
+    {"source":"controller/src/model.rs","lines":"164-168","finding":"State inventory retains latest two generations. Removing older state entries does not itself delete S3 archives."},
+    {"source":"controller/src/cloud.rs","lines":"923-958","finding":"computation.tar and computation-result.json upload requires completed and verified computation; failure does not automatically archive latest partial filesystem."},
+    {"source":"controller/src/cloud.rs","lines":"1128-1132","finding":"Wait returns failed state error without downloading checkpoint archives; receipt grace is not execution extension."}
+  ],
+  "expected_s3_prefix": "s3://isolab-results-104186811093-us-east-2/recovery/runs/pencil-p186379-20261030-b1/",
+  "reporting_rules": [
+    "Bind actual terminal state and controller receipts only after observed retrieval; this review does not assert run failure or completion.",
+    "Verify committed archive version, SHA256 and byte count before inspecting checkpoint members.",
+    "Label records as checkpoint-time partial computation, not fresh measurement, final completion or independently replayed results.",
+    "Retain all planned18 base slots and15 measured slots; absent or malformed/incomplete rows are missing, not zero-valued success.",
+    "No full gate cost ratio or continuation admission from incomplete or unverified records.",
+    "Preserve original03:28:20 internal deadline and05:05:50 outer expiry; unused outer window grants no deadline reset, retry or resume.",
+    "Do not assume post-checkpoint EBS writes were uploaded; separate retained checkpoint evidence from unavailable latest bytes."
+  ],
+  "live_terminal_status": null,
+  "observed_record_count": null,
+  "qualified_ratios": null,
+  "new_solver_executions": 0,
+  "cloud_calls": 0,
+  "source_changes": 0,
+  "launch_or_resume_authorized_by_review": false
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "isolab.eks.command-request/v1",
+  "job": {
+    "job_name": "scanp-main-epyc-20261111-a1",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:173a3960fb7e0e994db906ac09282cba928bd136159b1b2ee6f525d349257df3",
+    "command": [
+      "/opt/scanp/job.sh"
+    ],
+    "cpu": 4,
+    "memory": "12Gi",
+    "seconds": 10800,
+    "isolation_profile": "l2",
+    "instance_type": "c8a.2xlarge",
+    "retries": 0,
+    "wait_seconds": 600
+  },
+  "provenance": {
+    "harness": "claude-code-main-session",
+    "source_revision": "7daa1b566f82fb98fafef05d23aa5e4d151f7571",
+    "study": "research/ic_tool_program/explorations/scan-stages-main-epyc-20261111",
+    "note": "stage diagnostic (R04 probes) on the EPYC class rule v9 ran on; a record, not a round; no L2 admission for command Jobs"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "schema": "pencil-upper-gate-finite-design-independent-review/v1",
+  "reviewer": "/root/four_lead_state",
+  "producer": "/root",
+  "status": "reviewed_ready_for_scoped_finite_gate_admission",
+  "protocol": {
+    "path": "upper-gate-protocol.json",
+    "file_sha256": "709cb1b8dca094588db8e85429e186db2580d45f996f20c1388a365bdf38b133",
+    "canonical_body_sha256": "009499bc14e0ff3355a2373e621f73f0d5f1755b1cafb4f9d7e3e07d9cc2d091"
+  },
+  "body_derivation": "jq -cSj del(.freeze): remove only freeze, sorted compact JSON no newline; full frozen file retained unchanged",
+  "checks": {
+    "exact_gate_plan": true,
+    "workloads": 1,
+    "base_rows": 18,
+    "measured": 15,
+    "warmups": 3,
+    "pairs": 5,
+    "pricing_cells": 36,
+    "instrument_unchanged": true,
+    "consumer_source_commit": "848f495fa7031f0d0b5ac0d811ec07aa29fed9e7",
+    "native_source_review_complete": true,
+    "source_commit_and_binaries_bound": true,
+    "original_finite_mapping_semantics_unchanged": true,
+    "missing_and_failed_rows_retained": true,
+    "upper_gate_separately_charged_not_enrolled": true,
+    "independent_replay_required_before_remaining_cohort": true,
+    "shared10800budget_and_outer050550_retained": true,
+    "conditional_R900_internal032820_guard_reviewed": true
+  },
+  "coverage_boundary": "All nine finite declared semantic categories; external coverage record binds exact frozen body and current mapping. No allocator/infrastructure CPU census or invented cost conversion.",
+  "timing_boundary": "All clocks remain unqualified; original timing objective unfinished; no old L2 failure erased.",
+  "remaining_operational_requirements": [
+    "Commit and publish frozen protocol before any affected execution",
+    "Final live owner/job reconciliation and exact reviewed request admission",
+    "Retain actual attempt/control/replay/recovery/resource observations; stop on cap/deadline",
+    "Independent actual18-row result review and all15 measured non-wall replays before latercohort"
+  ],
+  "new_solver_executions": 0,
+  "new_cloud_actions": 0,
+  "launch_performed": false
+}

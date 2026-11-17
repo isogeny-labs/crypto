@@ -1,0 +1,64 @@
+{
+ "created_at": "2026-11-09T18:24:48Z",
+ "id": "PCC-20261109-57ac94",
+ "kind": "statement",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round68-p192/report.md",
+    "sha256": "140d61695135558bdd58cbb553ca58cc6865ee73133fcfaa9342f6cac4e9ef73"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round68-p192/coefficient-cache-proof.md",
+    "sha256": "65e173e93b93418e9f35e2e38251c6b7284991a8104da1104a28f54da35ee5f1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round68-p192/identity.json",
+    "sha256": "a6f7e26ba551bdb10f29a4a5701d8890c06db63f6c93e69df4f154986adf4fd9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round68-p192/audit-summary.json",
+    "sha256": "6ab381cdbbadc422c9fb282db63d71be27c0655efae6093a4acb6ba14560799e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round68-p192/candidate-response.json",
+    "sha256": "4969279329c61d8f29953c929d12ddf154a058c054ae50b2d79298fb4b65791a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round68-p192/candidate-P192.json",
+    "sha256": "33b5d28b7c5deffa858d60dd5c0da4d44396326dd947c5fb18ef3faa778d6652"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round68-p192/validation.json",
+    "sha256": "5c26be50bcce326fd69d7ffa2746aa009498514897e7878cc5b1f216c27c0db0"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Universal checked-integer cache identity and changed-coefficient residual;381 small decoder cases/2694queries/11382complete baby blocks;24 prescribed P19227-factor responses/72baby norms. P192 formation89 multiplications/no inverse per block; constructor1138 multiplications/18inverses/72coefficients per target. Five science outputs/two receipts fresh-match; mutations reject101. No full order-r P192 response.",
+ "statement": "Round68 implements a public-target 9+9 fixed coefficient-polynomial cache for the signed paired numerator, proving online formation at most19b+13 multiplication calls with explicit O(b^2) setup and at most18b cache coefficients, preserving frozen responses and separating norm costs."
+}

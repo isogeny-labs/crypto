@@ -1,0 +1,74 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Lazy orbit-member index, fully priced, vs the frozen orbit IC and rho: Koblitz a=0 n=31",
+  "description": "Frozen in research/ecbench_lazy_orbit_members_20261018/PROTOCOL.md before its data. Every arm is a *_full method. Only the oracle differs between the two IC arms. Engineering; no security claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 31
+      }
+    ],
+    "targets_per_curve": 32,
+    "target_seed": 202610181011,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-frob",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_full"
+      }
+    },
+    {
+      "name": "rho-strong",
+      "role": "baseline",
+      "method": {
+        "id": "rho.signed_frobenius_strong_full"
+      }
+    },
+    {
+      "name": "ic-orbit-c2-renew",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=100000000",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "max_trials": "1000000000",
+          "targets": "stride-renew"
+        }
+      }
+    },
+    {
+      "name": "ic-orbit-c2-renew-lazy",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=100000000",
+          "oracle": "mitm-frobenius-lazy-counted:m=2",
+          "max_trials": "1000000000",
+          "targets": "stride-renew"
+        }
+      }
+    },
+    {
+      "name": "rho-frob-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_full"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202610182011,
+    "isolation_required": "L0",
+    "timeout_seconds": 3600
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "elf": {
+    "gate": {
+      "sha256": "65f521d50818f593f5bc844eb26115bffd9866d4059a9ab5efee46df67d00377",
+      "receipt_match": true,
+      "elf_type": 2,
+      "machine": 62,
+      "program_header_types": [
+        1,
+        1,
+        1,
+        1,
+        4,
+        1685382483,
+        1685382481,
+        1685382482
+      ],
+      "has_interp": false,
+      "has_dynamic": false
+    },
+    "controls": {
+      "sha256": "1976faae3ceabd51f17125f356552993df5acca89c3e50447ac749101567d102",
+      "receipt_match": true,
+      "elf_type": 2,
+      "machine": 62,
+      "program_header_types": [
+        1,
+        1,
+        1,
+        1,
+        4,
+        1685382483,
+        1685382481,
+        1685382482
+      ],
+      "has_interp": false,
+      "has_dynamic": false
+    }
+  },
+  "commands": {
+    "compile-gate": {
+      "name": "compile-gate",
+      "exit_code": 0,
+      "timeout": false,
+      "elapsed_seconds": 0.09660776401869953
+    },
+    "compile-controls": {
+      "name": "compile-controls",
+      "exit_code": 0,
+      "timeout": false,
+      "elapsed_seconds": 0.07361921801930293
+    },
+    "gate-elf": {
+      "name": "gate-elf",
+      "exit_code": 0,
+      "timeout": false,
+      "elapsed_seconds": 0.007007179985521361
+    },
+    "gate-disassembly": {
+      "name": "gate-disassembly",
+      "exit_code": 0,
+      "timeout": false,
+      "elapsed_seconds": 0.01724033200298436
+    },
+    "controls-elf": {
+      "name": "controls-elf",
+      "exit_code": 0,
+      "timeout": false,
+      "elapsed_seconds": 0.0028287699969951063
+    },
+    "controls-disassembly": {
+      "name": "controls-disassembly",
+      "exit_code": 0,
+      "timeout": false,
+      "elapsed_seconds": 0.010063305991934612
+    },
+    "fixed-controls": {
+      "name": "fixed-controls",
+      "exit_code": 0,
+      "timeout": false,
+      "elapsed_seconds": 0.001056394015904516
+    },
+    "pristine-host-negative": {
+      "name": "pristine-host-negative",
+      "exit_code": 126,
+      "timeout": false,
+      "elapsed_seconds": 0.0010259770206175745
+    }
+  },
+  "main_calls": [
+    "strlen",
+    "fprintf",
+    "strcmp",
+    "strcmp",
+    "strcmp",
+    "getpid",
+    "fprintf",
+    "getuid",
+    "geteuid",
+    "getgid",
+    "getegid",
+    "open",
+    "bounded",
+    "close",
+    "memcmp",
+    "mount_ok",
+    "open",
+    "openat",
+    "close",
+    "fstatfs",
+    "close",
+    "fstatvfs",
+    "__fstat",
+    "exact_at.constprop.0",
+    "exact_at.constprop.0",
+    "exact_at.constprop.0",
+    "__clock_gettime",
+    "close",
+    "close",
+    "snprintf",
+    "exact_at.constprop.0",
+    "exact_at.constprop.0",
+    "close",
+    "write",
+    "__errno_location",
+    "close",
+    "strcmp",
+    "strcmp",
+    "execve",
+    "fwrite",
+    "close",
+    "execve"
+  ],
+  "link_LOAD_entries": [
+    "LOAD /var/tmp/pencil-musl-private-20261031/prefix/lib/Scrt1.o",
+    "LOAD /var/tmp/pencil-musl-private-20261031/prefix/lib/crti.o",
+    "LOAD /usr/lib/gcc/x86_64-amazon-linux/11/crtbeginS.o",
+    "LOAD /var/tmp/pencil-preexec-native-execution-20261031-v2/tmp/ccUb9AmN.o",
+    "LOAD /usr/lib/gcc/x86_64-amazon-linux/11/libgcc.a",
+    "LOAD /usr/lib/gcc/x86_64-amazon-linux/11/libgcc_eh.a",
+    "LOAD /var/tmp/pencil-musl-private-20261031/prefix/lib/libc.a",
+    "LOAD /usr/lib/gcc/x86_64-amazon-linux/11/crtendS.o",
+    "LOAD /var/tmp/pencil-musl-private-20261031/prefix/lib/crtn.o"
+  ],
+  "main_execve_calls": 2,
+  "count_derivation": {
+    "nonce": 7,
+    "mountinfo": 9,
+    "exact_values_including_open_close": 11,
+    "bounded_reader": 12,
+    "host_cases": 6,
+    "total": 45
+  },
+  "all_expected_exits": true,
+  "fixed_stdout": "PASS nonce\nPASS mountinfo\nPASS exact-values\nPASS bounded-reader\nPASS host-negative-and-fixed-cases\nALL_CONTROLS_PASS checks=45\n",
+  "host_negative_stderr": "qualification gate: PID/UID/GID boundary\n"
+}

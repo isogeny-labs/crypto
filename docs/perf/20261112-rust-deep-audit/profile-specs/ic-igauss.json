@@ -1,0 +1,4 @@
+{"schema":"ecbench.spec/v1","label":"r2 profile ic-igauss","description":"single-arm callgrind profile input; not a measurement",
+"workloads":{"curves":[{"kind":"prime_search","bits":24,"seed":59297}],"targets_per_curve":1,"target_seed":20261112},
+"arms":[{"name":"a","role":"candidate","method":{"id":"ic.pipeline","params":{"factor_base":"prime-abscissa:size=32","oracle":"mitm:negation_folded=1"}}}],
+"measurement":{"rounds":1,"warmup":0,"order":"alternate_measured","seed":20261112,"isolation_required":"L0","timeout_seconds":300}}

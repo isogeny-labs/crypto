@@ -1,0 +1,140 @@
+status: completed
+
+card: CARD-BLINDSPOT-13-15 (sha256 604ea5859131ddca4be56ec9c9cb96398ee87c0ffa5b6d97a40f5b574630a90f)
+commit: 2e35750c1261b90a9f2f8256ab19b0f78a71e839
+receipt: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/receipt-card-15.json sha256 7a3d25c2bf133469847d96cbdba5c90d80d8be509e1c875ba80688ba72270023
+command 1 (make-dirs): ["mkdir", "-p", "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw", "target/blindspots-13/card-15"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "target/blindspots-13/card-15/b13", "examples/blindspots_13_rho_negation.rs"] exit 0 (6.613 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (build-cpu-client): ["prlimit", "--as=4294967296", "g++", "-O3", "-std=c++17", "-march=native", "-fopenmp", "-DECC_BATCH=32", "-DECC_THREADS=128", "-DECC_MINBLOCKS=2", "-DECC_STREAM_KARAT=0", "-DECC_SMEM_SPILL=0", "-DECC_PACKED_SINGLE_PRODUCT=0", "-DECC_PACKED_CACHE_DENOM=0", "-DECC_PACKED_BY_VALUE=0", "-DECC_PACKED_PERM_SIGMA=0", "-DECC_PACKED_PARTIAL_SIGMA=0", "-DECC_PACKED_SIGMA_ORDER=0", "-DECC_PACKED_BYTE_SIGMA=0", "-DECC_PACKED_FAST_CONVERT=0", "-DECC_PACKED_POLY_CHAIN=0", "-DECC_PACKED_UNROLL_INV=0", "-DECC_PACKED_PAIR_PRODUCTS=0", "-DECC_PACKED_POLY_STATE=0", "-DECC_PACKED_DIRECT_REDUCE=0", "-DECC_PACKED_DIRECT_REDUCE=0", "-DECC_PACKED_ADD_COMBINE=0", "-DECC_PACKED_GENERATED_PRODUCT=0", "-DECC_PACKED_INLINE_POLY=0", "-DECC_PACKED_CLMAD=0", "-DECC_PACKED_CLMAD_SQUARE=0", "-DECC_PACKED_KARAT3=0", "-DECC_PACKED_WEIGHTED_PREFIX=0", "-DECC_PACKED_COMPACT_STATE=0", "-DECC_PACKED_SHARED_SIGMA=0", "-DECC_PACKED_TOP_CLMAD=0", "-DECC_PACKED_STATE_TILE=0", "-DECC_PACKED_ADD_COMBINE=0", "-DECC_PACKED_PAIR_ILP=0", "-DECC_UNROLL_SLOTS=1", "-DECC_PACKED_SLOT_PREFETCH=0", "-DECC_PACKED_SLOT_PIPELINE=0", "-DECC_SIGMA_FUSED=0", "-DECC_SIGMA_FUSED_LATE_Y=0", "-DECC_SIGMA_FUSED_SHARED_SLOTS=0", "-DECC_SIGMA_SQUARE_TABLE=0", "-DECC_PACKED_L2_PERSIST=0", "-DECC_PACKED_TOP_HOIST=0", "-DECC_PACKED_ONB_INV=0", "-DECC_PACKED_FROM_REDUCED=0", "-DECC_PACKED_SIGMA_TABLE=0", "-DECC_PACKED_CLMUL_FLAT=0", "-DECC_PACKED_PAIR_CLMUL=0", "-DECC_PACKED_ALU_SQR=0", "-DECC_WALK_TABLE=0", "-DECC_TABLE_BRANCHES=8", "-DECC_TABLE_PIVOT_BYTES=0", "-DECC_TABLE_PHASE_POPC=0", "-DECC_TABLE_TAG_DENOM=0", "-DECC_TABLE_FUSED=0", "-DECC_TABLE_FUSED_PIPE=0", "-DECC_PHASE_PROFILE=0", "-DECC_TABLE_PIPE_SELECT=0", "-DECC_TABLE_SPLIT_FORWARD=0", "-DECC_TABLE_BATCH_HINTS=0", "-DECC_TABLE_BLOCK_HINTS=0", "-DECC_TABLE_HINT_QUEUE=512", "-DECC_CYCLE_FAST2=0", "-DECC_CYCLE_PROFILE=0", "-DECC_PACKED_CHAIN_FIRST=0", "-DECC_PACKED_CHAINS=1", "-DECC_TABLE_GLOBAL_HINTS=0", "-DECC_TABLE_GLOBAL_HINT_THREADS=128", "-DECC_TABLE_GLOBAL=0", "-DECC_TABLE_ADDEND_GLOBAL=0", "-DECC_PACKED_ALU_SQUARE=0", "-DECC_PACKED_SQUARE_TABLE=0", "-DECC_PACKED_INV_POLY=0", "-DECC_WITNESS=1", "-DECC_SIGMA_SIGN=0", "-DECC_PACKED_NATIVE_PRODUCT=0", "-DECC_PACKED_NATIVE_REDUCE=0", "-DECC_PACKED_FUSED_SIGMA=0", "-DECC_PACKED_INLINE=0", "-DECC_PACKED_BLOCK_INVERSE=0", "-DECC_PACKED_BATCH_SPLIT=1", "-DECC_PACKED_LAST_SLOT_CACHE=0", "-DECC_PACKED_TAIL_LAYOUT=0", "-DECC_PACKED_SHARED_X_SLOTS=0", "-DECC_PACKED_XONLY_23=0", "-DECC_PACKED_XONLY_DOUBLE_ONLY=0", "-DECC_PACKED_XONLY_BRIDGE3=0", "-DECC_PACKED_XONLY_BRIDGE1_COMMON=0", "-DECC_PACKED_XONLY_BRIDGE_MOD72=0", "-DECC_PACKED_XONLY_SKIP_EMPTY_BRIDGE=0", "-DECC_PACKED_XONLY_ARITHMETIC_ONLY=0", "-DECC_PACKED_XONLY_POLY_SELECT=0", "-DECC_PACKED_XONLY_POLY_DP_CONVERT=1", "-DECC_PACKED_XONLY_POLY_SELECT_MASK=4095", "-DECC_PACKED_XONLY_POLY_SELECT_TARGET=14", "-DECC_NO_CUDA", "-Wall", "-Wno-unused-function", "-Wno-unknown-pragmas", "-x", "c++", "src/main.cu", "-o", "../target/blindspots-13/card-15/ecc2k130-cpu"] in ecc2k130 exit 0 (35.193 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 4 (host-load-before): ["uptime"] exit 0 (0.004 s) succeeded
+  stdout sha256 0ddaa0ea1d8e33e76567932fb68013c9075bb499a9c9c50c219e16d4e58626ff; last 1 lines:
+     17:07:25 up 14:20,  0 user,  load average: 0.83, 1.05, 1.27
+command 5 (host-cpu): ["lscpu"] exit 0 (0.004 s) succeeded
+  stdout sha256 18269c4df3e10f9a7ceccc769e9a0e4351de77618a6c51c2cc178fb979d0c0e1; last 20 lines:
+    NUMA node0 CPU(s):                       0-3
+    Vulnerability Gather data sampling:      Not affected
+    Vulnerability Ghostwrite:                Not affected
+    Vulnerability Indirect target selection: Not affected
+    Vulnerability Itlb multihit:             Not affected
+    Vulnerability L1tf:                      Not affected
+    Vulnerability Mds:                       Not affected
+    Vulnerability Meltdown:                  Not affected
+    Vulnerability Mmio stale data:           Not affected
+    Vulnerability Old microcode:             Not affected
+    Vulnerability Reg file data sampling:    Not affected
+    Vulnerability Retbleed:                  Not affected
+    Vulnerability Spec rstack overflow:      Not affected
+    Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl
+    Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+    Vulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI Vulnerable
+    Vulnerability Srbds:                     Not affected
+    Vulnerability Tsa:                       Not affected
+    Vulnerability Tsx async abort:           Not affected
+    Vulnerability Vmscape:                   Not affected
+command 6 (bench-1): ["prlimit", "--as=4294967296", "target/blindspots-13/card-15/ecc2k130-cpu", "--curve", "131", "--bench", "--threads", "1", "--steps", "32", "--launches", "800", "--verify", "0"] exit 0 (29.056 s) succeeded
+  stdout sha256 ca194e22fbe9f95c8f29a1e2156ac659aa038e60b5fdde4d87603543e53bb551; last 17 lines:
+    backend cpu: 1 threads x 32 slots x 512 lanes = 16384 walks, dp weight 0, 32 steps per launch
+           2.0 s      15.084 M it/s    30408704 iterations         0 dp         0 stored         0 dropped
+           4.0 s      14.925 M it/s    60293120 iterations         0 dp         0 stored         0 dropped
+           6.1 s      14.632 M it/s    88604672 iterations         0 dp         0 stored         0 dropped
+           8.1 s      14.234 M it/s   114819072 iterations         0 dp         0 stored         0 dropped
+          10.1 s      13.923 M it/s   140509184 iterations         0 dp         0 stored         0 dropped
+          12.1 s      14.208 M it/s   171966464 iterations         0 dp         0 stored         0 dropped
+          14.1 s      14.360 M it/s   202899456 iterations         0 dp         0 stored         0 dropped
+          16.2 s      14.476 M it/s   233832448 iterations         0 dp         0 stored         0 dropped
+          18.2 s      14.410 M it/s   261619712 iterations         0 dp         0 stored         0 dropped
+          20.2 s      14.439 M it/s   291504128 iterations         0 dp         0 stored         0 dropped
+          22.2 s      14.597 M it/s   324009984 iterations         0 dp         0 stored         0 dropped
+          24.2 s      14.624 M it/s   354418688 iterations         0 dp         0 stored         0 dropped
+          26.3 s      14.707 M it/s   386400256 iterations         0 dp         0 stored         0 dropped
+          28.3 s      14.678 M it/s   415236096 iterations         0 dp         0 stored         0 dropped
+          28.5 s      14.702 M it/s   419430400 iterations         0 dp         0 stored         0 dropped
+      finished: 14.702 M it/s, 0 distinguished points (0 verified against the reference, 0 dropped)
+command 7 (bench-2): ["prlimit", "--as=4294967296", "target/blindspots-13/card-15/ecc2k130-cpu", "--curve", "131", "--bench", "--threads", "1", "--steps", "32", "--launches", "800", "--verify", "0"] exit 0 (28.211 s) succeeded
+  stdout sha256 d57e62a32eb372d7d30336e478834c44ffd7dc8a2c5cb0ff7cd71847082eba4d; last 16 lines:
+    backend cpu: 1 threads x 32 slots x 512 lanes = 16384 walks, dp weight 0, 32 steps per launch
+           2.0 s      13.517 M it/s    27262976 iterations         0 dp         0 stored         0 dropped
+           4.0 s      14.651 M it/s    59244544 iterations         0 dp         0 stored         0 dropped
+           6.1 s      14.387 M it/s    87556096 iterations         0 dp         0 stored         0 dropped
+           8.1 s      14.293 M it/s   115867648 iterations         0 dp         0 stored         0 dropped
+          10.1 s      14.347 M it/s   145227776 iterations         0 dp         0 stored         0 dropped
+          12.1 s      14.438 M it/s   175112192 iterations         0 dp         0 stored         0 dropped
+          14.2 s      15.039 M it/s   212860928 iterations         0 dp         0 stored         0 dropped
+          16.2 s      15.293 M it/s   247463936 iterations         0 dp         0 stored         0 dropped
+          18.2 s      15.265 M it/s   277872640 iterations         0 dp         0 stored         0 dropped
+          20.2 s      15.279 M it/s   308805632 iterations         0 dp         0 stored         0 dropped
+          22.2 s      15.224 M it/s   338165760 iterations         0 dp         0 stored         0 dropped
+          24.2 s      15.178 M it/s   367525888 iterations         0 dp         0 stored         0 dropped
+          26.2 s      15.211 M it/s   398983168 iterations         0 dp         0 stored         0 dropped
+          27.6 s      15.189 M it/s   419430400 iterations         0 dp         0 stored         0 dropped
+      finished: 15.189 M it/s, 0 distinguished points (0 verified against the reference, 0 dropped)
+command 8 (bench-3): ["prlimit", "--as=4294967296", "target/blindspots-13/card-15/ecc2k130-cpu", "--curve", "131", "--bench", "--threads", "1", "--steps", "32", "--launches", "800", "--verify", "0"] exit 0 (29.255 s) succeeded
+  stdout sha256 21f6e5b6ac8537ba55488b70b42e7e4c0b6516e80af0970124e64823f532f268; last 17 lines:
+    backend cpu: 1 threads x 32 slots x 512 lanes = 16384 walks, dp weight 0, 32 steps per launch
+           2.0 s      15.745 M it/s    31981568 iterations         0 dp         0 stored         0 dropped
+           4.1 s      15.764 M it/s    63963136 iterations         0 dp         0 stored         0 dropped
+           6.1 s      15.524 M it/s    94371840 iterations         0 dp         0 stored         0 dropped
+           8.1 s      15.273 M it/s   123731968 iterations         0 dp         0 stored         0 dropped
+          10.1 s      14.920 M it/s   150994944 iterations         0 dp         0 stored         0 dropped
+          12.2 s      15.015 M it/s   182452224 iterations         0 dp         0 stored         0 dropped
+          14.2 s      14.775 M it/s   209190912 iterations         0 dp         0 stored         0 dropped
+          16.2 s      14.500 M it/s   234356736 iterations         0 dp         0 stored         0 dropped
+          18.2 s      14.476 M it/s   263192576 iterations         0 dp         0 stored         0 dropped
+          20.2 s      14.648 M it/s   295698432 iterations         0 dp         0 stored         0 dropped
+          22.2 s      14.552 M it/s   322961408 iterations         0 dp         0 stored         0 dropped
+          24.2 s      14.392 M it/s   348651520 iterations         0 dp         0 stored         0 dropped
+          26.2 s      14.361 M it/s   376963072 iterations         0 dp         0 stored         0 dropped
+          28.3 s      14.466 M it/s   408944640 iterations         0 dp         0 stored         0 dropped
+          28.9 s      14.532 M it/s   419430400 iterations         0 dp         0 stored         0 dropped
+      finished: 14.532 M it/s, 0 distinguished points (0 verified against the reference, 0 dropped)
+command 9 (bench-4): ["prlimit", "--as=4294967296", "target/blindspots-13/card-15/ecc2k130-cpu", "--curve", "131", "--bench", "--threads", "1", "--steps", "32", "--launches", "800", "--verify", "0"] exit 0 (28.143 s) succeeded
+  stdout sha256 463981e7f21446bcb1831796f8214d6fa8bf2c464d48e5e0a52961423e1ff24e; last 16 lines:
+    backend cpu: 1 threads x 32 slots x 512 lanes = 16384 walks, dp weight 0, 32 steps per launch
+           2.0 s      14.293 M it/s    28835840 iterations         0 dp         0 stored         0 dropped
+           4.0 s      14.904 M it/s    60293120 iterations         0 dp         0 stored         0 dropped
+           6.1 s      15.668 M it/s    94896128 iterations         0 dp         0 stored         0 dropped
+           8.1 s      15.344 M it/s   123731968 iterations         0 dp         0 stored         0 dropped
+          10.1 s      15.205 M it/s   153092096 iterations         0 dp         0 stored         0 dropped
+          12.1 s      15.158 M it/s   182976512 iterations         0 dp         0 stored         0 dropped
+          14.1 s      15.298 M it/s   215482368 iterations         0 dp         0 stored         0 dropped
+          16.1 s      15.249 M it/s   245891072 iterations         0 dp         0 stored         0 dropped
+          18.1 s      15.115 M it/s   274202624 iterations         0 dp         0 stored         0 dropped
+          20.2 s      15.426 M it/s   310902784 iterations         0 dp         0 stored         0 dropped
+          22.2 s      15.405 M it/s   341311488 iterations         0 dp         0 stored         0 dropped
+          24.2 s      15.271 M it/s   369098752 iterations         0 dp         0 stored         0 dropped
+          26.2 s      15.159 M it/s   396886016 iterations         0 dp         0 stored         0 dropped
+          27.6 s      15.206 M it/s   419430400 iterations         0 dp         0 stored         0 dropped
+      finished: 15.206 M it/s, 0 distinguished points (0 verified against the reference, 0 dropped)
+command 10 (bench-5): ["prlimit", "--as=4294967296", "target/blindspots-13/card-15/ecc2k130-cpu", "--curve", "131", "--bench", "--threads", "1", "--steps", "32", "--launches", "800", "--verify", "0"] exit 0 (27.479 s) succeeded
+  stdout sha256 e0fc188ae214d0fbdec1bc8cd3acc74e2910645551cd92c234c067278e1e1500; last 16 lines:
+    backend cpu: 1 threads x 32 slots x 512 lanes = 16384 walks, dp weight 0, 32 steps per launch
+           2.0 s      16.918 M it/s    34078720 iterations         0 dp         0 stored         0 dropped
+           4.0 s      15.503 M it/s    62390272 iterations         0 dp         0 stored         0 dropped
+           6.0 s      15.100 M it/s    91226112 iterations         0 dp         0 stored         0 dropped
+           8.1 s      15.404 M it/s   124256256 iterations         0 dp         0 stored         0 dropped
+          10.1 s      14.997 M it/s   150994944 iterations         0 dp         0 stored         0 dropped
+          12.1 s      15.137 M it/s   182976512 iterations         0 dp         0 stored         0 dropped
+          14.1 s      15.233 M it/s   214958080 iterations         0 dp         0 stored         0 dropped
+          16.1 s      15.215 M it/s   245366784 iterations         0 dp         0 stored         0 dropped
+          18.1 s      15.324 M it/s   277872640 iterations         0 dp         0 stored         0 dropped
+          20.2 s      15.320 M it/s   308805632 iterations         0 dp         0 stored         0 dropped
+          22.2 s      15.526 M it/s   344457216 iterations         0 dp         0 stored         0 dropped
+          24.2 s      15.499 M it/s   375390208 iterations         0 dp         0 stored         0 dropped
+          26.2 s      15.590 M it/s   408944640 iterations         0 dp         0 stored         0 dropped
+          26.9 s      15.605 M it/s   419430400 iterations         0 dp         0 stored         0 dropped
+      finished: 15.605 M it/s, 0 distinguished points (0 verified against the reference, 0 dropped)
+command 11 (host-load-after): ["uptime"] exit 0 (0.004 s) succeeded
+  stdout sha256 b4097cd703964ea5aab7b731c8857a7cb9d747f8c443592d6afaa8ee0a9d57f6; last 1 lines:
+     17:09:47 up 14:23,  0 user,  load average: 1.45, 1.20, 1.29
+command 12 (plan): ["prlimit", "--as=4294967296", "target/blindspots-13/card-15/b13", "plan", "--cpu-logs", "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-1.log,research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-2.log,research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-3.log,research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-4.log,research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-5.log", "--out-md", "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/plan.md", "--out-json", "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/plan.json"] exit 0 (0.003 s) succeeded
+  stdout sha256 bf578a949b84d173e7fe90ccd36d6aef5637ab9ab7cbe36865bc1f21ab4a85e8; last 1 lines:
+    wrote research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/plan.md and research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/plan.json
+  output research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/plan.md: 919143936de120805dcd3180b3a26b04348b358694d450c7cfd937dd63a10394
+  output research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/plan.json: 26c027ed5b6f692137add4036b8da767394e3a501d96d6dc3d0c3768ac1eee87
+command 13 (remove-bin): ["rm", "-f", "target/blindspots-13/card-15/b13", "target/blindspots-13/card-15/ecc2k130-cpu"] exit 0 (0.008 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 14 (remove-bin-dir): ["rmdir", "target/blindspots-13/card-15"] exit 0 (0.002 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:

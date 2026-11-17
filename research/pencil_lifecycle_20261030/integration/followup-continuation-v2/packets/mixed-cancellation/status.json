@@ -1,0 +1,74 @@
+{
+  "schema": "research.formal-component-result/v1",
+  "scope": "mixed degree1+2 shared-support prelude and cancellation branch",
+  "producer_sources": {
+    "MixedCancellation.lean": "23d050c6190b5abf46a3f71e39ec620b769391d37b18d7adaa9db6add678941e",
+    "WordMixed.lean": "74482d4e044d62a8742e25413419faf0172dd6177751e9d8339fcc2b6a67fd6a"
+  },
+  "theorem_ledger": [
+    {
+      "name": "extracted_valid",
+      "result": "factor support from actual root equation; both extracted degree-one supports valid"
+    },
+    {
+      "name": "ordinate_alternatives",
+      "result": "derive ordinate +/- alternatives from original validity predicates"
+    },
+    {
+      "name": "scales",
+      "result": "exact weighted guard/output normalization identities derived"
+    },
+    {
+      "name": "mismatch_excluded",
+      "result": "actual prelude mismatch excluded at field scope"
+    },
+    {
+      "name": "cancellation_preserves",
+      "result": "field cancellation dispatch and returned p4 validity/nonzero weights"
+    },
+    {
+      "name": "mixed_decode",
+      "result": "literal UInt64 prelude/p4 canonical and decoded"
+    },
+    {
+      "name": "mixed_classifier_decode",
+      "result": "word and field prelude guards agree"
+    },
+    {
+      "name": "mixed_word_branch_invariant",
+      "result": "mismatch excluded; cancellation implies canonical output, nonzero word weights, normalized validity"
+    }
+  ],
+  "machine_premises": [
+    "prime5<=p<2^31",
+    "10canonical degree1+degree2 inputwords",
+    "four nonzero word weights",
+    "both normalized supports divide common f minus ordinate squared"
+  ],
+  "no_added_output_assumptions": true,
+  "external_source_conditions": [
+    "Field.n=1",
+    "tables=None",
+    "ordinary execution/counter headroom"
+  ],
+  "evaluation_boundary": "mixedWords is a pure prelude/p4 value bundle and computes p4 even when common dispatch would return early; no operation-count or side-effect correspondence claimed",
+  "tail_boundary": "positiveCoincidence marks passage beyond prelude; does not model tripling or secondary generic output; common marks generic dispatch only",
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "independent_review": "pending",
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "receipts": {
+    "attempt1": 1,
+    "attempt2": 1,
+    "attempt3": 0,
+    "word-attempt1": 0,
+    "word-attempt2": 0,
+    "controls1": 1,
+    "readback1": 0,
+    "controls2": 0
+  }
+}

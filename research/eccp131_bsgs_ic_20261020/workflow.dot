@@ -1,0 +1,32 @@
+digraph ecc130_workflows {
+  graph [label="Certicom challenge workflows: exact identity and execution scope", labelloc=t,
+         fontname="Helvetica", fontsize=18, ranksep=0.55, nodesep=0.36];
+  node [shape=box, style="rounded,filled", fillcolor="#f4f7fb", color="#55718b",
+        fontname="Helvetica", fontsize=11];
+  edge [color="#55718b", fontname="Helvetica", fontsize=10];
+
+  p [label="ECCp-131\nprime field, published G and Q"];
+  b [label="ECC2K-130\nbinary Koblitz, published G and Q"];
+  pi [label="Exact parameter and\npoint inspection", fillcolor="#e4f2e7"];
+  bi [label="Exact parameter and\npoint inspection", fillcolor="#e4f2e7"];
+  pb [label="Interval BSGS\nverified scalar if in range", fillcolor="#e4f2e7"];
+  bb [label="Interval BSGS\nverified scalar if in range", fillcolor="#e4f2e7"];
+  ps [label="Prime IC structure and\nscaled pipeline", fillcolor="#fff2d6"];
+  pe [label="Exact ECCp-131 two-sum base\nB=512, 262144 distinct sums", fillcolor="#e4f2e7"];
+  pr [label="128 setup + 128 target candidates\n0 natural rows, rank 0", fillcolor="#fff2d6"];
+  pt [label="Exact ECCp-131 three-point oracle\nchecked pair-table subtraction", fillcolor="#e4f2e7"];
+  pr3 [label="B=128, two seeds, 32 setup + 16 target each\n0 natural rows, rank 0", fillcolor="#fff2d6"];
+  bf [label="Fixed-parameter IC\nselect / collect / logs / solve", fillcolor="#fff2d6"];
+  pg [label="Published ECCp-131 scalar and\nfull IC cost remain open", fillcolor="#fce5e5"];
+
+  p -> pi -> pb;
+  p -> ps;
+  p -> pe -> pr;
+  p -> pt -> pr3;
+  pr -> pg [style=dashed, label="needs natural rows and target descent"];
+  pr3 -> pg [style=dashed, label="needs independent rows and target descent"];
+  ps -> pg [style=dashed, label="scaled data do not transfer"];
+  b -> bi -> bb;
+  b -> bf;
+
+}

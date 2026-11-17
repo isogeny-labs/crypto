@@ -1,0 +1,115 @@
+{
+  "branch": "claude/zealous-meitner-85ipb5",
+  "closed_utc": "2026-11-12T06:38:18+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/inherited_f4_next_20261112/run_e2e.sh",
+        "research/inherited_f4_next_20261112/results_e2e"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T06:33:56+00:00",
+      "wall_s": 146.709
+    }
+  ],
+  "commit": "ca15f345e1d55e3d385c0f591a962b229b866a71",
+  "commit_dirty": false,
+  "created_utc": "2026-11-12T06:33:50+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261112-inherited-f4-next"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T0633Z-inherited-f4-next-e2e",
+  "metrics": [
+    {
+      "baseline": 123.11,
+      "better": "lower",
+      "n": 2,
+      "name": "s_fes_f2_koblitz13",
+      "note": "degree-13 Koblitz, binary-subspace dimension 7, descent-algebraic m=2 with fes-f2 (pinned word XORs); baseline = same oracle with inherited-f4 (117.79-128.43); S/rho 34.30 vs 44.59",
+      "reference": 2.76,
+      "reference_kind": "matched_rho",
+      "spread": [
+        83.71,
+        105.69
+      ],
+      "unit": "S",
+      "value": 94.7
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 6,
+      "name": "s_next_minus_old_max_abs",
+      "note": "inherited-f4-next S equals inherited-f4 S on all six instances (same counted work)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "S",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 2,
+      "name": "next_over_old_wall_per_call_koblitz23",
+      "note": "14.82 vs 16.14 ms per call at degree 23 (24 unknowns), whole-pipeline run; 0.97-0.99 at 13 and 17, 0.90 at 19, 0.87 at 21, 0.74 at 15",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.918
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "verified_configurations",
+      "note": "every one of the 24 configurations (6 instances x pair table, inherited-f4, inherited-f4-next, fes-f2) recovered its planted logarithm in every repeat; the matched rho runs verified too. Corrected from 30 (a miscount entered by the session) while the record was still open.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 24.0
+    }
+  ],
+  "problem": "study:inherited_f4_next_20261112:e2e-ladder",
+  "raw": [
+    {
+      "bytes": 79963,
+      "path": "research/inherited_f4_next_20261112/results_e2e.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6d/6def0de15308570c2fe010bee753640594f2875afa729256ff47071ed3c2fb57",
+      "sha256": "6def0de15308570c2fe010bee753640594f2875afa729256ff47071ed3c2fb57",
+      "uploaded": false
+    },
+    {
+      "bytes": 18064,
+      "path": "research/inherited_f4_next_20261112/results_e2e.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/97/97eb569846d7bad2541a523768861f6b5be88166b6aa27b0b8e78ba676baff09",
+      "sha256": "97eb569846d7bad2541a523768861f6b5be88166b6aa27b0b8e78ba676baff09",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/inherited_f4_next_20261112/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/inherited_f4_next_20261112/results_e2e.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "inherited-f4-next-e2e",
+  "status": "measured",
+  "summary": "ic bench --sweep on the six e2e-ladder instances (Koblitz 13/17/19/23, random 15/21), algebraic oracle with inherited-f4, inherited-f4-next and fes-f2, 2 repeats, 16 matched rho runs: all 24 configurations verified; degree 13 fes-f2 S 94.7 vs inherited-f4 123.1 (0.77x, 34.3x rho vs 44.6x); fes-f2 higher S from 16 unknowns up; inherited-f4-next S identical to inherited-f4, wall per call 0.74-0.99x. Local container; unverified.",
+  "validation": null
+}

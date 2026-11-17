@@ -1,0 +1,188 @@
+SetSeed(20261028);
+F2 := GF(2); P<X> := PolynomialRing(F2);
+K<w> := ext<F2|X^12+X^7+X^6+X^5+X^3+X+1>;
+k := FiniteField(2,4); Embed(k,K);
+E := EllipticCurve([K|1,w^5,0,0,1+w+w^2+w^3+w^4]);
+G := E![w^4+w^6+w^8+w^10+w^11,1+w+w^2+w^3+w^4+w^5+w^6+w^8+w^9];
+Q := E![w^4+w^5+w^6+w^7+w^8+w^9,w+w^4+w^6+w^8+w^9+w^11];
+assert #E eq 4178 and G ne E!0 and 2089*G eq E!0 and Q eq 7*G;
+assert WeilDescentGenus(E,k,K!1) eq 4;
+all_tic := Cputime();
+C,h := WeilDescent(E,k,K!1); J := Jacobian(C);
+D := h(G); T := h(Q);
+assert D ne J!0 and 2089*D eq J!0 and T eq 7*D;
+print "SOURCE",4178,"PRIME",2089,"MAP_CPU",Cputime(all_tic);
+print "CURVE",C;
+print "SOURCE_GENERATOR",G,"SOURCE_TARGET",Q;
+print "IMAGE_GENERATOR",D,"IMAGE_TARGET",T;
+R<x> := PolynomialRing(k);
+f,hyp := HyperellipticPolynomials(C);
+assert Degree(f) eq 9 and Genus(C) eq 4;
+fbx := [k|]; fby := [k|]; fb := [J|];
+for xx in k do
+    for root in Roots(R.1^2+Evaluate(hyp,xx)*R.1+Evaluate(f,xx)) do
+        yy := root[1];
+        Append(~fbx,xx); Append(~fby,yy);
+        Append(~fb,J![x-xx,R!yy]);
+    end for;
+end for;
+assert #fb+1 eq #RationalPoints(C);
+print "FACTOR_BASE",#fb;
+F := GF(2089);
+rows := []; rhs := [F|];
+walk := J!0; aa := 0; bb := 0; smooth := 0;
+seen_smooth := AssociativeArray();
+tic := Cputime(); used := 0;
+for step in [1..20000] do
+    z := Random(1,3);
+    if z eq 1 then walk +:= D; aa +:= 1;
+    elif z eq 2 then walk +:= T; bb +:= 1;
+    else walk +:= D+T; aa +:= 1; bb +:= 1;
+    end if;
+    aa mod:= 2089; bb mod:= 2089;
+    if Degree(walk[1]) lt 3 then continue; end if;
+    factors := Factorization(walk[1]);
+    if &or[Degree(tup[1]) ne 1 or tup[2] ne 1:tup in factors] then continue; end if;
+    coeffs := [F!0:i in [1..#fb+1]];
+    check := J!0; valid := true;
+    for tup in factors do
+        xx := -Coefficient(tup[1],0)/Coefficient(tup[1],1);
+        yy := Evaluate(walk[2],xx);
+        ix := 0;
+        for j in [1..#fb] do
+            if fbx[j] eq xx and fby[j] eq yy then ix := j; break; end if;
+        end for;
+        if ix eq 0 then valid := false; break; end if;
+        coeffs[ix] +:= 1;
+        check +:= fb[ix];
+    end for;
+    if not valid then continue; end if;
+    assert check eq walk;
+    smooth +:= 1;
+    key := Sprint(walk);
+    if IsDefined(seen_smooth,key) then continue; end if;
+    seen_smooth[key] := true;
+    coeffs[#fb+1] := -(F!bb);
+    Append(~rows,coeffs); Append(~rhs,F!aa);
+    if #rows ge #fb then
+        mat := Matrix(F,rows);
+        sol_now,ker_now := Solution(Transpose(mat),Vector(F,rhs));
+        if &and[v[#fb+1] eq 0:v in Basis(ker_now)] then
+            used := step; break;
+        end if;
+    end if;
+end for;
+if 2089 eq 17 then
+    subgroup_smooth := 0;
+    for j in [1..2088] do
+        u := (j*D)[1];
+        facts := Factorization(u);
+        if Degree(u) ge 3 and &and[Degree(t[1]) eq 1 and t[2] eq 1:t in facts] then
+            subgroup_smooth +:= 1;
+        end if;
+    end for;
+    print "SUBGROUP_SMOOTH",subgroup_smooth;
+    assert subgroup_smooth eq 0;
+    offset_steps := 0;
+    for oi in [1..#fb] do
+      if used ne 0 then break; end if;
+      for oj in [oi..#fb] do
+        if used ne 0 then break; end if;
+        offset := fb[oi]+fb[oj]; walk := offset; aa := 0; bb := 0;
+        for step in [1..8356] do
+          offset_steps +:= 1;
+          z := Random(1,3);
+          if z eq 1 then walk +:= D; aa +:= 1;
+          elif z eq 2 then walk +:= T; bb +:= 1;
+          else walk +:= D+T; aa +:= 1; bb +:= 1;
+          end if;
+          aa mod:= 2089; bb mod:= 2089;
+          if Degree(walk[1]) lt 3 then continue; end if;
+          factors := Factorization(walk[1]);
+          if &or[Degree(tup[1]) ne 1 or tup[2] ne 1:tup in factors] then continue; end if;
+          coeffs := [F!0:i in [1..#fb+1]];
+          check := J!0; valid := true;
+          for tup in factors do
+            xx := -Coefficient(tup[1],0)/Coefficient(tup[1],1);
+            yy := Evaluate(walk[2],xx); ix := 0;
+            for j in [1..#fb] do
+              if fbx[j] eq xx and fby[j] eq yy then ix := j; break; end if;
+            end for;
+            if ix eq 0 then valid := false; break; end if;
+            coeffs[ix] +:= 1; check +:= fb[ix];
+          end for;
+          if not valid then continue; end if;
+          assert check eq walk;
+          smooth +:= 1;
+          key := Sprint(walk);
+          if IsDefined(seen_smooth,key) then continue; end if;
+          seen_smooth[key] := true;
+          coeffs[oi] -:= 1; coeffs[oj] -:= 1;
+          coeffs[#fb+1] := -(F!bb);
+          Append(~rows,coeffs); Append(~rhs,F!aa);
+          if #rows ge #fb then
+            mat := Matrix(F,rows);
+            sol_now,ker_now := Solution(Transpose(mat),Vector(F,rhs));
+            if &and[v[#fb+1] eq 0:v in Basis(ker_now)] then
+              used := offset_steps; break;
+            end if;
+          end if;
+        end for;
+      end for;
+    end for;
+    print "OFFSET_WALK_STEPS",offset_steps;
+end if;
+print "RELATIONS",#rows,"SMOOTH",smooth,"WALK_STEPS",used,"REL_CPU",Cputime(tic);
+if #rows gt 0 then
+    tic := Cputime();
+    mat := Matrix(F,rows);
+    print "REL_RANK",Rank(mat),"VARS",#fb+1;
+    sol,ker := Solution(Transpose(mat),Vector(F,rhs));
+    target_free := &or[v[#fb+1] ne 0:v in Basis(ker)];
+    print "KERNEL_DIM",Dimension(ker),"TARGET_FREE",target_free;
+    assert not target_free;
+    print "RELATION_MATRIX",mat;
+    print "RELATION_RHS",rhs;
+    ans := Integers()!sol[#fb+1];
+    print "INDEX_LOG",ans,"LINEAR_CPU",Cputime(tic),"VERIFIED",ans*G eq Q and ans*D eq T;
+end if;
+print "FULL_CPU",Cputime(all_tic);
+print "J_ORDER",#J;
+rho_tic := Cputime(); rho_steps := 0; rho_success := 0; rho_attempts := 0;
+for trial in [1..2000] do
+    if rho_success eq 1000 then break; end if;
+    rho_attempts +:= 1;
+    seen := AssociativeArray();
+    ra := Random(0,2088); rb := Random(0,2088);
+    salt := Random(0,1000000);
+    rp := ra*G+rb*Q;
+    for iter in [1..10000] do
+        key := Sprint(rp);
+        present,old := IsDefined(seen,key);
+        if present then
+            den := F!(rb-old[2]);
+            if den ne 0 then
+                log := (F!(old[1]-ra))/den;
+                assert (Integers()!log)*G eq Q;
+                rho_success +:= 1;
+                break;
+            end if;
+            break;
+        else
+            seen[key] := <ra,rb>;
+        end if;
+        if rp eq E!0 then z := (salt mod 97) mod 3;
+        else
+            xp := Eltseq(rp[1]);
+            mask := &+[Integers()!xp[i]*2^(i-1):i in [1..#xp]];
+            z := ((mask+salt) mod 97) mod 3;
+        end if;
+        if z eq 0 then rp +:= G; ra := (ra+1) mod 2089;
+        elif z eq 1 then rp +:= Q; rb := (rb+1) mod 2089;
+        else rp +:= rp; ra := (2*ra) mod 2089; rb := (2*rb) mod 2089;
+        end if;
+        rho_steps +:= 1;
+    end for;
+end for;
+print "RHO_TRIALS",rho_success,"RHO_ATTEMPTS",rho_attempts,
+      "RHO_STEPS",rho_steps,"RHO_CPU",Cputime(rho_tic);

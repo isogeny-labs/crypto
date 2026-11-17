@@ -1,0 +1,72 @@
+{
+  "arms": [
+    {
+      "arm": "split",
+      "exit_code": 0,
+      "process_wall_seconds": 24.66644012500001,
+      "stage": {
+        "base_hash": "0d49fb3973e6cde8fc8dedb531c0f48e0bc00d077accfdc674fb4bab45c7e593",
+        "base_load_ms": 3774.152083,
+        "batch_roots": true,
+        "factor_base_points": 21248,
+        "index_build_ms": 14631.945709,
+        "indexed5_split_at": 64,
+        "kind": "compact_orbit_index_stage",
+        "n": 83,
+        "normal_basis_and_selftest_ms": 122.196084,
+        "orbit_columns": 128,
+        "overflow_digest_blake3": "3bd0e3682b89cfc0038642cad0e36371537e68a0b54cc17ddff5886c128b059d",
+        "overflow_table_allocated_bytes": 10485760,
+        "overflow_table_entries": 1019712,
+        "primary_table_allocated_bytes": 2621440,
+        "primary_table_entries": 339776,
+        "regular_states": 680000,
+        "root_bloom_bytes": 2097152,
+        "root_table_allocated_bytes": 13107200,
+        "root_table_entries": 1359488,
+        "setup_total_ms": 18528.294333,
+        "shared_bloom_bytes": 2097152,
+        "shared_bloom_enabled": true,
+        "state_digest_blake3": "8ff4de15e941ea6d1b6f526338382d06eb9e223d792a3c1cc6503efda1c75d60",
+        "status": "STAGE_DIAGNOSTIC_ONLY",
+        "table_digest_blake3": "ae1647835c9caddd143b853e3880589571d60267941eab2250a76422c98873a3"
+      },
+      "status": "PROCESS_EXITED"
+    },
+    {
+      "arm": "monolithic",
+      "exit_code": 0,
+      "process_wall_seconds": 39.94355883300159,
+      "stage": {
+        "base_hash": "0d49fb3973e6cde8fc8dedb531c0f48e0bc00d077accfdc674fb4bab45c7e593",
+        "base_load_ms": 5842.853541,
+        "batch_roots": true,
+        "factor_base_points": 21248,
+        "index_build_ms": 24861.570458,
+        "indexed5_split_at": null,
+        "kind": "compact_orbit_index_stage",
+        "n": 83,
+        "normal_basis_and_selftest_ms": 179.860416,
+        "orbit_columns": 128,
+        "overflow_digest_blake3": null,
+        "overflow_table_allocated_bytes": 0,
+        "overflow_table_entries": 0,
+        "primary_table_allocated_bytes": 10485760,
+        "primary_table_entries": 1359488,
+        "regular_states": 680000,
+        "root_bloom_bytes": 2097152,
+        "root_table_allocated_bytes": 10485760,
+        "root_table_entries": 1359488,
+        "setup_total_ms": 30884.284708,
+        "shared_bloom_bytes": 0,
+        "shared_bloom_enabled": false,
+        "state_digest_blake3": "8ff4de15e941ea6d1b6f526338382d06eb9e223d792a3c1cc6503efda1c75d60",
+        "status": "STAGE_DIAGNOSTIC_ONLY",
+        "table_digest_blake3": "5389decd3caa89c691b76d4820651dc1962794b1dac7801f0f40f5885bd745ec"
+      },
+      "status": "PROCESS_EXITED"
+    }
+  ],
+  "schema": "n83.split-index-smoke/v1",
+  "status": "PASS_INDEX_STAGE_CONTROL"
+}

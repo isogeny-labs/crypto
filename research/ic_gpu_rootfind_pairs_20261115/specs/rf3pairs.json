@@ -1,0 +1,183 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "rootfind-subtract m = 3 at 34-40 bits with the pair table built on the device, and a pooled multi-threaded CPU sweep",
+ "description": "research/ic_gpu_rootfind_pairs_20261115, frozen 2026-11-15 before the run. Curves: the prime_explicit curves of research/ic_gpu_rootfind_big_20261115. rf3-cpu: rootfind-subtract:m=3 (1 thread). rf3-mt: backend=emulate on the daemon, now on a persistent thread pool. rf3-gpud: backend=cuda with the probe table built on the device from the CPU-built pair table (round 3's GPU arm). rf3-gpup: probe_build=pairs, the pair table itself built on the device from the base and charged as the CPU build. All arms must report identical relations, logarithm and counted S. rho.negation is the matched reference; rho-neg-aa and rf3-cpuaa-F2048 are A/A controls. Public synthetic curves; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 11700434063,
+    "a": 11700434060,
+    "b": 7883827458,
+    "group_order": 11700309493,
+    "r": 11700309493,
+    "gx": 3415576976,
+    "gy": 16634281
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 39012606793,
+    "a": 39012606790,
+    "b": 22067677030,
+    "group_order": 39012932117,
+    "r": 39012932117,
+    "gx": 28471443345,
+    "gy": 30164763423
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 179789274499,
+    "a": 179789274496,
+    "b": 173964404864,
+    "group_order": 179789343343,
+    "r": 179789343343,
+    "gx": 59620662219,
+    "gy": 171377409987
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 697556657731,
+    "a": 697556657728,
+    "b": 166992763911,
+    "group_order": 697556764217,
+    "r": 697556764217,
+    "gx": 32890058555,
+    "gy": 671668786987
+   }
+  ],
+  "targets_per_curve": 2,
+  "target_seed": 20261122
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rf3-cpu-F2048",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract:m=3",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf3-mt-F2048",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract-gpu:m=3,worker=daemon,backend=emulate",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf3-gpud-F2048",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract-gpu:m=3,worker=daemon,backend=cuda,probe_build=device",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf3-gpup-F2048",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract-gpu:m=3,worker=daemon,backend=cuda,probe_build=pairs",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf3-cpu-F4096",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract:m=3",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf3-mt-F4096",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract-gpu:m=3,worker=daemon,backend=emulate",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf3-gpud-F4096",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract-gpu:m=3,worker=daemon,backend=cuda,probe_build=device",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf3-gpup-F4096",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract-gpu:m=3,worker=daemon,backend=cuda,probe_build=pairs",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf3-cpuaa-F2048",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract:m=3",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261123,
+  "isolation_required": "L0",
+  "timeout_seconds": 7200
+ }
+}

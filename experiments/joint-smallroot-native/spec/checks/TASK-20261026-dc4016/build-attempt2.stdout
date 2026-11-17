@@ -1,0 +1,6 @@
+make: Entering directory '/workspace/crypto-native-smallroot/experiments/joint-smallroot-native'
+g++ -Isrc -I/workspace/skeleton_sage-runtime/include -std=c++17 -O2 -g -Wall -Wextra -Wpedantic -Werror src/main.cpp -L/workspace/skeleton_sage-runtime/lib -Wl,-rpath,/workspace/skeleton_sage-runtime/lib -lgmpxx -lgmp -lcrypto -pthread -o /workspace/native-smallroot-cpu-build-dc4016-1/native-smallroot
+g++ -Isrc -I/workspace/skeleton_sage-runtime/include -std=c++17 -O2 -g -Wall -Wextra -Wpedantic -Werror tests/structural.cpp -L/workspace/skeleton_sage-runtime/lib -Wl,-rpath,/workspace/skeleton_sage-runtime/lib -lgmpxx -lgmp -lcrypto -pthread -o /workspace/native-smallroot-cpu-build-dc4016-1/structural
+g++ -Isrc -I/workspace/skeleton_sage-runtime/include -std=c++17 -O2 -g -Wall -Wextra -Wpedantic -Werror tests/cpu_accounting.cpp -L/workspace/skeleton_sage-runtime/lib -Wl,-rpath,/workspace/skeleton_sage-runtime/lib -lgmpxx -lgmp -lcrypto -pthread -o /workspace/native-smallroot-cpu-build-dc4016-1/cpu-accounting
+g++ -Isrc -I/workspace/skeleton_sage-runtime/include -std=c++17 -O2 -g -Wall -Wextra -Wpedantic -Werror tests/fake_child.cpp -o /workspace/native-smallroot-cpu-build-dc4016-1/fake-child
+make: Leaving directory '/workspace/crypto-native-smallroot/experiments/joint-smallroot-native'

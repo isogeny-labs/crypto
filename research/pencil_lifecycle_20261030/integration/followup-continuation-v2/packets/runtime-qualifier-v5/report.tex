@@ -1,0 +1,4 @@
+\documentclass[11pt]{article}\usepackage[margin=1in]{geometry}\setlength{\parindent}{0pt}\begin{document}\textbf{Qualifier v5: unique gate receipt}\par\medskip
+One additive assertion rejects the gate schema identifier anywhere in stdout or stderr after the first validated receipt. This closes the independent review finding while preserving sealed v4.\par\medskip
+Q1 requires complete parsed JSON equality. Q2/Q3 require the expected exit, rejection substring and absence of positive-report or further gate schemas. Complete negative byte equality is not claimed.\par\medskip
+AST parsing passed; no Docker or native execution. The original caps and pending bindings remain. An unexpected file-bind parent in the container diff would still fail closed; this is an operational possibility, not an observed result.\end{document}

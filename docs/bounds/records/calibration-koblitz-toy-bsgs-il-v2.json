@@ -1,0 +1,377 @@
+{
+  "admissibility": {
+    "bounded": true,
+    "deterministic": true,
+    "reasons": [
+      "3 size(s): below 4, so the exponent is descriptive and this is a constant bound"
+    ],
+    "status": "admissible",
+    "unpriced": [
+      "inserts_uncharged",
+      "lookups_uncharged"
+    ]
+  },
+  "bound_id": "ECBND1h8def4c9eb149",
+  "constant": {
+    "declared_ratio_to_floor": null,
+    "ratio_to_floor": {
+      "ci95": [
+        5.945963112774116,
+        7.109385877513529
+      ],
+      "ci_method": "cluster",
+      "value": 6.517429024984014
+    },
+    "s": {
+      "ci95": [
+        1.162413224799831,
+        1.4745298935408768
+      ],
+      "ci_method": "cluster",
+      "value": 1.3105233924853232
+    }
+  },
+  "dimensions": {
+    "memory": {
+      "ci95": [
+        1.1457700169063547,
+        1.4336307429118023
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "first of counters.inserts_uncharged, counters.table_inserts_uncharged, counters.table_entries, counters.distinguished_points",
+      "statistic": "mean table entries / sqrt(r) over verified runs",
+      "value": 1.291489946978547
+    },
+    "ops": {
+      "ci95": [
+        5.945963112774116,
+        7.109385877513529
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "cost.total_gae, workload.curve.r, automorphisms_available",
+      "statistic": "mean S / sqrt(pi / 2A) over verified runs",
+      "value": 6.517429024984014
+    },
+    "uncharged": {
+      "ci95": [
+        2.296170983549676,
+        2.9135996649965126
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "counters.*_uncharged",
+      "statistic": "mean sum of *_uncharged counters / sqrt(r) over verified runs",
+      "value": 2.5850947277272462
+    }
+  },
+  "domain": {
+    "envelope": {
+      "precomputation": "none",
+      "targets": 1,
+      "threads": 1
+    },
+    "family": "koblitz",
+    "problem": "ecdlp.single_target",
+    "target_kind": "planted",
+    "tier": "toy",
+    "unit": "ecbench.gae"
+  },
+  "domain_id": "ECDOM1h080dd3dc639e",
+  "fit": {
+    "alpha": 0.44324850007530925,
+    "alpha_agrees_with_declared": null,
+    "alpha_ci95": null,
+    "ci_method": "none",
+    "declared_alpha": 0.5,
+    "log2_c": 1.331407576732841,
+    "model": "gae = C * r^alpha",
+    "points": 72,
+    "r_squared": 0.7649760574379801,
+    "scaling_claim": false,
+    "size_parameter": "r",
+    "sizes": 3
+  },
+  "fit_options": {
+    "curves": [],
+    "fit_version": 2,
+    "resamples": 2000,
+    "seed": 20261005,
+    "tier": "toy"
+  },
+  "improves_on": [],
+  "label": "bsgs.interleaved on 3 koblitz curves, toy tier",
+  "level": "constant",
+  "method": {
+    "entry": "ecbench::generic::bsgs_interleaved",
+    "family": "bsgs",
+    "id": "bsgs.interleaved",
+    "method_id": "ECM1h6153371050b8",
+    "params": {}
+  },
+  "notes": "",
+  "provenance": {
+    "audits": [
+      {
+        "ok": true,
+        "path": "research/ecbench_calibration_20261002/audit-koblitz.json",
+        "replays": 12,
+        "replays_reproduced": 12,
+        "session_id": "ECBS1h73210d525d59",
+        "sha256": "6eba1d5c251683f9be55dd4aa3ab1e01f5c7f98a5b70744a01f0801908c808a4"
+      }
+    ],
+    "records": 72,
+    "sessions": [
+      {
+        "arm": "bsgs-il",
+        "binary_sha256": "32390c09f730971ad83eeff8ff97262be1150dc5e4c90657784f798827ef32af",
+        "dir": "research/ecbench_calibration_20261002/sessions/koblitz",
+        "env_class_id": "ECBENV1h9391b7a712c6",
+        "git_commit": "78a2b631f7273fbd222a6ed838a500f018fb83a7",
+        "records_sha256": "1f7a9ebe3cd1991a67be49bffb8e271c209dd3e4d2598ba3592e5705b7892bf8",
+        "role": "candidate",
+        "session_id": "ECBS1h73210d525d59",
+        "spec_id": "ECS1h9429f9e49b6c",
+        "status": "complete"
+      }
+    ],
+    "statuses": {
+      "verified": 72
+    },
+    "verified": 72
+  },
+  "schema": "ecbench.bound/v1",
+  "sizes": [
+    {
+      "automorphisms_available": 34,
+      "axes": {
+        "memory": {
+          "ci95": [
+            1.07422809617211,
+            1.729344334342022
+          ],
+          "value": 1.4183935241556889
+        },
+        "uncharged": {
+          "ci95": [
+            2.158340042607177,
+            3.4508303976107815
+          ],
+          "value": 2.8406917792794597
+        }
+      },
+      "band": [
+        {
+          "ci95": [
+            1.1059906421406003,
+            1.7444629645590644
+          ],
+          "s": 1.4515837373843834,
+          "weight": 0.0
+        },
+        {
+          "ci95": [
+            1.322141905792474,
+            2.09400959990803
+          ],
+          "s": 1.73565291531233,
+          "weight": 0.1
+        },
+        {
+          "ci95": [
+            3.2536170791541026,
+            5.189704715971776
+          ],
+          "s": 4.292275516663843,
+          "weight": 1.0
+        }
+      ],
+      "declared_ratio_to_floor": 6.203235322241704,
+      "declared_s": 1.3333333333333333,
+      "field_bits": 17,
+      "floor_s": 0.21494160128871234,
+      "levels": {
+        "L0": 24
+      },
+      "log2_r": 16.001122266128682,
+      "mean_gae": 371.75,
+      "mean_s": 1.4515837373843834,
+      "memory_entries_per_sqrt_r": 1.4183935241556889,
+      "r": 65587,
+      "ratio_to_floor": 6.753386634700824,
+      "runs": 24,
+      "s_ci95": [
+        1.1030620939145388,
+        1.7688675331095742
+      ],
+      "slug": "icv1-f2m17-tm101-00378d4e",
+      "uncharged_per_sqrt_r": 2.8406917792794597,
+      "verified": 24,
+      "workloads": 8
+    },
+    {
+      "automorphisms_available": 38,
+      "axes": {
+        "memory": {
+          "ci95": [
+            1.0038566846435493,
+            1.493254886327279
+          ],
+          "value": 1.2424630084119626
+        },
+        "uncharged": {
+          "ci95": [
+            2.0174715708061397,
+            2.986985484978611
+          ],
+          "value": 2.486877657127734
+        }
+      },
+      "band": [
+        {
+          "ci95": [
+            1.0074977135853407,
+            1.5091180626716707
+          ],
+          "s": 1.2607596362601652,
+          "weight": 0.0
+        },
+        {
+          "ci95": [
+            1.2143593880371224,
+            1.7947223245061676
+          ],
+          "s": 1.5094474019729383,
+          "weight": 0.1
+        },
+        {
+          "ci95": [
+            3.0279455358547884,
+            4.512338755427585
+          ],
+          "s": 3.7476372933878976,
+          "weight": 1.0
+        }
+      ],
+      "declared_ratio_to_floor": 6.5579876791545795,
+      "declared_s": 1.3333333333333333,
+      "field_bits": 19,
+      "floor_s": 0.2033144004785961,
+      "levels": {
+        "L0": 24
+      },
+      "log2_r": 18.002194205049015,
+      "mean_gae": 646.0,
+      "mean_s": 1.2607596362601652,
+      "memory_entries_per_sqrt_r": 1.2424630084119626,
+      "r": 262543,
+      "ratio_to_floor": 6.20103462072718,
+      "runs": 24,
+      "s_ci95": [
+        1.0216715012917488,
+        1.5140093611830905
+      ],
+      "slug": "icv1-f2m19-tm797-9c54981b",
+      "uncharged_per_sqrt_r": 2.4868776571277333,
+      "verified": 24,
+      "workloads": 8
+    },
+    {
+      "automorphisms_available": 46,
+      "axes": {
+        "memory": {
+          "ci95": [
+            0.8154685170107498,
+            1.5600407221398764
+          ],
+          "value": 1.2136133083679905
+        },
+        "uncharged": {
+          "ci95": [
+            1.684042531404008,
+            3.120801436086627
+          ],
+          "value": 2.427714746774542
+        }
+      },
+      "band": [
+        {
+          "ci95": [
+            0.8329206912956142,
+            1.5803484571503135
+          ],
+          "s": 1.2192268038114225,
+          "weight": 0.0
+        },
+        {
+          "ci95": [
+            1.004169217154445,
+            1.8892951109926999
+          ],
+          "s": 1.461998278488876,
+          "weight": 0.1
+        },
+        {
+          "ci95": [
+            2.558100381699204,
+            4.733940028577161
+          ],
+          "s": 3.6469415505859644,
+          "weight": 1.0
+        }
+      ],
+      "declared_ratio_to_floor": 7.21535517307468,
+      "declared_s": 1.3333333333333333,
+      "field_bits": 23,
+      "floor_s": 0.1847910880823847,
+      "levels": {
+        "L0": 24
+      },
+      "log2_r": 22.00089368896064,
+      "mean_gae": 2497.75,
+      "mean_s": 1.2192268038114225,
+      "memory_entries_per_sqrt_r": 1.2136133083679908,
+      "r": 4196903,
+      "ratio_to_floor": 6.597865819524041,
+      "runs": 24,
+      "s_ci95": [
+        0.8574492257332178,
+        1.5654909991016654
+      ],
+      "slug": "icv1-f2m23-tm5197-1f85e9e1",
+      "uncharged_per_sqrt_r": 2.4277147467745412,
+      "verified": 24,
+      "workloads": 8
+    }
+  ],
+  "stages": [
+    {
+      "alpha": null,
+      "alpha_ci95": null,
+      "mean_gae": 10.333333333333334,
+      "name": "setup",
+      "share_of_gae": 0.008818091309913241,
+      "sizes_with_work": 3
+    },
+    {
+      "alpha": null,
+      "alpha_ci95": null,
+      "mean_gae": 1161.5,
+      "name": "search",
+      "share_of_gae": 0.9911819086900867,
+      "sizes_with_work": 3
+    }
+  ],
+  "tail": {
+    "large": false,
+    "max_over_median": 1.4062725677497154,
+    "max_ratio": 9.85288339778788,
+    "median_ratio": 7.0063824209799055,
+    "runs": 72,
+    "top_run": "ECR1h46601f41aa6b",
+    "top_run_share": 0.020996868891470524
+  },
+  "verdict_id": null
+}

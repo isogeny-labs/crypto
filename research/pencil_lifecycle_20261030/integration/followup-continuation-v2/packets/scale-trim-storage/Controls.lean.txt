@@ -1,0 +1,25 @@
+import Bridge
+namespace ScaleTrimControls
+open ScaleTrim WordCoefficient CoefficientTraversal
+ theorem empty : trimFuel 0 []=[] := rfl
+ theorem all_zero : trimFuel 3 [0,0,0]=[] := by decide
+ theorem trailing : trimFuel 4 [1,2,0,0]=[1,2] := by decide
+ theorem internal : trimFuel 3 [1,0,2]=[1,0,2] := by decide
+ theorem partial_fuel : trimFuel 1 [1,0,0]=[1,0] := by decide
+ theorem pad_u : pad 3 [1,2]=[1,2,0] := by decide
+ theorem pad_v : pad 2 [7]=[7,0] := by decide
+ theorem over_capacity_excluded : ¬([1,2,3]:List UInt64).length≤2 := by decide
+ theorem no_silent_truncation : pad 2 [1,2,3]=[1,2,3] := by decide
+ theorem scale_zero_exponent : smallPow 17 2 ⟨0,by decide⟩=1 := by decide
+ theorem scale_two : smallPow 17 2 ⟨2,by decide⟩=4 := by decide
+ theorem scale_three : smallPow 17 2 ⟨3,by decide⟩=8 := by decide
+ theorem u_output :
+  let out := (transform (n:=3) (by decide) 17 (fun i=>if i.val=1 then 2 else 1) 2 3 (smallPow 17 2 ⟨2,by decide⟩)).val.toList
+  pad 3 (trimFuel out.length out)=[4,4,1] := by decide
+ theorem v_output :
+  let out := (transform (n:=2) (by decide) 17 (fun i=>if i.val=0 then 5 else 0) 2 3 (smallPow 17 2 ⟨3,by decide⟩)).val.toList
+  pad 2 (trimFuel out.length out)=[7,0] := by decide
+ theorem zero_v :
+  let out := (transform (n:=2) (by decide) 17 (fun _=>0) 2 3 (smallPow 17 2 ⟨3,by decide⟩)).val.toList
+  pad 2 (trimFuel out.length out)=[0,0] := by decide
+end ScaleTrimControls

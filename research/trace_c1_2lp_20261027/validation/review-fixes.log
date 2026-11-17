@@ -1,0 +1,38 @@
+2026-10-27T17:36:28Z PR #2709 review-fix validation
+
+Source parent: f5efc3a0e61051549b4ae818787a9b3cd15416b8
+Toolchain: rustc 1.99.1 (58cf8f9c3 2026-10-13)
+Profile: release with profile.release.opt-level=0 (correctness only)
+OpenSSL: OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
+         OPENSSL_INCLUDE_DIR=/usr/include
+
+Command:
+  cargo test --release --lib --locked -j 1 \
+    --config 'profile.release.opt-level=0' trace_line
+Result: exit 0; 4 passed, 0 failed, 5036 filtered out.
+
+Command:
+  cargo test --release --example trace_line_replay --locked -j 1 \
+    --config 'profile.release.opt-level=0'
+Result: exit 0; 1 passed, 0 failed.
+The example test now rejects a changed or malformed outcome scalar, a
+verified/exhausted status inconsistency, a missing detail scalar, a changed
+declared small_dimension, a damaged relation, empty input, and input with no
+matching method.
+
+Command:
+  cargo clippy --release --example trace_line_replay --locked -j 1 \
+    --config 'profile.release.opt-level=0' -- -D warnings
+Result: exit 101 at the two unchanged, previously recorded library warnings:
+  src/cryptanalysis/zero_dim_la.rs:1191 manual_range_contains
+  src/cryptanalysis/sat.rs:1343 manual_is_multiple_of
+No lint or test was disabled. This is not a green whole-repository lint gate.
+
+Command:
+  rustfmt --edition 2021 examples/trace_line_replay.rs \
+    src/cryptanalysis/ecbench_large_prime/trace_line.rs \
+    src/cryptanalysis/ecbench_large_prime/trace_line_tests.rs
+  git diff --check
+Result: exit 0.
+
+No benchmark, ecbench session, priced comparison, or paid experiment was run.

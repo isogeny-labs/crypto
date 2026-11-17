@@ -1,0 +1,53 @@
+import Wide
+set_option autoImplicit false
+namespace WideModPow
+open PencilWordRefinement WordCoefficient
+
+theorem fermat (p : ℕ) [Fact p.Prime] (a : ZMod p) (ha : a≠0) : a^(p-1)=1 := by
+ have h := congrArg (fun u : (ZMod p)ˣ => (u : ZMod p)) (show (Units.mk0 a ha)^Fintype.card ((ZMod p)ˣ)=1 from pow_card_eq_one)
+ simpa only [Units.val_pow_eq_pow_val,Units.val_mk0,Units.val_one,Fintype.card_units,ZMod.card] using h
+
+def inverseGenerator (p a : UInt64) : UInt64 := modpow p a (p-2)
+
+theorem inverse_exponent (p : UInt64) (hp : 1<p.toNat) : (p-2).toNat=p.toNat-2 := by
+ rw [UInt64.toNat_sub_of_le]
+ · rfl
+ · change (2:UInt64).toNat≤p.toNat
+   simpa using (show 2≤p.toNat by omega)
+
+theorem generator_product (p a : UInt64) [Fact p.toNat.Prime]
+ (hp : 1<p.toNat) (ha : a.toNat<p.toNat) (hn : a≠0) :
+ (inverseGenerator p a).toNat<p.toNat ∧
+ (a.toNat : ZMod p.toNat)*((inverseGenerator p a).toNat : ZMod p.toNat)=1 := by
+ have h := modpow_decode p a (p-2) hp ha
+ refine ⟨h.1,?_⟩
+ change (a.toNat : ZMod p.toNat)*((modpow p a (p-2)).toNat : ZMod p.toNat)=1
+ rw [h.2,inverse_exponent p hp,←pow_succ']
+ have he : p.toNat-2+1=p.toNat-1 := by omega
+ rw [he]
+ exact fermat p.toNat _ (canonical_word_nonzero p a (by omega) ha hn)
+
+theorem generator_decode (p a : UInt64) [Fact p.toNat.Prime]
+ (hp : 1<p.toNat) (ha : a.toNat<p.toNat) (hn : a≠0) :
+ ((inverseGenerator p a).toNat : ZMod p.toNat)=(a.toNat : ZMod p.toNat)⁻¹ := by
+ have h := (generator_product p a hp ha hn).2
+ have ha0 := canonical_word_nonzero p a (by omega) ha hn
+ calc
+  _ = 1*((inverseGenerator p a).toNat : ZMod p.toNat) := by ring
+  _ = ((a.toNat : ZMod p.toNat)⁻¹*(a.toNat : ZMod p.toNat))*((inverseGenerator p a).toNat : ZMod p.toNat) := by rw [inv_mul_cancel₀ ha0]
+  _ = (a.toNat : ZMod p.toNat)⁻¹*((a.toNat : ZMod p.toNat)*((inverseGenerator p a).toNat : ZMod p.toNat)) := by ring
+  _ = _ := by rw [h,mul_one]
+
+theorem generator_witness (p a : UInt64) [Fact p.toNat.Prime]
+ (hp : 1<p.toNat) (hb : p.toNat<2^31) (ha : a.toNat<p.toNat) (hn : a≠0) :
+ InverseWitness p a (inverseGenerator p a) := by
+ have h := generator_product p a hp ha hn
+ refine ⟨ha,hn,h.1,?_⟩
+ have hd := uint64_mul_decode p a (inverseGenerator p a) hb ha h.1
+ rw [h.2] at hd
+ have hc := uint64_mul_canonical p a (inverseGenerator p a) (by omega)
+ have hv : ((a*inverseGenerator p a)%p).toNat=1 :=
+  (canonical_equality p.toNat _ 1 hc hp).mp (by simpa using hd)
+ apply UInt64.toNat.inj
+ simpa using hv
+end WideModPow

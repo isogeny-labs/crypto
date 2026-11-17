@@ -1,0 +1,300 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h9d53585cac843775",
+  "statement": {
+    "name": "S4 leading coefficient perfect-square resultant rewrite",
+    "source": "S4DegreeAudit.quartic_coeff_four and s4_degree_audit_certificate; res22(a,b,c,1,-2z,z^2)=(az^2+bz+c)^2",
+    "variables": [
+      "a",
+      "b",
+      "c",
+      "z"
+    ],
+    "degree_bound": 6,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "z"
+                        },
+                        {
+                          "op": "var",
+                          "args": "z"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "var",
+                    "args": "c"
+                  }
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "z"
+                        },
+                        {
+                          "op": "var",
+                          "args": "z"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "var",
+                    "args": "c"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "a"
+                      },
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": -2
+                          },
+                          {
+                            "op": "var",
+                            "args": "z"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "neg",
+                    "args": {
+                      "op": "var",
+                      "args": "b"
+                    }
+                  }
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "b"
+                      },
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "z"
+                          },
+                          {
+                            "op": "var",
+                            "args": "z"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "neg",
+                    "args": {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "c"
+                        },
+                        {
+                          "op": "mul",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": -2
+                            },
+                            {
+                              "op": "var",
+                              "args": "z"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "z"
+                        },
+                        {
+                          "op": "var",
+                          "args": "z"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "b"
+                    },
+                    {
+                      "op": "var",
+                      "args": "z"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "c"
+            }
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "z"
+                        },
+                        {
+                          "op": "var",
+                          "args": "z"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "b"
+                    },
+                    {
+                      "op": "var",
+                      "args": "z"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "c"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 35347866654480,
+  "value_digest": "381440b0be0b292fc37fd8b2dbf4f7e17cc900cb4bf51265d33945dbfd9c528d",
+  "independence": "Producer-issued on one host with unchanged repository checker. Lean proves the actual determinant/coefficient/degree statements; this finite rewrite supplement supplies no all-characteristic, signed or independent-host inference.",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/theorem_census_20261109/lean/S4Degree.lean",
+    "sha256": "b26b20cddee5ec12369b5b3447c6d3b352f878a1f9201219090271ed201f2c20"
+  }
+}

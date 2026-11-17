@@ -1,0 +1,1 @@
+Attempt1 normalization module passed; controls failed because arrow immediately followed by row tokenized as relation-hom arrow-r plus ow. Failed declaration emitted sorryAx and overall checker rejected before acceptance. Change only space after arrow in actual_hypotheses. Pre-fix recursive input check unchanged. Attempt2 stays within frozen max3/285seconds software budget.

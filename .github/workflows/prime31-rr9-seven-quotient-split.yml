@@ -1,0 +1,85 @@
+name: Prime31 RR9 seven-quotient split (Rust 1.100)
+
+on:
+  push:
+    branches: [automation/prime31-rr9-seven-quotient-split-20261117]
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_seven_quotient_split.rs'
+      - 'research/prime31_ic_20261115/rr9/RR9_SEVEN_QUOTIENT_SPLIT_PROTOCOL_20261117.md'
+      - '.github/workflows/prime31-rr9-seven-quotient-split.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_seven_quotient_split.rs'
+      - 'research/prime31_ic_20261115/rr9/RR9_SEVEN_QUOTIENT_SPLIT_PROTOCOL_20261117.md'
+      - '.github/workflows/prime31-rr9-seven-quotient-split.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  split-seven-quotient:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact proposed source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_rr9_seven_quotient_split.rs
+          sparse-checkout-cone-mode: false
+      - name: Checkout immutable original native Rust arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: prime31-native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Pin Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay the proposed exact seven-quotient diagnostic source
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_seven_quotient_split.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+      - name: Native regression tests and new arithmetic census test
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          timeout -k 10 240 cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_seven_quotient_split
+          cargo +1.100.0 build --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_seven_quotient_split
+      - name: Run, collect and assert source-specific JSON evidence
+        run: |
+          timeout -k 10 240 bash -c '
+            ulimit -v 1048576
+            exec "$1"
+          ' _ prime31-native-pinned/research/prime31_ic_20261115/native/target/release/examples/prime31_rr9_seven_quotient_split > prime31-rr9-seven-quotient-split.json
+          jq -e '
+            .schema == "prime31.rr9.seven-quotient-split.v1" and
+            .p == 2147483647 and .n == 2147446831 and
+            .base_x == [0,1,2,3,5,6,8,9] and
+            .exact_seven_quadric_quotient_dimension == 128 and
+            .quotient_is_split_product_of_128_fp == true and
+            ([.cases[].seven_sign_branches] == [128,128,128]) and
+            ([.cases[].full_rank_7x7] == [128,128,128]) and
+            ([.cases[].distinct_affine_points] == [128,128,128]) and
+            ([.cases[].first_seven_unfactored_norm_checks] == [896,896,896]) and
+            ([.cases[].double_sign_ambiguities] == [0,0,0]) and
+            ([.cases[].eighth_selector_charts] == [1,0,0]) and
+            .cases[0].eighth_selector_original_group_replays == 1 and
+            .cases[1].eighth_selector_original_group_replays == 0 and
+            .cases[2].eighth_selector_original_group_replays == 0 and
+            .is_public_only_nonenumerative_extraction == false and
+            .complete_unknown_prime31_logs == 0 and
+            .pcc == "unverified"
+          ' prime31-rr9-seven-quotient-split.json
+      - name: Retain native exact-source raw JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-seven-quotient-split
+          path: prime31-rr9-seven-quotient-split.json
+          retention-days: 30
+          if-no-files-found: warn

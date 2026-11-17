@@ -1,0 +1,3729 @@
+//! End to end through the `ecbench` binary: plan, run, verify with
+//! replays, compare, and load the database SQL, on a session small
+//! enough for CI.  Runs with `--cpus none` so it works on any host; the
+//! Linux CI job (`.github/workflows/ecbench.yml`) runs a pinned session.
+
+use std::path::{Path, PathBuf};
+use std::process::Command;
+
+use serde_json::Value;
+
+fn exe() -> &'static str {
+    env!("CARGO_BIN_EXE_ecbench")
+}
+
+fn scratch(name: &str) -> PathBuf {
+    let d = std::env::temp_dir().join(format!("ecbench-test-{}-{name}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&d);
+    std::fs::create_dir_all(&d).unwrap();
+    d
+}
+
+fn ecbench(args: &[&str]) -> (bool, String, String) {
+    let out = Command::new(exe())
+        .args(args)
+        .output()
+        .expect("ecbench runs");
+    (
+        out.status.success(),
+        String::from_utf8_lossy(&out.stdout).into_owned(),
+        String::from_utf8_lossy(&out.stderr).into_owned(),
+    )
+}
+
+const SPEC: &str = r#"{
+  "schema": "ecbench.spec/v1",
+  "label": "integration test",
+  "workloads": {
+    "curves": [{"kind": "prime_search", "bits": 16, "seed": 59297},
+               {"kind": "koblitz", "a": 0, "n": 13}],
+    "targets_per_curve": 2,
+    "target_seed": 7
+  },
+  "arms": [
+    {"name": "rho", "role": "reference", "method": {"id": "rho.negation"}},
+    {"name": "bsgs", "role": "candidate", "method": {"id": "bsgs.negation"}},
+    {"name": "kangaroo", "role": "candidate", "method": {"id": "kangaroo.vow"}},
+    {"name": "rho-aa", "role": "control", "method": {"id": "rho.negation"}}
+  ],
+  "measurement": {"rounds": 2, "warmup": 1, "seed": 3, "isolation_required": "L0", "timeout_seconds": 60}
+}"#;
+
+fn lock(dir: &Path) -> String {
+    // A private lock, so the test never waits on (or blocks) a real
+    // benchmark holding the shared one.
+    dir.join("bench.lock").display().to_string()
+}
+
+#[test]
+fn native_hashed_library_solves_replays_and_preserves_exhausted_rows() {
+    let dir = scratch("native-hashed");
+    let spec = dir.join("spec.json");
+    let mut params = serde_json::json!({
+        "backend":"selectors", "m":"2", "trials":"32", "columns":"128",
+        "steps":"20000000", "vector":"2000000", "bits":"1000000",
+        "threshold":"11", "derive_last":"1", "smallest_first":"1",
+        "cache_entries":"4096", "rank":"16", "slices":"16",
+        "outer_multiplier":"1", "attempts":"128"
+    });
+    let mut arms = vec![serde_json::json!({
+        "name":"rho", "role":"reference", "method":{"id":"rho.negation"}
+    })];
+    for (name, backend, steps) in [
+        ("selectors", "selectors", "20000000"),
+        ("selectors-aa", "selectors", "20000000"),
+        ("partial", "partial", "20000000"),
+        ("exhausted", "width", "0"),
+    ] {
+        params["backend"] = backend.into();
+        params["steps"] = steps.into();
+        arms.push(serde_json::json!({"name":name,"role":if name.ends_with("aa") {"control"} else {"candidate"},
+            "method":{"id":"ic.hashed_native_v1","params":params}}));
+    }
+    let doc = serde_json::json!({
+        "schema":"ecbench.spec/v1", "label":"native adapter correctness test; no performance claim",
+        "workloads":{"curves":[{"kind":"prime_explicit","p":5,"a":2,"b":1,
+            "group_order":7,"r":7,"gx":0,"gy":1}],"targets_per_curve":2,"target_seed":20261030},
+        "arms":arms,
+        "measurement":{"rounds":1,"warmup":0,"seed":701,"isolation_required":"L0","timeout_seconds":30}
+    });
+    std::fs::write(&spec, serde_json::to_vec_pretty(&doc).unwrap()).unwrap();
+    let out = dir.join("session");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        spec.to_str().unwrap(),
+        "--out",
+        out.to_str().unwrap(),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "native run failed: {err}");
+    let records = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut solved = 0;
+    let mut exhausted = 0;
+    for line in records.lines() {
+        let row: Value = serde_json::from_str(line).unwrap();
+        if row["method"]["id"] != "ic.hashed_native_v1" {
+            continue;
+        }
+        if row["method"]["params"]["steps"] == "0" {
+            assert_eq!(row["outcome"]["status"], "exhausted");
+            exhausted += 1;
+        } else {
+            assert_eq!(row["outcome"]["status"], "verified");
+            assert_eq!(row["detail"]["implementation"], "crates/hashed-ecdl-tensor");
+            let online = &row["online"];
+            assert_eq!(
+                online["phases_ns"]
+                    .as_object()
+                    .unwrap()
+                    .values()
+                    .map(|v| v.as_u64().unwrap())
+                    .sum::<u64>(),
+                online["wall_ns"].as_u64().unwrap()
+            );
+            solved += 1;
+        }
+    }
+    assert_eq!((solved, exhausted), (6, 2));
+    let (ok, stdout, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "native exact replay failed: {err}\n{stdout}");
+    let audit: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(audit["ok"], true);
+    assert_eq!(audit["replays"].as_array().unwrap().len(), 10);
+    assert!(audit["replays"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .all(|r| r["reproduced"] == true));
+}
+
+#[test]
+fn known_log_public_targets_are_verified_replayed_and_counted_by_phase() {
+    let dir = scratch("known-log-public");
+    let spec = dir.join("spec.json");
+    let doc = serde_json::json!({
+        "schema":"ecbench.spec/v1", "label":"known-log public target replay",
+        "workloads":{
+            "curves":[{"kind":"prime_search","bits":12,"seed":59297},
+                {"kind":"koblitz","a":0,"n":13}],
+            "targets_per_curve":2,"target_seed":20261021,"target_kind":"public"},
+        "arms":[
+            {"name":"rho","role":"reference","method":{"id":"rho.negation"}},
+            {"name":"known","role":"candidate","method":{"id":"ic.known_log_mitm2_v1",
+                "params":{"size":"4","base_seed":"31","max_pair_work":"20","max_trials":"100000"}}},
+            {"name":"known-aa","role":"control","method":{"id":"ic.known_log_mitm2_v1",
+                "params":{"size":"4","base_seed":"31","max_pair_work":"20","max_trials":"100000"}}}
+        ],
+        "measurement":{"rounds":1,"warmup":0,"seed":17,
+            "isolation_required":"L0","timeout_seconds":60}
+    });
+    std::fs::write(&spec, serde_json::to_vec_pretty(&doc).unwrap()).unwrap();
+    let out = dir.join("session");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        spec.to_str().unwrap(),
+        "--out",
+        out.to_str().unwrap(),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "run failed: {err}");
+    let records = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut candidate_count = 0;
+    for line in records.lines() {
+        let record: Value = serde_json::from_str(line).unwrap();
+        assert!(record["workload"]["planted"].is_null());
+        assert_eq!(record["outcome"]["status"], "verified");
+        if record["method"]["id"] != "ic.known_log_mitm2_v1" {
+            continue;
+        }
+        candidate_count += 1;
+        assert_eq!(record["counters"]["matrix_rows"], 0);
+        assert_eq!(record["counters"]["matrix_work"], 0);
+        assert_eq!(record["counters"]["target_equation_rank"], 1);
+        assert_eq!(record["counters"]["useful_target_relations"], 1);
+        assert_eq!(record["counters"]["pair_attempts"], 20);
+        let phases = record["phases"].as_array().unwrap();
+        let total: f64 = phases.iter().map(|p| p["gae"].as_f64().unwrap()).sum();
+        assert_eq!(Some(total), record["cost"]["total_gae"].as_f64());
+        assert_eq!(phases[0]["scalar_mults"], 4);
+        assert!(record["cost"]["unpriced"].as_array().unwrap().len() > 1);
+        let online = &record["online"];
+        assert_eq!(online["phases_ns"].as_object().unwrap().len(), 5);
+        let sum: u64 = online["phases_ns"]
+            .as_object()
+            .unwrap()
+            .values()
+            .map(|v| v.as_u64().unwrap())
+            .sum();
+        assert_eq!(Some(sum), online["wall_ns"].as_u64());
+    }
+    assert_eq!(candidate_count, 8);
+    let (ok, stdout, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "replay failed: {err}\n{stdout}");
+    let receipt: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(receipt["ok"], true);
+    let (ok, stdout, err) = ecbench(&[
+        "compare",
+        "--dir",
+        out.to_str().unwrap(),
+        "--a",
+        "known",
+        "--b",
+        "known-aa",
+        "--json",
+    ]);
+    assert!(ok, "A/A comparison failed: {err}");
+    let comparison: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(comparison["ops"]["ratio_b_over_a"], 1.0);
+    assert_eq!(comparison["ops"]["ci95"], serde_json::json!([1.0, 1.0]));
+}
+
+#[test]
+fn a_session_runs_verifies_compares_and_loads() {
+    let dir = scratch("session");
+    let spec = dir.join("spec.json");
+    std::fs::write(&spec, SPEC).unwrap();
+    let out = dir.join("s");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        spec.to_str().unwrap(),
+        "--out",
+        out.to_str().unwrap(),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "run failed: {err}");
+
+    // Every execution has a sealed record, all verified.
+    let session: Value =
+        serde_json::from_str(&std::fs::read_to_string(out.join("session.json")).unwrap()).unwrap();
+    assert_eq!(session["status"], "complete");
+    assert_eq!(session["records_written"], 3 * 4 * 4); // rounds × workloads × arms
+    assert_eq!(session["status_counts"]["verified"], 48);
+
+    // A second run into the same directory is refused.
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        spec.to_str().unwrap(),
+        "--out",
+        out.to_str().unwrap(),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(!ok && err.contains("never overwrites"), "{err}");
+
+    // The audit re-derives everything and replays runs exactly.
+    let (ok, stdout, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay",
+        "6",
+        "--exit-code",
+    ]);
+    assert!(ok, "verify failed: {err}");
+    let audit: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(audit["ok"], true, "{stdout}");
+    assert_eq!(audit["replays"].as_array().unwrap().len(), 6);
+
+    // Same method, same seeds: the A/A arm's counts are identical.
+    let (ok, stdout, err) = ecbench(&[
+        "compare",
+        "--dir",
+        out.to_str().unwrap(),
+        "--a",
+        "rho",
+        "--b",
+        "rho-aa",
+        "--json",
+    ]);
+    assert!(ok, "{err}");
+    let c: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(c["ops"]["ratio_b_over_a"], 1.0);
+    assert_eq!(c["curves"].as_array().unwrap().len(), 2);
+    // At L0 a wall-clock figure is never admitted, whatever was required.
+    let (ok, stdout, _) = ecbench(&[
+        "compare",
+        "--dir",
+        out.to_str().unwrap(),
+        "--a",
+        "rho",
+        "--b",
+        "bsgs",
+        "--json",
+        "--save",
+    ]);
+    assert!(ok);
+    let c: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(c["ops"]["status"], "ok");
+    assert!(c["ops"]["ci95"].is_array());
+    assert_eq!(
+        c["quality"]["score"], 0,
+        "L0 measurements have no CPU isolation credit"
+    );
+    assert_eq!(c["quality"]["paired_attempts"], 8);
+    assert_eq!(c["quality"]["verified_pairs"], 8);
+    assert_eq!(c["quality"]["admitted_pairs"], 0);
+    assert_eq!(c["quality"]["levels"]["L0"], 8);
+
+    // The resource vector includes every measured attempt, excludes the
+    // warm-ups, and preserves native work in its original units.
+    let (ok, stdout, err) = ecbench(&["resources", "--dir", out.to_str().unwrap()]);
+    assert!(ok, "resources failed: {err}");
+    let resources: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(resources["schema"], "ecbench.resources/v1");
+    let arms = resources["arms"].as_array().unwrap();
+    assert_eq!(arms.len(), 4);
+    for arm in arms {
+        assert_eq!(arm["measured"], 8);
+        assert_eq!(arm["verified"], 8);
+        assert!(arm["process_wall_ns_sum"].as_u64().unwrap() > 0);
+        assert!(arm["peak_rss_kib"].as_u64().unwrap() > 0);
+        assert!(arm["phase_gae_totals"].is_object());
+        assert_eq!(arm["online_complete_runs"], 8);
+        assert!(arm["method_counter_totals"].is_object());
+    }
+
+    // Tampering with a record is caught.
+    let tampered = dir.join("t");
+    copy_dir(&out, &tampered);
+    let recs = std::fs::read_to_string(tampered.join("records.jsonl")).unwrap();
+    std::fs::write(
+        tampered.join("records.jsonl"),
+        recs.replacen("\"status\":\"verified\"", "\"status\":\"wrong_answer\"", 1),
+    )
+    .unwrap();
+    let (ok, stdout, _) = ecbench(&["verify", "--dir", tampered.to_str().unwrap(), "--exit-code"]);
+    assert!(!ok);
+    let audit: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(audit["ok"], false);
+
+    // The SQL loads: schema first, every statement idempotent.
+    let (ok, sql, err) = ecbench(&["db", "sql", out.to_str().unwrap()]);
+    assert!(ok, "{err}");
+    assert!(sql.starts_with("-- ecbench database schema"));
+    assert!(sql.contains(
+        "INSERT INTO runs (record_id, session_id, run_id, seq, round, warmup, arm, method_id, workload_id, fb_id, fbm_id,"
+    ));
+    assert!(sql.contains("ON CONFLICT (record_id) DO NOTHING"));
+    assert_eq!(
+        sql.matches(
+            "INSERT INTO runs (record_id, session_id, run_id, seq, round, warmup, arm, method_id, workload_id, fb_id, fbm_id,"
+        )
+        .count(),
+        48
+    );
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn bad_specs_are_refused_before_anything_runs() {
+    let dir = scratch("refuse");
+    let bad = SPEC.replace(
+        "\"id\": \"bsgs.negation\"",
+        "\"id\": \"rho.signed_frobenius\"",
+    );
+    let spec = dir.join("spec.json");
+    std::fs::write(&spec, bad).unwrap();
+    let out = dir.join("s");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        spec.to_str().unwrap(),
+        "--out",
+        out.to_str().unwrap(),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+    ]);
+    assert!(!ok && err.contains("Koblitz curves only"), "{err}");
+    assert!(!out.exists(), "a refused spec must leave nothing behind");
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn a_factor_base_dump_carries_its_points() {
+    let (ok, stdout, err) = ecbench(&[
+        "fb",
+        "--curve",
+        r#"{"kind":"prime_search","bits":16,"seed":59297}"#,
+        "--factor-base",
+        "prime-abscissa:size=8",
+    ]);
+    assert!(ok, "{err}");
+    let d: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(d["schema"], "ecbench.factor_base_dump/v1");
+    assert_eq!(d["factor_base"]["columns"], 8);
+    assert_eq!(
+        d["points"].as_array().unwrap().len() as u64,
+        d["factor_base"]["signed_points"].as_u64().unwrap()
+    );
+    assert!(d["factor_base"]["fb_id"]
+        .as_str()
+        .unwrap()
+        .starts_with("FB1h"));
+}
+
+#[test]
+fn explicit_binary_basis_dump_matches_the_run_and_replays() {
+    // A non-prefix subspace: ignoring `basis` would include bit 4 instead of
+    // bit 5. Use a tiny public synthetic curve; this checks wiring, not cost.
+    const CURVE: &str = r#"{"kind":"koblitz","a":1,"n":7}"#;
+    const BASIS: &str = "0x1;0x2;0x4;0x8;0x20";
+    let recipe = format!("binary-subspace:dimension=5,basis={BASIS}");
+    let (ok, stdout, err) = ecbench(&["fb", "--curve", CURVE, "--factor-base", &recipe]);
+    assert!(ok, "dump failed: {err}");
+    let dump: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(dump["factor_base"]["params"]["basis"], BASIS);
+    assert_eq!(dump["factor_base"]["dimension"], 5);
+    assert!(dump["factor_base"]["columns"].as_u64().unwrap() > 0);
+    let xs: Vec<u64> = dump["points"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|p| {
+            u64::from_str_radix(p["x"].as_str().unwrap().trim_start_matches("0x"), 16).unwrap()
+        })
+        .collect();
+    assert!(xs.iter().all(|&x| x != 0 && x & !0x2f == 0));
+    assert!(
+        xs.iter().any(|&x| x & 0x20 != 0),
+        "must use the supplied subspace"
+    );
+
+    let (ok, stdout, err) = ecbench(&[
+        "fb",
+        "--curve",
+        CURVE,
+        "--factor-base",
+        "binary-subspace:dimension=5",
+    ]);
+    assert!(ok, "prefix dump failed: {err}");
+    let prefix: Value = serde_json::from_str(&stdout).unwrap();
+    assert_ne!(
+        dump["factor_base"]["points_sha256"],
+        prefix["factor_base"]["points_sha256"]
+    );
+
+    let dir = scratch("explicit-basis");
+    let spec = serde_json::json!({
+        "schema": "ecbench.spec/v1",
+        "label": "explicit basis regression",
+        "workloads": {
+            "curves": [serde_json::from_str::<Value>(CURVE).unwrap()],
+            "targets_per_curve": 2, "target_seed": 7
+        },
+        "arms": [
+            {"name": "reference", "role": "reference", "method": {"id": "bsgs.negation"}},
+            {"name": "explicit", "role": "candidate", "method": {
+                "id": "ic.pipeline_counted",
+                "params": {"factor_base": recipe, "oracle": "mitm:m=2", "max_trials": "2000"}
+            }}
+        ],
+        "measurement": {"rounds": 1, "warmup": 0, "seed": 3,
+            "isolation_required": "L0", "timeout_seconds": 60}
+    });
+    let spec_path = dir.join("spec.json");
+    std::fs::write(&spec_path, serde_json::to_string_pretty(&spec).unwrap()).unwrap();
+    let out = dir.join("session");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        spec_path.to_str().unwrap(),
+        "--out",
+        out.to_str().unwrap(),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "run failed: {err}");
+    let records: Vec<Value> = std::fs::read_to_string(out.join("records.jsonl"))
+        .unwrap()
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect();
+    assert_eq!(records.len(), 4);
+    assert!(records.iter().all(|r| r["outcome"]["status"] == "verified"));
+    let candidates: Vec<_> = records
+        .iter()
+        .filter(|r| r["method"]["family"] == "ic")
+        .collect();
+    assert_eq!(candidates.len(), 2);
+    for record in candidates {
+        assert_eq!(record["factor_base"], dump["factor_base"]);
+    }
+    let (ok, stdout, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "replay failed: {err}\n{stdout}");
+    let audit: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(audit["ok"], true);
+    let replays = audit["replays"].as_array().unwrap();
+    assert_eq!(replays.len(), 4);
+    assert!(replays.iter().all(|r| r["reproduced"] == true));
+    let _ = std::fs::remove_dir_all(dir);
+}
+
+#[test]
+fn explicit_binary_basis_cli_rejects_invalid_recipes() {
+    for recipe in [
+        "binary-subspace:dimension=3,basis=1;2;3",
+        "binary-subspace:dimension=3,basis=1;2",
+        "binary-subspace:dimension=3,basis=1;2;128",
+        "binary-subspace:dimension=3,basis=1;2;0",
+        "binary-subspace:dimension=3,basis=1;2;",
+        "binary-subspace:dimension=3,basis=1,2,4",
+        "binary-subspace:dimension=3,basis=1;2;4,select=strict4e",
+        "binary-subspace:dimension=4294967299,basis=1;2;4",
+    ] {
+        let (ok, _, err) = ecbench(&[
+            "fb",
+            "--curve",
+            r#"{"kind":"koblitz","a":1,"n":7}"#,
+            "--factor-base",
+            recipe,
+        ]);
+        assert!(!ok, "accepted invalid recipe: {recipe}");
+        assert!(!err.trim().is_empty(), "missing diagnostic: {recipe}");
+    }
+}
+
+#[test]
+fn explicit_x_lists_preserve_inventory_identity_and_replay() {
+    for (label, curve, source) in [
+        (
+            "prime",
+            r#"{"kind":"prime_search","bits":12,"seed":59297}"#,
+            "prime-abscissa:size=12",
+        ),
+        (
+            "binary",
+            r#"{"kind":"koblitz","a":1,"n":7}"#,
+            "binary-subspace:dimension=5",
+        ),
+    ] {
+        let (ok, stdout, err) = ecbench(&["fb", "--curve", curve, "--factor-base", source]);
+        assert!(ok, "source dump: {err}");
+        let source: Value = serde_json::from_str(&stdout).unwrap();
+        let xs: std::collections::BTreeSet<_> = source["points"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|p| {
+                u64::from_str_radix(p["x"].as_str().unwrap().trim_start_matches("0x"), 16).unwrap()
+            })
+            .collect();
+        // Reverse ordering makes silently sorting/replacing the column list visible.
+        let xs: Vec<_> = xs.into_iter().rev().collect();
+        let list = xs
+            .iter()
+            .map(|x| format!("0x{x:x}"))
+            .collect::<Vec<_>>()
+            .join(";");
+        let recipe = format!("explicit-x:xs={list}");
+        let (ok, stdout, err) = ecbench(&["fb", "--curve", curve, "--factor-base", &recipe]);
+        assert!(ok, "explicit dump: {err}");
+        let dump: Value = serde_json::from_str(&stdout).unwrap();
+        assert_eq!(dump["factor_base"]["params"]["xs"], list);
+        assert!(dump["factor_base"]["dimension"].is_null());
+        assert_eq!(
+            dump["factor_base"]["columns"].as_u64(),
+            Some(xs.len() as u64)
+        );
+        let inventory = |doc: &Value| -> std::collections::BTreeSet<(String, String)> {
+            doc["points"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|p| {
+                    (
+                        p["x"].as_str().unwrap().to_owned(),
+                        p["y"].as_str().unwrap().to_owned(),
+                    )
+                })
+                .collect()
+        };
+        assert_eq!(inventory(&dump), inventory(&source));
+        for p in dump["points"].as_array().unwrap() {
+            let x =
+                u64::from_str_radix(p["x"].as_str().unwrap().trim_start_matches("0x"), 16).unwrap();
+            assert_eq!(x, xs[p["col"].as_u64().unwrap() as usize]);
+        }
+        for bad in [
+            "explicit-x",
+            "explicit-x:xs=",
+            "explicit-x:xs=1;0x1",
+            "explicit-x:xs=18446744073709551615",
+            "explicit-x:xs=1,size=1",
+        ] {
+            let (ok, _, _) = ecbench(&["fb", "--curve", curve, "--factor-base", bad]);
+            assert!(!ok, "accepted {bad}");
+        }
+        let dir = scratch(&format!("explicit-xs-{label}"));
+        let spec = serde_json::json!({
+            "schema":"ecbench.spec/v1","label":"explicit x list replay",
+            "workloads":{"curves":[serde_json::from_str::<Value>(curve).unwrap()],
+                "targets_per_curve":2,"target_seed":7},
+            "arms":[
+                {"name":"reference","role":"reference","method":{"id":"bsgs.negation"}},
+                {"name":"explicit","role":"candidate","method":{"id":"ic.pipeline_counted",
+                    "params":{"factor_base":recipe,"oracle":"mitm:m=2","max_trials":"20000"}}}],
+            "measurement":{"rounds":1,"warmup":0,"seed":3,"isolation_required":"L0","timeout_seconds":60}
+        });
+        let spec_path = dir.join("spec.json");
+        std::fs::write(&spec_path, serde_json::to_vec_pretty(&spec).unwrap()).unwrap();
+        let out = dir.join("session");
+        let (ok, _, err) = ecbench(&[
+            "run",
+            "--spec",
+            spec_path.to_str().unwrap(),
+            "--out",
+            out.to_str().unwrap(),
+            "--cpus",
+            "none",
+            "--lock",
+            &lock(&dir),
+            "--quiet",
+        ]);
+        assert!(ok, "{label} run: {err}");
+        let records: Vec<Value> = std::fs::read_to_string(out.join("records.jsonl"))
+            .unwrap()
+            .lines()
+            .map(|l| serde_json::from_str(l).unwrap())
+            .collect();
+        assert_eq!(records.len(), 4);
+        for record in &records {
+            assert_eq!(record["outcome"]["status"], "verified");
+            if record["method"]["family"] == "ic" {
+                assert_eq!(record["factor_base"], dump["factor_base"]);
+            }
+        }
+        let (ok, stdout, err) = ecbench(&[
+            "verify",
+            "--dir",
+            out.to_str().unwrap(),
+            "--replay-all",
+            "--exit-code",
+        ]);
+        assert!(ok, "{label} replay: {err}\n{stdout}");
+        let audit: Value = serde_json::from_str(&stdout).unwrap();
+        assert_eq!(audit["ok"], true);
+        let replay = audit["replays"].as_array().unwrap();
+        assert_eq!(replay.len(), 4);
+        assert!(replay.iter().all(|r| r["reproduced"] == true));
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+}
+
+#[test]
+fn a_stored_factor_base_loads_into_the_database_by_its_store_name() {
+    // The path a stored dump takes: `ecbench fb` writes it, `ecbench store
+    // push` moves it to the object store under its curve and FB1 id, and
+    // `ecbench db sql store:NAME` fetches it into an empty cache and loads
+    // its points, next to the store index, without a copy in the checkout.
+    let dir = scratch("store-fb");
+    let (ok, dump_text, err) = ecbench(&[
+        "fb",
+        "--curve",
+        r#"{"kind":"prime_search","bits":16,"seed":59297}"#,
+        "--factor-base",
+        "prime-abscissa:size=8",
+    ]);
+    assert!(ok, "{err}");
+    let d: Value = serde_json::from_str(&dump_text).unwrap();
+    let fb_id = d["factor_base"]["fb_id"].as_str().unwrap().to_string();
+    let slug = d["curve"]["slug"].as_str().unwrap().to_string();
+    let file = dir.join("dump.json");
+    std::fs::write(&file, &dump_text).unwrap();
+    let name = format!("factor-bases/{slug}/{fb_id}.json");
+    let index = dir.join("index.json");
+    let remote = dir.join("remote");
+    let with_store = |cache: &str, args: &[&str]| {
+        let out = Command::new(exe())
+            .args(args)
+            .env("CRYPTO_STORE_INDEX", &index)
+            .env("CRYPTO_STORE_CACHE", dir.join(cache))
+            .env(
+                "CRYPTO_STORE_REMOTE",
+                format!("file://{}", remote.display()),
+            )
+            .output()
+            .expect("ecbench runs");
+        (
+            out.status.success(),
+            String::from_utf8_lossy(&out.stdout).into_owned(),
+            String::from_utf8_lossy(&out.stderr).into_owned(),
+        )
+    };
+    let (ok, _, err) = with_store(
+        "pusher",
+        &["store", "push", file.to_str().unwrap(), "--name", &name],
+    );
+    assert!(ok, "{err}");
+    let store_ref = format!("store:{name}");
+    let (ok, sql, err) = with_store(
+        "fresh-cache",
+        &["db", "sql", &store_ref, index.to_str().unwrap()],
+    );
+    assert!(ok, "{err}");
+    assert!(
+        sql.contains("INSERT INTO factor_bases VALUES"),
+        "dump rows missing"
+    );
+    assert!(
+        sql.contains("INSERT INTO factor_base_points"),
+        "points missing"
+    );
+    assert!(
+        sql.contains("INSERT INTO store_objects VALUES"),
+        "store rows missing"
+    );
+    assert!(sql.contains(&format!("'{fb_id}'")));
+    // A name the index does not hold is refused with the store's message.
+    let (ok, _, err) = with_store(
+        "fresh-cache",
+        &["db", "sql", "store:factor-bases/none/FB1hnone.json"],
+    );
+    assert!(!ok && err.contains("is not in"), "{err}");
+
+    let Ok(probe) = Command::new("sqlite3").arg("-version").output() else {
+        eprintln!("sqlite3 not installed; the SQL was checked, not loaded");
+        let _ = std::fs::remove_dir_all(&dir);
+        return;
+    };
+    if probe.status.success() {
+        let db = dir.join("t.db");
+        let run = |sql: &str| {
+            let mut child = Command::new("sqlite3")
+                .args(["-bail", db.to_str().unwrap()])
+                .stdin(std::process::Stdio::piped())
+                .stdout(std::process::Stdio::piped())
+                .stderr(std::process::Stdio::piped())
+                .spawn()
+                .unwrap();
+            use std::io::Write;
+            child
+                .stdin
+                .take()
+                .unwrap()
+                .write_all(sql.as_bytes())
+                .unwrap();
+            child.wait_with_output().unwrap()
+        };
+        assert!(run(&sql).status.success(), "the SQL must load");
+        assert!(
+            run(&sql).status.success(),
+            "and load again, changing nothing"
+        );
+        let q = run("SELECT loaded, signed_points FROM store_factor_bases;");
+        let text = String::from_utf8_lossy(&q.stdout);
+        assert!(text.starts_with("1|"), "the stored dump is loaded: {text}");
+    }
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+fn run_spec(dir: &Path, out: &Path, extra: &[&str]) -> (bool, String) {
+    let spec = dir.join("spec.json");
+    if !spec.exists() {
+        std::fs::write(&spec, SPEC).unwrap();
+    }
+    let mut args = vec![
+        "run",
+        "--spec",
+        spec.to_str().unwrap(),
+        "--out",
+        out.to_str().unwrap(),
+        "--cpus",
+        "none",
+        "--lock",
+        Box::leak(lock(dir).into_boxed_str()),
+        "--quiet",
+    ];
+    args.extend_from_slice(extra);
+    let (ok, _, err) = ecbench(&args);
+    (ok, err)
+}
+
+#[test]
+fn counted_ic_sat_replays_with_different_solver_wall_times() {
+    // This checks counted work and replay, not a wall-time bound. Give the
+    // SAT fixture room on contended CI hosts while retaining a watchdog.
+    let dir = scratch("counted-sat");
+    let spec = dir.join("spec.json");
+    std::fs::write(
+        &spec,
+        r#"{
+  "schema":"ecbench.spec/v1",
+  "label":"counted SAT replay regression",
+  "workloads":{"curves":[{"kind":"koblitz","a":1,"n":17}],"targets_per_curve":2,"target_seed":41,"target_kind":"public"},
+  "arms":[
+    {"name":"rho","role":"reference","method":{"id":"rho.signed_frobenius_strong"}},
+    {"name":"sat-cnf","role":"candidate","method":{"id":"ic.pipeline_counted","params":{"factor_base":"koblitz-orbit:divisor=0;1","oracle":"descent-algebraic:m=2","solver":"sat-cdcl:sat_conflict_budget=20000,sat_xor_encoding=cnf","max_trials":"20000"}}},
+    {"name":"sat-xor","role":"candidate","method":{"id":"ic.pipeline_counted","params":{"factor_base":"koblitz-orbit:divisor=0;1","oracle":"descent-algebraic:m=2","solver":"sat-cdcl:sat_conflict_budget=20000,sat_xor_encoding=native","max_trials":"20000"}}}
+  ],
+  "measurement":{"rounds":1,"warmup":0,"seed":9123401,"isolation_required":"L0","timeout_seconds":300}
+}"#,
+    )
+    .unwrap();
+    let out = dir.join("session");
+    let (ok, err) = run_spec(&dir, &out, &[]);
+    assert!(ok, "{err}");
+    let records: Vec<Value> = std::fs::read_to_string(out.join("records.jsonl"))
+        .unwrap()
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect();
+    assert_eq!(records.len(), 6);
+    for r in records.iter().filter(|r| r["method"]["family"] == "ic") {
+        assert_eq!(r["outcome"]["status"], "verified");
+        assert_eq!(r["cost"]["lower_bound"], true);
+        assert!(r["cost"]["unpriced"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|u| u == "solver_conflicts_uncharged"));
+    }
+    let receipt = dir.join("audit.json");
+    let (ok, _, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--out",
+        receipt.to_str().unwrap(),
+        "--exit-code",
+    ]);
+    assert!(ok, "{err}");
+    let audit: Value = serde_json::from_str(&std::fs::read_to_string(receipt).unwrap()).unwrap();
+    assert_eq!(audit["replays"].as_array().unwrap().len(), 6);
+    assert!(audit["replays"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .all(|r| r["reproduced"] == true));
+}
+
+#[test]
+fn two_sessions_queued_for_one_directory_cannot_both_write_it() {
+    // Both start before either holds the lock; the second waits, then must
+    // fail on the atomic mkdir instead of writing over the first.
+    let dir = scratch("race");
+    std::fs::write(dir.join("spec.json"), SPEC).unwrap();
+    let out = dir.join("s");
+    let spawn = || {
+        Command::new(exe())
+            .args([
+                "run",
+                "--spec",
+                dir.join("spec.json").to_str().unwrap(),
+                "--out",
+                out.to_str().unwrap(),
+                "--cpus",
+                "none",
+                "--lock",
+                &lock(&dir),
+                "--wait",
+                "--quiet",
+            ])
+            .spawn()
+            .unwrap()
+    };
+    let (mut a, mut b) = (spawn(), spawn());
+    let (sa, sb) = (a.wait().unwrap(), b.wait().unwrap());
+    assert!(
+        sa.success() != sb.success(),
+        "exactly one of the two queued sessions may succeed"
+    );
+    let (ok, stdout, err) = ecbench(&["verify", "--dir", out.to_str().unwrap(), "--exit-code"]);
+    assert!(ok, "the surviving session must audit clean: {err} {stdout}");
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn a_candidate_session_compares_against_a_baseline_session() {
+    // Two sessions of one spec (a baseline and a candidate binary, here
+    // the same one): pairs match by (workload, round) across sessions, the
+    // ratio is exactly 1 and the interval exists.
+    let dir = scratch("cross");
+    let (a, b) = (dir.join("a"), dir.join("b"));
+    assert!(run_spec(&dir, &a, &[]).0);
+    assert!(run_spec(&dir, &b, &[]).0);
+    let (ok, stdout, err) = ecbench(&[
+        "compare",
+        "--dir",
+        a.to_str().unwrap(),
+        "--a",
+        "bsgs",
+        "--b-dir",
+        b.to_str().unwrap(),
+        "--b",
+        "bsgs",
+        "--json",
+    ]);
+    assert!(ok, "{err}");
+    let c: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(c["ops"]["ratio_b_over_a"], 1.0);
+    assert_eq!(c["ops"]["ci95"], serde_json::json!([1.0, 1.0]));
+    assert_eq!(c["ops"]["same_seeds"], true);
+    assert_eq!(c["ops"]["status"], "ok");
+    assert_eq!(c["wall"]["status"], "refused");
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn a_resealed_hand_edited_figure_is_caught() {
+    use crypto_lib::cryptanalysis::ecbench::canonical::sha256_hex;
+    use crypto_lib::cryptanalysis::ecbench::record::Record;
+    use crypto_lib::cryptanalysis::ecbench::runner::Session;
+    let dir = scratch("forge");
+    let out = dir.join("s");
+    assert!(run_spec(&dir, &out, &[]).0);
+    // Halve one verified run's S, reseal the record and rehash the file:
+    // every hash agrees, but S no longer follows from the counts.
+    let text = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut lines: Vec<String> = text.lines().map(String::from).collect();
+    let i = lines
+        .iter()
+        .position(|l| l.contains("\"warmup\":false") && l.contains("\"status\":\"verified\""))
+        .unwrap();
+    let mut rec: Record = serde_json::from_str(&lines[i]).unwrap();
+    rec.cost.s = rec.cost.s.map(|s| s / 2.0);
+    lines[i] = rec.seal();
+    let body = lines.join("\n") + "\n";
+    std::fs::write(out.join("records.jsonl"), &body).unwrap();
+    let mut session: Session =
+        serde_json::from_str(&std::fs::read_to_string(out.join("session.json")).unwrap()).unwrap();
+    session.records_sha256 = Some(sha256_hex(body.as_bytes()));
+    std::fs::write(
+        out.join("session.json"),
+        serde_json::to_string_pretty(&session).unwrap() + "\n",
+    )
+    .unwrap();
+    let (ok, stdout, _) = ecbench(&["verify", "--dir", out.to_str().unwrap(), "--exit-code"]);
+    assert!(!ok);
+    assert!(
+        stdout.contains("does not follow from the record"),
+        "{stdout}"
+    );
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn the_database_refuses_a_slug_with_another_identity() {
+    let Ok(probe) = Command::new("sqlite3").arg("-version").output() else {
+        eprintln!("sqlite3 not installed; skipped");
+        return;
+    };
+    if !probe.status.success() {
+        return;
+    }
+    let dir = scratch("db");
+    let out = dir.join("s");
+    assert!(run_spec(&dir, &out, &[]).0);
+    let (ok, sql, err) = ecbench(&["db", "sql", out.to_str().unwrap()]);
+    assert!(ok, "{err}");
+    let db = dir.join("t.db");
+    let load = |sql: &str| {
+        let mut child = Command::new("sqlite3")
+            .args(["-bail", db.to_str().unwrap()])
+            .stdin(std::process::Stdio::piped())
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::piped())
+            .spawn()
+            .unwrap();
+        use std::io::Write;
+        child
+            .stdin
+            .take()
+            .unwrap()
+            .write_all(sql.as_bytes())
+            .unwrap();
+        child.wait_with_output().unwrap().status.success()
+    };
+    assert!(load(&sql), "the first load must succeed");
+    assert!(
+        load(&sql),
+        "loading the same session again must change nothing and succeed"
+    );
+    // The same slug arriving on another ICV1 string must be an error.
+    let slug = "icv1-fp16-t295-8d3c3165";
+    assert!(sql.contains(slug));
+    let forged = format!(
+        "INSERT INTO curves VALUES ('{slug}', 'ICV1:forged', 'prime', NULL, 16, '1', '1', '1', 1.0, 2, 1.0, 1) ON CONFLICT (slug) DO NOTHING;"
+    );
+    assert!(
+        !load(&forged),
+        "a conflicting identity must not be silently dropped"
+    );
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn online_windows_split_into_exclusive_claim_phases() {
+    // The strong single-target reference and an index-calculus pipeline on
+    // a registered Koblitz curve: every run verifies, every record carries
+    // an online window whose exclusive phases sum to its wall time under
+    // the claim schema's names, and the hardware counts are recorded or
+    // their absence explained.
+    let dir = scratch("online");
+    let spec = r#"{
+      "schema": "ecbench.spec/v1",
+      "label": "online window test",
+      "workloads": {"curves": [{"kind": "koblitz", "a": 1, "n": 17}],
+                    "targets_per_curve": 2, "target_seed": 11},
+      "arms": [
+        {"name": "rho-strong", "role": "reference", "method": {"id": "rho.signed_frobenius_strong"}},
+        {"name": "ic", "role": "candidate", "method": {"id": "ic.pipeline", "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1", "oracle": "mitm-frobenius:m=2"}}}
+      ],
+      "measurement": {"rounds": 2, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 120}
+    }"#;
+    std::fs::write(dir.join("spec.json"), spec).unwrap();
+    let out = dir.join("s");
+    let (ok, err) = run_spec(&dir, &out, &[]);
+    assert!(ok, "{err}");
+    let text = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut saw_ic = false;
+    for line in text.lines() {
+        let r: Value = serde_json::from_str(line).unwrap();
+        assert_eq!(r["outcome"]["status"], "verified", "{line}");
+        let w = &r["online"];
+        assert!(w.is_object(), "no online window: {line}");
+        let wall = w["wall_ns"].as_u64().unwrap();
+        let sum: u64 = w["phases_ns"]
+            .as_object()
+            .unwrap()
+            .values()
+            .map(|v| v.as_u64().unwrap())
+            .sum();
+        assert_eq!(sum, wall, "exclusive phases must sum to the window");
+        let stages: Vec<&str> = w["included_stages"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|v| v.as_str().unwrap())
+            .collect();
+        if r["arm"] == "ic" {
+            saw_ic = true;
+            for s in [
+                "target_query",
+                "target_PDP",
+                "target_relation_check",
+                "target_descent",
+                "target_recovery_check",
+            ] {
+                assert!(stages.contains(&s), "{s} missing from {stages:?}");
+                assert!(w["phases_ns"][s].is_u64(), "{s} has no time");
+            }
+            assert!(w["phases_ns"]["target_PDP"].as_u64().unwrap() > 0);
+        } else {
+            assert_eq!(stages, ["walk", "collision", "recovery_check"]);
+            assert_eq!(r["method"]["id"], "rho.signed_frobenius_strong");
+        }
+        let hw = &r["time"]["hw_solve"];
+        assert!(
+            hw["instructions"].is_u64() || hw["error"].is_string(),
+            "hardware counts neither read nor explained: {hw}"
+        );
+    }
+    assert!(saw_ic);
+    let (ok, _, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "{err}");
+    // These targets are planted: no claim can be built from them.
+    let w = first_workload(&dir.join("spec.json"));
+    let (ok, _, err) = ecbench(&[
+        "claim",
+        "build",
+        "--dir",
+        out.to_str().unwrap(),
+        "--ic",
+        "ic",
+        "--rho",
+        "rho-strong",
+        "--workload",
+        &w,
+    ]);
+    assert!(!ok && err.contains("planted"), "{err}");
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+fn first_workload(spec: &Path) -> String {
+    let (ok, out, err) = ecbench(&["plan", "--spec", spec.to_str().unwrap(), "--json"]);
+    assert!(ok, "{err}");
+    let plan: Value = serde_json::from_str(&out).unwrap();
+    plan["workloads"][0]["workload_id"]
+        .as_str()
+        .unwrap()
+        .to_string()
+}
+
+#[test]
+fn a_public_target_session_yields_a_checked_vs_rho_claim() {
+    // One public target, the strong rho reference, an IC pipeline and the
+    // plain signed-Frobenius rho: the claim builds from the IC and strong
+    // rho runs, the checker requires an independent replay and L2 wall
+    // isolation. A receipt from the session's own host class is refused;
+    // a simulated other-host receipt cannot promote this L0 diagnostic.
+    let dir = scratch("claim");
+    let spec = r#"{
+      "schema": "ecbench.spec/v1",
+      "label": "claim test",
+      "workloads": {"curves": [{"kind": "koblitz", "a": 1, "n": 17}],
+                    "targets_per_curve": 1, "target_seed": 11, "target_kind": "public"},
+      "arms": [
+        {"name": "rho-strong", "role": "reference", "method": {"id": "rho.signed_frobenius_strong"}},
+        {"name": "rho", "role": "baseline", "method": {"id": "rho.signed_frobenius"}},
+        {"name": "ic", "role": "candidate", "method": {"id": "ic.pipeline", "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1", "oracle": "mitm-frobenius:m=2"}}}
+      ],
+      "measurement": {"rounds": 1, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 120}
+    }"#;
+    std::fs::write(dir.join("spec.json"), spec).unwrap();
+    let out = dir.join("s");
+    let (ok, err) = run_spec(&dir, &out, &[]);
+    assert!(ok, "{err}");
+    let w = first_workload(&dir.join("spec.json"));
+    let s = out.to_str().unwrap();
+    let claim_path = dir.join("claim.json");
+    let build = |rho: &str, extra: &[&str]| {
+        let mut args = vec![
+            "claim",
+            "build",
+            "--dir",
+            s,
+            "--ic",
+            "ic",
+            "--rho",
+            rho,
+            "--workload",
+            &w,
+            "--out",
+            claim_path.to_str().unwrap(),
+        ];
+        args.extend_from_slice(extra);
+        ecbench(&args)
+    };
+    let check = || {
+        let (ok, out, err) = ecbench(&["claim", "check", "--report", claim_path.to_str().unwrap()]);
+        (ok, serde_json::from_str::<Value>(&out).unwrap(), err)
+    };
+
+    // The plain walk is not the strong reference.
+    let (ok, _, err) = build("rho", &[]);
+    assert!(
+        !ok && err.contains("strong single-target reference"),
+        "{err}"
+    );
+
+    // Without an independent replay: built, and failed on exactly that.
+    let (ok, _, err) = build("rho-strong", &[]);
+    assert!(ok, "{err}");
+    let claim: Value =
+        serde_json::from_str(&std::fs::read_to_string(&claim_path).unwrap()).unwrap();
+    assert!(claim["candidate_id"]
+        .as_str()
+        .unwrap()
+        .starts_with("IC1N17Ckb1fb442PDP2mitmfrobeniusRCwalkLAincrementalgaussTDjointISO0h"));
+    assert_eq!(claim["target_count"], 1);
+    assert_eq!(claim["timing_class"], "single_target_online_wall");
+    assert_eq!(claim["ic_online_ms"], claim["ic_online_wall_ms"]);
+    assert_eq!(claim["ic_target_hash"], claim["rho_target_hash"]);
+    assert_eq!(
+        claim["ic_resource_envelope"],
+        claim["rho_resource_envelope"]
+    );
+    let (ok, c, _) = check();
+    assert!(!ok);
+    assert_eq!(c["status"], "FAIL");
+    assert_eq!(c["pairing_errors"], serde_json::json!([]));
+    assert_eq!(
+        c["validation_errors"],
+        serde_json::json!([
+            "independent_validation must be true",
+            "ic_replay_certificate_sha256 must be a full lowercase SHA-256 digest",
+            "rho_replay_certificate_sha256 must be a full lowercase SHA-256 digest",
+            "isolation_levels.ic L0 is below required L2",
+            "isolation_levels.rho L0 is below required L2",
+            "record_class must be verified_answer_controlled_wall for a primary wall claim"
+        ])
+    );
+    assert_eq!(
+        c["missing_stage_fields"],
+        serde_json::json!([
+            "ic_replay_certificate_sha256",
+            "rho_replay_certificate_sha256"
+        ])
+    );
+    assert_eq!(c["missing_global_provenance"], serde_json::json!([]));
+
+    // A replay on the session's own host class is not independent.
+    let receipt = dir.join("receipt.json");
+    let (ok, _, err) = ecbench(&[
+        "verify",
+        "--dir",
+        s,
+        "--replay-all",
+        "--exit-code",
+        "--out",
+        receipt.to_str().unwrap(),
+    ]);
+    assert!(ok, "{err}");
+    let (ok, _, err) = build(
+        "rho-strong",
+        &[
+            "--independent-receipt",
+            receipt.to_str().unwrap(),
+            "--pointer",
+            "test",
+        ],
+    );
+    assert!(!ok && err.contains("own host class"), "{err}");
+
+    // Synthetic receipt metadata exercises the class gate only.  A real
+    // independence assertion also needs the external runner's custody
+    // record; self-reported classes do not attest physical separation.
+    let mut r: Value = serde_json::from_str(&std::fs::read_to_string(&receipt).unwrap()).unwrap();
+    r["auditor_env_class_id"] = Value::from("ECBENV2h000000000000");
+    r["auditor_hardware_class_id"] = Value::from("ECBHW1h000000000000");
+    let elsewhere = dir.join("receipt-elsewhere.json");
+    std::fs::write(&elsewhere, serde_json::to_string_pretty(&r).unwrap()).unwrap();
+    let (ok, _, err) = build(
+        "rho-strong",
+        &[
+            "--independent-receipt",
+            elsewhere.to_str().unwrap(),
+            "--pointer",
+            "test",
+            "--exit-code",
+        ],
+    );
+    assert!(!ok && err.contains("below required L2"), "{err}");
+    let (ok, c, err) = check();
+    assert!(!ok, "{c} {err}");
+    assert_eq!(c["status"], "FAIL");
+    assert!(c["validation_errors"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|e| e.as_str() == Some("isolation_levels.ic L0 is below required L2")));
+
+    // Schema-only test: edited levels exercise the checker, but this
+    // report is no evidence that the test host earned L2.
+    let mut simulated_l2: Value =
+        serde_json::from_str(&std::fs::read_to_string(&claim_path).unwrap()).unwrap();
+    simulated_l2["isolation_levels"]["ic"] = Value::from("L2");
+    simulated_l2["isolation_levels"]["rho"] = Value::from("L2");
+    simulated_l2["record_class"] = Value::from("verified_answer_controlled_wall");
+    let simulated_path = dir.join("simulated-l2.json");
+    std::fs::write(
+        &simulated_path,
+        serde_json::to_string(&simulated_l2).unwrap(),
+    )
+    .unwrap();
+    let (ok, checked, err) = ecbench(&[
+        "claim",
+        "check",
+        "--report",
+        simulated_path.to_str().unwrap(),
+    ]);
+    assert!(ok, "{checked} {err}");
+    let mut invalid_floor = simulated_l2;
+    invalid_floor["isolation_levels"]["required"] = Value::from("L0");
+    let invalid_path = dir.join("invalid-floor.json");
+    std::fs::write(
+        &invalid_path,
+        serde_json::to_string(&invalid_floor).unwrap(),
+    )
+    .unwrap();
+    let (ok, checked, err) =
+        ecbench(&["claim", "check", "--report", invalid_path.to_str().unwrap()]);
+    assert!(!ok, "{checked} {err}");
+    assert!(checked.contains("isolation_levels.required must be L2 or L3"));
+
+    // The current ledger names the five phases through
+    // `primary_ic_online_phase_keys`. Dropping their explicit older
+    // field list must never make the phase-sum check vacuous.
+    let mut bad_phase: Value =
+        serde_json::from_str(&std::fs::read_to_string(&claim_path).unwrap()).unwrap();
+    bad_phase["ic_online_phase_ms"]["T_target_query_ms"] = Value::from(
+        bad_phase["ic_online_phase_ms"]["T_target_query_ms"]
+            .as_f64()
+            .unwrap()
+            + 1.0,
+    );
+    let bad_phase_path = dir.join("bad-phase.json");
+    std::fs::write(&bad_phase_path, serde_json::to_string(&bad_phase).unwrap()).unwrap();
+    let (ok, out, err) = ecbench(&[
+        "claim",
+        "check",
+        "--report",
+        bad_phase_path.to_str().unwrap(),
+    ]);
+    assert!(!ok, "{err}");
+    let checked: Value = serde_json::from_str(&out).unwrap();
+    assert!(checked["validation_errors"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|e| e.as_str() == Some("IC exclusive phase costs must sum to ic_online_wall_ms")));
+
+    // The claim loads into the database beside its session, checked again.
+    let (ok, sql, err) = ecbench(&["db", "sql", s, claim_path.to_str().unwrap()]);
+    assert!(ok, "{err}");
+    assert!(
+        sql.contains("INSERT OR REPLACE INTO claims VALUES ("),
+        "{sql}"
+    );
+    assert!(sql.contains("'FAIL'"));
+
+    // A receipt for other bytes is refused.
+    let mut r2 = r.clone();
+    r2["files"]["records.jsonl"] = Value::from("0".repeat(64));
+    std::fs::write(&elsewhere, serde_json::to_string_pretty(&r2).unwrap()).unwrap();
+    let (ok, _, err) = build(
+        "rho-strong",
+        &[
+            "--independent-receipt",
+            elsewhere.to_str().unwrap(),
+            "--pointer",
+            "test",
+        ],
+    );
+    assert!(!ok && err.contains("records.jsonl"), "{err}");
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+fn copy_dir(from: &Path, to: &Path) {
+    std::fs::create_dir_all(to).unwrap();
+    for e in std::fs::read_dir(from).unwrap() {
+        let e = e.unwrap();
+        let p = e.path();
+        if p.is_dir() {
+            copy_dir(&p, &to.join(e.file_name()));
+        } else {
+            std::fs::copy(&p, to.join(e.file_name())).unwrap();
+        }
+    }
+}
+
+#[test]
+fn pdp3_koblitz_f4_and_f6_verify_on_one_query_stream() {
+    // #1333's inherited-F4, F6-IC and pair-index F6-IC decomposers inside
+    // ic.pipeline on the E_0 m = 13 curve: every run verifies; all arms,
+    // being exact solvers
+    // on the same base and seed, issue the same queries and find the same
+    // relations; F6-IC's gate additions are charged and the solver's word
+    // XORs are counted but left out of S, which is therefore a lower bound.
+    let dir = scratch("pdp3");
+    let spec = r#"{
+      "schema": "ecbench.spec/v1",
+      "label": "pdp3-koblitz test",
+      "workloads": {"curves": [{"kind": "koblitz", "a": 0, "n": 13}],
+                    "targets_per_curve": 2, "target_seed": 7, "target_kind": "public"},
+      "arms": [
+        {"name": "ic-f4", "role": "baseline", "method": {"id": "ic.pipeline", "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "pdp3-koblitz:m=3,engine=inherited-f4,degree=3,node_budget=8192"}}},
+        {"name": "ic-f6", "role": "candidate", "method": {"id": "ic.pipeline", "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "pdp3-koblitz:m=3,engine=f6-ic,degree=3,node_budget=8192"}}},
+        {"name": "ic-f6-pair", "role": "candidate", "method": {"id": "ic.pipeline", "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "pdp3-koblitz:m=3,engine=f6-ic-pair,degree=3,node_budget=8192"}}}
+      ],
+      "measurement": {"rounds": 1, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 120}
+    }"#;
+    std::fs::write(dir.join("spec.json"), spec).unwrap();
+    let out = dir.join("s");
+    let (ok, err) = run_spec(&dir, &out, &[]);
+    assert!(ok, "{err}");
+    let text = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut by_workload: std::collections::BTreeMap<String, Vec<Value>> = Default::default();
+    for line in text.lines() {
+        let r: Value = serde_json::from_str(line).unwrap();
+        assert_eq!(r["outcome"]["status"], "verified", "{line}");
+        // The F4 word XORs are priced at the calibrated ratio since
+        // c8b1594f6, so the cost is no longer a lower bound.
+        assert_eq!(r["cost"]["lower_bound"], false, "{line}");
+        assert_eq!(r["cost"]["unpriced"], serde_json::json!([]), "{line}");
+        let extra = &r["solver"]["extra"];
+        let geometry = extra["geometric_group_additions"].as_u64().unwrap();
+        assert_eq!(extra["geometric_fallbacks"], 0, "{line}");
+        if r["arm"].as_str().unwrap().starts_with("ic-f6") {
+            assert!(geometry > 0, "F6-IC charged no geometry: {line}");
+        } else {
+            assert_eq!(geometry, 0, "{line}");
+        }
+        assert!(r["solver"]["ops"].as_u64().unwrap() > 0, "{line}");
+        let w = r["workload"]["workload_id"].as_str().unwrap().to_string();
+        by_workload.entry(w).or_default().push(r);
+    }
+    assert_eq!(by_workload.len(), 2);
+    for (w, rs) in by_workload {
+        assert_eq!(rs.len(), 3, "{w}");
+        for key in ["targets_tried", "relations_found", "matrix_rank"] {
+            for candidate in &rs[1..] {
+                assert_eq!(
+                    rs[0]["counters"][key], candidate["counters"][key],
+                    "{w}: the arms' query streams diverged at {key}"
+                );
+            }
+        }
+    }
+    let (ok, _, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "replay: {err}");
+}
+
+#[test]
+fn pdp3_binary_runs_every_engine_on_a_generic_binary_curve() {
+    // The PDP3 plug-in on a random binary curve (b ∉ F_2, no Frobenius
+    // endomorphism) through its Frobenius-free view, with all four engines:
+    // every run verifies; matrix F5 builds matrix F4's matrices less the
+    // rows its criterion predicts reduce to zero, so the two share a tree
+    // and find the same relations; F6-IC charges its gate's additions.
+    let dir = scratch("pdp3-binary");
+    let arm = |name: &str, engine: &str| {
+        format!(
+            r#"{{"name": "{name}", "role": "candidate", "method": {{"id": "ic.pipeline", "params": {{
+              "factor_base": "binary-standard-subspace:dimension=5",
+              "oracle": "pdp3-binary:m=3,engine={engine},degree=3,node_budget=8192"}}}}}}"#
+        )
+    };
+    let spec = format!(
+        r#"{{
+      "schema": "ecbench.spec/v1",
+      "label": "pdp3-binary test",
+      "workloads": {{"curves": [{{"kind": "binary_random", "n": 13, "seed": 59297, "max_cofactor": 8}}],
+                    "targets_per_curve": 1, "target_seed": 7, "target_kind": "public"}},
+      "arms": [{}, {}, {}, {}],
+      "measurement": {{"rounds": 1, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 300}}
+    }}"#,
+        arm("f4m", "matrix-f4"),
+        arm("f5m", "matrix-f5"),
+        arm("f4i", "inherited-f4"),
+        arm("f6", "f6-ic"),
+    );
+    std::fs::write(dir.join("spec.json"), spec).unwrap();
+    let out = dir.join("s");
+    let (ok, err) = run_spec(&dir, &out, &[]);
+    assert!(ok, "{err}");
+    let text = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut by_arm: std::collections::BTreeMap<String, Value> = Default::default();
+    for line in text.lines() {
+        let r: Value = serde_json::from_str(line).unwrap();
+        assert_eq!(r["outcome"]["status"], "verified", "{line}");
+        assert!(r["solver"]["ops"].as_u64().unwrap() > 0, "{line}");
+        by_arm.insert(r["arm"].as_str().unwrap().to_string(), r);
+    }
+    assert_eq!(by_arm.len(), 4);
+    for key in ["targets_tried", "relations_found", "matrix_rank"] {
+        assert_eq!(
+            by_arm["f4m"]["counters"][key], by_arm["f5m"]["counters"][key],
+            "matrix F4 and F5 diverged at {key}"
+        );
+    }
+    let geometry = |a: &str| by_arm[a]["solver"]["extra"]["geometric_group_additions"].as_u64();
+    assert!(geometry("f6").unwrap() > 0, "F6-IC charged no geometry");
+    assert_eq!(geometry("f4i"), Some(0));
+    let (ok, _, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "replay: {err}");
+}
+
+#[test]
+fn pdp3_koblitz_rootfind_engine_follows_f4_query_stream_without_a_solver() {
+    // The root-finding engine (`DecompositionStrategy::PairTable`) beside
+    // inherited F4 on the E_0 m = 13 curve, both at m = 2 and m = 3 on one
+    // base and seed: every run verifies; the exact engines issue the same
+    // queries and find the same relations; the root finder's record has no
+    // solver block and no word-XOR unit, its set-up phase charges the
+    // table's |F|(|F|+1)/2 pair additions, and its S is a complete count
+    // where F4's is a lower bound.  A Groebner bound handed to the root
+    // finder is refused as an error record, never ignored.
+    let dir = scratch("pdp3-rootfind");
+    let arm = |name: &str, oracle: &str| {
+        format!(
+            r#"{{"name": "{name}", "role": "candidate", "method": {{"id": "ic.pipeline", "params": {{
+              "factor_base": "koblitz-standard-subspace:dimension=5",
+              "oracle": "{oracle}"}}}}}}"#
+        )
+    };
+    let spec = format!(
+        r#"{{
+      "schema": "ecbench.spec/v1",
+      "label": "pdp3-koblitz rootfind test",
+      "workloads": {{"curves": [{{"kind": "koblitz", "a": 0, "n": 13}}],
+                    "targets_per_curve": 2, "target_seed": 7, "target_kind": "public"}},
+      "arms": [{}, {}, {}, {}, {}],
+      "measurement": {{"rounds": 1, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 300}}
+    }}"#,
+        arm(
+            "f4-m3",
+            "pdp3-koblitz:m=3,engine=inherited-f4,degree=3,node_budget=8192"
+        ),
+        arm("root-m3", "pdp3-koblitz:m=3,engine=rootfind"),
+        arm(
+            "f4-m2",
+            "pdp3-koblitz:m=2,engine=inherited-f4,degree=3,node_budget=8192"
+        ),
+        arm("root-m2", "pdp3-koblitz:m=2,engine=rootfind"),
+        arm("root-bad", "pdp3-koblitz:m=2,engine=rootfind,degree=3"),
+    );
+    std::fs::write(dir.join("spec.json"), spec).unwrap();
+    let out = dir.join("s");
+    let (ok, err) = run_spec(&dir, &out, &[]);
+    assert!(ok, "{err}");
+    let text = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut by_workload: std::collections::BTreeMap<
+        String,
+        std::collections::BTreeMap<String, Value>,
+    > = Default::default();
+    for line in text.lines() {
+        let r: Value = serde_json::from_str(line).unwrap();
+        let arm = r["arm"].as_str().unwrap().to_string();
+        if arm == "root-bad" {
+            assert_eq!(r["outcome"]["status"], "error", "{line}");
+            let reason = r["outcome"]["error"].as_str().unwrap_or_default();
+            assert!(reason.contains("no Groebner search"), "{line}");
+        } else {
+            assert_eq!(r["outcome"]["status"], "verified", "{line}");
+        }
+        if arm.starts_with("root") {
+            assert!(
+                r["solver"].is_null(),
+                "a table oracle has no solver block: {line}"
+            );
+            assert!(
+                !r["cost"]["unpriced"].to_string().contains("word_XORs"),
+                "{line}"
+            );
+        } else {
+            assert_eq!(r["cost"]["lower_bound"], false, "{line}");
+            assert!(r["solver"]["ops"].as_u64().unwrap() > 0, "{line}");
+        }
+        let w = r["workload"]["workload_id"].as_str().unwrap().to_string();
+        by_workload.entry(w).or_default().insert(arm, r);
+    }
+    assert_eq!(by_workload.len(), 2);
+    for (w, arms) in &by_workload {
+        assert_eq!(arms.len(), 5, "{w}");
+        for (f4, root) in [("f4-m3", "root-m3"), ("f4-m2", "root-m2")] {
+            for key in ["targets_tried", "relations_found", "matrix_rank"] {
+                assert_eq!(
+                    arms[f4]["counters"][key], arms[root]["counters"][key],
+                    "{w}: {f4} and {root} diverged at {key}"
+                );
+            }
+            let setup = arms[root]["phases"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|p| p["name"] == "oracle_setup")
+                .expect("an oracle_setup phase")
+                .clone();
+            let points = arms[root]["factor_base"]["signed_points"].as_u64().unwrap();
+            assert_eq!(
+                setup["adds"].as_u64().unwrap(),
+                points * (points - 1) / 2,
+                "{w}"
+            );
+            assert_eq!(setup["doubles"].as_u64().unwrap(), points, "{w}");
+            assert!(
+                setup["native"]["pair_table_entries"].as_u64().unwrap() > 0,
+                "{w}"
+            );
+            let relations = arms[root]["phases"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|p| p["name"] == "relations")
+                .unwrap()
+                .clone();
+            assert_eq!(
+                relations["native"]["frobfold_mismatches"]
+                    .as_u64()
+                    .unwrap_or(0),
+                0,
+                "{w}"
+            );
+            assert!(relations["native"]["lookups"].as_u64().unwrap() > 0, "{w}");
+        }
+    }
+    let (ok, _, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "replay: {err}");
+}
+
+#[test]
+fn pdp3_koblitz_linear_harvest_is_a_method_parameter_not_an_environment_switch() {
+    // PR #1862 turned the root linear-row harvest on by default, and the
+    // only opt-out was `KIC_LINEAR_HARVEST`, which `pdp3-koblitz` refuses
+    // because it would change the search without changing the method's
+    // identity.  `linear_harvest` puts it in the identity instead.  Omitted
+    // it changes nothing; `default` spells out what omission means; `off`
+    // is the engine before #1862. Same targets, same base: every arm verifies
+    // and finds the same relations. The narrowed default rank gate leaves this
+    // below-threshold workload unchanged; explicit `every` demonstrates that
+    // the method parameter changes the splitting tree. The parameter is
+    // refused where it would be ignored or is not understood.
+    let dir = scratch("pdp3-harvest");
+    let arm = |name: &str, oracle: &str| {
+        format!(
+            r#"{{"name": "{name}", "role": "candidate", "method": {{"id": "ic.pipeline", "params": {{
+              "factor_base": "koblitz-standard-subspace:dimension=5",
+              "oracle": "{oracle}"}}}}}}"#
+        )
+    };
+    let base = "pdp3-koblitz:m=3,engine=inherited-f4,degree=3,node_budget=8192";
+    let spec = format!(
+        r#"{{
+      "schema": "ecbench.spec/v1",
+      "label": "pdp3-koblitz linear_harvest test",
+      "workloads": {{"curves": [{{"kind": "koblitz", "a": 0, "n": 13}}],
+                    "targets_per_curve": 2, "target_seed": 7, "target_kind": "public"}},
+      "arms": [{}, {}, {}, {}, {}, {}, {}],
+      "measurement": {{"rounds": 1, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 600}}
+    }}"#,
+        arm("omitted", base),
+        arm("default", &format!("{base},linear_harvest=default")),
+        arm("off", &format!("{base},linear_harvest=off")),
+        arm("every", &format!("{base},linear_harvest=every")),
+        arm(
+            "bad-root",
+            "pdp3-koblitz:m=2,engine=rootfind,linear_harvest=off"
+        ),
+        arm(
+            "bad-matrix",
+            "pdp3-koblitz:m=3,engine=matrix-f4,degree=3,node_budget=8192,linear_harvest=off"
+        ),
+        arm("bad-value", &format!("{base},linear_harvest=maybe")),
+    );
+    std::fs::write(dir.join("spec.json"), spec).unwrap();
+    let out = dir.join("s");
+    let (ok, err) = run_spec(&dir, &out, &[]);
+    assert!(ok, "{err}");
+    let text = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut ops: std::collections::BTreeMap<String, Vec<u64>> = Default::default();
+    let mut found: std::collections::BTreeMap<String, Vec<u64>> = Default::default();
+    let mut method_ids: std::collections::BTreeMap<String, String> = Default::default();
+    for line in text.lines() {
+        let r: Value = serde_json::from_str(line).unwrap();
+        let arm = r["arm"].as_str().unwrap().to_string();
+        if arm.starts_with("bad-") {
+            assert_eq!(r["outcome"]["status"], "error", "{line}");
+            let reason = r["outcome"]["error"].as_str().unwrap_or_default();
+            let want = match arm.as_str() {
+                "bad-root" => "no Groebner search",
+                "bad-matrix" => "does not take linear_harvest",
+                _ => "is not off, default, gpv or every",
+            };
+            assert!(reason.contains(want), "{arm}: {line}");
+            continue;
+        }
+        assert_eq!(r["outcome"]["status"], "verified", "{line}");
+        ops.entry(arm.clone())
+            .or_default()
+            .push(r["solver"]["ops"].as_u64().unwrap());
+        found
+            .entry(arm.clone())
+            .or_default()
+            .push(r["counters"]["relations_found"].as_u64().unwrap());
+        method_ids.insert(arm, r["method"]["method_id"].as_str().unwrap().to_string());
+    }
+    assert_eq!(ops["omitted"].len(), 2);
+    assert_eq!(
+        ops["omitted"], ops["default"],
+        "spelling out the default must not change a count"
+    );
+    assert_eq!(
+        ops["default"], ops["off"],
+        "the default rank gate must leave this below-threshold workload unchanged"
+    );
+    assert_eq!(found["omitted"], found["off"], "same relations either way");
+    assert_ne!(
+        ops["off"], ops["every"],
+        "the explicit harvest parameter must change the splitting tree"
+    );
+    assert_ne!(method_ids["omitted"], method_ids["off"]);
+    assert_ne!(method_ids["omitted"], method_ids["default"]);
+    assert_ne!(method_ids["off"], method_ids["every"]);
+}
+
+#[test]
+fn pdp3_koblitz_rootfind_window_shortens_m3_scan_and_records_window_len() {
+    // engine=rootfind-window keeps the pair-table set-up charge but scans
+    // only ⌈|F|/3⌉ third summands a target.  It must verify, refuse m ≠ 3
+    // and Groebner bounds, expose scan_window_len, and match the full
+    // scan's set-up GAE.  End-to-end lookups may rise when the thinner
+    // yield needs more trials; that trade is measured in the improve-loop
+    // sessions, not asserted here.
+    let dir = scratch("pdp3-rootfind-window");
+    let arm = |name: &str, oracle: &str| {
+        format!(
+            r#"{{"name": "{name}", "role": "candidate", "method": {{"id": "ic.pipeline", "params": {{
+              "factor_base": "koblitz-standard-subspace:dimension=5",
+              "oracle": "{oracle}"}}}}}}"#
+        )
+    };
+    let spec = format!(
+        r#"{{
+      "schema": "ecbench.spec/v1",
+      "label": "pdp3-koblitz rootfind-window test",
+      "workloads": {{"curves": [{{"kind": "koblitz", "a": 0, "n": 13}}],
+                    "targets_per_curve": 2, "target_seed": 7, "target_kind": "public"}},
+      "arms": [{}, {}, {}, {}],
+      "measurement": {{"rounds": 1, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 300}}
+    }}"#,
+        arm("root-full", "pdp3-koblitz:m=3,engine=rootfind"),
+        arm("root-win", "pdp3-koblitz:m=3,engine=rootfind-window"),
+        arm("root-win-m2", "pdp3-koblitz:m=2,engine=rootfind-window"),
+        arm(
+            "root-win-bad",
+            "pdp3-koblitz:m=3,engine=rootfind-window,degree=3"
+        ),
+    );
+    std::fs::write(dir.join("spec.json"), spec).unwrap();
+    let out = dir.join("s");
+    let (ok, err) = run_spec(&dir, &out, &[]);
+    assert!(ok, "{err}");
+    let text = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut by_workload: std::collections::BTreeMap<
+        String,
+        std::collections::BTreeMap<String, Value>,
+    > = Default::default();
+    for line in text.lines() {
+        let r: Value = serde_json::from_str(line).unwrap();
+        let arm = r["arm"].as_str().unwrap().to_string();
+        match arm.as_str() {
+            "root-win-m2" => {
+                assert_eq!(r["outcome"]["status"], "error", "{line}");
+                assert!(
+                    r["outcome"]["error"]
+                        .as_str()
+                        .unwrap_or_default()
+                        .contains("m = 3"),
+                    "{line}"
+                );
+            }
+            "root-win-bad" => {
+                assert_eq!(r["outcome"]["status"], "error", "{line}");
+                assert!(
+                    r["outcome"]["error"]
+                        .as_str()
+                        .unwrap_or_default()
+                        .contains("no Groebner search"),
+                    "{line}"
+                );
+            }
+            _ => {
+                assert_eq!(r["outcome"]["status"], "verified", "{line}");
+                assert!(r["solver"].is_null(), "{line}");
+                assert_eq!(r["cost"]["lower_bound"], false, "{line}");
+            }
+        }
+        let w = r["workload"]["workload_id"].as_str().unwrap().to_string();
+        by_workload.entry(w).or_default().insert(arm, r);
+    }
+    assert_eq!(by_workload.len(), 2);
+    for (w, arms) in &by_workload {
+        let points = arms["root-win"]["factor_base"]["signed_points"]
+            .as_u64()
+            .unwrap();
+        let expect_window = points.div_ceil(3).max(1);
+        let setup = arms["root-win"]["phases"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|p| p["name"] == "oracle_setup")
+            .unwrap()
+            .clone();
+        assert_eq!(
+            setup["native"]["scan_window_len"].as_u64().unwrap(),
+            expect_window,
+            "{w}"
+        );
+        assert_eq!(
+            setup["native"]["pair_table_points"].as_u64().unwrap(),
+            points,
+            "{w}"
+        );
+        let full_setup = arms["root-full"]["phases"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|p| p["name"] == "oracle_setup")
+            .unwrap()
+            .clone();
+        assert_eq!(
+            setup["gae"], full_setup["gae"],
+            "{w}: same table build charge"
+        );
+        assert_eq!(setup["adds"], full_setup["adds"], "{w}");
+        assert!(
+            arms["root-full"]["phases"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|p| p["name"] == "oracle_setup")
+                .unwrap()["native"]
+                .get("scan_window_len")
+                .is_none(),
+            "{w}: full rootfind has no scan window"
+        );
+    }
+    let (ok, _, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "replay: {err}");
+}
+
+#[test]
+fn pkm_tower_runs_every_engine_on_a_prime_curve() {
+    // The prime-field PKM tower plug-in on a prime-order curve with
+    // 2^5 | p − 1 (p = 257): every engine verifies; signature F5 decides
+    // every node as F4 does, so the two walk one tree; F6 closes nodes
+    // with group additions; `enum` uses no solver at all.
+    let dir = scratch("pkm-tower");
+    let arm = |name: &str, engine: &str| {
+        format!(
+            r#"{{"name": "{name}", "role": "candidate", "method": {{"id": "ic.pipeline", "params": {{
+              "factor_base": "prime-tower:t=5,seed=1",
+              "oracle": "pkm-tower:m=2,t=5,seed=1,engine={engine},degree=20,cap=4"}}}}}}"#
+        )
+    };
+    let spec = format!(
+        r#"{{
+      "schema": "ecbench.spec/v1",
+      "label": "pkm-tower test",
+      "workloads": {{"curves": [{{"kind": "prime_search", "bits": 9, "seed": 17}}],
+                    "targets_per_curve": 1, "target_seed": 7, "target_kind": "public"}},
+      "arms": [{}, {}, {}, {}],
+      "measurement": {{"rounds": 1, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 300}}
+    }}"#,
+        arm("f4", "f4"),
+        arm("f5", "sig-f5"),
+        arm("f6", "f6"),
+        arm("enum", "enum"),
+    );
+    std::fs::write(dir.join("spec.json"), spec).unwrap();
+    let out = dir.join("s");
+    let (ok, err) = run_spec(&dir, &out, &[]);
+    assert!(ok, "{err}");
+    let text = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut by_arm: std::collections::BTreeMap<String, Value> = Default::default();
+    for line in text.lines() {
+        let r: Value = serde_json::from_str(line).unwrap();
+        assert_eq!(r["outcome"]["status"], "verified", "{line}");
+        by_arm.insert(r["arm"].as_str().unwrap().to_string(), r);
+    }
+    assert_eq!(by_arm.len(), 4);
+    let extra = |a: &str, k: &str| by_arm[a]["solver"]["extra"][k].as_u64().unwrap();
+    for k in ["nodes", "refuted", "leaves"] {
+        assert_eq!(
+            extra("f4", k),
+            extra("f5", k),
+            "F4 and signature F5 diverged at {k}"
+        );
+    }
+    for key in ["targets_tried", "relations_found"] {
+        assert_eq!(by_arm["f4"]["counters"][key], by_arm["f5"]["counters"][key]);
+    }
+    assert!(by_arm["f4"]["solver"]["ops"].as_u64().unwrap() > 0);
+    assert!(
+        extra("f6", "geometric_group_additions") > 0,
+        "F6 charged no geometry"
+    );
+    assert_eq!(extra("f4", "geometric_group_additions"), 0);
+    assert_eq!(by_arm["enum"]["solver"]["ops"].as_u64(), Some(0));
+    let (ok, _, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "replay: {err}");
+}
+
+const BOUNDS_SPEC: &str = r#"{
+  "schema": "ecbench.spec/v1",
+  "label": "bounds integration test: four sizes",
+  "workloads": {
+    "curves": [{"kind": "prime_search", "bits": 12, "seed": 59297},
+               {"kind": "prime_search", "bits": 14, "seed": 59297},
+               {"kind": "prime_search", "bits": 16, "seed": 59297},
+               {"kind": "prime_search", "bits": 18, "seed": 59297}],
+    "targets_per_curve": 4,
+    "target_seed": 11
+  },
+  "arms": [
+    {"name": "rho-plain", "role": "reference", "method": {"id": "rho.plain"}},
+    {"name": "rho-neg", "role": "candidate", "method": {"id": "rho.negation"}},
+    {"name": "bsgs-neg", "role": "candidate", "method": {"id": "bsgs.negation"}},
+    {"name": "rho-plain-aa", "role": "control", "method": {"id": "rho.plain"}}
+  ],
+  "measurement": {"rounds": 2, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 60}
+}"#;
+
+fn read_json(p: &Path) -> Value {
+    serde_json::from_str(&std::fs::read_to_string(p).unwrap()).unwrap()
+}
+
+#[test]
+fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
+    let dir = scratch("bounds");
+    let s = |p: &Path| p.to_str().unwrap().to_string();
+    let spec = dir.join("spec.json");
+    std::fs::write(&spec, BOUNDS_SPEC).unwrap();
+    let session = dir.join("s0");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        &s(&spec),
+        "--out",
+        &s(&session),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "run failed: {err}");
+    // A fit-v2 bound is admissible only with a passing audit of each session.
+    let receipt = dir.join("s0.audit.json");
+    let (ok, _, err) = ecbench(&[
+        "verify",
+        "--dir",
+        &s(&session),
+        "--replay-all",
+        "--exit-code",
+        "--out",
+        &s(&receipt),
+    ]);
+    assert!(ok, "verify: {err}");
+
+    // Bounds of three arms, sealed, re-derivable, and refused when touched.
+    let records = dir.join("records");
+    std::fs::create_dir_all(&records).unwrap();
+    let mut ids = std::collections::BTreeMap::new();
+    for arm in ["rho-plain", "rho-neg", "bsgs-neg"] {
+        let out = records.join(format!("{arm}.json"));
+        let (ok, _, err) = ecbench(&[
+            "bound",
+            "fit",
+            "--dir",
+            &s(&session),
+            "--audit",
+            &s(&receipt),
+            "--arm",
+            arm,
+            "--root",
+            &s(&dir),
+            "--out",
+            &s(&out),
+        ]);
+        assert!(ok, "bound fit {arm}: {err}");
+        let b = read_json(&out);
+        assert_eq!(b["schema"], "ecbench.bound/v1");
+        let id = b["bound_id"].as_str().unwrap().to_string();
+        assert!(id.starts_with("ECBND1h") && id.len() == 7 + 12, "{id}");
+        assert_eq!(b["domain"]["family"], "prime");
+        assert_eq!(b["domain"]["tier"], "toy");
+        assert_eq!(b["fit"]["sizes"], 4);
+        assert_eq!(b["fit"]["scaling_claim"], true);
+        assert_eq!(b["fit"]["declared_alpha"], 0.5);
+        assert_eq!(b["level"], "exponent");
+        assert_eq!(b["admissibility"]["status"], "admissible");
+        assert_eq!(b["dimensions"]["memory"]["known"], true);
+        assert_eq!(b["provenance"]["verified"], 32);
+        assert_eq!(b["provenance"]["sessions"][0]["dir"], "s0");
+        ids.insert(arm, id);
+    }
+    let (ok, _, err) = ecbench(&[
+        "bound",
+        "check",
+        "--root",
+        &s(&dir),
+        "--record",
+        &s(&records.join("rho-plain.json")),
+        &s(&records.join("rho-neg.json")),
+    ]);
+    assert!(ok, "bound check: {err}");
+    let touched = dir.join("touched.json");
+    let text = std::fs::read_to_string(records.join("rho-neg.json")).unwrap();
+    std::fs::write(
+        &touched,
+        text.replacen("\"verified\": 32", "\"verified\": 33", 1),
+    )
+    .unwrap();
+    let (ok, _, err) = ecbench(&[
+        "bound",
+        "check",
+        "--root",
+        &s(&dir),
+        "--record",
+        &s(&touched),
+    ]);
+    assert!(!ok && err.contains("seal mismatch"), "{err}");
+
+    // The frontier: BSGS leads on ops, the rho walks on memory; the page
+    // is current right after it is built and stale once edited.
+    let fjson = dir.join("frontier.json");
+    let fmd = dir.join("FRONTIER.md");
+    let (ok, _, err) = ecbench(&[
+        "frontier",
+        "build",
+        "--bounds",
+        &s(&records),
+        "--out",
+        &s(&fjson),
+        "--markdown",
+        &s(&fmd),
+    ]);
+    assert!(ok, "frontier build: {err}");
+    let f = read_json(&fjson);
+    assert_eq!(f["schema"], "ecbench.frontier/v2");
+    assert_eq!(f["domains"].as_array().unwrap().len(), 1);
+    let d = &f["domains"][0];
+    assert_eq!(d["entries"].as_array().unwrap().len(), 3);
+    assert_eq!(d["ops_leader"], ids["bsgs-neg"]);
+    let frontier_ids: Vec<&str> = d["entries"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|e| e["is_frontier"] == true)
+        .map(|e| e["bound_id"].as_str().unwrap())
+        .collect();
+    assert!(
+        frontier_ids.contains(&ids["bsgs-neg"].as_str()),
+        "{frontier_ids:?}"
+    );
+    let (ok, _, err) = ecbench(&[
+        "frontier",
+        "build",
+        "--bounds",
+        &s(&records),
+        "--out",
+        &s(&fjson),
+        "--markdown",
+        &s(&fmd),
+        "--check",
+    ]);
+    assert!(ok, "frontier check: {err}");
+    std::fs::write(&fmd, "edited\n").unwrap();
+    let (ok, _, err) = ecbench(&[
+        "frontier",
+        "build",
+        "--bounds",
+        &s(&records),
+        "--out",
+        &s(&fjson),
+        "--markdown",
+        &s(&fmd),
+        "--check",
+    ]);
+    assert!(!ok && err.contains("stale"), "{err}");
+
+    // A challenge against rho.plain, holding the bound fitted above.
+    let draft = dir.join("draft.json");
+    std::fs::write(
+        &draft,
+        format!(
+            r#"{{
+  "label": "test: beat rho.plain",
+  "domain": {{"problem": "ecdlp.single_target", "family": "prime", "target_kind": "planted",
+             "unit": "ecbench.gae", "tier": "toy",
+             "envelope": {{"targets": 1, "precomputation": "none", "threads": 1}}}},
+  "incumbent": {{"bound_id": "{}", "method": {{"id": "rho.plain"}}}},
+  "workloads": {{"curves": [{{"kind": "prime_search", "bits": 12, "seed": 59297}},
+                           {{"kind": "prime_search", "bits": 14, "seed": 59297}},
+                           {{"kind": "prime_search", "bits": 16, "seed": 59297}},
+                           {{"kind": "prime_search", "bits": 18, "seed": 59297}}],
+                "targets_per_curve": 4, "nonce": 7}},
+  "measurement": {{"rounds": 2, "warmup": 0, "isolation_required": "L0", "timeout_seconds": 60}},
+  "acceptance": {{"min_runs_per_size": 8}}
+}}"#,
+            ids["rho-plain"]
+        ),
+    )
+    .unwrap();
+    let challenge = dir.join("challenge.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "seal",
+        "--draft",
+        &s(&draft),
+        "--out",
+        &s(&challenge),
+    ]);
+    assert!(ok, "challenge seal: {err}");
+    let (ok, _, err) = ecbench(&["challenge", "check", "--file", &s(&challenge)]);
+    assert!(ok, "challenge check: {err}");
+    let c = read_json(&challenge);
+    assert!(c["challenge_id"].as_str().unwrap().starts_with("ECCH1h"));
+    assert_eq!(
+        c["acceptance"]["axes"],
+        serde_json::json!(["ops", "memory"])
+    );
+
+    // Epoch 1: BSGS with the negation map.  Fewer operations, a √r table:
+    // a trade, and a new bound that names the incumbent's.
+    let spec1 = dir.join("spec1.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&challenge),
+        "--candidate",
+        r#"{"id":"bsgs.negation"}"#,
+        "--legacy-epoch",
+        "1",
+        "--out",
+        &s(&spec1),
+    ]);
+    assert!(ok, "challenge spec: {err}");
+    let s1 = dir.join("s1");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        &s(&spec1),
+        "--out",
+        &s(&s1),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "run s1: {err}");
+    let v1 = dir.join("verdict1.json");
+    let b1 = dir.join("bound1.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "verdict",
+        "--procedure",
+        "1",
+        "--epoch",
+        "1",
+        "--challenge",
+        &s(&challenge),
+        "--dir",
+        &s(&s1),
+        "--replay-all",
+        "--bounds",
+        &s(&records),
+        "--root",
+        &s(&dir),
+        "--out",
+        &s(&v1),
+        "--bound-out",
+        &s(&b1),
+        "--exit-code",
+    ]);
+    assert!(ok, "verdict 1: {err}");
+    let v = read_json(&v1);
+    assert_eq!(v["schema"], "ecbench.verdict/v1");
+    assert_eq!(v["outcome"], "trade", "{}", v["statement"]);
+    assert_eq!(v["advances_on"], serde_json::json!(["ops"]));
+    assert_eq!(v["regresses_on"], serde_json::json!(["memory"]));
+    assert_eq!(v["level_moved"], Value::Null);
+    assert_eq!(v["session"]["spec_matches"], true);
+    assert_eq!(v["audit"]["ok"], true);
+    assert_eq!(v["audit"]["replay_all"], true);
+    assert_eq!(v["audit"]["replays"], v["audit"]["replays_reproduced"]);
+    assert_eq!(v["axes"][0]["axis"], "ops");
+    assert_eq!(v["axes"][0]["pairs"], 32);
+    assert_eq!(v["control"]["ratio"], 1.0);
+    assert!(v["incumbent_drift"]["recorded_bound_id"] == ids["rho-plain"]);
+    assert_eq!(v["fits"]["candidate"]["sizes"], 4);
+    let nb = read_json(&b1);
+    assert_eq!(nb["improves_on"], serde_json::json!([ids["rho-plain"]]));
+    assert_eq!(nb["verdict_id"], v["verdict_id"]);
+    assert_eq!(nb["method"]["id"], "bsgs.negation");
+
+    // Epoch 2: the incumbent against itself.  Same seeds, same counts:
+    // the ratio is exactly 1, the outcome `matches`, no bound is written.
+    let spec2 = dir.join("spec2.json");
+    assert!(
+        ecbench(&[
+            "challenge",
+            "spec",
+            "--challenge",
+            &s(&challenge),
+            "--candidate",
+            r#"{"id":"rho.plain"}"#,
+            "--legacy-epoch",
+            "2",
+            "--out",
+            &s(&spec2),
+        ])
+        .0
+    );
+    let s2 = dir.join("s2");
+    assert!(
+        ecbench(&[
+            "run",
+            "--spec",
+            &s(&spec2),
+            "--out",
+            &s(&s2),
+            "--cpus",
+            "none",
+            "--lock",
+            &lock(&dir),
+            "--quiet",
+        ])
+        .0
+    );
+    let v2 = dir.join("verdict2.json");
+    let b2 = dir.join("bound2.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "verdict",
+        "--procedure",
+        "1",
+        "--epoch",
+        "2",
+        "--challenge",
+        &s(&challenge),
+        "--dir",
+        &s(&s2),
+        "--replay-all",
+        "--root",
+        &s(&dir),
+        "--out",
+        &s(&v2),
+        "--bound-out",
+        &s(&b2),
+        "--exit-code",
+    ]);
+    assert!(ok, "verdict 2: {err}");
+    let v = read_json(&v2);
+    assert_eq!(v["outcome"], "matches", "{}", v["statement"]);
+    assert_eq!(v["axes"][0]["ratio_candidate_over_incumbent"], 1.0);
+    assert!(!b2.exists(), "a match writes no bound");
+
+    // The wrong epoch is somebody else's spec: inadmissible, exit 1, and
+    // the paired ratio is still reported for information.
+    let v3 = dir.join("verdict3.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "verdict",
+        "--procedure",
+        "1",
+        "--epoch",
+        "3",
+        "--challenge",
+        &s(&challenge),
+        "--dir",
+        &s(&s2),
+        "--root",
+        &s(&dir),
+        "--out",
+        &s(&v3),
+        "--exit-code",
+    ]);
+    assert!(!ok, "{err}");
+    let v = read_json(&v3);
+    assert_eq!(v["outcome"], "inadmissible");
+    assert_eq!(v["session"]["spec_matches"], false);
+    assert!(v["reasons"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|r| r.as_str().unwrap().contains("not the challenge's spec")));
+    assert!(v["reasons"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|r| r.as_str().unwrap().contains("replay-all")));
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+/// A public value standing in for a beacon: a 40-digit lowercase hex string,
+/// the shape of the git commit id the documentation names.  Injected on the
+/// command line, so nothing here touches the network.
+const TEST_BEACON: &str = "0123456789abcdef0123456789abcdef01234567";
+
+/// The epoch `docs/bounds/README.md` §3.4 documents, computed here from its
+/// parts rather than by `challenge::epoch_from`: the SHA-256-derived value
+/// of the law `ecbench.challenge.epoch` over the challenge's nonce, the hex
+/// digits of the commitment id after its `ECCM1h` prefix (twelve, read as a
+/// number) and the first 16 hex digits of the SHA-256 of the beacon text.
+fn documented_epoch(nonce: u64, commitment_id: &str, beacon: &str) -> u64 {
+    use crypto_lib::cryptanalysis::ecbench::canonical::{derive_u64, sha256_hex};
+    let hex = |h: &str| u64::from_str_radix(&h[..h.len().min(16)], 16).unwrap();
+    let cid = commitment_id.strip_prefix("ECCM1h").unwrap();
+    derive_u64(
+        "ecbench.challenge.epoch",
+        &[nonce, hex(cid), hex(&sha256_hex(beacon.as_bytes()))],
+    )
+}
+
+/// Verdict procedure 2 end to end (README §3.4, §6): commit, take a beacon,
+/// spec, run, judge.  The commitment is written with a fixed timestamp
+/// through the library, so its id, the derived epoch, the targets and the
+/// counts are the same on every run; the beacon is injected with `--beacon`.
+/// The CLI's own `challenge commit` (stamped with the wall clock) is
+/// exercised separately, on the epoch it derives.
+#[test]
+fn challenge_verdict_procedure_2_derives_the_epoch_from_commitment_and_beacon() {
+    use crypto_lib::cryptanalysis::ecbench::challenge::{self, Challenge};
+    use crypto_lib::cryptanalysis::ecbench::methods::MethodSpec;
+
+    let dir = scratch("proc2");
+    let s = |p: &Path| p.to_str().unwrap().to_string();
+
+    // The incumbent's committed bound.  An admissible procedure-2 verdict
+    // needs the drift check, so the challenge names a fitted, audited
+    // rho.plain bound and the verdict is given `--bounds`.  The record is a
+    // fixture, not fitted here: a fitted bound's id hashes the session it
+    // came from (wall-clock dependent), the challenge id hashes the bound id,
+    // the commitment id hashes the challenge id and the epoch derives from
+    // the commitment, so a bound fitted in the test would move the epoch, the
+    // targets and the counts on every run.  The fixture is the record that
+    // `ecbench bound fit --arm rho-plain` writes for the session
+    // `BOUNDS_SPEC` describes (four prime sizes, rho.plain, 32 verified
+    // runs); regenerate it with that command if the bound schema moves.
+    let records = dir.join("records");
+    std::fs::create_dir_all(&records).unwrap();
+    let bound_record = records.join("rho-plain.json");
+    std::fs::copy(
+        Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/ecbench/procedure-2/rho-plain-bound.json"),
+        &bound_record,
+    )
+    .unwrap();
+    let incumbent_bound = read_json(&bound_record)["bound_id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+
+    let draft = dir.join("draft.json");
+    std::fs::write(
+        &draft,
+        format!(
+            r#"{{
+  "label": "test: procedure 2 against rho.plain",
+  "domain": {{"problem": "ecdlp.single_target", "family": "prime", "target_kind": "planted",
+             "unit": "ecbench.gae", "tier": "toy",
+             "envelope": {{"targets": 1, "precomputation": "none", "threads": 1}}}},
+  "incumbent": {{"bound_id": "{incumbent_bound}", "method": {{"id": "rho.plain"}}}},
+  "workloads": {{"curves": [{{"kind": "prime_search", "bits": 12, "seed": 59297}},
+                           {{"kind": "prime_search", "bits": 14, "seed": 59297}},
+                           {{"kind": "prime_search", "bits": 16, "seed": 59297}},
+                           {{"kind": "prime_search", "bits": 18, "seed": 59297}}],
+                "targets_per_curve": 4, "nonce": 11}},
+  "measurement": {{"rounds": 2, "warmup": 0, "isolation_required": "L0", "timeout_seconds": 60}},
+  "acceptance": {{"min_runs_per_size": 8}}
+}}"#
+        ),
+    )
+    .unwrap();
+    let chpath = dir.join("challenge.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "seal",
+        "--draft",
+        &s(&draft),
+        "--out",
+        &s(&chpath),
+    ]);
+    assert!(ok, "challenge seal: {err}");
+    let ch = Challenge::read(&chpath).unwrap();
+    let nonce = ch.workloads.nonce;
+    assert_eq!(nonce, 11);
+
+    // 1. The commitment, sealed at a fixed time in the past.
+    let candidate_json = r#"{"id":"bsgs.negation"}"#;
+    let candidate: MethodSpec = serde_json::from_str(candidate_json).unwrap();
+    let (cm, text) =
+        challenge::commit(&ch, &candidate, "test commitment", 1_700_000_000_000).expect("commit");
+    let cmpath = dir.join("commitment.json");
+    std::fs::write(&cmpath, text).unwrap();
+    assert!(
+        cm.commitment_id.starts_with("ECCM1h"),
+        "{}",
+        cm.commitment_id
+    );
+
+    // 2. The epoch is the documented function of the nonce, the commitment
+    // and the beacon, and is not an input anyone chose.
+    let epoch = documented_epoch(nonce, &cm.commitment_id, TEST_BEACON);
+    assert_eq!(
+        challenge::epoch_from(&ch, &cm, TEST_BEACON).unwrap(),
+        epoch,
+        "epoch_from disagrees with the documented derivation"
+    );
+    let other_beacon = "fedcba9876543210fedcba9876543210fedcba98";
+    let other_epoch = documented_epoch(nonce, &cm.commitment_id, other_beacon);
+    assert_ne!(epoch, other_epoch, "the beacon must move the epoch");
+    // Pinned: with the fixture bound and the fixed commitment time every id
+    // and the epoch are the same on every run.  A change to the epoch law or
+    // to how a commitment or challenge is sealed moves them, and so
+    // re-derives every procedure-2 verdict ever committed: bump the
+    // procedure instead of editing these.
+    assert_eq!(ch.challenge_id, "ECCH1h2fb886fd1dca");
+    assert_eq!(cm.commitment_id, "ECCM1h6b270060cf95");
+    assert_eq!(epoch, 9746311172139217237);
+
+    // 3. The spec, through the CLI, with the beacon injected.
+    let spec_path = dir.join("spec.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        candidate_json,
+        "--commitment",
+        &s(&cmpath),
+        "--beacon",
+        TEST_BEACON,
+        "--out",
+        &s(&spec_path),
+    ]);
+    assert!(ok, "challenge spec (procedure 2): {err}");
+    assert!(
+        err.contains(&format!("epoch {epoch}:")),
+        "the CLI reports the derived epoch: {err}"
+    );
+    let spec = read_json(&spec_path);
+    let description = spec["description"].as_str().unwrap();
+    assert!(
+        description.contains(&format!(
+            "Epoch {epoch} derived from commitment {} and beacon {TEST_BEACON} (procedure 2).",
+            cm.commitment_id
+        )),
+        "{description}"
+    );
+    // The seeds derive from the nonce and that epoch, as for any challenge.
+    {
+        use crypto_lib::cryptanalysis::ecbench::canonical::derive_u64;
+        assert_eq!(
+            spec["workloads"]["target_seed"].as_u64().unwrap(),
+            derive_u64("ecbench.challenge.target_seed", &[nonce, epoch])
+        );
+        assert_eq!(
+            spec["measurement"]["seed"].as_u64().unwrap(),
+            derive_u64("ecbench.challenge.algorithm_seed", &[nonce, epoch])
+        );
+    }
+    let arms: Vec<&str> = spec["arms"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|a| a["name"].as_str().unwrap())
+        .collect();
+    assert_eq!(arms, vec!["incumbent", "candidate", "incumbent-aa"]);
+    // The same inputs give the same spec byte for byte; another beacon
+    // gives another one.
+    let again = dir.join("spec-again.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        candidate_json,
+        "--commitment",
+        &s(&cmpath),
+        "--beacon",
+        TEST_BEACON,
+        "--out",
+        &s(&again),
+    ]);
+    assert!(ok, "challenge spec again: {err}");
+    assert_eq!(
+        std::fs::read_to_string(&again).unwrap(),
+        std::fs::read_to_string(&spec_path).unwrap()
+    );
+    let other = dir.join("spec-other-beacon.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        candidate_json,
+        "--commitment",
+        &s(&cmpath),
+        "--beacon",
+        other_beacon,
+        "--out",
+        &s(&other),
+    ]);
+    assert!(ok, "challenge spec, other beacon: {err}");
+    assert!(err.contains(&format!("epoch {other_epoch}:")), "{err}");
+    assert_ne!(
+        std::fs::read_to_string(&other).unwrap(),
+        std::fs::read_to_string(&spec_path).unwrap()
+    );
+
+    // 4. Refusals before anything runs.
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        candidate_json,
+        "--commitment",
+        &s(&cmpath),
+        "--beacon",
+        "cafe",
+    ]);
+    assert!(
+        !ok && err.contains("at least 16 lowercase hex digits"),
+        "{err}"
+    );
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        r#"{"id":"rho.negation"}"#,
+        "--commitment",
+        &s(&cmpath),
+        "--beacon",
+        TEST_BEACON,
+    ]);
+    assert!(!ok && err.contains("the commitment names"), "{err}");
+    let (_, future_text) = challenge::commit(&ch, &candidate, "future", u64::MAX / 2).unwrap();
+    let future = dir.join("future.json");
+    std::fs::write(&future, future_text).unwrap();
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        candidate_json,
+        "--commitment",
+        &s(&future),
+        "--beacon",
+        TEST_BEACON,
+    ]);
+    assert!(!ok && err.contains("in the future"), "{err}");
+    // Procedure 2 and a chosen epoch do not mix.
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        candidate_json,
+        "--commitment",
+        &s(&cmpath),
+        "--beacon",
+        TEST_BEACON,
+        "--legacy-epoch",
+        "1",
+    ]);
+    assert!(
+        !ok,
+        "a commitment with --legacy-epoch must be refused: {err}"
+    );
+
+    // 5. The CLI's own commitment (wall-clock stamped, so its id differs on
+    // every run) derives the documented epoch too.
+    let cli_cm = dir.join("cli-commitment.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "commit",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        candidate_json,
+        "--note",
+        "cli",
+        "--out",
+        &s(&cli_cm),
+    ]);
+    assert!(ok, "challenge commit: {err}");
+    let cli_commitment = challenge::Commitment::read(&cli_cm).unwrap();
+    let cli_epoch = documented_epoch(nonce, &cli_commitment.commitment_id, TEST_BEACON);
+    let cli_spec = dir.join("cli-spec.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        candidate_json,
+        "--commitment",
+        &s(&cli_cm),
+        "--beacon",
+        TEST_BEACON,
+        "--out",
+        &s(&cli_spec),
+    ]);
+    assert!(ok, "challenge spec from the CLI commitment: {err}");
+    assert!(err.contains(&format!("epoch {cli_epoch}:")), "{err}");
+
+    // 6. Run the session and judge it.
+    let session = dir.join("s");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        &s(&spec_path),
+        "--out",
+        &s(&session),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "run: {err}");
+    let verdict_path = dir.join("verdict.json");
+    let bound_path = dir.join("bound.json");
+    let verdict_args = |extra: &[&str]| -> (bool, String) {
+        let mut a: Vec<String> = [
+            "challenge",
+            "verdict",
+            "--challenge",
+            &s(&chpath),
+            "--dir",
+            &s(&session),
+            "--replay-all",
+            "--bounds",
+            &s(&records),
+            "--root",
+            &s(&dir),
+        ]
+        .iter()
+        .map(|x| x.to_string())
+        .collect();
+        a.extend(extra.iter().map(|x| x.to_string()));
+        let refs: Vec<&str> = a.iter().map(String::as_str).collect();
+        let (ok, _, err) = ecbench(&refs);
+        (ok, err)
+    };
+    let (ok, err) = verdict_args(&[
+        "--commitment",
+        &s(&cmpath),
+        "--beacon",
+        TEST_BEACON,
+        "--out",
+        &s(&verdict_path),
+        "--bound-out",
+        &s(&bound_path),
+        "--exit-code",
+    ]);
+    assert!(ok, "verdict (procedure 2): {err}");
+    let v = read_json(&verdict_path);
+    assert_eq!(v["schema"], "ecbench.verdict/v1");
+    assert_eq!(v["procedure"], 2);
+    assert_eq!(v["epoch"].as_u64().unwrap(), epoch);
+    assert_eq!(v["commitment"]["commitment_id"], cm.commitment_id);
+    assert_eq!(v["commitment"]["committed_unix_ms"], 1_700_000_000_000u64);
+    assert_eq!(v["commitment"]["beacon"], TEST_BEACON);
+    assert_eq!(v["resamples"], 2000);
+    assert_eq!(v["multiplicity"]["method"], "holm");
+    assert_eq!(v["session"]["spec_matches"], true);
+    assert_eq!(v["audit"]["ok"], true);
+    assert_eq!(v["audit"]["replay_all"], true);
+    assert_eq!(v["audit"]["replays"], v["audit"]["replays_reproduced"]);
+    assert_eq!(v["axes"][0]["axis"], "ops");
+    assert_eq!(v["axes"][0]["pairs"], 32);
+    assert_eq!(v["control"]["ratio"], 1.0);
+    assert_eq!(v["candidate"]["method"], "bsgs.negation");
+    assert_eq!(v["incumbent"]["method"], "rho.plain");
+    // The outcome is a function of counted work, so it is the same on every
+    // run.  BSGS with the negation map counts fewer group operations than
+    // plain rho (ratio below 1) but holds a table that rho does not: the
+    // memory axis is clearly worse (its Holm-adjusted test passes), the ops
+    // axis is a bounded comparison that does not separate, so the verdict is
+    // `regresses`, not an advance and not a trade.
+    assert_eq!(v["outcome"], "regresses", "{}", v["statement"]);
+    assert_eq!(v["advances_on"], serde_json::json!([]));
+    assert_eq!(v["regresses_on"], serde_json::json!(["memory"]));
+    assert_eq!(v["level_moved"], Value::Null);
+    assert_eq!(v["reasons"], serde_json::json!([]));
+    assert_eq!(
+        v["multiplicity"],
+        serde_json::json!({"method": "holm", "alpha": 0.05, "family": ["memory", "ops"]})
+    );
+    let axis = |name: &str| {
+        v["axes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|a| a["axis"] == name)
+            .unwrap_or_else(|| panic!("no axis {name}"))
+    };
+    assert!(
+        axis("ops")["ratio_candidate_over_incumbent"]
+            .as_f64()
+            .unwrap()
+            < 1.0
+    );
+    assert_eq!(axis("memory")["verdict"], "worse");
+    assert!(
+        axis("memory")["p_value"].as_f64().unwrap()
+            < axis("memory")["holm_threshold"].as_f64().unwrap()
+    );
+    assert_eq!(v["incumbent_drift"]["recorded_bound_id"], incumbent_bound);
+    assert_eq!(v["incumbent_drift"]["outside"], false);
+    assert!(v["statement"].as_str().unwrap().starts_with("regresses"));
+    assert!(!bound_path.exists(), "a regression writes no bound");
+
+    // Judging the same session under another beacon is judging it against
+    // somebody else's spec: inadmissible, exit 1, the ratio still reported.
+    let wrong = dir.join("verdict-wrong-beacon.json");
+    let (ok, err) = verdict_args(&[
+        "--commitment",
+        &s(&cmpath),
+        "--beacon",
+        other_beacon,
+        "--out",
+        &s(&wrong),
+        "--exit-code",
+    ]);
+    assert!(!ok, "{err}");
+    let w = read_json(&wrong);
+    assert_eq!(w["outcome"], "inadmissible");
+    assert_eq!(w["epoch"].as_u64().unwrap(), other_epoch);
+    assert_eq!(w["session"]["spec_matches"], false);
+    assert!(w["reasons"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|r| r.as_str().unwrap().contains("not the challenge's spec")));
+    // Without the drift check (`--bounds`) a verdict is not admissible.
+    let no_bounds = dir.join("verdict-no-bounds.json");
+    let mut a = vec![
+        "challenge".to_string(),
+        "verdict".into(),
+        "--challenge".into(),
+        s(&chpath),
+        "--dir".into(),
+        s(&session),
+        "--replay-all".into(),
+        "--root".into(),
+        s(&dir),
+        "--commitment".into(),
+        s(&cmpath),
+        "--beacon".into(),
+        TEST_BEACON.into(),
+        "--out".into(),
+        s(&no_bounds),
+        "--exit-code".into(),
+    ];
+    let refs: Vec<&str> = a.iter().map(String::as_str).collect();
+    let (ok, _, err) = ecbench(&refs);
+    assert!(!ok, "{err}");
+    let nb = read_json(&no_bounds);
+    assert_eq!(nb["outcome"], "inadmissible");
+    assert!(nb["statement"]
+        .as_str()
+        .unwrap()
+        .contains("incumbent drift check was not run"));
+    // Procedure 2 never takes a chosen epoch: no commitment, no verdict.
+    a.truncate(9);
+    a.extend(["--epoch".to_string(), epoch.to_string()]);
+    let refs: Vec<&str> = a.iter().map(String::as_str).collect();
+    let (ok, _, err) = ecbench(&refs);
+    assert!(
+        !ok && err.contains("procedure 2 derives the epoch"),
+        "{err}"
+    );
+
+    // 7. A candidate that is the incumbent: its own commitment, hence its
+    // own epoch, and the paired ratio is exactly 1.
+    let same_json = r#"{"id":"rho.plain"}"#;
+    let same: MethodSpec = serde_json::from_str(same_json).unwrap();
+    let (cm2, text2) =
+        challenge::commit(&ch, &same, "the incumbent itself", 1_700_000_001_000).expect("commit");
+    let cm2path = dir.join("commitment2.json");
+    std::fs::write(&cm2path, text2).unwrap();
+    let epoch2 = documented_epoch(nonce, &cm2.commitment_id, TEST_BEACON);
+    assert_ne!(epoch2, epoch, "another commitment, another epoch");
+    let spec2 = dir.join("spec2.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        same_json,
+        "--commitment",
+        &s(&cm2path),
+        "--beacon",
+        TEST_BEACON,
+        "--out",
+        &s(&spec2),
+    ]);
+    assert!(ok, "challenge spec 2: {err}");
+    assert!(err.contains(&format!("epoch {epoch2}:")), "{err}");
+    let session2 = dir.join("s2");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        &s(&spec2),
+        "--out",
+        &s(&session2),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "run 2: {err}");
+    let verdict2 = dir.join("verdict2.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "verdict",
+        "--challenge",
+        &s(&chpath),
+        "--dir",
+        &s(&session2),
+        "--commitment",
+        &s(&cm2path),
+        "--beacon",
+        TEST_BEACON,
+        "--replay-all",
+        "--bounds",
+        &s(&records),
+        "--root",
+        &s(&dir),
+        "--out",
+        &s(&verdict2),
+        "--exit-code",
+    ]);
+    assert!(ok, "verdict 2: {err}");
+    let v2 = read_json(&verdict2);
+    assert_eq!(v2["procedure"], 2);
+    assert_eq!(v2["epoch"].as_u64().unwrap(), epoch2);
+    assert_eq!(v2["commitment"]["commitment_id"], cm2.commitment_id);
+    assert_eq!(v2["outcome"], "matches", "{}", v2["statement"]);
+    assert_eq!(v2["axes"][0]["ratio_candidate_over_incumbent"], 1.0);
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+const FIELD_SPEC: &str = r#"{
+  "schema": "ecbench.spec/v1",
+  "label": "field operations integration test: four prime sizes",
+  "workloads": {
+    "curves": [{"kind": "prime_search", "bits": 12, "seed": 59297},
+               {"kind": "prime_search", "bits": 14, "seed": 59297},
+               {"kind": "prime_search", "bits": 16, "seed": 59297},
+               {"kind": "prime_search", "bits": 18, "seed": 59297}],
+    "targets_per_curve": 2,
+    "target_seed": 13
+  },
+  "arms": [
+    {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+    {"name": "bsgs-neg", "role": "candidate", "method": {"id": "bsgs.negation"}}
+  ],
+  "measurement": {"rounds": 1, "warmup": 0, "seed": 9, "isolation_required": "L0", "timeout_seconds": 60}
+}"#;
+
+const KOBLITZ_FIELD_SPEC: &str = r#"{
+  "schema": "ecbench.spec/v1",
+  "label": "field operations integration test: a Koblitz curve counts none",
+  "workloads": {
+    "curves": [{"kind": "koblitz", "a": 0, "n": 13}],
+    "targets_per_curve": 1,
+    "target_seed": 13
+  },
+  "arms": [
+    {"name": "bsgs-neg", "role": "reference", "method": {"id": "bsgs.negation"}}
+  ],
+  "measurement": {"rounds": 1, "warmup": 0, "seed": 9, "isolation_required": "L0", "timeout_seconds": 60}
+}"#;
+
+/// The primitive level, end to end: prime-field curves count the
+/// multiplications, squarings and inversions behind their group
+/// operations; the block rides on every record outside `counters` and
+/// `phases`; a bound carries the three field axes with intervals; the
+/// frontier page grows their columns; a challenge may name one, and the
+/// verdict then decides on it and reports the other two.  A Koblitz curve
+/// counts none and its record and bound say nothing, not zero.
+#[test]
+fn field_operations_are_counted_bounded_and_judged() {
+    let dir = scratch("field-ops");
+    let s = |p: &Path| p.to_str().unwrap().to_string();
+    let spec = dir.join("spec.json");
+    std::fs::write(&spec, FIELD_SPEC).unwrap();
+    let session = dir.join("s0");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        &s(&spec),
+        "--out",
+        &s(&session),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "run failed: {err}");
+
+    // Every record carries the block, and nothing the replay of a
+    // committed record compares.  Every addition or doubling that did
+    // field work did exactly one inversion, at least two multiplications
+    // and at least one squaring (`PrimeCurve::FIELD_OPS_PER_ADD`,
+    // `FIELD_OPS_PER_DOUBLE`); the special cases did none.  The group
+    // operations are `total_gae` (additions plus doublings): the tuned
+    // rho's `search` phase carries its gae without an operation split.
+    let lines = std::fs::read_to_string(session.join("records.jsonl")).unwrap();
+    let mut records = 0;
+    for line in lines.lines().filter(|l| !l.trim().is_empty()) {
+        let r: Value = serde_json::from_str(line).unwrap();
+        assert_eq!(r["outcome"]["status"], "verified", "{}", r["run_id"]);
+        let f = &r["field_ops"];
+        let (muls, sqrs, invs) = (
+            f["muls"].as_u64().unwrap(),
+            f["sqrs"].as_u64().unwrap(),
+            f["invs"].as_u64().unwrap(),
+        );
+        let group_ops = r["cost"]["total_gae"].as_f64().unwrap();
+        assert!(
+            invs > 0 && invs as f64 <= group_ops && muls >= 2 * invs && sqrs >= invs,
+            "{}: {f} over {group_ops} group operations",
+            r["run_id"]
+        );
+        assert!(r["counters"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .all(|k| !k.contains("field")));
+        assert!(r["phases"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .all(|p| p.get("field_ops").is_none()));
+        records += 1;
+    }
+    assert_eq!(records, 16);
+    let receipt = dir.join("audit.json");
+    let (ok, _, err) = ecbench(&[
+        "verify",
+        "--dir",
+        &s(&session),
+        "--replay-all",
+        "--exit-code",
+        "--out",
+        &s(&receipt),
+    ]);
+    assert!(ok, "replay: {err}");
+
+    // Each arm's bound carries the three field axes, known, with the
+    // two-stage interval the other axes have, and re-derives.
+    let records_dir = dir.join("records");
+    std::fs::create_dir_all(&records_dir).unwrap();
+    let mut ids = std::collections::BTreeMap::new();
+    for arm in ["rho-neg", "bsgs-neg"] {
+        let out = records_dir.join(format!("{arm}.json"));
+        let (ok, _, err) = ecbench(&[
+            "bound",
+            "fit",
+            "--dir",
+            &s(&session),
+            "--audit",
+            &s(&receipt),
+            "--arm",
+            arm,
+            "--root",
+            &s(&dir),
+            "--out",
+            &s(&out),
+        ]);
+        assert!(ok, "bound fit {arm}: {err}");
+        let b = read_json(&out);
+        assert_eq!(b["fit"]["sizes"], 4);
+        for axis in ["field_muls", "field_sqrs", "field_invs"] {
+            let d = &b["dimensions"][axis];
+            assert_eq!(d["known"], true, "{arm} {axis}: {d}");
+            assert!(d["value"].as_f64().unwrap() > 0.0, "{arm} {axis}: {d}");
+            assert_eq!(d["ci95"].as_array().unwrap().len(), 2, "{arm} {axis}: {d}");
+            assert_eq!(d["lower_is_better"], true);
+        }
+        // Per `√r`: at most one inversion per group operation, so the
+        // inversions axis is bounded by `S`, and two multiplications each.
+        let dim = |axis: &str| b["dimensions"][axis]["value"].as_f64().unwrap();
+        assert!(dim("field_invs") <= b["constant"]["s"]["value"].as_f64().unwrap());
+        assert!(dim("field_muls") >= 2.0 * dim("field_invs"));
+        assert!(dim("field_sqrs") >= dim("field_invs"));
+        ids.insert(arm, b["bound_id"].as_str().unwrap().to_string());
+    }
+    let (ok, _, err) = ecbench(&[
+        "bound",
+        "check",
+        "--root",
+        &s(&dir),
+        "--record",
+        &s(&records_dir.join("rho-neg.json")),
+        &s(&records_dir.join("bsgs-neg.json")),
+    ]);
+    assert!(ok, "bound check: {err}");
+
+    // The frontier carries the axes and the page their columns; the axes
+    // are in the vocabulary dominance may read.
+    let fjson = dir.join("frontier.json");
+    let fmd = dir.join("FRONTIER.md");
+    let (ok, _, err) = ecbench(&[
+        "frontier",
+        "build",
+        "--bounds",
+        &s(&records_dir),
+        "--out",
+        &s(&fjson),
+        "--markdown",
+        &s(&fmd),
+    ]);
+    assert!(ok, "frontier build: {err}");
+    let f = read_json(&fjson);
+    let entries = f["domains"][0]["entries"].as_array().unwrap();
+    assert_eq!(entries.len(), 2);
+    for e in entries {
+        for axis in ["field_muls", "field_sqrs", "field_invs"] {
+            assert_eq!(e["axes"][axis]["known"], true, "{}", e["bound_id"]);
+        }
+    }
+    let page = std::fs::read_to_string(&fmd).unwrap();
+    assert!(page.contains("| field muls (/√r) | field sqrs (/√r) | field invs (/√r) |"));
+    assert!(page.contains(
+        "the modular multiplications, squarings and inversions behind the group operations"
+    ));
+    let (ok, _, err) = ecbench(&[
+        "frontier",
+        "build",
+        "--bounds",
+        &s(&records_dir),
+        "--out",
+        &s(&fjson),
+        "--markdown",
+        &s(&fmd),
+        "--check",
+    ]);
+    assert!(ok, "frontier check: {err}");
+    let (ok, _, err) = ecbench(&[
+        "frontier",
+        "build",
+        "--bounds",
+        &s(&records_dir),
+        "--axes",
+        "ops,field_sqrs",
+        "--json",
+    ]);
+    assert!(ok, "frontier on a field axis: {err}");
+
+    // A challenge naming `field_sqrs`: the verdict decides on it and
+    // reports the other two field axes.
+    let draft = dir.join("draft.json");
+    std::fs::write(
+        &draft,
+        format!(
+            r#"{{
+  "label": "test: fewer squarings than rho.negation",
+  "domain": {{"problem": "ecdlp.single_target", "family": "prime", "target_kind": "planted",
+             "unit": "ecbench.gae", "tier": "toy",
+             "envelope": {{"targets": 1, "precomputation": "none", "threads": 1}}}},
+  "incumbent": {{"bound_id": "{}", "method": {{"id": "rho.negation"}}}},
+  "workloads": {{"curves": [{{"kind": "prime_search", "bits": 12, "seed": 59297}},
+                           {{"kind": "prime_search", "bits": 14, "seed": 59297}},
+                           {{"kind": "prime_search", "bits": 16, "seed": 59297}},
+                           {{"kind": "prime_search", "bits": 18, "seed": 59297}}],
+                "targets_per_curve": 2, "nonce": 3}},
+  "measurement": {{"rounds": 1, "warmup": 0, "isolation_required": "L0", "timeout_seconds": 60}},
+  "acceptance": {{"axes": ["ops", "memory", "field_sqrs"], "min_runs_per_size": 2}}
+}}"#,
+            ids["rho-neg"]
+        ),
+    )
+    .unwrap();
+    let challenge = dir.join("challenge.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "seal",
+        "--draft",
+        &s(&draft),
+        "--out",
+        &s(&challenge),
+    ]);
+    assert!(ok, "challenge seal: {err}");
+    let (ok, _, err) = ecbench(&["challenge", "check", "--file", &s(&challenge)]);
+    assert!(ok, "challenge check: {err}");
+    let c = read_json(&challenge);
+    assert_eq!(
+        c["acceptance"]["axes"],
+        serde_json::json!(["ops", "memory", "field_sqrs"])
+    );
+    let spec1 = dir.join("spec1.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&challenge),
+        "--candidate",
+        r#"{"id":"bsgs.negation"}"#,
+        "--legacy-epoch",
+        "1",
+        "--out",
+        &s(&spec1),
+    ]);
+    assert!(ok, "challenge spec: {err}");
+    let s1 = dir.join("s1");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        &s(&spec1),
+        "--out",
+        &s(&s1),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "run s1: {err}");
+    let v1 = dir.join("verdict1.json");
+    let b1 = dir.join("bound1.json");
+    let (_, _, err) = ecbench(&[
+        "challenge",
+        "verdict",
+        "--procedure",
+        "1",
+        "--epoch",
+        "1",
+        "--challenge",
+        &s(&challenge),
+        "--dir",
+        &s(&s1),
+        "--replay-all",
+        "--bounds",
+        &s(&records_dir),
+        "--root",
+        &s(&dir),
+        "--out",
+        &s(&v1),
+        "--bound-out",
+        &s(&b1),
+    ]);
+    assert!(v1.exists(), "verdict 1 was not written: {err}");
+    let v = read_json(&v1);
+    assert_eq!(v["schema"], "ecbench.verdict/v1");
+    assert_ne!(v["outcome"], "inadmissible", "{}", v["statement"]);
+    assert_eq!(v["audit"]["ok"], true);
+    assert_eq!(v["audit"]["replays"], v["audit"]["replays_reproduced"]);
+    assert_eq!(
+        v["acceptance"]["axes"],
+        serde_json::json!(["ops", "memory", "field_sqrs"])
+    );
+    let axes = v["axes"].as_array().unwrap();
+    let axis = |name: &str| {
+        axes.iter()
+            .find(|a| a["axis"] == name)
+            .unwrap_or_else(|| panic!("no axis {name} in {axes:?}"))
+    };
+    let ops_pairs = axis("ops")["pairs"].as_u64().unwrap();
+    assert_eq!(ops_pairs, 8);
+    for (name, decides) in [
+        ("field_sqrs", true),
+        ("field_muls", false),
+        ("field_invs", false),
+    ] {
+        let a = axis(name);
+        assert_eq!(a["known"], true, "{a}");
+        assert_eq!(a["decides"], decides, "{a}");
+        assert_eq!(a["pairs"], ops_pairs, "{a}");
+        assert!(a["ratio_candidate_over_incumbent"].as_f64().unwrap() > 0.0);
+        assert!(
+            ["better", "worse", "indistinguishable"].contains(&a["verdict"].as_str().unwrap()),
+            "{a}"
+        );
+    }
+    // The axes named in the statement include the field ones, deciding or
+    // reported; the level, if any, is one of the three.
+    let statement = v["statement"].as_str().unwrap();
+    assert!(statement.contains("field_sqrs"), "{statement}");
+    assert!(
+        statement.contains("field_muls") && statement.contains("reported, not deciding"),
+        "{statement}"
+    );
+    match v["level_moved"].as_str() {
+        None => assert_ne!(v["outcome"], "advances"),
+        Some(l) => {
+            assert_eq!(v["outcome"], "advances");
+            assert!(["exponent", "constant", "primitive"].contains(&l), "{l}");
+        }
+    }
+    if b1.exists() {
+        let nb = read_json(&b1);
+        assert_eq!(nb["dimensions"]["field_sqrs"]["known"], true);
+        assert_eq!(nb["verdict_id"], v["verdict_id"]);
+    }
+
+    // A Koblitz curve does not count: no block on the record, no axis on
+    // the bound.  Unknown is not zero.
+    let kspec = dir.join("kspec.json");
+    std::fs::write(&kspec, KOBLITZ_FIELD_SPEC).unwrap();
+    let ksession = dir.join("k0");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        &s(&kspec),
+        "--out",
+        &s(&ksession),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "koblitz run failed: {err}");
+    let lines = std::fs::read_to_string(ksession.join("records.jsonl")).unwrap();
+    let krecords: Vec<Value> = lines
+        .lines()
+        .filter(|l| !l.trim().is_empty())
+        .map(|l| serde_json::from_str(l).unwrap())
+        .collect();
+    assert_eq!(krecords.len(), 1);
+    assert_eq!(krecords[0]["outcome"]["status"], "verified");
+    assert!(krecords[0].get("field_ops").is_none(), "absent, never zero");
+    let kout = dir.join("koblitz-bound.json");
+    let (ok, _, err) = ecbench(&[
+        "bound",
+        "fit",
+        "--dir",
+        &s(&ksession),
+        "--arm",
+        "bsgs-neg",
+        "--root",
+        &s(&dir),
+        "--out",
+        &s(&kout),
+    ]);
+    assert!(ok, "koblitz bound fit: {err}");
+    let kb = read_json(&kout);
+    let dims: Vec<&String> = kb["dimensions"].as_object().unwrap().keys().collect();
+    assert_eq!(dims, vec!["memory", "ops", "uncharged"], "{dims:?}");
+
+    // A Koblitz challenge that names no field axis, judged on a session
+    // that counted none: the verdict carries exactly the axes it always
+    // carried, so a committed verdict re-derives under this binary.
+    let kdraft = dir.join("kdraft.json");
+    std::fs::write(
+        &kdraft,
+        r#"{
+  "label": "test: koblitz, no field axes",
+  "domain": {"problem": "ecdlp.single_target", "family": "koblitz", "target_kind": "planted",
+             "unit": "ecbench.gae", "tier": "toy",
+             "envelope": {"targets": 1, "precomputation": "none", "threads": 1}},
+  "incumbent": {"bound_id": null, "method": {"id": "rho.negation"}},
+  "workloads": {"curves": [{"kind": "koblitz", "a": 1, "n": 17},
+                           {"kind": "koblitz", "a": 0, "n": 19},
+                           {"kind": "koblitz", "a": 0, "n": 23},
+                           {"kind": "koblitz", "a": 1, "n": 29}],
+                "targets_per_curve": 2, "nonce": 5},
+  "measurement": {"rounds": 1, "warmup": 0, "isolation_required": "L0", "timeout_seconds": 60},
+  "acceptance": {"min_runs_per_size": 2}
+}"#,
+    )
+    .unwrap();
+    let kchallenge = dir.join("kchallenge.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "seal",
+        "--draft",
+        &s(&kdraft),
+        "--out",
+        &s(&kchallenge),
+    ]);
+    assert!(ok, "koblitz challenge seal: {err}");
+    let kspec1 = dir.join("kspec1.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&kchallenge),
+        "--candidate",
+        r#"{"id":"bsgs.negation"}"#,
+        "--legacy-epoch",
+        "1",
+        "--out",
+        &s(&kspec1),
+    ]);
+    assert!(ok, "koblitz challenge spec: {err}");
+    let k1 = dir.join("k1");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        &s(&kspec1),
+        "--out",
+        &s(&k1),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "koblitz run k1: {err}");
+    let kv1 = dir.join("kverdict1.json");
+    let (_, _, err) = ecbench(&[
+        "challenge",
+        "verdict",
+        "--procedure",
+        "1",
+        "--epoch",
+        "1",
+        "--challenge",
+        &s(&kchallenge),
+        "--dir",
+        &s(&k1),
+        "--replay-all",
+        "--root",
+        &s(&dir),
+        "--out",
+        &s(&kv1),
+    ]);
+    assert!(kv1.exists(), "koblitz verdict was not written: {err}");
+    let kv = read_json(&kv1);
+    assert_ne!(kv["outcome"], "inadmissible", "{}", kv["statement"]);
+    let names: Vec<&str> = kv["axes"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|a| a["axis"].as_str().unwrap())
+        .collect();
+    assert_eq!(names, vec!["ops", "memory", "uncharged"], "{names:?}");
+    assert!(!kv["statement"].as_str().unwrap().contains("field_"));
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn hyperelliptic_ic_and_rho_run_verify_replay_and_price_completely() {
+    // A genus-2 Jacobian over F_41 (r = 1321): both hec methods, a planted
+    // target, two rounds; every run verifies in the runner, replays exactly,
+    // and `work` prices it with nothing missing.
+    let dir = scratch("hec");
+    let spec = dir.join("spec.json");
+    std::fs::write(
+        &spec,
+        r#"{
+  "schema":"ecbench.spec/v1",
+  "label":"hec integration",
+  "workloads":{"curves":[{"kind":"hec_thread","p":41,"genus":2}],"targets_per_curve":1,"target_seed":5},
+  "arms":[
+    {"name":"rho","role":"reference","method":{"id":"hec.rho_full_width"}},
+    {"name":"ic","role":"candidate","method":{"id":"hec.ic_fb_walk","params":{"branches":"64","d_step_in":"4","extra_relations":"8"}}}
+  ],
+  "measurement":{"rounds":2,"warmup":0,"seed":17,"isolation_required":"L0","timeout_seconds":120}
+}"#,
+    )
+    .unwrap();
+    let records = |out: &Path| -> Vec<Value> {
+        std::fs::read_to_string(out.join("records.jsonl"))
+            .unwrap()
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect()
+    };
+    let (a, b) = (dir.join("a"), dir.join("b"));
+    for out in [&a, &b] {
+        let (ok, err) = run_spec(&dir, out, &[]);
+        assert!(ok, "{err}");
+    }
+    let (ra, rb) = (records(&a), records(&b));
+    assert_eq!(ra.len(), 4);
+    for (x, y) in ra.iter().zip(&rb) {
+        assert_eq!(x["outcome"]["status"], "verified", "{x}");
+        assert_eq!(x["workload"]["curve"]["family"], "hyperelliptic");
+        // Two sessions of one spec: the same seeds give the same counts.
+        assert_eq!(x["algorithm_seed"], y["algorithm_seed"]);
+        for key in ["phases", "counters"] {
+            let strip = |v: &Value| {
+                let mut v = v[key].clone();
+                if let Some(ps) = v.as_array_mut() {
+                    for p in ps {
+                        p["wall_ns"] = Value::Null;
+                    }
+                }
+                v
+            };
+            assert_eq!(strip(x), strip(y), "{key}");
+        }
+        assert_eq!(x["work"]["complete"], true, "{}", x["work"]);
+        assert_eq!(x["work"]["bitops"], y["work"]["bitops"]);
+    }
+    let receipt = dir.join("audit.json");
+    let (ok, _, err) = ecbench(&[
+        "verify",
+        "--dir",
+        a.to_str().unwrap(),
+        "--replay-all",
+        "--out",
+        receipt.to_str().unwrap(),
+        "--exit-code",
+    ]);
+    assert!(ok, "{err}");
+    let audit: Value = serde_json::from_str(&std::fs::read_to_string(receipt).unwrap()).unwrap();
+    assert_eq!(audit["replays"].as_array().unwrap().len(), 4);
+    assert!(audit["replays"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .all(|r| r["reproduced"] == true));
+    let (ok, out, err) = ecbench(&["work", "--counted", a.to_str().unwrap()]);
+    assert!(ok, "{err}");
+    let lines: Vec<Value> = out
+        .lines()
+        .map(|l| serde_json::from_str(l).unwrap())
+        .collect();
+    assert_eq!(lines.len(), 4);
+    assert!(lines
+        .iter()
+        .all(|l| l["work"]["Ok"]["complete"] == true || l["work"]["complete"] == true));
+/// A quartic session the current harness writes, on the smallest curve of
+/// `research/prime_rho_automorphism_20261015/sessions/quartic`.
+const QUARTIC_SPEC: &str = r#"{
+  "schema": "ecbench.spec/v1",
+  "label": "class set-up accounting control",
+  "workloads": {
+    "curves": [{"kind": "prime_explicit", "p": 2395681, "a": 13, "b": 0,
+                "group_order": 2392850, "r": 47857, "gx": 462051, "gy": 856555}],
+    "targets_per_curve": 2,
+    "target_seed": 2026
+  },
+  "arms": [
+    {"name": "rho-quartic", "role": "candidate", "method": {"id": "rho.quartic"}}
+  ],
+  "measurement": {"rounds": 1, "warmup": 0, "seed": 3, "isolation_required": "L0", "timeout_seconds": 60}
+}"#;
+
+/// Rewrite one measured record of `out` with `edit`, reseal it and rehash
+/// the file, so every seal and digest agrees and only a replay can tell.
+fn forge_one_record(
+    out: &Path,
+    edit: impl FnOnce(&mut crypto_lib::cryptanalysis::ecbench::record::Record),
+) {
+    use crypto_lib::cryptanalysis::ecbench::canonical::sha256_hex;
+    use crypto_lib::cryptanalysis::ecbench::record::Record;
+    use crypto_lib::cryptanalysis::ecbench::runner::Session;
+    let text = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut lines: Vec<String> = text.lines().map(String::from).collect();
+    let i = lines
+        .iter()
+        .position(|l| l.contains("\"warmup\":false") && l.contains("\"status\":\"verified\""))
+        .unwrap();
+    let mut rec: Record = serde_json::from_str(&lines[i]).unwrap();
+    edit(&mut rec);
+    lines[i] = rec.seal();
+    let body = lines.join("\n") + "\n";
+    std::fs::write(out.join("records.jsonl"), &body).unwrap();
+    let mut session: Session =
+        serde_json::from_str(&std::fs::read_to_string(out.join("session.json")).unwrap()).unwrap();
+    session.records_sha256 = Some(sha256_hex(body.as_bytes()));
+    std::fs::write(
+        out.join("session.json"),
+        serde_json::to_string_pretty(&session).unwrap() + "\n",
+    )
+    .unwrap();
+}
+
+/// The pre-2026-10-18 class set-up reconstruction admits only the listed
+/// historical sessions.  Negative controls: a record the current harness
+/// wrote, undercharged by exactly its own class set-up (the error the
+/// reconstruction undoes) and resealed, fails its replay, whether it keeps
+/// `detail.class_setup` or is dressed in the pre-fix shape without it.
+/// Positive control: the same session, untouched, replays exactly.
+#[test]
+fn a_current_record_undercharged_by_its_class_setup_fails_replay() {
+    let dir = scratch("class-setup");
+    std::fs::write(dir.join("spec.json"), QUARTIC_SPEC).unwrap();
+    let clean = dir.join("clean");
+    assert!(run_spec(&dir, &clean, &[]).0);
+    let (ok, stdout, _) = ecbench(&[
+        "verify",
+        "--dir",
+        clean.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "{stdout}");
+    assert!(!stdout.contains("pre-2026-10-18"), "{stdout}");
+
+    for strip_marker in [false, true] {
+        let out = dir.join(format!("forged-{strip_marker}"));
+        copy_dir(&clean, &out);
+        forge_one_record(&out, |rec| {
+            let setup = rec.detail["class_setup"]["gae"]
+                .as_f64()
+                .expect("current records carry it");
+            assert!(setup > 0.0);
+            let total = rec.cost.total_gae.unwrap() - setup;
+            let r = rec.workload.curve.r.to_f64();
+            let floor = rec.cost.s.unwrap() / rec.boundaries.ratio_to_floor.unwrap();
+            rec.cost.total_gae = Some(total);
+            rec.cost.s = Some(total / r.sqrt());
+            rec.boundaries.ratio_to_floor = Some(total / r.sqrt() / floor);
+            if strip_marker {
+                rec.detail.as_object_mut().unwrap().remove("class_setup");
+            }
+        });
+        let (ok, stdout, _) = ecbench(&[
+            "verify",
+            "--dir",
+            out.to_str().unwrap(),
+            "--replay-all",
+            "--exit-code",
+        ]);
+        assert!(!ok, "strip_marker={strip_marker}: {stdout}");
+        assert!(
+            stdout.contains("differs in total_gae"),
+            "strip_marker={strip_marker}: {stdout}"
+        );
+    }
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn jacobians_and_transfers_verify_and_replay() {
+    // Genus-2 and plane-quartic Jacobians, a GHS curve over F_{p⁶}, and the
+    // isogeny, plane-quartic cover and GHS cover transfers, one session per
+    // family (every arm of a session runs on every curve): every run
+    // verifies, phases sum to the total, and every record replays exactly.
+    let sessions = [
+        (
+            "genus2",
+            r#"{"kind": "genus2_search", "p_bits": 8, "seed": 3, "max_cofactor": 16}"#,
+            vec![
+                ("rho", "rho.negation", "{}"),
+                ("ic-hec", "ic.hyperelliptic", "{}"),
+            ],
+        ),
+        (
+            "plane_quartic",
+            r#"{"kind": "plane_quartic_search", "p_bits": 6, "seed": 1, "max_cofactor": 64}"#,
+            vec![("rho", "rho.plain", "{}"), ("bsgs", "bsgs.textbook", "{}")],
+        ),
+        (
+            "ghs_fp6",
+            r#"{"kind": "ghs_fp6_search", "p": 13, "seed": 1}"#,
+            vec![
+                ("rho", "rho.negation", "{}"),
+                ("ghs", "transfer.ghs_cover", "{}"),
+            ],
+        ),
+        (
+            "prime",
+            r#"{"kind": "prime_search", "bits": 14, "seed": 5}"#,
+            vec![
+                ("rho", "rho.plain", "{}"),
+                ("iso", "transfer.isogeny", r#"{"ell": "3"}"#),
+                ("qcover", "transfer.quartic_cover", "{}"),
+            ],
+        ),
+    ];
+    for (family, curve, arms) in sessions {
+        let dir = scratch(&format!("jacobians-{family}"));
+        let arms: Vec<String> = arms
+            .iter()
+            .enumerate()
+            .map(|(k, (name, id, params))| {
+                let role = if k == 0 { "reference" } else { "candidate" };
+                format!(
+                    r#"{{"name": "{name}", "role": "{role}", "method": {{"id": "{id}", "params": {params}}}}}"#
+                )
+            })
+            .collect();
+        let spec = format!(
+            r#"{{"schema": "ecbench.spec/v1", "label": "{family} test",
+              "workloads": {{"curves": [{curve}], "targets_per_curve": 2, "target_seed": 7}},
+              "arms": [{}],
+              "measurement": {{"rounds": 1, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 120}}}}"#,
+            arms.join(",")
+        );
+        std::fs::write(dir.join("spec.json"), spec).unwrap();
+        let out = dir.join("s");
+        let (ok, err) = run_spec(&dir, &out, &[]);
+        assert!(ok, "{family}: {err}");
+        let text = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+        for line in text.lines() {
+            let r: Value = serde_json::from_str(line).unwrap();
+            assert_eq!(r["outcome"]["status"], "verified", "{line}");
+            assert_eq!(r["workload"]["curve"]["family"], family, "{line}");
+            let total = r["cost"]["total_gae"].as_f64().unwrap();
+            let sum: f64 = r["phases"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|p| p["gae"].as_f64().unwrap())
+                .sum();
+            assert!((total - sum).abs() <= 1e-9 * total.max(1.0), "{line}");
+        }
+        let (ok, _, err) = ecbench(&[
+            "verify",
+            "--dir",
+            out.to_str().unwrap(),
+            "--replay-all",
+            "--exit-code",
+        ]);
+        assert!(ok, "{family} replay: {err}");
+    }
+}
+
+/// `ecbench work` on committed records is frozen byte for byte: the
+/// snapshot in `tests/fixtures/ecbench/work-v1/expected.jsonl` was written
+/// by the binary before `bitop/v2` existed, and `--unit bitop/v1` is the
+/// same output.  `--unit bitop/v2` carries the same gates and adds the
+/// memory term.
+#[test]
+fn work_in_bitop_v1_is_frozen_and_bitop_v2_adds_memory() {
+    let fixture = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/ecbench/work-v1");
+    let expected = std::fs::read_to_string(fixture.join("expected.jsonl")).unwrap();
+    let dir = fixture.to_str().unwrap();
+    let (ok, out, err) = ecbench(&["work", dir]);
+    assert!(ok, "{err}");
+    assert_eq!(
+        out, expected,
+        "`ecbench work` output differs from the committed snapshot"
+    );
+    let (ok, out, err) = ecbench(&["work", "--unit", "bitop/v1", dir]);
+    assert!(ok, "{err}");
+    assert_eq!(
+        out, expected,
+        "`ecbench work --unit bitop/v1` differs from the committed snapshot"
+    );
+    let (ok, out, err) = ecbench(&["work", "--unit", "bitop/v2", dir]);
+    assert!(ok, "{err}");
+    assert_eq!(out.lines().count(), expected.lines().count());
+    for (l1, l2) in expected.lines().zip(out.lines()) {
+        let a: Value = serde_json::from_str(l1).unwrap();
+        let b: Value = serde_json::from_str(l2).unwrap();
+        assert_eq!(a["record_id"], b["record_id"]);
+        let (wa, wb) = (&a["work"]["Ok"], &b["work"]["Ok"]);
+        assert_eq!(wa["schema"], "ecbench.work/v1");
+        assert_eq!(wb["schema"], "ecbench.work/v2");
+        assert_eq!(wb["unit"], "bitop/v2");
+        assert_eq!(wa["bitops"], wb["bitops"], "{}", a["record_id"]);
+        assert_eq!(wb["memory_complete"], true, "{}", b["work"]);
+        assert_eq!(wb["memory_unpriced"].as_array().unwrap().len(), 0);
+        let bitops: u128 = wb["bitops"].as_str().unwrap().parse().unwrap();
+        let bits: u128 = wb["memory_bits"].as_str().unwrap().parse().unwrap();
+        assert!(bits > 0);
+        assert_eq!(wb["at"].as_str().unwrap(), (bitops * bits).to_string());
+    }
+    let (ok, _, err) = ecbench(&["work", "--unit", "bitop/v3", dir]);
+    assert!(!ok && err.contains("no unit"), "{err}");
+    // The v2 vectors the binary prints are the committed ones.
+    let (ok, out, err) = ecbench(&["bitop-vectors", "--unit", "bitop/v2"]);
+    assert!(ok, "{err}");
+    let printed: Value = serde_json::from_str(&out).unwrap();
+    let committed: Value = serde_json::from_str(
+        &std::fs::read_to_string(
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("docs/units/bitop-v2.vectors.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(printed, committed);
+}

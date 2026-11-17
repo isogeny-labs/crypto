@@ -1,0 +1,29 @@
+{
+  "recorded_at": "2026-11-05T17:02:32.230753+00:00",
+  "steps": [
+    {
+      "step": "positive",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-polynomial-constructor-20261105/checker",
+        "research/primefield-companion-followup-20261102/feature-native-reflection-solver/program.tsv"
+      ],
+      "exit_code": 0,
+      "timeout_seconds": 60,
+      "packet_sha256": "1bd9253dda0a3fc64f2f6eb7d50b03e557dc0a8a0453dba02c242c55aeb2a36f"
+    },
+    {
+      "step": "negative",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-polynomial-constructor-20261105/checker",
+        "research/primefield-companion-followup-20261102/feature-native-reflection-solver/negative-program.tsv"
+      ],
+      "exit_code": 101,
+      "timeout_seconds": 60,
+      "packet_sha256": "2807b35bea021104a41e512ab017d08d86f0972fd91b2bab2ed7e01475b6c7b3"
+    }
+  ],
+  "checker_binary_sha256": "a0a1b84c510c1a563fb5f1e11322bd01cc04cc0648b33146b78b0dd9e298f5ae",
+  "checker_source_path": "research/primefield-companion-followup-20261102/feature-native-polynomial-constructor/check.rs",
+  "checker_source_sha256": "c65b1588cd433b742d10c10fe343a04494caac88585348be0428618f14be1b84",
+  "negative_control": "negated one nonconstant reflected-partner coefficient"
+}

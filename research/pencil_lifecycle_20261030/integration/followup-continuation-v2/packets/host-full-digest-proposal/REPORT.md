@@ -1,0 +1,9 @@
+# Full host-class digest correction proposal
+
+The authoritative producer provides this field: host::capture obtains `(env_class_id, env_class_sha256)` directly from `canonical::short_id("ECBENV3", class_view_v3(stable))`. canonical.rs explicitly documents that the short identifier names while the full digest is what joins/audits check. The typed preflight should therefore validate the full field as metadata integrity, using the same existing canonical computation rather than a new hash convention.
+
+The two-file patch factors recompute_class's existing version dispatch into pub(crate) recompute_class_identity returning the original tuple. Public recompute_class retains exactly its old behavior and signature. V1, V3 and fallback-V2 version selection are unchanged. The preflight compares both recomputed fields with the capsule and still separately checks session class equality. No custody or execution admission is added.
+
+The positive typed fixture now fills both fields from that authoritative helper. Its new targeted negative changes only the LAST hex digit of the full digest, retaining the original short identifier and first 12 digest digits. All enclosing host/session/preparation byte hashes and identities are subsequently rebound by the existing fixture. The test therefore reaches the new full-digest comparison and requires the exact host schema/build/environment rejection; it cannot pass merely by an earlier stale raw-hash failure or a short-prefix mismatch. The existing nine-route positives and this expanded rebound-negative test remain manual retained-data tests; root must invoke them explicitly with PENCIL_RETAINED_INVENTORY and --ignored.
+
+No build was launched and no shared source was changed. The prior integration audit remains intact and correctly describes its earlier exact source. This is an additive correction proposal pending root source review, reservation check and actual compilation/tests.

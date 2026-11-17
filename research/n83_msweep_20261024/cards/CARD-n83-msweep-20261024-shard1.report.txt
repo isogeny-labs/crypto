@@ -1,0 +1,9 @@
+Result: stopped, not completed. No summary was printed.
+
+- Command run: `python3 tools/task_card.py run research/n83_msweep_20261024/cards/CARD-n83-msweep-20261024-shard1.yaml`, from `/home/user/crypto`, in the background, with default timeout.
+- The background job was killed by the harness after reaching its background time limit. Its output file (`/tmp/claude-0/-home-user/be4726a6-6887-5b0f-a70f-09baacd976f4/tasks/bzjhxzzb4.output`) contains only `[killed]`.
+- The tool did not exit 0, 2 or 3, so it produced no `IMPEDIMENT` line and no exit-status summary.
+- I did not rerun `run`, and I ran no card commands myself. The harness note says a run already at the longest allowed timeout should not be restarted.
+- The process from this command was no longer alive after the kill. A separate `task_card.py` process for `shard2.yaml` was visible in the process list. It is not mine and I did not touch it.
+
+Status: stopped (killed at the background time limit). Partial output in the card's `raw/` and `receipts/` directories was not inspected. The run needs re-dispatch with a longer timeout.

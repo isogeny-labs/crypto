@@ -1,0 +1,32 @@
+{
+  "_what": "End to end on a degree-15 random binary curve (instances of research/m4gb_e2e_ic_ladder_20261110): the pair-table reference row and the symbolic descent solved by inherited-f4 and by inherited-f4-batched (kept rows rewritten only when read or at a split: same decisions, fewer counted word XORs). Read S, s_over_rho against the matched counted rho, verified, priced_by.",
+  "instance": {
+    "regime": "char2",
+    "degree": 15,
+    "max_cofactor": 8
+  },
+  "repeats": 3,
+  "seed": 20261110,
+  "configurations": [
+    {
+      "factor_base": "binary-subspace:dimension=8",
+      "oracle": "mitm:m=2",
+      "targets": "walk"
+    }
+  ],
+  "matrix": {
+    "factor_base": [
+      "binary-subspace:dimension=8"
+    ],
+    "oracle": [
+      "descent-algebraic:m=2"
+    ],
+    "solver": [
+      "inherited-f4",
+      "inherited-f4-batched"
+    ],
+    "targets": [
+      "walk"
+    ]
+  }
+}

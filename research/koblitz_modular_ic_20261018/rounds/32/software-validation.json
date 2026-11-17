@@ -1,0 +1,17 @@
+{
+  "schema": "koblitz.software-validation/v1",
+  "root_sparse_initial_exit": 101,
+  "root_materialized_exit": 124,
+  "command": "ulimit -v 4194304; timeout 1200 env CARGO_TARGET_DIR=/var/tmp/koblitz-r31-root-test CARGO_BUILD_JOBS=1 cargo test --offline --release --lib",
+  "initial_obstacle": "missing sparse isogeny_algos path dependency; materialized src/isogeny_algos and retried once",
+  "final_observations": [
+    "missing embedded unrelated research/docs fixtures",
+    "allocation failure under4GiB cap",
+    "1200second cap reached"
+  ],
+  "root_test_summary_observed": false,
+  "root_suite_passed": false,
+  "caps_increased": false,
+  "scientific_results_affected": false,
+  "receipts": "software-validation/root-sparse-initial.*,root-materialized-final.*"
+}

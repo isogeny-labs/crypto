@@ -1,0 +1,187 @@
+Factor-base designs, Amendment 14 (R256-A0, R256-A11 on a 256 GiB EC2 host): rows from runs
+(V = min(cgroup_kB − 524288, MemTotal_kB − 524288). A system's limit is attributable only if its
+ row is a ulimit -v malloc failure or a timeout and the kernel log beside the rows has no OOM kill.
+ Operation counts are host-independent; wall times and peak_rss_kb are descriptive only.)
+
+════ R256-A0: A0 m = 4, t = 4, p1, budget 14400 s + grace 600 s
+  pre-flight: == segment start: cell R256-A0-m4-t4
+  pre-flight: date 2026-10-26T21:59:25Z
+  pre-flight: commit 2d526ec6118ff11b5abda18ec1e7202396150e03
+  pre-flight: binary_sha256 d750308a45a69334823ecb673bbafc98848dc8ce8647e81d3a64fba7709500c6
+  pre-flight: rustc rustc 1.99.1 (58cf8f9c3 2026-10-13)
+  pre-flight: cargo cargo 1.99.1 (5f94df478 2026-08-27)
+  pre-flight: runner_image unknown
+  pre-flight: runner_name none
+  pre-flight: MemTotal_kB 259751764
+  pre-flight: cgroup_path /system.slice/a15.service
+  pre-flight: cgroup_dir /sys/fs/cgroup/system.slice/a15.service
+  pre-flight: cgroup_limit_kB unlimited
+  pre-flight: cgroup_oom_kill_before 0
+  pre-flight: nproc 32
+  pre-flight: V_kB 259227476
+  pre-flight: kernel 7.0.0-1014-aws
+  pre-flight: product r7i.8xlarge
+  pre-flight: model name	: Intel(R) Xeon(R) Platinum 8488C
+  pre-flight: == segment start: cell R256-A0-m4-t4
+  pre-flight: date 2026-10-26T22:15:44Z
+  pre-flight: commit 2d526ec6118ff11b5abda18ec1e7202396150e03
+  pre-flight: binary_sha256 d750308a45a69334823ecb673bbafc98848dc8ce8647e81d3a64fba7709500c6
+  pre-flight: rustc rustc 1.99.1 (58cf8f9c3 2026-10-13)
+  pre-flight: cargo cargo 1.99.1 (5f94df478 2026-08-27)
+  pre-flight: runner_image unknown
+  pre-flight: runner_name none
+  pre-flight: MemTotal_kB 259751756
+  pre-flight: cgroup_path /system.slice/a15.service
+  pre-flight: cgroup_dir /sys/fs/cgroup/system.slice/a15.service
+  pre-flight: cgroup_limit_kB unlimited
+  pre-flight: cgroup_oom_kill_before 0
+  pre-flight: nproc 32
+  pre-flight: V_kB 259227468
+  pre-flight: kernel 7.0.0-1014-aws
+  pre-flight: product r7i.8xlarge
+  pre-flight: model name	: Intel(R) Xeon(R) Platinum 8488C
+  pre-flight: == segment start: cell R256-A0-m4-t4
+  pre-flight: date 2026-10-26T23:58:07Z
+  pre-flight: commit 2d526ec6118ff11b5abda18ec1e7202396150e03
+  pre-flight: binary_sha256 d750308a45a69334823ecb673bbafc98848dc8ce8647e81d3a64fba7709500c6
+  pre-flight: rustc rustc 1.99.1 (58cf8f9c3 2026-10-13)
+  pre-flight: cargo cargo 1.99.1 (5f94df478 2026-08-27)
+  pre-flight: runner_image unknown
+  pre-flight: runner_name none
+  pre-flight: MemTotal_kB 259751756
+  pre-flight: cgroup_path /system.slice/a15.service
+  pre-flight: cgroup_dir /sys/fs/cgroup/system.slice/a15.service
+  pre-flight: cgroup_limit_kB unlimited
+  pre-flight: cgroup_oom_kill_before 0
+  pre-flight: nproc 32
+  pre-flight: V_kB 259227468
+  pre-flight: kernel 7.0.0-1014-aws
+  pre-flight: product r7i.8xlarge
+  pre-flight: model name	: Intel(R) Xeon(R) Platinum 8488C
+  pre-flight: == segment start: cell R256-A0-m4-t4
+  pre-flight: date 2026-10-27T09:49:53Z
+  pre-flight: commit 2d526ec6118ff11b5abda18ec1e7202396150e03
+  pre-flight: binary_sha256 d750308a45a69334823ecb673bbafc98848dc8ce8647e81d3a64fba7709500c6
+  pre-flight: rustc unknown
+  pre-flight: cargo unknown
+  pre-flight: runner_image unknown
+  pre-flight: runner_name none
+  pre-flight: MemTotal_kB 259751760
+  pre-flight: cgroup_path /system.slice/a15.service
+  pre-flight: cgroup_dir /sys/fs/cgroup/system.slice/a15.service
+  pre-flight: cgroup_limit_kB unlimited
+  pre-flight: cgroup_oom_kill_before 0
+  pre-flight: nproc 32
+  pre-flight: V_kB 259227472
+  pre-flight: kernel 7.0.0-1014-aws
+  pre-flight: product r7i.8xlarge
+  pre-flight: model name	: Intel(R) Xeon(R) Platinum 8488C
+  pre-flight: == segment start: cell R256-A0-m4-t4
+  pre-flight: date 2026-10-27T10:58:22Z
+  pre-flight: commit 2d526ec6118ff11b5abda18ec1e7202396150e03
+  pre-flight: binary_sha256 d750308a45a69334823ecb673bbafc98848dc8ce8647e81d3a64fba7709500c6
+  pre-flight: rustc unknown
+  pre-flight: cargo unknown
+  pre-flight: runner_image unknown
+  pre-flight: runner_name none
+  pre-flight: MemTotal_kB 259751752
+  pre-flight: cgroup_path /system.slice/a15.service
+  pre-flight: cgroup_dir /sys/fs/cgroup/system.slice/a15.service
+  pre-flight: cgroup_limit_kB unlimited
+  pre-flight: cgroup_oom_kill_before 0
+  pre-flight: nproc 32
+  pre-flight: V_kB 259227464
+  pre-flight: kernel 7.0.0-1014-aws
+  pre-flight: product r7i.8xlarge
+  pre-flight: model name	: Intel(R) Xeon(R) Platinum 8488C
+  pre-flight: == segment start: cell R256-A0-m4-t4
+  pre-flight: date 2026-10-27T11:09:17Z
+  pre-flight: commit 2d526ec6118ff11b5abda18ec1e7202396150e03
+  pre-flight: binary_sha256 d750308a45a69334823ecb673bbafc98848dc8ce8647e81d3a64fba7709500c6
+  pre-flight: rustc unknown
+  pre-flight: cargo unknown
+  pre-flight: runner_image unknown
+  pre-flight: runner_name none
+  pre-flight: MemTotal_kB 259751744
+  pre-flight: cgroup_path /system.slice/a15.service
+  pre-flight: cgroup_dir /sys/fs/cgroup/system.slice/a15.service
+  pre-flight: cgroup_limit_kB unlimited
+  pre-flight: cgroup_oom_kill_before 0
+  pre-flight: nproc 32
+  pre-flight: V_kB 259227456
+  pre-flight: kernel 7.0.0-1014-aws
+  pre-flight: product r7i.8xlarge
+  pre-flight: model name	: Intel(R) Xeon(R) Platinum 8488C
+  OOM record (runs/R256-A0-m4-t4.oom.txt): 0 OOM events; capture verified
+  job cgroup oom_kill during the run: 0
+  A0 t=4 target 0: status ok, D 7, max_cols 167726, field_ops 32354122772019, time 7665.5 s, peak_rss_kb 121248592, ulimit_v_kb 259227468, budget 14400 s  →  limit none (completed), attributable
+  A0 t=4 target 1: status ok, D 7, max_cols 167726, field_ops 32353755743760, time 7727.0 s, peak_rss_kb 121415484, ulimit_v_kb 259227456, budget 14400 s  →  limit none (completed), attributable
+  identity: 2 of 2 R256-A0 systems match C2's A0 systems, 2 match L1's (cell_seed, target_seed, n_vars, n_eqs, planted_x, x_r, curve, set)
+  identity: 2 of 2 R256-A0 systems match H64-A0's
+  prior attempt A0 t=4 target 0: aborted at 536.9 s under ulimit -v 13000000, peak_rss_kb null
+  prior attempt A0 t=4 target 1: aborted at 512.8 s under ulimit -v 13000000, peak_rss_kb null
+  prior attempt A0 t=4 target 0: aborted at 516.7 s under ulimit -v 14500000, peak_rss_kb 12835532
+  prior attempt A0 t=4 target 1: aborted at 539.7 s under ulimit -v 14500000, peak_rss_kb 12891360
+  prior attempt A0 t=4 target 0: aborted at 1915.9 s under ulimit -v 64250012, peak_rss_kb 60667848
+  prior attempt A0 t=4 target 1: aborted at 1873.7 s under ulimit -v 64250012, peak_rss_kb 60713840
+
+════ R256-A11: A11 m = 4, t = 5, p1, budget 14400 s + grace 600 s
+  pre-flight: == segment start: cell R256-A11-m4-t5
+  pre-flight: date 2026-10-27T01:18:40Z
+  pre-flight: commit 2d526ec6118ff11b5abda18ec1e7202396150e03
+  pre-flight: binary_sha256 d750308a45a69334823ecb673bbafc98848dc8ce8647e81d3a64fba7709500c6
+  pre-flight: rustc rustc 1.99.1 (58cf8f9c3 2026-10-13)
+  pre-flight: cargo cargo 1.99.1 (5f94df478 2026-08-27)
+  pre-flight: runner_image unknown
+  pre-flight: runner_name none
+  pre-flight: MemTotal_kB 259751756
+  pre-flight: cgroup_path /system.slice/a15.service
+  pre-flight: cgroup_dir /sys/fs/cgroup/system.slice/a15.service
+  pre-flight: cgroup_limit_kB unlimited
+  pre-flight: cgroup_oom_kill_before 0
+  pre-flight: nproc 32
+  pre-flight: V_kB 259227468
+  pre-flight: kernel 7.0.0-1014-aws
+  pre-flight: product r7i.8xlarge
+  pre-flight: model name	: Intel(R) Xeon(R) Platinum 8488C
+  OOM record (runs/R256-A11-m4-t5.oom.txt): 0 OOM events; capture verified
+  job cgroup oom_kill during the run: 0
+  A11 t=5 target 0: status timeout, D 6, max_cols 477822, field_ops 92938768611363, time 14432.5 s, peak_rss_kb 222987152, ulimit_v_kb 259227468, budget 14400 s (F4 budget of 14400 s)  →  limit time, attributable
+  A11 t=5 target 1: status timeout, D 6, max_cols 477822, field_ops 88754869800815, time 14433.6 s, peak_rss_kb 216885628, ulimit_v_kb 259227468, budget 14400 s (F4 budget of 14400 s)  →  limit time, attributable
+  identity: 2 of 2 R256-A11 systems match L2's systems, 2 match L2r's
+  identity: 2 of 2 R256-A11 systems match H64-A11's
+  prior attempt A11 t=5 target 0: aborted at 97.3 s under ulimit -v 14500000, peak_rss_kb 13974324
+  prior attempt A11 t=5 target 1: aborted at 108.0 s under ulimit -v 14500000, peak_rss_kb 13974336
+  prior attempt A11 t=5 target 0: aborted at 130.0 s under ulimit -v 13483220, peak_rss_kb 13311580
+  prior attempt A11 t=5 target 1: aborted at 131.8 s under ulimit -v 13483220, peak_rss_kb 13286088
+  prior attempt A11 t=5 target 0: aborted at 6011.1 s under ulimit -v 64250008, peak_rss_kb 62919616
+  prior attempt A11 t=5 target 1: aborted at 6024.0 s under ulimit -v 64250008, peak_rss_kb 62849712
+
+════ σ and κ at m = 4, p1
+
+── A0 m = 4 p1 (F4 via C1, R256-A0's t = 4 cell)
+  t   b      D per system   max_cols per system   field_ops per system        status
+  2   2.000  [6, 6]         [1911, 1911]          [63703685, 63704352]        ok,ok
+  3   3.000  [7, 7]         [21619, 21619]        [111465267887, 111465240139] ok,ok
+  4   4.000  [7, 7]         [167726, 167726]      [32354122772019, 32353755743760] ok,ok
+  completed cells 3: κ = Δlog₂ field_ops/Δb = 9.477 against m − 1 = 3  →  cost-unfavourable (κ ≥ m − 1);  σ = 0.5000  →  no middle ground at this arity (σ ≥ 0.5)
+
+── A11 m = 4 p1 (F4 via C1, C2's t = 4 cell, R256-A11's t = 5 cell)
+  t   b      D per system   max_cols per system   field_ops per system        status
+  2   2.000  [3, 3]         [34, 34]              [941, 941]                  ok,ok
+  3   3.000  [5, 5]         [2159, 2159]          [33417634, 33402245]        ok,ok
+  4   4.000  [6, 6]         [88740, 88740]        [863032546892, 863026754688] ok,ok
+  5   5.000  []             []                    []                          timeout,timeout
+  completed cells 3: κ = Δlog₂ field_ops/Δb = 14.886 against m − 1 = 3  →  cost-unfavourable (κ ≥ m − 1);  σ = 1.5000  →  no middle ground at this arity (σ ≥ 0.5)
+
+════ R1: does A11's constant factor survive at m = 4, t = 4?
+  A11 t = 4 (C2) mean field_ops 863029650790 (log₂ 39.651); A0 t = 4 (R256-A0) mean field_ops 32353939257890 (log₂ 44.879)
+  R1: SURVIVES (A11 below A0)
+  A0 m = 4: 3 completed cells: κ = 9.477 (cost-unfavourable (κ ≥ m − 1)), σ = 0.5000 (no middle ground at this arity (σ ≥ 0.5))
+
+════ R2: A11 at m = 4, t = 5
+  R2: A11 NOT MEASURABLE AT m = 4, t = 5 WITHIN 259227468 kB AND 4 h (binding limit: time); the 3-cell verdicts stand: κ = 14.886 (cost-unfavourable (κ ≥ m − 1)), σ = 1.5000 (no middle ground at this arity (σ ≥ 0.5))
+
+════ Predictions scorecard (Amendment 14)
+  R256-A0: A0 does not complete; binding limit memory: limits [none (completed), none (completed)]  →  did not hold (completed)
+  R256-A11: A11 does not complete; binding limit time (a timeout at 14400 s): limits [time, time]  →  held

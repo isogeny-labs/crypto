@@ -1,0 +1,87 @@
+{
+  "files": {
+    "legacy-positive-native-replay.json": {
+      "bytes": 1361,
+      "sha256": "6f5defdfb297e6d069e893869f49c9058b8343d1f669c559c76d32b1a0be1a3b"
+    },
+    "natural/command.json": {
+      "bytes": 413,
+      "sha256": "e66fcfdd2f7b727c75ce741fc06b76fb369e1d764aade10ba1780a56cd6947c6"
+    },
+    "natural/host-preflight.json": {
+      "bytes": 278,
+      "sha256": "9d28368644abd926aa1b1e70d46ba586d22e368af1fb93f340e5cc15f11fc018"
+    },
+    "natural/receipt.json": {
+      "bytes": 1944,
+      "sha256": "a551fd35a22fc4a2636fbf2a3115a39d91921cb3b6bddd32b9f217c02bf05157"
+    },
+    "natural/stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "natural/stdout.txt.zst": {
+      "bytes": 19092,
+      "sha256": "5392079dee9e37f31c469bf8b084fcc33d5456e20f7f857ae9e511c7423cf4e4"
+    },
+    "positive/command.json": {
+      "bytes": 414,
+      "sha256": "ba54ba2b4c1ba1605a67583037af60b8d38badb432b575b6e25b81e1d26b70d7"
+    },
+    "positive/host-preflight.json": {
+      "bytes": 271,
+      "sha256": "996c130a5bd3b54327951ec47630395fbe0fd60497087246e46d723d5395591c"
+    },
+    "positive/receipt.json": {
+      "bytes": 1936,
+      "sha256": "d77f655082b092edf01334b490b7b823db064ff5d9e07b671d063c0ad474770a"
+    },
+    "positive/replay.json": {
+      "bytes": 1361,
+      "sha256": "03432e7b5e1d9af74cd7d7111ee2289506b50434bdf9dc58919438a7c0f2737d"
+    },
+    "positive/stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "positive/stdout.txt.zst": {
+      "bytes": 142410,
+      "sha256": "efe3c8b3639a076c2fdc3398baa759b99c9ca6394e2c4e2e2ee5976d5847607b"
+    }
+  },
+  "natural": {
+    "conflicts": 1000001,
+    "cpu_system_seconds": 1.044079,
+    "cpu_user_seconds": 136.3496,
+    "exit_code": 15,
+    "formula_sha256": "02d07716333e073f7eb40a7646ae3652b86b2129cb4d226f5dcc611d6bda7fff",
+    "host_load_1m": [
+      6.59423828125,
+      6.47314453125,
+      6.2822265625
+    ],
+    "status": "INDETERMINATE",
+    "stdout_sha256": "13889666db5fc0d3f0eba2dc1d7178e0ca48309ef9002d063b09f6e9e8e7c6b9",
+    "wait4_peak_rss_bytes": 1422950400,
+    "wall_seconds": 137.753047167
+  },
+  "positive": {
+    "conflicts": 839,
+    "cpu_system_seconds": 0.033797,
+    "cpu_user_seconds": 0.263083,
+    "exit_code": 10,
+    "formula_sha256": "f46a900495ec1a3594add973ee641de21a318a8fda6c9bfa67bd19057326d44c",
+    "host_load_1m": [
+      7.2919921875,
+      6.5625,
+      6.35791015625
+    ],
+    "status": "SAT_PENDING_REPLAY",
+    "stdout_sha256": "e9c61aa7c7fe4c3f31849428c8ec4e892295c40ec39408b1537c12fd2d88f938",
+    "wait4_peak_rss_bytes": 83705856,
+    "wall_seconds": 0.423803125
+  },
+  "schema": "n83.k2048-m5-native-audit/v1",
+  "selected_best_total_runtime": null,
+  "status": "PASS_NATIVE_RAW_CUSTODY_AND_TERMINAL_CLASSIFICATION"
+}

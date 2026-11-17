@@ -1,0 +1,21 @@
+rows: 1052  (sha256 027f656372a38aecea829c3309928a9019ceff3a30085852ec3551e9c47a3c43)
+
+== per (k, arm): attempts x curves, Dreg (mean, sd, distribution), solutions mean, time medians ==
+k=3     main  n=526    dreg mean 6.000 sd 0.000 hist {6: 526} sol_mean 0.0000 t_med 0.0039s
+k=4     main  n=526    dreg mean 7.000 sd 0.000 hist {7: 526} sol_mean 0.0000 t_med 2.7040s
+
+isomorphic-model control (Frobenius conjugate instance): 0/0 identical (dreg, solutions, refuted)
+A/A repeat: 0/0 identical counts; time ratio repeat/first median NaN, sd NaN (noise floor for the time column)
+within-orbit Dreg spread (same V, x_R; curves of one orbit are Galois conjugates but V is NOT conjugated, so this is a between-presentation spread):
+  #distinct dreg values per (k, attempt, orbit): {1: 12}
+
+== main arm mean dreg by (k, orbit) ==
+k=3 orbit=A n=262 mean=6.000 sd=0.000
+k=3 orbit=B n=262 mean=6.000 sd=0.000
+k=3 orbit=crater n=2 mean=6.000 sd=0.000
+k=4 orbit=A n=262 mean=7.000 sd=0.000
+k=4 orbit=B n=262 mean=7.000 sd=0.000
+k=4 orbit=crater n=2 mean=7.000 sd=0.000
+
+Decision rule, null set and thresholds: PROTOCOL.md section 6.  Masked output hides arm names; rerun with --unmask only after the analysis is frozen.
+(per-instance lines omitted: rerun p3h analyze --rows <pooled file> for the full listing)

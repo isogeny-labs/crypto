@@ -1,0 +1,878 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-prime-medium-tier-rho-20261107-A1
+experiment_id: prime_medium_tier_rho_20261107
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 5b566039d3bb745b204dac1a61492162deeb5ffb
+receipt: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.receipt.json
+binds:
+- path: research/prime_medium_tier_rho_20261107/protocol.json
+  sha256: 5a15b0a2730a4256dcb318ed08607cbdf7552d85fb1b78bb652194af94dcf690
+- path: research/prime_medium_tier_rho_20261107/PROTOCOL.md
+  sha256: 2dbafd435b3fd90d8026e679bd6a7e40669317352c96b5ee852296003a5747b8
+- path: research/prime_medium_tier_rho_20261107/fit.sh
+  sha256: 9fd4e3860933756bb0df2210dfc74a7318913a44b4aa27a93b78399c8dfa5e7f
+- path: research/prime_medium_tier_rho_20261107/check_session_complete.sh
+  sha256: c2dbc75919b34531a1385d2438bc32decb162281051d5399cbd4aa891e5e78b3
+- path: research/prime_medium_tier_rho_20261107/fetch_session.sh
+  sha256: ed2eec5604e7c0d3d556bbc3784f7412ca1190fd658bb57ee2ed4344e0d679b3
+- path: research/primefield-companion-schur-20261101/tools/experiment_protocol.py
+  sha256: 0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4
+- path: research/primefield-companion-schur-20261101/schemas/experiment-protocol.v1.json
+  sha256: a9b948f2be323f862b98301eb7a5aa147ecc29db35041737f0aa3dfd03ad2443
+- path: scripts/checkpoint.sh
+  sha256: 6fc6b9311461111ecf55cdb70ae4dd52a408d0b0bf6b44fbe1177788756c12e8
+- path: /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  sha256: a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9
+- path: target/release/examples/prime_medium_tier_rho_rfit
+  sha256: 7457cb7ce67a6eff8137606150779c8f268450857595c140903d3b5697210768
+- path: examples/prime_medium_tier_rho_rfit.rs
+  sha256: b79e7d00440547dd635e3611a709cba9ef0bf72af48ee22e38a5a5b1202d0837
+- path: research/prime_medium_tier_rho_20261107/receipts/J2/admission.json
+  sha256: 1f889f04860e7d46e068daf701f5394ff6d2246496787f9c550ed5abfd7ec5ce
+- path: research/prime_medium_tier_rho_20261107/receipts/J3/admission.json
+  sha256: ab962be2fd0f7118646f72f8e8068a5fa12ba440673889f4d334af6e7eeedbbc
+- path: research/prime_medium_tier_rho_20261107/receipts/J4/admission.json
+  sha256: 7d56134cb9865346c293d786a8da094e6c8ee099f7458f1d4c6ecb965b026e27
+- path: research/prime_medium_tier_rho_20261107/receipts/J5/admission.json
+  sha256: 99f1c755d1ba570302dd3ccde2e6da52455263e647d34fc0f2d6e91b82a9e2d7
+- path: research/prime_medium_tier_rho_20261107/receipts/J6/admission.json
+  sha256: 695670671d28966b9c91b2a10d709322e5e0e124d40f197f16eb0fc0d1b01f99
+- path: research/prime_medium_tier_rho_20261107/receipts/J1/result.json
+  sha256: 24804d51dd02bdecc490cd0435b6cba09036d48f74630a8a71a770e44dc8fd1e
+must_not_exist:
+- research/prime_medium_tier_rho_20261107/sessions
+- research/prime_medium_tier_rho_20261107/receipts/J1/admission.json
+- research/prime_medium_tier_rho_20261107/analysis/table-J1.md
+- research/prime_medium_tier_rho_20261107/analysis/table-J2.md
+- research/prime_medium_tier_rho_20261107/analysis/table-J3.md
+- research/prime_medium_tier_rho_20261107/analysis/table-J4.md
+- research/prime_medium_tier_rho_20261107/analysis/table-J5.md
+- research/prime_medium_tier_rho_20261107/analysis/table-J6.md
+commands:
+- id: checkpoint-gate
+  argv:
+  - scripts/checkpoint.sh
+  - gate
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.checkpoint-gate.stdout
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.checkpoint-gate.stderr
+- id: protocol-check
+  argv:
+  - python3
+  - research/primefield-companion-schur-20261101/tools/experiment_protocol.py
+  - validate
+  - research/prime_medium_tier_rho_20261107/protocol.json
+  timeout_seconds: 300
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.protocol-check.stdout
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.protocol-check.stderr
+- id: protocol-frozen-hash
+  argv:
+  - jq
+  - -e
+  - --arg
+  - h
+  - 5643e3e78d4fe23a624a0834b266fba9d2da81adc091595d418ba35d6c664cd6
+  - .freeze.status == "frozen" and .freeze.protocol_sha256 == $h
+  - research/prime_medium_tier_rho_20261107/protocol.json
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.protocol-frozen-hash.stdout
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.protocol-frozen-hash.stderr
+- id: frozen-ecbench-sha
+  argv:
+  - sha256sum
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - target/release/examples/prime_medium_tier_rho_rfit
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.frozen-ecbench-sha.stdout
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.frozen-ecbench-sha.stderr
+- id: admit-j1
+  argv:
+  - research/prime_medium_tier_rho_20261107/check_session_complete.sh
+  - prime-medium-rho-20261107-j1
+  - research/prime_medium_tier_rho_20261107/receipts/J1
+  - '1680'
+  timeout_seconds: 600
+  success_exit_codes:
+  - 0
+  env: &id001
+    AWS_REGION: us-east-2
+    AWS_DEFAULT_REGION: us-east-2
+    ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+  stdout: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.admit-j1.stdout
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.admit-j1.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/receipts/J1/admission.json
+- id: fetch-j1
+  argv:
+  - research/prime_medium_tier_rho_20261107/fetch_session.sh
+  - J1
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  env: *id001
+  stdout: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.fetch-j1.stdout
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.fetch-j1.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J1/records.jsonl
+- id: fetch-j2
+  argv:
+  - research/prime_medium_tier_rho_20261107/fetch_session.sh
+  - J2
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  env: *id001
+  stdout: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.fetch-j2.stdout
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.fetch-j2.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J2/records.jsonl
+- id: fetch-j3
+  argv:
+  - research/prime_medium_tier_rho_20261107/fetch_session.sh
+  - J3
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  env: *id001
+  stdout: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.fetch-j3.stdout
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.fetch-j3.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J3/records.jsonl
+- id: fetch-j4
+  argv:
+  - research/prime_medium_tier_rho_20261107/fetch_session.sh
+  - J4
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  env: *id001
+  stdout: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.fetch-j4.stdout
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.fetch-j4.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J4/records.jsonl
+- id: fetch-j5
+  argv:
+  - research/prime_medium_tier_rho_20261107/fetch_session.sh
+  - J5
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  env: *id001
+  stdout: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.fetch-j5.stdout
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.fetch-j5.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J5/records.jsonl
+- id: fetch-j6
+  argv:
+  - research/prime_medium_tier_rho_20261107/fetch_session.sh
+  - J6
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  env: *id001
+  stdout: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.fetch-j6.stdout
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.fetch-j6.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J6/records.jsonl
+- id: verify-j1
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - verify
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J1
+  - --replay-all
+  - --out
+  - research/prime_medium_tier_rho_20261107/sessions/J1.audit.json
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.verify-j1.stdout
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.verify-j1.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J1.audit.json
+- id: verify-j2
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - verify
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J2
+  - --replay-all
+  - --out
+  - research/prime_medium_tier_rho_20261107/sessions/J2.audit.json
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.verify-j2.stdout
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.verify-j2.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J2.audit.json
+- id: verify-j3
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - verify
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J3
+  - --replay-all
+  - --out
+  - research/prime_medium_tier_rho_20261107/sessions/J3.audit.json
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.verify-j3.stdout
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.verify-j3.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J3.audit.json
+- id: verify-j4
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - verify
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J4
+  - --replay-all
+  - --out
+  - research/prime_medium_tier_rho_20261107/sessions/J4.audit.json
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.verify-j4.stdout
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.verify-j4.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J4.audit.json
+- id: verify-j5
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - verify
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J5
+  - --replay-all
+  - --out
+  - research/prime_medium_tier_rho_20261107/sessions/J5.audit.json
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.verify-j5.stdout
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.verify-j5.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J5.audit.json
+- id: verify-j6
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - verify
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J6
+  - --replay-all
+  - --out
+  - research/prime_medium_tier_rho_20261107/sessions/J6.audit.json
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.verify-j6.stdout
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.verify-j6.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J6.audit.json
+- id: table-j1
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - table
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J1
+  timeout_seconds: 600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/table-J1.md
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.table-j1.stderr
+- id: table-j2
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - table
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J2
+  timeout_seconds: 600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/table-J2.md
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.table-j2.stderr
+- id: table-j3
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - table
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J3
+  timeout_seconds: 600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/table-J3.md
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.table-j3.stderr
+- id: table-j4
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - table
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J4
+  timeout_seconds: 600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/table-J4.md
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.table-j4.stderr
+- id: table-j5
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - table
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J5
+  timeout_seconds: 600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/table-J5.md
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.table-j5.stderr
+- id: table-j6
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - table
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J6
+  timeout_seconds: 600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/table-J6.md
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.table-j6.stderr
+- id: band-j1
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - band
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J1
+  - --json
+  - research/prime_medium_tier_rho_20261107/analysis/band-J1.json
+  timeout_seconds: 600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/band-J1.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.band-j1.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/analysis/band-J1.json
+- id: band-j2
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - band
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J2
+  - --json
+  - research/prime_medium_tier_rho_20261107/analysis/band-J2.json
+  timeout_seconds: 600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/band-J2.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.band-j2.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/analysis/band-J2.json
+- id: band-j3
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - band
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J3
+  - --json
+  - research/prime_medium_tier_rho_20261107/analysis/band-J3.json
+  timeout_seconds: 600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/band-J3.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.band-j3.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/analysis/band-J3.json
+- id: band-j4
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - band
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J4
+  - --json
+  - research/prime_medium_tier_rho_20261107/analysis/band-J4.json
+  timeout_seconds: 600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/band-J4.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.band-j4.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/analysis/band-J4.json
+- id: band-j5
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - band
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J5
+  - --json
+  - research/prime_medium_tier_rho_20261107/analysis/band-J5.json
+  timeout_seconds: 600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/band-J5.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.band-j5.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/analysis/band-J5.json
+- id: band-j6
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - band
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J6
+  - --json
+  - research/prime_medium_tier_rho_20261107/analysis/band-J6.json
+  timeout_seconds: 600
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/band-J6.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.band-j6.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/analysis/band-J6.json
+- id: compare-j1-rho-plain
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J1
+  - --a
+  - rho-neg
+  - --b
+  - rho-plain
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J1-rho-plain.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j1-rho-plain.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J1/comparisons/rho-neg__rho-plain.json
+- id: compare-j1-bsgs-neg
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J1
+  - --a
+  - rho-neg
+  - --b
+  - bsgs-neg
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J1-bsgs-neg.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j1-bsgs-neg.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J1/comparisons/rho-neg__bsgs-neg.json
+- id: compare-j1-rho-neg-v2
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J1
+  - --a
+  - rho-neg
+  - --b
+  - rho-neg-v2
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J1-rho-neg-v2.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j1-rho-neg-v2.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J1/comparisons/rho-neg__rho-neg-v2.json
+- id: compare-j1-rho-neg-aa
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J1
+  - --a
+  - rho-neg
+  - --b
+  - rho-neg-aa
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J1-rho-neg-aa.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j1-rho-neg-aa.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J1/comparisons/rho-neg__rho-neg-aa.json
+- id: compare-j2-rho-plain
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J2
+  - --a
+  - rho-neg
+  - --b
+  - rho-plain
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J2-rho-plain.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j2-rho-plain.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J2/comparisons/rho-neg__rho-plain.json
+- id: compare-j2-bsgs-neg
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J2
+  - --a
+  - rho-neg
+  - --b
+  - bsgs-neg
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J2-bsgs-neg.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j2-bsgs-neg.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J2/comparisons/rho-neg__bsgs-neg.json
+- id: compare-j2-rho-neg-v2
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J2
+  - --a
+  - rho-neg
+  - --b
+  - rho-neg-v2
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J2-rho-neg-v2.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j2-rho-neg-v2.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J2/comparisons/rho-neg__rho-neg-v2.json
+- id: compare-j2-rho-neg-aa
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J2
+  - --a
+  - rho-neg
+  - --b
+  - rho-neg-aa
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J2-rho-neg-aa.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j2-rho-neg-aa.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J2/comparisons/rho-neg__rho-neg-aa.json
+- id: compare-j3-rho-plain
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J3
+  - --a
+  - rho-neg
+  - --b
+  - rho-plain
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J3-rho-plain.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j3-rho-plain.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J3/comparisons/rho-neg__rho-plain.json
+- id: compare-j3-bsgs-neg
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J3
+  - --a
+  - rho-neg
+  - --b
+  - bsgs-neg
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J3-bsgs-neg.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j3-bsgs-neg.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J3/comparisons/rho-neg__bsgs-neg.json
+- id: compare-j3-rho-neg-v2
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J3
+  - --a
+  - rho-neg
+  - --b
+  - rho-neg-v2
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J3-rho-neg-v2.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j3-rho-neg-v2.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J3/comparisons/rho-neg__rho-neg-v2.json
+- id: compare-j3-rho-neg-aa
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J3
+  - --a
+  - rho-neg
+  - --b
+  - rho-neg-aa
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J3-rho-neg-aa.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j3-rho-neg-aa.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J3/comparisons/rho-neg__rho-neg-aa.json
+- id: compare-j4-rho-plain
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J4
+  - --a
+  - rho-neg
+  - --b
+  - rho-plain
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J4-rho-plain.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j4-rho-plain.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J4/comparisons/rho-neg__rho-plain.json
+- id: compare-j4-bsgs-neg
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J4
+  - --a
+  - rho-neg
+  - --b
+  - bsgs-neg
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J4-bsgs-neg.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j4-bsgs-neg.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J4/comparisons/rho-neg__bsgs-neg.json
+- id: compare-j4-rho-neg-v2
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J4
+  - --a
+  - rho-neg
+  - --b
+  - rho-neg-v2
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J4-rho-neg-v2.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j4-rho-neg-v2.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J4/comparisons/rho-neg__rho-neg-v2.json
+- id: compare-j4-rho-neg-aa
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J4
+  - --a
+  - rho-neg
+  - --b
+  - rho-neg-aa
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J4-rho-neg-aa.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j4-rho-neg-aa.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J4/comparisons/rho-neg__rho-neg-aa.json
+- id: compare-j5-rho-plain
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J5
+  - --a
+  - rho-neg
+  - --b
+  - rho-plain
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J5-rho-plain.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j5-rho-plain.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J5/comparisons/rho-neg__rho-plain.json
+- id: compare-j5-bsgs-neg
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J5
+  - --a
+  - rho-neg
+  - --b
+  - bsgs-neg
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J5-bsgs-neg.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j5-bsgs-neg.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J5/comparisons/rho-neg__bsgs-neg.json
+- id: compare-j5-rho-neg-v2
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J5
+  - --a
+  - rho-neg
+  - --b
+  - rho-neg-v2
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J5-rho-neg-v2.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j5-rho-neg-v2.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J5/comparisons/rho-neg__rho-neg-v2.json
+- id: compare-j5-rho-neg-aa
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J5
+  - --a
+  - rho-neg
+  - --b
+  - rho-neg-aa
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J5-rho-neg-aa.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j5-rho-neg-aa.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J5/comparisons/rho-neg__rho-neg-aa.json
+- id: compare-j6-rho-plain
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J6
+  - --a
+  - rho-neg
+  - --b
+  - rho-plain
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J6-rho-plain.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j6-rho-plain.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J6/comparisons/rho-neg__rho-plain.json
+- id: compare-j6-bsgs-neg
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J6
+  - --a
+  - rho-neg
+  - --b
+  - bsgs-neg
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J6-bsgs-neg.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j6-bsgs-neg.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J6/comparisons/rho-neg__bsgs-neg.json
+- id: compare-j6-rho-neg-v2
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J6
+  - --a
+  - rho-neg
+  - --b
+  - rho-neg-v2
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J6-rho-neg-v2.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j6-rho-neg-v2.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J6/comparisons/rho-neg__rho-neg-v2.json
+- id: compare-j6-rho-neg-aa
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - compare
+  - --dir
+  - research/prime_medium_tier_rho_20261107/sessions/J6
+  - --a
+  - rho-neg
+  - --b
+  - rho-neg-aa
+  - --save
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_tier_rho_20261107/analysis/compare-J6-rho-neg-aa.txt
+  stderr: research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.compare-j6-rho-neg-aa.stderr
+  outputs:
+  - research/prime_medium_tier_rho_20261107/sessions/J6/comparisons/rho-neg__rho-neg-aa.json
+bus_address: executor-mechanical-prime-medium-tier-rho
+background: true
+write_scope:
+- research/prime_medium_tier_rho_20261107/
+stop_when:
+- Any command exits with a code outside its success_exit_codes or reaches its timeout, including an ecbench verify that reports an audit problem; return the tool output verbatim and run no later command.
+- The tool exits 2 before running any command; return `refused` with the IMPEDIMENT line.
+notes: 'Counts only: PROTOCOL.md section 10 does not admit wall time for any of the six sessions, because each pod ended with exit 42. The wall-time columns and wall lines that ecbench table, band and compare print are not results and are quoted nowhere; copy the tool output verbatim and add nothing. Run the card as a tracked background task.'

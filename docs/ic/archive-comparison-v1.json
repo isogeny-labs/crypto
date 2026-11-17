@@ -1,0 +1,35 @@
+{
+  "schema": "archive-ic-comparison/v1",
+  "status": "frozen_before_measurement",
+  "purpose": "factor-base yield, verified useful rank and regularity screening; no total-runtime selection",
+  "curve_source_revision": "7364ad4625f233b372bd5bda9214c7b321e5df5e",
+  "curves": [
+    {"constructor": "roster_prime_instance", "bits": 16},
+    {"constructor": "koblitz_instance", "a": 1, "degree": 11},
+    {"constructor": "koblitz_instance", "a": 1, "degree": 17},
+    {"constructor": "random_binary_instance", "degree": 17, "seed": 73021, "max_cofactor": 8}
+  ],
+  "identity_gate": "freeze full CurveSpec, EC1/UID, registered ICV1 and SHA-256 manifests before any discovery queries; failure keeps stratum unavailable",
+  "binary_candidates": {
+    "shapes": ["coordinate", "random_linear", "geometric", "trace_zero"],
+    "dimensions": [3, 4, 5],
+    "recipe_seeds": [7, 19, 43],
+    "offsets": [["0"]],
+    "extra_recipe": {"kind": "frobenius_orbits", "seeds": [2, 4, 8], "recipe_seeds": [7, 19, 43], "only_if": "factory validates Koblitz coefficients"}
+  },
+  "prime_candidates": {
+    "counts": [32, 64, 128],
+    "progressions": {"start": "0", "steps": ["1", "3", "5"]},
+    "random_x_seeds": [7, 19, 43]
+  },
+  "archive": {"bucket": "setec-astronomy-artifacts", "prefix": "factor-bases", "max_candidates": 4096, "shard_points": 1024, "quotient": "negation_only"},
+  "discovery": {"workload_seeds": [1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008], "targets_per_seed": 1},
+  "confirmation": {"workload_seeds": [9001, 9002, 9003, 9004, 9005, 9006, 9007, 9008], "targets_per_seed": 1, "access": "only after finalist manifest hashes frozen"},
+  "pipeline": {"oracles": ["subtract", "mitm:m=3"], "targets": "random", "linalg": "incremental-gauss-full-rank-checked", "audit_rank": true, "max_trials": 100000, "rho_runs": 0},
+  "regularity": {"arities": [2, 3], "max_boolean_variables": 14, "target_panel_seed": 171717, "targets": 8, "metric": "exact homogeneous square-zero leading-form regularity", "prime_field": "unsupported", "union_or_orbit_base": "unsupported unless exact encoding is separately frozen"},
+  "resources": {"threads": 1, "memory_bytes": 2147483648, "per_candidate_seconds": 600, "max_total_cpu_hours": 12},
+  "controls": ["coordinate or step-one progression at every size", "seeded random bases", "A/A local versus fetched identical manifest"],
+  "selection": {"within_stratum_only": true, "match_actual_columns": "exact; unmatched sizes remain descriptive", "metrics": ["verified independent rows / targets tried", "full-rank completion", "regularity when measured"], "max_finalists_per_stratum": 2, "rule": "Pareto nondominated on discovery; ties by manifest SHA-256; retain control even if dominated", "confirmation_gate": "complete valid paired runs, positive paired useful-yield difference in at least 7 of 8 workloads, aggregate useful-yield ratio >= 1.10, no worse regularity when both available", "unknown_or_censored": "retain; ineligible as wins"},
+  "total_runtime_winner": null,
+  "speedup_claim": "requires separate ecbench one-public-target paired IC/rho protocol with complete phases and independent replay"
+}

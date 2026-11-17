@@ -1,0 +1,71 @@
+name: ECC2K-130 native m3 chain archive replay
+on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/ecc2k130-native-m3-chain.yml'
+      - 'research/notes/ecc2k130/native_m3_chain_20260929/**'
+  workflow_dispatch:
+
+jobs:
+  frozen-and-replay:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-native-m3-chain.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-native-m3-chain.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            .github/scripts/frozen-workflow-check.mjs
+            .github/scripts/run-frozen-workflow-replays.mjs
+            .github/scripts/frozen-workflow-pins.json
+            .github/workflows/ecc2k130-native-m3-chain.yml
+            research/notes/ecc2k130/native_m3_chain_20260929
+            research/notes/ecc2k130/native_fullpoint_edge_20260929
+            research/notes/ecc2k130/m10_export_capacity_20260925/capacity.py
+            research/notes/ecc2k130/symbolic_dag_fullpoint_20260925/dag.py
+            research/notes/ecc2k130/symbolic_dag_dimacs_gate_20260925/export.py
+            research/notes/ecc2k130/symbolic_dag_dimacs_gate_20260925/verify.py
+            research/notes/ecc2k130/rotated_subspace_support_20260925/gate.py
+            research/ecc2k130_factor_base_replication_20260925/exact_smoke.json
+            research/ecc2k130_factor_base_replication_20260925/exact_replay.json
+            research/ecc2k130_relations/relations.py
+            research/ecc2k130_relations/fastfield.py
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/native_fullpoint_edge_20260929
+      - name: Check frozen source and input bytes
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 research/notes/ecc2k130/native_m3_chain_20260929/ci_replay.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only native_m3_chain_20260929 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
+      - name: Independently replay raw toy and both exact leaves
+        if: hashFiles('research/notes/ecc2k130/native_m3_chain_20260929/evidence/final/receipt.json') != ''
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 research/notes/ecc2k130/native_m3_chain_20260929/ci_replay.py \
+              --evidence research/notes/ecc2k130/native_m3_chain_20260929/evidence/final
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only native_m3_chain_20260929 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"

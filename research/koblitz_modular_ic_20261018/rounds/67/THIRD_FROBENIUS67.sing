@@ -1,0 +1,146 @@
+LIB "linalg.lib";
+proc require67(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump67(link out,string name,matrix M){
+ int a;int b;write(out,"matrix "+name+"["+string(nrows(M))+"]["+string(ncols(M))+"];");
+ for(a=1;a<=nrows(M);a++){for(b=1;b<=ncols(M);b++){if(M[a,b]!=0){write(out,name+"["+string(a)+","+string(b)+"]="+string(M[a,b])+";");}}}
+}
+execute(read("../../../66/runs/second-frobenius66-01/second-lattice-polynomial66.sing"));
+require67(nrows(inclusion66)==32 && ncols(inclusion66)==32 && nrows(basisV266)==32 && ncols(basisV266)==32,"FROB67_SAVED_POLYNOMIAL_SHAPES");
+matrix inclusion67=lift(module(basisV266),module(inclusion66));
+require67(basisV266*inclusion67==inclusion66,"FROB67_COMPLETE_ORDER_INCLUSION");
+module quotientGB67=std(module(inclusion67));int quotientLength67=vdim(quotientGB67);
+require67(quotientLength67==32,"FROB67_COMPLETE_V2_ORDER_QUOTIENT");
+module quotientModule67=kbase(quotientGB67);matrix quotientQ67=matrix(quotientModule67);
+require67(nrows(quotientQ67)==32 && ncols(quotientQ67)==32,"FROB67_ALL_32_QUOTIENT_CLASSES");
+link quotientOut67="ASCII:w quotient-basis67.sing";open(quotientOut67);
+write(quotientOut67,"ring thirdPolynomial67=2,(u),dp;short=0;");
+dump67(quotientOut67,"inclusion67",inclusion67);dump67(quotientOut67,"quotientQ67",quotientQ67);close(quotientOut67);
+execute(read("../../../66/runs/second-frobenius66-01/second-lattice-field66.sing"));
+map polyToField67=secondLatticePolynomial66,u;
+matrix inclusionField67=polyToField67(inclusion67);
+matrix Qfield67=polyToField67(quotientQ67);
+require67(V2coordinates66*V2inverse66==unitmat(32) && V2inverse66*V2coordinates66==unitmat(32),"FROB67_SAVED_V2_TWO_SIDED_INVERSE");
+require67(V2inverse66==inclusionField67,"FROB67_SAVED_POLYNOMIAL_INCLUSION_MATCH");
+execute(read("../../../52/source-data/rr-table50.sing"));
+intmat squareSlots67[32][1];int p67;int i67;int j67;int k67;
+for(p67=1;p67<=528;p67++){
+ if(parents50[p67,1]==parents50[p67,2]){j67=parents50[p67,1];require67(j67>=1 && j67<=32 && squareSlots67[j67,1]==0,"FROB67_UNIQUE_SQUARE_SLOTS");squareSlots67[j67,1]=p67;}
+}
+matrix squareSource67[32][32];
+for(j67=1;j67<=32;j67++){
+ require67(squareSlots67[j67,1]>0,"FROB67_ALL_SQUARE_SLOTS");
+ for(i67=1;i67<=32;i67++){squareSource67[i67,j67]=table50[i67,squareSlots67[j67,1]];}
+}
+setring secondLatticeField66;
+map tableToField67=tablePidCertificate50,u;
+matrix square67=tableToField67(squareSource67);
+matrix sourceColumns67=V2coordinates66*Qfield67;
+matrix sourceSquares67[32][32];
+for(i67=1;i67<=32;i67++){for(j67=1;j67<=32;j67++){sourceSquares67[i67,j67]=sourceColumns67[i67,j67]^2;}}
+matrix squareImage67=V2inverse66*square67*sourceSquares67;
+string rationalCode67="matrix numeratorRows67[32][32];matrix denominatorRows67[32][32];";
+number coefficient67;int nonzero67=0;
+for(i67=1;i67<=32;i67++){for(j67=1;j67<=32;j67++){
+ require67(diff(squareImage67[i67,j67],q)==0,"FROB67_SCALAR_RATIONAL_COORDINATE");
+ if(squareImage67[i67,j67]!=0){
+  coefficient67=leadcoef(squareImage67[i67,j67]);
+  require67(numerator(coefficient67)/denominator(coefficient67)==coefficient67,"FROB67_RATIONAL_NUMERATOR_DENOMINATOR");
+  rationalCode67=rationalCode67+"numeratorRows67["+string(i67)+","+string(j67)+"]="+string(numerator(coefficient67))+";denominatorRows67["+string(i67)+","+string(j67)+"]="+string(denominator(coefficient67))+";";
+  nonzero67++;
+ }
+}}
+ring binaryRing67=2,(u),dp;short=0;execute(rationalCode67);
+matrix remainderRows67[32][32];list denominators67;intvec offsets67;
+poly common67;poly den67;poly exactQuotient67;poly numerator67;poly remainder67;ideal principal67;
+int rows67=0;int degree67;
+for(i67=1;i67<=32;i67++){
+ common67=1;
+ for(j67=1;j67<=32;j67++){
+  if(numeratorRows67[i67,j67]!=0){den67=denominatorRows67[i67,j67];require67(den67!=0,"FROB67_NONZERO_DENOMINATOR");common67=(common67*den67)/gcd(common67,den67);}
+ }
+ require67(common67!=0,"FROB67_NONZERO_COMMON_DENOMINATOR");
+ denominators67[i67]=common67;offsets67[i67]=rows67;degree67=deg(common67);
+ if(common67!=1){principal67=std(ideal(common67));}
+ for(j67=1;j67<=32;j67++){
+  remainder67=0;
+  if(numeratorRows67[i67,j67]!=0){
+   den67=denominatorRows67[i67,j67];exactQuotient67=common67/den67;
+   require67(exactQuotient67*den67==common67,"FROB67_EXACT_ROW_CLEARING");
+   numerator67=numeratorRows67[i67,j67]*exactQuotient67;
+   if(common67!=1){remainder67=reduce(numerator67,principal67);}
+  }
+  require67(remainder67==0 || deg(remainder67)<degree67,"FROB67_COMPLETE_REMAINDER_BOUND");
+  remainderRows67[i67,j67]=remainder67;
+ }
+ rows67=rows67+degree67;
+}
+matrix binaryMap67[rows67+1][32];matrix terms67;poly rebuilt67;int exponent67;
+for(i67=1;i67<=32;i67++){for(j67=1;j67<=32;j67++){
+ remainder67=remainderRows67[i67,j67];rebuilt67=0;
+ if(remainder67!=0){terms67=coef(remainder67,u);for(k67=1;k67<=ncols(terms67);k67++){
+  exponent67=deg(terms67[1,k67]);
+  require67(terms67[1,k67]==u^exponent67 && terms67[2,k67]==1,"FROB67_BINARY_MONOMIAL_COEFFICIENTS");
+  binaryMap67[offsets67[i67]+exponent67+1,j67]=1;
+  rebuilt67=rebuilt67+terms67[1,k67]*terms67[2,k67];
+ }}
+ require67(rebuilt67==remainder67,"FROB67_EVERY_REMAINDER_RECONSTRUCTION");
+}}
+int rank67=mat_rk(binaryMap67);int kernelDimension67=32-rank67;
+require67(rank67>=0 && kernelDimension67>=0,"FROB67_BINARY_RANK_BOUND");
+link kernelOut67="ASCII:w square-kernel67.sing";open(kernelOut67);
+write(kernelOut67,"ring thirdBinary67=2,(u),dp;short=0;");
+dump67(kernelOut67,"numeratorRows67",numeratorRows67);dump67(kernelOut67,"denominatorRows67",denominatorRows67);
+dump67(kernelOut67,"remainderRows67",remainderRows67);dump67(kernelOut67,"binaryMap67",binaryMap67);
+write(kernelOut67,"int rank67="+string(rank67)+";int kernelDimension67="+string(kernelDimension67)+";");
+matrix kernelBasis67=matrix(syz(module(binaryMap67)));
+require67(nrows(kernelBasis67)==32 && ncols(kernelBasis67)==kernelDimension67 && mat_rk(kernelBasis67)==kernelDimension67,"FROB67_COMPLETE_KERNEL_DIMENSION");
+require67(binaryMap67*kernelBasis67==matrix(0,rows67+1,kernelDimension67),"FROB67_ALL_KERNEL_PRODUCTS");
+for(i67=1;i67<=32;i67++){for(j67=1;j67<=kernelDimension67;j67++){require67(kernelBasis67[i67,j67]==0 || kernelBasis67[i67,j67]==1,"FROB67_KERNEL_OVER_F2");}}
+int changedKernel67=0;
+if(rank67>0 && kernelDimension67>0){
+ int changeColumn67=0;
+ for(i67=1;i67<=rows67+1;i67++){for(j67=1;j67<=32;j67++){if(changeColumn67==0 && binaryMap67[i67,j67]!=0){changeColumn67=j67;}}}
+ require67(changeColumn67>0,"FROB67_NONZERO_CHANGED_KERNEL_COLUMN");
+ matrix badKernel67=kernelBasis67;badKernel67[changeColumn67,1]=badKernel67[changeColumn67,1]+1;
+ require67(binaryMap67*badKernel67!=matrix(0,rows67+1,kernelDimension67),"FROB67_CHANGED_KERNEL_REJECTED");changedKernel67=1;
+}
+dump67(kernelOut67,"kernelBasis67",kernelBasis67);close(kernelOut67);
+map polyToBinary67=secondLatticePolynomial66,u;
+matrix Jbinary67=polyToBinary67(inclusion67);matrix Qbinary67=polyToBinary67(quotientQ67);
+matrix survivorPoly67=Qbinary67*kernelBasis67;
+matrix combined67[32][32+kernelDimension67];
+for(i67=1;i67<=32;i67++){
+ for(j67=1;j67<=32;j67++){combined67[i67,j67]=Jbinary67[i67,j67];}
+ for(j67=1;j67<=kernelDimension67;j67++){combined67[i67,32+j67]=survivorPoly67[i67,j67];}
+}
+module moduleV367=std(module(combined67));int quotientLength367=vdim(moduleV367);
+require67(quotientLength367==rank67,"FROB67_KERNEL_LATTICE_LENGTH_IDENTITY");
+matrix basisV367=matrix(moduleV367);
+require67(nrows(basisV367)==32 && ncols(basisV367)==32,"FROB67_FULL_THIRD_PID_BASIS");
+require67(mat_rk(matrix(reduce(module(combined67),moduleV367)))==0 && mat_rk(matrix(reduce(module(basisV367),std(module(combined67)))))==0,"FROB67_BOTH_THIRD_MODULE_INCLUSIONS");
+link polynomialOut67="ASCII:w third-lattice-polynomial67.sing";open(polynomialOut67);
+write(polynomialOut67,"ring thirdLatticePolynomial67=2,(u),dp;short=0;");
+dump67(polynomialOut67,"inclusion67",Jbinary67);dump67(polynomialOut67,"quotientQ67",Qbinary67);
+dump67(polynomialOut67,"kernelBasis67",kernelBasis67);dump67(polynomialOut67,"basisV367",basisV367);close(polynomialOut67);
+setring secondLatticeField66;
+map binaryToField67=binaryRing67,u;
+matrix V3basisField67=binaryToField67(basisV367);
+matrix V3coordinates67=V2coordinates66*V3basisField67;
+matrix V3inverse67=lift(module(V3coordinates67),module(unitmat(32)));
+require67(V3coordinates67*V3inverse67==unitmat(32) && V3inverse67*V3coordinates67==unitmat(32),"FROB67_BOTH_THIRD_BASIS_INVERSES");
+for(i67=1;i67<=32;i67++){for(j67=1;j67<=32;j67++){
+ if(V3inverse67[i67,j67]!=0){coefficient67=leadcoef(V3inverse67[i67,j67]);require67(denominator(coefficient67)==1,"FROB67_ORDER_INSIDE_THIRD_LATTICE");}
+}}
+matrix V3squared67[32][32];for(i67=1;i67<=32;i67++){for(j67=1;j67<=32;j67++){V3squared67[i67,j67]=V3coordinates67[i67,j67]^2;}}
+matrix squareInV267=V2inverse66*square67*V3squared67;
+for(i67=1;i67<=32;i67++){for(j67=1;j67<=32;j67++){
+ if(squareInV267[i67,j67]!=0){coefficient67=leadcoef(squareInV267[i67,j67]);require67(denominator(coefficient67)==1,"FROB67_EVERY_V3_BASIS_SQUARE_IN_V2");}
+}}
+matrix changedInverse67=V3inverse67;changedInverse67[1,1]=changedInverse67[1,1]+1;
+require67(V3coordinates67*changedInverse67!=unitmat(32),"FROB67_CHANGED_INVERSE_REJECTED");
+link fieldOut67="ASCII:w third-lattice-field67.sing";open(fieldOut67);
+write(fieldOut67,"ring thirdLatticeField67=(2,u),(q),dp;short=0;");
+dump67(fieldOut67,"V3coordinates67",V3coordinates67);dump67(fieldOut67,"V3inverse67",V3inverse67);
+dump67(fieldOut67,"squareInV267",squareInV267);close(fieldOut67);
+print("FROB67_RESULT order_rank=32 old_quotient=32 square_columns=32 binary_rows="+string(rows67)+" square_rank="+string(rank67)+" survivor_dimension="+string(kernelDimension67)+" new_quotient_length="+string(quotientLength367)+" rational_nonzero_entries="+string(nonzero67)+" third_basis_columns=32 changed_kernel_rejected="+string(changedKernel67)+" changed_inverse_rejected=1");
+print("THIRD_FROBENIUS67_ALL_CHECKS_PASS");quit;

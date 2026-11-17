@@ -1,0 +1,94 @@
+{
+  "accounting_note": "Actual wall time is recorded separately from ceiling; campaign debit reconciliation belongs to coordinator. Prior failures retained. Dollar waiver does not change worker or deadline limits.",
+  "attempt": 3,
+  "attempt_ceiling": 3,
+  "campaign_ceiling_seconds": 46800,
+  "campaign_deadline_utc": "2026-11-06T04:00:00Z",
+  "checked_dependency_bytes_each": 3111892318,
+  "checked_dependency_files_each": 16736,
+  "claim_standing": "pcc:unverified",
+  "commands": [
+    {
+      "argv": [
+        "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/Nonbranch.olean",
+        "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/Nonbranch.lean"
+      ],
+      "end_seconds": 246.21672322999802,
+      "exit": 0,
+      "expected_exit": 0,
+      "module": "Nonbranch",
+      "pgid": 959772,
+      "pid": 959772,
+      "reaped": true,
+      "remaining_group": [],
+      "start_seconds": 0.26260709499183577
+    },
+    {
+      "argv": [
+        "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.olean",
+        "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.lean"
+      ],
+      "end_seconds": 303.1925872360007,
+      "exit": 1,
+      "expected_exit": 0,
+      "module": "IndependentControls",
+      "pgid": 965075,
+      "pid": 965075,
+      "reaped": true,
+      "remaining_group": [],
+      "start_seconds": 246.25818978498864
+    }
+  ],
+  "cpu_seconds": null,
+  "freeze_sha256": "dfde7d96367f321f0d4446c205290622c545f3d4364d7796c392d632391267eb",
+  "machine_review_complete": false,
+  "native_phases": [
+    {
+      "exit": "",
+      "kind": "native_phase",
+      "name": "pre",
+      "seconds": 152.62771470600273,
+      "status": "passed"
+    },
+    {
+      "exit": "",
+      "kind": "native_phase",
+      "name": "compiler",
+      "seconds": 303.26343018899206,
+      "status": "failed"
+    },
+    {
+      "exit": "",
+      "kind": "native_phase",
+      "name": "post",
+      "seconds": 125.00391033399501,
+      "status": "passed"
+    }
+  ],
+  "new_attempt_authorized": false,
+  "not_invoked": [
+    "Readback",
+    "ExpectedFailure"
+  ],
+  "outer_elapsed_worker_wall_seconds": 582.3239518530027,
+  "pre_post_hash_bytes_equal": true,
+  "pre_post_hash_dictionaries_equal": true,
+  "pre_post_hash_sha256": "bd79b0566f9d19dbf1bdecbc1e94cd5dd119bffcf3f0bb639b9d921ff41ed2ad",
+  "prior_conservative_debit_seconds": 1200,
+  "run": "nonbranch-v3-20261105",
+  "schema": "pencil.native-replay-observation/v1",
+  "source_commit": "79588ee0ee",
+  "status": "failed",
+  "this_attempt_ceiling_seconds": 2400,
+  "trust": "Pinned shared caches; pre/post checks do not exclude transient concurrent changes."
+}

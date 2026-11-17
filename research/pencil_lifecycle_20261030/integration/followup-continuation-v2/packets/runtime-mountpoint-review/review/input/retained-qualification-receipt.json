@@ -1,0 +1,36 @@
+{
+  "schema": "software.runtime-qualification-supervisor/v2",
+  "passed_cases": [
+    "Q0"
+  ],
+  "failure": "Stop: unexpected writable-layer change",
+  "cleanup_complete": true,
+  "elapsed_seconds": 4.871143879980082,
+  "cap_seconds": 300,
+  "image_id": "sha256:1adcc3d49e5660bf25cd15f839f757786e0aa50455d6e255fe38cd19bc3cad60",
+  "binary_sha256": "d0e2d1426115f5efecced07c298d691e1bcc7d5378015f992edc615dc9384f5b",
+  "preexec_pids_observations": [
+    {
+      "schema": "software.preexec-pids/v1",
+      "case": "Q1",
+      "nonce": "0159ca8a-9eec-479a-9aa2-04d62b131f89",
+      "pid": 1,
+      "uid": 1000,
+      "gid": 1000,
+      "cgroup_mapping": "0::/",
+      "cgroup_device": 27,
+      "cgroup_inode": 1262919,
+      "pids_max": 1,
+      "pids_current": 1,
+      "monotonic_seconds": 195299,
+      "monotonic_nanoseconds": 130242741,
+      "boundary": "before_tested_program_exec"
+    }
+  ],
+  "effective_pids_observed_before_each_tested_exec": false,
+  "effective_before_container_start_proved": false,
+  "qualification_complete": false,
+  "status": "failed",
+  "scientific_execution": false,
+  "note": "Effective pids.max is observed after container startup and before tested exec by a no-fork PID1 gate; no earlier or continuous-enforcement claim."
+}

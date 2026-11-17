@@ -1,0 +1,150 @@
+{
+  "arms": "dense,sparse,fast",
+  "families": "gaudry-s5",
+  "fast_threads": 1,
+  "per": 8,
+  "primes": [
+    101
+  ],
+  "reps": 7,
+  "rows": [
+    {
+      "agree": true,
+      "arms": [
+        {
+          "arm": "sparse",
+          "fallback": false,
+          "fast": null,
+          "gave_up": null,
+          "median_ms": 135482.709203,
+          "ms": [
+            134325.33062999998,
+            133172.65973299998,
+            135309.455739,
+            136125.921423,
+            135482.709203,
+            136041.308765,
+            135929.552182
+          ],
+          "muls": 10265108536,
+          "sols": 2
+        },
+        {
+          "arm": "fast",
+          "fallback": false,
+          "fast": {
+            "bm_ms": 198.55813,
+            "bm_muls": 33380999,
+            "delta": 4096,
+            "dense_cols": 344,
+            "functionals_tried": 1,
+            "gave_up": null,
+            "krylov_ms": 2535.069645,
+            "krylov_muls": 11541315584,
+            "nf_ms": 86.549306,
+            "nf_muls": 0,
+            "nf_rows": 344,
+            "nnz": 1251925,
+            "readout_ms": 0.729356,
+            "readout_muls": 40960,
+            "roots": 2,
+            "roots_ms": 24.262665,
+            "roots_muls": 184961702,
+            "total_ms": 2845.3390440000003
+          },
+          "gave_up": null,
+          "median_ms": 2906.8417879999997,
+          "ms": [
+            2906.8417879999997,
+            2806.510064,
+            2933.033556,
+            2992.489016,
+            2913.347801,
+            2768.257042,
+            2845.340931
+          ],
+          "muls": 11759699245,
+          "sols": 2
+        }
+      ],
+      "delta": 4096,
+      "f4_ms": 3607.591125,
+      "family": "gaudry-s5",
+      "label": "p101-0",
+      "n": 4,
+      "p": 101,
+      "planted_found": null
+    },
+    {
+      "agree": true,
+      "arms": [
+        {
+          "arm": "sparse",
+          "fallback": false,
+          "fast": null,
+          "gave_up": null,
+          "median_ms": 264336.702511,
+          "ms": [
+            264336.702511,
+            263210.683958,
+            264813.213738,
+            263583.951507,
+            264459.976407,
+            264089.417547,
+            267147.937187
+          ],
+          "muls": 20504227120,
+          "sols": 3
+        },
+        {
+          "arm": "fast",
+          "fallback": false,
+          "fast": {
+            "bm_ms": 404.879207,
+            "bm_muls": 66764762,
+            "delta": 4096,
+            "dense_cols": 344,
+            "functionals_tried": 2,
+            "gave_up": null,
+            "krylov_ms": 5207.517052,
+            "krylov_muls": 23082631168,
+            "nf_ms": 92.583685,
+            "nf_muls": 0,
+            "nf_rows": 344,
+            "nnz": 1251781,
+            "readout_ms": 1.13901,
+            "readout_muls": 61440,
+            "roots": 3,
+            "roots_ms": 23.319983,
+            "roots_muls": 184962000,
+            "total_ms": 5729.67263
+          },
+          "gave_up": null,
+          "median_ms": 5652.198145,
+          "ms": [
+            5514.915094,
+            5630.879759,
+            5466.999674000001,
+            5652.198145,
+            5739.223068,
+            5790.598588,
+            5729.674747999999
+          ],
+          "muls": 23334419370,
+          "sols": 3
+        }
+      ],
+      "delta": 4096,
+      "f4_ms": 2371.095123,
+      "family": "gaudry-s5",
+      "label": "p101-1",
+      "n": 4,
+      "p": 101,
+      "planted_found": null
+    }
+  ],
+  "schema": "postgb_la_bench/v1",
+  "shapes": null,
+  "simd": "avx512f",
+  "skipped": []
+}

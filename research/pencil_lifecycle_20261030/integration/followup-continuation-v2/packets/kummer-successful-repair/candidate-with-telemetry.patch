@@ -1,0 +1,82 @@
+--- a/src/main_labelled.rs
++++ b/src/main_labelled.rs
+@@ -37,7 +37,7 @@
+         "/src/walk_impl_uncached.rs"
+     ));
+     type Pair = ([u64; 4], [u64; 4]);
+-    type StepResult = (Option<Pair>, u64, [Option<u64>; 3]);
++    type StepResult = (Option<Pair>, u64, [Option<u64>; 3], [bool;3], [bool;3]);
+     pub fn step(
+         k: [u64; 4],
+         kp: [u64; 4],
+@@ -48,11 +48,20 @@
+         p: u64,
+     ) -> StepResult {
+         let choice = branch(k, p);
+-        let (kd, r0) = xadd_repaired(k, k, k0, t, acts, p);
+-        let (km, r1) = xadd_repaired(k, kp, kg, t, acts, p);
+-        let (kpp, r2) = xadd_repaired(kp, kp, k0, t, acts, p);
+-        let pair = if choice == 0 { kd.zip(km) } else { km.zip(kpp) };
+-        (pair, choice, [r0, r1, r2])
++        // Proposed arm: only the selected double is evaluated.
++        // None in the unused repair slot means not evaluated, not repair failure.
++        if choice == 0 {
++            let (kd, r0) = xadd_repaired(k, k, k0, t, acts, p);
++            let (km, r1) = xadd_repaired(k, kp, kg, t, acts, p);
++            (kd.zip(km), choice, [r0, r1, None], [true,true,false], [true,true,false])
++        } else {
++            let (km, r1) = xadd_repaired(k, kp, kg, t, acts, p);
++            let (kpp, r2) = xadd_repaired(kp, kp, k0, t, acts, p);
++            (km.zip(kpp), choice, [None, r1, r2], [false,true,true], [false,true,true])
++        }
++    }
++    pub fn repair_probe(x:[u64;4],y:[u64;4],diff:[u64;4],t:[u64;4],acts:&[(u64,[[u64;4];4])],p:u64)->(Option<[u64;4]>,Option<[u64;4]>,Option<u64>){
++       let plain=xadd(x,y,diff,t,p);let(repaired,root)=xadd_repaired(x,y,diff,t,acts,p);(plain,repaired,root)
+     }
+     pub fn project_divisor(d: Divisor, t: &serde_json::Value, p: u64) -> Option<[u64; 4]> {
+         project(d, t, p)
+@@ -175,6 +184,8 @@
+     next: Option<([u64; 4], [u64; 4])>,
+     choice: u64,
+     roots: [Option<u64>; 3],
++    evaluated: [bool;3],
++    selected: [bool;3],
+     used_fallback: bool,
+     fallback_validity_checks: u64,
+     transition_checks: u64,
+@@ -224,7 +235,7 @@
+     b: u64,
+     validate_transition: bool,
+ ) -> Advance {
+-    let (next, choice, roots) = walk::step(k, kp, kg, k0, constants, acts, p);
++    let (next, choice, roots, evaluated, selected) = walk::step(k, kp, kg, k0, constants, acts, p);
+     if let Some((nk, nkp)) = next {
+         if validate_transition {
+             let aa = (2 * a + choice) % r;
+@@ -240,7 +251,7 @@
+             return Advance {
+                 next: valid.then_some((nk, nkp)),
+                 choice,
+-                roots,
++                roots, evaluated, selected,
+                 used_fallback: false,
+                 fallback_validity_checks: 0,
+                 transition_checks: 2,
+@@ -250,7 +261,7 @@
+         return Advance {
+             next,
+             choice,
+-            roots,
++            roots, evaluated, selected,
+             used_fallback: false,
+             fallback_validity_checks: 0,
+             transition_checks: 0,
+@@ -263,7 +274,7 @@
+     Advance {
+         next,
+         choice,
+-        roots,
++        roots, evaluated, selected,
+         used_fallback: true,
+         fallback_validity_checks: 2,
+         transition_checks: 0,

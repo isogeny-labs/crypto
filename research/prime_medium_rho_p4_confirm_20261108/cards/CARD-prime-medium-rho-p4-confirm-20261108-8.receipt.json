@@ -1,0 +1,668 @@
+{
+  "card_id": "CARD-prime-medium-rho-p4-confirm-20261108-8",
+  "card_path": "research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-8.yaml",
+  "card_sha256": "0685e5a44c5d7e478eb162ed58167a14050e5dd7c9b329d44b4e0e44f0c62432",
+  "commands": [
+    {
+      "argv": [
+        "scripts/checkpoint.sh",
+        "gate"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 5.049,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "checkpoint-gate",
+      "index": 1,
+      "outputs": {},
+      "seconds": 5.049,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "6c16509ac06f65a6ffd505d35f2a06ffae9fd3ffe05c2ccac5251687645f9e31",
+      "stdout_tail": [
+        "checkpoint: s3://setec-astronomy-artifacts/checkpoints/crypto/claude__serene-davinci-ujoi58/20261108T103650Z-c323a44291d1/ (0 unpushed commit(s), 0 spec file(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "75cf6c230728b6e9cefe30f175402bad1af7ccb4",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.01,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-ancestor",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.01,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--quiet",
+        "75cf6c230728b6e9cefe30f175402bad1af7ccb4",
+        "HEAD",
+        "--",
+        "research/prime_medium_rho_p4_confirm_20261108",
+        ":(exclude)research/prime_medium_rho_p4_confirm_20261108/cards",
+        ":(exclude)research/prime_medium_rho_p4_confirm_20261108/receipts",
+        ":(exclude)research/prime_medium_rho_p4_confirm_20261108/sessions",
+        "taskq/",
+        "tools/task_card.py",
+        "tools/benchrec.py"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-paths-unchanged",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/primefield-companion-schur-20261101/tools/experiment_protocol.py",
+        "validate",
+        "research/prime_medium_rho_p4_confirm_20261108/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.19,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-check",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.19,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "2c8fb1a0ceabccb482fbe45df810f70e8432af7a7b638bd264efef75f67c4e93",
+      "stdout_tail": [
+        "OK: experiment.protocol/v1 research/prime_medium_rho_p4_confirm_20261108/protocol.json (0 finding(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "26fd5c574d585f57d39cf298dbfb48b3569d952c1693526e253853bfca02ae0c",
+        ".freeze.status == \"frozen\" and .freeze.protocol_sha256 == $h",
+        "research/prime_medium_rho_p4_confirm_20261108/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-frozen-hash",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "-c",
+        "research/prime_medium_rho_p4_confirm_20261108/cards/frozen-ecbench.sha256"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.075,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "frozen-ecbench-sha",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.075,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "42ec20be7c7d947cb56e6ba9f9ca72289e84c004bdc796ac323c9c781116f18a",
+      "stdout_tail": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench: OK"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "s",
+        "1514deb4793dc4fe4ae14f55876dbe6e8d358c0d",
+        ".schema == \"isolab.git-publication/v1\" and .source_revision == $s",
+        "research/prime_medium_rho_p4_confirm_20261108/receipts/publication-receipt.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "publication-receipt-identity",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "-n",
+        "--arg",
+        "i",
+        "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5",
+        "--arg",
+        "s",
+        "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "--arg",
+        "b",
+        "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "[inputs | .job.build == {image_uri:$i, source_revision:$s, ecbench_sha256:$b} and .provenance.source_revision == $s] | length == 1 and all",
+        "research/prime_medium_rho_p4_confirm_20261108/requests/M8.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build-identity",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/validate-request",
+        "research/prime_medium_rho_p4_confirm_20261108/requests/M8.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.013,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate-m8",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.013,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "f7e813971673ce58d6e9169d84104d73709983f1ca234245054c880adcba9296",
+      "stdout_tail": [
+        "      \"measurement\": {",
+        "        \"rounds\": 6,",
+        "        \"warmup\": 1,",
+        "        \"order\": \"alternate\",",
+        "        \"seed\": 31435994005288,",
+        "        \"isolation_required\": \"L2\",",
+        "        \"timeout_seconds\": 300",
+        "      }",
+        "    },",
+        "    \"build\": {",
+        "      \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "      \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "      \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "    }",
+        "  },",
+        "  \"provenance\": {",
+        "    \"harness\": \"claude-code: research/prime_medium_rho_p4_confirm_20261108 (PROTOCOL.md)\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "job",
+        "prime-medium-rho-p4-20261108-m8",
+        ".job.job_name == $job and .job.seconds == 3600 and .job.memory == \"4Gi\" and .job.instance_type == \"c8a.2xlarge\"",
+        "research/prime_medium_rho_p4_confirm_20261108/requests/M8.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "request-job-m8",
+      "index": 10,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/prime_medium_rho_p4_confirm_20261108/cards/run_recorded.sh",
+        "taskq/deploy/eks-karpenter/remote/launch-remote",
+        "research/prime_medium_rho_p4_confirm_20261108/requests/M8.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 26,
+          "seconds": 1978.053,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 26,
+      "id": "launch-m8",
+      "index": 11,
+      "outputs": {
+        "research/prime_medium_rho_p4_confirm_20261108/receipts/M8/result.json": "78925700ff62b3d9832031815170c57a27a7ced56275eaefe1d7b0a2b554f5bd"
+      },
+      "seconds": 1978.053,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "59ffe210fcbf8f7bcb658c5a8b8cf4a5df0c797d3e4d7b5e27e83c03e94fba22",
+      "stdout_tail": [
+        "Launcher: isolab-experiment-launcher:2e0492ac-d675-4443-b5b4-ae9418ff4ed2",
+        "Launcher receipts: s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-p4-20261108-m8/launcher/2e0492ac-d675-4443-b5b4-ae9418ff4ed2/",
+        "{",
+        "  \"schema\": \"isolab.eks.result/v1\",",
+        "  \"state\": \"failed\",",
+        "  \"job_name\": \"prime-medium-rho-p4-20261108-m8\",",
+        "  \"job_uid\": \"9c8a0a66-1327-43c3-b42a-b1db096a8d3a\",",
+        "  \"pod_uid\": \"\",",
+        "  \"results_uri\": \"\",",
+        "  \"receipt_uri\": \"s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-p4-20261108-m8/launcher/2e0492ac-d675-4443-b5b4-ae9418ff4ed2/\",",
+        "  \"request_sha256\": \"f7e813971673ce58d6e9169d84104d73709983f1ca234245054c880adcba9296\",",
+        "  \"launcher\": \"isolab-experiment-launcher:2e0492ac-d675-4443-b5b4-ae9418ff4ed2\",",
+        "  \"exit_code\": 23,",
+        "  \"build\": {",
+        "    \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "    \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/prime_medium_rho_p4_confirm_20261108/cards/check_session_complete.sh",
+        "prime-medium-rho-p4-20261108-m8",
+        "research/prime_medium_rho_p4_confirm_20261108/receipts/M8",
+        "336"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 8.216,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "admit-m8",
+      "index": 12,
+      "outputs": {
+        "research/prime_medium_rho_p4_confirm_20261108/receipts/M8/admission.json": "0bb2571d8d642883c983fcd6890a21267b8f8167cb7c04486b636b4b31fd12b8"
+      },
+      "seconds": 8.216,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0bb2571d8d642883c983fcd6890a21267b8f8167cb7c04486b636b4b31fd12b8",
+      "stdout_tail": [
+        "{",
+        "  \"schema\": \"prime-medium-rho/session-admission/v1\",",
+        "  \"job_name\": \"prime-medium-rho-p4-20261108-m8\",",
+        "  \"job_uid\": \"9c8a0a66-1327-43c3-b42a-b1db096a8d3a\",",
+        "  \"pod_uid\": \"8868adbf-34df-4ef7-868a-b162fc35e4c3\",",
+        "  \"results_uri\": \"s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-p4-20261108-m8/8868adbf-34df-4ef7-868a-b162fc35e4c3/\",",
+        "  \"job_exit_code\": 42,",
+        "  \"expected_executions\": 336,",
+        "  \"audit_records\": 336,",
+        "  \"audit_replays\": 288,",
+        "  \"l2_accepted\": false,",
+        "  \"l2_below_l2\": 174,",
+        "  \"admitted_for_counts\": true",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-c",
+        "{job_name, job_uid, pod_uid, state, exit_code, launcher, results_uri, receipt_uri, request_sha256}",
+        "research/prime_medium_rho_p4_confirm_20261108/receipts/M8/result.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "record-m8",
+      "index": 13,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "4f18b1844119637f14d2328e79b64fc6f6e861f9f0d132c34eaac21a680e1088",
+      "stdout_tail": [
+        "{\"job_name\":\"prime-medium-rho-p4-20261108-m8\",\"job_uid\":\"9c8a0a66-1327-43c3-b42a-b1db096a8d3a\",\"pod_uid\":\"\",\"state\":\"failed\",\"exit_code\":23,\"launcher\":\"isolab-experiment-launcher:2e0492ac-d675-4443-b5b4-ae9418ff4ed2\",\"results_uri\":\"\",\"receipt_uri\":\"s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-p4-20261108-m8/launcher/2e0492ac-d675-4443-b5b4-ae9418ff4ed2/\",\"request_sha256\":\"f7e813971673ce58d6e9169d84104d73709983f1ca234245054c880adcba9296\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/prime_medium_rho_p4_confirm_20261108/cards/fetch_session.sh",
+        "M8"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.665,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fetch-m8",
+      "index": 14,
+      "outputs": {
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M8/records.jsonl": "baec3ea308d6d4f0e28159007dab2d1e2e9ea6d0fb954445f0db0fd3bbc5f826"
+      },
+      "seconds": 1.665,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "bba22982644db597db9301b1e3585e0e78a964a6ebf325e1522e3bbb0bbb37a5",
+      "stdout_tail": [
+        "fetched M8 from s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-p4-20261108-m8/8868adbf-34df-4ef7-868a-b162fc35e4c3/",
+        "records.jsonl sha256 baec3ea308d6d4f0e28159007dab2d1e2e9ea6d0fb954445f0db0fd3bbc5f826"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "b",
+        "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "--arg",
+        "s",
+        "ECS1he72ce6f8a2e3",
+        "--argjson",
+        "n",
+        "336",
+        ".binary_sha256 == $b and .spec_id == $s and .status == \"complete\" and .executions_planned == $n and .records_written == $n",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M8/session.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "session-identity-m8",
+      "index": 15,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "verify",
+        "--dir",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M8",
+        "--replay-all",
+        "--out",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M8.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1333.382,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-m8",
+      "index": 16,
+      "outputs": {
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M8.audit.json": "04b781c50a8dd27e25f27c05bc5e501e1c068cd8fc32a2ef3a285b8f4e5375b7"
+      },
+      "seconds": 1333.382,
+      "stderr_sha256": "49284c1ae8cbe891bd44f0b8aedf77e8a05d77a676a0f7f5e9b6ddf168361406",
+      "stderr_tail": [
+        "receipt sha256 04b781c50a8dd27e25f27c05bc5e501e1c068cd8fc32a2ef3a285b8f4e5375b7",
+        "audit OK: 336 records, 336 verified, 288 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "04b781c50a8dd27e25f27c05bc5e501e1c068cd8fc32a2ef3a285b8f4e5375b7",
+      "stdout_tail": [
+        "      \"seq\": 335,",
+        "      \"record_id\": \"ECR1h82f6b9aa0532\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"replay_selection\": \"all\",",
+        "  \"replay_candidates\": 288,",
+        "  \"files\": {",
+        "    \"host.json\": \"ab4def95217a4d228d09efefbd47447f5e728e87e9894b012aa15e9520178dbe\",",
+        "    \"plan.json\": \"e27725fae57fe14839fb6ae8a31b7bf87895e4fd44989b37472bcf6198aca093\",",
+        "    \"records.jsonl\": \"baec3ea308d6d4f0e28159007dab2d1e2e9ea6d0fb954445f0db0fd3bbc5f826\",",
+        "    \"session.json\": \"bb5a5b13177539c8094170911e9211e1470f5c7d03309f1f5a440471dc66ca46\",",
+        "    \"spec.json\": \"cdf6eddc72f93a1399f745888f88aa3c2782bfd188315f5b4db427fbba811d0e\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h8d80c7bc4dfc\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1he9e33daae9e7\",",
+        "  \"audited_unix_ms\": 1794137536034",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--argjson",
+        "n",
+        "336",
+        ".ok == true and .session_status == \"complete\" and (.problems | length) == 0 and .planned_executions == $n and .records == $n",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M8.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit-pass-m8",
+      "index": 17,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/prime_medium_rho_p4_confirm_20261108/cards/record_raw.sh",
+        "M8"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.074,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "add-raw-m8",
+      "index": 18,
+      "outputs": {},
+      "seconds": 0.074,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "17989284004642c6a69d25a111b902a52c7058bb5c0f463fa7e364ab49c56379",
+      "stdout_tail": [
+        "18 raw file(s) recorded"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 18,
+  "commit": "c323a44291d12755d19a17a3c81ecb123de0d686",
+  "dirty_after": [
+    "enchmarks/records/20261108T0512Z-prime-medium-rho-p4-confirm.json"
+  ],
+  "dirty_before": [
+    "enchmarks/records/20261108T0512Z-prime-medium-rho-p4-confirm.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

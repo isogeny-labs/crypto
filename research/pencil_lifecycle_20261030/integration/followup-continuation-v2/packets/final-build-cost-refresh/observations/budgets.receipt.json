@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "timeout",
+    "-k",
+    "2s",
+    "30s",
+    "aws",
+    "budgets",
+    "describe-budgets",
+    "--account-id",
+    "104186811093",
+    "--query",
+    "Budgets[].{Name:BudgetName,Filters:CostFilters,Types:CostTypes,Limit:BudgetLimit,Spent:CalculatedSpend,Updated:LastUpdatedTime}",
+    "--region",
+    "us-east-2",
+    "--cli-connect-timeout",
+    "5",
+    "--cli-read-timeout",
+    "15",
+    "--output",
+    "json"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T22:29:31.867125+00:00",
+  "observed_utc": "2026-11-03T22:29:38.029281+00:00",
+  "elapsed_seconds": 6.162162569991779,
+  "stdout_sha256": "ff4e434ebc811978e2eff4ab32ca530fc0ed7a4d1b60ec1e213eab9b25c47bb3",
+  "stdout_bytes": 1980,
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_bytes": 0
+}

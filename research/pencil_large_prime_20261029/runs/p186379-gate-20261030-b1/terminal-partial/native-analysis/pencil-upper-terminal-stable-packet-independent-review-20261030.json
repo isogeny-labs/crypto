@@ -1,0 +1,126 @@
+{
+  "schema": "pencil-upper-terminal-stable-independent-review/v1",
+  "reviewed_at_utc": "2026-10-30T03:41:10Z",
+  "reviewer_role": "independent packet and presentation review; no solver, cloud action, mathematical replay, source edit, or research admission",
+  "packet": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-b1/terminal-partial/native-analysis",
+    "receipt": {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-b1/terminal-partial/native-analysis/receipt.json",
+      "sha256": "185d674966f54682773c4287c9c24dacf6b9bba24e07d9a4d9315c1d225727ff"
+    },
+    "analysis_manifest_sha256": "adc48709409d8515c5ed5c2f7a91517da97755a34e54326b420ad353bdad484a",
+    "native_analysis_sha256": "770c40bfb7f574caa1bf5114022378a0ad72686c86f480d5fa39ad2d691e3625",
+    "execution_history_sha256": "9c43c8f3c81661a1fe47f2ef48a0da535b10b2a53839dd6917afb1fea92ddb95",
+    "package_request_sha256": "120b65d43342be635da6386c5c9232e5ba9325beee205d74456990fc9a141917",
+    "export_sha256": "ecdede7f20e213959f11ccb8e2b9abcb800a8243ea1638b7d62b7d4aeb8ea947",
+    "report_request_sha256": "2f157830f880e998af065154f76f0fd859d5200ddb257a1c6935d2dbe4f3a705",
+    "resource_observations_sha256": "4880cc449b6d4b0065cd71d1be119cb748bb5f658d8574b87051454738b6f928"
+  },
+  "stable_report": {
+    "directory": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/accounting/reports/run-20261030T0244Z-upper-partial/worker-terminal-update",
+    "json_sha256": "3482a7abdeca99b68d673b7559027de4cac2b75f1278352d7e301e2701f14881",
+    "pdf_sha256": "0a41cce1b48449119899e3ca9229fe88bfcf26e760acda41a58cb9b05838b613",
+    "pages": 3,
+    "visual_review": {
+      "method": "pdftoppm -png -r 120 followed by original-resolution image inspection; pdftotext -layout cross-check",
+      "page_png_sha256": [
+        "c95146e9bc2c591a2664c90b0ca34747e75bce5259180696ef6539ed4dff2b80",
+        "aab10980be3258053246917a4e7fb91c1d7cd40005866cef8c94750063f265b0",
+        "9f064ce727e7d851e5a49ad7a36e4a48b26ebf4677c66e5efce261a550eb4dcd"
+      ],
+      "result": "all three pages readable; no observed clipping; page 1 states observation-only limits and terminated-instance update; page 2 lists all 36 null price cells; page 3 completes the evidence bindings"
+    }
+  },
+  "binding_checks": {
+    "export_files_checked": 55,
+    "export_file_hash_or_size_mismatches": 0,
+    "package_request_bindings_checked": 22,
+    "package_request_binding_mismatches": 0,
+    "report_request_bindings_checked": 8,
+    "report_request_binding_mismatches": 0,
+    "report_embedded_evidence_bindings_checked": 8,
+    "report_embedded_evidence_binding_mismatches": 0,
+    "protocol_binding_note": "export.protocol.sha256 is the canonical protocol-body digest 5762e40132c75a0a3d1cbc9ec6d64b777e2235ebc6d3c3364d9bdd299af45040; export.files and package-request bind the actual protocol file SHA-256 65ad107e3d341e7783ed06942cc82b6c1b3a9084f9d88c92202b31fec7509746, which rehashed successfully"
+  },
+  "observed_accounting": {
+    "expected_slots": 18,
+    "observed_slots": 2,
+    "observed_warmups": 2,
+    "observed_measured": 0,
+    "missing_slots": 16,
+    "expected_measured_pairs": 5,
+    "pair_rows": 5,
+    "price_cells": 36,
+    "admitted_pairs_per_price_cell": 0,
+    "expected_pairs_per_price_cell": 5,
+    "nonnull_algorithm_ratios": 0,
+    "nonnull_inclusive_ratios": 0,
+    "observed_outcomes": {
+      "rho:verified": 1,
+      "rho_AA:verified": 1
+    },
+    "all_expected_records_present": false
+  },
+  "execution_and_findings": {
+    "native_analysis_exit": 0,
+    "canonical_package_exit": 1,
+    "canonical_package_findings": [
+      "export has 2 warmup rows; protocol plans 3",
+      "export has 0 measured rows; protocol plans 15",
+      "arm pencil instance shortfall",
+      "arm rho instance shortfall",
+      "arm rho_AA instance shortfall"
+    ],
+    "canonical_check_exit": 1,
+    "canonical_check_additional_finding": "protocol arm pencil has no run",
+    "renderer_exit": 0,
+    "history": {
+      "records": 2,
+      "attempts_each": 1,
+      "resumed_each": 0,
+      "checkpoint_each": null
+    }
+  },
+  "worker_resource_evidence": {
+    "instance_id": "i-027be1b63d0a94827",
+    "state": "terminated",
+    "launch_time_utc": "2026-10-30T02:47:55Z",
+    "transition_reason": "User initiated (2026-10-30 03:30:41 GMT)",
+    "instance_readback": {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-b1/terminal-partial/controller/worker-instance-terminal.json",
+      "sha256": "19c8ea62e1ca92293face7d11af9dd20ae0c2c2d94635da68379ac72a3379265"
+    },
+    "observation_timestamp_companion": {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-b1/terminal-partial/controller/worker-instance-terminal-observed-at.txt",
+      "sha256": "fe5e75e2b2c707a5607a1c7fee1fb43d422d90eb096e947d67fb5f679e385da3",
+      "observed_at_utc": "2026-10-30T03:36:21Z"
+    },
+    "publication_binding": {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-b1/terminal-partial/native-analysis/worker-observation-publication-binding.json",
+      "sha256": "b714cc115b3c24c1862e8c40a9dbdcc22e15fcda4e4766dacdeff5edcaef7f24",
+      "bindings_checked": 4,
+      "binding_mismatches": 0
+    },
+    "binding_note": "The report binds the instance readback but does not claim a readback observation time. The additive publication binding now binds the timestamp companion, instance readback, resource sidecar, and unchanged report for publication traceability; no report rerender is required.",
+    "worker_elapsed_seconds": null,
+    "active_scientific_payload_elapsed_seconds": null,
+    "cost_conversion": null
+  },
+  "preserved_prior_review": {
+    "json_path": "/tmp/pencil-upper-terminal-packet-independent-review-20261030.json",
+    "json_sha256": "bff0727916451d2c0cb8cd64e11950efd2915c66de2355d73b4413e45efa04eb",
+    "md_path": "/tmp/pencil-upper-terminal-packet-independent-review-20261030.md",
+    "md_sha256": "caf2ce4a85986ae8c6c942148aa13c0a89279ba928c912ea114489b911e582da",
+    "unchanged": true
+  },
+  "findings": [],
+  "review_result": "The stable packet and additive report are internally consistent and truthfully incomplete. The worker instance termination is verified; exact active payload time remains unknown. The packet contains no measured comparison and supports no scientific, timing, speed, or cost-ratio admission.",
+  "limits": [
+    "No solver or experiment was executed by this review.",
+    "No mathematical replay or independent reimplementation was performed.",
+    "The two retained rows are warmups; all measured comparison rows are absent.",
+    "Instance launch and transition timestamps do not establish scientific payload-active duration.",
+    "The artifact-child git commit 7d7f5495c5b85ae426efdbcb721b6faf72c1be14 is distinct from the instrument source commit 543a54b4b1c3be7052872af3ffe393a44c69a3c3, as disclosed in the packet.",
+    "This review does not change frozen data, protocol status, research status, or admission."
+  ]
+}

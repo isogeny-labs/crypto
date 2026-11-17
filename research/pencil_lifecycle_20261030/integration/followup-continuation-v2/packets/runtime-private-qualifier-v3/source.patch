@@ -1,0 +1,22 @@
+--- research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualifier-v2/supervise.py	2026-11-03 17:57:49.690000000 +0000
++++ research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualifier-v3/supervise.py	2026-11-03 19:36:16.636000000 +0000
+@@ -26,6 +26,10 @@
+   return {k:([{'name':v.split('=',1)[0],'sha256':H(v.encode())} for v in a] if k=='Env' and isinstance(a,list) else safe_inspect(a)) for k,a in x.items()}
+  return x
+ 
++def inspection_capture(directory):
++ # Use the owned bounded writable command directory; never ambient temp defaults.
++ return tempfile.TemporaryFile(mode='w+b',dir=directory)
++
+ def main():
+  ap=argparse.ArgumentParser();ap.add_argument('--image-id',required=True);ap.add_argument('--binary-sha256',required=True);ap.add_argument('--binding',required=True);ap.add_argument('--receipts',required=True);ap.add_argument('--private-endpoint',required=True);ap.add_argument('--private-endpoint-sha256',required=True);args=ap.parse_args()
+  require(re.fullmatch('sha256:[0-9a-f]{64}',args.image_id),'image ID shape')
+@@ -98,7 +102,7 @@
+   timeout=min(cap,remaining-2);seq+=1;d=out/f'{seq:03d}-{label}';d.mkdir();t=time.monotonic();proc=None;result={};so=None;se=None
+   try:
+    # Inspection bytes never have a named persistent raw file. Failure leaves only hash/size.
+-   so=tempfile.TemporaryFile(mode='w+b') if inspect else (d/'stdout').open('w+b')
++   so=inspection_capture(d) if inspect else (d/'stdout').open('w+b')
+    se=(d/'stderr').open('wb')
+    # Mark uncertain ownership BEFORE launch; never infer no child from an interrupted constructor.
+    unreaped_client=True

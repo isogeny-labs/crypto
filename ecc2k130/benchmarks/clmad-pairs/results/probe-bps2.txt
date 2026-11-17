@@ -1,0 +1,52 @@
+{"gpu":"NVIDIA RTX PRO 6000 Blackwell Server Edition","sms":188,"clockMaxKHz":2430000,"blocks":376,"threads":256,"chains":16,"rounds":4000}
+clmad verified against host carryless multiply
+{"stream":"lo","laneClmadsPerSecond":7.448454e+11,"laneClmadsPerSmClockAtMax":1.6304,"vsLo":1.0000}
+{"stream":"hi","laneClmadsPerSecond":7.449549e+11,"laneClmadsPerSmClockAtMax":1.6307,"vsLo":1.0001}
+{"stream":"pair-same","laneClmadsPerSecond":7.452679e+11,"laneClmadsPerSmClockAtMax":1.6314,"vsLo":1.0006}
+{"stream":"pair-other","laneClmadsPerSecond":7.458872e+11,"laneClmadsPerSmClockAtMax":1.6327,"vsLo":1.0014}
+{"stream":"lo-lo-same","laneClmadsPerSecond":7.454886e+11,"laneClmadsPerSmClockAtMax":1.6318,"vsLo":1.0009}
+{"stream":"flat 3lo+3hi","laneClmadsPerSecond":7.457471e+11,"laneClmadsPerSmClockAtMax":1.6324,"vsLo":1.0012}
+{"stream":"karat 3x(lo,hi)","laneClmadsPerSecond":7.450698e+11,"laneClmadsPerSmClockAtMax":1.6309,"vsLo":1.0003}
+{"stream":"pair-far (4 lop3 between)","laneClmadsPerSecond":7.445400e+11,"laneClmadsPerSmClockAtMax":1.6298,"vsLo":0.9996}
+{"stream":"lo-acc (clmad-price form)","laneClmadsPerSecond":7.444565e+11,"laneClmadsPerSmClockAtMax":1.6296,"vsLo":0.9995}
+{"stream":"pair-acc (clmad-price form)","laneClmadsPerSecond":8.830583e+11,"laneClmadsPerSmClockAtMax":1.9330,"vsLo":1.1856}
+{"stream":"16 lo then 16 hi, fresh dest","laneClmadsPerSecond":7.442263e+11,"laneClmadsPerSmClockAtMax":1.6291,"vsLo":0.9992}
+{"stream":"pair-acc forced adjacent","laneClmadsPerSecond":8.836683e+11,"laneClmadsPerSmClockAtMax":1.9343,"vsLo":1.1864}
+{"stream":"16 lo-acc then 16 hi-acc, hi reads old a","laneClmadsPerSecond":8.840396e+11,"laneClmadsPerSmClockAtMax":1.9351,"vsLo":1.1869}
+{"stream":"hi-acc alone (addend = dest)","laneClmadsPerSecond":7.440307e+11,"laneClmadsPerSmClockAtMax":1.6286,"vsLo":0.9989}
+{"stream":"hi, addend another register","laneClmadsPerSecond":7.444134e+11,"laneClmadsPerSmClockAtMax":1.6295,"vsLo":0.9994}
+{"stream":"lo, addend another register","laneClmadsPerSecond":7.444710e+11,"laneClmadsPerSmClockAtMax":1.6296,"vsLo":0.9995}
+{"stream":"lo fresh + hi with addend","laneClmadsPerSecond":8.075676e+11,"laneClmadsPerSmClockAtMax":1.7677,"vsLo":1.0842}
+{"stream":"pair, addend = zero register (kernel arg)","laneClmadsPerSecond":7.442220e+11,"laneClmadsPerSmClockAtMax":1.6291,"vsLo":0.9992}
+{"stream":"karat 3x(lo,hi), addends = zero register","laneClmadsPerSecond":7.445650e+11,"laneClmadsPerSmClockAtMax":1.6298,"vsLo":0.9996}
+{"stream":"pair, fresh dest, multiplicand = 0 (per-lane register)","laneClmadsPerSecond":7.446063e+11,"laneClmadsPerSmClockAtMax":1.6299,"vsLo":0.9997}
+{"stream":"pair-acc, operands kept nonzero every round","laneClmadsPerSecond":8.841980e+11,"laneClmadsPerSmClockAtMax":1.9355,"vsLo":1.1871}
+{"stream":"pair, self-addend on copies, corrected","laneClmadsPerSecond":8.838671e+11,"laneClmadsPerSmClockAtMax":1.9347,"vsLo":1.1866}
+{"stream":"karat 3x(lo,hi), self-addend on copies, corrected","laneClmadsPerSecond":8.828004e+11,"laneClmadsPerSmClockAtMax":1.9324,"vsLo":1.1852}
+2370 MHz, 204.21 W, 44
+{"gpu":"NVIDIA RTX PRO 6000 Blackwell Server Edition","sms":188,"clockMaxKHz":2430000,"blocks":376,"threads":256,"chains":16,"rounds":4000}
+clmad verified against host carryless multiply
+{"stream":"lo","laneClmadsPerSecond":7.448426e+11,"laneClmadsPerSmClockAtMax":1.6304,"vsLo":1.0000}
+{"stream":"hi","laneClmadsPerSecond":7.448973e+11,"laneClmadsPerSmClockAtMax":1.6305,"vsLo":1.0001}
+{"stream":"pair-same","laneClmadsPerSecond":7.454453e+11,"laneClmadsPerSmClockAtMax":1.6317,"vsLo":1.0008}
+{"stream":"pair-other","laneClmadsPerSecond":7.458077e+11,"laneClmadsPerSmClockAtMax":1.6325,"vsLo":1.0013}
+{"stream":"lo-lo-same","laneClmadsPerSecond":7.452044e+11,"laneClmadsPerSmClockAtMax":1.6312,"vsLo":1.0005}
+{"stream":"flat 3lo+3hi","laneClmadsPerSecond":7.450337e+11,"laneClmadsPerSmClockAtMax":1.6308,"vsLo":1.0003}
+{"stream":"karat 3x(lo,hi)","laneClmadsPerSecond":7.450404e+11,"laneClmadsPerSmClockAtMax":1.6309,"vsLo":1.0003}
+{"stream":"pair-far (4 lop3 between)","laneClmadsPerSecond":7.449146e+11,"laneClmadsPerSmClockAtMax":1.6306,"vsLo":1.0001}
+{"stream":"lo-acc (clmad-price form)","laneClmadsPerSecond":7.454252e+11,"laneClmadsPerSmClockAtMax":1.6317,"vsLo":1.0008}
+{"stream":"pair-acc (clmad-price form)","laneClmadsPerSecond":8.833419e+11,"laneClmadsPerSmClockAtMax":1.9336,"vsLo":1.1859}
+{"stream":"16 lo then 16 hi, fresh dest","laneClmadsPerSecond":7.448814e+11,"laneClmadsPerSmClockAtMax":1.6305,"vsLo":1.0001}
+{"stream":"pair-acc forced adjacent","laneClmadsPerSecond":8.847669e+11,"laneClmadsPerSmClockAtMax":1.9367,"vsLo":1.1879}
+{"stream":"16 lo-acc then 16 hi-acc, hi reads old a","laneClmadsPerSecond":8.846307e+11,"laneClmadsPerSmClockAtMax":1.9364,"vsLo":1.1877}
+{"stream":"hi-acc alone (addend = dest)","laneClmadsPerSecond":7.448973e+11,"laneClmadsPerSmClockAtMax":1.6305,"vsLo":1.0001}
+{"stream":"hi, addend another register","laneClmadsPerSecond":7.456619e+11,"laneClmadsPerSmClockAtMax":1.6322,"vsLo":1.0011}
+{"stream":"lo, addend another register","laneClmadsPerSecond":7.445228e+11,"laneClmadsPerSmClockAtMax":1.6297,"vsLo":0.9996}
+{"stream":"lo fresh + hi with addend","laneClmadsPerSecond":8.084442e+11,"laneClmadsPerSmClockAtMax":1.7696,"vsLo":1.0854}
+{"stream":"pair, addend = zero register (kernel arg)","laneClmadsPerSecond":7.448512e+11,"laneClmadsPerSmClockAtMax":1.6304,"vsLo":1.0000}
+{"stream":"karat 3x(lo,hi), addends = zero register","laneClmadsPerSecond":7.453226e+11,"laneClmadsPerSmClockAtMax":1.6315,"vsLo":1.0006}
+{"stream":"pair, fresh dest, multiplicand = 0 (per-lane register)","laneClmadsPerSecond":7.449060e+11,"laneClmadsPerSmClockAtMax":1.6306,"vsLo":1.0001}
+{"stream":"pair-acc, operands kept nonzero every round","laneClmadsPerSecond":8.851126e+11,"laneClmadsPerSmClockAtMax":1.9375,"vsLo":1.1883}
+{"stream":"pair, self-addend on copies, corrected","laneClmadsPerSecond":8.849723e+11,"laneClmadsPerSmClockAtMax":1.9372,"vsLo":1.1881}
+{"stream":"karat 3x(lo,hi), self-addend on copies, corrected","laneClmadsPerSecond":8.836223e+11,"laneClmadsPerSmClockAtMax":1.9342,"vsLo":1.1863}
+2370 MHz, 202.74 W, 43

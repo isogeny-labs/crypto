@@ -1,0 +1,60 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-p1-r3-launch-rr-a3
+experiment_id: split_prime_ecdlp_20261107-p1_rr_dickson-round3-launch-rr-a3
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 0f3aacdd50f87286a648eee08c58fdf10bc09703
+receipt: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r3-launch-rr-a3.receipt.json
+binds:
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/PROTOCOL-R3.md
+  sha256: 6f433d83473afcd12bde36dac820afb73a1443260a2766bddf6f865ead551257
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/README.md
+  sha256: d7a792960dd54d21098255a08346c976cfba7b5de76cec217e3b259cbd49bf33
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/image.json
+  sha256: ee5c5b121ea47adb26897e9d55e24ff305285cf62a0e600c7e84ea8323186e5b
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/build-info.json
+  sha256: 60916cec40dbcad7ceb1104c1375410fa03a5852927bfb406cee3f66e8000301
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/request-rr-a3.json
+  sha256: ce9e83e0e5162048e2087a54bbebfe73c254ba5798741231b1b78ddeee1c1fb9
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/make-requests.sh
+  sha256: b9d600a25378df3c858ee6f580d1168bed78a2fbd46a5adece9a6ffe17af532f
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a2-spot-eviction.cloudtrail.json
+  sha256: 959cde942168dc2dea7ecf364cb2b369255f5562f3436ba766e38aadaeeb493c
+- path: taskq/deploy/eks-karpenter/remote/launch-remote-command
+  sha256: 7e1daae8dc70f8fcb813d9315daa73df3e18e7e5f72e2d47f34f9a3c85637416
+- path: taskq/deploy/eks-karpenter/remote/run-command
+  sha256: 1cdaa7447893fd5c2dc337d3903f8981107df1de6d77ca18cd8191cc8449ced2
+- path: taskq/deploy/eks-karpenter/remote/current-run-request-buildspec.yml
+  sha256: 35504896fd8e9eae15690bda0ddd11c2a453ec1c463b8cbeb3c1224f286f335e
+must_not_exist:
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a3
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a3.launch.stdout
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a3.launch.stderr
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r3-launch-rr-a3.receipt.json
+commands:
+- id: launch-rr
+  argv:
+  - taskq/deploy/eks-karpenter/remote/launch-remote-command
+  - research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/request-rr-a3.json
+  env:
+    AWS_REGION: us-east-2
+    ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+    ISOLAB_CODEBUILD_PROJECT: isolab-experiment-launcher
+    ISOLAB_CLIENT_OUTPUT: /home/user/crypto/research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a3
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a3.launch.stdout
+  stderr: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a3.launch.stderr
+  outputs:
+  - research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a3.launch.stdout
+bus_address: executor-mechanical-p1-r3-launch-rr-a3
+background: false
+write_scope:
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/
+stop_when:
+- Any command exits with a status other than 0 or reaches its timeout; report the printed text verbatim, retry nothing and edit nothing. A resubmission is a new request under a new job name and is not the executor's decision.
+- Never run a launcher a second time for the same request.
+notes: Round 3 resubmission of RR attempt a3 (job p1r3-rr-a3-20261108) after the Spot losses of attempts a1 and a2, as PROTOCOL-R3.md allows (two resubmissions per system, under a new Job name). This is RR's last attempt under PROTOCOL-R3. The request pins instance_type r6a.4xlarge (see the attempt log in launch/README.md). Submits the one command Job to Iso Lab EKS and nothing else. The launcher returns once the Job is submitted and active. Report the printed result.json (state, job_uid) verbatim.

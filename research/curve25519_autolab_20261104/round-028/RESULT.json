@@ -1,0 +1,129 @@
+{
+  "assessed": "2026-11-04T08:38:31Z",
+  "round": 28,
+  "rule": "improvement = paired sel/inc 95% interval below 1 at w = 0 and band order sel < inc at every weight; regression = interval above 1 or band inc < sel; else null",
+  "schema": "ic_autolab.result/v1",
+  "sizes": {
+    "20": {
+      "band_rho": "rho-neg < sel",
+      "band_verdict": "sel < inc",
+      "class": "improvement",
+      "distance_to_rho": {
+        "inc": [
+          3.4186499159515176,
+          3.3532963172180046,
+          3.0077783937357077
+        ],
+        "sel": [
+          1.7601226812940525,
+          1.719122084292032,
+          1.5023560390825308
+        ]
+      },
+      "evidence": {
+        "binary_sha256": "6229f85b81f9a2e8f2811d675f77f4f830ca536422a1e92680a382183450a62c",
+        "compare_verdict": "ops (ok): sel / inc = 0.5149 [0.474, 0.559] (linearised_t, df 31) over 64 pairs on 32 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.5149, w=0.1: 0.5127, w=1: 0.4995): sel < inc at every weight; wall: admitted ns/GAE sel/inc 1.4908 [1.218, 1.824], bias-corrected 1.4732 [1.201, 1.807] (A/A 1.0120, includes arm A), outside noise; end-to-end wall 0.7676 [0.627, 0.940]; ns/GAE of inc, sel is an upper bound on its cost per operation (GAE is a lower bound)",
+        "levels": {
+          "verified": 480
+        },
+        "session_dir": "research/curve25519_autolab_20261104/round-028/sessions/holdout-k20",
+        "session_id": "ECBS1hedb8cab33622",
+        "spec_sha256": "31d58ece51b9f5adce749866dc1cf1c79dab8fe17509eec999e62b3cae0a5242",
+        "verify_exit": 0,
+        "verify_receipt": "research/curve25519_autolab_20261104/round-028/analysis/verify-holdout-k20.json",
+        "verify_receipt_sha256": "d1fb88594a6510e05d9d954c155267d2ddf2d53679834041230a703bb5374c71"
+      },
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wsum2-b15",
+        "n": 2,
+        "name": "wsum2-b15-n2",
+        "oracle": "wsum:coef=15,free=1"
+      },
+      "ratio": {
+        "aa": {
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "ratio": 1.0
+        },
+        "w0": {
+          "admissible": true,
+          "ci95": [
+            0.47436637197517206,
+            0.5588081424226906
+          ],
+          "ratio": 0.5148590012335771,
+          "status": "ok"
+        },
+        "w0.1": {
+          "ci95": [
+            0.4695812282457499,
+            0.5597045629251542
+          ],
+          "ratio": 0.5126663204396642
+        },
+        "w1": {
+          "ci95": [
+            0.44116192518009156,
+            0.5655305107259334
+          ],
+          "ratio": 0.499490269034276
+        }
+      },
+      "s": {
+        "inc": [
+          5.000549781428319,
+          5.249440615248054,
+          7.489458119625667
+        ],
+        "rho_neg": [
+          1.4627264868788148,
+          1.5654568277470773,
+          2.4900298955614355
+        ],
+        "sel": [
+          2.5745780660849693,
+          2.691211404585748,
+          3.740911451092766
+        ]
+      },
+      "sel": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wsum2g-b15",
+        "n": 2,
+        "name": "wsum2g-b15-n2",
+        "oracle": "wsum:coef=15,free=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "why": [
+        "compare ops.status = ok, admissible = true",
+        "sel / inc = 0.5149 [0.474, 0.559] at w = 0",
+        "band: sel < inc",
+        "A/A inc-aa / inc interval [1.000, 1.000] contains 1"
+      ]
+    },
+    "32": {
+      "class": "no_challenger",
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wsum2-b120",
+        "n": 2,
+        "name": "wsum2-b120-n2",
+        "oracle": "wsum:coef=120,free=1"
+      },
+      "incumbent_s": [
+        2.5189790595227413,
+        2.758593710106472,
+        4.915125565360056
+      ],
+      "why": [
+        "no_challenger"
+      ]
+    }
+  },
+  "track": "generic"
+}

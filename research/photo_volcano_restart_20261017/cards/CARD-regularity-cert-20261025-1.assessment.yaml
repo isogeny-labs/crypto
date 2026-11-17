@@ -1,0 +1,77 @@
+{
+  "card_id": "CARD-regularity-cert-20261025-1",
+  "relay_verbatim": true,
+  "outcome": "executed_as_specified",
+  "stopped_at_step": null,
+  "recommendation": "proceed_to_analysis",
+  "reasons": [
+    "The receipt records status completed and all five frozen command argv arrays in order, each with one attempt, exit_code 0, timed_out false, and succeeded true; receipt commit and current HEAD match the pinned local execution commit.",
+    "All 13 declared output digests and all 10 saved stdout/stderr digests match the receipt; all recorded stream tails match the saved streams. The final independent_audit.json records passed=true.",
+    "Every card bind still matches its SHA256, including the committed tools/task_card.py snapshot. No measurement was rerun and no source, card, receipt or result file was changed during assessment.",
+    "The receipt records dirty_before=[] and dirty_after=[]; current git status is clean. Declared outputs, streams, receipt and archived relay are inside the card write_scope.",
+    "The executor relay matches the complete stdout that the pinned runner prints byte for byte when each receipt output map is reconstructed in frozen card output order; the reconstructed SHA256 equals the archived relay SHA256.",
+    "The required check-relay CLI exited 1 during post-run lint because generated argv file paths now exist and the linter demands static binds for them. Before execution those future outputs did not exist.",
+    "The unchanged check_relay function then returned false because it reads receipt JSON whose output keys were sorted during serialization, whereas run prints the pre-serialization output maps in card order. The three reported missing lines are present verbatim in the executor relay in actual run order. This is a checker ordering discrepancy, not evidence of an altered executor relay.",
+    "The pinned runner snapshot equals canonical upstream main content plus exactly one trailing newline: 54252 versus 54251 characters. The snapshot was hash-bound before execution and remains unchanged. The upstream global tool was accessed read-only and was not modified by this study.",
+    "Assessment covers execution and evidence fidelity only; mathematical interpretation remains with the main session."
+  ],
+  "interpretation": "not_assessed",
+  "evidence": {
+    "card": {
+      "path": "cards/CARD-regularity-cert-20261025-1.yaml",
+      "sha256": "c67c3e05b8879c18930a9bad8f710a2be5fc3b544de9edad0ff59ea50d8aa72a"
+    },
+    "executor_relay": {
+      "path": "cards/CARD-regularity-cert-20261025-1.executor.txt",
+      "sha256": "4e28507304a6a27ae788f4b0be93f38f669530c7b00207af94966868f170763d"
+    },
+    "receipt": {
+      "path": "cards/CARD-regularity-cert-20261025-1.receipt.json",
+      "sha256": "267c369fc7b4e75a7d1ace39917a7c404449cdf3c87be9ffff6485672336b02d"
+    },
+    "local_execution_commit": "2763e90542c38fd9a92d755f452508bbd8cf60ee",
+    "output_digests_verified": 13,
+    "stream_digests_verified": 10,
+    "all_frozen_binds_unchanged": true,
+    "final_independent_audit": {
+      "path": "sessions/regularity_cert_20261025/independent_audit.json",
+      "sha256": "32632ec7d6d78d84b46ab66d73ef770a412c4c63eb5b864aeed6afe8a89f3b15",
+      "passed": true
+    },
+    "actual_run_stdout_reconstruction": {
+      "method": "Use unchanged brief() on receipt values, restoring only outputs-map insertion order from each frozen card command; append the newline printed by print(). This reproduces the pinned run main path without executing any measurement.",
+      "byte_exact_match": true,
+      "sha256": "4e28507304a6a27ae788f4b0be93f38f669530c7b00207af94966868f170763d"
+    },
+    "canonical_check_relay_cli": {
+      "exit_code": 1,
+      "comparison_reached": false,
+      "limitation": "Post-execution linter classifies eight now-existing generated argv paths as unbound repository inputs."
+    },
+    "unchanged_check_relay_function_result": {
+      "applicable": true,
+      "receipt": "cards/CARD-regularity-cert-20261025-1.receipt.json",
+      "relay_verbatim": false,
+      "missing_lines": [
+        "output sessions/regularity_cert_20261025/summary.json: 589c167161ff0b78b970a0c483582b19b6cd2f592f5ebe0c361543c45a39b9fe",
+        "output sessions/regularity_cert_20261025/toy.stdout: c1e01ac4831f216cebc83c9019b02e956ef85df44eef9cdd751c3f1cd2f73328",
+        "output sessions/regularity_cert_20261025/gp.stdout: 254f43233cf3762bd3fd28cccb7c26ac22d3bfb7846bf9c0bbf210bc9c715331"
+      ],
+      "verify_findings": [],
+      "status": "completed"
+    },
+    "runner_snapshot_provenance": {
+      "path": "tools/task_card.py",
+      "sha256": "a0e538fae6416fa2769cb708c9ffe34ca0dcd9f29848bee5311f0adaf9d36baa",
+      "upstream_url": "https://github.com/aburan28/crypto/blob/main/tools/task_card.py",
+      "upstream_git_blob_sha": "bc0c1c8a3ca85b892b948a03d4114727bd34f8b3",
+      "local_characters": 54252,
+      "upstream_characters": 54251,
+      "local_equals_upstream_plus_one_newline": true,
+      "trimEnd_equal": true,
+      "snapshot_modified": false,
+      "global_upstream_tool_modified": false
+    }
+  },
+  "scope_verification_limitation": "Git dirty-path observations do not enumerate ignored or external filesystem writes. The receipt, exact recorded commands and output paths provide the available execution-scope evidence; no evidence of a write outside scope was found."
+}

@@ -1,0 +1,98 @@
+validation_report:
+  id: VAL-20261103-c31c76
+  task_id: "none allocated (main-session task card 2026-11-03: independent validation of PR #3342 studies A and B)"
+  snapshot: "main aa1c89ab2a1be0bcbc60ac9c595df58089a471d1 (merged via PR #3342); study files clean against HEAD"
+  study: research/jv_sieve_negrho_20261102
+  claim_class: "accounting: plain JV sieve route (V2 records) against a matched negation-map rho at p = 1511, weak class only; no improvement claimed"
+  run_ids:
+    - "results/runs/rhostrong_p1511_s{17..24}_run{0,1}.json (16 new rho runs)"
+    - "research/jv_cover_negrho_rescore_20261101/results/inputs/old_rhostrong/*.json (18) and results/new/*.json (108): #3278 pooled-reference runs"
+    - "results/inputs/ic_1511_sparse.json (16 V2 sieve rows, seeds 17-32; byte-identical to V2 raw)"
+  artifact_checks:
+    - {check: presence, result: pass, detail: "16 new run records + logs, replay/ (5 files), inputs/ with MANIFEST.sha256 (sha256sum -c OK), FROZEN.sha, walls.txt, versions.txt, fit.json/fit.txt; graph.png is in the artifact store and its sha256 matches .artifacts.json"}
+    - {check: freeze hashes, result: pass, detail: "PROTOCOL.md 0513c0a8, run.sh 3bdc2cb2, inputs/MANIFEST.sha256 96493c92, fit/Cargo.toml c85899e7 equal FROZEN.sha; producer binary jv_cover_rho_frozen 2a61a521 present and matching; fit/src/main.rs 99503e22 (frozen) -> 788e3993 (final): git diff 73582ce306..30abe2bac8 touches only the SVG panel offset and two labels"}
+    - {check: freeze ordering (git), result: pass_with_note, detail: "FROZEN.sha times (protocol 19:01:32Z, tool 19:04:03Z, T0 19:06:47Z) are clock-only. Git first holds the frozen protocol, run.sh and the frozen tool at 73582ce306 (19:37:29Z), while the runs were in progress. The design (p = 1511, seeds 17-24, 2 runs each, settings, homogeneity test, positive control) is in LEADS.md at 3764c93e98 (18:50:54Z), before any run."}
+    - {check: receipts, result: pass, detail: "142 rho runs: correct, not capped, negation, batch 16, r 256, dp_bits 16, c_add_e 331; muls_tuned = 24 mul + 18 sq + 62 inv and muls_harness = 55 mul + 55 sq + 166 inv exactly; s_harness, s_tuned, s_plus_* (= muls + fp_adds + six native counters) to 1e-12; steps = walk_adds; file name = (p, seed, run)"}
+    - {check: identity, result: pass, detail: "l and c_add_e of all 16 new runs equal V2's sieve row of the same seed"}
+    - {check: cover input, result: pass, detail: "16 rows, seeds 17-32, solved, correct, sparse, p = 1511, c_add_e 331; identical to V2 raw and to study A's arm P"}
+    - {check: run budget, result: pass, detail: "16/16 runs completed in 2571 s wall, no job over 5400 s, cut rule not triggered"}
+  metric_recomputations:
+    tool: "review/validator/check/src/main.rs (Rust, independent of fit/); output review/validator/check_output.txt; numbers review/validator/recompute.json"
+    fit_json_agreement: "89 deterministic numbers (80 ratio cells over 2 seed sets x 2 references, 5 pooled reference means, z, 3 test statistics): max relative difference 1.4e-15"
+    headline:
+      - {name: "S/rho U1 (seeds 17-24, pooled)", claimed: "0.0065 [0.0055, 0.0080]", recomputed: "0.006474 [0.005456, 0.008020]", result: match}
+      - {name: "S/rho U2", claimed: "0.0156", recomputed: "0.01556 [0.01311, 0.01927]", result: match}
+      - {name: "S+/rho U1 (rho unpriced)", claimed: "0.027", recomputed: "0.02685 [0.02428, 0.02976]", result: match}
+      - {name: "S+/rho U2 (rho unpriced)", claimed: "0.065", recomputed: "0.06452 [0.05835, 0.07151]", result: match}
+      - {name: "S+/(rho S+) U1 / U2", claimed: "0.02261 / 0.04447", recomputed: "0.02261 / 0.04447", result: match}
+      - {name: "band A U1 at w = 0 / 0.1 / 1", claimed: "0.0065 / 0.107 / 0.121", recomputed: "0.00647 / 0.10710 / 0.12142", result: match}
+      - {name: "band B U2 at w = 0 / 0.1 / 1", claimed: "0.0156 / 0.0119 / 0.0110", recomputed: "0.01556 / 0.01193 / 0.01103", result: match}
+      - {name: "pooled reference means s_harness / s_tuned", claimed: "0.9180 / 0.3820", recomputed: "0.917956 / 0.381987", result: match}
+      - {name: "matched-only S/rho U1 (seeds 17-24)", claimed: "0.00738 [0.00563, 0.01021]", recomputed: "0.00738 [0.00561, 0.01022]", result: match}
+    intervals: "joint bootstrap (cover seeds with replacement, reference runs within each of the 17 (p, seed) groups, one draw shared by all cells), independent RNG, type-7 quantiles: endpoints agree within Monte Carlo error"
+  control_checks:
+    - {id: "control 3 (replay)", result: pass, detail: "new_p1451_s1_run0 equals #3278's record in every field but wall_ms; the s1 cut is the seed-1 row of the #3278 file; old_p1451_allseeds_run0.json equals the #3278 file"}
+    - {id: "control 2 (positive)", result: pass, detail: "matched steps/sqrt(l) mean 0.8056, sd 0.4834, se 0.1209; theory sqrt(pi/4)/sqrt(1 - 1/256) = 0.88796; z = -0.682; #3278 pooled z = +1.150"}
+    - {id: "test 1 (homogeneity)", result: pass, detail: "steps/sqrt(l) 0.8056 vs 0.9324, |diff| 0.1268 (perm p 0.281 validator / 0.282 producer), KS D 0.2778 (perm p 0.186 / 0.182), KW H 1.924 (0.170 / 0.169): homogeneous under the frozen rule -> primary reference pooled 142"}
+    - {id: "control 4", result: pass, detail: "all 16 runs correct, uncapped, settings as frozen; none excluded"}
+  replay_checks:
+    certificate: review/validator/replay-certificate.json
+    binary: "jv_cover_round3_frozen sha256 d21002a309374e1a06caf3f93a4c6da212362a72e5987b4e80aa8a96fdc44f2c (main aa1c89ab2a per the task card)"
+    runs:
+      - {run: "study-B rho p=1511 seed 23 run 0 (nonce draw)", result: "identical in every field but wall_ms (621 s vs 1004 s)"}
+      - {run: "#3278 reference p=1451 seed 1 run 6 (nonce draw)", result: "identical in every field but wall_ms (320 s vs 432 s)"}
+      - {run: "cover p=1511 seed 21 (nonce draw, primary set)", result: "identical to the V2 row"}
+      - {run: "cover p=1511 seed 32", result: "identical to the V2 row"}
+  heuristic_validation_checks:
+    - {item: pre-registered prediction, result: pass, detail: "theory 0.88796 steps/sqrt(l) and the homogeneity rule fixed in PROTOCOL.md before the runs"}
+    - {item: sample integrity, result: pass, detail: "seeds 17-24, runs 0 and 1 (walk seed independent of instance seed), recomputed from raw"}
+    - {item: scale binding, result: pass_with_limitation, detail: "p = 1511 only (l = 2^61.4); the pooled reference mixes p in {1301, 1451, 1511, 1601} normalised by sqrt(l), justified by the (low-power) homogeneity test"}
+  cost_model_checks:
+    - {item: unit, result: pass, detail: "U1: rho muls_harness and cover total_muls, both F_p multiplications of the same counter conventions, / (331 sqrt l); U2 reprices rho only (Karatsuba 24/18/62), which favours rho"}
+    - {item: unpriced work (5a), result: pass, detail: "cover: sieve_adds 5.61e9, sieve_lookups 2.94e8, enum_adds 4.72e9 per run (seeds 17-24), F4/descent/LA additions without a counter (layer-A proxy 1.56e9); rho: canon_cmp 1.44e9, hash 5.75e9, dp_check 1.44e9, scalar_ops 4.33e9, table_ops 2.2e4, cycle_cmp 1.14e10, fp_adds 6.49e10 per run; no byte counters. Order (below rho) holds at w = 0, 0.1, 1 in both layers and both units; at w = 1 layer A survives up to k = 69 unemitted additions per unemitted multiplication"}
+    - {item: memory, result: incomplete, detail: "not reported for either arm"}
+    - {item: bookkeeping, result: not_applicable, detail: "complete solved runs"}
+  proof_architecture_checks: []
+  verdict: passed
+  gate_admissibility:
+    admissible: true
+    validation_json_written: research/jv_sieve_negrho_20261102/VALIDATION.json
+    checker: "python3 scripts/validation_gate.py evidence research/jv_sieve_negrho_20261102 -> valid"
+    rho_reference: "negation (strongest for a generic E over F_{p^6}: alpha uniform in F_{q^3} minus F_q, no subfield structure imposed; j-invariants not checked per instance); protocol-named; same unit (U1); one main build reproduces both arms on the replayed sample; band layer A U1 at w = 0 / 0.1 / 1: ic 0.005943 / 0.7089 / 7.034, rho 0.9180 / 6.619 / 57.93 (GAE per sqrt l); order holds across the band"
+    scope_of_admission: "the plain sieve route at p = 1511 (V2 instances, seeds 17-24) against the matched rho; it does not admit the line-search arms of study A or LEADS.md's combined numbers"
+  limitations:
+    - "Replay is sampled (1/16 new rho, 1/126 #3278, 2/16 cover rows re-executed by the validator); the remaining runs rest on receipt checks and the producer's controls."
+    - "Homogeneity: not rejected with 16 vs 126 runs (sd 0.48 per run); the matched-only reference gives about 14% higher ratios (S/rho U1 0.00738), still below rho in every cell."
+    - "The cover side is V2's records (dp-bits and binary differ from V2's own rho, which is not used)."
+    - "Cover F4/descent/linear-algebra additions are unemitted (implementation gap); layer A is an upper-bound proxy, layer B the emitted lower bound."
+    - "strongest_available relies on the generic-instance argument, not on a per-instance j-invariant check."
+    - "Freeze timestamps clock-only; first git record 19:37:29Z with runs in progress (design pre-registered in LEADS.md at 18:50:54Z)."
+    - "Local run (shared 4-core box), not isolab-eks; counted metrics are host-independent and replay bit-for-bit."
+    - "LEADS.md 'Combined' (H S/rho U1 0.0042, x240) multiplies B's seeds-17-24 ratio by A's 16-seed H ratio; dividing the H records of seeds 17-24 directly by the pooled reference gives 0.00454 (x220), over all 16 seeds 0.00422. U S+/rho is robust (0.0141 product, 0.0142 direct). Labelled derived in LEADS.md, outside this study's frozen scope, and not admitted by this VALIDATION.json."
+  artifact_paths:
+    - research/jv_sieve_negrho_20261102/VALIDATION.json
+    - "REPORT.md: blocked by the validator harness (no report .md files); its full text is in the validator hand-back to the main session"
+    - research/jv_sieve_negrho_20261102/review/validator/validation_report.yaml
+    - research/jv_sieve_negrho_20261102/review/validator/replay-certificate.json
+    - research/jv_sieve_negrho_20261102/review/validator/validator-report.json
+    - research/jv_sieve_negrho_20261102/review/validator/check/Cargo.toml
+    - research/jv_sieve_negrho_20261102/review/validator/check/src/main.rs
+    - research/jv_sieve_negrho_20261102/review/validator/check_output.txt
+    - research/jv_sieve_negrho_20261102/review/validator/recompute.json
+    - research/jv_sieve_negrho_20261102/review/validator/replay/
+  review_attestation:
+    joints_owned: ["receipts", "controls", "metric recomputation", "replays", "5a band", "gate admissibility"]
+    sources_read:
+      - /home/user/crypto-autoresearcher/docs/agent-runtime-core.md
+      - /home/user/crypto-autoresearcher/agents/validator.md
+      - docs/VALIDATION_GATE.md
+      - "AGENTS.md: Standing workflow rules, sec. 5a"
+      - research/jv_sieve_negrho_20261102/{PROTOCOL.md, README.md, run.sh, results/*, fit.txt, fit.json (point values for comparison), .artifacts.json}
+      - research/jv_cover_negrho_rescore_20261101/{PROTOCOL.md lines 1-46 by grep, run.sh, results/inputs/old_rhostrong/*, results/new/*}
+      - research/jv_sieve_strong_rho_v2_20261020/raw/ic_1511_sparse.json
+      - research/jv_cover_next_leads_20261102/LEADS.md
+      - research/jv_sieve_fbline_20261102/results/{P,H,U}_1511.json
+      - "src/cryptanalysis/jv_rho_strong.rs (OpCounts, prices, report fields, correct flag) and jv_cover.rs generate_spec at aa1c89ab2a"
+      - scripts/validation_gate.py, scripts/fixtures/validation_gate/positive/
+    read_sibling_reports: false
+    verdict: passed

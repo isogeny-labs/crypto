@@ -1,0 +1,18 @@
+# Frozen deterministic archival reanalysis candidate
+
+Not executed or compiled. Admission pending independent source review and root. This additive packet fixes the prospective proposal: full archive180 records, select exactly p==739 (60records420cases), retain physical row indices. Preparation assertion failure is retained. No trajectory replay, new seed, label planting, cloud or budget extension.
+
+Complete all420 comparisons/dispositions in physical archive/case order. Each target has a fresh table/graph; no cross-target pooling. All later duplicate comparisons after a verified terminal are diagnostic; stop graph forwarding at that terminal. The primary output is JSONL with one disposition per input. Partition failures emit all seven dispositions; case panic poisons the rest of that partition, preserving their dispositions. Unexpected global failure or missing rows makes the audit incomplete, never silently successful.
+
+Archive labels and signed divisors come directly from the pinned coordinate-witness records. Model constants are bound to the previously reviewed p739 fixture, not inferred from unsourced numeric matches. Native verification rechecks valid G/Q, nonidentity G, rG=rQ=0, Q=planted*G, native prime Ring and every valid D=aG+bQ. Full target identity includes model polynomial,G,Q,r,workload identity,target index; separate target processing prevents mixing even identical geometry. Signs are preserved on first graph insertion; only duplicate table labels are canonicalized.
+
+Per target: initial checks at most3 scalar multiplications (rG,rQ,kG), constructor2 (rG,rQ), incoming labels at most14 (two per7cases); validity checks and prime Ring constructors also recorded by phase where counters exist. At most7 logical adapter ingests and7 unique graph insertions per target; repeated inputs count as logical ingests, not unique inserts. Native adapter candidate verification costs at most7 further scalar multiplications; independent terminal reference at most14 (two candidate sources percase). Maximum60targets,420cases, one120second locked/offline native process. Underlying field square-root nonresidue search and Ring primality implementation are retained; no group/scalar enumeration is introduced.
+
+Source-reviewed fixed eight-control packet and independent replay are hash-bound references; do not rerun them. No comparative clock, sampling/power or new measurements are proposed. This is a deterministic reanalysis of retained mathematical fixtures. Counters describe this audit schedule, including repeated eligibility checks, not production timing.
+
+Natural arm is inventory-only: references retained63state original-G fixed correctness fixtures and coordinate archive; neither is admitted as a natural sampled collector campaign. No expanded filesystem search, rerun or trajectory extension. Natural-collision yield remains unassessed.
+
+After admission run python3 run.py once in this private packet. Wrapper refuses overwrite, verifies frozen hashes, bounds120seconds, writes receipt and analyzes completeness. Retain failures. Output success requires420 unique physical-row/case identities matching the index; invalid/poisoned dispositions are counted, not dropped. No results exist at freeze.
+
+
+V2 amendment: see AMENDMENT.md. Nested archival adapter errors fail the audit. Setup counts are repeated nonadditive metadata and aggregate through a consistent unique-per-target ledger only.

@@ -1,0 +1,40 @@
+{
+  "schema": "n83.linux-xor-natural-panel-protocol/v1",
+  "curve": "icv1-f2m83-tm6151469093347-debefd74",
+  "source_commit": "acfcd8adfad8d45ddf9c5f799f9385120dce6cf4",
+  "preflight_run_id": 40177842203,
+  "preflight_artifact_id": 12593635829,
+  "preflight_artifact_sha256": "00713618c7c09188a9f75fef6ce6323af376428cc48d537491394c91429d1237",
+  "input_manifest_sha256": "f8238367cb5f1caba91aaf8311f1026a9f24ec867f87afa47aafd3563c8c34a1",
+  "solver_sha256": "0936420373bbdf22c2a3d37291e3a4ab4e041d7f41ae3ceed003373fb596ddb2",
+  "worker_sha256": "ee471eb40a313b9b9be4e538780d2468548c323134c4d789e0db29fe7d5d18be",
+  "runner": "ubuntu-24.04-arm",
+  "host_class": "ephemeral GitHub-hosted ARM VM, sequential single-thread solver processes",
+  "solver_package": "cryptominisat=5.11.15+dfsg1-1.1build1",
+  "solver_flags": [
+    "--threads", "1", "--random", "0", "--branchstr", "vmtf+vsids",
+    "--autodisablegauss", "0", "--maxmatrixcols", "25000",
+    "--maxnummatrices", "10", "--verb", "1", "--verbstat", "1",
+    "--printsol", "1", "--maxconfl", "1000000", "--maxtime", "300"
+  ],
+  "conflict_cap": 1000000,
+  "solver_time_cap_seconds": 300,
+  "process_watchdog_seconds": 330,
+  "memory_address_space_limit_bytes": 8589934592,
+  "inputs": {
+    "hash_5_1": "2c6dba1feabb28bc6b064268a1f53ebe3b0ecd8aa731d26b31016830ce431022",
+    "gray_5_1": "220eaeb04a43ee8c853b637d6255420e2e341c6bb3e5f3588ca1295529b327e9",
+    "hash_4_2": "9d8392af80cb17e4da99d616933d43feb718cbe897a4cfffbbe5eedbaccfbe69",
+    "gray_4_2": "a39dc89ea7c8c8ea0c6f54cd5900707537cbdc1307b90fc457bc8b50a3ae0bce"
+  },
+  "arms": [
+    {"id": "hash51_A1", "input": "hash_5_1", "role": "adjacent_AA_start"},
+    {"id": "hash51_A2", "input": "hash_5_1", "role": "adjacent_AA_start"},
+    {"id": "gray51", "input": "gray_5_1", "role": "candidate"},
+    {"id": "hash42", "input": "hash_4_2", "role": "candidate"},
+    {"id": "gray42", "input": "gray_4_2", "role": "candidate"},
+    {"id": "hash51_A3", "input": "hash_5_1", "role": "drift_control"}
+  ],
+  "stop_rule": "Execute in listed order on one hosted VM. Stop after a SAT model for exact verification and possible model blocking, any malformed solver result, a process watchdog, OOM, or a failed identity gate. Preserve completed arms and all raw streams. INDETERMINATE and time/conflict caps are censored. No factor-base ranking from solver-only timing.",
+  "selected_best_total_runtime": null
+}

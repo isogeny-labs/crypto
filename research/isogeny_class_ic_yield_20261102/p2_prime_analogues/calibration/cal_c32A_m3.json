@@ -1,0 +1,57 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=470",
+          "linalg": "incremental-gauss-full-rank",
+          "max_trials": "994",
+          "oracle": "mitm:m=3"
+        }
+      },
+      "name": "m3-main",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=499",
+          "linalg": "incremental-gauss-full-rank",
+          "max_trials": "994",
+          "oracle": "mitm:m=3"
+        }
+      },
+      "name": "m3-pc",
+      "role": "candidate"
+    }
+  ],
+  "description": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues: class c32A (D=-84171, h=128, p=4127505313, n=4127376823); same prime-abscissa FB size 470 on every curve, mitm m=3, attempt cap 994; arms main, aa (identical repeat), pc (FB x1.2^(1/3) = planted +20% yield); the last curves are u-scaled isomorphic models.",
+  "label": "P2 yield c32A m=3: yield on every curve of one isogeny class, |F|=470",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 2,
+    "seed": 103,
+    "timeout_seconds": 3600,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 3275518438,
+        "b": 1484076254,
+        "group_order": 4127376823,
+        "gx": 4,
+        "gy": 556516564,
+        "kind": "prime_explicit",
+        "p": 4127505313,
+        "r": 4127376823
+      }
+    ],
+    "target_seed": 20261102,
+    "targets_per_curve": 1
+  }
+}

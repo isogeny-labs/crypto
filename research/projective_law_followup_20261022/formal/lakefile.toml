@@ -1,0 +1,368 @@
+name = "projective_law_boundary"
+version = "0.1.0"
+defaultTargets = ["AxiomAudit", "Common22AffineOddDomain", "Common22AffineStalk", "Common22BranchDomain", "Common22BranchFactorization", "Common22BranchLocalParameter", "Common22BranchMaximalIdeal", "Common22BranchParameter", "Common22BranchStalk", "Common22BranchValuation", "Common22BranchZeroOrder", "Common22ChartOverlap", "Common22CompletionBridge", "Common22CoordinateRing", "Common22Coprime", "Common22Degree", "Common22Domain", "Common22Eisenstein", "Common22ExplicitChart", "Common22FiniteZeroOrder", "Common22FractionPole", "Common22GlueCast", "Common22GluingApi", "Common22InfinityChart", "Common22LocalParameter", "Common22LocalValuation", "Common22PointAllocation", "Common22PolynomialHead", "Common22PrincipalOpenEquation", "Common22PrincipalOpenSpec", "Common22Residual", "Common22Residues", "Common22SeparableAffineDomain", "Common22SeparateChartMap", "Common22SourceHead", "Common22SupportHead", "Common22TwoChartGlue", "Common22Uniqueness", "Common22WeightedProjCharts", "Common22WeightedProjCover", "Common22WeightedProjHead", "Common22WeightedProjKernel", "Common22WeightedProjQuotient", "CrossScale22", "ProjectiveLawBoundary", "RuntimeSemantics", "WeightedAffineRingSmooth", "WeightedAffineSquarefreeFinal", "WeightedAffineSquarefreeSmooth", "WeightedAffineXPartial", "WeightedChartDehomog", "WeightedChartIso", "WeightedChartKernelRec", "WeightedChartRingSmooth", "WeightedChartRoute", "WeightedFiniteBranchStalk", "WeightedInfinityJacobian", "WeightedInfinityOpenSmooth", "WeightedInfinityOrdinary", "WeightedInfinitySquarefreeSmooth", "WeightedJacobianIdeal", "WeightedOverlapEmbedding", "WeightedOverlapEquality", "WeightedOverlapFull", "WeightedOverlapMapEquality", "WeightedOverlapScalar", "WeightedOverlapScheme", "WeightedOverlapScratch", "WeightedPic0Bridge", "WeightedProjBase", "WeightedProjBranchPolynomialEval", "WeightedProjBranchZeroOrder", "WeightedProjChartIntoProj", "WeightedProjChartNaturality", "WeightedProjChartStructure", "WeightedProjCoheight", "WeightedProjCover", "WeightedProjCrossChart", "WeightedProjCrossImage", "WeightedProjCrossInjective", "WeightedProjDegreeZeroScratch", "WeightedProjDerivativePointDVR", "WeightedProjFiniteBranchDVR", "WeightedProjGlobalGlue", "WeightedProjGlobalSmooth", "WeightedProjGlueCompatibility", "WeightedProjGlueCone", "WeightedProjGlueInjective", "WeightedProjGlueIso", "WeightedProjGlueOpenImmersion", "WeightedProjGluedMorphism", "WeightedProjInfinityChart", "WeightedProjInfinityDVR", "WeightedProjIntegral", "WeightedProjIsIntegral", "WeightedProjLocallyNoetherian", "WeightedProjNonbranchDVR", "WeightedProjNonbranchNormTransport", "WeightedProjNonbranchZeroOrder", "WeightedProjNormBranchZeroOrder", "WeightedProjOverlapNonempty", "WeightedProjProper", "WeightedProjQuadraticJacobian", "WeightedProjQuadraticLocal", "WeightedProjQuadraticPoint", "WeightedProjQuinticHead", "WeightedProjSchemeChart", "WeightedProjSmoothFinal", "WeightedProjSmoothPointDVR", "WeightedProjSmoothPoints", "WeightedProjSmoothness", "WeightedProjSourceBranchActualQuintic", "WeightedProjSourceBranchZeroOrder", "WeightedProjSourceFunctionField", "WeightedProjSourceNonzero", "WeightedProjSourceOrder", "WeightedProjYIndependent", "WeightedRingComponent", "WeightedRingGraded", "WeightedSource22"]
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "d13f23b723b8a846827a245b89c10fc7d3f11612"
+
+[[lean_lib]]
+name = "ProjectiveLawBoundary"
+
+[[lean_lib]]
+name = "RuntimeSemantics"
+
+[[lean_lib]]
+name = "AxiomAudit"
+
+[[lean_lib]]
+name = "WeightedProjCoheight"
+
+[[lean_lib]]
+name = "WeightedProjQuadraticPoint"
+
+[[lean_lib]]
+name = "WeightedProjQuadraticLocal"
+
+[[lean_lib]]
+name = "WeightedProjQuadraticJacobian"
+
+[[lean_lib]]
+name = "Common22AffineOddDomain"
+
+[[lean_lib]]
+name = "Common22AffineStalk"
+
+[[lean_lib]]
+name = "Common22BranchDomain"
+
+[[lean_lib]]
+name = "Common22BranchFactorization"
+
+[[lean_lib]]
+name = "Common22BranchLocalParameter"
+
+[[lean_lib]]
+name = "Common22BranchMaximalIdeal"
+
+[[lean_lib]]
+name = "Common22BranchParameter"
+
+[[lean_lib]]
+name = "Common22BranchStalk"
+
+[[lean_lib]]
+name = "Common22BranchValuation"
+
+[[lean_lib]]
+name = "Common22BranchZeroOrder"
+
+[[lean_lib]]
+name = "Common22ChartOverlap"
+
+[[lean_lib]]
+name = "Common22CompletionBridge"
+
+[[lean_lib]]
+name = "Common22CoordinateRing"
+
+[[lean_lib]]
+name = "Common22Coprime"
+
+[[lean_lib]]
+name = "Common22Degree"
+
+[[lean_lib]]
+name = "Common22Domain"
+
+[[lean_lib]]
+name = "Common22Eisenstein"
+
+[[lean_lib]]
+name = "Common22ExplicitChart"
+
+[[lean_lib]]
+name = "Common22FiniteZeroOrder"
+
+[[lean_lib]]
+name = "Common22FractionPole"
+
+[[lean_lib]]
+name = "Common22GlueCast"
+
+[[lean_lib]]
+name = "Common22GluingApi"
+
+[[lean_lib]]
+name = "Common22InfinityChart"
+
+[[lean_lib]]
+name = "Common22LocalParameter"
+
+[[lean_lib]]
+name = "Common22LocalValuation"
+
+[[lean_lib]]
+name = "Common22PointAllocation"
+
+[[lean_lib]]
+name = "Common22PolynomialHead"
+
+[[lean_lib]]
+name = "Common22PrincipalOpenEquation"
+
+[[lean_lib]]
+name = "Common22PrincipalOpenSpec"
+
+[[lean_lib]]
+name = "Common22Residual"
+
+[[lean_lib]]
+name = "Common22Residues"
+
+[[lean_lib]]
+name = "Common22SeparableAffineDomain"
+
+[[lean_lib]]
+name = "Common22SeparateChartMap"
+
+[[lean_lib]]
+name = "Common22SourceHead"
+
+[[lean_lib]]
+name = "Common22SupportHead"
+
+[[lean_lib]]
+name = "Common22TwoChartGlue"
+
+[[lean_lib]]
+name = "Common22Uniqueness"
+
+[[lean_lib]]
+name = "Common22WeightedProjCharts"
+
+[[lean_lib]]
+name = "Common22WeightedProjCover"
+
+[[lean_lib]]
+name = "Common22WeightedProjHead"
+
+[[lean_lib]]
+name = "Common22WeightedProjKernel"
+
+[[lean_lib]]
+name = "Common22WeightedProjQuotient"
+
+[[lean_lib]]
+name = "CrossScale22"
+
+[[lean_lib]]
+name = "WeightedAffineRingSmooth"
+
+[[lean_lib]]
+name = "WeightedAffineSquarefreeFinal"
+
+[[lean_lib]]
+name = "WeightedAffineSquarefreeSmooth"
+
+[[lean_lib]]
+name = "WeightedAffineXPartial"
+
+[[lean_lib]]
+name = "WeightedChartDehomog"
+
+[[lean_lib]]
+name = "WeightedChartIso"
+
+[[lean_lib]]
+name = "WeightedChartKernelRec"
+
+[[lean_lib]]
+name = "WeightedChartRingSmooth"
+
+[[lean_lib]]
+name = "WeightedChartRoute"
+
+[[lean_lib]]
+name = "WeightedFiniteBranchStalk"
+
+[[lean_lib]]
+name = "WeightedInfinityJacobian"
+
+[[lean_lib]]
+name = "WeightedInfinityOpenSmooth"
+
+[[lean_lib]]
+name = "WeightedInfinityOrdinary"
+
+[[lean_lib]]
+name = "WeightedInfinitySquarefreeSmooth"
+
+[[lean_lib]]
+name = "WeightedJacobianIdeal"
+
+[[lean_lib]]
+name = "WeightedOverlapEmbedding"
+
+[[lean_lib]]
+name = "WeightedOverlapEquality"
+
+[[lean_lib]]
+name = "WeightedOverlapFull"
+
+[[lean_lib]]
+name = "WeightedOverlapMapEquality"
+
+[[lean_lib]]
+name = "WeightedOverlapScalar"
+
+[[lean_lib]]
+name = "WeightedOverlapScheme"
+
+[[lean_lib]]
+name = "WeightedOverlapScratch"
+
+[[lean_lib]]
+name = "WeightedPic0Bridge"
+
+[[lean_lib]]
+name = "WeightedProjBase"
+
+[[lean_lib]]
+name = "WeightedProjBranchPolynomialEval"
+
+[[lean_lib]]
+name = "WeightedProjBranchZeroOrder"
+
+[[lean_lib]]
+name = "WeightedProjChartIntoProj"
+
+[[lean_lib]]
+name = "WeightedProjChartNaturality"
+
+[[lean_lib]]
+name = "WeightedProjChartStructure"
+
+[[lean_lib]]
+name = "WeightedProjCover"
+
+[[lean_lib]]
+name = "WeightedProjCrossChart"
+
+[[lean_lib]]
+name = "WeightedProjCrossImage"
+
+[[lean_lib]]
+name = "WeightedProjCrossInjective"
+
+[[lean_lib]]
+name = "WeightedProjDegreeZeroScratch"
+
+[[lean_lib]]
+name = "WeightedProjDerivativePointDVR"
+
+[[lean_lib]]
+name = "WeightedProjFiniteBranchDVR"
+
+[[lean_lib]]
+name = "WeightedProjGlobalGlue"
+
+[[lean_lib]]
+name = "WeightedProjGlobalSmooth"
+
+[[lean_lib]]
+name = "WeightedProjGlueCompatibility"
+
+[[lean_lib]]
+name = "WeightedProjGlueCone"
+
+[[lean_lib]]
+name = "WeightedProjGlueInjective"
+
+[[lean_lib]]
+name = "WeightedProjGlueIso"
+
+[[lean_lib]]
+name = "WeightedProjGlueOpenImmersion"
+
+[[lean_lib]]
+name = "WeightedProjGluedMorphism"
+
+[[lean_lib]]
+name = "WeightedProjInfinityChart"
+
+[[lean_lib]]
+name = "WeightedProjInfinityDVR"
+
+[[lean_lib]]
+name = "WeightedProjIntegral"
+
+[[lean_lib]]
+name = "WeightedProjIsIntegral"
+
+[[lean_lib]]
+name = "WeightedProjLocallyNoetherian"
+
+[[lean_lib]]
+name = "WeightedProjNonbranchDVR"
+
+[[lean_lib]]
+name = "WeightedProjNonbranchNormTransport"
+
+[[lean_lib]]
+name = "WeightedProjNonbranchZeroOrder"
+
+[[lean_lib]]
+name = "WeightedProjNormBranchZeroOrder"
+
+[[lean_lib]]
+name = "WeightedProjOverlapNonempty"
+
+[[lean_lib]]
+name = "WeightedProjProper"
+
+[[lean_lib]]
+name = "WeightedProjQuinticHead"
+
+[[lean_lib]]
+name = "WeightedProjSchemeChart"
+
+[[lean_lib]]
+name = "WeightedProjSmoothFinal"
+
+[[lean_lib]]
+name = "WeightedProjSmoothPointDVR"
+
+[[lean_lib]]
+name = "WeightedProjSmoothPoints"
+
+[[lean_lib]]
+name = "WeightedProjSmoothness"
+
+[[lean_lib]]
+name = "WeightedProjSourceBranchActualQuintic"
+
+[[lean_lib]]
+name = "WeightedProjSourceBranchZeroOrder"
+
+[[lean_lib]]
+name = "WeightedProjSourceFunctionField"
+
+[[lean_lib]]
+name = "WeightedProjSourceNonzero"
+
+[[lean_lib]]
+name = "WeightedProjSourceOrder"
+
+[[lean_lib]]
+name = "WeightedProjYIndependent"
+
+[[lean_lib]]
+name = "WeightedRingComponent"
+
+[[lean_lib]]
+name = "WeightedRingGraded"
+
+[[lean_lib]]
+name = "WeightedSource22"

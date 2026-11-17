@@ -1,0 +1,40 @@
+import FastCallFinish
+import FastPayloadControls
+set_option autoImplicit false
+namespace FastCallControls
+open FastCalls FastPrelude FastPayload ScaleTrim MonicRemainder Polynomial
+open FastPreludeControls
+def fwords : List UInt64 := [1,0,0,16,16,1]
+
+theorem fixture_decoding : wordsPoly 17 fwords=FastPayloadControls.curve := by
+ have h16 : (16 : ZMod (17:UInt64).toNat)= -1 := by decide
+ norm_num [fwords,wordsPoly,listPoly,FastPayloadControls.curve]
+ norm_num [h16]
+ ring
+
+theorem complete_calls :
+ ∃ q r, FallbackWord.exactDiv 17 (ResidualWord.residual 17 fwords (v 17 small)) (u 17 small)=some q ∧
+ FallbackGeometry.remainder 17 (ResidualWord.pneg 17 (v 17 small)) (scaled 17 small q)=some r ∧
+ Canon 17 q ∧ MonicZeroTest.Normal q ∧ Canon 17 (scaled 17 small q) ∧ MonicZeroTest.Normal (scaled 17 small q) ∧
+ Canon 17 r ∧ MonicZeroTest.Normal r ∧ (scaled 17 small q).length=3 ∧
+ (scaled 17 small q).getLast?=some 1 ∧ r.length≤2 ∧
+ MumfordValidity.Valid (wordsPoly 17 fwords) (wordsPoly 17 (scaled 17 small q)) (wordsPoly 17 r) := by
+ apply fast_output_exists 17 small fwords (by decide) (by decide)
+  (by unfold Inputs.canonical;decide) (by decide) (by decide)
+  (by simp [Canon,fwords];decide)
+  (by rw [fixture_decoding];exact FastPayloadControls.curve_degree)
+ · refine ⟨X^3-X^2-X,?_⟩
+   rw [fixture_decoding]
+   norm_num [small,FastCRT.support,FastCRT.delta,FastPayloadControls.curve]
+   ring
+ · refine ⟨X^3-X^2-2*X,?_⟩
+   rw [fixture_decoding]
+   norm_num [small,FastCRT.support,FastCRT.delta,FastPayloadControls.curve]
+   ring
+
+theorem literal_input_support : ua small=[0,0,1] ∧ ub small=[1,0,1] ∧ va small=[1] := by decide
+
+theorem slope_orientation : sl 17 small=[0,16] := by decide
+
+theorem malformed_normality : ¬ MonicZeroTest.Normal [1,0] := by unfold MonicZeroTest.Normal;decide
+end FastCallControls

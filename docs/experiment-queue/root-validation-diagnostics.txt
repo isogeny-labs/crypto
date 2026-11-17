@@ -1,0 +1,54 @@
+Root Rust library validation diagnostics (2026-10-27)
+
+The broad suite was stopped after unrelated failures were observed and reproduced.
+This file is not a full-suite completion report. Queue changes leave src/, tests/, Cargo.toml and Cargo.lock identical to 5e4e6fb994d6a69d16f75adcbbf0989b8895d9ff.
+
+--- fixture ---
+
+running 1 test
+
+thread 'cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload' (23326) panicked at src/cryptanalysis/ecbench/bounds.rs:2393:10:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto/research/ecbench_all_candidates_20261003/audit-prime.json: No such file or directory (os error 2)"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload ... FAILED
+
+failures:
+
+failures:
+    cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5014 filtered out; finished in 0.22s
+
+
+--- compare ---
+
+running 1 test
+
+thread 'cryptanalysis::ecbench::compare::tests::weighted_comparison_prices_verified_pairs_and_records_weight_identity' (23936) panicked at src/cryptanalysis/ecbench/compare.rs:2448:9:
+assertion failed: zero.legacy_comparison_id.is_none()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cryptanalysis::ecbench::compare::tests::weighted_comparison_prices_verified_pairs_and_records_weight_identity ... FAILED
+
+failures:
+
+failures:
+    cryptanalysis::ecbench::compare::tests::weighted_comparison_prices_verified_pairs_and_records_weight_identity
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5014 filtered out; finished in 0.01s
+
+
+--- hyper ---
+
+running 1 test
+
+thread 'cryptanalysis::ecbench::hyper_ic::tests::ecbench_recovers_planted_logs_on_thread_jacobians' (23938) panicked at src/cryptanalysis/ecbench/hyper_ic.rs:1126:37:
+called `Result::unwrap()` on an `Err` value: "method `ic.hyperelliptic` has no parameter `branches`"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cryptanalysis::ecbench::hyper_ic::tests::ecbench_recovers_planted_logs_on_thread_jacobians ... FAILED
+
+failures:
+
+failures:
+    cryptanalysis::ecbench::hyper_ic::tests::ecbench_recovers_planted_logs_on_thread_jacobians
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5014 filtered out; finished in 0.15s

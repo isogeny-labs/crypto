@@ -1,0 +1,5 @@
+ring R=0,(p,z1,z2,z3,z4,h1,h2),Wp(1000,50,50,50,50,100,100);
+option(redSB); option(redTail);
+proc emit(poly f) { while(f!=0) { print(string(leadcoef(f))+":"+string(leadexp(f))); f=f-lead(f); } print("ENDPOLY"); }
+emit(lead(p+z1^20)); emit(lead(z1^2+h1)); emit(2/3*p*z1-5/7);
+print("SUCCESS-END"); quit;

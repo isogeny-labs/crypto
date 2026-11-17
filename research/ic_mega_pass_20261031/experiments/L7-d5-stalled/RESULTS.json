@@ -1,0 +1,88 @@
+{
+ "experiment": "L7-d5-stalled",
+ "engine": "L2 gf2close5 (copied unchanged, sha256 in src/SHA256)",
+ "validation": {
+  "total": 18,
+  "mismatches": 0,
+  "scope": "d=5 vs Python tensor_closure, n=9,11 s=0..2 arms A,C1,D1; plus L2 V1 81/81 n<=13 and L2 audit 11/11 n=19/21"
+ },
+ "runs": {
+  "n31_C1_s1_d5": {
+   "dim": 242825,
+   "low": 41449,
+   "one": 1,
+   "ncols": 242825,
+   "nlow": 41449,
+   "nprod": 693216,
+   "cpu": 2818.328,
+   "n": 31,
+   "k": 16,
+   "arm": "C1",
+   "s": 1,
+   "d": 5,
+   "wall": 5011.2
+  },
+  "n29_C1_s0_d5": {
+   "dim": 174435,
+   "low": 31929,
+   "one": 0,
+   "ncols": 174437,
+   "nlow": 31931,
+   "nprod": 957870,
+   "cpu": 2676.98,
+   "n": 29,
+   "k": 15,
+   "arm": "C1",
+   "s": 0,
+   "d": 5,
+   "wall": 4915.8
+  }
+ },
+ "imported_from_L2": {
+  "n31_D1_s25_d5": {
+   "dim": 242825,
+   "low": 41449,
+   "one": 1,
+   "ncols": 242825,
+   "nlow": 41449,
+   "nprod": 712672,
+   "cpu": 2393.483,
+   "n": 31,
+   "k": 16,
+   "arm": "D1",
+   "s": 25,
+   "d": 5,
+   "wall": 3866.2
+  },
+  "n31_C1_s1_d5_capped": {
+   "capped": 1,
+   "npiv": 239355,
+   "nlowpiv": 37979,
+   "qh": 21215,
+   "qt": 37979,
+   "ncols": 242825,
+   "nlow": 41449,
+   "nprod": 678880,
+   "one": 0,
+   "cpu": 2400.99,
+   "n": 31,
+   "k": 16,
+   "arm": "C1",
+   "s": 1,
+   "d": 5,
+   "wall": 4974.2
+  }
+ },
+ "answers": {
+  "n31_C1_s1_one_in_W5": true,
+  "n31_C1_s1_dF": 5,
+  "n31_D1_s0": "SAT (nsol=5, N1 raw): 1 in no W_d; not run",
+  "n29_C1_s0": "SAT sanity: one=0, dim=ncols-2"
+ },
+ "predictions": {
+  "P1": "held (1 in W_5, terminated within cap)",
+  "P2_one0": "held",
+  "P2_cpu_ratio": 0.95,
+  "P2_ratio_range": "0.3-0.6 predicted: FAILED (0.95)"
+ }
+}

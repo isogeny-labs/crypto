@@ -1,0 +1,28 @@
+# frozen analysis output (Park-Miller seed 20261101, 10000 resamples)
+## per q: finished, mean trials (range), mean relations by source, share closed by source (A = m=2, B = 2+1), mean rank
+q=0       (idx 0): finished=6/6 mean_trials=2441186 (759967..3851501) rels_A=142 rels_B=0 closed_by_A=6/6 closed_by_B=0/6 mean_rank=142
+q=0.000083 (idx 1): finished=6/6 mean_trials=3256130 (1014389..5137612) rels_A=142 rels_B=48 closed_by_A=6/6 closed_by_B=0/6 mean_rank=190
+q=0.00025 (idx 2): finished=6/6 mean_trials=4895924 (1524837..7722696) rels_A=142 rels_B=148 closed_by_A=6/6 closed_by_B=0/6 mean_rank=289
+q=0.00075 (idx 3): finished=6/6 mean_trials=9804244 (3052312..15467360) rels_A=142 rels_B=442 closed_by_A=6/6 closed_by_B=0/6 mean_rank=582
+q=0.0022  (idx 4): finished=6/6 mean_trials=19460204 (7483163..26876448) rels_A=115 rels_B=1032 closed_by_A=4/6 closed_by_B=2/6 mean_rank=1140
+q=0.008   (idx 5): finished=6/6 mean_trials=24576380 (14730725..31625413) rels_A=43 rels_B=1416 closed_by_A=0/6 closed_by_B=6/6 mean_rank=1437
+q=0.025   (idx 6): finished=6/6 mean_trials=30962572 (28489732..32786391) rels_A=20 rels_B=1821 closed_by_A=0/6 closed_by_B=6/6 mean_rank=1776
+q=1       (idx 7): finished=6/6 mean_trials=94677736 (91575695..99380668) rels_A=2 rels_B=5550 closed_by_A=0/6 closed_by_B=6/6 mean_rank=1852
+## per-seed trials ratio to q=0, paired geometric mean vs q=0 with 95% bootstrap (csv)
+q_idx,q,finished,mean_trials,geomean_vs_q0,ci_lo,ci_hi
+0,0,6,2441186,1.000,1.000,1.000
+1,0.000083,6,3256130,1.334,1.334,1.334
+2,0.00025,6,4895924,2.006,2.005,2.006
+3,0.00075,6,9804244,4.016,4.015,4.017
+4,0.0022,6,19460204,8.173,6.081,9.849
+5,0.008,6,24576380,10.601,7.270,17.089
+6,0.025,6,30962572,14.022,10.091,21.908
+7,1,6,94677736,42.917,31.463,68.206
+## per-seed ratios vs q=0 (trials)
+q_idx=1 per-seed ratio range 1.33..1.33
+q_idx=2 per-seed ratio range 2.01..2.01
+q_idx=3 per-seed ratio range 4.01..4.02
+q_idx=4 per-seed ratio range 4.06..9.85
+q_idx=5 per-seed ratio range 5.79..30.17
+q_idx=6 per-seed ratio range 8.04..38.49
+q_idx=7 per-seed ratio range 25.80..123.74

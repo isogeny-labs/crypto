@@ -1,0 +1,43 @@
+{
+  "arms": [
+    {
+      "name": "pkm-iso-t6-g0",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=6",
+          "oracle": "pkm-semaev:m=2,mode=full,guess=0"
+        }
+      }
+    }
+  ],
+  "description": "research/curve25519_algebraic_ecbench_20261102/PROTOCOL.md (frozen before data). Curve: the k=20 Curve25519 miniature of research/curve25519_ic_baseline_20261102 (same curve, fresh target_seed). Public synthetic curve and targets; no security claim.",
+  "label": "Curve25519 k=20: algebraic control G=0 (Amendment 1: first target of spec_a1.json, timeout 5400 s)",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 1,
+    "seed": 2026110232,
+    "timeout_seconds": 5400,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 63700,
+        "b": 872826,
+        "group_order": 1049624,
+        "gx": 349837,
+        "gy": 122,
+        "kind": "prime_explicit",
+        "p": 1048573,
+        "r": 131203
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 2026110231,
+    "targets_per_curve": 1
+  }
+}

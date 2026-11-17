@@ -1,0 +1,201 @@
+{
+  "branch": "research/hec-followups-20261114",
+  "closed_utc": "2026-11-14T22:15:41+00:00",
+  "commands": [
+    {
+      "argv": [
+        "sh",
+        "-c",
+        "HEC_SEEDS=20 /Users/adamburan/pq-work/hec-followup-target/release/examples/followups > research/hec_ic_speedup_20261113/followup-run/paired.txt"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-14T22:11:01+00:00",
+      "wall_s": 5.381
+    },
+    {
+      "argv": [
+        "sh",
+        "-c",
+        "HEC_TRACK=lp HEC_SEEDS=3 /Users/adamburan/pq-work/hec-followup-target/release/examples/followups > research/hec_ic_speedup_20261113/followup-run/lp.txt"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-14T22:11:07+00:00",
+      "wall_s": 39.932
+    }
+  ],
+  "commit": "ad74146534addc64de85cad69af035df9e90307f",
+  "commit_dirty": true,
+  "created_utc": "2026-11-14T22:10:48+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261114-hec-followups"
+  ],
+  "host": {
+    "cpu": "arm",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "isolation": "L0",
+    "platform": "macOS-27.2-arm64-arm-64bit-Mach-O"
+  },
+  "id": "20261114T2210Z-hec-followups",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 20,
+      "name": "hybrid_over_fast_median_solve_g2_p503",
+      "note": "Ratio of solve-time medians; Hybrid/reference oracle vs Fast/reference oracle; frozen bar <=0.8",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.6222262143608887
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 20,
+      "name": "hybrid_over_fast_median_solve_g2_p1009",
+      "note": "Ratio of solve-time medians; Hybrid/reference oracle vs Fast/reference oracle; frozen bar <=0.8",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.4986058391556201
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 20,
+      "name": "hybrid_over_fast_median_solve_g2_p2003",
+      "note": "Ratio of solve-time medians; Hybrid/reference oracle vs Fast/reference oracle; frozen bar <=0.8",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.7013603536832049
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 20,
+      "name": "hybrid_over_fast_median_solve_g2_p4001",
+      "note": "Ratio of solve-time medians; Hybrid/reference oracle vs Fast/reference oracle; frozen bar <=0.8",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.7770118780991555
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 20,
+      "name": "direct_over_reference_median_oracle_g4_p31",
+      "note": "Ratio of stage-time medians; frozen bar <=0.9, p31 misses; reference remains default",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.9622641302764332
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 20,
+      "name": "direct_over_reference_median_oracle_g4_p61",
+      "note": "Ratio of stage-time medians; frozen bar <=0.9, p31 misses; reference remains default",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.828742236514392
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 660,
+      "name": "paired_answers_checked",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 660.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 36,
+      "name": "large_prime_answers_checked",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 36.0
+    }
+  ],
+  "problem": "hec:g234-followups",
+  "raw": [
+    {
+      "bytes": 99190,
+      "path": "research/hec_ic_speedup_20261113/followup-run/paired.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9e/9ea767620753ea46f50d589465c18c944c71365bb79355064a8561eaa0a72afa",
+      "sha256": "9ea767620753ea46f50d589465c18c944c71365bb79355064a8561eaa0a72afa",
+      "uploaded": false
+    },
+    {
+      "bytes": 4883,
+      "path": "research/hec_ic_speedup_20261113/followup-run/lp.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/dd/dd4d90adec1b400373a9b64e6eb2b59bb49092d7c7d1aec559588422b1e9a629",
+      "sha256": "dd4d90adec1b400373a9b64e6eb2b59bb49092d7c7d1aec559588422b1e9a629",
+      "uploaded": false
+    },
+    {
+      "bytes": 138,
+      "path": "research/hec_ic_speedup_20261113/followup-run/binary.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a1/a1a74a6cb196f44c726d2782cb2e88103348f3e85d123a7eeeafdd30d4ed48b2",
+      "sha256": "a1a74a6cb196f44c726d2782cb2e88103348f3e85d123a7eeeafdd30d4ed48b2",
+      "uploaded": false
+    },
+    {
+      "bytes": 2470,
+      "path": "research/hec_ic_speedup_20261113/followup-run/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ee/eea6fbe5c6b97f7937b4f524ac0d85e7f951bc27d1c45b2c28cf83e151506c42",
+      "sha256": "eea6fbe5c6b97f7937b4f524ac0d85e7f951bc27d1c45b2c28cf83e151506c42",
+      "uploaded": false
+    },
+    {
+      "bytes": 8810,
+      "path": "research/hec_ic_speedup_20261113/followup-run/lp.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9f/9f977e45f8342feede53cd3fe07105dfe7accbd955bf6792e1f53713c55fb9a1",
+      "sha256": "9f977e45f8342feede53cd3fe07105dfe7accbd955bf6792e1f53713c55fb9a1",
+      "uploaded": false
+    },
+    {
+      "bytes": 2048,
+      "path": "research/hec_ic_speedup_20261113/followup-run/lp_summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f3/f3d39713343e636e4ab82fd2155cf5a3155bf9abbeb2818552c33193fd323e67",
+      "sha256": "f3d39713343e636e4ab82fd2155cf5a3155bf9abbeb2818552c33193fd323e67",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261114-hec-followups/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261114-hec-followups/ratios.svg",
+      "benchmarks/20261114-hec-followups/large_primes.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "hec-followups",
+  "status": "measured",
+  "summary": "Hybrid g2 median solve ratio 0.50-0.78; oracle threshold misses g4 p31; 660 paired answers and 36 signed large-prime arms checked.",
+  "validation": null
+}

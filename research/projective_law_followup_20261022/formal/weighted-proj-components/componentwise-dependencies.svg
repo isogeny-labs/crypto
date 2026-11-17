@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="450" viewBox="0 0 1000 450" role="img" aria-label="Formal dependency diagram for weighted projective quotient. Four checked prerequisites lead to four open obligations.">
+<style>
+  .title{font:700 22px sans-serif;fill:#17243a}.subtitle{font:14px sans-serif;fill:#475569}
+  .box{stroke-width:2;rx:10}.checked{fill:#e6f6ed;stroke:#228253}.open{fill:#fff4e5;stroke:#ba7318}
+  .head{font:700 15px sans-serif;fill:#17243a}.detail{font:13px sans-serif;fill:#334155}.tag{font:700 11px sans-serif}
+  .arrow{stroke:#718096;stroke-width:2;fill:none;marker-end:url(#arr)}
+</style>
+<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8" fill="#718096"/></marker></defs>
+<text class="title" x="24" y="34">Weighted-Proj proof boundary: componentwise quotient prerequisites</text>
+<text class="subtitle" x="24" y="58">Lean 4.34.1 / mathlib d13f23b · two new checked lemmas · no Proj chart claim</text>
+<rect class="box checked" x="24" y="84" width="210" height="92"/><text class="tag" fill="#176c43" x="38" y="105">CHECKED · HEAD</text><text class="head" x="38" y="129">Homogeneous equation</text><text class="detail" x="38" y="151">F has weighted degree 6</text>
+<rect class="box checked" x="272" y="84" width="210" height="92"/><text class="tag" fill="#176c43" x="286" y="105">CHECKED · HEAD</text><text class="head" x="286" y="129">Homogeneous ideal</text><text class="detail" x="286" y="151">I = (F)</text>
+<rect class="box checked" x="520" y="84" width="210" height="92"/><text class="tag" fill="#176c43" x="534" y="105">CHECKED · SCRATCH</text><text class="head" x="534" y="129">Finite homogeneous lifts</text><text class="detail" x="534" y="151">Every class is a finite sum</text>
+<rect class="box checked" x="768" y="84" width="210" height="92"/><text class="tag" fill="#176c43" x="782" y="105">CHECKED · SCRATCH</text><text class="head" x="782" y="129">Equality by component</text><text class="detail" x="782" y="151">All degrees detect equality</text>
+<path class="arrow" d="M234 130 H270"/><path class="arrow" d="M482 130 H518"/><path class="arrow" d="M730 130 H766"/>
+<rect class="box open" x="24" y="255" width="210" height="100"/><text class="tag" fill="#9c5d0b" x="38" y="277">OPEN</text><text class="head" x="38" y="301">Graded quotient</text><text class="detail" x="38" y="324">Degree pieces and</text><text class="detail" x="38" y="342">GradedRing instance</text>
+<rect class="box open" x="272" y="255" width="210" height="100"/><text class="tag" fill="#9c5d0b" x="286" y="277">OPEN</text><text class="head" x="286" y="301">Degree-zero at Z</text><text class="detail" x="286" y="324">Away ≃ quotient by Z−1</text>
+<rect class="box open" x="520" y="255" width="210" height="100"/><text class="tag" fill="#9c5d0b" x="534" y="277">OPEN</text><text class="head" x="534" y="301">Proj affine chart</text><text class="detail" x="534" y="324">Basic open at Z</text>
+<rect class="box open" x="768" y="255" width="210" height="100"/><text class="tag" fill="#9c5d0b" x="782" y="277">OPEN</text><text class="head" x="782" y="301">Completion / Pic⁰</text><text class="detail" x="782" y="324">Infinity and transport</text>
+<path class="arrow" d="M874 177 V211 H129 V253"/><path class="arrow" d="M234 305 H270"/><path class="arrow" d="M482 305 H518"/><path class="arrow" d="M730 305 H766"/>
+<text class="subtitle" x="24" y="410">Green: compiled theorem. Amber: dependency still unproved. Arrows show proof order, not isomorphisms.</text>
+</svg>

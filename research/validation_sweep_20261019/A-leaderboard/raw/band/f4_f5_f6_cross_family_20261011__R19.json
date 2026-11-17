@@ -1,0 +1,69 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-f2m19-tm649-a9133fe6",
+      "log2_r": 18.001787511740165,
+      "arm": "f6-ic",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        4473.685681375608,
+        108321.11831126564,
+        1042948.0119802759
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m19-tm649-a9133fe6",
+      "log2_r": 18.001787511740165,
+      "arm": "inherited-f4",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        3.368274021197171,
+        133784.708003869,
+        1337816.7655724988
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m19-tm649-a9133fe6",
+      "log2_r": 18.001787511740165,
+      "arm": "rho-negation",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        1.4322179286075623,
+        1.5434039098795325,
+        2.544077741327266
+      ],
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-f2m19-tm649-a9133fe6",
+      "a": "f6-ic",
+      "b": "inherited-f4",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m19-tm649-a9133fe6",
+      "a": "f6-ic",
+      "b": "rho-negation",
+      "verdict": "rho-negation < f6-ic"
+    },
+    {
+      "curve": "icv1-f2m19-tm649-a9133fe6",
+      "a": "inherited-f4",
+      "b": "rho-negation",
+      "verdict": "rho-negation < inherited-f4"
+    }
+  ]
+}

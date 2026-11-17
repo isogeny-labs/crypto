@@ -1,0 +1,52 @@
+{
+  "schema": "crypto.all-hash-stream-s3-acceptance/v1",
+  "checked_at_utc": "2026-10-24T05:01:18.335126+00:00",
+  "source_state": "working tree hash streaming and Streebog repair",
+  "binary_sha256": "8cfb04fa2aa4c1ff8b56fe40fb46e3631e2af285328c61f20d240be8c858f8e4",
+  "bucket": "setec-astronomy-artifacts",
+  "region": "us-east-2",
+  "aws_profile": "ecc-challenges-new",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/20261024T050110Z-0de720c9",
+  "logical_name": "evidence/crypto-all-hash-stream/20261024T050110Z-0de720c9/input.bin",
+  "object": {
+    "key": "ic/v1/acceptance/20261024T050110Z-0de720c9/sha256/dc/dceb11fea27458999b9aa5d4fbea9519d01712ec5b930b228df516f0632b0fba",
+    "sha256": "dceb11fea27458999b9aa5d4fbea9519d01712ec5b930b228df516f0632b0fba",
+    "bytes": 1048577
+  },
+  "checks": {
+    "remote_download_status": "bytes_ok",
+    "fresh_cache_matches_local_file": {
+      "ripemd160": "b171c2e258e00951c912764fb4d6d6a895c399b5",
+      "streebog-256": "0eb0edefe77b3e7539d8516a219c06eaf1ee5b69fa3d522b47d3b4bcf881ee15",
+      "streebog-512": "642fc0c5ecd4f4af58106b5b339d2287d3977597a5d751b5dbf2ff870d968222d666538c2ff4d66f12fad9410d06cfabc04baf3a2a863d3a9712197bbada92c4",
+      "whirlpool": "4a4f788a6351e09e44a27521cfc44976aded851ae7a613225270fd02417a254764cc3ba1eb977d479482e4bc714ecba9fb34d2e004bbcdddc1fc4d72e8e6cdad",
+      "tiger": "374eb51ff4e36386011e598d87b5796a47c3b6363ca62e84",
+      "tiger2": "b3c16b9b8d71d277fe4a3c100a05ec48ea3d747a1d9e2400",
+      "skein256": "b8fe3038bb65ff4099c1eff4cdd1ea7243c58385f2f2c55899397938d3656dd7",
+      "skein512": "877fde5d1ba0f3d5ce542210632b404efcec2b50ff1efb0339a03235e9e76f44b131210c11ef9a9b24957a7999c1b86c281eff3998c5ab84e05a5772d86646a8",
+      "skein1024": "112b83284f83c23ef333cef8889bc301adc08b36f0a39f7c6ed9e9a9ae3b1b482eed2a09adfaa208ecfefe3d14520c33ec8439ef662e49dd7402c7ffce40e82ef87e8d387eae898e305acbaf6178ba42e459ab0967aabab567f193a8eb8406e182903a48571c847f0f11f9d791d7564cd8edab6a16472a5edb31ed9ceed735ef"
+    },
+    "fresh_cache_pull_matches_source": true,
+    "independent_reference": {
+      "input": "1048577 zero bytes in /tmp/crypto-hash-reference.bin",
+      "ripemd160": {
+        "command": "openssl dgst -ripemd160 /tmp/crypto-hash-reference.bin",
+        "result": "43d05eff510c6ccb81f372866acead2a450c722a",
+        "crypto_cli_match": true
+      },
+      "whirlpool": {
+        "command": "openssl dgst -provider legacy -whirlpool /tmp/crypto-hash-reference.bin",
+        "result": "0300ef4a3d2f2480641f8d0797606c1caeafc501877124de9f7dd9472e6cdeefaf06fe78fd0c1926b9034d393effddf75148ca2d236ed3a66b09964a995dd457",
+        "crypto_cli_match": true
+      },
+      "streebog": "RFC 6986 M1 vectors converted from displayed bit-string order; both 256 and 512 library tests passed",
+      "skein": "Skein 1.3 empty-string KATs for 256, 512, and 1024 passed in the full library test suite",
+      "tiger": "Published empty-string and abc vectors for Tiger and Tiger2 passed in the full library test suite"
+    }
+  },
+  "cleanup": {
+    "objects_deleted": 1,
+    "prefix_empty": true,
+    "errors": []
+  }
+}

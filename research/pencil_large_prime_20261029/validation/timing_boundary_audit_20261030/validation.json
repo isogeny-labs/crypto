@@ -1,0 +1,75 @@
+{
+  "schema": "pencil-timing-boundary-audit-validation/v1",
+  "observed_at_utc": "2026-10-30T01:00:55Z",
+  "scope": "Native source-and-record extraction and communication-artifact validation only; no solver execution or timing qualification",
+  "conductor": {
+    "delegated_task": "T826",
+    "scope": "research/pencil_large_prime_20261029/validation/timing_boundary_audit_20261030",
+    "pre_edit_check": "clear"
+  },
+  "inputs": {
+    "records_sha256": "9ccc07c9b55b9180af36c3b910891803dde7f4249742881a7322f748bfdb73f7",
+    "records_rows": 1080,
+    "protocol_sha256": "d2ca570ce39f2effa9564576bdb6b6e16148a0a6d511eeb05c3a01565e48d948",
+    "instrument_commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+    "canonical_exporter_commit": "77765ba8b51d782aa0f32767b3e217e245a81cbd"
+  },
+  "software_checks": [
+    {
+      "command": "cargo +1.99.1 fmt --manifest-path native_extract/Cargo.toml -- --check",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo +1.99.1 clippy --release --locked --manifest-path native_extract/Cargo.toml -- -D warnings",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo +1.99.1 test --release --locked --manifest-path native_extract/Cargo.toml",
+      "exit_code": 0,
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "command": "xmllint --noout timing-ranges.svg",
+      "exit_code": 0
+    }
+  ],
+  "reproduction": {
+    "fresh_output_invocations_compared": 2,
+    "byte_identical": true,
+    "compared": [
+      "audit.json",
+      "timing-ranges.svg",
+      "report.tex",
+      "report.pdf",
+      "pdflatex.stdout.log",
+      "pdflatex.stderr.log",
+      "source-blobs/*"
+    ]
+  },
+  "render_inspection": {
+    "pdf_pages": 2,
+    "page_size": "letter",
+    "encrypted": false,
+    "javascript": false,
+    "text_extraction_checked": true,
+    "visual_pages_checked": [1, 2],
+    "render_dpi": 120,
+    "legible": true,
+    "clipping_or_overlap_observed": false
+  },
+  "outputs": {
+    "audit_json_sha256": "b7f3684b85a5fa537aa3725def4b479840784f2569d9d696b5c4db61a9795f70",
+    "svg_sha256": "24e299aa7d6bc5c7456c47febc4c2d0b24b739918a57b3f803f29ba7c961cdd5",
+    "pdf_sha256": "211d129c1898a765a28b05991544893838f8957afffda877811554e950c4ca51",
+    "renderer_source_sha256": "063548265e73d4782eeee0f68f11084476495c5b8eb8c048dcea451712922fa9"
+  },
+  "scientific_status": {
+    "timing_qualification": null,
+    "qualified_ratios": null,
+    "k8_approved": false,
+    "phase_schema_change_approved": false,
+    "new_experiment_authorized_by_this_packet": false
+  }
+}

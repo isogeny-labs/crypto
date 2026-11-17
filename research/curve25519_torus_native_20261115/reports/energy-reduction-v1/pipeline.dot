@@ -1,0 +1,15 @@
+digraph reduction {
+ graph [rankdir=TB,bgcolor="white",ranksep=0.25,nodesep=0.2,fontname="Helvetica"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf5ff",fontname="Helvetica",fontsize=10,margin="0.12,0.09"];
+ edge [color="#526277",fontname="Helvetica",fontsize=9];
+ base [label="Fixed common factor base; random admissible shift\nGeometric energy average and planted success: OPEN"];
+ oracle [label="Controller keeps a,b; oracle sees T=aP+bQ only\nFixed query budget; keep R>B checked rows\nDuplicates and dependent rows are retained"];
+ kernel [label="Kernel input is C only, without controller tags\nNonzero v with transpose(C)*v=0\nAny matrix rank; check the certificate"];
+ extract [label="alpha = v*a, beta = v*b\nIf beta != 0: candidate x = -alpha/beta\nAlways check xP=Q"];
+ facts [label="Lean scalar-field endpoints: 3 gate passes\nExtraction + free-tag fiber + annihilator count\nPrime modulus/checked-equation hypotheses explicit"];
+ diagnostic [label="OPTIONAL birthday diagnostic\nExact finite binomial calibration; no samples drawn\nQuadratic RAM: excluded from linear-memory path",fillcolor="#fff4d7",color="#a36d00",style="rounded,filled,dashed"];
+ open [label="OPEN: sublinear fixed-base decomposition cost\nD = soft-O(B^gamma), gamma < 1\nNo full-base solve or exponent improvement",fillcolor="#fff4d7",color="#a36d00",style="rounded,filled,dashed"];
+ base -> oracle;oracle -> kernel;kernel -> extract;facts -> extract [style=dashed,label="field/counting layer only"];
+ base -> diagnostic [style=dashed,label="not required for bounded restarts"];
+ extract -> open [label="complete cost still needs this bound"];
+}

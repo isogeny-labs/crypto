@@ -1,0 +1,7 @@
+# Prospective source refresh review
+
+Review exact final-source 3c592af sparse preparation proposal, before any checkout/build. Prior: old b985 selector was reviewed; final selection must be regenerated, not relabeled. Producer claims 5909 selected files / 289945217 bytes / 190081 omitted; only one changed existing selected blob isolation.rs and four added retained helper.rs files.
+
+Independently recompute counts, sizes, sorted path/blob delta from exact old/new Git inventories supplied in proposal. Verify commit binding and all admitted file digests; full package/include and local dependency manifests must be unchanged or explicitly accounted for. Attack selection with missing config/manifest/include and mistaken omitted target sources. Inspect mutation script: commit/hash allowlisting, exact bounded worktree destination, no unrelated deletion, fail-closed cleanliness, owner-lock and cache-owner conditions, no build launch, no reset/destructive effect on old evidence, nonduplicate invocation handling. Compare to prior preparation source and reviewed clean source-refresh plan.
+
+Source/receipt inspection only. No checkout, Git mutation, build, container, network or scientific action. Scope is prospective code review, not proof of successful preparation. Root owns shared source changes, independent execution and session logs. Private PDF/SVG/JSON result with exact hashes; preserve any source-only blockers.

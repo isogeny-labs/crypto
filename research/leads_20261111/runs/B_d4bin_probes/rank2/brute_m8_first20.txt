@@ -1,0 +1,60 @@
+BRUTE trial 0: brute [[28, 120, 241, 36], [159, 220, 182, 92], [196, 22, 145, 62]] | current [[28, 120, 241, 36], [159, 220, 182, 92], [196, 22, 145, 62]] | elim Some([[28, 120, 241, 36], [159, 220, 182, 92], [196, 22, 145, 62]])
+BRUTE trial 1: brute [[66, 212, 198, 19]] | current [[66, 212, 198, 19]] | elim Some([[66, 212, 198, 19]])
+BRUTE trial 2: brute [[65, 82, 55, 7]] | current [[65, 82, 55, 7]] | elim Some([[65, 82, 55, 7]])
+BRUTE trial 3: brute [[253, 204, 235, 72]] | current [[253, 204, 235, 72]] | elim Some([[253, 204, 235, 72]])
+BRUTE trial 4: brute [[118, 211, 50, 210], [224, 127, 103, 243]] | current [[118, 211, 50, 210], [224, 127, 103, 243]] | elim Some([[118, 211, 50, 210], [224, 127, 103, 243]])
+BRUTE trial 5: brute [] | current [] | elim Some([])
+BRUTE trial 6: brute [] | current [] | elim Some([])
+BRUTE trial 7: brute [[218, 30, 178, 243]] | current [[218, 30, 178, 243]] | elim Some([[218, 30, 178, 243]])
+BRUTE trial 8: brute [[81, 141, 46, 83], [106, 249, 249, 234], [233, 11, 15, 60]] | current [[81, 141, 46, 83], [106, 249, 249, 234], [233, 11, 15, 60]] | elim Some([[81, 141, 46, 83], [106, 249, 249, 234], [233, 11, 15, 60]])
+BRUTE trial 9: brute [] | current [] | elim Some([])
+BRUTE trial 10: brute [[217, 207, 141, 210]] | current [[217, 207, 141, 210]] | elim Some([[217, 207, 141, 210]])
+BRUTE trial 11: brute [] | current [] | elim Some([])
+BRUTE trial 12: brute [] | current [] | elim Some([])
+BRUTE trial 13: brute [] | current [] | elim Some([])
+BRUTE trial 14: brute [[41, 87, 212, 212], [85, 231, 19, 37], [86, 70, 65, 209]] | current [[41, 87, 212, 212], [85, 231, 19, 37], [86, 70, 65, 209]] | elim Some([[41, 87, 212, 212], [85, 231, 19, 37], [86, 70, 65, 209]])
+BRUTE trial 15: brute [[186, 64, 175, 200], [245, 50, 135, 75]] | current [[186, 64, 175, 200], [245, 50, 135, 75]] | elim Some([[186, 64, 175, 200], [245, 50, 135, 75]])
+BRUTE trial 16: brute [[184, 28, 153, 221], [204, 47, 47, 4]] | current [[184, 28, 153, 221], [204, 47, 47, 4]] | elim Some([[184, 28, 153, 221], [204, 47, 47, 4]])
+BRUTE trial 17: brute [[51, 181, 29, 99]] | current [[51, 181, 29, 99]] | elim Some([[51, 181, 29, 99]])
+BRUTE trial 18: brute [[199, 159, 192, 107]] | current [[199, 159, 192, 107]] | elim Some([[199, 159, 192, 107]])
+BRUTE trial 19: brute [] | current [] | elim Some([])
+DISAGREE trial 20: current [[200, 3, 133, 58]] elim [[200, 3, 133, 58], [201, 61, 0, 21]]
+DISAGREE trial 131: current [[22, 105, 249, 173], [35, 53, 251, 41], [58, 75, 169, 35]] elim [[22, 105, 249, 173], [35, 53, 251, 41], [58, 75, 169, 35], [161, 68, 0, 110]]
+DISAGREE trial 153: current [] elim [[116, 248, 0, 207]]
+BRUTE 20 targets: brute == current on 20, brute == elim on 20
+RANK2-ELIM m 8 curve seed 1 trials 300 (paired rows 300)
+current fails 0; elim errors 0 {}; agree 297; disagree 3
+agree on the s4 != 0 solutions (the only ones that can split into t_i >= 2): 300
+rational solutions 307 (1.023/trial); with s4 = 0: 0
+flags {}
+deg F (deg_s4, deg_P, total) after s4-strip: {"[(10, 10, 12), (10, 10, 10)]": 5, "[(10, 12, 12), (10, 10, 10)]": 294, "[(10, 12, 12), (10, 9, 10)]": 1}
+s4 strips (F1, F2), R: {"F [0, 2] R 0": 295, "F [0, 2] R 4": 5}
+evaluation points histogram {121: 300}
+deg R (after stripping s4^k) histogram {116: 7, 120: 293}
+rational nonzero roots of R histogram {0: 39, 1: 76, 2: 77, 3: 75, 4: 24, 5: 7, 6: 1, 7: 1}
+current        baseline   frob_roots
+weil               1425         1425
+triang              127          127
+echelon           54379        54379
+nf                21751        21751
+charpoly          87394        87394
+roots             22558        14410
+eigvec             1753         1753
+verify              211          211
+TOTAL            189599       181451
+elim           baseline   frob_roots
+weil               1425         1425
+reduce              130          130
+build              1414         1414
+resultant         39955        39955
+interp            14520        14520
+roots             51231        42930
+backsub             822          820
+s4zero              251          180
+verify              227          227
+PAIRED baseline: current 189599 elim 109974 muls/trial; ratio elim/current 0.5800 [95% boot 0.5794, 0.5806]; elim cheaper on 300/300 trials
+PAIRED frob_roots: current 181451 elim 101600 muls/trial; ratio elim/current 0.5599 [95% boot 0.5593, 0.5606]; elim cheaper on 300/300 trials
+
+real	5m25.766s
+user	5m22.220s
+sys	0m2.263s

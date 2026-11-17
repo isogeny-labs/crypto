@@ -1,0 +1,54 @@
+PASS all29 original payloads, including decompressed executable
+boolean_composition	4	6
+exterior_composition_entries	4080
+monomial_positive_entries	4080
+parity_code_passive_coefficient	-200/9
+swap_sign_rank	1	2
+swap_sign_rank	2	4
+swap_sign_rank	3	8
+swap_sign_rank	4	16
+swap_sign_rank	5	32
+swap_sign_entries	1364
+restricted_composition	1	0
+rank_one_affine_minors	560
+PASS
+single_axis_origins=8 code_slots=8 product_origin_pairs=64
+Cprime0=-144 Cprime1=240 W1_node=-5/3 W2_linear=40/3 passive=-200/9
+shuffle_n=2 rank=1
+shuffle_n=3 rank=2
+shuffle_n=4 rank=3
+shuffle_n=5 rank=4
+shuffle_n=6 rank=5
+shuffle_n=7 rank=6
+shuffle_n=8 rank=7
+shuffle_n=9 rank=8
+passive_L=4 code_slots=8 normalized_entries=6 rank=6
+passive_L=8 code_slots=32 normalized_entries=56 rank=14
+passive_L=16 code_slots=128 normalized_entries=480 rank=30
+passive_L=32 code_slots=512 normalized_entries=3968 rank=62
+PASS exact development identities; no runtime claim
+dimension	1	code_size	2	v_star	2
+dimension	2	code_size	4	v_star	3
+dimension	3	code_size	16	v_star	4
+a3_star	-12373218000
+a3_f	0	30990437521	v2	0
+a3_f	1	-15348459520	v2	11
+a3_f	2	-3268760000	v2	6
+dimension	4	code_size	32	v_star	5
+dimension	5	code_size	128	v_star	6
+dimension	6	code_size	512	v_star	7
+operator_pair_checks	30796
+orientation_checks	126
+selector_checks	21
+PASS
+PROTOCOL.md: OK
+main.cpp: OK
+checks.tsv: OK
+crossing-matrices.tsv: OK
+projection-matrices.tsv: OK
+selectors.tsv: OK
+slots.tsv: OK
+run.log: OK
+exit-code.txt: OK
+PASS assertions=33 code_slots=16 first_orientation_multiplicity=2 fixtures=4 projection_entries=1024 active_node_entries=256 crossing_entries=128 normalized_cross_ranks=8,8 determinant_orders=64,64 smith_orders_each_side=8x8
+PASS all four native units and frozen package bindings

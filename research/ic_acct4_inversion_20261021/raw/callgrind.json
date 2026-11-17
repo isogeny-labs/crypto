@@ -1,0 +1,15 @@
+{
+ "schema": "ic-acct4-callgrind/v1",
+ "binary": "target/release/examples/hyperelliptic_ic_vs_rho_bitops at commit 1961d1878 (claude/ic-acct-4)",
+ "command": "RAYON_NUM_THREADS=1 valgrind --tool=callgrind <bin> --genus G --p P --arms fb-walk --ic-trials I --rho-trials R --rho-variant full-width --json out.jsonl",
+ "method": "Marginal instructions per counted gate: run (I,R) = (1,2), (3,2) and (1,6); the IC arm's figure is (Ir(3,2) - Ir(1,2)) / (bitops_ic(3,2) - bitops_ic(1,2)), rho's is (Ir(1,6) - Ir(1,2)) / (bitops_rho(1,6) - bitops_rho(1,2)). Fixed costs (process start-up, instance construction) cancel.",
+ "runs": [
+  {"tag": "g2a", "genus": 2, "p": 41, "ic_trials": 1, "rho_trials": 2, "ir": 1616210857, "ic_bitops": 18099690, "rho_bitops": 233749076},
+  {"tag": "g2b", "genus": 2, "p": 41, "ic_trials": 3, "rho_trials": 2, "ir": 1665909810, "ic_bitops": 59107248, "rho_bitops": 233749076},
+  {"tag": "g2c", "genus": 2, "p": 41, "ic_trials": 1, "rho_trials": 6, "ir": 2212965974, "ic_bitops": 18099690, "rho_bitops": 691471210},
+  {"tag": "g3a", "genus": 3, "p": 23, "ic_trials": 1, "rho_trials": 2, "ir": 1444553222, "ic_bitops": 32128502, "rho_bitops": 338498782},
+  {"tag": "g3b", "genus": 3, "p": 23, "ic_trials": 3, "rho_trials": 2, "ir": 1559802636, "ic_bitops": 103682281, "rho_bitops": 338498782},
+  {"tag": "g3c", "genus": 3, "p": 23, "ic_trials": 1, "rho_trials": 6, "ir": 2586713442, "ic_bitops": 32128502, "rho_bitops": 1018041225}
+ ],
+ "recorded_before": {"source": "research/hec_bitop_20261020/PROTOCOL.md, Deviation 1 (whole-run Callgrind, before this change)", "ic_over_rho_instr_per_gate": {"g2_p41_fbwalk": 1.01, "g3_p23_fbwalk": 1.16}}
+}

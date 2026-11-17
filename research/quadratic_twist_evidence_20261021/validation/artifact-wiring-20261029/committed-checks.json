@@ -1,0 +1,84 @@
+{
+  "schema": "quadratic-twist-committed-policy-checks/v1",
+  "implementation_commit": "9d38366e70a15f3752035ee337711c184af68d19",
+  "base_commit": "ade900ef9ae73c76b101d557b0722703aca361e0",
+  "checks": [
+    {
+      "name": "artifact-policy",
+      "argv": [
+        "python3",
+        "tools/artifacts/artifacts.py",
+        "check",
+        "ade900ef9ae73c76b101d557b0722703aca361e0",
+        "9d38366e70a15f3752035ee337711c184af68d19"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": "artifacts check: no data files committed\n"
+    },
+    {
+      "name": "large-file",
+      "argv": [
+        "bash",
+        "/workspace/pr2381-check-20261029T1411Z/check-large-files-current.sh",
+        "ade900ef9ae73c76b101d557b0722703aca361e0",
+        "9d38366e70a15f3752035ee337711c184af68d19"
+      ],
+      "exit": 0,
+      "stdout": "check-large-files: no added or modified file over 10485760 bytes\n",
+      "stderr": ""
+    },
+    {
+      "name": "diff",
+      "argv": [
+        "git",
+        "diff",
+        "--check",
+        "ade900ef9ae73c76b101d557b0722703aca361e0",
+        "9d38366e70a15f3752035ee337711c184af68d19"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "changed_paths": [
+    ".github/workflows/quadratic-twist-adaptive-s3.yml",
+    ".github/workflows/quadratic-twist-cm8-transfer.yml",
+    ".github/workflows/quadratic-twist-direct-sign.yml",
+    ".github/workflows/quadratic-twist-evidence.yml",
+    ".github/workflows/quadratic-twist-known-roots.yml",
+    ".github/workflows/quadratic-twist-phase-demand.yml",
+    ".github/workflows/quadratic-twist-reduced-s3.yml",
+    ".github/workflows/quadratic-twist-signed-cache.yml",
+    "docs/session-logs/2026-10-29.md",
+    "problems/quadratic-twist-evidence-native-parity.md",
+    "research/quadratic_twist_evidence_20261021/CONTINUATION.md",
+    "research/quadratic_twist_evidence_20261021/REQUIREMENTS.md",
+    "research/quadratic_twist_evidence_20261021/validation/artifact-wiring-20261029/.gitignore",
+    "research/quadratic_twist_evidence_20261021/validation/artifact-wiring-20261029/INPUTS.sha256",
+    "research/quadratic_twist_evidence_20261021/validation/artifact-wiring-20261029/OUTPUTS.sha256",
+    "research/quadratic_twist_evidence_20261021/validation/artifact-wiring-20261029/README.md",
+    "research/quadratic_twist_evidence_20261021/validation/artifact-wiring-20261029/RUNS.sha256",
+    "research/quadratic_twist_evidence_20261021/validation/artifact-wiring-20261029/archive-receipt.json",
+    "research/quadratic_twist_evidence_20261021/validation/artifact-wiring-20261029/restore-runs.sh",
+    "research/quadratic_twist_evidence_20261021/validation/artifact-wiring-20261029/runs.tar.xz",
+    "research/quadratic_twist_evidence_20261021/validation/artifact-wiring-20261029/runs.tar.xz.sha256"
+  ],
+  "protected_native_proof_registry_catalog_benchmark_and_old_frozen_inputs_unchanged": true,
+  "generator_unchanged": true,
+  "artifact_helper_blob": "7ce68d532608a04747aaa6918904ec4fc328437b",
+  "artifact_config_blob": "8b75801c2be96f2fad0b83361168cdf0d1d01e6d",
+  "size_helper_blob": "825c5d0dc0722a7d729d1f90f9a625afd9b060d5",
+  "archive": {
+    "schema": "quadratic-twist-archive-receipt/v1",
+    "archive": "runs.tar.xz",
+    "bytes": 5764,
+    "sha256": "050a917d1b8ebea5ad614ffdc33bfe8811eae4c7db0a579cdbe90ec9145b72ca",
+    "raw_files": 28,
+    "raw_bytes": 24567,
+    "format": "GNU tar; names sorted; 2026-10-29 UTC; uid/gid0; normalized modes; xz -6 -T1"
+  },
+  "new_scientific_or_proof_execution": false,
+  "new_library_suite_run": false
+}

@@ -1,0 +1,45 @@
+name = "jksst_audit"
+version = "0.1.0"
+defaultTargets = ["JKSSTAll"]
+
+[leanOptions]
+relaxedAutoImplicit = false
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.34.1"
+
+[[lean_lib]]
+name = "JKSSTAll"
+roots = [
+  "JKSSTAll",
+  "JKSSTAsymptotic",
+  "JKSSTAudit",
+  "JKSSTActualHeightCounterexample",
+  "JKSSTCanonicalHeight",
+  "JKSSTCoefficientBox",
+  "JKSSTCoefficientProbability",
+  "JKSSTCompositeModulus",
+  "JKSSTConditionalHeightCore",
+  "JKSSTConcreteCubic",
+  "JKSSTCountNonDeterminacy",
+  "JKSSTCyclicECDLP",
+  "JKSSTEllipticCyclic",
+  "JKSSTExpectedTrials",
+  "JKSSTExplicitConstant",
+  "JKSSTFiniteHeightRepair",
+  "JKSSTHeightBound",
+  "JKSSTHeightCount",
+  "JKSSTHeightDiscriminant",
+  "JKSSTHeightToPacking",
+  "JKSSTHasseCofactor",
+  "JKSSTLang",
+  "JKSSTMathlibECFacts",
+  "JKSSTModelDiscriminant",
+  "JKSSTOmegaRuntime",
+  "JKSSTPacking",
+  "JKSSTProbability",
+  "JKSSTSuccessComposition",
+  "JKSSTWeierstrassScaling",
+]

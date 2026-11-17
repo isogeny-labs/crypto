@@ -1,0 +1,202 @@
+{
+  "arms": [
+    {
+      "method": {
+        "entry": "three_leads::solve_rho",
+        "family": "rho",
+        "id": "rho.three_leads_plain_v1",
+        "method_id": "ECM1h8e2cc46abd4f",
+        "method_sha256": "8e2cc46abd4f58b5e48accc0bd208c7430aba0a34c365cda6c022e4bb80d405a",
+        "params": {
+          "trial_cap": "47900"
+        }
+      },
+      "name": "rho_plain",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "entry": "three_leads::solve_rho",
+        "family": "rho",
+        "id": "rho.three_leads_negation_v1",
+        "method_id": "ECM1h32f6753a22d9",
+        "method_sha256": "32f6753a22d94b4dbb648eeca33171a1c8854d50d933f6dd5d705b69e4a1e5bc",
+        "params": {
+          "trial_cap": "47900"
+        }
+      },
+      "name": "rho_neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "entry": "three_leads::solve_rho",
+        "family": "rho",
+        "id": "rho.three_leads_jacobian_v1",
+        "method_id": "ECM1h8f8f7a965ae9",
+        "method_sha256": "8f8f7a965ae9775dd44dfe136864488c7d99db1cd622a1b50f06db0d7304901d",
+        "params": {
+          "trial_cap": "47900"
+        }
+      },
+      "name": "jac_rho",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "entry": "three_leads::solve_genus2_v2",
+        "family": "ic",
+        "id": "ic.three_leads_genus2_v2",
+        "method_id": "ECM1hdb0cca760bbd",
+        "method_sha256": "db0cca760bbd60bf44033dfa2997adcdbc4bec9a57a5a4e3af93b1bad8e84e6e",
+        "params": {
+          "independent": "0",
+          "trial_cap": "47900",
+          "unique_relations": "1"
+        }
+      },
+      "name": "genus_ic",
+      "role": "candidate"
+    }
+  ],
+  "executions": 12,
+  "spec_id": "ECS1hfb282b862031",
+  "spec_sha256": "fb282b862031cc3bc70c7a2dcfebf8cc3a84b8fb7ff8d69c8ebe1170126013ec",
+  "workloads": [
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 64,
+        "construction": "three_leads_explicit(p=311,n=2,a=72941,b=95583,family=scholten,parameter=0)",
+        "curve_uid": null,
+        "ec1": null,
+        "family": "extension",
+        "field_bits": 9,
+        "field_degree": 2,
+        "generator": [
+          "0x756",
+          "0x12f57"
+        ],
+        "group_order": 96704,
+        "icv1": "ICV1:fpk-311-2-d04e2322:18:96704:39,221:unk:unk:r:5fd473c68297",
+        "r": 1511,
+        "registered": true,
+        "slug": "icv1-fp9k2-t18-5fd473c6"
+      },
+      "curve_spec": {
+        "a": 72941,
+        "b": 95583,
+        "family": "scholten",
+        "group_order": 96704,
+        "gx": 1878,
+        "gy": 77655,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 311,
+        "parameter": 0,
+        "r": 1511
+      },
+      "planted": 1221,
+      "target": [
+        "0xea24",
+        "0x8e77"
+      ],
+      "target_index": 0,
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 202610181260,
+      "workload_id": "Wc3c64df7f21b",
+      "workload_sha256": "c3c64df7f21b5c6370c979080f14e1ba9fcd786d050ec7723d9a6d344091824c"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 32,
+        "construction": "three_leads_explicit(p=367,n=2,a=115749,b=90626,family=scholten,parameter=0)",
+        "curve_uid": null,
+        "ec1": null,
+        "family": "extension",
+        "field_bits": 9,
+        "field_degree": 2,
+        "generator": [
+          "0x9a18",
+          "0xf5e0"
+        ],
+        "group_order": 135328,
+        "icv1": "ICV1:fpk-367-2-776596a1:-638:135328:189,164:unk:unk:r:b41fe4ecb446",
+        "r": 4229,
+        "registered": true,
+        "slug": "icv1-fp9k2-tm638-b41fe4ec"
+      },
+      "curve_spec": {
+        "a": 115749,
+        "b": 90626,
+        "family": "scholten",
+        "group_order": 135328,
+        "gx": 39448,
+        "gy": 62944,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 367,
+        "parameter": 0,
+        "r": 4229
+      },
+      "planted": 3776,
+      "target": [
+        "0x10a4a",
+        "0x15f49"
+      ],
+      "target_index": 0,
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 202610181260,
+      "workload_id": "Wae1fc6dfdaa8",
+      "workload_sha256": "ae1fc6dfdaa842b9b5b2b29e49f3b2f245f9239effa979d96ebe89d02b24fe58"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 16,
+        "construction": "three_leads_explicit(p=379,n=2,a=131927,b=111912,family=scholten,parameter=0)",
+        "curve_uid": null,
+        "ec1": null,
+        "family": "extension",
+        "field_bits": 9,
+        "field_degree": 2,
+        "generator": [
+          "0xa063",
+          "0x107b8"
+        ],
+        "group_order": 143984,
+        "icv1": "ICV1:fpk-379-2-207bf7b1:-342:143984:7,111:unk:unk:r:02fbacd7dfb8",
+        "r": 8999,
+        "registered": true,
+        "slug": "icv1-fp9k2-tm342-02fbacd7"
+      },
+      "curve_spec": {
+        "a": 131927,
+        "b": 111912,
+        "family": "scholten",
+        "group_order": 143984,
+        "gx": 41059,
+        "gy": 67512,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 379,
+        "parameter": 0,
+        "r": 8999
+      },
+      "planted": 5031,
+      "target": [
+        "0xbf30",
+        "0xf490"
+      ],
+      "target_index": 0,
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 202610181260,
+      "workload_id": "W2014178dcbd8",
+      "workload_sha256": "2014178dcbd879e71fe3aa4fb2801ebef5c273d9d019216d8d60ed53eab01f4f"
+    }
+  ]
+}

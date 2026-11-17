@@ -1,0 +1,3 @@
+# Reproduction
+
+Restore archived .lean.txt files as .lean in a fresh directory, preserving unique final module names. Do not place shadowed-module-draft files on LEAN_PATH. The check.sh and replay.sh paths are source-host paths; adapt them to the restored directory and pinned dependencies. Each before.sha256 and dependencies.txt identifies imported helpers and the toolchain. Compiled caches and checker binary are omitted. This is a source-and-receipt archive, not a self-contained toolchain distribution. Only the five modules named by check.rs are final replay targets; failed attempts and original imported source snapshots are preserved separately.

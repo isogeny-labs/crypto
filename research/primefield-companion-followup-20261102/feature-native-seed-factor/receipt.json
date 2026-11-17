@@ -1,0 +1,32 @@
+{
+  "recorded_at": "2026-11-03T22:27:44.970982+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-seed-factor/lib.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-seed-factor-20261103/tests"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-seed-factor-20261103/tests",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    }
+  ],
+  "source_lock_entries": 30,
+  "binary_sha256": "b1502da6040ef0072f153928486fa7d979d3ee0d0b485693205c9237be4cd987",
+  "comparative_panel": false
+}

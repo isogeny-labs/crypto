@@ -1,0 +1,15 @@
+<!doctype html><meta charset=utf-8><title>Batch parity in ecbench</title>
+<style>body{font:13px/1.45 sans-serif;max-width:880px;margin:auto}table{border-collapse:collapse}td,th{border:1px solid #bbb;padding:2px 6px;text-align:right}td:first-child{text-align:left}h1{font-size:20px}</style>
+<h1>Index-calculus structure in the batch vs multi-target rho (ecbench, p36)</h1>
+<p>Protocol <code>PROTOCOL.md</code> frozen before data (Amendments 1-2: two code fixes before any valid data; the void attempts are kept in <code>aborted-attempt1/</code>, <code>aborted-attempt2/</code>). 320 / 320 records verified; <code>ecbench verify --replay 12</code>: audit OK, 12 replays reproduced, 0 problems. Local L0 (counts deterministic); an L2 replay is owed before any benchmarks row.</p>
+<p><code>ic.residual_batch</code> is <code>rho.multitarget_pooled</code> (same companions, walker, table and charging) plus one public base point P0 of unknown log in every relation, the residual collector's B = 1 column; log P0 was solved on the first target of every record and checked.</p>
+<h2>Claim P (parity, frozen rule: 95% interval contains 1 and lies in [0.9, 1.1] at w = 0, 0.1, 1)</h2>
+<img src="parity.svg">
+<table><tr><th>batch L</th><th>res / pool (all three weights)</th><th>95% interval</th><th>rule</th></tr>
+<tr><td>16</td><td>1.0465</td><td>[0.9886, 1.1078]</td><td><b>fails</b> (upper edge above 1.1)</td></tr>
+<tr><td>64</td><td>1.0077</td><td>[0.9811, 1.0350]</td><td><b>holds</b></td></tr></table>
+<p>The extra unknown costs about one extra collision per batch: 4.7% at L = 16, 0.8% at L = 64. At L = 64 the index-calculus structure is at parity with multi-target rho; at L = 16 its interval reaches past the frozen 1.1 edge, so parity is not established there.</p>
+<h2>Claim D (per-target cost against single-target rho)</h2>
+<table><tr><th>arm</th><th>L</th><th>S w=0</th><th>per target</th><th>S w=0.1</th><th>per target</th><th>S w=1</th><th>per target</th><th>single rho / per target (w=0)</th></tr><tr><td>rho</td><td>1</td><td>0.900</td><td>0.900</td><td>0.990</td><td>0.990</td><td>1.799</td><td>1.799</td><td>1.00x</td></tr><tr><td>pool16</td><td>16</td><td>4.220</td><td>0.264</td><td>4.641</td><td>0.290</td><td>8.430</td><td>0.527</td><td>3.41x</td></tr><tr><td>res16</td><td>16</td><td>4.416</td><td>0.276</td><td>4.857</td><td>0.304</td><td>8.822</td><td>0.551</td><td>3.26x</td></tr><tr><td>pool64</td><td>64</td><td>8.654</td><td>0.135</td><td>9.516</td><td>0.149</td><td>17.277</td><td>0.270</td><td>6.66x</td></tr><tr><td>res64</td><td>64</td><td>8.720</td><td>0.136</td><td>9.589</td><td>0.150</td><td>17.410</td><td>0.272</td><td>6.61x</td></tr></table>
+<p>Per target, both batch methods are 3.3-3.4x (L = 16) and 6.6-6.7x (L = 64) cheaper than single-target rho at every weight. This is the multi-target regime: the matched reference for a batch is multi-target rho, against which the index-calculus structure is at parity (L = 64), not ahead. Single-target index calculus remains 1.6x rho (earlier studies).</p>
+<p>Scripts: <code>scripts/analyse.sh</code>; derived files in <code>analysis/</code>; raw records in the artifact store.</p>

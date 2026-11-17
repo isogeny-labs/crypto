@@ -1,0 +1,30 @@
+CHECK sha256_empty PASS 
+KV check_sha256_empty=1
+CHECK sha256_abc PASS 
+KV check_sha256_abc=1
+CHECK sha256_1000a PASS 
+KV check_sha256_1000a=1
+CHECK json PASS 
+KV check_json=1
+CHECK dreg_known_answers PASS 13 values, mismatches: []
+KV check_dreg_known_answers=1
+CHECK columns_124314 PASS 124314
+KV check_columns_124314=1
+CHECK logcols PASS 
+KV check_logcols=1
+CHECK conformal_quantile PASS n=9: ceil(0.9*10)=9
+KV check_conformal_quantile=1
+CHECK conformal_quantile19 PASS n=19: ceil(0.9*20)=18
+KV check_conformal_quantile19=1
+CHECK spearman PASS 1 -1 0
+KV check_spearman=1
+CHECK gbt_planted_function PASS gbt mae 0.086 vs constant mae 1.969
+KV check_gbt_planted_function=1
+CHECK conformal_coverage_iid PASS mean coverage 0.8997 over 200 repetitions
+KV check_conformal_coverage_iid=1
+CHECK ridge_recovers_linear_law PASS max abs err 0.00017
+KV check_ridge_recovers_linear_law=1
+CHECK harvest_parsers PASS 
+KV check_harvest_parsers=1
+KV selftest_ok=1
+SELFTEST OK

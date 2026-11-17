@@ -1,0 +1,20 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\begin{document}
+\title{Canonical residues and bounded UInt64 products}
+\author{Independent source review and new proof candidate}
+\date{30 October 2026}\maketitle
+\section*{Observed result}
+The existing CanonicalResidue module was recompiled in a separate output directory. Its natural-number negation and subtraction statements match their expressly limited scope. New UInt64 product and square statements compiled successfully. A separate readback checked eleven named declarations. Their axiom union was propext, Classical.choice and Quot.sound. There was no native-decide proof and no independent binary kernel rechecker.
+\section*{Precise arithmetic statement}
+For canonical words $a,b<p$ and $p<2^{31}$, $ab<2^{64}$. Consequently Lean's actual UInt64 multiplication followed by UInt64 remainder has natural value $(ab)\bmod p$. Casting that value to $\mathbf Z/p\mathbf Z$ equals the product of the decoded inputs. Squaring is the specialization $b=a$. Remainder preserves canonicality for positive modulus.
+\section*{Source map}
+The pinned Rust provider is three\_leads.rs:190--199 (bm and bs); the caller is projective\_law\_gate.rs:903--920. These fragments use u64 multiplication and remainder. The correspondence applies to the table-free, n=1 route with the stated ranges. Rust compilation, instrumentation counters, complete call dispatch and collector reachability are not formalized by this candidate.
+\section*{Checks and failures}
+Kernel-decided controls include canonical $4\cdot4\bmod5=1$, and overflowing $2^{63}\cdot2$ yielding UInt64 zero while its mathematical residue modulo 5 is one. A noncanonical equality control uses residues 0 and 5 modulo 5. The initial probe failed on an unavailable theorem name. Two classifier candidate builds failed because the minimal imported library did not provide the Field instance for ZMod. They are retained as failed attempts; no classifier theorem is claimed.
+\section*{Review boundaries}
+The reviewer is separate from the original producer but read producer notes and proof before recording the plan. This is not blind derivation. The new UInt64 extension is authored by this reviewer and still requires independent fidelity review. The source inputs are private snapshots, so publication and immutable-source review remain parent-agent delivery tasks. No performance experiment or new timing comparison was performed.
+\section*{Next obligations}
+Connect the literal negation/subtraction word operations; complete the ordered classifier; compose the 16 multiplications and four squarings; prove counter headroom and reachable-input invariants. Reuse the pinned ZMod field module through a recorded dependency extension before retrying the classifier.
+\end{document}

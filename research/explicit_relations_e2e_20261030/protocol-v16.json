@@ -1,0 +1,789 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "EXPLICIT-RELATIONS-E2E-20261030",
+  "version": 16,
+  "created": "2026-10-30",
+  "repository": "crypto",
+  "study_dir": "research/explicit_relations_e2e_20261030",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "implementation_pr": "https://github.com/isogeny-labs/crypto/pull/2991"
+  },
+  "question": "Does an exact-safe GPU negative prefilter preserve complete deterministic recovery, and can the combined 63-bit pipeline complete both fixed targets within the same one-GPU resource limits?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Every reported recovery is independently replayed from a serialized certificate and corrupted-scalar certificates are rejected.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Largest complete rung is an observed bounded frontier for these fixtures and two seeds, not a mathematical maximum or certified time advantage.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "b",
+      "role": "baseline",
+      "description": "Dense CUB, persistent query and exact full-right cache/fallback, without negative prefilter",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "make",
+            "ARCH=sm_120",
+            "cuda-right-cache"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "ER_TABLE_DIAGNOSTICS": "defined",
+          "ER_COMPACT_ROWS": "defined",
+          "ER_QUERY_CACHED": "undefined",
+          "ER_WIDE_INDEX": "defined",
+          "ER_DENSE_ROWS": "defined",
+          "ER_CUB_SORT": "defined",
+          "ER_QUERY_PERSISTENT": "defined",
+          "ER_RIGHT_FULL_CACHE": "defined",
+          "ER_NEGATIVE_FILTER": "undefined"
+        },
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "slots": 8,
+        "max_rows": 4294967296,
+        "chunk_rows": 1048576,
+        "max_columns": 16384,
+        "max_work": 17179869184,
+        "max_trials": 16
+      }
+    },
+    {
+      "id": "u",
+      "role": "candidate",
+      "description": "Same source/query/cache with bounded blocked negative prefilter; all possible matches use exact lookup",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "make",
+            "ARCH=sm_120",
+            "cuda-filter"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "ER_TABLE_DIAGNOSTICS": "defined",
+          "ER_COMPACT_ROWS": "defined",
+          "ER_QUERY_CACHED": "undefined",
+          "ER_WIDE_INDEX": "defined",
+          "ER_DENSE_ROWS": "defined",
+          "ER_CUB_SORT": "defined",
+          "ER_QUERY_PERSISTENT": "defined",
+          "ER_RIGHT_FULL_CACHE": "defined",
+          "ER_NEGATIVE_FILTER": "defined"
+        },
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "slots": 8,
+        "max_rows": 4294967296,
+        "chunk_rows": 1048576,
+        "max_columns": 16384,
+        "max_work": 17179869184,
+        "max_trials": 16
+      }
+    },
+    {
+      "id": "x",
+      "role": "control_aa",
+      "description": "Identical negative-filter candidate A/A repeat at52bits",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "make",
+            "ARCH=sm_120",
+            "cuda-filter"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "ER_TABLE_DIAGNOSTICS": "defined",
+          "ER_COMPACT_ROWS": "defined",
+          "ER_QUERY_CACHED": "undefined",
+          "ER_WIDE_INDEX": "defined",
+          "ER_DENSE_ROWS": "defined",
+          "ER_CUB_SORT": "defined",
+          "ER_QUERY_PERSISTENT": "defined",
+          "ER_RIGHT_FULL_CACHE": "defined",
+          "ER_NEGATIVE_FILTER": "defined"
+        },
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "slots": 8,
+        "max_rows": 4294967296,
+        "chunk_rows": 1048576,
+        "max_columns": 16384,
+        "max_work": 17179869184,
+        "max_trials": 16
+      },
+      "same_instrument_as": "u"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "All successful public-input recoveries must satisfy scalar multiplication and complete independent certificate replay; existing tiny known-answer reduction controls run first."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Each successful certificate is copied with scalar incremented modulo r; a fresh verifier must reject with exit1, not timeout. Invalid curves/order witnesses are tested before measurement."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "negative_prefilter",
+        "levels": [
+          "off",
+          "blocked-bloom-before-exact-lookup"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_and_build",
+        "treatment": "fixed",
+        "value": "one frozen commit, nvcc13.2.51 -O3 -std=c++17 -arch=sm_120",
+        "how": "One pinned source/CPU driver; b/u differ only ER_NEGATIVE_FILTER;u/x identical. All arms use12-byte dense rows,2^24index,CUB,persistentquery and full-rightcache/fallback. All setup/construction charged."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "Deterministic PARI52/63-bit fixtures; p=precprime(2^bits) at52 and precprime(2^63-2^34) at63. Public-coordinate targets and seeds101/202; unchanged row/work limits; no target scalar.",
+        "how": "No target scalar is generated or supplied. Curve order is checked with prime torsion witness and unique Hasse multiple before solving."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Same full RTX PRO6000 and pod for all rows. Record device identity, GPU state, CPU affinity and CPUinfo; shared host earns only L0."
+      },
+      {
+        "name": "memory_layout",
+        "treatment": "randomized",
+        "how": "Fresh-process ASLR. Negative filter word count nextpoweroftwo(ceil(left/8)),zero whenempty,max4GiB. Build aftersort;charge maxsort/retainedfilterphase. Fullcache admission includesfilter;recordfilterbytesandcachefallback. All successful52-bit arms must fully cache; b has0filterbytes,u/x positive. Exact lookup remains authoritative; no assumed FPR."
+      },
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "how": "52bits seed101 b/u/x,seed202 x/u/b;63bits u forbothseeds. Finishcurrentrung thenstopafteranylimit/timeout."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Frozen Rust analyzer validates complete attempted rungs and labels, preserves failures, and plots all rows. No inferential timing analysis."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-aa",
+        "arms": [
+          "u",
+          "x"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-filter",
+        "arms": [
+          "b",
+          "u"
+        ],
+        "differs_in": [
+          "negative_prefilter"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-complete",
+        "arms": [
+          "u"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Every reported success has fresh certificate replay and corrupt-scalar rejection."
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Reverse three-arm order at52bits;63bit frontier runs negative-filter/full-cache-with-explicit-fallback candidateu forbothfixedtargets.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "Exactly101 and202 for each arm and rung; target-coordinate start1009*seed; solver uses same seed for hash/trial RNG."
+    },
+    "instance_sampling": {
+      "rule": "First nonsingular prime-order a=-3 curve with r<2^63 at p=precprime(2^52) and p=precprime(2^63-2^34), b1..8192, generator first x1..1000 with canonical smaller y. Target-coordinate start1009*seed, seeds101/202. The fixed2^34 gap leaves representable u64 hash primes above2p and order room under Hasse; no post-outcome fixture selection.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Descriptive frontier accounting; no masked or inferential timing claim.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 2,
+    "replicates": 2,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exact certificate and boundary checks, not population or timing inference. Two fixed public targets per rung with A/A repeats; no significance test."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 18000,
+      "measured_on": "Hard bound, notforecast:52bits180s,63bits7200s;maximum8rows,worker18000s/controller18300s. FullGPU cost<=2.50/hour,computeceiling12.7084USD excludingstorage. Verifyv13collection/deletion andcurrentcatalogbeforelaunch. V14frozenbutneverexecuted; thispanelcombinesitswidthvalidationwithseparatefiltercontrols toavoidduplicate63bitfrontierexecution."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "recoveries",
+        "name": "Independently replayed recovery",
+        "unit": "recoveries",
+        "kind": "exact",
+        "definition": "One iff solver succeeded, fresh verifier replay passed and corrupted-scalar replay failed; otherwise zero. Public target scalar never generated.",
+        "source": "rows.csv recoveries",
+        "aggregation": "sum",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "wall_seconds",
+        "name": "Complete execution and audit",
+        "unit": "seconds",
+        "kind": "timed",
+        "definition": "Outer native clock from target-coordinate construction through solver startup/recovery/shutdown, independent replay, negative-control replay and certificate comparisons. Includes validation overhead.",
+        "source": "rows.csv wall_seconds",
+        "aggregation": "per_row",
+        "resolution": "steady_clock",
+        "uncertainty": "range"
+      },
+      {
+        "id": "solver_seconds",
+        "name": "Cold complete recovery",
+        "unit": "seconds",
+        "kind": "timed",
+        "definition": "Outer clock from target-coordinate construction through driver startup, curve validation, service startup, bases, relation collection, elimination, in-process certificate replay, serialization and process teardown. Additional independent replay excluded and recorded separately.",
+        "source": "rows.csv solver_seconds",
+        "aggregation": "per_row",
+        "resolution": "steady_clock",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "monotonic",
+    "counters": [
+      "recoveries",
+      "attempts",
+      "relations"
+    ],
+    "record": [
+      "All raw certificates and logs",
+      "Source/binary hashes",
+      "GPU identity and state",
+      "Stage clocks and outer complete execution clock",
+      "Bound failures and unattempted higher rungs",
+      "Row representation and conservative admission bytes; no measured peak VRAM claim",
+      "TABLE right_cache_rows and phase admission bound per trial; successful52-bit v/x requirefull caching andb/u zerocache. Raw search visit counts include speculative candidate work and exclude the separately charged cache construction; no complete field-operation claim."
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "runpod",
+    "queue": "Secure Cloud full RTX PRO 6000",
+    "placement": {
+      "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "count": 1,
+      "container_disk_gb": 40
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 18000,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "52bits2seeds x3arms b/u/x=6rows;63bits2seeds xcandidateu=2rows. Maximum8rows. Finishcurrentrung thenstopafteranylimit/timeout. Noautomaticadjustmentofinputs,reserve,rowcaporworkcap.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Per solve52bits180s,63bits7200s;fresh replay60s,fixture180s,worker18000s/controller18300s. Retain every failure and unattempted cell. Rust/host/CUDA arithmetic, inventory, witness and sanitizer preflight must pass before data.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any incorrect recovery, accepted corrupt certificate, differing successful cross-arm certificate, failed sanitizer or unexpected process error invalidates the run. Explicit limits/timeouts are frontier observations, not invalidity."
+  ],
+  "decision_rule": {
+    "text": "Report exact recoveries and complete two-target63-bit rung withinbounds. b/u isolatefilter at52bits;u/x AA. Fullcachemustbeadmittedforall52controls;recordlargerfallback. Onlyabsolute correctness/frontierclaimdecided; no certifiedtimeadvantage,matchedrho,fulltensorbackendorglobalmaximum. No cross-versioncausaltimingcomparison.",
+    "comparison_ids": [
+      "C-complete"
+    ],
+    "threshold": "every reported recovery independently replayed; all attempted rung cells accounted for",
+    "statistic": "exact completed recovery count and descriptive per-execution stage clocks",
+    "interval": "none; fixed public inputs and raw per-execution values",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "none; bounded frontier only",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "analyze-filter.rs",
+      "sha256": "29590ddddd3a84996e0bf5535fd1e12e39560552980e6bc3065f01c6a69754b1"
+    },
+    "inputs": [
+      "rows.csv"
+    ],
+    "outputs": [
+      "summary.txt",
+      "scaling.svg",
+      "analysis.log"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Every solver execution against field bits, including bounded failures"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Claiming a largest possible ECDLP size from a finite timed ladder",
+    "Treating L0 times as certified speedups",
+    "Hiding unsuccessful trials or higher unattempted rungs",
+    "Claiming a tensor or subexponential backend from generic MITM",
+    "Supplying the target scalar to recovery"
+  ],
+  "literature": [
+    {
+      "ref": "user supplied Subexponential ECDL paper, sections1.2 and3",
+      "provenance": "internal",
+      "claim": "Paper reduction has factor bases,relation collection,linear algebra and extraction; claimed asymptotic contraction is conditional and not practical-curve speed evidence.",
+      "verified_by": "Read supplied full text2026-10-30"
+    },
+    {
+      "ref": "https://www.hyperelliptic.org/tanja/teaching/isogeny-school21/csidh-sidh-week-3.pdf",
+      "provenance": "retrieved",
+      "claim": "Point order divides group order; Hasse interval bounds full cardinality. Exact prime torsion witness and unique multiple certify cofactor one.",
+      "verified_by": "Primary lecture notes read2026-10-30"
+    },
+    {
+      "ref": "https://pari.math.u-bordeaux.fr/dochtml/html-stable/Elliptic_curves.html",
+      "provenance": "retrieved",
+      "claim": "ellcard returns finite-field curve cardinality; used for public fixture construction, independently certified again by driver.",
+      "verified_by": "Official documentation read2026-10-30"
+    },
+    {
+      "ref": "https://github.com/NVIDIA/cccl/blob/main/thrust/thrust/binary_search.h",
+      "provenance": "retrieved",
+      "claim": "Lower-bound on a sorted full-key range preserves first equal entry; prefix ranges are bounded with the same comparator. This is an engineering index, not a new decomposition algorithm.",
+      "verified_by": "Read NVIDIA primary implementation documentation2026-10-30; existing curve.cuh RowLess/lookup examined."
+    },
+    {
+      "ref": "https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html",
+      "provenance": "retrieved",
+      "claim": "Reuse invariant work with explicit memory accounting and test complete workload behavior. Here partial group sums are invariant across relation targets, preserving the mixed-radix tuple index.",
+      "verified_by": "Read NVIDIA best-practices guide and current tuple_sum/Plan indexing source2026-10-30"
+    },
+    {
+      "ref": "https://www.secg.org/sec1-v2.pdf section2.3.3",
+      "provenance": "retrieved",
+      "claim": "On a fixed odd-prime curve, x and y parity encode a point exactly; infinity is separate. Internal key2*(x+1)+(y&1) with infinity0 fits u64 under p<2^62. This is exact compression, not a hash or new algorithm.",
+      "verified_by": "Read SEC1 v2 primary standard section2.3.3 on2026-10-30 before implementation; inspected canonical affine conversion and validated service inputs."
+    },
+    {
+      "ref": "https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html section3.2",
+      "provenance": "retrieved",
+      "claim": "Random memory access limits throughput; assess realistic complete workloads. A larger index narrows exact binary search at an explicitly charged setup and storage cost. This is conventional indexing, not a new decomposition algorithm.",
+      "verified_by": "Read official NVIDIA guide and existing prefix kernels2026-10-30 before this change."
+    },
+    {
+      "ref": "https://docs.nvidia.com/cuda/archive/13.0.0/cuda-c-programming-guide/index.html#device-memory-accesses",
+      "provenance": "retrieved",
+      "claim": "Naturally aligned accesses are required; unaligned8/16-byte loads can produce incorrect results. Three u32 words provide exact12-byte storage without unaligned u64 loads; multiple loads may affect performance, so assess full workload.",
+      "verified_by": "Read primary CUDA13 guide global-memory size/alignment section2026-10-30; inspected current exact key/tuple-ID bounds before implementation."
+    },
+    {
+      "ref": "https://raw.githubusercontent.com/NVIDIA/cccl/v3.2.0/cub/cub/device/device_merge_sort.cuh and device/dispatch/dispatch_merge_sort.cuh",
+      "provenance": "retrieved",
+      "claim": "DeviceMergeSort accepts arbitrary comparable keys and integer offsets. Null scratch queries the required allocation before kernels. Admission uses returned bytes plus retained rows and other allocations, including virtual shared-memory needs; comparator includes original tuple ID, so stability is unnecessary.",
+      "verified_by": "Read primary CCCL3.2.0 interface and allocation dispatch2026-10-30 before implementation; runtime build retains actual nvcc/library identity."
+    },
+    {
+      "ref": "https://developer.nvidia.com/blog/cuda-pro-tip-write-flexible-kernels-grid-stride-loops/",
+      "provenance": "retrieved",
+      "claim": "Bounded grid-stride traversal reuses threads; atomically stopping only tiles above an existing witness preserves the exact minimum without cross-block waiting.",
+      "verified_by": "Read NVIDIA guidance and device-scope atomic memory semantics before implementation; see PERSISTENT-QUERY.md."
+    },
+    {
+      "ref": "https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#memory-optimizations",
+      "provenance": "retrieved",
+      "claim": "Reuse invariant data when memory permits, and charge construction/storage to the full workload. Exact right sums are independent of each relation target.",
+      "verified_by": "Read official guide2026-10-30; phase-lifetime and overflow-safe admission argument in FULL-RIGHT-CACHE.md. No novelty or unmeasured gain claimed."
+    },
+    {
+      "ref": "https://cacr.uwaterloo.ca/hac/about/chap14.pdf algorithms14.32/14.36 and Note14.33",
+      "provenance": "retrieved",
+      "claim": "Montgomery reduction with T<pR gives a result below2p. For R=2^64,p<R/2 the implemented intermediates fit; full-u64 hash arithmetic uses separate overflow-safe operations. Tests do not replace these domain bounds.",
+      "verified_by": "Primary chapter reread2026-10-30 before this protocol; gpu/explicit-relations/FIELD63.md and existing field/hash fixtures reviewed."
+    },
+    {
+      "ref": "https://arxiv.org/html/2512.15595v2 sectionsII/IV and https://github.com/NVIDIA/cuCollections",
+      "provenance": "retrieved",
+      "claim": "Blocked GPU filtering can avoid downstream misses, but construction/storage and false positives matter. Only definite absence skips exact lookup; no fastest implementation or fixedFPR claim.",
+      "verified_by": "Read primarypaper and NVIDIA bloom_filter.cuh/policy beforeimplementation2026-10-30; seeNEGATIVE-FILTER.md."
+    },
+    {
+      "ref": "https://prng.di.unimi.it/splitmix.c",
+      "provenance": "retrieved",
+      "claim": "Public-domain unsigned SplitMix finalizer reused forword/patternselection; correctnessofnoprunedtruekeys followsfromatomicOR,notstatisticalhashquality.",
+      "verified_by": "Read Vigna primarysource2026-10-30 beforeimplementation."
+    }
+  ],
+  "amendments": [
+    {
+      "id": "A-wrapper-newline",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "Podliii98dyd3b7to failed before compilation or measurements because mkdir and nvidia-smi were joined in run.sh. Failure archive retained; pod deletion verified.",
+      "changes": [
+        "Separate mkdir and nvidia-smi commands; admit one fresh execution of unchanged fixtures, analyzer and recovery code."
+      ],
+      "supersedes_fields": [
+        "execution"
+      ]
+    },
+    {
+      "id": "A-analysis-typecheck",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "Podt9kc1zn12mr2tc passed all13Rust tests, GPU/reduction checks,Clippy and sanitizers, then analyzer compilation failed at f64+integer before any ladder row. Failure archive and deletion retained.",
+      "changes": [
+        "Use floating-point5.0 in chart y-coordinate and compile native instruments with edition2021 and warnings denied. Both instruments metadata-typechecked locally before relaunch. No recovery code or inputs changed."
+      ],
+      "supersedes_fields": [
+        "analysis_plan.script.sha256",
+        "execution"
+      ]
+    },
+    {
+      "id": "A-prefix-index-frontier",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "v3 completed20..52bit cells;56bit cells still running when index panel designed. Introduce a separate matched panel for exact prefix indexing and larger fixed fields; retain v3 unchanged.",
+      "changes": [
+        "Index high x bits with at most65537u64 offsets, charged to admission and cold setup. Infinity uses full lookup; duplicates keep minimum original tuple id.",
+        "Frozen24-row maximum48/52/56/58/60 ladder with matched binary baseline48/52 and identical indexed A/A throughout. Same limits and target rules asv3.",
+        "Additional index boundary tests and query memcheck; table admission diagnostics on both measured services. Fix CI divisibility lint with equivalent is_multiple_of."
+      ],
+      "supersedes_fields": [
+        "arms",
+        "variable_ledger",
+        "randomization",
+        "sample_size.instances",
+        "stopping_rules",
+        "analysis_plan.script",
+        "question"
+      ]
+    },
+    {
+      "id": "A-bounded-partial-reuse",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "v3 stage records show relation oracle dominates52bit recovery. v4 indexed panel completed52bit comparison and is still running larger fields; source examination shows every query recomputes identical right-side partial sums. New separate panel tests bounded reuse and larger explicit row/work admission, without changing v4.",
+      "changes": [
+        "Cache two contiguous partial sums only when both table cardinalities fit chunk_rows; at most2*chunk_rows*sizeof(Point) extra storage, included in admission. Otherwise retain uncached path. Preserve exact right/left witness and visited order.",
+        "Matched52bit b/u/x panel and two-target56/58/60 frontier; twelve rows maximum, new fixed per-rung deadlines and bounded worker/controller duration.",
+        "Raise max_rows2^29->2^30 and max_work2^30->2^31 for all new arms so the larger frontier reaches GPU admission rather than the earlier planning cap. Keep25%free-memory reserve and conservative sort accounting.",
+        "New partial-cache/fallback/reprepare/infinity differential tests; preserve prior rawdata and protocols. Canonical rectangular coverage checker limitations remain documented; native analyzer validates this explicitly nonrectangular design."
+      ],
+      "supersedes_fields": [
+        "question",
+        "arms",
+        "variable_ledger",
+        "randomization",
+        "sample_size",
+        "execution.timeout_seconds",
+        "stopping_rules",
+        "decision_rule.text",
+        "analysis_plan.script"
+      ]
+    },
+    {
+      "id": "A-exact-compact-rows",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "V5 completed52bit comparison and both56bit recoveries; larger cases still running when designed. Cache showed no52bit timing benefit and is opt-in. Each retained full-coordinate row is32bytes; exact on-curve compression halves it without changing witnesses. Preserve prior panels.",
+      "changes": [
+        "Opt-in ER_COMPACT_ROWS and cuda-compact: exact16byte key/id row, same minimum original tuple id and right traversal. Check all valid points on a small curve against full-coordinate lookup, duplicates,infinity,emptybuckets,endpoint arithmetic and complete host/device replay.",
+        "Separate12-row panel uses same arm/target schedule asv5, matched full-coordinate baseline and no partial cache. Raise row cap2^31/work2^32 for all arms;58bit900s,60bit1200s,worker6900s/controller7200s. Reserve three actual row buffers plus25%free memory.",
+        "No concurrent task GPU; launch only afterv5archive/deletion. Preserve earlier limits and failures. Frozen scripts require recorded source."
+      ],
+      "supersedes_fields": [
+        "question",
+        "arms",
+        "variable_ledger",
+        "sample_size.preflight_runtime",
+        "execution.timeout_seconds",
+        "stopping_rules",
+        "decision_rule.text",
+        "analysis_plan.script"
+      ]
+    },
+    {
+      "id": "A-service-row-cap",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "V6 podoazm8b2kvq0wvz passed full/cached/compact CUDA, host/reduction,13Rust,Clippy and all query sanitizers, then first solver failed because the line protocol still capped rows at2^30. No ladder row was recorded. Raw failure archive and verified deletion retained.",
+      "changes": [
+        "Raise explicit line-protocol admission maximum to2^31, matching the already frozen v6 requested cap and checked u64 planner/device limits. Actual allocations remain guarded by GPU free memory and sort reserve. No automatic allocation at the cap.",
+        "Add direct upper-bound/zero/overflow/chunk unit checks and exercise the actual service header at2^31 before the ladder. New run-compact-v7.sh; same inputs, arms, seeds, limits, ladder and analyzer asv6.",
+        "Authorize one new bounded execution; preserve v6 as failed, never relabel it a completed panel."
+      ],
+      "supersedes_fields": [
+        "execution"
+      ]
+    },
+    {
+      "id": "A-wide-prefix",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "V7 live data already contains both verified58-bit targets;60-bit outcomes remain pending. Relation lookup dominates recorded stage clocks. The2^16 index ceiling leaves large buckets. Prepare a separately frozen optional2^24 ceiling; do not alter or overlap v7.",
+      "changes": [
+        "Use16-byte rows in both arms; change only prefix ceiling in matched52-bit comparison. Preserve all prefix setup/storage in cold accounting.",
+        "Retain new merged CPU arithmetic source identically for all arms; make no cross-version timing comparison.",
+        "Increase60-bit solve limit to1800s; worker9000/controller9300. Same fixtures,seeds,complete-rung stopping rule.",
+        "Run full original/compact/wide query correctness and memcheck/racecheck/synccheck, including all2^24 offset boundaries, before data."
+      ],
+      "supersedes_fields": [
+        "arms",
+        "variable_ledger",
+        "execution",
+        "stopping_rules",
+        "sample_size"
+      ]
+    },
+    {
+      "id": "A-field-width-boundary",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "v8 completed both60bit targets. Its driver guard prevents testing larger fields; this separate protocol extends checked arithmetic and probes actual resource admission. Existing outcomes unchanged.",
+      "changes": [
+        "Extend witness field p<2^62/order r<2^63, hash modulus s<2^63; retain fast Montgomery below2^62 and exact add/double fallback above. Validate with u128 arithmetic and signed hash-inventory differentials.",
+        "Raise explicit row cap to2^32/work2^34 so balanced larger tables reach memory admission. Preserve conservative three-row-buffer accounting and25%free reserve.",
+        "52bit baseline/candidate/AA control and two-target61/62bit ladder with exact replay and scalar corruption checks. No new tensor or certified speedup claim."
+      ],
+      "supersedes_fields": [
+        "question",
+        "arms",
+        "variable_ledger",
+        "randomization",
+        "sample_size",
+        "execution",
+        "stopping_rules",
+        "analysis_plan"
+      ]
+    },
+    {
+      "id": "A-exact-twelve-byte-rows",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "v8 completed both60bit targets. v9 first61bit target reported a resource limit; second still active when this distinct candidate was designed. Resource subtype awaits archive. Exact compact rows currently use16bytes though tuple IDs are bounded by2^32.",
+      "changes": [
+        "Store full point key as two naturally alignedu32 halves and original tuple ID asu32, exactly12bytes. Reject more than2^32left rows. Preserve full key comparator, minimum duplicate ID, infinity and UINT64_MAX miss sentinel.",
+        "Keep2^24prefix ceiling, same CPU driver, same inputs/caps/deadlines. Matched16-byte baseline and12-byte candidate/A/A at52bits; candidate only61/62bits. No cross-panel causal timing claim.",
+        "Add exhaustive valid-curve dense-key differentials including UINT32_MAX IDs, wide-prefix endpoints and dense memcheck/racecheck/synccheck. Existing tests retained. Launch only after v9 archive collection and verified deletion."
+      ],
+      "supersedes_fields": [
+        "question",
+        "arms",
+        "variable_ledger",
+        "analysis_plan",
+        "decision_rule.text"
+      ]
+    },
+    {
+      "id": "A-queried-sort-scratch",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "v9completed one61bit recovery and one explicit memory refusal:85,969,611,408byte conservative admission. v10was frozen but neverlaunched. CUB exposes exact scratch query; combine separately controlled52bit row/sort arms before one larger frontier panel rather than duplicate larger runs.",
+      "changes": [
+        "Add optional CUB merge sort with explicit int64 itemcount, queried scratch plus retainedrow admission,25%free reserve unchanged; free scratch before indexing/queries.",
+        "Add large-count sizing checks without allocation and actual CUB query differentials, repeated prepare tests, memcheck/racecheck/synccheck. Record returned scratch and row width.",
+        "Four52bit arms b16/Thrust,u12/Thrust,v12/CUB,xrepeatv; v-only61/62bit ladder. v10remains unexecuted and unchanged; v9data retained."
+      ],
+      "supersedes_fields": [
+        "question",
+        "arms",
+        "variable_ledger",
+        "randomization",
+        "sample_size",
+        "stopping_rules",
+        "analysis_plan",
+        "decision_rule"
+      ]
+    },
+    {
+      "id": "A-full-right-reuse",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "V11 completed both61-bit targets and is running62bits. V12 was frozen but never launched. Dense tables leave room for exact complete right-sum reuse, which differs from the prior losing partial-cache control. Preserve activev11 and supersede unexecutedv12 beforedata.",
+      "changes": [
+        "Retain distinct b/u persistent-query andu/v full-cache comparisons plusv/x AA at52bits; run larger v-only frontier once. V12 remains unchanged asunexecuted.",
+        "Full16-byte affine cache allocated only after sort scratch release and only if phase memory fits existing reserve. Otherwise explicit uncached fallback. All cold setup counted; no partial cache is enabled.",
+        "Native ladder requires correct cache mode on every successful52-bit trial; forced two-block tests include full cache and zero-cap fallback, late minima, complete misses, resets and memory boundaries. All query and full service sanitizer checks precede data.",
+        "Same fixed52/61/62bit curves, public targets, seeds, row/work caps, deadlines and complete-rung stopping. No concurrent taskGPU."
+      ],
+      "supersedes_fields": [
+        "question",
+        "arms",
+        "variable_ledger",
+        "sample_size",
+        "measurement",
+        "decision_rule",
+        "analysis_plan"
+      ]
+    },
+    {
+      "id": "A-63-bit-field-probe",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "V11 verified both62-bit targets. V13 remains active on its frozen62-bit source; no63-bit data exists. PR2985 merged the separately prepared width extension, with GPU/Rust validation still pending. This protocol validates that source before probing a new fixed63-bit field.",
+      "changes": [
+        "Admit p<2^63 and representable full-u64 hash primes, retaining r<2^63. Run existing independent host/u128, Rust, device boundary, hash inventory, witness and all query sanitizers before any frontier cell.",
+        "Two prescribed52/63-bit fixtures, unchanged seed/arm controls and explicit memory/row/work limits; only63-bit solve deadline7200s. Fullcache candidate retains explicit uncached fallback. Record failures rather than changing admission after outcomes.",
+        "No overlapping taskGPU; launch only afterv13 archive/deletion. New frozen source and instruments, no v11/v13 timing speedup inference. Larger-width support is generic decomposition, not the paper tensor backend."
+      ],
+      "supersedes_fields": [
+        "question",
+        "links",
+        "variable_ledger",
+        "randomization",
+        "sample_size",
+        "stopping_rules",
+        "decision_rule",
+        "analysis_plan",
+        "literature"
+      ]
+    },
+    {
+      "id": "A-negative-prefilter",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "V13stillrunsits62bitpanel. V14isfrozenbutneverlaunched. Savedv11logscontainbillionsofprobesperrelationattempt;mostareexactmisses. Combinetheseparate63bitvalidationwithcontrolledprefilterarmsbeforeanyv14data,toavoidduplicatelargerruns.",
+      "changes": [
+        "Opt-inatomicORblockedfilter,exactdownstreamlookup,chargedphasepeakandcacheadmission. Saturatedfiltertestforcesfalsepositivesthroughexactlookup;allhost/Rust/CUDAchecksandsanitizersbeforedata.",
+        "Matchedfullcachebaseline/filteredcandidate/AArepeat52bitcontrols;both63bitfixedtargetscandidateonly,unchangedlimitsanddeadlines. V14remainsunexecutedandimmutable.",
+        "NooverlappingtaskGPU;launchonlyafterv13archive/deletion. Preservealltimeouts/refusals,nocertifiedspeeduporhardwaremaximumclaim."
+      ],
+      "supersedes_fields": [
+        "question",
+        "arms",
+        "variable_ledger",
+        "randomization.arm_order_reason",
+        "sample_size.preflight_runtime",
+        "stopping_rules",
+        "decision_rule",
+        "analysis_plan",
+        "literature"
+      ]
+    },
+    {
+      "id": "A-source-delivery-v16",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "V15 failed source checkout before compilation or data; original one-attempt contract retained. New infrastructure attempt uses the identical source 23dc8a61ca928e47237f8fb5a3a8d87228649628 and native instruments. Deliver prehydrated hash-verified sparse source instead of GitHub lazy fetch.",
+      "changes": [
+        "No solver, input, control, analysis or deadline change. Every v15 failure remains recorded.",
+        "Bootstrap checks source archive SHA256 and exact original Git HEAD, plus clean selected worktree. Source delivery is outside the measured solve interval.",
+        "Launch only after v15 archive and pod deletion; retain full GPU preflight before data."
+      ],
+      "supersedes_fields": [
+        "version",
+        "links.implementation_pr",
+        "execution"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "fe424abdd265c0ded0c191edf1c36810d86a87163502a1497c2da43ffece378f",
+    "commit": "23dc8a61ca928e47237f8fb5a3a8d87228649628",
+    "frozen_at": "2026-10-30T20:16:09Z",
+    "filed_before_affected_data": true
+  }
+}

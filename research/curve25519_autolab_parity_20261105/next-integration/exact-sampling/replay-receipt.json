@@ -1,0 +1,62 @@
+{
+  "status": "unsigned_producer_observation",
+  "scope": "standalone native development tests",
+  "build_exit": 0,
+  "tests_exit": 0,
+  "dependencies": {
+    "num_bigint": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libnum_bigint-07cc2884707d2a19.rlib",
+      "sha256": "24508f87050e66c52cb2755af4df8632858fa5eb674679997d49cc3385b2281b"
+    },
+    "serde": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libserde-0bf82e85196bd177.rlib",
+      "sha256": "cbac69b55153b66829730eadf96cebdab42790a455f762d476b44f4113f14168"
+    },
+    "serde_json": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libserde_json-458049281485fb75.rlib",
+      "sha256": "688d29f94eb42520a78a31271704f90a8b370dbce6f8c65551fc1cf41b002019"
+    },
+    "hex": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libhex-06ecfa8b1b55f264.rlib",
+      "sha256": "a606b3dc553060ec919d70496df47f29396985f9daf1d1892ed27f3ae083d8e1"
+    }
+  },
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "argv": [
+    "rustc",
+    "--edition=2021",
+    "--test",
+    "-O",
+    "/tmp/curve25519-exact-sampling-replay-20261105/harness.rs",
+    "-L",
+    "dependency=/tmp/curve25519-autolab-target/release/deps",
+    "-o",
+    "/tmp/curve25519-exact-sampling-replay-20261105/tests",
+    "--extern",
+    "num_bigint=/tmp/curve25519-autolab-target/release/deps/libnum_bigint-07cc2884707d2a19.rlib",
+    "--extern",
+    "serde=/tmp/curve25519-autolab-target/release/deps/libserde-0bf82e85196bd177.rlib",
+    "--extern",
+    "serde_json=/tmp/curve25519-autolab-target/release/deps/libserde_json-458049281485fb75.rlib",
+    "--extern",
+    "hex=/tmp/curve25519-autolab-target/release/deps/libhex-06ecfa8b1b55f264.rlib"
+  ],
+  "files": {
+    "tests.log": {
+      "sha256": "00723dd51315dd0d7b5da4ef57232e117a288b5e0b103766b09913df4c7f02f4",
+      "bytes": 2746
+    },
+    "tests": {
+      "sha256": "3fcc30523914ff3f8fc268891d364a8f766a5aa0be99b30a6a1c8ed99182540d",
+      "bytes": 7768016
+    },
+    "build.log": {
+      "sha256": "c03e4438eeca6dc8e85abc5e10882876764d8bdfccde523be889a3cc36b0b6d9",
+      "bytes": 1339
+    },
+    "harness.rs": {
+      "sha256": "7960b70015ff66c75ee8afb8d1a45bbc1398a1ab2a1aa60fec3a8d504edd0ddc",
+      "bytes": 586
+    }
+  }
+}

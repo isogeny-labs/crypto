@@ -1,0 +1,44 @@
+{
+  "schema": "pencil-interim-coverage-display/v1",
+  "run_id": "pencil-p186379-20261030-c1",
+  "checkpoint_generation": 9,
+  "source": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-c1/checkpoint-g9-observations/native-analysis/native-analysis.json",
+    "sha256": "4f439949a2040d6b88cf9969c76316dfe7384f4963e75efba58c91934c83cd69"
+  },
+  "counts": [
+    {
+      "label": "All execution slots",
+      "observed": 4,
+      "expected": 18,
+      "source_fields": [
+        "observed_executions",
+        "expected_executions"
+      ]
+    },
+    {
+      "label": "Measured execution slots",
+      "observed": 1,
+      "expected": 15,
+      "source_fields": [
+        "observed_executions minus observed_warmup_executions",
+        "expected_executions minus expected_warmup_executions"
+      ]
+    },
+    {
+      "label": "Complete measured pairs",
+      "observed": 0,
+      "expected": 5,
+      "source_fields": [
+        "aggregate_cells admitted pair count (same 0 across all36 cells)",
+        "expected_measured_pairs"
+      ]
+    }
+  ],
+  "notes": [
+    "Coverage counts only, not runtime or cost ratios.",
+    "Three observed warmups include one pencil timeout.",
+    "Fourteen execution slots are absent in this checkpoint; they are not fabricated failures.",
+    "Session remains running; producer statuses have not undergone independent scientific replay."
+  ]
+}

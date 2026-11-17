@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T18:03:21Z",
+ "id": "PCC-20261116-5a3b3c",
+ "kind": "theorem",
+ "producer": {
+  "commit": "292abb6a209601b0ad78be4621da7ad85bcf64b2",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "713e4580dce46b3bae78f1f64e5a314052ef2f4b1dffdb6c38a8f7e3158e2a0b",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+   "theorem": "CubicFrobeniusTraceDescent05.faithful_stable_cyclic_forces_fixed"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Abstract cubic additive action with explicit module/scalar/additive/cube/annihilator/Bezout/stable-cyclic-faithfulness or endpoint-covariance hypotheses as stated. Normalized trace projection, complement, cyclic fixed implication and eigenline annihilation; abstract Fin109/3 controls are not actual curve Frobenius instances. Both original gates17/0 atj1/120/default memory. No global Jacobian/field/ECDLP cost or signed standing.",
+ "statement": "theorem faithful_stable_cyclic_forces_fixed {M : Type} [IntModule M] (F : M \u2192 M) (hlin : \u2200 (n : Int) x, F (n \u2022 x)=n \u2022 F x) (hcube : \u2200 x, F (F (F x))=x) (P : M) (lam : Int) (heigen : F P=lam \u2022 P) (faithful : \u2200 a b : Int, a \u2022 trace3 F P=b \u2022 trace3 F P \u2192 a \u2022 P=b \u2022 P) : F P=P"
+}

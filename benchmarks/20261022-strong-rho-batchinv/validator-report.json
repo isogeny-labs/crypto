@@ -1,0 +1,894 @@
+{
+ "kind": "validator-report",
+ "status": "pass",
+ "independent": true,
+ "date": "2026-10-22",
+ "validator": "Validator role (crypto-autoresearcher agents/validator.md), Claude Opus 5.5 subagent; not the producer",
+ "method": "Every headline number was recomputed in Python from the raw files, without summary.json, summarise.sh or jq. Ir comes from 'Collected' in each valgrind.log, cross-checked against 'I refs' and callgrind.out 'totals', and walk steps are summed from the paired jsonl. ns/step = sum(walk_ms)*1e6/sum(walk_steps) per timing file. Contention and exit status come from isolation.jsonl, and the run order from run.before.unix_time and append order. Supplementary: a Callgrind replay of both arms, and the validator's own native A/B replication at n53.",
+ "status_basis": "'pass' means every headline number recomputes from the repository raw data within rel_tol 1e-9 and every listed control holds on the recorded data. It does not mean the native n53 speedup is established: findings F1 and F2 contradict that, and the robust result is the Callgrind instruction reduction.",
+ "subject": {
+  "change": "Gf2::batch_inv_clmul in src/cryptanalysis/semaev_decomp.rs: fixed-width as_chunks::<4>() loops",
+  "baseline_commit": "412b60289db97ad1ba13a2bffe1120fadc7fb7d6",
+  "change_commit": "393a1a9359e23e21591a250f0691eb576dd45785",
+  "head_at_certification": "2c67a23c94b1cedc04d1dcc50ab0ddaeb2525eb2",
+  "research_dir": "research/rho_batchinv_20261022"
+ },
+ "raw_data": [
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/callgrind/fixture-n41-4-baseline.callgrind.out",
+   "repo_path": "research/rho_batchinv_20261022/runs/callgrind/fixture-n41-4-baseline.callgrind.out",
+   "sha256": "0a42f40253ee3453c2060b6db746d422a08e81eb3d60c58efa0ae78aa49fa36e",
+   "role": "callgrind profile"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/callgrind/fixture-n41-4-baseline.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/callgrind/fixture-n41-4-baseline.jsonl",
+   "sha256": "4f9bab8e35a9c215611f07af3f78a9f835a3e633d7c4acb10268161124d92355",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/callgrind/fixture-n41-4-baseline.valgrind.log",
+   "repo_path": "research/rho_batchinv_20261022/runs/callgrind/fixture-n41-4-baseline.valgrind.log",
+   "sha256": "af6c9fb753af414a9872cf0e34bf240e5abfb983b08af6c10b0589d03da5d221",
+   "role": "valgrind log"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/callgrind/fixture-n41-4-candidate.callgrind.out",
+   "repo_path": "research/rho_batchinv_20261022/runs/callgrind/fixture-n41-4-candidate.callgrind.out",
+   "sha256": "2bf2ae041aa32719385cb386ae7a111066ed55ebcdc5d5704046471b93820bbb",
+   "role": "callgrind profile"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/callgrind/fixture-n41-4-candidate.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/callgrind/fixture-n41-4-candidate.jsonl",
+   "sha256": "56a042b4a677dfaf0540fe5ec007bb09bc51c3c954ea44a20601e80fba29aada",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/callgrind/fixture-n41-4-candidate.valgrind.log",
+   "repo_path": "research/rho_batchinv_20261022/runs/callgrind/fixture-n41-4-candidate.valgrind.log",
+   "sha256": "bb82393bf542441c1aa0f5737eac0b5dbd132c100c262333cd1fcb3d8a463200",
+   "role": "valgrind log"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/callgrind/fixture-n53-4-baseline.callgrind.out",
+   "repo_path": "research/rho_batchinv_20261022/runs/callgrind/fixture-n53-4-baseline.callgrind.out",
+   "sha256": "5fa9e971d1965c831db457ee4f876a974b3682c6510cf31f1069beb7affe8a50",
+   "role": "callgrind profile"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/callgrind/fixture-n53-4-baseline.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/callgrind/fixture-n53-4-baseline.jsonl",
+   "sha256": "0e714099c1c3f1191e2f0fe888cc0687956c8090afac460c9af4c62314d942ac",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/callgrind/fixture-n53-4-baseline.valgrind.log",
+   "repo_path": "research/rho_batchinv_20261022/runs/callgrind/fixture-n53-4-baseline.valgrind.log",
+   "sha256": "2195bab9e7b98b37bdc85fb78e45d32ef0ce5820ba16e8a307b144e9f5a8e48b",
+   "role": "valgrind log"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/callgrind/fixture-n53-4-candidate.callgrind.out",
+   "repo_path": "research/rho_batchinv_20261022/runs/callgrind/fixture-n53-4-candidate.callgrind.out",
+   "sha256": "8b31d168739d7cef62899b9311af00bac02166cd9d1cffb5ef0293c49e815517",
+   "role": "callgrind profile"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/callgrind/fixture-n53-4-candidate.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/callgrind/fixture-n53-4-candidate.jsonl",
+   "sha256": "0ec74b84fa9d18e5f3442ee37e49e62f330521a829a8079d4942a75269fd81ff",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/callgrind/fixture-n53-4-candidate.valgrind.log",
+   "repo_path": "research/rho_batchinv_20261022/runs/callgrind/fixture-n53-4-candidate.valgrind.log",
+   "sha256": "cfa180f77449b82a9de42c2b3adc08ddf743e3a8f4aebcfa258a71f1688e2353",
+   "role": "valgrind log"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/identity/fixture-n41-baseline.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/identity/fixture-n41-baseline.jsonl",
+   "sha256": "2b32c3c980c08db9c179f43eb769ecede6fd9a4cd274e17d6e9c6e6732b236d2",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/identity/fixture-n41-candidate.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/identity/fixture-n41-candidate.jsonl",
+   "sha256": "f763998656e3db717639165969af0706019010c6a1d929a74762e9a4a29362ac",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/identity/fixture-n53-baseline.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/identity/fixture-n53-baseline.jsonl",
+   "sha256": "e438b97d76e07c9d46f2f2ed4b851fa6ccc8e529b74e8fcf634517ffb781a13b",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/identity/fixture-n53-candidate.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/identity/fixture-n53-candidate.jsonl",
+   "sha256": "80017bd3cb0b3dfe02c5d2b7756258708a353064526228dc3884f528d57cd914",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/identity/fixture-n61-baseline.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/identity/fixture-n61-baseline.jsonl",
+   "sha256": "389d4535f543fe618c4a166e219c612f81478da4c119f84db2ec8afcf7019b41",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/identity/fixture-n61-candidate.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/identity/fixture-n61-candidate.jsonl",
+   "sha256": "06e9831e3c52a3d1f0b2781cb652e3f8cf2e4a66a94445fd1b906738a124a369",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/aa/icv1-f2m53-tm56619371-dac20a85-baseline-r1.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/aa/icv1-f2m53-tm56619371-dac20a85-baseline-r1.jsonl",
+   "sha256": "0726e35240f24f62e9305296e6b19a1f609a7a2e3b05fbec32af251968d9820d",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/aa/icv1-f2m53-tm56619371-dac20a85-baseline-r2.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/aa/icv1-f2m53-tm56619371-dac20a85-baseline-r2.jsonl",
+   "sha256": "42957ebca6fa512fefa216de90c9b1b2f31387f6432bef5f97da21ade6c490da",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/aa/icv1-f2m53-tm56619371-dac20a85-baseline-r3.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/aa/icv1-f2m53-tm56619371-dac20a85-baseline-r3.jsonl",
+   "sha256": "b69dafe17e865f16e121eab730775348266254a28c74f8b633360084fd73f7a1",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/aa/icv1-f2m53-tm56619371-dac20a85-baseline-r4.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/aa/icv1-f2m53-tm56619371-dac20a85-baseline-r4.jsonl",
+   "sha256": "0967e51f41a84700416f2f48bbb73a62180c6c345db2dc8d95c0ec410cea85ad",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/aa/icv1-f2m53-tm56619371-dac20a85-baseline-r5.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/aa/icv1-f2m53-tm56619371-dac20a85-baseline-r5.jsonl",
+   "sha256": "f5985520a4cc902942fbffdcdd74d1dbf9329d643865bfff029d8dfbd0ec01b1",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/aa/icv1-f2m53-tm56619371-dac20a85-baseline-r6.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/aa/icv1-f2m53-tm56619371-dac20a85-baseline-r6.jsonl",
+   "sha256": "df2bd3b2224ec2e2b94b4ffb55209c76c58979deaad2e90b67a519c63410bf1c",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/aa/icv1-f2m61-t158598901-ab42b6c5-baseline-r1.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/aa/icv1-f2m61-t158598901-ab42b6c5-baseline-r1.jsonl",
+   "sha256": "b51fa6599cd803bb3bd974216dbc45ff18a2628052c145f5fa54be30ef5b5b76",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/aa/icv1-f2m61-t158598901-ab42b6c5-baseline-r2.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/aa/icv1-f2m61-t158598901-ab42b6c5-baseline-r2.jsonl",
+   "sha256": "443d206ec5bb64bfe1ece0a2855fecfcac0657dabfab222aa76dde8ceedc932e",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/aa/icv1-f2m61-t158598901-ab42b6c5-baseline-r3.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/aa/icv1-f2m61-t158598901-ab42b6c5-baseline-r3.jsonl",
+   "sha256": "c0b2fec024413da567ed7c8ea1f6de94beaac4cb6c2acf3b245614b46e65baae",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/aa/icv1-f2m61-t158598901-ab42b6c5-baseline-r4.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/aa/icv1-f2m61-t158598901-ab42b6c5-baseline-r4.jsonl",
+   "sha256": "e92e1a44b39a8297828d514af56a27cf385d1f964aaec43b8d6553ae4111f42e",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/aa/icv1-f2m61-t158598901-ab42b6c5-baseline-r5.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/aa/icv1-f2m61-t158598901-ab42b6c5-baseline-r5.jsonl",
+   "sha256": "62e3b94effe2b00ca95513959ea0ca706af4f86a1fbe9975692103530286c0ac",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/aa/icv1-f2m61-t158598901-ab42b6c5-baseline-r6.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/aa/icv1-f2m61-t158598901-ab42b6c5-baseline-r6.jsonl",
+   "sha256": "be7bb270c9fa07fc0ee434a40f93e376389dd64efead07349d8411075cafc8f1",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/aa/isolation.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/aa/isolation.jsonl",
+   "sha256": "e43497aef32108a75033e67183f1511161c29335873cb3e7be425d2dfd56cc3f",
+   "role": "isolation record"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-baseline-r1.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-baseline-r1.jsonl",
+   "sha256": "890413404e6310c573b57a160a451e495a164a7efba6c39d557754a831b610b7",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-baseline-r2.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-baseline-r2.jsonl",
+   "sha256": "60343c6197f3043fe7fdf6178082446afd453a060b26c231e929eb67919e81e4",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-baseline-r3.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-baseline-r3.jsonl",
+   "sha256": "005eb100ce7d6faa454dc19a74422e060a9a920f4c1db7dc35e0bec63bce3036",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-baseline-r4.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-baseline-r4.jsonl",
+   "sha256": "cbdce2bc39f8b56993f97b4d42b921cc5da2d0062ea8e3e9f14ff3442b58866a",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-baseline-r5.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-baseline-r5.jsonl",
+   "sha256": "01eb24d009863be0b4bfc35b896ea1a1212d1bcbcda07ba326ff9d6aa42d6b4b",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-candidate-r1.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-candidate-r1.jsonl",
+   "sha256": "35ffab23af7896b8a456787bb56eaa937d5bfaf42a0082767140c22a8f3a9f0c",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-candidate-r2.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-candidate-r2.jsonl",
+   "sha256": "b67aaeeceed24c7818637403c419896e38dc060e41a047d534eaf11cb88456ce",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-candidate-r3.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-candidate-r3.jsonl",
+   "sha256": "6a57bbc17ebee604676bd06839d9131369be5bb2bfcff15575408b39ef733d20",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-candidate-r4.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-candidate-r4.jsonl",
+   "sha256": "2b077ac126d8b4cea225c3022dd24cba1f65b5b232acc7fe8c9221f5f44a5f69",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-candidate-r5.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m53-tm56619371-dac20a85-candidate-r5.jsonl",
+   "sha256": "1a599618791ca927b433d7db1df6a0036ab89e339b33b4abf74f5f1818869364",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-baseline-r1.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-baseline-r1.jsonl",
+   "sha256": "e43a1f192c6f54e69c6b6e73263dd5b45726fe2cfe968f91b2a1d0824ad878ce",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-baseline-r2.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-baseline-r2.jsonl",
+   "sha256": "7a62add84764b790a52d7bb30ac89802e5a1c14a6b50709e272b32a64682cb31",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-baseline-r3.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-baseline-r3.jsonl",
+   "sha256": "77e63d35936e9ac43f9fffa58e74a2460a40d035d5ce0122320e96c5e52297f7",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-baseline-r4.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-baseline-r4.jsonl",
+   "sha256": "ccf4f5a1a4855b195e0bc5e7e5a5e55f5d54254365769af4188ae8ca1bdbd99b",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-baseline-r5.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-baseline-r5.jsonl",
+   "sha256": "29808fc9be3e0b8460915542b76cebc17051399c3004ccd80cb5130885d71b71",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-candidate-r1.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-candidate-r1.jsonl",
+   "sha256": "c8ba8cc5194cd46e28871590e50a2df04b3ca3c50d3f89a0e29f04b38ae36955",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-candidate-r2.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-candidate-r2.jsonl",
+   "sha256": "e49ef917ca59c38f074153561784e95b99796868275f13e9de1be2f079c642b0",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-candidate-r3.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-candidate-r3.jsonl",
+   "sha256": "e31f441796ec3f9686313469cd2d49aaab1359b14594b28b32a863293d520b5c",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-candidate-r4.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-candidate-r4.jsonl",
+   "sha256": "a36ab2d04399c130e5e6d35466cb82e2a2363ca0095c871b61cf6499a40c8071",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-candidate-r5.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/icv1-f2m61-t158598901-ab42b6c5-candidate-r5.jsonl",
+   "sha256": "30540699108103dc783dbdb3bc2665604f26ce81bf48806304511f9dcae4a6af",
+   "role": "raw run output"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/runs/time/ab/isolation.jsonl",
+   "repo_path": "research/rho_batchinv_20261022/runs/time/ab/isolation.jsonl",
+   "sha256": "2772f78e871c504bd3372f3b415186d75601b783537c5a018444d6b2ed8b8e70",
+   "role": "isolation record"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/PROTOCOL.md",
+   "repo_path": "research/rho_batchinv_20261022/PROTOCOL.md",
+   "sha256": "90d8e3da143a4a24df226a6a3bbb0d7bab953cb74ae31a5260cc26ce8012e559",
+   "role": "protocol/script/claim (not raw)"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/run_time.sh",
+   "repo_path": "research/rho_batchinv_20261022/run_time.sh",
+   "sha256": "f01d279c2b00c6f9c2a4a1b95f08347e2acd27b55238b6fd60ca9793047d736a",
+   "role": "protocol/script/claim (not raw)"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/summarise.sh",
+   "repo_path": "research/rho_batchinv_20261022/summarise.sh",
+   "sha256": "aae9b4d4925e17877f4227b48cf8750414c9e43ac964351176ff5fadb2b24c6f",
+   "role": "protocol/script/claim (not raw)"
+  },
+  {
+   "path": "../../research/rho_batchinv_20261022/summary.json",
+   "repo_path": "research/rho_batchinv_20261022/summary.json",
+   "sha256": "f34f20e1030d2ff55bef40c311a5073c55e7d382f73b08760e97a03455efefab",
+   "role": "protocol/script/claim (not raw)"
+  }
+ ],
+ "headline": [
+  {
+   "name": "ir_per_step_n53_baseline",
+   "claimed": 707.1881657249329,
+   "recomputed": 707.1881657249329,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "method": "Collected Ir from runs/callgrind/fixture-n{n}-4-{arm}.valgrind.log (equal to I refs and to callgrind.out totals) / sum(walk_steps) of the matching .jsonl; ratio = baseline Ir / candidate Ir"
+  },
+  {
+   "name": "ir_per_step_n53_candidate",
+   "claimed": 679.7070586203738,
+   "recomputed": 679.7070586203738,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "method": "Collected Ir from runs/callgrind/fixture-n{n}-4-{arm}.valgrind.log (equal to I refs and to callgrind.out totals) / sum(walk_steps) of the matching .jsonl; ratio = baseline Ir / candidate Ir"
+  },
+  {
+   "name": "ir_ratio_n53",
+   "claimed": 1.040430810238073,
+   "recomputed": 1.040430810238073,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "method": "Collected Ir from runs/callgrind/fixture-n{n}-4-{arm}.valgrind.log (equal to I refs and to callgrind.out totals) / sum(walk_steps) of the matching .jsonl; ratio = baseline Ir / candidate Ir"
+  },
+  {
+   "name": "ir_per_step_n41_baseline",
+   "claimed": 706.4885906582857,
+   "recomputed": 706.4885906582857,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "method": "Collected Ir from runs/callgrind/fixture-n{n}-4-{arm}.valgrind.log (equal to I refs and to callgrind.out totals) / sum(walk_steps) of the matching .jsonl; ratio = baseline Ir / candidate Ir"
+  },
+  {
+   "name": "ir_per_step_n41_candidate",
+   "claimed": 678.9988450622078,
+   "recomputed": 678.9988450622078,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "method": "Collected Ir from runs/callgrind/fixture-n{n}-4-{arm}.valgrind.log (equal to I refs and to callgrind.out totals) / sum(walk_steps) of the matching .jsonl; ratio = baseline Ir / candidate Ir"
+  },
+  {
+   "name": "ir_ratio_n41",
+   "claimed": 1.0404857030258414,
+   "recomputed": 1.0404857030258414,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "method": "Collected Ir from runs/callgrind/fixture-n{n}-4-{arm}.valgrind.log (equal to I refs and to callgrind.out totals) / sum(walk_steps) of the matching .jsonl; ratio = baseline Ir / candidate Ir"
+  },
+  {
+   "name": "native_ns_per_step_median_ab_n53_baseline",
+   "claimed": 110.57209124217245,
+   "recomputed": 110.57209124217245,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "method": "per file sum(walk_ms)*1e6/sum(walk_steps); uncontended runs only (contended flags from runs/time/*/isolation.jsonl); median over the 5 ab files per arm; ratio = baseline median / candidate median; aa_spread = max/min - 1 over the 6 aa (baseline) files"
+  },
+  {
+   "name": "native_ns_per_step_median_ab_n53_candidate",
+   "claimed": 98.9828675414586,
+   "recomputed": 98.9828675414586,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "method": "per file sum(walk_ms)*1e6/sum(walk_steps); uncontended runs only (contended flags from runs/time/*/isolation.jsonl); median over the 5 ab files per arm; ratio = baseline median / candidate median; aa_spread = max/min - 1 over the 6 aa (baseline) files"
+  },
+  {
+   "name": "native_ratio_n53",
+   "claimed": 1.1170831275004207,
+   "recomputed": 1.1170831275004207,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "method": "per file sum(walk_ms)*1e6/sum(walk_steps); uncontended runs only (contended flags from runs/time/*/isolation.jsonl); median over the 5 ab files per arm; ratio = baseline median / candidate median; aa_spread = max/min - 1 over the 6 aa (baseline) files"
+  },
+  {
+   "name": "native_aa_spread_n53",
+   "claimed": 0.0700551400894216,
+   "recomputed": 0.0700551400894216,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "method": "per file sum(walk_ms)*1e6/sum(walk_steps); uncontended runs only (contended flags from runs/time/*/isolation.jsonl); median over the 5 ab files per arm; ratio = baseline median / candidate median; aa_spread = max/min - 1 over the 6 aa (baseline) files"
+  },
+  {
+   "name": "native_ratio_n61",
+   "claimed": 1.075955194098941,
+   "recomputed": 1.075955194098941,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "method": "per file sum(walk_ms)*1e6/sum(walk_steps); uncontended runs only (contended flags from runs/time/*/isolation.jsonl); median over the 5 ab files per arm; ratio = baseline median / candidate median; aa_spread = max/min - 1 over the 6 aa (baseline) files"
+  },
+  {
+   "name": "native_aa_spread_n61",
+   "claimed": 0.14442668378624113,
+   "recomputed": 0.14442668378624113,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "method": "per file sum(walk_ms)*1e6/sum(walk_steps); uncontended runs only (contended flags from runs/time/*/isolation.jsonl); median over the 5 ab files per arm; ratio = baseline median / candidate median; aa_spread = max/min - 1 over the 6 aa (baseline) files"
+  }
+ ],
+ "additional_recomputations": {
+  "ir_total": {
+   "ir_n41_baseline": 244684552,
+   "ir_n41_candidate": 235163781,
+   "ir_n53_baseline": 2145944102,
+   "ir_n53_candidate": 2062553397
+  },
+  "native_n61_ab_medians": {
+   "baseline": 117.09157620475348,
+   "candidate": 108.82569910618989
+  },
+  "summary_json_agrees": true
+ },
+ "controls": [
+  {
+   "name": "contended_runs",
+   "expected": 0,
+   "observed": 0,
+   "ok": true,
+   "detail": "run.contended over 32 isolation records; recomputed at --max-other-cpu 0.1 from other_cpu_seconds/wall_seconds: 0; max other_cpu_seconds 0.02"
+  },
+  {
+   "name": "nonzero_exit_status",
+   "expected": 0,
+   "observed": 0,
+   "ok": true
+  },
+  {
+   "name": "isolation_records_match_timing_files",
+   "expected": true,
+   "observed": true,
+   "ok": true
+  },
+  {
+   "name": "run_order_matches_run_time.sh",
+   "expected": "aa: rounds 1-3 x curves (53, 61) x (r, r+3); ab: rounds 1-5 x curves x (baseline, candidate)",
+   "observed": {
+    "by_run.before.unix_time": true,
+    "by_isolation_append_order": true
+   },
+   "ok": true
+  },
+  {
+   "name": "timing_commands",
+   "expected": "env RAYON_NUM_THREADS=1 /tmp/claude-0/arms7/bin/koblitz_rho_fixture-<arm> <n> 0 signed_frobenius 4 strong on reserved CPU 3",
+   "observed": true,
+   "ok": true
+  },
+  {
+   "name": "timing_outputs_identical_to_identity_reference",
+   "expected": true,
+   "observed": true,
+   "ok": true,
+   "detail": "all 32 timing files, stripped, equal the first 4 identity rows of their curve"
+  },
+  {
+   "name": "identity_between_arms_n41_n53_n61",
+   "expected": true,
+   "observed": true,
+   "ok": true
+  },
+  {
+   "name": "recovered_equals_published_all",
+   "expected": true,
+   "observed": true,
+   "ok": true
+  },
+  {
+   "name": "callgrind_walk_steps_equal_between_arms",
+   "expected": true,
+   "observed": true,
+   "ok": true
+  },
+  {
+   "name": "run_time.sh_equals_round_3_script_but_header",
+   "expected": true,
+   "observed": true,
+   "ok": true,
+   "detail": "diff against research/rho_step3_20261016/run_time.sh: only line 2 (header comment) differs"
+  },
+  {
+   "name": "protocol_rule_n53_established",
+   "expected": true,
+   "observed": true,
+   "ok": true,
+   "detail": "ratio-1 = 0.1171 > aa_spread 0.0701; also candidate median 98.98 < A/A min 100.23. Not robust: see F2"
+  },
+  {
+   "name": "protocol_rule_n61_not_established",
+   "expected": true,
+   "observed": true,
+   "ok": true,
+   "detail": "ratio-1 = 0.0760 <= aa_spread 0.1444; candidate median 108.83 >= A/A min 103.64; not established under any reading tested"
+  }
+ ],
+ "native_rule_readings": {
+  "53": {
+   "aa_ns": [
+    107.2407441948753,
+    103.30363285366755,
+    100.22975711770805,
+    101.40093175950759,
+    102.46510795610706,
+    107.25136679371779
+   ],
+   "ab_baseline_ns": [
+    111.27105916873896,
+    104.53150035228511,
+    113.80794529793302,
+    110.57209124217245,
+    104.03523707897975
+   ],
+   "ab_candidate_ns": [
+    102.6622851275048,
+    98.78316868096415,
+    98.78564851766731,
+    111.71127813255279,
+    98.9828675414586
+   ],
+   "aa_median": 102.8843704048873,
+   "aa_min": 100.22975711770805,
+   "aa_max": 107.25136679371779,
+   "aa_spread": 0.0700551400894216,
+   "ab_baseline_median": 110.57209124217245,
+   "ab_candidate_median": 98.9828675414586,
+   "ratio_of_medians": 1.1170831275004207,
+   "paired_round_ratios": [
+    1.0838552739259817,
+    1.0581914079906274,
+    1.1520696275793447,
+    0.9898024003536274,
+    1.051042868963207
+   ],
+   "paired_ratio_median": 1.0581914079906274,
+   "ab_baseline_median_over_aa_median": 1.0747219505453662,
+   "aa_median_over_ab_candidate_median": 1.039415940963668,
+   "pooled_baseline_median_over_ab_candidate_median": 1.056056496933699,
+   "established_under_reading": {
+    "ratio_of_ab_medians_minus_1_vs_aa_spread (summarise.sh quantities)": true,
+    "ab_candidate_median_below_aa_min": true,
+    "paired_round_ratio_median_minus_1_vs_aa_spread": false,
+    "aa_median_over_ab_candidate_median_minus_1_vs_aa_spread": false,
+    "pooled_baseline_(aa+ab)_median_over_ab_candidate_median_minus_1_vs_aa_spread": false,
+    "ab_ranges_disjoint (candidate max < baseline min)": false
+   }
+  },
+  "61": {
+   "aa_ns": [
+    111.67707954876002,
+    103.63599818227297,
+    111.63985972036885,
+    118.60380172061558,
+    106.71307444871147,
+    106.9047730614213
+   ],
+   "ab_baseline_ns": [
+    118.0682827572859,
+    107.59939435508608,
+    121.5986835626997,
+    111.04486028062718,
+    117.09157620475348
+   ],
+   "ab_candidate_ns": [
+    100.38271699257855,
+    108.82569910618989,
+    113.67310737379191,
+    115.3603111867177,
+    105.73505468460851
+   ],
+   "aa_median": 109.27231639089507,
+   "aa_min": 103.63599818227297,
+   "aa_max": 118.60380172061558,
+   "aa_spread": 0.14442668378624113,
+   "ab_baseline_median": 117.09157620475348,
+   "ab_candidate_median": 108.82569910618989,
+   "ratio_of_medians": 1.075955194098941,
+   "paired_round_ratios": [
+    1.1761813815620759,
+    0.9887314783072774,
+    1.0697225260399197,
+    0.9625915458991291,
+    1.1074054536976383
+   ],
+   "paired_ratio_median": 1.0697225260399197,
+   "ab_baseline_median_over_aa_median": 1.0715575552172512,
+   "aa_median_over_ab_candidate_median": 1.0041039689004836,
+   "pooled_baseline_median_over_ab_candidate_median": 1.0258593387158759,
+   "established_under_reading": {
+    "ratio_of_ab_medians_minus_1_vs_aa_spread (summarise.sh quantities)": false,
+    "ab_candidate_median_below_aa_min": false,
+    "paired_round_ratio_median_minus_1_vs_aa_spread": false,
+    "aa_median_over_ab_candidate_median_minus_1_vs_aa_spread": false,
+    "pooled_baseline_(aa+ab)_median_over_ab_candidate_median_minus_1_vs_aa_spread": false,
+    "ab_ranges_disjoint (candidate max < baseline min)": false
+   }
+  }
+ },
+ "supplementary_native_replication_n53": {
+  "what": "Validator's own native A/A + A/B at n53 under tools/isolated_bench.py run --wait --cpus 3 --max-other-cpu 0.1, RAYON_NUM_THREADS=1, same binaries and command as run_time.sh; arm order alternated each round (odd rounds baseline first, even rounds candidate first). Not in the repository; scratchpad only.",
+  "executed_runs": 42,
+  "contended_runs": [
+   "ab-baseline-r16",
+   "ab-baseline-r17"
+  ],
+  "refused_runs": "rounds 19-21 refused by isolated_bench preflight: another session's cargo/rustc build started (machine busy); not retried",
+  "rounds_used": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   18
+  ],
+  "aa_ns": [
+   119.87677732615273,
+   101.06187101949135,
+   98.3038365133463,
+   124.39816620607064,
+   99.46428013553584,
+   100.36655776256445
+  ],
+  "aa_spread": 0.2654456897944326,
+  "aa_median": 100.7142143910279,
+  "ab_baseline_ns": [
+   99.61054271679374,
+   98.7728364125051,
+   99.179140437519,
+   96.91702581732451,
+   105.02861649168851,
+   119.2089409894433,
+   101.45728814944535,
+   100.79193593354235,
+   99.2848147652608,
+   136.9271422328878,
+   108.5191024869549,
+   108.45778576451801,
+   100.57188791204011,
+   101.54189391637563,
+   111.99304591174615,
+   116.61478397903558
+  ],
+  "ab_candidate_ns": [
+   103.35101042223462,
+   100.73112638302388,
+   105.75461612127835,
+   97.08710043322172,
+   105.32783803716887,
+   99.93734630779502,
+   110.84495896158607,
+   105.28874229932437,
+   108.11906643457812,
+   129.41467878782285,
+   105.28302565782406,
+   120.08433389114555,
+   99.43508430126604,
+   116.60194089651122,
+   100.83327258694585,
+   98.61653485908927
+  ],
+  "ab_baseline_median": 101.49959103291049,
+  "ab_candidate_median": 105.28588397857422,
+  "ratio_of_medians": 0.9640379811368232,
+  "paired_round_ratios": [
+   0.9638081167261026,
+   0.9805592368433119,
+   0.9378232750027794,
+   0.9982482264364854,
+   0.9971591409160533,
+   1.1928367661704173,
+   0.915308094295979,
+   0.95729072009429,
+   0.9182914544063064,
+   1.0580495467394524,
+   1.03073692847362,
+   0.9031801422393131,
+   1.0114326207772883,
+   0.870842227287606,
+   1.1106755046076435,
+   1.18250741770296
+  ],
+  "paired_ratio_median": 0.9888591888796826,
+  "rounds_favouring_candidate": 6,
+  "outputs_identical_to_reference": true
+ },
+ "supplementary_callgrind_replay": {
+  "runs": [
+   {
+    "command": "valgrind --tool=callgrind bin/base 41 0 signed_frobenius 4 strong (cwd /tmp/claude-0/arms7)",
+    "binary_sha256": "7ce6504a134ba12125e37b07ef72e095100f2055db11dc2f78ea0310e4b8ecbf",
+    "n": 41,
+    "arm": "baseline",
+    "fixtures": 4,
+    "ir_recorded": 244684552,
+    "ir_replayed": 244684628,
+    "ir_rel_diff": 3.106039975911516e-07,
+    "outputs_reproduced": true
+   },
+   {
+    "command": "valgrind --tool=callgrind bin/cand 41 0 signed_frobenius 4 strong (cwd /tmp/claude-0/arms7)",
+    "binary_sha256": "cb5f1d2eabec25155aca0d05bfa04699d35c11e92636cb2d71193f5ddec98c78",
+    "n": 41,
+    "arm": "candidate",
+    "fixtures": 4,
+    "ir_recorded": 235163781,
+    "ir_replayed": 235163727,
+    "ir_rel_diff": -2.29627197565768e-07,
+    "outputs_reproduced": true
+   },
+   {
+    "command": "valgrind --tool=callgrind bin/base 53 0 signed_frobenius 4 strong (cwd /tmp/claude-0/arms7)",
+    "binary_sha256": "7ce6504a134ba12125e37b07ef72e095100f2055db11dc2f78ea0310e4b8ecbf",
+    "n": 53,
+    "arm": "baseline",
+    "fixtures": 4,
+    "ir_recorded": 2145944102,
+    "ir_replayed": 2145944126,
+    "ir_rel_diff": 1.1183888703173686e-08,
+    "outputs_reproduced": true
+   },
+   {
+    "command": "valgrind --tool=callgrind bin/cand 53 0 signed_frobenius 4 strong (cwd /tmp/claude-0/arms7)",
+    "binary_sha256": "cb5f1d2eabec25155aca0d05bfa04699d35c11e92636cb2d71193f5ddec98c78",
+    "n": 53,
+    "arm": "candidate",
+    "fixtures": 4,
+    "ir_recorded": 2062553397,
+    "ir_replayed": 2062553421,
+    "ir_rel_diff": 1.163606238505543e-08,
+    "outputs_reproduced": true
+   }
+  ],
+  "ratio": {
+   "41": {
+    "recorded": 1.0404857030258414,
+    "replayed": 1.0404862651288054
+   },
+   "53": {
+    "recorded": 1.040430810238073,
+    "replayed": 1.0404308097676176
+   }
+  }
+ },
+ "findings": [
+  {
+   "id": "F1",
+   "severity": "major",
+   "topic": "native n53 claim does not replicate",
+   "finding": "An independent native replication at n53 found no speedup, using the same binaries, command, isolation tool and CPU, 16 uncontended paired rounds with arm order alternated, and 6 A/A runs. Ratio of medians 0.964, median paired ratio 0.989, and 6/16 rounds favour the candidate. The claimed 1.117x 'established' native gain at n53 is not reproduced. The host was noisier than in the producer's run (validator A/A spread 0.265 against 0.070), so this replication cannot exclude a gain of a few percent. It is still strong evidence against 11.7%: if the true ratio were about 1.117, nearly every paired round would exceed 1."
+  },
+  {
+   "id": "F2",
+   "severity": "major",
+   "topic": "n53 ratio inflated by baseline drift between phases",
+   "finding": "In the recorded data the A/B baseline median (110.57 ns/step) is 7.5% above the A/A median (102.88) of the same binary and command, as large as the claimed effect net of the 4.0% instruction gain. The null control (baseline against itself across phases) therefore moves by about as much as the claimed signal. Against the A/A median the candidate's gain is 1.039x, and against the pooled baseline median 1.056x. The median of the five per-round paired ratios is 1.058x, and one round is 0.990. All three fall inside the 0.070 A/A spread, so 'established' holds only under the ratio-of-A/B-medians reading (and the 'candidate median below A/A min' reading). It fails under the paired, A/A-median and pooled readings."
+  },
+  {
+   "id": "F3",
+   "severity": "moderate",
+   "topic": "established rule not operationally defined",
+   "finding": "PROTOCOL.md says only 'outside the A/A spread'. It does not fix the statistic (ratio of medians against max/min-1 of single runs, which mixes a median with a range of singles), the comparison arms, or the sidedness. summarise.sh and the report use ratio-1 > aa_spread. Under that reading the arithmetic gives n53 established and n61 not established, as claimed. The verdicts under the other readings are listed in native_rule_readings."
+  },
+  {
+   "id": "F4",
+   "severity": "moderate",
+   "topic": "native gain exceeds instruction gain about 2.9x, unexplained",
+   "finding": "The native n53 ratio of 1.117 is about 2.9x the Callgrind Ir reduction of 1.0404. The report offers dependent-chain length as one reading, but no PMU is available, so IPC is unmeasured and the excess is unexplained. There is no Callgrind measurement at n61. With F1 and F2, the robust result of this round is the 4.04% instruction reduction, not an 11.7% time reduction."
+  },
+  {
+   "id": "F5",
+   "severity": "minor",
+   "topic": "pre-registration not verifiable from history",
+   "finding": "PROTOCOL.md says it was written before any native timing. It was first committed in 393a1a935 (05:38:32Z), together with the timing results. Its file mtime (05:32:16Z) is 8 s before the first timed run (05:32:24Z), but the mtimes of PROTOCOL.md and run_time.sh are 1 ms apart, which suggests a copy. The ordering is asserted, not verifiable from the repository."
+  },
+  {
+   "id": "F6",
+   "severity": "minor",
+   "topic": "Callgrind Ir not bit-reproducible; binary not hashed in Callgrind records",
+   "finding": "Replaying Callgrind on the hashed binaries gives Ir within 3.1e-07 relative of the recorded counts (ratios within 5.4e-7). Three identical n41 baseline invocations span 244684428..244684701 Ir. The headline Ir values are single samples. That is immaterial to the 4.04% ratio, and it explains PROTOCOL.md's 2,145,944,068 (profile) against 2,145,944,102 (measurement). The callgrind.out/valgrind.log files name the binary only as the relative path bin/base or bin/cand, with no hash. The isolation records name symlinks (koblitz_rho_fixture-{baseline,candidate} -> base/cand). Both bindings rest on my replay and the current symlinks, not on the raw data."
+  },
+  {
+   "id": "F7",
+   "severity": "minor",
+   "topic": "source-to-binary binding not verified",
+   "finding": "No rebuild was done (instruction: do not build; disk about 1 GB). That base was built from 412b60289 and cand from the change is asserted. The committed change (393a1a935) also edits the batch_inv doc comment (+1 line) beyond the uncommitted diff validated at the start, so a rebuild from the commit need not be bit-identical to cand (line numbers shift). The code hunks are identical. The diff keeps the lane assignment and the order exactly (head chunks in lanes 0-3, tail in lanes 0..len%4; forward head then tail, backward tail then head reversed), so identical outputs are expected by construction."
+  },
+  {
+   "id": "F8",
+   "severity": "minor",
+   "topic": "identity-gate unit tests unrecorded",
+   "finding": "PROTOCOL.md's identity gate includes 'The batch_inv unit tests pass'. No test log is in the research directory, and I could not run the tests without a build. Not verified."
+  },
+  {
+   "id": "F9",
+   "severity": "minor",
+   "topic": "run_time.sh usage comment",
+   "finding": "The run_time.sh usage line shows [MAX_OTHER_CPU=0.3], but the code default is 0.1, and the isolation records do not store the threshold used. Recomputing contention at 0.1 from other_cpu_seconds/wall_seconds still gives 0 contended runs (max other_cpu_seconds 0.02), so there is no effect on the result."
+  },
+  {
+   "id": "F10",
+   "severity": "info",
+   "topic": "concurrent commits during validation",
+   "finding": "While this validation ran, another session committed the change and study (393a1a935) and then the in-progress verify_scalars.py (2c67a23c9). The committed verify_scalars.py equals the final version. The raw-data sha256 values pinned below were taken after those commits from a clean worktree and bind this report to those bytes. The committed README and report state the n53 native result as '1.117, established'; F1 and F2 contradict that."
+  },
+  {
+   "id": "F11",
+   "severity": "info",
+   "topic": "raw_data path convention",
+   "finding": "scripts/validation_gate.py resolves raw_data paths against the evidence directory. Each entry's 'path' is therefore relative to benchmarks/20261022-strong-rho-batchinv/ (../../research/...), and 'repo_path' gives the repository-relative path that was asked for."
+  }
+ ],
+ "claims_supported": [
+  "Outputs identical between arms at n41/53/61 (timing and RSS aside); every recovered scalar equals the published one and satisfies d*G == Q (independent arithmetic).",
+  "Callgrind instructions per walk step fall 4.04% at n41 and n53 (ratio 1.0405 / 1.0404), replayed within 5.4e-7."
+ ],
+ "claims_not_supported": [
+  "Native 1.117x at n53 'established': the arithmetic recomputes, but the gain is not robust to the choice of statistic (F2) and did not replicate (F1)."
+ ],
+ "heuristic_validation_checks": "not applicable: no heuristic distribution is claimed",
+ "cost_model_checks": "unit is declared (Callgrind Ir per walk step; native ns per walk step). Memory: peak_rss_bytes is recorded per row but not compared; identical counted operations in both arms",
+ "verdict": "passed",
+ "limitations": [
+  "The binaries were not rebuilt from source (no build, as instructed: disk about 1 GB free). That base is origin/main 412b60289 and cand is the change is the producer's assertion, bound here only by sha256.",
+  "The binaries live in /tmp/claude-0/arms7/bin, outside the repository, and are not durable artifacts.",
+  "These are known-scalar fixtures: Q is constructed from published_fixture_scalar, and the binary itself asserts recovery. The independent check confirms d*G == Q and the group structure. It cannot show that the walk did not read the known scalar.",
+  "Field degrees are 41, 53 and 61. The prime subgroups are about 2^39.0, 2^44.3 and 2^47.2 (cofactors 4, 428, 14156).",
+  "The supplementary native replication was run later on a noisier host (A/A spread 0.265) and was cut short by another session's build; it is evidence against the claimed magnitude, not a precise estimate."
+ ],
+ "artifact_paths": [
+  "benchmarks/20261022-strong-rho-batchinv/replay-certificate.json",
+  "benchmarks/20261022-strong-rho-batchinv/validator-report.json",
+  "benchmarks/20261022-strong-rho-batchinv/verify_scalars.py"
+ ]
+}

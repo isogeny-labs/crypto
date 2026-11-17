@@ -1,0 +1,138 @@
+{
+  "created": "2026-11-04T04:14:21Z",
+  "round": 5,
+  "rules": {
+    "exploration_slots": 2,
+    "families_enabled": [
+      "mitm2",
+      "ksum3",
+      "mitm3",
+      "ksum4",
+      "ksum5",
+      "rfmitm2",
+      "rfpairs3",
+      "rfsub2",
+      "sub2",
+      "mitmbatch",
+      "mitmblocked"
+    ],
+    "max_candidates": 9,
+    "n_grid": [
+      0.5,
+      0.7,
+      1.4,
+      2.0
+    ]
+  },
+  "schema": "ic_autolab.panel/v1",
+  "sizes": {
+    "32": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=37,scan_cap=592",
+            "family": "ksum4",
+            "n": 37,
+            "name": "ksum4-n37",
+            "oracle": "ksum:m=4"
+          },
+          "reason": "cross-size transfer: ksum4 is incumbent at 2 sizes; ln N fitted on log2 r (slope 0.140) and extrapolated"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=52,scan_cap=832",
+            "family": "ksum4",
+            "n": 52,
+            "name": "ksum4-n52",
+            "oracle": "ksum:m=4"
+          },
+          "reason": "cross-size transfer neighbourhood: N = 1.4 x 37 (ksum4 from k = 28)"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=26,scan_cap=416",
+            "family": "ksum4",
+            "n": 26,
+            "name": "ksum4-n26",
+            "oracle": "ksum:m=4"
+          },
+          "reason": "cross-size transfer neighbourhood: N = 0.7 x 37 (ksum4 from k = 28)"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=19,scan_cap=304",
+            "family": "ksum4",
+            "n": 19,
+            "name": "ksum4-n19",
+            "oracle": "ksum:m=4"
+          },
+          "reason": "cross-size transfer neighbourhood: N = 0.5 x 37 (ksum4 from k = 28)"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=74,scan_cap=1184",
+            "family": "ksum4",
+            "n": 74,
+            "name": "ksum4-n74",
+            "oracle": "ksum:m=4"
+          },
+          "reason": "cross-size transfer neighbourhood: N = 2 x 37 (ksum4 from k = 28)"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=176,scan_cap=2816",
+            "family": "ksum3",
+            "n": 176,
+            "name": "ksum3-n176",
+            "oracle": "ksum:m=3"
+          },
+          "reason": "cross-size transfer: ksum3-n11 is the k = 20 incumbent at N / N_a = 0.344"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=246,scan_cap=3936",
+            "family": "ksum3",
+            "n": 246,
+            "name": "ksum3-n246",
+            "oracle": "ksum:m=3"
+          },
+          "reason": "cross-size transfer neighbourhood: N = 1.4 x 176 (ksum3 from k = 20)"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=512,scan_cap=8192",
+            "family": "mitmbatch",
+            "n": 512,
+            "name": "mitmbatch-n512",
+            "oracle": "mitm-prime-batch:m=2"
+          },
+          "reason": "exploration: family mitmbatch untried at k = 32, N = 1 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=512,scan_cap=8192",
+            "family": "mitmblocked",
+            "n": 512,
+            "name": "mitmblocked-n512",
+            "oracle": "mitm-prime-blocked:m=2"
+          },
+          "reason": "exploration: family mitmblocked untried at k = 32, N = 1 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=512,scan_cap=8192",
+        "family": "mitm2",
+        "n": 512,
+        "name": "mitm2-n512",
+        "oracle": "mitm:negation_folded=1"
+      },
+      "incumbent_s": [
+        23.31,
+        25.52,
+        45.41
+      ],
+      "tried_before": 10
+    }
+  },
+  "track": "generic"
+}

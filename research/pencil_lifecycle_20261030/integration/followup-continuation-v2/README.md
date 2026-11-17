@@ -1,0 +1,76 @@
+# Follow-up continuation: component evidence
+
+The additive packets preserve source, commands, native receipts, failures, and independent reviews. The original full 1,260-target enrollment and prior costs remain unchanged.
+
+- [Component overview PDF (00:31 UTC snapshot)](report-complete/report.pdf), [editable overview graph](report-complete/overview.svg), [standardized index](report-complete/index.json). The [earlier overview](report/report.pdf) remains unchanged.
+- [Bounded word error-exclusion PDF](packets/word-error-exclusion/report.pdf) and [independent review](packets/word-error-exclusion-review/REVIEW.md): literal word prelude, explicit modulus/canonicality/nonzero-weight/common-validity assumptions; concrete positive and outside-validity controls.
+- [Original G-step PDF](packets/kummer-original-gstep/report.pdf) and [independent review](packets/kummer-original-gstep-review/REVIEW.md): 63 candidate and 61 eager signed recoveries on 63 fixed transitions per arm.
+- [Graph-integration PDF](packets/kummer-graph-integration/report.pdf), [graph](packets/kummer-graph-integration/coverage.svg), [structured results](packets/kummer-graph-integration/status.json): 35 edges per arm; degree-1 recovery gains do not increase edges under the retained collector gate. Synthetic stopping controls are separate from geometric transitions. [Independent review](packets/kummer-graph-review/review.json) reproduced native output and separately checked 70 geometric and nine synthetic elimination prefixes.
+- [Relation-row adapter](relation-adapter/report/result.json): exact native RHS-to-zero-equation sign convention and exhaustive small-field solution equivalence.
+- [Preflight review plan](preflight-review/PLAN.md) and [prior-author integration audit](packets/preflight-integration-audit/REVIEW.md): read-only structural binding checks, with owner authentication and scientific admission remaining external obligations. Both the initial and full-host-digest-corrected retained typed tests passed. The first full-library check reported 5,792 passed, one lock-reacquisition failure and 128 ignored; the isolated replay passed. The same binary subsequently passed 5,793 tests at reduced concurrency, with 128 ignored. Maintained Clippy then required boxing the private request payload; fresh corrected-source validation is in progress. Standalone proposal tests are distinct.
+- [Continuation prerequisite audit](packets/continuation-audit/AUDIT.md): artifact bindings, intended runtime qualification, and prospective review before scientific execution.
+
+Each packet retains its producer manifest. `custody-map.json` maps original bytes to published paths; Lean snapshots use `.lean.txt`, while executable canonical sources are in `../lean/same-support/`. Compiled objects and render intermediates are listed as omissions. Policy-selected data is represented by `.artifacts.json`; hydrate using `tools/artifacts/artifacts.py pull` before replay. Published raw records are never replaced by a later passing check.
+
+No new full-cohort timing or complete-cost ratio is supplied by these component packets. The aggregate index leaves those ratios null. This folder supplements the previous five-followup and four-lead inventories.
+
+Additional reviewed components:
+
+- [Literal weighted constructor PDF](packets/constructor/report.pdf), [independent review](packets/constructor-review/review.json): canonicality, normalized validity and conditional initialization-to-error-exclusion bridge.
+- [Fixed geometric-archive result](packets/geometric-cycle-obstruction/report.pdf), [independent forest review](packets/geometric-forest-review/rendering/report.pdf), [scope clarification](packets/geometric-forest-scope/ADDENDUM.md): the selected deduplicated graph has 175 vertices, 61 components and 114 edges. No predecessor/native cycle run began.
+- [Independent preflight source review](packets/preflight-independent-review/review.json): distinguishes source review from pending current-source runtime tests.
+
+- [Distinct unit-weight add11 PDF](packets/add11-distinct/report.pdf), [independent review](packets/add11-distinct-review/review.json): field-level normalized validity and branch precedence under distinct x; the equal-x invalid-input control remains explicit.
+
+- [Weighted distinct add11 PDF](packets/weighted-add11/report.pdf), [independent review](packets/weighted-add11-review/REVIEW.md): arbitrary nonzero input weights, four normalized output identities, nonzero output weights and Mumford validity; actual word-expression composition remains separate.
+- [Duplicate-label target-information PDF](packets/kummer-target-rank/report.pdf), [exact lemma and source proposal](packets/kummer-target-rank/LEMMA.md): same-target normalized label differences can carry information before geometric deduplication. Twelve fixed algebra controls passed; source integration is a subsequent task.
+- [Software validation snapshot PDF](packets/software-validation-snapshot/report.pdf), [graph](packets/software-validation-snapshot/snapshot.svg), [structured status](packets/software-validation-snapshot/snapshot.json): retained full-suite failure, isolated replay and deterministic lock mechanism, with [separate root source/receipt review](preflight-review/lock-mechanism-source-review/review.json).
+
+Branch-completion snapshot: [PDF](report-branch-completion/report.pdf), [editable graph](report-branch-completion/overview.svg), [standardized index](report-branch-completion/index.json). This sealed snapshot has a separate [later software-validation record](preflight-review/validation-after-branch-report.json).
+
+- [Publication custody audit](packets/final-publication-audit/report.pdf): 17 aggregate links and 19 canonical bindings checked; one custody-map path collision repaired with original evidence preserved.
+- [Archival duplicate audit prospective v2 review](packets/retained-duplicate-v2-review/report.pdf): exact 60-target/420-case selection, nested failure propagation and once-per-target setup accounting; [root admission](preflight-review/retained-audit-execution-admission.json) binds commit `191a0210a7e150c922bc848b37fb639daacd89e1`. Execution results will be additive.
+- [Runtime readiness](packets/runtime-readiness/REPORT.pdf): five retained artifact hashes match; local Docker socket inspection failed, leaving image state unknown.
+
+- [Executed archival audit PDF](packets/retained-duplicate-executed/results/report.pdf), [graph](packets/retained-duplicate-executed/results/diagram.svg), [standardized result](packets/retained-duplicate-executed/results/status.json), [independent review](packets/retained420-independent-review/review.pdf): all 420 frozen cases across 60 targets;218 ineligible,174 first occurrences and28 redundant duplicates. All 28 pairs are the designed signed case 6/case 3 with normalized coefficient differences (0, 0). Setup counted once per target; whole-cost and natural-yield fields remain null.
+
+Mixed-branch and archival snapshot: [PDF](report-mixed-archival/report.pdf), [editable counts graph](report-mixed-archival/counts.svg), [standardized index](report-mixed-archival/index.json). Mixed cancellation and generic mixed branches have separate field and UInt64 producer packets and independent source reviews. At that snapshot the canonical project registered 23 targets; its configuration check passed. Maintained Clippy and retained typed fixtures passed on the boxed-request source; full-library and CLI checks remain in progress.
+
+The next component snapshot is [the positive/tripling/lock PDF](report-positive-tripling-lock/report.pdf), with [mathematical graph](report-positive-tripling-lock/page-1.svg), [archival and software graph](report-positive-tripling-lock/page-2.svg), and [standardized index](report-positive-tripling-lock/index.json). Its 13 published evidence bindings match their recorded hashes.
+
+- Positive shared-support distinct-other composition: [field review](packets/mixed-positive-review/review.pdf), [word review](packets/mixed-positive-word-review/review.pdf). Original validity and ordered source guards imply canonical word output, nonzero weights and normalized validity within the stated branch.
+- Repeated-support tripling: [field review](packets/mixed-tripling-review/report.pdf), [word review](packets/mixed-tripling-word-review/report.pdf), [word result](packets/mixed-tripling-word/status.json). The literal constants 5, 8 and 10 are retained at small primes; word correspondence covers the degree-one prime-field no-table route. Output validity requires no nonzero-derivative assumption.
+- Owner-process lock release: [prospective source review](packets/benchlock-review-v2/report.pdf), [independent six-control execution review](packets/benchlock-execution-review-v2/report.pdf), [structured results](packets/benchlock-execution-review-v2/result.json). All fixed controls passed once; the original failed GPU interleaving remains unknown. The v1 helper's prohibited explicit destructor call was corrected before execution and remains recorded.
+- [Docker route reconciliation](packets/runtime-route-reconciliation/report.pdf): the existing noninteractive route reaches the daemon; the exact named upstream image is absent locally. This updates the earlier socket-only readiness snapshot.
+
+The boxed-request full-library check ended with 5,791 passing tests, two GPU lock failures and 128 ignored tests; its supervisor did not reach the CLI build. The owner-release correction is now applied, with a separate bounded supervisor for affected GPU tests, the full library, maintained Clippy and the CLI build. The isolated native build remains pinned to its original b985 source and is not relabeled as the later lock-corrected source.
+
+The canonical project now registers 32 targets, with a passing configuration check. Further reviewed components are the [field dispatcher aggregate](packets/mixed-dispatch-field-review/review.pdf), [UInt64 dispatcher aggregate](packets/mixed-dispatch-word-review/report.pdf), [degree-two ordered-guard exclusion](packets/degree22-guards-review/report.pdf), and [same-support extraction](packets/sameu-mixed-point-review/report.pdf). The extraction packet preserves a singular counterexample showing that input validity alone does not establish the next doubling's nonzero weight.
+
+[Native candidate provenance review](packets/musl-native-provenance-review/report.pdf) binds the actual Rust self-contained CRT/libc paths and the retained static CLI checks. The candidate's positive request exited0 and its wrong-digest control exited2; the reviewer independently recomputed5,251,028 loaded bytes. The corrected-source GPU check separately passed all8 tests; the full library suite then passed 5,793 tests with zero failures and 128 ignored tests.
+
+Latest aggregate snapshot (03:04 UTC): [PDF](report-dispatch-smoothness/report.pdf), [editable diagram](report-dispatch-smoothness/report.svg), [standardized index](report-dispatch-smoothness/index.json). Eight producer/review pairs are bound separately from software validation. Maintained Clippy and the CLI build were pending at this snapshot.
+
+Global-to-local nonsingularity: [producer PDF](packets/sameu-global-smooth/report.pdf), [independent review](packets/sameu-global-smooth-review/report.pdf). Evaluating an explicit coprimality certificate excludes a common root of the polynomial and its derivative over an arbitrary field. The extracted ordinate conclusion retains its local extraction premises. No squarefree-to-separable implication or characteristic-two geometric smoothness claim is made.
+
+Runtime preparation: [supervisor v1 review](packets/runtime-supervisor-review-v1/report.pdf) records six source issues before execution; [v2 proposal](packets/runtime-supervisor-v2/PLAN.md) supplies additive corrections and remains under review. The [local builder routing review](packets/image-routing-review/REVIEW.md) preserves exact parent-image and route checks before assembly.
+
+The expanded canonical project registers 34 Lean targets; its [configuration check](packets/lake-config-global/lakefile-run4/receipt.json) passed. This configuration check is separate from each theorem module's retained independent proof/readback.
+
+The [completed corrected-source software summary](preflight-review/owner-lock-software-summary.json) records all four stages passing: affected GPU tests, full library, maintained Clippy and CLI build. Source hashes remained unchanged in each stage. The earlier full-suite failures remain retained. The isolated 3c592af source refresh separately matched all 5,909 selected files before admitting one bounded static rebuild; that build is still active at this update.
+
+## Reviewed same-u composition and current software snapshot
+
+[Neutral PDF](packets/components-progress/report.pdf), [editable diagram](packets/components-progress/flow.svg), and [standardized result index](packets/components-progress/index.json) bind the independently reviewed field and UInt64 same-u compositions, final static binary and four terminal software checks. The canonical Lean project now registers 37 targets; its configuration check passed.
+
+The local base-image build returned exit 0, followed by a permission failure reading the root-owned IID file. Exact owned-image readback is retained; runtime assembly and qualification are pending. The [continuation ledger](packets/continuation-reconciliation/remaining-binding-ledger.json) preserves all 1,260 targets and null remaining worker allowance. No scientific cohort was launched.
+
+### Runtime outcome 2026-10-31T07:11:16.773616+00:00
+
+Runtime-only recovery completed using the existing base plus one runtime build. [Outcome PDF](packets/runtime-outcome/report.pdf), [diagram](packets/runtime-outcome/flow.svg), [standardized record](packets/runtime-outcome/status.json). Q0 passed. Q1 produced expected output and observed pids.max=1 before exec, then failed the strict writable-layer check: added /fixtures, /qualification and /qualification/exec-gate. Q1 is not a passed case; qualification remains incomplete. Cleanup completed; no scientific payload launched. All sub-agents subsequently hit their usage limit; unfinished BZero proof controls/review remain private and are not promoted.
+
+At 2026-10-31T07:14:23.675625+00:00, the 2026-10-31 06:00 UTC scientific campaign deadline is expired. No scientific payload was launched in this continuation. The budget record remains unchanged; a future scientific admission needs a new explicit envelope as well as the unresolved technical reviews.
+
+### Degree-two B-zero producer packet — 2026-10-31T07:20:52.481864+00:00
+
+The six field-level lemmas in the degree22 B-zero branch compiled; fixed controls and separate axiom readback passed. [PDF](packets/degree22-bzero-producer/report.pdf), [SVG](packets/degree22-bzero-producer/flow.svg), [standardized results](packets/degree22-bzero-producer/status.json). Characteristic-five positive, singular rational, characteristic-two and zero-s controls are retained alongside failed proof-script attempts. Independent source-fidelity review is pending; this module is not added to the canonical project. No scientific payload or cost measurement occurred.

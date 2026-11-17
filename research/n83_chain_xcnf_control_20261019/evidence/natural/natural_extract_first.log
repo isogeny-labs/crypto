@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/tmp/n83_chain_xcnf_20261019/research/n83_chain_xcnf_control_20261019/natural_domains.py", line 118, in <module>
+    main(args.archives, args.output)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/SSD990-2/tmp/n83_chain_xcnf_20261019/research/n83_chain_xcnf_control_20261019/natural_domains.py", line 63, in main
+    base_points, base_reps = read_archive(archives / f'{base_hash}.jsonl.gz', base_sha)
+                             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/SSD990-2/tmp/n83_chain_xcnf_20261019/research/n83_chain_xcnf_control_20261019/natural_domains.py", line 38, in read_archive
+    require(len(point) == 2 and all(0 <= c < 1 << 83 for c in point) and
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            row['column'] == index // ORBIT_SIZE and
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+            row['coefficient'] == '1',
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f'{path.name}: point or orbit labeling differs at {index}')
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/SSD990-2/tmp/n83_chain_xcnf_20261019/research/n83_chain_xcnf_control_20261019/natural_domains.py", line 23, in require
+    raise ValueError(message)
+ValueError: 3888e2597fd3519807c9d722f49f83329c93ce5cb0929501cf7cb7cbc3cab1a0.jsonl.gz: point or orbit labeling differs at 1

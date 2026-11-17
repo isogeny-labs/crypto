@@ -1,0 +1,13 @@
+import Constructor
+namespace PencilWordRefinement
+-- Exact value expressions/parenthesization of weight_degree_two, omitting counters.
+theorem constructor_literal (p q r s t z w : UInt64) :
+    weightConstructor p q r s t z w =
+      (let z2 := (z*z)%p
+       let z3 := (z2*z)%p
+       let z4 := (z2*z2)%p
+       let z5 := (z4*z)%p
+       WeightedWord.mk ((q*z2)%p) ((r*z4)%p)
+         ((s*((z3*w)%p))%p) ((t*((z5*w)%p))%p) z w) := by rfl
+end PencilWordRefinement
+#print axioms PencilWordRefinement.constructor_literal

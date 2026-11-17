@@ -1,0 +1,56 @@
+failures:
+
+---- cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar stdout ----
+
+thread 'cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar' (8424) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:
+tracked gpu/certicom source must be materialized
+
+---- cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures stdout ----
+
+thread 'cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures' (8425) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:
+tracked gpu/certicom source must be materialized
+
+---- cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic stdout ----
+
+thread 'cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic' (8426) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:
+tracked gpu/certicom source must be materialized
+
+---- cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver stdout ----
+
+thread 'cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver' (8427) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:
+tracked gpu/certicom source must be materialized
+
+---- cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed stdout ----
+
+thread 'cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed' (8428) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:
+tracked gpu/certicom source must be materialized
+
+---- cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means stdout ----
+
+thread 'cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means' (9294) panicked at src/cryptanalysis/ecbench/band.rs:338:81:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-native-smallroot/research/ic_planner_validation_20261020/sessions/r24/records.jsonl: No such file or directory (os error 2)"
+
+---- cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files stdout ----
+
+thread 'cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files' (9762) panicked at src/cryptanalysis/ecbench/koblitz_descent.rs:1009:74:
+/workspace/crypto-native-smallroot/research/ic_tool_program/rule/v8/runs/k0n41/T01.params.json: No such file or directory (os error 2)
+
+---- cryptanalysis::ic_framework::planner::tests::every_cited_file_exists stdout ----
+
+thread 'cryptanalysis::ic_framework::planner::tests::every_cited_file_exists' (10753) panicked at src/cryptanalysis/ic_framework/planner.rs:889:13:
+missing evidence file research/ic_planner_weight_rule_20261021/README.md
+
+
+failures:
+    cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar
+    cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures
+    cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic
+    cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver
+    cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed
+    cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means
+    cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files
+    cryptanalysis::ic_framework::planner::tests::every_cited_file_exists
+
+test result: FAILED. 5198 passed; 8 failed; 123 ignored; 0 measured; 0 filtered out; finished in 1409.33s
+
+error: test failed, to rerun pass `--lib`

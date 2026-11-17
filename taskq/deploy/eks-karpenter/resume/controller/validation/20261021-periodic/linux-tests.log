@@ -1,0 +1,44 @@
+   Compiling isolab-eks-recovery v0.1.0 (/src/taskq/deploy/eks-karpenter/resume/controller)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.59s
+     Running unittests src/lib.rs (/target/debug/deps/isolab_eks_recovery-5dcc004b055905d9)
+
+running 18 tests
+test cloud::tests::runtime_class_requires_all_fields_and_exact_container_runtime ... ok
+test contract::tests::expiry_never_supplies_a_fresh_budget ... ok
+test contract::tests::request_hash_binds_source_spec_and_original_deadline ... ok
+test contract::tests::strict_contract_rejects_unknown_fields_and_unpinned_sources ... ok
+
+running 1 test
+test io::tests::relative_atomic_file_has_a_durable_current_directory_parent ... ok
+test model::tests::ambiguous_controller_ownership_is_not_a_lease_expiry ... ok
+test model::tests::expired_original_deadline_prevents_restore ... ok
+test model::tests::failed_measurement_cannot_spawn_a_second_epoch ... ok
+test model::tests::generation_cannot_move_between_runs_or_attempts ... ok
+test model::tests::incomplete_generation_keeps_prior_committed_progress ... ok
+test model::tests::legacy_checkpoint_state_without_intent_is_not_guessed ... ok
+test model::tests::missing_or_stopped_worker_is_not_a_fence ... ok
+test model::tests::periodic_checkpoints_survive_restart_on_both_sides_of_continue ... ok
+test model::tests::same_run_name_never_accepts_a_new_command_or_deadline ... ok
+test supervisor::tests::changed_ids_capabilities_and_missing_nnp_are_rejected ... ok
+test supervisor::tests::completed_computation_wins_race_with_checkpoint_request ... ok
+test supervisor::tests::restored_group_zero_is_rejected_before_continue ... ok
+test cloud::tests::checkpoint_readback_rejects_corruption_version_and_manifest_changes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 17 filtered out; finished in 1.27s
+
+test cloud::tests::checkpoint_readback_rejects_corruption_version_and_manifest_changes ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.34s
+
+     Running unittests src/main.rs (/target/debug/deps/isolab_eks_recovery-7963f7bc9931e384)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests isolab_eks_recovery
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

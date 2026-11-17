@@ -1,0 +1,11 @@
+# Fixed native pre-exec gate controls (not executed)
+
+Freeze before helper implementation. Use pristine reviewed gate.c bytes for production compile, and a separate TU including those exact bytes with only main renamed and open redirected for /proc/self/mountinfo. No production source edit. Fixed immutable fixture files exercise nonce/case rejection, read-only mountinfo acceptance and rejection, exact controller-file byte parsing and capacity edges. Calls to original main on this non-PID1 host must stop at126 before kernel mapping/exec; no UID/namespace/cgroup change. Test-main refuses PID1.
+
+Two static compiler commands, each120s maximum, total sequence300s, controls20s, remaining readbacks10s each. Existing qualified musl1.2.6 wrapper plus pinned GCC11/binutils/CRT/libc/header files only; no downloads. Child environment exact PATH=/usr/bin:/bin, LC_ALL=C, REALGCC=/usr/bin/gcc and fresh private TMPDIR. No parent/global environment mutation. One fresh output directory; no retries, existing output rejected. Timeout terminates/reaps the process group and writes partial output/receipts. Build identities and ELF/readelf/disassembly recorded; absence of unexpected calls needs independent source/disassembly review and is not inferred solely from symbol names.
+
+Root independently reviews this proposal before any compile/run. Wrapper requires admitted JSON with exact proposal-manifest hash and fixed caps; no implicit admission. This proposal allocates no scientific work, starts no containers, alters no image and never invokes a tested ecbench/owner payload. Production host-negative result and helper fixtures are software checks, not actual kernel PID qualification. Preserve test authorship for subsequent independent evidence review.
+
+## Additive v2 signal correction
+
+Preserve v1. Root found asynchronous handler exceptions could precede Popen child assignment and bypass cleanup. v2 uses only deferred signal recording, persists launch uncertainty before Popen, records owned PID immediately after assignment, then checks signals after ownership and after communicate. Unknown Popen outcome remains launch_uncertain and failed, never retried. Repeated signals cannot raise through cleanup. No scientific/native execution accompanies this correction.

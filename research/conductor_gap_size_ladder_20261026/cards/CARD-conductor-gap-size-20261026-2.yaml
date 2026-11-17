@@ -1,0 +1,80 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-conductor-gap-size-20261026-2
+experiment_id: conductor_gap_size_ladder_20261026
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 834cc5015d221c9bac774bd9eb278db624db4d85
+receipt: research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.receipt.json
+binds:
+- path: research/conductor_gap_size_ladder_20261026/PROTOCOL.md
+  sha256: 20f7d7d5adaaa23deeaca824ac2170679f10c24672675fd62b7ffb95ef1e7a4d
+- path: research/conductor_gap_size_ladder_20261026/AMENDMENT-v2.md
+  sha256: 12e91a16e8b8963a07dfb65c4b08572acf5824075b5334a249b0a28370c6e578
+- path: research/conductor_gap_size_ladder_20261026/feasibility.cpp
+  sha256: 7c12cd12b23f86da5124643833632cf79b9ccf8d07a902afa800d9c3b2ea0675
+- path: research/conductor_gap_size_ladder_20261026/verify.cpp
+  sha256: 99d19f05b62be03c00c271f6f72746a87af06e4fdccbe4de94f0518fc44af098
+- path: research/conductor_gap_crater_design_20261025/design.json
+  sha256: 915c8956161272e9171dcc7201ac9d1dbaa53973c85320d9a30749a5204680c9
+- path: research/conductor_gap_size_ladder_20261026/results/candidates.csv
+  sha256: 3321de58940fd19ee26bdbe7fdf71d13f144cdd5a6e06de8193fc52c4acfd8e1
+- path: target/conductor-gap-size-plan-v2
+  sha256: 979eb6026c366197fd14837d93d9a480b0b3dd1e286397faf09b6f60c61f01a6
+- path: target/conductor-gap-size-verify-v2
+  sha256: 34f783fe971d87cc93097a8b845597475a69d326953bce71efeb6df7cfe7589e
+must_not_exist:
+- research/conductor_gap_size_ladder_20261026/results-v2
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.receipt.json
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.self-test.stdout
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.self-test.stderr
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.search.stdout
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.search.stderr
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.verify.stdout
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.verify.stderr
+commands:
+- id: self-test
+  argv:
+  - target/conductor-gap-size-plan-v2
+  - --self-test
+  timeout_seconds: 30
+  success_exit_codes:
+  - 0
+  stdout: research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.self-test.stdout
+  stderr: research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.self-test.stderr
+  outputs: []
+- id: search
+  argv:
+  - target/conductor-gap-size-plan-v2
+  - --complete-v2
+  - research/conductor_gap_crater_design_20261025/design.json
+  - research/conductor_gap_size_ladder_20261026/results/candidates.csv
+  - research/conductor_gap_size_ladder_20261026/results-v2
+  timeout_seconds: 930
+  success_exit_codes:
+  - 0
+  stdout: research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.search.stdout
+  stderr: research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.search.stderr
+  outputs:
+  - research/conductor_gap_size_ladder_20261026/results-v2/candidates.csv
+  - research/conductor_gap_size_ladder_20261026/results-v2/design.json
+- id: verify
+  argv:
+  - target/conductor-gap-size-verify-v2
+  - research/conductor_gap_size_ladder_20261026/results-v2/candidates.csv
+  - research/conductor_gap_size_ladder_20261026/results-v2/verification.json
+  timeout_seconds: 120
+  success_exit_codes:
+  - 0
+  stdout: research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.verify.stdout
+  stderr: research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.verify.stderr
+  outputs:
+  - research/conductor_gap_size_ladder_20261026/results-v2/verification.json
+bus_address: executor-mechanical-conductor-gap-size
+background: true
+write_scope:
+- research/conductor_gap_size_ladder_20261026/
+stop_when:
+- Any command exits with a status other than 0.
+- Any command is stopped by its declared timeout.
+- The tool refuses a bound digest, the pinned HEAD, or a must_not_exist path.

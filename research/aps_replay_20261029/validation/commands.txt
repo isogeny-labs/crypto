@@ -1,0 +1,23 @@
+Base: 91902d0ca3ec365cf346e5b36aa0ece894c2af2f
+Branch: codex/aps-replay-20261029
+Release opt-level 3; CARGO_PROFILE_RELEASE_CODEGEN_UNITS=256, matching focused CI. No timing comparison.
+cargo test --release --locked --lib aps_single_relation -- --test-threads=2
+cargo test --release --locked --example aps_single_relation_check
+cargo +1.98.0 clippy --release --locked --lib --tests --example aps_single_relation_check -- -D warnings
+cargo clippy --release --locked --lib --tests --example aps_single_relation_check -- -D warnings (Rust 1.99.1; before final artifact-only test addition)
+rustfmt +1.98.0 --check --edition 2021 src/cryptanalysis/aps_single_relation.rs examples/aps_single_relation_check.rs
+actionlint .github/workflows/aps-single-relation.yml
+python3 -B scripts/test_workflows_parse.py -v (existing YAML metadata checks)
+node --test .github/scripts/test-ci-scope.mjs (existing CI metadata checks)
+scripts/check-large-files.sh 91902d0ca3ec365cf346e5b36aa0ece894c2af2f HEAD
+python3 -B tools/artifacts/artifacts.py check 91902d0ca3ec365cf346e5b36aa0ece894c2af2f HEAD
+python3 -B tools/artifacts/wire_workflows.py --check (stopped during off-disk manifest hydration; no pass verdict)
+cargo build --release --locked --example aps_single_relation_check
+Native fixture solve/replay commands and their inputs are described in ../README.md; no-relation solve exit 1 is expected.
+cargo test --release --locked --lib -- --test-threads=2 (initial compiled tree: 5220 passed, 0 failed, 123 ignored, exit 0)
+Post-integration main 992c2579: APS library 34, F4 library 67, example 10 tests passed; strict Rust 1.98 Clippy passed, all exit 0.
+
+Working merge with main 78f84234: cargo test --release --locked --lib aps_single_relation -- --test-threads=2; lib f4_fp; example aps_single_relation_check; strict Rust 1.98 Clippy, all exit 0.
+Actionlint and four YAML tests: exit 0.
+node --test --test-reporter=tap .github/scripts/test-ci-scope.mjs: 12/0 with Rust environment and network permission; two earlier network-denied runner failures retained.
+Source equality checked after final main 8171fb53 refresh: src, Cargo.toml/lock, .cargo, APS example/fixtures and .github.

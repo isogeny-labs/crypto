@@ -1,0 +1,10 @@
+set -euo pipefail
+job_root="${ISOLAB_RESULTS_URI%/*/*}/"
+src="s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r32-20261031-r1/source-v9/"
+mkdir -p /work/source-v9
+aws s3 sync "$src" /work/source-v9/ --only-show-errors --region us-east-2
+dst="${job_root}source-v9/"
+aws s3 sync /work/source-v9/ "$dst" --only-show-errors --region us-east-2
+aws s3 cp "${dst}job-command.sh.txt" /work/job-command.sh --only-show-errors --region us-east-2
+chmod 755 /work/job-command.sh
+exec /work/job-command.sh

@@ -1,0 +1,95 @@
+{
+  "pr": 2699,
+  "original_head": "8fcaf163449cc29fa751910f8e3c0af2b1ecf1a9",
+  "main": "2c8f16e2eca1d864dcb658ac2fe4b5dacda60e36",
+  "copilot_request": "2026-10-28T02:17:13+00:00",
+  "manual_conflicts": [
+    "docs/session-logs/2026-10-30.md"
+  ],
+  "journal_checks": [
+    {
+      "path": "docs/session-logs/2026-10-30.md",
+      "original_head_sha256": "f5ccd12a8a7f1a6d86e8c656c48ce357969e509b55d3e9dc934f71f307e1ed78",
+      "main_sha256": "0049feed4605a2c80b98ac95d111ebe7d32bd28536cc88c74b14facb2e00dd4c",
+      "both_complete_parent_line_sequences_retained": true
+    }
+  ],
+  "all_other_files": "unmodified Git three-way merge",
+  "scientific_execution": false,
+  "fresh_head_ci_required": true,
+  "hydration_repair": {
+    "failure_jobs": [
+      124215720598,
+      124215720551
+    ],
+    "before_first_consumer": true,
+    "old_prefixes_preserved": true,
+    "prefixes": [
+      "docs/curves",
+      "research/bitop_ladder_20261019",
+      "research/f4_fp_ic_effect_20261018",
+      "research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst",
+      "research/four_followups_20261021/results/pencil-pilot",
+      "research/hec_bitop_20261020",
+      "research/ic_aimed_gather_20261023",
+      "research/ic_cover_weakclass_20261023",
+      "research/ic_d4_char2_lever_20261023",
+      "research/kummer_coordinates_20261022",
+      "research/kummer_differential_collector_20261022",
+      "research/n83_e2e_finalist_results_20261017",
+      "research/pencil_sparse_20261022",
+      "research/postgb_linear_stage_20261026",
+      "research/prime_base_oracle_tuning_20261029",
+      "research/projective_law_followup_20261022",
+      "research/quartic_n4_20261019",
+      "research/quartic_n4v2_20261020",
+      "research/three_leads_e2e_20261018/results",
+      "research/twist_index_calculus_20261020",
+      "research/validation_sweep_20261019"
+    ],
+    "all_nonhydration_workflow_values_unchanged": true,
+    "generated_from": "tools/artifacts/wire_workflows.py; consolidate identical bootstrap blocks before first consumer",
+    "scientific_execution_or_promotion": false
+  },
+  "restore_timeout_repair": {
+    "failed_job": 124242175423,
+    "observed": "10-minute job was canceled during required artifact restoration before dashboard checks",
+    "old_job_timeout_minutes": 10,
+    "new_job_timeout_minutes": 25,
+    "all_other_workflow_values_and_commands_unchanged": true,
+    "no_check_or_input_removed": true,
+    "initial_30_minute_attempt": "Preserved as history: c2d11046 failed routine 25-minute policy in job124262796536; corrected to policy-compliant25, no exception or gate change."
+  },
+  "trigger_coverage_repair": {
+    "failed_job": 124262797100,
+    "all_observed_missing_paths_now_match": {
+      "pull_request": 2,
+      "push": 100
+    },
+    "added_patterns": {
+      "pull_request": [
+        "benchmarks/20261029-ic-aimed-gather/**"
+      ],
+      "push": [
+        "research/prime_base_oracle_tuning_20261029/**",
+        "backlog/XP-20261016-prime-base-oracle-tuning/PROTOCOL.md"
+      ]
+    },
+    "all_prior_filters_preserved": true,
+    "local_builder_read_set": 223,
+    "full_hosted_read_set": 964,
+    "local_read_set_is_not_full_hosted_replay": true,
+    "budget_tests_passed": 15,
+    "budget_policy_violations": 0,
+    "actionlint": "pass",
+    "artifact_wire_check": "pass"
+  },
+  "concurrent_head_integration": {
+    "incoming_head": "be93d758ec994dbd7c4e238071198b45ba2a6358",
+    "normal_merge": true,
+    "incoming_push_filters_all_preserved": true,
+    "restored_pr_checks": true,
+    "reason": "Concurrent workflow repair removed pull_request trigger. Keep validated full PR filter coverage and PR-specific concurrency; no check removal to achieve green CI.",
+    "both_complete_journal_sequences_preserved": true
+  }
+}

@@ -1,0 +1,37 @@
+# Null or purely descriptive entries (no verdict needed)
+
+| row | date | entry | where | why no verdict |
+|:--|:--|:--|:--|:--|
+| 4 | 2026-10-18 | k-conversion | README | Self-labelled accounting (K = Ir per Macaulay column over Ir per rho step, pooled m=4 median 4.48 [3.96, 16.77]); 9/9 recompute. A unit conversion, not an improvement; class label agrees (accounting). Isolation none, Ir… |
+| 20 | 2026-10-17 | n83-e2e-precision | README | Comparison of K1120 vs K1104 returned BOUNDED_UNKNOWN: paired mean 145.454 ms with 95% interval [-92.776, 383.684] spanning 0 (7/7 recompute). RESULT.md says '145.454 ms faster in mean' but the frozen selection is incon… |
+| 13 | 2026-10-17 | volcano-ic-campaign | README | 'No runtime speedup claim', external comparison not run. Discrepancy: '56 exact completed comparisons, four censored' vs 44 of 48 checks completed in the committed release-pilot-match.json. Checkpoints on Google Drive. |
+| 12 | 2026-10-17 | volcano-ic-release-stopped | README | Survey counts of a stopped release survey with 'no admitted runtime comparison or external speed claim'; 7/7 counts recompute; checkpoints on Google Drive. |
+| 11 | 2026-10-17 | volcano-repaired-qa | README | 'No runtime improvement or external fastest claim'. Discrepancy: 'exact baseline completed pairs 58' vs 46 of 48 checks classified completed_count_comparison in the committed pilot-match.json. |
+| 10 | 2026-10-17 | volcano-C-finite-field | README | Counts and correctness (3,738/3,738 prefix targets verified); 'No external speed claim'. 517 vertices / 1,352 unknown labels not derivable from committed rows (cannot_define). Self-contained Drive archive referenced. |
+| 9 | 2026-10-17 | rootfinding-native-cycles | README | '60 s hard search inconclusive, 0 verified models', 'not measured speedup; no qualified end-to-end gain'. Discrepancy noted: the recorded process wall is 61.51 s and the preregistered timeout 90 s, not 60 s. |
+| 7 | 2026-10-17 | volcano-repaired-2935 | README | Survey counts (2,935 vertices, 46,960 records) with 'no admitted runtime or external fastest claim'. 9/9 counts recompute. Complete frozen checkpoint is on Google Drive (drive.google.com link in the study README); the r… |
+| 6 | 2026-10-17 | photo-volcano-restart | README | Descriptive survey of a photographed 2-volcano (rho 4600/4600 verified, BSGS 3297/4600, rho curve-mean max/min 1.2465, IC GB probes); row disclaims any speedup or hardness claim. Per-run records are not committed (only … |
+| 17 | 2026-10-16 | isogeny-volcano-rho | README | A null result across volcano levels (no level effect on rho iterations: pooled means within sampling error of sqrt(pi n/2)); 10/10 recompute; pull-back control identical 640/640. Wall ns/op descriptive at L0 (no isolati… |
+| 62 | 2026-10-15 | factor-base-evaluation | README | Exploratory historical Python/Sage rows-per-CPU-second (low-x 1,352 vs coset 1,167 vs random 1,144; coset/random 1.020 with 95% field bootstrap 0.959-1.083, i.e. null). README states there is no A/A or isolation receipt… |
+| 61 | 2026-10-15 | conductor-gap-cm-orbits | README | Null result: primary floor/crater native CPU 0.980 [0.866, 1.111] at L0 with endpoint-wave confounding; descriptive, no improvement claimed; 145 same-crater comparisons recompute 10/10. |
+| 48 | 2026-10-15 | p61-adjacency-pilot | README | Descriptive timings (191.551 s generation, 296.931 s replay for 4,096 vertices) on a shared, unisolated macOS host with a concurrent 8-thread census; 'one shared-host observation, L0 descriptive'. 9/9 recompute; the ful… |
+| 1001 | 2026-10-14 | p61-class-pilot | dir only | p61 selected-class census pilot timings (shared unisolated macOS host, 8 producer threads); directory README has no numeric claim to recompute. |
+| 100 | 2026-10-14 | paper-figures | README | Figure re-render of the ECC2K-130 Blackwell paper ('no new measurement'). Contains derived quantities (about 229x the 2010 GTX 295 card is a cross-hardware-generation ratio, not a method comparison; ledger factors 17.2x… |
+| 94 | 2026-10-13 | ecc-arithmetic | README | 'Wall comparison rejected for host contention; no speedup claimed': Apple M4 Pro, load over 100. 96/96 arm rows checked. |
+| 93 | 2026-10-13 | ecc-arithmetic-modal | README | 'Descriptive only, no qualified speedup': GF(2^131) baseline/candidate 36.079/33.580 ms (run 1) and 28.825/27.043 (run 2) on Modal workers with unknown CPU model; the unchanged control was biased. 192/192 arm rows check… |
+| 1009 | 2026-10-12 | f4-f5-dense-packing | dir only | benchmarks/20261012-f4-f5-dense-packing holds figures only (no README, no headline, no row). |
+| 1008 | 2026-10-12 | f4-f5-fused-readback | dir only | benchmarks/20261012-f4-f5-fused-readback holds figures only (no README, no headline, no row). |
+| 1006 | 2026-10-12 | f4-f5-performance-history | dir only | Historical rendering of seven frozen perf-history snapshots: 'no new timing measurement'; runtime has no stored spread or isolation eligibility. |
+| 1005 | 2026-10-12 | f4-fp-vs-msolve | dir only | benchmarks/20261012-f4-fp-vs-msolve holds only PDFs and PNGs: no README, no headline, no row; nothing to verdict. Note the related claim (blocked pair reduction vs msolve) appears in README row 30. |
+| 113 | 2026-10-12 | conductor-gap-counts | README | Null/boundary-control result: IC floor/crater counted-S ratios 0.975 (99% 0.603-1.451) and 1.127 (0.922-1.342) both span 1; 'no full-cost or wall advantage'; 6/6 recompute; replays 96 exact. |
+| 1034 | 2026-10-11 | eigen-seta-1813z-bench | dir only | KEM benchmark timings (13.4-15.0 / 51.8-53.9 / 120.2-124.0 s; 15/15 correct); no comparison. |
+| 1033 | 2026-10-11 | eigen-seta-1827z-sidechannel | dir only | Side-channel instruction-count diagnostic (1,116,186,003 instructions in all 12 runs; dudect /t/ <= 0.84); no performance comparison. |
+| 1032 | 2026-10-11 | eigen-seta-1944z-l1-fix | dir only | One-sample L1 timing; no comparison. |
+| 1031 | 2026-10-11 | eigen-seta-1946z-l3-l5-fix | dir only | One-sample L3/L5 decapsulation timings run concurrently; no comparison. |
+| 1030 | 2026-10-11 | eigen-seta-1955z-final-l1 | dir only | One-sample L1 timing; no comparison. |
+| 1029 | 2026-10-11 | eigen-seta-1955z-verify | dir only | Constant instruction counts (1,116,209,216 Toy16 / 120,996,429,610 L1) and 3,620/3,620 round trips; a constant-instruction diagnostic, not a speedup. |
+| 1028 | 2026-10-11 | eigen-seta-1956z-pke-l1 | dir only | One-sample timing of an authenticated PKE (L1); no comparison. |
+| 1027 | 2026-10-11 | eigen-seta-1958z-pke-l3-l5 | dir only | One-sample-per-size timing of an authenticated PKE (L3/L5), 'no isolation or performance comparison'. |
+| 1018 | 2026-10-11 | koblitz-m3-2357z | dir only | Diagnostic cells (128/128 verified; 20,661 relations; median 16.6 ms/call; work ICC 0.228 [0.032, 0.403]) for a presentation study; 'no end-to-end sub-rho claim'. The ICC estimator and per-call aggregation are not in th… |
+| 1013 | 2026-10-11 | pdp-ps0-baseline | dir only | PS0 baseline medians 337.7-452.3 ns/pair with a largest A/A spread 8.81%: an accounting result labelled as such; 2/2 recompute; CPU 3 pinned, 0/50 runs contended, no certified isolation level. |
+| 1037 | 2026-10-05 | ic-semiregular-law | dir only | Degree-law verification (68/68 units resolved; x4 meets its generic window on 32/32 draws); heavy-solve times (42-51 min on 4 threads) descriptive; 'about 90 min on 2 threads' recomputes as 84.8-89.8 min. |

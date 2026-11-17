@@ -1,0 +1,49 @@
+module
+
+public import TernaryPacket
+public import Mathlib.NumberTheory.Padics.PadicVal.Basic
+
+public section
+
+/-!
+A versioned addition to the frozen ternary packet label formalization.
+Digits use Euclidean division of arbitrary signed integers. No representative
+range is needed for the digit-addition identity when the difference is
+divisible by the selected power of three.
+-/
+
+namespace TernaryDigits
+
+open TernaryPacket
+
+/-- The base-three digit at coordinate i, interpreted in ZMod 3. -/
+def digit (i : Nat) (x : Int) : Digit := (x / (3 : Int) ^ i : Int)
+
+/-- Exact signed-integer division identity; the divisibility assumption is
+essential, since unrestricted floor-division does not distribute over sums. -/
+theorem digit_add_of_dvd (i : Nat) (x t : Int) (hdiv : (3 : Int) ^ i ∣ t) :
+    digit i (x + t) = digit i x + (t / (3 : Int) ^ i : Int) := by
+  unfold digit
+  rw [Int.add_ediv_of_dvd_right hdiv, Int.cast_add]
+
+theorem digit_difference_of_dvd (i : Nat) (x y : Int)
+    (hdiv : (3 : Int) ^ i ∣ y - x) :
+    digit i y = digit i x + ((y - x) / (3 : Int) ^ i : Int) := by
+  have he : x + (y - x) = y := by abel
+  simpa only [he] using digit_add_of_dvd i x (y - x) hdiv
+
+/-- The leading nonzero digit is defined from the actual Mathlib integer
+valuation. Its nonzero proof will be supplied separately. -/
+def leadingDigit (t : Int) : Digit :=
+  (t / (3 : Int) ^ padicValInt 3 t : Int)
+
+theorem digit_difference_at_valuation (x y : Int) :
+    digit (padicValInt 3 (y - x)) y =
+      digit (padicValInt 3 (y - x)) x + leadingDigit (y - x) := by
+  exact digit_difference_of_dvd _ x y (padicValInt_dvd (p := 3) (y - x))
+
+end TernaryDigits
+
+#print axioms TernaryDigits.digit_add_of_dvd
+#print axioms TernaryDigits.digit_difference_of_dvd
+#print axioms TernaryDigits.digit_difference_at_valuation

@@ -1,0 +1,133 @@
+{
+ "inputs": {
+  "t12_chunks": 16,
+  "sqrt_r": 362.219547,
+  "n_V": 32,
+  "grid_fp_mults_per_target": 1248,
+  "mitm_table_additions": 506,
+  "weights": [
+   0.0,
+   0.1,
+   1.0
+  ]
+ },
+ "arms": {
+  "pkm-iso-t5-g4-s1307 (T12 measured)": {
+   "runs": 32,
+   "mean_gae": 9564.21875,
+   "mean_unpriced": 363128009.78125,
+   "mean_S": [
+    26.404479905111252,
+    100277.20894056279,
+    1002534.4490864818
+   ],
+   "mean_trials": 7061.0,
+   "sd_trials": 2920.8993050086474,
+   "mean_relations": 10.84375,
+   "trials_per_relation": 651.1585014409222,
+   "phase_gae": {
+    "factor_base": 932.0,
+    "oracle_setup": 0.0,
+    "relations": 8610.28125,
+    "verify": 21.9375
+   },
+   "mean_solver_ops": 361573723.53125,
+   "solver_ops_per_trial": 51207.15529404475,
+   "mean_grid_mults_on_consistent": 13533.0,
+   "mean_consistent_systems": 10.84375,
+   "grid_mults_per_consistent_system": 1248.0
+  },
+  "proj-a (T12 measured)": {
+   "runs": 32,
+   "mean_gae": 4576.0625,
+   "mean_unpriced": 3593.34375,
+   "mean_S": [
+    12.633394685350872,
+    13.625429427749795,
+    22.553742109340114
+   ],
+   "mean_trials": 1553.59375,
+   "sd_trials": 587.6668837112888,
+   "mean_relations": 22.25,
+   "trials_per_relation": 69.8244382022472,
+   "phase_gae": {
+    "factor_base": 736.0,
+    "oracle_setup": 1056.0,
+    "relations": 2762.125,
+    "verify": 21.9375
+   }
+  },
+  "rho-neg (T12 measured)": {
+   "runs": 32,
+   "mean_gae": 559.125,
+   "mean_unpriced": 401.21875,
+   "mean_S": [
+    1.5436080262117937,
+    1.654374756865344,
+    2.651275332747297
+   ]
+  },
+  "grid-iso-t5-s1307 (modelled)": {
+   "mean_S": [
+    26.404479905111252,
+    2461.22807599337,
+    24374.640440787698
+   ],
+   "model": "GAE = GAE(F4 run); unpriced = common natives + trials * 1248"
+  },
+  "mitm-iso-t5-s1307 (modelled)": {
+   "mean_S": [
+    27.801422737685662,
+    31.7603476821752,
+    67.39067218258103
+   ],
+   "model": "GAE = GAE(F4 run) + 506; unpriced = common natives + trials lookups"
+  }
+ },
+ "modelled_ratios_b_over_a": {
+  "grid / F4": [
+   1.0,
+   0.02454424192691892,
+   0.024313020328626197
+  ],
+  "mitm / grid": [
+   1.0529055235170148,
+   0.012904268398350887,
+   0.002764786309208966
+  ],
+  "grid / proj-a": [
+   2.0900542223800485,
+   180.63489954898512,
+   1080.7359737741037
+  ],
+  "mitm / proj-a": [
+   2.2006296351940122,
+   2.3309612258892556,
+   2.988004024160263
+  ],
+  "grid / rho-neg": [
+   17.105689693717864,
+   1487.7089158787855,
+   9193.553057173536
+  ],
+  "F4 / grid (how far above its grid limit)": [
+   1.0,
+   40.74275355407286,
+   41.13022514206506
+  ],
+  "F4 / rho-neg (T12)": [
+   17.105689693717864,
+   60613.357719846266,
+   378132.90709706803
+  ]
+ },
+ "per_trial_unpriced": {
+  "F4 solver ops + system mults per trial": 51424.33051710098,
+  "grid mults per trial": 1248,
+  "mitm lookups per trial": 1
+ },
+ "positive_control": {
+  "patched_pooled_compare_vs_T12_jsonl_max_rel_diff": 0.0,
+  "pairs_checked": 12
+ }
+}

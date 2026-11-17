@@ -1,0 +1,119 @@
+{
+  "main": "ProcyclicGaloisCocycleAudit.procyclic_galois_cocycle_certificate",
+  "binding": "4f6948a2e69332e5f2a6f72ef7a13f751e3653bda1dbfa30f90482305c59c613",
+  "custom_imports": {
+    "FiniteQuotients": "research/procyclic_galois_cocycle_audit_20261115/lean/FiniteQuotients.lean",
+    "CocycleClasses": "research/procyclic_galois_cocycle_audit_20261115/lean/CocycleClasses.lean",
+    "FiniteCocycles": "research/procyclic_galois_cocycle_audit_20261115/lean/FiniteCocycles.lean",
+    "InfiniteControl": "research/procyclic_galois_cocycle_audit_20261115/lean/InfiniteControl.lean",
+    "ProcyclicCertificate": "research/procyclic_galois_cocycle_audit_20261115/lean/ProcyclicCertificate.lean",
+    "GaloisGenerator": "research/procyclic_galois_cocycle_audit_20261115/lean/GaloisGenerator.lean"
+  },
+  "claims": [
+    {
+      "declaration": "ProcyclicGaloisCocycleAudit.absoluteGaloisEquiv",
+      "hypotheses": "ActualAlgebraicClosureKaut/Krulltopology",
+      "conclusion": "ExplicitidentitycontinuousMulEquivtowrappedabsoluteGaloisGroup."
+    },
+    {
+      "declaration": "ProcyclicGaloisCocycleAudit.frobenius_fixed_iff",
+      "hypotheses": "ActualqFrobenius/finitebasefield",
+      "conclusion": "Fixedscalarsareexactlybaseimage."
+    },
+    {
+      "declaration": "ProcyclicGaloisCocycleAudit.frobenius_powers_dense",
+      "hypotheses": "ActualclosedsubgroupGaloiscorrespondence",
+      "conclusion": "ActualFrobeniuspowersdense,notassumed."
+    },
+    {
+      "declaration": "ProcyclicGaloisCocycleAudit.finite_target_extension",
+      "hypotheses": "ActualanyfinitegroupH/h",
+      "conclusion": "ActualcontinuoushomhasprescribedFrobeniusvalue."
+    },
+    {
+      "declaration": "ProcyclicGaloisCocycleAudit.finite_hom_evaluation_bijective",
+      "hypotheses": "ActualfinitegroupH/discretetopology",
+      "conclusion": "Evaluationbijectionderived."
+    },
+    {
+      "declaration": "ProcyclicGaloisCocycleAudit.cocycle_with_value",
+      "hypotheses": "ActualfiniteM/continuousaction",
+      "conclusion": "Everyvaluerealizedbyactualcontinuouscrossedcocycleviaactualsemidirectproduct."
+    },
+    {
+      "declaration": "ProcyclicGaloisCocycleAudit.cocycle_eq_of_frobenius",
+      "hypotheses": "Actualcontinuouscocycles/sameFrobeniusvalue",
+      "conclusion": "Actualgraph/densityuniqueness."
+    },
+    {
+      "declaration": "ProcyclicGaloisCocycleAudit.cocycleEvaluationEquiv",
+      "hypotheses": "Allactualfinitecontinuouscocycles",
+      "conclusion": "ActualgroupMulEquivtoM."
+    },
+    {
+      "declaration": "ProcyclicGaloisCocycleAudit.evaluation_maps_principals",
+      "hypotheses": "Actualprincipalcontinuouscocyclewholeimage",
+      "conclusion": "Actualevalimageequalsdifferencehomrange."
+    },
+    {
+      "declaration": "ProcyclicGaloisCocycleAudit.classEvaluationEquiv",
+      "hypotheses": "Actualallcocycle/principalquotient/finitecoefficients",
+      "conclusion": "ActualMulEquivtocoinevariants."
+    },
+    {
+      "declaration": "ProcyclicGaloisCocycleAudit.classEvaluation_mk",
+      "hypotheses": "Actualcontinuouscocyclerepresentative",
+      "conclusion": "ExactsourceFrobeniusevaluationformula."
+    },
+    {
+      "declaration": "ProcyclicGaloisCocycleAudit.classes_equal_iff",
+      "hypotheses": "Actualwholeclassquotient",
+      "conclusion": "Exactprincipalcocyclerepresentativerelation."
+    },
+    {
+      "declaration": "ProcyclicGaloisCocycleAudit.finite_guard_needed",
+      "hypotheses": "Actualintegers/trivialaction/everyfinitebasefield",
+      "conclusion": "Sameactualclassevaluationnotsurjective/directfiniteguardnegativecontrol."
+    }
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 36,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_Krull_Galois_Frobenius_density_derived": true,
+    "actual_finite_target_pointed_universal_property_derived": true,
+    "all_continuous_cocycles_classified": true,
+    "all_principal_cocycle_class_quotient_formula_proved": true,
+    "finite_guard_integer_negative_control_proved": true,
+    "canonical_continuous_homogeneous_complex_H1_comparison_proved": false,
+    "full_Bruin_Tate_pairing_proved": false,
+    "original_FR_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

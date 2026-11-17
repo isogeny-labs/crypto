@@ -1,0 +1,50 @@
+{
+  "card_id": "CARD-bitop-ladder-20261019-7",
+  "card_path": "research/bitop_ladder_20261019/cards/CARD-bitop_ladder-20261019-7.yaml",
+  "card_sha256": "f98f627e45a4201b8c2e6e3e0ac1c700ac0be836c5b463268304e0cdd8eec50a",
+  "commands": [
+    {
+      "argv": [
+        "./run_sessions.sh",
+        "specs/holdout-P39.json",
+        "specs/holdout-P40.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 5277.36,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": "research/bitop_ladder_20261019",
+      "exit_code": 0,
+      "id": "holdout-panel",
+      "index": 1,
+      "outputs": {
+        "research/bitop_ladder_20261019/sessions/holdout-P39/verify.json": "7fbdcc3d7e4d430bf91b39b8310cd6dcca7f36151e0aa093e663e1ab0a388557",
+        "research/bitop_ladder_20261019/sessions/holdout-P40/verify.json": "41adffe2a0fbf2f58c3671e345adf9e919056d2b102f61a39a410ec71fb341da"
+      },
+      "seconds": 5277.36,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "141afa729adfd8dc9872aca027ed80b0b465fe24699d4e237697f7007548cf6c",
+      "stdout_tail": [
+        "DONE holdout-P39",
+        "DONE holdout-P40"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 1,
+  "commit": "9bb27d4fdf3aecf1239a7339ba9cd26c0eb9ee0f",
+  "dirty_after": [],
+  "dirty_before": [
+    "research/bitop_ladder_20261019/cards/CARD-bitop-ladder-20261019-6.assessment.yaml",
+    "research/bitop_ladder_20261019/cards/CARD-bitop_ladder-20261019-7.yaml",
+    "research/bitop_ladder_20261019/cards/CARD-bitop_ladder-20261019-8.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

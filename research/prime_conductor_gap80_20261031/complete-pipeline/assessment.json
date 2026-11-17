@@ -1,0 +1,162 @@
+{
+  "format": "correspondence-assessment-draft-v1",
+  "assessment_state": "draft",
+  "authority": "Companion artifact; not a ledger record or certificate",
+  "source": {
+    "object_uid": null,
+    "representation_uid": null,
+    "equations": [
+      "0",
+      "0",
+      "0",
+      "-140",
+      "784"
+    ],
+    "field": {
+      "prime": "4794168233664648458988367110514316682522236917173341621535751"
+    },
+    "dimension": 1,
+    "subgroup_order": "1125023250121"
+  },
+  "destination": {
+    "object_uid": null,
+    "representation_uid": null,
+    "equations": null,
+    "field": {
+      "prime": "4794168233664648458988367110514316682522236917173341621535751"
+    },
+    "dimension": 1,
+    "ambient_group_order": null
+  },
+  "transformation": {
+    "kind": "elliptic_isogeny",
+    "family": "normalized square-root Velu from the frozen rational kernel",
+    "degree": "729845429276318409687041",
+    "field_of_definition": "4794168233664648458988367110514316682522236917173341621535751",
+    "formulas": "native/complete_pipeline.cpp; complete fixtures independently replayed, target coverage missing",
+    "exceptional_cases": [
+      "infinity",
+      "kernel points"
+    ],
+    "normalization": "short Weierstrass normalized Velu"
+  },
+  "obligations": {
+    "existence": {
+      "state": "supported",
+      "evidence": [
+        "parameters.json",
+        "native/verify80.gp"
+      ],
+      "scope": "source/kernel certificate and structural CM argument, not an explicit target equation"
+    },
+    "explicit_construction": {
+      "state": "unknown",
+      "evidence": [
+        "complete-pipeline/target80-gate.json"
+      ],
+      "scope": "80-bit quotient not computed"
+    },
+    "map_correctness": {
+      "state": "unknown",
+      "evidence": [
+        "complete-pipeline/fixture-receipts.jsonl"
+      ],
+      "scope": "42 inputs match PARI only on complete small fixtures, not the target"
+    },
+    "subgroup_preservation": {
+      "state": "unknown",
+      "evidence": [
+        "complete-pipeline/fixture-receipts.jsonl"
+      ],
+      "scope": "target transported generator absent; preservation independently checked on controls"
+    },
+    "computational_advantage": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": "no target timing or counted-cost comparison"
+    },
+    "scaling_support": {
+      "state": "unknown",
+      "evidence": [
+        "measurement-readiness.json"
+      ],
+      "scope": "full-work schedule and durable S3 coverage/resumption not implemented"
+    }
+  },
+  "preservation_certificate": {
+    "identity": "phi([s]G)=[s]phi(G), checked on 34 fixture pairs only",
+    "kernel_intersection": "Target q and ell are distinct primes; no target image/recovery certificate supplied",
+    "recovery_map": null,
+    "scalar_multiplier": "1 for normalized known-scalar fixture recovery",
+    "proof_artifact": null
+  },
+  "mechanism": {
+    "proposed_benefit": "bounded native blocks and fail-closed coverage accounting",
+    "prediction": "incomplete coverage is rejected before quotient/image assembly",
+    "falsification_condition": "any incomplete/duplicate/gapped fixture schedule accepted",
+    "assumptions": [
+      "frozen ordinary source and rational prime kernel",
+      "complete verified contributions required"
+    ]
+  },
+  "cost_comparison": {
+    "workload": "requested full 80-bit crossing and paired endpoint trials",
+    "baseline": null,
+    "units": null,
+    "construction": null,
+    "transfer": null,
+    "destination": null,
+    "recovery": null,
+    "verification": null,
+    "failed_attempts_and_duplicates": "Initial q=2 fixture assumption failed, retained and corrected to q=3; repeated base inputs disclosed",
+    "memory_and_data": "bounded native fixture blocks; no measured target peak RSS or total I/O",
+    "setup_reuse": null,
+    "uncertainty": null,
+    "evidence_label": "unmeasured"
+  },
+  "controls": [
+    "six coverage rejection controls",
+    "independent PARI quotients and 42 point-input comparisons",
+    "34 paired scalar recoveries; 68 endpoint answers",
+    "kernel and infinity controls",
+    "actual target incomplete-prefix refusal"
+  ],
+  "protocol": {
+    "parameter_scope": "exact target in parameters.json; p=71/6666679 fixtures separately labelled",
+    "sample_selection": "deterministic nonzero fixture scalars 1..q-1 capped at32",
+    "stopping_rules": "refuse quotient/images on incomplete coverage",
+    "invalidation_rules": "any independent model/image/scalar mismatch aborts",
+    "hardware_manifest": "historical environment.json retained in source archive; no performance run here",
+    "execution_route": "native development controls; future performance work requires EKS and checkpoints"
+  },
+  "exploration_boundary": {
+    "families": [
+      "ordinary short-Weierstrass supplied fixtures",
+      "frozen CM(-7) 80-bit target"
+    ],
+    "parameters": "parameters.json and explicit fixture constants in native source",
+    "completed_scope": "complete fixture software validation only",
+    "completeness_claim": "none for target"
+  },
+  "composition": {
+    "edge_ids": [],
+    "junction_compatibility": "fixture subgroup transport checked; target transport not available",
+    "weakest_open_obligation": "complete feasible target construction and durable coverage"
+  },
+  "sources": [
+    "native/complete_pipeline.cpp",
+    "complete-pipeline/checks.json",
+    "complete-pipeline/fixture-receipts.jsonl",
+    "MEASUREMENT_PROTOCOL.md"
+  ],
+  "open_obligations": [
+    "manifest-bound durable S3 coverage/controller and resume",
+    "complete target codomain and point map",
+    "full-work resource and I/O accounting",
+    "matched target endpoint measurements",
+    "applicable index-calculus arm if supplied",
+    "independent largest-known record comparison"
+  ],
+  "recommended_next_action": "Integrate authenticated stored-block coverage and establish feasible complete target execution before timing endpoints",
+  "official_status_change": "none"
+}

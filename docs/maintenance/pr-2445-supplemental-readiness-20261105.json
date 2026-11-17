@@ -1,0 +1,348 @@
+{
+  "schema": "pr-maintenance/v1",
+  "parent_pr": 2445,
+  "date": "2026-11-05",
+  "standing": "unverified",
+  "base_main": "d9c228db855c475da6ee11843654d6dca7bd97a3",
+  "purpose": "Common journal/provenance preparation for independent readiness-only workflow batches.",
+  "groups": [
+    {
+      "key": "device-tools",
+      "title": "Gate device and Delphi workflow jobs on PR readiness",
+      "files": [
+        "certicom-devices.yml",
+        "delphi-loop.yml",
+        "delphi-tools.yml"
+      ]
+    },
+    {
+      "key": "native-software",
+      "title": "Gate native tensor, F4 and pencil checks on PR readiness",
+      "files": [
+        "ecdl-tensor-ic.yml",
+        "f4-frozen-audit.yml",
+        "pencil-early-rejection.yml",
+        "pencil-native-tools.yml"
+      ]
+    },
+    {
+      "key": "lean-proofs",
+      "title": "Gate five newer Lean workflows on PR readiness",
+      "files": [
+        "finite-field-handbook-lean.yml",
+        "h111-p2-halving-lean.yml",
+        "l10-tensor-route-lean.yml",
+        "n83-projector-lean.yml",
+        "planner-proofs-lean.yml"
+      ]
+    },
+    {
+      "key": "twist-replay",
+      "title": "Gate quadratic-twist replay workflows on PR readiness",
+      "files": [
+        "quadratic-twist-adaptive-s3.yml",
+        "quadratic-twist-cm8-transfer.yml",
+        "quadratic-twist-direct-sign.yml",
+        "quadratic-twist-evidence.yml",
+        "quadratic-twist-known-roots.yml",
+        "quadratic-twist-phase-demand.yml",
+        "quadratic-twist-reduced-s3.yml",
+        "quadratic-twist-signed-cache.yml"
+      ]
+    }
+  ],
+  "workflows": [
+    {
+      "path": ".github/workflows/certicom-devices.yml",
+      "main_blob": "746c7a9676e2980a075b084a8fcdd4c7aa5137c2",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "hardware",
+          "previous_condition": "github.event_name == 'workflow_dispatch' && inputs.hardware_runner != ''",
+          "retained_condition_conjoined": true
+        },
+        {
+          "job": "metal-build",
+          "previous_condition": "always()",
+          "retained_condition_conjoined": true
+        },
+        {
+          "job": "metal-qualification",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        },
+        {
+          "job": "cuda-build",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        },
+        {
+          "job": "cpu-cross-check",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/delphi-loop.yml",
+      "main_blob": "689452ab40ed91e7144195bc39581d74b10cbd29",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "test",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/delphi-tools.yml",
+      "main_blob": "50f071c84e1724a80f9e25d56d706baf86b86707",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "test",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/ecdl-tensor-ic.yml",
+      "main_blob": "bb2d26b50d305801f9e1cdaa8bb76a7a0b782b93",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "native",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/f4-frozen-audit.yml",
+      "main_blob": "1cc1461318c4b4d0414ad50d34098ab78a14177a",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "native-f4-audit",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/finite-field-handbook-lean.yml",
+      "main_blob": "ee867ac6acf3b5439b26e386063f54d1c0658437",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "proof",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/h111-p2-halving-lean.yml",
+      "main_blob": "50ecf1e98ac761c70ad1d8c6acb9af29c8386e6f",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "proof",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/l10-tensor-route-lean.yml",
+      "main_blob": "ecc7fb37f1c388be896ef720546e6ca2a7d14aec",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "proof",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/n83-projector-lean.yml",
+      "main_blob": "1407dc9a786e482d8b3c7a6ad21b79a619bc41ea",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "proof",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/pencil-early-rejection.yml",
+      "main_blob": "9005fcb80fdd31c5497b5e1022ae9138b53fa6d3",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "software",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/pencil-native-tools.yml",
+      "main_blob": "2e4f0817f7512e537fe2c79c5885d30103ce47cd",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "test",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/planner-proofs-lean.yml",
+      "main_blob": "3c926a677930a302bcc9cc2579bea82cc7b6f6f0",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "lean",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/quadratic-twist-adaptive-s3.yml",
+      "main_blob": "9cfd30ae04070b5735740786ae29c8153094cb8a",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "native-adaptive-s3",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/quadratic-twist-cm8-transfer.yml",
+      "main_blob": "53ec9e1339a851c422facdbf1962d26689a908ae",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "native-cm8-transfer",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/quadratic-twist-direct-sign.yml",
+      "main_blob": "ffb042639e287213d17af3af8d8b9323afef7be4",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "native-direct-sign",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/quadratic-twist-evidence.yml",
+      "main_blob": "ffdeab444af65cf50d7ebb4c8669df631a26af37",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "native-audit",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/quadratic-twist-known-roots.yml",
+      "main_blob": "c9dafd442b135917a0c0cd481725156cb3454034",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "native-known-roots",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/quadratic-twist-phase-demand.yml",
+      "main_blob": "eb675b45e3117c9da86a47554adae47c09662541",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "native-phase-demand",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/quadratic-twist-reduced-s3.yml",
+      "main_blob": "b0fa76ad4ec4dc1c978337edcbedc9363b15ad9d",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "native-reduced-s3",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    },
+    {
+      "path": ".github/workflows/quadratic-twist-signed-cache.yml",
+      "main_blob": "dd56ecbfcc2c44756f18efe33e1d1c31b8eb1b6d",
+      "mode": "100644",
+      "jobs": [
+        {
+          "job": "native-signed-cache",
+          "previous_condition": null,
+          "retained_condition_conjoined": true
+        }
+      ],
+      "only_change": "Insert ready_for_review into default PR event types and conjoin nondraft guards; retain every other byte."
+    }
+  ],
+  "remaining_parent_fix": "ecc2k130-status.yml: add ready_for_review and nondraft guard to source-connection-check while preserving dispatch/main admission.",
+  "validation": {
+    "merge_sweeper_tests": 35,
+    "pass_heads": [
+      "78fc04905041ee920f5a869efba1a01ee9040b6e",
+      "2e2f11495df3fdef50f8271ccd934af3fafea1e6"
+    ],
+    "policy_gaps": 21,
+    "new_workflow_validation": "pending actual CI",
+    "local_execution": "unavailable"
+  },
+  "scientific_changes": false
+}

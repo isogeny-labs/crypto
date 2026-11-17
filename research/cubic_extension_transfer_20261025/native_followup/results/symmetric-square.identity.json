@@ -1,0 +1,106 @@
+{
+  "id": "IDC1h291ab23e96f808db",
+  "independence": "Issued by native C++ port of the documented derivation; also checked by exact integer coefficient expansion. Same session; no independent reviewer or formal proof.",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": null,
+  "schema": "identity.certificate/v1",
+  "seed": 20261025,
+  "statement": {
+    "degree_bound": 2,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "p",
+                  "op": "var"
+                },
+                {
+                  "args": 1,
+                  "op": "const"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": "p",
+                  "op": "var"
+                },
+                {
+                  "args": 1,
+                  "op": "const"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": "p",
+              "op": "var"
+            },
+            {
+              "args": "p",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": 1,
+          "op": "const"
+        }
+      ],
+      "op": "add"
+    },
+    "name": "symmetric-square point count specialization",
+    "rhs": {
+      "args": [
+        {
+          "args": 2,
+          "op": "const"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "p",
+                  "op": "var"
+                },
+                {
+                  "args": "p",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": "p",
+              "op": "var"
+            },
+            {
+              "args": 1,
+              "op": "const"
+            }
+          ],
+          "op": "add"
+        }
+      ],
+      "op": "mul"
+    },
+    "source": "GEOMETRIC_CHART_BOUND.md / projective_divisor.cpp; exact integer expansion",
+    "variables": [
+      "p"
+    ]
+  },
+  "value_digest": "53ed4c6668617694088e203284e950687721370039dc0aa6f1da1caec0b78088"
+}

@@ -1,0 +1,3 @@
+# Shared-intermediate circuit preparation
+
+Before once-only execution, freeze this Rust integer-polynomial transform and its binary/input hash in Git. Substitute K3=U+r*K2-r²*K1 in all four first-chart forms, with exact coefficient collection. Independently substitute U=K3-r*K2+r²*K1 back and require exact equality with the original source specialization, not agreement on field samples. Retain every output and failure. No field arithmetic or performance result. This checks only the first chart; other charts remain the old generic fallback. Sixty CPU seconds, no retries or source modifications during execution. Git custody while S3 unavailable.

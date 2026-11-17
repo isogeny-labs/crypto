@@ -1,0 +1,30 @@
+--- a/src/ml_dataset/solvers.rs
++++ b/src/ml_dataset/solvers.rs
+@@ -423,6 +423,10 @@
+     residual: WorkerResidualCustody,
+ }
+ impl WorkerSolveOutput {
++    fn from_original_boolean_search_failure(custody:koblitz_m3::sat_original_owner::worker::Custody)->Self{
++        Self{data:SolverData{outcome:Value::Null,artifacts:Vec::new()},stored:Vec::new(),
++            residual:WorkerResidualCustody{sat:Some(custody),boolean_search_report_unavailable:true,..Default::default()}}
++    }
+     // Lifetime-free actual ownership, but no report admitted until durable
+     // publication and original-source replay are implemented.
+     fn from_original_boolean_search(custody:koblitz_m3::sat_original_owner::boolean_search::OwnedAttempt)->Self{
+@@ -813,6 +817,16 @@
+     original.matches_bound(config, case, directory, &binding)?;
+     if context.is_some_and(|c| c.launch.binding != binding) {
+         return Err("verified worker originals differ from execution attempt".into());
++    }
++    if koblitz_m3::sat_original_owner::owned_search_worker::requested(config) {
++        config.channels.as_ref().unwrap().validate()?;
++        if !koblitz_m3::sat_original_owner::owned_search_worker::supported(config) {
++            return Ok(WorkerSolveOutput::legacy(SolverData{outcome:json!({"strategy":"original-boolean-search-unsupported","status":"unsupported","solver_completed":false,"all_patterns_negative":false,"training_export_admitted":false}),artifacts:Vec::new()}));
++        }
++        let context=context.ok_or("owned Boolean search requires original execution context")?;
++        if LIVE_SINK.with(|slot|slot.borrow().is_some()){return Err("nested live owned search sink".into())}
++        let sink=CaptureEmitter::create(directory,binding,limits.clone())?;
++        return Ok(koblitz_m3::sat_original_owner::owned_search_worker::run(original,case,context,sink,&limits));
+     }
+     if config.channels.as_ref().is_some_and(|c|c.affine_boolean_row.is_some()) {
+         config.channels.as_ref().unwrap().validate()?;

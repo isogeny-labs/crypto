@@ -1,0 +1,35 @@
+Explicit excerpt, not the complete raw output. Raw SHA256: fecbec58ee7927991be96231e2c5343855c9c1b62b13e983117f74a8ada00439
+
+    Blocking waiting for file lock on build directory
+   Compiling crypto v0.1.0 (/workspace/crypto)
+    Finished `release` profile [optimized] target(s) in 51m 18s
+     Running unittests src/lib.rs (target/release/deps/crypto_lib-2d9e4dc6e286cf2e)
+
+running 5356 tests
+test asymmetric::ec_elgamal::tests::decrypt_large_message_bounded ... ignored, slow: 1M-entry BSGS table; run with --ignored
+test asymmetric::ec_elgamal::tests::decrypt_rejects_invalid_ciphertext_points ... ok
+test asymmetric::ec_elgamal::tests::checked_encrypt_rejects_invalid_public_key_and_plaintext_collision ... ok
+test asymmetric::ec_elgamal::tests::encrypt_decrypt_roundtrip_small ... ignored, slow: 5 × P-256 affine scalar mul + 5 × BSGS; run with --ignored
+test asymmetric::ec_elgamal::tests::encrypt_is_probabilistic ... ignored, slow: two P-256 encrypts + two BSGS decrypts; run with --ignored
+test asymmetric::ec_elgamal::tests::encrypted_vote_tally ... ignored, slow: 10 P-256 ballots + tally + BSGS decrypt; run with --ignored
+
+[... middle omitted; complete raw file is NOT_UPLOADED ...]
+
+test cryptanalysis::ic_run::tests::prime_analogue_recovers_a_logarithm ... ok
+test cryptanalysis::inherited_f4::tests::a_refuted_child_is_one_and_stays_refuted_for_free ... ok
+test cryptanalysis::inherited_f4::tests::compact_refuted_basis_survives_two_more_specialisations ... ignored, global compact-refutation toggle requires an isolated test process
+test cryptanalysis::inherited_f4::tests::completion_batch_matches_cancel_then_extend ... ok
+test cryptanalysis::inherited_f4::tests::degree_drop_completion_rows_are_added ... ok
+test cryptanalysis::inherited_f4::tests::inherited_f4_accounting_version_pins_the_charge ... ok
+test cryptanalysis::ic_run::tests::koblitz_analogue_runs_and_is_labelled ... ok
+test cryptanalysis::inherited_f4::tests::odd_terms_matches_sorting_parity ... ok
+test cryptanalysis::inherited_f4::tests::lane_roots_match_the_sequential_rref ... ok
+test cryptanalysis::inherited_f4::tests::rewrite_plan_matches_the_bit_scatter ... ok
+test cryptanalysis::inherited_f4::tests::rewrite_paths_charge_identical_work_and_build_identical_rows ... ok
+test cryptanalysis::inherited_f4::tests::xor_words_is_wordwise_xor_over_the_common_length ... ok
+test cryptanalysis::inherited_f4::tests::zero_closure_rounds_is_the_plain_basis ... ok
+test cryptanalysis::invalid_curve_attack::tests::demo_invalid_curve_attack ... ignored
+error: test failed, to rerun pass `--lib`
+
+Caused by:
+  process didn't exit successfully: `/workspace/crypto/target/release/deps/crypto_lib-2d9e4dc6e286cf2e` (signal: 15, SIGTERM: termination signal)

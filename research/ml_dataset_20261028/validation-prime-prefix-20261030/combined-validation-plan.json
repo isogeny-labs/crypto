@@ -1,0 +1,20 @@
+{
+  "schema": "software-validation-plan/v1",
+  "source_commit": "113526b577044a6283be81acb1a847c89c96aa4e",
+  "purpose": "Combined-source software validation and retained-fixture CLI replay",
+  "prerequisite": "prefix-combined-dataset-04 source-bound receipt must report exit0 and matching runtime sources",
+  "sequence": [
+    "RAYON_NUM_THREADS=8 cargo test --release --lib -- --test-threads=1",
+    "bash scripts/clippy-maintained.sh",
+    "cargo build --release --bin crypto",
+    "bash research/ml_dataset_20261028/prime-prefix-cli-fixture/run.sh <frozen binary> <fresh output directory>"
+  ],
+  "driver_store_name": "evidence/ml-dataset-prime-prefix-20261030/validate_prefix_combined_pipeline.sh",
+  "stop_on_any_failure": true,
+  "automatic_retries": false,
+  "archive_each_finished_phase": true,
+  "fresh_s3_byte_readback_required": true,
+  "full_suite_summary_rule": "Use the final outer test summary and process exit receipt; nested subprocess summaries are not suite totals",
+  "scientific_samples_added": 0,
+  "verified_cloud_dataset_cells": 0
+}

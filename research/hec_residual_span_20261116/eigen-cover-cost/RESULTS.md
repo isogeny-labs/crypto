@@ -1,0 +1,9 @@
+# Complete bound eigen-cover cost: first implementation rejected
+
+[pcc:unverified] Freeze211c0536b61 pushed before once-only run; input hashes pass,exit0. All24completecalls/12originaltargets pass bytepacket replay against216mutation-qualified packets, producer/nativecontrol full16vectors replay, exactrepeats and REDC accounting. Nocharacter/action calls. All4roots/proofs, denseconstruction/selfchecks and completeboundverification charged; nativefinalcontrol delta separatelyrecorded, conservative total retained.
+
+Atp601 fullcandidate/triangular basefield ratios0.856-0.985 (roughly1.5-14.4percent fewer), but subgroup ratios35.026-70.910. Candidate/retainedarm0 base0.624-1.332, subgroup17.540-24.758. Thus registered10xgate fails; this dense4proof implementation rejected as acceleration. Do not present avoidingcharactersum as a freeaction check. Allotherfields/targets remaininSUMMARY.tsv, full16vectors inCONTROL.tsv; no averaging/mixedmodulus weights/time/externalfastest claim. Source/order/target identity unchanged.
+
+Next discriminating implementation must remove densefull-column and densewitness costs in eachcomponent. The prior triangular provenance invariant can reduce closure constraints to2variables, but needs an exact contradiction witness path (0=1) for rejectedcomponents, not merely a targetpivot. Sparse support-only branchverification must still validate complete rootset and everyusedprincipalrelation. Such successor requires its own frozenprotocol, completepacket/mutation agreement and allcosts; do not remove verification/selfcheck costs silently or pool rejectedbranches away.
+
+The mathematical finitecover argument and boundpacket qualification remain useful; negativecost is specific to this implementation and fixedpanel. Independent signedreview and genus3/4extensions unresolved. Gitcustody,noS3/cloud/retry; originalgenus2+10xgoal active.

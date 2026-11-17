@@ -1,0 +1,770 @@
+{
+  "controls": {
+    "f4_counter_check": [
+      {
+        "f4_muls": 6197337097,
+        "f4_muls_per_test_sum": 6178397570,
+        "label": "f4check_t1",
+        "lin_muls": 1792806416,
+        "per_test_over_global": 0.9969439249949518,
+        "relation_digest": 3844607112822951055,
+        "relations": 33,
+        "total_muls": 8043451006
+      },
+      {
+        "f4_muls": 6197337097,
+        "f4_muls_per_test_sum": 11355981341,
+        "label": "f4check_t2",
+        "lin_muls": 1792806416,
+        "per_test_over_global": 1.8323969090687662,
+        "relation_digest": 3844607112822951055,
+        "relations": 33,
+        "total_muls": 8043451006
+      }
+    ],
+    "reproduction_sparse": {
+      "correct": true,
+      "identical": true,
+      "lin_identical": true,
+      "lin_muls": 113394312494,
+      "predecessor_lin_muls": 113394312494,
+      "predecessor_total_muls": 452313823812,
+      "solved": true,
+      "total_muls": 452313823812
+    }
+  },
+  "cover_variance": {
+    "corr_ln_residual_ratio_ln_S_p2": 0.9996639198191769,
+    "n": 9
+  },
+  "labels": "measured: study and control records; derived: means, ratios, bootstrap intervals, Welch; model: random-walk expectations, crossover extrapolations",
+  "per_prime": [
+    {
+      "band_5a": [
+        {
+          "cover": 1.3096646556092097,
+          "cover_over_rhodp": 0.7932986305168394,
+          "cover_over_rhodp_native4": 0.7932986305168394,
+          "cover_over_rhostrong": 1.3488516606934635,
+          "rhodp": 1.6509100170208972,
+          "rhodp_native4": 1.6509100170208972,
+          "rhostrong": 0.9709478764595157,
+          "w": 0.0
+        },
+        {
+          "cover": 3.7032236163807593,
+          "cover_over_rhodp": 2.0392182019489993,
+          "cover_over_rhodp_native4": 1.6022429920262236,
+          "cover_over_rhostrong": 1.4147937847925465,
+          "rhodp": 1.8160016484951798,
+          "rhodp_native4": 2.311274653601449,
+          "rhostrong": 2.617500625311108,
+          "w": 0.1
+        },
+        {
+          "cover": 25.245254263324707,
+          "cover_over_rhodp": 7.645845579600656,
+          "cover_over_rhodp_native4": 3.058341731827939,
+          "cover_over_rhostrong": 1.4478415926899266,
+          "rhodp": 3.3018263317637224,
+          "rhodp_native4": 8.254556382826415,
+          "rhostrong": 17.436475364975436,
+          "w": 1.0
+        }
+      ],
+      "cover_S_geo_mean": 1.3096646556092097,
+      "cover_S_per_seed": [
+        1.4939968550895473,
+        1.336605146812347,
+        1.1249352074611745
+      ],
+      "cover_base": [
+        634,
+        651,
+        662
+      ],
+      "cover_cross_checked": [
+        0,
+        0,
+        0
+      ],
+      "cover_f4_native_per_sqrt_l": [
+        27.126022533597887,
+        24.263017736218604,
+        20.41772855332999
+      ],
+      "cover_residual_ratio": [
+        1.2440266841644794,
+        1.0838211486025904,
+        0.8969058991117814
+      ],
+      "crossover_model": {
+        "negation pooled steps": {
+          "p_star_model": 1568.1100670388014,
+          "ratio_at_p": 1.479606460342633
+        },
+        "negation tuned unit": {
+          "p_star_model": 2376.712304559883,
+          "ratio_at_p": 3.5403416082699932
+        },
+        "plain theory": {
+          "p_star_model": 1318.5458342703675,
+          "ratio_at_p": 1.028504098009901
+        },
+        "rhodp pooled": {
+          "p_star_model": 1219.8371036206795,
+          "ratio_at_p": 0.8735896705771876
+        }
+      },
+      "p": 1301,
+      "references": {
+        "R1 rhodp this prime (study primary)": {
+          "ci95_boot": [
+            0.5870708394647114,
+            1.1169896985811858
+          ],
+          "per_seed_ratio": [
+            0.9049535345272766,
+            0.8096172008358637,
+            0.6814031024483965
+          ],
+          "ratio_geo_mean": 0.7932986305168394,
+          "reference_mean": 1.6509100170208972,
+          "reference_n": 9,
+          "verdict": "not resolved"
+        },
+        "R2 rhodp pooled 43 runs (study, all primes incl. calibration)": {
+          "ci95_boot": [
+            0.7369399675507011,
+            1.032331434299821
+          ],
+          "per_seed_ratio": [
+            0.99654534837693,
+            0.8915598698450213,
+            0.7503690147685596
+          ],
+          "ratio_geo_mean": 0.8735896705771876,
+          "reference_mean": 1.499175985842305,
+          "reference_n": 43,
+          "verdict": "not resolved"
+        },
+        "R2b rhodp pooled 27 runs (study, new primes only)": {
+          "ci95_boot": [
+            0.7379474333466107,
+            1.069586510386913
+          ],
+          "per_seed_ratio": [
+            1.012612055701202,
+            0.9059339588056453,
+            0.762466767635626
+          ],
+          "ratio_geo_mean": 0.8876740367141936,
+          "reference_mean": 1.4753891647626114,
+          "reference_n": 27,
+          "verdict": "not resolved"
+        },
+        "R3 plain rho theory 1.2733 (fixed, model)": {
+          "ci95_boot": [
+            0.8834326145353906,
+            1.1732636146913042
+          ],
+          "per_seed_ratio": [
+            1.1732636146913042,
+            1.0496609685768457,
+            0.8834326145353906
+          ],
+          "ratio_geo_mean": 1.028504098009901,
+          "reference_mean": 1.2733684368816216,
+          "reference_n": 0,
+          "verdict": "not resolved"
+        },
+        "R4 rhostrong this prime, steps/sqrt(l) (study secondary)": {
+          "ci95_boot": [
+            1.089359796909512,
+            1.6989049052402607
+          ],
+          "per_seed_ratio": [
+            1.538427171324093,
+            1.3763547548194097,
+            1.158389914437702
+          ],
+          "ratio_geo_mean": 1.348613074149513,
+          "reference_mean": 0.971119649299807,
+          "reference_n": 6,
+          "verdict": "above"
+        },
+        "R5 rhostrong negation pooled (study 18 + red-team 251), steps/sqrt(l)": {
+          "ci95_boot": [
+            1.2436415171712007,
+            1.7585522742133886
+          ],
+          "per_seed_ratio": [
+            1.687857566480491,
+            1.5100427439044155,
+            1.270906558635184
+          ],
+          "ratio_geo_mean": 1.479606460342633,
+          "reference_mean": 0.8851439154340608,
+          "reference_n": 82,
+          "verdict": "above"
+        },
+        "R6 negation rho theory 0.8880 (fixed, model)": {
+          "ci95_boot": [
+            1.266871820629819,
+            1.682499137078384
+          ],
+          "per_seed_ratio": [
+            1.682499137078384,
+            1.5052488219538518,
+            1.266871820629819
+          ],
+          "ratio_geo_mean": 1.474909164244847,
+          "reference_mean": 0.8879629250115599,
+          "reference_n": 0,
+          "verdict": "above"
+        },
+        "R7 rhostrong negation pooled, TUNED F_p-multiplication unit (s_tuned)": {
+          "ci95_boot": [
+            2.970888679286632,
+            4.193285757807261
+          ],
+          "per_seed_ratio": [
+            4.038636307427616,
+            3.6131682983277864,
+            3.0409730494941414
+          ],
+          "ratio_geo_mean": 3.5403416082699932,
+          "reference_mean": 0.3699260694363289,
+          "reference_n": 82,
+          "verdict": "above"
+        }
+      },
+      "sqrt_l": 1101036950.0728493
+    },
+    {
+      "band_5a": [
+        {
+          "cover": 1.0810440681583442,
+          "cover_over_rhodp": 0.7750855800796439,
+          "cover_over_rhodp_native4": 0.7750855800796439,
+          "cover_over_rhostrong": 1.0627903536936012,
+          "rhodp": 1.3947415562127494,
+          "rhodp_native4": 1.3947415562127494,
+          "rhostrong": 1.0171752729983898,
+          "w": 0.0
+        },
+        {
+          "cover": 3.0523592901050733,
+          "cover_over_rhodp": 1.9895235122621133,
+          "cover_over_rhodp_native4": 1.5631971615135147,
+          "cover_over_rhostrong": 1.1131265291415988,
+          "rhodp": 1.5342162438857043,
+          "rhodp_native4": 1.9526387107495293,
+          "rhostrong": 2.742149441410706,
+          "w": 0.1
+        },
+        {
+          "cover": 20.79419628762564,
+          "cover_over_rhodp": 7.454483783498724,
+          "cover_over_rhodp_native4": 2.9817969257887547,
+          "cover_over_rhostrong": 1.1383528121596238,
+          "rhodp": 2.7894884329422993,
+          "rhodp_native4": 6.973713101580548,
+          "rhostrong": 18.266916957121552,
+          "w": 1.0
+        }
+      ],
+      "cover_S_geo_mean": 1.0810440681583442,
+      "cover_S_per_seed": [
+        0.982099292772632,
+        1.0363848662491004,
+        1.2412342002040773
+      ],
+      "cover_base": [
+        735,
+        729,
+        703
+      ],
+      "cover_cross_checked": [
+        0,
+        0,
+        0
+      ],
+      "cover_f4_native_per_sqrt_l": [
+        17.81596928863425,
+        18.801588198141882,
+        22.521899171625744
+      ],
+      "cover_residual_ratio": [
+        0.977926856884058,
+        1.040589802130898,
+        1.292471590909091
+      ],
+      "crossover_model": {
+        "negation pooled steps": {
+          "p_star_model": 1596.0783771648664,
+          "ratio_at_p": 1.221320114512923
+        },
+        "negation tuned unit": {
+          "p_star_model": 2419.1025858364333,
+          "ratio_at_p": 2.922324641260277
+        },
+        "plain theory": {
+          "p_star_model": 1342.0629964794875,
+          "ratio_at_p": 0.8489640836439574
+        },
+        "rhodp pooled": {
+          "p_star_model": 1241.5937284485337,
+          "ratio_at_p": 0.7210921722114997
+        }
+      },
+      "p": 1451,
+      "references": {
+        "R1 rhodp this prime (study primary)": {
+          "ci95_boot": [
+            0.6472113760722271,
+            0.9708059676203372
+          ],
+          "per_seed_ratio": [
+            0.7041442827869866,
+            0.7430658831613773,
+            0.8899384941067486
+          ],
+          "ratio_geo_mean": 0.7750855800796439,
+          "reference_mean": 1.3947415562127494,
+          "reference_n": 9,
+          "verdict": "below"
+        },
+        "R2 rhodp pooled 43 runs (study, all primes incl. calibration)": {
+          "ci95_boot": [
+            0.6231839611687102,
+            0.8505392305411446
+          ],
+          "per_seed_ratio": [
+            0.65509273230577,
+            0.6913030064757957,
+            0.8279442920149869
+          ],
+          "ratio_geo_mean": 0.7210921722114997,
+          "reference_mean": 1.499175985842305,
+          "reference_n": 43,
+          "verdict": "below"
+        },
+        "R2b rhodp pooled 27 runs (study, new primes only)": {
+          "ci95_boot": [
+            0.6231614099016288,
+            0.8779741119736298
+          ],
+          "per_seed_ratio": [
+            0.6656544023967065,
+            0.7024484732581412,
+            0.8412927448899834
+          ],
+          "ratio_geo_mean": 0.7327179119769957,
+          "reference_mean": 1.4753891647626114,
+          "reference_n": 27,
+          "verdict": "below"
+        },
+        "R3 plain rho theory 1.2733 (fixed, model)": {
+          "ci95_boot": [
+            0.7712609047996473,
+            0.9747643841744353
+          ],
+          "per_seed_ratio": [
+            0.7712609047996473,
+            0.8138923788523649,
+            0.9747643841744353
+          ],
+          "ratio_geo_mean": 0.8489640836439574,
+          "reference_mean": 1.2733684368816216,
+          "reference_n": 0,
+          "verdict": "below"
+        },
+        "R4 rhostrong this prime, steps/sqrt(l) (study secondary)": {
+          "ci95_boot": [
+            0.8094240159148338,
+            1.4762979067325204
+          ],
+          "per_seed_ratio": [
+            0.9653307553706046,
+            1.018689447343411,
+            1.2200411474608694
+          ],
+          "ratio_geo_mean": 1.062586130123407,
+          "reference_mean": 1.0173707688362106,
+          "reference_n": 6,
+          "verdict": "not resolved"
+        },
+        "R5 rhostrong negation pooled (study 18 + red-team 251), steps/sqrt(l)": {
+          "ci95_boot": [
+            1.0420443628126934,
+            1.4374978904155211
+          ],
+          "per_seed_ratio": [
+            1.1095362863009974,
+            1.1708659441452223,
+            1.402296483725356
+          ],
+          "ratio_geo_mean": 1.221320114512923,
+          "reference_mean": 0.8851439154340608,
+          "reference_n": 82,
+          "verdict": "above"
+        },
+        "R6 negation rho theory 0.8880 (fixed, model)": {
+          "ci95_boot": [
+            1.1060138493505756,
+            1.397844623060043
+          ],
+          "per_seed_ratio": [
+            1.1060138493505756,
+            1.167148804366588,
+            1.397844623060043
+          ],
+          "ratio_geo_mean": 1.2174427982387561,
+          "reference_mean": 0.8879629250115599,
+          "reference_n": 0,
+          "verdict": "above"
+        },
+        "R7 rhostrong negation pooled, TUNED F_p-multiplication unit (s_tuned)": {
+          "ci95_boot": [
+            2.518387626877089,
+            3.452624596630067
+          ],
+          "per_seed_ratio": [
+            2.6548528852510875,
+            2.8015999732819084,
+            3.355357469386776
+          ],
+          "ratio_geo_mean": 2.922324641260277,
+          "reference_mean": 0.3699260694363289,
+          "reference_n": 82,
+          "verdict": "above"
+        }
+      },
+      "sqrt_l": 1527468425.6085255
+    },
+    {
+      "band_5a": [
+        {
+          "cover": 0.8108491638656076,
+          "cover_over_rhodp": 0.5873522727984392,
+          "cover_over_rhodp_native4": 0.5873522727984392,
+          "cover_over_rhostrong": 0.9095296159267892,
+          "rhodp": 1.3805159210541875,
+          "rhodp_native4": 1.3805159210541875,
+          "rhostrong": 0.8915038605305573,
+          "w": 0.0
+        },
+        {
+          "cover": 2.3229215219899815,
+          "cover_over_rhodp": 1.5296789219397884,
+          "cover_over_rhodp_native4": 1.2018906708393298,
+          "cover_over_rhostrong": 0.966529029943924,
+          "rhodp": 1.5185680397846373,
+          "rhodp_native4": 1.9327228161008936,
+          "rhostrong": 2.403364461929046,
+          "w": 0.1
+        },
+        {
+          "cover": 15.931572745109348,
+          "cover_over_rhodp": 5.77014075503678,
+          "cover_over_rhodp_native4": 2.308058943373516,
+          "cover_over_rhostrong": 0.9950945290181231,
+          "rhodp": 2.761037108358684,
+          "rhodp_native4": 6.902584871521247,
+          "rhostrong": 16.010109874515443,
+          "w": 1.0
+        }
+      ],
+      "cover_S_geo_mean": 0.8108491638656076,
+      "cover_S_per_seed": [
+        1.1184125445836213,
+        0.7163633241873747,
+        0.6654031414451005
+      ],
+      "cover_base": [
+        764,
+        820,
+        824
+      ],
+      "cover_cross_checked": [
+        0,
+        0,
+        0
+      ],
+      "cover_f4_native_per_sqrt_l": [
+        20.297986711099437,
+        12.99486019983796,
+        12.06932383279382
+      ],
+      "cover_residual_ratio": [
+        1.4399564270152505,
+        0.8589152794694817,
+        0.7939158249158249
+      ],
+      "crossover_model": {
+        "negation pooled steps": {
+          "p_star_model": 1535.4782189496068,
+          "ratio_at_p": 0.9160647774073889
+        },
+        "negation tuned unit": {
+          "p_star_model": 2327.253713288561,
+          "ratio_at_p": 2.1919221997550236
+        },
+        "plain theory": {
+          "p_star_model": 1291.1073347243496,
+          "ratio_at_p": 0.6367749823070162
+        },
+        "rhodp pooled": {
+          "p_star_model": 1194.4526998752963,
+          "ratio_at_p": 0.5408632285488723
+        }
+      },
+      "p": 1601,
+      "references": {
+        "R1 rhodp this prime (study primary)": {
+          "ci95_boot": [
+            0.44795124266980824,
+            0.8120279189090182
+          ],
+          "per_seed_ratio": [
+            0.8101409969466927,
+            0.5189098606268491,
+            0.4819959924380925
+          ],
+          "ratio_geo_mean": 0.5873522727984392,
+          "reference_mean": 1.3805159210541875,
+          "reference_n": 9,
+          "verdict": "below"
+        },
+        "R2 rhodp pooled 43 runs (study, all primes incl. calibration)": {
+          "ci95_boot": [
+            0.4263139139922321,
+            0.7389447098333239
+          ],
+          "per_seed_ratio": [
+            0.7460181827520712,
+            0.4778380463350934,
+            0.4438459178434924
+          ],
+          "ratio_geo_mean": 0.5408632285488723,
+          "reference_mean": 1.499175985842305,
+          "reference_n": 43,
+          "verdict": "below"
+        },
+        "R2b rhodp pooled 27 runs (study, new primes only)": {
+          "ci95_boot": [
+            0.4251806706753508,
+            0.7490215650341879
+          ],
+          "per_seed_ratio": [
+            0.7580457897449536,
+            0.4855419446588093,
+            0.4510017813179231
+          ],
+          "ratio_geo_mean": 0.5495832443612072,
+          "reference_mean": 1.4753891647626114,
+          "reference_n": 27,
+          "verdict": "below"
+        },
+        "R3 plain rho theory 1.2733 (fixed, model)": {
+          "ci95_boot": [
+            0.5225535062535553,
+            0.8783102456367813
+          ],
+          "per_seed_ratio": [
+            0.8783102456367813,
+            0.5625734888966556,
+            0.5225535062535553
+          ],
+          "ratio_geo_mean": 0.6367749823070162,
+          "reference_mean": 1.2733684368816216,
+          "reference_n": 0,
+          "verdict": "below"
+        },
+        "R4 rhostrong this prime, steps/sqrt(l) (study secondary)": {
+          "ci95_boot": [
+            0.648826185519522,
+            1.3387943034791299
+          ],
+          "per_seed_ratio": [
+            1.2542770987287852,
+            0.8033870115718004,
+            0.7462361950236324
+          ],
+          "ratio_geo_mean": 0.9093509740081197,
+          "reference_mean": 0.8916789963853576,
+          "reference_n": 6,
+          "verdict": "not resolved"
+        },
+        "R5 rhostrong negation pooled (study 18 + red-team 251), steps/sqrt(l)": {
+          "ci95_boot": [
+            0.7184454553973468,
+            1.2386686124608162
+          ],
+          "per_seed_ratio": [
+            1.2635375164220264,
+            0.809318475443715,
+            0.7517457103219166
+          ],
+          "ratio_geo_mean": 0.9160647774073889,
+          "reference_mean": 0.8851439154340608,
+          "reference_n": 82,
+          "verdict": "not resolved"
+        },
+        "R6 negation rho theory 0.8880 (fixed, model)": {
+          "ci95_boot": [
+            0.7493591485662963,
+            1.2595261728625227
+          ],
+          "per_seed_ratio": [
+            1.2595261728625227,
+            0.8067491378404664,
+            0.7493591485662963
+          ],
+          "ratio_geo_mean": 0.9131565530791181,
+          "reference_mean": 0.8879629250115599,
+          "reference_n": 0,
+          "verdict": "not resolved"
+        },
+        "R7 rhostrong negation pooled, TUNED F_p-multiplication unit (s_tuned)": {
+          "ci95_boot": [
+            1.7096293079131464,
+            2.977159249226202
+          ],
+          "per_seed_ratio": [
+            3.023340707746797,
+            1.9365040297887794,
+            1.7987462804635581
+          ],
+          "ratio_geo_mean": 2.1919221997550236,
+          "reference_mean": 0.3699260694363289,
+          "reference_n": 82,
+          "verdict": "above"
+        }
+      },
+      "sqrt_l": 2051842400.863614
+    }
+  ],
+  "rho_instruments": {
+    "calibration_welch": {
+      "df": 25.85052965240425,
+      "diff": 0.2754884521158132,
+      "diff_corrected": 0.07655857288928153,
+      "se": 0.19353733945342844,
+      "t": 1.4234382517287054
+    },
+    "rho_e predecessor p=251 (32 runs, stored table)": {
+      "corrected_mean": 1.2638277942984744,
+      "corrected_z": -0.09666998826394309,
+      "mean": 1.2638277942984744,
+      "n": 32,
+      "overshoot_model": 0.0,
+      "ratio_to_theory": 0.9925075553101415,
+      "sd": 0.5582914150357324,
+      "se": 0.0986929113624999,
+      "z_vs_r32_theory": -0.09666998826394309
+    },
+    "rhodp red-team null p=251 (1 thread)": {
+      "corrected_mean": 1.1504326731171113,
+      "corrected_z": -1.0841851323148095,
+      "mean": 1.1504326731171113,
+      "n": 24,
+      "overshoot_model": 0.0,
+      "ratio_to_theory": 0.9034562502070727,
+      "sd": 0.5554953363351349,
+      "se": 0.11339001070973373,
+      "z_vs_r32_theory": -1.0841851323148095
+    },
+    "rhodp red-team null p=251 (2 threads)": {
+      "corrected_mean": 1.2280196505458283,
+      "corrected_z": -0.6618145895174097,
+      "mean": 1.2943296102880055,
+      "n": 96,
+      "overshoot_model": 0.06630995974217722,
+      "ratio_to_theory": 1.0164612007014373,
+      "sd": 0.6713746643644793,
+      "se": 0.06852188974688714,
+      "z_vs_r32_theory": 0.305904777054637
+    },
+    "rhodp study calibration p=251 (16 runs, 4 threads)": {
+      "corrected_mean": 1.3403863671877558,
+      "corrected_z": 0.4025524879090729,
+      "mean": 1.5393162464142875,
+      "n": 16,
+      "overshoot_model": 0.19892987922653166,
+      "ratio_to_theory": 1.2088537785528524,
+      "sd": 0.6659298582824509,
+      "se": 0.16648246457061272,
+      "z_vs_r32_theory": 1.5974523816582826
+    },
+    "rhodp study new primes (27 runs, 4 threads)": {
+      "corrected_mean": 1.474380993527079,
+      "corrected_z": 1.6627396213923413,
+      "mean": 1.4753891647626114,
+      "n": 27,
+      "overshoot_model": 0.0010081712355322077,
+      "ratio_to_theory": 1.1586506481782464,
+      "sd": 0.6281752535211217,
+      "se": 0.120892383906227,
+      "z_vs_r32_theory": 1.671079032056245
+    },
+    "rhodp study pooled (43 runs, 4 threads)": {
+      "corrected_mean": 1.4245225279124474,
+      "corrected_z": 1.560124647838635,
+      "mean": 1.499175985842305,
+      "n": 43,
+      "overshoot_model": 0.07465345792985759,
+      "ratio_to_theory": 1.1773308827362394,
+      "sd": 0.6353233768882212,
+      "se": 0.0968859066743363,
+      "z_vs_r32_theory": 2.3306542376662986
+    },
+    "rhostrong NO negation, batch 1, r 32, red-team p=251": {
+      "fp_adds_per_step": 42.029702194224804,
+      "n": 48,
+      "native_per_sqrt_l": 7.198783324038036,
+      "s_harness_mean": 1.4403602889079428,
+      "s_tuned_mean": 0.5569967372432952,
+      "steps_mean": 1.4396862681504228,
+      "steps_sd": 0.6601847937631629,
+      "steps_se": 0.09528946709851492
+    },
+    "rhostrong negation, pooled study + red-team": {
+      "fp_adds_per_step": 45.4898843229488,
+      "n": 82,
+      "native_per_sqrt_l": 15.007923702846192,
+      "s_harness_mean": 0.8892859428437748,
+      "s_tuned_mean": 0.3699260694363289,
+      "steps_mean": 0.8851439154340608,
+      "steps_sd": 0.48612903995916856,
+      "steps_se": 0.053683971751991036
+    },
+    "rhostrong negation, red-team p=251": {
+      "fp_adds_per_step": 45.58749074802013,
+      "n": 64,
+      "native_per_sqrt_l": 14.650726445525688,
+      "s_harness_mean": 0.8694325820821676,
+      "s_tuned_mean": 0.36162781548097533,
+      "steps_mean": 0.8640747590385117,
+      "steps_sd": 0.511626702243774,
+      "steps_se": 0.06395333778047176
+    },
+    "rhostrong negation, study new primes (18 runs)": {
+      "fp_adds_per_step": 45.14283925602851,
+      "n": 18,
+      "native_per_sqrt_l": 16.277958395541322,
+      "s_harness_mean": 0.9598756699961543,
+      "s_tuned_mean": 0.3994309723886966,
+      "steps_mean": 0.9600564715071253,
+      "steps_sd": 0.3851366519159361,
+      "steps_se": 0.09077757941774713
+    },
+    "welch_null_vs_rho_e": {
+      "df": 85.11013041031084,
+      "diff": 0.20484637555429952,
+      "se": 0.11866814352046112,
+      "t": 1.7262120184679495
+    }
+  }
+}

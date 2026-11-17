@@ -1,0 +1,889 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-CANDIDATE-PAIRED-FALLS-20261028-R1",
+  "version": 1,
+  "created": "2026-10-28",
+  "repository": "crypto",
+  "study_dir": "research/n83_candidate_pdp_20261028",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "PDP_PLAN.md"
+  },
+  "question": "Measure exact input-specific FFD certificates and degree-two closure/global LFD certificates on paired baseline and spike40 PDP systems for the original n83 curves, m2..9.",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Explicit witnesses, prime coefficient minors and replayable V2 closure certify only the named input presentation. LFD=2 needs a global upper certificate.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Regularity reduction, elite-base status, universal FFD/LFD assertions, solving speed and ECDLP claims remain outside this batch.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "baseline-koblitz",
+      "role": "baseline",
+      "description": "baseline koblitz matched public PDP systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ca3ac5bd0d371a25883cc8e5b05af15fcb7ffdd4",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "seconds": 60,
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+        "candidate_id": "baseline"
+      }
+    },
+    {
+      "id": "baseline-binary",
+      "role": "baseline",
+      "description": "baseline binary matched public PDP systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ca3ac5bd0d371a25883cc8e5b05af15fcb7ffdd4",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "seconds": 60,
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+        "candidate_id": "baseline"
+      }
+    },
+    {
+      "id": "baseline-prime",
+      "role": "baseline",
+      "description": "baseline prime matched public PDP systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ca3ac5bd0d371a25883cc8e5b05af15fcb7ffdd4",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "closure_not_supported"
+        ],
+        "seconds": 60,
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5",
+        "candidate_id": "baseline"
+      }
+    },
+    {
+      "id": "spike40-koblitz",
+      "role": "candidate",
+      "description": "spike40 koblitz matched public PDP systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ca3ac5bd0d371a25883cc8e5b05af15fcb7ffdd4",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "seconds": 60,
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6",
+        "candidate_id": "spike40"
+      }
+    },
+    {
+      "id": "spike40-binary",
+      "role": "candidate",
+      "description": "spike40 binary matched public PDP systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ca3ac5bd0d371a25883cc8e5b05af15fcb7ffdd4",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "seconds": 60,
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe",
+        "candidate_id": "spike40"
+      }
+    },
+    {
+      "id": "spike40-prime",
+      "role": "candidate",
+      "description": "spike40 prime matched public PDP systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ca3ac5bd0d371a25883cc8e5b05af15fcb7ffdd4",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "closure_not_supported"
+        ],
+        "seconds": 60,
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324",
+        "candidate_id": "spike40"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact computations only; no clock or statistical comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "No extra experimental arm: native quadratic unit and affine-line controls pass, plus unchanged first-fall selfcheck; target planted witnesses remain in original inputs."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No null-population claim: native nonlinear xy control must not certify LFD; tampered replay must fail."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "family",
+        "levels": [
+          "koblitz",
+          "binary",
+          "prime"
+        ]
+      },
+      {
+        "name": "m",
+        "levels": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "name": "factor_base",
+        "levels": [
+          "baseline",
+          "spike40"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "f860a68fcd8c98585082965f3d4c1622d71add204c0afc5bc922ea243153ea85",
+        "how": "Identical adapted native instruments for both arms, all hashes pinned in extensions"
+      },
+      {
+        "name": "seed",
+        "treatment": "fixed",
+        "value": 20261027,
+        "how": "SplitMix64 family and m seed rule in PROTOCOL.md"
+      },
+      {
+        "name": "factor_base",
+        "treatment": "crossed",
+        "how": "Two27-dimensional domains; one complete manifest per curve per arm reused for allm"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Sequential native processes"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Existing host after recorded EKS S3 permission failure; no timing claim"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "Baseline then spike40; fixedinput order, exact algebra, no clock comparison"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Frozen parsing; no discretionary exclusion"
+      },
+      {
+        "name": "limits",
+        "treatment": "fixed",
+        "how": "8GiB virtual memory;60s per closure/replay,600s per first-fall/catalog batch,1200s per input generation,14400s outer,5s per-process grace, no retries"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-completion",
+        "arms": [
+          "baseline-koblitz",
+          "baseline-binary",
+          "baseline-prime",
+          "spike40-koblitz",
+          "spike40-binary",
+          "spike40-prime"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Accept exact per-input certificate only after completion and successful replay; unsupported and failed values remain null."
+      }
+    ],
+    "aa_not_applicable": "Exact non-timing computations",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Baseline then candidate in fixed identical input order; no timing or population claim.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261027
+      ],
+      "nonce": null,
+      "note": "SplitMix64: seed xor m<<32 xor family tag; source defines all draws."
+    },
+    "instance_sampling": {
+      "rule": "All m2..9, three exact curves, original natural targets shared across arms; identical planted tuple from low26 common support with seed20261027/family/m rule.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Deterministic exact computation with frozen parser",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 16,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "96 systems in48 matched pairs;96FFD/replays,64binary V2 closures/replays. Exact per-input results, no statistical population claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0.01,
+      "per_sample_seconds": 60,
+      "threads": 1,
+      "estimated_total_seconds": 14400,
+      "measured_on": "Native unit controls only;14400s is a budget, not a performance prediction"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "last_fall_degree",
+        "name": "Certified last fall degree",
+        "unit": "polynomial degree",
+        "kind": "counted",
+        "definition": "2 only with explicit lower witness and unit/affine-space global upper certificate; otherwise null",
+        "source": "closure/<id>/result.json last_fall_degree",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "first_fall_degree",
+        "name": "first fall degree",
+        "unit": "integer",
+        "kind": "counted",
+        "definition": "First exact nonzero degree fall, otherwise null",
+        "source": "summary.json rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "first_fall_lower_bound",
+        "name": "first fall lower bound",
+        "unit": "integer",
+        "kind": "counted",
+        "definition": "Proven per-input lower bound, not an estimate",
+        "source": "summary.json rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "closure_rank",
+        "name": "closure rank",
+        "unit": "integer",
+        "kind": "counted",
+        "definition": "Rank of completed Boolean V2 normal-form closure",
+        "source": "summary.json rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "linear_rank",
+        "name": "linear rank",
+        "unit": "integer",
+        "kind": "counted",
+        "definition": "Number of independent linear rows in V2",
+        "source": "summary.json rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "last_fall_degree",
+      "first_fall_degree",
+      "first_fall_lower_bound",
+      "closure_rank",
+      "linear_rank"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "source_revision",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "existing-spot-workspace",
+    "placement": {
+      "cpus": 1,
+      "memory": "8Gi",
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 14400,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "All96 first-fall and catalog cases; fresh FFDreplays;64 binary V2closure attempts and replay completed cases; exact paired target/witness checks.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "1200s per generation;600s per FFD/catalog batch;60s per closure/replay with5s grace;8GiB virtual;14400s outer;no retries.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Hash mismatch, malformed input or failed replay invalidates a certificate",
+    "Closure plateau alone does not certify last fall degree",
+    "Resource limits imply no mathematical degree bound",
+    "Every elapsed time is diagnostic, wall_valid=false"
+  ],
+  "decision_rule": {
+    "text": "Report per-instance certificates/bounds and every unresolved or failed attempt; no scientific hypothesis promotion",
+    "comparison_ids": [
+      "C-completion"
+    ],
+    "statistic": "Exact per-input value or missing",
+    "interval": "not applicable",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "not applicable",
+    "verdict_vocabulary": [
+      "certified",
+      "bounded",
+      "resource_limit",
+      "error",
+      "unresolved"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/bin/compare.rs",
+      "sha256": "d89b32a614239f9762ce76a4408ba42a2f7e575e8227b1089d07ef1c1481c366"
+    },
+    "inputs": [
+      "baseline/summary.json",
+      "spike40/summary.json"
+    ],
+    "outputs": [
+      "paired-summary.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Paired FFD/LFD and closure-rank grid, unknowns explicit"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Reporting first-fall degree as regularity",
+    "Reporting final basis degree as solving degree",
+    "Using timeout as a degree bound",
+    "Downscaling n or omitting m cells",
+    "Claiming an IC/rho speedup or subgroup attack from this stage",
+    "Equating closure plateau with global stabilization",
+    "Inferring lower regularity or elite factor-base quality from low FFD/LFD alone",
+    "Removing failed or partial outputs"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/html/1503.08001",
+      "provenance": "retrieved",
+      "claim": "Summation polynomial formulas and distinction between first fall and regularity",
+      "verified_by": "Read primary HTML and checked formulas with controls"
+    },
+    {
+      "ref": "https://www.singular.uni-kl.de/index.php/singular.pdf",
+      "provenance": "internal",
+      "claim": "Standard bases and Hilbert functions; installed-version behavior checked by controls",
+      "verified_by": "Previously checked manual and installed4.3.1 controls; current manual fetch failed"
+    },
+    {
+      "ref": "https://arxiv.org/html/2112.05579",
+      "provenance": "retrieved",
+      "claim": "Definitions of bounded multiplication closure and last fall degree; distinction from regularity",
+      "verified_by": "Primary text checked before implementation; restricted upper certificate documented in DESIGN.md"
+    }
+  ],
+  "amendments": [],
+  "extensions": {
+    "detailed_design": "PDP_PLAN.md",
+    "factor_base_indices": {
+      "baseline": {
+        "candidate_x_count_per_curve": 134217728,
+        "complete": true,
+        "ell": 27,
+        "families": [
+          {
+            "compressed_bytes": 1329389614,
+            "family": "koblitz",
+            "liftable_x": 67110393,
+            "manifest": "koblitz/manifest.json",
+            "manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+            "point_count": 134220785,
+            "same_base_for_m": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "compressed_bytes": 1329453079,
+            "family": "binary",
+            "liftable_x": 67113567,
+            "manifest": "binary/manifest.json",
+            "manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+            "point_count": 134227133,
+            "same_base_for_m": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "compressed_bytes": 1849491803,
+            "family": "prime",
+            "liftable_x": 67106828,
+            "manifest": "prime/manifest.json",
+            "manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5",
+            "point_count": 134213656,
+            "same_base_for_m": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          }
+        ],
+        "schema": "n83.shared-factor-bases/v1"
+      },
+      "spike40": {
+        "candidate_id": "spike40",
+        "candidate_x_count_per_curve": 134217728,
+        "complete": true,
+        "coordinate_bit_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          40
+        ],
+        "ell": 27,
+        "families": [
+          {
+            "compressed_bytes": 1394855010,
+            "family": "koblitz",
+            "liftable_x": 67113938,
+            "manifest": "koblitz/manifest.json",
+            "manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6",
+            "point_count": 134227875,
+            "same_base_for_m": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "compressed_bytes": 1394620808,
+            "family": "binary",
+            "liftable_x": 67103971,
+            "manifest": "binary/manifest.json",
+            "manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe",
+            "point_count": 134207941,
+            "same_base_for_m": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "compressed_bytes": 1849489651,
+            "family": "prime",
+            "liftable_x": 67105985,
+            "manifest": "prime/manifest.json",
+            "manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324",
+            "point_count": 134211970,
+            "same_base_for_m": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          }
+        ],
+        "schema": "n83.shared-factor-bases/v2"
+      }
+    },
+    "backend_reason": "Recorded EKS shared-bucket failure, existing-host fallback with no IAM or quota change",
+    "matched_original_inputs_sha256": "c9e5a0ff7e38e792c2cbfa196e6e6b7d5fc231bdc6d683784de8774f94afad4e",
+    "executables": {
+      "pdp": {
+        "sha256": "dea2f9c15eb3f21c2021a2823efbb051c6ee5759554d2bd0c9e1a93157f662ca",
+        "source_commit": "ca3ac5bd0d371a25883cc8e5b05af15fcb7ffdd4"
+      },
+      "fall": {
+        "sha256": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+        "source_commit": "ca3ac5bd0d371a25883cc8e5b05af15fcb7ffdd4"
+      },
+      "compare": {
+        "sha256": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9",
+        "source_commit": "ca3ac5bd0d371a25883cc8e5b05af15fcb7ffdd4"
+      },
+      "catalog": {
+        "sha256": "363fe79f88eaecd1a7099e294d78d6b509f7e116446f5fa89b716f8b2cc7111e",
+        "source_commit": "390f82a33ad189491bb9a5dc7a458c39e57591ac"
+      }
+    },
+    "raw_prefix": "s3://setec-astronomy-artifacts/runs/n83-candidate-paired-falls-20261028-r1/local/",
+    "file_layout": "PDP_PLAN.md",
+    "paired_planted_distribution": "common low26 coordinate support; not uniform over full base",
+    "no_regularities_in_this_stage": true
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "36a0b990d80dbe2e4660d1910eed3dfa39e23bea4cb4630b4b5eeac2ba4531ab",
+    "commit": "ca3ac5bd0d371a25883cc8e5b05af15fcb7ffdd4",
+    "frozen_at": "2026-10-28T06:17:27Z",
+    "filed_before_affected_data": true
+  }
+}

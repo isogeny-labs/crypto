@@ -1,0 +1,75 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "rho.plain"
+      },
+      "name": "rho-plain",
+      "role": "baseline"
+    }
+  ],
+  "description": "rho.negation against rho.plain on the same workloads and seeds: the difference the level study must be able to see.",
+  "label": "2-volcano, D = -3, depth 20, m = 0, p = 104602353229057: positive control on the floor curves, 8 targets per curve",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 2,
+    "seed": 18,
+    "timeout_seconds": 3600,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 83854758101184,
+        "b": 13468427663768,
+        "group_order": 104602332854788,
+        "gx": 96392248874688,
+        "gy": 15771876641970,
+        "kind": "prime_explicit",
+        "p": 104602353229057,
+        "r": 26150583213697
+      },
+      {
+        "a": 34273277599648,
+        "b": 16132204765068,
+        "group_order": 104602332854788,
+        "gx": 45201533593528,
+        "gy": 31948771838224,
+        "kind": "prime_explicit",
+        "p": 104602353229057,
+        "r": 26150583213697
+      },
+      {
+        "a": 94027044439423,
+        "b": 100903350318859,
+        "group_order": 104602332854788,
+        "gx": 22324788151337,
+        "gy": 10502620351263,
+        "kind": "prime_explicit",
+        "p": 104602353229057,
+        "r": 26150583213697
+      },
+      {
+        "a": 53367443464642,
+        "b": 102820647960147,
+        "group_order": 104602332854788,
+        "gx": 68668658212203,
+        "gy": 33336247630030,
+        "kind": "prime_explicit",
+        "p": 104602353229057,
+        "r": 26150583213697
+      }
+    ],
+    "target_seed": 20260954,
+    "targets_per_curve": 8
+  }
+}

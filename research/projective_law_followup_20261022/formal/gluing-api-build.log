@@ -1,0 +1,26 @@
+AlgebraicGeometry.Scheme.GlueData.{u_1} : Type (u_1 + 1)
+AlgebraicGeometry.Scheme.GlueData.glued.{u} (D : AlgebraicGeometry.Scheme.GlueData) : AlgebraicGeometry.Scheme
+AlgebraicGeometry.Scheme.GlueData.ι.{u} (D : AlgebraicGeometry.Scheme.GlueData) (i : D.J) : D.U i ⟶ D.glued
+AlgebraicGeometry.Scheme.GlueData.ι_isOpenImmersion.{u} (D : AlgebraicGeometry.Scheme.GlueData) (i : D.J) :
+  AlgebraicGeometry.IsOpenImmersion (D.ι i)
+AlgebraicGeometry.Scheme.GlueData.vPullbackConeIsLimit.{u} (D : AlgebraicGeometry.Scheme.GlueData) (i j : D.J) :
+  CategoryTheory.Limits.IsLimit (D.vPullbackCone i j)
+CategoryTheory.GlueData.t_fac.{v, u₁} {C : Type u₁} [CategoryTheory.Category.{v, u₁} C]
+  (self : CategoryTheory.GlueData C) (i j k : self.J) :
+  CategoryTheory.CategoryStruct.comp (self.t' i j k) (CategoryTheory.Limits.pullback.snd (self.f j k) (self.f j i)) =
+    CategoryTheory.CategoryStruct.comp (CategoryTheory.Limits.pullback.fst (self.f i j) (self.f i k)) (self.t i j)
+CategoryTheory.GlueData.cocycle.{v, u₁} {C : Type u₁} [CategoryTheory.Category.{v, u₁} C]
+  (self : CategoryTheory.GlueData C) (i j k : self.J) :
+  CategoryTheory.CategoryStruct.comp (self.t' i j k)
+      (CategoryTheory.CategoryStruct.comp (self.t' j k i) (self.t' k i j)) =
+    CategoryTheory.CategoryStruct.id (CategoryTheory.Limits.pullback (self.f i j) (self.f i k))
+Common22PrincipalOpenSpec.affinePrincipalOpenEmbedding.{u_1} {K : Type u_1} [Field K] (a3 a2 a1 a0 : K) :
+  AlgebraicGeometry.Spec ↧(Common22SeparateChartMap.AffineOpen a3 a2 a1 a0) ⟶
+    AlgebraicGeometry.Spec ↧(Common22SeparateChartMap.AffineRing a3 a2 a1 a0)
+Common22PrincipalOpenSpec.infinityPrincipalOpenEmbedding.{u_1} {K : Type u_1} [Field K] (a3 a2 a1 a0 : K) :
+  AlgebraicGeometry.Spec ↧(Common22SeparateChartMap.InfinityOpen a3 a2 a1 a0) ⟶
+    AlgebraicGeometry.Spec ↧(Common22ExplicitChart.ChartRing a3 a2 a1 a0)
+Common22PrincipalOpenSpec.principalOpenSpecIso.{u_1} {K : Type u_1} [Field K] (a3 a2 a1 a0 : K) :
+  AlgebraicGeometry.Spec ↧(Common22SeparateChartMap.AffineOpen a3 a2 a1 a0) ≅
+    AlgebraicGeometry.Spec ↧(Common22SeparateChartMap.InfinityOpen a3 a2 a1 a0)
+'Common22PrincipalOpenSpec.principalOpenSpecIso' depends on axioms: [propext, Classical.choice, Quot.sound]

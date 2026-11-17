@@ -1,0 +1,7 @@
+P<x> := PolynomialRing(GF(2));
+K<z> := ext<GF(2) | x^7+x+1>;
+E := EllipticCurve([K | 1, 1, 0, 0, z^3]);
+print "K_modulus", DefiningPolynomial(K);
+print "order", #E;
+print "j", jInvariant(E);
+print "genus_c1", WeilDescentGenus(E, GF(2), K!1);

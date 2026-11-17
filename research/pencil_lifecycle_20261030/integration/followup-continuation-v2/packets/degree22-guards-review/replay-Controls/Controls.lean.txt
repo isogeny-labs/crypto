@@ -1,0 +1,17 @@
+import Guard22
+import WordMixed
+set_option autoImplicit false
+open Degree22Guards
+instance : Fact (Nat.Prime 2) := ⟨by decide⟩
+-- Nonvacuous equal, noninverse, B=0 branch: reaches point-double, not identity.
+example : (1:ℚ) ≠ 0 := by
+ exact double_b_zero_forces_point_arm (1:ℚ) 0 1 1 1 1 1 1 1 1
+  (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num [doubleB])
+-- The predecessor guard is necessary: direct allzero ordinate may reach identity.
+example : doubleB (0:ℚ) 0 0 0=0 ∧ (0:ℚ)= -(0:ℚ) := by norm_num [doubleB]
+-- Odd characteristic is necessary for the first standalone algebra lemma.
+example : doubleB (0:ZMod 2) 0 0 1=0 ∧ (1:ZMod 2) ≠ 0 := by decide
+-- Nonunit weights; normalized v1=v2, crossed equality but not inverse.
+example : (8:ℚ) ≠ 0 := by
+ exact double_b_zero_forces_point_arm (4:ℚ) 0 8 32 2 3 1 1 27 243
+  (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num [doubleB])

@@ -1,0 +1,245 @@
+name: Run pending Isolab experiments
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Report eligibility without claiming or launching experiments
+        type: boolean
+        default: false
+      max_jobs:
+        description: Maximum new jobs or existing-claim collections (1 to 4)
+        type: string
+        default: '1'
+  push:
+    branches: [main]
+    paths:
+      - 'experiments/queue/**'
+      - 'experiments/specs/**'
+      - 'tools/experiment-queue/**'
+      - '.github/workflows/experiment-queue.yml'
+
+permissions:
+  contents: read
+concurrency:
+  group: isolab-experiment-queue
+  cancel-in-progress: false
+
+jobs:
+  contracts:
+    runs-on: ${{ vars.ISOLAB_BUILD_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 15
+    steps:
+      - name: Check access to the private canonical protocol repository
+        env:
+          PROTOCOL_TOKEN: ${{ secrets.EXPERIMENT_PROTOCOL_READ_TOKEN }}
+        run: |
+          if [[ -z "$PROTOCOL_TOKEN" ]]; then
+            printf '::error::Set EXPERIMENT_PROTOCOL_READ_TOKEN with contents-read access to isogeny-labs/crypto-autoresearcher; the default workflow token cannot read another private repository.\n'
+            exit 1
+          fi
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/experiment-queue/
+            /tools/expspec/
+            /tools/task_card.py
+      - name: Get the canonical protocol schemas and test fixture
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          repository: isogeny-labs/crypto-autoresearcher
+          token: ${{ secrets.EXPERIMENT_PROTOCOL_READ_TOKEN }}
+          ref: 6a69b2d02ecd53f1649bcf56e23e4ffe91d953ad
+          path: canonical-protocol
+          persist-credentials: false
+          sparse-checkout: |
+            schemas
+            examples/experiment-protocol/ecbench-l2-smoke-subset
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.10'
+          cache-dependency-path: tools/experiment-queue/go.sum
+      - name: Test and build native queue tooling
+        env:
+          EXPERIMENT_SCHEMAS: ${{ github.workspace }}/canonical-protocol/schemas
+          EXPERIMENT_PROTOCOL_FIXTURE: ${{ github.workspace }}/canonical-protocol/examples/experiment-protocol/ecbench-l2-smoke-subset/protocol.json
+        run: |
+          set -euo pipefail
+          mkdir -p queue-bin
+          go -C tools/expspec build -o "$PWD/queue-bin/expspec" .
+          export EXPSPEC_BIN="$PWD/queue-bin/expspec"
+          go -C tools/experiment-queue test -race ./...
+          go -C tools/experiment-queue vet ./...
+          test -z "$(gofmt -l tools/experiment-queue)"
+          bash -n tools/experiment-queue/worker.sh tools/experiment-queue/remote.sh
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go -C tools/experiment-queue build -trimpath -o "$PWD/queue-bin/experiment-queue" .
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: isolab-queue-tooling
+          path: queue-bin/
+          retention-days: 1
+
+  plan:
+    needs: contracts
+    if: github.ref == 'refs/heads/main'
+    runs-on: ${{ vars.ISOLAB_BUILD_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 15
+    permissions:
+      contents: write # Atomic permanent claim refs; no AWS identity in this job.
+    outputs:
+      selected: ${{ steps.discover.outputs.selected }}
+      matrix: ${{ steps.discover.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/experiment-queue/
+            /experiments/specs/
+            /experiments/queue/
+            /backlog/*/card.json
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          repository: isogeny-labs/crypto-autoresearcher
+          token: ${{ secrets.EXPERIMENT_PROTOCOL_READ_TOKEN }}
+          ref: 6a69b2d02ecd53f1649bcf56e23e4ffe91d953ad
+          path: canonical-protocol
+          persist-credentials: false
+          sparse-checkout: schemas
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: isolab-queue-tooling
+          path: queue-bin
+      - name: Discover, validate and permanently claim eligible experiments
+        id: discover
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MAX_JOBS: ${{ inputs.max_jobs || '1' }}
+          DRY_RUN: ${{ inputs.dry_run || false }}
+          ISOLAB_TRIGGER_ROLE_ARN: ${{ vars.ISOLAB_TRIGGER_ROLE_ARN }}
+          ISOLAB_RESULTS_BUCKET: ${{ vars.ISOLAB_RESULTS_BUCKET }}
+          ISOLAB_CODEBUILD_PROJECT: ${{ vars.ISOLAB_CODEBUILD_PROJECT }}
+        run: |
+          set -euo pipefail
+          chmod +x queue-bin/*
+          export EXPSPEC_BIN="$PWD/queue-bin/expspec"
+          queue-bin/experiment-queue plan --root "$PWD" --schemas "$PWD/canonical-protocol/schemas" \
+            --revision "$GITHUB_SHA" --repo "$GITHUB_REPOSITORY" --out queue-plan.json \
+            --max-jobs "$MAX_JOBS" --dry-run="$DRY_RUN"
+          if [[ "$DRY_RUN" == true ]]; then
+            printf 'selected=0\n' >> "$GITHUB_OUTPUT"
+          else
+            printf 'selected=%s\n' "$(jq '.candidates|length' queue-plan.json)" >> "$GITHUB_OUTPUT"
+          fi
+          printf 'matrix=%s\n' "$(jq -c '{include:[.candidates[]|{key:.key}]}' queue-plan.json)" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: isolab-queue-plan
+          path: queue-plan.json
+          retention-days: 7
+
+  execute:
+    needs: [contracts, plan]
+    if: github.ref == 'refs/heads/main' && needs.plan.outputs.selected != '0'
+    runs-on: ${{ vars.ISOLAB_BUILD_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 110
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_REGION: ${{ vars.ISOLAB_AWS_REGION }}
+      ISOLAB_BUCKET: ${{ vars.ISOLAB_RESULTS_BUCKET }}
+      ISOLAB_CODEBUILD_PROJECT: ${{ vars.ISOLAB_CODEBUILD_PROJECT }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: tools/experiment-queue
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          repository: isogeny-labs/crypto-autoresearcher
+          token: ${{ secrets.EXPERIMENT_PROTOCOL_READ_TOKEN }}
+          ref: 6a69b2d02ecd53f1649bcf56e23e4ffe91d953ad
+          path: canonical-protocol
+          persist-credentials: false
+          sparse-checkout: schemas
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: isolab-queue-*
+          path: transfer
+          merge-multiple: true
+      - name: Obtain temporary AWS credentials for the existing bridge
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
+        with:
+          role-to-assume: ${{ vars.ISOLAB_TRIGGER_ROLE_ARN }}
+          role-session-name: isolab-queue-${{ github.run_id }}
+          role-duration-seconds: 7200
+          aws-region: ${{ env.AWS_REGION }}
+          mask-aws-account-id: true
+      - name: Submit once, collect and verify EKS results
+        env:
+          QUEUE_KEY: ${{ matrix.key }}
+        run: |
+          set -euo pipefail
+          [[ $(aws sts get-caller-identity --query Account --output text) == 104186811093 ]]
+          chmod +x transfer/experiment-queue
+          jq --arg key "$QUEUE_KEY" '.candidates |= map(select(.key==$key))' transfer/queue-plan.json > one-plan.json
+          transfer/experiment-queue run --repo "$GITHUB_REPOSITORY" --file one-plan.json \
+            --schemas "$PWD/canonical-protocol/schemas" --tool-dir "$PWD/tools/experiment-queue" \
+            --wait 75m --out queue-results.json
+      - name: Retain only declared public results and compact receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: isolab-queue-return-${{ matrix.key }}
+          path: queue-results.json
+          if-no-files-found: warn
+          retention-days: 7
+
+  publish:
+    needs: [contracts, plan, execute]
+    if: always() && github.ref == 'refs/heads/main' && needs.plan.result == 'success' && needs.plan.outputs.selected != '0' && needs.execute.result != 'skipped'
+    runs-on: ${{ vars.ISOLAB_BUILD_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: isolab-queue-tooling
+          path: transfer
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        continue-on-error: true
+        with:
+          pattern: isolab-queue-return-*
+          path: returns
+      - name: Return terminal observations on one result PR per execution
+        env:
+          GH_TOKEN: ${{ secrets.EXPERIMENT_RESULTS_PUSH_TOKEN || github.token }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(returns/*/queue-results.json)
+          if [[ ${#files[@]} == 0 ]]; then
+            printf 'No controller result was captured. Permanent claims remain for collection; no experiment is resubmitted.\n' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          jq -s 'add' "${files[@]}" > combined-results.json
+          chmod +x transfer/experiment-queue
+          transfer/experiment-queue publish --repo "$GITHUB_REPOSITORY" --file combined-results.json --out published.json
+          jq -r '.pull_requests[] | "- Result PR: " + .html_url' published.json >> "$GITHUB_STEP_SUMMARY"
+          while read -r number; do
+            gh pr merge "$number" --repo "$GITHUB_REPOSITORY" --auto --merge
+          done < <(jq -r '.pull_requests[].number' published.json)

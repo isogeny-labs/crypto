@@ -1,0 +1,24 @@
+/var/tmp/pencil-wide-modpow-20261031-v1/Wide.lean:18:52: error: unsolved goals
+p a b : UInt64
+hp : 0 < p.toNat
+ha : a.toNat < 2 ^ 128
+hb : b.toNat < 2 ^ 128
+hpw : p.toNat < 2 ^ 128
+hr : a.toNat * b.toNat % p.toNat < 2 ^ 64
+⊢ (UInt64.ofNat (a.toNat * b.toNat % p.toNat)).toNat = a.toNat * b.toNat % p.toNat
+/var/tmp/pencil-wide-modpow-20261031-v1/Wide.lean:23:20: warning: This simp argument is unused:
+  UInt64.toNat_ofNat
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [wideMul, BitVec.toNat_umod, BitVec.toNat_mul, BitVec.toNat_ofNat, Nat.mod_eq_of_lt ha,
+    Nat.mod_eq_of_lt hb, Nat.mod_eq_of_lt hpw, Nat.mod_eq_of_lt (product_fits a b), Nat.mod_eq_of_lt hr]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-wide-modpow-20261031-v1/Wide.lean:24:99: warning: This simp argument is unused:
+  Nat.mod_eq_of_lt hr
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [wideMul, UInt64.toNat_ofNat, BitVec.toNat_umod, BitVec.toNat_mul, BitVec.toNat_ofNat,
+    Nat.mod_eq_of_lt ha, Nat.mod_eq_of_lt hb, Nat.mod_eq_of_lt hpw, Nat.mod_eq_of_lt (product_fits a b)]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

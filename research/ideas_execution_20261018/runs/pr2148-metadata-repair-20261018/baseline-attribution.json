@@ -1,0 +1,555 @@
+{
+  "attribution": "Both observed deterministic failure conditions pre-exist on the actual base; no base CI failure run was executed/observed by this review.",
+  "backlog_last_shard_variables_derived_from_fixed_card": {
+    "checkpoint": "OUT/checkpoint.json",
+    "mode": "odd-support",
+    "out": "OUT",
+    "seed": "2026101703",
+    "shard": "2"
+  },
+  "backlog_protocol_binding": {
+    "actual_base_blob": "32b1497df398f355b9d93c4fe37d1ec2c9b0c52b",
+    "declared": "32b1497df398f355b9d93c4fe37d1ec2c9b0c52b",
+    "matches": true
+  },
+  "backlog_relevant_input_source_closure": [
+    {
+      "base_blob": "7789a2821deb79218e4144b1993ddb64bfa14c72",
+      "head_blob": "7789a2821deb79218e4144b1993ddb64bfa14c72",
+      "identical": true,
+      "path": "backlog/XP-20261017-quintic-support-frobenius/card.json"
+    },
+    {
+      "base_blob": "32b1497df398f355b9d93c4fe37d1ec2c9b0c52b",
+      "head_blob": "32b1497df398f355b9d93c4fe37d1ec2c9b0c52b",
+      "identical": true,
+      "path": "backlog/XP-20261017-quintic-support-frobenius/PROTOCOL.md"
+    },
+    {
+      "base_blob": "29417d0712c57f6a76d88c84ec1d407666dec6d6",
+      "head_blob": "29417d0712c57f6a76d88c84ec1d407666dec6d6",
+      "identical": true,
+      "path": "backlog/XP-20261017-quintic-support-frobenius/README.md"
+    },
+    {
+      "base_blob": "8d2e313e5d2a472713fca31f5e20a69dedc8119f",
+      "head_blob": "8d2e313e5d2a472713fca31f5e20a69dedc8119f",
+      "identical": true,
+      "path": "backlog/README.md"
+    },
+    {
+      "base_blob": "4d87ef178822276fdc601eb1c971718ffc6b886e",
+      "head_blob": "4d87ef178822276fdc601eb1c971718ffc6b886e",
+      "identical": true,
+      "path": "backlog/schema/card.v1.json"
+    },
+    {
+      "base_blob": "9b7cfd380b0b557a4e3d9425d8f0f5354be0edbe",
+      "head_blob": "9b7cfd380b0b557a4e3d9425d8f0f5354be0edbe",
+      "identical": true,
+      "path": "src/bin/backlog.rs"
+    },
+    {
+      "base_blob": "29e21eb055369dee09e741798f4123b5efa70aa5",
+      "head_blob": "29e21eb055369dee09e741798f4123b5efa70aa5",
+      "identical": true,
+      "path": "src/bin/backlog/card.rs"
+    },
+    {
+      "base_blob": "94dcc89c9bbde2371c62b1bd5b404a6b08ad9c72",
+      "head_blob": "94dcc89c9bbde2371c62b1bd5b404a6b08ad9c72",
+      "identical": true,
+      "path": "src/bin/backlog/cairn.rs"
+    },
+    {
+      "base_blob": "0c51ddbc2752db9dba3479804259787a3c694503",
+      "head_blob": "0c51ddbc2752db9dba3479804259787a3c694503",
+      "identical": true,
+      "path": ".github/workflows/backlog.yml"
+    },
+    {
+      "base_blob": "0359c428d5aee3409ed303ae7ce835879cf6a938",
+      "head_blob": "0359c428d5aee3409ed303ae7ce835879cf6a938",
+      "identical": true,
+      "path": ".github/scripts/ci-scope.mjs"
+    },
+    {
+      "base_blob": "c9ddd0fe8c2d14eb2ac16f6f8c7c6e3abbc77383",
+      "head_blob": "c9ddd0fe8c2d14eb2ac16f6f8c7c6e3abbc77383",
+      "identical": true,
+      "path": "Cargo.toml"
+    },
+    {
+      "base_blob": "d9fdedcd2b059498e8e1b8f7ee9f9a451793bb05",
+      "head_blob": "d9fdedcd2b059498e8e1b8f7ee9f9a451793bb05",
+      "identical": true,
+      "path": "Cargo.lock"
+    },
+    {
+      "base_blob": "75447fb1ebd1b1ee749cb35789cbe33c2b1aa93b",
+      "head_blob": "75447fb1ebd1b1ee749cb35789cbe33c2b1aa93b",
+      "identical": true,
+      "path": "src/lib.rs"
+    },
+    {
+      "base_blob": "9b9e87cfc892666f451dca3ae60f81c4192f831d",
+      "head_blob": "9b9e87cfc892666f451dca3ae60f81c4192f831d",
+      "identical": true,
+      "path": "src/hash/mod.rs"
+    },
+    {
+      "base_blob": "d5978b0b3d0d71e2d8552f0b6cdeb9070e15f101",
+      "head_blob": "d5978b0b3d0d71e2d8552f0b6cdeb9070e15f101",
+      "identical": true,
+      "path": "src/hash/sha1.rs"
+    },
+    {
+      "base_blob": "42f32e5479b40681f9edbd2aab0a5eb5a91add39",
+      "head_blob": "42f32e5479b40681f9edbd2aab0a5eb5a91add39",
+      "identical": true,
+      "path": "problems/generalized-rootfinding-all-roots-8x.md"
+    }
+  ],
+  "base": "b7cafe04485eb97d873dffef698e7337cfb38cfe",
+  "base_is_ancestor_of_head": true,
+  "ci_merge_compare": {
+    "ahead_by": 1,
+    "base": "55da3adf5dc96be86687583c5ae967a686bc1a09",
+    "base_commit": {
+      "html_url": "https://github.com/aburan28/crypto/commit/55da3adf5dc96be86687583c5ae967a686bc1a09",
+      "sha": "55da3adf5dc96be86687583c5ae967a686bc1a09",
+      "url": "https://api.github.com/repos/aburan28/crypto/commits/55da3adf5dc96be86687583c5ae967a686bc1a09"
+    },
+    "behind_by": 0,
+    "files": [],
+    "head": "58f87d063808217b0caa072310cc139607544ba5",
+    "merge_base_commit": {
+      "html_url": "https://github.com/aburan28/crypto/commit/55da3adf5dc96be86687583c5ae967a686bc1a09",
+      "sha": "55da3adf5dc96be86687583c5ae967a686bc1a09",
+      "url": "https://api.github.com/repos/aburan28/crypto/commits/55da3adf5dc96be86687583c5ae967a686bc1a09"
+    },
+    "repository_full_name": "aburan28/crypto",
+    "status": "ahead",
+    "too_large": null,
+    "total_commits": 1
+  },
+  "compact_pr_comment": "Two remaining metadata failures are source-proven baseline defects at b7cafe044, not changes introduced by PR #2148. Cover-transfer buildLedger:1124 requires 2,100 rows while its unchanged catalog inputs already contain 2,572 (all 52 declared builder/support paths have identical blobs). The blocked quintic card:112 uses outputs.verify {artifact}, which unchanged card.rs:769\u2013774 expands without an artifact variable (16 relevant input/source files are identical). CI tested merge 58f87d, whose tree comparison with head55da3ad has no file changes. No base CI rerun or check waiver is claimed.",
+  "cover_complete_declared_file_inputs": [
+    {
+      "base_blob": "a8fd0f73ce98d2cfadf52d1a9e2b69b578fed014",
+      "head_blob": "a8fd0f73ce98d2cfadf52d1a9e2b69b578fed014",
+      "identical": true,
+      "path": ".gitattributes"
+    },
+    {
+      "base_blob": "1ab33ca4156e4cb4e2f940a884f5563eebb0f7e3",
+      "head_blob": "1ab33ca4156e4cb4e2f940a884f5563eebb0f7e3",
+      "identical": true,
+      "path": ".github/workflows/curve-covers.yml"
+    },
+    {
+      "base_blob": "8996e12ea2c66614f493d2fcd968cace94db41b7",
+      "head_blob": "8996e12ea2c66614f493d2fcd968cace94db41b7",
+      "identical": true,
+      "path": ".github/workflows/release.yml"
+    },
+    {
+      "base_blob": "d9fdedcd2b059498e8e1b8f7ee9f9a451793bb05",
+      "head_blob": "d9fdedcd2b059498e8e1b8f7ee9f9a451793bb05",
+      "identical": true,
+      "path": "Cargo.lock"
+    },
+    {
+      "base_blob": "c9ddd0fe8c2d14eb2ac16f6f8c7c6e3abbc77383",
+      "head_blob": "c9ddd0fe8c2d14eb2ac16f6f8c7c6e3abbc77383",
+      "identical": true,
+      "path": "Cargo.toml"
+    },
+    {
+      "base_blob": "9548d148b990f6a5ee69acaab848adc8219c9e9c",
+      "head_blob": "9548d148b990f6a5ee69acaab848adc8219c9e9c",
+      "identical": true,
+      "path": "docs/curves/COVERS.md"
+    },
+    {
+      "base_blob": "7c388123cff17a0b54787b2b78b7ad93c8520a1b",
+      "head_blob": "7c388123cff17a0b54787b2b78b7ad93c8520a1b",
+      "identical": true,
+      "path": "docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md"
+    },
+    {
+      "base_blob": "c98d605f6b93405a1c38b671d0fc0ab6a393e7b8",
+      "head_blob": "c98d605f6b93405a1c38b671d0fc0ab6a393e7b8",
+      "identical": true,
+      "path": "docs/curves/JACOBIAN_TRANSFERS.md"
+    },
+    {
+      "base_blob": "751bfa2a9da16e70efa30c2e044eff50d7854114",
+      "head_blob": "751bfa2a9da16e70efa30c2e044eff50d7854114",
+      "identical": true,
+      "path": "docs/curves/cover-links.yaml"
+    },
+    {
+      "base_blob": "5b8841d0bbe3d5e062cb854ce1b6542ac1e5fb5c",
+      "head_blob": "5b8841d0bbe3d5e062cb854ce1b6542ac1e5fb5c",
+      "identical": true,
+      "path": "docs/curves/cover-transfer-assessment.schema.json"
+    },
+    {
+      "base_blob": "abb3760f4f7c0458a271ec06ca2711c3c55a55df",
+      "head_blob": "abb3760f4f7c0458a271ec06ca2711c3c55a55df",
+      "identical": true,
+      "path": "docs/curves/cover-transfer-assessments.json"
+    },
+    {
+      "base_blob": "022b411a2bb35644155c2b1c36c07c7c78281382",
+      "head_blob": "022b411a2bb35644155c2b1c36c07c7c78281382",
+      "identical": true,
+      "path": "docs/curves/covers.json"
+    },
+    {
+      "base_blob": "c0d193eb33f019c851869b74bac2d39bf6020328",
+      "head_blob": "c0d193eb33f019c851869b74bac2d39bf6020328",
+      "identical": true,
+      "path": "docs/curves/fixed-f8-genus3-order-certificate.json"
+    },
+    {
+      "base_blob": "f9b1893cfb494a6950d11a66731a876afb30b4e8",
+      "head_blob": "f9b1893cfb494a6950d11a66731a876afb30b4e8",
+      "identical": true,
+      "path": "docs/curves/jacobian-transfers.json"
+    },
+    {
+      "base_blob": "e0c176272b03cbe15f3a3c24b78d23e826ca8d51",
+      "head_blob": "e0c176272b03cbe15f3a3c24b78d23e826ca8d51",
+      "identical": true,
+      "path": "docs/curves/registry.json"
+    },
+    {
+      "base_blob": "4ae1e342acb59f018bf59ce9bf3df986c99c7450",
+      "head_blob": "4ae1e342acb59f018bf59ce9bf3df986c99c7450",
+      "identical": true,
+      "path": "research/cover_transfer_assessment_20261013/README.md"
+    },
+    {
+      "base_blob": "b6462a654678c8de4ebd6825a12612688787c6a4",
+      "head_blob": "b6462a654678c8de4ebd6825a12612688787c6a4",
+      "identical": true,
+      "path": "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf"
+    },
+    {
+      "base_blob": "9a8e173a0e053324b3db3c78a72444d0a6097342",
+      "head_blob": "9a8e173a0e053324b3db3c78a72444d0a6097342",
+      "identical": true,
+      "path": "research/cover_transfer_assessment_20261013/lean/CoverTransfer.lean"
+    },
+    {
+      "base_blob": "094316545c77e7cb3342b7d84ae7db0c2b24bd1f",
+      "head_blob": "094316545c77e7cb3342b7d84ae7db0c2b24bd1f",
+      "identical": true,
+      "path": "research/cover_transfer_assessment_20261013/lean/README.md"
+    },
+    {
+      "base_blob": "75d900ab161a413b0feb77e0b6800834e42348f9",
+      "head_blob": "75d900ab161a413b0feb77e0b6800834e42348f9",
+      "identical": true,
+      "path": "research/cover_transfer_assessment_20261013/release_replay.txt"
+    },
+    {
+      "base_blob": "215d6ed0cce76f72e950cf735c442320a4c2bb79",
+      "head_blob": "215d6ed0cce76f72e950cf735c442320a4c2bb79",
+      "identical": true,
+      "path": "research/cover_transfer_assessment_20261013/typed_correspondence.dot"
+    },
+    {
+      "base_blob": "5672d404fa21cbcc99203bdbad32c38de74f78e2",
+      "head_blob": "5672d404fa21cbcc99203bdbad32c38de74f78e2",
+      "identical": true,
+      "path": "research/cover_transfer_assessment_20261013/typed_correspondence.png"
+    },
+    {
+      "base_blob": "d90b7ebc635b24ab80a7c0c7321282aa7b36553a",
+      "head_blob": "d90b7ebc635b24ab80a7c0c7321282aa7b36553a",
+      "identical": true,
+      "path": "research/cover_transfer_assessment_20261013/typed_correspondence.svg"
+    },
+    {
+      "base_blob": "935597e2607222bb2ac6fe5f4e7fb11445c09972",
+      "head_blob": "935597e2607222bb2ac6fe5f4e7fb11445c09972",
+      "identical": true,
+      "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.dot"
+    },
+    {
+      "base_blob": "75fcadd5600d943aa296440bdf30546f24a076d8",
+      "head_blob": "75fcadd5600d943aa296440bdf30546f24a076d8",
+      "identical": true,
+      "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.png"
+    },
+    {
+      "base_blob": "808363aca4bb1905e08795bf722a1897e4c0a5fd",
+      "head_blob": "808363aca4bb1905e08795bf722a1897e4c0a5fd",
+      "identical": true,
+      "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.svg"
+    },
+    {
+      "base_blob": "120ef35e4d9a70b3c92c806e88467625f81ada91",
+      "head_blob": "120ef35e4d9a70b3c92c806e88467625f81ada91",
+      "identical": true,
+      "path": "research/cover_transfer_assessment_20261013/verify_assessment.mjs"
+    },
+    {
+      "base_blob": "05f2697685465a8a0f74c2264ff4c3e25e70ff93",
+      "head_blob": "05f2697685465a8a0f74c2264ff4c3e25e70ff93",
+      "identical": true,
+      "path": "research/hyperelliptic_cover_infrastructure_20261006/README.md"
+    },
+    {
+      "base_blob": "52287434fb2b8cb781e780a6e74b66b1a5c5eefd",
+      "head_blob": "52287434fb2b8cb781e780a6e74b66b1a5c5eefd",
+      "identical": true,
+      "path": "research/hyperelliptic_cover_infrastructure_20261006/evidence.json"
+    },
+    {
+      "base_blob": "3fcb6ab9cd82c8e1d745b6365e8a21ec1505baf7",
+      "head_blob": "3fcb6ab9cd82c8e1d745b6365e8a21ec1505baf7",
+      "identical": true,
+      "path": "scripts/build_cover_transfer_assessments.mjs"
+    },
+    {
+      "base_blob": "f3613f2e05c88d703b9d79bfe200568633ce9138",
+      "head_blob": "f3613f2e05c88d703b9d79bfe200568633ce9138",
+      "identical": true,
+      "path": "src/bin/curve_cover_check.rs"
+    },
+    {
+      "base_blob": "44b10f81f3122e2c3323c89a40c7b149a1a05100",
+      "head_blob": "44b10f81f3122e2c3323c89a40c7b149a1a05100",
+      "identical": true,
+      "path": "src/bin/curve_cover_check/checker.rs"
+    },
+    {
+      "base_blob": "82390b65e1c51479e5ba2c7714513d729f42eebc",
+      "head_blob": "82390b65e1c51479e5ba2c7714513d729f42eebc",
+      "identical": true,
+      "path": "src/bin/curve_cover_check/links.rs"
+    },
+    {
+      "base_blob": "ba0f97a59e37180331a9c2db6db44328da05c67f",
+      "head_blob": "ba0f97a59e37180331a9c2db6db44328da05c67f",
+      "identical": true,
+      "path": "src/bin/curve_cover_check/models.rs"
+    },
+    {
+      "base_blob": "5692daaad4f8172414b94fa607c16a4a44de5548",
+      "head_blob": "5692daaad4f8172414b94fa607c16a4a44de5548",
+      "identical": true,
+      "path": "src/bin/ecdlp_audit/fixed_f8_order.rs"
+    },
+    {
+      "base_blob": "5041317bcff0bc0c676530839ed489c6478cfc62",
+      "head_blob": "5041317bcff0bc0c676530839ed489c6478cfc62",
+      "identical": true,
+      "path": "src/bin/hyperelliptic_cover.rs"
+    },
+    {
+      "base_blob": "c4ade710d1880c8d93608c44fc23c95f70049b6f",
+      "head_blob": "c4ade710d1880c8d93608c44fc23c95f70049b6f",
+      "identical": true,
+      "path": "src/binary_ecc/cover_transfer.rs"
+    },
+    {
+      "base_blob": "c56dcec3907b76cc5f227d435023907fa95465be",
+      "head_blob": "c56dcec3907b76cc5f227d435023907fa95465be",
+      "identical": true,
+      "path": "src/binary_ecc/curve.rs"
+    },
+    {
+      "base_blob": "6310dff8128836be11711723b0023ea4ff4ba3dc",
+      "head_blob": "6310dff8128836be11711723b0023ea4ff4ba3dc",
+      "identical": true,
+      "path": "src/binary_ecc/f2m.rs"
+    },
+    {
+      "base_blob": "15d5fac70f415940c01f7be7e52a2e9a356756f5",
+      "head_blob": "15d5fac70f415940c01f7be7e52a2e9a356756f5",
+      "identical": true,
+      "path": "src/binary_ecc/hyperelliptic.rs"
+    },
+    {
+      "base_blob": "7d093f56e56dc3b9713c7b73e23d8e4899508be7",
+      "head_blob": "7d093f56e56dc3b9713c7b73e23d8e4899508be7",
+      "identical": true,
+      "path": "src/binary_ecc/mod.rs"
+    },
+    {
+      "base_blob": "ed2b1bd6ca89e2f942f0c334d0ec6b2f4989bd05",
+      "head_blob": "ed2b1bd6ca89e2f942f0c334d0ec6b2f4989bd05",
+      "identical": true,
+      "path": "src/binary_ecc/poly_f2m.rs"
+    },
+    {
+      "base_blob": "a775df63705c1eb004c831ce771c9e913024b96f",
+      "head_blob": "a775df63705c1eb004c831ce771c9e913024b96f",
+      "identical": true,
+      "path": "src/cryptanalysis/ecc2k130_guard.rs"
+    },
+    {
+      "base_blob": "87c5ff004eb2e4647ce5e61543f7b0314e951d3e",
+      "head_blob": "87c5ff004eb2e4647ce5e61543f7b0314e951d3e",
+      "identical": true,
+      "path": "src/cryptanalysis/mod.rs"
+    },
+    {
+      "base_blob": "9b9e87cfc892666f451dca3ae60f81c4192f831d",
+      "head_blob": "9b9e87cfc892666f451dca3ae60f81c4192f831d",
+      "identical": true,
+      "path": "src/hash/mod.rs"
+    },
+    {
+      "base_blob": "9566e3de448e21ff98811cfc4c6992ff3448962e",
+      "head_blob": "9566e3de448e21ff98811cfc4c6992ff3448962e",
+      "identical": true,
+      "path": "src/hash/sha256.rs"
+    },
+    {
+      "base_blob": "75447fb1ebd1b1ee749cb35789cbe33c2b1aa93b",
+      "head_blob": "75447fb1ebd1b1ee749cb35789cbe33c2b1aa93b",
+      "identical": true,
+      "path": "src/lib.rs"
+    },
+    {
+      "base_blob": "048e2265aa4066241b10be3538806ad6c3a22484",
+      "head_blob": "048e2265aa4066241b10be3538806ad6c3a22484",
+      "identical": true,
+      "path": "src/prime_hyperelliptic/curve.rs"
+    },
+    {
+      "base_blob": "aa38cd2908c1ab9e82785e3596ff2a5c89c0888e",
+      "head_blob": "aa38cd2908c1ab9e82785e3596ff2a5c89c0888e",
+      "identical": true,
+      "path": "src/prime_hyperelliptic/fp2.rs"
+    },
+    {
+      "base_blob": "5c3c6e9a71d25627597b70978078df4429d045c8",
+      "head_blob": "5c3c6e9a71d25627597b70978078df4429d045c8",
+      "identical": true,
+      "path": "src/prime_hyperelliptic/fp_poly.rs"
+    },
+    {
+      "base_blob": "7941445b81ac6c490c513cebc18b3df29c0eaf3d",
+      "head_blob": "7941445b81ac6c490c513cebc18b3df29c0eaf3d",
+      "identical": true,
+      "path": "src/prime_hyperelliptic/mod.rs"
+    },
+    {
+      "base_blob": "0fef8624d3d38a64601e0886599ad8b8f793083f",
+      "head_blob": "0fef8624d3d38a64601e0886599ad8b8f793083f",
+      "identical": true,
+      "path": "src/utils/mod.rs"
+    }
+  ],
+  "cover_input_counts": {
+    "55da3adf5dc96be86687583c5ae967a686bc1a09": {
+      "covers_curves": 2572,
+      "graph_covers": 2570,
+      "graph_curves": 2572,
+      "graph_maps": 2572
+    },
+    "b7cafe04485eb97d873dffef698e7337cfb38cfe": {
+      "covers_curves": 2572,
+      "graph_covers": 2570,
+      "graph_curves": 2572,
+      "graph_maps": 2572
+    }
+  },
+  "evidence_sha256": {
+    "base-check-runs.json": "d85536a8edf55b5f90c1d3476e6d8e212b2bc32605ef161570d177392b87ae11",
+    "check-runs.json": "ebc5a97f334c6414bc8bd6235892c9c7ed4ecff9136cd2397887cb4a8f5b13ea",
+    "job-117613565304.decoded.log": "e3322a3b0564b1dc3a0103b730988ce07f066a0356d6bb7ff4b9492ec50cf6e5",
+    "job-117613565927.decoded.log": "995cdf0dc74060dfc32ad31935b6bea0422d85836b7999ce0c692b42a93bc5ff",
+    "pr.json": "e962dbbcd03e303633e57493fbbf4fa7aaed0663d0f1bc0aaf98881270b0b288"
+  },
+  "failures": [
+    {
+      "actual_counts_at_both_refs": {
+        "covers_curves": 2572,
+        "graph_covers": 2570,
+        "graph_curves": 2572,
+        "graph_maps": 2572
+      },
+      "all_identical": true,
+      "command": "node scripts/build_cover_transfer_assessments.mjs --check",
+      "declared_full_builder_input_paths_compared": 52,
+      "expected_counts": {
+        "covers_curves": 2100,
+        "graph_covers": 2098,
+        "graph_curves": 2100,
+        "graph_maps": 2100
+      },
+      "failure_prefix_input_closure": [
+        "scripts/build_cover_transfer_assessments.mjs",
+        "docs/curves/covers.json",
+        "docs/curves/cover-links.yaml"
+      ],
+      "job": "Cover transfer assessment",
+      "job_url": "https://github.com/aburan28/crypto/actions/runs/39106562573/job/117613565927",
+      "log": "job-117613565927.decoded.log",
+      "log_lines": [
+        2958,
+        2967
+      ],
+      "observed_error": "Error: unexpected covers row count",
+      "observed_exit_code": 1,
+      "source_line": 1124,
+      "source_path": "scripts/build_cover_transfer_assessments.mjs",
+      "why_preexisting": "Same exact script and two early JSON inputs at base/head. Before later evidence/file hashes/output comparison, buildLedger asserts2572===2100 and throws. All52 static builder file inputs/output/workflow/attributes additionally have identical Git blobs.",
+      "workflow": "Curve cover certificates",
+      "workflow_line": 145,
+      "workflow_path": ".github/workflows/curve-covers.yml",
+      "workflow_run_url": "https://github.com/aburan28/crypto/actions/runs/39106562573"
+    },
+    {
+      "all_identical": true,
+      "card_line": 112,
+      "card_path": "backlog/XP-20261017-quintic-support-frobenius/card.json",
+      "card_status": "blocked",
+      "command": "./target/release/backlog validate --all --merged-into origin/main",
+      "job": "validate",
+      "job_url": "https://github.com/aburan28/crypto/actions/runs/39106562496/job/117613565304",
+      "log": "job-117613565304.decoded.log",
+      "log_lines": [
+        815,
+        818
+      ],
+      "observed_error": "outputs.verify: placeholder {artifact} in \"{artifact}\" has no value",
+      "observed_exit_code": 1,
+      "outputs_validation_line": 769,
+      "relevant_closure_files_compared": 16,
+      "shard_variables_line": 361,
+      "substitution_error_line": 349,
+      "validator_path": "src/bin/backlog/card.rs",
+      "why_preexisting": "Same card and CLI/validator/shard expansion/schema/build/dependency protocol inputs at base/head. Outputs placeholder resolution is unconditional for a parsed outputs.verify even on blocked cards; fixed final shard vars omit artifact, so substitute returns the exact recorded error. Ancestry option for ready commits cannot supply it.",
+      "workflow": "backlog",
+      "workflow_line": 97,
+      "workflow_path": ".github/workflows/backlog.yml",
+      "workflow_run_url": "https://github.com/aburan28/crypto/actions/runs/39106562496"
+    }
+  ],
+  "head": "55da3adf5dc96be86687583c5ae967a686bc1a09",
+  "limitations": [
+    "No supplied base check run/log exercises either failing workflow.",
+    "Basecheck snapshot has39 checks and no recorded failure but neither exact failing job, so it does not contradict source-proven defects.",
+    "Attribution covers the two observed failures, not every unexecuted downstream validation or complete PR readiness.",
+    "All local source reads use fixed base/head Git blobs; bounded_memory owns current working-tree source fixes."
+  ],
+  "network_scope": "Read-only GitHub compare/commit API; no provider allocation or messaging. Initial local lookup of absent merge object attempted implicit promisor access and failed; subsequent local Git reads disabled lazy fetching.",
+  "pull_request": 2148,
+  "repo_or_PR_mutations": false,
+  "report_sha256": "9491ea6ba3d485399d88c8d44edd8a2f004a67f0a713dabfd37703c1e90ba2ca",
+  "repository": "aburan28/crypto",
+  "schema": "pr-ci-baseline-attribution/v1",
+  "scientific_trials_executed": 0,
+  "state": "complete_read_only_source_attribution",
+  "tested_pr_merge": "58f87d063808217b0caa072310cc139607544ba5",
+  "validator_or_builder_executions": 0
+}

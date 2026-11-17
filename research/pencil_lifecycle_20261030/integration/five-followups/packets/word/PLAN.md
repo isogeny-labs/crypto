@@ -1,0 +1,5 @@
+# Word correspondence plan
+Review date 2026-10-30. Scope: existing natural residue statements, then UInt64 multiplication and square values under explicit canonical bounds. This reviewer read producer OBLIGATIONS and proof before recording this plan; the review is a separate-agent source review, NOT blind derivation. No independent verdict for newly authored extensions is claimed.
+Prior: canonical casts should be injective below positive modulus; noncanonical words and overflowing products should invalidate direct field correspondence. Source: three_leads.rs bm/bs (190-199), n=1/table-free dispatch; prior field theorem and published complete-law provenance in OBLIGATIONS. No novelty claim.
+Controls: explicit p=5,a=2^63,b=2 overflow mismatch; noncanonical p=5,a=0,b=5 cast equality; successful canonical p=5,a=4,b=4.
+Bound target: p<2^31 and a,b<p imply a*b<2^62<2^64. Native UInt64 modulo then equals Nat product modulo p and casts to field multiplication. Counters and call-dispatch remain separate source obligations.

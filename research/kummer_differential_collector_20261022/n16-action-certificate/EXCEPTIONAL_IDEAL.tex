@@ -1,0 +1,30 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.72in]{geometry}
+\usepackage{amsmath,amssymb,booktabs,graphicx}
+\title{N16: exceptional torsion action and chart-basis correction}
+\author{Exact 21-model Rosenhain packet}
+\date{25 October 2026}
+\begin{document}
+\maketitle
+\noindent The source matrix $C_1$ differs from the cancelled degree-two matrix $C_2$ in its third column. The earlier N16 chart note claimed they were the same; that statement is retracted. The difference is an exact degree-two basis change: for $\sigma=1+\lambda+\mu+\nu$, $C_2(1,-a_1,-a_0,q_3)^T=C_1(1,-a_1,a_0,q_3+\sigma a_0)^T$. Thus N15 correctly inverts $C_1$ for degree-two inputs. The retained wrong-basis diagnostic applies $C_2$ to the degree-one vector without this transformation; the corrected exceptional check uses $C_1$ for degree one and $C_2$ for the direct degree-two vector.
+
+\begin{center}\begin{tabular}{lr}\toprule Exact recorded quantity & Value\\\midrule
+Models / torsion roots per model & 21 / 5\\
+Corrected $U=u(r)=0$ pairs & 105\\
+Zero univariate projective cross-products & 630 / 630\\
+$O\leftrightarrow T_r$ exact cases & 105 / 105 each direction\\
+Nonzero $\det(C_1)$ / $\det(C_2)$ & 21 / 21 each\\
+Wrong-basis pairs with nonzero cross-products & 105 / 105\\
+Wrong-basis $O$-to-torsion mismatches & 84 / 105\\
+Clearing factor for degree-two chart & $(s-r)^2$\\
+New signed collector / matched-rho ratio & null / null\\
+\bottomrule\end{tabular}\end{center}
+
+\begin{center}\includegraphics[width=0.94\textwidth]{research/kummer_differential_collector_20261022/n16-action-certificate/exceptional-ideal-graph.png}\end{center}
+
+\noindent On the exceptional locus $u(r)=0$, validity gives $v(r)^2=f(r)=0$. Write $u=(x-r)(x-s)$ and $v=b_1(x-r)$. A repeated root $s=r$ cannot represent a valid reduced divisor: $v^2$ would have a double zero at $r$ while $f'(r)\ne0$ is verified for every recorded branch point. Thus $s\ne r$, and validity at $s$ gives $(s-r)^2b_1^2=f(s)$. Translation by $T_r=(r,0)-\infty$ sends $(r,0)+(s,y)-2\infty$ to $(s,y)-\infty$, since $2T_r=\operatorname{div}(x-r)$ as a divisor class.
+
+\noindent The exact checker reconstructs $f$, both matrices, the action matrix, $C_2$ applied to the cleared degree-two vector, and $C_1(0,1,s,s^2)^T$. All six coefficients of every projective cross-product vanish identically in $\mathbb F_p[s]$ for all 105 rows. The reverse degree-one action for $s\ne r$ follows from the earlier exact involution $M_r^2=\alpha_r I$ with $\alpha_r\ne0$ and nonzero chart vectors. At $s=r$, the $T_r\leftrightarrow O$ checks cover the degree-one/zero boundary. Together with the separate 630 generic $u(r)\ne0$ ideal certificates, this is an all-reduced-class action identity for the \emph{declared charts} on the 21 models.
+
+\noindent A source-independent geometric derivation that these charts are the intended Kummer embedding is still missing. A signed collector that preserves relation labels and a new cold matched-rho cost were not run, so their ratios remain null. The 105-row CSV, successful and failed raw JSON packets, native producer/checker, and SHA-256 list accompany this report.
+\end{document}

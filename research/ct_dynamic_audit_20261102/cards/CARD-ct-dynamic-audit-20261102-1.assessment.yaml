@@ -1,0 +1,16 @@
+card_id: CARD-ct-dynamic-audit-20261102-1
+relay_verbatim: false
+outcome: executor_deviated
+stopped_at_step: null
+recommendation: escalate
+reasons:
+  - "check-relay (tools/task_card.py check_relay, called directly because the CLI re-lints and the lint now fails, see below) reports relay_verbatim false: missing_lines are the rows.jsonl and summary.json output lines of command 3, EXECUTOR-REPORT-card1.txt."
+  - "Cause traced: the report lists the four command-3 output lines in the card's declared order (ENV.txt, rows.jsonl, summary.json, fig_ir_spread.svg); the check recomputes from the receipt JSON, written with sort_keys, so its order is ENV.txt, fig_ir_spread.svg, rows.jsonl, summary.json. Recomputing brief() with the outputs in the card's order gives missing_lines [] (all digests identical). Every number matches; only the order of two lines differs. Probable tool artifact, not an executor edit; the rule makes any non-verbatim relay executor_deviated, so the main session settles it."
+  - "Receipt: status completed, commit a1530967a1c6ea4e63bb9b470639ec0c73294117, card_sha256 ae18c737..., 4 commands, exit 0, timed_out false, 1 attempt each, in card order, argv equal to the card; seconds 0.28, 0.325, 2318.055, 0.003 (within the 600/60/3000/60 timeouts). Receipt sha256 fd4fee553718b7b9d4a0aa897ecabbdc019a1a3af1ec16d1f0659658428a351d."
+  - "Disk digests equal the receipt and the report: binary ebdf722a... (equals the bound value, build was a no-op, Finished in 0.19s), rows.jsonl 2a5c921a..., summary.json 7eb2fa01..., fig_ir_spread.svg 309e8af7..., ENV.txt 03169a9a... (binary_sha256 line equals the binary, commit a1530967, valgrind-3.22.0)."
+  - "Acceptance: summary.json is a list of 11 targets (ctrl_pos_branch, ctrl_neg_masked, x25519, smul_p256, smul_secp256k1, smul_sm2_generic, inv_prime_ct, inv_euclid, ed25519_sign, ecdsa_p256_sign, sm2_sign); 11 memcheck-<target>.xml present; 81 callgrind files per target (the process-exit file plus dumps .1 to .80, so 80 per-call dumps each, 880 in total); rows.jsonl has 2290 lines; analyzer printed 'rows: 2290 lines; summary: 11 targets'."
+  - "raw/stderr.log (6144 bytes): no match for fatal, Assertion, unhandled, Killed, abort or error; contents are Callgrind headers and I refs lines only."
+  - "Card-level note: tools/task_card.py check-relay and lint now print CARD FAIL (commands[3].argv names rows.jsonl, summary.json, fig_ir_spread.svg, ENV.txt, which exist after the run and are not bound); at the pre-run lint they did not exist. The CLI therefore cannot print the JSON; this is a card design consequence, not a run deviation."
+  - "Write scope: git status --porcelain shows only the receipt and the executor report untracked in cards/, both inside research/ct_dynamic_audit_20261102/; raw/, results/ and cards/*.stdout, *.stderr are hidden by the temporary .git/info/exclude entry (git status --ignored lists them, all inside scope). The receipt dirty_after is [] and dirty_before names only the card; HEAD is now 2d9a44841 (the card was committed after the run; git diff a1530967..HEAD adds only the card), the receipt commit a1530967 was checked at start."
+  - "Not checked: that no command beyond the card's argv ran in the executor's transcript (only the receipt shows what the tool ran)."
+interpretation: not_assessed

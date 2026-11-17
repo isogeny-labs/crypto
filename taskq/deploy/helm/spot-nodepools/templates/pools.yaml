@@ -1,0 +1,70 @@
+{{- $cluster := required "clusterName is required" .Values.clusterName -}}
+{{- $role := required "nodeRole is required" .Values.nodeRole -}}
+{{- $alias := required "amiAlias is required" .Values.amiAlias -}}
+{{- range $pool := list (dict "name" "cpu" "types" .Values.cpuInstanceTypes) (dict "name" "gpu" "types" .Values.gpuInstanceTypes) }}
+{{- if $pool.types }}
+---
+apiVersion: karpenter.k8s.aws/v1
+kind: EC2NodeClass
+metadata:
+  name: taskq-{{ $pool.name }}
+spec:
+  role: {{ $role | quote }}
+  amiSelectorTerms:
+    - alias: {{ $alias | quote }}
+  subnetSelectorTerms:
+    - tags: {karpenter.sh/discovery: {{ $cluster | quote }}}
+  securityGroupSelectorTerms:
+    - tags: {karpenter.sh/discovery: {{ $cluster | quote }}}
+  tags:
+    karpenter.sh/discovery: {{ $cluster | quote }}
+    taskq/capacity: spot
+  userData: |
+    apiVersion: node.eks.aws/v1alpha1
+    kind: NodeConfig
+    spec:
+      kubelet:
+        config:
+          cpuManagerPolicy: static
+          kubeReserved: {cpu: 500m, memory: 1Gi}
+          systemReserved: {cpu: 300m, memory: 512Mi}
+---
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: taskq-{{ $pool.name }}-spot
+spec:
+  template:
+    metadata:
+      labels:
+        taskq/pool: {{ $pool.name }}
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: taskq-{{ $pool.name }}
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: [amd64]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: [spot]
+        - key: node.kubernetes.io/instance-type
+          operator: In
+          values: {{ $pool.types | toJson }}
+      taints:
+        {{- if eq $pool.name "gpu" }}
+        - key: nvidia.com/gpu
+          value: present
+          effect: NoSchedule
+        {{- else }}
+        - key: taskq/pool
+          value: cpu
+          effect: NoSchedule
+        {{- end }}
+  disruption:
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 5m
+{{- end }}
+{{- end }}

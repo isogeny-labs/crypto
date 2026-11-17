@@ -1,0 +1,168 @@
+import Mathlib
+
+/-!
+UNEXECUTED DRAFT. This file deliberately ends in .lean.txt: it is not part of
+any proof-gate project. The pending checkpoint authorization/access gate has
+not been bypassed. No declaration here has been elaborated or kernel checked.
+
+This describes the algebraic first-step equations of the frozen native uniform
+sampler. The improving successor LIST retains one entry per query outcome,
+including duplicates. It must never be replaced by a deduplicated set.
+The height is intended to be b - dim(L), but that actual-subspace bridge and
+the probability interpretation of the first-step equations remain obligations.
+-/
+namespace UniformCollectionDraft
+
+structure RankSystem (S : Type*) where
+  height : S → ℕ
+  outcomes : ℕ
+  outcomes_pos : 0 < outcomes
+  stays : S → ℕ
+  improving : S → List S
+  mass : ∀ s, height s ≠ 0 → stays s + (improving s).length = outcomes
+  progresses : ∀ s, height s ≠ 0 → stays s < outcomes
+  descends : ∀ s t, t ∈ improving s → height t < height s
+
+/-- The costMass is the SUM over all equally likely query outcomes, not the
+mean and not the cost of an improving query alone. Terminal states cost zero.
+The first-step identity is explicit; no stochastic semantics is assumed by
+defining this predicate. -/
+def Solves {S : Type*} (sys : RankSystem S) (costMass : ℚ) (F : S → ℚ) : Prop :=
+  (∀ s, sys.height s = 0 → F s = 0) ∧
+  (∀ s, sys.height s ≠ 0 →
+    (sys.outcomes : ℚ) * F s = costMass +
+      (sys.stays s : ℚ) * F s + ((sys.improving s).map F).sum)
+
+theorem remaining_mass_positive {S : Type*} (sys : RankSystem S)
+    (s : S) (h : sys.height s ≠ 0) :
+    0 < (sys.outcomes : ℚ) - (sys.stays s : ℚ) := by
+  have hi : (sys.stays s : ℚ) < (sys.outcomes : ℚ) := by
+    exact_mod_cast sys.progresses s h
+  exact sub_pos.mpr hi
+
+/-- Exactly the rational recurrence computed by both prepared native paths. -/
+theorem recurrence {S : Type*} (sys : RankSystem S) (c : ℚ) (F : S → ℚ)
+    (hF : Solves sys c F) (s : S) (h : sys.height s ≠ 0) :
+    F s = (c + ((sys.improving s).map F).sum) /
+      ((sys.outcomes : ℚ) - (sys.stays s : ℚ)) := by
+  apply (eq_div_iff (ne_of_gt (remaining_mass_positive sys s h))).2
+  have he := hF.2 s h
+  nlinarith [he]
+
+/-- Strictly decreasing remaining rank removes ambiguity from the finite
+algebraic recursion. This is uniqueness, not a proof of iid expectation. -/
+theorem solution_unique {S : Type*} (sys : RankSystem S) (c : ℚ)
+    (F G : S → ℚ) (hF : Solves sys c F) (hG : Solves sys c G) : F = G := by
+  have go : ∀ n, ∀ s, sys.height s = n → F s = G s := by
+    intro n
+    induction n using Nat.strong_induction_on with
+    | h n ih =>
+      intro s hs
+      by_cases hz : sys.height s = 0
+      · rw [hF.1 s hz, hG.1 s hz]
+      · have hm : (sys.improving s).map F = (sys.improving s).map G := by
+          apply List.map_congr_left
+          intro t ht
+          apply ih (sys.height t) _ t rfl
+          simpa only [hs] using sys.descends s t ht
+        calc
+          F s = (c + ((sys.improving s).map F).sum) /
+            ((sys.outcomes : ℚ) - (sys.stays s : ℚ)) := recurrence sys c F hF s hz
+          _ = (c + ((sys.improving s).map G).sum) /
+            ((sys.outcomes : ℚ) - (sys.stays s : ℚ)) := by rw [hm]
+          _ = G s := (recurrence sys c G hG s hz).symm
+  funext s
+  exact go (sys.height s) s rfl
+
+theorem list_sum_scale {S : Type*} (a : ℚ) (F : S → ℚ) (xs : List S) :
+    (xs.map (fun t => a * F t)).sum = a * (xs.map F).sum := by
+  induction xs with
+  | nil => simp
+  | cons x xs ih => simp only [List.map_cons, List.sum_cons, ih]; ring
+
+theorem scaled_solution {S : Type*} (sys : RankSystem S) (c a : ℚ)
+    (F : S → ℚ) (hF : Solves sys c F) :
+    Solves sys (a * c) (fun s => a * F s) := by
+  constructor
+  · intro s hs
+    rw [hF.1 s hs]
+    ring
+  · intro s hs
+    rw [list_sum_scale]
+    calc
+      (sys.outcomes : ℚ) * (a * F s) = a * ((sys.outcomes : ℚ) * F s) := by ring
+      _ = a * (c + (sys.stays s : ℚ) * F s +
+        ((sys.improving s).map F).sum) := by rw [hF.2 s hs]
+      _ = a * c + (sys.stays s : ℚ) * (a * F s) +
+        a * ((sys.improving s).map F).sum := by ring
+
+/-- For the same fixed query-degree law at every nonterminal state, the
+degree-weighted solution is mean query degree times the call solution.
+Both first-step equations are hypotheses. This does not price total work. -/
+theorem degree_requests_factor {S : Type*} (sys : RankSystem S) (degreeMass : ℚ)
+    (E C : S → ℚ) (hE : Solves sys (sys.outcomes : ℚ) E)
+    (hC : Solves sys degreeMass C) :
+    C = fun s => (degreeMass / (sys.outcomes : ℚ)) * E s := by
+  have hn : (sys.outcomes : ℚ) ≠ 0 := by
+    apply ne_of_gt
+    exact_mod_cast sys.outcomes_pos
+  have hm : (degreeMass / (sys.outcomes : ℚ)) * (sys.outcomes : ℚ) = degreeMass :=
+    div_mul_cancel₀ degreeMass hn
+  have hscaled := scaled_solution sys (sys.outcomes : ℚ)
+    (degreeMass / (sys.outcomes : ℚ)) E hE
+  rw [hm] at hscaled
+  exact solution_unique sys degreeMass C _ hC hscaled
+
+/-- In the special one-rank-remaining case all improving successors terminate.
+Only here does positive-progress probability by itself determine call count. -/
+theorem one_rank_remaining {S : Type*} (sys : RankSystem S) (E : S → ℚ)
+    (hE : Solves sys (sys.outcomes : ℚ) E) (s : S) (hs : sys.height s = 1) :
+    E s = (sys.outcomes : ℚ) /
+      ((sys.outcomes : ℚ) - (sys.stays s : ℚ)) := by
+  have hz : sys.height s ≠ 0 := by omega
+  have hsum : ((sys.improving s).map E).sum = 0 := by
+    have hm : (sys.improving s).map E =
+        (sys.improving s).map (fun _ => (0 : ℚ)) := by
+      apply List.map_congr_left
+      intro t ht
+      apply hE.1 t
+      have hd := sys.descends s t ht
+      omega
+    rw [hm]
+    simp
+  rw [recurrence sys (sys.outcomes : ℚ) E hE s hz, hsum, add_zero]
+
+theorem one_rank_inverse_probability {S : Type*} (sys : RankSystem S)
+    (E : S → ℚ) (hE : Solves sys (sys.outcomes : ℚ) E)
+    (s : S) (hs : sys.height s = 1) :
+    E s = 1 / (((sys.outcomes : ℚ) - (sys.stays s : ℚ)) /
+      (sys.outcomes : ℚ)) := by
+  have hz : sys.height s ≠ 0 := by omega
+  have hn : (sys.outcomes : ℚ) ≠ 0 := by
+    apply ne_of_gt
+    exact_mod_cast sys.outcomes_pos
+  have hd := ne_of_gt (remaining_mass_positive sys s hz)
+  rw [one_rank_remaining sys E hE s hs]
+  field_simp [hn, hd]
+
+/-- An explicit sufficient conditional comparison. A larger empty-state
+rank gain is NOT a hypothesis that would justify hCalls by itself. -/
+theorem lower_degree_and_calls (mainCalls twistCalls mainDegree twistDegree : ℚ)
+    (hCalls : twistCalls ≤ mainCalls) (hDegree : twistDegree < mainDegree)
+    (hNonneg : 0 ≤ twistDegree) (hPositive : 0 < mainCalls) :
+    twistDegree * twistCalls < mainDegree * mainCalls := by
+  calc
+    twistDegree * twistCalls ≤ twistDegree * mainCalls :=
+      mul_le_mul_of_nonneg_left hCalls hNonneg
+    _ < mainDegree * mainCalls := mul_lt_mul_of_pos_right hDegree hPositive
+
+#print axioms remaining_mass_positive
+#print axioms recurrence
+#print axioms solution_unique
+#print axioms list_sum_scale
+#print axioms scaled_solution
+#print axioms degree_requests_factor
+#print axioms one_rank_remaining
+#print axioms one_rank_inverse_probability
+#print axioms lower_degree_and_calls
+end UniformCollectionDraft

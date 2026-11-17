@@ -1,0 +1,18 @@
+{
+ "schema":"backlog.card/v1","id":"XP-20261027-nist-best2-seeded-validation",
+ "title":"Execute native BEST2 model comparison and seeded validation",
+ "created":"2026-10-27","authors":["Codex research lane"],"status":"blocked",
+ "status_note":"Prepared, unleased and unlaunched; no authenticated lab/GPU route or root build in this session. Model comparison does not validate the full-size GPU cost estimate.",
+ "blocked_on":["problem:problems/nist-best2-dp-bias-and-gpu-validation.md","hw:authorized EKS L2 worker and authenticated GPU host","note:root Rust integration build and GPU replay path still missing"],
+ "links":{"lead":"research/nist_best2_small_batch_20261027/README.md","notes":["research/nist_best2_small_batch_20261027/seeded-audit-v1/README.md"],"prs":[2689]},
+ "question":"Does the BEST2 selection model retain any advantage when setup, two candidate additions, DP restarts and cycle work are all charged?",
+ "decision_value":"Sealed native model records distinguish selection effects from dropped work; separate exact-kernel seeded DP and GPU replay panels are required to decide any NIST GPU enablement. No derived throughput-times-model ratio is promoted.",
+ "protocol":{"path":"PROTOCOL.md","blob":null},
+ "code":{"repo":"crypto","branch":"research/nist-best2-small-batch-20261027","commit":null,"build":[["cargo","build","--release","--bin","ecbench"]]},
+ "resources":{"cpus":4,"ram_gb":16,"disk_gb":20,"gpu":null,"est_core_hours":null,"est_wall_hours":null,"notes":"This task runs only the ecbench model; exact-curve CPU/GPU panels and their separate bounds remain in the frozen protocol. No spend estimate asserted."},
+ "run":{"argv":["target/release/ecbench","run","--spec","research/nist_best2_small_batch_20261027/ecbench-model.json","--out","{out}","--cpus","inherit"],"env":{},"timeout_per_shard_s":1800},
+ "shards":{"count":1,"scheme":"single","params":{},"stop":"all"},
+ "checkpoint":{"file":null,"resume_flag":null},
+ "outputs":{"result_schema":"ecbench.session/v1","verify":["target/release/ecbench","verify","--dir","{out}","--replay","12"],"land":"research/nist_best2_small_batch_20261027/seeded-audit-v1"},
+ "cairn":{"mode":"lab-task","space":"unconfigured","tasks":["XP-20261027-nist-best2-seeded-validation/shard-{k}"],"ttl_s":7200,"env":{"name":"crypto-rust","recipe":"Build from a pinned reviewed commit; use EKS L2 admission and independent-host replay."},"exec":{"cpus":4,"memory_mb":16384,"timeout_s":1800,"sandbox":"auto","publish":"runs/XP-20261027-nist-best2-seeded-validation"},"funding":{"units":0,"rationale":"Blocked card, not published or funded; use only existing authorized infrastructure."},"notes":"No lease, dispatch or running job exists."}
+}

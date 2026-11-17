@@ -1,0 +1,36 @@
+PASS field n=13 tail=0x1b
+PASS inv n=13 mul=4 sqr=12
+PASS curve n=13 #E=2^13+1-V_n=8374 (mod 4 = 2)
+PASS 2E=ker(delta) n=13 cyclic 2-part Z/2
+PASS field n=17 tail=0x9
+PASS inv n=17 mul=4 sqr=16
+PASS curve n=17 #E=2^17+1-V_n=131174 (mod 4 = 2)
+PASS 2E=ker(delta) n=17 cyclic 2-part Z/2
+PASS field n=31 tail=0x9
+PASS inv n=31 mul=7 sqr=30
+PASS curve n=31 #E=2^31+1-V_n=2147392942 (mod 4 = 2)
+PASS 2E=ker(delta) n=31 cyclic 2-part Z/2
+PASS field n=37 tail=0x53
+PASS inv n=37 mul=6 sqr=36
+PASS curve n=37 #E=2^37+1-V_n=137438419414 (mod 4 = 2)
+PASS 2E=ker(delta) n=37 cyclic 2-part Z/2
+PASS field n=41 tail=0x9
+PASS inv n=41 mul=6 sqr=40
+PASS curve n=41 #E=2^41+1-V_n=2199020947334 (mod 4 = 2)
+PASS 2E=ker(delta) n=41 cyclic 2-part Z/2
+PASS quartic forms == resultant S4 (n=31) 300 random (x1,x2,xr,t)
+PASS S4(x1,x2,x3,x(P1+-P2+-P3))=0 n=17 100 triples x 4 signs
+PASS S4(x1,x2,x3,x(P1+-P2+-P3))=0 n=31 100 triples x 4 signs
+PASS S4(x1,x2,x3,x(P1+-P2+-P3))=0 n=41 100 triples x 4 signs
+PASS families n=31 l=9 size/membership rational counts sub-low:236 sub-rand1:252 sub-rand2:260 sub-rand3:258 sub-rand4:252 sub-rand5:234 sub-rand6:244 coset2-s1:272 coset2-s2:253 coset2-s3:259 coset2-s4:236 coset4-s1:266 coset4-s2:253 ham:252 ham-shift:245 geom-s1:233 geom-s2:266 geom-s3:269 geom-s4:267 affine-rand-s1:270 affine-rand-s2:255 affine-aligned-s1:274 affine-aligned-s2:258 affine-anti:249
+PASS families n=37 l=9 size/membership rational counts sub-low:267 sub-rand1:243 sub-rand2:256 sub-rand3:252 sub-rand4:260 sub-rand5:272 sub-rand6:265 coset2-s1:257 coset2-s2:236 coset2-s3:257 coset2-s4:261 coset4-s1:279 coset4-s2:267 ham:294 ham-shift:260 geom-s1:265 geom-s2:261 geom-s3:253 geom-s4:255 affine-rand-s1:242 affine-rand-s2:246 affine-aligned-s1:267 affine-aligned-s2:259 affine-anti:243
+PASS families n=41 l=9 size/membership rational counts sub-low:252 sub-rand1:242 sub-rand2:255 sub-rand3:253 sub-rand4:254 sub-rand5:265 sub-rand6:263 coset2-s1:246 coset2-s2:269 coset2-s3:236 coset2-s4:261 coset4-s1:262 coset4-s2:260 ham:251 ham-shift:257 geom-s1:298 geom-s2:256 geom-s3:252 geom-s4:223 affine-rand-s1:268 affine-rand-s2:283 affine-aligned-s1:275 affine-aligned-s2:264 affine-anti:249
+PASS delta classes and T_eff (n=17 l=6) n0/n1 sub-low:19/13 sub-rand1:22/22 sub-rand2:18/16 sub-rand3:13/18 sub-rand4:16/14 sub-rand5:17/12 sub-rand6:19/14 coset2-s1:12/16 coset2-s2:13/17 coset2-s3:16/19 coset2-s4:18/20 coset4-s1:19/16 coset4-s2:17/16 ham:7/24 ham-shift:23/3 geom-s1:24/10 geom-s2:24/8 geom-s3:19/15 geom-s4:6/9 affine-rand-s1:16/13 affine-rand-s2:16/11 affine-aligned-s1:30/0 affine-aligned-s2:31/0 affine-anti:0/22
+PASS kernel == brute force (n=17 l=6, random programs) 400 programs, exact decisions checked 412, witnesses 1700, bad 0
+  incumbent-continue core/pair 141.3, lin/pair 79.1
+PASS handicap pairs=full costs ~2x pairs ratio 1.996
+PASS lift prefilter costs ~1/4 pairs ratio 0.213
+PASS abort 1/8 costs 1-(7/8)^2 = 0.234 of pairs ratio 0.234
+PASS generic root finder costs more core ops ratio 1.542
+PASS b1 quartic costs fewer core ops ratio 0.9858
+selftest PASSED in 8.3s, peak RSS 3 MB

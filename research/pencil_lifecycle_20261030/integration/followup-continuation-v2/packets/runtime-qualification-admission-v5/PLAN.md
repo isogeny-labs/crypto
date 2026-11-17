@@ -1,0 +1,5 @@
+# Descriptor-release qualification planning — T1485
+
+Bind reviewed qualifier-v4 descriptor transport and unchanged supervisor-v4 to current retained disk after Q0 passed/Q1 copy transport failed. Preserve historicalassembly and bothfailedqualifications, sourcecorrections, costs and deadline. Propose one300second2CPU2GiB successor on same4GiBdisk, additional600worker seconds leaving22200; no launch until freshcostreview, finalindependentbindingreview and exactGitHubpublication. No automaticretry/scientificcohort/rebuild/newresource/IAM change.
+
+Use current native diskhash/custody and Q0 imageidentity observations, notoldassemblydigest. Source review is accepted at exact5679e3/d015056; actualproc-rootaccess notyetqualified. Newowner-specificdirs preservepreviousreceipts. Root holds scope; draft is notexecutionadmission. Fresh dollar reconciliation is committed in runtime-cost-refresh-v5: existing USD 58 plus the proposed USD 1 attempt gives USD 59 total, with USD 9.87 estimated daily unreserved headroom. Prior records stay intact.

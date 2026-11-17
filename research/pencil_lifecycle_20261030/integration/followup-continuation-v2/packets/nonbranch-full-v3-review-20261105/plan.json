@@ -1,0 +1,32 @@
+{
+  "schema": "prospective-source-review-plan/v1",
+  "created_utc": "2026-11-05T17:43:27.833533+00:00",
+  "producer_source_read": false,
+  "prior": "V2 nativepre passed but service manager garbage collection cleared InvocationID, incorrectly causing outer custody failure. Exact managerjournalstart/success supports reconciliation. Remaining-phase original-clock admission expired without source review or launch.",
+  "scope": [
+    "Fresh full pre/compiler/post900/600/900 attempt, exclusive new workspace, no prior pre reuse",
+    "Journal fallback must bind exact captured InvocationID, uniqueunit, currentboot, trusted systemd manager start and success events with ordered timestamps and phase-window bounds",
+    "EmptyInvocation alone never suffices; active/replacementowner or nonemptycgroup rejects progression",
+    "Journal query and processcleanup bounded within phase; no weakening timeout, receipt, negative or axiom controls",
+    "Compare mathematical sources, runtime and closure pins with published v2; native fullhashchecks preserved",
+    "Prior300+900charged=1200; remaining45600 of46800; totalnormattemptceiling3; oldclocks immutable and deadlineNov6 04UTC"
+  ],
+  "attacks": [
+    "oldsuccessful journal event replay",
+    "success event fromanotherboot/unit/invocation",
+    "unit replacement after capturedowner",
+    "missingortruncatedjournal",
+    "journal process timeout",
+    "activeunit despitehistoric success",
+    "partialprecache reuse",
+    "counter reset excluding priorfailure"
+  ],
+  "execution": false,
+  "independence": "Reviewer did not author producer fix; prior findings and runtime terminal observations shared, not blind design",
+  "deliverables": [
+    "sourceverdict JSON",
+    "report PDF",
+    "graph SVG",
+    "exact manifest"
+  ]
+}

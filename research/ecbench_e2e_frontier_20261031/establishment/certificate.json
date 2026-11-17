@@ -1,0 +1,601 @@
+{
+  "all_artifact_consistency_checks_passed": true,
+  "as_of": "2026-10-31",
+  "checks": [
+    {
+      "detail": 74,
+      "name": "registry:74-top-level",
+      "ok": true
+    },
+    {
+      "detail": 74,
+      "name": "registry:unique-top-level",
+      "ok": true
+    },
+    {
+      "detail": {
+        "extra": [],
+        "missing": []
+      },
+      "name": "registry:coverage-exact",
+      "ok": true
+    },
+    {
+      "detail": [
+        "f4-f2",
+        "buchberger-f2",
+        "matrix-f4",
+        "matrix-f5",
+        "inherited-f4",
+        "crossbred-f2",
+        "xl-f2",
+        "sat-cdcl",
+        "fes-f2",
+        "fes-f2-wide",
+        "exhaustive"
+      ],
+      "name": "registry:11-nested-solvers",
+      "ok": true
+    },
+    {
+      "detail": {
+        "char2": {
+          "ratio_rho": 10.6210696509,
+          "slug": "icv1-f2m18-t393-d2c04152"
+        },
+        "koblitz": {
+          "ratio_rho": 3.4299576491,
+          "slug": "icv1-f2m47-t22705043-f4e44623"
+        },
+        "prime": {
+          "ratio_rho": 5.4703789656,
+          "slug": "icv1-fp12-t19-d4a315df"
+        }
+      },
+      "name": "generic:standing-leaders-above-rho",
+      "ok": true
+    },
+    {
+      "detail": {
+        "commit": null,
+        "filed_before_affected_data": null,
+        "frozen_at": null,
+        "protocol_sha256": null,
+        "status": "draft"
+      },
+      "name": "generic:fresh-campaign-remains-draft",
+      "ok": true
+    },
+    {
+      "detail": {
+        "matches": 1
+      },
+      "name": "unique:N4 B0 q=4051",
+      "ok": true
+    },
+    {
+      "detail": {
+        "ci95": [
+          0.66191,
+          0.81643
+        ],
+        "ratio": 0.73475
+      },
+      "name": "ghs:N4-B0-below-plain-rho",
+      "ok": true
+    },
+    {
+      "detail": {
+        "matches": 1
+      },
+      "name": "unique:N4-v2 DL/neg q=2097091",
+      "ok": true
+    },
+    {
+      "detail": {
+        "ci95": [
+          0.00395,
+          0.00764
+        ],
+        "ratio": 0.00523
+      },
+      "name": "ghs:N4v2-DL-below-negation-rho",
+      "ok": true
+    },
+    {
+      "detail": {
+        "matched": "1008/1008",
+        "status": "verified",
+        "verdict": "passed"
+      },
+      "name": "p20:second-host-validation",
+      "ok": true
+    },
+    {
+      "detail": {
+        "0": {
+          "ci95": [
+            0.8064021105570519,
+            0.8660634281836213
+          ],
+          "ratio": 0.8364170531754714
+        },
+        "0.1": {
+          "ci95": [
+            0.7861367893322674,
+            0.8469761804724445
+          ],
+          "ratio": 0.8166378371406973
+        },
+        "1": {
+          "ci95": [
+            0.7138072151741669,
+            0.7785934369624194
+          ],
+          "ratio": 0.746060262094452
+        }
+      },
+      "name": "p20:selected-beats-incumbent-across-band",
+      "ok": true
+    },
+    {
+      "detail": {
+        "0": {
+          "ci95": [
+            7.30526075400282,
+            8.644893916412563
+          ],
+          "ratio": 7.9522720696688065
+        },
+        "0.1": {
+          "ci95": [
+            7.558102748582131,
+            8.967488910694774
+          ],
+          "ratio": 8.237899570382032
+        },
+        "1": {
+          "ci95": [
+            8.76541875513979,
+            10.54744204328265
+          ],
+          "ratio": 9.620189133190149
+        }
+      },
+      "name": "p20:selected-remains-behind-rho-across-band",
+      "ok": true
+    },
+    {
+      "detail": {
+        "K13": {
+          "f5_over_f4_solver_ops": 0.6464869277565661,
+          "f6_over_inherited_e2e_s": 68.76893221092526,
+          "f6_over_inherited_solver_ops": 0.8176068767227203,
+          "inherited_over_rho_negation_s": 7.213451868734515,
+          "median_s": {
+            "f6-ic": 1161.7332449386388,
+            "inherited-f4": 16.285429314010337,
+            "matrix-f4": 16.027159859740003,
+            "matrix-f5": 16.027159859740003,
+            "rho-negation": 2.2902526311148534,
+            "rho-strong": 14.318373493370782
+          },
+          "median_solver_ops": {
+            "f6-ic": 9097648.0,
+            "inherited-f4": 11122152.0,
+            "matrix-f4": 2244717235.0,
+            "matrix-f5": 1454014746.0
+          }
+        },
+        "K19": {
+          "f6_over_inherited_e2e_s": 1303.19700128513,
+          "f6_over_inherited_solver_ops": 0.7797759965030848,
+          "inherited_over_rho_negation_s": 3.7723251886796367,
+          "median_s": {
+            "f6-ic": 6483.442846066015,
+            "inherited-f4": 5.105542156473639,
+            "rho-negation": 1.3102474186077449,
+            "rho-strong": 3.090096684154342
+          },
+          "median_solver_ops": {
+            "f6-ic": 519329588.5,
+            "inherited-f4": 670243437.5
+          }
+        },
+        "R13": {
+          "f5_over_f4_solver_ops": 0.6414164706076306,
+          "f6_over_inherited_e2e_s": 64.60804148209132,
+          "f6_over_inherited_solver_ops": 0.811256560809037,
+          "inherited_over_rho_negation_s": 5.892892156862745,
+          "median_s": {
+            "f6-ic": 1177.6578438819852,
+            "inherited-f4": 18.500004942762146,
+            "matrix-f4": 18.161920057112255,
+            "matrix-f5": 18.161920057112255,
+            "rho-negation": 3.2320915068129774
+          },
+          "median_solver_ops": {
+            "f6-ic": 7990513.0,
+            "inherited-f4": 8660188.5,
+            "matrix-f4": 2325292666.0,
+            "matrix-f5": 1495317753.0
+          }
+        },
+        "R19": {
+          "f6_over_inherited_e2e_s": 1352.6290877718548,
+          "f6_over_inherited_solver_ops": 0.772737611976398,
+          "inherited_over_rho_negation_s": 2.283118312719571,
+          "median_s": {
+            "f6-ic": 4714.5061723723375,
+            "inherited-f4": 3.4051164244714034,
+            "rho-negation": 1.3868358954353295
+          },
+          "median_solver_ops": {
+            "f6-ic": 561542619.0,
+            "inherited-f4": 714844609.5
+          }
+        }
+      },
+      "name": "f456:historical-local-saving-is-not-e2e-saving",
+      "ok": true
+    },
+    {
+      "detail": {
+        "cells": {
+          "K13": {
+            "failures": 32,
+            "ok": false,
+            "receipt_sha256": "d22657138fbb26a99a5b48a3da852e7fef03ab1b728c10d4704d184599501154",
+            "records": 48,
+            "replay_candidates": 48,
+            "reproduced": 16,
+            "verified_records": 48
+          },
+          "K19": {
+            "failures": 16,
+            "ok": false,
+            "receipt_sha256": "10f6dbb4f2d3e2e3790d013d8f121d22c2c33d389f4f55172f2b997bd79b7684",
+            "records": 32,
+            "replay_candidates": 32,
+            "reproduced": 16,
+            "verified_records": 32
+          },
+          "R13": {
+            "failures": 8,
+            "ok": false,
+            "receipt_sha256": "9cedda97fe20de7c1d1e86a688643ffe62f6c3e5a255cf00c22bdcd0f5ad9f7f",
+            "records": 40,
+            "replay_candidates": 40,
+            "reproduced": 32,
+            "verified_records": 40
+          },
+          "R19": {
+            "failures": 16,
+            "ok": false,
+            "receipt_sha256": "127ee48abe5a7e58ccbac370eff645fa8dcbad3a6353a9db3b94ed910c79969f",
+            "records": 24,
+            "replay_candidates": 24,
+            "reproduced": 8,
+            "verified_records": 24
+          },
+          "X19": {
+            "failures": 0,
+            "ok": true,
+            "receipt_sha256": "59cbdfc7472a0b8a829bb38e284679933c6b6abbffc59c56c97cb62a657eb13e",
+            "records": 4,
+            "replay_candidates": 0,
+            "reproduced": 0,
+            "verified_records": 0
+          }
+        },
+        "total": {
+          "candidates": 144,
+          "failures": 72,
+          "reproduced": 72
+        }
+      },
+      "name": "f456:current-binary-replay-regression-retained",
+      "ok": true
+    },
+    {
+      "detail": 30,
+      "name": "rho:callgrind-raw-hashes",
+      "ok": true
+    },
+    {
+      "detail": {
+        "legacy_ir": 1995304985,
+        "optimized_ir": 1600543701,
+        "ratio": 0.8021549151795458,
+        "speedup": 1.246641990314515
+      },
+      "name": "rho:instruction-speedup-recomputed",
+      "ok": true
+    },
+    {
+      "detail": {
+        "candidates": 720,
+        "receipt_sha256": "517a0859253fc11a15397ee7d6d025cb5e1867abd3abf8462a9629caf6af1c92",
+        "reproduced": 720,
+        "verified": 864
+      },
+      "name": "rho:current-binary-all-replay",
+      "ok": true
+    },
+    {
+      "detail": {
+        "admitted_pairs": 0,
+        "blockers": [
+          "PSI cpu unavailable",
+          "PSI memory unavailable"
+        ],
+        "ci95": null,
+        "earned_level": "L0",
+        "optimized_aa_median": 0.9996863141669985,
+        "optimized_over_legacy_median": 0.9585836525559679,
+        "pairs_below_level": 240,
+        "required_level": "L2",
+        "status": "descriptive only; not a result"
+      },
+      "name": "rho:l2-wall-remains-open",
+      "ok": true
+    }
+  ],
+  "gates": {
+    "f4_f5_f6": {
+      "current_binary_all_replay": {
+        "cells": {
+          "K13": {
+            "failures": 32,
+            "ok": false,
+            "receipt_sha256": "d22657138fbb26a99a5b48a3da852e7fef03ab1b728c10d4704d184599501154",
+            "records": 48,
+            "replay_candidates": 48,
+            "reproduced": 16,
+            "verified_records": 48
+          },
+          "K19": {
+            "failures": 16,
+            "ok": false,
+            "receipt_sha256": "10f6dbb4f2d3e2e3790d013d8f121d22c2c33d389f4f55172f2b997bd79b7684",
+            "records": 32,
+            "replay_candidates": 32,
+            "reproduced": 16,
+            "verified_records": 32
+          },
+          "R13": {
+            "failures": 8,
+            "ok": false,
+            "receipt_sha256": "9cedda97fe20de7c1d1e86a688643ffe62f6c3e5a255cf00c22bdcd0f5ad9f7f",
+            "records": 40,
+            "replay_candidates": 40,
+            "reproduced": 32,
+            "verified_records": 40
+          },
+          "R19": {
+            "failures": 16,
+            "ok": false,
+            "receipt_sha256": "127ee48abe5a7e58ccbac370eff645fa8dcbad3a6353a9db3b94ed910c79969f",
+            "records": 24,
+            "replay_candidates": 24,
+            "reproduced": 8,
+            "verified_records": 24
+          },
+          "X19": {
+            "failures": 0,
+            "ok": true,
+            "receipt_sha256": "59cbdfc7472a0b8a829bb38e284679933c6b6abbffc59c56c97cb62a657eb13e",
+            "records": 4,
+            "replay_candidates": 0,
+            "reproduced": 0,
+            "verified_records": 0
+          }
+        },
+        "total": {
+          "candidates": 144,
+          "failures": 72,
+          "reproduced": 72
+        }
+      },
+      "historical": {
+        "K13": {
+          "f5_over_f4_solver_ops": 0.6464869277565661,
+          "f6_over_inherited_e2e_s": 68.76893221092526,
+          "f6_over_inherited_solver_ops": 0.8176068767227203,
+          "inherited_over_rho_negation_s": 7.213451868734515,
+          "median_s": {
+            "f6-ic": 1161.7332449386388,
+            "inherited-f4": 16.285429314010337,
+            "matrix-f4": 16.027159859740003,
+            "matrix-f5": 16.027159859740003,
+            "rho-negation": 2.2902526311148534,
+            "rho-strong": 14.318373493370782
+          },
+          "median_solver_ops": {
+            "f6-ic": 9097648.0,
+            "inherited-f4": 11122152.0,
+            "matrix-f4": 2244717235.0,
+            "matrix-f5": 1454014746.0
+          },
+          "records": 48
+        },
+        "K19": {
+          "f6_over_inherited_e2e_s": 1303.19700128513,
+          "f6_over_inherited_solver_ops": 0.7797759965030848,
+          "inherited_over_rho_negation_s": 3.7723251886796367,
+          "median_s": {
+            "f6-ic": 6483.442846066015,
+            "inherited-f4": 5.105542156473639,
+            "rho-negation": 1.3102474186077449,
+            "rho-strong": 3.090096684154342
+          },
+          "median_solver_ops": {
+            "f6-ic": 519329588.5,
+            "inherited-f4": 670243437.5
+          },
+          "records": 32
+        },
+        "R13": {
+          "f5_over_f4_solver_ops": 0.6414164706076306,
+          "f6_over_inherited_e2e_s": 64.60804148209132,
+          "f6_over_inherited_solver_ops": 0.811256560809037,
+          "inherited_over_rho_negation_s": 5.892892156862745,
+          "median_s": {
+            "f6-ic": 1177.6578438819852,
+            "inherited-f4": 18.500004942762146,
+            "matrix-f4": 18.161920057112255,
+            "matrix-f5": 18.161920057112255,
+            "rho-negation": 3.2320915068129774
+          },
+          "median_solver_ops": {
+            "f6-ic": 7990513.0,
+            "inherited-f4": 8660188.5,
+            "matrix-f4": 2325292666.0,
+            "matrix-f5": 1495317753.0
+          },
+          "records": 40
+        },
+        "R19": {
+          "f6_over_inherited_e2e_s": 1352.6290877718548,
+          "f6_over_inherited_solver_ops": 0.772737611976398,
+          "inherited_over_rho_negation_s": 2.283118312719571,
+          "median_s": {
+            "f6-ic": 4714.5061723723375,
+            "inherited-f4": 3.4051164244714034,
+            "rho-negation": 1.3868358954353295
+          },
+          "median_solver_ops": {
+            "f6-ic": 561542619.0,
+            "inherited-f4": 714844609.5
+          },
+          "records": 24
+        }
+      },
+      "status": "historical_binary_result_established; current_source_result_not_established"
+    },
+    "generic_prime_random_binary_koblitz": {
+      "fresh_protocol_status": "draft",
+      "leaders": {
+        "char2": {
+          "ratio_rho": 10.6210696509,
+          "slug": "icv1-f2m18-t393-d2c04152"
+        },
+        "koblitz": {
+          "ratio_rho": 3.4299576491,
+          "slug": "icv1-f2m47-t22705043-f4e44623"
+        },
+        "prime": {
+          "ratio_rho": 5.4703789656,
+          "slug": "icv1-fp12-t19-d4a315df"
+        }
+      },
+      "status": "standing_admitted_frontier_established; fresh_current_source_wall_open"
+    },
+    "ghs_weak_exception": {
+      "n4_b0_over_plain_rho": {
+        "ci95": [
+          0.66191,
+          0.81643
+        ],
+        "q": 4051,
+        "ratio": 0.73475
+      },
+      "n4v2_dl_over_negation_rho": {
+        "ci95": [
+          0.00395,
+          0.00764
+        ],
+        "q": 2097091,
+        "ratio": 0.00523
+      },
+      "raw_archive_manifest": {
+        "bytes": 382105,
+        "sha256": "aac9a25ce50ac5d23895f0dba8f907fb223aaac32a2a41391bc590e3c6bcca42"
+      },
+      "raw_archive_present": false,
+      "scope": "GHS-weak E0/Fq^3 with #E0(K)=4*ell only",
+      "status": "established_in_counted_aggregate; raw_archive_unavailable_in_this_workspace"
+    },
+    "prime_p20_factor_base": {
+      "selected_over_incumbent": {
+        "0": {
+          "ci95": [
+            0.8064021105570519,
+            0.8660634281836213
+          ],
+          "ratio": 0.8364170531754714
+        },
+        "0.1": {
+          "ci95": [
+            0.7861367893322674,
+            0.8469761804724445
+          ],
+          "ratio": 0.8166378371406973
+        },
+        "1": {
+          "ci95": [
+            0.7138072151741669,
+            0.7785934369624194
+          ],
+          "ratio": 0.746060262094452
+        }
+      },
+      "selected_over_rho": {
+        "0": {
+          "ci95": [
+            7.30526075400282,
+            8.644893916412563
+          ],
+          "ratio": 7.9522720696688065
+        },
+        "0.1": {
+          "ci95": [
+            7.558102748582131,
+            8.967488910694774
+          ],
+          "ratio": 8.237899570382032
+        },
+        "1": {
+          "ci95": [
+            8.76541875513979,
+            10.54744204328265
+          ],
+          "ratio": 9.620189133190149
+        }
+      },
+      "status": "established_second_host_counted_evidence; one_curve_no_scaling_claim"
+    },
+    "registry_coverage": {
+      "nested_solver_backends": 11,
+      "status": "established",
+      "top_level_methods": 74
+    },
+    "rho_optimization": {
+      "current_binary_replays": {
+        "candidates": 720,
+        "reproduced": 720
+      },
+      "l2_wall_status": "unknown",
+      "legacy_ir": 1995304985,
+      "optimized_ir": 1600543701,
+      "optimized_over_legacy": 0.8021549151795458,
+      "speedup": 1.246641990314515,
+      "status": "instruction_and_count_stability_established; L2_wall_open"
+    }
+  },
+  "open_obligations": [
+    "Bind an immutable ECR image, freeze protocol.json, and execute all nine prepared EKS L2 jobs.",
+    "Rerun F4/F5/F6 and all 11 solver backends from the current binary; historical IC counts do not all-replay.",
+    "Restore the GHS units.tar.gz artifact to permit a raw-record recomputation of the N4-v2 aggregate.",
+    "Measure optimized versus legacy signed-Frobenius rho on L2; Callgrind Ir does not establish wall speedup."
+  ],
+  "schema": "ecbench.frontier-establishment/v1",
+  "scope": "versioned evidence audit; not a substitute for the draft EKS wall campaign",
+  "source_identity": {
+    "auditor_binary_sha256": "91f5895637501c6de257bbaf3afc9cbc2c0f5e964964d3dc4fc3bf78a427d96b",
+    "code_source_commit": "48c8a4767d2d1eed6a7b379f74410bc729239380",
+    "coverage_sha256": "3d9c5beb07b134213bd7364d1805299cd03061a33105ff1eea7ca1f3d5641aeb",
+    "evidence_commit_at_audit_start": "66c71217bef08b414826f9c1e50773d7eeb96603",
+    "registry_sha256": "66af0af2a73c731bfa8eeb02c7134e5f4658a30d07f6fae4ffca5f69af5ce529"
+  }
+}

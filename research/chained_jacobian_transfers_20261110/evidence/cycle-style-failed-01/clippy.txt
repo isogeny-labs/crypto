@@ -1,0 +1,27 @@
+    Checking chained-successor-preflight v0.1.0 (/workspace/crypto/research/chained_jacobian_transfers_20261110/successor-preflight)
+error: digits of hex, binary or octal literal not in groups of equal size
+   --> src/isogeny_cycle_census.rs:100:57
+    |
+100 |     let mut xs = poly::roots(f, &map.ker, &mut Rng::new(0x45_7));
+    |                                                         ^^^^^^ help: consider: `0x0457`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unusual_byte_groupings
+    = note: `-D clippy::unusual-byte-groupings` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::unusual_byte_groupings)]`
+
+error: the loop variable `step` is used to index `old`
+   --> src/isogeny_cycle_census.rs:505:17
+    |
+505 |     for step in 0..36 {
+    |                 ^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_range_loop
+    = note: `-D clippy::needless-range-loop` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_range_loop)]`
+help: consider using an iterator and enumerate()
+    |
+505 -     for step in 0..36 {
+505 +     for (step, <item>) in old.iter().enumerate().take(36) {
+    |
+
+error: could not compile `chained-successor-preflight` (lib test) due to 2 previous errors

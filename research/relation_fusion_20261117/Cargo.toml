@@ -1,0 +1,14 @@
+[package]
+name = "relation-fusion"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.87"
+publish = false
+[workspace]
+[features]
+scale-screen = ["certified-relations/scale-screen"]
+[dependencies]
+certified-relations = { path = "../../crates/certified-relations" }
+relation-replay-checker = { path = "../../crates/relation-replay-checker" }
+serde_json = "1"
+sha2 = "0.10"

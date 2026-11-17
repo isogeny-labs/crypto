@@ -1,0 +1,45 @@
+{
+  "checked_at_utc": "2026-10-30T06:16:25Z",
+  "scope": "Three finite integer-matrix declarations only; no general contraction or ECDLP theorem",
+  "lean": "leanprover/lean4:v4.35.0",
+  "lean_release_commit": "eb6cafb7290e8bd5f2937522d8d804f58f02bafc",
+  "shared_crypto_lean_revision": "148f5dc389b341401e06d76abe7783c4ccf42f2e",
+  "mathlib_revision": "cfc55fc58714a59dc06e6e79edc6d1d95140d3c2",
+  "source_sha256": "833e4e253c3a4e32a68fa1915a0f792317b925c05c78e35ea7a06877dca408ca",
+  "lake_manifest_sha256": "67d43f1dd738638599e704bf4d6146d7617dc83e3f43ad62e2c9cea18532bbbe",
+  "reported_theorems": 3,
+  "axiom_audit": {
+    "exit_code": 0,
+    "audited": 3,
+    "failing": 0,
+    "native_trusted": 0,
+    "allowed_axioms_used": ["propext", "Classical.choice", "Quot.sound"],
+    "receipt": "axiom-audit-final.log"
+  },
+  "shared_proof_gate": {
+    "exit_code": 0,
+    "receipt_directory": "proof-gate-final",
+    "source_inventory": "proof-gate-final/_/sources.log",
+    "status": "PASS"
+  },
+  "fresh_leanchecker": {
+    "exit_code": 0,
+    "command": "lake env leanchecker --fresh --verbose GaugeCounterexample",
+    "receipt": "fresh-leanchecker.log",
+    "output": "replaying GaugeCounterexample with --fresh"
+  },
+  "background_jobs_remaining": false,
+  "development_events": [
+    "Initial auditor command ran from wrong working directory and exited1; error retained.",
+    "Initial successful full-Mathlib-import build was superseded by narrower imports; redundant initial audit terminated143 after final source audit passed.",
+    "Final project build directory is isolated; only pinned dependency package caches are shared.",
+    "Copied manifest root package name corrected without dependency changes; final shared gate rerun passed."
+  ],
+  "claims_not_formalized": [
+    "General gauge identity",
+    "Determinantal-ideal invariance",
+    "Entry and recursive cost bounds",
+    "Common sparse two-axis kernel",
+    "Improved ECDLP algorithm"
+  ]
+}

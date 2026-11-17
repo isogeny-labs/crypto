@@ -1,0 +1,17 @@
+digraph phase {
+  graph [rankdir=LR,bgcolor="white",fontname="Helvetica",fontsize=10];
+  node [shape=box,style="rounded,filled",fillcolor="#edf3f7",fontname="Helvetica",fontsize=10];
+  edge [fontname="Helvetica",fontsize=9];
+  policy [label="Frozen factor-base policy"];
+  setup [label="Public mG queries\nrank + base-log solve"];
+  logs [label="Checked base logs",fillcolor="#dceedd"];
+  source [label="One source point Q"];
+  transfer [label="Actual phi + shifts\nall failed queries charged"];
+  solver [label="Checked reduced S3\nrows + witnesses + roots"];
+  lift [label="Signed point lifts\nrecover integer / mod 11"];
+  verify [label="Verify on main curve",fillcolor="#dceedd"];
+  policy -> setup -> logs;
+  source -> transfer -> solver -> lift -> verify;
+  logs -> lift;
+  policy -> solver [style=dashed,label="membership inputs"];
+}

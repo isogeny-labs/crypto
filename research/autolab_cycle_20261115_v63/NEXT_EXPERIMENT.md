@@ -1,0 +1,15 @@
+# Next: constant-block elimination with polynomial Gray matrix updates
+
+The quadratic representation prediction passed, but the original speed hypothesis is unresolved and the inheritedF4 width/memory assumption failed. Do not repeat the identical lifted5s calls. Change the candidate algorithm itself.
+
+For the exact cubic chart, write e1=h^2+h+z, e20=A*h^2+z*e1, e30=h^2*(y+A*z+z^2)+z^3, C0=z*r^2+e30 and C1=r^2+h*r+e20. The ordinate follows the existing native scanner's source/conjugate convention, and must be cross-checked against the independent Python chart.
+
+At n83,d18, C0 must have no coordinates>=52. Since z!=0, r->z*r^2 is an F2 automorphism; projection to the31 high coordinates is surjective. Therefore the constant constraint matrix has rank31 with a fixed52-dimensional kernel U, without any generic-rank assumption. Compute a right inverse once, giving r=r0(h)+U*theta. Since e30 is affine in the F2 coordinates of h, r0 is affine too. Zero h is retained; no per-h inverse is needed.
+
+The remaining high C1 constraint is a48x52 binary system with columns (U_i^2+h*U_i)>>35 and rhs (r0^2+h*r0+e20)>>35. On a Gray step h->h+delta, each column changes by (delta*U_i)>>35. Precompute one packed52-column delta per outer basis direction. The rhs is a quadratic Boolean polynomial in the18 outer coordinates, so it can also be updated exactly without fresh field multiplication. Its direct difference is delta_r0^2+h*delta_r0+delta*r0+delta*delta_r0+A*delta^2+z*(delta^2+delta), followed by high projection.
+
+Retain all rank defects and all affine-kernel solutions. The Gold condition projects e1*C1+C0 into the quotient by span(a^2*b+a*b^2) for a,b inV. Its columns after substitution are Gold((e1+z)*U_i^2+e1*h*U_i). They have Boolean degree<=2 in the outer coordinates, and the rhs degree<=3. One can precompute/update these low-degree coefficient tensors, or apply the Gold rows after the48-row solve. Do not assume a generic four-dimensional fiber or discard a rank-minor-zero branch. Final exact support/nilpotence and original tuple lift/replay are unchanged.
+
+First bounded experiment: new native variant,90s/4GiB/onecore, source/input hashes and budgets frozen before execution. Compare every affine candidate family against the existing AS backend on exhaustive tiny charts,including even binary extension controls where the algebra applies. Then compare complete original root sets on the fixed ordinary and Koblitz calibration fixtures. Only after exact equality, run>=4 cold repetitions with total startup/setup/factoring/lifting/serialization charged, and per-process memory. Reject promotion if total cost is worse. A local reference gain is not a genuineF4/F5/F6 release ratio.
+
+Separate queue: odd-prime/extension coordinate encoder with explicit interval/domain predicates; complete wideF6 all-roots contract; global quintic whole-cell pruning remains necessary. The cubic constant-block rank saving does not automatically apply to the quintic family, whose constant coefficient can already span the entire field at d18.

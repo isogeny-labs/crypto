@@ -1,0 +1,23 @@
+{
+  "parent_commit": "753554febaf6442347a790a76533abe32d018279",
+  "source_path": "src/cryptanalysis/hashed_ecdl.rs",
+  "source_sha256": "6b9f56c6b1c2f05c6e2c3537cf68d0f242d7ba2c7750b0451a89c4693940b979",
+  "parent_source_sha256": "52916c44e632685877338d15b96483ebb50ae9f6bbdb89ec0e7c03bc7b975b52",
+  "independent_verifier_unchanged": true,
+  "independent_verifier_sha256": "d21e3bcadf19006698a71c0b97b5a2add0fceb1d05e6b0baf381defcbfb4da31",
+  "combined_patch": "../combined-reduction/combined-reduction.patch",
+  "conductor_task": "T-929",
+  "checks": [
+    {
+      "command": "cargo test --release --locked --all-targets --manifest-path crates/hashed-ecdl-cpu/Cargo.toml --target-dir /home/ec2-user/hashed-ecdl-cpu-build-20261030",
+      "exit_code": 0,
+      "tests_passed": 33
+    },
+    {
+      "command": "cargo clippy --locked --all-targets --manifest-path crates/hashed-ecdl-cpu/Cargo.toml --target-dir /home/ec2-user/hashed-ecdl-cpu-build-20261030 -- -D warnings",
+      "exit_code": 0
+    }
+  ],
+  "evidence": "Observed command outputs in integration session; no fabricated log files. This is software validation, not performance evidence.",
+  "snapshot_timings_apply_to_integrated_revision": false
+}

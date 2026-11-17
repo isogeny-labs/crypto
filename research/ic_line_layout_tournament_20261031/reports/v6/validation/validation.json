@@ -1,0 +1,443 @@
+{
+ "amendment": "V6-AMENDMENT-1 (PR #3531)",
+ "artifacts": {
+  "VALIDATION.json": "c7b31644aecad86e89304e77e5fac5f8c168b0aea9ab5cf88f4239e46b661fcf",
+  "descriptive.json": "8befa6780a1976a6447d1a6cee4ca865f27b211913f11a77c348e74f7d6bf21a",
+  "gate-draft/VALIDATION-replay-certificate.json": "904a0645d9770246b44a146b79da710f10775b43db13d243a4d69e2186937300",
+  "gate-draft/VALIDATION-validator-report.json": "fbd3e3ded8515f0460f40015a28ca366ab0e5bc2873fef66b6ecc511bc02a13b",
+  "recompute.json": "712bfeb30ee96b9ac00d4caf78e5a22dc7be31545c92a9dbf32ee175ad84d2fa",
+  "scripts/derive_verdict.py": "a9d8e978b02eef2677e88a0c781372b14e26762f3b656d527cc824df21b02427",
+  "scripts/descriptive.py": "2ddd046d31334d8798f37ab2dea206fc026db97d6d1cccf31339f317da329460",
+  "scripts/recompute.py": "e79f3c7aa7eb757fbc04a73d76a0d8460882e85ad4945bdc7a893d96d0cc0760",
+  "verdict-rederived.json": "bdcacd3aa3a8cfa6cd2f4a424107d62a025ac2e512170df6b9e285b5cc84ed1a"
+ },
+ "checks": [
+  {
+   "check": "SHA256SUMS of every session verifies; file set equals the list; SHA256SUMS and job-exit.json byte-equal to the S3 originals",
+   "evidence": {
+    "counted": {
+     "records_jsonl_sha256": "1a7f3faad6f5ebada35f4546d150e0f35aadf0fae3df9d84234832851b8ec00b",
+     "sha256sums_sha256": "c9f9e71cf6fb10eac5a4f370c0775e321e0a1c4f64105e48b967343f8deada44"
+    },
+    "s1": {
+     "records_jsonl_sha256": "bc60833be8ab95026f926bf25cfc3b73eca8e8ef90ec9a2e674972e64d976493",
+     "sha256sums_sha256": "49a6d059912574d79db917d6fe00824848fa63a4e7fd78f71a858ee3ef5ee3ca"
+    },
+    "s2": {
+     "records_jsonl_sha256": "ab4be90eaa0b0fe3fa4840c846c4e98221e1e3cd0a3c8f866eebecde416c65b3",
+     "sha256sums_sha256": "39c20cd3e8b44b4fc704c4e9d002ced9d4b171aaa12b6238e0e98a1f74aa1ecd"
+    },
+    "s3": {
+     "records_jsonl_sha256": "9aa25936928da79fb3a58a6724205533a2a441de6f7f73931ad26f42403c0489",
+     "sha256sums_sha256": "f61204efc9e8e195e549eeab17a801f6e1a7d59e40f05021fe2e7bc85c68a822"
+    }
+   },
+   "id": "A1-sha256sums",
+   "status": "pass"
+  },
+  {
+   "check": "validator read S3 directly: each v6 job prefix has exactly one pod dir; only five v6 jobs exist (qual, s1, s2, s3, counted); no -r2/-nr",
+   "evidence": {
+    "listing": "s3-anchor/v6-job-prefixes.txt"
+   },
+   "id": "A2-s3-anchor",
+   "status": "pass"
+  },
+  {
+   "check": "pinned binary sha256 equals 73362eed...; every record and every binary.sha256 carries it",
+   "evidence": {
+    "s1": [
+     "73362eed4165d6db20fe1d398baa8fabefa2497aff6e78dab9ed8f31af31dd01"
+    ],
+    "s2": [
+     "73362eed4165d6db20fe1d398baa8fabefa2497aff6e78dab9ed8f31af31dd01"
+    ],
+    "s3": [
+     "73362eed4165d6db20fe1d398baa8fabefa2497aff6e78dab9ed8f31af31dd01"
+    ]
+   },
+   "id": "A3-binary",
+   "status": "pass"
+  },
+  {
+   "check": "binary extraction from image 3c4ad8bf... (layer 5) is executor-attested (analysis-step-E.out); the validator checked only the binary hash",
+   "evidence": {},
+   "id": "A4-image-extraction",
+   "status": "caveat"
+  },
+  {
+   "check": "input-spec.json and session/spec.json JSON-equal (jq -S -c) to the frozen spec; request-embedded spec equal; build-info source ea8e9ef7 and ecbench 73362eed equal the request's job.build",
+   "evidence": {
+    "counted_spec_sha256": "ac231ee6303942e3d491daa2c31e07216a72cf227e15015778aa7ffe829bb2a2",
+    "wall_spec_sha256": "0116954ff2646a81fa4383ef87125d445f2f3d3d4315a4ed49db9d0845515a81"
+   },
+   "id": "A5-spec-and-build",
+   "status": "pass"
+  },
+  {
+   "check": "protocol_sha256 2aedaaf8... and prior 12415faa... reproduce with experiment_protocol.py hash; validate 0 findings; amendment sha 6383bbfc and request-session-3 sha 9302e585 match the amendments[] entry",
+   "evidence": {},
+   "id": "A6-freeze",
+   "status": "pass"
+  },
+  {
+   "check": "original freeze 04:25:05Z before s2 start 04:51:55Z; PR #3531 merged 05:32:59Z before s3 start 06:23:19Z",
+   "evidence": {},
+   "id": "A7-timing",
+   "status": "pass"
+  },
+  {
+   "check": "frozen contract is committed on main e87fa18a (study dir identical at 4a3461a7f); the session raw data and analysis outputs are NOT committed (untracked in the working tree; records.jsonl absent from the repo). Receipts are anchored to S3 instead",
+   "evidence": {},
+   "id": "A8-committed-snapshot",
+   "status": "caveat"
+  },
+  {
+   "check": "ecbench verify --replay-all with the pinned binary into the validator's dir: exit 0, ok, 576/576 verified, 512/512 replays identical in every session",
+   "evidence": {
+    "counted": {
+     "exit": 0,
+     "replays": 512,
+     "reproduced": 512
+    },
+    "s1": {
+     "exit": 0,
+     "replays": 512,
+     "reproduced": 512
+    },
+    "s2": {
+     "exit": 0,
+     "replays": 512,
+     "reproduced": 512
+    },
+    "s3": {
+     "exit": 0,
+     "replays": 512,
+     "reproduced": 512
+    }
+   },
+   "id": "R1-replay",
+   "status": "pass"
+  },
+  {
+   "check": "candidate/incumbent total solve-wall ratio and paired linearised-t 95% CI (delta method on log R, t_127) recomputed; agrees with producer to <= 4e-16 relative",
+   "evidence": {
+    "s1": {
+     "ci95": [
+      1.118285088673869,
+      1.1246033880431476
+     ],
+     "ratio": 1.1214397886292269
+    },
+    "s2": {
+     "ci95": [
+      1.118255535863652,
+      1.1248579258323375
+     ],
+     "ratio": 1.121551872461598
+    },
+    "s3": {
+     "ci95": [
+      1.11926083671079,
+      1.1257917255892635
+     ],
+     "ratio": 1.122521531528515
+    }
+   },
+   "id": "M1-total-wall",
+   "status": "pass"
+  },
+  {
+   "check": "incumbent-aa/incumbent A/A ratio and CI recomputed; agrees to <= 3e-16",
+   "evidence": {
+    "s1": {
+     "ci95": [
+      0.9968707401821588,
+      0.9999183108129553
+     ],
+     "ratio": 0.9983933626691459
+    },
+    "s2": {
+     "ci95": [
+      0.9972931936095877,
+      1.0019947482391822
+     ],
+     "ratio": 0.9996412068594855
+    },
+    "s3": {
+     "ci95": [
+      0.9972234651976087,
+      1.0006421894969924
+     ],
+     "ratio": 0.998931364825989
+    }
+   },
+   "id": "M2-aa",
+   "status": "pass"
+  },
+  {
+   "check": "corrected = R/AA, log-scale variance sum, Welch-Satterthwaite dof; agrees to <= 3e-16",
+   "evidence": {
+    "s1": {
+     "ci95": [
+      1.1196634690422043,
+      1.126836853930443
+     ],
+     "dof": 195.64293605902762,
+     "ratio": 1.1232444350702848
+    },
+    "s2": {
+     "ci95": [
+      1.1177546296571743,
+      1.1261699944457204
+     ],
+     "dof": 242.19550259060003,
+     "ratio": 1.121954422012186
+    },
+    "s3": {
+     "ci95": [
+      1.1199500550115746,
+      1.1275074128875409
+     ],
+     "dof": 205.49150075057798,
+     "ratio": 1.123722380790451
+    }
+   },
+   "id": "M3-corrected",
+   "status": "pass"
+  },
+  {
+   "check": "counted ops ratio candidate/incumbent exactly 1 at w = 0, 0.1, 1 (every pair identical), CI [1,1]",
+   "evidence": {
+    "0.0": 1.0,
+    "0.1": 1.0,
+    "1.0": 1.0
+   },
+   "id": "M4-ops",
+   "status": "pass"
+  },
+  {
+   "check": "IC/rho S ratio at w = 0, 0.1, 1 (workload-cluster linearised t, t_15) and per-curve band recomputed; agrees to <= 7e-16; rho < IC on both curves at every w",
+   "evidence": {
+    "0.0": {
+     "ci95": [
+      20.153491463637007,
+      26.244428012823136
+     ],
+     "ratio": 22.998192449070146
+    },
+    "0.1": {
+     "ci95": [
+      20.011350472182354,
+      26.13560816610833
+     ],
+     "ratio": 22.869385973734076
+    },
+    "1.0": {
+     "ci95": [
+      19.34631373806721,
+      25.661527589762017
+     ],
+     "ratio": 22.281291788170705
+    }
+   },
+   "id": "M5-rho",
+   "status": "pass"
+  },
+  {
+   "check": "candidate vs incumbent equal on the frozen projection in 144/144 cells per wall session and 144/144 in counted; counted IC records equal each wall session's in 288/288 cells; outside timing only detail.label, fbm_id and phases[].wall_ns differ",
+   "evidence": {
+    "counted": {
+     "cells": 144,
+     "mismatched_cells": 0
+    },
+    "cross": {
+     "s1": {
+      "cells_compared": 288,
+      "mismatched_cells": 0
+     },
+     "s2": {
+      "cells_compared": 288,
+      "mismatched_cells": 0
+     },
+     "s3": {
+      "cells_compared": 288,
+      "mismatched_cells": 0
+     }
+    },
+    "wall": {
+     "s1": 0,
+     "s2": 0,
+     "s3": 0
+    }
+   },
+   "id": "P1-record-parity",
+   "status": "pass"
+  },
+  {
+   "check": "A/A CI must be non-null, contain 1 and lie in [0.9,1.1] (both the candidate comparison and control-comparison.json read the same incumbent-aa/incumbent pair)",
+   "evidence": {
+    "s1": false,
+    "s2": true,
+    "s3": true
+   },
+   "id": "C1-aa-gate",
+   "status": "fail_s1_pass_s2_s3"
+  },
+  {
+   "check": "pc-fb2x/incumbent: ops S ratio 2.396 > 1, total wall ratio ~1.38 with CI lower bound > 1.34, all pairs L2",
+   "evidence": {
+    "s1": {
+     "ci95": [
+      1.3427572299079467,
+      1.4221934810436305
+     ],
+     "ratio": 1.381904692444195
+    },
+    "s2": {
+     "ci95": [
+      1.3413811973656438,
+      1.4205003900797954
+     ],
+     "ratio": 1.380374048620011
+    },
+    "s3": {
+     "ci95": [
+      1.3538913691804473,
+      1.4332063227280152
+     ],
+     "ratio": 1.3929844473633963
+    }
+   },
+   "id": "C2-positive-control",
+   "status": "pass"
+  },
+  {
+   "check": "the null object is the same-session twin incumbent-aa, at the same block positions {1,2} as the candidate; A/A ratios 0.9984/0.9996/0.9989 against candidate ~1.12",
+   "evidence": {
+    "s1": {
+     "candidate@1": 64,
+     "candidate@2": 64,
+     "incumbent-aa@1": 64,
+     "incumbent-aa@2": 64,
+     "incumbent@0": 64,
+     "incumbent@3": 64,
+     "pc-fb2x@0": 64,
+     "pc-fb2x@3": 64
+    }
+   },
+   "id": "C3-null-object",
+   "status": "pass"
+  },
+  {
+   "check": "per-session verdicts re-derived from the frozen rule text: s1 invalid_measurement (A/A gate), s2 inconclusive, s3 inconclusive; gates identical to the producer's; unchanged under both readings of outside_noise",
+   "evidence": {
+    "s1": "invalid_measurement",
+    "s2": "inconclusive",
+    "s3": "inconclusive"
+   },
+   "id": "V1-per-session",
+   "status": "pass"
+  },
+  {
+   "check": "amendment section 3 command exits 0: s3 node ip-10-84-75-83 differs from H1 ip-10-84-67-216, pod UIDs distinct, s3 exit 0",
+   "evidence": {
+    "h1_node": "ip-10-84-67-216.us-east-2.compute.internal",
+    "h1_same_node_s1_s2": true,
+    "h2_condition_holds": true,
+    "h2_node": "ip-10-84-75-83.us-east-2.compute.internal"
+   },
+   "id": "V2-host-epoch",
+   "status": "pass"
+  },
+  {
+   "check": "s1 {verify_exit, verdict, gates} byte-equal in run (i) and run (ii); s1 compare files byte-identical across runs",
+   "evidence": {
+    "byte_equal": true,
+    "run_i": "{\"gates\":{\"aa_inside_0_9_1_1\":false,\"admission\":true,\"counted_parity_ops\":true,\"counted_parity_records\":true,\"outside_noise\":true,\"positive_control_detected\":true,\"replay_and_audit\":true,\"total_and_corrected_ci_below_1\":false},\"verdict\":\"invalid_measurement\",\"verify_exit\":0}",
+    "run_ii": "{\"gates\":{\"aa_inside_0_9_1_1\":false,\"admission\":true,\"counted_parity_ops\":true,\"counted_parity_records\":true,\"outside_noise\":true,\"positive_control_detected\":true,\"replay_and_audit\":true,\"total_and_corrected_ci_below_1\":false},\"verdict\":\"invalid_measurement\",\"verify_exit\":0}"
+   },
+   "id": "V3-determinism",
+   "status": "pass"
+  },
+  {
+   "check": "three-session combination: any invalid_measurement gives invalid_measurement; host-epoch rule can only lower support",
+   "evidence": {
+    "combined": "invalid_measurement"
+   },
+   "id": "V4-combined",
+   "status": "pass"
+  },
+  {
+   "check": "counted: audit OK, 576 verified, 512/512 replays identical, invalid_outcomes [], spec/build equal to freeze; exit 42 accepted (97 below-L2 executions, all rho arms at L1)",
+   "evidence": {
+    "below_l2": {
+     "accepted": false,
+     "by_arm": {
+      "rho-neg": 49,
+      "rho-neg-aa": 48
+     },
+     "by_level": {
+      "L1": 97
+     },
+     "first_entry_keys": [
+      "arm",
+      "isolation",
+      "seq"
+     ],
+     "invalid_outcomes": [],
+     "n": 97
+    }
+   },
+   "id": "K1-counted-acceptance",
+   "status": "pass"
+  },
+  {
+   "check": "candidate is slower by ~12% in all three sessions (CI wholly above 1); the frozen vocabulary has no regression label and maps it to inconclusive with the direction reported descriptively",
+   "evidence": {},
+   "id": "X1-regression-label",
+   "status": "caveat"
+  },
+  {
+   "check": "ecbench's own wall.status 'admitted' and outside_noise labels are not re-implemented; the validator checked their inputs (128 pairs, all L2) and two readings of outside_noise, both true",
+   "evidence": {},
+   "id": "X2-admission-noise-labels",
+   "status": "caveat"
+  },
+  {
+   "check": "4 of 5 frozen qualification conditions re-checked from committed files; the min solve_wall_ns >= 5 ms condition needs the uncommitted qualification records.jsonl (attested true)",
+   "evidence": {},
+   "id": "X3-qualification",
+   "status": "caveat"
+  },
+  {
+   "check": "pre-launch EC2 node check (0 and 0 at 06:20:27Z) and the budget gate line (USD 1.14 <= 5.00) are executor-attested card records",
+   "evidence": {},
+   "id": "X4-card-procedure",
+   "status": "caveat"
+  },
+  {
+   "check": "analysis written to scratch run-i/run-ii instead of reports/v6/analysis-a|b; the later reports/v6 copies are byte-identical (empty .stderr files omitted)",
+   "evidence": {},
+   "id": "X5-output-paths",
+   "status": "caveat"
+  }
+ ],
+ "combined_verdict": "invalid_measurement",
+ "headline_max_rel_diff": 4.660440402135228e-16,
+ "per_session_verdicts": {
+  "s1": "invalid_measurement",
+  "s2": "inconclusive",
+  "s3": "inconclusive"
+ },
+ "protocol_id": "IC-LINE-LAYOUT-E2E-FP28-V6-20261106",
+ "repo_revision": {
+  "checked_out": "4a3461a7f2a7db7820e7c49d108e317455294100",
+  "named": "e87fa18a73340a95871c73c259eca0fa99ebf81e",
+  "study_dir_identical": true
+ },
+ "reported_outcome_confirmed": true,
+ "schema": "validator.validation/v1",
+ "validation_report_id": "VAL-20261106-9ce3e6",
+ "validation_verdict": "passed"
+}

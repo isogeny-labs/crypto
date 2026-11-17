@@ -1,0 +1,14 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage[T1]{fontenc}
+\sloppy
+\begin{document}
+\section*{Native pre-child limits: independent delta review}
+Source correction supported; runtime admission pending. Exact revision \texttt{8609dfee3039}, source digest \texttt{4e01f95c...}, was inspected after the preserved preread plan. No candidate import, test, compiler or worker execution occurred.
+\paragraph{Prior gap addressed in source.} The 22-line insertion follows existing physical-cgroup checks and precedes the first findmnt child. Every subprocess creation remains inside the existing cmd function. Effective limits are observed by the worker before findmnt or Git, removing the external PID-observation race from this gate.
+\paragraph{Native policy.} The worker checkpoints its PID and incomplete state, reads process-limits text, hash and byte count, and obtains AS and DATA soft/hard values. All four must equal RLIM\_INFINITY. A finite value records rejection and raises before any child. No setrlimit or widening operation is added.
+\paragraph{Failure paths.} Read, decode, getrlimit and checkpoint errors leave the try body for existing failure/finalization. Available observations remain when storage works. Decode failure need not retain undecodable raw bytes; incomplete state and errors are the available evidence. Storage failures may prevent complete receipts but cannot advance into child creation. Qualified status is not overall success.
+\paragraph{Preserved boundaries.} Physical caps remain 2 CPU, 4 GiB RAM, zero swap and 512 tasks. Inner 880 and total 900 seconds, no automatic retry, cleanup helper and final input verification are unchanged. Requiring infinity can reject a sufficient finite environment; it does not guarantee mapping success. External privileged changes after the snapshot are outside this source invariant.
+\paragraph{Bindings and admission.} Packet bytes matched the published revision and referenced local input hashes matched. Configuration remains reviewed false, publication null and lease null, with disabled and approval-required flags. Additional-attempt approval is absent. Recorded 42,300 seconds and deadline 2026-11-06 04:00 UTC are unchanged.
+\paragraph{Next admission step.} Explicit additional-attempt authorization, fully bound independently reviewed published admission and a live runtime reservation remain required. Native observations and captured invocation/cgroup terminal evidence require a subsequently authorized attempt. This review closes source-level R1, not those runtime gates.
+\end{document}

@@ -1,0 +1,107 @@
+{
+  "E_order": 4144,
+  "N": 12,
+  "R71_run_curve_steps_estimate": {
+    "J0_closure_seconds": 2024.20532294049,
+    "J0_split_filter_seconds": 4.25917266,
+    "note": "run_curve calls subgroup() with cap 400000 once (J0) and with cap 20000 twice (H, l-part); three 100000-step walks (+20000 burn-in each) plus the burn-in; two full filters of J0 with `splits`",
+    "walk_seconds_each": 31.640831642107354
+  },
+  "a": 0,
+  "affine_points": 8,
+  "beta": 3,
+  "closure_measured": {
+    "cap": 20000,
+    "elements_reached": 20004,
+    "extrapolated_seconds_for_R71_cap_400000": 2024.20532294049,
+    "generators": 20,
+    "reached_cap": true,
+    "seconds": 21.684299522,
+    "seconds_per_validated_add": 0.00025302566536756127,
+    "validated_adds": 85700
+  },
+  "count_e_points_seconds": 0.011475357,
+  "count_points_extension": [
+    {
+      "N_k": 9,
+      "field_bits": 3,
+      "k": 1,
+      "ratio_to_previous": 0.0,
+      "seconds": 0.000019557
+    },
+    {
+      "N_k": 65,
+      "field_bits": 6,
+      "k": 2,
+      "ratio_to_previous": 6.369586337372809,
+      "seconds": 0.00012457
+    },
+    {
+      "N_k": 513,
+      "field_bits": 9,
+      "k": 3,
+      "ratio_to_previous": 8.62932487757887,
+      "seconds": 0.001074955
+    },
+    {
+      "N_k": 3961,
+      "field_bits": 12,
+      "k": 4,
+      "ratio_to_previous": 25.18565149238805,
+      "seconds": 0.027073442
+    },
+    {
+      "N_k": 32769,
+      "field_bits": 15,
+      "k": 5,
+      "ratio_to_previous": 8.62518973390971,
+      "seconds": 0.233513574
+    },
+    {
+      "N_k": 262145,
+      "field_bits": 18,
+      "k": 6,
+      "ratio_to_previous": 13.371358257743081,
+      "seconds": 3.122393656
+    },
+    {
+      "N_k": 2097153,
+      "field_bits": 21,
+      "k": 7,
+      "ratio_to_previous": 7.514973692349829,
+      "seconds": 23.464706182
+    },
+    {
+      "N_k": 16807673,
+      "field_bits": 24,
+      "k": 8,
+      "ratio_to_previous": 6.397477011033472,
+      "seconds": 150.11491837
+    }
+  ],
+  "extrapolated_seconds_for_remaining_counts_up_to_g_plus_1": 1200.91934696,
+  "genus": 8,
+  "l": 3,
+  "n": 4,
+  "phases": [
+    {
+      "candidates_counted": 2,
+      "phase": "selection scan (magic_number_full + count_e_points per candidate)",
+      "seconds": 0.015650635
+    },
+    {
+      "phase": "SmoothCover::new",
+      "seconds": 0.000204597
+    },
+    {
+      "phase": "Jacobian add, validated (MumfordDivisor::add)",
+      "seconds_per_op": 0.00003621768
+    },
+    {
+      "phase": "Jacobian add, add_unchecked",
+      "seconds_per_op": 3.85765e-6
+    }
+  ],
+  "q": 8,
+  "split_test_seconds_each": 0.00001064793165
+}

@@ -1,0 +1,1637 @@
+{
+ "schema": "validator-report/v1",
+ "target": "research/full_jacobian_ic_20261113 (bench record 20261113T1722Z-full-jacobian-ic, status measured)",
+ "validated_commit": "224624a91a97639781ff336f2e8dc9a0738035b3 (origin/main; target files byte-equal to f1997205729b506658fadbaebfab7de84ba91aca)",
+ "validator": "Validator V (Claude Opus 5.5, validator role, independent of the producers); 2026-11-14",
+ "status": "pass",
+ "independent": true,
+ "standing": "[pcc:unverified]: no pcc claim id; no keyring signature",
+ "raw_data": [
+  {
+   "path": "full_jacobian.json",
+   "sha256": "e65114ea8bf019ac4e4ae76f6eb5bf2f036dfb496b95816532ba49c8fa7c9d7c"
+  },
+  {
+   "path": "run.log",
+   "sha256": "bfd3f60df888745a52a5db5772d4331d784f54a457a6366778506db121722ba3"
+  },
+  {
+   "path": "PROTOCOL.md",
+   "sha256": "7cdbad9dba78994a257abf26d3ec6ad3f1082d6dbdad12579d35909e7c416c52"
+  },
+  {
+   "path": "frozen.sha256",
+   "sha256": "884157009c25029e9b1cd52222d51d71054d6a33c311a01d34bdf243c95e7135"
+  },
+  {
+   "path": "RESULTS.md",
+   "sha256": "fbea111e9013a76c656d272d9ff60f943a90c7b76fbd9466293f12d2bcc51842"
+  },
+  {
+   "path": "tables.md",
+   "sha256": "de51763818dd31822ee7b704dbc812235e4059903bd09fbb4fc8a1c080a454ae"
+  },
+  {
+   "path": "../../benchmarks/records/20261113T1722Z-full-jacobian-ic.json",
+   "sha256": "fae0117b9e1a2f4f5c9de1822a0fcaffa7bfc2abadda8c95937a6e04ea89a911"
+  }
+ ],
+ "method": [
+  "recompute_fj.py: band and calibrated totals, ratios, order classes of 45 arm-rows (36 IC cells), 64 fits with own Student-t quantile, the frozen rule, F1-F8 numbers, 20 record metrics, RESULTS.md table (2057 values, 0 mismatches)",
+  "check_tables_md.py: 635 tables.md cells",
+  "compare_replay.py: replay vs committed json",
+  "check_fj_certs.py on val_fj_dump output: curve data, planted logs, every recovered log, j-invariants, #E1/#E2 by point counting, #J by the L-polynomial (p <= 3203) and by annihilation"
+ ],
+ "headline": [
+  {
+   "name": "record:total_w0.1_a_p211",
+   "claimed": 498213.0,
+   "recomputed": 498213.0833333333,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_a_p211:reference(negation rho on E1, w=0.1)",
+   "claimed": 71.1458,
+   "recomputed": 71.14583333333333,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p211",
+   "claimed": 28889.2,
+   "recomputed": 28889.208333333332,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p211:reference(negation rho on E1, w=0.1)",
+   "claimed": 71.1458,
+   "recomputed": 71.14583333333333,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_a_p419",
+   "claimed": 1847680.0,
+   "recomputed": 1847675.0833333333,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_a_p419:reference(negation rho on E1, w=0.1)",
+   "claimed": 76.875,
+   "recomputed": 76.875,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p419",
+   "claimed": 134991.0,
+   "recomputed": 134990.96666666667,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p419:reference(negation rho on E1, w=0.1)",
+   "claimed": 76.875,
+   "recomputed": 76.875,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_a_p821",
+   "claimed": 4059150.0,
+   "recomputed": 4059149.308333333,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_a_p821:reference(negation rho on E1, w=0.1)",
+   "claimed": 72.3625,
+   "recomputed": 72.36250000000001,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p821",
+   "claimed": 313496.0,
+   "recomputed": 313495.73333333334,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p821:reference(negation rho on E1, w=0.1)",
+   "claimed": 72.3625,
+   "recomputed": 72.36250000000001,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_a_p1619",
+   "claimed": 4770880.0,
+   "recomputed": 4770878.716666667,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_a_p1619:reference(negation rho on E1, w=0.1)",
+   "claimed": 109.537,
+   "recomputed": 109.5375,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p1619",
+   "claimed": 188843.0,
+   "recomputed": 188842.94166666668,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p1619:reference(negation rho on E1, w=0.1)",
+   "claimed": 109.537,
+   "recomputed": 109.5375,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_a_p3203",
+   "claimed": 3306850.0,
+   "recomputed": 3306848.691666667,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_a_p3203:reference(negation rho on E1, w=0.1)",
+   "claimed": 98.6813,
+   "recomputed": 98.68125,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p3203",
+   "claimed": 122458.0,
+   "recomputed": 122457.50833333333,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p3203:reference(negation rho on E1, w=0.1)",
+   "claimed": 98.6813,
+   "recomputed": 98.68125,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_a_p6421",
+   "claimed": 4874280.0,
+   "recomputed": 4874279.408333333,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_a_p6421:reference(negation rho on E1, w=0.1)",
+   "claimed": 205.49,
+   "recomputed": 205.48958333333334,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p6421",
+   "claimed": 128723.0,
+   "recomputed": 128723.16666666666,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p6421:reference(negation rho on E1, w=0.1)",
+   "claimed": 205.49,
+   "recomputed": 205.48958333333334,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_a_p12841",
+   "claimed": 28546000.0,
+   "recomputed": 28545971.20833334,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_a_p12841:reference(negation rho on E1, w=0.1)",
+   "claimed": 231.644,
+   "recomputed": 231.64375,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p12841",
+   "claimed": 204121.0,
+   "recomputed": 204121.49166666667,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p12841:reference(negation rho on E1, w=0.1)",
+   "claimed": 231.644,
+   "recomputed": 231.64375,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_a_p25601",
+   "claimed": 488718000.0,
+   "recomputed": 488717688.45000005,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_a_p25601:reference(negation rho on E1, w=0.1)",
+   "claimed": 78.6688,
+   "recomputed": 78.66875,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p25601",
+   "claimed": 451664.0,
+   "recomputed": 451663.5,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p25601:reference(negation rho on E1, w=0.1)",
+   "claimed": 78.6688,
+   "recomputed": 78.66875,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_a_p51203",
+   "claimed": 1232010000.0,
+   "recomputed": 1232014920.4,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_a_p51203:reference(negation rho on E1, w=0.1)",
+   "claimed": 164.8,
+   "recomputed": 164.8,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p51203",
+   "claimed": 769174.0,
+   "recomputed": 769173.75,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:total_w0.1_b_p51203:reference(negation rho on E1, w=0.1)",
+   "claimed": 164.8,
+   "recomputed": 164.8,
+   "rel_tol": 5e-06
+  },
+  {
+   "name": "record:ratio_slope_w0.1_a",
+   "claimed": 0.421,
+   "recomputed": 0.421,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ratio_slope_w0.1_b",
+   "claimed": -0.053,
+   "recomputed": -0.053,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:A:ratio_neg_band[w=0]",
+   "claimed": 18.655385616661242,
+   "recomputed": 18.655385616661242,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:A:ratio_neg_cal[0]",
+   "claimed": 18.655385616661242,
+   "recomputed": 18.655385616661242,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:A:ratio_neg_band[w=0.1]",
+   "claimed": 7002.702196193265,
+   "recomputed": 7002.702196193265,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:A:ratio_neg_cal[w_cal]",
+   "claimed": 603.5489146376317,
+   "recomputed": 603.5489146376317,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:A:ratio_neg_band[w=1]",
+   "claimed": 36751.32111504698,
+   "recomputed": 36751.32111504698,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:A:ratio_neg_cal[10w_cal]",
+   "claimed": 5159.040669203951,
+   "recomputed": 5159.0406692039505,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:B:ratio_neg_band[w=0]",
+   "claimed": 17.960299381711682,
+   "recomputed": 17.960299381711682,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:B:ratio_neg_cal[0]",
+   "claimed": 17.960299381711682,
+   "recomputed": 17.960299381711682,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:B:ratio_neg_band[w=0.1]",
+   "claimed": 406.0562225475842,
+   "recomputed": 406.0562225475842,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:B:ratio_neg_cal[w_cal]",
+   "claimed": 50.34480276736479,
+   "recomputed": 50.34480276736479,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:B:ratio_neg_band[w=1]",
+   "claimed": 2059.154782073002,
+   "recomputed": 2059.154782073002,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:B:ratio_neg_cal[10w_cal]",
+   "claimed": 302.57419295399905,
+   "recomputed": 302.57419295399905,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:A_S:ratio_neg_band[w=0]",
+   "claimed": 11.925805401887407,
+   "recomputed": 11.925805401887407,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:A_S:ratio_neg_cal[0]",
+   "claimed": 11.925805401887407,
+   "recomputed": 11.925805401887407,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:A_S:ratio_neg_band[w=0.1]",
+   "claimed": 114.00995607613473,
+   "recomputed": 114.00995607613473,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:A_S:ratio_neg_cal[w_cal]",
+   "claimed": 20.394250912226862,
+   "recomputed": 20.394250912226862,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:A_S:ratio_neg_band[w=1]",
+   "claimed": 548.8384413984293,
+   "recomputed": 548.8384413984293,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:A_S:ratio_neg_cal[10w_cal]",
+   "claimed": 86.35144103693142,
+   "recomputed": 86.35144103693143,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:B_S:ratio_neg_band[w=0]",
+   "claimed": 10.907907582167265,
+   "recomputed": 10.907907582167265,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:B_S:ratio_neg_cal[0]",
+   "claimed": 10.907907582167265,
+   "recomputed": 10.907907582167265,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:B_S:ratio_neg_band[w=0.1]",
+   "claimed": 51.35215226939972,
+   "recomputed": 51.35215226939972,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:B_S:ratio_neg_cal[w_cal]",
+   "claimed": 14.22011503262273,
+   "recomputed": 14.22011503262273,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:B_S:ratio_neg_band[w=1]",
+   "claimed": 223.6248267364855,
+   "recomputed": 223.6248267364855,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p211:B_S:ratio_neg_cal[10w_cal]",
+   "claimed": 40.01751743373907,
+   "recomputed": 40.01751743373907,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:A:ratio_neg_band[w=0]",
+   "claimed": 25.033748859835818,
+   "recomputed": 25.033748859835818,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:A:ratio_neg_cal[0]",
+   "claimed": 25.033748859835818,
+   "recomputed": 25.033748859835818,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:A:ratio_neg_band[w=0.1]",
+   "claimed": 24034.797831978318,
+   "recomputed": 24034.797831978318,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:A:ratio_neg_cal[w_cal]",
+   "claimed": 2090.091035986485,
+   "recomputed": 2090.091035986485,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:A:ratio_neg_band[w=1]",
+   "claimed": 121406.08521715303,
+   "recomputed": 121406.08521715303,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:A:ratio_neg_cal[10w_cal]",
+   "claimed": 18058.850959725198,
+   "recomputed": 18058.850959725198,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:B:ratio_neg_band[w=0]",
+   "claimed": 24.462146549103075,
+   "recomputed": 24.462146549103075,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:B:ratio_neg_cal[0]",
+   "claimed": 24.462146549103075,
+   "recomputed": 24.462146549103075,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:B:ratio_neg_band[w=0.1]",
+   "claimed": 1755.980054200542,
+   "recomputed": 1755.980054200542,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:B:ratio_neg_cal[w_cal]",
+   "claimed": 173.23535497698467,
+   "recomputed": 173.23535497698467,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:B:ratio_neg_band[w=1]",
+   "claimed": 8778.1285107549,
+   "recomputed": 8778.1285107549,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:B:ratio_neg_cal[10w_cal]",
+   "claimed": 1323.674940008933,
+   "recomputed": 1323.6749400089327,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:A_S:ratio_neg_band[w=0]",
+   "claimed": 23.19489206445728,
+   "recomputed": 23.19489206445728,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:A_S:ratio_neg_cal[0]",
+   "claimed": 23.19489206445728,
+   "recomputed": 23.19489206445728,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:A_S:ratio_neg_band[w=0.1]",
+   "claimed": 245.550027100271,
+   "recomputed": 245.550027100271,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:A_S:ratio_neg_cal[w_cal]",
+   "claimed": 42.16416624637593,
+   "recomputed": 42.16416624637593,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:A_S:ratio_neg_band[w=1]",
+   "claimed": 1147.3083984107413,
+   "recomputed": 1147.3083984107413,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:A_S:ratio_neg_cal[10w_cal]",
+   "claimed": 188.85054982855516,
+   "recomputed": 188.85054982855513,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:B_S:ratio_neg_band[w=0]",
+   "claimed": 25.996959562176954,
+   "recomputed": 25.996959562176954,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:B_S:ratio_neg_cal[0]",
+   "claimed": 25.996959562176954,
+   "recomputed": 25.996959562176954,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:B_S:ratio_neg_band[w=0.1]",
+   "claimed": 133.22623306233064,
+   "recomputed": 133.22623306233064,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:B_S:ratio_neg_cal[w_cal]",
+   "claimed": 35.044578147546325,
+   "recomputed": 35.044578147546325,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:B_S:ratio_neg_band[w=1]",
+   "claimed": 568.0931634470476,
+   "recomputed": 568.0931634470476,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p419:B_S:ratio_neg_cal[10w_cal]",
+   "claimed": 105.00837526445373,
+   "recomputed": 105.00837526445373,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:A:ratio_neg_band[w=0]",
+   "claimed": 45.2107765451664,
+   "recomputed": 45.2107765451664,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:A:ratio_neg_cal[0]",
+   "claimed": 45.2107765451664,
+   "recomputed": 45.2107765451664,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:A:ratio_neg_band[w=0.1]",
+   "claimed": 56094.65273219323,
+   "recomputed": 56094.65273219323,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:A:ratio_neg_cal[w_cal]",
+   "claimed": 4694.30156441593,
+   "recomputed": 4694.30156441593,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:A:ratio_neg_band[w=1]",
+   "claimed": 307163.2604511752,
+   "recomputed": 307163.2604511752,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:A:ratio_neg_cal[10w_cal]",
+   "claimed": 41529.240819914754,
+   "recomputed": 41529.24081991474,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:B:ratio_neg_band[w=0]",
+   "claimed": 44.535023771790804,
+   "recomputed": 44.535023771790804,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:B:ratio_neg_cal[0]",
+   "claimed": 44.535023771790804,
+   "recomputed": 44.535023771790804,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:B:ratio_neg_band[w=0.1]",
+   "claimed": 4332.295502965393,
+   "recomputed": 4332.295502965393,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:B:ratio_neg_cal[w_cal]",
+   "claimed": 399.95055381640867,
+   "recomputed": 399.95055381640867,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:B:ratio_neg_band[w=1]",
+   "claimed": 23538.946206026187,
+   "recomputed": 23538.946206026187,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:B:ratio_neg_cal[10w_cal]",
+   "claimed": 3215.922548557833,
+   "recomputed": 3215.922548557832,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:A_S:ratio_neg_band[w=0]",
+   "claimed": 34.44057052297939,
+   "recomputed": 34.44057052297939,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:A_S:ratio_neg_cal[0]",
+   "claimed": 34.44057052297939,
+   "recomputed": 34.44057052297939,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:A_S:ratio_neg_band[w=0.1]",
+   "claimed": 433.5668797144008,
+   "recomputed": 433.5668797144008,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:A_S:ratio_neg_cal[w_cal]",
+   "claimed": 67.34868293361544,
+   "recomputed": 67.34868293361544,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:A_S:ratio_neg_band[w=1]",
+   "claimed": 2221.418520271336,
+   "recomputed": 2221.418520271336,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:A_S:ratio_neg_cal[10w_cal]",
+   "claimed": 328.0810232917322,
+   "recomputed": 328.08102329173215,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:B_S:ratio_neg_band[w=0]",
+   "claimed": 35.5689381933439,
+   "recomputed": 35.5689381933439,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:B_S:ratio_neg_cal[0]",
+   "claimed": 35.5689381933439,
+   "recomputed": 35.5689381933439,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:B_S:ratio_neg_band[w=0.1]",
+   "claimed": 240.39097138250702,
+   "recomputed": 240.39097138250702,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:B_S:ratio_neg_cal[w_cal]",
+   "claimed": 52.352769000278805,
+   "recomputed": 52.352769000278805,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:B_S:ratio_neg_band[w=1]",
+   "claimed": 1157.8734816217068,
+   "recomputed": 1157.8734816217068,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p821:B_S:ratio_neg_cal[10w_cal]",
+   "claimed": 185.33175703401452,
+   "recomputed": 185.3317570340145,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:A:ratio_neg_band[w=0]",
+   "claimed": 42.43211882107217,
+   "recomputed": 42.43211882107217,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:A:ratio_neg_cal[0]",
+   "claimed": 42.43211882107217,
+   "recomputed": 42.43211882107217,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:A:ratio_neg_band[w=0.1]",
+   "claimed": 43554.7526341816,
+   "recomputed": 43554.7526341816,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:A:ratio_neg_cal[w_cal]",
+   "claimed": 4014.4094656508155,
+   "recomputed": 4014.4094656508155,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:A:ratio_neg_band[w=1]",
+   "claimed": 165860.4206711604,
+   "recomputed": 165860.4206711604,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:A:ratio_neg_cal[10w_cal]",
+   "claimed": 33337.49067240149,
+   "recomputed": 33337.49067240149,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:B:ratio_neg_band[w=0]",
+   "claimed": 46.65212346252031,
+   "recomputed": 46.65212346252031,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:B:ratio_neg_cal[0]",
+   "claimed": 46.65212346252031,
+   "recomputed": 46.65212346252031,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:B:ratio_neg_band[w=0.1]",
+   "claimed": 1724.0026627106397,
+   "recomputed": 1724.0026627106397,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:B:ratio_neg_cal[w_cal]",
+   "claimed": 199.54375405279146,
+   "recomputed": 199.54375405279146,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:B:ratio_neg_band[w=1]",
+   "claimed": 6438.747263897949,
+   "recomputed": 6438.747263897949,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:B:ratio_neg_cal[10w_cal]",
+   "claimed": 1328.2646172796124,
+   "recomputed": 1328.2646172796124,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:A_S:ratio_neg_band[w=0]",
+   "claimed": 42.35135762357856,
+   "recomputed": 42.35135762357856,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:A_S:ratio_neg_cal[0]",
+   "claimed": 42.35135762357856,
+   "recomputed": 42.35135762357856,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:A_S:ratio_neg_band[w=0.1]",
+   "claimed": 1520.76845829054,
+   "recomputed": 1520.76845829054,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:A_S:ratio_neg_cal[w_cal]",
+   "claimed": 177.1039515339158,
+   "recomputed": 177.1039515339158,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:A_S:ratio_neg_band[w=1]",
+   "claimed": 5676.345292454882,
+   "recomputed": 5676.345292454882,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:A_S:ratio_neg_cal[10w_cal]",
+   "claimed": 1171.9135662480874,
+   "recomputed": 1171.9135662480876,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:B_S:ratio_neg_band[w=0]",
+   "claimed": 29.77117660710142,
+   "recomputed": 29.77117660710142,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:B_S:ratio_neg_cal[0]",
+   "claimed": 29.77117660710142,
+   "recomputed": 29.77117660710142,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:B_S:ratio_neg_band[w=0.1]",
+   "claimed": 219.87629807143674,
+   "recomputed": 219.87629807143674,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:B_S:ratio_neg_cal[w_cal]",
+   "claimed": 46.97778158188621,
+   "recomputed": 46.97778158188621,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:B_S:ratio_neg_band[w=1]",
+   "claimed": 754.2291802565775,
+   "recomputed": 754.2291802565775,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p1619:B_S:ratio_neg_cal[10w_cal]",
+   "claimed": 174.0053627866996,
+   "recomputed": 174.0053627866996,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:A:ratio_neg_band[w=0]",
+   "claimed": 47.193218648716034,
+   "recomputed": 47.193218648716034,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:A:ratio_neg_cal[0]",
+   "claimed": 47.193218648716034,
+   "recomputed": 47.193218648716034,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:A:ratio_neg_band[w=0.1]",
+   "claimed": 33510.40538771719,
+   "recomputed": 33510.40538771719,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:A:ratio_neg_cal[w_cal]",
+   "claimed": 3027.8133665056116,
+   "recomputed": 3027.8133665056116,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:A:ratio_neg_band[w=1]",
+   "claimed": 140715.63223287184,
+   "recomputed": 140715.63223287184,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:A:ratio_neg_cal[10w_cal]",
+   "claimed": 25742.029153241052,
+   "recomputed": 25742.029153241056,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:B:ratio_neg_band[w=0]",
+   "claimed": 37.49389179755672,
+   "recomputed": 37.49389179755672,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:B:ratio_neg_cal[0]",
+   "claimed": 37.49389179755672,
+   "recomputed": 37.49389179755672,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:B:ratio_neg_band[w=0.1]",
+   "claimed": 1240.9399793104903,
+   "recomputed": 1240.9399793104903,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:B:ratio_neg_cal[w_cal]",
+   "claimed": 144.53964577314827,
+   "recomputed": 144.53964577314827,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:B:ratio_neg_band[w=1]",
+   "claimed": 5096.389066382676,
+   "recomputed": 5096.389066382676,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:B:ratio_neg_cal[10w_cal]",
+   "claimed": 960.2961777162176,
+   "recomputed": 960.2961777162176,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:A_S:ratio_neg_band[w=0]",
+   "claimed": 87.76863625031164,
+   "recomputed": 87.76863625031164,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:A_S:ratio_neg_cal[0]",
+   "claimed": 87.76863625031164,
+   "recomputed": 87.76863625031164,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:A_S:ratio_neg_band[w=0.1]",
+   "claimed": 3924.4965482297803,
+   "recomputed": 3924.4965482297803,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:A_S:ratio_neg_cal[w_cal]",
+   "claimed": 429.1728818507658,
+   "recomputed": 429.1728818507658,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:A_S:ratio_neg_band[w=1]",
+   "claimed": 16216.122470713522,
+   "recomputed": 16216.122470713522,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:A_S:ratio_neg_cal[10w_cal]",
+   "claimed": 3030.8897462597015,
+   "recomputed": 3030.889746259702,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:B_S:ratio_neg_band[w=0]",
+   "claimed": 69.90775367738719,
+   "recomputed": 69.90775367738719,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:B_S:ratio_neg_cal[0]",
+   "claimed": 69.90775367738719,
+   "recomputed": 69.90775367738719,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:B_S:ratio_neg_band[w=0.1]",
+   "claimed": 556.3074714463656,
+   "recomputed": 556.3074714463656,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:B_S:ratio_neg_cal[w_cal]",
+   "claimed": 112.94709436437228,
+   "recomputed": 112.94709436437228,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:B_S:ratio_neg_band[w=1]",
+   "claimed": 2114.5736599219026,
+   "recomputed": 2114.5736599219026,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p3203:B_S:ratio_neg_cal[10w_cal]",
+   "claimed": 440.93416523816745,
+   "recomputed": 440.93416523816745,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:A:ratio_neg_band[w=0]",
+   "claimed": 50.176394665136954,
+   "recomputed": 50.176394665136954,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:A:ratio_neg_cal[0]",
+   "claimed": 50.176394665136954,
+   "recomputed": 50.176394665136954,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:A:ratio_neg_band[w=0.1]",
+   "claimed": 23720.32357682364,
+   "recomputed": 23720.32357682364,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:A:ratio_neg_cal[w_cal]",
+   "claimed": 2418.561269533053,
+   "recomputed": 2418.561269533053,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:A:ratio_neg_band[w=1]",
+   "claimed": 65123.61881933217,
+   "recomputed": 65123.61881933217,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:A:ratio_neg_cal[10w_cal]",
+   "claimed": 18460.464954978463,
+   "recomputed": 18460.464954978463,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:B:ratio_neg_band[w=0]",
+   "claimed": 37.91710884841531,
+   "recomputed": 37.91710884841531,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:B:ratio_neg_cal[0]",
+   "claimed": 37.91710884841531,
+   "recomputed": 37.91710884841531,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:B:ratio_neg_band[w=0.1]",
+   "claimed": 626.4218583667055,
+   "recomputed": 626.4218583667055,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:B:ratio_neg_cal[w_cal]",
+   "claimed": 96.70789709793517,
+   "recomputed": 96.70789709793517,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:B:ratio_neg_band[w=1]",
+   "claimed": 1655.8212832376385,
+   "recomputed": 1655.8212832376385,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:B:ratio_neg_cal[10w_cal]",
+   "claimed": 494.91858181310886,
+   "recomputed": 494.9185818131088,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:A_S:ratio_neg_band[w=0]",
+   "claimed": 73.59070701276352,
+   "recomputed": 73.59070701276352,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:A_S:ratio_neg_cal[0]",
+   "claimed": 73.59070701276352,
+   "recomputed": 73.59070701276352,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:A_S:ratio_neg_band[w=0.1]",
+   "claimed": 10884.073401936432,
+   "recomputed": 10884.073401936432,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:A_S:ratio_neg_cal[w_cal]",
+   "claimed": 1155.1360222914977,
+   "recomputed": 1155.1360222914977,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:A_S:ratio_neg_band[w=1]",
+   "claimed": 29793.52940520653,
+   "recomputed": 29793.52940520653,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:A_S:ratio_neg_cal[10w_cal]",
+   "claimed": 8480.822807094053,
+   "recomputed": 8480.822807094053,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:B_S:ratio_neg_band[w=0]",
+   "claimed": 65.0641044026961,
+   "recomputed": 65.0641044026961,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:B_S:ratio_neg_cal[0]",
+   "claimed": 65.0641044026961,
+   "recomputed": 65.0641044026961,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:B_S:ratio_neg_band[w=0.1]",
+   "claimed": 648.9353272165051,
+   "recomputed": 648.9353272165051,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:B_S:ratio_neg_cal[w_cal]",
+   "claimed": 123.32268274063627,
+   "recomputed": 123.32268274063627,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:B_S:ratio_neg_band[w=1]",
+   "claimed": 1670.2298901833992,
+   "recomputed": 1670.2298901833992,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p6421:B_S:ratio_neg_cal[10w_cal]",
+   "claimed": 517.9285225538692,
+   "recomputed": 517.9285225538692,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:A:ratio_neg_band[w=0]",
+   "claimed": 87.10657537785815,
+   "recomputed": 87.10657537785815,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:A:ratio_neg_cal[0]",
+   "claimed": 87.10657537785815,
+   "recomputed": 87.10657537785815,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:A:ratio_neg_band[w=0.1]",
+   "claimed": 123232.20984090155,
+   "recomputed": 123232.20984090155,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:A:ratio_neg_cal[w_cal]",
+   "claimed": 12562.075330867352,
+   "recomputed": 12562.075330867352,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:A:ratio_neg_band[w=1]",
+   "claimed": 329865.0662813103,
+   "recomputed": 329865.0662813103,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:A:ratio_neg_cal[10w_cal]",
+   "claimed": 97355.69043844288,
+   "recomputed": 97355.69043844288,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:B:ratio_neg_band[w=0]",
+   "claimed": 53.792016535331356,
+   "recomputed": 53.792016535331356,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:B:ratio_neg_cal[0]",
+   "claimed": 53.792016535331356,
+   "recomputed": 53.792016535331356,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:B:ratio_neg_band[w=0.1]",
+   "claimed": 881.1871318205938,
+   "recomputed": 881.1871318205938,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:B:ratio_neg_cal[w_cal]",
+   "claimed": 137.57927110263347,
+   "recomputed": 137.57927110263347,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:B:ratio_neg_band[w=1]",
+   "claimed": 2269.5250481695566,
+   "recomputed": 2269.5250481695566,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:B:ratio_neg_cal[10w_cal]",
+   "claimed": 707.0896525674319,
+   "recomputed": 707.0896525674318,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:A_S:ratio_neg_band[w=0]",
+   "claimed": 123.2987986048314,
+   "recomputed": 123.2987986048314,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:A_S:ratio_neg_cal[0]",
+   "claimed": 123.2987986048314,
+   "recomputed": 123.2987986048314,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:A_S:ratio_neg_band[w=0.1]",
+   "claimed": 26654.607488150807,
+   "recomputed": 26654.607488150807,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:A_S:ratio_neg_cal[w_cal]",
+   "claimed": 2810.9392569506545,
+   "recomputed": 2810.9392569506545,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:A_S:ratio_neg_band[w=1]",
+   "claimed": 71173.14662813101,
+   "recomputed": 71173.14662813101,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:A_S:ratio_neg_cal[10w_cal]",
+   "claimed": 21079.10128919948,
+   "recomputed": 21079.10128919948,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:B_S:ratio_neg_band[w=0]",
+   "claimed": 83.87133445291306,
+   "recomputed": 83.87133445291306,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:B_S:ratio_neg_cal[0]",
+   "claimed": 83.87133445291306,
+   "recomputed": 83.87133445291306,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:B_S:ratio_neg_band[w=0.1]",
+   "claimed": 919.7987930460748,
+   "recomputed": 919.7987930460748,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:B_S:ratio_neg_cal[w_cal]",
+   "claimed": 168.50477702238538,
+   "recomputed": 168.50477702238538,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:B_S:ratio_neg_band[w=1]",
+   "claimed": 2322.45366088632,
+   "recomputed": 2322.45366088632,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p12841:B_S:ratio_neg_cal[10w_cal]",
+   "claimed": 743.7667832945083,
+   "recomputed": 743.7667832945082,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:A:ratio_neg_band[w=0]",
+   "claimed": 429.6898395721925,
+   "recomputed": 429.6898395721925,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:A:ratio_neg_cal[0]",
+   "claimed": 429.6898395721925,
+   "recomputed": 429.6898395721925,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:A:ratio_neg_band[w=0.1]",
+   "claimed": 6212348.466830858,
+   "recomputed": 6212348.466830858,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:A:ratio_neg_cal[w_cal]",
+   "claimed": 490581.4686794772,
+   "recomputed": 490581.4686794772,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:A:ratio_neg_band[w=1]",
+   "claimed": 31414419.905182805,
+   "recomputed": 31414419.905182805,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:A:ratio_neg_cal[10w_cal]",
+   "claimed": 4423524.707512704,
+   "recomputed": 4423524.707512704,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:B:ratio_neg_band[w=0]",
+   "claimed": 250.44563279857397,
+   "recomputed": 250.44563279857397,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:B:ratio_neg_cal[0]",
+   "claimed": 250.44563279857397,
+   "recomputed": 250.44563279857397,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:B:ratio_neg_band[w=0.1]",
+   "claimed": 5741.333121474537,
+   "recomputed": 5741.333121474537,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:B:ratio_neg_cal[w_cal]",
+   "claimed": 682.825081839416,
+   "recomputed": 682.825081839416,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:B:ratio_neg_band[w=1]",
+   "claimed": 28018.143832864604,
+   "recomputed": 28018.143832864604,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:B:ratio_neg_cal[10w_cal]",
+   "claimed": 4152.207228611234,
+   "recomputed": 4152.207228611234,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:A_S:ratio_neg_band[w=0]",
+   "claimed": 801.2655971479501,
+   "recomputed": 801.2655971479501,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:A_S:ratio_neg_cal[0]",
+   "claimed": 801.2655971479501,
+   "recomputed": 801.2655971479501,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:A_S:ratio_neg_band[w=0.1]",
+   "claimed": 27077.14340192262,
+   "recomputed": 27077.14340192262,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:A_S:ratio_neg_cal[w_cal]",
+   "claimed": 2871.7795820125125,
+   "recomputed": 2871.7795820125125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:A_S:ratio_neg_band[w=1]",
+   "claimed": 133679.72036962636,
+   "recomputed": 133679.72036962636,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:A_S:ratio_neg_cal[10w_cal]",
+   "claimed": 19485.43749213199,
+   "recomputed": 19485.43749213199,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:B_S:ratio_neg_band[w=0]",
+   "claimed": 464.2032085561497,
+   "recomputed": 464.2032085561497,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:B_S:ratio_neg_cal[0]",
+   "claimed": 464.2032085561497,
+   "recomputed": 464.2032085561497,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:B_S:ratio_neg_band[w=0.1]",
+   "claimed": 4868.111861444348,
+   "recomputed": 4868.111861444348,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:B_S:ratio_neg_cal[w_cal]",
+   "claimed": 810.078742939705,
+   "recomputed": 810.078742939705,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:B_S:ratio_neg_band[w=1]",
+   "claimed": 22734.993973483328,
+   "recomputed": 22734.993973483328,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p25601:B_S:ratio_neg_cal[10w_cal]",
+   "claimed": 3585.3595909480964,
+   "recomputed": 3585.359590948096,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:A:ratio_neg_band[w=0]",
+   "claimed": 463.9047146401985,
+   "recomputed": 463.9047146401985,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:A:ratio_neg_cal[0]",
+   "claimed": 463.9047146401985,
+   "recomputed": 463.9047146401985,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:A:ratio_neg_band[w=0.1]",
+   "claimed": 7475818.691747573,
+   "recomputed": 7475818.691747573,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:A:ratio_neg_cal[w_cal]",
+   "claimed": 674451.5433466713,
+   "recomputed": 674451.5433466713,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:A:ratio_neg_band[w=1]",
+   "claimed": 23941937.854002185,
+   "recomputed": 23941937.854002185,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:A:ratio_neg_cal[10w_cal]",
+   "claimed": 5503674.2886202,
+   "recomputed": 5503674.2886202,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:B:ratio_neg_band[w=0]",
+   "claimed": 245.38362282878413,
+   "recomputed": 245.38362282878413,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:B:ratio_neg_cal[0]",
+   "claimed": 245.38362282878413,
+   "recomputed": 245.38362282878413,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:B:ratio_neg_band[w=0.1]",
+   "claimed": 4667.316444174757,
+   "recomputed": 4667.316444174757,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:B:ratio_neg_cal[w_cal]",
+   "claimed": 643.1621664409913,
+   "recomputed": 643.1621664409913,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:B:ratio_neg_band[w=1]",
+   "claimed": 14407.59965990526,
+   "recomputed": 14407.59965990526,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:B:ratio_neg_cal[10w_cal]",
+   "claimed": 3493.3052258786342,
+   "recomputed": 3493.3052258786342,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:A_S:ratio_neg_band[w=0]",
+   "claimed": 804.5995037220844,
+   "recomputed": 804.5995037220844,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:A_S:ratio_neg_cal[0]",
+   "claimed": 804.5995037220844,
+   "recomputed": 804.5995037220844,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:A_S:ratio_neg_band[w=0.1]",
+   "claimed": 184681.88425364078,
+   "recomputed": 184681.88425364078,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:A_S:ratio_neg_cal[w_cal]",
+   "claimed": 17380.272513310578,
+   "recomputed": 17380.272513310578,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:A_S:ratio_neg_band[w=1]",
+   "claimed": 589712.1962832503,
+   "recomputed": 589712.1962832503,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:A_S:ratio_neg_cal[10w_cal]",
+   "claimed": 136147.46129824308,
+   "recomputed": 136147.46129824308,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:B_S:ratio_neg_band[w=0]",
+   "claimed": 571.0967741935484,
+   "recomputed": 571.0967741935484,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:B_S:ratio_neg_cal[0]",
+   "claimed": 571.0967741935484,
+   "recomputed": 571.0967741935484,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:B_S:ratio_neg_band[w=0.1]",
+   "claimed": 6471.861347087378,
+   "recomputed": 6471.861347087378,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:B_S:ratio_neg_cal[w_cal]",
+   "claimed": 1101.0016078230744,
+   "recomputed": 1101.0016078230744,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:B_S:ratio_neg_band[w=1]",
+   "claimed": 19469.597959431558,
+   "recomputed": 19469.597959431558,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "json:p51203:B_S:ratio_neg_cal[10w_cal]",
+   "claimed": 4897.849396586772,
+   "recomputed": 4897.849396586772,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "verdict:A:ratio_slope_w0.1",
+   "claimed": 0.4209944346561204,
+   "recomputed": 0.42099443465612046,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "verdict:A:ratio_slope_ci95_lower (claimed with t=2.571; recomputed with exact t=2.5706)",
+   "claimed": -0.06991081715436065,
+   "recomputed": -0.06983097309280706,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "verdict:B:ratio_slope_w0.1",
+   "claimed": -0.052756396474546406,
+   "recomputed": -0.05275639647454639,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "verdict:B:ratio_slope_ci95_lower (claimed with t=2.571; recomputed with exact t=2.5706)",
+   "claimed": -0.6540943574941506,
+   "recomputed": -0.6539965519298445,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "cells above at band and calibrated reading (of 36)",
+   "claimed": 36,
+   "recomputed": 36
+  }
+ ],
+ "headline_failures": [],
+ "verdict_under_frozen_rule": {
+  "A": {
+   "above_band": 7,
+   "above_cal": 7,
+   "cells": 7,
+   "slope_w0.1": 0.42099443465612046,
+   "ci95_lower_exact_t": -0.06983097309280706,
+   "meets_closed": false
+  },
+  "B": {
+   "above_band": 7,
+   "above_cal": 7,
+   "cells": 7,
+   "slope_w0.1": -0.05275639647454639,
+   "ci95_lower_exact_t": -0.6539965519298445,
+   "meets_closed": false
+  },
+  "verdict": "unresolved"
+ },
+ "caveats": [
+  "toy sizes only (p = 211 to 51,203), one session on one shared 4-vCPU VM with no isolation; wall times and the best-of-N calibrated weights are indicative",
+  "stage 2 has 1 instance and 2 IC seeds per prime; the frozen rule reads stage 1 only",
+  "freeze before data is not established by git: PROTOCOL.md, frozen.sha256 and the data enter in one commit (c88c7b4e0c, 18:56:30Z) after the run (17:29:02Z-17:36:10Z); the session scratch shows the protocol's own account is consistent (smoke run with unit class times 17:21:51Z, record opened 17:22:14Z) and that the p = 211 and 419 counters seen in the smoke equal the measured ones (340 values)",
+  "IC arms are lower bounds although labelled lower_bound=false: the walk's per-step partition hash (mix64(key_of)), the large-prime HashMap and the RNG draws are not counted, nor the per-instance [h]Z of pick_z; every one of these only raises the IC side, so 'above' is conservative",
+  "same unit is a counting convention: an IC group operation is a Cantor step on the word Jacobian (t_add 588-653 ns) and a rho operation an E1 addition (103-152 ns), so every IC/rho ratio is understated by about 4.3-5.7x in time"
+ ],
+ "findings": [
+  "RESULTS.md scorecard F6 says held on per-prime means 0.483-0.536; the frozen F6 is per run, and 3 of 176 whole-J runs exceed 0.6 (p = 211: A k0 s2 0.6031, A k1 s3 0.6031, B k0 s2 0.6034; certs_check.json, val_fj_dump); per-prime means are 0.4830-0.5398, not 0.483-0.536. F6 failed narrowly under its frozen wording",
+  "RESULTS.md 'At w = 0 ... the smallest ratio is 18.7, for A at p = 211': B at p = 211 is 17.96 (and the controls 10.9 and 11.9); 18.66 is the smallest for arm A only",
+  "RESULTS.md 'fitted rho exponent against ln r 0.234' and 'ln(group ops / sqrt r) on ln p gives 0.420 for A and 0.292 for B, both positive' are fits over all 9 primes (stage 2 included, unlabelled); over the 7 stage-1 primes they are 0.238, 0.074 and -0.033 (B negative). The stage-1 rho fit on ln p (0.236 [0.120, 0.352]) is as stated",
+  "RESULTS.md 'All arms are certified per log, with 0 bad relations': relation verification was off in the run (verify_relations false, check_walk false), so bad_relations = 0 is not a check; the logs themselves are certified (360/360 here)",
+  "RESULTS.md 'group operations, linear-algebra multiplications and additions are priced on the band': additions (rel_add, la_add) are only in the w=1 sensitivity total_w1_with_additions, as PROTOCOL.md says",
+  "PROTOCOL.md seeds '700 + s', '500 + s', '1000 + s per instance' differ from the code: 700 + s + 10k, 500 + s + 10k, 1000 + s + (seed mod 997); deterministic formulas, no sign of seed selection, but the text does not describe the run",
+  "p = 102407 (third stage-2 prime of the protocol) is not in full_jacobian.json stage2_not_run, because the rerun dropped it from --stage2; the killed first run is not a command in the bench record (only RESULTS.md F8 and PROGRESS.md mention it)",
+  "bench record raw files are uploaded: false (no S3 copy yet)"
+ ]
+}

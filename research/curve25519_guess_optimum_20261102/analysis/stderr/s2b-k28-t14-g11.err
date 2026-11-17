@@ -1,0 +1,13 @@
+memory allocation of 1207959568 bytes failed
+stack backtrace:
+   0: std::alloc::rust_oom
+   1: __rustc::__rust_alloc_error_handler
+   2: alloc::alloc::handle_alloc_error
+   3: <hashbrown::raw::Fallibility>::alloc_err
+   4: <hashbrown::raw::RawTableInner>::fallible_with_capacity::<alloc::alloc::Global>
+   5: <hashbrown::raw::RawTable<(u64, ())>>::reserve_rehash::<hashbrown::map::make_hasher<u64, (), std::hash::random::RandomState>::{closure#0}>
+   6: <hashbrown::map::HashMap<u64, (), std::hash::random::RandomState>>::insert
+   7: crypto_lib::cryptanalysis::ic_framework::pkm_semaev::decomposable_points
+   8: curve25519_family::f4cost_m
+   9: curve25519_family::main
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.

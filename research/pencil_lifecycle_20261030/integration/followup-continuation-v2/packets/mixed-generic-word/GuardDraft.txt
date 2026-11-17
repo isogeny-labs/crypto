@@ -1,0 +1,36 @@
+
+def genericWordDispatch (p : UInt64) (a : WordD1) (b : WeightedWord) (a3 : UInt64) : Option WeightedWord :=
+ let c := genericWords p a b a3
+ if c.k=0 then none else some c.payload
+
+theorem generic_guard_decode (p : UInt64) [Fact p.toNat.Prime]
+ (hfive : 5≤p.toNat) (hb : p.toNat<2^31) (a : WordD1) (b : WeightedWord) (a3 : UInt64)
+ (ha : a.canonical p) (hc : b.canonical p) (h3 : a3.toNat<p.toNat) :
+ (genericWords p a b a3).k=0 ↔ MixedGeneric.genericK (a.decode p) (b.decodeTwo p)=0 := by
+ obtain ⟨hk,hpayload,hdecode,hout⟩ := generic_word_decode p hfive hb a b a3 ha hc h3
+ have hp : 0<p.toNat := by omega
+ have he : (genericWords p a b a3).k=0 ↔
+   ((genericWords p a b a3).k.toNat:ZMod p.toNat)=(0:ZMod p.toNat) := by
+  rw [←UInt64.toNat_inj]
+  simpa using (canonical_equality p.toNat (genericWords p a b a3).k.toNat 0 hk hp).symm
+ simpa only [hdecode] using he
+
+theorem generic_dispatch_decode (p : UInt64) [Fact p.toNat.Prime]
+ (hfive : 5≤p.toNat) (hb : p.toNat<2^31) (a : WordD1) (b : WeightedWord) (a3 : UInt64)
+ (ha : a.canonical p) (hc : b.canonical p) (h3 : a3.toNat<p.toNat) :
+ (genericWordDispatch p a b a3).map (fun c => c.decodeTwo p)=
+ MixedGeneric.dispatch (a.decode p) (b.decodeTwo p) (a3.toNat:ZMod p.toNat) := by
+ have hg := generic_guard_decode p hfive hb a b a3 ha hc h3
+ have hd := (generic_word_decode p hfive hb a b a3 ha hc h3).2.2.2
+ simp only [genericWordDispatch,MixedGeneric.dispatch,hg]
+ split <;> simp_all
+
+theorem generic_outer_guard (p : UInt64) [Fact p.toNat.Prime]
+ (hfive : 5≤p.toNat) (hb : p.toNat<2^31) (a : WordD1) (b : WeightedWord) (a3 : UInt64)
+ (ha : a.canonical p) (hc : b.canonical p) (h3 : a3.toNat<p.toNat) :
+ (genericWords p a b a3).k=(mixedWords p a b).k := by
+ obtain ⟨hk,hpayload,hdecode,hout⟩ := generic_word_decode p hfive hb a b a3 ha hc h3
+ obtain ⟨hmk,hl,hr,hpnt,hmd,hld,hrd,hpd⟩ := mixed_decode p hfive hb a b ha hc
+ apply UInt64.toNat_inj.mp
+ apply (canonical_equality p.toNat _ _ hk hmk).mp
+ rw [hdecode,hmd,MixedGeneric.genericK_same]

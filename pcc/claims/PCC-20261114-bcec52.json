@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T02:07:21Z",
+ "id": "PCC-20261114-bcec52",
+ "kind": "theorem",
+ "producer": {
+  "commit": "85c57a726a644a6d2138a5c97785ab1119a06aff",
+  "model": "",
+  "session": "norm-target-grading-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "2478d94d12852062aa36fafb68565ef649c5f85a88c4fbb0ee60b233e0bf564a",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormRowClosure.rowSpans"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact source declaration/context hypotheses. Field K, CommRing coefficient algebra A; Nontrivial A where monic degree guards need it. Curve equation, e!=0, d>=3 explicit for actual normalized binding. Full iterated closure with literal deg(a)+deg(f)<=D multiplier budget; requires both old/new input families admitted. No invariance below admission threshold, runtime impossibility, weighted-degree29, growing-family low closure or sub-exponential claim. Unsigned; fresh replay pending at claim creation.",
+ "statement": "Exact source-bound theorem NormRowClosure.rowSpans: theorem rowSpans (V : A[X]) (hV : V.natDegree\u22644) (q c : K) (hc : c\u22600) : Submodule.span K (oldRows V)=Submodule.span K (newRows V q c)"
+}

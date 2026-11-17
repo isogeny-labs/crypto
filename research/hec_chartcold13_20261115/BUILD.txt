@@ -1,0 +1,67 @@
+warning: function `reduce` is never used
+   --> verify_poly.rs:115:4
+    |
+115 | fn reduce(a: &[u64], m: &[u64]) -> U {
+    |    ^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling hec-chart-cold13 v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_chartcold13_20261115)
+warning: `hec-chart-cold13` (bin "verify13") generated 1 warning
+warning: field `canonical` is never read
+  --> config.rs:13:9
+   |
+ 7 | pub struct Config {
+   |            ------ field in this struct
+...
+13 |     pub canonical: [[u64; 3]; 4],
+   |         ^^^^^^^^^
+   |
+   = note: `Config` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `install` is never used
+  --> config.rs:20:8
+   |
+20 | pub fn install(c: Config) {
+   |        ^^^^^^^
+
+warning: function `hc` is never used
+  --> setup.rs:16:8
+   |
+16 | pub fn hc() -> [u64; 8] {
+   |        ^^
+
+warning: function `eval` is never used
+   --> verify_poly.rs:103:4
+    |
+103 | fn eval(a: &[u64], x: u64) -> u64 {
+    |    ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `deriv` is never used
+   --> verify_poly.rs:106:4
+    |
+106 | fn deriv(a: &[u64]) -> U {
+    |    ^^^^^
+
+warning: function `reduce` is never used
+   --> verify_poly.rs:115:4
+    |
+115 | fn reduce(a: &[u64], m: &[u64]) -> U {
+    |    ^^^^^^
+
+warning: function `install` is never used
+  --> config.rs:20:8
+   |
+20 | pub fn install(c: Config) {
+   |        ^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `hec-chart-cold13` (bin "generate13") generated 3 warnings
+warning: `hec-chart-cold13` (bin "recover13") generated 5 warnings (2 duplicates)
+warning: `hec-chart-cold13` (bin "descent13") generated 2 warnings (1 duplicate)
+warning: `hec-chart-cold13` (bin "fiberalign13") generated 1 warning (1 duplicate)
+    Finished `release` profile [optimized] target(s) in 4.67s

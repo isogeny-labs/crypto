@@ -1,0 +1,71 @@
+CARD SWB-RECOMPUTE-01  (frozen before dispatch; experiment-director style; mechanical tier)
+GOAL  Recompute, from raw records committed in this repository, the headline numbers of the benchmark-README rows listed below, and check the identical-output claims. COMPUTE AND COPY ONLY. You do not judge, classify, explain or repair anything.
+REPO  /home/user/crypto (cwd). Read everything; write ONLY under research/validation_sweep_20261019/B-benchmarks/scripts/recompute/ and research/validation_sweep_20261019/B-benchmarks/recompute/.
+TOOLS  python3 -I (isolated mode) for every computation; grep/ls/zcat/xz -dc/tar -tf/sed for reading. FORBIDDEN: cargo/rustc builds or tests, running any benchmark or ecbench/crypto binary, network access, editing or deleting any file outside the two write dirs, git commands other than read-only (git log/show/ls-files).
+PER ROW (do these in order; at most 25 tool calls per row, then record status cannot_define for what is left):
+ 1. Open the row's study directories (listed per row) and read the README/PROTOCOL/REPORT only as needed to find which raw files hold per-run records.
+ 2. From the row's HEADLINE copy up to 10 numeric claims, preferring ratios, speedups, quotients, medians, intervals and counts (verbatim string each).
+ 3. For each, find the raw per-run/per-pair records in the repo that the number is computed from. Write ONE script per row at scripts/recompute/<row_no>.py (python3 -I, reads only committed files, prints the computed values with the field names used). Run it. If the aggregation (median vs mean, paired vs pooled, which rounds are excluded) is not stated in the study, try the study's stated rule; if still undefined record status cannot_define and say which choice is missing. Never pick the aggregation that happens to match.
+ 4. status per claim: match (relative difference <= 1% or equal at the precision the row prints), mismatch (state both numbers), no_raw_in_repo (the records are not in the repo), cannot_define, partial.
+ 5. If the HEADLINE or MEASURED text claims identical/bit-identical/equal outputs, counters, answers, digests or checksums between arms: find the corresponding fields in the raw records of both arms and report n_compared, n_equal, n_differ, files. If the raw records contain no such field, status no_raw_in_repo.
+ 6. Copy verbatim (path:line) every sentence in the row's study files that points to data outside the repo (drive.google.com, /Volumes, SSD, /Users, s3://, gs://, store:<name>, Modal volume, 'not committed', 'scratch'). For each store:<name> check store/index.json lists it (yes/no).
+ 7. Copy verbatim from the study files: (a) the A/A or null-control result lines (path:line), (b) the isolation tier or isolation statement (path:line), (c) whether PROTOCOL/spec is committed in git before the first raw record (run `git log --diff-filter=A --format=%H%x20%cI -- <protocol path>` and `git log --diff-filter=A --format=%H%x20%cI -- <first raw file>` and print both dates; if either is empty say so).
+OUTPUT  Write research/validation_sweep_20261019/B-benchmarks/recompute/SWB-RECOMPUTE-01.jsonl, one JSON object per row: {"row_no":int,"slug":str,"claims":[{"claimed":str,"computed":str,"definition":str,"files":[str],"status":str}],"identical":{"claimed":bool,"n_compared":int|null,"n_equal":int|null,"n_differ":int|null,"files":[str],"status":str},"offrepo_refs":[str],"aa_lines":[str],"isolation_lines":[str],"protocol_git_date":str,"first_raw_git_date":str,"script":str,"notes":str}. notes holds only facts you saw, never opinions. Then reply with the file path and one line per row: row_no, number of match/mismatch/no_raw/cannot_define claims.
+STOP_WHEN  a row's study directory does not exist; a file you must read is unreadable; you are about to write outside the two write dirs. Report the stop verbatim and continue with the next row.
+ROWS
+
+--- ROW 1 | 2026-10-18 | 20261018-hec-rho-negation
+MEASURED: DP Pollard rho on hyperelliptic Jacobians (genus 2/3/4, 18 instances, N 1321 to 16790591, 40 seeds each), walk on divisors vs on ±-classes with look-ahead; counted group operations
+HEADLINE: folded/plain walk ops 0.67 to 0.89 at N ≤ 6·10^4; median 0.968 at N ≥ 10^5 (registered R1, ≤ 0.80, falsified); plain S_walk 1.82 and 2.10 vs ideal 1.2533 at the two largest rows; every run verified
+HOST (as reported): 4 vCPU Xeon 2.80 GHz, isolated_bench reserved CPU 3, uncontended (counts are contention-independent)
+STUDY DIRS: research/notes/index-calculus/round9
+RAW CANDIDATES (largest first): research/notes/index-calculus/round9/CARD-HEIC-ROUND9-2.yaml, research/notes/index-calculus/round9/CARD-HEIC-ROUND9-3.yaml, research/notes/index-calculus/round9/CARD-HEIC-ROUND9-4.yaml, research/notes/index-calculus/round9/CARD-HEIC-ROUND9-5.yaml, research/notes/index-calculus/round9/run5/executor_report.txt, research/notes/index-calculus/round9/run5/receipt.json
+
+--- ROW 2 | 2026-10-18 | 20261018-hec-rho-hash-mixing
+MEASURED: DP Pollard rho on hyperelliptic Jacobians, same 18 instances and 40 seeds as round nine; four arms: plain and ±-folded walks, each with the old divisor hash and with it passed through SplitMix64's finaliser; counted group operations
+HEADLINE: mixed plain S_walk median 1.406 at N ≥ 10^5, two largest rows 2.240 and 1.696 (registered H1, ≤ 1.55, falsified); mixed fold/plain median 0.960 (H2, ≤ 0.80, falsified); small-N control difference 0.023 (H3 holds); every run verified
+HOST (as reported): 4 vCPU Xeon 2.80 GHz, isolated_bench reserved CPU 3, uncontended (counts are contention-independent)
+STUDY DIRS: research/notes/index-calculus/round10
+RAW CANDIDATES (largest first): research/notes/index-calculus/round10/CARD-HEIC-ROUND10-1.yaml, research/notes/index-calculus/round10/diagnostic/seed_profile.txt, research/notes/index-calculus/round10/run1/R10.txt, research/notes/index-calculus/round10/run1/isolated_bench.jsonl, research/notes/index-calculus/round10/run1/receipt.json
+
+--- ROW 3 | 2026-10-19 | 20261019-hec-rho-branch-width
+MEASURED: DP Pollard rho on hyperelliptic Jacobians and on Z/N (same walk), same 18 instances and 40 seeds as rounds nine to eleven; 8-bit vs full-width branch coefficients; counted group operations
+HEADLINE: full-width Jacobian S_walk median 1.390 at N ≥ 10^5 (registered W2 holds), largest row 2.100 → 1.481 (8-bit/full 1.418); integer model 1.303 (W1 holds); small-N control moves 0.025 (W3 holds); every run verified. Accounting correction against IC: the 8-bit reference was slow at large N
+HOST (as reported): 4 vCPU Xeon 2.80 GHz, isolated_bench reserved CPU 3, uncontended (counts are contention-independent)
+STUDY DIRS: research/notes/index-calculus/round12
+RAW CANDIDATES (largest first): research/notes/index-calculus/round12/CARD-HEIC-ROUND12-1.yaml, research/notes/index-calculus/round12/run1/R12.txt, research/notes/index-calculus/round12/run1/isolated_bench.jsonl, research/notes/index-calculus/round12/run1/receipt.json
+
+--- ROW 4 | 2026-10-18 | 20261018-k-conversion
+MEASURED: K = Ir per Macaulay column touch (dense degree-3 MutantXL closure, m = 4 cells N = 36 to 44 and m = 3 N = 34) over Ir per signed-Frobenius strong-rho walk step (n = 83 and n = 61), Callgrind, one binary
+HEADLINE: K (rho steps per column) pooled m = 4 median 4.48 [3.96, 16.77]; 83 at 17,902 columns (degree 4, N = 26); derived conversion only: +7.62 and +10.32 bit rows become +9.78 and +12.48 at median K (accounting, not an improvement); n = 131 rho step not measurable
+HOST (as reported): 4 vCPU Xeon 2.10 GHz shared VM, no PMU, no isolation tier (Ir is contention-independent)
+STUDY DIRS: research/k_conversion_20261018
+RAW CANDIDATES (largest first): research/k_conversion_20261018/PROVENANCE.txt, research/k_conversion_20261018/RESULT.json, research/k_conversion_20261018/raw.jsonl
+
+--- ROW 5 | 2026-10-17 | 20261017-perf-history-factor-bases
+MEASURED: callgrind solve `Ir` of 11 frozen `ic_factor_base` children (rho references and index calculus with 9 factor bases over Koblitz a = 1 n = 17, a 20-bit generic prime curve and a j = 0 prime curve) at `ca00c151`, rendered with the 75-snapshot perf history
+HEADLINE: Index calculus at 28.1–34.6 M `Ir` against rho at 0.22–0.84 M on the same curves (38–159× above rho); on j = 0 the order-6 GLV base has 3× the signed points of the negation base at 32 columns and costs 4 % more `Ir`; tooling entry, no speedup claimed
+HOST (as reported): Managed Linux x86_64 container, callgrind, not the CI runner
+STUDY DIRS: docs/perf/PERFORMANCE_INDEX.md
+RAW CANDIDATES (largest first): 
+
+--- ROW 6 | 2026-10-17 | 20261017-photo-volcano-restart
+MEASURED: Fresh 46-curve, five-level photographed 2-volcano: 100 paired ECDLP cases per curve; rho and BSGS stage counters/time; actual IC GB diagnostics
+HEADLINE: Snapshot 14:50 UTC: rho 4600/4600 verified, BSGS 3297/4600; rho curve-mean count range 107895789.39–134494184.67 group operations (descriptive max/min 1.246519); IC 4600 target GB probes each 217410 field multiplications, elapsed 11.519667–266.013969 ms; zero full IC recoveries; no speedup/hardness claim
+HOST (as reported): Intel Xeon Platinum 8573C, four-CPU cgroup, 16 GiB, CPU-only L0 concurrent
+STUDY DIRS: research/photo_volcano_restart_20261017
+RAW CANDIDATES (largest first): research/photo_volcano_restart_20261017/artifacts/public_ic_metrics_and_replay.tar.xz, research/photo_volcano_restart_20261017/artifacts/public_inputs.tar.xz, research/photo_volcano_restart_20261017/data/ic_support_audit.json, research/photo_volcano_restart_20261017/reports/quantitative_1452/ic_per_problem.json, research/photo_volcano_restart_20261017/reports/quantitative_1452/per_curve.csv, research/photo_volcano_restart_20261017/reports/quantitative_1452/per_curve.json
+
+--- ROW 7 | 2026-10-17 | 20261017-volcano-repaired-2935
+MEASURED: Repaired bounded survey checkpoint
+HEADLINE: 2,935 vertices, all 51 strata; 46,960 records: 30,270 verified, 14,626 exhausted, 2,064 timeout. 1,530,557 relations / 71,296,000 actual calls. One interrupted attempt excluded and retained. No admitted runtime or external fastest claim.
+HOST (as reported): Frozen release runner; native capsule host observations; raw wall unqualified
+STUDY DIRS: research/full_volcano_graphwide_ic_20261017/execution/recovery-20261017T1450Z/README.md
+RAW CANDIDATES (largest first): research/full_volcano_graphwide_ic_20261017/execution/recovery-20261017T1450Z/combined-cli-site-network-failed-browser.log, research/full_volcano_graphwide_ic_20261017/execution/recovery-20261017T1450Z/combined-release-network-denied.log, research/full_volcano_graphwide_ic_20261017/execution/recovery-20261017T1450Z/inventory.json, research/full_volcano_graphwide_ic_20261017/execution/recovery-20261017T1450Z/resumed-launch-initial.json, research/full_volcano_graphwide_ic_20261017/execution/recovery-20261017T1450Z/resumed-launch-verified.json, research/full_volcano_graphwide_ic_20261017/execution/recovery-20261017T1450Z/validation.json
+
+--- ROW 8 | 2026-10-17 | 20261017-two-sylow-fp64
+MEASURED: `two_sylow_search` halving search (`Halver::run_draw`, both families, all three search arms) on `fp_backend::Fp64` at 2^63 − 25, baseline vs branch-free `Fp64` (PR #2034) `hwcost` binaries alternated A1 B1 A2 B2; `fp64` kernel as positive and `FpWide<1>` kernel as negative control
+HEADLINE: neutral within resolution: ratios 0.98–1.02 (pair 1) and 1.02–1.08 (pair 2, where unchanged controls also read high); S1 (no arm > +10%) PASS at 1.083; positive control 0.44, negative control within 4.5%; both binaries compute the same search (gate checksums identical)
+HOST (as reported): Intel Xeon @ 2.10 GHz (family 6 model 207), 4 vCPU KVM, L0, no PMU
+STUDY DIRS: research/two_sylow_fp64_20261017; research/two_sylow_fp64_20261017/reports/run-20261017T0018Z/run_report.pdf
+RAW CANDIDATES (largest first): research/two_sylow_fp64_20261017/runs/base-1/measurements.json, research/two_sylow_fp64_20261017/runs/base-2/measurements.json, research/two_sylow_fp64_20261017/runs/cand-1/measurements.json, research/two_sylow_fp64_20261017/runs/cand-1/samples.csv, research/two_sylow_fp64_20261017/runs/cand-2/measurements.json, research/two_sylow_fp64_20261017/runs/cand-2/samples.csv

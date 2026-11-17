@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "/var/tmp/pencil-node-v22.23.4/node-v22.23.4-linux-x64/bin/node",
+    "--input-type=module",
+    "-e",
+    "import {sourceFiles, embeddedInputs} from './.github/scripts/ci-scope.mjs'; import {createHash} from 'node:crypto'; const s=sourceFiles(process.cwd()); const e=embeddedInputs(process.cwd(),s); console.log(JSON.stringify({source_count:s.size,embedded_count:e.size,source_paths_sha256:createHash('sha256').update([...s].sort().join('\\0')).digest('hex'),materialization_performed:false}));"
+  ],
+  "timeout_seconds": 300
+}

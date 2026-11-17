@@ -1,0 +1,73 @@
+{
+  "scope": "Software/schema/identity metadata validation only; no scientific trial, benchmark or new arithmetic.",
+  "checks": [
+    {
+      "name": "negative-controls",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "docs/curves/ic",
+        "-p",
+        "test_validate_semantics.py",
+        "-v"
+      ],
+      "exit_status": 0,
+      "stdout": "research/ideas_execution_20261018/fp4_metadata_erratum/negative-controls.stdout.log",
+      "stderr": "research/ideas_execution_20261018/fp4_metadata_erratum/negative-controls.stderr.log"
+    },
+    {
+      "name": "semantic",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "docs/curves/ic/validate_semantics.py"
+      ],
+      "exit_status": 0,
+      "stdout": "research/ideas_execution_20261018/fp4_metadata_erratum/semantic.stdout.log",
+      "stderr": "research/ideas_execution_20261018/fp4_metadata_erratum/semantic.stderr.log"
+    },
+    {
+      "name": "peer-semantic",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "docs/curves/ic/validate_semantics.py",
+        "--peer",
+        "/tmp/fp4-semantic-design/peer"
+      ],
+      "exit_status": 0,
+      "stdout": "research/ideas_execution_20261018/fp4_metadata_erratum/peer-semantic.stdout.log",
+      "stderr": "research/ideas_execution_20261018/fp4_metadata_erratum/peer-semantic.stderr.log"
+    }
+  ],
+  "all_five_peer_files_match_pinned_main": {
+    "curves.yaml": true,
+    "curves.schema.json": true,
+    "curve-links/link.schema.json": true,
+    "validate_semantics.py": true,
+    "test_validate_semantics.py": true
+  },
+  "mirror_lock_unchanged_and_all_three_hashes_correct": true,
+  "original_field_curve_uid_records_preserved": 4,
+  "canonical_registry_entries_added": 0,
+  "schema_or_validator_edits": false,
+  "upstream_repository_modified": false,
+  "runtime": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "PyYAML": "6.0.3",
+    "jsonschema": "4.26.0"
+  },
+  "root_followup": "Native trait dependency-equivalence/freshness and browser regeneration are owned by integrating root; not done by this repair.",
+  "model_registry": {
+    "path": "docs/curves/registry.json",
+    "sha256": "584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf",
+    "computed_candidate_slugs_absent": {
+      "icv1-fp4k4-tm210-19073b0f": true,
+      "icv1-fp5k4-t30-b008f9b7": true,
+      "icv1-fp5k4-tm746-dc56f0aa": true,
+      "icv1-fp6k4-tm290-f3916f66": true
+    }
+  }
+}

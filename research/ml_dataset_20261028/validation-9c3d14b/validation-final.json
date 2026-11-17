@@ -1,0 +1,61 @@
+{
+  "schema": "ml-dataset.software-validation/v1",
+  "source_commit": "9c3d14b03950affa0237529ce5b55238eda011b5",
+  "phase": "completed-checks",
+  "rust_toolchain": "1.98",
+  "checks": {
+    "clippy-maintained": {
+      "exit_code": 0,
+      "receipt": "clippy-maintained-9c3d14b.receipt.json",
+      "source_readback_matches": true
+    },
+    "dataset-tests": {
+      "exit_code": 0,
+      "receipt": "dataset-tests-9c3d14b.receipt.json",
+      "source_readback_matches": true,
+      "passed": 119,
+      "failed": 0,
+      "ignored": 1
+    },
+    "release-build": {
+      "exit_code": 0,
+      "receipt": "release-build-9c3d14b.receipt.json",
+      "source_readback_matches": true
+    },
+    "full-library-tests": {
+      "exit_code": 0,
+      "receipt": "full-library-tests-9c3d14b.receipt.json",
+      "source_readback_matches": true,
+      "passed": 5119,
+      "failed": 0,
+      "ignored": 123
+    }
+  },
+  "cli": {
+    "checks": 22,
+    "passed": true,
+    "legacy_binary_checked": true,
+    "synthetic_grants_never_activated": true,
+    "network_monitoring_performed": false
+  },
+  "binary_sha256": "6d38ac6a2a78d60b7380fe518cd747b913d0febbfec858e62feaad35b326595e",
+  "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:ae3ad91b07ccbd0710e90b453aa300658362be6b7b4e615a6d3bb5ea511e7a01",
+  "container_preflight": {
+    "uid": 1000,
+    "network": "none",
+    "read_only_root": true,
+    "passed": true,
+    "cloud_permissions_checked": false
+  },
+  "image_publication": {
+    "first_attempt": "failed-expired-registry-token",
+    "retry": "passed-after-same-identity-login-refresh",
+    "ecr_digest_verified": true
+  },
+  "native_plan_sha256": "c905e878e3dcb29e407e743874d18b6b7091c097984f829820f26673ccd47f21",
+  "plan_file_sha256": "d698efdad6d674e944ebf3741962eb71b38829bdaf882fb8a8407a7fc57f753a",
+  "protocol_file_sha256": "05a54dacc052b49bf7b9d6ffd776c461f49757e01488088c9a79bbf136f11604",
+  "verified_cloud_dataset_cells": 0,
+  "scientific_claims_established": false,
+  "finished_utc": "2026-10-29T02:51:38.505839+00:00"
+}

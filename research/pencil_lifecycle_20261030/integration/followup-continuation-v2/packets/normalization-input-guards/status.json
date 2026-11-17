@@ -1,0 +1,161 @@
+{
+  "schema": "research.proof-packet-status/v1",
+  "task": "T-1189",
+  "kind": "normalization_input_guards",
+  "main_declarations": 6,
+  "control_declarations": 8,
+  "checks": {
+    "guards1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "word1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "readback": [
+    {
+      "name": "NormalizationInputGuards.prefix_degree_bound",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationInputGuards.prefix_natDegree",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationInputGuards.prefix_monic",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationInputGuards.prefixes_valid",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationInputGuards.top_word_one",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationInputGuards.stored_valid_from_guards",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationInputGuardsControls.degree_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationInputGuardsControls.degree_one",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationInputGuardsControls.degree_two",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationInputGuardsControls.zero_ordinate",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationInputGuardsControls.missing_top",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationInputGuardsControls.metadata_mismatch",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationInputGuardsControls.nonmonic_top",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationInputGuardsControls.ordinate_prefix",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    }
+  ],
+  "failed_proof_attempts": [],
+  "derived_premises": [
+    "exact input degree",
+    "monicity",
+    "ordinate degree bound"
+  ],
+  "remaining_premises": [
+    "residual divisibility",
+    "canonical words",
+    "prime 1<p<2^31",
+    "nonzero scale"
+  ],
+  "native_remainder_correspondence": "unproved",
+  "all_caller_invariants": "not established",
+  "independent_source_fidelity_review": "pending",
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "pdf_inspection": "one page readable and unclipped",
+  "upstream_compiled_dependencies": "retained trust boundary"
+}

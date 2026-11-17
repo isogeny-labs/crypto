@@ -1,0 +1,62 @@
+import FastInterpolationShape
+set_option autoImplicit false
+namespace FastCRT
+open Polynomial
+variable {K : Type*} [Field K]
+
+theorem quintic_over_quartic_quotient (f v u : K[X])
+ (hf : f.natDegree=5) (hv : v.natDegree=3)
+ (hu : u.natDegree=4) (hm : u.Monic) (hdiv : u ∣ f-v^2) :
+ ∃ q, f-v^2=u*q ∧ q.natDegree=2 ∧ q.leadingCoeff=-(v.leadingCoeff)^2 := by
+ have hv0 : v ≠ 0 := by intro hz;rw [hz,natDegree_zero] at hv;omega
+ have hv2 : (v^2).natDegree=6 := by rw [pow_two,natDegree_mul hv0 hv0,hv]
+ have hlt : f.natDegree<(v^2).natDegree := by rw [hf,hv2];omega
+ have hd : (f-v^2).natDegree=6 := (natDegree_sub_eq_right_of_natDegree_lt hlt).trans hv2
+ have hr0 : f-v^2 ≠ 0 := by intro hz;rw [hz,natDegree_zero] at hd;omega
+ have hl : (f-v^2).leadingCoeff=-(v.leadingCoeff)^2 := by
+  rw [leadingCoeff_sub_of_degree_lt' (degree_lt_degree hlt),pow_two,leadingCoeff_mul]
+ obtain ⟨q,hq⟩ := hdiv
+ have hq0 : q ≠ 0 := by intro hz;apply hr0;rw [hq,hz,mul_zero]
+ have hqd : q.natDegree=2 := by
+  rw [hq,natDegree_mul hm.ne_zero hq0,hu] at hd
+  omega
+ have hql : q.leadingCoeff=-(v.leadingCoeff)^2 := by
+  rw [hq,leadingCoeff_mul,hm.leadingCoeff,one_mul] at hl
+  exact hl
+ exact ⟨q,hq,hqd,hql⟩
+
+theorem source_quotient_exists (qa ra sa ta qb rb sb tb : K) (f : K[X])
+ (hn : norm (qa-qb) (ra-rb) qb rb ≠ 0)
+ (hs : slopeOne (qa-qb) (ra-rb) (sb-sa) (tb-ta) ≠ 0)
+ (hf : f.natDegree=5)
+ (ha : support qa ra ∣ f-(delta sa ta)^2)
+ (hb : support qb rb ∣ f-(delta sb tb)^2) :
+ ∃ q, f-(interpolant qa ra sa ta qb rb sb tb)^2=(support qa ra*support qb rb)*q ∧
+ q.natDegree=2 ∧ q.leadingCoeff=
+ -(slopeOne (qa-qb) (ra-rb) (sb-sa) (tb-ta)/norm (qa-qb) (ra-rb) qb rb)^2 := by
+ obtain ⟨hvd,hvl⟩ := interpolant_shape qa ra sa ta qb rb sb tb hn hs
+ obtain ⟨had,ham⟩ := support_shape qa ra
+ obtain ⟨hbd,hbm⟩ := support_shape qb rb
+ have hu : (support qa ra*support qb rb).natDegree=4 := by
+  rw [natDegree_mul ham.ne_zero hbm.ne_zero,had,hbd]
+ obtain ⟨q,hq,hqd,hql⟩ := quintic_over_quartic_quotient f _ _ hf hvd hu (ham.mul hbm)
+  (product_residual qa ra sa ta qb rb sb tb f hn ha hb)
+ exact ⟨q,hq,hqd,by rw [hvl] at hql;exact hql⟩
+
+theorem inverse_lead_identity (n s : K) (hn : n ≠ 0) (hs : s ≠ 0) :
+ (-(n/s)^2)*(-(s/n)^2)=1 := by
+ rw [neg_mul_neg,←mul_pow]
+ have h : n/s*(s/n)=1 := by
+  simp only [div_eq_mul_inv]
+  calc
+   n*s⁻¹*(s*n⁻¹)=(n*n⁻¹)*(s⁻¹*s) := by ring
+   _=1 := by rw [mul_inv_cancel₀ hn,inv_mul_cancel₀ hs,mul_one]
+ rw [h,one_pow]
+
+theorem scaled_quotient_monic (q : K[X]) (n s : K) (hn : n ≠ 0) (hs : s ≠ 0)
+ (hl : q.leadingCoeff=-(s/n)^2) :
+ (C (-(n/s)^2)*q).Monic := by
+ change (C (-(n/s)^2)*q).leadingCoeff=1
+ rw [leadingCoeff_mul,leadingCoeff_C,hl]
+ exact inverse_lead_identity n s hn hs
+end FastCRT

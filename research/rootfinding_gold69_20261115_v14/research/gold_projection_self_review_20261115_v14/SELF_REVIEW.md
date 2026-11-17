@@ -1,0 +1,7 @@
+# Sole-model preparation review (not external independent admission)
+
+Read the newworkerbody and existing BinaryField/rootpackagebodies. Checked source-product indexing: ascending quintic e1=H4,e2=H3,e3=H2. Homogeneous norm directions subtract the zero norm, while the affine particular is evaluated literally. b is fixed byh and does not vary across the recorded73kernel. Original415rows, rank93, independent73kernel and particular replay certify full input coverage.
+
+Column-DP reachable sets grow by disjoint cosets of the prior output image; each dependent column gives a triangular independent kernel. The separately written high-pivot row solver back-substitutes from low pivots, carries contradiction witnesses and agrees with exhaustive tiny truth tables. Masks do not enter wrapped tiny-field controls. Formal Goldgraph rank/codimension proves actual mask completeness under nonwrap guards. Every time/raw cap and final six-key output was inspected; no global root or qualified timing flags exist.
+
+This root agent authored and reviewed the preparation code. No distinct reviewer is claimed. It changes the review assumption only for a nonpromoted rank-certificate diagnostic; external independent validation remains required before the proposed solver integration. This is a reproducible scientific limitation, not user permission or approval bypass. Source/code/input hashes freeze BEFORE the one declared bounded run; no author execution or worker import occurred during review (AST parsing only).

@@ -1,0 +1,21 @@
+import NodeContract
+set_option autoImplicit false
+namespace NativeNodeControls
+open NativeNode SignedWord
+def one : Columns 1 :=
+ ⟨⟨#[0],by decide⟩,⟨#[1],by decide⟩,⟨#[ident],by decide⟩,⟨#[some (0,0)],by decide⟩⟩
+def empty : Columns 0 :=
+ ⟨⟨#[],by decide⟩,⟨#[],by decide⟩,⟨#[],by decide⟩,⟨#[],by decide⟩⟩
+theorem old_anchor_retained : get (append one).fixed (0 : Fin 1).castSucc=some (0,0) := by
+ change NativeNode.get (push _ _) _ = _
+ rw [at_old]
+ rfl
+theorem new_unanchored : get (append one).fixed (Fin.last 1)=none := by change NativeNode.get (push _ _) (Fin.last _) = _;rw [at_new]
+theorem new_size_one : get (append one).size (Fin.last 1)=1 := by change NativeNode.get (push _ _) (Fin.last _) = _;rw [at_new]
+theorem new_identity : get (append one).pot (Fin.last 1)=ident := by change NativeNode.get (push _ _) (Fin.last _) = _;rw [at_new]
+theorem empty_unanchored : get (append empty).fixed (Fin.last 0)=none := by rw [show (append empty).fixed=push empty.fixed none from rfl,at_new]
+theorem old_parent_retained : get (append one).parent (0 : Fin 1).castSucc=0 := by
+ change NativeNode.get (push _ _) _ = _
+ rw [at_old]
+ rfl
+end NativeNodeControls

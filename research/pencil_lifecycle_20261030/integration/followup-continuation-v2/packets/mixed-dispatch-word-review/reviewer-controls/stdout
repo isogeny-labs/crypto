@@ -1,0 +1,28 @@
+/var/tmp/pencil-mixed-dispatch-word-independent-review-20261031-v1/ReviewerControls.lean:5:45: error: failed to synthesize
+  Decidable
+    (dispatch 5 0 0 0 0 { x := 0, y := 0, z := 1, w := 1 } { q := 0, r := 0, s := 0, t := 0, z := 1, w := 1 } =
+      (some (Sum.inl { x := 0, y := 0, z := 1, w := 1 }), Tag.cancellation))
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+/var/tmp/pencil-mixed-dispatch-word-independent-review-20261031-v1/ReviewerControls.lean:8:24: error: failed to synthesize
+  Decidable
+    (dispatch 5 1 0 0 0 { x := 0, y := 2, z := 1, w := 1 } { q := 0, r := 0, s := 0, t := 1, z := 1, w := 1 } =
+      (none, Tag.mismatch))
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+/var/tmp/pencil-mixed-dispatch-word-independent-review-20261031-v1/ReviewerControls.lean:11:63: error: failed to synthesize
+  Decidable
+    (dispatch 5 1 0 0 0 { x := 0, y := 1, z := 1, w := 1 } { q := 0, r := 0, s := 0, t := 1, z := 1, w := 1 } =
+      (some (Sum.inr (tripleWords 5 0 0 0 { x := 0, y := 1, z := 1, w := 1 })), Tag.tripling))
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+/var/tmp/pencil-mixed-dispatch-word-independent-review-20261031-v1/ReviewerControls.lean:15:79: error: failed to synthesize
+  Decidable
+    (dispatch 7 1 6 0 0 { x := 0, y := 1, z := 2, w := 2 } { q := 5, r := 0, s := 0, t := 3, z := 3, w := 2 } =
+      (Option.map Sum.inr
+          (genericWordDispatch 7
+            (mixedWords 7 { x := 0, y := 1, z := 2, w := 2 } { q := 5, r := 0, s := 0, t := 3, z := 3, w := 2 }).point
+            (dblWordPayload 7 1 6 0 0 { x := 0, y := 1, z := 2, w := 2 }) 0),
+        Tag.positiveDistinct))
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.

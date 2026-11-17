@@ -1,0 +1,13 @@
+card_id: CARD-isogeny-ic-yield-p3-a-main-k3-20261102-1
+relay_verbatim: not_checked   # detached run (LAUNCH_NOTE.md, tools/card_queue.sh) or no executor report file supplied; check-relay needs --report; not a deviation
+outcome: executed_as_specified
+stopped_at_step: null
+recommendation: proceed_to_analysis
+reasons:
+  - "Receipt research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-a-main-k3-20261102-1.receipt.json (sha256 b250016532d70d0cd0e932bf4cc2dab361a53368c5975c9f106b2d90a1a76119): status completed, commands_total 1 (card lists 1), measure exit_code 0, attempts 1, timed_out false, 210.957 s of 1800 s. Command ids and argv in the receipt equal the card's, in the card's order; no retry key in the card; no other command ran."
+  - "Identity: receipt commit d97f5953b24e05096208a54df6e699827d021541 equals the HEAD of /home/user/crypto-p3run and the card's commit field; receipt card_sha256 06d49bb59aab976e5f736c47e553e742955acf2eb54177f37356e8213e7d48b8 equals the card file in /home/user/crypto-p3run and in /home/user/crypto; all 9 bind sha256 values equal the files on disk in /home/user/crypto-p3run now."
+  - "Output digests in the receipt equal the files in /home/user/crypto-p3run: p3_ecc2k130/full/p3a_main_k3.jsonl 5a74f7c788b3afb7bf50d4cfc4f6b03fb4159f969f16eeb343928f7adbedd461. The files in /home/user/crypto (p3_ecc2k130/full/) have the same digests and equal the .artifacts.json manifest entry (jsonl files)."
+  - "stdout/stderr digests in the receipt equal the files in the worktree: measure.stdout e3b0c442, measure.stderr e3b0c442 (e3b0c442 is the empty file)."
+  - "Rows p3a_main_k3.jsonl: 5180 lines, 0 unparsable, 0 with an error/err/panic key; arms {\"main\": 5180}; outcome counts {\"resolved\": 5180}; planted_ok 0 rows 0."
+  - "Write scope: receipt dirty_after minus dirty_before (3 paths) has nothing outside write_scope; git status --porcelain in /home/user/crypto-p3run shows only cards/ and p3_ecc2k130/full/ paths, the untracked LAUNCH_NOTE.md and TIMEOUT_NOTE.md (main-session files bound by no card) and ' M .resume/RESUME.md' (hook, in every receipt's dirty_before); every file in full/ is a declared output of a receipt, a declared stdout, or belongs to the running card b-main-k5-s0 (not touched)."
+interpretation: not_assessed

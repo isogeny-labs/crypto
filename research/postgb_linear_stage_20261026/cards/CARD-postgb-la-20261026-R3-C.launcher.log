@@ -1,0 +1,66 @@
+launched by the main session (PROTOCOL_AMENDMENTS 2-3), 2026-10-27T08:04:31Z
+card: CARD-postgb-la-20261026-R3-C (sha256 c45169881593db2387d0a8220a734966b63ffe6fadb2f0fe01cade73c36e6ccc)
+commit: 2f756fe236230cb5c53d4810209649d7f03a3ead
+receipt: research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-C.receipt.json sha256 639b2da55cf42e8a9b30eb43322b7e00264f36f4f0262e1bb8aa00ecc8ae42f5
+status: completed
+command 1 (git-clean): ["python3", "-c", "import subprocess,sys; out=subprocess.run(['git','status','--porcelain','--untracked-files=all','--',':(exclude)research/postgb_linear_stage_20261026/cards'],capture_output=True,text=True).stdout; sys.exit(1 if out.strip() else 0)"] exit 0 (0.7 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (output-absent): ["python3", "-c", "import os,sys; sys.exit(1 if os.path.exists('research/postgb_linear_stage_20261026/runs/R3-C.json') else 0)"] exit 0 (0.022 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (mkdir-runs): ["mkdir", "-p", "research/postgb_linear_stage_20261026/runs"] exit 0 (0.004 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 4 (disk-record): ["df", "-h", "/"] exit 0 (0.004 s) succeeded
+  stdout sha256 cd92b1c0bdbcd9511dd046437a969fa10974fa0122af5df279836c033e17fa4c; last 2 lines:
+    Filesystem      Size  Used Avail Use% Mounted on
+    /dev/vda        252G   33G  6.8G  83% /
+command 5 (lscpu-record): ["lscpu"] exit 0 (0.005 s) succeeded
+  stdout sha256 35aff9c9dd67ea379067ea6d72263b3e9c6305b94cf02227c955888621eeca93; last 20 lines:
+    NUMA node0 CPU(s):                       0-3
+    Vulnerability Gather data sampling:      Not affected
+    Vulnerability Ghostwrite:                Not affected
+    Vulnerability Indirect target selection: Mitigation; Aligned branch/return thunks
+    Vulnerability Itlb multihit:             Not affected
+    Vulnerability L1tf:                      Not affected
+    Vulnerability Mds:                       Not affected
+    Vulnerability Meltdown:                  Not affected
+    Vulnerability Mmio stale data:           Vulnerable: Clear CPU buffers attempted, no microcode; SMT Host state unknown
+    Vulnerability Old microcode:             Not affected
+    Vulnerability Reg file data sampling:    Not affected
+    Vulnerability Retbleed:                  Mitigation; Enhanced IBRS
+    Vulnerability Spec rstack overflow:      Not affected
+    Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl
+    Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+    Vulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI Vulnerable
+    Vulnerability Srbds:                     Not affected
+    Vulnerability Tsa:                       Not affected
+    Vulnerability Tsx async abort:           Vulnerable: Clear CPU buffers attempted, no microcode; SMT Host state unknown
+    Vulnerability Vmscape:                   Not affected
+command 6 (disk-before-run): ["python3", "-c", "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"] exit 0 (0.042 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 7 (quiet-before-run): ["python3", "-c", "import re, sys, time\nstart = time.time()\nheld = 0\nwhile True:\n    value = float(re.search(r'some avg10=([0-9.]+)', open('/proc/pressure/cpu').read()).group(1))\n    if value <= 1.0:\n        held += 1\n    else:\n        held = 0\n    if held >= 6:\n        sys.exit(0)\n    if time.time() - start >= 1800:\n        sys.exit(1)\n    time.sleep(5)\n"] exit 0 (115.047 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 8 (run): ["./target/release/examples/postgb_la_bench", "--families", "jv-nagao,gaudry-s4,gaudry-d4,gaudry-s5,dense", "--per", "8", "--reps", "1", "--arms", "sparse,fast", "--json", "research/postgb_linear_stage_20261026/runs/R3-C.json"] exit 0 (1010.489 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 20 lines:
+    dense     n6-d3-p32-1            δ=  729 f4=    363.9ms sparse= 2706.941 fast=   70.907 sols=2 agree=true planted=Some(true)
+    dense     n6-d3-p32-2            δ=  729 f4=    414.1ms sparse= 2887.589 fast=   69.461 sols=3 agree=true planted=Some(true)
+    dense     n7-d2-p16-0            δ=  128 f4=     27.2ms sparse=   26.779 fast=    1.965 sols=1 agree=true planted=Some(true)
+    dense     n7-d2-p16-1            δ=  128 f4=     21.5ms sparse=   37.400 fast=    2.570 sols=5 agree=true planted=Some(true)
+    dense     n7-d2-p16-2            δ=  128 f4=     22.5ms sparse=   32.239 fast=    2.477 sols=2 agree=true planted=Some(true)
+    dense     n7-d2-p31-0            δ=  128 f4=     28.8ms sparse=   48.955 fast=    2.756 sols=1 agree=true planted=Some(true)
+    dense     n7-d2-p31-1            δ=  128 f4=     32.8ms sparse=   39.080 fast=    2.079 sols=3 agree=true planted=Some(true)
+    dense     n7-d2-p31-2            δ=  128 f4=     35.7ms sparse=   41.276 fast=    1.881 sols=1 agree=true planted=Some(true)
+    dense     n7-d2-p32-0            δ=  128 f4=     35.4ms sparse=   41.067 fast=    2.262 sols=3 agree=true planted=Some(true)
+    dense     n7-d2-p32-1            δ=  128 f4=     31.2ms sparse=   37.894 fast=    1.891 sols=1 agree=true planted=Some(true)
+    dense     n7-d2-p32-2            δ=  128 f4=     27.5ms sparse=   39.645 fast=    2.269 sols=1 agree=true planted=Some(true)
+    dense     n8-d2-p16-0            δ=  256 f4=     94.6ms sparse=  191.227 fast=    6.975 sols=2 agree=true planted=Some(true)
+    dense     n8-d2-p16-1            δ=  256 f4=     89.9ms sparse=  162.739 fast=   10.112 sols=3 agree=true planted=Some(true)
+    dense     n8-d2-p16-2            δ=  256 f4=     86.3ms sparse=  174.888 fast=    7.269 sols=1 agree=true planted=Some(true)
+    dense     n8-d2-p31-0            δ=  256 f4=    151.7ms sparse=  240.147 fast=    8.756 sols=4 agree=true planted=Some(true)
+    dense     n8-d2-p31-1            δ=  256 f4=    144.6ms sparse=  251.617 fast=   10.483 sols=1 agree=true planted=Some(true)
+    dense     n8-d2-p31-2            δ=  256 f4=    140.1ms sparse=  244.523 fast=    7.249 sols=3 agree=true planted=Some(true)
+    dense     n8-d2-p32-0            δ=  256 f4=    125.7ms sparse=  243.885 fast=    9.875 sols=1 agree=true planted=Some(true)
+    dense     n8-d2-p32-1            δ=  256 f4=    126.0ms sparse=  285.144 fast=    9.121 sols=2 agree=true planted=Some(true)
+    dense     n8-d2-p32-2            δ=  256 f4=    186.1ms sparse=  221.444 fast=    7.793 sols=2 agree=true planted=Some(true)
+  output research/postgb_linear_stage_20261026/runs/R3-C.json: 630ecf4136979328e8944aed7fe905099069210e42b174c42990a103baff776f
+exit 0

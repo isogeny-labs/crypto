@@ -1,0 +1,19 @@
+import GlobalSmooth
+import Mathlib.Algebra.Field.ZMod
+set_option autoImplicit false
+open Polynomial SameUGlobal
+instance : Fact (Nat.Prime 2) := ⟨by decide⟩
+@[simp] theorem five_eq_one : (5:ZMod 2)=1 := by decide
+-- Characteristic-two certificate: f=X5+X+1, f'=X4+1, f-X*f'=1.
+theorem binary_certificate : IsCoprime (WeightedDoubling.curve (1:ZMod 2) 1 0 0)
+ (WeightedDoubling.curve (1:ZMod 2) 1 0 0).derivative := by
+ refine ⟨1,-X,?_⟩
+ simp [WeightedDoubling.curve,derivative_add,derivative_mul,derivative_X_pow]
+ <;> ring
+example (x : ZMod 2) : SameULocal.LocalNonsingular 1 1 0 0 x :=
+ global_implies_local 1 1 0 0 binary_certificate x
+-- Common zero directly rejects a coprimality certificate, independently of quintic shape.
+example : ¬IsCoprime (X^2:ℚ[X]) (X^2:ℚ[X]).derivative := by
+ intro h
+ apply coprime_excludes_common_root (X^2:ℚ[X]) h 0
+ norm_num [derivative_X_pow]

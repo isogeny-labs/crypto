@@ -1,0 +1,79 @@
+{
+  "schema": "lean-formalization-verification/v1",
+  "verification_date": "2026-10-29",
+  "request": "Complete exact ordinary first/last pair (4,5) under the original hypotheses",
+  "request_complete": false,
+  "verified_scope": "Uniform actual six-input degree-four obstruction; ordinary filtered closure and last-fall/refutation bridge; degree-four divided-difference derivation; first-fall dependencies",
+  "remaining": [
+    "Universal degree-five normalization/resultant/grid/point construction",
+    "Rational-unsatisfiability/unit-ideal bridge",
+    "Weighted syzygy/Koszul definition and exact first-fall equality"
+  ],
+  "lean": "4.34.1",
+  "lean_commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "mathlib_revision": "d13f23b723b8a846827a245b89c10fc7d3f11612",
+  "source_manifest": "source.sha256",
+  "build": {
+    "command": "lake build",
+    "exit_code": 0,
+    "jobs": 1641,
+    "log": "build.log"
+  },
+  "axiom_audit": {
+    "command": "lake env lean --run ../../../tools/lean/AuditAxioms.lean -- FilteredClosure ThreePointRigidity AffineCoefficient GridLower GuardedModel FirstFallCore",
+    "exit_code": 0,
+    "audited_declarations": 54,
+    "new_named_theorems": 44,
+    "generated_equations_included": true,
+    "failing": 0,
+    "compiler_trusted": 0,
+    "allowed_foundations": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "auditor_sha256": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929",
+    "log": "audit.log"
+  },
+  "fresh_kernel_replays": [
+    {
+      "module": "FilteredClosure",
+      "command": "lake env leanchecker --fresh --verbose FilteredClosure",
+      "exit_code": 0,
+      "log": "FilteredClosure.fresh.log"
+    },
+    {
+      "module": "ThreePointRigidity",
+      "command": "lake env leanchecker --fresh --verbose ThreePointRigidity",
+      "exit_code": 0,
+      "log": "ThreePointRigidity.fresh.log"
+    },
+    {
+      "module": "AffineCoefficient",
+      "command": "lake env leanchecker --fresh --verbose AffineCoefficient",
+      "exit_code": 0,
+      "log": "AffineCoefficient.fresh.log"
+    },
+    {
+      "module": "GridLower",
+      "command": "lake env leanchecker --fresh --verbose GridLower",
+      "exit_code": 0,
+      "log": "GridLower.fresh.log"
+    },
+    {
+      "module": "GuardedModel",
+      "command": "lake env leanchecker --fresh --verbose GuardedModel",
+      "exit_code": 0,
+      "log": "GuardedModel.fresh.log"
+    },
+    {
+      "module": "FirstFallCore",
+      "command": "lake env leanchecker --fresh --verbose FirstFallCore",
+      "exit_code": 0,
+      "log": "FirstFallCore.fresh.log"
+    }
+  ],
+  "development_library_receipt": "library-tests.json",
+  "scientific_experiment": false,
+  "performance_claim": false
+}

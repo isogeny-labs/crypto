@@ -1,0 +1,46 @@
+======================================================================
+ERROR: test_committed_metadata_passes (test_validate_semantics.SemanticValidatorTests.test_committed_metadata_passes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/crypto-history/docs/curves/ic/test_validate_semantics.py", line 60, in test_committed_metadata_passes
+    self.assertEqual(gate.validate(ROOT), [])
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-history/docs/curves/ic/validate_semantics.py", line 486, in validate
+    registry = read_json(root / "docs/curves/registry.json")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-history/docs/curves/ic/validate_semantics.py", line 55, in read_json
+    return json.loads(path.read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/crypto-history/docs/curves/registry.json'
+
+======================================================================
+ERROR: test_peer_mirror_mismatch_fails (test_validate_semantics.SemanticValidatorTests.test_peer_mirror_mismatch_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/crypto-history/docs/curves/ic/test_validate_semantics.py", line 160, in test_peer_mirror_mismatch_fails
+    self.assertTrue(any("peer repository mirror differs" in error for error in gate.validate(ROOT, peer)))
+                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-history/docs/curves/ic/validate_semantics.py", line 486, in validate
+    registry = read_json(root / "docs/curves/registry.json")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-history/docs/curves/ic/validate_semantics.py", line 55, in read_json
+    return json.loads(path.read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/crypto-history/docs/curves/registry.json'
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.765s
+
+FAILED (errors=2, skipped=2)

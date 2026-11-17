@@ -1,0 +1,54 @@
+/var/tmp/pencil-mixed-generic-20261031-v1/MixedGeneric.lean:14:13: error: Ambiguous term
+  support
+Possible interpretations:
+  MixedCancellation.support : ?m.147 → ?m.147 → ?m.147[X]
+  
+  Polynomial.support : ?m.147[X] → Finset ℕ
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-mixed-generic-20261031-v1/MixedGeneric.lean:13:61: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+x q r : K
+hk : x ^ 2 + q * x + r ≠ 0
+P a : K[X]
+ha : P = (X - C x) * a
+b : K[X]
+hb : P = MixedCancellation.support q r * b
+⊢ MixedCancellation.support q r - X * C q - X ^ 2 + C x * C q + C x ^ 2 = C x * C q + C x ^ 2 + C r
+/var/tmp/pencil-mixed-generic-20261031-v1/MixedGeneric.lean:39:20: error: Ambiguous term
+  support
+Possible interpretations:
+  MixedCancellation.support : ?m.354 → ?m.354 → ?m.354[X]
+  
+  Polynomial.support : ?m.354[X] → Finset ℕ
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-mixed-generic-20261031-v1/MixedGeneric.lean:36:70: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+f : K[X]
+x y q r s t : K
+hk : x ^ 2 + q * x + r ≠ 0
+hp : X - C x ∣ f - C y ^ 2
+hu : MixedCancellation.support q r ∣ f - ordinate s t ^ 2
+m : K := (y - (s * x + t)) / (x ^ 2 + q * x + r)
+hm : m * (x ^ 2 + q * x + r) + (s * x + t) = y
+hy : y = m * (x ^ 2 + q * x + r) + (s * x + t)
+⊢ C s * X - C s * C x + C m * MixedCancellation.support q r - C m * C x * C q - C m * C x ^ 2 - C m * C r =
+    C s * X - C s * C x + X * C m * C q + X ^ 2 * C m - C m * C x * C q - C m * C x ^ 2
+/var/tmp/pencil-mixed-generic-20261031-v1/MixedGeneric.lean:39:43: warning: This simp argument is unused:
+  C_sub
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [interp, support, ordinate, C_add, C_mul, C_pow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

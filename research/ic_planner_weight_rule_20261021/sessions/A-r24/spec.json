@@ -1,0 +1,129 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "ic planner weight rule, Phase A, curve r24: base multipliers 0.5-4 x N0",
+  "description": "research/ic_planner_weight_rule_20261021/PROTOCOL.md. m100 = ic-planner/1 plan; every other IC arm scales the factor base only.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 16777199,
+        "a": 16777196,
+        "b": 31,
+        "group_order": 16782299,
+        "r": 16782299,
+        "gx": 2,
+        "gy": 5412647
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261023
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "m050",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=64",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "m071",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=91",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "m100",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=128",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "m141",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=180",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "m200",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=256",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "m283",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=362",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "m400",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=512",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss",
+          "targets": "walk"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261024,
+    "isolation_required": "L2",
+    "timeout_seconds": 1800
+  }
+}

@@ -1,0 +1,18 @@
+exhaustive pair matching: arm A pool 5 x-coordinates, arm B pool 65
+  a0  set a : decomposable arm A false (0 x-quadruples), arm B true  (5370 x-quadruples)
+  a1  set a : decomposable arm A false (0 x-quadruples), arm B true  (5429 x-quadruples)
+  a2  set a : decomposable arm A false (0 x-quadruples), arm B true  (5337 x-quadruples)
+  a3  set a : decomposable arm A false (0 x-quadruples), arm B true  (5437 x-quadruples)
+  b0  set b : decomposable arm A true  (1 x-quadruples), arm B true  (5496 x-quadruples)
+  b1  set b : decomposable arm A true  (1 x-quadruples), arm B true  (5436 x-quadruples)
+  b2  set b : decomposable arm A true  (1 x-quadruples), arm B true  (5362 x-quadruples)
+  b3  set b : decomposable arm A true  (1 x-quadruples), arm B true  (5423 x-quadruples)
+  c0  set c : decomposable arm A false (0 x-quadruples), arm B true  (5352 x-quadruples)
+  c1  set c : decomposable arm A false (0 x-quadruples), arm B true  (5403 x-quadruples)
+  c2  set c : decomposable arm A false (0 x-quadruples), arm B true  (5315 x-quadruples)
+  c3  set c : decomposable arm A false (0 x-quadruples), arm B true  (5426 x-quadruples)
+exhaustive: arm A decomposes 4 of 12 (b0,b1,b2,b3), arm B decomposes 12 of 12  -> MATCHES legacy
+sealed legacy brute force agrees with native exhaustive check: true
+rep 1 subgroup_xor   arm A: attempts 12 verified  4 unsat  8 budget 0 deadline 0 rejected 0 failed-checks 0 rank 4 (legacy 4) | contradictions with exhaustive 0 -> REPRODUCES
+rep 1 subgroup_xor   arm B: attempts 12 verified 12 unsat  0 budget 0 deadline 0 rejected 0 failed-checks 0 rank 5 (legacy 5) | contradictions with exhaustive 0 -> REPRODUCES
+GATE PASS

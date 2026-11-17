@@ -1,0 +1,65 @@
+{
+  "schema": "isolab.eks.request/v1",
+  "job": {
+    "job_name": "criu-ecbench-20261021-epoch-1",
+    "instance_type": "c8a.2xlarge",
+    "seconds": 600,
+    "memory": "4Gi",
+    "spec": {
+      "schema": "ecbench.spec/v1",
+      "label": "Fresh L2 epoch after native ecbench CRIU/EBS restore",
+      "description": "Isolation and correctness validation after a computation-only restore; independent fresh warmup and A/A. No algorithm speed claim.",
+      "workloads": {
+        "curves": [
+          {
+            "kind": "prime_search",
+            "bits": 32,
+            "seed": 59297
+          }
+        ],
+        "targets_per_curve": 2,
+        "target_seed": 20261002
+      },
+      "arms": [
+        {
+          "name": "rho-neg",
+          "role": "reference",
+          "method": {
+            "id": "rho.negation"
+          }
+        },
+        {
+          "name": "rho-plain",
+          "role": "baseline",
+          "method": {
+            "id": "rho.plain"
+          }
+        },
+        {
+          "name": "rho-neg-aa",
+          "role": "control",
+          "method": {
+            "id": "rho.negation"
+          }
+        }
+      ],
+      "measurement": {
+        "rounds": 5,
+        "warmup": 1,
+        "order": "alternate",
+        "seed": 1,
+        "isolation_required": "L2",
+        "timeout_seconds": 120
+      }
+    },
+    "build": {
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+      "source_revision": "cb2ec6873f30b683f7885b53c410d69965f02c20",
+      "ecbench_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9"
+    }
+  },
+  "provenance": {
+    "harness": "CRIU/EBS native ecbench recovery qualification; separate fresh epoch",
+    "source_revision": "cb2ec6873f30b683f7885b53c410d69965f02c20"
+  }
+}

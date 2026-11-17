@@ -1,0 +1,152 @@
+{
+  "authors": [
+    "Codex research implementation"
+  ],
+  "blocked_on": [
+    "hw:independent non-measuring host class",
+    "problem:problems/known-log-recovery-cost-and-validation.md"
+  ],
+  "cairn": {
+    "env": {
+      "name": "crypto-rust",
+      "recipe": "Checkout the final merged study commit, install CI Rust 1.98 and build ecbench with the committed Cargo.lock. Pin that commit before ready status."
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 4096,
+      "publish": "runs/XP-20261021-known-log-independent-replay",
+      "sandbox": "auto",
+      "timeout_s": 3600
+    },
+    "funding": {
+      "rationale": "Unfunded blocked validation follow-up; no execution or publication authorized by this card.",
+      "units": 0
+    },
+    "mode": "lab-task",
+    "notes": "An independent headline-number validator and verification argv must be supplied before marking ready; local audit_totals.rs is same-author and cannot stand in for that validator.",
+    "space": "independent-validation-unassigned",
+    "tasks": [
+      "XP-20261021-known-log-independent-replay/shard-{k}"
+    ],
+    "ttl_s": 86400
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "code": {
+    "branch": "codex/known-log-arbitrary-target-benchmark",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--bin",
+        "ecbench"
+      ]
+    ],
+    "commit": null,
+    "repo": "crypto"
+  },
+  "created": "2026-10-21",
+  "decision_value": "Exact scalar and count replay plus an independent recomputation would qualify the bounded modeled-cost result for validation review. A mismatch blocks promotion and identifies a correction in a new report; neither outcome establishes complete runtime or an asymptotic advantage.",
+  "id": "XP-20261021-known-log-independent-replay",
+  "links": {
+    "lead": "research/ecbench_known_log_targets_20261021/README.md",
+    "notes": [
+      "research/ecbench_known_log_targets_20261021/PROTOCOL.md",
+      "problems/known-log-recovery-cost-and-validation.md"
+    ],
+    "prs": []
+  },
+  "outputs": {
+    "result_schema": "ecbench.audit/v1",
+    "verify": [],
+    "land": "research/ecbench_known_log_targets_independent_validation"
+  },
+  "owner_hint": null,
+  "protocol": {
+    "blob": null,
+    "path": null
+  },
+  "question": "Do independent replay and raw-data recomputation reproduce the frozen arbitrary-target known-log modeled-cost comparison?",
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 4,
+    "disk_gb": 4,
+    "gpu": null,
+    "est_core_hours": 1,
+    "est_wall_hours": 1,
+    "notes": "Rounded planning estimate for a native release build and all eight small-curve replays; see README. Use a different host class; keep each execution original timeout."
+  },
+  "run": {
+    "argv": [
+      "target/release/ecbench",
+      "verify",
+      "--dir",
+      "{session}",
+      "--replay-all",
+      "--exit-code",
+      "--out",
+      "{out}/audit.json"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1"
+    },
+    "timeout_per_shard_s": 3600
+  },
+  "schema": "backlog.card/v1",
+  "shards": {
+    "count": 8,
+    "scheme": "list",
+    "params": {
+      "items": [
+        {
+          "vars": {
+            "session": "research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-cofactor"
+          }
+        },
+        {
+          "vars": {
+            "session": "research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-generator-1"
+          }
+        },
+        {
+          "vars": {
+            "session": "research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-generator-2"
+          }
+        },
+        {
+          "vars": {
+            "session": "research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-generator-7"
+          }
+        },
+        {
+          "vars": {
+            "session": "research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-holdout"
+          }
+        },
+        {
+          "vars": {
+            "session": "research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-primary"
+          }
+        },
+        {
+          "vars": {
+            "session": "research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-smoke"
+          }
+        },
+        {
+          "vars": {
+            "session": "research/ecbench_known_log_targets_20261021/sessions/20261021T0643Z-cofactor-v2"
+          }
+        }
+      ]
+    },
+    "stop": "all"
+  },
+  "status": "blocked",
+  "status_note": "The local study is complete; this follow-up requires an independent host and validator. No cairn task has been posted or funded.",
+  "title": "Independently replay and validate frozen known-log arbitrary-target results"
+}

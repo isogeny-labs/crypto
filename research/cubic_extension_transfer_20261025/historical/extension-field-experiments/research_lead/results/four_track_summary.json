@@ -1,0 +1,351 @@
+{
+  "status": "passed",
+  "coverage": {
+    "prepared_component_orbits": 26,
+    "closed": true,
+    "broad_cases": 2384,
+    "broad_draws": 258309,
+    "broad_screened_zero_centers": 1,
+    "targeted_nine_cases": 163,
+    "targeted_screened_zero_centers": 0,
+    "one_extra_step_counterexample_found": false,
+    "certified_forced_total_steps": 2,
+    "certified_forced_source_count": 2,
+    "forced_p": 157,
+    "forced_r": 3868159
+  },
+  "structure": {
+    "endomorphism_discriminant": -21195,
+    "different_coverage_same_endomorphism_order": true,
+    "cm_frobenius_orbits": 12,
+    "cm_zero_coverage_orbits": 1,
+    "exceptional_cm_j_polynomials": [
+      "x^3 + 55*x^2 + 74*x + 107"
+    ],
+    "coprime_three_repair_degrees": [
+      5
+    ],
+    "coprime_repairs_leave_prepared_3_component": [
+      true
+    ]
+  },
+  "transfer_edge_checks": [
+    {
+      "case": "coincident_x_distinct_y",
+      "degree": 3,
+      "passed": true
+    },
+    {
+      "case": "repeated_rational_point",
+      "degree": 3,
+      "passed": true
+    },
+    {
+      "case": "quadratic_closed_point_with_rational_x",
+      "degree": 3,
+      "passed": true
+    },
+    {
+      "case": "zero",
+      "passed": true
+    },
+    {
+      "case": "equal",
+      "passed": true
+    },
+    {
+      "case": "opposite",
+      "passed": true
+    },
+    {
+      "case": "zero_generator_rejected",
+      "passed": true
+    }
+  ],
+  "benchmarks": [
+    {
+      "file": "four_track_benchmarks.json",
+      "p": 7,
+      "r": 373,
+      "scalar": 49,
+      "isogeny_steps": 1,
+      "algorithm": "line-assisted rational-point index calculus",
+      "target_seconds": 4.0507760620021145,
+      "pipeline_seconds": 44.06006092399912,
+      "rho_median_seconds": 0.0069350680023489986,
+      "target_matrix_rank": 9,
+      "chart_retries": 1,
+      "basic_target_seconds": 13.973544549000508,
+      "speedup_over_source_rho": 0.00015740032711964613
+    },
+    {
+      "file": "four_track_benchmarks.json",
+      "p": 13,
+      "r": 2137,
+      "scalar": 369,
+      "isogeny_steps": 0,
+      "algorithm": "line-assisted rational-point index calculus",
+      "target_seconds": 12.450173467997956,
+      "pipeline_seconds": 46.49163604699788,
+      "rho_median_seconds": 0.009278677000111202,
+      "target_matrix_rank": 15,
+      "chart_retries": 0,
+      "basic_target_seconds": 38.13252270799785,
+      "speedup_over_source_rho": 0.00019957733882996695
+    },
+    {
+      "file": "four_track_benchmarks.json",
+      "p": 19,
+      "r": 6871,
+      "scalar": 1313,
+      "isogeny_steps": 1,
+      "algorithm": "line-assisted rational-point index calculus",
+      "target_seconds": 9.107428455001354,
+      "pipeline_seconds": 41.408708153998305,
+      "rho_median_seconds": 0.011817205999250291,
+      "target_matrix_rank": 21,
+      "chart_retries": 3,
+      "basic_target_seconds": 389.25379169000007,
+      "speedup_over_source_rho": 0.0002853797311256921
+    },
+    {
+      "file": "four_track_benchmarks.json",
+      "p": 31,
+      "r": 29641,
+      "scalar": 11954,
+      "isogeny_steps": 0,
+      "algorithm": "line-assisted rational-point index calculus",
+      "target_seconds": 30.880743136000092,
+      "pipeline_seconds": 96.22591356200064,
+      "rho_median_seconds": 0.022679988000163576,
+      "target_matrix_rank": 33,
+      "chart_retries": 0,
+      "basic_target_seconds": 507.96054027300124,
+      "speedup_over_source_rho": 0.00023569522138701567
+    },
+    {
+      "file": "four_track_large-prime_benchmarks.json",
+      "p": 7,
+      "r": 373,
+      "scalar": 49,
+      "isogeny_steps": 1,
+      "algorithm": "split-line double-large-prime tree index calculus with translate-walk anchors",
+      "target_seconds": 3.665740904998529,
+      "pipeline_seconds": 65.47599838300084,
+      "rho_median_seconds": 0.010457850999955554,
+      "target_matrix_rank": 9,
+      "chart_retries": 1,
+      "basic_target_seconds": 30.19363814999815,
+      "speedup_over_source_rho": 0.0001597203747666819
+    },
+    {
+      "file": "four_track_large-prime_benchmarks.json",
+      "p": 13,
+      "r": 2137,
+      "scalar": 369,
+      "isogeny_steps": 0,
+      "algorithm": "split-line double-large-prime tree index calculus with translate-walk anchors",
+      "target_seconds": 4.40856433999943,
+      "pipeline_seconds": 63.09632302599857,
+      "rho_median_seconds": 0.014494925999315456,
+      "target_matrix_rank": 12,
+      "chart_retries": 0,
+      "basic_target_seconds": 91.23877291900135,
+      "speedup_over_source_rho": 0.00022972695244607015
+    },
+    {
+      "file": "four_track_large-prime_benchmarks.json",
+      "p": 19,
+      "r": 6871,
+      "scalar": 1313,
+      "isogeny_steps": 1,
+      "algorithm": "split-line double-large-prime tree index calculus with translate-walk anchors",
+      "target_seconds": 7.043895831000555,
+      "pipeline_seconds": 77.40304646599907,
+      "rho_median_seconds": 0.016519720000360394,
+      "target_matrix_rank": 15,
+      "chart_retries": 3,
+      "basic_target_seconds": 294.96243704000153,
+      "speedup_over_source_rho": 0.0002134246745393546
+    },
+    {
+      "file": "four_track_large-prime_benchmarks.json",
+      "p": 31,
+      "r": 29641,
+      "scalar": 11954,
+      "isogeny_steps": 0,
+      "algorithm": "split-line double-large-prime tree index calculus with translate-walk anchors",
+      "target_seconds": 5.414652347997617,
+      "pipeline_seconds": 59.044050912001694,
+      "rho_median_seconds": 0.024913754998124205,
+      "target_matrix_rank": 18,
+      "chart_retries": 0,
+      "basic_target_seconds": 363.2915252829989,
+      "speedup_over_source_rho": 0.0004219519936945936
+    },
+    {
+      "file": "repaired_pipeline.json",
+      "p": 109,
+      "r": 1293169,
+      "scalar": 1729,
+      "isogeny_steps": 1,
+      "algorithm": "line-assisted rational-point index calculus",
+      "target_seconds": 37.40004070899886,
+      "pipeline_seconds": 73.87505969400081,
+      "rho_median_seconds": 0.27442368300035014,
+      "target_matrix_rank": 111,
+      "chart_retries": 0,
+      "basic_target_seconds": null,
+      "speedup_over_source_rho": 0.0037146999831478354
+    },
+    {
+      "file": "forced_source_pipeline.json",
+      "p": 157,
+      "r": 3868159,
+      "scalar": 271828,
+      "isogeny_steps": 2,
+      "algorithm": "split-line double-large-prime tree index calculus with translate-walk anchors",
+      "target_seconds": 10.871628294000402,
+      "pipeline_seconds": 91.42677520000143,
+      "rho_median_seconds": 1.0351612929989642,
+      "target_matrix_rank": 39,
+      "chart_retries": 0,
+      "basic_target_seconds": null,
+      "speedup_over_source_rho": 0.011322299082894352
+    }
+  ],
+  "validation": {
+    "status": "passed",
+    "checks": [
+      {
+        "file": "four_track_benchmarks.json",
+        "p": 7,
+        "source_answer_verified": true
+      },
+      {
+        "file": "four_track_benchmarks.json",
+        "p": 13,
+        "source_answer_verified": true
+      },
+      {
+        "file": "four_track_benchmarks.json",
+        "p": 19,
+        "source_answer_verified": true
+      },
+      {
+        "file": "four_track_benchmarks.json",
+        "p": 31,
+        "source_answer_verified": true
+      },
+      {
+        "file": "four_track_large-prime_benchmarks.json",
+        "p": 7,
+        "source_answer_verified": true,
+        "graph": {
+          "p": 7,
+          "r": 373,
+          "raw_line_certificates": 6,
+          "parent_substitutions": 0,
+          "matrix_rank": 9,
+          "scalar": 49,
+          "passed": true
+        }
+      },
+      {
+        "file": "four_track_large-prime_benchmarks.json",
+        "p": 13,
+        "source_answer_verified": true,
+        "graph": {
+          "p": 13,
+          "r": 2137,
+          "raw_line_certificates": 13,
+          "parent_substitutions": 3,
+          "matrix_rank": 12,
+          "scalar": 369,
+          "passed": true
+        }
+      },
+      {
+        "file": "four_track_large-prime_benchmarks.json",
+        "p": 19,
+        "source_answer_verified": true,
+        "graph": {
+          "p": 19,
+          "r": 6871,
+          "raw_line_certificates": 22,
+          "parent_substitutions": 6,
+          "matrix_rank": 15,
+          "scalar": 1313,
+          "passed": true
+        }
+      },
+      {
+        "file": "four_track_large-prime_benchmarks.json",
+        "p": 31,
+        "source_answer_verified": true,
+        "graph": {
+          "p": 31,
+          "r": 29641,
+          "raw_line_certificates": 33,
+          "parent_substitutions": 15,
+          "matrix_rank": 18,
+          "scalar": 11954,
+          "passed": true
+        }
+      },
+      {
+        "file": "repaired_pipeline.json",
+        "p": 109,
+        "source_answer_verified": true
+      },
+      {
+        "file": "forced_source_pipeline.json",
+        "p": 157,
+        "source_answer_verified": true,
+        "graph": {
+          "p": 157,
+          "r": 3868159,
+          "raw_line_certificates": 259,
+          "parent_substitutions": 119,
+          "matrix_rank": 39,
+          "scalar": 271828,
+          "passed": true
+        }
+      },
+      {
+        "file": "forced_two_step_audit.json",
+        "p": 157,
+        "non_subfield_forced_sources": 2,
+        "target_order_values_checked": 12
+      }
+    ],
+    "seconds": 5.2595262929971796,
+    "scope": "Saved source logs, exact line intersections, tree substitutions and modular linear systems; runtime target-Jacobian equality was checked by each solver."
+  },
+  "source_sha256": {
+    "large_prime_index_calculus.py": "ab5ac8134bc7da3fc3283c9b60c71dd2d8595b018b37e9e305124cd5754bc98d",
+    "validate_four_track.py": "38ffaaa2aed7f437b69de2d31d43b43e9341696e8d73541dfd755435b9505841",
+    "line_index_calculus.py": "7d85fdd27d92e145309156f170b41669271b1eb2258578cfdb93a7a6180c0e38",
+    "endomorphism_audit.py": "bf1521cea0adad8599a7f09371f6798ed8d68de9809a5d9da995ac58901db362",
+    "inverse_map.py": "cc1c622b558a04a04e9ec5a67ebc9d2e30a1077e34ce8f3291c1ced5cdb025a1",
+    "pollard_rho.py": "556297c0805ec57daa79a2513ba88d3158187b9ab0a2eab7695b17f8632d7794",
+    "polynomial_inverse.py": "1a9c672499e50092c362a379bff019f2e811635ba86e321e2460613ce0f6e743",
+    "structure_audit.py": "32613329b5650eec7771c60f1dec1e2419a503efd64153dd4123ea925c4f3c88",
+    "forced_two_step_audit.py": "57990e590d531341080a44e7b8b3bcb0e2a99da57eb26c348941c22eaff64569",
+    "forced_source_pipeline.py": "0b68276b41ba8d05a9d279fc54ae11139654fe38cba4c0c0ad67fd8b7038c16d",
+    "transfer_edge_cases.py": "ac9cc72da3b6fd2e2a019ed7ed2ea5e73d67bac4273e12bf0afb5fbe54e59565",
+    "four_track_report.py": "9dc2e15a9a70f9c872576067bf43d6f35625ea6cb36953a680efe6d0bad6995d",
+    "cm_coverage.py": "7a41f01a7a3ceb4d45d419907bad753c2e5bc7914d549d27297b5a99a48575c5",
+    "transfer_pipeline.py": "8fbeb5e50f48461f9635015db0b1cf80089876406cdf60e65b149683c984dfca",
+    "obstruction_neighborhoods.py": "e461f3bc82363bcb22d4de94e6038d6d4b43f180afe637314be80bbdf2e716cb",
+    "repaired_pipeline.py": "0e8b9213bb241390d1efd780c83acc20e962a4af6c2c7dfbc4bb144fe6ed9d1a",
+    "explicit_counterexample_witnesses.py": "51dbd53d5eca92ded4b528f491e05406a247198686a6ba348609d2d2ba0d3676"
+  },
+  "limits": [
+    "No proof or disproof of the universal one-extra-step claim after torsion preparation.",
+    "Generic tangent charts and bounded retries; universal exceptional-input coverage remains open.",
+    "Dense experimental solvers; no new complexity exponent or practical speedup.",
+    "Wall times include concurrent load; no controlled scaling or density estimate.",
+    "No novelty priority claim or cryptographic-size DLP computation."
+  ]
+}

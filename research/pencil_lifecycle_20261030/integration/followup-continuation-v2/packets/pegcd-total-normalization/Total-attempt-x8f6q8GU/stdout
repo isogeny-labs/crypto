@@ -1,0 +1,24 @@
+/var/tmp/pencil-pegcd-total-20261101-v1/Total.lean:5:63: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod p.toNat)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-pegcd-total-20261101-v1/Total.lean:5:86: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod p.toNat)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-pegcd-total-20261101-v1/Total.lean:9:29: error: Application type mismatch: The argument
+  wordsPoly p r
+has type
+  @Polynomial (ZMod p.toNat) (@CommSemiring.toSemiring (ZMod p.toNat) CommRing.toCommSemiring)
+but is expected to have type
+  @Polynomial ?m.24 (@CommSemiring.toSemiring ?m.24 Field.toSemifield.toCommSemiring)
+in the application
+  step z ?m.26 (wordsPoly p r)
+/var/tmp/pencil-pegcd-total-20261101-v1/Total.lean:17:8: error(lean.unknownIdentifier): Unknown identifier `WordTrace`
+
+Note: It is not possible to treat `WordTrace` as an implicitly bound variable here because the `autoImplicit` option is set to `false`.
+/var/tmp/pencil-pegcd-total-20261101-v1/Total.lean:23:14: error(lean.unknownIdentifier): Unknown identifier `WordTrace.stop`
+/var/tmp/pencil-pegcd-total-20261101-v1/Total.lean:42:17: error(lean.unknownIdentifier): Unknown identifier `WordTrace.next`
+/var/tmp/pencil-pegcd-total-20261101-v1/Total.lean:48:8: error(lean.unknownIdentifier): Unknown identifier `WordTrace`
+
+Note: It is not possible to treat `WordTrace` as an implicitly bound variable here because the `autoImplicit` option is set to `false`.

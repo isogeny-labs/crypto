@@ -1,0 +1,479 @@
+{
+  "schema": "msolve-degree-source-plan/v1",
+  "created": "2026-11-16T16:13:19.890126+00:00",
+  "formal": {
+    "project": "research/msolve_degree_word_audit_20261116/lean",
+    "theorem": "MsolveDegreeWordAudit.actual_degree_word_certificate",
+    "statement": "theorem actual_degree_word_certificate : ActualWordBounds ∧ ActualPolynomialBoundary ∧ ActualRecordedPrefix ∧ LegacyFullF4Statement",
+    "decl_sha256": "285221ce90632adbf8398f66d7c011b1c8b9ad6cdc5be42b95e1616cd6011e64",
+    "scope": "Actual UInt16 degree-sum exactness iff no wrap; all-field x^(n+2)+1,x^(n+1)y family excludes y from every original degree(n+2) F4Run but admits a degree(n+3) run. Actual decoded written boundary set and captured word logs satisfy the checked mathematical obstruction. Native control passes; boundary times out124, so normal execution validation fails and only recorded prefix facts are claimed. Full inherited7clause F4 statement rebound; historical prefix separately detected. No C/parser/compiler/independent-host refinement, signed standing or full14 closure.",
+    "sources": [
+      {
+        "path": "research/theorem_census_20261109/lean/SubspaceCriterion.lean",
+        "bytes": 4756,
+        "sha256": "c43c2305db01cf4aa496bae58aea42a084a61f167a7cf4242de4277d0d2d2675"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/F4Containment.lean",
+        "bytes": 8482,
+        "sha256": "34353d9f95cc4a9e503a9c8dcaedcfb85ab9a3c510115821bb1325face972616"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/F4SaturationBoundary.lean",
+        "bytes": 5144,
+        "sha256": "e624147b691f93b0091cc4821662808945d759da06835dcedd79f2f0ff5f960b"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/F4ExpectedOutputs.lean",
+        "bytes": 2735,
+        "sha256": "0d9675fefed4287378df7394493af1416351d9169a06b62a525545c20f469ca3"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/SolvingDegreeBound.lean",
+        "bytes": 18489,
+        "sha256": "14956b5ef063b890d4397545e3cf2b8976a21b24db7687a8d7ad171dcc5ac48a"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lakefile.toml",
+        "bytes": 1038,
+        "sha256": "7a607847ad1f457ed8fc93699c13d81c398d6b585896f990f3bc6b656d5815ec"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/msolve_degree_word_audit_20261116/lean/DegreeCertificate.lean",
+        "bytes": 4289,
+        "sha256": "d31a26a3a167f8b3e77a55d082e697cef102eb055452da4a39ee9936e8c431ea"
+      },
+      {
+        "path": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+        "bytes": 5618,
+        "sha256": "8784364d6fffba1882427a4e9638a70227ff16148e4ced764b49760b1c2ce8f2"
+      },
+      {
+        "path": "research/msolve_degree_word_audit_20261116/lean/DegreeImports.lean",
+        "bytes": 94,
+        "sha256": "05a018f50c2479f0ce9396b0c170ebead3b95601a49b40b8f3964106a3b88c31"
+      },
+      {
+        "path": "research/msolve_degree_word_audit_20261116/lean/DegreeWords.lean",
+        "bytes": 1954,
+        "sha256": "00c6769e127be2d2a5768e3d96230495808ca444e098138c15981c4fd968b9ee"
+      },
+      {
+        "path": "research/msolve_degree_word_audit_20261116/lean/F4Boundary.lean",
+        "bytes": 3910,
+        "sha256": "b22cd535155c192e21c8dc1b1474ff1716ceffef2cbed0eaa5663dd5acb14f1e"
+      },
+      {
+        "path": "research/msolve_degree_word_audit_20261116/lean/NativeWitness.lean",
+        "bytes": 4533,
+        "sha256": "99d8871b89b77fba551666f865808aca6528da2afd1eece521225ba528905b37"
+      },
+      {
+        "path": "research/msolve_degree_word_audit_20261116/lean/lake-manifest.json",
+        "bytes": 4087,
+        "sha256": "e5a8c1c9d90d12706ac641841a8c3f197caf4d9ae9d3bf066ca977663dc30787"
+      },
+      {
+        "path": "research/msolve_degree_word_audit_20261116/lean/lakefile.toml",
+        "bytes": 335,
+        "sha256": "cd4cfe308f2ff29f026b18ab4542eb5885d72376f54aa8491a08b196a9503531"
+      },
+      {
+        "path": "research/msolve_degree_word_audit_20261116/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/attempts.tar.xz.part01",
+      "bytes": 64000,
+      "sha256": "7c3a77ff5231232ac9bee8cdefe0cc3590f4dd4f487fb32934bc941c62832147"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/attempts.tar.xz.part02",
+      "bytes": 64000,
+      "sha256": "d3096986bbd3e06f3956e34c8aac5618f48b906ce2030c7d23af2a2d6ae96c7e"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/attempts.tar.xz.part03",
+      "bytes": 64000,
+      "sha256": "9ea675298c805a7f63326dc9bfde746497cbdae2680c5eeb603aa361adfbc697"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/attempts.tar.xz.part04",
+      "bytes": 4748,
+      "sha256": "f08d8f07239d3205db93c78e70bacae9abc2b8a4428f66d50fdb0428e7fc7213"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/attempts.tar.xz.sha256",
+      "bytes": 90,
+      "sha256": "17109efe3ff30c372a5d36867e600c1cdb0d96b44bf3a382d2164a32468e12e6"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/attempts.json",
+      "bytes": 1290,
+      "sha256": "9a87d15d455384b20126ac3da34f2466d7257c510786eedb4f6af43a05efc14c"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/gate.tar.gz",
+      "bytes": 1827,
+      "sha256": "388ef4fd3e2c8d7880b655c171d6f27c661a54460560282fc2edeaca0821efaf"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/gate.json",
+      "bytes": 1874,
+      "sha256": "b0a75f36312f1d178329c3cd34f0ca60cabe031ea378b99e62c478b7557ed378"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/source-review.json",
+      "bytes": 4604,
+      "sha256": "5076738c7dc15247c823f14c8cc87d4d484512bc0620a18dcd520e027a2e276e"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/binding-check.json",
+      "bytes": 5216,
+      "sha256": "fb72fc226275b58d134eee5fc0d54f6f8450d478c7deaa99d8708fc6e90cf78a"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/export-provenance-correction.json",
+      "bytes": 23643,
+      "sha256": "86dc7538218234d9a43ee0ae24189865515b1f691717cf6e5e80a580c34e190f"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/restore-check.json",
+      "bytes": 125,
+      "sha256": "373dcbb8c3a266bee68504d5c6e1d6875af67ffcffff002ea54db8600a842e0c"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/proof-map.json",
+      "bytes": 22355,
+      "sha256": "89bb3ce6d9b2847c8c2a2421743afdab59c18190d84d7837e054baf83e32b15c"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/render_report.py",
+      "bytes": 6854,
+      "sha256": "f1fbd8f61411c3426e447f052d12cd2d177521e0f5ff60d3564378cfaf57ef78"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/restore_attempts.py",
+      "bytes": 1454,
+      "sha256": "ad4323d1a631009f5ab16d39ca7067ec39a5cbd7fc355f0723e58da5ac7adbfc"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/export_binding_input.py",
+      "bytes": 1929,
+      "sha256": "01cda3e8ce919bcf716e9d0a7018910698922b5f09b1b625e97361a99d713d94"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/PROTOCOL.md",
+      "bytes": 9759,
+      "sha256": "29a16b2645ae1d885e1ab198675b76991e4473fdcc7856a01e278e6f18e01a02"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/protocol.json",
+      "bytes": 18064,
+      "sha256": "089e3bf2612c9200c984b7818d545892fe5a22f8d3fda7a80d90fb8d23874e77"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/export.json",
+      "bytes": 11252,
+      "sha256": "b8824f7729dc19a47e171349dfd332577871f700bfcb119b02d90a690e6abb57"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/rows.jsonl",
+      "bytes": 410,
+      "sha256": "a18ca4355a405b53bf447efe47c84f23972cccb3e0af1a7469e4bedc2685e872"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/preflight.json",
+      "bytes": 4820,
+      "sha256": "3c9d9bfbbd78be2bdfbc9f622319680a65f9b38b03e6e9d381866aacbbfca8de"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/native/analyze.rs",
+      "bytes": 7402,
+      "sha256": "61549e81f039698dfca0ce38498ccd49fdcf0a7c9c07bcd5aa750c2630b4d582"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/native/build.sh",
+      "bytes": 1324,
+      "sha256": "92a956ab50f86a9eecafb308c2de2bd37b5c0ced968d68792a68137c7be83361"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/native/degree-audit.patch",
+      "bytes": 3229,
+      "sha256": "0004e252ba059e1f7c54404049118f96fe91c479a37961966855d1f65d707686"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/native/prepare_source.py",
+      "bytes": 4792,
+      "sha256": "0aa9b20bdf3b8397af181384bebea1628f5f21a160a1d9f8f9b96f94b42883e9"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/native/run_one.sh",
+      "bytes": 1415,
+      "sha256": "f279f94ab98480f0e56a8a373754b199330ed062d31dfd765197908a9a472f58"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/inputs/boundary.ms",
+      "bytes": 29,
+      "sha256": "8d775c7c17bce47b94c9a00d2b3174f77e666220dfa3464b27fe4672f311d931"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/inputs/control.ms",
+      "bytes": 19,
+      "sha256": "f110d0d7eaa4e65caab0760b64563e0147d71906f3a601448cd761895bb8f07f"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/boundary-analysis.json",
+      "bytes": 186,
+      "sha256": "bafae50998ec0653d2a28159a912a79efdcd5998d8ef7794c167dabd7dd2ecdc"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/boundary-constants.lean.txt",
+      "bytes": 644,
+      "sha256": "dc2019734d67576d812c225faf73eb733af75bacd620f947cf54991026db8bbb"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/boundary.after-pins.json",
+      "bytes": 198,
+      "sha256": "dcbcf45a645ad62632d279da2f997aba8fb6ec8fa3939f265697bcfb02cb5a91"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/boundary.analyzer.exit",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/boundary.analyzer.stderr",
+      "bytes": 49,
+      "sha256": "f9bf37bda3c71428cd6becfcdc7f8de1f7da8138d8410647add611c50517091f"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/boundary.analyzer.stdout",
+      "bytes": 186,
+      "sha256": "bafae50998ec0653d2a28159a912a79efdcd5998d8ef7794c167dabd7dd2ecdc"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/boundary.argv.txt",
+      "bytes": 137,
+      "sha256": "99e4c4795c64a23952bb6c4ac40e6ddadb9cde2f88dbe18b405844cb2ec32d1d"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/boundary.before-pins.json",
+      "bytes": 198,
+      "sha256": "dcbcf45a645ad62632d279da2f997aba8fb6ec8fa3939f265697bcfb02cb5a91"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/boundary.end.utc",
+      "bytes": 21,
+      "sha256": "38ad80d5f1f6e22f76ce40fee990d78e9342982bcd7a436b7e3bf86fb1024ec3"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/boundary.exit",
+      "bytes": 4,
+      "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/boundary.out",
+      "bytes": 243,
+      "sha256": "7849c96c1a5b6adc84878443525aa290fd9073974cf6206d30a052853dd5f430"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/boundary.start.utc",
+      "bytes": 21,
+      "sha256": "43e30e37764b9cb40fcaef09001a510f0814b210c6b5cd8987521653a09ba853"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/boundary.stderr",
+      "bytes": 273,
+      "sha256": "0b711c43dec9427a2dc464a6937f43e0771aa8e6b76eda9d4c076c50b1ba25c1"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/boundary.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/control-analysis.json",
+      "bytes": 161,
+      "sha256": "2ba6518e0d22cc5bc2ca98da5ddc6e13048e28915a607f53b8a9a61d53e6cb9b"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/control-constants.lean.txt",
+      "bytes": 542,
+      "sha256": "42ac1f7aa9053a23b3b3a8a675bce8d795ad79b9efca7f2a03ed85a1e515515d"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/control.after-pins.json",
+      "bytes": 198,
+      "sha256": "dcbcf45a645ad62632d279da2f997aba8fb6ec8fa3939f265697bcfb02cb5a91"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/control.analyzer.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/control.analyzer.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/control.analyzer.stdout",
+      "bytes": 161,
+      "sha256": "2ba6518e0d22cc5bc2ca98da5ddc6e13048e28915a607f53b8a9a61d53e6cb9b"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/control.argv.txt",
+      "bytes": 135,
+      "sha256": "67b503b06e145b1a3f7b81c4fc55b92cf23b9d4ebc8ed0e0854ba2a43fafa135"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/control.before-pins.json",
+      "bytes": 198,
+      "sha256": "dcbcf45a645ad62632d279da2f997aba8fb6ec8fa3939f265697bcfb02cb5a91"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/control.end.utc",
+      "bytes": 21,
+      "sha256": "45609e4d610c3b2ecc2fb5057b3f946837d56415d728bd5641fbf686a838d9ba"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/control.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/control.out",
+      "bytes": 239,
+      "sha256": "2c31e448ac030c537ae6da25f7ef6235bb329b6b6bc8496bdee61943b468deaf"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/control.start.utc",
+      "bytes": 21,
+      "sha256": "45609e4d610c3b2ecc2fb5057b3f946837d56415d728bd5641fbf686a838d9ba"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/control.stderr",
+      "bytes": 193,
+      "sha256": "fd7b42916f18d05f046a4248ec3ca87c700c7fafc918eac4a1ef288e03a98233"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/native/control.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/reports/layout.json",
+      "bytes": 299,
+      "sha256": "07aadaa1427a914df5d1d9ba845026ff906401433c7c11e4bd5a4eb834b20c6a"
+    },
+    {
+      "path": "research/msolve_degree_word_audit_20261116/reports/report.pdf",
+      "bytes": 47024,
+      "sha256": "33d33aec31b8d79ff48f1c6f8db620f56c8093d3aede5722f3a57c5b34d3c31a"
+    },
+    {
+      "path": "research/theorem_census_20261109/f4-model-sources.json",
+      "bytes": 3434,
+      "sha256": "2b540f24ba727f94f662bf74222250572771762487d73429c015d0e6d9c8e5e4"
+    }
+  ],
+  "assurance": {
+    "schema": "msolve-degree-preflight/v1",
+    "build_snapshots": 7,
+    "failed_states": [
+      "01",
+      "02",
+      "03",
+      "05"
+    ],
+    "successful_states": [
+      "04",
+      "06",
+      "07"
+    ],
+    "published_preservation_entries": 6260,
+    "all_checked_entries": 6306,
+    "frozen_plans": 51,
+    "native_preservation_pins": 46,
+    "manifest_packages": 11,
+    "copied_Lean_modules": 0,
+    "hydrated_Lean_modules": 0,
+    "lake_update": false,
+    "registered_roots_from01": [
+      "DegreeCertificate",
+      "DegreeFamily",
+      "DegreeImports",
+      "DegreeWords",
+      "F4Boundary",
+      "NativeWitness"
+    ],
+    "native_protocol_hash": "e36c897190211f1824a1c3baebfb766660a0d82be55d5f6cb6f007daaaf95796",
+    "native_calls": 2,
+    "native_control_exit": 0,
+    "native_boundary_exit": 124,
+    "native_boundary_validated": false,
+    "native_scope": "Captured written set/log prefix, not normal completion/full execution trace",
+    "export_flow": {
+      "planned": 2,
+      "attempted": 2,
+      "completed": 1,
+      "not_completed": 1,
+      "interrupted": 0,
+      "resumed": 0,
+      "excluded": []
+    },
+    "signed_standing": "unverified",
+    "full14complete": false,
+    "paid_compute": 0,
+    "gate_declarations": 68,
+    "new_modules": 6,
+    "new_concrete_modules": 5,
+    "official_import_bridge_modules": 1,
+    "pinned_custom_modules": 11,
+    "actually_imported_custom_modules": 11,
+    "credited_custom_modules": 5,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_source_warnings": 0
+  },
+  "preservation_scope": "49 issued sets6260entries plus36StaticHash and10canonical model/config entries =6306;51 initial plans. Native source/input/analyzer/binary/data pins46. No edits to frozen predecessors."
+}

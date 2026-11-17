@@ -1,0 +1,66 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h1e5ca2ba1c38a562",
+  "statement": {
+    "name": "quadratic-twist Frobenius projection numerator",
+    "source": "research/twist_index_calculus_20261020/MIXED_REPORT.md",
+    "variables": [
+      "F",
+      "pi_F"
+    ],
+    "degree_bound": 1,
+    "lhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "const",
+          "args": 2
+        },
+        {
+          "op": "var",
+          "args": "F"
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "var",
+              "args": "F"
+            },
+            {
+              "op": "var",
+              "args": "pi_F"
+            }
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "var",
+              "args": "F"
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "var",
+                "args": "pi_F"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 8392292375222774115,
+  "value_digest": "bdc481ef5094ef3e329884c2c141842f48997771745577579866e710e54d39f7",
+  "independence": "issued by identity_certificate_twist_projection.rs; checked by the native certificate checker at 32 additional domain-separated points",
+  "proof": null
+}

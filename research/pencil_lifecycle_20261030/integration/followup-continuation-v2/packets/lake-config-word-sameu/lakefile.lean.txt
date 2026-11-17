@@ -1,0 +1,118 @@
+import Lake
+open Lake DSL
+
+package same_support
+
+require mathlib from git
+  "https://github.com/leanprover-community/mathlib4.git" @ "d13f23b723b8a846827a245b89c10fc7d3f11612"
+
+@[default_target]
+lean_lib ProjectiveLawBoundary
+
+@[default_target]
+lean_lib RuntimeSemantics
+
+@[default_target]
+lean_lib SameSupport
+
+@[default_target]
+lean_lib SameSupportClassifier
+
+@[default_target]
+lean_lib WeightedSameSupport
+
+@[default_target]
+lean_lib CanonicalResidue
+
+@[default_target]
+lean_lib UInt64Residue
+
+@[default_target]
+lean_lib InvariantBranches
+
+@[default_target]
+lean_lib NatClassifier
+
+@[default_target]
+lean_lib WordClassifier
+
+@[default_target]
+lean_lib CrossScaling
+
+@[default_target]
+lean_lib WordErrorExclusion
+
+@[default_target]
+lean_lib Constructor
+
+@[default_target]
+lean_lib Add11
+
+@[default_target]
+lean_lib WeightedAdd11
+
+@[default_target]
+lean_lib WordAdd11
+
+@[default_target]
+lean_lib Doubling
+
+@[default_target]
+lean_lib WordAdd11Validity
+
+@[default_target]
+lean_lib WordDoubling
+
+@[default_target]
+lean_lib MixedCancellation
+
+@[default_target]
+lean_lib WordMixed
+
+@[default_target]
+lean_lib MixedGeneric
+
+@[default_target]
+lean_lib WordGeneric
+
+@[default_target]
+lean_lib PositiveDistinct
+
+@[default_target]
+lean_lib WordPositive
+
+@[default_target]
+lean_lib Tripling
+
+@[default_target]
+lean_lib WordTriple
+
+@[default_target]
+lean_lib Guard22
+
+@[default_target]
+lean_lib MixedDispatch
+
+@[default_target]
+lean_lib SameUMixed
+
+@[default_target]
+lean_lib WeightedExtract
+
+@[default_target]
+lean_lib WordDispatch
+
+@[default_target]
+lean_lib LocalSmooth
+
+@[default_target]
+lean_lib GlobalSmooth
+
+@[default_target]
+lean_lib ZeroSlope
+
+@[default_target]
+lean_lib SameUComposition
+
+@[default_target]
+lean_lib WordSameU

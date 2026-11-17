@@ -1,0 +1,83 @@
+name: N83 cross-family archived independent replay
+
+on:
+  push:
+    branches: [codex/n83-hosted-regenerate-20261016]
+    paths:
+      - research/n83_crossfamily_independent_replay_20261018/dispatch.json
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: n83-crossfamily-independent-replay-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  replay-stratum:
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-hosted-regenerate-20261016'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - stratum: 0
+            artifact_id: 12121348162
+          - stratum: 1
+            artifact_id: 12122613894
+          - stratum: 2
+            artifact_id: 12123245985
+          - stratum: 3
+            artifact_id: 12122004580
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Check out frozen replay protocol
+        uses: actions/checkout@v4
+      - name: Check out exact provider source
+        uses: actions/checkout@v4
+        with:
+          ref: 577c8cbe9ddfa20a2b6a62d8c39eb1dd339497ed
+          path: frozen-source
+          persist-credentials: false
+      - name: Download archived provider artifact
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ matrix.artifact_id }}
+          STRATUM: ${{ matrix.stratum }}
+        run: |
+          set -euo pipefail
+          receipt_root="$RUNNER_TEMP/n83-crossfamily-independent-stratum-${STRATUM}"
+          mkdir -p "$receipt_root/receipts"
+          if gh api -H 'Accept: application/vnd.github+json' \
+            "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" \
+            > "$receipt_root/provider.zip" \
+            2> "$receipt_root/receipts/download.stderr.txt"; then
+            printf '0\n' > "$receipt_root/receipts/download.exit_status.txt"
+          else
+            download_status=$?
+            printf '%s\n' "$download_status" > "$receipt_root/receipts/download.exit_status.txt"
+            exit "$download_status"
+          fi
+      - name: Replay archived arithmetic and compare provider analysis
+        shell: bash
+        env:
+          STRATUM: ${{ matrix.stratum }}
+        run: |
+          set -euo pipefail
+          receipt_root="$RUNNER_TEMP/n83-crossfamily-independent-stratum-${STRATUM}"
+          python3 research/n83_crossfamily_independent_replay_20261018/replay.py \
+            --stratum "$STRATUM" \
+            --archive "$receipt_root/provider.zip" \
+            --source-root "$GITHUB_WORKSPACE/frozen-source" \
+            --work-root "$receipt_root/work" \
+            --receipt-dir "$receipt_root/receipts"
+      - name: Preserve replay and failure receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-crossfamily-independent-replay-stratum-${{ matrix.stratum }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/n83-crossfamily-independent-stratum-${{ matrix.stratum }}/receipts/
+          if-no-files-found: warn
+          retention-days: 14

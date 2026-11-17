@@ -1,0 +1,45 @@
+{
+  "schema": "semaev-full-symmetry-source-review/v1",
+  "semaev": {
+    "source_id": "S-SEMAEV-2004",
+    "title": "Summation polynomials and the discrete logarithm problem on elliptic curves",
+    "author": "Igor Semaev",
+    "document_date": "2004-02-05",
+    "url": "https://www.researchgate.net/profile/Igor-Semaev-3/publication/2869464_Summation_Polynomials_and_the_Discrete_Logarithm_Problem_on_Elliptic_Curves/links/5440f69f0cf228087b6a11ba/Summation-Polynomials-and-the-Discrete-Logarithm-Problem-on-Elliptic-Curves.pdf",
+    "bytes": 131064,
+    "sha256": "1cab0ae675996cdba6393b1e369a22113fd2e74bcf1223595743dc140631c7d6",
+    "pages": 6
+  },
+  "kosters_yeo": {
+    "id": "Kosters-Yeo2015",
+    "url": "https://arxiv.org/pdf/1503.08001",
+    "version": "arXiv1503.08001v3",
+    "pdf_sha256": "b5ea5e4c5de7dcacf579e283168d9463b2b6977b031002ddee134a3a0d7868eb",
+    "text_sha256": "49a35941e7f8b2a7d33c7d4a387a967354c48a16b172f66d443e72ee57e85345",
+    "read_scope": "Section2 p3 general b-invariant S3 formula and Proposition2.1, including visual PDF inspection; not a claim to audit all r, NP-completeness or first-fall results."
+  },
+  "read_scope": "Original Semaev2004 Theorem1/p2: symmetry for arity>=3. General model S3 and recursion from Kosters-Yeo Section2/p3, text and PDF reviewed in preceding actual-source-order study; exact prior read scopes retained.",
+  "parent_review": "research/semaev_reassociation_audit_20261113/evidence/source-review.json",
+  "repository_scope": [
+    "actual SourceOrder/LiteralPolynomial/CanonicalBridge",
+    "RecursiveSemaevSymmetry",
+    "RecursiveSemaevTransport",
+    "RecursiveSemaevDegree",
+    "S4Degree actual S3/S4",
+    "prior MV scalar/variable equivalence method"
+  ],
+  "mathlib_scope": [
+    "Algebra/MvPolynomial/Equiv.lean: finSucc/isEmpty/unique equivalences",
+    "Algebra/MvPolynomial/Rename.lean: actual rename and hom ext",
+    "RingTheory/MvPolynomial/Symmetric/Defs.lean: actual IsSymmetric",
+    "GroupTheory/Perm/Sign.lean: mclosure_swap_castSucc_succ,swap_induction_on",
+    "polynomial mapEquiv/map_C/naturality"
+  ],
+  "method": "Prove actual adjacent swaps at every stage, identify them with real variable renamings via the actual tower equivalence, invoke the existing finite adjacent-generator theorem, pull back to original canonical source with scalar/coordinate semantics. No degree-preservation or zero-set equality substitute.",
+  "control_scope": "Inherited rational independent-b S4 counterexample; actual curve hypothesis remains explicit. No qualified source refutation.",
+  "kb": "MCP absent; repository wrapper unavailable127. Bounded primary/repository/Mathlib fallback.",
+  "conductor": "No executable/service.",
+  "novelty_claim": false,
+  "new_native_experiment": false,
+  "paid_compute_and_agent_upload": 0
+}

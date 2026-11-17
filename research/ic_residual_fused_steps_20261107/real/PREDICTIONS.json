@@ -1,0 +1,26 @@
+{
+ "frozen": "2026-11-07, before the real-code run",
+ "model": "the walk-hazard model of PREDICTIONS.json, J = 16, f = number of signed base points (assumed 2B; checked against the records)",
+ "metric": "sum over paired workloads of residual_walk_step_transitions + residual_initial_step... i.e. trials (walk steps), fused / base, cluster bootstrap by workload",
+ "caveat": "relations need several collisions plus direct hits; the model predicts the hazard ratio per step, which sets every collision time equally, so the ratio of total steps should follow it",
+ "predictions": [
+  {
+   "B": 2,
+   "f": 4,
+   "ratio": "res2f/res2 walk steps",
+   "prediction": 1.163757151927075
+  },
+  {
+   "B": 4,
+   "f": 8,
+   "ratio": "res4f/res4 walk steps",
+   "prediction": 1.1881770515720091
+  },
+  {
+   "B": 8,
+   "f": 16,
+   "ratio": "res8f/res8 walk steps",
+   "prediction": 1.2001304560530026
+  }
+ ]
+}

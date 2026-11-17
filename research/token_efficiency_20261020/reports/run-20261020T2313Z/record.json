@@ -1,0 +1,131 @@
+{
+  "schema": "crypto.autoresearch.token-usage.v1",
+  "source": {
+    "kind": "claude-code-session",
+    "session_id": "784f9132-33b2-545c-8e00-c83cc57517f6",
+    "subagents": 1
+  },
+  "prices": {
+    "as_of": "2026-10-06",
+    "source": "tools/token_prices.json"
+  },
+  "groups": [
+    {
+      "agent": "main",
+      "agent_type": "main",
+      "model": "claude-opus-5-5",
+      "tier": "core",
+      "tokens": {
+        "input": 74,
+        "cache_write_5m": 0,
+        "cache_write_1h": 155485,
+        "cache_read": 4903301,
+        "output": 38310,
+        "thinking": 8925
+      },
+      "max_prompt_tokens": 201701,
+      "output_lower_bound_requests": 0,
+      "requests": 37,
+      "prompt_tokens": 5058860,
+      "output_tokens": 38310,
+      "thinking_tokens": 8925,
+      "cache_hit_ratio": 0.9693,
+      "mean_prompt_tokens": 136726,
+      "output_per_request": 1035.4,
+      "cost_usd": 2.991036,
+      "cost_usd_by_component": {
+        "input": 0.000296,
+        "cache_write_5m": 0.0,
+        "cache_write_1h": 1.24388,
+        "cache_read": 0.98066,
+        "output": 0.7662
+      },
+      "output_cost_share": 0.2562,
+      "uncached_cost_usd": 21.00164,
+      "cache_saving_ratio": 0.8576
+    },
+    {
+      "agent": "agent-a46c82119a197a8fe",
+      "agent_type": "Explore",
+      "model": "claude-haiku-5-5",
+      "tier": "mechanical",
+      "tokens": {
+        "input": 4,
+        "cache_write_5m": 38923,
+        "cache_write_1h": 0,
+        "cache_read": 37408,
+        "output": 232,
+        "thinking": 121
+      },
+      "max_prompt_tokens": 38925,
+      "output_lower_bound_requests": 1,
+      "requests": 2,
+      "prompt_tokens": 76335,
+      "output_tokens": 232,
+      "thinking_tokens": 121,
+      "cache_hit_ratio": 0.4901,
+      "mean_prompt_tokens": 38168,
+      "output_per_request": 116.0,
+      "cost_usd": 0.005356,
+      "cost_usd_by_component": {
+        "input": 0.0,
+        "cache_write_5m": 0.004865,
+        "cache_write_1h": 0.0,
+        "cache_read": 0.000374,
+        "output": 0.000116
+      },
+      "output_cost_share": 0.0217,
+      "uncached_cost_usd": 0.007749,
+      "cache_saving_ratio": 0.3089
+    }
+  ],
+  "by_tier": {
+    "core": {
+      "requests": 37,
+      "output_tokens": 38310,
+      "prompt_tokens": 5058860,
+      "cost_usd": 2.991036
+    },
+    "mechanical": {
+      "requests": 2,
+      "output_tokens": 232,
+      "prompt_tokens": 76335,
+      "cost_usd": 0.005356
+    }
+  },
+  "total": {
+    "requests": 39,
+    "prompt_tokens": 5135195,
+    "output_tokens": 38542,
+    "thinking_tokens": 9046,
+    "cache_hit_ratio": 0.9621,
+    "mean_prompt_tokens": 131672,
+    "output_per_request": 988.3,
+    "cost_usd": 2.996392,
+    "cost_usd_by_component": {
+      "input": 0.000296,
+      "cache_write_5m": 0.004865,
+      "cache_write_1h": 1.24388,
+      "cache_read": 0.981034,
+      "output": 0.766316
+    },
+    "output_cost_share": 0.2557,
+    "uncached_cost_usd": 21.009389,
+    "cache_saving_ratio": 0.8574,
+    "tokens": {
+      "input": 78,
+      "cache_write_5m": 38923,
+      "cache_write_1h": 155485,
+      "cache_read": 4940709,
+      "output": 38542,
+      "thinking": 9046
+    },
+    "output_lower_bound_requests": 1,
+    "delegated_output_share": 0.006,
+    "delegated_cost_share": 0.0018
+  },
+  "outcome": null,
+  "notes": [
+    "1 subagent response(s) recorded without a final usage: their output_tokens are lower bounds"
+  ]
+}

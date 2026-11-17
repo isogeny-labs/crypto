@@ -1,0 +1,232 @@
+{
+  "card_id": "CARD-BLINDSPOT-07-09",
+  "card_path": "research/blindspots_20261018/07-blocked-f4-degree-cells/card-09.yaml",
+  "card_sha256": "79e5fdb6d4e3213d4bb156b8ab8048f55fcadc7abb778a3147e9284fad7c655b",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-07/card-09"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-07/card-09/b07",
+        "examples/blindspots_07_blocked_closure.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2.877,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 2.877,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-09/b07",
+        "closure",
+        "--m",
+        "4",
+        "--n",
+        "15",
+        "--ell",
+        "5",
+        "--basis",
+        "23601,31280,15375,19525,27853",
+        "--xr",
+        "31097",
+        "--from",
+        "3",
+        "--to",
+        "4",
+        "--label",
+        "l-15-5-4-g12",
+        "--time-limit",
+        "460",
+        "--expect-solutions",
+        "0"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 468.946,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "l-15-5-4-g12",
+      "index": 3,
+      "outputs": {},
+      "seconds": 468.946,
+      "stderr_sha256": "06abd36a73d7f8305132750317cd2887077587143b8ff515d101472a4a9371ee",
+      "stderr_tail": [
+        "  [21s] rank 84132 products 141548 pending 3062 basis 929 MiB vm 1057 MiB rss-peak 1054 MiB",
+        "  [41s] rank 103740 products 235762 pending 2093 basis 1173 MiB vm 1309 MiB rss-peak 1315 MiB",
+        "  [63s] rank 125441 products 284910 pending 1571 basis 1555 MiB vm 1578 MiB rss-peak 1610 MiB",
+        "  [83s] rank 129144 products 291309 pending 1818 basis 1640 MiB vm 1733 MiB rss-peak 1729 MiB",
+        "  [119s] rank 136837 products 301276 pending 1815 basis 1792 MiB vm 1883 MiB rss-peak 1880 MiB",
+        "  [148s] rank 144850 products 321738 pending 1699 basis 1956 MiB vm 2038 MiB rss-peak 2066 MiB",
+        "  [169s] rank 149960 products 329953 pending 1816 basis 2045 MiB vm 2153 MiB rss-peak 2150 MiB",
+        "  [202s] rank 153855 products 334053 pending 2192 basis 2108 MiB vm 2254 MiB rss-peak 2252 MiB",
+        "  [230s] rank 163263 products 346353 pending 4362 basis 2237 MiB vm 2366 MiB rss-peak 2365 MiB",
+        "  [251s] rank 171092 products 362703 pending 4370 basis 2368 MiB vm 2499 MiB rss-peak 2497 MiB",
+        "  [272s] rank 180248 products 407803 pending 3468 basis 2491 MiB vm 2596 MiB rss-peak 2631 MiB",
+        "  [293s] rank 187635 products 444653 pending 2731 basis 2658 MiB vm 2795 MiB rss-peak 2795 MiB",
+        "  [314s] rank 195008 products 481503 pending 1994 basis 2800 MiB vm 2937 MiB rss-peak 2938 MiB",
+        "  [335s] rank 201933 products 514298 pending 1765 basis 2949 MiB vm 3042 MiB rss-peak 3087 MiB",
+        "  [358s] rank 209468 products 547038 pending 1320 basis 3119 MiB vm 3251 MiB rss-peak 3246 MiB",
+        "  [383s] rank 217188 products 571635 pending 1601 basis 3257 MiB vm 3373 MiB rss-peak 3395 MiB",
+        "  [405s] rank 221871 products 600270 pending 1229 basis 3348 MiB vm 3464 MiB rss-peak 3482 MiB",
+        "  [428s] rank 224533 products 628952 pending 854 basis 3405 MiB vm 3507 MiB rss-peak 3544 MiB",
+        "  [453s] rank 227948 products 657645 pending 791 basis 3472 MiB vm 3619 MiB rss-peak 3616 MiB"
+      ],
+      "stdout_sha256": "d216718b90df682793e9c236f77756e35329a689f8f78d9d6827113e7311216d",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"count\",\"cell\":\"l-15-5-4-g12\",\"solutions\":0}",
+        "{\"tool\":\"b07\",\"cell\":\"l-15-5-4-g12\",\"m\":4,\"n\":15,\"ell\":5,\"n_vars\":50,\"degree\":3,\"columns\":20876,\"status\":\"saturated\",\"refuted\":false,\"rank\":2494,\"products\":3709,\"seed_rows\":45,\"chunks\":4,\"falls\":75,\"new_pivots\":2494,\"word_ops\":6879379,\"word_ops_forward\":482524,\"word_ops_block\":4584075,\"word_ops_pass\":1812780,\"hits_forward\":4319,\"bytes_pass\":4894528,\"bytes_read_forward\":3860192,\"basis_bytes_peak\":3799528,\"rss_peak_kb\":12056,\"secs\":0.020,\"secs_forward\":0.003,\"secs_block\":0.007,\"secs_pass\":0.003,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"cell\":\"l-15-5-4-g12\",\"m\":4,\"n\":15,\"ell\":5,\"n_vars\":50,\"degree\":4,\"columns\":251176,\"status\":\"timelimit\",\"refuted\":false,\"rank\":232054,\"products\":665845,\"seed_rows\":45,\"chunks\":164,\"falls\":14099,\"new_pivots\":232054,\"word_ops\":348094611152,\"word_ops_forward\":89247077773,\"word_ops_block\":36095560285,\"word_ops_pass\":222751973094,\"hits_forward\":108821301,\"bytes_pass\":314818696576,\"bytes_read_forward\":713976622184,\"basis_bytes_peak\":3727147128,\"rss_peak_kb\":3757456,\"secs\":468.574,\"secs_forward\":105.914,\"secs_block\":28.839,\"secs_pass\":323.537,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"mode\":\"closure-summary\",\"cell\":\"l-15-5-4-g12\",\"closure_degree\":null,\"last_status\":\"timelimit\",\"rss_peak_kb\":3757456}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-07/card-09/b07"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-07/card-09"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "16d97a43fe881f07aa52dcd0e8b6486c9e3bf18e",
+  "dirty_after": [
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-09-l-15-5-4-g12.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-09-l-15-5-4-g12.stdout.log"
+  ],
+  "dirty_before": [
+    "examples/blindspots_06_signature_gb.rs",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/gls-b40-i2.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b40-i1.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b40-i2.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/receipt-card-09.json",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell1-planted-b.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell1-planted-b.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell2-first.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell2-first.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-build.stderr.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-build.stdout.log",
+    "research/blindspots_20261018/04-presentation-search/raw/receipt-card-08.json",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-08-build.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-08-build.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-build.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-build.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-l-15-5-4-g8.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-l-15-5-4-g8.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/receipt-card-08.json",
+    "research/blindspots_20261018/11-learned-prefilter/raw/card-06-build.stderr.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/card-06-build.stdout.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n29-m2-S.jsonl",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n29-m2-S.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n29-m2-U.jsonl",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n29-m2-U.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/receipt-card-06.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

@@ -1,0 +1,38 @@
+// Insert inside each R24 seed branch after all original seed checks.
+list ob=lseed(bb,precision);list oc=lseed(cc,precision);
+list ol=lseed(ll,precision);list on=lseed(nu,precision-denorder);
+list initialL=ol;list initialN=on;list initialB=ob;list initialC=oc;
+list ou=li(lm(lpw(lseed(tt,precision),2),lseed(qq,precision)));
+list ov=li(lm(lpw(lseed(tt,precision),3),lseed(qq,precision)));
+list oa;list ok;list osc;list osl;list nb;list nc;list nl;list nnu;
+list nbu;list nbv;list coords;list result;int orbit;int index27;int ram=1;
+if(kind==1){ram=7;}
+intvec expectedB=3,-7,1,2,1;
+intvec expectedC=2,-4,1,2,-1;
+for(orbit=0;orbit<=4;orbit++){
+ print("CUSPORBIT "+string(kind)+" "+string(branch)+" "+string(orbit));
+ coords=list(on,ol,ob,oc);
+ for(index27=1;index27<=5;index27++){
+  result=leval(sourceTerms[index27],coords);lzero("original"+string(index27),result);
+ }
+ lrecord("lambda",ol);lrecord("nu",on);
+ for(index27=1;index27<=8;index27++){
+  result=leval(registeredTerms[index27],coords);
+  lrecord("registered"+string(index27),result);
+  if(index27==1 && result[2]!=ram*expectedB[orbit+1]){ERROR("base b order mismatch");}
+  if(index27==3 && result[2]!=ram*expectedC[orbit+1]){ERROR("base c order mismatch");}
+ }
+ oa=la(lc(1),oc);ok=la(ob,lm(oa,oc));
+ osc=lm(lpw(oc,3),li(ok));osl=lm(ok,li(oc));
+ nb=lm(lm(ob,oc),lpw(li(osc),3));
+ nc=la(lc(1),lm(oa,li(osc)));
+ nl=lm(la(ol,osl),li(osc)); // actual update, corrupt-control target
+ nnu=lm(la(la(on,lm(ol,ob)),lm(ob,oc)),lpw(li(osc),3));
+ nbu=lm(la(ou,ov),lpw(li(ou),2));
+ nbv=lm(la(la(lm(ou,ov),ou),ov),lpw(li(ou),3));
+ ob=nb;oc=nc;ol=nl;on=nnu;ou=nbu;ov=nbv;
+ lzero("base_cubic",la(la(lpw(ov,2),ov),la(lpw(ou,3),ou)));
+}
+lzero("fifth_b",la(ob,initialB));lzero("fifth_c",la(oc,initialC));
+lzero("fifth_lambda",la(ol,la(initialL,la(lc(1),initialC))));
+lzero("fifth_nu",la(on,la(initialN,initialB)));

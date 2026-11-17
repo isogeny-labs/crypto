@@ -1,0 +1,92 @@
+{
+  "costs": {
+    "destination_solver": "HyperellipticIndexCalculus",
+    "log2_baseline": 93.754,
+    "log2_cost_ratio": -12.165,
+    "log2_total": 81.589,
+    "repo_ratio_log2": 12.165,
+    "rows": [
+      {
+        "formula": "synthetic: construction priced at zero",
+        "log2": 0.0,
+        "phase": "map_construction",
+        "status": "modeled"
+      },
+      {
+        "formula": "g elliptic operations over the source field: log2 g + log2(10 * M(source_bits)); a lower bound, the conorm-norm formulas are not implemented",
+        "log2": 16.927,
+        "phase": "transfer_evaluation",
+        "status": "modeled"
+      },
+      {
+        "formula": "g! * q Jacobian operations (random divisor splits over the degree-1 factor base with probability 1/g!)",
+        "log2": 62.174,
+        "phase": "relation_collection",
+        "status": "modeled"
+      },
+      {
+        "formula": "g^2 * q^(2 - 2/g) Jacobian operations (double large primes, Gaudry-Thome-Theriault-Diem)",
+        "log2": 81.589,
+        "phase": "linear_algebra",
+        "status": "modeled"
+      },
+      {
+        "formula": "phases split above",
+        "log2": null,
+        "phase": "destination_solve_unsplit",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "the discrete logarithm of the image is the logarithm of the source (homomorphism), so recovery is free; one scalar multiplication on E verifies it: log2(1.5 log2 r) + log2(op)",
+        "log2": 22.816,
+        "phase": "descent_back_mapping",
+        "status": "modeled"
+      }
+    ],
+    "solvers_considered": [
+      [
+        "RhoOnJacobian",
+        96.415
+      ],
+      [
+        "HyperellipticIndexCalculus",
+        81.589
+      ],
+      [
+        "EngeGaudrySmoothness",
+        91.576
+      ]
+    ],
+    "total_is_lower_bound": false,
+    "unit": "log2 bit operations (frozen formula model; measured rows say so)"
+  },
+  "counterfactual_with_map_and_subgroup_granted": {
+    "expected_verdict": "source-transfer-weak",
+    "lead_class": "formula_advantage",
+    "note": "the same priced route with the map executed and the subgroup verified, inputs that do not exist for this synthetic instance: shows the decision rule and the margin turn the lead into a weakness verdict once the missing ingredients are supplied",
+    "verdict": "source-transfer-weak",
+    "verdict_basis": [
+      "Weil/GHS descent: subgroup carried, map Executed, priced total 12.2 bits below the matched baseline (margin 8 bits); a statement relative to rho on <G> under the frozen formula model, not a claim about absolute security"
+    ]
+  },
+  "description": "synthetic GHS instance: genus 4 over F_(2^40) carrying a 158-bit subgroup of a curve over a 160-bit field; no curve, no map, formulas only",
+  "evaluation": {
+    "reason": "the map is not constructed or a required phase is unpriced, and the priced part (-12.2 bits against the matched baseline) does not exclude the route",
+    "status": "not_evaluable"
+  },
+  "expected_lead_class": "formula_advantage",
+  "expected_verdict": "no weakness found in scope",
+  "id": "control:synthetic_formula_advantage",
+  "lead_class": "formula_advantage",
+  "note": "shows the classifier flags a lead and the verdict rule withholds a weakness verdict without a map and a subgroup certificate; the lead is not a weakness",
+  "pass": true,
+  "path": "Spec -> ctx::judge, the function Ctx::finish uses for every certificate (verdict::decide, cost::classify, route evaluation)",
+  "protocol": "F10",
+  "schema": "transfer-audit/control/v1",
+  "verdict": "no weakness found in scope",
+  "verdict_basis": [
+    "subgroup preservation is NotEvaluated: the transfer is not shown to carry <G>",
+    "the map is not constructed (existence or construction missing)",
+    "formula-level lead (FormulaAdvantage) below the baseline, recorded as a lead only: a lead is not a weakness"
+  ]
+}

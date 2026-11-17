@@ -1,0 +1,12 @@
+IsCoprime.{u} {R : Type u} [CommSemiring R] (x y : R) : Prop
+IsCoprime.mul_dvd.{u} {R : Type u} [CommSemiring R] {x y z : R} (H : IsCoprime x y) (H1 : x ∣ z) (H2 : y ∣ z) :
+  x * y ∣ z
+/var/tmp/pencil-czero-interpolation-20261101-v1/Probe.lean:4:7: error(lean.unknownIdentifier): Unknown constant `Polynomial.dvd_sub`
+dvd_sub.{u_1} {α : Type u_1} [NonUnitalRing α] {a b c : α} (h₁ : a ∣ b) (h₂ : a ∣ c) : a ∣ b - c
+dvd_sub_comm.{u_1} {α : Type u_1} [NonUnitalRing α] {a b c : α} : a ∣ b - c ↔ a ∣ c - b
+Polynomial.eval₂_mul.{u, v} {R : Type u} {S : Type v} [Semiring R] {p q : Polynomial R} [CommSemiring S] (f : R →+* S)
+  (x : S) : Polynomial.eval₂ f x (p * q) = Polynomial.eval₂ f x p * Polynomial.eval₂ f x q
+Polynomial.eval_mul.{u} {R : Type u} [CommSemiring R] {p q : Polynomial R} {x : R} :
+  Polynomial.eval x (p * q) = Polynomial.eval x p * Polynomial.eval x q
+/var/tmp/pencil-czero-interpolation-20261101-v1/Probe.lean:9:7: error(lean.unknownIdentifier): Unknown constant `Polynomial.dvd_iff_isRoot`
+Polynomial.IsRoot.{u} {R : Type u} [Semiring R] (p : Polynomial R) (a : R) : Prop

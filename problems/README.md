@@ -12,7 +12,8 @@ Keep resolved and superseded records in the index.
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
 | [Quartic matched-rho overpricing](quartic-matched-rho-overpricing.md) | open; review requested from quartic-row owners | trusting the IC/rho gap on existing plane-quartic IC rows (may be ~1.73x too favourable to IC) | an executed negation-walk and `<rho>`-class-walk rho on the same Jacobians, under the validation gate, then a row correction |
-| [P-192 mixed-3 quotient and projected relations](nist-mixed-three-quotient-and-relation-solver.md) | open | complete mixed-3 transfer/solver comparison | explicit quotient and dual from the realized kernel, algebraic relation solver, independent replay and budget admission |
+| [Curve25519 target-conditioned section coefficients](curve25519-section-coefficient-selection.md) | investigating | converting structured membership into exponent-moving discovery | biased coefficient constructor with complete attempt/yield/cold-cost and original-row bounds; native quotient query and actual-object proofs |
+| [P-192 mixed-3 quotient and projected relations](nist-mixed-three-quotient-and-relation-solver.md) | open | complete mixed-3 transfer/solver comparison | quotient and maps implemented at producer standing; independent/search certification, restricted solver, complete costs and budget admission remain |
 | [Current-main research regression gates](current-main-research-regressions.md) | open; library/lint repairs validated | merging the Rust/IC changes with passing final-head CI/review | local release library, 53 consumers, full maintained Clippy and workspace types pass; shared frozen-lock, checkout, registry, leaderboard and backlog gates remain |
 | [Secret-key Rust API timing coverage](rust-secret-api-timing-coverage.md) | open | an end-to-end side-channel resistance claim for the whole crate | complete secret-data-flow coverage, fixed-width API boundaries and independent target-specific timing/code review |
 | [IC live-trace baseline compilation](ic-live-trace-main-compile.md) | superseded; build wiring repaired | the original build obstruction is removed; integrated validation remains blocked by the [successor](current-main-research-regressions.md) | all binaries now type-check; the successor tracks the remaining full-library/lint gates |
@@ -3484,3 +3485,6 @@ does not establish a mathematical obstruction or a security theorem. [pcc:unveri
 
 
 
+
+
+- [Chained transfers: canonical trust and store gate omission](chained-current-main-trust-gate-omission.md) (open, 2026-11-17). [pcc:unverified]

@@ -1,0 +1,228 @@
+{
+  "schema": "ecbench.host/v1",
+  "env_class_id": "ECBENV2h126216ac6611",
+  "env_class_sha256": "126216ac661193fb02a452e5977b8a3d3b16b0f52db022c87e774fe5387d96f4",
+  "stable": {
+    "os": "linux",
+    "arch": "x86_64",
+    "kernel_release": "6.18.54-121.166.amzn2023.x86_64",
+    "cpu_vendor": "AuthenticAMD",
+    "cpu_model": "AMD EPYC 9R45",
+    "cpu_signature": "26/2/1",
+    "microcode": "0xb002176",
+    "features": [
+      "adx",
+      "aes",
+      "avx",
+      "avx2",
+      "avx512bw",
+      "avx512dq",
+      "avx512f",
+      "avx512ifma",
+      "avx512vbmi",
+      "avx512vl",
+      "bmi1",
+      "bmi2",
+      "fma",
+      "gfni",
+      "pclmulqdq",
+      "popcnt",
+      "sha",
+      "sse4.2",
+      "vaes",
+      "vpclmulqdq"
+    ],
+    "flags_sha256": "c147bdd73e3be10d96654c5b72273cf6312a40fb0608a0f2319a3766904ddb63",
+    "logical_cpus": 8,
+    "physical_cores": 8,
+    "packages": 1,
+    "numa_nodes": 1,
+    "topology": {
+      "cpus": [
+        {
+          "cpu": 0,
+          "core_id": 0,
+          "package": 0,
+          "node": 0,
+          "siblings": [
+            0
+          ]
+        },
+        {
+          "cpu": 1,
+          "core_id": 1,
+          "package": 0,
+          "node": 0,
+          "siblings": [
+            1
+          ]
+        },
+        {
+          "cpu": 2,
+          "core_id": 2,
+          "package": 0,
+          "node": 0,
+          "siblings": [
+            2
+          ]
+        },
+        {
+          "cpu": 3,
+          "core_id": 3,
+          "package": 0,
+          "node": 0,
+          "siblings": [
+            3
+          ]
+        },
+        {
+          "cpu": 4,
+          "core_id": 4,
+          "package": 0,
+          "node": 0,
+          "siblings": [
+            4
+          ]
+        },
+        {
+          "cpu": 5,
+          "core_id": 5,
+          "package": 0,
+          "node": 0,
+          "siblings": [
+            5
+          ]
+        },
+        {
+          "cpu": 6,
+          "core_id": 6,
+          "package": 0,
+          "node": 0,
+          "siblings": [
+            6
+          ]
+        },
+        {
+          "cpu": 7,
+          "core_id": 7,
+          "package": 0,
+          "node": 0,
+          "siblings": [
+            7
+          ]
+        }
+      ],
+      "nodes": [
+        {
+          "node": 0,
+          "cpus": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "mem_total_kib": 16036260,
+          "distances": [
+            10
+          ]
+        }
+      ]
+    },
+    "perf_levels": [],
+    "mem_total_kib": 16036260,
+    "cpu_settings": {
+      "0": {
+        "governor": null,
+        "no_turbo": null,
+        "boost": null,
+        "in_isolcpus": false,
+        "in_nohz_full": false,
+        "smt_control": "notsupported"
+      },
+      "1": {
+        "governor": null,
+        "no_turbo": null,
+        "boost": null,
+        "in_isolcpus": false,
+        "in_nohz_full": true,
+        "smt_control": "notsupported"
+      },
+      "2": {
+        "governor": null,
+        "no_turbo": null,
+        "boost": null,
+        "in_isolcpus": false,
+        "in_nohz_full": true,
+        "smt_control": "notsupported"
+      },
+      "3": {
+        "governor": null,
+        "no_turbo": null,
+        "boost": null,
+        "in_isolcpus": false,
+        "in_nohz_full": true,
+        "smt_control": "notsupported"
+      },
+      "4": {
+        "governor": null,
+        "no_turbo": null,
+        "boost": null,
+        "in_isolcpus": false,
+        "in_nohz_full": true,
+        "smt_control": "notsupported"
+      },
+      "5": {
+        "governor": null,
+        "no_turbo": null,
+        "boost": null,
+        "in_isolcpus": false,
+        "in_nohz_full": true,
+        "smt_control": "notsupported"
+      },
+      "6": {
+        "governor": null,
+        "no_turbo": null,
+        "boost": null,
+        "in_isolcpus": false,
+        "in_nohz_full": true,
+        "smt_control": "notsupported"
+      },
+      "7": {
+        "governor": null,
+        "no_turbo": null,
+        "boost": null,
+        "in_isolcpus": false,
+        "in_nohz_full": true,
+        "smt_control": "notsupported"
+      }
+    },
+    "transparent_hugepages": "always [madvise] never",
+    "virtualization": {
+      "cpu_flag": "hypervisor",
+      "dmi_product": "c8a.2xlarge",
+      "dmi_vendor": "Amazon EC2"
+    },
+    "rustc_vv": null
+  },
+  "build": {
+    "binary_path": "/usr/local/bin/ecbench",
+    "binary_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9",
+    "git_commit": null,
+    "git_dirty": null,
+    "debug_assertions": false,
+    "target_os": "linux",
+    "target_arch": "x86_64",
+    "build_env": {}
+  },
+  "process_affinity": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "captured_unix_ms": 1792561018868
+}

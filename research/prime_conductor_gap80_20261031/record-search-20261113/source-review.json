@@ -1,0 +1,42 @@
+{
+  "schema": "prime-conductor-source-review/v1",
+  "date": "2026-11-13",
+  "category": "ordinary elliptic curves with a prime endomorphism-conductor gap crossed by an explicitly evaluated isogeny and matched endpoint ECDLP measurements",
+  "minimum_requested_gap_bits": 80,
+  "search_boundary": "Scoped primary-source review; no exhaustive world-record registry and no available research-kb service",
+  "sources": [
+    {
+      "title": "Elliptic Curve Cryptography: The Serpentine Course of a Paradigm Shift",
+      "authors": "Ann Hibner Koblitz, Neal Koblitz, Alfred Menezes",
+      "url": "https://www.math.uwaterloo.ca/~ajmeneze/publications/ecc.pdf",
+      "locator": "Section 11.2, Example 4",
+      "sha256": "5b8cac7adac49d8400cfe890ee906233f041d52e55f419472fc659d8c2f8493f",
+      "finding": "K-571 has maximal endomorphism order; its Frobenius conductor has 22-bit and 263-bit prime factors. This is not a supplied evaluated crossing."
+    },
+    {
+      "title": "Climbing and descending tall isogeny volcanos",
+      "authors": "Steven D. Galbraith",
+      "url": "https://antsmath.org/ANTSXVI/papers/Galbraith.pdf",
+      "locator": "Introduction; Section 5 Problems 1-4; Appendix A",
+      "sha256": "d235bb5bef93da9f6d08b71a9459999dcdea336dbba5e394d6d46668e7ccc77a",
+      "finding": "Distinguishes finding the second curve from recovering an isogeny between supplied endpoints. Appendix conductor examples do not supply floor equations. This is the ANTS submission copy, not the latest IACR revision."
+    },
+    {
+      "title": "Improved algorithms for ascending isogeny volcanoes, and applications",
+      "authors": "Steven D. Galbraith, Valerie Gilchrist, Damien Robert",
+      "url": "https://www.math.u-bordeaux.fr/~damienrobert/pro/publications/articles/climbing_volcanoes.pdf",
+      "locator": "Algorithm 3; Proposition 5.1; PDF dated 2025-08-15",
+      "sha256": "8096b7128ee907ef922fcea652e3c2f1fb3ed90e6de866f1715e6a480c9d3c60",
+      "finding": "Vertical recovery requires both curves. Additional pairing savings depend on a useful divisor of the upper-order discriminant. Our maximal D=-7 endpoint has only odd positive divisors 1 and 7, so this particular divisor mechanism does not scale with the conductor prime. This does not rule out other methods."
+    },
+    {
+      "title": "The Isogeny Problems",
+      "url": "https://isogeni.es/problems/full.pdf",
+      "locator": "Problem 5.2, efficient evaluation for non-invertible ideals of ordinary endomorphism orders",
+      "finding": "The general ordinary non-invertible-ideal evaluation problem remains listed as open. Horizontal invertible ideal class actions do not supply a general conductor-changing construction."
+    }
+  ],
+  "new_measurements": [],
+  "world_record_claim": null,
+  "requested_crossing_complete": false
+}

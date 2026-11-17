@@ -1,0 +1,73 @@
+The task card run completed with exit 0. The tool's output, verbatim:
+
+```
+card: CARD-lead19-projected-base-20261023-1 (sha256 3d655e8f6376fe93ac94c03f179191d06db12532a746b448b3c3f364d32def9b)
+commit: 6783523a3b75266db669d6138decdf142d14e16d
+receipt: research/lead19_projected_base/cards/CARD-lead19-projected-base-20261023-1.receipt.json sha256 bb2e3b717d2360118a629037c4aac127a7377fd1a962a4fb588fac1ad29b5c86
+status: completed
+command 1 (build): ["cargo", "build", "--release", "--bin", "ic"] exit 0 (0.205 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 1 lines:
+        Finished `release` profile [optimized] target(s) in 0.14s
+  output target/release/ic: 373c0f1d02abc29465c4d434754f5e9c732e3ff82bcb836364d1655ca2d1e2ec
+command 2 (run-char2): ["./target/release/ic", "boundary", "--regime", "char2", "--char2-degrees", "15,18,21,24,27", "--repeats", "5", "--seed", "123212651130", "--s4-max-degree", "0", "--base-arms", "raw,projected,subgroup", "--out", "research/lead19_projected_base/char2.json"] exit 0 (36.864 s) succeeded
+  stdout sha256 e85e6619fe90f243a01b043057336cbb1762262b7c7be60a5d8666320f094818; last 20 lines:
+    | char2 | mitm_m2_negfold_walk_subgroup_balanced | total | 0.463 | 0.977 | 0.425 | 5 |
+    | char2 | mitm_m2_negfold_walk_subgroup_balanced | trials | 0.552 | 0.952 | 0.471 | 5 |
+    | char2 | mitm_m3 | factor_base | 0.578 | 0.953 | 0.541 | 5 |
+    | char2 | mitm_m3 | linear_algebra | 0.708 | 0.961 | 0.651 | 5 |
+    | char2 | mitm_m3 | relations | 0.637 | 0.977 | 0.565 | 5 |
+    | char2 | mitm_m3 | total | 0.621 | 0.985 | 0.559 | 5 |
+    | char2 | mitm_m3 | trials | 0.362 | 0.936 | 0.312 | 5 |
+    | char2 | mitm_m3_negfold | factor_base | 0.528 | 0.956 | 0.494 | 5 |
+    | char2 | mitm_m3_negfold | linear_algebra | 0.708 | 0.961 | 0.651 | 5 |
+    | char2 | mitm_m3_negfold | relations | 0.637 | 0.977 | 0.565 | 5 |
+    | char2 | mitm_m3_negfold | total | 0.615 | 0.983 | 0.552 | 5 |
+    | char2 | mitm_m3_negfold | trials | 0.362 | 0.936 | 0.312 | 5 |
+    | char2 | mitm_m3_negfold_walk | factor_base | 0.528 | 0.956 | 0.494 | 5 |
+    | char2 | mitm_m3_negfold_walk | linear_algebra | 0.683 | 0.947 | 0.640 | 5 |
+    | char2 | mitm_m3_negfold_walk | relations | 0.665 | 0.981 | 0.595 | 5 |
+    | char2 | mitm_m3_negfold_walk | total | 0.633 | 0.982 | 0.572 | 5 |
+    | char2 | mitm_m3_negfold_walk | trials | 0.326 | 0.923 | 0.280 | 5 |
+    | char2 | rho_reference | total | 0.406 | 0.999 | 0.364 | 5 |
+
+    Report saved: research/lead19_projected_base/char2.json
+  stderr last 10 lines:
+      char2: searching a curve over GF(2^15)
+      char2: icv1-f2m15-t131-ed7256f0 r=2^14.0 rho S=2.03 best IC S=9.9
+      char2: searching a curve over GF(2^18)
+      char2: icv1-f2m18-t393-d2c04152 r=2^15.0 rho S=1.96 best IC S=8.5
+      char2: searching a curve over GF(2^21)
+      char2: icv1-f2m21-t2591-de54d72e r=2^20.0 rho S=1.32 best IC S=7.6
+      char2: searching a curve over GF(2^24)
+      char2: icv1-f2m24-tm3047-2d0c0e8c r=2^21.0 rho S=1.23 best IC S=6.0
+      char2: searching a curve over GF(2^27)
+      char2: icv1-f2m27-t12543-569dca8b r=2^24.4 rho S=1.08 best IC S=7.5
+command 3 (run-prime24): ["./target/release/ic", "boundary", "--regime", "prime", "--prime-bits", "24", "--repeats", "5", "--seed", "123212651130", "--s4-max-degree", "0", "--base-arms", "raw,projected,subgroup", "--out", "research/lead19_projected_base/prime24.json"] exit 0 (21.526 s) succeeded
+  stdout sha256 cc222cf5f7f26a91b7410dd9408e29e8f2feb8d6cc3140d3d1c46b96d025b5ae; last 20 lines:
+    | regime | instance | log₂ r | variant | m | \|F\| | K | table | targets | trials | yield/ceiling | y/c exact | S | S rho | rho walk | vs rho | vs floor | FB | rel | LA | ok |
+    |:--|:--|--:|:--|--:|--:|--:|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|
+    | prime | icv1-fp24-t1577-77336155 | 23.4 | semaev_s3_roots_m2 | 2 | 512 | 256 | none | random | 10982 | 1.03 | 1.03 | 4830 | 1.03 | 0.90 | 4696× | 5450× | 0.45 | 4830 | 0.01 | ✓ |
+    | prime | icv1-fp24-t1577-77336155 | 23.4 | direct_subtraction_m2 | 2 | 512 | 256 | none | random | 10982 | 1.03 | 1.03 | 1925 | 1.03 | 0.90 | 1872× | 2173× | 0.45 | 1925 | 0.01 | ✓ |
+    | prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m2 | 2 | 512 | 256 | full | random | 10982 | 1.03 | 1.03 | 255.8 | 1.03 | 0.90 | 248.8× | 288.7× | 40.2 | 215.6 | 0.01 | ✓ |
+    | prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m3 | 3 | 512 | 256 | full | random | 265 | 0.87 | 0.87 | 56.8 | 1.03 | 0.90 | 55.2× | 64.1× | 40.2 | 16.1 | 0.49 | ✓ |
+    | prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m2_negfold | 2 | 512 | 256 | negation_folded | random | 10982 | 1.03 | 1.03 | 236.0 | 1.03 | 0.90 | 229.5× | 266.3× | 20.4 | 215.6 | 0.01 | ✓ |
+    | prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m2_negfold_walk | 2 | 512 | 256 | negation_folded | walk | 12889 | 0.97 | 0.97 | 24.9 | 1.03 | 0.90 | 24.2× | 28.1× | 20.4 | 4.51 | 0.01 | ✓ |
+    | prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m3_negfold | 3 | 512 | 256 | negation_folded | random | 265 | 0.87 | 0.87 | 37.0 | 1.03 | 0.90 | 35.9× | 41.7× | 20.4 | 16.1 | 0.49 | ✓ |
+    | prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m3_negfold_walk | 3 | 512 | 256 | negation_folded | walk | 259 | 0.87 | 0.87 | 32.0 | 1.03 | 0.90 | 31.1× | 36.1× | 20.4 | 11.1 | 0.52 | ✓ |
+    | prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m2_negfold_walk_balanced | 2 | 222 | 111 | negation_folded | walk | 30982 | 1.01 | 1.01 | 14.3 | 1.03 | 0.90 | 13.9× | 16.1× | 3.95 | 10.3 | 0.00 | ✓ |
+    | prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m2_negfold_walk_projected | 2 | 512 | 256 | negation_folded | walk | 12889 | 0.97 | 0.97 | 24.9 | 1.03 | 0.90 | 24.2× | 28.1× | 20.4 | 4.51 | 0.01 | ✓ |
+    | prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m2_negfold_walk_subgroup | 2 | 512 | 256 | negation_folded | walk | 12889 | 0.97 | 0.97 | 24.9 | 1.03 | 0.90 | 24.2× | 28.1× | 20.4 | 4.51 | 0.01 | ✓ |
+    | prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m2_negfold_walk_projected_balanced | 2 | 222 | 111 | negation_folded | walk | 30982 | 1.01 | 1.01 | 14.3 | 1.03 | 0.90 | 13.9× | 16.1× | 3.95 | 10.3 | 0.00 | ✓ |
+    | prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m2_negfold_walk_subgroup_balanced | 2 | 222 | 111 | negation_folded | walk | 30982 | 1.01 | 1.01 | 14.3 | 1.03 | 0.90 | 13.9× | 16.1× | 3.95 | 10.3 | 0.00 | ✓ |
+
+    | regime | variant | phase | α (ops ∝ r^α) | R² | α vs #E | points |
+    |:--|:--|:--|--:|--:|--:|--:|
+
+    Report saved: research/lead19_projected_base/prime24.json
+  stderr last 2 lines:
+      prime: 24-bit instance
+      prime: icv1-fp24-t1577-77336155 r=2^23.4 rho S=1.03 best IC S=12.7
+```
+
+Status: completed (exit 0). No refusal. The run wrote only under `research/lead19_projected_base/` and `target/`, as the card's write scope requires. I ran no other commands and computed nothing.

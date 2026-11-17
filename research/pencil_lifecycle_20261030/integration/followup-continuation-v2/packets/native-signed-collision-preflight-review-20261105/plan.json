@@ -1,0 +1,35 @@
+{
+  "task": "T-1685",
+  "announced_candidate_prefix": "d8c496",
+  "announced_claim": "Early native signed-collision preflight resolves priorL1 while preserving false-path semantics",
+  "joints": [
+    "Read priorL1 and existing wrapper contract before judgingcorrection",
+    "Order/primality/subgroup checks precede unsafe arithmetic and have precise scope",
+    "Invalid input false paths preserved; no candidate recovery fabricated",
+    "Denominator inversion and signed relation coefficients match valid collision labels",
+    "Remaining assertion/panic/overflow boundaries documented",
+    "No runtime or totalcost/speed claim from sourcechecks"
+  ],
+  "attacks": [
+    "compositeorder accepted asprime",
+    "pointnotinsubgroup despite multiplecheck",
+    "zero denominator or noninvertible residue",
+    "negation signlost",
+    "earlycheck calls unsafe routine beforevalidating modulus",
+    "validfalsepath converted into panic",
+    "sourcecheck operation excluded fromclaimedcost"
+  ],
+  "prior": "Only announced correction purpose known; priorL1 and candidate not yet read. Source review follows exact publication.",
+  "schema": "prospective-source-review-plan/v1",
+  "created_utc": "2026-11-05T18:49:01.494426+00:00",
+  "new_producer_source_read": false,
+  "compiler_runs": 0,
+  "runtime_runs": 0,
+  "knowledge_fallback": "KB tooling unavailable; exact existing primary source and prior review artifacts. No novelty inference.",
+  "deliverables": [
+    "PDF",
+    "SVG",
+    "JSON",
+    "manifest"
+  ]
+}

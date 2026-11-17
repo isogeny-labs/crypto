@@ -1,0 +1,72 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "E3 (PROTOCOL frozen in ede431274), curve e3-ctl",
+ "description": "research/generator_effect_ic_20261019/E3-PROTOCOL.md: pkm-semaev (Semaev S4 on the prime-kummer tower, F4) capped, its grid reference and known-log:scalars=random with mitm:m=3 to full solve, rho-neg; equal B per tower height t.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 2393,
+    "a": 2390,
+    "b": 1614,
+    "group_order": 2377,
+    "r": 2377,
+    "gx": 0,
+    "gy": 80
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 20261019,
+  "target_kind": "planted_shared"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "sem-chain-t2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=2",
+     "oracle": "pkm-semaev:m=3,crosscheck=1"
+    }
+   }
+  },
+  {
+   "name": "sem-grid-t2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=2",
+     "oracle": "pkm-semaev:m=3,engine=exhaustive"
+    }
+   }
+  },
+  {
+   "name": "kl-mitm3-t2",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "known-log:size=3,scalars=random",
+     "oracle": "mitm:m=3,negation_folded=1"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261019,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

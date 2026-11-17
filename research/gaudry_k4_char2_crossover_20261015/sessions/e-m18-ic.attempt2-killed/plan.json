@@ -1,0 +1,75 @@
+{
+  "schema": "ecbench.plan/v1",
+  "spec_id": "ECS1h18b6880115fe",
+  "arms": [
+    {
+      "name": "ic-wied",
+      "role": "reference",
+      "method": {
+        "id": "ic.pipeline",
+        "family": "ic",
+        "params": {
+          "factor_base": "bin-t-line",
+          "linalg": "wiedemann",
+          "max_trials": "50000000",
+          "oracle": "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1,charge_unsolved=1",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        },
+        "method_id": "ECM1h4f470a1652ee",
+        "method_sha256": "4f470a1652eeeee83acaf4994f0c2f0a251c56774afd15a588f3f10a20d3c425",
+        "entry": "ic_framework::run_pipeline"
+      }
+    }
+  ],
+  "workloads": [
+    {
+      "workload_id": "We3b266046ebb",
+      "workload_sha256": "e3b266046ebb7c49057d4c5e8f29663253234800b51ff37f2924c7d964844652",
+      "curve_spec": {
+        "kind": "f2m4_torsion",
+        "m": 18,
+        "seed": 1,
+        "max_cofactor": 2
+      },
+      "curve": {
+        "slug": "icv1-f2m72-tm128296031097-38af8562",
+        "icv1": "ICV1:f2m-72-d789ff57:-128296031097:4722366482997941244794:0xc22b4da88e61fd1412:unk:unk:r:38af85621ca9",
+        "family": "extension",
+        "construction": "gaudry_quartic_bin::find_bin_curve(18, 1, 2)",
+        "field_degree": null,
+        "field_bits": 18,
+        "group_order": "4722366482997941244794",
+        "r": "2361183241498970622397",
+        "cofactor": 2,
+        "generator": [
+          "0x8b6893293d6511cb65",
+          "0x58281bbf6a34a44ee7"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v2",
+      "target_seed": 202610150301,
+      "target_index": 0,
+      "target": [
+        "0x19943c14a8762c532a",
+        "0x309f4728f17f01cb50"
+      ],
+      "planted": "1015840976327529764177"
+    }
+  ],
+  "executions": [
+    {
+      "seq": 0,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 0,
+      "algorithm_seed": 17139268110016576924
+    }
+  ]
+}

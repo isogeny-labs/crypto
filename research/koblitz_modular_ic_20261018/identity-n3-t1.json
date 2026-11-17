@@ -1,0 +1,217 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h737db76d9ca78dbd",
+  "statement": {
+    "name": "trace-zero quotient n=3 t=1",
+    "source": "research/koblitz_modular_ic_20261018/native/src/main.rs; coefficientwise integer checks in results.json",
+    "variables": [
+      "X"
+    ],
+    "degree_bound": 6,
+    "lhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "X"
+                },
+                {
+                  "op": "var",
+                  "args": "X"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "const",
+                  "args": -1
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "X"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "const",
+              "args": 2
+            }
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "const",
+                  "args": 4
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "const",
+                  "args": 2
+                },
+                {
+                  "op": "var",
+                  "args": "X"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "const",
+                  "args": -1
+                },
+                {
+                  "op": "var",
+                  "args": "X"
+                },
+                {
+                  "op": "var",
+                  "args": "X"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "const",
+                  "args": 1
+                },
+                {
+                  "op": "var",
+                  "args": "X"
+                },
+                {
+                  "op": "var",
+                  "args": "X"
+                },
+                {
+                  "op": "var",
+                  "args": "X"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "const",
+                  "args": 1
+                },
+                {
+                  "op": "var",
+                  "args": "X"
+                },
+                {
+                  "op": "var",
+                  "args": "X"
+                },
+                {
+                  "op": "var",
+                  "args": "X"
+                },
+                {
+                  "op": "var",
+                  "args": "X"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "X"
+            },
+            {
+              "op": "var",
+              "args": "X"
+            },
+            {
+              "op": "var",
+              "args": "X"
+            },
+            {
+              "op": "var",
+              "args": "X"
+            },
+            {
+              "op": "var",
+              "args": "X"
+            },
+            {
+              "op": "var",
+              "args": "X"
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": 5
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "X"
+                },
+                {
+                  "op": "var",
+                  "args": "X"
+                },
+                {
+                  "op": "var",
+                  "args": "X"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "const",
+          "args": 8
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "seed": 20261018,
+  "value_digest": "ffa8c48cf4c82cd6508e0fcbfd43f50ce13762bab5b2d1d9e60b6dae0504be80",
+  "independence": "Same-agent native issuance and extra-point replay; not independent-host validation",
+  "proof": null
+}

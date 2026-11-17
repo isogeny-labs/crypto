@@ -1,0 +1,225 @@
+$ ./hyperelliptic-cover --help
+A bounded, certificate-oriented interface. It constructs the repository's fixed same-field cover families, replays their certificates, runs checked arithmetic where the infinity model is supported, and exports catalog evidence. It is not an index-calculus or key-recovery solver.
+
+Usage: hyperelliptic-cover <COMMAND>
+
+Commands:
+  construct       Construct and replay a cover certificate for one exact elliptic model object
+  verify          Replay a supplied `{model, certificate}` request
+  arithmetic      Run checked arithmetic on supported binary-cover or odd-prime one-infinity Jacobians
+  catalog-export  Rebuild the deterministic cover catalog from the exact model registry
+  help            Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help
+          Print help (see a summary with '-h')
+$ ./ecdlp-audit --help
+Validate ECDLP audit control-plane records
+
+Usage: ecdlp-audit <COMMAND>
+
+Commands:
+  verify-plan            Verify the non-authoritative eight-workstream planning record
+  verify-fixed-f8-order  Independently replay the exact fixed-GF(8) genus-3 order certificate
+  help                   Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+$ ./curve_cover_check --registry docs/curves/registry.json --output docs/curves/covers.json --links docs/curves/cover-links.yaml --check
+{"invalid_input":0,"unsupported":0,"verified":20592}
+$ ./hyperelliptic-cover construct --input -
+{
+  "command": "construct",
+  "result": {
+    "certificate": {
+      "construction": "binary_cubic_pullback_v1",
+      "degree": 3,
+      "f": [
+        "0x0",
+        "0x1",
+        "0x0",
+        "0x0",
+        "0x0",
+        "0x0",
+        "0x0",
+        "0x1"
+      ],
+      "genus": 3,
+      "h": [
+        "0x0",
+        "0x0",
+        "0x1"
+      ],
+      "x": [
+        "0x0",
+        "0x0",
+        "0x0",
+        "0x1"
+      ],
+      "y_0": [
+        "0x1"
+      ],
+      "y_v": [
+        "0x0",
+        "0x1"
+      ]
+    },
+    "model": {
+      "a": "0x0",
+      "b": "0x1",
+      "field": "f2m-7-e1a6f45a",
+      "form": "y^2+xy=x^3+a*x^2+b",
+      "modulus": "0x83",
+      "v": "1"
+    },
+    "scope": "explicit same-field cover; no minimality, unconditional subgroup-transfer, or DLP-advantage claim",
+    "verification": {
+      "arbitrary_jacobian_pushforward": "unsupported",
+      "cli_transfer_subcommand": "not_exposed",
+      "composition": "verified_phi_push_phi_pull_equals_multiplication_by_3_on_typed_rational_point_class_domain",
+      "construction": "explicit",
+      "defining_equation_identity": "verified_exact_polynomial_identity",
+      "degree": "verified_degree_3",
+      "field_of_definition": "same_as_target",
+      "field_validation": "irreducibility_proved_by_rabin",
+      "genus": "verified_genus_3_from_two_order_3_artin_schreier_poles",
+      "infinity": "one_base_field_rational_point",
+      "jacobian_arithmetic": "implemented_checked_one_infinity_model",
+      "pullback": "implemented_for_rational_target_point_classes",
+      "pushforward": "implemented_for_rational_source_point_divisors_and_typed_pullback_witnesses",
+      "ramification": {
+        "exceptional_index": 3,
+        "infinity_index": 3,
+        "riemann_hurwitz_total": 4
+      },
+      "separability": "verified_characteristic_2_does_not_divide_3",
+      "source_smoothness": "verified_affine_and_infinity_fixed_family_criteria",
+      "subgroup_transfer": "conditional_on_an_independently_verified_exact_subgroup_order_coprime_to_3; this command does not accept or verify an order",
+      "target_smoothness": "verified_b_nonzero"
+    }
+  },
+  "schema": "hyperelliptic-infrastructure-command/v1",
+  "status": "ok"
+}
+$ ./hyperelliptic-cover verify --input verify-smoke.json
+{
+  "command": "verify",
+  "result": {
+    "certificate": {
+      "construction": "binary_cubic_pullback_v1",
+      "degree": 3,
+      "f": [
+        "0x0",
+        "0x1",
+        "0x0",
+        "0x0",
+        "0x0",
+        "0x0",
+        "0x0",
+        "0x1"
+      ],
+      "genus": 3,
+      "h": [
+        "0x0",
+        "0x0",
+        "0x1"
+      ],
+      "x": [
+        "0x0",
+        "0x0",
+        "0x0",
+        "0x1"
+      ],
+      "y_0": [
+        "0x1"
+      ],
+      "y_v": [
+        "0x0",
+        "0x1"
+      ]
+    },
+    "verification": {
+      "arbitrary_jacobian_pushforward": "unsupported",
+      "cli_transfer_subcommand": "not_exposed",
+      "composition": "verified_phi_push_phi_pull_equals_multiplication_by_3_on_typed_rational_point_class_domain",
+      "construction": "explicit",
+      "defining_equation_identity": "verified_exact_polynomial_identity",
+      "degree": "verified_degree_3",
+      "field_of_definition": "same_as_target",
+      "field_validation": "irreducibility_proved_by_rabin",
+      "genus": "verified_genus_3_from_two_order_3_artin_schreier_poles",
+      "infinity": "one_base_field_rational_point",
+      "jacobian_arithmetic": "implemented_checked_one_infinity_model",
+      "pullback": "implemented_for_rational_target_point_classes",
+      "pushforward": "implemented_for_rational_source_point_divisors_and_typed_pullback_witnesses",
+      "ramification": {
+        "exceptional_index": 3,
+        "infinity_index": 3,
+        "riemann_hurwitz_total": 4
+      },
+      "separability": "verified_characteristic_2_does_not_divide_3",
+      "source_smoothness": "verified_affine_and_infinity_fixed_family_criteria",
+      "subgroup_transfer": "conditional_on_an_independently_verified_exact_subgroup_order_coprime_to_3; this command does not accept or verify an order",
+      "target_smoothness": "verified_b_nonzero"
+    }
+  },
+  "schema": "hyperelliptic-infrastructure-command/v1",
+  "status": "ok"
+}
+$ ./hyperelliptic-cover arithmetic --input -
+{
+  "command": "arithmetic",
+  "result": {
+    "context": {
+      "curve_construction": {
+        "construction": "binary_cubic_pullback_v1",
+        "degree": 3,
+        "f": [
+          "0x0",
+          "0x1",
+          "0x0",
+          "0x0",
+          "0x0",
+          "0x0",
+          "0x0",
+          "0x1"
+        ],
+        "genus": 3,
+        "h": [
+          "0x0",
+          "0x0",
+          "0x1"
+        ],
+        "x": [
+          "0x0",
+          "0x0",
+          "0x0",
+          "0x1"
+        ],
+        "y_0": [
+          "0x1"
+        ],
+        "y_v": [
+          "0x0",
+          "0x1"
+        ]
+      },
+      "family": "binary_cubic_pullback_v1",
+      "infinity_configuration": "one_rational_point"
+    },
+    "operation": "identity",
+    "result": {
+      "divisor": {
+        "u": [
+          "0x1"
+        ],
+        "v": []
+      }
+    }
+  },
+  "schema": "hyperelliptic-infrastructure-command/v1",
+  "status": "ok"
+}
+$ ./hyperelliptic-cover catalog-export --registry docs/curves/registry.json --output catalog-smoke.json
+$ ./ecdlp-audit verify-fixed-f8-order --input docs/curves/fixed-f8-genus3-order-certificate.json --repo-root .
+{"certificate_uid":"urn:ecdlp-order-certificate:1:sha256:44b0072f58f744d173b1c92bda05c81a757e2f770ed8831dbc5ae10faf1bfc36","extension_point_counts":[6,104,558],"jacobian_order_over_f8":486,"schema":"ecdlp.fixed-f8-genus3-order-certificate/v1","status":"verified","zeta_numerator_coefficients_ascending":[1,-3,24,-48,192,-192,512]}

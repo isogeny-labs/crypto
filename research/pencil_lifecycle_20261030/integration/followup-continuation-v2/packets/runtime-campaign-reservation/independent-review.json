@@ -1,0 +1,54 @@
+{
+  "schema": "runtime.reservation.independent-review/v1",
+  "reviewer": "/root/assembler_independent_review_v2",
+  "independent": true,
+  "scope": "one-private-runtime-assembly",
+  "decision": "conditional_approve",
+  "execution_allowance_approved": false,
+  "reservation_sha256": "26751814932a14104cb9cefb59d0414ac867e9379efc669a9f688b4fe5118f14",
+  "inputs_sha256": "ba15f0b8639110811082258591d7ca6de39d01277c24c562fe525cb8086ddb5d",
+  "pins": [
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/planning-20261103/planning-limits.json",
+      "sha256": "4079023e620b18b8ca6ab650362c83c8bdc4b81d8f0728bf313a6e011d789631",
+      "matches": true
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-supervisor-v2/assembly-binding.draft.json",
+      "sha256": "8a9c10a1480afaf54e80ced33540a9a65c3d880f780abc2bde8e46d115dde586",
+      "matches": true
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-admission/conditional-review.json",
+      "sha256": "3929d38a42dea90d7006af518d918885420a40af985d549ae98425974932bede",
+      "matches": true
+    }
+  ],
+  "reviewed_files": {
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-campaign-reservation/reservation.draft.json": "26751814932a14104cb9cefb59d0414ac867e9379efc669a9f688b4fe5118f14",
+    "/home/ec2-user/AGENTS.md": "4ec24823593f4fa48bcc641e1bbddf10752be7620af8dc20e22f755191370423",
+    "/home/ec2-user/crypto-eks-cost-controls-20261101/taskq/deploy/eks-karpenter/COST_CONTROLS.md": "e57d6eb9378caebf9071f5eb306870f8fbc1149288d74ec65a78cc8108384f3d",
+    "/home/ec2-user/crypto-eks-cost-controls-20261101/taskq/deploy/eks-karpenter/budget-change-20261103.json": "0433e770b190ce764fd8c2c2e59043eb99a4eda012b56ea573ef19b3bac39365",
+    "/home/ec2-user/crypto-eks-cost-controls-20261101/taskq/deploy/eks-karpenter/cost-inspection-20261101.json": "a6c6efa899efa93f327587abe296c59612fbf6affc69e23f87f68a15d8546dc2"
+  },
+  "worker_metric_review": "accepted_scoped",
+  "resource_reservation_review": "accepted_scoped",
+  "worker_seconds_debit": 1200,
+  "worker_seconds_remaining": 24000,
+  "worker_charge_basis": "conservative discretionary debit;600wallseconds with2CPU cap, not measured worker or CPU time",
+  "historical_balance_carried_forward": false,
+  "unmetered_local_software_zeroed": false,
+  "dollar_review": "unresolved",
+  "known_daily_limit_usd": 200,
+  "known_monthly_limit_usd": 1000,
+  "verified_current_remaining_usd": null,
+  "verified_host_prepaid_allocation_usd": null,
+  "verified_build_dollar_reservation_usd": null,
+  "material_gap": "No reviewed record establishes current available funds or an already-funded host/storage allocation covering this600second build and4GiB retention. Budget-change receipt verifies thresholds only, not spend or headroom. Existing-host execution alone does not establish zero charge.",
+  "required_evidence": "Bind an authoritative current funding/reservation record covering this finite build and retained storage, including how retention cost is bounded or charged to an existing allocation. No new budget increase, signing key, role or general owner confirmation is required by this review.",
+  "rule_source": "/home/ec2-user/AGENTS.md lines13-16",
+  "rule_quote": "Charge builds, idle nodes, failed attempts, Spot restarts, storage and transfer. Unknown or exhausted remaining funds stop new submissions.",
+  "no_new_infrastructure_planned": true,
+  "runtime_launched": false,
+  "owner_worktree_modified": false
+}

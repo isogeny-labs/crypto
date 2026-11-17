@@ -1,0 +1,55 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-tm1514-dce9313c | 21.00 | inc | 24/24 | 1.902 | 1.940 | 2.280 | — |
+| icv1-fp24-tm1514-dce9313c | 21.00 | inc-aa | 24/24 | 1.902 | 1.940 | 2.280 | — |
+| icv1-fp24-tm1514-dce9313c | 21.00 | rho-neg | 24/24 | 1.253 | 1.367 | 2.389 | — |
+| icv1-fp24-tm1514-dce9313c | 21.00 | rho-neg-aa | 24/24 | 1.253 | 1.367 | 2.389 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | inc | 24/24 | 2.166 | 2.210 | 2.603 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | inc-aa | 24/24 | 2.166 | 2.210 | 2.603 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | rho-neg | 24/24 | 1.188 | 1.296 | 2.260 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | rho-neg-aa | 24/24 | 1.188 | 1.296 | 2.260 | — |
+| icv1-fp24-tm2338-191c1070 | 21.00 | inc | 24/24 | 2.162 | 2.208 | 2.619 | — |
+| icv1-fp24-tm2338-191c1070 | 21.00 | inc-aa | 24/24 | 2.162 | 2.208 | 2.619 | — |
+| icv1-fp24-tm2338-191c1070 | 21.00 | rho-neg | 24/24 | 1.032 | 1.123 | 1.946 | — |
+| icv1-fp24-tm2338-191c1070 | 21.00 | rho-neg-aa | 24/24 | 1.032 | 1.123 | 1.946 | — |
+| icv1-fp24-tm3530-7cdfa218 | 21.00 | inc | 24/24 | 2.221 | 2.261 | 2.625 | — |
+| icv1-fp24-tm3530-7cdfa218 | 21.00 | inc-aa | 24/24 | 2.221 | 2.261 | 2.625 | — |
+| icv1-fp24-tm3530-7cdfa218 | 21.00 | rho-neg | 24/24 | 1.286 | 1.403 | 2.454 | — |
+| icv1-fp24-tm3530-7cdfa218 | 21.00 | rho-neg-aa | 24/24 | 1.286 | 1.403 | 2.454 | — |
+| icv1-fp24-tm7826-eab5872b | 21.00 | inc | 24/24 | 2.106 | 2.145 | 2.498 | — |
+| icv1-fp24-tm7826-eab5872b | 21.00 | inc-aa | 24/24 | 2.106 | 2.145 | 2.498 | — |
+| icv1-fp24-tm7826-eab5872b | 21.00 | rho-neg | 24/24 | 1.204 | 1.313 | 2.291 | — |
+| icv1-fp24-tm7826-eab5872b | 21.00 | rho-neg-aa | 24/24 | 1.204 | 1.313 | 2.291 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp24-tm1514-dce9313c | inc vs inc-aa | unresolved inside the band |
+| icv1-fp24-tm1514-dce9313c | inc vs rho-neg | unresolved inside the band |
+| icv1-fp24-tm1514-dce9313c | inc vs rho-neg-aa | unresolved inside the band |
+| icv1-fp24-tm1514-dce9313c | inc-aa vs rho-neg | unresolved inside the band |
+| icv1-fp24-tm1514-dce9313c | inc-aa vs rho-neg-aa | unresolved inside the band |
+| icv1-fp24-tm1514-dce9313c | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp24-tm1578-e83ed1b2 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp24-tm1578-e83ed1b2 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp24-tm1578-e83ed1b2 | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp24-tm1578-e83ed1b2 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp24-tm1578-e83ed1b2 | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp24-tm1578-e83ed1b2 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp24-tm2338-191c1070 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp24-tm2338-191c1070 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp24-tm2338-191c1070 | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp24-tm2338-191c1070 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp24-tm2338-191c1070 | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp24-tm2338-191c1070 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp24-tm3530-7cdfa218 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp24-tm3530-7cdfa218 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp24-tm3530-7cdfa218 | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp24-tm3530-7cdfa218 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp24-tm3530-7cdfa218 | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp24-tm3530-7cdfa218 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp24-tm7826-eab5872b | inc vs inc-aa | unresolved inside the band |
+| icv1-fp24-tm7826-eab5872b | inc vs rho-neg | rho-neg < inc |
+| icv1-fp24-tm7826-eab5872b | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp24-tm7826-eab5872b | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp24-tm7826-eab5872b | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp24-tm7826-eab5872b | rho-neg vs rho-neg-aa | unresolved inside the band |

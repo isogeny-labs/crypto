@@ -1,0 +1,75 @@
+name: ECC2K-130 leaf m10 support outcome replay
+
+on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/ecc2k130-leaf-m10-outcome.yml'
+      - 'research/notes/ecc2k130/leaf_m10_support_20260930/evidence/**'
+      - 'research/notes/ecc2k130/leaf_m10_support_outcome_20260930/**'
+
+# A newer push to the same pull request cancels this workflow's run for the older commit.
+# Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.event_name == 'push' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+
+jobs:
+  replay:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-leaf-m10-outcome.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-leaf-m10-outcome.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            research/notes/ecc2k130/leaf_m10_support_20260930
+            research/notes/ecc2k130/leaf_m10_support_outcome_20260930
+            research/notes/ecc2k130/m10_export_capacity_20260925/INPUT.json
+            research/notes/ecc2k130/dual_all_lines_20260930/RESULT.json
+            research/notes/ecc2k130/rotated_subspace_support_20260925/gate.py
+            research/notes/ecc2k130/rotated_unequal_arity_20260925/verify.py
+            research/ecc2k130_relations/fastfield.py
+            research/ecc2k130_relations/relations.py
+            .github/workflows/ecc2k130-leaf-m10-support.yml
+            .github/workflows/ecc2k130-leaf-m10-outcome.yml
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/leaf_m10_support_20260930
+      - name: Verify every archived byte and source receipt
+        run: |
+          python3 research/notes/ecc2k130/leaf_m10_support_outcome_20260930/verify_archive.py
+      - name: Recompute decision table from archived counts
+        run: |
+          python3 research/notes/ecc2k130/leaf_m10_support_outcome_20260930/analyze.py
+          git diff --exit-code -- research/notes/ecc2k130/leaf_m10_support_outcome_20260930/ANALYSIS.json
+      - name: Replay all 294912 rows and 264 point images again
+        run: |
+          python3 research/notes/ecc2k130/leaf_m10_support_20260930/verify.py \
+            --evidence research/notes/ecc2k130/leaf_m10_support_20260930/evidence \
+            --out "${{ runner.temp }}/replay.json"
+          cmp "${{ runner.temp }}/replay.json" \
+            research/notes/ecc2k130/leaf_m10_support_20260930/evidence/replay.json

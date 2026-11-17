@@ -1,0 +1,43 @@
+name: vault
+
+# Tests tools/vault, and audits the whole history for plaintext in protected
+# paths once the repository has adopted vault (.vault/vault.json exists).
+# Push-time only, like the repository's other non-merge-set workflows
+# (AGENTS.md "Default workflow"); the commit and push guards are the hooks
+# installed by `vault unlock` and .claude/hooks/vault-hook.sh.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/vault/**'
+      - '.vault/**'
+      - '.gitattributes'
+      - '.github/workflows/vault.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/vault
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo fmt --check
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - run: cargo test --locked
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Guard every commit (header check; no key needed)
+        run: |
+          if [ ! -f .vault/vault.json ]; then echo "vault not adopted; nothing to audit"; exit 0; fi
+          cargo install --quiet --locked --path tools/vault --root "$RUNNER_TEMP/vault"
+          "$RUNNER_TEMP/vault/bin/vault" guard --range HEAD

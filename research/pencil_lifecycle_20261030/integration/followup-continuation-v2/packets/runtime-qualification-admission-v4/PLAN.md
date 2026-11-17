@@ -1,0 +1,5 @@
+# Corrected retained-image qualification planning — T1465
+
+Preserve failed attempt owner4bf12f23 and its costs. Bind new qualifier-v3 explicit temporary-directory correction and new supervisor-v4 owner-scoped retained directories after independent source review. Derive current assembled-image custody from historical assembly plus failed qualification endpoint/worker and observed stop/detachment, without calling it successful qualification. Publish exact reviewed bindings and command before any single300second2CPU2GiB successor. Reuse existing4GiB disk, no rebuild or new cloudresources. Reserve600additionalworker seconds andUSD1 only upon complete reviewed inputs; prior1800second/USD57reservations remain. Proposed remaining22800seconds/USD58total. Deadline2026-11-04T06:00:00Z unchanged. This draft is not execution admission.
+
+Literature/source basis: existing supervisor/qualifier source, native failedqualification receipt and independentpostreview, Pythonstdlib tempfile behavior; known same-owner and prefix-collision paths must fail closed and oldrecords must remain untouched. No scientificcohort launch is included.

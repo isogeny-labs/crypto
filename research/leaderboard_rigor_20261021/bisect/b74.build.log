@@ -1,0 +1,15 @@
+   Compiling crypto v0.1.0 (/tmp/bisect-wt-b74)
+warning: unused import: `super::koblitz_fast_arith::FastBinaryCurve`
+  --> src/cryptanalysis/koblitz_factor_base_search.rs:77:5
+   |
+77 | use super::koblitz_fast_arith::FastBinaryCurve;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `U64RankTracker` and `to_u64_mod`
+   --> src/cryptanalysis/koblitz_index_calculus.rs:163:5
+    |
+163 |     to_u64_mod, IncrementalRelationSolver, RowStatus, U64RankTracker,
+    |     ^^^^^^^^^^                                        ^^^^^^^^^^^^^^
+

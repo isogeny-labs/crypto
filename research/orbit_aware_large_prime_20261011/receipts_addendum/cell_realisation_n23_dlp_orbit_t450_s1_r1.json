@@ -1,0 +1,523 @@
+{
+  "arm": "dlp_orbit",
+  "cpu_instance_ns": 960473,
+  "cpu_process_ns": 508351236,
+  "curve": {
+    "a": 1,
+    "b": 1,
+    "cofactor": 2,
+    "group_order": 8393806,
+    "modulus_mask": 13419477,
+    "modulus_seed": 1,
+    "name": "icv1-f2m23-tm5197-d88cbca2",
+    "r": 4196903
+  },
+  "n": 23,
+  "peak_rss_bytes": 175472640,
+  "planted_log": 3031950,
+  "recovered_matches_planted": true,
+  "rep": 1,
+  "report": {
+    "config": {
+      "envelope_dimension": 10,
+      "large_prime_graph": "filter_orbit",
+      "max_large_primes": 2,
+      "max_states": 3000000,
+      "max_trials": 450,
+      "seed": 1,
+      "small_dimension": 7,
+      "summands": 3
+    },
+    "counters": {
+      "accepted_relations": 450,
+      "combination_states_uncharged": 543402,
+      "decompositions": 450,
+      "eliminated_full_relations": 86,
+      "independent_rows": 59,
+      "lp_merge_ops_uncharged": 285,
+      "lp_pivots": 176,
+      "matrix_rank": 59,
+      "mitm_lookups_uncharged": 7431,
+      "rejected_large_prime_count": 0,
+      "relation_histogram": [
+        6,
+        98,
+        346,
+        0
+      ],
+      "row_ops_uncharged": 8404,
+      "trials": 450
+    },
+    "exhausted": false,
+    "factor_base": {
+      "columns": 520,
+      "large_columns": 453,
+      "orbit": {
+        "absorb_into_small": false,
+        "absorbed_into_small": 0,
+        "examples": [],
+        "lambda": 368914,
+        "large_orbits": 453,
+        "large_points": 453,
+        "merged_points": 0,
+        "negated_points": 224,
+        "phase_histogram": [
+          20,
+          18,
+          14,
+          27,
+          20,
+          21,
+          22,
+          19,
+          29,
+          14,
+          21,
+          18,
+          21,
+          15,
+          14,
+          21,
+          15,
+          25,
+          18,
+          18,
+          17,
+          23,
+          23
+        ]
+      },
+      "raw_points": 1041,
+      "small_columns": 67,
+      "small_raw_points": 135
+    },
+    "filter_pipeline": {
+      "complete_relations": 92,
+      "cpu_ns": {
+        "audit": 2769865,
+        "collect": 7466264,
+        "filter": 539442,
+        "replay": 1333722,
+        "setup": 307578777
+      },
+      "dependent_verified": 33,
+      "filter": {
+        "complete_relations": 92,
+        "core_large_vertices": 176,
+        "core_relations": 262,
+        "cycles_closed": 86,
+        "duplicate_relations": 0,
+        "input_large_vertices": 369,
+        "input_relations": 450,
+        "merges": 285,
+        "peeled_relations": 182,
+        "pivots": 176,
+        "rejected_fill": 0
+      },
+      "graph": "filter_orbit",
+      "independent_verified": 59,
+      "partial_audit_failed": 0,
+      "partials_by_class": [
+        6,
+        98,
+        346
+      ],
+      "rank": 59,
+      "replay_failed_curve": 0,
+      "replay_failed_linear": 0,
+      "replays_failed": 0,
+      "replays_verified": 92,
+      "stream": {
+        "accepted": 450,
+        "digest": "ba32c9bd71079f29978d214cc1b901b87ddba8b96ee795b747c7421b58e64dd2"
+      }
+    },
+    "mitm": {
+      "left_states": 542361,
+      "left_terms": 2,
+      "right_states": 1041,
+      "right_terms": 1
+    },
+    "phase_group_ops": {
+      "factor_base": {
+        "adds": 0,
+        "doubles": 1041,
+        "scalar_mults": 1041
+      },
+      "oracle_setup": {
+        "adds": 544443,
+        "doubles": 0,
+        "scalar_mults": 0
+      },
+      "relations": {
+        "adds": 16880,
+        "doubles": 18012,
+        "scalar_mults": 900
+      },
+      "verification": {
+        "adds": 1350,
+        "doubles": 0,
+        "scalar_mults": 0
+      }
+    },
+    "recovered": 3031950,
+    "relation_samples": [
+      {
+        "a": 50020,
+        "b": 411733,
+        "class": "double_large_prime",
+        "columns": [
+          [
+            58,
+            4196902
+          ],
+          [
+            67,
+            3373437
+          ],
+          [
+            230,
+            2352331
+          ],
+          [
+            500,
+            1978827
+          ]
+        ],
+        "raw_terms": [
+          235,
+          541,
+          4
+        ],
+        "trial": 1
+      },
+      {
+        "a": 269276,
+        "b": 1577203,
+        "class": "full",
+        "columns": [
+          [
+            28,
+            1
+          ],
+          [
+            46,
+            1
+          ],
+          [
+            48,
+            4196902
+          ],
+          [
+            67,
+            1042497
+          ]
+        ],
+        "raw_terms": [
+          96,
+          121,
+          5
+        ],
+        "trial": 2
+      },
+      {
+        "a": 1273098,
+        "b": 1527095,
+        "class": "double_large_prime",
+        "columns": [
+          [
+            9,
+            4196902
+          ],
+          [
+            67,
+            1142713
+          ],
+          [
+            93,
+            1913995
+          ],
+          [
+            414,
+            750164
+          ]
+        ],
+        "raw_terms": [
+          657,
+          1032,
+          11
+        ],
+        "trial": 3
+      },
+      {
+        "a": 666759,
+        "b": 48978,
+        "class": "single_large_prime",
+        "columns": [
+          [
+            11,
+            1
+          ],
+          [
+            21,
+            4196902
+          ],
+          [
+            67,
+            4098947
+          ],
+          [
+            399,
+            1106756
+          ]
+        ],
+        "raw_terms": [
+          45,
+          951,
+          2
+        ],
+        "trial": 4
+      },
+      {
+        "a": 2450519,
+        "b": 604227,
+        "class": "double_large_prime",
+        "columns": [
+          [
+            21,
+            4196902
+          ],
+          [
+            67,
+            2988449
+          ],
+          [
+            183,
+            1978827
+          ],
+          [
+            269,
+            3090147
+          ]
+        ],
+        "raw_terms": [
+          275,
+          798,
+          2
+        ],
+        "trial": 5
+      },
+      {
+        "a": 430744,
+        "b": 1016840,
+        "class": "double_large_prime",
+        "columns": [
+          [
+            51,
+            4196902
+          ],
+          [
+            67,
+            2163223
+          ],
+          [
+            220,
+            186528
+          ],
+          [
+            377,
+            3718404
+          ]
+        ],
+        "raw_terms": [
+          259,
+          737,
+          20
+        ],
+        "trial": 6
+      },
+      {
+        "a": 2976491,
+        "b": 2212519,
+        "class": "single_large_prime",
+        "columns": [
+          [
+            49,
+            1
+          ],
+          [
+            52,
+            4196902
+          ],
+          [
+            67,
+            3968768
+          ],
+          [
+            393,
+            750164
+          ]
+        ],
+        "raw_terms": [
+          55,
+          644,
+          25
+        ],
+        "trial": 7
+      },
+      {
+        "a": 2324224,
+        "b": 4162267,
+        "class": "double_large_prime",
+        "columns": [
+          [
+            54,
+            1
+          ],
+          [
+            67,
+            69272
+          ],
+          [
+            94,
+            1106756
+          ],
+          [
+            386,
+            368916
+          ]
+        ],
+        "raw_terms": [
+          409,
+          645,
+          61
+        ],
+        "trial": 8
+      },
+      {
+        "a": 1396291,
+        "b": 2714562,
+        "class": "single_large_prime",
+        "columns": [
+          [
+            26,
+            4196902
+          ],
+          [
+            34,
+            4196902
+          ],
+          [
+            67,
+            2964682
+          ],
+          [
+            73,
+            368916
+          ]
+        ],
+        "raw_terms": [
+          104,
+          965,
+          10
+        ],
+        "trial": 9
+      },
+      {
+        "a": 3431918,
+        "b": 2387931,
+        "class": "double_large_prime",
+        "columns": [
+          [
+            27,
+            4196902
+          ],
+          [
+            67,
+            3617944
+          ],
+          [
+            250,
+            3239906
+          ],
+          [
+            465,
+            750164
+          ]
+        ],
+        "raw_terms": [
+          180,
+          185,
+          15
+        ],
+        "trial": 10
+      },
+      {
+        "a": 1178546,
+        "b": 2621476,
+        "class": "double_large_prime",
+        "columns": [
+          [
+            58,
+            4196902
+          ],
+          [
+            67,
+            3150854
+          ],
+          [
+            398,
+            2282908
+          ],
+          [
+            472,
+            3827991
+          ]
+        ],
+        "raw_terms": [
+          384,
+          907,
+          4
+        ],
+        "trial": 11
+      },
+      {
+        "a": 3639544,
+        "b": 2197134,
+        "class": "single_large_prime",
+        "columns": [
+          [
+            32,
+            4196902
+          ],
+          [
+            34,
+            1
+          ],
+          [
+            67,
+            3999538
+          ],
+          [
+            453,
+            4196902
+          ]
+        ],
+        "raw_terms": [
+          70,
+          290,
+          9
+        ],
+        "trial": 12
+      }
+    ],
+    "solve_wall_ns": 320242454,
+    "verification_performed": true,
+    "verified_fast": true,
+    "verified_independent": true
+  },
+  "schema": "orbit-lp-cell/v1",
+  "seed": 1,
+  "series": "realisation",
+  "wall_ns": 508548882
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "ghs-screen/v2",
+  "curve": {
+    "model": "y^2+xy=x^3+a*x^2+b",
+    "absolute_degree": 185,
+    "modulus": "0x20000000000000000000000000000200000000000000001",
+    "a": "0x0",
+    "b": "0x1ee9"
+  },
+  "summary": {
+    "factorisations": 3,
+    "candidates_within_bound": 0,
+    "genus_bound": "4",
+    "best_relative_degree": 5,
+    "best_base_degree": 37,
+    "best_magic_number": 5,
+    "best_genus": "16",
+    "interpretation": "structural screen only; no DLP cost or vulnerability claim"
+  },
+  "towers": [
+    {
+      "relative_degree": 5,
+      "base_degree": 37,
+      "field_tower": "F_2 <= F_(2^37) <= F_(2^185)",
+      "cover_tower": "C/F_(2^37) -> E/F_(2^185)",
+      "magic_number": 5,
+      "genus": "16",
+      "ghs_type": "II",
+      "artin_schreier_cover_degree": "32",
+      "mmt_condition_8": true,
+      "within_genus_bound": false
+    },
+    {
+      "relative_degree": 37,
+      "base_degree": 5,
+      "field_tower": "F_2 <= F_(2^5) <= F_(2^185)",
+      "cover_tower": "C/F_(2^5) -> E/F_(2^185)",
+      "magic_number": 37,
+      "genus": "68719476736",
+      "ghs_type": "II",
+      "artin_schreier_cover_degree": "137438953472",
+      "mmt_condition_8": true,
+      "within_genus_bound": false
+    },
+    {
+      "relative_degree": 185,
+      "base_degree": 1,
+      "field_tower": "F_2 <= F_(2^1) <= F_(2^185)",
+      "cover_tower": "C/F_(2^1) -> E/F_(2^185)",
+      "magic_number": 185,
+      "genus": "24519928653854221733733552434404946937899825954937634816",
+      "ghs_type": "II",
+      "artin_schreier_cover_degree": "49039857307708443467467104868809893875799651909875269632",
+      "mmt_condition_8": true,
+      "within_genus_bound": false
+    }
+  ]
+}

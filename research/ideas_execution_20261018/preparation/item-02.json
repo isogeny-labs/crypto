@@ -1,0 +1,60 @@
+{
+  "item": 2,
+  "title": "Deployed binary sizes cost table",
+  "original_requirement": "Evaluate n=131,233,283,409,571 under D=4 model and determine whether the gap changes sign, with full pipeline cost and memory.",
+  "acceptance_criteria": [
+    "Optimize factor-base dimension and arity; include relation probability/extraction, sparse linear algebra, memory, matched ordinary/Koblitz rho.",
+    "Compare D=4,5,6 and guess-then-degree4; identify calibration and extrapolation assumptions.",
+    "Separate measured unit calibration from modeled cost tables."
+  ],
+  "source_bindings": [
+    {
+      "repository": "crypto",
+      "path": "research/notes/ecc2k130/descent_degree_cost_20260930.py"
+    },
+    {
+      "repository": "crypto",
+      "path": "research/notes/ecc2k130/RESEARCH_ECC2K130_DESCENT_DEGREE.md"
+    },
+    {
+      "repository": "crypto-autoresearcher",
+      "path": "experiments/EXP-SEMBIN-992e73/specification.yaml"
+    },
+    {
+      "repository": "crypto-autoresearcher",
+      "path": "experiments/EXP-SEMBIN-992e73/code/curve_table.py"
+    },
+    {
+      "repository": "crypto-autoresearcher",
+      "path": "experiments/EXP-SEMBIN-81dc96/code/joint_balance.py"
+    },
+    {
+      "repository": "crypto-autoresearcher",
+      "path": "experiments/EXP-NISTBIN-451dfa/specification.yaml"
+    }
+  ],
+  "source_supported_commands": [
+    {
+      "repo": "crypto-autoresearcher",
+      "argv": [
+        "python3",
+        "experiments/EXP-SEMBIN-992e73/code/curve_table.py"
+      ],
+      "purpose": "Existing cost derivation; stdout JSON, requires original frozen raw-result and source inputs.",
+      "kind": "modeled_calculation",
+      "launch_qualification": "992e73 is specified/unapproved; original derivation already archived. Do not promote it or overwrite it."
+    }
+  ],
+  "remaining_gaps": [
+    "Root is implementing a separate native-cost calculation; its execution evidence must be linked separately.",
+    "Existing historical Semaev model is not interchangeable with a fixed-m4 model; ordinary and Koblitz calibrated units remain separate."
+  ],
+  "dependencies": [],
+  "existing_evidence_notes": [
+    "Existing 992e73 calls the frozen joint-balance module, checks n250/300/302/400/571 before named Certicom/FIPS outputs; it does not instantiate deployed curves."
+  ],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "Re-aim the binary program at the deployed sizes. Under the \"D constant at 4\" model the m = 4 cost scales like 2^{n/4} times a polynomial, against rho's 2^{n/2}. The committed gap of about 8 bits at n = 131 flips sign somewhere above it, and sect233, sect283, sect409 and sect571 are never priced. This is one calculation, and it decides whether the big-memory cells in item 7 are worth the machine."
+}

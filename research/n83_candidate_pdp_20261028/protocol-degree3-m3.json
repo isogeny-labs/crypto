@@ -1,0 +1,831 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-DEGREE3-M3-20261029-R1",
+  "version": 1,
+  "created": "2026-10-29",
+  "repository": "crypto",
+  "study_dir": "research/n83_candidate_pdp_20261028",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "DEGREE3_M3_DESIGN.md"
+  },
+  "question": "Do retained m3 systems have a strict degree-three fall or global LFD certificate under a replayed bounded ordinary-degree closure?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Replayed admitted V3 membership plus nonmembership in verified complete V2 certifies LFD>=3, even if V3 closure was capped. A unit or exhaustive affine-completion certificate separately gives upper3. Both give exact3; unknown stays null.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Regularity reduction, elite-base status, universal FFD/LFD assertions, solving speed and ECDLP claims remain outside this batch.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "original-koblitz",
+      "role": "baseline",
+      "description": "original retained koblitz m3 cases",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "6a2c028999634a4ddf9791dc3082180086b6c2ff",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "degree3_m3"
+          ]
+        ],
+        "binary_sha256": "5a24efb4574f838c7f651f3205307d319bce6d84459178a484308eb9ba348c03",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          3
+        ],
+        "ell": 27,
+        "max_rows": 32768,
+        "max_operations": 131072,
+        "seconds": 600,
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "original-binary",
+      "role": "baseline",
+      "description": "original retained binary m3 cases",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "6a2c028999634a4ddf9791dc3082180086b6c2ff",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "degree3_m3"
+          ]
+        ],
+        "binary_sha256": "5a24efb4574f838c7f651f3205307d319bce6d84459178a484308eb9ba348c03",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          3
+        ],
+        "ell": 27,
+        "max_rows": 32768,
+        "max_operations": 131072,
+        "seconds": 600,
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "baseline-koblitz",
+      "role": "baseline",
+      "description": "baseline retained koblitz m3 cases",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "6a2c028999634a4ddf9791dc3082180086b6c2ff",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "degree3_m3"
+          ]
+        ],
+        "binary_sha256": "5a24efb4574f838c7f651f3205307d319bce6d84459178a484308eb9ba348c03",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          3
+        ],
+        "ell": 27,
+        "max_rows": 32768,
+        "max_operations": 131072,
+        "seconds": 600,
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "baseline-binary",
+      "role": "baseline",
+      "description": "baseline retained binary m3 cases",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "6a2c028999634a4ddf9791dc3082180086b6c2ff",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "degree3_m3"
+          ]
+        ],
+        "binary_sha256": "5a24efb4574f838c7f651f3205307d319bce6d84459178a484308eb9ba348c03",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          3
+        ],
+        "ell": 27,
+        "max_rows": 32768,
+        "max_operations": 131072,
+        "seconds": 600,
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "spike40-koblitz",
+      "role": "candidate",
+      "description": "spike40 retained koblitz m3 cases",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "6a2c028999634a4ddf9791dc3082180086b6c2ff",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "degree3_m3"
+          ]
+        ],
+        "binary_sha256": "5a24efb4574f838c7f651f3205307d319bce6d84459178a484308eb9ba348c03",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          3
+        ],
+        "ell": 27,
+        "max_rows": 32768,
+        "max_operations": 131072,
+        "seconds": 600,
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "spike40-binary",
+      "role": "candidate",
+      "description": "spike40 retained binary m3 cases",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "6a2c028999634a4ddf9791dc3082180086b6c2ff",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "degree3_m3"
+          ]
+        ],
+        "binary_sha256": "5a24efb4574f838c7f651f3205307d319bce6d84459178a484308eb9ba348c03",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          3
+        ],
+        "ell": 27,
+        "max_rows": 32768,
+        "max_operations": 131072,
+        "seconds": 600,
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact computations only; no clock or statistical comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Native xy+1,yz+1,xz requires exactLFD3; xy,xy+1 requires exactLFD2. Fresh replay of all controls."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Native xy-only gives no global upper; missing fields, duplicate equation IDs, overdegree multiplication, modified source trace, false completion markers rejected. Both row and operation caps replayed."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "family",
+        "levels": [
+          "koblitz",
+          "binary"
+        ]
+      },
+      {
+        "name": "m",
+        "levels": [
+          3
+        ]
+      },
+      {
+        "name": "factor_base",
+        "levels": [
+          "original",
+          "baseline",
+          "spike40"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "9311d19c36f3e416ab07175ee9433acff1980ec5525d6463d16f590171289bbd",
+        "how": "Same native m3 instrument; saved complete V2 replay before V3"
+      },
+      {
+        "name": "seed",
+        "treatment": "fixed",
+        "value": 20261027,
+        "how": "No fresh draws; exact saved public synthetic inputs"
+      },
+      {
+        "name": "factor_base",
+        "treatment": "crossed",
+        "how": "Same retained ell27 point manifests; original and baseline share point datasets"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Sequential native processes"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Existing host after recorded EKS S3 permission failure; no timing claim"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "original,baseline,spike40; koblitz,binary; planted,natural"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Frozen parsing; no discretionary exclusion"
+      },
+      {
+        "name": "limits",
+        "treatment": "fixed",
+        "how": "8GiB,600s each producer/replay plus5s grace,32768 rows,131072 operations,18000s outer;no retries"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-completion",
+        "arms": [
+          "original-koblitz",
+          "original-binary",
+          "baseline-koblitz",
+          "baseline-binary",
+          "spike40-koblitz",
+          "spike40-binary"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Replay all recorded admitted rows, complete prior V2 and exact stop state. Numerical degree claims require valid witness; capped trace never implies closure completion."
+      }
+    ],
+    "aa_not_applicable": "Exact non-timing computations",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Fixed provenance enumeration; exact non-timing computations",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261027
+      ],
+      "nonce": null,
+      "note": "Retained input identities; no new randomness"
+    },
+    "instance_sampling": {
+      "rule": "Entire12-case retained panel; original planted differs from paired planted; natural originals/baselines repeat; no statistical independence assumption. Independent_of_arm means no fresh arm-dependent sampling.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Deterministic exact computation with frozen parser",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 2,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Six dataset/family arms times two targets;12 producers and12 replays, exact computations"
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0.01,
+      "per_sample_seconds": 600,
+      "threads": 1,
+      "estimated_total_seconds": 18000,
+      "measured_on": "Seven native controls pass;18000s is an upper resource budget, not a timing prediction"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "last_fall_degree",
+        "name": "Certified last fall degree",
+        "unit": "polynomial degree",
+        "kind": "counted",
+        "definition": "Exact3 only with strict membership/nonmembership witness plus global upper certificate; verified exact prior value may be retained; otherwise null",
+        "source": "summary.json rows last_fall_degree",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "closure_rank",
+        "name": "closure rank",
+        "unit": "integer",
+        "kind": "counted",
+        "definition": "Rank of admitted V3 rows; full V3 rank only if closure_complete=true",
+        "source": "summary.json rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "linear_rank",
+        "name": "linear rank",
+        "unit": "integer",
+        "kind": "counted",
+        "definition": "Rank of degree-one rows in admitted V3 subspace",
+        "source": "summary.json rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "last_fall_lower_bound",
+        "name": "last fall lower bound",
+        "unit": "polynomial degree",
+        "kind": "counted",
+        "definition": "Verified per-case bound; null for unknown; never inferred from a plateau or timeout",
+        "source": "summary.json rows last_fall_lower_bound",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "last_fall_upper_bound",
+        "name": "last fall upper bound",
+        "unit": "polynomial degree",
+        "kind": "counted",
+        "definition": "Verified per-case bound; null for unknown; never inferred from a plateau or timeout",
+        "source": "summary.json rows last_fall_upper_bound",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "last_fall_degree",
+      "last_fall_lower_bound",
+      "last_fall_upper_bound",
+      "closure_rank",
+      "linear_rank"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "source_revision",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "existing-spot-workspace",
+    "placement": {
+      "cpus": 1,
+      "memory": "8Gi",
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 18000,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "All12 pinned cases attempted; each completed or deterministically capped producer replayed in a fresh process with complete prior V2; no retry",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stop at queue exhaustion,32768 inserted rows or131072 candidates;600s each production/replay plus5s grace;8GiB1thread;18000s outer",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Source/input/base hash mismatch, malformed input or failed replay invalidates certificate",
+    "Capped traces establish admitted membership only; never full V3",
+    "A degree<=2 admitted row outside complete V2 proves lower3 even when capped",
+    "No plateau, timeout or cap supplies a global upper bound",
+    "All times diagnostic;wall_valid=false"
+  ],
+  "decision_rule": {
+    "text": "Report exactLFD or strict lower/global upper certificates only after fresh replay; no scientific hypothesis promotion; unknown stays null.",
+    "comparison_ids": [
+      "C-completion"
+    ],
+    "statistic": "Exact per-input value or missing",
+    "interval": "not applicable",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "not applicable",
+    "verdict_vocabulary": [
+      "certified",
+      "bounded",
+      "resource_limit",
+      "error",
+      "unresolved"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/bin/degree3_m3.rs",
+      "sha256": "9311d19c36f3e416ab07175ee9433acff1980ec5525d6463d16f590171289bbd"
+    },
+    "inputs": [
+      "protocol-degree3-m3.json extensions.cases",
+      "cases/*/result.json",
+      "status/*.json"
+    ],
+    "outputs": [
+      "summary.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "12-case admitted rank and lower/upper LFD evidence grid with completion state"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Reporting first-fall degree as regularity",
+    "Reporting final basis degree as solving degree",
+    "Using timeout as a degree bound",
+    "Downscaling n or omitting m cells",
+    "Claiming an IC/rho speedup or subgroup attack from this stage",
+    "Equating closure plateau with global stabilization",
+    "Inferring lower regularity or elite factor-base quality from low FFD/LFD alone",
+    "Removing failed or partial outputs"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/html/2112.05579",
+      "provenance": "retrieved",
+      "claim": "Ordinary-degree V_i and LFD definitions; distinction of FFD, LFD, solving degree and homogeneous regularity",
+      "verified_by": "Read primary definitions and Macaulay closure construction before implementation"
+    },
+    {
+      "ref": "research/n83_fixed_fall_catalog_20261028/src/main.rs",
+      "provenance": "internal",
+      "claim": "Prior exactV2 construction and complete replay traces",
+      "verified_by": "Read source and retained paired data before extension"
+    }
+  ],
+  "amendments": [],
+  "extensions": {
+    "cases": [
+      {
+        "key": "original-koblitz-m3-planted",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m3-planted",
+        "family": "koblitz",
+        "target_kind": "planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m3-planted",
+        "v2directory": "/home/ec2-user/n83-fixed-fall-recovery/r1/closure/koblitz-m3-planted",
+        "input_json_sha256": "a124fa0bf4db31742b52fc220866d9e50e9beb5510ff62183edd6e7fe1ab2cd9",
+        "system_sha256": "0283370eaec54fc4da455ed371acd7573e61950e44253c10022258a893d6724d",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+        "v2": {
+          "rows_sha256": "ecaa6ab8dc107ab9e7a07e5c437d88b6fe0f8f52189f08afc362150bf735a534",
+          "operations_sha256": "b2cb475ea0eb846200aa12cd39cef960086e2845d9ecbd78c4386c5d0ec22409",
+          "result_sha256": "ff811f3f19e79be4245607bfa66b9c2295accd3f2f45abc3b3dfcb193423a634"
+        }
+      },
+      {
+        "key": "original-koblitz-m3-natural",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m3-natural",
+        "family": "koblitz",
+        "target_kind": "natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m3-natural",
+        "v2directory": "/home/ec2-user/n83-fixed-fall-recovery/r1/closure/koblitz-m3-natural",
+        "input_json_sha256": "aa09768eb7e1c0a9cf2393314de3923294910e3dc2abfdac7eed0c4bcbf26a51",
+        "system_sha256": "6b4a7da1d137a1cb955ef9f43cb3f4c631b91b9638df5ac178e5f92dcc34e635",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+        "v2": {
+          "rows_sha256": "dcda434f2e51c7ff1432a8113c4f6041bf62259a9f09743cd03ebc992421ba2d",
+          "operations_sha256": "afcef2633cbff9537342dd2109ebfcb12195a8248d7d242f8da4a405b9284ab1",
+          "result_sha256": "cea998fe74fbd0f13a4c07802ec6b8437267d26026aeb9df2eed5d8bf6590f8a"
+        }
+      },
+      {
+        "key": "original-binary-m3-planted",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m3-planted",
+        "family": "binary",
+        "target_kind": "planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m3-planted",
+        "v2directory": "/home/ec2-user/n83-fixed-fall-recovery/r1/closure/binary-m3-planted",
+        "input_json_sha256": "824e38fe2e36c3a73b189fcbb1608292b78486bea0c49d1b50b5907a50e2c43a",
+        "system_sha256": "8963f6bf596dec633086c81f90d7246c858f83880839c542dcc4626e81812c03",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+        "v2": {
+          "rows_sha256": "fe44f6133d92e0baf10d108dd071fb7d25484fc776bdaac21760b28b190a1a1f",
+          "operations_sha256": "71e5125e5aaa8f64b948618b842797ffb526a91547188c140a8af99b269262af",
+          "result_sha256": "a2860d58095d0e2508f8fc41751a5a3a391c3fdbbc8c1bf2ea49765a9ad9751e"
+        }
+      },
+      {
+        "key": "original-binary-m3-natural",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m3-natural",
+        "family": "binary",
+        "target_kind": "natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m3-natural",
+        "v2directory": "/home/ec2-user/n83-fixed-fall-recovery/r1/closure/binary-m3-natural",
+        "input_json_sha256": "1a23e4de28cb63de7131c487b1e14a09887b96b01595240dff5a7d04377033de",
+        "system_sha256": "490eb1e70c156faed40b5576dd35c6d5ed6b4885ac3415faf29f7b503c1e4dbd",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+        "v2": {
+          "rows_sha256": "e6c98a9c5ff9c21ac272e609de593ea06c76e68b89cb7969cd45f4314f98c02b",
+          "operations_sha256": "bbc33a63e95683c5d480501aa36472d6a71bcb155a597cc1b7bdd9250cfc2993",
+          "result_sha256": "e01f803a673b7bf707131e0ded7929ea8d9cd071e5c94ee816149366adc296cd"
+        }
+      },
+      {
+        "key": "baseline-koblitz-m3-planted",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m3-planted",
+        "family": "koblitz",
+        "target_kind": "planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m3-planted",
+        "v2directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/closure/koblitz-m3-planted",
+        "input_json_sha256": "bbd5ed57754b9be49eccc81b3f69185651f163c6be964214e9c7c7a7b73fe24f",
+        "system_sha256": "cf8749c346c9e66e6a83e044c45a9c43d2214da300d1f78c1fceec153386c5ad",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+        "v2": {
+          "rows_sha256": "90e41ad167cd5b7085e86856bee6054f696ba31ef5d4fc74b24bc482084279bc",
+          "operations_sha256": "34cf9e674463a1ea22ce8b80686a0ca615b71d869cc61af1863b1a60b7d615d2",
+          "result_sha256": "4877ec4f4b26716a1f177f03b50d52bcb305b70e24ab60558842452351cefff3"
+        }
+      },
+      {
+        "key": "baseline-koblitz-m3-natural",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m3-natural",
+        "family": "koblitz",
+        "target_kind": "natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m3-natural",
+        "v2directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/closure/koblitz-m3-natural",
+        "input_json_sha256": "a2572b4bdcdca1db8bc938c02bcc5c58deec4ed0efb8d9b9904fa8d718a24806",
+        "system_sha256": "6b4a7da1d137a1cb955ef9f43cb3f4c631b91b9638df5ac178e5f92dcc34e635",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+        "v2": {
+          "rows_sha256": "dcda434f2e51c7ff1432a8113c4f6041bf62259a9f09743cd03ebc992421ba2d",
+          "operations_sha256": "afcef2633cbff9537342dd2109ebfcb12195a8248d7d242f8da4a405b9284ab1",
+          "result_sha256": "3889c3f5e10670623075de8a31ee132757606eb17ebea5703a064e05cfe70cba"
+        }
+      },
+      {
+        "key": "baseline-binary-m3-planted",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m3-planted",
+        "family": "binary",
+        "target_kind": "planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m3-planted",
+        "v2directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/closure/binary-m3-planted",
+        "input_json_sha256": "e9619e308ad1b19155551c3a80fc1c9a6c49faaeb080bee68e500797fef4894a",
+        "system_sha256": "f6261f88dba5334afba16b1871dc58875bebbb77d89999a654b21fc8211d4abf",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+        "v2": {
+          "rows_sha256": "b8af172df76259ebb6424987b79fd75cfde566cdd213ba7dd71bbf9f16640e82",
+          "operations_sha256": "0a1a6afcd3ccdeb698bb40ae0dccf0371099d95cf16d72f9cf75d1ef9543c560",
+          "result_sha256": "b73944055778003fd9f5baefb541fc8993c9ea95ad678693234026752c46cb31"
+        }
+      },
+      {
+        "key": "baseline-binary-m3-natural",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m3-natural",
+        "family": "binary",
+        "target_kind": "natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m3-natural",
+        "v2directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/closure/binary-m3-natural",
+        "input_json_sha256": "c53dbfdcecfe31b9e70af5a3ba5ad77b78731b5fb58204ab6c8dd27db7665b7b",
+        "system_sha256": "490eb1e70c156faed40b5576dd35c6d5ed6b4885ac3415faf29f7b503c1e4dbd",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+        "v2": {
+          "rows_sha256": "e6c98a9c5ff9c21ac272e609de593ea06c76e68b89cb7969cd45f4314f98c02b",
+          "operations_sha256": "bbc33a63e95683c5d480501aa36472d6a71bcb155a597cc1b7bdd9250cfc2993",
+          "result_sha256": "c03f8929385fc7ea56c4c772d101ab03882798d9bb3e47020d908607ad1846dc"
+        }
+      },
+      {
+        "key": "spike40-koblitz-m3-planted",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m3-planted",
+        "family": "koblitz",
+        "target_kind": "planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m3-planted",
+        "v2directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/closure/koblitz-m3-planted",
+        "input_json_sha256": "c989fbe15c64657a44d849c84f50437f3ece5b9bd189611c1656bc3969cd122b",
+        "system_sha256": "7698c2a5e749ecd8776a2b059ec134d82a9e3faa6dce82369468b4796671d455",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6",
+        "v2": {
+          "rows_sha256": "382787219f7e54e1f98b13f019975605219922dc1d06751867d97abcddb1e461",
+          "operations_sha256": "74e9cfe8305498a86545528af2d1b465b24525bf0b1f2ab51060ec768968c434",
+          "result_sha256": "3d13fc0e1354cb2a1faaea477e99ce8adbefb9ee7fde8c27e39fc95935b59cc8"
+        }
+      },
+      {
+        "key": "spike40-koblitz-m3-natural",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m3-natural",
+        "family": "koblitz",
+        "target_kind": "natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m3-natural",
+        "v2directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/closure/koblitz-m3-natural",
+        "input_json_sha256": "20e18534251a21d0b204c6f75cb8ac0b7d69bbd69985a403c6e4ed0bbefe74b5",
+        "system_sha256": "48416fc837f14eb6d3dfeb37ec5aee4b0079f95d3f81458bf2b351ef6613abb9",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6",
+        "v2": {
+          "rows_sha256": "96231c6742c6246b43feb2c8a1e762b226961341dab90e6e40690123735e4773",
+          "operations_sha256": "3e42bf3b2c46637e8edae514cecddc959c4ae67abe78a558a4971f9a9cc1ab38",
+          "result_sha256": "06839b434a8b5e93f24f341ebe3ec7f35a59a6505249eb7a12b0de37f5b3eab3"
+        }
+      },
+      {
+        "key": "spike40-binary-m3-planted",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m3-planted",
+        "family": "binary",
+        "target_kind": "planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m3-planted",
+        "v2directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/closure/binary-m3-planted",
+        "input_json_sha256": "75c3330da55082219ebd182af6092f8982b9dad3e2d5b76b6bc19e01ff78e4b1",
+        "system_sha256": "73b090ea1a19ebccd6ff1e1b0860f74bbc632a3a56fe4a3bbd4e2e971c4eddc7",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe",
+        "v2": {
+          "rows_sha256": "8ec85d66df52a640582f0476d840eb0064fa67aba118551723c6082fdb293a1b",
+          "operations_sha256": "151f5bdf161364a5469b3843680644f39b6063cd0161ed8f2bb01caf27dd80a1",
+          "result_sha256": "3930f8db2a369985cd8043e06863f0e6abf1fbd4f27754afbeda15af210d1e35"
+        }
+      },
+      {
+        "key": "spike40-binary-m3-natural",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m3-natural",
+        "family": "binary",
+        "target_kind": "natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m3-natural",
+        "v2directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/closure/binary-m3-natural",
+        "input_json_sha256": "912e260514a30fd6fcff7403cf14a24e47fbfc5638ef42c48338397dd9bd7851",
+        "system_sha256": "a12e8fe09180f3639a6bda70811b7e49b5bc25da55ced2abb59bbbd1f4ce3676",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe",
+        "v2": {
+          "rows_sha256": "be3fdeb7e4e307d519c3aa21e42f513e1b119e037fed3698246bf79562cad6f4",
+          "operations_sha256": "7b848f310b13134606482d15696101f533a81ccdb305c43913a5b4830cf253e4",
+          "result_sha256": "8e4b9c93606416e16ee52fe06a8db4784dfe3c4324b059504c4a56c3d54a0db1"
+        }
+      }
+    ],
+    "raw_prefix": "s3://setec-astronomy-artifacts/runs/n83-degree3-m3-20261029-r1/local/",
+    "detailed_design": "DEGREE3_M3_DESIGN.md",
+    "file_layout": "DEGREE3_M3_FORMAT.json",
+    "backend_reason": "Existing host fallback after retained EKS bucket denial; fresh2026-10-29 inventory has no active duplicate; no IAM/capacity changes",
+    "prior_paired_archive_sha256": "25f88306bde0643f435ffe3db3ab1de9c95952f9e3476242083d4ab551c23845",
+    "retained_objective": "All n83 families m2..9 and elite-base goal remain; this batch addresses m3 binary-family LFD only"
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "e4d9a88ecf15df5dd837e713d1cfaf936c02fae9b9b9359d6803d20214fbb438",
+    "commit": "6a2c028999634a4ddf9791dc3082180086b6c2ff",
+    "frozen_at": "2026-10-29T03:02:35Z",
+    "filed_before_affected_data": true
+  }
+}

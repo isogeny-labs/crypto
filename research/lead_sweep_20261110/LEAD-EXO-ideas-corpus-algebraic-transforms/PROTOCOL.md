@@ -1,0 +1,20 @@
+# LEAD-EXO-ideas-corpus-algebraic-transforms
+## 1. Lead as recorded (disposition, family, title, next-step excerpt; files read with paths)
+- Disposition: open_blocked (2026-11-01 unchanged); family: exotic; last_reviewed 2026-10-30; source atlas_survey_20261107 --pursuit.
+- Title: ECDLP-IDEA breakthrough corpus: algebraic-geometric transforms awaiting constructors.
+- Next-step excerpt (truncated in leads.json): "For each of the 15 active registry rows, supply the named constructor or theorem the deferred/in..."
+- Files read: /home/user/crypto/research/lead_sweep_20261110/leads.json (entry); one-line row in /home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md (line 284); grep hit /home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json (tally only). The 15 registry rows and their constructors were not found in readable form; the cryptanalysis hits were only atlas-input indexes (not read further).
+## 2. Hypothesis
+The lead's transforms are only useful if each is a group homomorphism (or a relation-producing map with a computable preimage) from E(F_p) to a cheaper group. Claim H: for random prime-field curves with group order ~2^12..2^20, no "generic coordinate transform" of the kind a registry row would name without a constructor (x or y into F_p^+, x or y into F_p^*, Legendre symbol of y or x-code, a random polynomial in x, y) is a homomorphism: its homomorphism-rate over random point pairs is below 1% on every curve, whereas genuine endomorphisms are at 100%. So an unconstructed transform carries no ECDLP content; a constructor (explicit homomorphism) is the entire content.
+## 3. Preregistered prediction and falsification criterion
+- Statistic: per (curve, map) fraction r of N_PAIRS random pairs (P,Q) with f(P+Q) = f(P) (*) f(Q) in the target group. Excluded: pairs with P, Q, P+Q at infinity or P=+-Q.
+- Prediction: max r over all negative-candidate maps and all curves < 0.01. Positive control ([k]P into E, k=2,3, and negation) must have r = 1.0 exactly. Null control: a seeded random function on points, r < 0.01 and within noise of the candidates (A/A).
+- A/A arm: each candidate evaluated on two independent pair samples (seed streams A and B); |rA - rB| must be <= 0.02 for all maps.
+- Outcomes: consistent_with_prediction if positive controls all 1.0, null < 0.01, A/A ok, and max negative r < 0.01. falsified if any negative candidate has r >= 0.05 with controls valid (a nontrivial homomorphism exists in the family). inconclusive otherwise (controls fail or 0.01 <= r < 0.05).
+- Note: Legendre(y) into {+-1} has chance rate ~0.5 on a size-2 target, so it is compared against its own null (random +-1 function); the criterion for it is r within 0.05 of 0.5 and not 1.0; it is reported separately and cannot falsify.
+## 4. Method
+Primes: 12 primes chosen deterministically from the first prime above 2^k for k = 8..11 (group orders ~2^8..2^12 counted by naive enumeration, at most 3 curves each; larger primes make O(p) enumeration unnecessary here, and sizes up to p~2^14 in the full run). Curves y^2=x^3+ax+b, seeds random.Random(20261110+i), nonsingular, order via enumeration. Affine addition with modular inverses (pow(x,-1,p)). N_PAIRS=3000 per curve per map per stream. Maps: xadd (x mod p into Z_p), xmul (x into F_p^*, x!=0), yadd, ymul, xy_poly (x*y+x^2 mod p into Z_p), legy, null-random. Controls: dbl, tpl, neg into E. Cost: a few seconds pure Python, far below 10 min / 200 MB.
+## 5. Classification: runnable_local
+A stdlib toy decides the sharpened question about the recorded obstruction (constructors missing); it does not test the 15 specific registry rows, which are unavailable.
+## 6. What a run cannot establish
+It does not evaluate any of the 15 registry transforms or their constructors, nor any asymptotic cost; absence of homomorphism among generic coordinate maps is near-tautological and says nothing about constructed transforms (isogenies, covers, Weil descent). Toy sizes only. Results are labelled [pcc:unverified].

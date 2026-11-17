@@ -1,0 +1,7 @@
+# Root independent source review of symbolic index
+
+2026-10-30. Reviewed patch5d580e5122f31c4d8c6e01f640ffead25d5857305985aca095aef40881adc3f4 against accepted concrete contract and baseline9bfe. No remaining source blocker found; compilation and authored tests are not yet executed.
+
+Hash constants, all-active-coordinate comparison, bounded linear probing and zero-tail assumption match contract. Table initialization is charged before stores; fixed helper and Vec allocations are separately admitted. Duplicate at full column limit returns without mutation. Empty-slot publication follows successful gate.push with no intervening fallible operation, and rejected append leaves the index unchanged. Every index maps an append position; table drops before sorting. Reducer/pair/step behavior remains untouched. Test-only legacy path preserves former lookup for completed-output differential controls; test hooks cannot affect non-test runtime.
+
+Reviewed seven controls cover collision/wraparound/all28axes, maximum logical columns, exact-one-less work/bytes, failed-growth transaction, deterministic expiry and native basis/stage/batch/counter equivalence on completed fixtures. The supported64bit layout assertions are explicit contract requirements. This does not establish passing tests, machine speed, useful-work coverage on432 cases or profile activation. Original342 failed panel remains evidence.

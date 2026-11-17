@@ -1,0 +1,10 @@
+/var/tmp/pencil-residual-acceptance-20261101-v1/ListGuards.lean:13:53: error: unexpected token ')'; expected term
+/var/tmp/pencil-residual-acceptance-20261101-v1/ListGuards.lean:13:3: error: `simp` made no progress
+/var/tmp/pencil-residual-acceptance-20261101-v1/ListGuards.lean:7:68: error: unsolved goals
+case p1
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+u : List UInt64
+hm : u.getLast? = some 1
+hu : 0 < u.length
+⊢ (wordsPoly p u).coeff (u.length - 1) ≠ 0

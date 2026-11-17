@@ -1,0 +1,26 @@
+{
+  "schema": "ic-acct7.work-medians/v1",
+  "source": "audit/n17-work-counted.jsonl",
+  "computed_by": "jq -s -f audit/medians.jq audit/n17-work-counted.jsonl (median of an even count = mean of the two middle values)",
+  "arms": [
+    {
+      "arm": "ic-symmetrised-d9",
+      "records": 8,
+      "complete": 8,
+      "median_bitops": 1955905811.5,
+      "min_bitops": 979783375,
+      "max_bitops": 3664367922,
+      "median_gae": 897.1153059999999
+    },
+    {
+      "arm": "rho-frob",
+      "records": 8,
+      "complete": 8,
+      "median_bitops": 1867876.5,
+      "min_bitops": 1269207,
+      "max_bitops": 6581823,
+      "median_gae": 254.58137399999998
+    }
+  ],
+  "median_bitops_ic_over_rho": 1047.128014887494
+}

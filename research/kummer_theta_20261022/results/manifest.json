@@ -1,0 +1,17 @@
+{
+  "schema": "kummer-theta-run-manifest/v1",
+  "study_id": "KUMMER-THETA-AFFINE-20261022",
+  "protocol_frozen_before_run": "PROTOCOL.md",
+  "source_model_path": "research/four_followups_20261021/results/kummer-model-gate.jsonl",
+  "source_model_sha256": "280b06474489bd78cba9a1fedd548aac9ac529a843f60156060d692851432680",
+  "prior_rosenhain_path": "research/kummer_walk_20261022/results/rosenhain-models.jsonl",
+  "prior_rosenhain_sha256": "1663896e5526193174f5b1550ec2c4e3b1098f15f886da0c4427591dc2cc9648",
+  "producer_command": "research/kummer_theta_20261022/target/release/kummer-theta-gate",
+  "validator_command": "research/kummer_theta_20261022/target/release/validate_theta",
+  "raw_results": "results/theta-models.jsonl",
+  "aggregate": "results/summary.json",
+  "graph": ["theta-setup.svg", "theta-setup.png"],
+  "pdf": "THETA_GATE.pdf",
+  "independent_validator": "src/bin/validate_theta.rs",
+  "cost_status": "unmeasured; candidate_cost, rho_cost, candidate_to_rho_ratio are null"
+}

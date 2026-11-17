@@ -1,0 +1,27 @@
+{
+  "base_main_commit": "abee07ee7337d04a7e734333669ca1bacd6c763a",
+  "binary_sha256": "609569b34aee6bcda7370cb165146274562ffc6a1d412eb6d50d1fedb6393822",
+  "branch_commit_before_receipt": "ceddefda1ea16c99cb3b0cf3d3e8db4c9065f44f",
+  "command": "cargo build --offline --release --example rho_worker_phase_profile && target/release/examples/rho_worker_phase_profile 32 8192 12",
+  "current_trace_fraction": 0.07011939664266516,
+  "date_utc": "2026-10-18",
+  "illustrative_same_trace_speedup_if_phase_doubled": 1.0363335413189196,
+  "illustrative_same_trace_upper_bound_if_phase_eliminated": 1.075406881689433,
+  "independent_replay": "passed_for_every_walker",
+  "measurement_tier": "local_diagnostic",
+  "previous_trace_binary_sha256": "9d94ed7b1ea318769ece8ab158fa5f2bc7d9dc2202208e7d4c3d199fba56218c",
+  "previous_trace_fraction": 0.03608392129589697,
+  "previous_trace_sha256": "dc0d6ab4598fad17c9b92e30682d7365388ec91152fa2bfbec2d690eafe346a3",
+  "qualified_worker_speedup": null,
+  "same_trace_fraction_shift_percentage_points": 3.4035475346768185,
+  "schema": "rho-worker-rebased-main-phase-validation-v1",
+  "source_sha256": {
+    "examples/rho_worker_phase_profile.rs": "4266f7c3a4179be35a28f7ee52dea0c0c61b5c1e571fedff4f0f56e4155945cf",
+    "src/cryptanalysis/pollard_collab/job.rs": "f62d8fcb066e0780e6fd6035767dcc7457217cce92812a8b76059c16c6cce05d",
+    "src/cryptanalysis/pollard_collab/walk.rs": "fdefcf5ea40cc7e2a7eadd71cd2bd140635cc87a4f3215761f4b3ad0dc4d6a6c"
+  },
+  "trace_file": "rebased-main-phase-32x8192-dp12.json",
+  "trace_sha256": "a6ccb421b595f77c882163e587e353eb8ad1f1202d9bdc19621f925a8d25c46c",
+  "transcript_blake3": "8abc16ee2b29b7531d2fcbf9c1bce660061464c2b36deecca095d13234f22dc2",
+  "walk_steps": 106327
+}

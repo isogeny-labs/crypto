@@ -1,5 +1,17 @@
 # Extension-field algebraic IC with graph elimination
 
+The [complete-process Nagao comparison](nagao-e2e/README.md) now reports
+five measured cold recoveries per method. The paired new/old ratio0.99832
+(95% interval0.96725–1.02717) does not demonstrate an E2E gain from unit
+elimination. All24recoveries and local controls pass; fixed known-answer
+weak-family timing remains separate from general parity/price claims.
+[pcc:unverified]
+
+The [17 November Nagao unit-elimination component](rho-parity/README.md)
+adds an opt-in five-variable finder with exact lifting and the existing checked
+row materializer. Its fixed-fixture counts and dashboard exclusion are recorded
+separately; frozen stage41–43 data and whole-pipeline status are unchanged.
+
 The [native quadratic remainder component](quadratic-remainder-component/README.md)
 adds a reusable opt-in degree-nine extractor and bounded signed class-graph
 adapter to the library. Its separate frozen-source release suite reports19

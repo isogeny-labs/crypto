@@ -1,0 +1,49 @@
+{
+  "schema": "research.software-control/v1",
+  "scope": "standalone Lean launcher process status and binding custody",
+  "scientific_execution": false,
+  "independent_review": "pending",
+  "controls": [
+    {
+      "case": "legacy-rejected",
+      "wrapper_exit": 0,
+      "native_exit": 1,
+      "inputs_unchanged": true,
+      "expected_wrapper_exit": 0,
+      "expected_native_exit": 1
+    },
+    {
+      "case": "strict-rejected",
+      "wrapper_exit": 1,
+      "native_exit": 1,
+      "inputs_unchanged": true,
+      "expected_wrapper_exit": 1,
+      "expected_native_exit": 1
+    },
+    {
+      "case": "strict-positive",
+      "wrapper_exit": 0,
+      "native_exit": 0,
+      "inputs_unchanged": true,
+      "expected_wrapper_exit": 0,
+      "expected_native_exit": 0
+    },
+    {
+      "case": "strict-input-mutation",
+      "wrapper_exit": 2,
+      "native_exit": 0,
+      "inputs_unchanged": false,
+      "expected_wrapper_exit": 2,
+      "expected_native_exit": 0
+    },
+    {
+      "case": "stale-output",
+      "wrapper_exit": 1,
+      "native_execution": "not reached; existing directory rejected",
+      "retained_files_unchanged": true
+    }
+  ],
+  "performance_ratio": null,
+  "prior_proof_receipts": "preserved; final native zero and unchanged bindings were explicitly checked",
+  "limits": "This is instrument validation, not theorem semantic review or canonical gate integration."
+}

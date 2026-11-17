@@ -1,0 +1,8 @@
+make: Entering directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations block_qual.cpp -o /tmp/cm-marked-scalar-build/block-qual -lcrypto -lgmpxx -lgmp
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations block_eval.cpp -o /tmp/cm-marked-scalar-build/block-eval -lcrypto
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations block_analyze.cpp -o /tmp/cm-marked-scalar-build/block-analysis -lcrypto
+make: Leaving directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'

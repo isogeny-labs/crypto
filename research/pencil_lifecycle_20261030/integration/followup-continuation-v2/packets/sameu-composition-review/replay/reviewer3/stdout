@@ -1,0 +1,14 @@
+/var/tmp/pencil-sameu-composition-review-20261031-v1/replay/ReviewerControls.lean:8:5: error: `field_simp` made no progress on the goal
+/var/tmp/pencil-sameu-composition-review-20261031-v1/replay/ReviewerControls.lean:17:5: error: Tactic `decide` failed for proposition
+  -(120932352 / 60466176) = 3 ∧
+    ¬3656158440062976 = 0 ∧
+      160409934466124808814066151718912 / 80204967233062404407033075859456 = 2 ∧
+        -(4849687664788584363858837602739217760256 / 4849687664788584363858837602739217760256) = 4
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableAnd`, `instDecidableEqFin`, `instDecidableEqNat`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match h : (↑(-(120932352 / 60466176))).beq ↑3 with
+  | true => isTrue ⋯
+  | false => isFalse ⋯

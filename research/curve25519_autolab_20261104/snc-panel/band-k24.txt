@@ -1,0 +1,82 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-tm1274-94607e3f | 21.00 | inc | 96/96 | 2.262 | 2.456 | 4.198 | — |
+| icv1-fp24-tm1274-94607e3f | 21.00 | inc-lazy | 96/96 | 2.190 | 2.384 | 4.126 | — |
+| icv1-fp24-tm1274-94607e3f | 21.00 | rho-neg | 96/96 | 1.156 | 1.260 | 2.194 | — |
+| icv1-fp24-tm1274-94607e3f | 21.00 | tw2cj | 96/96 | 2.027 | 2.196 | 3.712 | — |
+| icv1-fp24-tm1274-94607e3f | 21.00 | tw2cj-lazy | 96/96 | 1.893 | 2.062 | 3.579 | — |
+| icv1-fp24-tm3106-7b0fab0e | 21.00 | inc | 96/96 | 2.209 | 2.397 | 4.087 | — |
+| icv1-fp24-tm3106-7b0fab0e | 21.00 | inc-lazy | 96/96 | 2.136 | 2.324 | 4.013 | — |
+| icv1-fp24-tm3106-7b0fab0e | 21.00 | rho-neg | 96/96 | 1.149 | 1.253 | 2.181 | — |
+| icv1-fp24-tm3106-7b0fab0e | 21.00 | tw2cj | 96/96 | 2.169 | 2.351 | 3.989 | — |
+| icv1-fp24-tm3106-7b0fab0e | 21.00 | tw2cj-lazy | 96/96 | 2.032 | 2.214 | 3.852 | — |
+| icv1-fp24-tm3458-53ccc2e9 | 21.00 | inc | 96/96 | 2.148 | 2.330 | 3.970 | — |
+| icv1-fp24-tm3458-53ccc2e9 | 21.00 | inc-lazy | 96/96 | 2.078 | 2.260 | 3.900 | — |
+| icv1-fp24-tm3458-53ccc2e9 | 21.00 | rho-neg | 96/96 | 1.150 | 1.253 | 2.182 | — |
+| icv1-fp24-tm3458-53ccc2e9 | 21.00 | tw2cj | 96/96 | 1.984 | 2.148 | 3.621 | — |
+| icv1-fp24-tm3458-53ccc2e9 | 21.00 | tw2cj-lazy | 96/96 | 1.848 | 2.012 | 3.485 | — |
+| icv1-fp24-tm3426-0438c267 | 21.00 | inc | 96/96 | 2.143 | 2.324 | 3.957 | — |
+| icv1-fp24-tm3426-0438c267 | 21.00 | inc-lazy | 96/96 | 2.067 | 2.249 | 3.881 | — |
+| icv1-fp24-tm3426-0438c267 | 21.00 | rho-neg | 96/96 | 1.245 | 1.358 | 2.373 | — |
+| icv1-fp24-tm3426-0438c267 | 21.00 | tw2cj | 96/96 | 1.984 | 2.147 | 3.622 | — |
+| icv1-fp24-tm3426-0438c267 | 21.00 | tw2cj-lazy | 96/96 | 1.847 | 2.011 | 3.485 | — |
+| icv1-fp24-tm4010-db2650ce | 21.00 | inc | 96/96 | 2.079 | 2.254 | 3.830 | — |
+| icv1-fp24-tm4010-db2650ce | 21.00 | inc-lazy | 96/96 | 2.008 | 2.183 | 3.759 | — |
+| icv1-fp24-tm4010-db2650ce | 21.00 | rho-neg | 96/96 | 1.177 | 1.283 | 2.236 | — |
+| icv1-fp24-tm4010-db2650ce | 21.00 | tw2cj | 96/96 | 2.089 | 2.264 | 3.831 | — |
+| icv1-fp24-tm4010-db2650ce | 21.00 | tw2cj-lazy | 96/96 | 1.954 | 2.128 | 3.696 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp24-tm1274-94607e3f | inc vs inc-lazy | inc-lazy < inc |
+| icv1-fp24-tm1274-94607e3f | inc vs rho-neg | rho-neg < inc |
+| icv1-fp24-tm1274-94607e3f | inc vs tw2cj | tw2cj < inc |
+| icv1-fp24-tm1274-94607e3f | inc vs tw2cj-lazy | tw2cj-lazy < inc |
+| icv1-fp24-tm1274-94607e3f | inc-lazy vs rho-neg | rho-neg < inc-lazy |
+| icv1-fp24-tm1274-94607e3f | inc-lazy vs tw2cj | tw2cj < inc-lazy |
+| icv1-fp24-tm1274-94607e3f | inc-lazy vs tw2cj-lazy | tw2cj-lazy < inc-lazy |
+| icv1-fp24-tm1274-94607e3f | rho-neg vs tw2cj | rho-neg < tw2cj |
+| icv1-fp24-tm1274-94607e3f | rho-neg vs tw2cj-lazy | rho-neg < tw2cj-lazy |
+| icv1-fp24-tm1274-94607e3f | tw2cj vs tw2cj-lazy | tw2cj-lazy < tw2cj |
+| icv1-fp24-tm3106-7b0fab0e | inc vs inc-lazy | inc-lazy < inc |
+| icv1-fp24-tm3106-7b0fab0e | inc vs rho-neg | rho-neg < inc |
+| icv1-fp24-tm3106-7b0fab0e | inc vs tw2cj | tw2cj < inc |
+| icv1-fp24-tm3106-7b0fab0e | inc vs tw2cj-lazy | tw2cj-lazy < inc |
+| icv1-fp24-tm3106-7b0fab0e | inc-lazy vs rho-neg | rho-neg < inc-lazy |
+| icv1-fp24-tm3106-7b0fab0e | inc-lazy vs tw2cj | unresolved inside the band |
+| icv1-fp24-tm3106-7b0fab0e | inc-lazy vs tw2cj-lazy | tw2cj-lazy < inc-lazy |
+| icv1-fp24-tm3106-7b0fab0e | rho-neg vs tw2cj | rho-neg < tw2cj |
+| icv1-fp24-tm3106-7b0fab0e | rho-neg vs tw2cj-lazy | rho-neg < tw2cj-lazy |
+| icv1-fp24-tm3106-7b0fab0e | tw2cj vs tw2cj-lazy | tw2cj-lazy < tw2cj |
+| icv1-fp24-tm3458-53ccc2e9 | inc vs inc-lazy | inc-lazy < inc |
+| icv1-fp24-tm3458-53ccc2e9 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp24-tm3458-53ccc2e9 | inc vs tw2cj | tw2cj < inc |
+| icv1-fp24-tm3458-53ccc2e9 | inc vs tw2cj-lazy | tw2cj-lazy < inc |
+| icv1-fp24-tm3458-53ccc2e9 | inc-lazy vs rho-neg | rho-neg < inc-lazy |
+| icv1-fp24-tm3458-53ccc2e9 | inc-lazy vs tw2cj | tw2cj < inc-lazy |
+| icv1-fp24-tm3458-53ccc2e9 | inc-lazy vs tw2cj-lazy | tw2cj-lazy < inc-lazy |
+| icv1-fp24-tm3458-53ccc2e9 | rho-neg vs tw2cj | rho-neg < tw2cj |
+| icv1-fp24-tm3458-53ccc2e9 | rho-neg vs tw2cj-lazy | rho-neg < tw2cj-lazy |
+| icv1-fp24-tm3458-53ccc2e9 | tw2cj vs tw2cj-lazy | tw2cj-lazy < tw2cj |
+| icv1-fp24-tm3426-0438c267 | inc vs inc-lazy | inc-lazy < inc |
+| icv1-fp24-tm3426-0438c267 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp24-tm3426-0438c267 | inc vs tw2cj | tw2cj < inc |
+| icv1-fp24-tm3426-0438c267 | inc vs tw2cj-lazy | tw2cj-lazy < inc |
+| icv1-fp24-tm3426-0438c267 | inc-lazy vs rho-neg | rho-neg < inc-lazy |
+| icv1-fp24-tm3426-0438c267 | inc-lazy vs tw2cj | tw2cj < inc-lazy |
+| icv1-fp24-tm3426-0438c267 | inc-lazy vs tw2cj-lazy | tw2cj-lazy < inc-lazy |
+| icv1-fp24-tm3426-0438c267 | rho-neg vs tw2cj | rho-neg < tw2cj |
+| icv1-fp24-tm3426-0438c267 | rho-neg vs tw2cj-lazy | rho-neg < tw2cj-lazy |
+| icv1-fp24-tm3426-0438c267 | tw2cj vs tw2cj-lazy | tw2cj-lazy < tw2cj |
+| icv1-fp24-tm4010-db2650ce | inc vs inc-lazy | inc-lazy < inc |
+| icv1-fp24-tm4010-db2650ce | inc vs rho-neg | rho-neg < inc |
+| icv1-fp24-tm4010-db2650ce | inc vs tw2cj | inc < tw2cj |
+| icv1-fp24-tm4010-db2650ce | inc vs tw2cj-lazy | tw2cj-lazy < inc |
+| icv1-fp24-tm4010-db2650ce | inc-lazy vs rho-neg | rho-neg < inc-lazy |
+| icv1-fp24-tm4010-db2650ce | inc-lazy vs tw2cj | inc-lazy < tw2cj |
+| icv1-fp24-tm4010-db2650ce | inc-lazy vs tw2cj-lazy | tw2cj-lazy < inc-lazy |
+| icv1-fp24-tm4010-db2650ce | rho-neg vs tw2cj | rho-neg < tw2cj |
+| icv1-fp24-tm4010-db2650ce | rho-neg vs tw2cj-lazy | rho-neg < tw2cj-lazy |
+| icv1-fp24-tm4010-db2650ce | tw2cj vs tw2cj-lazy | tw2cj-lazy < tw2cj |

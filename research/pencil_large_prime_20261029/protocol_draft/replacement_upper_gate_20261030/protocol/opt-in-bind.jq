@@ -1,0 +1,14 @@
+.version=4 |
+.extensions.resource_authorization.path=($root+"/resource_authorization.json") |
+.extensions.upper_gate.execution_request.path=($root+"/request.json") |
+.extensions.continuation_envelope.operational_guard.independent_review.path=($root+"/pencil-six-hour-operational-review.json") |
+.extensions.upper_gate.spec=($study+"/prepared_specs/gate-p186379-target0.json") |
+.extensions.known_data.replacement_context.terminal_state.path=($study+"/runs/p186379-gate-20261030-b1/terminal-partial/terminal-state-0328.json") |
+.extensions.unknown_runtime_characterization_gate={schema:"pencil-bounded-unknown-runtime-gate/v1",runtime_estimate_status:"unknown",resource_caps_are_not_runtime_estimates:true,remaining_cohort_blocked_until:["complete_gate","all_15_measured_independent_nonwall_replays","independent_review","separate_prospective_cohort_admission"],resource_authorization:.extensions.resource_authorization,execution_request:.extensions.upper_gate.execution_request,operational_review:.extensions.continuation_envelope.operational_guard.independent_review,prepared_spec:{path:.extensions.upper_gate.spec,sha256:.extensions.upper_gate.spec_sha256}} |
+.extensions.upper_gate.admission_conditions=.extensions.unknown_runtime_characterization_gate.remaining_cohort_blocked_until |
+.extensions.canonical_packaging.adapter_sha256="5d14e1a9ea20e56c016cf80a12c85ac37d6b4653a6caf53530da69f9a78bc4e3" |
+.extensions.canonical_packaging.binary_sha256="b904a0da30851284da6301d4c97117cf427d6e3d32ea0ff242d90a928367bf7e" |
+.extensions.canonical_packaging.binary_path="/tmp/pencil-unknown-runtime-target/release/pencil-native-canonical-export" |
+.extensions.canonical_packaging.receipt=($study+"/native_canonical_export/validation/unknown-runtime-gate/build-receipt.json") |
+.extensions.canonical_packaging.receipt_sha256=$receipt |
+.amendments += [{id:"A-explicit-unknown-runtime-gate-20261030",filed:"2026-10-30",filed_before_affected_data:true,reason:"Retain genuinely unknown gate runtime without mislabeling the resource allowance as an estimate. A narrowly reviewed native packaging admission route checks the exact bounded finite-count gate, known failed-run context, resource caps and blocking conditions. Scientific instrument, inputs, pricing and metrics are unchanged.",changes:["Opt in to exact bounded unknown-runtime gate; keep estimated_total_seconds null.","Bind new packaging adapter source/binary and software checks; this changes metadata admission only.","Preserve original draft and failed freeze, prior b1 and all resource costs."],supersedes_fields:["extensions.canonical_packaging","extensions.unknown_runtime_characterization_gate","extensions.upper_gate.admission_conditions"]}]

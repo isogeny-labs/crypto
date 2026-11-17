@@ -1,0 +1,22 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}\usepackage[T1]{fontenc}\usepackage{graphicx}
+\begin{document}
+\title{Distinct 1+1 branch: validity preservation}\author{Private field-level proof; independent review pending}\date{31 October 2026}\maketitle
+The unit-weight distinct branch of the actual add11 formula preserves normalized Mumford validity and nonzero output weights. The proof assumes two valid degree-one inputs and distinct x-coordinates. A companion theorem checks branch precedence: inverse and doubling both require equal x.
+\section*{Exact formula}
+For inputs $(x_1,y_1),(x_2,y_2)$ with unit weights, the source returns
+\[q=-(x_1+x_2),\quad r=x_1x_2,\quad s=y_1-y_2,\quad t=x_1y_2-x_2y_1,\quad z=1,\quad w=x_1-x_2.\]
+The normalized support is $(X-x_1)(X-x_2)$ and the ordinate is the interpolation line $v=(s/w)X+t/w$. The proof derives each linear support's divisibility of $f-v^2$, then uses an explicit constant Bezout identity to obtain product divisibility.
+\par\medskip\noindent\includegraphics[width=\linewidth]{diagram.png}
+\newpage
+\section*{Checks and controls}
+Two proof stages compile. Separate readback and controls are retained. The positive control uses $f=X^5-X+1$ over $\mathbb Q$ with $(0,1),(1,1)$, explicitly proves both degree-one input divisibilities and applies the full normalized output theorem. Distinct and doubling selection and overlapping inverse precedence are checked. Equal x yields zero output w, marking the required guard boundary.
+
+The initial bounded API probe failed because polynomial evaluation/factor-theorem modules were absent from the pinned minimal library. The preserved amendment uses degree-one Mumford divisibility directly and proves the Bezout step without new dependencies. Successful proof logs retain stylistic linter warnings.
+\section*{Source and scope}
+Exact source: projective\_law\_gate.rs add11 lines 511--532, from\_affine lines 569--580 and dispatcher lines 606--625; projective\_state\_collector.rs lines 153--160. Retained hashes 5976e7f3 and 96246448 match current HEAD in the preceding constructor packet. Degree-one from\_affine assigns unit weights, which is the input specialization proved here.
+
+Input validity means $(X-Cx_i)$ divides $f-(Cy_i)^2$. The theorem covers any field and polynomial with those hypotheses. Smooth quintic/odd-characteristic assumptions belong to the intended Jacobian interpretation. No native j.valid refinement, UInt64/counter payload proof, generic weighted 1+1 law, doubling law, divisor-class equality or loop induction is claimed. No scientific trial or cost ratio was produced.
+\section*{Evidence and prior work}
+Add11.lean, Controls.lean, Readback.lean, raw compile receipts, REPORT.md, status.json and the source manifest accompany this PDF. Prior InvariantBranches does not contain this output congruence. Literature: Ozbay Gurler--Hisil, DOI 10.1007/s13389-024-00351-7, sections 2--4. The result is a local implementation-preservation connection.
+\end{document}

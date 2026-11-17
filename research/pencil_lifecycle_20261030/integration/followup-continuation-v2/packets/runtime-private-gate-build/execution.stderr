@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-build/run.py", line 70, in <module>
+    if __name__=='__main__':main()
+  File "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-build/run.py", line 56, in main
+    run('candidate-build',[str(compiler),'-static','-O2','-Wall','-Wextra','-Werror',str(SOURCE),'-o',str(out/'gate-candidate.bin')],60)
+  File "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-build/run.py", line 49, in run
+    if proc.returncode:raise RuntimeError(label+' failed')
+RuntimeError: candidate-build failed

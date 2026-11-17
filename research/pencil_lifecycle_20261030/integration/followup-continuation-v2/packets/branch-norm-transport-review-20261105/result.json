@@ -1,0 +1,72 @@
+{
+  "schema": "formal-source-fidelity-review/v1",
+  "task": "T-1690",
+  "created_utc": "2026-11-05T19:08:43.336971+00:00",
+  "producer_commit": "332575b279b07ae75afff81bafa2b96ff8e365f2",
+  "source_sha256": "8cb678a278660748b1d2a58d3f32149f9f952de809353b6b29290b320bb21d96",
+  "plan_sha256": "2b2270e41246ab7d1ba26453a5d89ed082a0f3fecec1933fe14a86018d30e557",
+  "status": "source_fidelity_supported_kernel_unverified",
+  "independence": "Reviewer did not author candidate; prior derivation and announced claims known. Preread plan saved before candidate inspection.",
+  "checks": [
+    {
+      "joint": "Actual evaluator",
+      "finding": "E uses projectiveCoeffHom and projectiveX. rho is affine localization followed by the inverse branchRingEquiv. Polynomial.ringHom_ext checks constants through the scalar tower and X through its definition."
+    },
+    {
+      "joint": "Actual curve equation",
+      "finding": "curve_eval transports affine_curve, which derives from quotient_affine_relation. No curve-evaluation premise is introduced."
+    },
+    {
+      "joint": "Norm scalar and sign",
+      "finding": "Mapping n^2-u1*u2*U=C(b^2)f gives N^2-product=B^2Y^2. map_pow applies to polynomial C and then E; hc identifies E(C b)=B. Difference of squares gives (N-BY)(N+BY)=product."
+    },
+    {
+      "joint": "Support valuation",
+      "finding": "The norm at a and support root imply n(a)=0. The prior conjugate-order theorem supplies both orders 1 and product order 2. Applying addVal and AddValuation.map_mul gives the three stalk orders summing to 2."
+    },
+    {
+      "joint": "Source specialization",
+      "finding": "source_norm_identity derives the exact polynomial identity from coefficientData, nonzero determinant and the two divisor congruences; separability derives the simple-root condition. Desired stalk norm and order are not wrapper hypotheses."
+    }
+  ],
+  "attacks": [
+    {
+      "case": "b=0",
+      "finding": "Excluded by hb for order statements; norm identity alone legitimately permits zero b."
+    },
+    {
+      "case": "Singular branch",
+      "finding": "Excluded by derivative nonzero, obtained from separability in the source wrapper."
+    },
+    {
+      "case": "Zero U or zero support polynomial",
+      "finding": "Not explicitly excluded. Norm plus simple branch and b nonzero would contradict the finite conjugate product order; additive valuation at zero cannot equal finite 2."
+    },
+    {
+      "case": "Characteristic two",
+      "finding": "The local algebra and orders do not require distinct conjugates. Do not promote this to a separable double-cover interpretation in characteristic two."
+    },
+    {
+      "case": "Wrong factor of two",
+      "finding": "Conclusion concerns stalk orders. The base-polynomial multiplicity sum equals selected order 1 in the independent derivation; its formal transport is still absent."
+    },
+    {
+      "case": "Abstract or circular bridge",
+      "finding": "E and rho bind actual imported maps. No new desired evaluator, norm or valuation equation is assumed. The predecessor does not import this successor."
+    }
+  ],
+  "compiler_invoked": false,
+  "fresh_axiom_readback": false,
+  "full_import_closure_bound": false,
+  "remaining": [
+    "Compile exact candidate with complete pinned imports and independently read back five named declarations and axioms.",
+    "Formalize branch residual-unit and base-polynomial root multiplicity transport.",
+    "Global divisor and infinity obligations remain separate."
+  ],
+  "primary_bindings": {
+    "Nonbranch": "ef72bcbfc9ea3643ae126dfeba644c2a34a999cb34254f8b17357ddd31d6f9e1",
+    "BranchConjugateOrders": "930259e66702f535984562e037f79d4e91e4aa74c9425a15df7cc217cdc77e9b"
+  },
+  "knowledge": "Existing primary local source definitions and earlier independent hand derivation; KB tools unavailable in this runtime.",
+  "scientific_execution": false
+}

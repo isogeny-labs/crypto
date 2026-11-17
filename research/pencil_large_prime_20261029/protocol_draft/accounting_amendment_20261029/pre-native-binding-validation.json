@@ -1,0 +1,108 @@
+{
+  "schema": "pencil-protocol-amendment-validation/v1",
+  "canonical_validation": {
+    "exit_code": 0,
+    "stdout": "OK: experiment.protocol/v1 research/pencil_large_prime_20261029/protocol_draft/accounting_amendment_20261029/protocol.json (0 finding(s))\n",
+    "checker_path": "/home/ec2-user/crypto-autoresearcher-fall-degree-submission-20261029/tools/experiment_protocol.py",
+    "checker_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+    "schema_path": "/home/ec2-user/crypto-autoresearcher-fall-degree-submission-20261029/schemas/experiment-protocol.v1.json",
+    "schema_sha256": "a9b948f2be323f862b98301eb7a5aa147ecc29db35041737f0aa3dfd03ad2443",
+    "command": [
+      "uv",
+      "run",
+      "--no-project",
+      "--with",
+      "jsonschema>=4",
+      "python",
+      "/home/ec2-user/crypto-autoresearcher-fall-degree-submission-20261029/tools/experiment_protocol.py",
+      "validate",
+      "research/pencil_large_prime_20261029/protocol_draft/accounting_amendment_20261029/protocol.json"
+    ]
+  },
+  "protocol_sha256_integrity_only": "7fc75638c1922b3cf24ac17e1bece6c3e984e0fd16ae1bb92d27798deb7aa530",
+  "preservation_checks": {
+    "sample_size": true,
+    "randomization": true,
+    "controls": true,
+    "execution": true,
+    "stopping_rules": true,
+    "invalidation_rules": true,
+    "prepared_manifest_unchanged": true,
+    "freeze_remains_draft": true,
+    "no_qualified_results": true,
+    "all_three_arm_binary_hashes_match_completed_build": true,
+    "all_arm_images_pending": true
+  },
+  "expected_pending_bindings": {
+    "image_digest": null,
+    "independent_coverage_review": null,
+    "cumulative_authorized_budget": null,
+    "original_absolute_deadline": null,
+    "cap_provenance": "Resolved for the first p739 gate only by explicit user approval first-gate-limits-20261029: all60 prescribed targets and25000000coefficients. Historical10m small-gate limit is preserved as provenance, superseded only within this approval. Later-stage authorization is not inferred.",
+    "launch_authorization": null,
+    "execution_time_envelope": "Explicit user approval first-gate-limits-20261029 permits3600seconds per execution for the first p739 gate, replacing its historical single external-command3600seconds envelope. Cumulative authorized budget and original absolute deadline remain pending; no total budget or later-stage authorization is inferred.",
+    "runtime_image_and_request_binding": null,
+    "iam_controller_authorization": null
+  },
+  "initial_schema_or_semantic_defect": "Derived finite_algorithm_gae metric initially lacked formula; corrected before final validation. Raw first finding retained.",
+  "freeze_or_authorization_performed": false,
+  "analysis_binding_checks": {
+    "source_files_verified_against_commit": 13,
+    "binary_hashes_and_sizes_verified": 2,
+    "mapping_matches": true,
+    "receipt_sha256": "dd1f6084d437491400e4618aa5a0466d28a4b3be506ac7f203d5f615b0df34c3",
+    "plan_only_observed_slots": 0,
+    "earlier_validation_preserved": "pre-analysis-binding-validation.json",
+    "instrument_build_unchanged": true,
+    "no_solver_executions_or_approval": true
+  },
+  "instrument_binding_checks": {
+    "binary_hash_and_size_verified": true,
+    "evidence_file_hashes_verified": 4,
+    "generated_plan_hashes_verified": 9,
+    "retained_cohort_plan_digests_matched": 7,
+    "archive_parity_receipt_targets": 1260,
+    "receipt_sha256": "59fd9e0e1f4573d9492bcca710b5351cd0175f788b197a7c82939e177ab1a1a1",
+    "earlier_validation_preserved": "pre-instrument-binding-validation.json",
+    "no_solver_executions_or_approval": true
+  },
+  "packaging_binding_checks": {
+    "status": "software_validated_packaging_only_not_qualification",
+    "adapter": "research/pencil_large_prime_20261029/canonical_export/package.py",
+    "adapter_sha256": "02b80a3c2f8960d9c0dbeb4be215c1cfc88044e9ebefed14f1a5cef883a65f6d",
+    "canonical_tool": "/home/ec2-user/crypto-autoresearcher-fall-degree-submission-20261029/tools/experiment_protocol.py",
+    "canonical_tool_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+    "export_schema_sha256": "108f0ae9c1be3ed141bca3c22216eba049f2c76677f11013109a4740f19bd757",
+    "protocol_schema_sha256": "a9b948f2be323f862b98301eb7a5aa147ecc29db35041737f0aa3dfd03ad2443",
+    "software_tests": 17,
+    "test_log_sha256": "ca0b496550c65b730498d04fe663736f03bdabc6185f26172c703e2802862acc",
+    "limitations": [
+      "wall_valid false until independent clock admission; no qualification from producer flags",
+      "canonical rows cannot represent unattempted slots; missing slots remain in backend ledger/native output and shortfall findings",
+      "explicit attempts/resumed history and hashed evidence required for every observed row; unknown history refuses canonical export"
+    ],
+    "experiment_executions": 0
+  },
+  "first_gate_authorization_checks": {
+    "binding": {
+      "path": "first_gate_authorization.json",
+      "sha256": "e04f26d0cab6850f3c477e9521ea4359c46f64ec436ce899b3b4049867710600",
+      "scope": "first p739 gate only; all60targets,25000000coefficients,3600seconds per execution",
+      "authority": "explicit_user_approval"
+    },
+    "preservation_checks": {
+      "sample_size": true,
+      "randomization": true,
+      "controls": true,
+      "execution": true,
+      "stopping_rules": true,
+      "invalidation_rules": true,
+      "arms": true,
+      "freeze": true,
+      "prepared_manifest_unchanged": true,
+      "budget_and_deadline_remain_pending": true,
+      "launch_authorization_remains_pending": true
+    },
+    "freeze_or_launch_performed": false
+  }
+}

@@ -1,0 +1,29 @@
+theorem weighted_generic_preserves (a0 a1 a2 a3 : K)
+ (a : WeightedAdd11.Input K) (b : D2 K)
+ (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0)
+ (hk : genericK a b ≠ 0)
+ (ha : validPoint (curve a0 a1 a2 a3) a)
+ (hb : validTwo (curve a0 a1 a2 a3) b) :
+ (output a b a3).z ≠ 0 ∧ (output a b a3).w ≠ 0 ∧
+ validTwo (curve a0 a1 a2 a3) (output a b a3) := by
+ have hkaff : (WeightedAdd11.nx a)^2+nq b*WeightedAdd11.nx a+nr b ≠ 0 := by
+  intro hz
+  apply hk
+  rw [genericK_same,(scales a b haz haw hbz hbw).1,hz,mul_zero]
+ obtain ⟨hz,hw,hq,hr,hs,ht⟩ := normalized_with (genericK a b) (genericA a b) a b a3 hk haz hbz hbw
+ have hm := slope_decode a b haz haw hbz hbw hk
+ rw [hm] at hq hr hs ht
+ refine ⟨hz,hw,?_⟩
+ change MixedCancellation.support (nq (outputWith (genericK a b) (genericA a b) a b a3))
+  (nr (outputWith (genericK a b) (genericA a b) a b a3)) ∣
+  curve a0 a1 a2 a3-(ordinate (ns (outputWith (genericK a b) (genericA a b) a b a3))
+   (nt (outputWith (genericK a b) (genericA a b) a b a3)))^2
+ rw [hq,hr,hs,ht]
+ exact affine_generic_valid a0 a1 a2 a3 (WeightedAdd11.nx a) (WeightedAdd11.ny a)
+   (nq b) (nr b) (ns b) (nt b) hkaff ha hb
+
+def dispatch [DecidableEq K] (a : WeightedAdd11.Input K) (b : D2 K) (a3 : K) : Option (D2 K) :=
+ if genericK a b=0 then none else some (output a b a3)
+
+theorem generic_dispatch [DecidableEq K] (a : WeightedAdd11.Input K) (b : D2 K) (a3 : K)
+ (hk : genericK a b ≠ 0) : dispatch a b a3=some (output a b a3) := by simp [dispatch,hk]

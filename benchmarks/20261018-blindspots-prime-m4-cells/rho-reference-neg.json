@@ -1,0 +1,518 @@
+{
+  "schema": "validation-gate/v1 rho_reference",
+  "descriptor_for": "the rho_reference key of a VALIDATION.json for item 14 arm (a); VALIDATION.json itself is not written by the validator",
+  "validator_report": "validator-report-rhoneg.json",
+  "supersedes_for_the_gate": "rho-reference.json (plain rho, strongest_available false); that file is unchanged",
+  "scope": "arm (a) full index calculus (default bx per cell) vs the negation-map matched rho (rho-neg), the four design cells 16, 20, 24, 28 bits; gae_band at the largest measured cell, 28 bits (bx = 63). Arm (b) full-IC rows are outside this reference (separate builds, cards 09-12).",
+  "kind": "negation",
+  "kind_note": "Pollard rho on classes {P, -P} (representative: smaller ordinate), the 16-jump r-adding walk with BKL look-ahead against fruitless 2-cycles, Brent detection of longer fruitless cycles and a deterministic escape (double the cycle minimum). Validator: code read, and a Python port re-ran all 64 measured runs and reproduced every emitted field except ms.",
+  "protocol": "research/blindspots_20261018/14-prime-m4-cells/PROTOCOL-ADDENDUM-rho-neg.md (addendum B to PROTOCOL.md, committed in 9b2f5e1b36 before the run): 'The matched reference for the gate is rho-neg (kind: negation). Plain rho is still reported beside it, priced at the same three weights.' Everything not changed by the addendum is PROTOCOL.md's matched rho: same make_jumps (16 jumps, four random bits per scalar, counted doubling chains), same partition, theta = max(bits/4, 2), DP rule x mod 2^theta = 0, cap 20*2^theta + 64, x-keyed table, counted verification mul(cand, G) == Q, 16 logarithms per cell, one thread, setup counted in gae.",
+  "unit": "GAE: one counted affine group addition (doubling and P + (-P) included) = 1, plus w x native operations, w in {0, 0.1, 1}. Native set (same counters on every arm): lookup, insert, legendre, sqrt, rowop, madd, dptest, build, and for rho-neg canon, lookahead, cyctest (zero on every other arm). Recomputed natives: rho-neg = lookup + insert + dptest + canon + lookahead + cyctest; plain rho = lookup + insert + dptest; arm (a) = lookup + insert + legendre + sqrt + rowop. Cost(w) = mean over 16 runs of (gae + w * native), setup included.",
+  "binary_or_process": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg: one rustc build (prlimit --as=4294967296 rustc --edition 2021 -C opt-level=3 -C codegen-units=1 -C target-cpu=native) of research/blindspots_20261018/instruments/blindspots_14_prime_m4_neg.rs (sha256 1a7d51c3adcd7108de335cd7ac3b2d83a11f5ef1246b8b959271ced1f5e8710e, committed in 9b2f5e1b36), command 'build' (index 2) of card CARD-BLINDSPOT-14-RHONEG-01 (research/blindspots_20261018/14-prime-m4-cells/rho-neg-cards/card-n01.yaml, sha256 a8aa5e6871bbb65578910a7661d05ccdc23c282420373cf63e39b93eaccba596), run at commit 84e5b2c8592a97fffe0245602d18139fc140c45b with dirty_before empty; receipt research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/receipt-n01.json (sha256 3e966efdc2c444926f914c9ec3b4c98acb639fd36dab25890addff5d6905e6ae), outputs committed in 41155e5554. From that one binary, as separate processes: selftest --deep (3), continuity controls cont-rho-b16..b28 (4-7) and cont-fullic-a-b16..b28 (8-11), rho-neg-b16..b28 (12-15); remove-bin (16). Continuity: cont-rho-bB.jsonl equals raw/rho-bB.jsonl and cont-fullic-a-bB.jsonl equals raw/fullic-a-bB.jsonl in every field except ms at B = 16, 20, 24, 28 (validator-checked), so arm (a)'s recorded rows (card-01 binary, built from research/blindspots_20261018/instruments/blindspots_14_prime_m4.rs, sha256 f6696fc0caff...) are what this binary computes, and the gap uses them. The binary's own sha256 is not recorded (deleted by remove-bin; the receipt has no binary digest).",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "evidence": {
+    "matches_protocol": "rho_neg_run/neg_step/canon/cmd_rho_neg read against the addendum's 'rho-neg algorithm (exact)': classes, look-ahead, Brent, escape, counting, row fields and seeds as specified; everything else is rho_run's code (make_jumps, start chain, theta, mask, cap, table, collision algebra, verification). The validator's port reproduced all 64 rho-neg rows and all 64 continuity rho rows field by field (except ms) from the addendum's target and seed formulas; 16/16 ok per cell.",
+    "strongest_available": "every cell: p prime > 3, a, b != 0, j not in {0, 1728} => Aut(E) = {+-1}; E(F_p) has prime order n = #E(F_p) (G of order n, n prime in the Hasse interval and > 4 sqrt p), so no 2-torsion; the p-power Frobenius fixes E(F_p) pointwise and gives no class reduction. Negation (classes of size 2) is the largest usable automorphism group. Per-cell facts in validator-report-rhoneg.json.",
+    "same_unit": "one instrument, one counter set: gae = counts.gadd for both rhos and total.gadd for arm (a); the new rho-neg counters are priced as native operations exactly like dptest (the addendum's pricing note; conservative against rho-neg at high w).",
+    "same_binary_or_process": "see binary_or_process; continuity rows equal the recorded rows except ms at all four cells."
+  },
+  "gae_band": {
+    "0": {
+      "ic": 568572.875,
+      "rho": 15953.375
+    },
+    "0.1": {
+      "ic": 627636.11875,
+      "rho": 21276.66875
+    },
+    "1": {
+      "ic": 1159205.3125,
+      "rho": 69186.3125
+    }
+  },
+  "gae_band_cell": {
+    "bits": 28,
+    "p": 248685287,
+    "n": 248685841,
+    "bx": 63,
+    "runs_ic": 16,
+    "runs_rho": 16,
+    "ic_over_rho": {
+      "0": 35.63966088680295,
+      "0.1": 29.49879636350498,
+      "1": 16.754835900525844
+    },
+    "definition": "ic = mean(gae_total) + w * mean(native_total) over 16 arm (a) full-IC runs (raw/fullic-a-b28.jsonl); rho = mean(gae) + w * mean(native) over 16 rho-neg runs (raw/rho-neg/rho-neg-b28.jsonl)"
+  },
+  "order_holds_across_band": true,
+  "order_note": "At every design cell and every w in {0, 0.1, 1}, rho-neg AND plain rho are both cheaper than arm (a) full IC (the addendum requires an order statement to hold against both). The two rhos change order inside the band: rho-neg is cheaper at ['16 bits w=0', '16 bits w=0.1', '20 bits w=0', '24 bits w=0', '28 bits w=0'], plain rho at ['16 bits w=1', '20 bits w=0.1', '20 bits w=1', '24 bits w=0.1', '24 bits w=1', '28 bits w=0.1', '28 bits w=1'] (rho-neg's canon, lookahead and cyctest are priced like dptest), so which rho is cheaper is unresolved at that boundary; the distance remaining for arm (a) is S / min(rho-neg, plain rho), reported per cell as gap_S_over_cheaper_rho.",
+  "per_cell": {
+    "16": {
+      "bits": 16,
+      "n": 48383,
+      "bx_arm_a": 8,
+      "band": {
+        "0": {
+          "S_a": 3651.1875,
+          "rho_neg": 417.375,
+          "rho_plain": 566.5,
+          "gap_S_over_rho_neg": 8.747978436657682,
+          "gap_S_over_rho_plain": 6.445167696381288,
+          "rho_plain_over_rho_neg": 1.3572926025756213,
+          "gap_S_over_cheaper_rho": 8.747978436657682,
+          "cheaper_rho": "rho_neg"
+        },
+        "0.1": {
+          "S_a": 3996.8375,
+          "rho_neg": 485.03125,
+          "rho_plain": 602.63125,
+          "gap_S_over_rho_neg": 8.240371110108885,
+          "gap_S_over_rho_plain": 6.632310388815714,
+          "rho_plain_over_rho_neg": 1.2424586044713615,
+          "gap_S_over_cheaper_rho": 8.240371110108885,
+          "cheaper_rho": "rho_neg"
+        },
+        "1": {
+          "S_a": 7107.6875,
+          "rho_neg": 1093.9375,
+          "rho_plain": 927.8125,
+          "gap_S_over_rho_neg": 6.497343312574987,
+          "gap_S_over_rho_plain": 7.660693836308521,
+          "rho_plain_over_rho_neg": 0.848140318802491,
+          "gap_S_over_cheaper_rho": 7.660693836308521,
+          "cheaper_rho": "rho_plain"
+        }
+      },
+      "ci95": {
+        "0": {
+          "S_a": [
+            3145.0732001741685,
+            4157.301799825832
+          ],
+          "rho_neg": [
+            365.6645100666199,
+            469.0854899333801
+          ],
+          "rho_plain": [
+            449.804191755409,
+            683.195808244591
+          ],
+          "gap_S_over_rho_neg_conservative": [
+            6.704690866948015,
+            11.369169512973569
+          ],
+          "gap_S_over_rho_plain_conservative": [
+            4.6034726241297435,
+            9.24247011483267
+          ]
+        },
+        "0.1": {
+          "S_a": [
+            3443.0418159330507,
+            4550.633184066949
+          ],
+          "rho_neg": [
+            417.00718419016493,
+            553.0553158098351
+          ],
+          "rho_plain": [
+            474.22457317388967,
+            731.0379268261104
+          ],
+          "gap_S_over_rho_neg_conservative": [
+            6.225492672268104,
+            10.91260140494787
+          ],
+          "gap_S_over_rho_plain_conservative": [
+            4.709799163063171,
+            9.595945552990806
+          ]
+        },
+        "1": {
+          "S_a": [
+            6124.57098775653,
+            8090.80401224347
+          ],
+          "rho_neg": [
+            878.9118922980044,
+            1308.9631077019956
+          ],
+          "rho_plain": [
+            693.9833838862342,
+            1161.6416161137658
+          ],
+          "gap_S_over_rho_neg_conservative": [
+            4.678948514071396,
+            9.205477913251624
+          ],
+          "gap_S_over_rho_plain_conservative": [
+            5.272341230547578,
+            11.658498171722522
+          ]
+        }
+      },
+      "order_holds_against_both": true,
+      "ci95_separated_at_all_w": true,
+      "rho_neg_vs_rho_plain": "unresolved at the boundary (order flips inside the band)"
+    },
+    "20": {
+      "bits": 20,
+      "n": 660917,
+      "bx_arm_a": 15,
+      "band": {
+        "0": {
+          "S_a": 16480.875,
+          "rho_neg": 969.6875,
+          "rho_plain": 1119.1875,
+          "gap_S_over_rho_neg": 16.996068320979695,
+          "gap_S_over_rho_plain": 14.725749706818563,
+          "rho_plain_over_rho_neg": 1.1541733805994199,
+          "gap_S_over_cheaper_rho": 16.996068320979695,
+          "cheaper_rho": "rho_neg"
+        },
+        "0.1": {
+          "S_a": 18138.45625,
+          "rho_neg": 1214.04375,
+          "rho_plain": 1207.8625,
+          "gap_S_over_rho_neg": 14.940529326064238,
+          "gap_S_over_rho_plain": 15.016987653809933,
+          "rho_plain_over_rho_neg": 0.9949085442761021,
+          "gap_S_over_cheaper_rho": 15.016987653809933,
+          "cheaper_rho": "rho_plain"
+        },
+        "1": {
+          "S_a": 33056.6875,
+          "rho_neg": 3413.25,
+          "rho_plain": 2005.9375,
+          "gap_S_over_rho_neg": 9.68481286164213,
+          "gap_S_over_rho_plain": 16.479420470478267,
+          "rho_plain_over_rho_neg": 0.5876913498864719,
+          "gap_S_over_cheaper_rho": 16.479420470478267,
+          "cheaper_rho": "rho_plain"
+        }
+      },
+      "ci95": {
+        "0": {
+          "S_a": [
+            13815.416084423203,
+            19146.333915576797
+          ],
+          "rho_neg": [
+            789.8932011227228,
+            1149.4817988772772
+          ],
+          "rho_plain": [
+            788.657397618908,
+            1449.717602381092
+          ],
+          "gap_S_over_rho_neg_conservative": [
+            12.018821087830192,
+            24.239142568087637
+          ],
+          "gap_S_over_rho_plain_conservative": [
+            9.529729142925518,
+            24.27712460871205
+          ]
+        },
+        "0.1": {
+          "S_a": [
+            15200.397284749593,
+            21076.515215250405
+          ],
+          "rho_neg": [
+            974.7456958050515,
+            1453.3418041949485
+          ],
+          "rho_plain": [
+            844.3399147162247,
+            1571.3850852837752
+          ],
+          "gap_S_over_rho_neg_conservative": [
+            10.45892799675543,
+            21.622578387322978
+          ],
+          "gap_S_over_rho_plain_conservative": [
+            9.673247778092895,
+            24.962121117220946
+          ]
+        },
+        "1": {
+          "S_a": [
+            27664.775488417647,
+            38448.59951158235
+          ],
+          "rho_neg": [
+            2638.349909299065,
+            4188.150090700935
+          ],
+          "rho_plain": [
+            1345.4758784900246,
+            2666.3991215099754
+          ],
+          "gap_S_over_rho_neg_conservative": [
+            6.605488076905962,
+            14.572972059569254
+          ],
+          "gap_S_over_rho_plain_conservative": [
+            10.375331759317094,
+            28.576208705229057
+          ]
+        }
+      },
+      "order_holds_against_both": true,
+      "ci95_separated_at_all_w": true,
+      "rho_neg_vs_rho_plain": "unresolved at the boundary (order flips inside the band)"
+    },
+    "24": {
+      "bits": 24,
+      "n": 10542893,
+      "bx_arm_a": 29,
+      "band": {
+        "0": {
+          "S_a": 76401.4375,
+          "rho_neg": 3365.125,
+          "rho_plain": 3707.75,
+          "gap_S_over_rho_neg": 22.70389287173582,
+          "gap_S_over_rho_plain": 20.605876205245767,
+          "rho_plain_over_rho_neg": 1.1018164258385648,
+          "gap_S_over_cheaper_rho": 22.70389287173582,
+          "cheaper_rho": "rho_neg"
+        },
+        "0.1": {
+          "S_a": 84242.08125,
+          "rho_neg": 4410.65,
+          "rho_plain": 4052.6625,
+          "gap_S_over_rho_neg": 19.099697606928682,
+          "gap_S_over_rho_plain": 20.78684846073415,
+          "rho_plain_over_rho_neg": 0.9188356591432102,
+          "gap_S_over_cheaper_rho": 20.78684846073415,
+          "cheaper_rho": "rho_plain"
+        },
+        "1": {
+          "S_a": 154807.875,
+          "rho_neg": 13820.375,
+          "rho_plain": 7156.875,
+          "gap_S_over_rho_neg": 11.201423622730932,
+          "gap_S_over_rho_plain": 21.63065234477338,
+          "rho_plain_over_rho_neg": 0.5178495518392229,
+          "gap_S_over_cheaper_rho": 21.63065234477338,
+          "cheaper_rho": "rho_plain"
+        }
+      },
+      "ci95": {
+        "0": {
+          "S_a": [
+            71411.38907697766,
+            81391.48592302234
+          ],
+          "rho_neg": [
+            2510.5055402038115,
+            4219.7444597961885
+          ],
+          "rho_plain": [
+            2758.273705747718,
+            4657.226294252282
+          ],
+          "gap_S_over_rho_neg_conservative": [
+            16.923154887067923,
+            32.42035702355578
+          ],
+          "gap_S_over_rho_plain_conservative": [
+            15.333459137493504,
+            29.50812522826069
+          ]
+        },
+        "0.1": {
+          "S_a": [
+            78760.11427203781,
+            89724.0482279622
+          ],
+          "rho_neg": [
+            3268.580358688633,
+            5552.719641311366
+          ],
+          "rho_plain": [
+            3008.3078836517516,
+            5097.017116348248
+          ],
+          "gap_S_over_rho_neg_conservative": [
+            14.184061029495325,
+            27.45046423272268
+          ],
+          "gap_S_over_rho_plain_conservative": [
+            15.452197329183269,
+            29.82542070097133
+          ]
+        },
+        "1": {
+          "S_a": [
+            144893.22830963787,
+            164722.52169036213
+          ],
+          "rho_neg": [
+            10091.207917044703,
+            17549.542082955297
+          ],
+          "rho_plain": [
+            5258.614234945848,
+            9055.135765054152
+          ],
+          "gap_S_over_rho_neg_conservative": [
+            8.256239828067253,
+            16.323370110344783
+          ],
+          "gap_S_over_rho_plain_conservative": [
+            16.001220972170742,
+            31.324321262378817
+          ]
+        }
+      },
+      "order_holds_against_both": true,
+      "ci95_separated_at_all_w": true,
+      "rho_neg_vs_rho_plain": "unresolved at the boundary (order flips inside the band)"
+    },
+    "28": {
+      "bits": 28,
+      "n": 248685841,
+      "bx_arm_a": 63,
+      "band": {
+        "0": {
+          "S_a": 568572.875,
+          "rho_neg": 15953.375,
+          "rho_plain": 18912.8125,
+          "gap_S_over_rho_neg": 35.63966088680295,
+          "gap_S_over_rho_plain": 30.062840997339766,
+          "rho_plain_over_rho_neg": 1.1855054181325269,
+          "gap_S_over_cheaper_rho": 35.63966088680295,
+          "cheaper_rho": "rho_neg"
+        },
+        "0.1": {
+          "S_a": 627636.11875,
+          "rho_neg": 21276.66875,
+          "rho_plain": 20775.33125,
+          "gap_S_over_rho_neg": 29.49879636350498,
+          "gap_S_over_rho_plain": 30.210643151598365,
+          "rho_plain_over_rho_neg": 0.9764372183497946,
+          "gap_S_over_cheaper_rho": 30.210643151598365,
+          "cheaper_rho": "rho_plain"
+        },
+        "1": {
+          "S_a": 1159205.3125,
+          "rho_neg": 69186.3125,
+          "rho_plain": 37538.0,
+          "gap_S_over_rho_neg": 16.754835900525844,
+          "gap_S_over_rho_plain": 30.880849072939423,
+          "rho_plain_over_rho_neg": 0.5425639645124893,
+          "gap_S_over_cheaper_rho": 30.880849072939423,
+          "cheaper_rho": "rho_plain"
+        }
+      },
+      "ci95": {
+        "0": {
+          "S_a": [
+            541176.1044448446,
+            595969.6455551554
+          ],
+          "rho_neg": [
+            10641.505668300002,
+            21265.2443317
+          ],
+          "rho_plain": [
+            13674.664604105794,
+            24150.960395894206
+          ],
+          "gap_S_over_rho_neg_conservative": [
+            25.448854290289812,
+            56.004259559856294
+          ],
+          "gap_S_over_rho_plain_conservative": [
+            22.408057301805997,
+            43.582030185677574
+          ]
+        },
+        "0.1": {
+          "S_a": [
+            597083.8870116882,
+            658188.3504883118
+          ],
+          "rho_neg": [
+            14161.162827209246,
+            28392.174672790756
+          ],
+          "rho_plain": [
+            15013.453047336494,
+            26537.209452663505
+          ],
+          "gap_S_over_rho_neg_conservative": [
+            21.02987509385448,
+            46.47841130840395
+          ],
+          "gap_S_over_rho_plain_conservative": [
+            22.499874678863783,
+            43.8399046783631
+          ]
+        },
+        "1": {
+          "S_a": [
+            1100222.5369526935,
+            1218188.0880473065
+          ],
+          "rho_neg": [
+            45838.02118614494,
+            92534.60381385506
+          ],
+          "rho_plain": [
+            27062.54881017177,
+            48013.45118982823
+          ],
+          "gap_S_over_rho_neg_conservative": [
+            11.889849760052238,
+            26.575930996242864
+          ],
+          "gap_S_over_rho_plain_conservative": [
+            22.914881344454955,
+            45.01379735486838
+          ]
+        }
+      },
+      "order_holds_against_both": true,
+      "ci95_separated_at_all_w": true,
+      "rho_neg_vs_rho_plain": "unresolved at the boundary (order flips inside the band)"
+    }
+  },
+  "plain_rho_comparison": {
+    "source": "raw/rho-bB.jsonl (card-01; reproduced in this binary by cont-rho-bB.jsonl)",
+    "plain_over_neg": {
+      "16": {
+        "0": 1.3572926025756213,
+        "0.1": 1.2424586044713615,
+        "1": 0.848140318802491
+      },
+      "20": {
+        "0": 1.1541733805994199,
+        "0.1": 0.9949085442761021,
+        "1": 0.5876913498864719
+      },
+      "24": {
+        "0": 1.1018164258385648,
+        "0.1": 0.9188356591432102,
+        "1": 0.5178495518392229
+      },
+      "28": {
+        "0": 1.1855054181325269,
+        "0.1": 0.9764372183497946,
+        "1": 0.5425639645124893
+      }
+    },
+    "online_gae_plain_over_neg": {
+      "16": 1.641362660944206,
+      "20": 1.1958299264104661,
+      "24": 1.108802929003502,
+      "28": 1.188467904948352
+    },
+    "note": "plain/neg > 1 means rho-neg is cheaper. Expected online-GAE ratio about sqrt 2 = 1.414 (heuristic); independent 16-run samples, so a per-cell ratio carries about 11% (16 bits) to 20% (28 bits) relative standard error."
+  }
+}

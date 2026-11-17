@@ -1,0 +1,94 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.03,
+    0.1,
+    0.3,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-f2m39-t1481485-829ef1d1",
+      "log2_r": 26.032049406402123,
+      "arm": "c4",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1.0601396755742947,
+        1.2276599029040864,
+        1.618540433340267,
+        2.735341948872211,
+        6.644147253234016
+      ],
+      "charged_sum": 210760.0,
+      "native_sum": 1110123,
+      "uncounted": [],
+      "exempt_mean_counts": {
+        "factor_base_vec_bytes_floor_uncharged": 14976.0
+      }
+    },
+    {
+      "curve": "icv1-f2m39-t1481485-829ef1d1",
+      "log2_r": 26.032049406402123,
+      "arm": "plan",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        0.9094284165139559,
+        1.103448765579458,
+        1.5561629133989625,
+        2.8496319071689764,
+        7.376773385364022
+      ],
+      "charged_sum": 180798.0,
+      "native_sum": 1285734,
+      "uncounted": [],
+      "exempt_mean_counts": {
+        "factor_base_vec_bytes_floor_uncharged": 22464.0
+      }
+    },
+    {
+      "curve": "icv1-f2m39-t1481485-829ef1d1",
+      "log2_r": 26.032049406402123,
+      "arm": "rho",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        0.21413553866423093,
+        0.2191913727442899,
+        0.2309883189310942,
+        0.2646938794648209,
+        0.3826633413328642
+      ],
+      "charged_sum": 42571.0,
+      "native_sum": 33504,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-f2m39-t1481485-829ef1d1",
+      "a": "c4",
+      "b": "plan",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m39-t1481485-829ef1d1",
+      "a": "c4",
+      "b": "rho",
+      "verdict": "rho < c4"
+    },
+    {
+      "curve": "icv1-f2m39-t1481485-829ef1d1",
+      "a": "plan",
+      "b": "rho",
+      "verdict": "rho < plan"
+    }
+  ]
+}

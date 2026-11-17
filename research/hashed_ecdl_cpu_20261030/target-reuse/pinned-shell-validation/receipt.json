@@ -1,0 +1,38 @@
+{
+  "scope": "pinned historical software reproduction; no timing/scientific execution",
+  "tests": 32,
+  "checks": [
+    "release all-target tests",
+    "strict all-target Clippy",
+    "formatting",
+    "Bash syntax",
+    "ShellCheck warnings"
+  ],
+  "shared_runner_sha256": "0c2142ad6eb9e9c219e3e66c63100e4b68a97e60467d54cb7c35df27426bd8ba",
+  "wrapper_sha256": "061849285dda30abfbdd0c7993470b17492a3484e4dfc820b521c06af799e0dd",
+  "files": {
+    "validation.json": {
+      "sha256": "520743cd75e840901db1acab98271ccba418c8853c0822c77416df98633cb7a4",
+      "bytes": 2032
+    },
+    "validation-0.log": {
+      "sha256": "1252a230f8f1892cb7aa4726c9f4af613b2031931a77249f5f94f956c0e38908",
+      "bytes": 3893
+    },
+    "validation-1.log": {
+      "sha256": "744a424f3af2ed190df5303584f71ea9cbb205ea26a29af6bf50dc3b2869e026",
+      "bytes": 308
+    },
+    "validation-2.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  "negative_controls": [
+    "existing destination refused without overwrite",
+    "wrong patch digest rejected before destination creation",
+    "wrong base digest rejected before build",
+    "wrong candidate digest rejected before build"
+  ],
+  "negative_control_fixture": "target-reuse through the same shared shell runner"
+}

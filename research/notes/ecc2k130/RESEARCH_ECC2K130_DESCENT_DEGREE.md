@@ -1,0 +1,769 @@
+# ECC2K-130: what a growing solving degree means for the Weil-descent route
+
+2026-09-30. Class: **accounting**. It is a derived reading of measurements
+already committed plus one new measurement stage, the degree-7 study
+(`research/dreg_degree7_ell5_20260930/`). It adds no algorithm, no `S` and
+no speed claim, and it moves no ECC2K-130 cost. Every number at
+`n = 131` below is **derived, not measured**, and is marked with the
+exponents it rests on.
+
+**Updated 2026-10-06** with the first `m = 4` measurement
+(`research/dreg_m4_chain_20261006/`). It adds §5 and point 5 of the short
+version, plus the new rows of §2's table. The cost model is now native
+(`examples/descent_degree_cost`), and its first 16 rows reproduce the
+2026-09-30 table exactly.
+
+**Updated 2026-10-16** with the MutantXL closure study
+(`research/dreg_closure_mutantxl_20261016/`). It adds §6 and point 6 of the
+short version. The model's output with the new rows is
+`descent_degree_cost-output-20261016.txt`, and every earlier row reproduces
+unchanged.
+
+**Updated again 2026-10-16** with the closure-at-scale study
+(`research/dreg_closure_scale_20261016/`). It adds §7 and point 7, and the
+model output is `descent_degree_cost-output-20261016-scale.txt`.
+
+## The short version
+
+1. **Measured.** The system is the `m = 3` chained `S₃` system over
+   random `ℓ`-dimensional subspaces of GF(2^n), with `n ≤ 15`.
+   - Its **first fall degree is 3 everywhere**. That is Kosters–Yeo's trace
+     equation (`RESEARCH_KOBLITZ_SCALING_TARGET.md`, H1 attribution).
+   - **The degree at which the Macaulay matrix refutes it grows** over
+     `ℓ = 2, 3, 4, 5`: 5, then 6, then 6–7, then **exactly 7** at `(10, 5)`,
+     one degree above 6. That is the degree-7 study.
+   - At fixed surplus it grows in every pair of the registered ladder.
+2. **It tracks a generic reference.** In every cell with exact values, the
+   refutation degree is within one of the semi-regular degree of
+   regularity of the system's shape, and equal to it in 10 of 14. The
+   reference predicted the 7 at `(10, 5)` before it was measured, and the
+   `ℓ = 5` lower bounds are consistent with it. That reference grows about
+   linearly in the number of unknowns.
+3. **ECC2K-130's verdict does not depend on it.**
+   - At `m = 3` the route loses to rho even with a free oracle:
+     `2^68.58` against `2^60.81`.
+   - At `m = 4` it needs an oracle that costs under `2^5.71` operations a
+     target. The descended system has more unknowns than that before any
+     elimination starts.
+   - This is `RESEARCH_ECC2K130_DECOMPOSITION.md` §5.3, and it stands.
+4. **What the growth removes is the asymptotic case.**
+   - At a constant degree the per-target oracle is polynomial in the
+     unknowns. The published sub-exponential estimates rest on that, with a
+     crossover near `n ≈ 1250` (Kousidis–Wiemers, as quoted in
+     `RESEARCH_ECC2K130_IC_LITERATURE.md`).
+   - If the degree tracks the semi-regular reference, the oracle is
+     exponential in the unknowns, and that crossover does not exist.
+   - At `n = 131`, `m = 3` then prices at `≥ 2^196.95`. That is above an
+     exhaustive search of the `2^129` subgroup. This is an extrapolation
+     from `n ≤ 15`.
+5. **`m = 4`, measured (2026-10-06, §5).** This is the decomposition size
+   whose free-oracle floor is below rho.
+   - It refutes at `ℓ + 4` for `ℓ ≤ 2`, one degree above `m = 3` at the
+     same `ℓ`, and at ≥7 for `ℓ = 3`.
+   - Like `m = 3`, it is flat in `n` at fixed `ℓ`. So the measured degree
+     is set by `m` and `ℓ`, and the semi-regular reference overstates its
+     growth in `n`.
+   - **Any degree that grows with `ℓ` collapses the route.** Under either
+     small-`ℓ` fit the best cell sits at the smallest factor base in the
+     range, where the route is a search over targets:
+     - `m = 3`: `2^158.96`;
+     - `m = 4`: `2^173.13`.
+     Both are above an exhaustive search of the subgroup.
+   - Below the range the model searches (`ℓ < 4`), the fits price
+     `2^158.12` to `2^170.90`, with target counts at or past the subgroup's
+     `2^129`. So every `ℓ` is above exhaustive search.
+   - These are extrapolations of three-rung fits.
+6. **The growth in points 1 and 5 is XL's, not the ideal's (2026-10-16,
+   §6).**
+   - Saturating each degree under MutantXL's fall closure refutes the same
+     92 committed draws at **3–4**, flat in `ℓ` (1 to 5), in `m` (3 and 4),
+     and in the unknowns (11 to 32). XL needs 5 to 7 on those draws.
+   - Held at 4 to `n = 131`, the best `m = 4` row is `2^68.43` at `w = 1`,
+     `2^+7.62` over rho in unconverted units, against `2^173.13` under the
+     XL fit.
+   - It is still above rho, and point 3 stands.
+   - The constant-degree case point 4 called removed is back on the table
+     as an **open extrapolation** from `N ≤ 32`.
+7. **The closure degree does grow, slowly (2026-10-16, §7).**
+   - **m = 3.** It refutes at 4 for ℓ ≤ 6. At ℓ = 7 (N = 40, 42), on 8 of
+     8 draws, it does not refute at 4.
+   - **m = 4.** It still refutes at 4 at ℓ = 3, 4 (N = 36–42).
+   - **Rows.** The m = 3 degree-4 row is withdrawn. The m = 4 degree-4 row
+     (`2^68.43`) keeps measured support to ℓ = 4 only. Held at 5, m = 4
+     prices `2^71.13`, `2^+10.32` over rho.
+8. **N does not set the closure degree; ℓ = 7 or m·ℓ ≥ 21 does (§8).**
+   - Both surviving explanations put m = 4's rise at ℓ ≤ 7. So the m = 4
+     degree-4 row (`2^68.43`) is contradicted.
+   - The degree-5 rows are now the optimistic case: m = 4 at `2^71.13`.
+   - **Update 2026-10-23.** Another session measured m = 4, ℓ = 6 (N = 54)
+     on a large host (`research/dreg_closure_m4l6_20261018/RESULTS.md`): the degree-4 closure
+     refutes on 2 of 2 unsatisfiable draws. So **m·ℓ ≥ 21 is refuted and
+     ℓ = 7 is what survives.** The m = 4 degree-4 row stays contradicted,
+     because the rise at ℓ = 7 is still far below the priced ℓ = 33.
+9. **Guess-then-degree-4 survives to ℓ = 8, with k ≤ 4 (§9, §10).**
+   - At m = 3, ℓ = 8, four guessed variables make degree 4 refute on all 64
+     branches of 4 draws. The linear rule `m·(ℓ−6)` (6 guesses) fails.
+   - At the priced m = 4, ℓ = 33 cell the hybrid beats degree 5 only if
+     k ≤ 6. Linear growth in ℓ gives about 105; a bounded k is not
+     excluded. Its best case is the `2^68.43` degree-4 row. No row moves.
+10. **Three guesses at ℓ = 8 do not suffice for variables 7, 15, 23 (§11).**
+    - Three of four draws have a branch that saturates degree 4; four guesses
+      (§10) did suffice. The 3-set is structurally an ℓ = 7 system, and the
+      pattern fits `m·(ℓ−7)+1` guesses (105 at ℓ = 33, m = 4): a reading, not
+      a result. No row moves.
+11. **The three-guess failure is the ℓ = 7 rise (§12).**
+    - The unspecialised (22, 7) system, same N = 43 and 136,698 columns as the
+      3-set, does not refute at degree 4 on 4 of 4 draws; 12 of 12 unspecialised
+      ℓ = 7 draws do not refute over surplus −2, 0, +1.
+    - The pattern fits `m·(ℓ−7)+1` guesses: 4 at ℓ = 8, 105 at the priced
+      m = 4, ℓ = 33 cell, against a break-even of 6. An extrapolation from ℓ = 7
+      and 8. No row moves.
+
+## 1. What is measured
+
+Refutation degree of the `m = 3` chained `S₃` system (`b = 1`), per cell
+`(n, ℓ)`: four unsatisfiable draws each, `N = n + 3ℓ` unknowns, `n` cubic
+and `n` quadratic equations, surplus `S = n − 3ℓ` (equations minus
+unknowns). A value is exact where the degree-`D` Macaulay row space first
+contains `1`; `≥D` is a lower bound (the full degree-`(D−1)` matrix does
+not). Sources: `RESEARCH_DREG_MEASUREMENT.md` Results 4–9, the last being
+the degree-7 study.
+
+| `ℓ` | cell `(n, ℓ)` | `N` | `S` | measured, four draws | semi-regular `D_reg` |
+|--:|---|--:|--:|---|--:|
+| 2 | `(5,2)` `(7,2)` `(8,2)` `(10,2)` `(12,2)` | 11–18 | −1 to +6 | 5 in every draw | 5 |
+| 3 | `(4, 3)` | 13 | −5 | 5 5 5 5 | 5 |
+| 3 | `(5, 3)` | 14 | −4 | 6 6 6 6 | 5 |
+| 3 | `(7, 3)` | 16 | −2 | 6 6 6 6 | 6 |
+| 3 | `(9, 3)` | 18 | 0 | 6 6 6 6 | 6 |
+| 4 | `(7, 4)` | 19 | −5 | 7 7 6 7 | 6 |
+| 4 | `(8, 4)` | 20 | −4 | 6 7 6 7 | 6 |
+| 4 | `(11, 4)` | 23 | −1 | 6 6 6 6 | 7 |
+| 4 | `(13, 4)` | 25 | +1 | 6 6 6 6 | 7 |
+| 5 | **`(10, 5)`** | 25 | −5 | **7 7 7 7** | 7 |
+| 5 | `(11, 5)` | 26 | −4 | ≥7 ≥7 ≥7 ≥7 | 7 |
+| 5 | `(13, 5)` | 28 | −2 | ≥7 ≥7 ≥7 ≥7 | 7 |
+| 5 | `(15, 5)` | 30 | 0 | ≥7 ≥7 ≥7 ≥7 | 8 |
+
+The last column is `D_reg`, the semi-regular reference: the first
+non-positive coefficient of `(1+z)^N / ((1+z²)^n (1+z³)^n)`. It comes from
+`research/dreg_degree7_ell5_20260930/semireg.py`, a formula, not a run.
+
+- **The degree never falls as `ℓ` rises at a fixed surplus, and it rises
+  from `ℓ = 3` to `ℓ = 5` in every column where both are measured.**
+  - `S = −5`: 5 to 7. `S = −4`, `−2` and 0: 6 to ≥7.
+  - At `S = −5` it is flat from `ℓ = 4` to `ℓ = 5`: 7 7 6 7, then 7.
+- **At fixed surplus it grows in every registered pair**, two of them with
+  `ℓ ≥ 3` at both ends (Results 7 and 8).
+- **The first fall degree is 3 throughout.** So the gap between the fall
+  degree and the refutation degree widens from 2 at `ℓ = 2` to
+  4 at `ℓ = 5`, where the measured degree is 7.
+  - The first-fall-degree assumption behind the sub-exponential estimates
+    (Petit–Quisquater, *On polynomial systems arising from a Weil descent*,
+    ASIACRYPT 2012) treats that gap as bounded.
+  - On this system, at these sizes, it is not.
+- **Against the reference, the measured degree is within one degree in
+  every cell with exact values.**
+  - It is equal in 10 of those 14 cells. One of them is `(10, 5)`, where the
+    reference predicted 7 before the degree-7 run.
+  - It is one above in `(5, 3)` and `(7, 4)`, and one below in `(11, 4)` and
+    `(13, 4)`.
+  - The lower bounds of the three unrun `ℓ = 5` cells are consistent with
+    it.
+
+## 2. The price at `n = 131`, by degree
+
+`examples/descent_degree_cost` evaluates the cost model of
+`RESEARCH_ECC2K130_DECOMPOSITION.md` §5.1 with the oracle priced as a
+Macaulay elimination of the descended system:
+
+- It is the native port of `descent_degree_cost_20260930.py`, which
+  produced this table on 2026-09-30 and stays as that record.
+- The port's first 16 rows are identical, and its output is
+  `descent_degree_cost-output-20261006.txt`.
+
+The model:
+
+- **relations:** `2^ℓ`;
+- **targets:** `m!·2^{n−(m−1)ℓ}`, at least one a relation;
+- **linear algebra:** `m·2^{2ℓ}`;
+- **oracle:** `C(N, ≤D)^w` a target, the column count of the degree-`D`
+  matrix raised to `w`.
+  - `N = (m−2)·n + m·ℓ` unknowns, since the chain has `m − 2` intermediate
+    points.
+  - `w = 1` prices one touch per column, which no elimination beats.
+  - `w = 2` is the usual estimate at `ω = 2`.
+
+Each row is minimised over integer `ℓ`. The rho reference is `2^60.81`
+(§5.2 of that note, with `⟨−1⟩ × ⟨π⟩`).
+
+| `m` | degree `D` | `w` | `ℓ` | `N` | oracle a target | total | vs rho |
+|--:|---|--:|--:|--:|--:|--:|--:|
+| 3 | free oracle (the floor) | — | 33 | 230 | — | `2^68.58` | `2^+7.77` |
+| 3 | 2, any Macaulay matrix | 1 | 37 | 242 | `2^14.84` | `2^76.12` | `2^+15.31` |
+| 3 | 6, constant | 1 | 43 | 260 | `2^38.59` | `2^88.05` | `2^+27.24` |
+| 3 | 6, constant | 2 | 45 | 266 | `2^77.58` | `2^122.58` | `2^+61.77` |
+| 3 | 7, constant | 1 | 44 | 263 | `2^43.90` | `2^90.53` | `2^+29.72` |
+| 3 | 7, constant | 2 | 45 | 266 | `2^88.02` | `2^133.02` | `2^+72.21` |
+| 3 | **semi-regular `D_reg(N)`** (28 at `ℓ = 26`) | 1 | 26 | 209 | `2^115.37` | **`2^196.95`** | **`2^+136.14`** |
+| 3 | semi-regular `D_reg(N)` (17 at `ℓ = 4`) | 2 | 4 | 143 | `2^144.31` | `2^269.90` | `2^+209.09` |
+| 4 | free oracle (the floor) | — | 27 | 370 | — | `2^56.46` | `2^−4.35` |
+| 4 | 2, any Macaulay matrix | 1 | 30 | 382 | `2^16.16` | `2^62.88` | `2^+2.07` |
+| 4 | 2, any Macaulay matrix | 2 | 33 | 394 | `2^32.50` | `2^69.64` | `2^+8.83` |
+| 4 | 6, constant | 1 | 34 | 398 | `2^42.30` | `2^76.31` | `2^+15.50` |
+| 4 | 6, constant | 2 | 34 | 398 | `2^84.59` | `2^118.59` | `2^+57.78` |
+| 4 | 7, constant | 1 | 34 | 398 | `2^48.11` | `2^82.11` | `2^+21.30` |
+| 4 | 7, constant | 2 | 34 | 398 | `2^96.21` | `2^130.21` | `2^+69.40` |
+| 3 | `⌈ℓ/2⌉ + 4`, the `m = 3` fit (6 at `ℓ = 4`) — *new 2026-10-06* | 1 | 4 | 143 | `2^33.38` | `2^158.96` | `2^+98.15` |
+| 3 | `⌈ℓ/2⌉ + 4`, the `m = 3` fit — *new* | 2 | 4 | 143 | `2^66.76` | `2^192.34` | `2^+131.53` |
+| 4 | semi-regular `D_reg(N)` of the `m = 4` shape (55 at `ℓ = 27`) — *new* | 1 | 27 | 370 | `2^220.56` | `2^275.14` | `2^+214.33` |
+| 4 | semi-regular `D_reg(N)` (38 at `ℓ = 5`) — *new* | 2 | 5 | 282 | `2^314.45` | `2^435.04` | `2^+374.23` |
+| 4 | **`ℓ + 4`, the measured `m = 4` fit** (8 at `ℓ = 4`) — *new* | 1 | 4 | 278 | `2^49.55` | **`2^173.13`** | **`2^+112.32`** |
+| 4 | `ℓ + 4`, the `m = 4` fit — *new* | 2 | 4 | 278 | `2^99.10` | `2^222.68` | `2^+161.87` |
+
+- **The free-oracle rows reproduce §5.3.** At `m = 3`, `ℓ = 33` gives
+  `2^68.58`, exactly. At `m = 4` the integer optimum `ℓ = 27` gives
+  `2^56.46`, against §5.3's `2^56.40` at the continuous `ℓ = 26.83`.
+- **Units.**
+  - The oracle column counts monomial-column touches. Rho counts group
+    operations, and one group operation over GF(2^131) is many such
+    touches.
+  - Converting would lower every row with an oracle by `log₂ K`, where `K`
+    is touches per group operation. `K` is not measured here.
+  - So the `m = 4`, `D = 2`, `w = 1` row, `2^+2.07`, is **not a separation**.
+    Every other row with an oracle clears rho by 8 to 209 bits, and a
+    reader should subtract `log₂ K` from those gaps.
+- **The `m = 4` constant-degree rows are `m = 3`'s degrees applied to
+  `m = 4`.** The chain has `2n` cubic equations. At equal `ℓ` it has
+  `n + ℓ` more unknowns, one more 131-bit intermediate point and one more
+  summand.
+  - On 2026-09-30 these rows were unmeasured and called the optimistic
+    case.
+  - §5 now measures `m = 4`: 6 at `ℓ = 2` and ≥7 at `ℓ = 3`.
+  - The `D = 6` rows are already exceeded at `ℓ = 3`, and `D = 7` is
+    already reached there. Both are priced at `ℓ ≈ 34`.
+  - Holding the degree at 7 from `ℓ = 3` to `ℓ = 34` would need the
+    measured rise of one degree per `ℓ` to stop at once. So both rows
+    remain the optimistic case.
+  - A ≥7 is a bound, so this does not show 7 exceeded.
+- **The fit rows' minima sit at the bottom of the search range,
+  `ℓ = 4`.** The range `4..70` is the 2026-09-30 model's, kept so the
+  existing rows reproduce.
+  - Once the degree grows with `ℓ`, a larger factor base costs more than
+    it saves in targets. The optimiser therefore shrinks the base until
+    the target count, `2^125.6` here, is nearly the whole group.
+  - The route has then turned into an expensive search over targets.
+  - The tool also prints the fits below the range, at `ℓ = 1`–`3`:
+    - `m = 3`: `2^158.12` to `2^160.78`;
+    - `m = 4`: `2^165.93` to `2^170.90`.
+  - There the target count is at or past the `2^129` subgroup, so the
+    model has stopped describing index calculus. Every value is still above
+    exhaustive search.
+
+### What the table says
+
+- **The verdict is degree-independent.**
+  - `m = 3` is above rho at every degree, including a free oracle.
+  - At `m = 4`, the lowest Macaulay degree there is (`D = 2`) already
+    spends the whole margin a free oracle had. Its `2^−4.35` becomes
+    `2^+2.07`.
+  - That is the §5.3 budget of `2^5.71` a target, seen from the oracle's
+    side. It holds at any degree.
+- **The degree decides how far past rho the route is, and whether it has
+  an asymptote at all.**
+  - At a constant degree the oracle column is `N^D/D!`, polynomial in
+    `n`. That is the regime of the published crossover estimates: `2^86.0`
+    at `n = 131` by Kousidis–Wiemers' formula, "about `2^25` short"
+    (`RESEARCH_ECC2K130_IC_LITERATURE.md` §2).
+  - If the degree tracks `D_reg(N)`, which rises linearly in `N`, the
+    column is exponential in `N`. The best `m = 3` cell is then `2^196.95`,
+    above both rho and exhaustive search of the subgroup (`2^129`).
+  - At that point the descent is not a slow sub-exponential method. It is
+    worse than brute force.
+- **Which regime the data support.** The measurements at `n ≤ 15` rule out
+  constant degree 6, which is what `ℓ = 3` and most of `ℓ = 4` show.
+  They do not yet separate a degree that has levelled off at 7 from one
+  that follows `D_reg`. Both say 7 at `(10, 5)`.
+  - Between those two, the `n = 131` price differs by 106 bits at `w = 1`.
+  - `(15, 5)` is the cell that decides it.
+  - *Added 2026-10-06:*
+    - Both `m` show a degree that is flat in `n` at fixed `ℓ` and rises
+      with `ℓ`.
+    - That favours an `ℓ`-driven degree, which the fit rows model, over
+      both "levelled off" and the `N`-driven `D_reg`.
+    - The fit rows sit between those two prices, and above brute force.
+    - Whatever the right model, any degree that keeps rising with `ℓ`
+      gives the same verdict: the optimiser shrinks the factor base until
+      the route is a target search.
+
+## 3. What changes, and what does not
+
+**Does not change.**
+
+- The ECC2K-130 cost verdict. Index calculus by summation polynomials
+  loses to rho at `n = 131` by the product law and the oracle budget
+  (`RESEARCH_ECC2K130_DECOMPOSITION.md` §5.1–5.3). The scoreboard already
+  says so.
+- What remains open is also unchanged: an oracle that is not an
+  elimination of the descended system at all (§5.4 of that note). This
+  note prices Macaulay-type oracles, not every oracle.
+
+**Changes.**
+
+- **The constant-degree premise, for this system.**
+  `RESEARCH_IC_BOUNDARY_LEDGER.md` records "the solving degree is flat in
+  `n`" at `m = 2`. At `m = 3` it is not flat.
+  - The chained `S₃` system's refutation degree rises with `ℓ`.
+  - It rises at fixed surplus, across the four registered ladder pairs.
+  - The first fall degree stays at 3.
+  - H1 of `RESEARCH_KOBLITZ_SCALING_TARGET.md`, "the fall degree stays
+    ≤ 3", therefore holds. It is Kosters–Yeo's trace equation.
+  - H1's falsifier was a proxy for "the subspace-restricted systems are not
+    as benign as the first data suggests". The fall degree does not show
+    that. The refutation degree, which H1 does not measure, does.
+- **The model to extrapolate with.**
+  - A constant degree is contradicted at these sizes.
+  - The semi-regular reference is the one model on hand that fits every
+    measured cell within one degree, and it is not constant.
+  - Any future ECC2K-130 figure for this route should state which degree
+    model it assumes. The two differ by more than 100 bits at `n = 131`.
+  - *2026-10-06:* §5 adds a third model, a degree set by `m` and `ℓ` and
+    flat in `n`. It fits both `m` measured so far, and it is the one the
+    data favour.
+
+## 4. What would move it
+
+- **A degree that stops growing.**
+  - `(15, 5)` is the discriminating cell: `D_reg` is 8 there, and every
+    other measured `ℓ = 5` cell has a reference of 7.
+  - Its degree-7 matrix is 3.1M × 2.8M. At `(10, 5)`'s measured band-7
+    rank ratio its dense block is about 110–120 GB, so it needs a host of
+    about 128 GB.
+  - A resolution at 7 there would put `ℓ = 5` at 7 wherever it is measured,
+    and would favour the levelled-off reading.
+  - A ≥8 would follow `D_reg` into a fifth consecutive rung.
+- **A Frobenius-stable factor base.** It would divide the target count
+  by `n`. At `n = 131` the only stable subspaces have dimensions
+  0, 1, 130 and 131, because `ord₁₃₁(2) = 130`
+  (`RESEARCH_ECC2K130_DECOMPOSITION.md` §6). No such base exists at the
+  `ℓ` this route needs.
+- **A different oracle.** SAT is measured and goes the wrong way (§5.4
+  there). Anything else is unpriced.
+
+## 5. The `m = 4` measurement (2026-10-06)
+
+`research/dreg_m4_chain_20261006/` and Result 10 of
+`RESEARCH_DREG_MEASUREMENT.md`. It was pre-registered, and its predictions
+held.
+
+| `ℓ` | `m = 4` cells, unknowns | measured, four draws each | semi-regular `D_reg` | `m = 3` at the same `ℓ` |
+|--:|---|---|---|---|
+| 1 | (4,1) (5,1) (6,1), 12–16 | 5 in every draw | 5 | — |
+| 2 | (5,2) (6,2) (7,2) (8,2), 18–24 | 6 in every draw | 6, 7, 7, 7 | 5 in every draw |
+| 3 | (9,3) (10,3), 30 and 32 | ≥7 in all eight draws | 8, 9 | 6 (5 at surplus −5) |
+
+- **`m = 4` sits one degree above `m = 3` at the same `ℓ`**, and the gap
+  does not close as `n` grows.
+- **It rises with `ℓ`:** 5, then 6, then ≥7. That is at least one degree
+  per unit of `ℓ`, against about half a degree for `m = 3`.
+- **It is flat in `n` at fixed `ℓ`.**
+  - So the measured degree is set by `m` and `ℓ`.
+  - The semi-regular reference, which counts unknowns and equations, is
+    within one in every cell but overstates the growth in `n`.
+- **What it does to §2.**
+  - The `m = 4` constant-degree rows are the optimistic case. 6 is
+    exceeded and 7 is reached at `ℓ = 3`, against the `ℓ ≈ 34` they
+    assume.
+  - The new `ℓ + 4` row prices `m = 4` at `2^173.13` at `w = 1`, with its
+    minimum at the smallest factor base. That is `2^+112` over rho, and
+    above an exhaustive search of the subgroup.
+  - Below the searched range it is `2^165.93` at `ℓ = 1`, still above that
+    search.
+  - It is an extrapolation of a fit to three rungs, one of them a bound.
+    What it shows robustly is the shape: a degree that rises with `ℓ` makes
+    the factor base shrink until the route is a search.
+- **Unchanged:** the verdict against rho, which never depended on the
+  degree (§2, "What the table says").
+
+## 6. The MutantXL closure degree (2026-10-16)
+
+Every degree in §1–§5 is XL's: the first degree whose plain Macaulay row
+space contains `1`. `research/dreg_closure_mutantxl_20261016/` replays the
+same 92 unsatisfiable draws and saturates each degree under MutantXL's step:
+degree falls times monomials, repeated to saturation.
+
+| | XL | closure |
+|---|---|---|
+| `m = 3`, `ℓ = 2..5` (N = 11–25) | 5, 5–6, 6–7, 7 | 3–4, 4, 4, 4 |
+| `m = 4`, `ℓ = 1..3` (N = 12–32) | 5, 6, ≥7 | 3–4, 3–4, 4 |
+
+- **Refutation degree.** Every draw refutes under the closure below XL.
+  58 of the 84 resolved draws refute two or more degrees below.
+- **Growth with `ℓ`.** None appears: the m = 3 closure median is 4 at
+  every `ℓ`.
+- **Soundness.** The closure never refuted a committed satisfiable draw.
+  This control was disclosed as added after measurement.
+- **Instrument checks.** XL identity held on every degree built.
+
+**Priced as a constant degree 4** (`descent_degree_cost`, derived):
+
+| m | w | ℓ | N | total | vs rho |
+|--:|--:|--:|--:|--:|--:|
+| 3 | 1 | 40 | 251 | `2^82.27` | `2^+21.46` |
+| 3 | 2 | 45 | 266 | `2^100.25` | `2^+39.44` |
+| 4 | 1 | 33 | 394 | `2^68.43` | `2^+7.62` |
+| 4 | 2 | 34 | 398 | `2^93.91` | `2^+33.10` |
+
+- **The closure's counted work.** It grows roughly as its column count to
+  the power 2.2. So the `w = 2` rows are the ones the measured closure
+  tracks.
+- **The extrapolation.** These rows assume the closure stays at 4 from
+  `N = 32` to `N ≈ 400`, and nothing here measures that.
+  - The successor lead is a sparse closure at degree 4 for `N ≈ 40` to 50.
+- **The free-oracle floor still binds.** At `m = 4` it is `2^56.46`, which
+  leaves `2^5.71` an oracle call. So **no row beats rho**.
+- **Units are unconverted, as in §2.** Touches against group operations,
+  with `K` unmeasured. So `+7.62` is a distance, not a separation.
+
+## 7. The closure at scale (2026-10-16)
+
+`research/dreg_closure_scale_20261016/` measured degree 4 on 40
+unsatisfiable draws at N = 26–42. It was pre-registered, and every draw
+ran to completion.
+
+| | refutes at 4 | does not refute at 4 (degree 4 saturated) |
+|---|---|---|
+| m = 3 | ℓ = 5 (12/12), ℓ = 6 (8/8) | **ℓ = 7 (8/8)**, N = 40, 42 |
+| m = 4 | ℓ = 3 (8/8), ℓ = 4 (4/4), up to N = 42 | — |
+
+- **The rise follows ℓ, not N.** At N = 40 and 42, m = 4 holds and m = 3
+  rises. A descriptive reading is that the closure degree is set by
+  `m·ℓ`: the refuting cells have `m·ℓ ≤ 18` and the rising cells 21. It
+  was not registered.
+- **What it does to §6:**
+  - The m = 3 "4, constant" row (`2^82.27`) is **withdrawn**, because
+    m = 3 exceeds 4 from ℓ = 7, far below its priced ℓ = 40.
+  - The m = 4 row (`2^68.43`) keeps its status as an open extrapolation.
+    Its measured support is now ℓ ≤ 4 and N ≤ 42, against a priced ℓ = 33
+    and N = 394.
+- **Degree held at 5** (`descent_degree_cost`, derived):
+
+| m | w | ℓ | N | total | vs rho |
+|--:|--:|--:|--:|--:|--:|
+| 3 | 1 | 41 | 254 | `2^85.18` | `2^+24.37` |
+| 4 | 1 | 34 | 398 | `2^71.13` | `2^+10.32` |
+| 4 | 2 | 34 | 398 | `2^106.52` | `2^+45.71` |
+
+- **Degree 5 is unmeasured above N = 25.** At N = 40 it is 760k columns,
+  past the dense engine. A sparse closure would be needed.
+- **No row beats rho.** The free-oracle floor (§2) still binds, and the
+  units are unconverted.
+
+## 8. What sets the closure degree (2026-10-16)
+
+`research/dreg_closure_driver_20261016/` was pre-registered, with 16 draws.
+
+- **Cells.**
+  - m = 3, ℓ = 6 at N = 40 and 42: it refutes at 4 on 8 of 8, at the same
+    N where ℓ = 7 does not (§7).
+  - m = 4, ℓ = 5 (`m·ℓ = 20`) at N = 42 and 44: it refutes at 4 on 8 of 8.
+- **Rejected:**
+  - N as the driver;
+  - an `m·ℓ` threshold ≤ 20.
+- **Surviving:**
+  - the closure degree exceeds 4 from **ℓ = 7**;
+  - it exceeds 4 from **m·ℓ ≥ 21**.
+- **What this does to §6–§7.** Under either survivor, m = 4 exceeds
+  degree 4 by ℓ = 7 at the latest, against the priced ℓ = 33.
+  - So the m = 4 "4, constant" row (`2^68.43`) is **contradicted**, not
+    merely extrapolated. It is unmeasured at m = 4, ℓ ≥ 6.
+  - The optimistic case is now the degree-5 row:
+
+| m | w | ℓ | total | vs rho |
+|--:|--:|--:|--:|--:|
+| 4 | 1 | 34 | `2^71.13` | `2^+10.32` |
+| 3 | 1 | 41 | `2^85.18` | `2^+24.37` |
+
+- **Degree 5 is unmeasured past ℓ = 7.** Whether it holds there decides
+  even these rows, and testing that needs a sparse closure.
+- **No row beats rho.** The free-oracle floor binds, and the units are
+  unconverted.
+
+## 9. Guess-then-degree-4 (2026-10-17)
+
+`research/dreg_closure_specialise_20261017/` fixed single variables in the 8
+m = 3, ℓ = 7 draws that do not refute at degree 4.
+
+- **Single fixes.** Any one fixed variable lets degree 4 refute on 6 of 8.
+- **Both branches.** On 5 of 8, both values of one guess refute.
+- **That names a third oracle model.** Alongside "degree 4" (contradicted,
+  §8) and "degree 5" (optimistic, §8), there is **guess k variables, then
+  degree 4**, at `2^k · C(N−k, ≤4)^w` per target.
+  - It is measured only at ℓ = 7, where k = 1 often suffices.
+  - If k grows like `m·(ℓ−6)`, it is about 108 at m = 4, ℓ = 33. That is
+    far worse than degree 5, so no row is added.
+  - The measurement that would decide it is k at ℓ = 8 and 9.
+- **No row beats rho.**
+
+## 10. Guesses at ℓ = 8 (2026-10-22)
+
+`research/dreg_closure_guess_20261022/` guessed four variables (one per
+summand and one intermediate coordinate) on 4 unsatisfiable m = 3, ℓ = 8
+draws (N = 46), all 16 branches each.
+
+- **All 64 branches refute at degree 4**, and the dimension-6 positive
+  control refutes on 4 of 4. So k ≤ 4 at ℓ = 8; fewer is not measurable
+  in the 16 GB container.
+- **The price.** At w = 1 and the m = 4, ℓ = 33 cell (N = 394), the oracle
+  ratio `C(N, ≤5) / (2^k · C(N−k, ≤4))` is 78.2 at k = 0, 5.09 at k = 4,
+  1.30 at k = 6 and 0.66 at k = 7. The hybrid beats degree 5 there only if
+  k ≤ 6.
+- **What would move a row:** k measured to stay bounded as ℓ grows (k = 3
+  at ℓ = 8, then ℓ = 9). Even then its best case is the degree-4 row
+  `2^68.43`, `2^+7.62` over rho. The free-oracle floor binds every row.
+
+## 11. Three guesses at ℓ = 8 (2026-10-23)
+
+`research/dreg_closure_guess3_20261023/` guessed variables 7, 15 and 23 (the
+top coordinate of each summand) on the same 4 unsatisfiable m = 3, ℓ = 8
+draws (N = 43, 136,698 columns), 8 branches per draw.
+
+- **Three do not suffice for this set.** Draws 0, 3 and 5 each have a branch
+  that saturates degree 4 without refuting; draw 6 refutes on 8 of 8. The
+  controls are valid (the ℓ = 7 identity control matches its committed
+  record; the dimension-6 control refutes on 4 of 4).
+- **Four did (§10).** So the set matters or the count does, and this study
+  does not separate them.
+- **Reading (not registered).** The 3-set leaves each summand in dimension 7
+  at N = 43: structurally the ℓ = 7 systems that did not refute at degree 4
+  on 8 of 8 draws (§7, §8). The result fits `m·(ℓ−7)+1` guesses, 4 at ℓ = 8.
+  Extended linearly that is 105 at the priced m = 4, ℓ = 33 cell, against
+  the break-even of 6 with degree 5. It rests on two values of ℓ and is the
+  first evidence leaning toward a count that grows with ℓ. The matched null
+  (unspecialised (22, 7), same matrix size) and a 3-set that leaves one
+  summand at dimension 8 would test it.
+- **The price is unchanged.** At the m = 4, ℓ = 33 cell (N = 394) the ratio
+  `C(N, ≤5) / (2^k · C(N−k, ≤4))` is 78.2, 39.5, 19.95, 10.08, 5.09 for
+  k = 0..4, and the hybrid beats degree 5 only if k ≤ 6.
+- **No row moves** and none beats rho.
+
+## 12. The matched null at (22, 7) (2026-10-28)
+
+`research/dreg_closure_null22_7_20261028/` measured the unspecialised
+m = 3, (n, ℓ) = (22, 7) system: the same N = 43, 44 equations and 136,698
+columns as the three-guess set of §11, on four unsatisfiable draws (surplus +1).
+
+- **It does not refute at degree 4 on 4 of 4 draws** (registered verdict: the
+  pure ℓ = 7 reading). Identity, dimension-6 positive and satisfiable soundness
+  controls are valid.
+- **So the earlier ℓ = 7 failure is not a surplus artefact:** 12 of 12
+  unspecialised ℓ = 7 draws fail over surplus −2, 0, +1.
+- **What follows (derived).** Fixing the top coordinate of each summand takes
+  ℓ = 8 to ℓ = 7, and ℓ = 7 is where degree 4 stops refuting, so the guess count
+  is about `m·(ℓ−7)` plus the one that ℓ = 7 itself needs: 4 at ℓ = 8, which is
+  what §10 and §11 measured. Linear extrapolation gives 4·(33−7)+1 = 105 guesses
+  at the priced m = 4, ℓ = 33 cell, far above the break-even k ≤ 6, so the
+  hybrid does not beat degree 5 there. It rests on ℓ = 7 and ℓ = 8.
+- **Not measured:** a 3-set leaving one summand at dimension 8 (the reading
+  predicts failure); degree 5 at ℓ = 7. No row moves, and none beats rho.
+
+## Scope and disclosures
+
+- **System.** `m = 3`, the chained `S₃`, with `b = 1`.
+  - `b = 1` is the ECC2K-130 family's own coefficient: `E₀: y² + xy = x³ + 1`.
+  - Random `ℓ`-dimensional subspaces, four unsatisfiable draws per cell.
+  - The degree is the refutation degree of bounded Macaulay linear algebra
+    (the constant `1` in the row space). It is neither an F4/F5 solving
+    degree nor a certified first fall degree
+    (`degree-reporting-correction-20260922` on the scoreboard).
+- **Fields (`AGENTS.md` §8b).**
+  - The measured degrees are `n = 4, 5, 7, 8, 9, 10, 11, 12, 13, 15`.
+  - Several have proper intermediate subfields over GF(2): `n = 4`
+    (GF(2²)), 8 (GF(2²), GF(2⁴)), 9 (GF(2³)), 10 (GF(2²), GF(2⁵)), 12
+    (GF(2²), GF(2³), GF(2⁴), GF(2⁶)) and 15 (GF(2³), GF(2⁵)).
+  - The subspaces are random, so no subfield structure is chosen or used.
+  - The `m = 4` cells (§5) are `n = 4`–`10`, with GF(2^6) adding GF(2²)
+    and GF(2³). Their other subfields are listed above.
+  - The challenge field GF(2^131) has no proper intermediate subfields.
+  - No result here depends on a subfield. No Frobenius action is used.
+- **§8a.** Nothing here is an index-calculus improvement, so the `m = 83`
+  gate is neither claimed nor discharged. No statement here is evidence
+  at `m = 83` or `m = 131`. The `n = 131` rows are extrapolations.
+- **Extrapolations, named.**
+  - Every `n = 131` figure in §2 is derived.
+  - The constant-degree rows assume the degree stops where `n ≤ 15` left
+    it.
+  - The semi-regular rows assume the one-degree agreement seen at `n ≤ 15`
+    persists to `N ≈ 209`. For `m = 4` that is `N ≈ 370`.
+  - The fit rows (2026-10-06) assume that `⌈ℓ/2⌉ + 4` (`m = 3`) and
+    `ℓ + 4` (`m = 4`), fitted at `ℓ ≤ 5` and `ℓ ≤ 3`, hold at `ℓ = 4`.
+    That `ℓ` is in range, but `n = 131` is not.
+  - None of these is measured.
+- **Units.** Oracle costs are in monomial-column touches and rho is in
+  group operations, unconverted (§2).
+
+## Pair invariant `p = x₁x₂` inside the chain (2026-10-28): no lower degree at ℓ = 6, unresolved at ℓ = 7
+
+`research/dreg_pair_invariant_20261028/` (pre-registered; `RESULTS.md`,
+`results.pdf`) asks whether the summand-swap invariant lowers the m = 3
+closure degree.
+
+- **The construction.** At m = 3 every cubic monomial comes from `x₁x₂e₁`.
+  Adding `p = x₁x₂` as unknowns over `span{v_i v_j}` turns the first link
+  into the quadratic `s²e₁² + p e₁ + p² + b`, so every equation is
+  quadratic. A matched control adds the non-invariant `r = x₁e₁`.
+- **Draws.** The same committed draws at (22, 6) and (21, 7).
+- **Result.** Neither arm refutes at degree 3 on any of 8 unsatisfiable
+  draws (registered verdict: H_none in both cells).
+  - Degree 4 is unmeasured for the new arms: a sparse run capped at 10⁹
+    entries.
+  - Their degree-4 matrices have 5.1–5.5 times the columns of the plain
+    system's.
+  - So the invariant arm refutes no earlier than the plain chain (which
+    refutes at 4 at (22, 6)), at a larger matrix.
+- **Measured at (22, 6), open at (21, 7).**
+  - At (22, 6), where the plain chain refutes at 4, the invariant arm does
+    not help: no lower degree, and a larger matrix.
+  - At (21, 7) the plain chain does not refute at 4 (degree-5 matrix: 974,982
+    columns). Q's degree 4 (637,393 columns) is unmeasured, so a lower degree
+    there is not excluded. That measurement needs a large-memory host.
+  - At m = 4 the second cubic link has no summand symmetry.
+- **Untried.**
+  - The invariants as a *replacement* for the summand coordinates, so that N
+    falls.
+  - The orbit-aware split rule (`RESEARCH_EXOTIC_COORDINATES.md` §18).
+
+## Invariant guess at ℓ = 8 (2026-10-29): never worse than a raw guess, not reliably enough
+
+`research/dreg_invariant_guess_20261029/` (pre-registered; `RESULTS.md`,
+`results.pdf`) compares two three-guess sets on the committed (22, 8) draws.
+
+- **The arms.**
+  - The invariant arm fixes `a₇ + b₇`, a coordinate of `s = x₁ + x₂`, which
+    the first link sees in place of the two summands.
+  - The raw arm fixes `a₇`.
+  - Both also fix `c₇` and one intermediate coordinate, so they differ only
+    in the guess that touches the first link.
+- **Result.** The invariant arm refutes at degree 4 on every branch of draws
+  5 and 6; the raw arm does so on draw 6 only.
+  - The registered verdict is mixed (invariant split 2/4, raw fails 1/4).
+  - Paired by draw, the invariant guess is never worse.
+- **Comparison.** The committed raw set `{7, 15, 23}`, which spends two
+  guesses on the pair, suffices on 1 of 4.
+- **What it weakens.** The summand-dimension reading (§12), since the
+  invariant arm leaves both summands at dimension 8.
+- **What it is not.** No row moves: the extrapolated guess count at
+  ℓ = 33 stays far above the break-even of 6.
+- **Disclosure.** The soundness rule was replaced after the data, because the
+  satisfiable branches holding solutions ran out of memory (Amendment 1).
+
+## Invariant guess, eight more draws (2026-10-29): the invariant guess is better (p = 0.031)
+
+`research/dreg_invariant_guess_more_20261029/` (pre-registered on fresh draws
+7–39 of the same seeded sequence; `RESULTS.md`, `results.pdf`).
+
+- **Result.** On the 8 registered unsatisfiable draws, guessing `a₇ + b₇`
+  suffices on 5 and guessing `a₇` on 0.
+  - All 5 discordant draws favour the invariant (one-sided exact sign test
+    p = 0.031).
+  - With the four earlier draws: 6 of 6, p = 0.016, and 7 of 12 draws
+    against 1 of 12.
+- **What it contradicts.** The summand-dimension reading of §12 does not hold
+  at this cell: what governs refutation is the coordinate of `s`, not the
+  dimension of the summands.
+- **What it is.** A measured stage-level improvement in the guess-then-degree-4
+  oracle's guess choice.
+- **What it is not.** No row moves: the guess count at ℓ = 33 is still
+  extrapolated far above the break-even of 6.
+- **Next.** Two invariant guesses on the pair, ℓ = 9, and m = 4.
+
+## A second invariant guess (2026-10-29): not a substitute for the raw guess on x₃
+
+`research/dreg_invariant_pair_guess_20261029/` (pre-registered; `RESULTS.md`,
+`results.pdf`) replaces S3's raw `c₇` with a second invariant coordinate of the
+pair, `a₆ + b₆`, on the same 12 draws.
+
+- **Result.** The new arm suffices on 2 of 12 draws, against S3's 7 of 12.
+  - All 5 discordant draws favour S3. The registered two-sided sign test gives
+    p = 0.0625, so the verdict is no detected difference.
+  - It is never better on any draw.
+- **What it means.** One invariant guess per summand pair is the useful part,
+  and the raw guess on the third summand still carries weight.
+- **What it is not.** No row moves.
+
+## An invariant guess on the second link (2026-11-05): as good as the raw guess on x₃
+
+`research/dreg_second_link_guess_20261105/` (pre-registered; `RESULTS.md`,
+`results.pdf`) replaces S3's raw `c₇` with coordinate 20 of the second link's
+swap invariant `e₁ + x₃`, on the same 12 draws. Unverified assertion until a
+pcc verdict exists.
+
+- **Result.** The new arm suffices on 6 of 12 draws, against S3's 7 of 12.
+  - One discordant draw (27), which favours S3. The registered two-sided sign
+    test gives p = 1.0, so the verdict is no detected difference.
+  - The arms agree on 11 of 12 draws.
+- **What it means.** Unlike a second invariant guess on the first link, an
+  invariant guess on the second link does not lose. One invariant guess per
+  link is a rule that extends along the chain, and m = 4 is its test.
+- **What it is not.** Not shown to be better than S3. No row moves.
+
+## One invariant guess per link at m = 4, degree 3 (2026-11-06): no detected difference
+
+`research/dreg_m4_link_guess_d3_20261106/` (pre-registered; `RESULTS.md`,
+`results.pdf`). Every m = 4 cell this host can hold refutes at degree 4 with
+no guess, so the per-link rule was tested at degree 3 with k = 10 guesses at
+ℓ = 5 (n = 11, 12), on all 1024 branches of 8 unsatisfiable draws.
+Unverified assertion until a pcc verdict exists.
+
+- **Result.** Invariant placement (four sums on `x₁ + x₂`, three guesses on
+  `e₁ + x₃`, three on `e₂ + x₄`) refutes on 1,888 of 8,192 branches; raw
+  placement in the same places on 1,312.
+  - By draw it is ahead on 4 and behind on 3. The registered two-sided sign
+    test gives p = 1.0: no detected difference.
+- **What it means.** The per-link rule is not established at m = 4 in the
+  regime this host reaches. The degree-4 three-guess regime at m = 4 needs a
+  larger host.
+- **What it is not.** A test of the m = 3 degree-4 regime. No row moves.
+
+## Which guesses decide refutation at m = 4 (2026-11-06): links 2 and 3, never link 1
+
+`research/dreg_m4_guess_bits_20261106/` (pre-registered; `RESULTS.md`,
+`results.pdf`) reruns the ten-guess m = 4 design and reads, per arm and draw,
+the guesses whose value changes degree-3 refutation. Unverified assertion until
+a pcc verdict exists.
+
+- **Result.** No link-1 guess (pair sums or raw x₂) is essential on any of 16
+  arm-draws; essential guesses sit on link 3 (34) and link 2 (18). Guessing
+  only the essential set keeps every refutation on 7 of 13 tested arm-draws,
+  all with one to three guesses.
+- **What it means.** At m = 4, degree 3, guesses on the last links do the work,
+  the opposite of m = 3 at degree 4. A guess budget should go to links 2 and 3
+  first.
+- **What it is not.** A complete guess-and-determine. No row moves.
+
+## Two guesses at (22, 8) (2026-11-07): enough on 1 of 12 draws
+
+`research/dreg_two_guess_20261106/` (pre-registered; `RESULTS.md`,
+`results.pdf`) drops `e₁[0]` from S3 and L3. Unverified assertion until a pcc
+verdict exists.
+
+- **Result.** Both two-guess sets suffice at degree 4 on draw 6 only and fail
+  at their first branch on the other 11; they never disagree.
+- **What it means.** Three guesses stay the floor for these guess kinds on 11
+  of 12 draws at ℓ = 8; there is no general halving of the branch count.
+- **What it is not.** A test of two-guess pairs that keep `e₁[0]`. No row moves.
+
+## Reproducing
+
+```sh
+# native (AGENTS.md: no Python); the 2026-09-30 Python tools stay as that
+# round's record and are reproduced exactly
+cargo run --release --example dreg_score -- semireg 3 10:5 13:5 15:5     # the reference column
+cargo run --release --example dreg_score -- score research/dreg_degree7_ell5_20260930/runs/cell-10-5-7.u*.jsonl
+cargo run --release --example dreg_score -- score research/dreg_m4_chain_20261006/runs/cell-*.jsonl  # §5
+cargo run --release --example descent_degree_cost                        # §2's table + §6's rows
+cargo run --release --example dreg_score -- closure research/dreg_closure_mutantxl_20261016/runs/*.jsonl  # §6
+cargo run --release --example dreg_score -- scale research/dreg_closure_scale_20261016/runs/*.d*.jsonl  # §7
+cargo run --release --example dreg_score -- scale research/dreg_closure_driver_20261016/runs/*.d*.jsonl  # §8
+cargo run --release --example dreg_invariant_score -- research/dreg_pair_invariant_20261028/runs  # pair invariant
+```

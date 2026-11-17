@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-14T17:01:27Z",
+ "id": "PCC-20261114-0e5133",
+ "kind": "measurement",
+ "producer": {
+  "commit": "b66ba0c7788ba5449a4dd50097ef4be620bceb7c",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/koblitz_n83_factor_base_sweep_20261008/verification/k2048-sorted-unpinned-20261114/evidence/audit.json",
+    "sha256": "b108a1ec7fcc6627fe2bb37ace92ea3b37d395e09fdab31b7236fc1a7a688ad0"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "N83 a=0 K2048 sorted constructed-point solver gate, 2026-11-14",
+ "statement": "The all-summand-ordered K2048 pinned five-summand control passed independent original-XCNF and group-row replay; the sorted unpinned original formula accepted that complete model, while a frozen one-thread CryptoMiniSat 5.14.7 search returned INDETERMINATE at 1000001 conflicts and 283.604899625 process-wall seconds."
+}

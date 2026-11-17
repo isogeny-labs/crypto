@@ -1,0 +1,33 @@
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:11:55: error: Tactic `decide` failed for proposition
+  nq a = -1 ∧ nr a = 0 ∧ ns a = 1 ∧ nt a = 0
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableAnd`, `instDecidableEqFin`, `instDecidableEqNat`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match h : (↑(nq a)).beq ↑(-1) with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:16:66: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:18:60: error: unsolved goals
+⊢ -(X * 4) - C 3 * X * 3 + C 3 * X * C 2 * 3 + X ^ 2 * 4 + C 3 * C 2 * X ^ 2 * 3 - C 4 * X ^ 2 * 3 - C 3 * X ^ 3 * 3 +
+                C 4 * C 2 * X ^ 3 * 3 -
+              X ^ 4 * 3 +
+            C 3 * C 2 * X ^ 4 * 3 +
+          X ^ 5 * 4 +
+        C 2 * X ^ 5 * 3 -
+      C 3 * 3 =
+    1
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:34:1: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:42:37: error: Type mismatch: After simplification, term
+  congrArg (⇑C)
+    (have this := of_decide_eq_true (id (Eq.refl true));
+    this)
+ has type
+  (2 : ZMod 2) = 0
+but is expected to have type
+  (2 : (ZMod 2)[X]) = 0

@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T07:00:18Z",
+ "id": "PCC-20261117-dfcc55",
+ "kind": "statement",
+ "producer": {
+  "commit": "89b108d137a16c8d394755097c5e75b92404ee16",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/review_relation_replay.cpp",
+    "sha256": "6f251300be4599c2a3ebecbaa5c74a024bf146e0eb5792cd649697fa698ec9be"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/check-portable-replay.sh",
+    "sha256": "d2f26ca803a7ca7ac1ee27c892789672fe744b3b28a04b585a2f4ce98456f980"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/PORTABLE_REPLAY_PROTOCOL.md",
+    "sha256": "c983e94d23c21ebdd6d98e067f82cd872499ec4a9e07be93a82408cabfd3ccea"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/relation-portable-inputs-v1.sha256",
+    "sha256": "091c480b82c69b88758ebc24afea32d919f05792023cb8ac3460d0f688357ece"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/relation-portable-v2/result.json",
+    "sha256": "1a2d28860a5b88216aa42f62c942d9c05006d663578a33c83363bcc881deb836"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/relation-portable-v2/relocated-result.json",
+    "sha256": "1a2d28860a5b88216aa42f62c942d9c05006d663578a33c83363bcc881deb836"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/relation-portable-v2/pre-call-manifest.sha256",
+    "sha256": "f86a9eb75741a53b3c476f0ea5f743591ea13588d5f9399c6be5f7fe8db2953a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/relation-portable-v2/relocated-pre-call-manifest.sha256",
+    "sha256": "e0e62fb092df273d7605c6bde8ffa0f8b6bad0a918ed5e0d12cbbd9f8efe03c7"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "nist-cover-portable-replay",
+ "statement": "Producer native portable comparison v2 checks112 repository-relative manifest subjects and exact typed semantics of four standalone/integrated outputs, excluding33 declared timing fields and separately recording library versions. Both original and relocated-subset calls exit0; six corruption controls reject and a timing-only change is accepted. Initial v1 omitted explicit observed-JSON pre-call binding; v2 fixes that custody gap. No curve arithmetic, independent signed verdict, new relation rank, or admitted cost result follows."
+}

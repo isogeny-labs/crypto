@@ -1,0 +1,30 @@
+# family_n8 (sha256 b2749c8305ac9963fa9d198188c5e89b4cafecaf0984f544a44e2498f0b37668; rustc 1.97.0)
+# family F(A,B,v) = {A v + 1, B v + B + 1}; v = x0; conjecture d_F(inside) = min(deg A, deg B) + 2, d'_F = 1
+FAMILY shared k=1: n=3 deg A=1 deg B=1 d_F(inside)=3 d'_F=1 predicted (3, 1) -> MATCH
+FAMILY shared k=2: n=4 deg A=2 deg B=2 d_F(inside)=4 d'_F=1 predicted (4, 1) -> MATCH
+FAMILY shared k=3: n=5 deg A=3 deg B=3 d_F(inside)=4 d'_F=1 predicted (5, 1) -> MISMATCH
+FAMILY shared k=4: n=6 deg A=4 deg B=4 d_F(inside)=4 d'_F=1 predicted (6, 1) -> MISMATCH
+FAMILY shared k=5: n=7 deg A=5 deg B=5 d_F(inside)=4 d'_F=1 predicted (7, 1) -> MISMATCH
+FAMILY disjoint k=1: n=3 deg A=1 deg B=1 d_F(inside)=3 d'_F=1 predicted (3, 1) -> MATCH
+FAMILY disjoint k=2: n=5 deg A=2 deg B=2 d_F(inside)=4 d'_F=1 predicted (4, 1) -> MATCH
+FAMILY disjoint k=3: n=7 deg A=3 deg B=3 d_F(inside)=4 d'_F=1 predicted (5, 1) -> MISMATCH
+FAMILY unequal 2,1: n=4 deg A=2 deg B=1 d_F(inside)=3 d'_F=1 predicted (3, 1) -> MATCH
+FAMILY unequal 3,2: n=5 deg A=3 deg B=2 d_F(inside)=4 d'_F=1 predicted (4, 1) -> MATCH
+FAMILY RESULT -> SOME MISMATCH
+FIELD-EQUATIONS-ONLY n=2: d_F(S_fe)=4 -> = 4
+FIELD-EQUATIONS-ONLY n=3: d_F(S_fe)=4 -> = 4
+FIELD-EQUATIONS-ONLY n=4: d_F(S_fe)=4 -> = 4
+FIELD-EQUATIONS-ONLY n=5: d_F(S_fe)=4 -> = 4
+FIELD-EQUATIONS-ONLY n=6: d_F(S_fe)=4 -> = 4
+FIELD-EQUATIONS-ONLY n=7: d_F(S_fe)=4 -> = 4
+FIELD-EQUATIONS-ONLY n=8: d_F(S_fe)=4 -> = 4
+FIELD-EQUATIONS-ONLY RESULT (d_F = 4 for n = 2..8) -> PASS
+N1-FAMILY {X^2, X^2+1}: d_F(inside)=2 d'_F=1 gap=1 -> MATCH
+N1-FAMILY {X^3, X^3+1}: d_F(inside)=3 d'_F=1 gap=2 -> MATCH
+N1-FAMILY {X^4, X^4+1}: d_F(inside)=4 d'_F=1 gap=3 -> MATCH
+N1-FAMILY {X^5, X^5+1}: d_F(inside)=5 d'_F=1 gap=4 -> MATCH
+N1-FAMILY {X^6, X^6+1}: d_F(inside)=6 d'_F=1 gap=5 -> MATCH
+N1-FAMILY {X^7, X^7+1}: d_F(inside)=7 d'_F=1 gap=6 -> MATCH
+N1-FAMILY {X^8, X^8+1}: d_F(inside)=8 d'_F=1 gap=7 -> MATCH
+N1-FAMILY RESULT (d_F(inside) = k, d'_F = 1 for k = 2..8) -> PASS
+# wall .009950617 s

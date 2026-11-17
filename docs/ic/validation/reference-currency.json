@@ -1,0 +1,36 @@
+{
+ "schema": "ic-reference-currency/v1",
+ "note": "A leaderboard table's rho reference was measured at a commit.  When the strong-rho implementation changes after that, the table's x reference describes a rho that is no longer the standing one.  scripts/ic_audit/check_reference_currency.sh fails when a table's rho source files are not the version (git blob) an entry here has assessed, so each change of the standing rho needs either a re-measurement or a dated, measured assessment of its effect on the table.",
+ "tables": {
+  "A": {
+   "measured_at": "995ea2071cc7453877a503d30eb561ae82cddab9",
+   "rho_paths": [
+    "src/cryptanalysis/koblitz_strong_rho.rs"
+   ],
+   "assessment": "Rule v3 priced rho as built (32 lanes). 13 commits changed the standing strong rho afterwards; research/ecbench_rho_optimized_20261014 measured the largest, 0.8046x solve instructions (a 1.25x faster rho), so Table A's x reference is against a slower rho than the standing one. The step-cost gap to the canonical step is in research/validation_sweep_20261019/A-leaderboard/raw/recompute_A_haiku.json (xref_canonical_step); the lane sweep in research/leaderboard_rigor_20261021/rho_lanes/ shows it is not a lane-count effect. No re-measurement of Table A at the current rho exists yet. 2026-10-28 (ecbench accounting v2, PR #2465): koblitz_strong_rho.rs gained the rho.signed_frobenius_strong_v2 path (StrongRho::solve_accounted, fixed-base jump table, r-scaled lanes) beside the frozen one. The frozen rho.signed_frobenius_strong this table uses is count-identical to main's binary: 504 of 504 matched records equal on every count field, and committed strong-rho sessions replay exactly (research/ecbench_accounting_v2_20261023/analysis/cross_binary.json, REPORT.typ). The table's reference is unchanged by it. 2026-11-11 (rule v9, isogeny-labs/crypto#3892): Table A now reads rule v9, re-measured at main f465f2fb against rule v8's matched rho (batched canonicalisation) in the same process; scripts/ic_audit/recompute_A.sh and band_A.sh read rule/v9/runs. 2026-11-16 (isogeny-labs/crypto#4406, three-word Koblitz class): koblitz_strong_rho.rs gained RhoScalar::to_biguint (an exact-value accessor, BigUint::from on u64 and u128) and doc comments naming the new W192/U192 instantiation; no walk, hash, jump or charge code changed. Committed strong-rho sessions replay identically with the new binary (ecbench_wide_gf2m_20261004 smoke-m83 4/4, ecbench_all_candidates_20261003 koblitz sampled, ecbench_pair_claw_20261003 koblitz 16 sampled). The table's reference is unchanged by it. 2026-11-17: the file is now blob 5051406f6, the Curve25519 integration's version (57f49fa233), kept by merge 85307789f6 over f57e537f51's a6a5fc8d7. Code-line diff a6a5fc8d7 -> 5051406f6: to_u128 moved from RhoScalar to a new NarrowRhoScalar trait and checked_u128 added; to_biguint is present in both; no walk, jump-table, hash, canonicalisation or counter code differs. The table's reference is unchanged by it.",
+   "evidence": [
+    "research/ecbench_rho_optimized_20261014/RESULT.json",
+    "research/validation_sweep_20261019/A-leaderboard/raw/recompute_A_haiku.json",
+    "research/ecbench_accounting_v2_20261023/analysis/cross_binary.json"
+   ],
+   "assessed_blobs": {
+    "src/cryptanalysis/koblitz_strong_rho.rs": "5051406f668b96f1438a285892a92dbef71ef6ad"
+   }
+  },
+  "C": {
+   "measured_at": "57e7ce3a3",
+   "rho_paths": [
+    "src/cryptanalysis/koblitz_strong_rho.rs"
+   ],
+   "assessment": "Table C's rho S is S20's (2026-09-26) batch rho priced at the canonical step. The standing strong rho has changed since (see Table A); S20's counts were re-verified equal at n = 41 only. No re-measurement of Table C's reference at the current rho exists yet. 2026-10-28 (ecbench accounting v2, PR #2465): koblitz_strong_rho.rs gained the rho.signed_frobenius_strong_v2 path (StrongRho::solve_accounted, fixed-base jump table, r-scaled lanes) beside the frozen one. The frozen rho.signed_frobenius_strong this table uses is count-identical to main's binary: 504 of 504 matched records equal on every count field, and committed strong-rho sessions replay exactly (research/ecbench_accounting_v2_20261023/analysis/cross_binary.json, REPORT.typ). The table's reference is unchanged by it. 2026-11-16 (isogeny-labs/crypto#4406, three-word Koblitz class): koblitz_strong_rho.rs gained RhoScalar::to_biguint (an exact-value accessor, BigUint::from on u64 and u128) and doc comments naming the new W192/U192 instantiation; no walk, hash, jump or charge code changed. Committed strong-rho sessions replay identically with the new binary (ecbench_wide_gf2m_20261004 smoke-m83 4/4, ecbench_all_candidates_20261003 koblitz sampled, ecbench_pair_claw_20261003 koblitz 16 sampled). The table's reference is unchanged by it. 2026-11-17: the file is now blob 5051406f6, the Curve25519 integration's version (57f49fa233), kept by merge 85307789f6 over f57e537f51's a6a5fc8d7. Code-line diff a6a5fc8d7 -> 5051406f6: to_u128 moved from RhoScalar to a new NarrowRhoScalar trait and checked_u128 added; to_biguint is present in both; no walk, jump-table, hash, canonicalisation or counter code differs. The table's reference is unchanged by it.",
+   "evidence": [
+    "research/ic_descent_20260930/analysis-isolated.json",
+    "research/ecbench_rho_optimized_20261014/RESULT.json",
+    "research/ecbench_accounting_v2_20261023/analysis/cross_binary.json"
+   ],
+   "assessed_blobs": {
+    "src/cryptanalysis/koblitz_strong_rho.rs": "5051406f668b96f1438a285892a92dbef71ef6ad"
+   }
+  }
+ }
+}

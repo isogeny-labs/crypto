@@ -1,0 +1,63 @@
+{
+  "time": "2026-11-17T03:38:54.645453+00:00",
+  "original_Rust_sha256": "7ed6541c66d953f7d06680cc7a50b67d724a930f5b932c40ff7f5898a49f83f8",
+  "new_Rust_sha256": "f5dfad0a736b9e1cc4b98ad32b30296c0d8b882f5d85d283025e928e0b98a0c0",
+  "only_Rust_change": {
+    "old": "type Result<T> = std::result::Result<T, String>;",
+    "new": "type Result<T, Error = String> = std::result::Result<T, Error>;"
+  },
+  "old_source_pinned_files_unchanged": true,
+  "first_failed_compilation": "PCC-20261117-d3ae2a",
+  "complete_new_compiler_inputs": [
+    {
+      "path": "Cargo.toml",
+      "bytes": 213,
+      "sha256": "e306ff6892547aad7006a86adbe504724f324f8aecc826309b9226d21b9d221e"
+    },
+    {
+      "path": "Cargo.lock",
+      "bytes": 1115,
+      "sha256": "64352dfc95861bf6850a6dbec93ec1d5a47561c0b544ba3a4d0e805eb4edbb3b"
+    },
+    {
+      "path": "fixtures-13.csv",
+      "bytes": 561,
+      "sha256": "32dcd6c74f232bc156b711eccc0e7b38c1479c29a3140ad7a2a5b24b7a254e4c"
+    },
+    {
+      "path": "REUSED_CORE_EXTRACTION_13.json",
+      "bytes": 451,
+      "sha256": "c623ba1124b18a9601fd9930c2f518749da1f5141fefc6759813ac3bfcbe49dc"
+    },
+    {
+      "path": "src/lib.rs",
+      "bytes": 373,
+      "sha256": "99ae353883d74098d364419663acfd1a37bada002f2cd01a81a495aea6fccd11"
+    },
+    {
+      "path": "src/joint.rs",
+      "bytes": 17010,
+      "sha256": "f5dfad0a736b9e1cc4b98ad32b30296c0d8b882f5d85d283025e928e0b98a0c0"
+    },
+    {
+      "path": "vendor/fp2.rs",
+      "bytes": 12739,
+      "sha256": "b833bdff5247f2eea0cde7feb89d0378cfe8305671f9065d2dae7ab538c03e55"
+    },
+    {
+      "path": "vendor/fp_poly.rs",
+      "bytes": 11867,
+      "sha256": "44f7af14d22bed78d85c4bd009ccce7197fa9257e7ff56164c8d891303e49590"
+    },
+    {
+      "path": "reused-core/cubic_core.rs.inc",
+      "bytes": 5842,
+      "sha256": "1d73e3b8e9241fe2fdb8c79e19faa2070e28b846a5015f9df6932764957fb8f1"
+    }
+  ],
+  "caller_sha256": "7f71e667c2acea05b0bd7f3b040945faa336e18afb422ba0f5fe6aa8b683bee1",
+  "source_before_first_C_compilation_and_any_arithmetic_test": true,
+  "scientific_fixture_criteria_limits_changed": false,
+  "new_Gitdir": "/run/lock/chained-transfers-ct669/owned-canonical-gitdir",
+  "new_mutable_GIT_INDEX_FILE": "/run/lock/chained-transfers-ct669/canonical-current-index"
+}

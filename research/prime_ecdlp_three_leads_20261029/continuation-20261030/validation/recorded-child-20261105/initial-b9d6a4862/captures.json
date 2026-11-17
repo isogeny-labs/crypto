@@ -1,0 +1,112 @@
+{
+  "clippy.exit": {
+    "raw_utf8": "1\n",
+    "raw_bytes": 2,
+    "raw_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  "clippy.finished": {
+    "raw_utf8": "2026-11-05T14:54:32Z\n",
+    "raw_bytes": 21,
+    "raw_sha256": "822053125f6ad68de5f1ce49e44185630dd21326770ab573646d8cbaa2ccebc3"
+  },
+  "clippy.log": {
+    "raw_utf8": "error: using `chunks_exact` with a constant chunk size\n  --> research/prime_ecdlp_three_leads_20261029/continuation-20261030/prerequisites/recorded_child.rs:49:10\n   |\n49 |         .chunks_exact(2)\n   |          ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<2>().0.iter()`\n   |\n   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks\n   = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`\n   = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`\n\nerror: aborting due to 1 previous error\n\n",
+    "raw_bytes": 637,
+    "raw_sha256": "2b04bf7313fc3c865305d9e7eda6aae1f5703803a8a9e46248c67c638332b74f"
+  },
+  "clippy.started": {
+    "raw_utf8": "2026-11-05T14:54:31Z\n",
+    "raw_bytes": 21,
+    "raw_sha256": "f9eaf81bb128eec33d70f0521603df78927d844a5f729f60aaa11be56b7cc9cf"
+  },
+  "fixture-build.exit": {
+    "raw_utf8": "0\n",
+    "raw_bytes": 2,
+    "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "fixture-build.finished": {
+    "raw_utf8": "2026-11-05T14:54:26Z\n",
+    "raw_bytes": 21,
+    "raw_sha256": "fedeb4e6712c49014933d05bf37f06de3fe05e3e76dbb7fe55a5952e81c5093b"
+  },
+  "fixture-build.log": {
+    "raw_utf8": "",
+    "raw_bytes": 0,
+    "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "fixture-build.started": {
+    "raw_utf8": "2026-11-05T14:54:25Z\n",
+    "raw_bytes": 21,
+    "raw_sha256": "6206ea487235c21c4abffe04245bbf4566c810f64f11f9449f0f4a7babbe2000"
+  },
+  "supervisor.exit": {
+    "raw_utf8": "1\n",
+    "raw_bytes": 2,
+    "raw_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  "supervisor.finished": {
+    "raw_utf8": "2026-11-05T14:54:32Z\n",
+    "raw_bytes": 21,
+    "raw_sha256": "822053125f6ad68de5f1ce49e44185630dd21326770ab573646d8cbaa2ccebc3"
+  },
+  "test-build.exit": {
+    "raw_utf8": "0\n",
+    "raw_bytes": 2,
+    "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "test-build.finished": {
+    "raw_utf8": "2026-11-05T14:54:28Z\n",
+    "raw_bytes": 21,
+    "raw_sha256": "2a1601aa006bc566f00cc4884a3ad365b9a9bce7fb0799ce7e427fb2360f62cd"
+  },
+  "test-build.log": {
+    "raw_utf8": "",
+    "raw_bytes": 0,
+    "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "test-build.started": {
+    "raw_utf8": "2026-11-05T14:54:27Z\n",
+    "raw_bytes": 21,
+    "raw_sha256": "e618a04c4d5febcfc9c9f128e005aff8c8c003fbfa2692aa7947527c48b9a1b5"
+  },
+  "tests.exit": {
+    "raw_utf8": "0\n",
+    "raw_bytes": 2,
+    "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "tests.finished": {
+    "raw_utf8": "2026-11-05T14:54:30Z\n",
+    "raw_bytes": 21,
+    "raw_sha256": "f4e8ad00bf960063f7ea3f0c11e1fde335e22d15565d82fb888ff3144a519585"
+  },
+  "tests.log": {
+    "raw_utf8": "\nrunning 27 tests\ntest child_observation::attempt_driver::durable_attempt::tests::abandoned_or_pending_only_attempt_is_unfinished_with_unknown_work ... ok\ntest child_observation::attempt_driver::durable_attempt::tests::all_terminal_kinds_survive_close_and_reopen ... ok\ntest child_observation::attempt_driver::durable_attempt::tests::bad_bindings_and_io_failures_are_errors_not_terminal_success ... ok\ntest child_observation::attempt_driver::durable_attempt::tests::duplicate_attempt_or_terminal_never_overwrites_evidence ... ok\ntest child_observation::attempt_driver::durable_attempt::tests::malformed_torn_or_transplanted_records_are_rejected ... ok\ntest child_observation::attempt_driver::tests::both_work_and_publication_errors_survive_collision ... ok\ntest child_observation::attempt_driver::tests::failed_begin_does_not_invoke_either_callback ... ok\ntest child_observation::attempt_driver::tests::gate_and_work_errors_record_failure_without_losing_primary_error ... ok\ntest child_observation::attempt_driver::tests::interrupted_work_survives_inventory_and_fresh_retry_has_no_continuous_clock ... ok\ntest child_observation::attempt_driver::tests::permission_precedes_work_and_all_terminal_labels_are_retained ... ok\ntest child_observation::attempt_driver::tests::refusal_sees_existing_record_and_never_runs_work ... ok\ntest child_observation::tests::deadline_stop_request_alone_is_not_reap_or_terminal ... ok\ntest child_observation::tests::late_stop_does_not_relabel_an_already_observed_success ... ok\ntest child_observation::tests::observed_nonzero_exit_is_failed_not_completed_or_unknown_zero ... ok\ntest child_observation::tests::observed_zero_exit_allows_one_publication_and_propagates_read_errors ... ok\ntest child_observation::tests::pending_child_cannot_publish_or_read_sidecars ... ok\ntest child_observation::tests::premature_stop_or_wait_error_keeps_pending_child_and_unfinished_record ... ok\ntest child_observation::tests::publication_collision_preserves_bytes_after_actual_reap ... ok\ntest tests::actual_nonzero_and_signal_exit_keep_distinct_statuses ... ok\ntest tests::actual_success_persists_exit_and_declared_launch_binding_without_a_clock ... ok\ntest tests::collision_and_transplanted_or_inconsistent_reap_are_not_accepted ... ok\ntest tests::durable_launch_exists_before_refusal_and_no_child_handle_is_created ... ok\ntest tests::gate_and_spawn_errors_are_preserved_before_obtaining_a_child_handle ... ok\ntest tests::invalid_identity_oversize_command_or_duplicate_id_cannot_overwrite ... ok\ntest tests::malformed_oversize_symlink_missing_and_pending_launch_fail_closed ... ok\ntest tests::primary_and_recording_errors_survive_without_publishing_a_terminal ... ok\ntest tests::published_reap_without_outcome_stays_unfinished_after_record_failure ... ok\n\ntest result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s\n\n",
+    "raw_bytes": 2866,
+    "raw_sha256": "0ecaa3caf2ab2e842aefe274add96764919af3850835f884c199bba067bc8554"
+  },
+  "tests.started": {
+    "raw_utf8": "2026-11-05T14:54:30Z\n",
+    "raw_bytes": 21,
+    "raw_sha256": "f4e8ad00bf960063f7ea3f0c11e1fde335e22d15565d82fb888ff3144a519585"
+  },
+  "toolchain.exit": {
+    "raw_utf8": "0\n",
+    "raw_bytes": 2,
+    "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "toolchain.finished": {
+    "raw_utf8": "2026-11-05T14:54:25Z\n",
+    "raw_bytes": 21,
+    "raw_sha256": "6206ea487235c21c4abffe04245bbf4566c810f64f11f9449f0f4a7babbe2000"
+  },
+  "toolchain.log": {
+    "raw_utf8": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\n",
+    "raw_bytes": 36,
+    "raw_sha256": "55cd0529c005d3f62869ea6e2271bfa9d5196f56dc65a8be00a371af114a4a98"
+  },
+  "toolchain.started": {
+    "raw_utf8": "2026-11-05T14:54:25Z\n",
+    "raw_bytes": 21,
+    "raw_sha256": "6206ea487235c21c4abffe04245bbf4566c810f64f11f9449f0f4a7babbe2000"
+  }
+}

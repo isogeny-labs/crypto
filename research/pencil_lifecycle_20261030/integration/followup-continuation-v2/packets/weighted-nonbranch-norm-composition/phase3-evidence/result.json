@@ -1,0 +1,58 @@
+{
+  "schema": "research.component-result/v1",
+  "status": "concrete_elaboration_failure",
+  "phases": [
+    {
+      "phase": "pre",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "295s",
+        "python3",
+        "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/weighted-nonbranch-norm-composition/custody-phase3.unreleased.py",
+        "pre"
+      ],
+      "outer_exit": 0,
+      "elapsed_seconds": 87.93094584799837
+    },
+    {
+      "phase": "compiler",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "295s",
+        "python3",
+        "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/weighted-nonbranch-norm-composition/compiler-phase3.unreleased.py"
+      ],
+      "outer_exit": 1,
+      "elapsed_seconds": 137.2559968700225
+    },
+    {
+      "phase": "post",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "295s",
+        "python3",
+        "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/weighted-nonbranch-norm-composition/custody-phase3.unreleased.py",
+        "post"
+      ],
+      "outer_exit": 0,
+      "elapsed_seconds": 93.71560344099998
+    }
+  ],
+  "elapsed_phase_sum_seconds": 318.90254615902086,
+  "compiler_errors": 4,
+  "compiler_invocations": 1,
+  "all_started_children_reaped": true,
+  "cleanup_errors": [],
+  "telemetry_samples": 137,
+  "theorem_acceptance": false,
+  "posthash_complete": true,
+  "posthash_manifest_sha256": "a77aa5f69a670f50860ea75a74d62f06caf42a35907e5353595933ce22679b3b",
+  "diagnosis": "Two scalar quotient normalization goals; constant polynomial mapping mismatch; unit2 simplification mismatch",
+  "next": "same-statement source correction with new audited scalar helper, pending prospective release"
+}

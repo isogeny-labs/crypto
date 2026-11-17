@@ -1,0 +1,13 @@
+import StrictFallback
+set_option autoImplicit false
+namespace ReductionWord
+-- Array capacity does not imply the assertion checked by Divisor::from.
+theorem control_capacity_not_strict :
+ ([1] : List UInt64).length≤3 ∧ ([0] : List UInt64).length≤2 ∧
+ ¬ (([0] : List UInt64).length < ([1] : List UInt64).length) := by decide
+
+theorem control_identity_strict :
+ MonicZeroTest.Normal ([1] : List UInt64) ∧ MonicZeroTest.Normal ([] : List UInt64) ∧
+ ([] : List UInt64).length < ([1] : List UInt64).length := by
+ simp [MonicZeroTest.Normal]
+end ReductionWord

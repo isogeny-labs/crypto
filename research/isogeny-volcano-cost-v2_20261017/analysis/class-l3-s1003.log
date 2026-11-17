@@ -1,0 +1,16 @@
+bsgs-neg: S over 512 runs
+ic-mitm: S over 2048 runs
+ic-mitm-plus1: S over 248 runs
+rho-neg: S over 2048 runs
+rho-neg-aa: S over 248 runs
+ic-mitm: relation yield over 2048 runs
+ic-mitm-plus1: relation yield over 248 runs
+        bsgs-neg               S: floor/crater 1.0000 90% [1.0000, 1.0000] p=1.0000 equiv=true | horizontal tau 0.0000 (null p95 0.0118) p=1.0000 maxz p=1.0000 | model tau 0.0000 (null p95 0.0000) p=1.0000 maxz p=1.0000
+         ic-mitm               S: floor/crater 0.9872 90% [0.9191, 1.0580] p=0.6097 equiv=false | horizontal tau 0.0439 (null p95 0.0381) p=0.0170 maxz p=0.0500 | model tau 0.1032 (null p95 0.0968) p=0.0080 maxz p=0.5402
+   ic-mitm-plus1               S: floor/crater 1.0458 90% [0.8622, 1.2626] p=0.5636 equiv=false | horizontal tau 0.1156 (null p95 0.1305) p=0.1089 maxz p=0.0815 | model tau 0.0000 (null p95 0.0000) p=1.0000 maxz p=1.0000
+         rho-neg               S: floor/crater 0.9964 90% [0.9345, 1.0636] p=0.8703 equiv=false | horizontal tau 0.0000 (null p95 0.0410) p=0.7816 maxz p=0.6197 | model tau 0.0919 (null p95 0.0998) p=0.1694 maxz p=0.0535
+      rho-neg-aa               S: floor/crater 1.0378 90% [0.8623, 1.2548] p=0.6262 equiv=false | horizontal tau 0.1170 (null p95 0.1380) p=0.1469 maxz p=0.2639 | model tau 0.0000 (null p95 0.0000) p=1.0000 maxz p=1.0000
+         ic-mitm  relation_yield: floor/crater 1.0151 90% [0.9626, 1.0699] p=0.4551 equiv=false | horizontal tau 0.0294 (null p95 0.0259) p=0.0220 maxz p=0.1774 | model tau 0.0951 (null p95 0.0642) p=0.0005 maxz p=0.0150
+   ic-mitm-plus1  relation_yield: floor/crater 0.9699 90% [0.8737, 1.0776] p=0.6341 equiv=false | horizontal tau 0.1070 (null p95 0.0862) p=0.0165 maxz p=0.0675 | model tau 0.0000 (null p95 0.0000) p=1.0000 maxz p=1.0000
+bsgs exactness: {"arm":"bsgs-neg","exact":true,"max_distinct_cost_per_target":1,"paired_targets":2}
+pair: {"a":"ic-mitm-plus1","b":"ic-mitm","ci95":[1.0624685395000175,1.0937077173534195],"classes":1,"excludes_1":true,"matched_workloads":248,"metric":"relation_yield","ratio":1.0767534930695037}

@@ -1,0 +1,108 @@
+{
+  "schema": "committed-metrics-verification/v1",
+  "checked_commit": "fd8c4bd2051f",
+  "reader": "tools/progress_metrics.py explicit_gpu_fullcache",
+  "status": "passed",
+  "scope": "version3 coverage and retained version2 interruption accounting; not the whole-exporter runtime check",
+  "samples": [
+    {
+      "metric": "gpu.explicit_relations.fullcache.v2.large.interrupted",
+      "value": 1.0,
+      "date": "2026-11-01",
+      "problem": "gpu-generic-decomposition",
+      "unit": "count",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Full-cache results-v2: retained interrupted executions; no complete clock; fixed bounded panel, L0",
+      "source": "research/explicit_relations_fullcache_20261101/results-v2/export.json@fd8c4bd2051f"
+    },
+    {
+      "metric": "gpu.explicit_relations.fullcache.v2.large.not_attempted",
+      "value": 2.0,
+      "date": "2026-11-01",
+      "problem": "gpu-generic-decomposition",
+      "unit": "count",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Full-cache results-v2: planned cells not started after infrastructure stop; fixed bounded panel, L0",
+      "source": "research/explicit_relations_fullcache_20261101/results-v2/export.json@fd8c4bd2051f"
+    },
+    {
+      "metric": "gpu.explicit_relations.fullcache.v3.large.planned",
+      "value": 3.0,
+      "date": "2026-11-01",
+      "problem": "gpu-generic-decomposition",
+      "unit": "count",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Full-cache results-v3: protocol-planned executions; fixed bounded panel, L0",
+      "source": "research/explicit_relations_fullcache_20261101/results-v3/export.json@fd8c4bd2051f"
+    },
+    {
+      "metric": "gpu.explicit_relations.fullcache.v3.large.attempted",
+      "value": 3.0,
+      "date": "2026-11-01",
+      "problem": "gpu-generic-decomposition",
+      "unit": "count",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Full-cache results-v3: recorded complete-recovery executions; fixed bounded panel, L0",
+      "source": "research/explicit_relations_fullcache_20261101/results-v3/export.json@fd8c4bd2051f"
+    },
+    {
+      "metric": "gpu.explicit_relations.fullcache.v3.large.verified_recoveries",
+      "value": 3.0,
+      "date": "2026-11-01",
+      "problem": "gpu-generic-decomposition",
+      "unit": "count",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Full-cache results-v3: fresh CPU-replayed recoveries; fixed bounded panel, L0",
+      "source": "research/explicit_relations_fullcache_20261101/results-v3/export.json@fd8c4bd2051f"
+    },
+    {
+      "metric": "gpu.explicit_relations.fullcache.v3.large.timeouts",
+      "value": 0.0,
+      "date": "2026-11-01",
+      "problem": "gpu-generic-decomposition",
+      "unit": "count",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Full-cache results-v3: retained solve timeouts; fixed bounded panel, L0",
+      "source": "research/explicit_relations_fullcache_20261101/results-v3/export.json@fd8c4bd2051f"
+    },
+    {
+      "metric": "gpu.explicit_relations.fullcache.v3.large.failed",
+      "value": 0.0,
+      "date": "2026-11-01",
+      "problem": "gpu-generic-decomposition",
+      "unit": "count",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Full-cache results-v3: retained failed or resource-limited executions; fixed bounded panel, L0",
+      "source": "research/explicit_relations_fullcache_20261101/results-v3/export.json@fd8c4bd2051f"
+    },
+    {
+      "metric": "gpu.explicit_relations.fullcache.v3.large.interrupted",
+      "value": 0.0,
+      "date": "2026-11-01",
+      "problem": "gpu-generic-decomposition",
+      "unit": "count",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Full-cache results-v3: retained interrupted executions; no complete clock; fixed bounded panel, L0",
+      "source": "research/explicit_relations_fullcache_20261101/results-v3/export.json@fd8c4bd2051f"
+    },
+    {
+      "metric": "gpu.explicit_relations.fullcache.v3.large.not_attempted",
+      "value": 0.0,
+      "date": "2026-11-01",
+      "problem": "gpu-generic-decomposition",
+      "unit": "count",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Full-cache results-v3: planned cells not started after infrastructure stop; fixed bounded panel, L0",
+      "source": "research/explicit_relations_fullcache_20261101/results-v3/export.json@fd8c4bd2051f"
+    }
+  ]
+}

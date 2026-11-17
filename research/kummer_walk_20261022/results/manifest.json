@@ -1,0 +1,39 @@
+{
+  "schema": "kummer-differential-manifest/v1",
+  "run_id": "KUMMER-REF-20261022",
+  "protocol": "research/kummer_walk_20261022/PROTOCOL.md",
+  "input_archive": "research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst",
+  "input_archive_sha256": "550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339",
+  "input_ref": "f879244559b368a69e97e4f86988e5c0bdb7f896",
+  "producer": "research/kummer_walk_20261022/src/main.rs",
+  "analyzer": "research/kummer_walk_20261022/src/bin/summarize.rs",
+  "commands": [
+    "TMPDIR=/var/tmp cargo build --release --locked --manifest-path research/kummer_walk_20261022/Cargo.toml",
+    "for bits in 16 20 24 28 32 36 40; do research/kummer_walk_20261022/target/release/kummer-walk-gate $bits research/kummer_walk_20261022/results; done",
+    "research/kummer_walk_20261022/target/release/summarize",
+    "rerun all seven producers into /var/tmp/kummer-replay and cmp all fourteen JSONL files"
+  ],
+  "cohort": {
+    "models": 21,
+    "public_targets_requested": 1260,
+    "public_targets_checked": 1260,
+    "target_cases": 8820,
+    "exception_cases": 630,
+    "failures": 0
+  },
+  "measurement": {
+    "tier": "L0 algebraic correctness; no wall-time or fast-coordinate cost claim",
+    "coordinate_only_kummer_formula_verified": false,
+    "full_collector_targets_completed": 0,
+    "full_collector_targets_requested": 1260,
+    "price_cells_per_slice": 36,
+    "candidate_over_rho": null
+  },
+  "raw_files": {
+    "target_pattern": "target-gate-<bits>.jsonl",
+    "model_pattern": "model-exceptions-<bits>.jsonl",
+    "summary": "summary.json",
+    "price_grid": "price-grid.csv"
+  },
+  "digests": "../SHA256SUMS"
+}

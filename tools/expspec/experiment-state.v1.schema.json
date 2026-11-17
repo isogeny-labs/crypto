@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "crypto.experiment-state/v1",
+  "title": "Experiment run state v1",
+  "description": "experiments/specs/<id>.state.yaml. Written only by tools/expspec/expspec.py (init, card, ingest, answer, host-*). Never hand-edited; a correction is a `note` event.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "experiment_id", "spec_version", "spec_sha256", "status", "created_at", "updated_at", "vars", "hosts", "instances", "gates", "events"],
+  "properties": {
+    "schema": {"const": "crypto.experiment-state/v1"},
+    "experiment_id": {"type": "string"},
+    "spec_version": {"type": "integer"},
+    "spec_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$", "description": "Of the spec file's bytes. Every command refuses when the spec on disk differs."},
+    "status": {"enum": ["not_started", "running", "waiting", "blocked", "completed", "stopped"],
+               "description": "waiting: a host step or wait_until gate is pending. blocked: a question for the owner is open. stopped: a stop rule, budget cap or owner ended it."},
+    "blocked_on": {"type": ["string", "null"]},
+    "created_at": {"type": "string"},
+    "updated_at": {"type": "string"},
+    "vars": {"type": "object", "additionalProperties": {"type": "string"}},
+    "hosts": {"type": "array", "items": {
+      "type": "object", "additionalProperties": false, "required": ["candidate", "state"],
+      "properties": {
+        "candidate": {"type": "string"},
+        "state": {"enum": ["provisioning", "up", "torn_down", "lost", "unavailable"]},
+        "handle": {"type": ["string", "null"]},
+        "hourly_usd": {"type": "number"},
+        "started_at": {"type": ["string", "null"]},
+        "ended_at": {"type": ["string", "null"]},
+        "last_poll_at": {"type": ["string", "null"]}
+      }
+    }},
+    "instances": {"type": "object", "description": "Key: <step>, <step>@<cell> or <step>#<host-index>.", "additionalProperties": {
+      "type": "object", "additionalProperties": false, "required": ["step", "status", "attempts"],
+      "properties": {
+        "step": {"type": "string"},
+        "cell": {"type": ["string", "null"]},
+        "host": {"type": ["integer", "null"]},
+        "status": {"enum": ["pending", "carded", "running_remote", "done", "skipped_done", "failed", "censored", "not_attempted", "void"]},
+        "reason": {"type": ["string", "null"]},
+        "attempts": {"type": "array", "items": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "card": {"type": "string"},
+            "receipt": {"type": ["string", "null"]},
+            "receipt_status": {"type": ["string", "null"]},
+            "exit_code": {"type": ["integer", "null"]},
+            "seconds": {"type": ["number", "null"]},
+            "carded_at": {"type": "string"},
+            "ingested_at": {"type": ["string", "null"]},
+            "outputs": {"type": "object", "additionalProperties": {"type": ["string", "null"]}}
+          }
+        }}
+      }
+    }},
+    "gates": {"type": "object", "additionalProperties": {
+      "type": "object", "additionalProperties": false, "required": ["result"],
+      "properties": {
+        "result": {"enum": ["pass", "fail", "waiting", "asked", "answered_yes", "answered_no"]},
+        "first_at": {"type": "string"},
+        "at": {"type": "string"},
+        "detail": {"type": "string"},
+        "by": {"type": "string"}
+      }
+    }},
+    "events": {"type": "array", "items": {
+      "type": "object", "additionalProperties": false, "required": ["at", "kind", "text"],
+      "properties": {"at": {"type": "string"}, "kind": {"type": "string"}, "text": {"type": "string"}}
+    }}
+  }
+}

@@ -1,0 +1,222 @@
+{
+  "schema": "mumford-prime-family-source-plan/v1",
+  "created": "2026-11-10T14:23:35.196288+00:00",
+  "status": "Preissue frozen sources; whole5gatePASS/0failures/0trusted.",
+  "formal": {
+    "project": "research/mumford_prime_family_audit_20261110/lean",
+    "theorem": "MumfordPrimeFamilyAudit.unbounded_prime_family_certificate",
+    "statement": "theorem unbounded_prime_family_certificate : ∀ B : ℕ,∃ t : ℕ, B<genus t ∧ B<exponent t ∧ Nat.Prime (exponent t) ∧ Nat.card (OrbitPair t)=exponent t ∧ addOrderOf (familyGenerator t)=exponent t ∧ (∀ D E : OrbitPair t,SelectedRun t (familyIndex t D) (familyIndex t E) (D+E).val) ∧ (∀ D : OrbitPair t,∃ j : ℕ,j<exponent t ∧ j • familyGenerator t=D) ∧ (Nat.card {D : OrbitPair t // Smooth D.val}:ℚ)/Nat.card (OrbitPair t)=1 ∧ (Nat.card {D : ReducedPair (genus t) (curvePolynomial t) // Smooth D}:ℚ)/ Nat.card (ReducedPair (genus t) (curvePolynomial t))<1",
+    "decl_sha256": "a034cd9655f47f76a77af9f11b4fb0af24a351203f7daafa65217c8e588f0494",
+    "sources": [
+      {
+        "path": "research/mumford_family_audit_20261110/lean/CurveFamily.lean",
+        "bytes": 4926,
+        "sha256": "e39d24971effb3aaf82ffa6c25ae7b11f2bc4c67e48c7966e4a921e8e4c29f88"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/Cycle.lean",
+        "bytes": 4588,
+        "sha256": "f1615aa6b195cdcd3295018ad49db9a7dc686d7bce73c66c76c23198d7b35a01"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/FamilyCertificate.lean",
+        "bytes": 2440,
+        "sha256": "4f628a597b9f4eeeb0690194edbe2cc8dbcddeedf16b7326c3678b40ffa9106a"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/FamilyTransitions.lean",
+        "bytes": 4613,
+        "sha256": "5f2819946265342bfa21a032fe75f7b6833e2592f8c94a8f63fa3d4dc1357c0e"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/NormalizedCantor.lean",
+        "bytes": 5050,
+        "sha256": "82579c0d58b2a2b2813e232c20f5006bf37c3d16fca1d72d4d039296e5125f13"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/OrbitFamily.lean",
+        "bytes": 4915,
+        "sha256": "43f5634e05f9b360e8a95242573b5a43d9ce4e7ae1b6df32a4e90dda3f44f63c"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/ReducedPairs.lean",
+        "bytes": 3078,
+        "sha256": "c56a3605d034da7fa7d1839b87cd0e5c90b2899f52cab09f690fd969f5163a73"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/Successor.lean",
+        "bytes": 4045,
+        "sha256": "a2949bca917daf5a3e03e6b1c1ce91dbc561ff28d963c6142dc01c298abfa04e"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/lake-manifest.json",
+        "bytes": 3554,
+        "sha256": "213bf2b942006362be9388ca12a8e12828e573d3598d862b6e26035687a4b388"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/lakefile.toml",
+        "bytes": 409,
+        "sha256": "a23b8ac113b8d71fa0a7ddf33fa3d53176b23498dc1033266b00aabca811f273"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/mumford_family_group_audit_20261110/lean/AllPairRuns.lean",
+        "bytes": 4313,
+        "sha256": "59a2eea5b679964283eb537fd3ef0b51f98e1cd80a7904890a233c1d026aef79"
+      },
+      {
+        "path": "research/mumford_family_group_audit_20261110/lean/GeneratorAgreement.lean",
+        "bytes": 3333,
+        "sha256": "f1a65f4d4c2ab40d2490c199641cfa2ea31c28b7d08151cad0e4d5b4900ff201"
+      },
+      {
+        "path": "research/mumford_family_group_audit_20261110/lean/IndexArithmetic.lean",
+        "bytes": 4969,
+        "sha256": "f030803ae65901b2c74f00eb79d4bbe3f1b2a0ce96791f6311baf93fdc441c74"
+      },
+      {
+        "path": "research/mumford_family_group_audit_20261110/lean/PairwiseOutput.lean",
+        "bytes": 6575,
+        "sha256": "ec5651057974346436b3bf9efbf7936fca5babda912e5e3a5bba1e93050ddfae"
+      },
+      {
+        "path": "research/mumford_family_group_audit_20261110/lean/VerifiedFamilyGroup.lean",
+        "bytes": 5451,
+        "sha256": "d6025aa77597f3b6a65405457426ac870ba4bf7964fd94c579097988acf585a9"
+      },
+      {
+        "path": "research/mumford_family_group_audit_20261110/lean/lake-manifest.json",
+        "bytes": 3835,
+        "sha256": "50abeb2bbdc20d1d767d3e023217191a14e9c99f9afaf28a9c60e49dc2c9b9d6"
+      },
+      {
+        "path": "research/mumford_family_group_audit_20261110/lean/lakefile.toml",
+        "bytes": 345,
+        "sha256": "2ec4d2f286c4de544e67caee447cedebc917742b7849b3b137ae8d7b27751f15"
+      },
+      {
+        "path": "research/mumford_family_group_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/mumford_prime_family_audit_20261110/lean/PrimeFamily.lean",
+        "bytes": 3373,
+        "sha256": "cd3668952cee54b2e48325db68ca2fefe3065d869dfd54991b9544aab395099a"
+      },
+      {
+        "path": "research/mumford_prime_family_audit_20261110/lean/lake-manifest.json",
+        "bytes": 4122,
+        "sha256": "4e941c6ac1ab3d289612c195d15c5b235204cba6aaad5c2ec361622b846ba6f9"
+      },
+      {
+        "path": "research/mumford_prime_family_audit_20261110/lean/lakefile.toml",
+        "bytes": 275,
+        "sha256": "6958518276e31ccf462566ddfc1ff0fa077432504d105a7ef976cc8f1d96ca4f"
+      },
+      {
+        "path": "research/mumford_prime_family_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ],
+    "scope": "Arbitrarily large prime orders in the actual polynomial arithmetic family, actual cardinality/order/generation/sum certificates and smoothness disparity. Genus grows with the order; full ambient/Picard geometry and typical/dominant-prime or fixed-genus asymptotics remain open."
+  },
+  "artifacts": [
+    {
+      "path": "research/mumford_prime_family_audit_20261110/evidence/attempts.tar.gz",
+      "bytes": 1416,
+      "sha256": "2f76a861c2442e67ca90fe8c12ffc78311a95c2388df370bcb982530f116306d"
+    },
+    {
+      "path": "research/mumford_prime_family_audit_20261110/evidence/attempts.json",
+      "bytes": 954,
+      "sha256": "c8493eb56b63d4ff2feb9b73d5f2f65c7139dec308523cf3266583324bbd661e"
+    },
+    {
+      "path": "research/mumford_prime_family_audit_20261110/evidence/gate.tar.gz",
+      "bytes": 2045,
+      "sha256": "6f3a2962cc036b40451944b342c71d6bd5bf26a09cf8af7c36401f807a6f1405"
+    },
+    {
+      "path": "research/mumford_prime_family_audit_20261110/evidence/gate.json",
+      "bytes": 1189,
+      "sha256": "857a6ef56319f6df3ba30cd9f85c79934254d8f08cde70b9303a1a474005feae"
+    },
+    {
+      "path": "research/mumford_prime_family_audit_20261110/evidence/source-review.json",
+      "bytes": 1872,
+      "sha256": "6bf3e6e8cad21890cc18834c953d21a73cacc154471d21407b12fa0319370a7d"
+    },
+    {
+      "path": "research/mumford_family_group_audit_20261110/evidence/source-review.json",
+      "bytes": 2948,
+      "sha256": "89ef6ee3a28c9371d69c84c6839ffe7f3408edef97e30df5f0664b41ecea08fe"
+    }
+  ],
+  "gate": {
+    "archive": "research/mumford_prime_family_audit_20261110/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 5,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/mumford_prime_family_audit_20261110/evidence/attempts.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true
+  },
+  "proof_outline": [
+    "Apply actual Mathlib Dirichlet theorem with q24,a5,coprimality proved; choose primep>24B+5.",
+    "Actual modular and division/remainder identities give t=p/24>B and24t+5=p.",
+    "Frozen actual groupcardinality/order/generation and normalized allpair arithmetic apply at the chosen parameter.",
+    "Prime order and both genus/order unbounded are combined with exact smooth fraction1vsstrictlysmallerambient.",
+    "Direct unbounded prime-order disparity witnesses and negation of universal prime-family equality."
+  ],
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Dirichlet_assumed_as_axiom": false,
+    "holes": false,
+    "native_decide": false,
+    "paid_compute": 0,
+    "native_experiment": false,
+    "new_IDC_sampling": false,
+    "lean4checker": "Unavailable; actual kernel/transitive axiom gate.",
+    "advisories": "Legacy-module advisories retained; no waivers, added elaboration options or issued source edits."
+  },
+  "source_review": {
+    "schema": "mumford-prime-family-source-review/v1",
+    "created": "2026-11-10T14:23:35.195413+00:00",
+    "primary_formal_source": {
+      "url": "https://github.com/leanprover-community/mathlib4/blob/56a005855ea17e0b0958f73ec801ae140b0a1679/Mathlib/NumberTheory/LSeries/PrimesInAP.lean",
+      "bytes": 25487,
+      "sha256": "30bf0b168ca305ac5c93a5a9bf62ef01bc56d5874dc83ecff87542681595f70b",
+      "author": "Michael Stoll (2024 header)",
+      "revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+      "read_scope": "Introduction/proof outline and actual used theorem statements/proofs in DirichletsTheorem section, lines428–469. No claim of reading the entire analytic dependency stack.",
+      "used_theorem": "Nat.forall_exists_prime_gt_and_modEq",
+      "hypotheses": "q24nonzero and Nat.Coprime5,24, both discharged by kernel decisions.",
+      "effect": "Actual Dirichlet theorem proves an arbitrarily large prime congruent5mod24; quotient/remainder extracts actual family parameter."
+    },
+    "parent_review": {
+      "path": "research/mumford_family_group_audit_20261110/evidence/source-review.json",
+      "bytes": 2948,
+      "sha256": "89ef6ee3a28c9371d69c84c6839ffe7f3408edef97e30df5f0664b41ecea08fe"
+    },
+    "parent_scope": "Frozen known Stoll/Jędrzejak torsion-family attribution and complete normalized polynomial arithmetic/group/fraction proofs remain unchanged.",
+    "KB": "MCP absent/wrapper127; bounded primary formal-source/repository/Mathlib fallback. Conductor absent.",
+    "novelty": "Application of existing Dirichlet and known torsion-family results; no novelty claim.",
+    "scope": "Arbitrarily large prime orders in the actual polynomial arithmetic family, actual cardinality/order/generation/sum certificates and smoothness disparity. Genus grows with the order; full ambient/Picard geometry and typical/dominant-prime or fixed-genus asymptotics remain open."
+  }
+}

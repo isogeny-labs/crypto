@@ -1,0 +1,33 @@
+// Arbitrary RAMIFIED CUSP divisors; no ordinary-collector evaluator claim.
+LIB "linalg.lib";
+ring reverse27=0,(e0,e1,e2,e3,e4),dp;
+matrix principal[5][5]=11,-5,-11,-7,0,0,11,-5,-11,-7,7,0,11,-5,-11,11,7,0,11,-5,5,11,7,0,11;
+poly determinant=det(principal);
+if(determinant!=1477212){ERROR("reverse cusp principal determinant mismatch");}
+matrix d[5][1]=-9,-11,-4,8,10;
+matrix phi[1][5]=1,6,36,216,1296;
+matrix one[5][5]=1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1;
+int scalar=134292;
+if(11*scalar!=1477212 || scalar%11!=4){ERROR("reverse cusp prime-to11 scalar mismatch");}
+matrix wanted=scalar*one-d*phi;
+matrix inverseMatrix27=inverse(principal);
+matrix certificate=inverseMatrix27*wanted;
+int i;int j;
+for(i=1;i<=5;i++){for(j=1;j<=5;j++){
+ if(denominator(leadcoef(certificate[i,j]))!=1){ERROR("cusp recovery witness is not integral");}
+}}
+matrix residual=principal*certificate-wanted;
+for(i=1;i<=5;i++){for(j=1;j<=5;j++){if(residual[i,j]!=0){ERROR("cusp recovery matrix identity failed");}}}
+matrix arbitrary[5][1]=e0,e1,e2,e3,e4;
+matrix actual=principal*certificate*arbitrary-scalar*arbitrary+d*phi*arbitrary;
+for(i=1;i<=5;i++){if(actual[i,1]!=0){ERROR("arbitrary cusp divisor recovery mismatch");}}
+print("REVERSE27_EXACT_INTEGRAL_CUSP_CERTIFICATE");certificate;
+print("REVERSE27_ARBITRARY_CUSP_11PRIMARY_COORDINATE");phi*arbitrary;
+// Positive/negative controls: D maps to scalar*D; corrupt one witness.
+poly dAtSix=(phi*d)[1,1];
+if(dAtSix!=14469){ERROR("actual nonzero11class coordinate failed");}
+certificate[1,1]=certificate[1,1]+1;
+residual=principal*certificate-wanted;
+if(residual[1,1]==0){ERROR("corrupted recovery witness was not detected");}
+print("REVERSE27_SCOPE exact actual cusp11primary evaluator only; arbitrary ordinary divisors and CM sign projections OPEN");
+print("REVERSE27_ALL_CHECKS_PASS");quit;

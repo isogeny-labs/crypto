@@ -1,0 +1,114 @@
+\documentclass[10pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,graphicx,hyperref}
+\usepackage[margin=.75in]{geometry}
+\setlength{\parindent}{0pt}\setlength{\parskip}{7pt}
+\begin{document}
+\begin{center}{\Large Actual scalar sizes and shared denominators}\\[5pt]
+Local proof continuation; 14 November 2026
+\end{center}
+\textbf{Exact status.} Scalar draft006 locally elaborates31 theorem statements
+without warnings; data PCC-20261114-c107f5. Common draft004 includes this
+work and locally elaborates42 theorem statements without warnings; data
+PCC-20261114-9df8cf. Central printed foundations are standard. These drafts
+are outside OrientationTransport's53 authored/shared57/fresh audit and its151
+checkpoint pins.\\
+All records are unsigned/defaultnot\_covered [pcc:unverified].
+
+\textbf{Size measured by the proof.} Define
+\[
+ \operatorname{Bits}(B,q)\iff
+ \max\{|\operatorname{num}(q)|,\operatorname{den}(q)\}\le2^B.
+\]
+This controls both reduced rational integer sizes, including$q=0$.
+Standard height formulas prove multiplication/division add bit exponents,
+inversion preserves them, addition costs at most$B+C+1$, and powers multiply
+the exponent. Finite sums/products are covered. No runtime is measured or
+inferred from those arithmetic inequalities [pcc:unverified].
+
+For the actual signed grid$[-2^a,2^a)$, actual bounded displacement and
+$u\le a$, the proof derives scalar bounds
+\[
+ \operatorname{Bits}(a,t),\quad \operatorname{Bits}(a,\delta),\quad
+ \operatorname{Bits}(3a+2,\lambda),\quad
+ \operatorname{Bits}(u+j+a+1,e_j).
+\]
+These are actual chart/anchor slopes, with the source range hypotheses
+retained; no favorable coefficient-size witness is supplied.
+
+Set$H_a=2^{a+1}(2a+1)$ and$J_a=a+1+2H_a$. The actual nodal derivative and
+normalizer have bound$H_a$, and the actual jet scalar has bound$J_a$.
+The actual diagonal bound is
+\[
+ S_{a,u,i}=J_a+i+\sum_{j<u}(2j+i+1)m_j.
+\]
+Every coefficient of the actual absolute-left entry at label$(r,b)$ has
+bound$S_{a,u,i}+b+ab$. The proof uses actual finite nodal and correction
+products, not a supplied small scalar. The actual schedule/family is retained
+[pcc:unverified].
+
+\textbf{Sources and failures.} Read pinned Mathlib Height.Basic/NumberField
+rational formulas, Nat/Int absolute-value APIs, actual grid/jet/diagonal/moment
+definitions and prior cost/precision reviews. KB unavailable as journaled.
+Standard heights and denominator clearing are reused without novelty claims.
+Failed scalar001/002/004/005 sources and raw logs are retained, including
+integer casts, finite-sum scoping and imported definition reductions. No
+warning, gate or premise was disabled [pcc:unverified].
+
+\newpage
+\begin{center}{\Large Constructed denominator of actual geometric factors}\end{center}
+The certificate contains a positive natural denominator$d$ and integer
+bivariate polynomial$A$, mapping to$dD$ for the actual polynomial$D$.
+Constructors preserve the exact polynomial through rational constants,
+variables, addition, multiplication, powers and finite products. Actual
+\texttt{denomRows} is assembled from those constructors, not assumed to have
+a favorable representation [pcc:unverified].
+
+For actual chart/anchor slopes$\lambda,e_t,e_j$, the constructed denominator is
+\[
+ d=\operatorname{den}(\lambda)\operatorname{den}(e_t)
+     \prod_{j\in\mathrm{mask}}\operatorname{den}(e_j)^{m_j}>0,
+\]
+\[
+ d\le2^{B_D},\qquad
+ B_D=(3a+2)+(u+2a+1)+\sum_{j\in\mathrm{mask}}(u+j+a+1)m_j.
+\]
+The bound uses the actual scalar results on page1. All multiplicities and
+the literal mask remain present.\\
+[pcc:unverified]
+
+For$G_k(D)=\sum_{j<k}(1-D)^j$, construct an integer numerator recursively:
+\[
+ R_0=0,\qquad R_{k+1}=dR_k+d(d-A)^k.
+\]
+After coefficient mapping, this gives the exact identity
+\[
+ R_k\longmapsto d^kG_k(D),\qquad d^k\le2^{B_Dk}.
+\]
+The inverse used in the rational identity is derived from$d\ne0$; it is not
+an additional favorable input. The denominator exponent is linear in$k$;
+it is not a product of separately charged power-term denominators
+[pcc:unverified].
+
+\begin{center}
+\includegraphics[width=\linewidth,height=1.2in,keepaspectratio]{dependencies.pdf}
+\end{center}
+
+\textbf{Precise remaining work.} Complete actual \texttt{rowNumerator} and
+right-coefficient numerator construction/sizes, or prove bounded modular
+work with sufficient working precision for even denominator removal.
+Original immutable creation representatives/entry routines, mode extraction,
+child networks, recovery/recursion and public expected costs remain open.
+These local denominator/scalar results are not a bit-operation count or
+runtime bound [pcc:unverified].
+
+Exact local sources, logs and bindings are in
+\begin{center}\small
+\path{../draft-006.lean.txt},\quad\path{../local-validation-002.json}\\
+\path{../common-draft-004.lean.txt}\\
+\path{../common-local-validation-003.json}.
+\end{center}
+No paid/cloud/attack/native fixture/F4/msolve/timing/scaling campaign or old
+proof replay. All Transport151 and older pending/final artifacts remain exact;
+protected ledger history is unchanged [pcc:unverified].
+\end{document}

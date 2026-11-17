@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="640" viewBox="0 0 1180 640" font-family="DejaVu Sans, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#52514e"/></marker>
+  </defs>
+  <rect width="1180" height="640" fill="#ffffff"/>
+  <text x="20" y="28" font-size="17" font-weight="bold" fill="#0b0b0b">Teske-type hidden Weil descent: the three ingredients, by field type</text>
+  <text x="20" y="48" fill="#52514e">E over F_{q^n}; weak set of size q^{n-δ}; isogeny class of size q^{n/2}; margin a = δ - n/2 (exponents in units of log q, constants dropped). Tags: [T] source or proof, [E] exact count of this round, [H] heuristic.</text>
+
+  <!-- ingredient boxes -->
+  <g>
+    <rect x="20" y="70" width="350" height="92" rx="8" fill="#eaf2fc" stroke="#2a78d6" stroke-width="1.5"/>
+    <text x="34" y="92" font-weight="bold" fill="#0b0b0b">1. Non-class-invariant weakness</text>
+    <text x="34" y="112" fill="#0b0b0b">GHS genus depends on the model (b, or the branch set</text>
+    <text x="34" y="128" fill="#0b0b0b">of a degree-2 function), not on the trace.  [T: GHS 2002 §1]</text>
+    <text x="34" y="148" fill="#52514e">Anomalous, MOV, group order: class invariants, cannot be hidden.</text>
+  </g>
+  <g>
+    <rect x="415" y="70" width="350" height="92" rx="8" fill="#eaf2fc" stroke="#2a78d6" stroke-width="1.5"/>
+    <text x="429" y="92" font-weight="bold" fill="#0b0b0b">2. Transfer along the secret isogeny</text>
+    <text x="429" y="112" fill="#0b0b0b">E_pb → E_s (degree coprime to r), then conorm-norm</text>
+    <text x="429" y="128" fill="#0b0b0b">E_s(F_{q^n}) → Jac(C)(F_q).  [T: Teske 2006; Hess 2004 Thm 7]</text>
+    <text x="429" y="148" fill="#52514e">Owner's cost: index calculus on genus g, exponent 2 - 2/g [H].</text>
+  </g>
+  <g>
+    <rect x="810" y="70" width="350" height="92" rx="8" fill="#eaf2fc" stroke="#2a78d6" stroke-width="1.5"/>
+    <text x="824" y="92" font-weight="bold" fill="#0b0b0b">3. Sparse inside the isogeny class</text>
+    <text x="824" y="112" fill="#0b0b0b">Auditor walks the class: q^{min(δ, n/2)} steps [H].</text>
+    <text x="824" y="128" fill="#0b0b0b">a &gt; 0: hidden member not findable below rho.</text>
+    <text x="824" y="148" fill="#52514e">a &lt; 0: whole field weak for every covered class (MTW).</text>
+  </g>
+
+  <!-- field columns -->
+  <g font-size="12.5">
+    <rect x="20" y="190" width="270" height="420" rx="8" fill="#f6f6f4" stroke="#d9d8d4"/>
+    <text x="34" y="214" font-weight="bold" font-size="14" fill="#0b0b0b">Prime fields F_p</text>
+    <text x="34" y="236" fill="#0b0b0b">No proper subfield: no Weil restriction,</text>
+    <text x="34" y="252" fill="#0b0b0b">no descent.  [T: GHS 2002 §5]</text>
+    <text x="34" y="276" fill="#0b0b0b">Same-field covers C → E of genus g ≥ 2:</text>
+    <text x="34" y="292" fill="#0b0b0b">Jac(C)(F_p) has size p^g, index calculus</text>
+    <text x="34" y="308" fill="#0b0b0b">costs ≥ p^{1-o(1)} &gt; rho's p^{1/2}.  [T]</text>
+    <text x="34" y="332" fill="#0b0b0b">Base change to F_{p^k} then descend:</text>
+    <text x="34" y="348" fill="#0b0b0b">the group stays of size p; same bound.  [T]</text>
+    <text x="34" y="372" fill="#0b0b0b">Non-class-invariant weaknesses known:</text>
+    <text x="34" y="388" fill="#0b0b0b">none with an exponential gain.  [O]</text>
+    <rect x="34" y="404" width="242" height="54" rx="6" fill="#fdecec" stroke="#c0392b"/>
+    <text x="44" y="424" font-weight="bold" fill="#c0392b">Ingredients 1 and 3 absent.</text>
+    <text x="44" y="442" fill="#0b0b0b">No Teske-type variant via descent.</text>
+  </g>
+
+  <g font-size="12.5">
+    <rect x="310" y="190" width="420" height="420" rx="8" fill="#f6f6f4" stroke="#d9d8d4"/>
+    <text x="324" y="214" font-weight="bold" font-size="14" fill="#0b0b0b">Binary fields F_{2^{nl}} (n odd, d = ord_n(2))</text>
+    <text x="324" y="236" fill="#0b0b0b">Weak set: Ord_b | F, |{b}| = q^{deg F}, m = deg F + [x+1 ∤ F].  [T: MMT 2002]</text>
+    <text x="324" y="252" fill="#0b0b0b">gGHS (Hess): b = (αβ)^2, genus 2^t - 2^{t-r} - 2^{t-s} + 1, δ = n + 1 - r - s.  [T]</text>
+    <text x="324" y="278" font-weight="bold" fill="#0b0b0b">n = 7 (Teske's field, N = 161):</text>
+    <text x="324" y="294" fill="#0b0b0b">type I  g = 7,  δ = 4, a = +0.5 → 11.5 bits: hidden [E]</text>
+    <text x="324" y="310" fill="#0b0b0b">type II g = 8,  δ = 3, a = -0.5 → walk 2^69 &lt; rho 2^80 [E]</text>
+    <text x="324" y="326" fill="#0b0b0b">gGHS    g = 7,  δ = 2, a = -1.5: half of all classes covered [T: MT 2006]</text>
+    <text x="324" y="352" font-weight="bold" fill="#0b0b0b">n = 3, 5: δ ≤ 1, every curve descends (weak fields) [T: MTW 2004]</text>
+    <text x="324" y="376" font-weight="bold" fill="#0b0b0b">n = 15, 21, 31: a &gt; 0, but genus 15, 21–31 [E]</text>
+    <text x="324" y="392" fill="#0b0b0b">n = 15: the public n = 5 sub-descent already beats rho.</text>
+    <text x="324" y="408" fill="#0b0b0b">n = 31 (F_{2^155}): a = +6.5 to +10.5, Hess's 2^{-38} per class.</text>
+    <text x="324" y="432" font-weight="bold" fill="#0b0b0b">Prime n (NIST): m ≥ d + 1 with d large: no descent [T: Menezes–Qu]</text>
+    <rect x="324" y="452" width="392" height="54" rx="6" fill="#e9f7f0" stroke="#1a8a5f"/>
+    <text x="334" y="472" font-weight="bold" fill="#1a8a5f">All three ingredients present only for n ∈ {7 (type I), 15, 21, 31, …}.</text>
+    <text x="334" y="490" fill="#0b0b0b">Auditor's answer: reject composite N, or audit every N = n·l (ec_trapdoor.rs).</text>
+    <text x="324" y="530" fill="#52514e">Isogeny-class coverage at toy N: ghs_class_coverage.rs; Yee 2016 (F_{2^150}).</text>
+  </g>
+
+  <g font-size="12.5">
+    <rect x="750" y="190" width="410" height="420" rx="8" fill="#f6f6f4" stroke="#d9d8d4"/>
+    <text x="764" y="214" font-weight="bold" font-size="14" fill="#0b0b0b">Odd characteristic F_{q^n} (Kummer descents)</text>
+    <text x="764" y="236" fill="#0b0b0b">Weak set: branch orbit type (m, r), genus 1 + 2^{m-2}(r-4), δ = n + 3 - r. [T/E]</text>
+    <text x="764" y="262" fill="#0b0b0b">n = 2  (r=5, g=2): δ = 0, no gain over rho [T: Scholten]</text>
+    <text x="764" y="278" fill="#0b0b0b">n = 3  (r=5, g=3): δ = 1, a = -0.5: weak field via walk [T: JV 2012]</text>
+    <text x="764" y="294" fill="#0b0b0b">n = 4  (g=5): r=5 type δ = 2, a = 0; r=6 types δ = 1, a = -1 [E]</text>
+    <text x="764" y="310" font-weight="bold" fill="#0b0b0b">n = 5  (r=5, g=5): δ = 3, a = +0.5: the one hidden regime [E]</text>
+    <text x="764" y="326" fill="#0b0b0b">n = 6  (r=6, g=9): δ = 3, a = 0: borderline [E; JV App. C]</text>
+    <text x="764" y="342" fill="#0b0b0b">n = 7  (r=7, g=7): δ = 3, a = -0.5: weak field via walk [E]</text>
+    <text x="764" y="358" fill="#0b0b0b">prime n ≥ 11: genus ≥ 1793, nothing descends [T: Diem 2003]</text>
+    <text x="764" y="384" font-weight="bold" fill="#0b0b0b">Other associations (ingredient 1 widened):</text>
+    <text x="764" y="400" fill="#0b0b0b">Jac(C) ~ Res(E) by L-polynomial (Tate): a cover of some degree.</text>
+    <text x="764" y="416" fill="#0b0b0b">Census: most Res-shaped genus-3 hyperelliptic Jacobians are NOT</text>
+    <text x="764" y="432" fill="#0b0b0b">GHS compositums [E]; Tian 2020: (ℓ,ℓ,ℓ)-isogenies for prime order [T].</text>
+    <rect x="764" y="452" width="382" height="54" rx="6" fill="#e9f7f0" stroke="#1a8a5f"/>
+    <text x="774" y="472" font-weight="bold" fill="#1a8a5f">Hidden regime exists at n = 5 only (genus 5 over F_q).</text>
+    <text x="774" y="490" fill="#0b0b0b">Auditor's answer for F_{q^5}: test every branch type of period 5 (Part B).</text>
+    <text x="764" y="530" fill="#52514e">Trace-zero / decomposition attacks are class-invariant: not hideable, not trapdoors.</text>
+  </g>
+
+  <line x1="195" y1="162" x2="155" y2="190" stroke="#52514e" marker-end="url(#arr)"/>
+  <line x1="590" y1="162" x2="520" y2="190" stroke="#52514e" marker-end="url(#arr)"/>
+  <line x1="985" y1="162" x2="955" y2="190" stroke="#52514e" marker-end="url(#arr)"/>
+  <text x="20" y="630" fill="#52514e" font-size="11.5">research/teske_variants_field_types_20261018 · exponents only; every "hidden" or "weak" label is a formula on exact invariants, not a measured attack.</text>
+</svg>

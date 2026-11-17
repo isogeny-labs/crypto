@@ -1,0 +1,48 @@
+{
+  "apiVersion": "v1",
+  "kind": "PersistentVolumeClaim",
+  "metadata": {
+    "annotations": {
+      "isolab.dev/recovery-request": "ed92a0e90d771b6780055281e5d4fe5175314d990ab914bf52202b75e1fa8d55",
+      "karpenter.sh/do-not-disrupt": "true",
+      "pv.kubernetes.io/bind-completed": "yes",
+      "pv.kubernetes.io/bound-by-controller": "yes",
+      "volume.beta.kubernetes.io/storage-provisioner": "ebs.csi.aws.com",
+      "volume.kubernetes.io/selected-node": "ip-10-84-176-154.us-east-2.compute.internal",
+      "volume.kubernetes.io/storage-provisioner": "ebs.csi.aws.com"
+    },
+    "creationTimestamp": "2026-10-22T05:34:56Z",
+    "finalizers": [
+      "kubernetes.io/pvc-protection"
+    ],
+    "labels": {
+      "isolab.dev/recovery-run": "ecbench-periodic-20261022-b"
+    },
+    "name": "ecbench-periodic-20261022-b-a0",
+    "namespace": "isolab-recovery-system",
+    "resourceVersion": "1280594",
+    "uid": "ab68d030-7bc0-49af-99fe-225cc3bf03a8"
+  },
+  "spec": {
+    "accessModes": [
+      "ReadWriteOnce"
+    ],
+    "resources": {
+      "requests": {
+        "storage": "8Gi"
+      }
+    },
+    "storageClassName": "gp3",
+    "volumeMode": "Filesystem",
+    "volumeName": "pvc-ab68d030-7bc0-49af-99fe-225cc3bf03a8"
+  },
+  "status": {
+    "accessModes": [
+      "ReadWriteOnce"
+    ],
+    "capacity": {
+      "storage": "8Gi"
+    },
+    "phase": "Bound"
+  }
+}

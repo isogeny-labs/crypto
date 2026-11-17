@@ -1,0 +1,47 @@
+Pollard rho remains the fastest known algorithm for the discrete logarithm on
+a prime-order elliptic curve. Index calculus, which can in principle exploit
+more structure, has never beaten it on curves of cryptographic shape. Between
+July and October 2026 we treated closing that gap as a \emph{ratchet}. Each
+verified, measured improvement over the current best index-calculus pipeline
+became the new baseline, and every row reports its remaining distance to a
+matched rho. This paper is the ledger of that work, written from committed
+evidence and current to 23 October 2026.
+
+We organise the improvements by the stage they act on.
+\begin{itemize}
+\item \emph{Decomposition oracle.} Root-finding and meet-in-the-middle
+  oracles are $383$--$1{,}535\times$ cheaper per decomposition than matrix
+  F4, and up to $10^5\times$ cheaper than the earlier point-decomposition
+  oracle. Inherited F4 does $199$--$222\times$ less matrix work than matrix
+  F4. An $\FF_p$ F4 reaches msolve parity. A gate-first order and a
+  root-rank harvest gate each cut the Gr\"obner work further, by
+  $1.3$--$1.7\times$ and $1.41\times$.
+\item \emph{Factor base and relation yield.} Free relations ($0.960\times$),
+  re-randomised targets ($0.531\times$), a greedy coverage base, and a
+  confirmed $n=83$ base selection ($1.195$\,s of $115$\,s cold).
+\item \emph{Set-up and linear algebra.} A stacked $n=83$ producer
+  ($3.24\times$ cold), a cache-blocked pair table ($0.24\times$ set-up), and
+  CADO-style sparse linear algebra ($10.4\times$).
+\item \emph{Two families whose fitted cost exponent lies below rho's.}
+  Genus-three index calculus after the cubic GHS transfer, whose whole solve
+  moved from $q^{1.91}$ to a local $q^{1.36}$ over five rounds. Gaudry's
+  $k=4$ index calculus with FGHR's $D_4$ symmetry, $370$--$481\times$
+  cheaper per decomposition, whose gap to rho closes as $n^{-1/4}$ from
+  $5{,}080\times$ to $6.1\times$.
+\end{itemize}
+
+The distance remaining is stated plainly. On Koblitz curves of 36.6--47.2
+bits, against a matched rho, the cold gap is $4.67$--$18.07\times$. On prime
+curves it is $10.5\times$ at 20 bits and grows to $102\times$ at 40. The
+nearest families are genus three ($1.15\times$ a measured rho at $q=2^{20}$)
+and $k=4$ in characteristic two ($4.3\times$ a measured rho at $n\approx2^{56}$,
+one target). Neither is a deployed curve shape.
+
+We also report the claims that did not survive. All online wins over rho are
+retired: Bernstein--Lange preprocessing rho with equal advice is
+$53$--$317\times$ faster. Pricing native work and matching the rho reference
+each raised a recorded gap, and a replay regression was traced to a
+cross-ISA counter divergence. As of
+this writing no index-calculus leaderboard row has passed the repository's
+validation gate. Nothing here is a speed-up on a deployed curve or a key
+recovery.

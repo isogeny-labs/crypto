@@ -1,0 +1,26 @@
+   Compiling crypto v0.1.0 (/workspace/scratch/8b5ae6246dba/crypto)
+    Finished `release` profile [unoptimized] target(s) in 2m 32s
+     Running unittests src/lib.rs (target/release/deps/crypto_lib-e037a35c58fca7b4)
+
+running 3 tests
+test cryptanalysis::ecbench_large_prime::trace_line::tests::explicit_bases_recover_and_every_relation_replays_independently ... FAILED
+test cryptanalysis::ecbench_large_prime::trace_line::tests::malformed_bases_twists_and_exhaustion_fail_closed ... ok
+test cryptanalysis::ecbench_large_prime::trace_line::tests::trace_lines_lift_and_standard_is_the_actual_subfield ... ok
+
+failures:
+
+---- cryptanalysis::ecbench_large_prime::trace_line::tests::explicit_bases_recover_and_every_relation_replays_independently stdout ----
+
+thread 'cryptanalysis::ecbench_large_prime::trace_line::tests::explicit_bases_recover_and_every_relation_replays_independently' (60) panicked at src/cryptanalysis/ecbench_large_prime/trace_line_tests.rs:91:9:
+assertion `left == right` failed
+  left: Some(0)
+ right: Some(7)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    cryptanalysis::ecbench_large_prime::trace_line::tests::explicit_bases_recover_and_every_relation_replays_independently
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 5036 filtered out; finished in 0.03s
+
+error: test failed, to rerun pass `--lib`

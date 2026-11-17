@@ -1,0 +1,37 @@
+{
+  "job": {
+    "created_at": "2026-10-31T09:23:08Z",
+    "job_name": "n83-fb-variants-r30-20261031-r1",
+    "state": "active",
+    "status": {
+      "active": 1,
+      "ready": 0,
+      "startTime": "2026-10-31T09:23:08Z",
+      "terminating": 0,
+      "uncountedTerminatedPods": {}
+    },
+    "uid": "ecdab919-76ea-4b8e-9d4f-19d5b934a69a"
+  },
+  "pods": [
+    {
+      "name": "n83-fb-variants-r30-20261031-r1-hqqqj",
+      "node": null,
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-31T09:23:08Z",
+            "message": "0/3 nodes are available: 1 node(s) didn't match pod anti-affinity rules, 2 node(s) didn't match Pod's node affinity/selector. no new claims to deallocate, preemption: 0/3 nodes are available: 1 No preemption victims found for incoming pod, 2 Preemption is not helpful for scheduling.",
+            "observedGeneration": 1,
+            "reason": "Unschedulable",
+            "status": "False",
+            "type": "PodScheduled"
+          }
+        ],
+        "phase": "Pending",
+        "qosClass": "Guaranteed"
+      },
+      "uid": "a764c481-0003-480b-b077-7e4b6ac49a4a"
+    }
+  ]
+}

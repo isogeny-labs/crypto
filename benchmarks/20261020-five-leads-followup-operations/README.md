@@ -1,0 +1,44 @@
+# Five-lead follow-up: operation evidence
+
+The [results PDF](report.pdf) and graphs here are browsing copies of the
+[study report](../../research/five_leads_e2e_20261019/REPORT.md) and its
+[rendering source](../../research/five_leads_e2e_20261019/reports/results-20261020/render.py).
+The seven `run-order-genus-*.pdf` files correspond to the seven exact-order
+projective-chart ecbench sessions; each graph has an SVG and 150 dpi PNG.
+The study directory contains the raw session archive, replay receipts, native
+analyzers and all 12×3 operation-price rows. Counts are L0 evidence on a busy,
+unpinned host; no qualified wall-speed or external-system comparison is made.
+The cubic arithmetic-gate plot is a group-law diagnostic. The separate
+`run-tian-km-linear` PDF and graph show a source-verified bounded DLP on the
+published destination classes. The `run-tian-line-sieve` PDF records a
+genuine index-calculus DLP on those same published classes: 11,116 line
+relations, rank 521 on 522 affine points, verified divisor descents and a
+source-verified answer. It loses 561.59× to mean source rho at the stated
+M+0.5S+10I+0.1A price, with 36/36 pricing-cell losses. The source-to-Jacobian
+map is excluded from this published-class control.
+
+The `run-tian-mapped-line-sieve` PDF and graph add the source map. All 101
+tested cubic-source points gave traced quartic Jacobian classes matching their
+source multiples. The line sieve consumed the newly mapped P and Q classes,
+recovered 1987 and verified it on source and destination. Counting formula
+evaluation, trace-class construction, relation solving and verification gives
+**645.65×** mean source rho at the representative price, with 36/36 losses
+and a **47.14–787.55×** price band. This is one published fixture; independent
+quotient-from-kernel certification and growing-size evidence remain open.
+
+The `run-mixed-fiber-polynomial` PDF records 540 source-verified Semaev-S4
+exhaustive-polynomial DLP arms on the same 180 targets as the pair-table
+control. Homogeneous, mixed and matched-random pooled costs are 57.88×,
+32.30× and 34.48× source rho at the representative price. All pooled
+pricing cells lose to rho and to the pair table. This is an all-roots
+polynomial evaluator, not F4/msolve; the fastest external solver comparison
+and qualified wall timings remain open.
+
+The `run-mixed-fiber-f4` PDF adds the native F4-backed replay. All 2,290
+nonidentity relation-query root sets agreed with exhaustive enumeration, and all
+540 DLP answers were source-verified. Counting only F4 row-reduction
+multiplications and the collector's recorded costs yields homogeneous,
+mixed and matched-random lower bounds of 160,899×, 232,110× and 239,616×
+matched rho at the representative price. Each loses in all 36 pooled
+pricing cells. Full F4 primitive accounting and external msolve remain open;
+the 356.1 s sum of F4 internal wall times is unqualified on a busy host.

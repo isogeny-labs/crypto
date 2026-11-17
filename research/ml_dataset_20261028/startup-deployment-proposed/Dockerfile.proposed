@@ -1,0 +1,34 @@
+# OFFLINE RECIPE. No image was built or published from this file.
+# Preserve ../Dockerfile and all historical image evidence unchanged.
+FROM public.ecr.aws/aws-cli/aws-cli@sha256:b94fc7612d131f1a3cb76145ba3385c813ad7561ef2c2b60c89fbd5dfee93d39
+ARG SOURCE_REVISION
+ARG BINARY_SHA256
+ARG PLAN_FILE_SHA256
+ARG PROTOCOL_FILE_SHA256
+LABEL org.opencontainers.image.source="https://github.com/isogeny-labs/crypto" \
+      org.opencontainers.image.revision="${SOURCE_REVISION}"
+# Context: the exact tested executable, frozen pilot plan renamed plan.json,
+# byte-identical protocol.json, and truthful build-info.json. No credentials,
+# grant, policy, mutable campaign state or private construction labels.
+RUN mkdir -p /opt/crypto/dataset /run/dataset-admission /work \
+    && test ! -L /opt && test ! -L /run \
+    && chmod 0755 /opt /opt/crypto /opt/crypto/dataset /run /run/dataset-admission \
+    && chown 1000:1000 /work
+COPY --chmod=0755 crypto /usr/local/bin/crypto
+COPY --chmod=0444 plan.json protocol.json build-info.json /opt/crypto/dataset/
+# Required immutable single-file config mount replaces this invalid sentinel.
+# Do not bake a per-launch reservation into the image digest dependency chain.
+RUN printf '%s\n' '{"schema":"UNCONFIGURED-STARTUP-GATE"}' > /opt/crypto/dataset/startup-gate.json \
+    && chmod 0444 /opt/crypto/dataset/startup-gate.json \
+    && test "$(sha256sum /usr/local/bin/crypto | cut -d' ' -f1)" = "$BINARY_SHA256" \
+    && test "$(sha256sum /opt/crypto/dataset/plan.json | cut -d' ' -f1)" = "$PLAN_FILE_SHA256" \
+    && test "$(sha256sum /opt/crypto/dataset/protocol.json | cut -d' ' -f1)" = "$PROTOCOL_FILE_SHA256"
+ENV HOME=/work
+ENV AWS_REGION=us-east-2
+ENV AWS_DEFAULT_REGION=us-east-2
+ENV RAYON_NUM_THREADS=1
+ENV OMP_NUM_THREADS=1
+WORKDIR /work
+USER 1000:1000
+ENTRYPOINT []
+CMD ["/usr/local/bin/crypto", "dataset", "start"]

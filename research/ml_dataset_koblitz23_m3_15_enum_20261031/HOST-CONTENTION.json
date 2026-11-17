@@ -1,0 +1,20 @@
+{
+  "schema": "ml-dataset.koblitz23-host-contention-observation/v1",
+  "observation_at": "2026-10-31T15:46:08Z",
+  "command": "ps -o pid,ppid,stat,etime,pcpu,pmem,args -p 3410425,3410539",
+  "observed_processes": [
+    {
+      "pid": 3410425,
+      "role": "unrelated release cargo test",
+      "command_prefix": "cargo test --release --lib --locked --offline ml_dataset::solvers::koblitz_m3::",
+      "elapsed": "05:20:58"
+    },
+    {
+      "pid": 3410539,
+      "ppid": 3410425,
+      "role": "rustc child of unrelated release cargo test",
+      "elapsed": "05:20:54"
+    }
+  ],
+  "interpretation": "Shared-host contention was present during later campaign cells. Native timeouts are retained as resource-conditioned censored outcomes. This observation does not attribute any specific timeout to the competing process. No wall-clock comparison or whole-worker instruction training label is promoted."
+}

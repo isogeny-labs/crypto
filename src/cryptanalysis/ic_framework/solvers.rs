@@ -1,0 +1,2974 @@
+//! # Polynomial-system solvers, as plug-ins.
+//!
+//! The [`SystemSolver`] plug point takes a boolean system and returns
+//! its solutions with a cost record.  It knows nothing about elliptic
+//! curves, which is the point: a Gröbner implementer can work here
+//! without reading a line of curve arithmetic, and the framework can
+//! ask "what does this pipeline cost if the decomposition oracle solves
+//! its systems with *that* engine instead" without touching anything
+//! else.
+//!
+//! ## What ships here
+//!
+//! | name | engine | native unit |
+//! |:--|:--|:--|
+//! | `f4-f2` | Faugère's F4: batched pairs, symbolic preprocessing, bit-packed elimination, field pairs; a full reduced basis | word XORs (elimination only) |
+//! | `buchberger-f2` | boolean-ring Buchberger with the coprime and chain criteria and the field-equation pairs, one pair at a time | monomial operations |
+//! | `matrix-f4` | the Koblitz oracle's hybrid: Macaulay matrices to a fixed degree, then splitting | word XORs (elimination only) |
+//! | `matrix-f5` | the same hybrid, rows the Boolean F5 criterion predicts to vanish left out | word XORs (elimination only) |
+//! | `inherited-f4` | the same hybrid, children specialising their parent's reduced basis | word XORs (elimination, specialisation and linear elimination only) |
+//! | `inherited-f4-next` | alias of `inherited-f4` (the next kernels are its default since 2026-11-12) | word XORs (elimination, specialisation and linear elimination only) |
+//! | `inherited-f4-legacy` | `inherited-f4` with its kernels before 2026-11-12: identical rows, decisions and count (the A/B arm of the fold) | word XORs (elimination, specialisation and linear elimination only) |
+//! | `inherited-f4-batched` | `inherited-f4` with kept rows rewritten only when read or when the node splits: identical rows, decisions and tree, fewer counted rewrites | word XORs (elimination, specialisation and linear elimination only) |
+//! | `fes-then-batched` | size rule: `fes-f2` for quadratic systems of at most `fes_max_vars` unknowns (default 14), `inherited-f4-batched` otherwise | word XORs (of the engine that ran) |
+//! | `fes-then-inherited` | size rule: `fes-f2` for quadratic systems of at most `fes_max_vars` unknowns (default 14), `inherited-f4` otherwise | word XORs (of the engine that ran) |
+//! | `crossbred-f2` | Joux–Vitse: a Macaulay left kernel, then `2^k` linear solves | word operations (partial) |
+//! | `xl-f2` | XL: multiply out to a degree, then linearise | monomial operations (modelled) |
+//! | `sat-cdcl` | CDCL with Tseitin monomials; parity encoded as CNF by default, native XOR opt-in | conflicts |
+//! | `primo-smt` | Primo 0.2.0 through SMT-LIB `QF_UF`; one checked Boolean model per call | solver-reported SAT conflicts |
+//! | `primo-smt-file` | matched legacy control for `primo-smt`: temporary-file input and 5 ms completion polling | solver-reported SAT conflicts |
+//! | `fes-f2` | fast exhaustive search, libfes-lite Gray code, quadratic systems only | word XORs (Gray-code steps) |
+//! | `fes-f2-gpu` | `fes-f2` with the search on the `gpu/fes` CUDA serve worker, every point re-verified on the CPU; same count as `fes-f2` | word XORs (Gray-code steps) |
+//! | `fes-f2-wide` | the same over 8 or 16 sub-cubes per step in the lanes of an AVX2 or AVX-512 register, ≤ 32 equations | vector XORs (Gray-code steps) |
+//! | `m4gb-f2` | M4GB (external process, Makarim–Stevens ISSAC 2017), reduced degrevlex basis over GF(2) with field equations | none (wall time only; see `AGENTS.md` §6: a reference arm, not a leaderboard row) |
+//! | `exhaustive` | evaluate every equation at every point, stopping at the first that fails | monomial tests |
+//!
+//! The exhaustive searches are not strawmen.  They are the
+//! **reference** the others are measured against, in the sense
+//! `AGENTS.md` §1 means: the best algorithm that already solves the same
+//! problem, priced in the same unit on the same instances.  `fes-f2-wide`
+//! is the strongest wherever it applies, `fes-f2` next — two XORs per
+//! point of `{0,1}^n`, or per sixteen points in the vector form, against
+//! a pass over the terms — and a solver that cannot beat the strongest
+//! one on a cell has not earned its place in that cell, however good its
+//! asymptotics are said to be.
+//!
+//! ## Why every unit here is qualified
+//!
+//! The framework prices a count at the calibrated word-XOR ratio only
+//! when the unit is exactly `word XORs`, meaning the count covers the
+//! engine's whole run.  None of these does: F4's elimination is under a
+//! third of its wall time at twelve unknowns (the products, symbolic
+//! preprocessing and packing are the rest), and the hybrids count their
+//! eliminations but not their matrix builds.  Pricing either at the XOR
+//! ratio would flatter it by an order of magnitude, so each names what
+//! its count covers and the runner prices it by wall time instead.  The
+//! native count stays in the report as the engine's own regression
+//! measure.
+//!
+//! Since PR #1774 the framework matches the whole `word XORs (…)` family to
+//! `ns_per_word_xor`.  Every other unit has its own calibration key
+//! ([`solver_unit_key`], 2026-11-12), which charges the count only once
+//! `docs/ic/calibration.json` pins that key for the curve.  No key is pinned
+//! yet, so every unit below is still priced by wall time as described above.
+//! The rule in this section still holds after a pin: a unit whose count
+//! does not cover the engine's whole run is refused, and the solver block
+//! says why (`pricing_qualification`).  Today that is `crossbred-f2`'s
+//! `word operations (partial…)` and `xl-f2`'s modelled count.
+//!
+//! ## Adding an engine — F4, F5, or anything else
+//!
+//! Implement [`SystemSolver`] and register it in [`solver_registry`].
+//! The contract is short and all of it matters:
+//!
+//! - **Count something.**  `SolverCost::ops` with an `op_unit` naming
+//!   it.  Wall time is never the metric (`AGENTS.md` §6); an engine
+//!   that reports only time cannot be compared across hosts and will
+//!   not be accepted into the table as a speed.
+//! - **Respect the budget.**  Return [`SolverVerdict::BudgetExceeded`],
+//!   never a wrong answer and never an unbounded run.
+//! - **Never guess `Unsatisfiable`.**  Say it only when the system is
+//!   decided.  An engine that reports a timeout as "no solution"
+//!   quietly lowers the hit rate of every relation phase built on it.
+//! - **Report a degree if you have one.**  `solving_degree` is the
+//!   highest degree at which the run learned something; it is the one
+//!   comparable against a degree bound.  `degree_reached` may be higher
+//!   and is a property of the strategy.
+//!
+//! See `docs/ic/FRAMEWORK.md` for a worked example of adding one.
+
+use std::collections::BTreeMap;
+use std::path::PathBuf;
+use std::time::{Duration, Instant};
+
+use super::stages::{BooleanSystem, Params, SolverCost, SolverVerdict, SystemShape, SystemSolver};
+use crate::cryptanalysis::bitop_tally;
+use crate::cryptanalysis::koblitz_groebner::{
+    f4_word_ops_thread, solve_boolean_system, SolveOptions, SolverEngine, SplitRule,
+};
+use crate::cryptanalysis::m4gb_oracle::{
+    run_m4gb, run_m4gb_persistent, select_binary, M4gbError, M4gbOptions, M4gbRun,
+};
+use crate::cryptanalysis::pq_f4_f2::{groebner_basis_f4, solutions_from_reduced_basis};
+use crate::cryptanalysis::pq_groebner_f2::{
+    bit, groebner_basis_f2_within, mask_from64, solve_system_f2_counted, F2BoolPoly, Mask,
+    MASK_BITS,
+};
+use crate::cryptanalysis::semaev_sat::XorEncoding;
+use crate::cryptanalysis::smt_oracle::{
+    find_solver, format_smtlib_for_solver, parse_smt_stdout, rows_satisfied, run_smt, SmtEncoding,
+    SmtSolveOptions, SmtSolverKind, SmtVerdict,
+};
+use crate::cryptanalysis::wdsat_oracle::AnfRow;
+
+pub use super::solver_units::{solver_unit_key, SolverUnitKey};
+
+/// The largest system `exhaustive` and the model-enumerating solvers
+/// will attempt, since they are `2^n` in the variable count.
+const ENUMERATION_CAP: usize = 26;
+
+/// The largest system `xl-f2` will attempt.  The repository's XL runs
+/// one pass at degree `n_vars`, so its matrix has `2^{n_vars}` columns
+/// and it has no budget hook: on a 12-unknown, 13-equation descent it
+/// measured about 150 seconds a call against Buchberger's 7
+/// milliseconds on the same systems.  Declining above ten unknowns is
+/// what keeps a sweep row from running for hours; the row is then
+/// skipped and says why.
+const XL_CAP: usize = 10;
+
+/// Terms of a system: the words a copy of it moves, and the word
+/// operations of a pass over it.
+fn terms_of(equations: &[F2BoolPoly]) -> u64 {
+    equations.iter().map(|p| p.terms.len() as u64).sum()
+}
+
+fn is_one(gb: &[F2BoolPoly]) -> bool {
+    gb.len() == 1 && gb[0].terms.len() == 1 && gb[0].terms[0].degree() == 0
+}
+
+/// Solutions of a system by direct evaluation, with the monomial tests
+/// **performed**: a point stops at the first equation it fails, so the
+/// count is the work done, not the `2^n · Σ_i |terms_i|` model an earlier
+/// revision reported (which overstated the work by the short-circuit
+/// factor and understated the per-test cost by the same factor).
+fn points_satisfying(equations: &[F2BoolPoly], n_vars: usize) -> (Vec<u64>, u64) {
+    let mut out = Vec::new();
+    let mut tests = 0u64;
+    for v in 0..1u64 << n_vars {
+        let mut ok = true;
+        for e in equations {
+            tests += e.terms.len() as u64;
+            if e.eval(mask_from64(v)) != 0 {
+                ok = false;
+                break;
+            }
+        }
+        if ok {
+            out.push(v);
+        }
+    }
+    (out, tests)
+}
+
+/// Enumeration engines work in `u64` points (at most `2^n` of them, so
+/// `n < 64`); the verdict carries [`Mask`] points.
+fn masks(points: Vec<u64>) -> Vec<Mask> {
+    points.into_iter().map(mask_from64).collect()
+}
+
+/// Check every returned point against the original equations, counting
+/// the monomial tests.  An engine's answer is never trusted unchecked.
+fn verified(points: Vec<Mask>, system: &BooleanSystem, tests: &mut u64) -> Vec<Mask> {
+    points
+        .into_iter()
+        .filter(|&v| {
+            system.equations.iter().all(|e| {
+                *tests += e.terms.len() as u64;
+                e.eval(v) == 0
+            })
+        })
+        .collect()
+}
+
+// ── F4 ─────────────────────────────────────────────────────────────
+
+/// Faugère's F4 over the boolean ring, computing the full reduced basis
+/// ([`crate::cryptanalysis::pq_f4_f2`]), with the field pairs a boolean
+/// basis needs and solutions read off the linear elements rather than
+/// enumerated.
+pub struct F4F2;
+
+impl SystemSolver for F4F2 {
+    fn name(&self) -> &str {
+        "f4-f2"
+    }
+
+    fn describe(&self) -> String {
+        "F4 over F_2[v]/(v²−v): normal strategy, dense exact-LCM Gebauer–Möller selection on bounded domains, field pairs, bitmap/hash symbolic sets, Faugère–Lachartre reducer/free-column split with full-width fallback, tiled bit-packed elimination, reduced basis"
+            .into()
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= MASK_BITS
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        _params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        let started = Instant::now();
+        let tally_before = bitop_tally::snapshot();
+        let (gb, st) = groebner_basis_f4(system.equations.clone(), system.n_vars, budget);
+        let mut tests = 0u64;
+        let mut extra = BTreeMap::new();
+        for (k, v) in [
+            ("steps", st.steps),
+            ("pairs_reduced", st.pairs_reduced),
+            ("field_pairs_reduced", st.field_pairs_reduced),
+            ("pairs_product_skipped", st.pairs_product_skipped),
+            ("pairs_chain_skipped", st.pairs_chain_skipped),
+            ("pair_dense_select_calls", st.pair_dense_select_calls),
+            (
+                "pair_quadratic_select_calls",
+                st.pair_quadratic_select_calls,
+            ),
+            ("pair_candidate_visits", st.pair_candidate_visits),
+            ("pair_lcm_groups", st.pair_lcm_groups),
+            ("pair_cover_lookups", st.pair_cover_lookups),
+            (
+                "pair_dense_scratch_bytes_max",
+                st.pair_dense_scratch_bytes_max,
+            ),
+            (
+                "inner_build_parallel_disabled_calls",
+                st.inner_build_parallel_disabled_calls,
+            ),
+            ("reducer_rows", st.reducer_rows),
+            ("matrix_rows_max", st.matrix_rows_max),
+            ("matrix_cols_max", st.matrix_cols_max),
+            ("matrix_rows_sum", st.matrix_rows_sum),
+            ("word_xors_performed", st.word_xors_performed),
+            ("divisor_tests", st.divisor_tests),
+            ("new_elements", st.new_elements),
+            ("max_poly_degree", u64::from(st.max_poly_degree)),
+            ("basis_len", st.basis_len),
+            ("peak_matrix_bytes", st.peak_matrix_bytes),
+            ("peak_table_bytes", st.peak_table_bytes),
+            ("full_m4ri_matrices", st.full_m4ri_matrices),
+            ("full_m4ri_blocks", st.full_m4ri_blocks),
+            ("full_m4ri_table_word_xors", st.full_m4ri_table_word_xors),
+            ("fl_matrices", st.fl_matrices),
+            ("fl_reducer_rows", st.fl_reducer_rows),
+            ("fl_pair_rows", st.fl_pair_rows),
+            ("fl_free_cols", st.fl_free_cols),
+            ("build_ns", st.build_ns),
+            ("eliminate_ns", st.eliminate_ns),
+            ("f4_wall_ns", st.wall_ns),
+            ("pairs_left", st.pairs_left),
+            ("oversize", st.oversize as u64),
+        ] {
+            extra.insert(k.to_string(), v);
+        }
+        for (index, label) in [
+            "lt256",
+            "r256_511",
+            "r512_1023",
+            "r1024_2047",
+            "r2048_4095",
+            "ge4096",
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            for (metric, value) in [
+                ("count", st.matrix_profile_counts[index]),
+                ("rows_sum", st.matrix_profile_rows_sum[index]),
+                ("cols_sum", st.matrix_profile_cols_sum[index]),
+                ("eliminate_ns", st.matrix_profile_eliminate_ns[index]),
+                ("logical_xors", st.matrix_profile_logical_xors[index]),
+                ("performed_xors", st.matrix_profile_performed_xors[index]),
+                ("full_m4ri_count", st.matrix_profile_full_m4ri_counts[index]),
+            ] {
+                extra.insert(format!("matrix_profile_{label}_{metric}"), value);
+            }
+        }
+        for (metric, value) in [
+            ("eliminate_ns", st.matrix_profile_unbinned_eliminate_ns),
+            ("logical_xors", st.matrix_profile_unbinned_logical_xors),
+            ("performed_xors", st.matrix_profile_unbinned_performed_xors),
+        ] {
+            extra.insert(format!("matrix_profile_unbinned_{metric}"), value);
+        }
+        let mut cost = SolverCost {
+            ops: st.word_xors,
+            op_unit: "word XORs (elimination only)".into(),
+            wall_ns: 0,
+            // Tables and their matrix are simultaneously live.  Summing
+            // their individually observed maxima is a conservative
+            // per-call upper bound and avoids silently omitting the table
+            // storage from charged memory.
+            peak_bytes: st
+                .peak_matrix_bytes
+                .saturating_add(st.peak_table_bytes)
+                .saturating_add(st.pair_dense_scratch_bytes_max),
+            degree_reached: Some(st.degree_reached),
+            solving_degree: Some(st.solving_degree),
+            timed_out: st.timed_out,
+            extra,
+            ..Default::default()
+        };
+        let verdict = if st.timed_out || st.oversize {
+            SolverVerdict::BudgetExceeded
+        } else {
+            match solutions_from_reduced_basis(&gb, system.n_vars, 24, &mut tests) {
+                // More than 2^24 solutions, or not a reduced basis: never
+                // guess, and never enumerate the whole space behind the
+                // caller's back.
+                None => SolverVerdict::BudgetExceeded,
+                Some(points) => {
+                    let points = verified(points, system, &mut tests);
+                    if points.is_empty() {
+                        SolverVerdict::Unsatisfiable
+                    } else {
+                        SolverVerdict::Solved(points)
+                    }
+                }
+            }
+        };
+        cost.extra.insert("extraction_tests".into(), tests);
+        // The whole run in `bitop/v1` primitives: the XORs the eliminations
+        // performed (M4RI tables included), every other word operation and
+        // hash probe `pq_f4_f2` tallies (products, symbolic preprocessing,
+        // pair selection, column sort and index, packing, lead scans,
+        // read-back, interreduction), and the extraction's monomial tests,
+        // one word operation each.
+        bitop_tally::snapshot()
+            .since(tally_before)
+            .put_complete(&mut cost.extra, st.word_xors_performed + tests);
+        cost.wall_ns = started.elapsed().as_nanos() as u64;
+        (verdict, cost)
+    }
+}
+
+// ── M4GB, an external process ──────────────────────────────────────
+
+/// M4GB (Makarim–Stevens, ISSAC 2017) run as a separate process behind
+/// `M4GB_BINARY` ([`crate::cryptanalysis::m4gb_oracle`]).  It is priced by
+/// wall time only, so it is a reference arm and never a leaderboard row.
+pub struct M4gbF2;
+
+impl SystemSolver for M4gbF2 {
+    fn name(&self) -> &str {
+        "m4gb-f2"
+    }
+
+    fn describe(&self) -> String {
+        "M4GB (Makarim–Stevens, ISSAC 2017), external process: GF(2) with field equations, reduced degrevlex basis, solutions read off the basis"
+            .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "M4GB_BINARY",
+                "path to a solver_m4gb_n<N>_gf2 binary, or a directory of them from which the narrowest N >= unknowns is used (required)",
+            ),
+            ("M4GB_THREADS", "threads passed to --nrthreads (default 1)"),
+        ]
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        let Some(options) = M4gbOptions::from_env() else {
+            return false;
+        };
+        shape.n_vars <= MASK_BITS && select_binary(&options.binary, shape.n_vars).is_some()
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        _params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        solve_m4gb(system, budget, run_m4gb)
+    }
+}
+
+/// [`M4gbF2`] against one long-lived `--serve` process per binary.
+pub struct M4gbF2Server;
+
+impl SystemSolver for M4gbF2Server {
+    fn name(&self) -> &str {
+        "m4gb-f2-server"
+    }
+
+    fn describe(&self) -> String {
+        "M4GB (Makarim–Stevens, ISSAC 2017), external process: GF(2) with field equations, reduced degrevlex basis, solutions read off the basis, one long-lived `--serve` process per binary (process start, field tables and thread pool paid once)"
+            .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        M4gbF2.parameters()
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        M4gbF2.accepts(shape)
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        _params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        solve_m4gb(system, budget, run_m4gb_persistent)
+    }
+}
+
+/// Shared body of the M4GB solvers: `run` is the one-shot or the persistent client.
+fn solve_m4gb(
+    system: &BooleanSystem,
+    budget: Option<Duration>,
+    run: fn(&BooleanSystem, &M4gbOptions, Option<Duration>) -> Result<M4gbRun, M4gbError>,
+) -> (SolverVerdict, SolverCost) {
+    let started = Instant::now();
+    let mut cost = SolverCost {
+        ops: 0,
+        op_unit: "none (external process; wall time only)".into(),
+        ..SolverCost::default()
+    };
+    let Some(options) = M4gbOptions::from_env() else {
+        eprintln!("m4gb: M4GB_BINARY is not set");
+        cost.extra.insert("m4gb_error".into(), 1);
+        cost.wall_ns = started.elapsed().as_nanos() as u64;
+        return (SolverVerdict::BudgetExceeded, cost);
+    };
+    let run = match run(system, &options, budget) {
+        Ok(run) => run,
+        Err(M4gbError::Timeout(_)) => {
+            cost.timed_out = true;
+            cost.wall_ns = started.elapsed().as_nanos() as u64;
+            return (SolverVerdict::BudgetExceeded, cost);
+        }
+        Err(e) => {
+            static REPORTED: std::sync::Once = std::sync::Once::new();
+            REPORTED.call_once(|| eprintln!("m4gb: {e}"));
+            cost.extra.insert("m4gb_error".into(), 1);
+            cost.wall_ns = started.elapsed().as_nanos() as u64;
+            return (SolverVerdict::BudgetExceeded, cost);
+        }
+    };
+    let mut tests = 0u64;
+    let verdict = match solutions_from_reduced_basis(&run.basis, system.n_vars, 24, &mut tests) {
+        None => SolverVerdict::BudgetExceeded,
+        Some(points) => {
+            let points = verified(points, system, &mut tests);
+            if points.is_empty() {
+                SolverVerdict::Unsatisfiable
+            } else {
+                SolverVerdict::Solved(points)
+            }
+        }
+    };
+    cost.peak_bytes = run.peak_mib.unwrap_or(0).saturating_mul(1 << 20);
+    cost.degree_reached = run.max_lcm_degree;
+    cost.extra.insert(
+        "m4gb_cpu_ms".into(),
+        run.cpu_seconds.map_or(0, |s| (s * 1000.0).round() as u64),
+    );
+    cost.extra
+        .insert("m4gb_basis_len".into(), run.basis.len() as u64);
+    cost.extra.insert("extraction_tests".into(), tests);
+    cost.wall_ns = started.elapsed().as_nanos() as u64;
+    (verdict, cost)
+}
+
+// ── The Koblitz oracle's hybrid engines ────────────────────────────
+
+/// Which of the hybrid engines of
+/// [`crate::cryptanalysis::koblitz_groebner`] a plug-in runs.
+#[derive(Clone, Copy)]
+enum HybridKind {
+    MatrixF4,
+    MatrixF5,
+    InheritedF4,
+    /// `InheritedF4` with the next kernels
+    /// ([`crate::cryptanalysis::koblitz_groebner::with_next_kernels`]): the
+    /// same computation, decisions and count, done faster.
+    InheritedF4Next,
+    /// `InheritedF4` with the kernels it used before 2026-11-12 (the
+    /// paired A/B arm of the fold; identical rows, decisions and count).
+    InheritedF4Legacy,
+    /// `InheritedF4` with the batched rewrite
+    /// ([`crate::cryptanalysis::koblitz_groebner::with_batched_rewrite`]):
+    /// kept rows rewritten only when read or when the node splits; identical
+    /// rows, decisions and tree, fewer word XORs.
+    InheritedF4Batched,
+}
+
+/// Macaulay matrices to a fixed degree, reduced with the bit-packed
+/// kernels the Koblitz oracle is tuned on, propagation of every forced
+/// variable, and a split on a free variable when the algebra stalls
+/// ([`solve_boolean_system`]).  Not a Gröbner basis computation: the
+/// matrices stop at `max_degree` and the tree does the rest, which is
+/// why `solving_degree` is not reported and `degree_reached` is the
+/// highest matrix built.
+///
+/// The run is bounded by the node budget and the matrix-size caps of
+/// that module, not by a wall clock: it has no interrupt hook, and this
+/// wrapper does not add one to a module another thread is tuning.
+pub struct HybridF4 {
+    kind: HybridKind,
+}
+
+impl HybridF4 {
+    fn engine(&self, max_degree: u32) -> SolverEngine {
+        match self.kind {
+            HybridKind::MatrixF4 => SolverEngine::MatrixF4 { max_degree },
+            HybridKind::MatrixF5 => SolverEngine::MatrixF5 { max_degree },
+            HybridKind::InheritedF4
+            | HybridKind::InheritedF4Next
+            | HybridKind::InheritedF4Legacy
+            | HybridKind::InheritedF4Batched => SolverEngine::InheritedF4 { max_degree },
+        }
+    }
+}
+
+fn split_rule(name: &str) -> Result<SplitRule, String> {
+    match name {
+        "auto" => Ok(SplitRule::Auto),
+        "lowest" => Ok(SplitRule::LowestFree),
+        "highest" => Ok(SplitRule::HighestFree),
+        "frequent" => Ok(SplitRule::MostFrequent),
+        "mom" => Ok(SplitRule::MinTermWeight),
+        other => Err(format!(
+            "unknown split rule `{other}`; try auto, lowest, highest, frequent or mom"
+        )),
+    }
+}
+
+impl SystemSolver for HybridF4 {
+    fn name(&self) -> &str {
+        match self.kind {
+            HybridKind::MatrixF4 => "matrix-f4",
+            HybridKind::MatrixF5 => "matrix-f5",
+            HybridKind::InheritedF4 => "inherited-f4",
+            HybridKind::InheritedF4Next => "inherited-f4-next",
+            HybridKind::InheritedF4Legacy => "inherited-f4-legacy",
+            HybridKind::InheritedF4Batched => "inherited-f4-batched",
+        }
+    }
+
+    fn describe(&self) -> String {
+        match self.kind {
+            HybridKind::MatrixF4 => "boolean Macaulay matrices to a fixed degree, propagation, splitting (koblitz_groebner MatrixF4)",
+            HybridKind::MatrixF5 => "the same with rows the Boolean F5 criterion predicts to vanish left out (MatrixF5)",
+            HybridKind::InheritedF4 => "the same with each child specialising its parent's reduced basis (InheritedF4, the Koblitz oracle's default), with the next kernels since 2026-11-12: SIMD re-reduction, fused tallies, exact fused builders, reused Four Russians tables",
+            HybridKind::InheritedF4Next => "alias of inherited-f4 since the next kernels became its default (2026-11-12); kept so earlier sweeps reproduce",
+            HybridKind::InheritedF4Legacy => "inherited-f4 with its kernels before 2026-11-12: identical rows, decisions and word-XOR count, slower (the A/B arm of the fold)",
+            HybridKind::InheritedF4Batched => "inherited-f4 with each kept row rewritten only when read or when the node splits (batched rewrite): identical rows, decisions and tree, fewer word XORs",
+        }
+        .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "max_degree",
+                "highest Macaulay degree built before splitting (default 3)",
+            ),
+            (
+                "split",
+                "auto, lowest, highest, frequent or mom (default auto)",
+            ),
+            (
+                "node_budget",
+                "reductions before the run gives up (default 4096)",
+            ),
+        ]
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= MASK_BITS
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        _budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        use crate::cryptanalysis::algebra_cache::{enabled, Layer};
+        let started = Instant::now();
+        let max_degree = params.u64_or("max_degree", 3).unwrap_or(3) as u32;
+        let split = params.get("split").unwrap_or("auto");
+        let opts = SolveOptions {
+            engine: self.engine(max_degree),
+            max_solutions: 1 << 20,
+            node_budget: params.u64_or("node_budget", 4096).unwrap_or(4096) as usize,
+            split_rule: split_rule(split).unwrap_or(SplitRule::Auto),
+        };
+        // The module's environment switches can change the engine; the
+        // report says so rather than labelling one engine's cost as
+        // another's.
+        let resolved = opts.resolve();
+        let before = f4_word_ops_thread();
+        let tally_before = bitop_tally::snapshot();
+        // The next kernels are inherited-f4's default since 2026-11-12;
+        // `inherited-f4-legacy` keeps the earlier kernels for paired A/B.
+        let next = matches!(
+            self.kind,
+            HybridKind::InheritedF4 | HybridKind::InheritedF4Next | HybridKind::InheritedF4Batched
+        );
+        let batched = matches!(self.kind, HybridKind::InheritedF4Batched);
+        let (points, st) = crate::cryptanalysis::koblitz_groebner::with_next_kernels(next, || {
+            crate::cryptanalysis::koblitz_groebner::with_batched_rewrite(batched, || {
+                solve_boolean_system(&system.equations, system.n_vars, &opts)
+            })
+        });
+        let ops = f4_word_ops_thread().wrapping_sub(before);
+        let mut tests = 0u64;
+        let points = verified(points, system, &mut tests);
+        let mut extra = BTreeMap::new();
+        // The whole run in `bitop/v1` primitives: the engine's word XORs
+        // (`ops`), every other word operation and hash probe the splitting
+        // solve tallied (Macaulay builds, column sorts and indexes,
+        // packing, pivot searches, read-back, substitutions and scans, the
+        // inherited bases' layouts), and the verification's monomial
+        // tests, a word operation each.
+        bitop_tally::snapshot()
+            .since(tally_before)
+            .put_complete(&mut extra, ops + tests);
+        for (k, v) in [
+            ("reductions", st.reductions as u64),
+            ("infeasible_branches", st.infeasible_branches as u64),
+            ("propagations", st.propagations as u64),
+            ("splits", st.splits as u64),
+            ("eliminated", st.eliminated as u64),
+            ("oversize", st.oversize as u64),
+            ("max_degree", max_degree as u64),
+            ("verification_tests", tests),
+            (
+                "engine_overridden_by_environment",
+                (format!("{:?}", resolved.engine) != format!("{:?}", opts.engine)) as u64,
+            ),
+            ("reduction_cache_on", enabled(Layer::ExactReduction) as u64),
+        ] {
+            extra.insert(k.to_string(), v);
+        }
+        let cost = SolverCost {
+            ops,
+            op_unit: match self.kind {
+                HybridKind::InheritedF4
+                | HybridKind::InheritedF4Next
+                | HybridKind::InheritedF4Legacy
+                | HybridKind::InheritedF4Batched => {
+                    "word XORs (elimination, specialisation and linear elimination only)"
+                }
+                _ => "word XORs (elimination only)",
+            }
+            .into(),
+            wall_ns: started.elapsed().as_nanos() as u64,
+            peak_bytes: 0,
+            degree_reached: Some(st.max_degree_built),
+            solving_degree: None,
+            timed_out: st.exhausted,
+            extra,
+            ..Default::default()
+        };
+        let verdict = if st.exhausted {
+            SolverVerdict::BudgetExceeded
+        } else if points.is_empty() {
+            SolverVerdict::Unsatisfiable
+        } else {
+            SolverVerdict::Solved(points)
+        };
+        (verdict, cost)
+    }
+}
+
+// ── Crossbred ──────────────────────────────────────────────────────
+
+/// Joux–Vitse crossbred ([`crate::cryptanalysis::crossbred`]): the left
+/// kernel of a degree-`D` Macaulay matrix restricted to the columns of
+/// degree above one in the last `n − k` variables, then a bit-sliced
+/// sweep of the first `k` and a linear solve per surviving point.  Its
+/// parameters decide whether it applies at all; the defaults are the
+/// module's, not a tuning, and a system they do not fit is reported as
+/// over budget, never as unsatisfiable.
+pub struct CrossbredF2;
+
+impl SystemSolver for CrossbredF2 {
+    fn name(&self) -> &str {
+        "crossbred-f2"
+    }
+
+    fn describe(&self) -> String {
+        "Joux–Vitse crossbred: Macaulay left kernel at degree D, then 2^k bit-sliced linear solves"
+            .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("D", "Macaulay degree of the preprocessing (default 3)"),
+            ("k", "variables enumerated (default 8, capped at n − 1)"),
+            (
+                "max_rows",
+                "Macaulay rows the preprocessing may build (default 4000)",
+            ),
+            (
+                "max_kernel_dim",
+                "affine solution space enumerated per point (default 12)",
+            ),
+        ]
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars >= 2 && shape.n_vars <= 64
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        _budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        use crate::cryptanalysis::crossbred::{
+            extract_crossbred_counted, solve_crossbred, CrossbredParams, SearchOptions,
+        };
+        let started = Instant::now();
+        let n = system.n_vars;
+        let xp = CrossbredParams {
+            macaulay_degree: params.u64_or("D", 3).unwrap_or(3) as u32,
+            enumerated: (params.u64_or("k", 8).unwrap_or(8) as usize).min(n - 1),
+            target_degree: 1,
+            max_rows: params.u64_or("max_rows", 4000).unwrap_or(4000) as usize,
+        };
+        let opts = SearchOptions {
+            max_solutions: 0,
+            max_kernel_dim: params.u64_or("max_kernel_dim", 12).unwrap_or(12) as u32,
+            ..SearchOptions::default()
+        };
+        let mut extra = BTreeMap::new();
+        // `bitop/v1` over the whole call: every word operation of the
+        // extraction (also when it gives up at `max_rows`) and of the
+        // search, per-point solves and verification included.
+        let mut word_ops = 0u64;
+        let (verdict, ops) =
+            match extract_crossbred_counted(&system.equations, n, &xp, &mut word_ops) {
+                None => (SolverVerdict::BudgetExceeded, 0),
+                Some(xb) => {
+                    let (points, ss) = solve_crossbred(&system.equations, &xb, &opts);
+                    word_ops += ss.bitop_word_ops;
+                    for (k, v) in [
+                        ("macaulay_rows", xb.stats.macaulay_rows as u64),
+                        ("macaulay_cols", xb.stats.macaulay_cols as u64),
+                        ("kernel_dim", xb.stats.kernel_dim as u64),
+                        ("filters", xb.stats.filters as u64),
+                        ("points", ss.points),
+                        ("survivors", ss.survivors),
+                        ("linear_solves", ss.linear_solves),
+                        ("solve_row_ops", ss.solve_row_ops),
+                        ("exhausted", ss.exhausted as u64),
+                    ] {
+                        extra.insert(k.to_string(), v);
+                    }
+                    let ops = xb.stats.word_ops + ss.transform_word_ops + ss.filter_word_ops;
+                    // (`xb.stats.bitop_word_ops` is already in `word_ops`.)
+                    if ss.exhausted {
+                        (SolverVerdict::BudgetExceeded, ops)
+                    } else if points.is_empty() {
+                        (SolverVerdict::Unsatisfiable, ops)
+                    } else {
+                        (SolverVerdict::Solved(masks(points)), ops)
+                    }
+                }
+            };
+        extra.insert("bitop_word_ops".into(), word_ops);
+        extra.insert("bitop_complete".into(), 1);
+        let cost = SolverCost {
+            ops,
+            op_unit: "word operations (partial: extraction, transform and filter; per-point solves in solve_row_ops)".into(),
+            wall_ns: started.elapsed().as_nanos() as u64,
+            peak_bytes: 0,
+            degree_reached: Some(xp.macaulay_degree),
+            solving_degree: None,
+            timed_out: matches!(verdict, SolverVerdict::BudgetExceeded),
+            extra,
+            ..Default::default()
+        };
+        (verdict, cost)
+    }
+}
+
+// ── Fast exhaustive search ─────────────────────────────────────────
+
+/// Word operations (`bitop/v1`'s `word_op`) of turning one equation of
+/// `terms` terms into a [`QuadraticForm`](crate::cryptanalysis::mq_fes::QuadraticForm)
+/// over `n` unknowns: `AnfRow::from_poly` tests the 64 bits of each mask
+/// (64) and stores the row (1); `from_anf_row` zeroes `n + n(n−1)/2`
+/// coefficient bytes (a word per eight) and flips one or two of them a
+/// term (2).
+fn fes_form_ops(terms: usize, n: usize) -> u64 {
+    let bytes = (n + n * n.saturating_sub(1) / 2) as u64;
+    67 * terms as u64 + bytes.div_ceil(8)
+}
+
+/// Word operations of `gray_tables` for `m` forms over `n` unknowns: the
+/// two stack tables zeroed (561 + 34 words), a coefficient test (and its
+/// XOR) per constant, linear and quadratic coefficient of every form, and
+/// the `2n + 2` fictive entries.
+fn gray_table_ops(m: usize, n: usize) -> u64 {
+    595 + m as u64 * (1 + n + n * n.saturating_sub(1) / 2) as u64 + 2 * n as u64 + 2
+}
+
+/// Word operations of a Gray-code walk of `steps` steps on words of
+/// `words` 64-bit words (one for the scalar walk, `lanes / 2` for a vector
+/// of `lanes` 32-bit lanes): per step the zero test of the value (a
+/// compare of every word and the test of the resulting mask, `words + 1`)
+/// and two XORs of `words` words; per sixteen-step chunk the focus-pointer
+/// advance and the chunk's three table indices (12).
+fn gray_walk_ops(steps: u64, words: u64) -> u64 {
+    steps * (3 * words + 1) + 12 * steps.div_ceil(16)
+}
+
+/// Bouillaguet et al.'s fast exhaustive search in the libfes-lite form
+/// ([`crate::cryptanalysis::mq_fes::gray_incremental_find_all`]): all
+/// equations packed one bit each into a word, the points of `{0,1}^n` in
+/// Gray-code order, two word XORs per point.  Quadratic systems only —
+/// the two-summand descents — with at most 64 equations and 32 unknowns.
+pub struct FesF2;
+
+impl SystemSolver for FesF2 {
+    fn name(&self) -> &str {
+        "fes-f2"
+    }
+
+    fn describe(&self) -> String {
+        "fast exhaustive search (libfes-lite Gray code): two word XORs per point, quadratic systems only".into()
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        (1..=32).contains(&shape.n_vars)
+            && shape.n_equations <= 64
+            && shape.degrees.iter().all(|&d| d <= 2)
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        _params: &Params,
+        _budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        fes_quadratic_solve(system, |fs| {
+            crate::cryptanalysis::mq_fes::gray_incremental_find_all(fs, usize::MAX)
+        })
+    }
+}
+
+/// Opt-in per-phase wall clock of the FES engines (`FES_GPU_TIMING=1`), printed to
+/// stderr every 500 calls and at process exit.  Off by default: no output, and the
+/// only cost is one cached flag read per call.  It measures; it changes no result.
+mod fes_timing {
+    use std::sync::atomic::{AtomicU64, Ordering::Relaxed};
+    use std::sync::OnceLock;
+    use std::time::Instant;
+
+    pub static CALLS: AtomicU64 = AtomicU64::new(0);
+    pub static FORMS: AtomicU64 = AtomicU64::new(0);
+    pub static PACK: AtomicU64 = AtomicU64::new(0);
+    pub static ROUND_TRIP: AtomicU64 = AtomicU64::new(0);
+    pub static SORT: AtomicU64 = AtomicU64::new(0);
+    pub static SEARCH: AtomicU64 = AtomicU64::new(0);
+    pub static VERIFY: AtomicU64 = AtomicU64::new(0);
+    pub static POINTS: AtomicU64 = AtomicU64::new(0);
+
+    extern "C" {
+        fn atexit(callback: extern "C" fn()) -> i32;
+    }
+    extern "C" fn at_exit() {
+        report();
+    }
+
+    pub fn on() -> bool {
+        static ON: OnceLock<bool> = OnceLock::new();
+        *ON.get_or_init(|| {
+            let on = std::env::var_os("FES_GPU_TIMING").is_some();
+            if on {
+                // SAFETY: registers a plain `extern "C"` function with libc.
+                unsafe { atexit(at_exit) };
+            }
+            on
+        })
+    }
+
+    pub fn add(counter: &AtomicU64, since: Option<Instant>) {
+        if let Some(t) = since {
+            counter.fetch_add(t.elapsed().as_nanos() as u64, Relaxed);
+        }
+    }
+
+    pub fn start() -> Option<Instant> {
+        on().then(Instant::now)
+    }
+
+    pub fn call_done() {
+        if on() && CALLS.fetch_add(1, Relaxed) % 500 == 499 {
+            report();
+        }
+    }
+
+    pub fn report() {
+        let calls = CALLS.load(Relaxed).max(1);
+        let ms = |c: &AtomicU64| c.load(Relaxed) as f64 / 1e6 / calls as f64;
+        eprintln!(
+            "fes-timing: calls={} points/call={:.2} per call (ms): forms={:.4} pack={:.4} round_trip={:.4} sort={:.4} search_total={:.4} verify={:.4}",
+            CALLS.load(Relaxed),
+            POINTS.load(Relaxed) as f64 / calls as f64,
+            ms(&FORMS),
+            ms(&PACK),
+            ms(&ROUND_TRIP),
+            ms(&SORT),
+            ms(&SEARCH),
+            ms(&VERIFY)
+        );
+    }
+}
+
+/// The form conversion of [`fes_quadratic_solve`]: one [`QuadraticForm`] per equation over the
+/// system's unknowns, with the `bitop/v1` word-op charge of the conversion added to `word_ops`.
+/// `None` when an equation is not quadratic or names an unknown outside its own range.
+fn fes_forms(
+    system: &BooleanSystem,
+    word_ops: &mut u64,
+) -> Option<Vec<crate::cryptanalysis::mq_fes::QuadraticForm>> {
+    use crate::cryptanalysis::mq_fes::QuadraticForm;
+    let n = system.n_vars;
+    system
+        .equations
+        .iter()
+        .map(|p| {
+            *word_ops += fes_form_ops(p.terms.len(), p.n_vars);
+            let mut q = QuadraticForm::from_poly(p)?;
+            // `from_poly` sizes the form by the polynomial's own
+            // variable count; the search needs the system's.
+            if q.n != n {
+                *word_ops += fes_form_ops(p.terms.len(), n);
+                q = QuadraticForm::from_anf_row(
+                    &crate::cryptanalysis::wdsat_oracle::AnfRow::from_poly(p),
+                    n,
+                )?;
+            }
+            Some(q)
+        })
+        .collect()
+}
+
+/// The coefficient-scan charge: one test per coefficient set in some form.
+fn fes_setup(forms: Option<&Vec<crate::cryptanalysis::mq_fes::QuadraticForm>>) -> u64 {
+    forms
+        .map(|fs| {
+            fs.iter()
+                .map(|f| {
+                    f.constant as u64
+                        + f.linear.iter().filter(|&&b| b).count() as u64
+                        + f.quad.iter().flatten().filter(|&&b| b).count() as u64
+                })
+                .sum()
+        })
+        .unwrap_or(0)
+}
+
+/// The body of [`FesF2`] with the search step as a parameter: form building,
+/// the `bitop/v1` count, the Gray-code step count (`2 * 2^n + setup` word
+/// XORs) and CPU verification of every returned point are the same for every
+/// search, so `fes-f2` and `fes-f2-gpu` report the same counted cost for the
+/// same system.  `search` returns every zero of the forms, or `None` when it
+/// cannot (which becomes `BudgetExceeded`, never `Unsatisfiable`).
+fn fes_quadratic_solve(
+    system: &BooleanSystem,
+    search: impl FnOnce(&[crate::cryptanalysis::mq_fes::QuadraticForm]) -> Option<Vec<u64>>,
+) -> (SolverVerdict, SolverCost) {
+    let started = Instant::now();
+    // `bitop/v1` over the whole call; see `fes_form_ops`,
+    // `gray_table_ops` and `gray_walk_ops` for the constants.
+    let mut word_ops = 0u64;
+    let t_forms = fes_timing::start();
+    let forms = fes_forms(system, &mut word_ops);
+    let setup = fes_setup(forms.as_ref());
+    fes_timing::add(&fes_timing::FORMS, t_forms);
+    let t_search = fes_timing::start();
+    let found = forms.as_deref().and_then(search);
+    fes_timing::add(&fes_timing::SEARCH, t_search);
+    fes_finish(system, started, word_ops, setup, found)
+}
+
+/// The packed system the `gpu/fes` worker takes, built straight from the equations' monomials
+/// without the intermediate [`QuadraticForm`]s, with the same two charges
+/// [`fes_quadratic_solve`] takes from the forms (`word_ops` of the conversion and the
+/// coefficient-scan `setup`).  The packed words are identical to
+/// `PackedSystem::from_quadratic_forms` of the forms, and the charges are the same numbers.
+/// `None` for anything the form path would treat differently or reject (a monomial of degree
+/// above 2, or on an unknown outside the equation's or the system's range, more than 64
+/// equations, more than 62 unknowns): the caller then takes the form path, so behaviour
+/// outside the plain case is unchanged.
+fn fes_pack_direct(
+    system: &BooleanSystem,
+) -> Option<(crate::cryptanalysis::fes_gpu::PackedSystem, u64, u64)> {
+    use crate::cryptanalysis::fes_gpu::PackedSystem;
+    let n = system.n_vars;
+    let m = system.equations.len();
+    if m == 0 || m > 64 || n > 62 {
+        return None;
+    }
+    let tri = |a: usize, b: usize| a * (a + 1) / 2 + b; // a >= b
+    let (mut cst, mut lin, mut quad_tri) = (0u64, vec![0u64; n], vec![0u64; n * (n + 1) / 2]);
+    let mut word_ops = 0u64;
+    for (e, p) in system.equations.iter().enumerate() {
+        let bit = 1u64 << e;
+        word_ops += fes_form_ops(p.terms.len(), p.n_vars);
+        if p.n_vars != n {
+            word_ops += fes_form_ops(p.terms.len(), n);
+        }
+        let limit = p.n_vars.min(n);
+        for term in &p.terms {
+            let mask = term.mask;
+            if limit < Mask::BITS as usize && (mask >> limit) != 0 {
+                return None;
+            }
+            match mask.count_ones() {
+                0 => cst ^= bit,
+                1 => lin[mask.trailing_zeros() as usize] ^= bit,
+                2 => {
+                    let low = mask.trailing_zeros() as usize;
+                    let high = (Mask::BITS - 1 - mask.leading_zeros()) as usize;
+                    quad_tri[tri(high, low)] ^= bit;
+                }
+                _ => return None,
+            }
+        }
+    }
+    let setup = cst.count_ones() as u64
+        + lin.iter().map(|w| w.count_ones() as u64).sum::<u64>()
+        + quad_tri.iter().map(|w| w.count_ones() as u64).sum::<u64>();
+    Some((
+        PackedSystem {
+            n,
+            m,
+            cst,
+            lin,
+            quad_tri,
+        },
+        word_ops,
+        setup,
+    ))
+}
+
+/// Everything after the search of [`fes_quadratic_solve`]: the counted cost, the CPU
+/// re-verification of every point, and the verdict.  Shared with the direct-pack path of
+/// [`FesF2Gpu`], so both report the same cost for the same system.
+fn fes_finish(
+    system: &BooleanSystem,
+    started: Instant,
+    mut word_ops: u64,
+    setup: u64,
+    found: Option<Vec<u64>>,
+) -> (SolverVerdict, SolverCost) {
+    let n = system.n_vars;
+    let mut tests = 0u64;
+    let mut extra = BTreeMap::new();
+    extra.insert("points".into(), 1u64 << n);
+    let (verdict, ops) = match found {
+        None => (SolverVerdict::BudgetExceeded, 0),
+        Some(points) => {
+            // The coefficient scan above (a test a coefficient), the
+            // tables, the walk, and a store per root found.
+            let m = system.equations.len();
+            word_ops += m as u64 * (1 + n + n * n.saturating_sub(1) / 2) as u64
+                + gray_table_ops(m, n)
+                + gray_walk_ops(1u64 << n, 1)
+                + 2 * points.len() as u64;
+            if fes_timing::on() {
+                fes_timing::POINTS
+                    .fetch_add(points.len() as u64, std::sync::atomic::Ordering::Relaxed);
+            }
+            let t_verify = fes_timing::start();
+            let points = verified(masks(points), system, &mut tests);
+            fes_timing::add(&fes_timing::VERIFY, t_verify);
+            // Two XORs per Gray-code step, one step per point, plus
+            // one per coefficient scattered into the tables.
+            let ops = 2 * (1u64 << n) + setup;
+            if points.is_empty() {
+                (SolverVerdict::Unsatisfiable, ops)
+            } else {
+                (SolverVerdict::Solved(points), ops)
+            }
+        }
+    };
+    fes_timing::call_done();
+    extra.insert("verification_tests".into(), tests);
+    // A verification test is a word test of one term.
+    extra.insert("bitop_word_ops".into(), word_ops + tests);
+    extra.insert("bitop_complete".into(), 1);
+    let cost = SolverCost {
+        ops,
+        op_unit: "word XORs (Gray-code steps)".into(),
+        wall_ns: started.elapsed().as_nanos() as u64,
+        peak_bytes: 0,
+        degree_reached: None,
+        solving_degree: None,
+        timed_out: false,
+        extra,
+        ..Default::default()
+    };
+    (verdict, cost)
+}
+
+/// `fes-f2` with the Gray-code search run by the `gpu/fes` worker in serve
+/// mode (one CUDA context per process; `ICX_FES_WORKER` names the worker,
+/// else `fes_cuda`/`fes_metal`/`fes_solve` beside the executable).  The
+/// worker only proposes points: each is re-verified on the CPU, and an
+/// empty answer means `Unsatisfiable` only when the worker reports that its
+/// list is complete.  Points are returned in `fes-f2`'s order (Gray rank):
+/// the descent oracle keeps the first solution that lifts, so order decides
+/// which relation a call yields.  Same forms, same counted cost (`word XORs (Gray-code
+/// steps)`) as `fes-f2`; what changes is wall time, which `AGENTS.md` §6
+/// keeps as a practicality note.  Without a worker, or after a worker
+/// error, it runs `fes-f2`'s CPU search (`gpu_fallback` = 1 in the cost
+/// record) for systems of at most 32 unknowns and reports `BudgetExceeded`
+/// above that.  Up to 40 unknowns (the CUDA kernel's `FES_MAX_VARS`).
+pub struct FesF2Gpu;
+
+impl SystemSolver for FesF2Gpu {
+    fn name(&self) -> &str {
+        "fes-f2-gpu"
+    }
+
+    fn describe(&self) -> String {
+        "fes-f2 with the Gray-code search on the gpu/fes serve worker (CUDA), every point re-verified on the CPU".into()
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        (1..=40).contains(&shape.n_vars)
+            && shape.n_equations <= 64
+            && shape.degrees.iter().all(|&d| d <= 2)
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        _params: &Params,
+        _budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        use crate::cryptanalysis::fes_gpu::{solve_on_shared_server, PackedSystem};
+        use crate::cryptanalysis::mq_fes::gray_incremental_find_all;
+        let (mut used, mut fallback, mut capped, mut gpu_ns) = (0u64, 0u64, 0u64, 0u64);
+        // Fast path: pack the equations' monomials directly (no `QuadraticForm`s), same packed
+        // words and same counted charges as the form path (`fes_pack_direct`).  Anything it
+        // declines, and any worker miss, goes through the form path below.
+        let started = Instant::now();
+        let t_pack = fes_timing::start();
+        let direct = fes_pack_direct(system);
+        fes_timing::add(&fes_timing::PACK, t_pack);
+        if let Some((packed, word_ops, setup)) = direct {
+            let t = Instant::now();
+            if let Ok(Some((reply, _))) = solve_on_shared_server(&packed) {
+                gpu_ns = t.elapsed().as_nanos() as u64;
+                if fes_timing::on() {
+                    fes_timing::ROUND_TRIP.fetch_add(gpu_ns, std::sync::atomic::Ordering::Relaxed);
+                }
+                let found = if reply.total > reply.proposed.len() as u64 {
+                    capped = 1;
+                    None
+                } else {
+                    let mut points = reply.proposed;
+                    let t_sort = fes_timing::start();
+                    crate::cryptanalysis::fes_gpu::sort_gray_order(&mut points);
+                    fes_timing::add(&fes_timing::SORT, t_sort);
+                    Some(points)
+                };
+                let (verdict, mut cost) = fes_finish(system, started, word_ops, setup, found);
+                cost.extra.insert("gpu_worker".into(), 1);
+                cost.extra.insert("gpu_fallback".into(), 0);
+                cost.extra.insert("gpu_capped".into(), capped);
+                cost.extra.insert("gpu_round_trip_ns".into(), gpu_ns);
+                return (verdict, cost);
+            }
+            // No worker, or it failed: the CPU search over the forms, as before.
+            let (verdict, mut cost) = fes_quadratic_solve(system, |fs| {
+                if fs.first().is_none_or(|f| f.n <= 32) {
+                    gray_incremental_find_all(fs, usize::MAX)
+                } else {
+                    None
+                }
+            });
+            cost.extra.insert("gpu_worker".into(), 0);
+            cost.extra.insert("gpu_fallback".into(), 1);
+            cost.extra.insert("gpu_capped".into(), 0);
+            cost.extra.insert("gpu_round_trip_ns".into(), 0);
+            return (verdict, cost);
+        }
+        let (verdict, mut cost) = fes_quadratic_solve(system, |fs| {
+            let cpu = |fs: &[crate::cryptanalysis::mq_fes::QuadraticForm]| {
+                if fs.first().is_none_or(|f| f.n <= 32) {
+                    gray_incremental_find_all(fs, usize::MAX)
+                } else {
+                    None
+                }
+            };
+            let t_pack = fes_timing::start();
+            let packed = PackedSystem::from_quadratic_forms(fs);
+            fes_timing::add(&fes_timing::PACK, t_pack);
+            let Ok(packed) = packed else {
+                fallback = 1;
+                return cpu(fs);
+            };
+            let t = Instant::now();
+            match solve_on_shared_server(&packed) {
+                Ok(Some((reply, _))) => {
+                    gpu_ns = t.elapsed().as_nanos() as u64;
+                    if fes_timing::on() {
+                        fes_timing::ROUND_TRIP
+                            .fetch_add(gpu_ns, std::sync::atomic::Ordering::Relaxed);
+                    }
+                    used = 1;
+                    if reply.total > reply.proposed.len() as u64 {
+                        capped = 1;
+                        None
+                    } else {
+                        // fes-f2's order, so the oracle (first liftable
+                        // solution wins) follows fes-f2's trajectory.
+                        let mut points = reply.proposed;
+                        let t_sort = fes_timing::start();
+                        crate::cryptanalysis::fes_gpu::sort_gray_order(&mut points);
+                        fes_timing::add(&fes_timing::SORT, t_sort);
+                        Some(points)
+                    }
+                }
+                Ok(None) | Err(_) => {
+                    fallback = 1;
+                    cpu(fs)
+                }
+            }
+        });
+        cost.extra.insert("gpu_worker".into(), used);
+        cost.extra.insert("gpu_fallback".into(), fallback);
+        cost.extra.insert("gpu_capped".into(), capped);
+        cost.extra.insert("gpu_round_trip_ns".into(), gpu_ns);
+        (verdict, cost)
+    }
+}
+
+/// The solver `descent-algebraic` runs when a command names none
+/// (`ic bench`, `ic run`): the size rule with the batched inherited engine.
+/// On the 2026-11-12 end-to-end ladder (research/fes_then_batched_20261112)
+/// its S is 0.74 to 0.89 of `inherited-f4`'s at the pinned word-XOR ratio;
+/// under the AGENTS.md §5a band it ties `inherited-f4` at w = 0 (identical
+/// decisions, solver free) and is lower at w = 0.1 and 1, except at 14
+/// unknowns, where `fes-f2` tries more targets and is above at w = 0
+/// (validation/validator-report.json).  A run that names a solver is
+/// unaffected; ecbench specs always name theirs.
+pub const DEFAULT_DESCENT_SOLVER: &str = "fes-then-batched";
+
+/// The default `fes_max_vars` of [`FesThenInherited`]: the largest number
+/// of unknowns at which `fes-f2`'s word-XOR count per call was below
+/// `inherited-f4`'s on the descent ladder (14 unknowns: about 33 thousand
+/// against 49 to 52 thousand; 16 unknowns: 132 thousand against 102 to 124
+/// thousand; `research/inherited_f4_next_20261112/RESULTS_AB.md`).
+pub const FES_THEN_INHERITED_MAX_VARS: u64 = 14;
+
+/// A size rule between two engines priced in the same unit: `fes-f2` for
+/// quadratic systems of at most `fes_max_vars` unknowns (and at most 64
+/// equations), `inherited-f4` for everything else.  Both count word XORs,
+/// so the oracle's S stays on one pricing basis; the cost record says which
+/// engine ran (`size_rule_fes` = 1 for `fes-f2`).
+pub struct FesThenInherited;
+
+/// [`FesThenInherited`] with `inherited-f4-batched` above the threshold:
+/// `fes-f2` for quadratic systems of at most `fes_max_vars` unknowns,
+/// `inherited-f4-batched` (same decisions as `inherited-f4`, fewer counted
+/// rewrites) otherwise.  Both count word XORs.
+pub struct FesThenBatched;
+
+impl SystemSolver for FesThenInherited {
+    fn name(&self) -> &str {
+        "fes-then-inherited"
+    }
+
+    fn describe(&self) -> String {
+        format!(
+            "size rule: fes-f2 for quadratic systems of at most fes_max_vars unknowns (default {FES_THEN_INHERITED_MAX_VARS}), inherited-f4 otherwise; both priced in word XORs"
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "fes_max_vars",
+                "largest number of unknowns solved by fes-f2 (default 14)",
+            ),
+            (
+                "max_degree",
+                "inherited-f4: highest Macaulay degree built before splitting (default 3)",
+            ),
+            (
+                "node_budget",
+                "inherited-f4: reductions before the run gives up (default 4096)",
+            ),
+        ]
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= MASK_BITS
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        let max = params
+            .u64_or("fes_max_vars", FES_THEN_INHERITED_MAX_VARS)
+            .unwrap_or(FES_THEN_INHERITED_MAX_VARS) as usize;
+        let quadratic = system
+            .equations
+            .iter()
+            .all(|p| p.terms.iter().all(|m| m.degree() <= 2));
+        let use_fes =
+            (1..=max.min(32)).contains(&system.n_vars) && system.equations.len() <= 64 && quadratic;
+        let (verdict, mut cost) = if use_fes {
+            FesF2.solve(system, params, budget)
+        } else {
+            HybridF4 {
+                kind: HybridKind::InheritedF4,
+            }
+            .solve(system, params, budget)
+        };
+        cost.extra
+            .insert("size_rule_fes".into(), u64::from(use_fes));
+        (verdict, cost)
+    }
+}
+
+impl SystemSolver for FesThenBatched {
+    fn name(&self) -> &str {
+        "fes-then-batched"
+    }
+
+    fn describe(&self) -> String {
+        format!(
+            "size rule: fes-f2 for quadratic systems of at most fes_max_vars unknowns (default {FES_THEN_INHERITED_MAX_VARS}), inherited-f4-batched otherwise; both priced in word XORs"
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "fes_max_vars",
+                "largest number of unknowns solved by fes-f2 (default 14)",
+            ),
+            (
+                "max_degree",
+                "inherited-f4-batched: highest Macaulay degree built before splitting (default 3)",
+            ),
+            (
+                "node_budget",
+                "inherited-f4-batched: reductions before the run gives up (default 4096)",
+            ),
+        ]
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= MASK_BITS
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        let max = params
+            .u64_or("fes_max_vars", FES_THEN_INHERITED_MAX_VARS)
+            .unwrap_or(FES_THEN_INHERITED_MAX_VARS) as usize;
+        let quadratic = system
+            .equations
+            .iter()
+            .all(|p| p.terms.iter().all(|m| m.degree() <= 2));
+        let use_fes =
+            (1..=max.min(32)).contains(&system.n_vars) && system.equations.len() <= 64 && quadratic;
+        let (verdict, mut cost) = if use_fes {
+            FesF2.solve(system, params, budget)
+        } else {
+            HybridF4 {
+                kind: HybridKind::InheritedF4Batched,
+            }
+            .solve(system, params, budget)
+        };
+        cost.extra
+            .insert("size_rule_fes".into(), u64::from(use_fes));
+        (verdict, cost)
+    }
+}
+
+/// The same search with the last three or four unknowns fixed per
+/// 32-bit lane of a vector register, so one Gray-code walk enumerates 8
+/// (AVX2) or 16 (AVX-512) sub-cubes at once
+/// ([`crate::cryptanalysis::mq_fes::gray_find_all_wide`]): the vector form
+/// of libfes-lite's enumeration.  It is the strongest exhaustive search
+/// this host runs for the shape: the lanes wherever the host has the
+/// instructions and the system fits them (at most 32 equations, one per
+/// lane bit, and enough unknowns for the unrolled walk), the scalar
+/// [`FesF2`] otherwise, and the unit it reports says which ran.
+pub struct FesWide;
+
+impl SystemSolver for FesWide {
+    fn name(&self) -> &str {
+        "fes-f2-wide"
+    }
+
+    fn describe(&self) -> String {
+        "fast exhaustive search over 8 (AVX2) or 16 (AVX-512) sub-cubes per Gray-code step, the first 32 equations in the lanes and the rest as a filter; the scalar search where the lanes do not fit: quadratic systems".into()
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        if FesF2.accepts(shape) {
+            return true;
+        }
+        // Past the scalar walk's 32 unknowns the lanes still reach: the
+        // walk covers only the `n − k` unknowns the lanes do not fix.
+        let Some(lanes) = crate::cryptanalysis::mq_fes::wide_lanes() else {
+            return false;
+        };
+        let k = lanes.trailing_zeros() as usize;
+        // More than 32 equations: the lanes walk the first 32 and the
+        // rest filter the candidates (see `solve`).
+        shape.n_vars <= 32 + k && shape.degrees.iter().all(|&d| d <= 2)
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        use crate::cryptanalysis::mq_fes::{gray_find_all_wide, QuadraticForm};
+        let started = Instant::now();
+        let n = system.n_vars;
+        let form_ops: u64 = system
+            .equations
+            .iter()
+            .map(|p| fes_form_ops(p.terms.len(), n))
+            .sum();
+        let forms: Option<Vec<QuadraticForm>> = system
+            .equations
+            .iter()
+            .map(|p| {
+                QuadraticForm::from_anf_row(
+                    &crate::cryptanalysis::wdsat_oracle::AnfRow::from_poly(p),
+                    n,
+                )
+            })
+            .collect();
+        // A lane holds 32 equations.  With more, the walk enumerates the
+        // roots of the first 32 — a superset of the system's — and every
+        // candidate is checked against all the equations below, as
+        // libfes does: about `2^{n−32}` spurious candidates per call.
+        let found = forms
+            .as_deref()
+            .and_then(|fs| gray_find_all_wide(&fs[..fs.len().min(32)], usize::MAX));
+        let Some((candidates, lanes)) = found else {
+            // No lanes on this host, or a system the lanes do not fit:
+            // the scalar walk, which reports its own unit.  The forms
+            // built here for nothing are still work done.
+            let (verdict, mut cost) = FesF2.solve(system, params, budget);
+            *cost.extra.entry("bitop_word_ops".into()).or_insert(0) += form_ops;
+            return (verdict, cost);
+        };
+        let mut tests = 0u64;
+        let candidate_count = candidates.len() as u64;
+        let points = verified(masks(candidates), system, &mut tests);
+        let mut extra = BTreeMap::new();
+        extra.insert("points".into(), 1u64 << n);
+        extra.insert("lanes".into(), lanes as u64);
+        extra.insert("candidates".into(), candidate_count);
+        extra.insert("verification_tests".into(), tests);
+        // `bitop/v1` over the whole call: the forms; per lane the
+        // specialisation (a test a coefficient of the form, `m` forms of
+        // the walked `m'` = min(m, 32)) and its tables, and the lane's
+        // first-derivative column moved into the vector table (34), plus
+        // the shared second-derivative table (561); the walk on vectors of
+        // `lanes / 2` words; a store per candidate; a word test per
+        // verification test.
+        let walked = system.equations.len().min(32);
+        let k = lanes.trailing_zeros() as usize;
+        let free = n - k;
+        let per_lane = walked as u64 * (1 + n + n * n.saturating_sub(1) / 2) as u64
+            + gray_table_ops(walked, free)
+            + 34;
+        let word_ops = form_ops
+            + lanes as u64 * per_lane
+            + 561
+            + gray_walk_ops((1u64 << n) / lanes as u64, lanes as u64 / 2)
+            + 2 * candidate_count
+            + tests;
+        extra.insert("bitop_word_ops".into(), word_ops);
+        extra.insert("bitop_complete".into(), 1);
+        let cost = SolverCost {
+            // Two vector XORs per Gray-code step, one step per `lanes`
+            // points; the per-lane table setup is negligible beside it.
+            ops: 2 * ((1u64 << n) / lanes as u64),
+            op_unit: format!("vector XORs (Gray-code steps, {lanes} lanes of 32 bits)"),
+            wall_ns: started.elapsed().as_nanos() as u64,
+            peak_bytes: 0,
+            degree_reached: None,
+            solving_degree: None,
+            timed_out: false,
+            extra,
+            ..Default::default()
+        };
+        if points.is_empty() {
+            (SolverVerdict::Unsatisfiable, cost)
+        } else {
+            (SolverVerdict::Solved(points), cost)
+        }
+    }
+}
+
+// ── Buchberger over the boolean ring ───────────────────────────────
+
+/// The repository's boolean-ring Buchberger, with the coprime and
+/// chain criteria under the normal selection strategy.
+pub struct BuchbergerF2;
+
+impl SystemSolver for BuchbergerF2 {
+    fn name(&self) -> &str {
+        "buchberger-f2"
+    }
+
+    fn describe(&self) -> String {
+        "Buchberger over F_2[v]/(v²−v), DegRevLex, normal selection, coprime and chain criteria"
+            .into()
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= MASK_BITS
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        _params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        let (gb, st) = groebner_basis_f2_within(system.equations.clone(), system.n_vars, budget);
+        // `bitop/v1` over the whole call: the engine's own word operations
+        // (`GbStats::bitop_word_ops`), the copy of the input (a word a
+        // term), the `is_one` test, and the solution enumeration below.
+        let mut word_ops = st.bitop_word_ops + terms_of(&system.equations) + 1;
+        let mut extra = BTreeMap::new();
+        extra.insert("spolys".into(), st.spolys);
+        extra.insert("reduction_steps".into(), st.reduction_steps);
+        extra.insert("pairs_coprime_skipped".into(), st.pairs_coprime_skipped);
+        extra.insert("pairs_chain_skipped".into(), st.pairs_chain_skipped);
+        extra.insert("basis_len".into(), st.basis_len);
+        extra.insert("pairs_left".into(), st.pairs_left);
+        let cost = SolverCost {
+            ops: st.mono_ops,
+            op_unit: "monomial operations".into(),
+            wall_ns: st.wall_ns,
+            peak_bytes: st.peak_bytes(),
+            degree_reached: Some(st.max_pair_degree),
+            solving_degree: Some(st.solving_degree),
+            timed_out: st.timed_out,
+            extra,
+            ..Default::default()
+        };
+        let done = |mut cost: SolverCost, word_ops: u64| {
+            cost.extra.insert("bitop_word_ops".into(), word_ops);
+            cost.extra.insert("bitop_complete".into(), 1);
+            cost
+        };
+        if st.timed_out {
+            return (SolverVerdict::BudgetExceeded, done(cost, word_ops));
+        }
+        if is_one(&gb) {
+            return (SolverVerdict::Unsatisfiable, done(cost, word_ops));
+        }
+        if system.n_vars > ENUMERATION_CAP {
+            // The basis is correct but this module extracts solutions by
+            // enumeration, which is not affordable here.  Saying so is
+            // better than reporting no solutions.
+            return (SolverVerdict::BudgetExceeded, done(cost, word_ops));
+        }
+        let solutions = solve_system_f2_counted(&gb, system.n_vars, &mut word_ops);
+        let cost = done(cost, word_ops);
+        if solutions.is_empty() {
+            (SolverVerdict::Unsatisfiable, cost)
+        } else {
+            (SolverVerdict::Solved(masks(solutions)), cost)
+        }
+    }
+}
+
+// ── XL ─────────────────────────────────────────────────────────────
+
+/// XL (Courtois–Klimov–Patarin–Shamir): multiply the system out to a
+/// degree, then linearise.  Scales better than Buchberger on the wider
+/// boolean systems and worse on the narrow ones, which is the whole
+/// reason to be able to switch between them.
+pub struct XlF2;
+
+impl SystemSolver for XlF2 {
+    fn name(&self) -> &str {
+        "xl-f2"
+    }
+
+    fn describe(&self) -> String {
+        "XL over F_2: multiply to a degree bound, linearise, solve".into()
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= XL_CAP
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        _params: &Params,
+        _budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        // The XL implementation has no interrupt hook, so the budget is
+        // enforced by `accepts` and by the caller's cell sizing rather
+        // than mid-run.  That is stated rather than hidden: a long XL
+        // call will run to completion.
+        let started = Instant::now();
+        // `bitop/v1` over the whole call: the copy of the input (a word a
+        // term), then XL's own word operations and the enumeration.
+        let mut word_ops = terms_of(&system.equations);
+        let solutions = crate::cryptanalysis::pq_xl::boolean_xl_solve_counted(
+            system.equations.clone(),
+            system.n_vars,
+            &mut word_ops,
+        );
+        let terms: u64 = system.equations.iter().map(|p| p.terms.len() as u64).sum();
+        let cost = SolverCost {
+            // XL's work is dominated by the linearised elimination; the
+            // term count times the expansion is the honest proxy this
+            // implementation can report exactly.
+            ops: terms * (system.n_vars as u64).pow(2),
+            op_unit: "monomial operations (modelled)".into(),
+            wall_ns: started.elapsed().as_nanos() as u64,
+            peak_bytes: 0,
+            degree_reached: None,
+            solving_degree: None,
+            timed_out: false,
+            extra: BTreeMap::from([
+                ("bitop_word_ops".to_string(), word_ops),
+                ("bitop_complete".to_string(), 1),
+            ]),
+            ..Default::default()
+        };
+        if solutions.is_empty() {
+            (SolverVerdict::Unsatisfiable, cost)
+        } else {
+            (SolverVerdict::Solved(masks(solutions)), cost)
+        }
+    }
+}
+
+// ── CDCL ───────────────────────────────────────────────────────────
+
+/// Validate a solver's configuration before a timed run. The solver trait
+/// cannot return configuration errors, so its own call repeats the check as
+/// a fail-fast invariant.
+pub fn validate_solver_params(name: &str, params: &Params) -> Result<(), String> {
+    match name {
+        "sat-cdcl" => {
+            sat_xor_encoding(params)?;
+        }
+        "primo-smt" | "primo-smt-file" => {
+            let timeout_ms = params.u64_or("primo_timeout_ms", 600_000)?;
+            if timeout_ms == 0 {
+                return Err("primo_timeout_ms must be positive".into());
+            }
+            primo_binary(params)?;
+        }
+        _ => {}
+    }
+    Ok(())
+}
+
+fn primo_binary(params: &Params) -> Result<PathBuf, String> {
+    if let Some(raw) = params.get("primo_binary") {
+        let path = PathBuf::from(raw);
+        return path
+            .is_file()
+            .then_some(path)
+            .ok_or_else(|| format!("primo_binary is not a file: `{raw}`"));
+    }
+    find_solver(SmtSolverKind::Primo).ok_or_else(|| {
+        "Primo executable not found; set primo_binary, SMT_PRIMO_BIN, or PATH".into()
+    })
+}
+
+fn sat_xor_encoding(params: &Params) -> Result<XorEncoding, String> {
+    match params.get("sat_xor_encoding") {
+        None | Some("cnf") => Ok(XorEncoding::Cnf),
+        Some("native") => Ok(XorEncoding::Native),
+        Some(other) => Err(format!(
+            "invalid sat_xor_encoding `{other}`; expected cnf or native"
+        )),
+    }
+}
+
+/// The repository's CDCL solver, with one Tseitin auxiliary per
+/// monomial of degree at least two. Parity is CNF-expanded by default
+/// for historical reproducibility; `sat_xor_encoding=native` opts into
+/// the solver's native XOR rows.
+pub struct SatCdcl;
+
+impl SystemSolver for SatCdcl {
+    fn name(&self) -> &str {
+        "sat-cdcl"
+    }
+
+    fn describe(&self) -> String {
+        "CDCL with Tseitin monomial definitions and CNF parity by default (native XOR opt-in)"
+            .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "sat_conflict_budget",
+                "conflicts before the solver gives up (default 200000)",
+            ),
+            (
+                "sat_xor_encoding",
+                "cnf (historical default) or native; recorded in cost.extra",
+            ),
+        ]
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= MASK_BITS
+    }
+
+    /// One model per call: a first-solution search.
+    fn finds_every_solution(&self) -> bool {
+        false
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        _budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        use crate::cryptanalysis::sat::SolveResult;
+        let encoding = sat_xor_encoding(params)
+            .expect("sat-cdcl configuration must be validated before a timed solve");
+        let started = Instant::now();
+        let mut enc = crate::cryptanalysis::semaev_sat::encode_boolean_system_with(
+            system.n_vars,
+            &system.equations,
+            &[],
+            encoding,
+        );
+        enc.solver.conflict_budget = params
+            .u64_or("sat_conflict_budget", 200_000)
+            .unwrap_or(200_000);
+        let verdict = if enc.trivially_unsat {
+            SolveResult::Unsat
+        } else {
+            enc.solver.solve()
+        };
+        let st = &enc.solver.stats;
+        let mut extra = BTreeMap::new();
+        extra.insert("decisions".into(), st.decisions);
+        extra.insert("propagations".into(), st.propagations);
+        extra.insert("restarts".into(), st.restarts);
+        extra.insert("learnt_clauses".into(), st.learnt_clauses);
+        extra.insert("xor_propagations".into(), st.xor_propagations);
+        extra.insert(
+            "native_xor_encoding".into(),
+            u64::from(encoding == XorEncoding::Native),
+        );
+        extra.insert("native_xor_rows".into(), enc.solver.n_xors() as u64);
+        extra.insert(
+            "original_clauses".into(),
+            enc.solver.n_original_clauses() as u64,
+        );
+        // The encoding's size, as maxima over calls (`*_max`, see
+        // `SolverTotals::absorb`): the ICMS registry's cnf_variables and
+        // cnf_clauses.
+        extra.insert("variables_max".into(), u64::from(enc.solver.n_vars()));
+        extra.insert("clauses_max".into(), enc.solver.n_clauses() as u64);
+        // The whole run in `bitop/v1` word operations: the encoding and
+        // the search as `Solver::word_ops` counts them, plus reading a
+        // model out (the per-variable assignment, then the problem
+        // variables packed into a word).  No hash map is probed.
+        let model_read = if matches!(verdict, SolveResult::Sat) {
+            u64::from(enc.solver.n_vars()) + system.n_vars as u64
+        } else {
+            0
+        };
+        extra.insert("bitop_word_ops".into(), enc.solver.word_ops() + model_read);
+        extra.insert("bitop_complete".into(), 1);
+        let cost = SolverCost {
+            ops: st.conflicts,
+            op_unit: "conflicts".into(),
+            wall_ns: started.elapsed().as_nanos() as u64,
+            peak_bytes: 0,
+            degree_reached: None,
+            solving_degree: None,
+            timed_out: matches!(verdict, SolveResult::Unknown),
+            extra,
+            ..Default::default()
+        };
+        match verdict {
+            SolveResult::Sat => (SolverVerdict::Solved(vec![enc.model_assignment()]), cost),
+            SolveResult::Unsat => (SolverVerdict::Unsatisfiable, cost),
+            SolveResult::Unknown => (SolverVerdict::BudgetExceeded, cost),
+        }
+    }
+}
+
+// ── Primo through SMT-LIB ─────────────────────────────────────────
+
+/// Primo as a first-solution engine for the framework's exact Boolean rows.
+///
+/// This is the binary-field Weil-descent route. Primo 0.2.0 has no bit-vector,
+/// finite-field, or nonlinear-arithmetic theory, so prime-field systems do not
+/// reach this engine. Every SAT model is independently checked before it is
+/// converted to the framework's mask representation.
+pub struct PrimoSmt;
+
+/// The pre-optimization Primo adapter, retained as a matched benchmark arm.
+/// It has the same input, solver and model checks as [`PrimoSmt`]; only the
+/// script transport and child-completion polling interval differ.
+pub struct PrimoSmtFile;
+
+const PRIMO_PARAMETERS: &[(&str, &str)] = &[
+    (
+        "primo_binary",
+        "path to Primo; otherwise SMT_PRIMO_BIN or PATH is used",
+    ),
+    (
+        "primo_timeout_ms",
+        "external wall timeout per call (default 600000; intersected with the pipeline budget)",
+    ),
+];
+
+#[derive(Clone, Copy)]
+enum PrimoTransport {
+    Stdin,
+    LegacyFile,
+}
+
+fn solve_primo(
+    solver_name: &str,
+    transport: PrimoTransport,
+    system: &BooleanSystem,
+    params: &Params,
+    budget: Option<Duration>,
+) -> (SolverVerdict, SolverCost) {
+    validate_solver_params(solver_name, params)
+        .expect("primo-smt configuration must be validated before a timed solve");
+    let binary = primo_binary(params)
+        .expect("primo-smt configuration must be validated before a timed solve");
+    let started = Instant::now();
+    let rows: Vec<AnfRow> = system.equations.iter().map(AnfRow::from_poly).collect();
+    let script = format_smtlib_for_solver(
+        system.n_vars as u32,
+        &rows,
+        &[],
+        SmtEncoding::Bool,
+        SmtSolverKind::Primo,
+    );
+    let configured = Duration::from_millis(
+        params
+            .u64_or("primo_timeout_ms", 600_000)
+            .expect("validated Primo timeout"),
+    );
+    let timeout = budget.map_or(configured, |limit| limit.min(configured));
+    let mut options = SmtSolveOptions::new(SmtSolverKind::Primo, binary);
+    options.encoding = SmtEncoding::Bool;
+    options.timeout = timeout;
+    options.use_stdin = matches!(transport, PrimoTransport::Stdin);
+    options.poll_interval = match transport {
+        PrimoTransport::Stdin => Duration::from_micros(250),
+        PrimoTransport::LegacyFile => Duration::from_millis(5),
+    };
+
+    let mut extra = BTreeMap::from([
+        ("input_bytes".into(), script.len() as u64),
+        ("rows".into(), rows.len() as u64),
+        ("variables".into(), system.n_vars as u64),
+        ("solver_calls".into(), 1),
+        ("solver_conflicts_available".into(), 0),
+        ("solver_decisions_available".into(), 0),
+        ("decisions".into(), 0),
+        ("invocation_error".into(), 0),
+        ("external_timeout".into(), 0),
+        ("unknown".into(), 0),
+        ("invalid_model".into(), 0),
+        ("model_checked".into(), 0),
+        ("stdin_transport".into(), u64::from(options.use_stdin)),
+        (
+            "poll_interval_us".into(),
+            options.poll_interval.as_micros() as u64,
+        ),
+        ("solver_process_wall_ns".into(), 0),
+    ]);
+    let run = match run_smt(&script, 0, &options) {
+        Ok(run) => run,
+        Err(error) => {
+            let timed_out = error.contains(" timed out after ");
+            extra.insert("external_timeout".into(), u64::from(timed_out));
+            extra.insert("invocation_error".into(), u64::from(!timed_out));
+            return (
+                SolverVerdict::BudgetExceeded,
+                SolverCost {
+                    ops: 0,
+                    op_unit: "Primo SAT conflicts (solver-reported)".into(),
+                    wall_ns: started.elapsed().as_nanos() as u64,
+                    peak_bytes: 0,
+                    degree_reached: None,
+                    solving_degree: None,
+                    timed_out,
+                    extra,
+                    ..Default::default()
+                },
+            );
+        }
+    };
+    let conflicts = run.conflicts.unwrap_or(0);
+    extra.insert(
+        "solver_conflicts_available".into(),
+        u64::from(run.conflicts.is_some()),
+    );
+    extra.insert(
+        "solver_decisions_available".into(),
+        u64::from(run.decisions.is_some()),
+    );
+    extra.insert("decisions".into(), run.decisions.unwrap_or(0));
+    extra.insert(
+        "solver_process_wall_ns".into(),
+        run.elapsed.as_nanos() as u64,
+    );
+    let verdict = match parse_smt_stdout(&run.stdout, system.n_vars) {
+        SmtVerdict::Unsat => SolverVerdict::Unsatisfiable,
+        SmtVerdict::Unknown => {
+            extra.insert("unknown".into(), 1);
+            SolverVerdict::BudgetExceeded
+        }
+        SmtVerdict::Sat(model) if rows_satisfied(&rows, &model) => {
+            extra.insert("model_checked".into(), 1);
+            let root = model
+                .iter()
+                .enumerate()
+                .filter(|(_, value)| **value)
+                .fold(0 as Mask, |mask, (i, _)| mask | bit(i as u32));
+            SolverVerdict::Solved(vec![root])
+        }
+        SmtVerdict::Sat(_) => {
+            extra.insert("invalid_model".into(), 1);
+            SolverVerdict::BudgetExceeded
+        }
+    };
+    (
+        verdict,
+        SolverCost {
+            ops: conflicts,
+            op_unit: "Primo SAT conflicts (solver-reported)".into(),
+            wall_ns: started.elapsed().as_nanos() as u64,
+            peak_bytes: 0,
+            degree_reached: None,
+            solving_degree: None,
+            timed_out: false,
+            extra,
+            ..Default::default()
+        },
+    )
+}
+
+impl SystemSolver for PrimoSmt {
+    fn name(&self) -> &str {
+        "primo-smt"
+    }
+
+    fn describe(&self) -> String {
+        "Primo SMT over stdin on exact Boolean QF_UF rows; returns one independently checked model"
+            .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        PRIMO_PARAMETERS
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= MASK_BITS
+    }
+
+    fn finds_every_solution(&self) -> bool {
+        false
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        solve_primo(self.name(), PrimoTransport::Stdin, system, params, budget)
+    }
+}
+
+impl SystemSolver for PrimoSmtFile {
+    fn name(&self) -> &str {
+        "primo-smt-file"
+    }
+
+    fn describe(&self) -> String {
+        "legacy Primo SMT file transport and 5 ms polling; matched performance control only".into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        PRIMO_PARAMETERS
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= MASK_BITS
+    }
+
+    fn finds_every_solution(&self) -> bool {
+        false
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        solve_primo(
+            self.name(),
+            PrimoTransport::LegacyFile,
+            system,
+            params,
+            budget,
+        )
+    }
+}
+
+// ── Exhaustive search, the reference ───────────────────────────────
+
+/// Evaluate the equations at every point of `{0,1}^n`, moving to the
+/// next point at the first equation that fails.
+///
+/// The general-degree reference: it needs nothing of the system but
+/// the ability to evaluate it, so it applies where `fes-f2` does not
+/// (the degree-six three-summand descents).  Its count is the monomial
+/// tests performed, at most `2^n · Σ_i |terms_i|`.
+pub struct Exhaustive;
+
+impl SystemSolver for Exhaustive {
+    fn name(&self) -> &str {
+        "exhaustive"
+    }
+
+    fn describe(&self) -> String {
+        "evaluate every equation at every point of {0,1}^n — the reference, not a strawman".into()
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= ENUMERATION_CAP
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        _params: &Params,
+        _budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        let started = Instant::now();
+        let (solutions, ops) = points_satisfying(&system.equations, system.n_vars);
+        // `bitop/v1` over the whole call: a word test a monomial test (an
+        // AND and a compare on the point word), the point counter, and a
+        // store per solution.
+        let word_ops = ops + (1u64 << system.n_vars) + solutions.len() as u64;
+        let cost = SolverCost {
+            ops,
+            op_unit: "monomial tests".into(),
+            wall_ns: started.elapsed().as_nanos() as u64,
+            peak_bytes: 0,
+            degree_reached: None,
+            solving_degree: None,
+            timed_out: false,
+            extra: BTreeMap::from([
+                ("bitop_word_ops".to_string(), word_ops),
+                ("bitop_complete".to_string(), 1),
+            ]),
+            ..Default::default()
+        };
+        if solutions.is_empty() {
+            (SolverVerdict::Unsatisfiable, cost)
+        } else {
+            (SolverVerdict::Solved(masks(solutions)), cost)
+        }
+    }
+}
+
+/// Every solver the framework knows, by name.
+pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
+    vec![
+        Box::new(F4F2),
+        Box::new(BuchbergerF2),
+        Box::new(M4gbF2),
+        Box::new(M4gbF2Server),
+        Box::new(HybridF4 {
+            kind: HybridKind::MatrixF4,
+        }),
+        Box::new(HybridF4 {
+            kind: HybridKind::MatrixF5,
+        }),
+        Box::new(HybridF4 {
+            kind: HybridKind::InheritedF4,
+        }),
+        Box::new(HybridF4 {
+            kind: HybridKind::InheritedF4Next,
+        }),
+        Box::new(HybridF4 {
+            kind: HybridKind::InheritedF4Legacy,
+        }),
+        Box::new(HybridF4 {
+            kind: HybridKind::InheritedF4Batched,
+        }),
+        Box::new(FesThenInherited),
+        Box::new(FesThenBatched),
+        Box::new(CrossbredF2),
+        Box::new(XlF2),
+        Box::new(SatCdcl),
+        Box::new(PrimoSmt),
+        Box::new(PrimoSmtFile),
+        Box::new(FesF2),
+        Box::new(FesF2Gpu),
+        Box::new(FesWide),
+        Box::new(Exhaustive),
+    ]
+}
+
+/// Look one up.
+pub fn solver_by_name(name: &str) -> Result<Box<dyn SystemSolver>, String> {
+    let registry = solver_registry();
+    let known: Vec<String> = registry.iter().map(|s| s.name().to_string()).collect();
+    registry
+        .into_iter()
+        .find(|s| s.name() == name)
+        .ok_or_else(|| format!("unknown solver `{name}`; known: {}", known.join(", ")))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
+    use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+
+    /// `v0 + v1`, `v0·v1 + v1` — solutions are `v0 = v1 = 0` and
+    /// `v0 = v1 = 1`, i.e. masks 0 and 3.
+    fn fixture() -> BooleanSystem {
+        let m = F2BoolMono::from_mask;
+        BooleanSystem {
+            equations: vec![
+                F2BoolPoly::from_monos(vec![m(1), m(2)], 2),
+                F2BoolPoly::from_monos(vec![m(3), m(2)], 2),
+            ],
+            n_vars: 2,
+        }
+    }
+
+    #[test]
+    fn m4gb_is_registered_and_declines_without_binary() {
+        let solver = solver_by_name("m4gb-f2").expect("registered");
+        assert_eq!(solver.name(), "m4gb-f2");
+        if std::env::var_os("M4GB_BINARY").is_none() {
+            assert!(!solver.accepts(&fixture().shape()));
+        }
+    }
+
+    /// Runs only with `M4GB_BINARY` set: the external solver must find
+    /// the same solutions as the exhaustive reference.
+    #[test]
+    fn m4gb_matches_exhaustive_on_fixture() {
+        if std::env::var_os("M4GB_BINARY").is_none() {
+            return;
+        }
+        let sys = fixture();
+        assert!(M4gbF2.accepts(&sys.shape()));
+        let reference: std::collections::BTreeSet<Mask> =
+            match Exhaustive.solve(&sys, &Params::default(), None).0 {
+                SolverVerdict::Solved(v) => v.into_iter().collect(),
+                other => panic!("the reference must solve the fixture, got {other:?}"),
+            };
+        let (verdict, cost) = M4gbF2.solve(&sys, &Params::default(), None);
+        assert!(!cost.extra.contains_key("m4gb_error"), "{cost:?}");
+        match verdict {
+            SolverVerdict::Solved(v) => {
+                assert_eq!(
+                    v.into_iter().collect::<std::collections::BTreeSet<_>>(),
+                    reference
+                )
+            }
+            other => panic!("m4gb-f2 did not solve the fixture: {other:?}"),
+        }
+    }
+
+    /// The default descent solver is a registered engine.
+    #[test]
+    fn default_descent_solver_is_registered() {
+        let solver = solver_by_name(DEFAULT_DESCENT_SOLVER).expect("registered");
+        assert_eq!(solver.name(), DEFAULT_DESCENT_SOLVER);
+    }
+
+    /// The size rule runs `fes-f2` at or below `fes_max_vars` and
+    /// `inherited-f4` above it, says which in the cost record, reports that
+    /// engine's unit, and both branches return the exhaustive reference's
+    /// solutions.  The folded `inherited-f4` and `inherited-f4-legacy` give
+    /// the same solutions and the same word-XOR count.
+    #[test]
+    fn size_rule_and_inherited_fold_match_the_reference() {
+        let sys = fixture();
+        let set = |v: SolverVerdict| -> std::collections::BTreeSet<Mask> {
+            match v {
+                SolverVerdict::Solved(v) => v.into_iter().collect(),
+                SolverVerdict::Unsatisfiable => Default::default(),
+                other => panic!("undecided: {other:?}"),
+            }
+        };
+        let reference = set(Exhaustive.solve(&sys, &Params::default(), None).0);
+        for (max, expect_fes) in [(sys.n_vars as u64, true), (sys.n_vars as u64 - 1, false)] {
+            let mut params = Params::default();
+            params.set("fes_max_vars", max.to_string());
+            let (verdict, cost) = FesThenInherited.solve(&sys, &params, None);
+            let (verdict_b, cost_b) = FesThenBatched.solve(&sys, &params, None);
+            assert_eq!(
+                cost_b.extra.get("size_rule_fes"),
+                Some(&u64::from(expect_fes))
+            );
+            assert!(cost_b.ops <= cost.ops, "{} > {}", cost_b.ops, cost.ops);
+            assert_eq!(
+                set(verdict_b),
+                reference,
+                "fes-then-batched, fes_max_vars = {max}"
+            );
+            assert_eq!(
+                cost.extra.get("size_rule_fes"),
+                Some(&u64::from(expect_fes))
+            );
+            assert!(cost.op_unit.starts_with("word XORs"), "{}", cost.op_unit);
+            assert_eq!(set(verdict), reference, "fes_max_vars = {max}");
+        }
+        let folded = HybridF4 {
+            kind: HybridKind::InheritedF4,
+        }
+        .solve(&sys, &Params::default(), None);
+        let legacy = HybridF4 {
+            kind: HybridKind::InheritedF4Legacy,
+        }
+        .solve(&sys, &Params::default(), None);
+        assert_eq!(folded.1.ops, legacy.1.ops);
+        let folded_set = set(folded.0);
+        assert_eq!(folded_set, set(legacy.0));
+        let batched = HybridF4 {
+            kind: HybridKind::InheritedF4Batched,
+        }
+        .solve(&sys, &Params::default(), None);
+        assert!(
+            batched.1.ops <= folded.1.ops,
+            "{} > {}",
+            batched.1.ops,
+            folded.1.ops
+        );
+        assert_eq!(set(batched.0), folded_set);
+    }
+
+    /// Keep the historical CNF default distinct from an explicitly
+    /// selected native-XOR arm, and check both against the same system.
+    #[test]
+    fn sat_cdcl_parity_modes_are_equivalent_and_reported() {
+        let sys = fixture();
+        let mut cnf = Params::default();
+        cnf.set("sat_xor_encoding", "cnf");
+        let mut native = Params::default();
+        native.set("sat_xor_encoding", "native");
+        let reference: std::collections::BTreeSet<Mask> = [0, 3].into_iter().collect();
+        for (params, expected_native) in [(Params::default(), false), (cnf, false), (native, true)]
+        {
+            let (verdict, cost) = SatCdcl.solve(&sys, &params, None);
+            let SolverVerdict::Solved(points) = verdict else {
+                panic!("selected SAT encoding failed to solve the fixture: {verdict:?}");
+            };
+            assert!(points.iter().all(|point| reference.contains(point)));
+            assert_eq!(
+                cost.extra["native_xor_encoding"],
+                u64::from(expected_native)
+            );
+            assert_eq!(cost.extra["native_xor_rows"] > 0, expected_native);
+            assert!(cost.extra["original_clauses"] > 0);
+        }
+
+        let m = F2BoolMono::from_mask;
+        let inconsistent = BooleanSystem {
+            equations: vec![
+                F2BoolPoly::from_monos(vec![m(1)], 1),
+                F2BoolPoly::from_monos(vec![m(1), m(0)], 1),
+            ],
+            n_vars: 1,
+        };
+        for mode in ["cnf", "native"] {
+            let mut params = Params::default();
+            params.set("sat_xor_encoding", mode);
+            assert!(matches!(
+                SatCdcl.solve(&inconsistent, &params, None).0,
+                SolverVerdict::Unsatisfiable
+            ));
+        }
+        let mut invalid = Params::default();
+        invalid.set("sat_xor_encoding", "nativ");
+        assert!(validate_solver_params("sat-cdcl", &invalid).is_err());
+        assert!(std::panic::catch_unwind(|| SatCdcl.solve(&sys, &invalid, None)).is_err());
+    }
+
+    /// Runs only when the pinned Primo executable is installed. The adapter
+    /// must return a member of the exact solution set, independently check the
+    /// model, expose the solver's statistics, and accept a real UNSAT verdict.
+    #[test]
+    fn primo_smt_is_first_solution_checked_and_refutes() {
+        let Ok(binary) = primo_binary(&Params::default()) else {
+            return;
+        };
+        let mut params = Params::default();
+        params.set("primo_binary", binary.to_string_lossy().into_owned());
+        params.set("primo_timeout_ms", "60000");
+        validate_solver_params("primo-smt", &params).expect("installed Primo is valid");
+
+        let sys = fixture();
+        let reference: std::collections::BTreeSet<Mask> = [0, 3].into_iter().collect();
+        let (verdict, cost) = PrimoSmt.solve(&sys, &params, Some(Duration::from_secs(60)));
+        let SolverVerdict::Solved(found) = verdict else {
+            panic!("Primo did not solve the fixture: {verdict:?}");
+        };
+        assert_eq!(found.len(), 1);
+        assert!(reference.contains(&found[0]));
+        assert_eq!(cost.extra["model_checked"], 1);
+        assert_eq!(cost.extra["invalid_model"], 0);
+        assert_eq!(cost.extra["solver_calls"], 1);
+        assert_eq!(cost.extra["solver_conflicts_available"], 1);
+        assert_eq!(cost.extra["stdin_transport"], 1);
+        assert_eq!(cost.extra["poll_interval_us"], 250);
+        assert!(cost.extra["solver_process_wall_ns"] > 0);
+        assert!(!cost.timed_out);
+        assert!(!PrimoSmt.finds_every_solution());
+
+        let (legacy_verdict, legacy_cost) =
+            PrimoSmtFile.solve(&sys, &params, Some(Duration::from_secs(60)));
+        let SolverVerdict::Solved(legacy_found) = legacy_verdict else {
+            panic!("legacy Primo control did not solve the fixture: {legacy_verdict:?}");
+        };
+        assert_eq!(legacy_found, found);
+        assert_eq!(legacy_cost.ops, cost.ops);
+        assert_eq!(legacy_cost.extra["decisions"], cost.extra["decisions"]);
+        assert_eq!(legacy_cost.extra["stdin_transport"], 0);
+        assert_eq!(legacy_cost.extra["poll_interval_us"], 5_000);
+        assert!(legacy_cost.extra["solver_process_wall_ns"] > 0);
+        assert!(!PrimoSmtFile.finds_every_solution());
+
+        let m = F2BoolMono::from_mask;
+        let inconsistent = BooleanSystem {
+            equations: vec![
+                F2BoolPoly::from_monos(vec![m(1)], 1),
+                F2BoolPoly::from_monos(vec![m(1), m(0)], 1),
+            ],
+            n_vars: 1,
+        };
+        let (verdict, cost) = PrimoSmt.solve(&inconsistent, &params, None);
+        assert!(matches!(verdict, SolverVerdict::Unsatisfiable));
+        assert_eq!(cost.extra["unknown"], 0);
+        assert!(!cost.timed_out);
+        let (legacy_verdict, legacy_cost) = PrimoSmtFile.solve(&inconsistent, &params, None);
+        assert!(matches!(legacy_verdict, SolverVerdict::Unsatisfiable));
+        assert_eq!(legacy_cost.ops, cost.ops);
+        assert_eq!(legacy_cost.extra["decisions"], cost.extra["decisions"]);
+        assert_eq!(legacy_cost.extra["unknown"], 0);
+        assert!(!legacy_cost.timed_out);
+    }
+
+    #[test]
+    fn primo_smt_rejects_missing_binary_and_zero_timeout() {
+        let mut zero = Params::default();
+        zero.set("primo_timeout_ms", "0");
+        assert!(validate_solver_params("primo-smt", &zero)
+            .unwrap_err()
+            .contains("must be positive"));
+
+        let mut missing = Params::default();
+        missing.set("primo_binary", "/definitely/not/a/real/primo-executable");
+        assert!(validate_solver_params("primo-smt", &missing)
+            .unwrap_err()
+            .contains("is not a file"));
+    }
+
+    /// sat-cdcl prices its whole run in `bitop/v1` word operations, the
+    /// count is deterministic, and the completeness flag survives being
+    /// totalled over calls (it is a flag, not a sum) until a call that
+    /// does not report it.
+    #[test]
+    fn sat_cdcl_reports_complete_bitop_work() {
+        use crate::cryptanalysis::ic_framework::stages::SolverTotals;
+        let sys = fixture();
+        for mode in ["cnf", "native"] {
+            let mut params = Params::default();
+            params.set("sat_xor_encoding", mode);
+            let (_, a) = SatCdcl.solve(&sys, &params, None);
+            let (_, b) = SatCdcl.solve(&sys, &params, None);
+            assert_eq!(a.extra["bitop_complete"], 1);
+            assert!(a.extra["bitop_word_ops"] > 0);
+            assert_eq!(a.extra["bitop_word_ops"], b.extra["bitop_word_ops"]);
+
+            let shape = sys.shape();
+            let mut totals = SolverTotals::default();
+            totals.absorb(&shape, Some(&a), false);
+            totals.absorb(&shape, Some(&b), false);
+            assert_eq!(totals.extra["bitop_complete"], 1);
+            assert_eq!(
+                totals.extra["bitop_word_ops"],
+                2 * a.extra["bitop_word_ops"]
+            );
+            totals.absorb(&shape, None, false);
+            assert_eq!(totals.extra["bitop_complete"], 0);
+        }
+    }
+
+    /// **Every engine must agree on the answer.**  A framework whose
+    /// plug points disagree is not measuring the same problem, and the
+    /// column that compares them would be meaningless.
+    #[test]
+    fn every_solver_finds_the_same_solution_set() {
+        let sys = fixture();
+        let reference: std::collections::BTreeSet<Mask> =
+            match Exhaustive.solve(&sys, &Params::default(), None).0 {
+                SolverVerdict::Solved(v) => v.into_iter().collect(),
+                other => panic!("the reference must solve the fixture, got {other:?}"),
+            };
+        assert_eq!(reference, [0 as Mask, 3].into_iter().collect());
+
+        for solver in solver_registry() {
+            // An engine that declines the shape or whose external binary is
+            // unavailable is not asked.
+            if !solver.accepts(&sys.shape())
+                || validate_solver_params(solver.name(), &Params::default()).is_err()
+            {
+                continue;
+            }
+            // A first-solution engine is checked for membership, not equality.
+            let (verdict, cost) = solver.solve(&sys, &Params::default(), None);
+            match verdict {
+                SolverVerdict::Solved(found) => {
+                    assert!(
+                        !found.is_empty(),
+                        "{}: solved with no solutions",
+                        solver.name()
+                    );
+                    for f in &found {
+                        assert!(
+                            reference.contains(f),
+                            "{} returned {f}, which is not a solution",
+                            solver.name()
+                        );
+                    }
+                    if solver.finds_every_solution() {
+                        let got: std::collections::BTreeSet<Mask> = found.into_iter().collect();
+                        assert_eq!(got, reference, "{} missed a solution", solver.name());
+                    }
+                }
+                other => panic!("{} said {other:?} on a satisfiable system", solver.name()),
+            }
+            assert!(
+                !cost.op_unit.is_empty(),
+                "{} must name the unit it counts",
+                solver.name()
+            );
+        }
+    }
+
+    /// An unsatisfiable system must be reported as unsatisfiable by
+    /// every engine, never as a budget failure and never as solved.
+    #[test]
+    fn every_solver_refutes_an_unsatisfiable_system() {
+        let m = F2BoolMono::from_mask;
+        // v0 = 0 and v0 = 1 at once.
+        let sys = BooleanSystem {
+            equations: vec![
+                F2BoolPoly::from_monos(vec![m(1)], 1),
+                F2BoolPoly::from_monos(vec![m(1), m(0)], 1),
+            ],
+            n_vars: 1,
+        };
+        for solver in solver_registry() {
+            if !solver.accepts(&sys.shape())
+                || validate_solver_params(solver.name(), &Params::default()).is_err()
+            {
+                continue;
+            }
+            let (verdict, _) = solver.solve(&sys, &Params::default(), None);
+            assert!(
+                matches!(verdict, SolverVerdict::Unsatisfiable),
+                "{} said {verdict:?} on an unsatisfiable system",
+                solver.name()
+            );
+        }
+    }
+
+    /// **With more equations than a lane holds**, the vector search
+    /// walks the first 32 and filters with the rest; the answer must be
+    /// exactly the scalar search's, which packs up to 64 in a word.
+    #[test]
+    fn the_wide_search_filters_the_equations_past_a_lane() {
+        use rand::{Rng, SeedableRng};
+        if crate::cryptanalysis::mq_fes::wide_lanes().is_none() {
+            return;
+        }
+        let mut rng = rand::rngs::StdRng::seed_from_u64(33);
+        for trial in 0..12usize {
+            let n = 10 + trial % 7;
+            let m = 33 + trial * 2;
+            let planted: u64 = rng.gen::<u64>() & ((1u64 << n) - 1);
+            let mut sys = random_quadratic(n, m, &mut rng);
+            // Make `planted` a root so the answer is never trivially empty.
+            for e in &mut sys.equations {
+                if e.eval(mask_from64(planted)) != 0 {
+                    *e = e.add(&F2BoolPoly::one(n));
+                }
+            }
+            let shape = sys.shape();
+            assert!(FesWide.accepts(&shape) && FesF2.accepts(&shape));
+            let (wide, cost) = FesWide.solve(&sys, &Params::default(), None);
+            let (scalar, _) = FesF2.solve(&sys, &Params::default(), None);
+            let sorted = |v: SolverVerdict| match v {
+                SolverVerdict::Solved(mut s) => {
+                    s.sort_unstable();
+                    s
+                }
+                other => panic!("trial {trial}: {other:?} on a system with a planted root"),
+            };
+            let (wide, scalar) = (sorted(wide), sorted(scalar));
+            assert!(scalar.contains(&mask_from64(planted)));
+            assert_eq!(wide, scalar, "trial {trial} (n = {n}, m = {m})");
+            assert!(
+                cost.op_unit.starts_with("vector XORs"),
+                "the lanes ran: {}",
+                cost.op_unit
+            );
+        }
+    }
+
+    #[test]
+    fn the_registry_resolves_every_name_it_advertises() {
+        for solver in solver_registry() {
+            let name = solver.name().to_string();
+            assert_eq!(solver_by_name(&name).unwrap().name(), name);
+        }
+        assert!(solver_by_name("f5").is_err());
+    }
+
+    fn random_quadratic(n: usize, m: usize, rng: &mut impl rand::Rng) -> BooleanSystem {
+        let equations = (0..m)
+            .map(|_| {
+                let mut monos = Vec::new();
+                for i in 0..n {
+                    for j in 0..i {
+                        if rng.gen_bool(0.5) {
+                            monos.push(F2BoolMono::from_mask(mask_from64((1u64 << i) | (1 << j))));
+                        }
+                    }
+                    if rng.gen_bool(0.5) {
+                        monos.push(F2BoolMono::from_mask(mask_from64(1u64 << i)));
+                    }
+                }
+                if rng.gen_bool(0.5) {
+                    monos.push(F2BoolMono::from_mask(0));
+                }
+                F2BoolPoly::from_monos(monos, n)
+            })
+            .collect();
+        BooleanSystem {
+            equations,
+            n_vars: n,
+        }
+    }
+
+    /// Hold every engine that answers to the reference's answer on one
+    /// system.  An engine may decline or run out of budget — that is not
+    /// a wrong answer — but a verdict it gives must be the right one,
+    /// and every complete-enumeration engine must return every solution.
+    fn agree_with_the_reference(sys: &BooleanSystem, label: &str) -> usize {
+        let reference: std::collections::BTreeSet<Mask> =
+            match Exhaustive.solve(sys, &Params::default(), None).0 {
+                SolverVerdict::Solved(v) => v.into_iter().collect(),
+                SolverVerdict::Unsatisfiable => Default::default(),
+                other => panic!("{label}: the reference must decide, got {other:?}"),
+            };
+        let mut answered = 0;
+        for solver in solver_registry() {
+            if !solver.accepts(&sys.shape())
+                || validate_solver_params(solver.name(), &Params::default()).is_err()
+            {
+                continue;
+            }
+            let (verdict, cost) =
+                solver.solve(sys, &Params::default(), Some(Duration::from_secs(60)));
+            match verdict {
+                SolverVerdict::Solved(found) => {
+                    answered += 1;
+                    assert!(
+                        !reference.is_empty(),
+                        "{label}: {} solved an inconsistent system",
+                        solver.name()
+                    );
+                    let got: std::collections::BTreeSet<Mask> = found.into_iter().collect();
+                    assert!(
+                        got.is_subset(&reference),
+                        "{label}: {} returned a non-solution",
+                        solver.name()
+                    );
+                    if solver.finds_every_solution() {
+                        assert_eq!(
+                            got,
+                            reference,
+                            "{label}: {} missed a solution",
+                            solver.name()
+                        );
+                    }
+                }
+                SolverVerdict::Unsatisfiable => {
+                    answered += 1;
+                    assert!(
+                        reference.is_empty(),
+                        "{label}: {} refuted a satisfiable system",
+                        solver.name()
+                    );
+                }
+                SolverVerdict::BudgetExceeded => {}
+            }
+            assert!(!cost.op_unit.is_empty());
+        }
+        answered
+    }
+
+    /// **The F4 family counts its whole run** in `bitop/v1` primitives
+    /// (`bitop_complete = 1`), more than its native unit, and the count is
+    /// a function of the system: the same on a fresh thread (the engines'
+    /// layout and template caches are per thread, as in a replay).
+    #[test]
+    fn the_f4_family_reports_its_whole_run() {
+        use rand::SeedableRng;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(20261016);
+        let sys = random_quadratic(10, 9, &mut rng);
+        for name in ["f4-f2", "matrix-f4", "matrix-f5", "inherited-f4"] {
+            let run = || {
+                let sys = sys.clone();
+                std::thread::spawn(move || {
+                    let solver = solver_registry()
+                        .into_iter()
+                        .find(|s| s.name() == name)
+                        .expect("registered");
+                    solver.solve(&sys, &Params::default(), None).1
+                })
+                .join()
+                .unwrap()
+            };
+            let (a, b) = (run(), run());
+            assert_eq!(a.extra.get("bitop_complete"), Some(&1), "{name}");
+            let bitops = |c: &SolverCost| -> Vec<(String, u64)> {
+                c.extra
+                    .iter()
+                    .filter(|(k, _)| k.starts_with("bitop_"))
+                    .map(|(k, v)| (k.clone(), *v))
+                    .collect()
+            };
+            assert_eq!(bitops(&a), bitops(&b), "{name} is deterministic");
+            assert!(
+                a.extra["bitop_word_ops"] > a.ops,
+                "{name}: {} word operations against {} {}",
+                a.extra["bitop_word_ops"],
+                a.ops,
+                a.op_unit
+            );
+        }
+    }
+
+    /// **The new engines against the reference, on random quadratic
+    /// systems** of two to eleven unknowns, consistent and not.  (Dense
+    /// random systems are far harder for Buchberger than descents of the
+    /// same size, which is what bounds the size here.)
+    #[test]
+    fn every_engine_agrees_on_random_quadratic_systems() {
+        use rand::SeedableRng;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(20260922);
+        for trial in 0..40usize {
+            let n = 2 + trial % 10;
+            let m = (n + trial % 3).saturating_sub(1).max(1);
+            let sys = random_quadratic(n, m, &mut rng);
+            let answered =
+                agree_with_the_reference(&sys, &format!("trial {trial} (n = {n}, m = {m})"));
+            assert!(
+                answered >= 5,
+                "trial {trial}: only {answered} engines answered"
+            );
+        }
+    }
+
+    /// **And on the systems the framework actually solves**: two- and
+    /// three-summand Weil descents of random targets.  The three-summand
+    /// one is kept at `n' = 2`: at `n' = 3` its degree-six system cost
+    /// the pair-only Buchberger about twenty seconds a target (§14.4).
+    #[test]
+    fn every_engine_agrees_on_descent_systems() {
+        use crate::cryptanalysis::ic_boundary::random_binary_instance;
+        use crate::cryptanalysis::pq_descent_symbolic::descend;
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(7);
+        for &(n, np, m, seed) in &[
+            (7u32, 4u32, 2u32, 1u64),
+            (9, 5, 2, 2),
+            (11, 6, 2, 3),
+            (7, 2, 3, 4),
+        ] {
+            let inst = random_binary_instance(n, seed, 1 << 20).unwrap();
+            let words: Vec<u64> = (0..np).map(|k| 1u64 << k).collect();
+            for t in 0..3 {
+                let x_r = rng.gen::<u64>() & ((1u64 << n) - 1);
+                let d = descend(&inst.gf, inst.b, x_r, &words, m).unwrap();
+                let sys = BooleanSystem {
+                    equations: d.equations,
+                    n_vars: d.n_vars,
+                };
+                agree_with_the_reference(&sys, &format!("n = {n}, n' = {np}, m = {m}, target {t}"));
+            }
+        }
+    }
+
+    /// Timing probe (not a test of correctness; `--ignored --nocapture`):
+    /// the Rust-side cost of one `fes-f2-gpu` call on degree-29 descent
+    /// systems (30 unknowns, as in research/ic_gpu_e2e_20261113), split into
+    /// the engine body around the search, form packing, and serialisation.
+    #[test]
+    #[ignore]
+    fn fes_gpu_rust_side_overhead_probe() {
+        use crate::cryptanalysis::fes_gpu::PackedSystem;
+        use crate::cryptanalysis::ic_boundary::random_binary_instance;
+        use crate::cryptanalysis::mq_fes::QuadraticForm;
+        use crate::cryptanalysis::pq_descent_symbolic::descend;
+        use rand::{Rng, SeedableRng};
+        let (n, np) = (
+            std::env::var("PROBE_N")
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(29u32),
+            std::env::var("PROBE_NP")
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(15u32),
+        );
+        let inst = random_binary_instance(n, 1, 8).unwrap();
+        let words: Vec<u64> = (0..np).map(|k| 1u64 << k).collect();
+        let mut rng = rand::rngs::StdRng::seed_from_u64(9);
+        let systems: Vec<BooleanSystem> = (0..40)
+            .map(|_| {
+                let x_r = rng.gen::<u64>() & ((1u64 << n) - 1);
+                let d = descend(&inst.gf, inst.b, x_r, &words, 2).unwrap();
+                BooleanSystem {
+                    equations: d.equations,
+                    n_vars: d.n_vars,
+                }
+            })
+            .collect();
+        let terms: usize = systems[0].equations.iter().map(|e| e.terms.len()).sum();
+        let t = Instant::now();
+        for sys in &systems {
+            let _ = fes_quadratic_solve(sys, |_| Some(Vec::new()));
+        }
+        let body = t.elapsed().as_secs_f64() / systems.len() as f64;
+        let forms: Vec<Vec<QuadraticForm>> = systems
+            .iter()
+            .map(|s| {
+                s.equations
+                    .iter()
+                    .map(|p| {
+                        QuadraticForm::from_anf_row(
+                            &crate::cryptanalysis::wdsat_oracle::AnfRow::from_poly(p),
+                            s.n_vars,
+                        )
+                        .unwrap()
+                    })
+                    .collect()
+            })
+            .collect();
+        let t = Instant::now();
+        let packed: Vec<PackedSystem> = forms
+            .iter()
+            .map(|f| PackedSystem::from_quadratic_forms(f).unwrap())
+            .collect();
+        let pack = t.elapsed().as_secs_f64() / systems.len() as f64;
+        let t = Instant::now();
+        let bytes: usize = packed.iter().map(|p| p.to_contract().len()).sum();
+        let ser = t.elapsed().as_secs_f64() / systems.len() as f64;
+        let t = Instant::now();
+        for s in &systems {
+            for p in &s.equations {
+                std::hint::black_box(crate::cryptanalysis::wdsat_oracle::AnfRow::from_poly(p));
+            }
+        }
+        let anf = t.elapsed().as_secs_f64() / systems.len() as f64;
+        let t = Instant::now();
+        for s in &systems {
+            for p in &s.equations {
+                std::hint::black_box(QuadraticForm::from_poly(p));
+            }
+        }
+        let from_poly = t.elapsed().as_secs_f64() / systems.len() as f64;
+        let same_n = systems
+            .iter()
+            .all(|s| s.equations.iter().all(|p| p.n_vars == s.n_vars));
+        eprintln!(
+            "  AnfRow::from_poly {:.3} ms, QuadraticForm::from_poly {:.3} ms (poly n_vars == system n_vars: {same_n})",
+            anf * 1e3,
+            from_poly * 1e3
+        );
+        eprintln!(
+            "n = {n}, unknowns = {}, equations = {}, terms = {terms}: engine body {:.3} ms, pack {:.3} ms, to_contract {:.3} ms ({} bytes)",
+            systems[0].n_vars, systems[0].equations.len(), body * 1e3, pack * 1e3, ser * 1e3, bytes / systems.len()
+        );
+    }
+
+    /// `fes-f2-gpu` reports `fes-f2`'s counted cost and answer on the same
+    /// system, whichever search ran (the serve worker, or the CPU fallback
+    /// when none is configured): the counting lives in one function.
+    #[test]
+    fn fes_gpu_engine_counts_like_fes_f2() {
+        use rand::SeedableRng;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(4031);
+        for trial in 0..24usize {
+            let n = 2 + trial % 14;
+            let sys = random_quadratic(n, 1 + trial % 4, &mut rng);
+            let (va, ca) = FesF2.solve(&sys, &Params::default(), None);
+            let (vb, cb) = FesF2Gpu.solve(&sys, &Params::default(), None);
+            assert_eq!(
+                format!("{va:?}"),
+                format!("{vb:?}"),
+                "trial {trial}: verdict"
+            );
+            assert_eq!(ca.ops, cb.ops, "trial {trial}: counted ops");
+            assert_eq!(ca.op_unit, cb.op_unit);
+            assert_eq!(
+                ca.extra.get("bitop_word_ops"),
+                cb.extra.get("bitop_word_ops")
+            );
+        }
+    }
+
+    /// **The direct pack is the form pack.**  `fes_pack_direct` must give the same packed words
+    /// and the same two charges (`word_ops`, `setup`) as the forms path, including for systems
+    /// wider than their equations, and must decline what the forms path treats differently.
+    #[test]
+    fn direct_pack_equals_the_form_pack_and_its_charges() {
+        use crate::cryptanalysis::fes_gpu::PackedSystem;
+        use rand::SeedableRng;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(7);
+        for trial in 0..90usize {
+            let n = 1 + trial % 20;
+            let mut sys = random_quadratic(n, 1 + trial % 9, &mut rng);
+            if trial % 3 == 0 {
+                sys.n_vars = n + 2; // wider than its equations: the second conversion
+            }
+            let mut word_ops = 0u64;
+            let forms = fes_forms(&sys, &mut word_ops).expect("quadratic forms");
+            let want = PackedSystem::from_quadratic_forms(&forms).expect("packs");
+            let want_setup = fes_setup(Some(&forms));
+            let (got, got_ops, got_setup) = fes_pack_direct(&sys).expect("direct pack");
+            assert_eq!(got, want, "trial {trial}: packed words");
+            assert_eq!(got_ops, word_ops, "trial {trial}: conversion word ops");
+            assert_eq!(got_setup, want_setup, "trial {trial}: coefficient scan");
+        }
+        // Declined, so the form path decides: a cubic monomial, an unknown outside the
+        // equation's range, more than 64 equations, no equations.
+        let cubic = BooleanSystem {
+            equations: vec![F2BoolPoly::from_monos(
+                vec![F2BoolMono::from_mask(mask_from64(0b111))],
+                3,
+            )],
+            n_vars: 3,
+        };
+        assert!(fes_pack_direct(&cubic).is_none());
+        let outside = BooleanSystem {
+            equations: vec![F2BoolPoly::from_monos(
+                vec![F2BoolMono::from_mask(mask_from64(1 << 3))],
+                3,
+            )],
+            n_vars: 3,
+        };
+        assert!(fes_pack_direct(&outside).is_none());
+        let mut many = random_quadratic(4, 65, &mut rng);
+        assert!(fes_pack_direct(&many).is_none());
+        many.equations.clear();
+        assert!(fes_pack_direct(&many).is_none());
+    }
+
+    /// **The fast exhaustive search is exhaustive**, at every size its
+    /// Gray-code tables handle, including the small ones where it takes
+    /// its unrolling-free path.
+    #[test]
+    fn fes_finds_exactly_the_solutions_at_every_size() {
+        use rand::SeedableRng;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(11);
+        for n in 1..=18usize {
+            for _ in 0..3 {
+                let sys = random_quadratic(n, n.saturating_sub(1).max(1), &mut rng);
+                let (fes, cost) = FesF2.solve(&sys, &Params::default(), None);
+                let (reference, _) = Exhaustive.solve(&sys, &Params::default(), None);
+                let as_set = |v: &SolverVerdict| -> std::collections::BTreeSet<Mask> {
+                    match v {
+                        SolverVerdict::Solved(p) => p.iter().copied().collect(),
+                        SolverVerdict::Unsatisfiable => Default::default(),
+                        other => panic!("n = {n}: undecided {other:?}"),
+                    }
+                };
+                assert_eq!(as_set(&fes), as_set(&reference), "n = {n}");
+                assert!(cost.ops >= 2 << n, "n = {n}: two XORs per point");
+            }
+        }
+    }
+
+    /// The exhaustive count is the work performed: never more than the
+    /// full model, and less as soon as a point fails early.
+    #[test]
+    fn the_exhaustive_count_is_the_work_performed() {
+        use rand::SeedableRng;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(5);
+        let sys = random_quadratic(12, 12, &mut rng);
+        let model: u64 = sys
+            .equations
+            .iter()
+            .map(|p| p.terms.len() as u64)
+            .sum::<u64>()
+            << 12;
+        let (_, cost) = Exhaustive.solve(&sys, &Params::default(), None);
+        assert!(
+            cost.ops < model,
+            "{} tests against a model of {model}",
+            cost.ops
+        );
+        assert!(
+            cost.ops >= sys.equations[0].terms.len() as u64 * (1 << 12),
+            "every point tests the first equation"
+        );
+    }
+}

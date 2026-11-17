@@ -1,6 +1,6 @@
 # An explicit degree-6 map from the kernel3 quartic to P-192
 
-The actual reconstructed kernel3 quartic now has an explicit degree6 morphism to P-192 over the original prime field. Its closed fibers give an executed public transfer into the target Jacobian:zero,doubling,cancellation and the known-answer G/Q relation pass. The retained destination point pool also supplies six source-bound principal relations. All results have unsigned producer standing;the full source-Jacobian isogeny and index-calculus individual descent remain open. [pcc:unverified]
+The reconstructed kernel3 quartic has an explicit degree6 morphism to P-192 over the original prime field. Its closed fibers give an executed public transfer into the target Jacobian:zero,doubling,cancellation and the known-answer G/Q relation pass. The retained destination pool supplies six source-bound principal relations. The later [quotient report](POLARIZED_QUOTIENT.md) now identifies the full source map using actual kernel witnesses and a written degree27/polarization3 proof. All results have unsigned producer standing;generic transpose-dual execution and index-calculus individual descent remain open. [pcc:unverified]
 
 ![The constructed map and the next executable subgroup transfer](figures/backmap.svg)
 
@@ -85,7 +85,7 @@ For target arithmetic,the implementation adds the same auxiliary rational degree
 
 The class spaces and scalar-multiple witness are retained in [public-classes-v2/result.json](evidence/public-classes-v2/result.json),PCC-20261116-8599e0. Scalar37 is used only by the known-answer checker;the public-fiber/class constructor consumes public coordinates. These tests do not recover a scalar by individual descent,and target multiplication by the full subgroup order was not executed. [pcc:unverified]
 
-The global source-curve correspondence and full-source evaluator now also pass their exact equation,differential and public bridge checks;see [the global construction report](FORMAL_RECONSTRUCTION.md),PCC-20261116-fe2b13 and PCC-20261116-b54698. Identifying its actual recorded kernel,polarization/degree and dual remains separate. [pcc:unverified]
+The global source evaluator passes its exact equations,differential and public bridge checks. The later [quotient proof](POLARIZED_QUOTIENT.md) now identifies its actual kernel,degree27 and polarization3(PCC-20261116-3f440b,PCC-20261116-ce4a7b,PCC-20261116-8559fc). A generic transpose-dual evaluator remains separate from this executed elliptic norm. [pcc:unverified]
 
 The retained first seven-variable inverse call used the exact Fp24 bridge and round-tripped762 distinct coefficients. It reached its predeclared60-second limit without a basis. This is a bounded execution result. The backmap construction proceeds independently of that root solve. Large program/stdout files and the earlier expanded coefficient result remain local with explicit pending-artifact manifests;the current uploader lacks the AWS CLI. No remote-byte verification is asserted. [pcc:unverified]
 

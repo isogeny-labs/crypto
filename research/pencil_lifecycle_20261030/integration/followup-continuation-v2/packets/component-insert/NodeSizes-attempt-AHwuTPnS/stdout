@@ -1,0 +1,37 @@
+/var/tmp/pencil-component-insert-20261101-v1/NodeSizes.lean:11:1: error: unsolved goals
+case refine_1
+n : ℕ
+owner : Fin n → Fin n
+root : Fin n
+x : Fin (n + 1)
+⊢ ¬Fin.last n = root.castSucc
+/var/tmp/pencil-component-insert-20261101-v1/NodeSizes.lean:22:59: error: unsolved goals
+n : ℕ
+sizes : Sizes n
+i : Fin n
+⊢ ((↑sizes).push 1)[↑i] = (↑sizes)[↑i]
+/var/tmp/pencil-component-insert-20261101-v1/NodeSizes.lean:23:26: warning: This simp argument is unused:
+  i.isLt
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [sizeAt, insertSizes, sizes.property]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-component-insert-20261101-v1/NodeSizes.lean:23:33: warning: This simp argument is unused:
+  sizes.property
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [sizeAt, insertSizes, i.isLt]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-component-insert-20261101-v1/NodeSizes.lean:25:48: error: unsolved goals
+n : ℕ
+sizes : Sizes n
+⊢ ((↑sizes).push 1)[n] = 1
+/var/tmp/pencil-component-insert-20261101-v1/NodeSizes.lean:26:26: warning: This simp argument is unused:
+  sizes.property
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [sizeAt, insertSizes]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

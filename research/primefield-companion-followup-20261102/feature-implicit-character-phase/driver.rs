@@ -1,0 +1,10 @@
+#[path="engine.rs"]mod polynomial;
+use std::collections::{BTreeMap,BTreeSet};
+#[derive(Debug,PartialEq)]enum Error{Domain,Limit,Arithmetic}
+fn mul(a:u64,b:u64,r:u64)->u64{((a as u128*b as u128)%r as u128)as u64}
+fn pow(mut a:u64,mut n:u64,r:u64)->u64{let mut v=1;while n>0{if n&1!=0{v=mul(v,a,r)}n>>=1;if n>0{a=mul(a,a,r)}}v}
+fn eval(a:&[u64],x:u64,r:u64)->u64{a.iter().rev().fold(0,|v,&c|(mul(v,x,r)+c)%r)}
+include!("implicit.rs");
+include!("observation.rs");
+include!("checks.rs");
+fn main(){phase_checks();observation_checks();}

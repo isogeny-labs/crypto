@@ -1,0 +1,121 @@
+# r2c_validate_output.txt: Amendment 9 (R2-C) requests, regenerated and validated 2026-11-08T12:57:38Z with validate_command_request.sh (sha256 38a087a9a75bfa6b...). [pcc:unverified]
+# PREREGISTRATION.md sha256 now: 7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d (Amendment 9 appended; was 63bdff283385ff60d862c07fe81784fb21ee70853327524baa0c1982a75549a8)
+== pin pre-checks for r6i.4xlarge (stop rule: either fails -> no pin)
+-- 1. cpu-spot requirements (taskq/deploy/eks-karpenter/nodepool.yaml, NodePool cpu-spot):
+           - key: isolab.dev/workload
+           - key: kubernetes.io/arch
+             operator: In
+             values: [amd64]
+           - key: kubernetes.io/os
+             operator: In
+             values: [linux]
+           - key: karpenter.sh/capacity-type
+             operator: In
+             values: [spot]
+           - key: karpenter.k8s.aws/instance-category
+             operator: In
+             values: [c, m, r]
+           - key: karpenter.k8s.aws/instance-generation
+             operator: Gt
+             values: ["5"]
+           - key: karpenter.k8s.aws/instance-cpu
+             operator: In
+             values: ["8", "16", "32"]
+           - key: karpenter.k8s.aws/instance-family
+             operator: NotIn
+             values: [c7i-flex, m7i-flex, c8i-flex, m8i-flex]
+   r6i.4xlarge (aws ec2 describe-instance-types, measured): r6i.4xlarge	131072	2 (type, MiB, threads/core); arch x86_64 (amd64), category r, generation 6 (>5), 16 vCPU (in [8,16,32]), family r6i (not in [c7i-flex,m7i-flex,c8i-flex,m8i-flex]), Spot quoted in 3 AZs (r2c_spot_prices_20261108.txt). PASS
+-- 2. memory (derived; kubeReserved 512Mi + systemReserved 512Mi from nodepool.yaml; eviction threshold not set there -> kubelet default memory.available<100Mi; pod 112Gi = 114688Mi + daemonsets ~104Mi (minors pod: 32872Mi for 32Gi))
+   nominal: 131072 - 1024 - 100 = 129948 MiB = 126.90 GiB >= need 114792 MiB (112.10 GiB); margin 15156 MiB. PASS
+   Karpenter estimate (default vmMemoryOverheadPercent 7.5%, none set in karpenter-values.yaml): 131072*0.925 - 1024 - 100 = 120118 MiB = 117.30 GiB >= 114792 MiB; margin 5326 MiB. PASS
+   cpu: 12000m + ~180m daemonsets = 12180m <= 14000m allocatable. PASS. Real-node MemTotal/allocatable not measured.
+== requests_r2c/ (image 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0d6b2ecd6df3f5f092fe4b6179986b041eb7d6be3b94e52d92809bdab2ff3ae8)
+validator: /home/user/crypto/taskq/deploy/eks-karpenter/remote/run-command (sha256 1cdaa7447893fd5c...), 22 jq lines
+VALID    requests_r2c/pfd-a.json
+VALID    requests_r2c/pfd-b.json
+VALID    requests_r2c/pfd-c.json
+VALID    requests_r2c/pfd-m4-t4-k0-c7.json
+VALID    requests_r2c/pfd-m4-t4-k1-c7.json
+VALID    requests_r2c/pfd-m4-t5-k0-c6.json
+VALID    requests_r2c/pfd-m4-t5-k1-c6.json
+VALID    requests_r2c/pfd-x-t12-k0-c5.json
+VALID    requests_r2c/pfd-x-t12-k0-c6.json
+VALID    requests_r2c/pfd-x-t12-k1-c5.json
+VALID    requests_r2c/pfd-x-t12-k1-c6.json
+VALID    requests_r2c/pfd-x-t13-k0-c5.json
+VALID    requests_r2c/pfd-x-t13-k0-c6.json
+VALID    requests_r2c/pfd-x-t13-k1-c5.json
+VALID    requests_r2c/pfd-x-t13-k1-c6.json
+VALID    requests_r2c/pfd-x-t14-k0-c6.json
+VALID    requests_r2c/pfd-x-t14-k1-c6.json
+exit(requests_r2c)=0
+== fields per request
+requests_r2c/pfd-a.json cpu=12 memory=56Gi seconds=172800 instance_type=r6i.4xlarge protocol_sha256=7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d
+requests_r2c/pfd-b.json cpu=12 memory=56Gi seconds=172800 instance_type=r6i.4xlarge protocol_sha256=7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d
+requests_r2c/pfd-c.json cpu=12 memory=56Gi seconds=86400 instance_type=- protocol_sha256=7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d
+requests_r2c/pfd-m4-t4-k0-c7.json cpu=12 memory=112Gi seconds=176400 instance_type=r6i.4xlarge protocol_sha256=7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d
+requests_r2c/pfd-m4-t4-k1-c7.json cpu=12 memory=112Gi seconds=176400 instance_type=r6i.4xlarge protocol_sha256=7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d
+requests_r2c/pfd-m4-t5-k0-c6.json cpu=12 memory=112Gi seconds=176400 instance_type=r6i.4xlarge protocol_sha256=7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d
+requests_r2c/pfd-m4-t5-k1-c6.json cpu=12 memory=112Gi seconds=176400 instance_type=r6i.4xlarge protocol_sha256=7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d
+requests_r2c/pfd-x-t12-k0-c5.json cpu=12 memory=56Gi seconds=90000 instance_type=- protocol_sha256=7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d
+requests_r2c/pfd-x-t12-k0-c6.json cpu=12 memory=56Gi seconds=90000 instance_type=- protocol_sha256=7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d
+requests_r2c/pfd-x-t12-k1-c5.json cpu=12 memory=56Gi seconds=90000 instance_type=- protocol_sha256=7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d
+requests_r2c/pfd-x-t12-k1-c6.json cpu=12 memory=56Gi seconds=90000 instance_type=- protocol_sha256=7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d
+requests_r2c/pfd-x-t13-k0-c5.json cpu=12 memory=112Gi seconds=90000 instance_type=- protocol_sha256=7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d
+requests_r2c/pfd-x-t13-k0-c6.json cpu=12 memory=112Gi seconds=90000 instance_type=- protocol_sha256=7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d
+requests_r2c/pfd-x-t13-k1-c5.json cpu=12 memory=112Gi seconds=90000 instance_type=- protocol_sha256=7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d
+requests_r2c/pfd-x-t13-k1-c6.json cpu=12 memory=112Gi seconds=90000 instance_type=- protocol_sha256=7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d
+requests_r2c/pfd-x-t14-k0-c6.json cpu=12 memory=112Gi seconds=90000 instance_type=- protocol_sha256=7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d
+requests_r2c/pfd-x-t14-k1-c6.json cpu=12 memory=112Gi seconds=90000 instance_type=- protocol_sha256=7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d
+== jq -S diff against requests/ (changed leaf paths; new paths marked (new))
+pfd-a.json: [job.cpu,job.instance_type(new),provenance.note,provenance.protocol_sha256]; note=old+appended; rest-after-del(cpu,instance_type,note,protocol_sha256)=identical
+pfd-b.json: [job.cpu,job.instance_type(new),provenance.note,provenance.protocol_sha256]; note=old+appended; rest-after-del(cpu,instance_type,note,protocol_sha256)=identical
+pfd-c.json: [job.cpu,provenance.note,provenance.protocol_sha256]; note=old+appended; rest-after-del(cpu,instance_type,note,protocol_sha256)=identical
+pfd-m4-t4-k0-c7.json: [job.cpu,job.instance_type(new),provenance.note,provenance.protocol_sha256]; note=old+appended; rest-after-del(cpu,instance_type,note,protocol_sha256)=identical
+pfd-m4-t4-k1-c7.json: [job.cpu,job.instance_type(new),provenance.note,provenance.protocol_sha256]; note=old+appended; rest-after-del(cpu,instance_type,note,protocol_sha256)=identical
+pfd-m4-t5-k0-c6.json: [job.cpu,job.instance_type(new),provenance.note,provenance.protocol_sha256]; note=old+appended; rest-after-del(cpu,instance_type,note,protocol_sha256)=identical
+pfd-m4-t5-k1-c6.json: [job.cpu,job.instance_type(new),provenance.note,provenance.protocol_sha256]; note=old+appended; rest-after-del(cpu,instance_type,note,protocol_sha256)=identical
+pfd-x-t12-k0-c5.json: [job.cpu,provenance.note,provenance.protocol_sha256]; note=old+appended; rest-after-del(cpu,instance_type,note,protocol_sha256)=identical
+pfd-x-t12-k0-c6.json: [job.cpu,provenance.note,provenance.protocol_sha256]; note=old+appended; rest-after-del(cpu,instance_type,note,protocol_sha256)=identical
+pfd-x-t12-k1-c5.json: [job.cpu,provenance.note,provenance.protocol_sha256]; note=old+appended; rest-after-del(cpu,instance_type,note,protocol_sha256)=identical
+pfd-x-t12-k1-c6.json: [job.cpu,provenance.note,provenance.protocol_sha256]; note=old+appended; rest-after-del(cpu,instance_type,note,protocol_sha256)=identical
+pfd-x-t13-k0-c5.json: [job.cpu,provenance.note,provenance.protocol_sha256]; note=old+appended; rest-after-del(cpu,instance_type,note,protocol_sha256)=identical
+pfd-x-t13-k0-c6.json: [job.cpu,provenance.note,provenance.protocol_sha256]; note=old+appended; rest-after-del(cpu,instance_type,note,protocol_sha256)=identical
+pfd-x-t13-k1-c5.json: [job.cpu,provenance.note,provenance.protocol_sha256]; note=old+appended; rest-after-del(cpu,instance_type,note,protocol_sha256)=identical
+pfd-x-t13-k1-c6.json: [job.cpu,provenance.note,provenance.protocol_sha256]; note=old+appended; rest-after-del(cpu,instance_type,note,protocol_sha256)=identical
+pfd-x-t14-k0-c6.json: [job.cpu,provenance.note,provenance.protocol_sha256]; note=old+appended; rest-after-del(cpu,instance_type,note,protocol_sha256)=identical
+pfd-x-t14-k1-c6.json: [job.cpu,provenance.note,provenance.protocol_sha256]; note=old+appended; rest-after-del(cpu,instance_type,note,protocol_sha256)=identical
+== full jq -S diff, two examples
+-- pfd-a
+11c11
+<     "cpu": 14,
+---
+>     "cpu": 12,
+12a13
+>     "instance_type": "r6i.4xlarge",
+22,23c23,24
+<     "note": "stage A + F4 chain: g1 hky-A g3 d-A cap-A. seconds is a proposal (worst-case sum of per-system budgets ~3.8e5 s; the proposed 172800 s is below it).",
+<     "protocol_sha256": "63bdff283385ff60d862c07fe81784fb21ee70853327524baa0c1982a75549a8",
+---
+>     "note": "stage A + F4 chain: g1 hky-A g3 d-A cap-A. seconds is a proposal (worst-case sum of per-system budgets ~3.8e5 s; the proposed 172800 s is below it). Amendment 9 (R2-C, AMENDMENT_R2_C_cpu12.md, frozen 2026-11-08): cpu 14->12 because a 14-vCPU pod cannot be scheduled on cpu-spot (14180m > 14000m allocatable); RAYON_NUM_THREADS=12 from the pod env; instance_type r6i.4xlarge where seconds > 90000 (US$40 per job); every wall budget and seconds unchanged.",
+>     "protocol_sha256": "7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d",
+-- pfd-c
+10c10
+<     "cpu": 14,
+---
+>     "cpu": 12,
+21,22c21,22
+<     "note": "stage C: g1 g4 hky-C g3. seconds is a proposal.",
+<     "protocol_sha256": "63bdff283385ff60d862c07fe81784fb21ee70853327524baa0c1982a75549a8",
+---
+>     "note": "stage C: g1 g4 hky-C g3. seconds is a proposal. Amendment 9 (R2-C, AMENDMENT_R2_C_cpu12.md, frozen 2026-11-08): cpu 14->12 because a 14-vCPU pod cannot be scheduled on cpu-spot (14180m > 14000m allocatable); RAYON_NUM_THREADS=12 from the pod env; instance_type r6i.4xlarge where seconds > 90000 (US$40 per job); every wall budget and seconds unchanged.",
+>     "protocol_sha256": "7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d",
+== requests_r2c_pending_amendment/: NOT regenerated (still needs R2-B); left as written in the draft round (cpu 12, protocol_sha256 63bdff28..., no pin)
+validator: /home/user/crypto/taskq/deploy/eks-karpenter/remote/run-command (sha256 1cdaa7447893fd5c...), 22 jq lines
+VALID    requests_r2c_pending_amendment/pfd-m4n-t4-k0-c7.json
+VALID    requests_r2c_pending_amendment/pfd-m4n-t4-k1-c7.json
+VALID    requests_r2c_pending_amendment/pfd-m4n-t5-k0-c6.json
+VALID    requests_r2c_pending_amendment/pfd-m4n-t5-k1-c6.json
+exit(pending)=0
+== dev check (local, not a launch): submit-job --dry-run (sha256 def41b1a72b6e48d...) with requests_r2c/pfd-a.json's fields, as run-command passes them
+{"nodeSelector":{"isolab.dev/pool":"cpu-spot","node.kubernetes.io/instance-type":"r6i.4xlarge"},"activeDeadlineSeconds":172800,"command":["/usr/local/bin/entry.sh","g1","hky-A","g3","d-A","cap-A"],"threads":[{"name":"RAYON_NUM_THREADS","value":"12"},{"name":"OMP_NUM_THREADS","value":"12"}],"resources":{"requests":{"cpu":"12","memory":"56Gi","ephemeral-storage":"10Gi"},"limits":{"cpu":"12","memory":"56Gi","ephemeral-storage":"10Gi"}}}

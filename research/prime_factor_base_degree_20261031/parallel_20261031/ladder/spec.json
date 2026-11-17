@@ -1,0 +1,15 @@
+{
+  "schema": "secant-graph-ladder-spec/v1",
+  "seed": 315,
+  "primes": [83, 101, 127],
+  "degrees": [3, 4, 5],
+  "curve_attempt_cap": 256,
+  "graph_attempt_cap": 512,
+  "soft_seconds": 120,
+  "curve_selection": "first_hash_proposal_nonsingular_nonexceptional_nonanomalous_prime_full_order_ge23",
+  "graph_selection": "first_hash_interpolation_d_plus_one_distinct_signed_points_with_exact_2d_rational_roots",
+  "controls": ["low-x", "hash-x"],
+  "targets": "all_affine_curve_points_both_signs",
+  "stop_rule": "first_success_per_cell_or_frozen_cap_or_global_deadline",
+  "scientific_run_admission": "parent_must_verify_checkpoint_and_backend_or_explicit_owner_override"
+}

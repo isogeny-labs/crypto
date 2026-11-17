@@ -1,0 +1,61 @@
+{
+  "schema": "independent-native-proof-workflow-review/v1",
+  "source_commit": "79588ee0ee629dd9d247957bf8d6402bc6a6f855",
+  "producer_archive_commit": "a51006010dd6beca644de066745fe0c94917145d",
+  "status": "failed_attempt_evidence_consistent",
+  "claim_fidelity": "scoped_producer_compilation_supported_complete_review_not_supported",
+  "machine_review_complete": false,
+  "fresh_execution_by_reviewer": false,
+  "observations": {
+    "producer_module_exit": 0,
+    "independent_controls_exit": 1,
+    "compiler_calls_actual": 2,
+    "compiler_calls_required": 4,
+    "named_axiom_readback": "not_invoked",
+    "intended_negative_control": "not_invoked",
+    "pre_post_full_dictionaries_equal": true,
+    "files_each": 16736,
+    "bytes_each": 3111892318,
+    "runtime_dicts_equal_freeze": true,
+    "all_four_source_copies_match": true,
+    "all_three_terminal_owners_confirmed": true,
+    "both_compiler_processes_reaped_empty_groups": true,
+    "archive_manifest_entries_checked": 55,
+    "raw_artifact_bindings_checked": 46,
+    "remote_download_independently_repeated": false
+  },
+  "native_seconds": {
+    "pre": 152.62771470600273,
+    "compiler": 303.26343018899206,
+    "post": 125.00391033399501,
+    "outer_total": 582.3239518530027
+  },
+  "compiler_seconds": {
+    "Nonbranch": 245.9541161350062,
+    "IndependentControls": 56.93439745101206
+  },
+  "failure_diagnostics": [
+    "line19 invalid simp theorem/residual goal",
+    "lines21/26 polynomial normalization",
+    "line34 Bezout polynomial normalization",
+    "line74 unknown tactic",
+    "lines120-121 additive valuation treated through multiplicative hom API, addition/multiplication mismatch"
+  ],
+  "inference": "Control-source elaboration/proof-script failures stop the workflow; these diagnostics alone do not refute the mathematical statements.",
+  "cost_accounting": {
+    "attempt": 3,
+    "attempt_ceiling": 3,
+    "prior_conservative_debit_seconds": 1200,
+    "attempt_reserved_seconds": 2400,
+    "actual_outer_seconds": 582.3239518530027,
+    "campaign_seconds": 46800,
+    "deadline": "2026-11-06T04:00:00Z",
+    "next_attempt_authorized": false
+  },
+  "limitations": [
+    "No fresh Lean run or independent binary kernel rechecker.",
+    "Reviewer compared saved full dictionaries and hashes; did not reread all3.1GB dependencies.",
+    "Shared cache pre/post checks cannot exclude transient changes between observations.",
+    "Thirty named readbacks and intended negative failure remain unchecked in this attempt."
+  ]
+}

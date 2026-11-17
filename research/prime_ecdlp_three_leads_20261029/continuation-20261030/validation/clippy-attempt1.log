@@ -1,0 +1,13 @@
+    Checking hashed-ecdl-tensor v0.1.0 (/workspace/crypto/crates/hashed-ecdl-tensor)
+    Checking crypto v0.1.0 (/workspace/crypto)
+error: manual implementation of `.is_multiple_of()`
+  --> examples/pkm_oracle_program/rank_reference.rs:65:16
+   |
+65 |             if p % divisor == 0 {
+   |                ^^^^^^^^^^^^^^^^ help: replace with: `p.is_multiple_of(divisor)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+   = note: `-D clippy::manual-is-multiple-of` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::manual_is_multiple_of)]`
+
+error: could not compile `crypto` (example "pkm_oracle_program") due to 1 previous error

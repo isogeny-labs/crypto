@@ -1,0 +1,36 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "7b079b0030e15e6dcd035598e9b660734780bfdd5b113d9125dbf49d43de8436"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "2b3cec1683b13dac64492ac35b3ed0fde52afd772c7dd23b380b9144e51d3106"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "research/ic_residual_dp_eq_20261101/PROTOCOL.md: rho.negation, the matched reference named by the ecbench spec, same 16 targets and rounds in the same session",
+  "unit": "GAE (ecbench counted unit), S = GAE/sqrt(r)",
+  "binary_or_process": "target/release/ecbench, one ecbench session per curve (E-p36, E-p37), arms interleaved alternate_measured",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 1.43355,
+    "rho": 0.929484
+   },
+   "0.1": {
+    "ic": 1.785011,
+    "rho": 1.022276
+   },
+   "1": {
+    "ic": 4.948159,
+    "rho": 1.857398
+   }
+  },
+  "order_holds_across_band": true
+ }
+}

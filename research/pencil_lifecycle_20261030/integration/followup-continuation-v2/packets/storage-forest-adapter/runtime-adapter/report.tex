@@ -1,0 +1,18 @@
+\documentclass[10pt]{article}\usepackage[margin=0.8in]{geometry}\usepackage[T1]{fontenc}\usepackage{lmodern,hyperref}
+\title{Native qualification diff adapter proposal}\date{1 November 2026}\begin{document}\maketitle
+The Rust library implements exact diff parsing together with identity, terminal-state, mount and security prerequisites. All 58 fixed native controls pass: nine positive cases and 49 negative cases. The component is ready for independent source review. A full native supervisor/callsite is not yet implemented.
+\section*{Implemented contract}
+The public functions accept raw bytes and structured inspection/expected-identity data. Qualification is restricted to Q1--Q3 and requires the full container/image IDs, nonce-bound name/label, user/entrypoint, correct stopped exit state, read-only rootfs, no network, resource limits, privilege/namespace/device restrictions, exact read-only fixture/gate mounts and approved tmpfs. Only then are successful transport and the exact three added paths accepted.
+
+Malformed identity, mount, byte framing or transport conditions return errors. Accepted results retain null writer attribution and a false no-writes claim. The library does not collect daemon evidence or authenticate an executed container; those remain caller responsibilities.
+\section*{Controls and preserved source}
+Controls test all three valid cases and six diff orderings, plus wrong identities, user/entrypoint, running/wrong exit state, security/resource restrictions, wrong/writable/duplicate/missing mounts, transport failure and malformed bytes. A second replay matches; source hashes remain unchanged.
+
+The v5 Python supervisor, published parser and failed receipt are unchanged reference evidence. An initial unexecuted Python adapter draft was stopped when the native-only repository rule was identified; it is retained as rejected provenance. The deliverable is Rust and neither executes nor extends the Python path.
+\section*{Precise integration boundary}
+The proposed patch adds the full Rust library and fixed-control binary. It does not modify a supervisor. A native supervisor must still collect trusted identity/mount evidence, enforce command/output limits and exact-ID cleanup, preserve Q0--Q4 behavior and compose this adapter at the diff boundary. Its actual callsite needs independent fixed controls and review.
+
+The binding template leaves review, supervisor, image/binary/fixture/gate and admission fields unfilled. Limits remain 300 seconds total,30 seconds cleanup reserve and20 seconds per active case if subsequently admitted. This library has no clock or runtime authority.
+
+\texttt{REPORT.md} maps all eight amendment requirements to implemented and pending work; \texttt{binding-template.json}, \texttt{controls.json}, full source and patch provide reviewable artifacts. No Docker, qualification subprocess, supervisor, cloud or scientific execution occurred. The producer packet awaits independent review.
+\end{document}

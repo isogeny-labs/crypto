@@ -1,0 +1,72 @@
+[
+  {
+    "source": "companion-zero-prefix/selection_zero.py",
+    "target": "selection_delete.py",
+    "substitutions": [
+      [
+        "    zero_prefix: int\n",
+        "    zero_prefix: int\n    first_column: tuple\n"
+      ],
+      [
+        "def result(indices, columns, zero_prefix):",
+        "def result(indices, columns, zero_prefix, first_column):"
+      ],
+      [
+        "queries, zero_prefix)",
+        "queries, zero_prefix, first_column)"
+      ],
+      [
+        "return result((j,), (c,), j)",
+        "return result((j,), (c,), j, c)"
+      ],
+      [
+        "return result((i,), (other,), j)",
+        "return result((i,), (other,), j, c)"
+      ],
+      [
+        "return result((j, i), (c, other), j)",
+        "return result((j, i), (c, other), j, c)"
+      ],
+      [
+        "return result((), (), n)",
+        "return result((), (), n, ())"
+      ]
+    ]
+  },
+  {
+    "source": "companion-zero-prefix/paired_zero.py",
+    "target": "paired_delete.py",
+    "substitutions": [
+      [
+        "from selection_zero import Selection",
+        "from selection_delete import Selection"
+      ]
+    ]
+  },
+  {
+    "source": "companion-zero-prefix/driver_zero.py",
+    "target": "driver_delete.py",
+    "substitutions": [
+      [
+        "from selection_zero import select",
+        "from selection_delete import select"
+      ],
+      [
+        "from paired_zero import move",
+        "from paired_delete import move\nfrom deletion import delete_prefix, ZeroFrame"
+      ],
+      [
+        "    pivots = 0\n",
+        "    pivots = 0\n    rank_complete = True\n"
+      ],
+      [
+        "        moved=move(source,selection)",
+        "        if selection.zero_prefix:\n            removed=selection.zero_prefix\n            deletion=delete_prefix(source,selection,b)\n            trace.append(deletion['trace'])\n            if deletion['kind']=='exclusion_witness':\n                vector=deletion['vector']\n                kind='exclusion_witness'\n                rank_complete=False\n                break\n            frames.append(ZeroFrame(size,removed,meter))\n            source=deletion['source']\n            b=b[removed:]\n            labels=labels[removed:]\n            view=view.tail(removed)\n            del selection,deletion,d,di\n            continue\n        moved=move(source,selection)"
+      ],
+      [
+        "derived_rank=pivots, rank_independently_checked=False,",
+        "derived_rank=pivots if rank_complete else None, rank_lower_bound=pivots,\n                rank_independently_checked=False,"
+      ]
+    ]
+  }
+]

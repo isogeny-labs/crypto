@@ -1,0 +1,17 @@
+K<w> := GF(512);
+k<a> := GF(8);
+Embed(k,K);
+assert DefiningPolynomial(K) eq Polynomial([K|1,0,0,0,1,0,0,0,0,1]);
+assert DefiningPolynomial(k) eq Polynomial([k|1,1,0,1]);
+ell := &+[(Integers()!((9 div 2^i) mod 2))*w^i : i in [0..8]];
+E := EllipticCurve([K|1,0,0,0,ell]);
+assert #E eq 524;
+print "source", 524, 0, 9, #E, 131;
+for j in [0..510] do
+    try
+        genus := WeilDescentGenus(E,k,w^j);
+        print "row", 524, 9, j, genus;
+    catch err
+        print "error", 524, 9, j, err;
+    end try;
+end for;

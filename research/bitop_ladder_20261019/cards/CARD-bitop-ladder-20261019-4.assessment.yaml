@@ -1,0 +1,14 @@
+card_id: CARD-bitop-ladder-20261019-4
+relay_verbatim: not_verified_by_tool
+outcome: executed_as_specified
+stopped_at_step: null
+recommendation: proceed_to_analysis
+reasons:
+  - "Receipt cards/CARD-bitop-ladder-20261019-4.receipt.json (sha256 d99df6ae3a4a5e1bc4f9f035f04d87fe503273e2eda2950dabfd650cc9075429): status completed, one command train-panel, exit_code 0, attempts 1, timed_out false, seconds 22.757, commit f3661ed3e3f4b94db9bd2e8c89181fb11670d738, argv and outputs list equal to the card's."
+  - "cards/CARD-bitop-ladder-20261019-4.run.stdout sha256 matches the receipt's stdout_sha256; it has 17 lines, all DONE, none FAILED; stderr empty."
+  - "All 17 output digests in the receipt equal the sha256 of sessions/<name>/verify.json on disk. Each has ok true, session_status complete, problems empty, verified_records equal to records (16 each, 8 for train-P35-pair-ext1), and spec.json byte-identical to specs/<name>.json."
+  - "git status --porcelain shows no tracked modification and no path outside research/bitop_ladder_20261019/."
+  - "Relay: the dispatch says it was the card text plus the Deviation 1 timeout note; the executor's full text was not provided and check-relay was not run, so verbatim relay is recorded from the dispatch only. The figures quoted in the dispatch (exit 0, 22.757 s, receipt sha256, 17 DONE lines) equal the receipt."
+observations:
+  - "The receipt's dirty_before lists 'esearch/bitop_ladder_20261019/cards/CARD-bitop-ladder-20261019-2.assessment.yaml' (first letter missing), plus the card 3 assessment and the card 4 yaml; all are inside write_scope. The missing letter is in the tool's receipt and is not corrected here."
+interpretation: not_assessed

@@ -1,0 +1,18 @@
+{
+  "backend": "local",
+  "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0f591bb57d9c2c0a694d0fec1b83ef822453df0a10632f2ad4ffff731f51b2ab",
+  "source_revision": "05d5a84ac7f90d8d8b82b5f151ed9d758b14e7cc",
+  "mounted_binary_sha256": "166a22a8b2bb611d180ce93a3e990c11a97e7861629e7a4c5f79e314c2234415",
+  "cpus": 4,
+  "memory": "16Gi",
+  "seconds": 1800,
+  "command": [
+    "bash",
+    "research/n83_fixed_degree_sweep_20261028/run-local.sh",
+    "/home/ec2-user/n83-fixed-degree-recovery/target/release/n83-fixed-degree-sweep",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_fixed_factor_base_20261028/data",
+    "/home/ec2-user/n83-fixed-degree-recovery/r1/results"
+  ],
+  "results_uri": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/",
+  "retries": 0
+}

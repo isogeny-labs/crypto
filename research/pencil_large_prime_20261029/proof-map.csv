@@ -1,0 +1,8 @@
+claim,lean_declaration,hypotheses,status,remaining_bridge
+pivot solves equivalent equation,PencilSymbolicGraph.pivot_equivalence,field and nonzero pivot,checked,Rust field implementation correspondence
+root substitution preserves equation,PencilSymbolicGraph.substitution,field,checked,stored forest invariant
+balanced cycle emits small constraint,PencilSymbolicGraph.balanced_cycle,field and zero sum of root coefficients,checked,correct extraction of coefficients from forest
+unbalanced cycle anchors root,PencilSymbolicGraph.unbalanced_cycle,field and nonzero sum of root coefficients,checked,correct extraction of coefficients from forest
+all emitted rows span eliminated small row space,,arbitrary accepted input sequence,development_tests_only,induction over all Rust forest transitions and emitted output history
+retained residual basis spans accepted small constraints,,prime field and successful insertion outcomes,development_tests_only,residual invariant and composition with graph including terminal cap handling
+composed collector preserves admitted small row space,,fixed partition and nonterminal successful admissions,development_tests_only,formal composition theorem and producer geometry bridge

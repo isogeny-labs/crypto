@@ -1,0 +1,43 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-isogeny-vs-mu-factor-base-20261102-3
+experiment_id: isogeny_vs_mu_factor_base_20261102
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 233b8fa8f253dc880e0fd808db43c68bffd9ad50
+receipt: research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102.receipt.json
+binds:
+  - {path: research/isogeny_vs_mu_factor_base_20261102/run_q5.sh, sha256: 533536bac953fffb3b02ee8aff634228826b88ddef1c46982e57c6fa14a160f0}
+  - {path: research/isogeny_vs_mu_factor_base_20261102/PROTOCOL_Q5_MSOLVE.md, sha256: ae7e51f605145168ed8a0b450dd065955539ff2e768163b27a689b0d2b8d7f48}
+  - {path: research/isogeny_vs_mu_factor_base_20261102/search/src/main.rs, sha256: a02ce2378ec04bd188ca51a038e547137848a73a5298ce640cbc896ae5e45487}
+  - {path: research/isogeny_vs_mu_factor_base_20261102/search/Cargo.toml, sha256: 8944125f6edfa9abe379ece93d45a93736b8b1538a8f45193c9a0b36eaf3ff9f}
+  - {path: research/isogeny_vs_mu_factor_base_20261102/search/Cargo.lock, sha256: e05aa49bf1f1eb762f0531ba2c580fa18046d6bc8d88741c21ee21666af28c34}
+must_not_exist:
+  - research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102
+commands:
+  - id: run-q5-msolve
+    argv:
+      - research/isogeny_vs_mu_factor_base_20261102/run_q5.sh
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102
+    timeout_seconds: 5400
+    success_exit_codes: [0]
+    stdout: research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102.stdout
+    stderr: research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102.stderr
+    outputs:
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q5_systems.csv
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q5_cells.csv
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q5_verdicts.json
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q5_q2_summary.json
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q4_candidates.csv
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q4_summary.json
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/host.txt
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/SHA256SUMS
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/progress.log
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/cargo-test.log
+bus_address: executor-mechanical-isogeny-vs-mu-factor-base-q5
+background: true
+write_scope: [research/isogeny_vs_mu_factor_base_20261102/results/]
+stop_when:
+  - The command exits nonzero or reaches its 5400 second timeout; return the receipt and the stderr tail unedited.
+  - A declared output file is missing from the output directory; return the receipt unedited.
+notes: The run is local in the session container (PROTOCOL_Q5_MSOLVE.md, Execution). The build writes the gitignored directory research/isogeny_vs_mu_factor_base_20261102/search/target. The launcher records the msolve package version and binary hash in host.txt. No retry is allowed and no environment variable is set. The working tree has .resume/RESUME.md modified on purpose; do not touch it. Earlier runs' paths (results/run-20261102*, results/run-q4-20261102*) must not be touched.

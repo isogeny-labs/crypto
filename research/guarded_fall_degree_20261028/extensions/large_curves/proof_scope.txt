@@ -1,0 +1,236 @@
+Larger curves: uniform degree bounds and public UNSAT fixtures
+Date: 2026-10-28
+
+Status and purpose
+------------------
+This is a mathematical applicability audit and a proof of a public,
+known-answer fixture construction. It is not a new field-size experiment,
+timing result, independent closure computation, or Lean formalization.
+Numerical fixture-generation and replay receipts, when supplied alongside
+this note, certify their own explicitly stated execution scope.
+
+Increasing a field modulus beyond a machine word requires a larger exact
+arithmetic implementation. It does not change the hypotheses or degree
+accounting of the already stated ordinary-ring theorems.
+
+1. What already holds at larger field sizes
+-------------------------------------------
+For every prime p>3, let E/F_p be a nonsingular short Weierstrass curve
+  Y^2=X^3+a*X+b.
+Let S contain B distinct abscissas of affine rational points, with both
+point signs admitted, and let R be an affine rational target, r=x(R).
+For the explicit six-input presentation
+  g(x), g(y), g(z), S3(x,y,u), S3(u,z,r), v*(x-y)-1,
+  g(T)=product_(s in S)(T-s),
+the established bounds have no upper restriction on the bit length of p:
+
+* B=3, UNSAT: exact ordinary first/last pair (4,5).
+* B>=3, UNSAT: ordinary first fall B+1 and
+    max(5,B+1) <= d_F <= 3B-4.
+
+Here first fall means homogeneous-top syzygies modulo Koszul syzygies, and
+last fall uses ordinary total degree with the displayed explicit inputs.
+The proof files are ../../proofs/universal_five_symmetric_audit.txt and
+../growing_b/proof.txt. Those are mathematical derivations, not complete
+Lean formalizations.
+
+The standard curves secp256k1, secp256r1, secp384r1 and secp521r1 all have
+this model over prime fields of the stated sizes. Thus a larger-curve
+fixture satisfying the hypotheses is a direct application of the theorem;
+its existence does not require an extrapolation from the characteristic-101
+test case. The ordinary-ring variable count remains five when B=3, although
+coefficient bit lengths and arithmetic costs increase.
+
+The ordinary binary model is
+  E/GF(2^n): Y^2+X*Y=X^3+a2*X^2+a6, a6!=0,
+with
+  S3(X,Y,Z)=(X*Y+X*Z+Y*Z)^2+X*Y*Z+a6.
+The established characteristic-two theorem applies for arbitrary n. For
+B=3, every UNSAT instance has ordinary first fall four and last fall
+four exactly for split cube-orbit membership g(T)=T^3+c, and five otherwise.
+If n is odd, a split cube orbit with three distinct roots is impossible:
+3 does not divide 2^n-1, so GF(2^n) contains no nontrivial cube root of one.
+Every UNSAT B=3 instance then has exact pair (4,5).
+
+The SEC 2 binary field sizes 163,233,239,283,409,571 are all odd, and the
+listed binary curves have exactly this ordinary model. They are therefore
+covered by the exact (4,5) statement whenever the rational-lift and UNSAT
+hypotheses hold. This extension does not claim a numerical certificate or
+new closure computation on those binary standard curves. For B>=4 the
+binary ordinary-ring bounds remain
+  d_ff^ord=B+1,  B+1 <= d_F <= 3B-4.
+See ../characteristic_two/extension_proof.txt and ../growing_b/binary_bridge.txt.
+
+2. A nonvacuous public three-abscissa construction
+-------------------------------------------------
+Let E/k be either of the nonsingular curve models above. Choose a rational
+point G satisfying
+  [j]G != O for every integer 1<=j<=28.                 (A)
+Since E(k) is finite, (A) is equivalent to ord(G)>28. The construction only
+needs (A); it does not need the full group order, a primality proof of a
+claimed subgroup order, or knowledge of the ambient curve's cofactor.
+
+Define public points and the target by
+  P1=G, P2=[2]G, P4=[4]G,
+  S={x(P1),x(P2),x(P4)}, R=[16]G, r=x(R).
+All scalars here are public construction data. This is not an unknown-
+scalar target and no discrete logarithm is being computed.
+
+The points P1,P2,P4 and R are affine by (A). Two affine points in either
+model share an abscissa exactly when they are equal up to point negation.
+In the prime-field model -(x,y)=(x,-y); in the ordinary binary model
+-(x,y)=(x,x+y). If i,j are different members of {1,2,4}, equality of the
+abscissas of [i]G and [j]G would imply
+  [i-j]G=O or [i+j]G=O,
+where the relevant nonzero absolute integer is at most eight. Condition
+(A) excludes this. It also excludes a self-negative point among these
+lifts, since [2*i]G would then be O. Thus S has three distinct abscissas,
+each with the two rational point lifts +/-[i]G.
+
+Similarly r cannot belong to S: an abscissa collision with [i]G would
+give [16-i]G=O or [16+i]G=O. These are nonzero integers between 12 and 20,
+again forbidden by (A).
+
+Every sum of three signed factor-base point lifts, including repetitions,
+equals [s]G for an integer s with |s|<=12. If such a sum equalled R or -R,
+then
+  [s-16]G=O or [s+16]G=O.
+The integer concerned is nonzero and its absolute value lies between four
+and 28. Negative multiples vanish exactly when their positive counterparts
+do, so (A) excludes both equalities. There is therefore no signed three-
+point decomposition of either target sign, even before imposing the guard.
+
+To connect this fact to the displayed polynomial system, membership puts
+x,y,z in S and the inverse guard forces x!=y. Hence the first summation
+quadratic has nonzero leading coefficient and its roots are the rational
+abscissas of sums/differences of the first two rational point lifts. Those
+points are affine because their abscissas differ. Since z!=r, the second
+summation quadratic, viewed as a polynomial in u, likewise has roots given
+by the rational abscissas of sums/differences of a third factor-base point
+and R. A common u would identify those points up to sign and give a signed
+three-point relation to R or -R, already excluded above.
+
+This also excludes zeros over an algebraic closure: the split membership
+polynomials fix x,y,z to S, the guard fixes v rationally, and the first
+quadratic already has all its roots rational. Thus no additional zero can
+appear by extending the coefficient field. The ideal is the unit ideal,
+and the applicable ordinary-ring theorem gives the claimed exact (4,5)
+pair for prime fields p>3 and for the listed odd-degree binary fields.
+
+3. What a fixture verifier must actually check
+----------------------------------------------
+A faithful numerical known-answer fixture can verify (A) without counting
+the group or trusting a source-declared subgroup order:
+
+* Bind the field and curve parameters to the named standard curve. Check
+  that the supplied point G is affine, lies on that curve, and is nonzero.
+  For the prime model check 4*a^3+27*b^2 !=0; for the binary model check
+  a6!=0. The field interpretation still requires a valid prime field or a
+  correctly represented binary extension field.
+* Compute the sequential point chain [j]G, 1<=j<=28, using the actual curve
+  law, and check that none is O. Checking only [28]G!=O is insufficient:
+  a point of smaller order not dividing 28 could pass that weaker check.
+* Bind S to the abscissas of entries 1,2,4 and R to entry 16. Check curve
+  membership, distinct base abscissas, and r outside S explicitly as useful
+  conformance checks, although the mathematical proof implies them.
+* Reconstruct g and both S3 inputs from those exact parameters. Bind the
+  reconstructed six-input polynomial system to the canonical problem
+  digest used by any sparse proof-DAG replay.
+
+The low-order point-chain check establishes a small-order exclusion. It
+must not be reported as a verification of the full standardized subgroup
+order or curve point count. The same construction works on a binary curve
+with ambient cofactor two or four, because (A) concerns the selected point
+G, not the full order #E(k).
+
+4. Optional growing-base family on the larger curves
+----------------------------------------------------
+For B>=3, choose rational G satisfying
+  [j]G != O for every 1<=j<=6B+1,
+equivalently ord(G)>6B+1. Define
+  S_B={x([i]G):1<=i<=B}, R=[3B+1]G.
+
+Abscissa collisions between two different base indices would yield a
+nonzero vanishing multiple of absolute value at most 2B, which is excluded.
+The target is affine and outside S_B: its possible collision coefficients
+are 3B+1-i and 3B+1+i, between 2B+1 and 4B+1. Every three signed base lift
+sum has integer coefficient |s|<=3B. Equality to +/-R would require a
+nonzero vanishing multiple with absolute coefficient between one and 6B+1.
+Thus the same argument proves UNSAT of the guarded polynomial presentation.
+The applicable growing-B degree sandwich then follows from the prior
+theorem, rather than from empirical closure ranks.
+
+For example the contiguous B=3 variant is S={x(G),x(2G),x(3G)} with
+R=10G and ord(G)>19. The earlier {1,2,4}/16 construction uses a slightly
+larger low-order exclusion and is convenient when doubling generates the
+public target. This section proves a family, not a claim that certificates
+for every B have been generated or replayed.
+
+5. Ordinary-ring and Boolean presentations remain different
+------------------------------------------------------------
+The known-generator fixtures above use three explicit abscissas or a
+contiguous list of generator multiples. Such a set is not thereby a linear
+ell-bit subspace of GF(2^n). In particular cardinality three is not the
+cardinality of an injective linear F2^ell embedding. An ordinary-field
+degree-five certificate must not be presented as a certificate of a
+Boolean Weil-descent instance merely by writing its coordinates as bits.
+
+The separate direct Boolean theorem in
+../characteristic_two/boolean_upper_bound.txt already allows arbitrary n:
+for the specified binary two-S3 chain with one shared u, linear ell-bit
+base maps, and explicit Boolean equations for all bits,
+  d_F <= 3*ell+1 for ell>=1,
+with or without the inverse guard. Its proof needs no rational-lift
+assumption, but may have exponential proof size. It establishes no exact
+Boolean first-fall value, growing Boolean lower bound, or universal ceiling
+five. Applying it to an existing E12 record still needs an encoding audit.
+
+Increasing field size while keeping B=3 does not enlarge the factor base.
+Neither the field-size applicability nor the public UNSAT construction is
+a timing result, an index-calculus speed improvement, or an ECDLP security
+claim. No performance comparison or leaderboard promotion follows here.
+
+6. Source assumptions, exact replay, and formalization boundary
+---------------------------------------------------------------
+A sparse polynomial-DAG replay checks its stated ideal identity and degree
+cap with exact coefficient arithmetic and input binding. Over a modulus p
+that guarantee is an identity over Z/pZ; it does not by itself certify that
+p is prime, that the curve is nonsingular, that supplied coordinates lie
+on the named curve, that a field representation is irreducible, or that
+point-group semantics match the polynomial inputs. Those are separate
+source assumptions or fixture checks. A probable-prime test, if used by
+an implementation, is not a primality certificate.
+
+The standardized prime-field parameters and binary reduction polynomials
+are supplied by the primary source cited below. SEC 2 declares the order
+of each standard generator prime and lists the cofactor. This note does
+not independently certify those large group-order declarations; the
+small-order exclusion (A) is sufficient for the fixture proof and can be
+checked independently by ordinary public point arithmetic.
+
+The complete filtered-closure theorems, point/sign interpretation and this
+fixture-unsatisfiability proof are not Lean formalized in this packet.
+The existing checked Lean identity lemmas remain partial formalization.
+Any native development tests or future experiment receipts must retain
+their separate labels and exact workload scope.
+
+7. Primary source checked for the larger-curve extension
+--------------------------------------------------------
+Standards for Efficient Cryptography 2 (SEC 2): Recommended Elliptic Curve
+Domain Parameters, Version 2.0, January 27, 2010, Certicom Research:
+  https://www.secg.org/sec2-v2.pdf
+Checked sections:
+  2.1: prime-field short Weierstrass domain-parameter model;
+  2.4.1: secp256k1; 2.4.2: secp256r1;
+  2.5.1: secp384r1; 2.6.1: secp521r1;
+  3.1: ordinary binary model, reduction polynomials and subgroup/cofactor
+       convention;
+  3.2--3.7: binary standard field sizes and curve parameters.
+SHA-256 of the downloaded primary-source PDF:
+  87b8f3703364ed5b21ba8582e411cc0cbf477bcaa3f4f45e0d6580d1c00d9952
+
+The associated model-specific summation-polynomial context is recorded in
+../../SOURCES.md: Semaev, arXiv:1504.01175, Section 2, and Kosters--Yeo,
+arXiv:1503.08001, Section 2/Proposition 2.1 and Section 4.2. The existing
+degree proof files, cited above, were read before this applicability audit.
+No literature-priority claim is made.

@@ -1,0 +1,58 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "DLP tuning POSITIVE CONTROL Koblitz n=41",
+  "description": "Koblitz double-large-prime tuning against the compact-orbit m=2 baseline; research/ic_koblitz_dlp_tuning_20261023/PROTOCOL.md. Counts only (L0); public synthetic targets; no security claim.",
+  "workloads": {
+    "targets_per_curve": 8,
+    "target_seed": 20261023201,
+    "target_kind": "public",
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 41
+      }
+    ]
+  },
+  "arms": [
+    {
+      "name": "rho-frob",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius"
+      }
+    },
+    {
+      "name": "plain-m3-k10",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=10,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k10-c10",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=10,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=10",
+          "max_trials": "50000000"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 20261023202,
+    "isolation_required": "L0",
+    "timeout_seconds": 3600
+  }
+}

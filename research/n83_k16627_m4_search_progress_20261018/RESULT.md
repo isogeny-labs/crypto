@@ -1,0 +1,7 @@
+# Result: N83 K=16,627 post-root search progress
+
+The exact retained signed-Frobenius base and seven-x-block m=4 witness passed group and model preflight. Root propagation returned `Fixpoint` in **199.977792 ms** with zero decisions and conflicts. Ordinary SAT began at **39.623697 s**. The one-CPU, hard-4-GiB, zero-swap worker reached its frozen **1,800-second outer wall cap**: exit 124, `OOMKilled=false`, **2,662,309,888-byte** cgroup peak.
+
+The 176 fsynced progress records include one initial `Idle` sample and 175 periodic samples that all landed in `XorPropagation`. At the last complete sample, **1,792.112144 s** after process start, the solver had completed **322,255 decisions, 360 conflicts and two restarts**. Search continued after root; the periodic phase observations identify recurrent XOR work but are not a precise time fraction. Work after the last sample, SAT status, returned model, checked group lift and returned-relation rank are unknown. The dependent unpinned arm was not attempted because the positive control did not return a checked result.
+
+**Outcome:** `UNKNOWN_wall_cap`, a valid bounded diagnostic. It selects no m=2, m=3 or m=4 factor base and supplies no full cold index-calculus or matched-rho ratio. Next: freeze and measure completed XOR-pass work counters before changing search policy, then test natural relation yield and useful rank on the stored bases. Exact receipts, hashes and validation are linked from [RUN_REPORT.md](RUN_REPORT.md).

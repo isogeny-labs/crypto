@@ -1,0 +1,116 @@
+   Compiling pencil-symbolic-graph v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029)
+warning: fields `output`, `max_records`, `max_bytes`, and `started` are never read
+   --> /home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/src/relation_stream.rs:156:5
+    |
+155 | pub struct Trace<'a> {
+    |            ----- fields in this struct
+156 |     output: &'a mut dyn Write,
+    |     ^^^^^^
+157 |     identity: Identity,
+158 |     max_records: u64,
+    |     ^^^^^^^^^^^
+159 |     max_bytes: usize,
+    |     ^^^^^^^^^
+...
+162 |     started: bool,
+    |     ^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `emit` and `write_event` are never used
+   --> /home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/src/relation_stream.rs:211:19
+    |
+166 | impl<'a> Trace<'a> {
+    | ------------------ methods in this implementation
+...
+211 |     pub(crate) fn emit(&mut self, event: Event) -> Result<(), Error> {
+    |                   ^^^^
+...
+221 |     fn write_event(&mut self, event: Event) -> Result<(), Error> {
+    |        ^^^^^^^^^^^
+
+warning: struct `Buffer` is never constructed
+   --> /home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/src/relation_stream.rs:268:8
+    |
+268 | struct Buffer {
+    |        ^^^^^^
+
+warning: `pencil-symbolic-graph` (lib) generated 3 warnings
+   Compiling pencil-target-information v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/five-followups/rank-information)
+   Compiling pencil-relation-information-adapter v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/relation-adapter)
+   Compiling pencil-target-stream-offline v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/target-stream)
+error[E0308]: mismatched types
+   --> src/lib.rs:417:44
+    |
+417 |                     || t.submitted_rows != collector.counts().submitted_rows
+    |                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `u64`, found `u128`
+
+error[E0277]: can't compare `u64` with `u128`
+   --> src/lib.rs:417:41
+    |
+417 |                     || t.submitted_rows != collector.counts().submitted_rows
+    |                                         ^^ no implementation for `u64 == u128`
+    |
+    = help: the trait `PartialEq<u128>` is not implemented for `u64`
+help: `u64` implements trait `PartialEq<Rhs>`
+   --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/cmp.rs:2103:12
+    |
+    = note: `PartialEq`
+   ::: /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/cmp.rs:2115:5
+    |
+    = note: in this macro invocation
+    |
+   ::: /home/ec2-user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.154/src/value/partial_eq.rs:76:13
+    |
+ 76 |               impl PartialEq<Value> for $ty {
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `PartialEq<Value>`
+...
+ 97 | / partialeq_numeric! {
+ 98 | |     eq_i64[i8 i16 i32 i64 isize]
+ 99 | |     eq_u64[u8 u16 u32 u64 usize]
+100 | |     eq_f32[f32]
+101 | |     eq_f64[f64]
+102 | |     eq_bool[bool]
+103 | | }
+    | |_- in this macro invocation
+    = note: this error originates in the macro `impl_partial_eq_for_primitive` which comes from the expansion of the macro `partialeq_numeric` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0308]: mismatched types
+   --> src/lib.rs:418:43
+    |
+418 |                     || t.admitted_rows != collector.counts().admitted_rows
+    |                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `u64`, found `u128`
+
+error[E0277]: can't compare `u64` with `u128`
+   --> src/lib.rs:418:40
+    |
+418 |                     || t.admitted_rows != collector.counts().admitted_rows
+    |                                        ^^ no implementation for `u64 == u128`
+    |
+    = help: the trait `PartialEq<u128>` is not implemented for `u64`
+help: `u64` implements trait `PartialEq<Rhs>`
+   --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/cmp.rs:2103:12
+    |
+    = note: `PartialEq`
+   ::: /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/cmp.rs:2115:5
+    |
+    = note: in this macro invocation
+    |
+   ::: /home/ec2-user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.154/src/value/partial_eq.rs:76:13
+    |
+ 76 |               impl PartialEq<Value> for $ty {
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `PartialEq<Value>`
+...
+ 97 | / partialeq_numeric! {
+ 98 | |     eq_i64[i8 i16 i32 i64 isize]
+ 99 | |     eq_u64[u8 u16 u32 u64 usize]
+100 | |     eq_f32[f32]
+101 | |     eq_f64[f64]
+102 | |     eq_bool[bool]
+103 | | }
+    | |_- in this macro invocation
+    = note: this error originates in the macro `impl_partial_eq_for_primitive` which comes from the expansion of the macro `partialeq_numeric` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+Some errors have detailed explanations: E0277, E0308.
+For more information about an error, try `rustc --explain E0277`.
+error: could not compile `pencil-target-stream-offline` (lib) due to 4 previous errors

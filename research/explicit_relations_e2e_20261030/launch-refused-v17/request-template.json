@@ -1,0 +1,22 @@
+{
+  "name": "ecbench-explicit-e2e-v17-20261030",
+  "cloud": "SECURE",
+  "gpu": {
+    "id": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+    "count": 1,
+    "minCudaVersion": "13.2",
+    "minVcpuCountPerGpu": 4,
+    "minRamPerGpu": 16
+  },
+  "image": "nvidia/cuda@sha256:d266e59b88c295bc5fa0e4cef9064eaff84939381b09e2c3d76a5532a303e42d",
+  "disk": 40,
+  "entrypoint": [
+    "/bin/bash",
+    "-c"
+  ],
+  "cmd": [
+    "set +e\nprintf '%s' \"$BOOTSTRAP_BASE64\" | base64 -d > /tmp/ecbench-bootstrap.sh\nbash /tmp/ecbench-bootstrap.sh\nvalidation_rc=$?\ntar -czf /tmp/ecbench-results.tgz --exclude=./target --exclude=./ladder --exclude=./analyze -C /results .\narchive_rc=$?\nif [ \"$archive_rc\" -eq 0 ]; then\n  curl --fail --silent --show-error --retry 2 --max-time 180 -X PUT --upload-file /tmp/ecbench-results.tgz \"$ARTIFACT_UPLOAD_URL\"\n  archive_rc=$?\n  printf 'ECBENCH_ARCHIVE_SHA256 '\n  sha256sum /tmp/ecbench-results.tgz | cut -d ' ' -f1\nfi\nprintf 'ECBENCH_DONE validation=%s archive=%s\\n' \"$validation_rc\" \"$archive_rc\"\nsleep infinity\n"
+  ],
+  "env": {},
+  "ports": []
+}

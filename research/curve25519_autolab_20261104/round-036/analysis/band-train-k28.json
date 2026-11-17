@@ -1,0 +1,395 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "inc",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.9966324402071407,
+        2.186612511570807,
+        3.8964331538438035
+      ],
+      "charged_sum": 185061.0,
+      "native_sum": 176086,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 8256.3125
+      }
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "rho-neg",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        0.9292716926174679,
+        1.0157383785510363,
+        1.7939385519531512
+      ],
+      "charged_sum": 86131.0,
+      "native_sum": 80143,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "tw2l-x10-j16-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        2.0007538574271875,
+        2.1948337679102723,
+        3.9415529622580356
+      ],
+      "charged_sum": 185443.0,
+      "native_sum": 179886,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 11130.375
+      }
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "tw2l-x10-j8-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.965365772396417,
+        2.1569372286814366,
+        3.8810803352466126
+      ],
+      "charged_sum": 182163.0,
+      "native_sum": 177561,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 11052.4375
+      }
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "tw2l-x15-j16-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.7262804174324309,
+        1.8927727262619547,
+        3.391203505727669
+      ],
+      "charged_sum": 160003.0,
+      "native_sum": 154316,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 9601.875
+      }
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "tw2l-x20-j16-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.6779778391754923,
+        1.839506105955425,
+        3.2932605069748235
+      ],
+      "charged_sum": 155526.0,
+      "native_sum": 149715,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 9315.1875
+      }
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "tw2l-x20-j32-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.9284564312713357,
+        2.1127808824602674,
+        3.7717009431606527
+      ],
+      "charged_sum": 178742.0,
+      "native_sum": 170844,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 10635.25
+      }
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "tw2l-x20-j8-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.6880763902696385,
+        1.8517613882073927,
+        3.3249263696471743
+      ],
+      "charged_sum": 156462.0,
+      "native_sum": 151714,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 9437.5
+      }
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "tw2l-x30-j16-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.6144950671263907,
+        1.7696772145114763,
+        3.1663165409772485
+      ],
+      "charged_sum": 149642.0,
+      "native_sum": 143833,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 8947.5625
+      }
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "rho-neg",
+      "verdict": "rho-neg < inc"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "tw2l-x10-j16-n2",
+      "verdict": "inc < tw2l-x10-j16-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "tw2l-x10-j8-n2",
+      "verdict": "tw2l-x10-j8-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "tw2l-x15-j16-n2",
+      "verdict": "tw2l-x15-j16-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "tw2l-x20-j16-n2",
+      "verdict": "tw2l-x20-j16-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "tw2l-x20-j32-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x20-j8-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x30-j16-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "rho-neg",
+      "b": "tw2l-x10-j16-n2",
+      "verdict": "rho-neg < tw2l-x10-j16-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "rho-neg",
+      "b": "tw2l-x10-j8-n2",
+      "verdict": "rho-neg < tw2l-x10-j8-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "rho-neg",
+      "b": "tw2l-x15-j16-n2",
+      "verdict": "rho-neg < tw2l-x15-j16-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "rho-neg",
+      "b": "tw2l-x20-j16-n2",
+      "verdict": "rho-neg < tw2l-x20-j16-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "rho-neg",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "rho-neg < tw2l-x20-j32-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "rho-neg",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "rho-neg < tw2l-x20-j8-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "rho-neg",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "rho-neg < tw2l-x30-j16-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x10-j8-n2",
+      "verdict": "tw2l-x10-j8-n2 < tw2l-x10-j16-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x15-j16-n2",
+      "verdict": "tw2l-x15-j16-n2 < tw2l-x10-j16-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x20-j16-n2",
+      "verdict": "tw2l-x20-j16-n2 < tw2l-x10-j16-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "tw2l-x20-j32-n2 < tw2l-x10-j16-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x20-j8-n2 < tw2l-x10-j16-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x30-j16-n2 < tw2l-x10-j16-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x10-j8-n2",
+      "b": "tw2l-x15-j16-n2",
+      "verdict": "tw2l-x15-j16-n2 < tw2l-x10-j8-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x10-j8-n2",
+      "b": "tw2l-x20-j16-n2",
+      "verdict": "tw2l-x20-j16-n2 < tw2l-x10-j8-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x10-j8-n2",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "tw2l-x20-j32-n2 < tw2l-x10-j8-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x10-j8-n2",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x20-j8-n2 < tw2l-x10-j8-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x10-j8-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x30-j16-n2 < tw2l-x10-j8-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x15-j16-n2",
+      "b": "tw2l-x20-j16-n2",
+      "verdict": "tw2l-x20-j16-n2 < tw2l-x15-j16-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x15-j16-n2",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "tw2l-x15-j16-n2 < tw2l-x20-j32-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x15-j16-n2",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x20-j8-n2 < tw2l-x15-j16-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x15-j16-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x30-j16-n2 < tw2l-x15-j16-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x20-j16-n2",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "tw2l-x20-j16-n2 < tw2l-x20-j32-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x20-j16-n2",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x20-j16-n2 < tw2l-x20-j8-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x20-j16-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x30-j16-n2 < tw2l-x20-j16-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x20-j32-n2",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x20-j8-n2 < tw2l-x20-j32-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x20-j32-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x30-j16-n2 < tw2l-x20-j32-n2"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "tw2l-x20-j8-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x30-j16-n2 < tw2l-x20-j8-n2"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "kind": "retained-proof-development-history/v1",
+  "attempts": [
+    {
+      "id": "001",
+      "build_status": 1,
+      "reason": "Thread startup failed under4GiB virtual-address cap; default workers"
+    },
+    {
+      "id": "002",
+      "build_status": 1,
+      "reason": "Same startup failure with one worker and4GiB virtual-address cap"
+    },
+    {
+      "id": "003",
+      "build_status": 1,
+      "reason": "1GiB Lean allocation limit, no virtual-address cap; CountsLE needed unfolding for decidability; error placeholders not accepted as proofs"
+    },
+    {
+      "id": "004",
+      "build_status": 0,
+      "audit_status": 1,
+      "reason": "Six kernel proofs pass; auditor import exceeds1GiB allocation budget"
+    },
+    {
+      "id": "005",
+      "build_status": 0,
+      "audit_status": 1,
+      "reason": "Final eight kernel proofs pass;4GiB auditor cannot locate its external lean command on PATH"
+    },
+    {
+      "id": "006",
+      "audit_status": 0,
+      "reason": "Verified binary added to command-local PATH; unchanged repository auditor checks all8 with0axioms and0trusted"
+    }
+  ],
+  "final_settings": {
+    "threads": 1,
+    "kernel_memory_limit_MiB": 1024,
+    "auditor_memory_limit_MiB": 4096,
+    "virtual_address_cap": "none; initial caps prevented runtime startup",
+    "rss_measured": false
+  },
+  "scientific_features_changed": false,
+  "proof_statements_weakened": false,
+  "missing_definition_fix": "Unfold CountsLE before decide +kernel; no new axiom or changed vector"
+}

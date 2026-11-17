@@ -1,0 +1,15 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | f1-x07 | 64/64 | 1.899 | 1.967 | 2.583 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | rho-neg | 64/64 | 1.152 | 1.255 | 2.188 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | tw-x15 | 64/64 | 1.854 | 1.855 | 1.865 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | twcj-x15 | 64/64 | 1.764 | 1.765 | 1.775 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp24-tm1578-e83ed1b2 | f1-x07 vs rho-neg | rho-neg < f1-x07 |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x07 vs tw-x15 | tw-x15 < f1-x07 |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x07 vs twcj-x15 | twcj-x15 < f1-x07 |
+| icv1-fp24-tm1578-e83ed1b2 | rho-neg vs tw-x15 | unresolved inside the band |
+| icv1-fp24-tm1578-e83ed1b2 | rho-neg vs twcj-x15 | unresolved inside the band |
+| icv1-fp24-tm1578-e83ed1b2 | tw-x15 vs twcj-x15 | twcj-x15 < tw-x15 |

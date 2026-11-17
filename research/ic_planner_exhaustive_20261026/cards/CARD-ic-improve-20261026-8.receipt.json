@@ -1,0 +1,202 @@
+{
+  "card_id": "CARD-ic-improve-20261026-8",
+  "card_path": "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-8.yaml",
+  "card_sha256": "127592f73341f8088229996b94e7375ad3f2da0ca4f73823c483286e24926789",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import subprocess,sys; out=subprocess.run(['git','status','--porcelain','--untracked-files=all','--',':(exclude)research/ic_planner_exhaustive_20261026/cards'],capture_output=True,text=True).stdout; sys.exit(1 if out.strip() else 0)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.394,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "git-clean",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.394,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import os,sys; sys.exit(1 if any(os.path.exists(p) for p in ['research/ic_planner_exhaustive_20261026/sessions/K-k61', 'research/ic_planner_exhaustive_20261026/sessions/K-k61.audit.json']) else 0)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.016,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "sessions-absent",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.016,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "df",
+        "-h",
+        "/"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-record",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "54666e512c0995f215a71a2ff51b5a27676d7392bd2d915b667daa434b2c329f",
+      "stdout_tail": [
+        "Filesystem      Size  Used Avail Use% Mounted on",
+        "/dev/vda        252G   36G  3.6G  92% /"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.027,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-run-k-k61",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.027,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import re, sys, time\nstart = time.time()\nheld = 0\nwhile True:\n    value = float(re.search(r'some avg10=([0-9.]+)', open('/proc/pressure/cpu').read()).group(1))\n    if value <= 1.0:\n        held += 1\n    else:\n        held = 0\n    if held >= 6:\n        sys.exit(0)\n    if time.time() - start >= 1800:\n        sys.exit(1)\n    time.sleep(5)\n"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 45.032,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "quiet-before-run-k-k61",
+      "index": 5,
+      "outputs": {},
+      "seconds": 45.032,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ic_planner_exhaustive_20261026/specs/K-k61.json",
+        "--out",
+        "research/ic_planner_exhaustive_20261026/sessions/K-k61",
+        "--cpus",
+        "auto",
+        "--wait",
+        "--quiet"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2136.027,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-k-k61",
+      "index": 6,
+      "outputs": {
+        "research/ic_planner_exhaustive_20261026/sessions/K-k61/host.json": "9dd8ce65c462a27308fd8ba9943b97b3c2f349320a72fb845a80f605142c2e52",
+        "research/ic_planner_exhaustive_20261026/sessions/K-k61/plan.json": "a3151da3b7a819aa5ab031c63928eaf3ba617cdd994cd6926bf4e5c7ac06cec2",
+        "research/ic_planner_exhaustive_20261026/sessions/K-k61/records.jsonl": "f5788b16c5dbad3e783152f59e5673c9b2e2bae99528d4bdf5a4f3e3006d675b",
+        "research/ic_planner_exhaustive_20261026/sessions/K-k61/session.json": "eac86ce881eb5554d992e6a455385a9f38ff47e4c8d1775a1c1d1ea347ad410c",
+        "research/ic_planner_exhaustive_20261026/sessions/K-k61/spec.json": "d7ca96b275afbbb855e0086af8f576f1d573953ebe0e604004fbb6049c47c0c2"
+      },
+      "seconds": 2136.027,
+      "stderr_sha256": "e674d1eb3b15d02b8f2961ed0a0caa314aa8ce90d2867741b7dae5cb3ba23941",
+      "stderr_tail": [
+        "session ECBS1h6b5c12391d8b complete -> research/ic_planner_exhaustive_20261026/sessions/K-k61 (128 records: {\"verified\": 128})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "d60caaad9d9fe7d7a153450303dc6ddfd34bd47e",
+  "dirty_after": [
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-8.disk-start.stdout",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-8.run-k-k61.stderr",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-8.run-k-k61.stdout",
+    "research/ic_planner_exhaustive_20261026/sessions/K-k61/host.json",
+    "research/ic_planner_exhaustive_20261026/sessions/K-k61/plan.json",
+    "research/ic_planner_exhaustive_20261026/sessions/K-k61/records.jsonl",
+    "research/ic_planner_exhaustive_20261026/sessions/K-k61/session.json",
+    "research/ic_planner_exhaustive_20261026/sessions/K-k61/spec.json"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

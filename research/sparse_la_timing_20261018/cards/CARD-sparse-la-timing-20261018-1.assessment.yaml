@@ -1,0 +1,51 @@
+card_id: CARD-sparse-la-timing-20261018-1
+relay_verbatim: not_checkable   # no card receipt exists, so tools/task_card.py check-relay has nothing to recompute; the executor text was not saved to a file
+outcome: stopped
+stopped_at_step: run-fp4-p29
+recommendation: rerun_after_infrastructure_fix   # the rerun of fp4-p29 was already carried out as card 2 (see its assessment)
+execution_class: partially_executed   # 2 of 4 commands completed on disk; 3rd interrupted; 4th not run
+per_command:
+  run-prime-scaling:
+    on_disk: complete
+    evidence:
+      - sessions/prime-scaling/session.json status=complete, executions_planned=330, records_written=330, status_counts={verified:330}
+      - sessions/prime-scaling/records.jsonl has 330 lines; sha256 e796a352...d92325 equals session.json records_sha256
+      - sessions/prime-scaling/spec.json sha256 867a3a49...078ca equals card bind SPEC-prime-scaling.json and specs/SPEC-prime-scaling.json
+      - session.json binary_sha256 1ecb2154...3a43 equals card bind ./target/release/ecbench and sha256sum of the binary now
+      - session.json options cpus=auto, wait_for_lock=true, allow_busy=true match argv (--wait --allow-busy --cpus auto); git_commit 6414d157... equals card commit
+      - receipts/run-prime-scaling.stderr last line: "session ECBS1h0bf2b60b4cc4 complete -> .../sessions/prime-scaling (330 records: {verified: 330})"; stdout empty (0 bytes) as card routes it
+      - exit status not recorded anywhere on disk (no receipt)
+  verify-prime-scaling:
+    on_disk: complete
+    evidence:
+      - sessions/prime-scaling.audit.json exists, sha256 7a08fca1...a15b; receipts/verify-prime-scaling.stderr prints "receipt sha256 7a08fca1...a15b" (equal) and "audit OK: 330 records, 330 verified, 330 replays reproduced, 0 problems"
+      - audit JSON: ok=true, problems=[], session_status=complete, records_bound=true, records=330, verified_records=330, regraded=true, auditor_binary_sha256 equals the card binary bind
+      - audit files digests: spec.json 867a3a49... (card bind), plan.json fa6ec845... and records.jsonl e796a352... equal the on-disk files; session.json 09f20a74... equals sha256sum of sessions/prime-scaling/session.json
+      - receipts/verify-prime-scaling.stdout is byte-identical (cmp) to the audit JSON
+      - argv used --replay-all; the audit reports 330 replays reproduced = records (the audit JSON replays key was not expanded here)
+      - exit status not recorded (no receipt)
+  run-fp4-p29:
+    on_disk: interrupted
+    evidence:
+      - sessions/fp4-p29/session.json status=interrupted, executions_planned=20, records_written=2, status_counts={crashed:1, verified:1}
+      - records.jsonl 2 lines: seq0 filter-wiedemann outcome verified; seq1 sparse-cado outcome crashed, exit "signal 15", error "child output: EOF while parsing a value at line 1 column 0; session interrupted by signal 15"
+      - spec.json in session sha256 11a4ccce...5cc0 equals card bind SPEC-fp4-p29.json; binary_sha256 equals card bind
+      - session git_commit is 8089e7b3... (differs from card commit 6414d157...); session options match argv
+      - no receipts/run-fp4-p29.stdout or .stderr files exist (card names both)
+      - consistent with the executor text "killed after reaching its background time limit"; exit status none
+  verify-fp4-p29:
+    on_disk: not_run
+    evidence:
+      - sessions/fp4-p29.audit.json does not exist; receipts/verify-fp4-p29.* do not exist
+checks:
+  card_receipt_exists: false
+  sessions_fp4_p29_audit_exists: false
+  card_lint_now: "CARD FAIL (sha256 29e72156...c9653): commands[1].argv names sessions/prime-scaling.audit.json that binds does not pin. Card is write-once and was not edited; reported, not repaired."
+  write_scope: "git status --porcelain shows no untracked or modified path outside the card's write_scope attributable to this card (see card 2 assessment for the one unrelated analysis/ file)"
+  only_card_argv_ran: not_determinable from disk (no receipt); the produced artefacts are consistent with run-prime-scaling, verify-prime-scaling, run-fp4-p29 in card order
+reasons:
+  - "Stop cause is a runtime/infrastructure limit (background task killed at its time limit), not a card or spec error: sessions/fp4-p29/session.json status=interrupted, record 1 'session interrupted by signal 15'."
+  - "The prime-scaling run and its audit are complete and internally consistent (session.json, audit JSON, stderr line)."
+  - "The fp4-p29 session is a partial 2/20 session; it is not an audit subject and was not verified."
+  - "No receipt means exit codes and the executor relay cannot be checked; those fields are not assessed rather than assumed."
+interpretation: not_assessed

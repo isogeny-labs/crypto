@@ -1,0 +1,53 @@
+warning: unused manifest key: lints.rust.unexpected_cfgs.check-cfg
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded atomic-waker v1.1.2
+  Downloaded anstyle v1.0.14
+  Downloaded anstyle-query v1.1.5
+  Downloaded anstyle-parse v1.0.0
+  Downloaded adler2 v2.0.1
+  Downloaded ahash v0.8.12
+  Downloaded arc-swap v1.9.3
+  Downloaded anstream v1.0.0
+  Downloaded aws-credential-types v1.3.1
+  Downloaded anyhow v1.0.104
+  Downloaded aws-sdk-sts v1.119.0
+  Downloaded aws-smithy-eventstream v0.61.6
+  Downloaded aws-smithy-async v1.3.1
+  Downloaded aws-runtime v1.10.2
+  Downloaded arcstr v1.2.0
+  Downloaded aws-smithy-json v0.65.1
+  Downloaded aws-smithy-http-client v1.5.2
+  Downloaded aws-smithy-runtime-api-macros v1.2.0
+  Downloaded aws-sigv4 v1.6.4
+  Downloaded aws-smithy-checksums v0.65.0
+  Downloaded aws-smithy-runtime-api v1.19.2
+  Downloaded aws-smithy-json v0.63.1
+  Downloaded aws-smithy-query v0.62.1
+  Downloaded aws-smithy-observability v0.3.0
+  Downloaded arrayvec v0.7.8
+  Downloaded aws-smithy-types v1.9.1
+  Downloaded aws-types v1.7.0
+  Downloaded aws-smithy-schema v0.2.1
+  Downloaded aws-smithy-http v0.64.3
+  Downloaded aws-smithy-schema v1.1.0
+  Downloaded aws-smithy-xml v0.64.1
+  Downloaded aws-smithy-xml v0.62.1
+  Downloaded aws-smithy-runtime v1.16.2
+  Downloaded aws-sdk-s3 v1.155.0
+  Downloaded base64 v0.22.1
+  Downloaded bytes v1.12.1
+  Downloaded block-buffer v0.10.4
+  Downloaded bitflags v2.13.2
+  Downloaded base64-simd v0.8.0
+  Downloaded base64 v0.23.1
+  Downloaded base64 v0.21.7
+  Downloaded blake3 v1.8.7
+error: failed to parse manifest at `/workspace/audit/toolchains/cargo/registry/src/index.crates.io-6f17d22bba15001f/blake3-1.8.7/Cargo.toml`
+
+Caused by:
+  feature `edition2024` is required
+
+  The package requires the Cargo feature called `edition2024`, but that feature is not stabilized in this version of Cargo (1.78.0 (54d8815d0 2024-03-26)).
+  Consider trying a newer version of Cargo (this may require the nightly release).
+  See https://doc.rust-lang.org/nightly/cargo/reference/unstable.html#edition-2024 for more information about the status of this feature.

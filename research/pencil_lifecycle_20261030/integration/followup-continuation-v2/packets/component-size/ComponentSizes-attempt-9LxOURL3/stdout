@@ -1,0 +1,39 @@
+/var/tmp/pencil-component-size-20261101-v1/ComponentSizes.lean:21:85: warning: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+/var/tmp/pencil-component-size-20261101-v1/ComponentSizes.lean:22:1: error: Tactic `split` failed: Could not split an `if` or `match` expression in the goal
+
+Hint: If you meant to destruct this structure, use the `cases` tactic instead
+
+Hint: Use `set_option trace.split.failure true` to display additional diagnostic information
+
+n : ℕ
+owner : Fin n → Fin n
+c p x : Fin n
+⊢ x ∈ {x | (if owner x = c then p else owner x) = p} ↔ owner x = c ∨ owner x = p
+/var/tmp/pencil-component-size-20261101-v1/ComponentSizes.lean:21:85: warning: This simp argument is unused:
+  Set.mem_setOf_eq
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [fiber, Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_union, merged]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-component-size-20261101-v1/ComponentSizes.lean:28:68: warning: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+/var/tmp/pencil-component-size-20261101-v1/ComponentSizes.lean:29:1: error: Tactic `split` failed: Could not split an `if` or `match` expression in the goal
+
+Hint: If you meant to destruct this structure, use the `cases` tactic instead
+
+Hint: Use `set_option trace.split.failure true` to display additional diagnostic information
+
+n : ℕ
+owner : Fin n → Fin n
+c p root : Fin n
+hc : root ≠ c
+hp : root ≠ p
+x : Fin n
+⊢ x ∈ {x | (if owner x = c then p else owner x) = root} ↔ owner x = root
+/var/tmp/pencil-component-size-20261101-v1/ComponentSizes.lean:28:68: warning: This simp argument is unused:
+  Set.mem_setOf_eq
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [fiber, Finset.mem_filter, Finset.mem_univ, true_and, merged]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

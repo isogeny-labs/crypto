@@ -1,0 +1,322 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-ic-planner-weight-rule-20261021-2
+experiment_id: ic_planner_weight_rule_20261021
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 66f1642d1c04fb4fc236aacfbe746e2ebb639a87
+receipt: research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.receipt.json
+binds:
+- path: research/ic_planner_weight_rule_20261021/PROTOCOL.md
+  sha256: 4f1ba29439f900149ba31966086084c579b8fbd5a7e3f5cc263da15ef788842d
+- path: research/ic_planner_weight_rule_20261021/PROTOCOL_AMENDMENT_1.md
+  sha256: 40ad2bc4e8106ee530ae0842629b784b8132f2ea498ca979adf56496c8c80b29
+- path: research/ic_planner_weight_rule_20261021/specs/B-h21.json
+  sha256: 53393bc27b06dc9f58d7c5f470f62234a7165f29127654390384f87a1f24fd5a
+- path: research/ic_planner_weight_rule_20261021/specs/B-h22.json
+  sha256: 317a45736751b1b0581d4cacbc1e32e00c19858915177331920a2a89662b3bdd
+- path: research/ic_planner_weight_rule_20261021/specs/B-h24.json
+  sha256: 4ce4d345539157a2baf32a7927075f22f16b0af0662d84c58af743bccd07c1ce
+- path: research/ic_planner_weight_rule_20261021/specs/B-h29.json
+  sha256: 385bcb6ec0f133b776a58ddd054ca4ab017fa5adefe7b30e6bb31ded816bd362
+- path: ./target/release/ecbench
+  sha256: 25e1e76f5a0ae0a78859cb940d09c2307a7343facbb16eb424ea4971ef76c53f
+must_not_exist:
+- research/ic_planner_weight_rule_20261021/sessions/B-h21
+- research/ic_planner_weight_rule_20261021/sessions/B-h21.audit.json
+- research/ic_planner_weight_rule_20261021/sessions/B-h22
+- research/ic_planner_weight_rule_20261021/sessions/B-h22.audit.json
+- research/ic_planner_weight_rule_20261021/sessions/B-h24
+- research/ic_planner_weight_rule_20261021/sessions/B-h24.audit.json
+- research/ic_planner_weight_rule_20261021/sessions/B-h29
+- research/ic_planner_weight_rule_20261021/sessions/B-h29.audit.json
+commands:
+- id: git-clean
+  argv:
+  - python3
+  - -c
+  - import subprocess,sys; out=subprocess.run(['git','status','--porcelain','--untracked-files=all','--',':(exclude)research/ic_planner_weight_rule_20261021/cards'],capture_output=True,text=True).stdout; sys.exit(1 if out.strip() else 0)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: sessions-absent
+  argv:
+  - python3
+  - -c
+  - import glob,sys; sys.exit(1 if glob.glob('research/ic_planner_weight_rule_20261021/sessions/B-*') else 0)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-record
+  argv:
+  - df
+  - -h
+  - /
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.disk-start.stdout
+- id: disk-before-run-h21
+  argv:
+  - python3
+  - -c
+  - import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: run-h21
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_planner_weight_rule_20261021/specs/B-h21.json
+  - --out
+  - research/ic_planner_weight_rule_20261021/sessions/B-h21
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 172800
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.run-h21.stdout
+  stderr: research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.run-h21.stderr
+  outputs:
+  - research/ic_planner_weight_rule_20261021/sessions/B-h21/session.json
+  - research/ic_planner_weight_rule_20261021/sessions/B-h21/plan.json
+  - research/ic_planner_weight_rule_20261021/sessions/B-h21/spec.json
+  - research/ic_planner_weight_rule_20261021/sessions/B-h21/host.json
+  - research/ic_planner_weight_rule_20261021/sessions/B-h21/records.jsonl
+- id: disk-before-run-h22
+  argv:
+  - python3
+  - -c
+  - import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: run-h22
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_planner_weight_rule_20261021/specs/B-h22.json
+  - --out
+  - research/ic_planner_weight_rule_20261021/sessions/B-h22
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 172800
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.run-h22.stdout
+  stderr: research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.run-h22.stderr
+  outputs:
+  - research/ic_planner_weight_rule_20261021/sessions/B-h22/session.json
+  - research/ic_planner_weight_rule_20261021/sessions/B-h22/plan.json
+  - research/ic_planner_weight_rule_20261021/sessions/B-h22/spec.json
+  - research/ic_planner_weight_rule_20261021/sessions/B-h22/host.json
+  - research/ic_planner_weight_rule_20261021/sessions/B-h22/records.jsonl
+- id: disk-before-run-h24
+  argv:
+  - python3
+  - -c
+  - import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: run-h24
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_planner_weight_rule_20261021/specs/B-h24.json
+  - --out
+  - research/ic_planner_weight_rule_20261021/sessions/B-h24
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 172800
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.run-h24.stdout
+  stderr: research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.run-h24.stderr
+  outputs:
+  - research/ic_planner_weight_rule_20261021/sessions/B-h24/session.json
+  - research/ic_planner_weight_rule_20261021/sessions/B-h24/plan.json
+  - research/ic_planner_weight_rule_20261021/sessions/B-h24/spec.json
+  - research/ic_planner_weight_rule_20261021/sessions/B-h24/host.json
+  - research/ic_planner_weight_rule_20261021/sessions/B-h24/records.jsonl
+- id: disk-before-run-h29
+  argv:
+  - python3
+  - -c
+  - import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: run-h29
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_planner_weight_rule_20261021/specs/B-h29.json
+  - --out
+  - research/ic_planner_weight_rule_20261021/sessions/B-h29
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 172800
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.run-h29.stdout
+  stderr: research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.run-h29.stderr
+  outputs:
+  - research/ic_planner_weight_rule_20261021/sessions/B-h29/session.json
+  - research/ic_planner_weight_rule_20261021/sessions/B-h29/plan.json
+  - research/ic_planner_weight_rule_20261021/sessions/B-h29/spec.json
+  - research/ic_planner_weight_rule_20261021/sessions/B-h29/host.json
+  - research/ic_planner_weight_rule_20261021/sessions/B-h29/records.jsonl
+- id: disk-before-verify-h21
+  argv:
+  - python3
+  - -c
+  - import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-h21
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_planner_weight_rule_20261021/sessions/B-h21
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_20261021/sessions/B-h21.audit.json
+  stderr: research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.verify-h21.stderr
+  outputs:
+  - research/ic_planner_weight_rule_20261021/sessions/B-h21.audit.json
+- id: count-h21
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_planner_weight_rule_20261021/sessions/B-h21.audit.json')); s=json.load(open('research/ic_planner_weight_rule_20261021/sessions/B-h21/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-h22
+  argv:
+  - python3
+  - -c
+  - import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-h22
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_planner_weight_rule_20261021/sessions/B-h22
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_20261021/sessions/B-h22.audit.json
+  stderr: research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.verify-h22.stderr
+  outputs:
+  - research/ic_planner_weight_rule_20261021/sessions/B-h22.audit.json
+- id: count-h22
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_planner_weight_rule_20261021/sessions/B-h22.audit.json')); s=json.load(open('research/ic_planner_weight_rule_20261021/sessions/B-h22/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-h24
+  argv:
+  - python3
+  - -c
+  - import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-h24
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_planner_weight_rule_20261021/sessions/B-h24
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_20261021/sessions/B-h24.audit.json
+  stderr: research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.verify-h24.stderr
+  outputs:
+  - research/ic_planner_weight_rule_20261021/sessions/B-h24.audit.json
+- id: count-h24
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_planner_weight_rule_20261021/sessions/B-h24.audit.json')); s=json.load(open('research/ic_planner_weight_rule_20261021/sessions/B-h24/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-h29
+  argv:
+  - python3
+  - -c
+  - import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-h29
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_planner_weight_rule_20261021/sessions/B-h29
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_20261021/sessions/B-h29.audit.json
+  stderr: research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.verify-h29.stderr
+  outputs:
+  - research/ic_planner_weight_rule_20261021/sessions/B-h29.audit.json
+- id: count-h29
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_planner_weight_rule_20261021/sessions/B-h29.audit.json')); s=json.load(open('research/ic_planner_weight_rule_20261021/sessions/B-h29/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+bus_address: executor-mechanical-ic-planner-weight-rule-b
+background: true
+write_scope:
+- research/ic_planner_weight_rule_20261021/sessions/
+- research/ic_planner_weight_rule_20261021/cards/
+stop_when:
+- The run command exits with status 2.
+- Any command in the card exits with a status other than 0, or times out.
+- A verify command reports a verified count below the executions planned for its session.
+- The disk has less than 1000000000 bytes free before a session or an audit.
+- The working tree has a change outside research/ic_planner_weight_rule_20261021/cards before the first session.
+- 'On any stop: report the printed text verbatim, retry nothing and edit nothing.'

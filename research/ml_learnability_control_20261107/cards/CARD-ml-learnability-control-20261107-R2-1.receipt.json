@@ -1,0 +1,492 @@
+{
+  "card_id": "CARD-ml-learnability-control-20261107-R2-1",
+  "card_path": "research/ml_learnability_control_20261107/cards/CARD-ml-learnability-control-20261107-R2-1.yaml",
+  "card_sha256": "1d4578329e31a0476d973602cf976ccc15aa597bab5d5577a666386541d82766",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "ce32bb4dc76114ee0fffee8e1733c261e79cb8f1",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-ancestor",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--quiet",
+        "ce32bb4dc76114ee0fffee8e1733c261e79cb8f1",
+        "HEAD",
+        "--",
+        "research/ml_learnability_control_20261107",
+        ":(exclude)research/ml_learnability_control_20261107/cards",
+        "taskq/",
+        "tools/task_card.py",
+        "tools/benchrec.py"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-paths-unchanged",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/primefield-companion-schur-20261101/tools/experiment_protocol.py",
+        "validate",
+        "research/ml_learnability_control_20261107/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.115,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-check",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.115,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "950a8d0c12ee97f06a3d8da5472288d67463d3eceabf1cafef2c63dbc94418ed",
+      "stdout_tail": [
+        "OK: experiment.protocol/v1 research/ml_learnability_control_20261107/protocol.json (0 finding(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "674d224c94b5653265534f19bdebbdced1249b2a6ef8a7afa091496cb438e6e2",
+        ".freeze.status == \"frozen\" and .freeze.protocol_sha256 == $h",
+        "research/ml_learnability_control_20261107/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.008,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-frozen-hash",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.008,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "674d224c94b5653265534f19bdebbdced1249b2a6ef8a7afa091496cb438e6e2",
+        ".provenance.protocol_sha256 == $h",
+        "research/ml_learnability_control_20261107/eks/requests/mllc-all-20261108.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "request-protocol-identity",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "-n",
+        "--slurpfile",
+        "r",
+        "research/ml_learnability_control_20261107/eks/requests/mllc-all-20261108.json",
+        "--slurpfile",
+        "l",
+        "research/ml_learnability_control_20261107/eks/image.json",
+        "--arg",
+        "i",
+        "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:a43ceee769b62f514862d219dd447fc2112e30a085b13d90485919687a9ecadd",
+        "--arg",
+        "job",
+        "mllc-all-20261108",
+        "$r[0].job.image == $i and $l[0].image_uri == $i and $r[0].job.job_name == $job and $r[0].job.cpu == 8 and $r[0].job.memory == \"16Gi\" and $r[0].job.seconds == 14400 and $r[0].job.command == [\"/usr/local/bin/r2mllc_entry.sh\",\"12\",\"16\",\"20\",\"24\"]"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "request-identity",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/ml_learnability_control_20261107/eks/validate_command_request.sh",
+        "research/ml_learnability_control_20261107/eks/requests/mllc-all-20261108.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.063,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate-request",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.063,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e870da30f3a9f8ebdede10789c7f2fe4a1a92f3c1764670521d9148107a073b9",
+      "stdout_tail": [
+        "validator: run-command sha256 1cdaa7447893fd5c..., 22 jq lines",
+        "VALID    research/ml_learnability_control_20261107/eks/requests/mllc-all-20261108.json"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "aws",
+        "ecr",
+        "describe-images",
+        "--repository-name",
+        "isolab/tasks",
+        "--image-ids",
+        "imageDigest=sha256:a43ceee769b62f514862d219dd447fc2112e30a085b13d90485919687a9ecadd",
+        "--region",
+        "us-east-2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.855,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "image-exists-in-ecr",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.855,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a2d83a300a005e20489e9b3d0da7450e29b95b81bc7a504e44ea6b17e34ed0f9",
+      "stdout_tail": [
+        "{",
+        "    \"imageDetails\": [",
+        "        {",
+        "            \"registryId\": \"104186811093\",",
+        "            \"repositoryName\": \"isolab/tasks\",",
+        "            \"imageDigest\": \"sha256:a43ceee769b62f514862d219dd447fc2112e30a085b13d90485919687a9ecadd\",",
+        "            \"imageTags\": [",
+        "                \"mllc-f13a690df016\"",
+        "            ],",
+        "            \"imageSizeInBytes\": 138389315,",
+        "            \"imagePushedAt\": 1794113875.904,",
+        "            \"imageManifestMediaType\": \"application/vnd.oci.image.manifest.v1+json\",",
+        "            \"artifactMediaType\": \"application/vnd.oci.image.config.v1+json\",",
+        "            \"lastRecordedPullTime\": 1794113899.281,",
+        "            \"imageStatus\": \"ACTIVE\"",
+        "        }",
+        "    ]",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "scripts/checkpoint.sh",
+        "gate"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.051,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "checkpoint-gate",
+      "index": 9,
+      "outputs": {},
+      "seconds": 1.051,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "aabdf10cc9533810fe6912aab0654969a739026ad7eeb86fd448b1026d00e944",
+      "stdout_tail": [
+        "checkpoint: unchanged since 20261108T050425Z-84bbe8aeee99 s3://setec-astronomy-artifacts/checkpoints/crypto/claude__serene-davinci-ujoi58/20261108T050425Z-84bbe8aeee99/"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "run",
+        "benchmarks/records/20261108T0501Z-mllc-panel.json",
+        "--",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command",
+        "research/ml_learnability_control_20261107/eks/requests/mllc-all-20261108.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 368.599,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch",
+      "index": 10,
+      "outputs": {
+        "research/ml_learnability_control_20261107/receipts/R2/launch/result.json": "79a49e25bd5d130467b036db45e7adf0396aadf0657645cd481f29499d801c84"
+      },
+      "seconds": 368.599,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "7d052b8e65119bcb2f7b2483c2d5db35523b07dfdfca0a67d5095d29c3329c9c",
+      "stdout_tail": [
+        "{",
+        "  \"schema\": \"isolab.eks.command-result/v1\",",
+        "  \"state\": \"active\",",
+        "  \"job_name\": \"mllc-all-20261108\",",
+        "  \"job_uid\": \"ca04a7c5-9751-43cf-9235-5410f2c0c838\",",
+        "  \"pods\": [",
+        "    {",
+        "      \"uid\": \"d1e64084-42af-4973-b1a1-b1c28510c122\",",
+        "      \"phase\": \"Pending\",",
+        "      \"node\": null,",
+        "      \"exit_code\": null",
+        "    }",
+        "  ],",
+        "  \"results_prefix\": \"s3://isolab-results-104186811093-us-east-2/runs/mllc-all-20261108/\",",
+        "  \"receipt_uri\": \"s3://isolab-results-104186811093-us-east-2/runs/mllc-all-20261108/launcher/9f0e20bd-1ae5-4b8d-9ba1-35b54280d393/\",",
+        "  \"request_sha256\": \"012f1a80d64f224a3af8c8fe59c1cf0877fb3740b2315b368ea233418d4b8bd0\",",
+        "  \"manifest_sha256\": \"5f58066c97bc18b8724dd666a1c848d0cf95496bb7ace84d44273c9037427fc8\",",
+        "  \"launcher\": \"isolab-experiment-launcher:9f0e20bd-1ae5-4b8d-9ba1-35b54280d393\",",
+        "  \"exit_code\": 0",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-c",
+        "{job_name, job_uid, pods, state, exit_code, launcher, receipt_uri, results_prefix, request_sha256, manifest_sha256}",
+        "research/ml_learnability_control_20261107/receipts/R2/launch/result.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "record-launch",
+      "index": 11,
+      "outputs": {},
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "78c5e5f308af71fc3afeb64a1cb3ebf51305fdb672c34e3524fcd78287b0f258",
+      "stdout_tail": [
+        "{\"job_name\":\"mllc-all-20261108\",\"job_uid\":\"ca04a7c5-9751-43cf-9235-5410f2c0c838\",\"pods\":[{\"uid\":\"d1e64084-42af-4973-b1a1-b1c28510c122\",\"phase\":\"Pending\",\"node\":null,\"exit_code\":null}],\"state\":\"active\",\"exit_code\":0,\"launcher\":\"isolab-experiment-launcher:9f0e20bd-1ae5-4b8d-9ba1-35b54280d393\",\"receipt_uri\":\"s3://isolab-results-104186811093-us-east-2/runs/mllc-all-20261108/launcher/9f0e20bd-1ae5-4b8d-9ba1-35b54280d393/\",\"results_prefix\":\"s3://isolab-results-104186811093-us-east-2/runs/mllc-all-20261108/\",\"request_sha256\":\"012f1a80d64f224a3af8c8fe59c1cf0877fb3740b2315b368ea233418d4b8bd0\",\"manifest_sha256\":\"5f58066c97bc18b8724dd666a1c848d0cf95496bb7ace84d44273c9037427fc8\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "run",
+        "benchmarks/records/20261108T0501Z-mllc-panel.json",
+        "--",
+        "research/ml_learnability_control_20261107/cards/wait_command_status.sh",
+        "research/ml_learnability_control_20261107/cards/status_request.json",
+        "mllc-all-20261108",
+        "research/ml_learnability_control_20261107/receipts/R2/status",
+        "5400",
+        "60",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 41,
+          "seconds": 5446.315,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 41,
+      "id": "wait",
+      "index": 12,
+      "outputs": {
+        "research/ml_learnability_control_20261107/receipts/R2/status/final-status.json": null
+      },
+      "seconds": 5446.315,
+      "stderr_sha256": "6e595b0360d331aabf0e4c09781be7eeef60ddee586cb9c0ea63ed9b67a95b8f",
+      "stderr_tail": [
+        "FAIL: no terminal state within 5400 seconds (last state active)"
+      ],
+      "stdout_sha256": "52ee6eaafea97e144ad21b96614326521e518844e51b33c1b8091f2d7e8e8d58",
+      "stdout_tail": [
+        "2026-11-08T06:06:16Z poll 34 launcher_exit 255 state none",
+        "2026-11-08T06:08:08Z poll 35 launcher_exit 0 state active",
+        "2026-11-08T06:10:01Z poll 36 launcher_exit 0 state active",
+        "2026-11-08T06:11:53Z poll 37 launcher_exit 0 state active",
+        "2026-11-08T06:13:46Z poll 38 launcher_exit 0 state active",
+        "2026-11-08T06:15:39Z poll 39 launcher_exit 0 state active",
+        "2026-11-08T06:17:31Z poll 40 launcher_exit 0 state active",
+        "2026-11-08T06:19:24Z poll 41 launcher_exit 0 state active",
+        "2026-11-08T06:21:16Z poll 42 launcher_exit 0 state active",
+        "2026-11-08T06:23:09Z poll 43 launcher_exit 0 state active",
+        "2026-11-08T06:25:01Z poll 44 launcher_exit 0 state active",
+        "2026-11-08T06:26:54Z poll 45 launcher_exit 0 state active",
+        "2026-11-08T06:28:47Z poll 46 launcher_exit 0 state active",
+        "2026-11-08T06:30:39Z poll 47 launcher_exit 0 state active",
+        "2026-11-08T06:32:32Z poll 48 launcher_exit 0 state active",
+        "2026-11-08T06:34:25Z poll 49 launcher_exit 0 state active",
+        "2026-11-08T06:36:18Z poll 50 launcher_exit 0 state active",
+        "2026-11-08T06:38:10Z poll 51 launcher_exit 0 state active",
+        "2026-11-08T06:40:03Z poll 52 launcher_exit 0 state active",
+        "2026-11-08T06:41:55Z poll 53 launcher_exit 0 state active"
+      ],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 16,
+  "commit": "84bbe8aeee9920e1a953b6bc072e400b6c6f15a2",
+  "dirty_after": [
+    "enchmarks/records/20261108T0501Z-mllc-panel.json"
+  ],
+  "dirty_before": [
+    "research/pkm_falldegree_unblock_20261107/AMENDMENT_R2_B_m4_null.md",
+    "research/pkm_falldegree_unblock_20261107/make_requests_r2.sh",
+    "research/prime_medium_tier_rho_20261107/validation/recompute/certificates.json",
+    "research/prime_medium_tier_rho_20261107/validation/recompute/design.json",
+    "research/prime_medium_tier_rho_20261107/validation/recompute/ecr-manifest-292bdc3d.json",
+    "research/prime_medium_tier_rho_20261107/validation/recompute/estimates.json",
+    "research/prime_medium_tier_rho_20261107/validation/recompute/harness-resampler-S.jsonl",
+    "research/prime_medium_tier_rho_20261107/validation/recompute/harness-resampler-ratio-to-floor.jsonl",
+    "research/prime_medium_tier_rho_20261107/validation/recompute/hashes.json",
+    "research/prime_medium_tier_rho_20261107/validation/recompute/rfit-points.json",
+    "research/prime_medium_tier_rho_20261107/validation/replay/J1.verify-replay-seq.json",
+    "research/prime_medium_tier_rho_20261107/validation/replay/J2.verify-replay-seq.json",
+    "research/prime_medium_tier_rho_20261107/validation/replay/J3.verify-replay-seq.json",
+    "research/prime_medium_tier_rho_20261107/validation/replay/J4.verify-replay-seq.json",
+    "research/prime_medium_tier_rho_20261107/validation/replay/J5.verify-replay-seq.json",
+    "research/prime_medium_tier_rho_20261107/validation/replay/J6.verify-replay-seq.json",
+    "research/prime_medium_tier_rho_20261107/validation/replay/exec-replay-compare.json",
+    "research/prime_medium_tier_rho_20261107/validation/replay/nonce.txt",
+    "research/prime_medium_tier_rho_20261107/validation/replay/sample.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 12"
+}

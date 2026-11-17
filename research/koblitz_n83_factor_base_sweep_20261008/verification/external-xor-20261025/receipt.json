@@ -1,0 +1,115 @@
+{
+  "accounting_limits": [
+    "S3 GET was completed in an earlier hosted replay and is excluded here",
+    "binary build is excluded",
+    "no completed relation/rank/linear algebra/target descent/rho"
+  ],
+  "arms": [
+    {
+      "base_summands": 5,
+      "conflict_cap": 2000000,
+      "export_process_wall_seconds_L0": 3.4361671669976204,
+      "name": "hash_5_1",
+      "observed_conflicts": 2000001,
+      "pool_object_blake3": "b4dda45e6c3edfca673db6f3f82c16cce8c860f5e62c092155258df399a0363e",
+      "residual_summands": 1,
+      "result": "INDETERMINATE",
+      "solver_process_wall_seconds_L0": 162.3215112910002,
+      "solver_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "solver_stdout_sha256": "90b91ad3cd3aab558ee459327d35a016c27a305489a34de9e4cc5ad8cbc8722f",
+      "solver_time_cap_seconds": 300,
+      "watchdog_seconds": 330,
+      "xcnf_sha256": "2c6dba1feabb28bc6b064268a1f53ebe3b0ecd8aa731d26b31016830ce431022"
+    },
+    {
+      "base_summands": 5,
+      "conflict_cap": 2000000,
+      "export_process_wall_seconds_L0": 3.8032051250011136,
+      "name": "gray_5_1",
+      "observed_conflicts": 2000002,
+      "pool_object_blake3": "966a0493c96674f0af6d184615ed05309d08fba5c7342957b4186cd50366dc47",
+      "residual_summands": 1,
+      "result": "INDETERMINATE",
+      "solver_process_wall_seconds_L0": 119.20826329099873,
+      "solver_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "solver_stdout_sha256": "7a18353bbd4af6563adaa3a39a9ab145cd0f21178bd0c21d82eea9911d419443",
+      "solver_time_cap_seconds": 300,
+      "watchdog_seconds": 330,
+      "xcnf_sha256": "220eaeb04a43ee8c853b637d6255420e2e341c6bb3e5f3588ca1295529b327e9"
+    },
+    {
+      "base_summands": 4,
+      "conflict_cap": 2000000,
+      "export_process_wall_seconds_L0": 2.401716749998741,
+      "name": "hash_4_2",
+      "observed_conflicts": 2000001,
+      "pool_object_blake3": "b4dda45e6c3edfca673db6f3f82c16cce8c860f5e62c092155258df399a0363e",
+      "residual_summands": 2,
+      "result": "INDETERMINATE",
+      "solver_process_wall_seconds_L0": 133.70399741599977,
+      "solver_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "solver_stdout_sha256": "771cfbab3a3ee5e09c314eeb4c9d4fe53035a745c6d790365769480df65b3532",
+      "solver_time_cap_seconds": 300,
+      "watchdog_seconds": 330,
+      "xcnf_sha256": "9d8392af80cb17e4da99d616933d43feb718cbe897a4cfffbbe5eedbaccfbe69"
+    },
+    {
+      "base_summands": 4,
+      "conflict_cap": 2000000,
+      "export_process_wall_seconds_L0": 2.3330509170009464,
+      "name": "gray_4_2",
+      "observed_conflicts": 2000001,
+      "pool_object_blake3": "966a0493c96674f0af6d184615ed05309d08fba5c7342957b4186cd50366dc47",
+      "residual_summands": 2,
+      "result": "INDETERMINATE",
+      "solver_process_wall_seconds_L0": 192.4844269999994,
+      "solver_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "solver_stdout_sha256": "75bf4bf8fb0240bf6f264cfadb34ea1aae1e89a9f55e3a8614ef727a9bf6c082",
+      "solver_time_cap_seconds": 300,
+      "watchdog_seconds": 330,
+      "xcnf_sha256": "a39dc89ea7c8c8ea0c6f54cd5900707537cbdc1307b90fc457bc8b50a3ae0bce"
+    }
+  ],
+  "base_object_blake3": "3888e2597fd3519807c9d722f49f83329c93ce5cb0929501cf7cb7cbc3cab1a0",
+  "curve_slug": "icv1-f2m83-tm6151469093347-debefd74",
+  "execution_order": [
+    "hash_5_1",
+    "gray_5_1",
+    "hash_4_2",
+    "gray_4_2"
+  ],
+  "host": {
+    "isolation": "L0 local, no cgroup; sequential solver processes",
+    "machine": "arm64",
+    "release": "25.6.0",
+    "system": "Darwin"
+  },
+  "schema": "n83.external-xor-local-pilot/v1",
+  "selected_best_total_runtime": null,
+  "solver": "CryptoMiniSat 5.14.7",
+  "solver_flags": [
+    "--verb",
+    "1",
+    "--verbstat",
+    "1",
+    "--threads",
+    "1",
+    "--maxtime",
+    "300",
+    "--maxconfl",
+    "2000000",
+    "--printsol",
+    "1"
+  ],
+  "source_files_blake3": {
+    "examples/koblitz_n83_mixed_orbit_worker.rs": "d9289587eeec06996a044f27631c8e5cd35c92834ccdff07879a063ed01be38d",
+    "src/cryptanalysis/binary_semaev_chain_sat.rs": "8fe86482ce6a6a3b0a396fe8192adfffc7a2322cdb42103ca8cb43362e779435",
+    "src/cryptanalysis/koblitz_large_prime.rs": "100231dc515c014523bca0aa02838e580a02747e0b1fda0af02d7a87562b65e4",
+    "src/cryptanalysis/sat.rs": "4c7444130b1204895485fbaee0a0d40d12197c85767f62c8db281a82573a5b3a"
+  },
+  "source_parent_commit": "aa57f462e321d0a5219d89875abf28547c567112",
+  "status": "PASS_BOUNDED_CENSORED",
+  "study": "koblitz_n83_factor_base_sweep_20261008",
+  "summed_export_plus_solver_process_wall_seconds_L0": 619.6923389569965,
+  "worker_binary_sha256": "7c15310f0ede9d6fdb62af9b4c1eb4e1f5cfe527350118b1d38854bc66936108"
+}

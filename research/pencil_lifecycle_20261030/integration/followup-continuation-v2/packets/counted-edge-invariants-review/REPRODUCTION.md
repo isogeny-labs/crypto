@@ -1,0 +1,7 @@
+# Evidence readback and replay
+
+Hydrate the exact archive with `python3 tools/artifacts/artifacts.py pull <packet-path>`. Verify its digest from `.artifacts.json`, then every member against `archive-members.json`. The archive contains both original reviewer directories, source copies, generated oleans, stdout/stderr, receipts and dependency-before.json; exact original records are preserved.
+
+For a separately authorized future proof replay, copy the five Lean source files into a fresh directory. Use the producer's published `dependencies.txt` and `check.sh` to reconstruct LEAN_PATH, preserving the whole quoted dependency expansion. Pin the Lean executable and all imported dependency bytes against the successful review inventory. Compile OwnerEdge, CountedContract and EdgeControls in order, followed by EdgeReadback and ExpectedFailure. The first four must exit zero; ExpectedFailure must exit one with the explicit decide-false diagnostic. Check the13 exact names and allowed axiom set using the producer's audit checker. This paragraph is a reconstruction guide, not a claim that the producer wrapper was the reviewer's exact command, and does not authorize another invocation.
+
+The reviewer had source/report familiarity, reused hashed dependency binaries and did not use an independent binary/kernel checker. The first wrapper's incomplete path expansion and its smaller inventory remain separately identifiable in the archive.

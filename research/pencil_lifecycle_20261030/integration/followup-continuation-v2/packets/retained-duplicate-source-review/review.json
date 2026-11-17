@@ -1,0 +1,35 @@
+{
+  "schema": "research.prospective-source-review/v1",
+  "candidate_manifest_sha256": "822465e7bc61e4ec43a5da8f3a8a239377a9e0476da497a055d491540e26e343",
+  "verdict": "Two reporting corrections required before execution; target/source contract otherwise supported",
+  "static_checks": "static-checks.json",
+  "checks": [
+    "all24 file hashes and sizes match",
+    "180 archived records; exact60 p739 rows420 cases; index order/labels/target metadata match",
+    "six prior control reference hashes match",
+    "duplicate/graph/native source and base fixture identical to reviewed prior packet",
+    "new per-target table and graph prevent cross-target pooling",
+    "original signed divisor and original a,b sent to first graph insertion; no relabeling",
+    "G/Q validity/order and planted-to-Q reference checks plus every D=aG+bQ check precede ingestion",
+    "all selected cases receive normal/failure/censored-by-poison dispositions, subject to global-failure completeness detection",
+    "all comparisons continue after terminal while graph forwarding stops",
+    "main does not invoke planted alternate-label fixture function",
+    "wrapper verifies frozen files, refuses existing output, caps entire offline cargo invocation120s+5s grace",
+    "420unique source identities required for complete; errors and raw outputs retained"
+  ],
+  "reporting_limits": [
+    "complete means disposition coverage not all mathematical cases accepted",
+    "any_failed_dispositions checks selected top-level failures only, not nested adapter invariant_error/candidate_rejected; inspect adapter_statuses and raw rows",
+    "setup and constructor counters repeated per case with count-once marker; aggregate once per target",
+    "provenance string is coarse retained_coordinate_fixture; designed category grouping must use fixed case_index and source labels",
+    "square-root/primality and dense reference work are not complete calibrated costs",
+    "global setup/constructor failures outside local catches can truncate output; wrapper reports incomplete"
+  ],
+  "required_corrections": [
+    "include invariant_error/candidate_rejected/noncanonical_label nested adapter failures in standardized failure flag",
+    "per-target setup/constructor ledger with repeated-copy consistency check or equally unambiguous typed accounting"
+  ],
+  "execution": false,
+  "admission": "root decision separate from this source review",
+  "cost_ratio": null
+}

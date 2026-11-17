@@ -1,0 +1,39 @@
+card: CARD-BLINDSPOT-05-14 (sha256 f5c95ad3b091d4720827448a34b0c6c2a5105fbe03f5da4c4891e76f8596c8dc)
+commit: 49990049d5edaef70306cb315223f803356da84c
+receipt: research/blindspots_20261018/05-elimination-orders/raw/receipt-card-14.json sha256 5f548d2d3eb6d651432b46f01925de15ae4247f8d8f68ed2a611920a8e2165de
+status: completed
+command 1 (make-bin-dir): ["mkdir", "-p", "target/blindspots-05/card-14"] exit 0 (0.002 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "target-cpu=native", "-o", "target/blindspots-05/card-14/b05", "examples/blindspots_05_elimination_orders.rs"] exit 0 (4.169 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 20 lines:
+        |
+    458 | fn poly_degree(p: &Poly) -> u32 {
+        |    ^^^^^^^^^^^
+    
+    warning: field `nv` is never read
+       --> examples/blindspots_05_elimination_orders.rs:549:5
+        |
+    548 | struct Order {
+        |        ----- field in this struct
+    549 |     nv: usize,
+        |     ^^
+    
+    warning: constant `FIXED_ARMS` is never used
+        --> examples/blindspots_05_elimination_orders.rs:1334:7
+         |
+    1334 | const FIXED_ARMS: [&str; 6] = ["grevlex", "blkLI", "blkIL", "wdeg", "mindeg", "tw"];
+         |       ^^^^^^^^^^
+    
+    warning: 4 warnings emitted
+    
+command 3 (rand0-c31-15-2-t0): ["prlimit", "--as=4294967296", "target/blindspots-05/card-14/b05", "run", "--draws", "research/blindspots_20261018/05-elimination-orders/draws.tsv", "--cell", "c31-15-2", "--targets", "0", "--arms", "rand0", "--time-limit", "370", "--total-limit", "370"] exit 0 (239.275 s) succeeded
+  stdout sha256 264f5177f7bb7682a652bcdeac0b93f04a974505069a1dcbfc9ece136b41d8fa; last 1 lines:
+    {"cell":"c31-15-2","m":2,"n":31,"ell":15,"nv":30,"target":0,"arm":"rand0","solutions":0,"status":"refuted","d_mat":4,"d_sel":4,"steps":6,"pairs_sel":20072,"pairs_gen":110866,"rows_max":29586,"cols_max":27816,"rc_max":822964176,"nnz_max":33198019,"cols_sum":58705,"rows_sum":61453,"touches":127271642295,"build":48477665,"elim":119108411829,"back":8114752801,"zero_red":11878,"new_elems":8194,"g_size":8225,"ms":239229.4,"ms_sym":673.3,"ms_elim":224232.6,"ms_back":11339.5,"ms_add":2036.0,"rss_kb":289964,"step_rows":[30,53,1309,2156,29586,28319],"step_cols":[254,380,4051,4389,27816,21815],"pg_edges":435,"pg_pairs":435,"width_mindeg":29,"width_minfill":29}
+  stderr last 1 lines:
+    c31-15-2 t0 rand0: refuted D=4 steps=6 touches=127271642295 239.2s
+command 4 (remove-bin): ["rm", "-f", "target/blindspots-05/card-14/b05"] exit 0 (0.007 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 5 (remove-bin-dir): ["rmdir", "target/blindspots-05/card-14"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+exit 0

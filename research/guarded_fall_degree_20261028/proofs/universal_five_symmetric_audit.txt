@@ -1,0 +1,214 @@
+Independent symbolic audit of the universal degree-five proof
+Date: 2026-10-28
+
+Setting
+-------
+p>3, E:y^2=x^3+a*x+b nonsingular, S three distinct rational-point
+abscissas, both signs allowed, R an affine rational target. F is the six-input
+inverse-guarded chain in ordinary polynomial total degree. Assume F has no
+solution (equivalently, under these rational-lift assumptions, no guarded
+point decomposition). Write V_D=V(F,D): this is the smallest K-linear
+subspace containing every input of degree at most D and closed under
+multiplication by any polynomial whenever the ordinary product degree is
+at most D. The conclusion is 1 in V_5 and hence d_F<=5. This is a proof for B=3; no claim for arbitrary growing B.
+
+1. Pair coordinate identities and degree-four reduction
+------------------------------------------------------
+Let g(T)=T^3-s1*T^2+s2*T-s3, x=x1, y=x2, z=x3, h=v*(x-y)-1,
+Q=(g(x)-g(y))/(x-y), and w=s1-x-y. Then
+  v*(g(x)-g(y))-Q*h=Q,
+so Q belongs to V_4. Define
+  L=s1-w=x+y,
+  M=w^2-s1*w+s2,
+  Delta=L^2-4*M=-3*w^2+2*s1*w+s1^2-4*s2.
+The exact identities
+  M-x*y=Q,
+  g(w)=g(y)+(w-y)*Q
+show g(w) belongs to V_4. All involved products have ordinary degree <=4.
+
+Put
+  Atilde(w,u)=Delta*u^2 -2*(L*(M+a)+2*b)*u +(M-a)^2-4*b*L.
+Direct expansion gives
+  S3(x,y,u)-Atilde(w,u)
+    =Q*(4*u^2+2*L*u-2*(M-a)+Q).
+Thus Atilde is available in V_4. Reduce its coefficient of u (degree<=3)
+and constant coefficient (degree<=4) modulo the monic cubic g(w). These
+reductions cost at most four; they use g(w)*u or linear multiples of g(w).
+We obtain q1(w,u)=alpha(w)*u^2+beta(w)*u+gamma(w) in V_4, with all three
+coefficient degrees <=2 and alpha=Delta.
+
+The second input q2(z,u)=S3(u,z,r) already has the same form, with
+coefficient degrees <=2 and leading coefficient (z-r)^2. We also have g(z).
+
+Unsatisfiability forces r outside S. Otherwise choose P1=R, any P2 above a
+different abscissa in S, and P3=-P2. The intermediate P1+P2 is affine and
+gives a guarded solution. Consequently the leading coefficient of q2 is
+nonzero at each z in S. Likewise Delta(c)=(a-b)^2 is nonzero when {a,b}
+is the complement of c in S.
+
+2. Monic normalization within degree five
+-----------------------------------------
+General lemma: if q(t,u)=alpha(t)*u^2+beta(t)*u+gamma(t) is available at
+D=4 with coefficient degrees <=2, g(t) is a monic cubic available at D<=4,
+and alpha is invertible modulo g, then its monic normalization belongs to
+V_5 and has form H=u^2+A(t)*u+B(t), deg A,deg B<=2.
+
+Proof: q has total degree<=4. Multiplying by t costs at most five; reducing
+its coefficient polynomials modulo g preserves total degree and gives
+NF_g(t*q) of degree<=4. Multiply this derived degree-four polynomial by t
+again and reduce to obtain NF_g(t^2*q), again within V_5. If
+I(t)=I0+I1*t+I2*t^2 is alpha inverse modulo g, the linear combination
+I0*q+I1*NF_g(t*q)+I2*NF_g(t^2*q) has u^2 coefficient exactly one, and all
+other coefficient degrees at most two. This is the required H.
+
+Applying the lemma gives
+  H1=u^2+A(w)*u+B(w),
+  H2=u^2+C(z)*u+D(z)
+in V_5, with all A,B,C,D quadratic or lower. No symbolic inverse or product
+of degree six is actually used in the derivation.
+
+3. Resultant within degree five
+-------------------------------
+All following products and coefficient reductions take place inside V_5.
+Reduce polynomials modulo g(w),g(z), without increasing ordinary degree.
+Put
+  E=A-C, J=B-D, L0=H1-H2=E*u+J.
+Then deg L0<=3. Form
+  N=2*u*L0-E*(H1+H2).
+The first product costs <=4, the second <=5. After reducing w,z, write
+  N=F0*u+G0,
+  F0=NF(2*J-A^2+C^2), G0=NF(-E*(B+D)).
+F0 is separable: a quadratic in w plus a quadratic in z. G0 has degree at
+most two in each of w,z, hence total degree<=4. Thus deg N<=4.
+
+Multiplying N by w costs <=5. Its reduced u-coefficient has total degree
+<=3 (separable F0 times w); its reduced scalar part still has bidegree
+<= (2,2). Therefore NF(w*N) has total degree<=4. The same holds for z*N.
+Multiplying these derived degree-four polynomials by w or z, respectively,
+therefore obtains NF(w^2*N),NF(z^2*N) within degree five. These second
+products may have degree FIVE, and need not have degree four.
+
+Because E is separable and quadratic, these five available polynomials
+N,NF(w*N),NF(w^2*N),NF(z*N),NF(z^2*N) give NF(E*N) by linear combination.
+This staged derivation is why the apparent degree-six product is legal.
+Meanwhile F0*L0 has degree at most 2+3=5. Subtracting cancels u and gives
+  NF(E*N-F0*L0) = -2*NF(Res_u(H1,H2)).
+For verification, the monic quadratic resultant is
+  Res=J^2-A*E*J+B*E^2.
+Expanding E*G0-F0*J gives -2 times this expression, modulo g(w),g(z).
+Characteristic p>3 permits division by -2. Therefore the scalar polynomial
+T(w,z)=NF(Res) belongs to V_5 and has total degree<=4.
+
+4. Refutation from the scalar resultant
+---------------------------------------
+At each (w,z) in S^2, a zero resultant is equivalent to a common root in u
+of the corresponding two monic quadratics. The first is S3(a,b,u) up to a
+nonzero scalar, where {a,b}=S excluding w. Its roots are the rational
+abscissas of P_a+P_b and P_a-P_b. A common root with S3(u,z,r) therefore
+joins compatible rational signs to a guarded decomposition. Repeated roots
+and 2-torsion do not affect common-root/resultant equivalence. The assumed
+unsatisfiability implies T is nowhere zero on S^2.
+
+The quotient K[w,z]/(g(w),g(z)) is K^9. Every element has a representative
+of bidegree <=(2,2), hence total degree<=4. The reduced polynomials already
+in V_5 form an ideal in this quotient: multiplying any such representative
+by w or z costs at most five, and reduction by the monic cubics remains
+within degree five. This ideal contains the invertible element T, so it
+contains 1. Hence 1 belongs to V_5.
+
+The w variable is shorthand for a linear polynomial in x1,x2. Substitution
+therefore does not increase any stated total degree, and its multiplication
+can be performed by linear combinations of permitted variable products.
+For a unit ideal the least refutation degree equals last fall degree. Thus
+  d_F <= 5.
+
+Audit status
+------------
+This document supplies symbolic identities and complete ordinary-degree
+accounting, not a Lean formalization. The key one-degree savings are staged
+coefficient normalization and staged multiplication of N. No asymptotic
+claim in field size or increasing factor-base cardinality follows.
+
+Sharpness from the existing independently replayed certificate
+------------------------------------------------------------
+For p=101, E:y^2=x^3+7, S={4,5,6}, R=(7,42), the files
+ controlled-prime-results/B3_lower_D4.json
+ controlled-prime-results/B3_upper_D5.json
+certify respectively 1 not in V_4 and 1 in V_5, bound to
+ controlled-prime-results/B3_problem.json.
+Thus the universal ceiling is attained and cannot be lowered to four.
+The lower verifier and upper sparse replay were independently checked in
+the preceding continuation. This finite certificate is additional to the
+universal symbolic upper-bound argument above.
+
+Appendix: a uniform degree-four obstruction and the exact pair (4,5)
+------------------------------------------------------------------
+The ceiling can in fact be strengthened to equality on EVERY unsatisfiable
+system in the stated B=3 class. The following independent closed-space
+argument proves 1 not in V_4; it does not depend on experimental ranks.
+
+Write f1=S3(x,y,u), f2=S3(u,z,r), and
+  I0=(g(x),g(y),g(z),v*(x-y)-1).
+The ideal I0 is proper: any distinct a,b in S, c in S, v=(a-b)^(-1), and
+arbitrary u give a common zero. Define the finite-dimensional space
+  W=(I0 intersect R_(<=4)) + K*f1 + K*f2.
+It contains every input. We prove that W is closed under all ordinary
+multiplications permitted at degree four and excludes 1.
+
+Suppose w0=i+c1*f1+c2*f2 is an element of W of degree at most three,
+i in I0 and degree(i)<=4. Evaluate on every ordered distinct pair (a,b)
+in S^2, every z in S, and v=(a-b)^(-1), leaving u free. Since i vanishes,
+comparison of the u^2 coefficients gives
+  c1*(a-b)^2+c2*(z-r)^2
+    = l0+l1*a+l2*b+l3*z+l4/(a-b),
+for some field scalars l0,...,l4. Indeed, the u^2 coefficient of any
+polynomial of total degree at most three is affine in x,y,z,v. Terms
+in u^3 do not interfere with this coefficient comparison.
+
+Fixing (a,b) and varying the three distinct z values makes the two sides
+quadratic polynomials in z that agree at all three points. Their quadratic
+coefficient comparison forces c2=0, and then l3=0.
+
+Swap a,b and subtract. The resulting equation is
+  (l1-l2)*(a-b)^2+2*l4=0
+for every unordered pair. The three squared differences cannot all be
+equal in characteristic greater than three. To see this, if (a-b)^2 and
+(a-c)^2 agree for distinct a,b,c, then b+c=2a; the remaining squared
+difference is 4*(a-b)^2 and equality would force 3*(a-b)^2=0.
+Therefore l1=l2 and l4=0.
+
+Consequently c1*(a-b)^2 is affine in a+b, equivalently affine in the
+missing root w=s1-a-b. But
+  (a-b)^2=-3*w^2+2*s1*w+s1^2-4*s2.
+This genuinely quadratic function cannot agree with an affine function at
+all three distinct w values unless c1=0, because -3 is nonzero. Thus c1
+and c2 both vanish, proving w0 belongs to I0.
+
+Every member of W of degree at most three is therefore in I0. Multiplying
+such a member by any nonconstant polynomial while keeping product degree
+at most four remains in I0 intersect R_(<=4), hence in W. Multiplication
+by constants is covered by linearity. This proves W is closed under every
+permitted multiplication at degree four.
+
+If 1 belonged to W, the same coefficient argument (now applied to the
+constant polynomial 1) would force c1=c2=0, giving 1 in I0, contrary to
+I0 being proper. Hence W excludes 1, and V_4 is contained in W. We have
+proved 1 not in V_4 uniformly. On unsatisfiable instances, the preceding
+upper proof then gives exactly d_F=5.
+
+The syzygy-defined first fall is uniformly four as well. Before degree
+four the available homogeneous tops are x^3,y^3,z^3 and v*(x-y). There
+is no degree-two relation. Any degree-three relation would have the form
+  a1*x^3+a2*y^3+a3*z^3+L*v*(x-y)=0,
+with L linear. Separating the part not divisible by v forces all ai=0,
+then the polynomial-domain property gives L=0. At degree four the identity
+  v*(g(x)-g(y))-Q*h=Q
+provides a top syzygy, and it is non-Koszul because the first possible
+Koszul degree is at least five. It lifts to nonzero Q, not to zero. Thus
+under the stated leading-homogeneous-syzygy/Koszul convention the exact
+uniform pair on unsatisfiable B=3 inverse-guarded models is
+  (d_ff,d_F)=(4,5).
+
+This does not establish an analogous ceiling for the unguarded model,
+for systems with more than three abscissas, for characteristic two, or for
+other polynomial presentations.

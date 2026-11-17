@@ -1,0 +1,89 @@
+name: Prime31 B8 RR9 generic MITM control (Rust 1.100)
+
+on:
+  push:
+    branches: [automation/prime31-b8-mitm-control-20261117]
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_b8_generic_mitm.rs'
+      - 'research/prime31_ic_20261115/rr9/RR9_B8_GENERIC_MITM_PROTOCOL_20261117.md'
+      - '.github/workflows/prime31-rr9-b8-generic-mitm.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_b8_generic_mitm.rs'
+      - 'research/prime31_ic_20261115/rr9/RR9_B8_GENERIC_MITM_PROTOCOL_20261117.md'
+      - '.github/workflows/prime31-rr9-b8-generic-mitm.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-b8-mitm:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact proposed native comparator source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_rr9_b8_generic_mitm.rs
+            research/prime31_ic_20261115/native/examples/prime31_rr9_barycentric_core.rs
+            research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs
+          sparse-checkout-cone-mode: false
+      - name: Checkout immutable native curve arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: prime31-native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Pin Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay exact proposed RR9 controls on immutable native crate
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_b8_generic_mitm.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_barycentric_core.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+      - name: Original native Rust and new comparator tests
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          timeout -k 10 300 cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_b8_generic_mitm
+          cargo +1.100.0 build --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_b8_generic_mitm
+      - name: Produce and assert exact-source native B8 control receipt
+        run: |
+          timeout -k 10 300 bash -c '
+            ulimit -v 1048576
+            exec "$1"
+          ' _ prime31-native-pinned/research/prime31_ic_20261115/native/target/release/examples/prime31_rr9_b8_generic_mitm > prime31-rr9-b8-generic-mitm.json
+          jq -e '
+            .schema == "prime31.rr9.b8-generic-mitm-control.v1" and
+            .p == 2147483647 and .n == 2147446831 and
+            .base_x == [0,1,2,3,5,6,8,9] and
+            .left_table_entries == 16 and
+            .right_table_distinct_points >= 1 and
+            .all_256_masks_replayed == 256 and
+            .blinded_public_targets == 1024 and
+            .blinded_distinct_secret_labels_test_only == 1024 and
+            .fixed_cases[0].found == true and
+            .fixed_cases[1].found == false and
+            .fixed_cases[2].found == false and
+            .rr9_chart_fixed_positive == 1 and
+            .rr9_chart_fixed_negative_1 == 0 and
+            .rr9_chart_fixed_negative_2 == 0 and
+            .complete_unknown_prime31_logs == 0 and
+            .is_nongeneric_extraction == false and
+            .pcc == "unverified"
+          ' prime31-rr9-b8-generic-mitm.json
+      - name: Preserve full source-specific JSON evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-b8-generic-mitm
+          path: prime31-rr9-b8-generic-mitm.json
+          if-no-files-found: warn
+          retention-days: 30

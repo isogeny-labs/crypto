@@ -1,0 +1,11 @@
+# Native adapter independent source review
+
+The exact published Rust library was rebuilt offline and checked against the frozen supervisor predicates. All 58 producer controls and 32 independent controls passed their expected outcomes. The independent set contains five accepted inputs and 27 rejected inputs. No Docker daemon, supervisor, scientific execution or qualification job was invoked.
+
+Source fidelity. Identity, nonce, image, user, entrypoint, terminal exit, resource limits, readonly mounts, approved tmpfs, namespace and security predicates are checked before the exact diff language. Independent cases vary metadata types, duplicate mount destinations, bind sources, ownership, diff framing and transport status. Q1, Q2 and Q3 are covered with distinct fixture identities and reordered binds. Published library SHA256: 91a8f422b708307bf305baca65f661ab3ddf4a578d6d663f19cc54c9bec0f116.
+
+Accepted boundaries. Duplicate identical tmpfs options are treated as a set, consistent with the original source. An absolute source path containing a parent segment is accepted when expected and observed strings match. Filesystem canonicalization and file custody therefore remain caller obligations. Typed Rust predicates reject several malformed values that the old Python defaults or truthiness could accept; the result is a stricter metadata contract, not universal equivalence over malformed JSON.
+
+Remaining integration. The library receives a parsed JSON value; duplicate raw JSON key rejection must happen at the native callsite. Fixture and gate hashes, filesystem modes and symlinks, daemon observations, pre-execution gate output, PID/cgroup observations, actual wait/log collection, cleanup, ownership and deadline enforcement are outside this library. Its prerequisites_checked result refers only to its metadata checks. The full native supervisor remains unported and runtime admission remains false.
+
+Review independence. The reviewer did not author this adapter, and inspected the original frozen supervisor before the new source. Prior familiarity with the parser and supervisor is disclosed. Compilation, native fixed controls, returned rejection errors and source hashes are retained. The earlier Python draft was not executed; original v5 failure evidence remains unchanged.

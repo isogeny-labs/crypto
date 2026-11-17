@@ -1,0 +1,39 @@
+{
+  "aggregate": {
+    "cold_selected_candidate_id": null,
+    "online_selected_candidate_id": null,
+    "status": "INFRASTRUCTURE_TRANSFER_INCOMPLETE"
+  },
+  "provider_snapshot_sha256": "050c48ab2d6263cd18b16c60c8fad020317e751d673c334bbeb0963bdae9506a",
+  "recorded_utc": "2026-10-19T02:02:45.397216+00:00",
+  "schema": "n83.root4-runpod-partial-result/v1",
+  "source_head_sha": "9f7aef84e3179fe9d661f75efd30c3aede690d87",
+  "stratum0": {
+    "aa_status": "PASS_10_PERCENT_PER_PAIR",
+    "durable_dedup_archive_sha256": "ee88188e918ab90c1c32c76349822f75dc35237b8fa41faafb9652ef8730b3ac",
+    "local_replay_exit": 0,
+    "local_replay_stdout_sha256": "dfb8a78fbc2f0b8d1f6e149b27f7839b655512b3cb9bf89df36491f9293c9c71",
+    "point_count": 8,
+    "raw_archive_sha256": "d06daffcbdb35d4ba3fc74c94d6eb3c4fe206d5b428f53a3673fce9f46866aca",
+    "raw_file_count": 1384,
+    "status": "PASS_INDEPENDENT_LOCAL_REPLAY",
+    "tier_status": "PASS_TIER1"
+  },
+  "stratum1": {
+    "aa_status": "PASS_10_PERCENT_PER_PAIR",
+    "gateway_failure": "OCI runtime exec could not allocate a container PTY: reopen ptmx no space left on device",
+    "local_replay_exit": null,
+    "locally_verified_parts": [
+      "raw.part.aa"
+    ],
+    "manifest_sha256": "facd358a5081e9f9d2e1bdd8dacf6136918e2269a4a359e205f4f70c37facf72",
+    "point_count": 8,
+    "producer_exit": "0",
+    "provider_analysis_status": "STRATUM_ADMITTED",
+    "provider_verifier_exit": "0",
+    "raw_archive_bytes": 333656014,
+    "raw_archive_sha256": "0abc06f1353ebabb79e5009cd7d9021bd8f37132a721017d3734741999ff54bd",
+    "status": "PROVIDER_VERIFIED_RAW_TRANSFER_INCOMPLETE",
+    "tier_status": "PASS_TIER1"
+  }
+}

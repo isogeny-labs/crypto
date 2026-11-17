@@ -1,0 +1,3 @@
+Original proposal/validation files are copied unchanged. Test executables are omitted from Git and preserved in the private software archive named by s3.receipt.json. Map proposal manifest absolute paths to the archive source directories by basename. Hashes and reproduction commands remain in the original records.
+
+The two V1 base references in MANIFEST.json are preserved in historical-base/ in Git. They are outside the V2 S3 package; current V2 source and its executables are inside that archive. The base receipt records historical validation and is not a new replay.

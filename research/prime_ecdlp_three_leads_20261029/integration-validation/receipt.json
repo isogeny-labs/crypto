@@ -1,0 +1,227 @@
+{
+  "schema": "prime-ecdlp.integration-validation/v1",
+  "updated_utc": "2026-10-29T18:16:56.156556+00:00",
+  "scope": "software/schema/proof integration; no scientific performance result",
+  "tested_integration_commit": "497698e279eee351b775d8dad6696f35cbef468a",
+  "parents": [
+    "9a29c1d6cbebe1db669be59119adc4ce69bc8a97",
+    "78f84234e18facfc46be52741d7fa6acadc92b88"
+  ],
+  "copilot_request_comment": 6503015092,
+  "fallback_explanation_comment": 6504324054,
+  "conflicts": [
+    "docs/session-logs/2026-10-29.md"
+  ],
+  "preserved_parent_paragraphs": {
+    "authored": 350,
+    "main": 430
+  },
+  "original_nonlog_blobs_unchanged": 60,
+  "historical_source_hash_maps_match": true,
+  "commands": [
+    {
+      "name": "native-example-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--example",
+        "pkm_symmetric_complete",
+        "--example",
+        "hecke_target_router",
+        "-j2"
+      ],
+      "exit": 0,
+      "log": "native-tests.log",
+      "captured_bytes": 1276,
+      "captured_sha256": "ec0b5fa150b6ba1fa5e8cca1213f57286e2701064780f57de9eae7a016683221",
+      "passed": 8,
+      "failed": 0,
+      "env": {
+        "CARGO_TARGET_DIR": "/workspace/three-leads-clippy-target",
+        "CARGO_HOME": "/workspace/toolchains/cargo",
+        "RUSTUP_HOME": "/workspace/toolchains/rustup"
+      },
+      "timeout_seconds": 2700
+    },
+    {
+      "name": "strict-clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--release",
+        "--locked",
+        "--example",
+        "pkm_symmetric_complete",
+        "--example",
+        "hecke_target_router",
+        "--no-deps",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "log": "clippy.log",
+      "captured_bytes": 209,
+      "captured_sha256": "d94ab9b6c79835b80736c6ea6e9caa87a61335ee360841f7ec9fb360d4f1544e",
+      "env": {
+        "CARGO_TARGET_DIR": "/workspace/crypto/target",
+        "CARGO_HOME": "/workspace/toolchains/cargo",
+        "RUSTUP_HOME": "/workspace/toolchains/rustup"
+      },
+      "timeout_seconds": 900
+    },
+    {
+      "name": "rustfmt",
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2021",
+        "--check",
+        "examples/pkm_symmetric_complete.rs",
+        "examples/hecke_target_router.rs"
+      ],
+      "exit": 0,
+      "log": "rustfmt.log",
+      "captured_bytes": 0,
+      "captured_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "proof-gate",
+      "argv": [
+        "tools/lean/proof-gate.sh",
+        "--out",
+        "/workspace/pr2868-integration-proof",
+        "research/prime_ecdlp_three_leads_20261029/lean"
+      ],
+      "exit": 0,
+      "log": "proof.log",
+      "captured_bytes": 92,
+      "captured_sha256": "4b7f1980358176ca373a4f130955b27b6cbf23f63f378b38987c1a87a16365d8",
+      "audited_declarations": 10,
+      "trusted_exceptions": 0
+    },
+    {
+      "name": "model-kernel-replay",
+      "argv": [
+        "lake",
+        "env",
+        "leanchecker",
+        "ThreeLeads.PKMGoalModel"
+      ],
+      "exit": 0,
+      "log": "kernel.log",
+      "captured_bytes": 0,
+      "captured_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "cwd": "research/prime_ecdlp_three_leads_20261029/lean",
+      "mode": "module replay against imports, not --fresh or an external prover"
+    },
+    {
+      "name": "backlog-card-validation",
+      "argv": [
+        "target/release/backlog",
+        "validate",
+        "XP-20261029-pkm-verified-oracle-program"
+      ],
+      "exit": 0,
+      "log": "backlog.log",
+      "captured_bytes": 44,
+      "captured_sha256": "00c228dbeecbb17c54e2ba4cba835117d7849e10c05f255aec11e31877b78e2e",
+      "tool_sha256": "4c5256a9e6f66e5b02e47a5650c1e0e553dea2b0f226a304dcc77fa1341a2e15",
+      "tool_note": "previously built executable; validator sources unchanged across integration; no launch/post/lease"
+    },
+    {
+      "name": "artifact-tool-tests",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "tools/artifacts/test_artifacts.py"
+      ],
+      "exit": 0,
+      "log": "artifact-tests.log",
+      "captured_bytes": 178,
+      "captured_sha256": "bbb64af2c890e2862d4d5a87e3e5ecd285b1d1ba3e956d66c98e31758422a2ec",
+      "passed": 28
+    },
+    {
+      "name": "size-policy-at-integration",
+      "argv": [
+        "scripts/check-large-files.sh",
+        "78f84234e18facfc46be52741d7fa6acadc92b88",
+        "497698e279eee351b775d8dad6696f35cbef468a"
+      ],
+      "exit": 0,
+      "log": "size.log",
+      "captured_bytes": 65,
+      "captured_sha256": "322761bcb838f5da662927750da20634e40f03f900e2c31c260a13cd2d9a78ec"
+    },
+    {
+      "name": "artifact-policy-at-integration",
+      "argv": [
+        "python3",
+        "tools/artifacts/artifacts.py",
+        "check",
+        "78f84234e18facfc46be52741d7fa6acadc92b88",
+        "497698e279eee351b775d8dad6696f35cbef468a"
+      ],
+      "exit": 0,
+      "log": "artifacts.log",
+      "captured_bytes": 41,
+      "captured_sha256": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934"
+    }
+  ],
+  "unit_test_binaries": [
+    {
+      "path": "/workspace/three-leads-clippy-target/release/examples/hecke_target_router-3c420b70a6db96f6",
+      "bytes": 4911024,
+      "sha256": "fd5937d81b0515fc65480b16960696b2b3af3f1f9c415e4b936d2f6eb3c03986"
+    },
+    {
+      "path": "/workspace/three-leads-clippy-target/release/examples/pkm_symmetric_complete-ec1ee167db9c99a7",
+      "bytes": 6252112,
+      "sha256": "a5a1b7198016b08024cb7476760ec4b191b45e6fc0a5c406c6daca330513f7bb"
+    }
+  ],
+  "source_sha256": {
+    "Cargo.toml": "05b2ef3c0125cf8dc487923fc37f976b14f772ffcd27f713b6a844bb37d6fd59",
+    "Cargo.lock": "111e4be701491000d99baec1a43768f005871712295f26d88af0ee0a46572137",
+    "examples/pkm_symmetric_complete.rs": "f4b54888798695840813e211e4a17bfc6358ecb939f0817762e04bb26cf8e67b",
+    "examples/hecke_target_router.rs": "716ec5f01876d651a66e5564128361bb5f69429843e2a0b514f301198dbca692",
+    "tools/lean/proof-gate.sh": "19d54c7c9095a2604f9daeaac51e9069d43b8864a225a4b8443df01a8b0b5a83",
+    "tools/lean/AuditAxioms.lean": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929",
+    "tools/lean/trusted-native.txt": "934d0322ac07faec9502186b206c289cdeed7fb9a54f700cc097124476b6bf15"
+  },
+  "initial_failures": [
+    {
+      "command": "rustfmt --edition 2021 --check examples/pkm_symmetric_complete.rs examples/hecke_target_router.rs",
+      "exit": 1,
+      "log": "rustfmt-initial.log",
+      "reason": "RUSTUP_HOME selector omitted; failed before formatting; corrected invocation exit0"
+    }
+  ],
+  "prior_full_library_status": "historical capped incomplete: 5232 passed,0 failed,123 ignored,one unchanged test unfinished; not rerun for this integration",
+  "large_raw_logs_status": "NOT_UPLOADED; original sizes and SHA256 rechecked",
+  "scientific_panels_run": 0,
+  "backlog_status": "blocked",
+  "funding_units": 0,
+  "remote_merge_gates": "gate,size,artifacts required on final published head; local checks do not establish these",
+  "log_sha256": {
+    "artifact-tests.log": "bbb64af2c890e2862d4d5a87e3e5ecd285b1d1ba3e956d66c98e31758422a2ec",
+    "artifacts.log": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934",
+    "backlog.log": "00c228dbeecbb17c54e2ba4cba835117d7849e10c05f255aec11e31877b78e2e",
+    "clippy.log": "d94ab9b6c79835b80736c6ea6e9caa87a61335ee360841f7ec9fb360d4f1544e",
+    "kernel.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-tests.log": "44a67b7f2995ba6264ebb6f2d4b99080312fbe8583628a6bb15338080717cda8",
+    "proof-gate/audit.log": "ea99d15c2073c8e6d445dc6dc3b29dd2300b9e0fa6baec2e6cf64820e1441057",
+    "proof-gate/build.log": "fd3f4c2f41d4fc2b7334d43d37dd0854abe3c6ba7a24c866d270ce050a5e8cc4",
+    "proof-gate/cache.log": "29e284dc7d8024aa6a333a92d0b23035028d78ada47b37f7dd77d8e1a0293483",
+    "proof-gate/source-build.log": "12a0ac1809d71f7184b84087c6d8e9bd9183e5b20b7dbbbc8a245088ed54ebf9",
+    "proof.log": "4b7f1980358176ca373a4f130955b27b6cbf23f63f378b38987c1a87a16365d8",
+    "rustfmt-initial.log": "f46f9a73097cb30ec2a81937fac11e20622fe5187281d562ec725161d5c6706b",
+    "rustfmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size.log": "322761bcb838f5da662927750da20634e40f03f900e2c31c260a13cd2d9a78ec"
+  }
+}

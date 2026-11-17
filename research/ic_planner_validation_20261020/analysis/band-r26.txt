@@ -1,0 +1,41 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp26-tm1775-7e8fb6df | 25.35 | double-base | 24/24 | 24.296 | 25.376 | 35.102 | — |
+| icv1-fp26-tm1775-7e8fb6df | 25.35 | full-rank | 24/24 | 58.453 | 69.158 | 165.509 | — |
+| icv1-fp26-tm1775-7e8fb6df | 25.35 | half-base | 24/24 | 23.559 | 27.967 | 67.640 | — |
+| icv1-fp26-tm1775-7e8fb6df | 25.35 | plan | 24/24 | 15.228 | 17.279 | 35.741 | — |
+| icv1-fp26-tm1775-7e8fb6df | 25.35 | plan-aa | 24/24 | 15.228 | 17.279 | 35.741 | — |
+| icv1-fp26-tm1775-7e8fb6df | 25.35 | random-targets | 24/24 | 747.613 | 749.736 | 768.842 | — |
+| icv1-fp26-tm1775-7e8fb6df | 25.35 | rho-neg | 24/24 | 1.046 | 1.145 | 2.035 | — |
+| icv1-fp26-tm1775-7e8fb6df | 25.35 | rootfind | 24/24 | 3551.026 | 3907.129 | 7112.055 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp26-tm1775-7e8fb6df | double-base vs full-rank | double-base < full-rank |
+| icv1-fp26-tm1775-7e8fb6df | double-base vs half-base | unresolved inside the band |
+| icv1-fp26-tm1775-7e8fb6df | double-base vs plan | unresolved inside the band |
+| icv1-fp26-tm1775-7e8fb6df | double-base vs plan-aa | unresolved inside the band |
+| icv1-fp26-tm1775-7e8fb6df | double-base vs random-targets | double-base < random-targets |
+| icv1-fp26-tm1775-7e8fb6df | double-base vs rho-neg | rho-neg < double-base |
+| icv1-fp26-tm1775-7e8fb6df | double-base vs rootfind | double-base < rootfind |
+| icv1-fp26-tm1775-7e8fb6df | full-rank vs half-base | half-base < full-rank |
+| icv1-fp26-tm1775-7e8fb6df | full-rank vs plan | plan < full-rank |
+| icv1-fp26-tm1775-7e8fb6df | full-rank vs plan-aa | plan-aa < full-rank |
+| icv1-fp26-tm1775-7e8fb6df | full-rank vs random-targets | full-rank < random-targets |
+| icv1-fp26-tm1775-7e8fb6df | full-rank vs rho-neg | rho-neg < full-rank |
+| icv1-fp26-tm1775-7e8fb6df | full-rank vs rootfind | full-rank < rootfind |
+| icv1-fp26-tm1775-7e8fb6df | half-base vs plan | plan < half-base |
+| icv1-fp26-tm1775-7e8fb6df | half-base vs plan-aa | plan-aa < half-base |
+| icv1-fp26-tm1775-7e8fb6df | half-base vs random-targets | half-base < random-targets |
+| icv1-fp26-tm1775-7e8fb6df | half-base vs rho-neg | rho-neg < half-base |
+| icv1-fp26-tm1775-7e8fb6df | half-base vs rootfind | half-base < rootfind |
+| icv1-fp26-tm1775-7e8fb6df | plan vs plan-aa | unresolved inside the band |
+| icv1-fp26-tm1775-7e8fb6df | plan vs random-targets | plan < random-targets |
+| icv1-fp26-tm1775-7e8fb6df | plan vs rho-neg | rho-neg < plan |
+| icv1-fp26-tm1775-7e8fb6df | plan vs rootfind | plan < rootfind |
+| icv1-fp26-tm1775-7e8fb6df | plan-aa vs random-targets | plan-aa < random-targets |
+| icv1-fp26-tm1775-7e8fb6df | plan-aa vs rho-neg | rho-neg < plan-aa |
+| icv1-fp26-tm1775-7e8fb6df | plan-aa vs rootfind | plan-aa < rootfind |
+| icv1-fp26-tm1775-7e8fb6df | random-targets vs rho-neg | rho-neg < random-targets |
+| icv1-fp26-tm1775-7e8fb6df | random-targets vs rootfind | random-targets < rootfind |
+| icv1-fp26-tm1775-7e8fb6df | rho-neg vs rootfind | rho-neg < rootfind |

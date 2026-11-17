@@ -1,0 +1,49 @@
+import WordComparator
+set_option autoImplicit false
+namespace SieveDifference
+variable {K : Type*} [CommRing K]
+def U (a b c : K) (n : Nat) : K := a+b*(n:K)+c*(n:K)^2
+def D (b c : K) (n : Nat) : K := b+c*(2*(n:K)+1)
+def V (a b : K) (n : Nat) : K := a+b*(n:K)
+theorem initial (a b c e f : K) : U a b c 0=a ∧ D b c 0=b+c ∧ V e f 0=e := by simp [U,D,V]
+theorem next_u (a b c : K) (n : Nat) : U a b c n+D b c n=U a b c (n+1) := by simp only [U,D,Nat.cast_add,Nat.cast_one];ring
+theorem next_d (b c : K) (n : Nat) : D b c n+(c+c)=D b c (n+1) := by simp only [D,Nat.cast_add,Nat.cast_one];ring
+theorem next_v (a b : K) (n : Nat) : V a b n+b=V a b (n+1) := by simp only [V,Nat.cast_add,Nat.cast_one];ring
+
+def state (a b c e f : K) : Nat → K × K × K
+ | 0 => (a,b+c,e)
+ | n+1 => let s:=state a b c e f n; (s.1+s.2.1,s.2.1+(c+c),s.2.2+f)
+theorem state_closed (a b c e f : K) (n : Nat) : state a b c e f n=(U a b c n,D b c n,V e f n) := by
+ induction n with
+ | zero => simp [state,U,D,V]
+ | succ n ih => simp only [state,ih];rw [next_u,next_d,next_v]
+
+def horner2 (a b c : K) (x : K) : K := (c*x+b)*x+a
+theorem horner_value (a b c : K) (n : Nat) : U a b c n=horner2 a b c (n:K) := by unfold U horner2;ring
+theorem zero_pad_degree_one (a b : K) (n : Nat) : U a b 0 n=a+b*(n:K) := by simp [U]
+theorem zero_pad_degree_zero (a : K) (n : Nat) : U a 0 0 n=a := by simp [U]
+theorem empty_v (n : Nat) : V (0:K) 0 n=0 := by simp [V]
+
+def evaluated (a b c e f : K) (count : Nat) : List (Nat × K × K) :=
+ (List.range count).map (fun n => (n,(state a b c e f n).1,(state a b c e f n).2.2))
+def reference (a b c e f : K) (count : Nat) : List (Nat × K × K) :=
+ (List.range count).map (fun n => (n,horner2 a b c (n:K),e+f*(n:K)))
+theorem ordered_evaluation (a b c e f : K) (count : Nat) : evaluated a b c e f count=reference a b c e f count := by
+ simp only [evaluated,reference,state_closed,horner_value,V]
+theorem same_branch_fold {S : Type*} (step : S → Nat × K × K → S) (s : S)
+ (a b c e f : K) (count : Nat) :
+ (evaluated a b c e f count).foldl step s=(reference a b c e f count).foldl step s := by rw [ordered_evaluation]
+
+def wordAdd (p a b : UInt64) : UInt64 := (a+b)%p
+theorem sum_bound (p a b : Nat) (hp:p≤2^63) (ha:a<p) (hb:b<p) : a+b<2^64 := by
+ norm_num at hp ⊢;omega
+theorem word_add_canonical (p a b : UInt64) (hp:0<p.toNat) : (wordAdd p a b).toNat<p.toNat := by
+ rw [wordAdd,UInt64.toNat_mod];exact Nat.mod_lt _ hp
+theorem word_add_decode (p a b : UInt64) (hp:p.toNat≤2^63) (ha:a.toNat<p.toNat) (hb:b.toNat<p.toNat) :
+ ((wordAdd p a b).toNat : ZMod p.toNat)=(a.toNat : ZMod p.toNat)+(b.toNat : ZMod p.toNat) := by
+ simp only [wordAdd,UInt64.toNat_mod,UInt64.toNat_add,Nat.mod_eq_of_lt (sum_bound _ _ _ hp ha hb),ZMod.natCast_mod,Nat.cast_add]
+ theorem boundary_add : wordAdd 9223372036854775808 9223372036854775807 9223372036854775807=9223372036854775806 := by decide
+ theorem square_sample : state (0:ZMod 7) 0 1 0 0 3=(2,0,0) := by decide
+ theorem degree_zero_sample : state (1:ZMod 7) 0 0 0 0 5=(1,0,0) := by decide
+ theorem missing_second_difference : (0:ZMod 7)+0≠U 0 0 1 1 := by decide
+end SieveDifference

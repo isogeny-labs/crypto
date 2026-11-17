@@ -1,0 +1,87 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Orbit-layout table and generator-orbit base, fully priced, vs the lazy orbit IC and rho: Koblitz a=0 n=37",
+  "description": "Frozen in research/ecbench_generator_orbit_20261022/PROTOCOL.md before its data. Every arm is a *_full method. ic-layout differs from ic-lazy in the oracle id only; ic-gen-layout differs from ic-layout in generator_orbit=1 and targets=stride-generator. Engineering; no security claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 37
+      }
+    ],
+    "targets_per_curve": 16,
+    "target_seed": 202610221013,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-frob",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_full"
+      }
+    },
+    {
+      "name": "rho-strong",
+      "role": "baseline",
+      "method": {
+        "id": "rho.signed_frobenius_strong_full"
+      }
+    },
+    {
+      "name": "ic-lazy-c8",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=100000000",
+          "oracle": "mitm-frobenius-lazy-counted:m=2",
+          "max_trials": "1000000000",
+          "targets": "stride-renew"
+        }
+      }
+    },
+    {
+      "name": "ic-layout-c8",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=100000000",
+          "oracle": "mitm-frobenius-layout-counted:m=2",
+          "max_trials": "1000000000",
+          "targets": "stride-renew"
+        }
+      }
+    },
+    {
+      "name": "ic-gen-layout-c8",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=100000000,generator_orbit=1",
+          "oracle": "mitm-frobenius-layout-counted:m=2",
+          "max_trials": "1000000000",
+          "targets": "stride-generator"
+        }
+      }
+    },
+    {
+      "name": "rho-frob-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_full"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202610222013,
+    "isolation_required": "L0",
+    "timeout_seconds": 3600
+  }
+}

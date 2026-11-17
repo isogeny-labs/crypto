@@ -1,0 +1,59 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "ic planner weight rule (binary, Koblitz), Phase B, Koblitz curve hk23: orbit columns",
+  "description": "research/ic_planner_weight_rule_binkob_20261026. The candidate arm is the ic plan (ic-planner/2, w = 0) output; every other IC arm changes the factor base only.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 23
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261029
+  },
+  "arms": [
+    {
+      "name": "rho",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius"
+      }
+    },
+    {
+      "name": "plan",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "targets": "walk",
+          "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000"
+        }
+      }
+    },
+    {
+      "name": "c3",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "targets": "walk",
+          "factor_base": "compact-orbit-scan:columns=3,raw_x_cap=100000000"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 20261030,
+    "isolation_required": "L2",
+    "timeout_seconds": 1800
+  }
+}

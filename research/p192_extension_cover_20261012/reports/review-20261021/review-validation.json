@@ -1,0 +1,64 @@
+{
+  "reviewed_original_head": "2d84f8194b7947456694e58be415e87346aed615",
+  "integrated_base": "51e8742ae95e0c11aea10c7db7575b380225f2c7",
+  "recorded_utc": "2026-10-21T04:34:15.030820+00:00",
+  "geometry_replay": "PASS; 5026 split rows; zero residual core rows; archived output unchanged",
+  "sorted_union_replay": "PASS; 39984 classes; capacity 10654671159440; archived output unchanged",
+  "lean_build": {
+    "toolchain": "leanprover/lean4:v4.34.1",
+    "targets": [
+      "UnorderedSupport",
+      "ThreePivotSupport"
+    ],
+    "status": "PASS",
+    "printed_theorems": 6,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "fresh_kernel_check": "Additional local execution is not included in this receipt; hosted fresh checks remain required before merge. No fresh-check pass is claimed here.",
+  "proof_gate_selftests": "PASS all 7 cases with pinned toolchain",
+  "sea_proof_gate": "PASS 20 theorems, 0 trusted",
+  "budget_tests": "PASS 15 tests",
+  "workflow_budget_audit": "PASS 437 workflows, zero violations",
+  "actionlint": "PASS for the three touched workflows",
+  "curve_names": "PASS added-line lint against integrated base and corrected F4 README; repository-wide lint remains a hosted gate",
+  "frozen_run_manifest": "PASS all 22 entries; restored exact dependency manifest from 3283d46e4a, with identical dependency revisions",
+  "weakcurves_inventory": "PASS all 106 entries",
+  "isogeny_graphs": "Both copies change only snapshot source hash; all source bindings match",
+  "native_validation": {
+    "mode": "reuse of independently hash-checked committed Linux evidence, not a fresh local execution",
+    "commit": "9f91bdea59b44f0cf3a37ba3b5f0b27a61edf0db",
+    "log": "reports/lean-proof-gate-audit-20261021/evidence/cargo-test-release-lib.log.gz",
+    "uncompressed_sha256": "de7281263c07499c30f671e7e0821010f60a16f918095b18c2ff6a37ebf95271",
+    "passed": 4464,
+    "failed": 0,
+    "ignored": 119,
+    "identical_paths": [
+      "src",
+      "Cargo.toml",
+      "Cargo.lock",
+      "build.rs",
+      ".cargo",
+      "tools/volcano-cli",
+      "isogeny_algos"
+    ]
+  },
+  "initial_diagnostics": [
+    "Unpinned local self-test mixed Lean 4.35 auditor with 4.34 fixtures and failed header compatibility; pinned rerun passed.",
+    "The first fresh checker invocation supplied two modules and was rejected; individual module invocations are used by the existing CI and corrected local attempt."
+  ],
+  "logs_sha256": {
+    "2111-pivot-replay.log": "8b0278dc357d1e0fc1b679237c42938b89496b785cec550d4cc22f30307c27d4",
+    "2111-union-replay.log": "d731d9f00558818b3230f073447904239c5f486d833973b9c63f24afbe07cd99",
+    "2111-lean-selftest-pinned.log": "553e56bad7204c3d8ca84a9a159b7b5c9165201ceba59fef875869a0b9eee9f4",
+    "2111-sea-proof-gate.log": "a2c5b4914d5d6647fcd2c84c2afcf82885e7a2d5554fa5999609112ce7873197",
+    "2111-three-pivot-build.log": "6520592f9e597316ba3c1abd40e220cd91cb48ed002342cbfee34c6ee62f085a",
+    "2111-budget-tests.log": "b27c38acb2171e17d5c7bb4b5add1feb22e2f1893e9d3dbb949cbfb2655b7b7d",
+    "2111-budget-check.log": "77900817143c1252602b9f169ced5e9d77fd704d2cf46cca66c4afd402e7eb64",
+    "2111-actionlint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "pdf_visual_review": "PASS, one page; no clipping or overlap"
+}

@@ -1,0 +1,1401 @@
+{
+  "schema": "ecbench.plan/v1",
+  "spec_id": "ECS1he70b9ec8bf27",
+  "arms": [
+    {
+      "name": "rho",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong",
+        "family": "rho",
+        "params": {
+          "dp_bits": "4",
+          "lanes": "32",
+          "step_cap_factor": "2000"
+        },
+        "method_id": "ECM1hb6123afffc07",
+        "method_sha256": "b6123afffc07ac34d98ef18a4c1a3ec1e0f14583933b9329680417044aa15707",
+        "entry": "koblitz_strong_rho::StrongRho::solve"
+      }
+    },
+    {
+      "name": "pipeline",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "family": "ic",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=298,raw_x_cap=100000000",
+          "linalg": "incremental-gauss",
+          "max_trials": "100000000",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        },
+        "method_id": "ECM1ha25e2aba1f52",
+        "method_sha256": "a25e2aba1f520a50d9861eaf016bf6c0601d59950667745057af155e4e685d0e",
+        "entry": "ic_framework::run_pipeline"
+      }
+    },
+    {
+      "name": "pipeline71",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "family": "ic",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=212,raw_x_cap=100000000",
+          "linalg": "incremental-gauss",
+          "max_trials": "100000000",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        },
+        "method_id": "ECM1hba2d5daee24e",
+        "method_sha256": "ba2d5daee24ed99ffdd6de66f330ae002ac6550d57b2117436f938b575fc07f4",
+        "entry": "ic_framework::run_pipeline"
+      }
+    },
+    {
+      "name": "descent",
+      "role": "baseline",
+      "method": {
+        "id": "ic.koblitz_descent",
+        "family": "ic",
+        "params": {
+          "collection_aim": "true",
+          "collection_window": "rule_v8",
+          "descent_summands": "rule_v8",
+          "factor_base_points": "rule_v8",
+          "max_trials": "rule_v8",
+          "max_units": "100000",
+          "seed": "rule_v8",
+          "summands": "3",
+          "unit_trials": "rule_v8",
+          "units": "rule_v8"
+        },
+        "method_id": "ECM1h607f76527d13",
+        "method_sha256": "607f76527d13c5fadc3e90bc508546ed633df72c19e465508bcb2bbb8977ac05",
+        "entry": "ecbench::koblitz_descent::run"
+      }
+    }
+  ],
+  "workloads": [
+    {
+      "workload_id": "W764230f40522",
+      "workload_sha256": "764230f4052208f58ebc821d20ddf5a83dcba7f0d1f2965e8159c5f01ea3d854",
+      "curve_spec": {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 59
+      },
+      "curve": {
+        "slug": "icv1-f2m59-tm943548413-98844ecc",
+        "icv1": "ICV1:f2m-59-eeb35974:-943548413:576460753246971902:0x1:-7:unk:r:98844eccbb36",
+        "family": "koblitz",
+        "construction": "KoblitzCurve::new(1, 59)",
+        "field_degree": 59,
+        "field_bits": null,
+        "group_order": 576460753246971902,
+        "r": 25179555920633,
+        "cofactor": 22894,
+        "generator": [
+          "0x4637772649759e9",
+          "0x23c2d5da728b130"
+        ],
+        "automorphisms_available": 118,
+        "registered": true,
+        "ec1": "EC1N59Ce1h20858f64459b",
+        "curve_uid": "urn:ec-record:1:sha256:20858f64459bbef8a18a8b75dbe579ce4cb0901d5c1b70d236ac154427d86980"
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 20261105,
+      "target_index": 0,
+      "target": [
+        "0x17cac8dd829c25f",
+        "0x5060a9c797b8570"
+      ],
+      "planted": 22197369756622
+    },
+    {
+      "workload_id": "Wbdd2eb1780d5",
+      "workload_sha256": "bdd2eb1780d59fda4c4defe3750426aaa87ed017662d5cee3ebbf9900eebcc0d",
+      "curve_spec": {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 59
+      },
+      "curve": {
+        "slug": "icv1-f2m59-tm943548413-98844ecc",
+        "icv1": "ICV1:f2m-59-eeb35974:-943548413:576460753246971902:0x1:-7:unk:r:98844eccbb36",
+        "family": "koblitz",
+        "construction": "KoblitzCurve::new(1, 59)",
+        "field_degree": 59,
+        "field_bits": null,
+        "group_order": 576460753246971902,
+        "r": 25179555920633,
+        "cofactor": 22894,
+        "generator": [
+          "0x4637772649759e9",
+          "0x23c2d5da728b130"
+        ],
+        "automorphisms_available": 118,
+        "registered": true,
+        "ec1": "EC1N59Ce1h20858f64459b",
+        "curve_uid": "urn:ec-record:1:sha256:20858f64459bbef8a18a8b75dbe579ce4cb0901d5c1b70d236ac154427d86980"
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 20261105,
+      "target_index": 1,
+      "target": [
+        "0x307ff9d872a145c",
+        "0x5593eb5c016a0d4"
+      ],
+      "planted": 16282729114804
+    },
+    {
+      "workload_id": "Wca7a1ec1f074",
+      "workload_sha256": "ca7a1ec1f074c0c85ca4af9933b78da5ffb3b7b1a3baaa613d5da410c7ef6be6",
+      "curve_spec": {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 59
+      },
+      "curve": {
+        "slug": "icv1-f2m59-tm943548413-98844ecc",
+        "icv1": "ICV1:f2m-59-eeb35974:-943548413:576460753246971902:0x1:-7:unk:r:98844eccbb36",
+        "family": "koblitz",
+        "construction": "KoblitzCurve::new(1, 59)",
+        "field_degree": 59,
+        "field_bits": null,
+        "group_order": 576460753246971902,
+        "r": 25179555920633,
+        "cofactor": 22894,
+        "generator": [
+          "0x4637772649759e9",
+          "0x23c2d5da728b130"
+        ],
+        "automorphisms_available": 118,
+        "registered": true,
+        "ec1": "EC1N59Ce1h20858f64459b",
+        "curve_uid": "urn:ec-record:1:sha256:20858f64459bbef8a18a8b75dbe579ce4cb0901d5c1b70d236ac154427d86980"
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 20261105,
+      "target_index": 2,
+      "target": [
+        "0xa963dfff3d05fe",
+        "0x159b937f66e38d7"
+      ],
+      "planted": 12161124414990
+    },
+    {
+      "workload_id": "Wbed45ba72781",
+      "workload_sha256": "bed45ba727811e1bc7ae06c48a3710eb327054a1ee18b976e37fcbc80d506fbb",
+      "curve_spec": {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 59
+      },
+      "curve": {
+        "slug": "icv1-f2m59-tm943548413-98844ecc",
+        "icv1": "ICV1:f2m-59-eeb35974:-943548413:576460753246971902:0x1:-7:unk:r:98844eccbb36",
+        "family": "koblitz",
+        "construction": "KoblitzCurve::new(1, 59)",
+        "field_degree": 59,
+        "field_bits": null,
+        "group_order": 576460753246971902,
+        "r": 25179555920633,
+        "cofactor": 22894,
+        "generator": [
+          "0x4637772649759e9",
+          "0x23c2d5da728b130"
+        ],
+        "automorphisms_available": 118,
+        "registered": true,
+        "ec1": "EC1N59Ce1h20858f64459b",
+        "curve_uid": "urn:ec-record:1:sha256:20858f64459bbef8a18a8b75dbe579ce4cb0901d5c1b70d236ac154427d86980"
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 20261105,
+      "target_index": 3,
+      "target": [
+        "0x65cf2a3a2755a7",
+        "0x57b29a343bee4e9"
+      ],
+      "planted": 9768528790874
+    },
+    {
+      "workload_id": "W309ab0c93226",
+      "workload_sha256": "309ab0c9322660b2b53d27d0bdc555f744139f8e161a27fdc5b169bff127eb83",
+      "curve_spec": {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 59
+      },
+      "curve": {
+        "slug": "icv1-f2m59-tm943548413-98844ecc",
+        "icv1": "ICV1:f2m-59-eeb35974:-943548413:576460753246971902:0x1:-7:unk:r:98844eccbb36",
+        "family": "koblitz",
+        "construction": "KoblitzCurve::new(1, 59)",
+        "field_degree": 59,
+        "field_bits": null,
+        "group_order": 576460753246971902,
+        "r": 25179555920633,
+        "cofactor": 22894,
+        "generator": [
+          "0x4637772649759e9",
+          "0x23c2d5da728b130"
+        ],
+        "automorphisms_available": 118,
+        "registered": true,
+        "ec1": "EC1N59Ce1h20858f64459b",
+        "curve_uid": "urn:ec-record:1:sha256:20858f64459bbef8a18a8b75dbe579ce4cb0901d5c1b70d236ac154427d86980"
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 20261105,
+      "target_index": 4,
+      "target": [
+        "0x40d02bf755f6387",
+        "0x11f9402fd6971eb"
+      ],
+      "planted": 21009176072827
+    },
+    {
+      "workload_id": "W2c127580b1ce",
+      "workload_sha256": "2c127580b1cefc6db52d2b8a6311276e64523a2c28e7d114c9db9df32236a0d3",
+      "curve_spec": {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 59
+      },
+      "curve": {
+        "slug": "icv1-f2m59-tm943548413-98844ecc",
+        "icv1": "ICV1:f2m-59-eeb35974:-943548413:576460753246971902:0x1:-7:unk:r:98844eccbb36",
+        "family": "koblitz",
+        "construction": "KoblitzCurve::new(1, 59)",
+        "field_degree": 59,
+        "field_bits": null,
+        "group_order": 576460753246971902,
+        "r": 25179555920633,
+        "cofactor": 22894,
+        "generator": [
+          "0x4637772649759e9",
+          "0x23c2d5da728b130"
+        ],
+        "automorphisms_available": 118,
+        "registered": true,
+        "ec1": "EC1N59Ce1h20858f64459b",
+        "curve_uid": "urn:ec-record:1:sha256:20858f64459bbef8a18a8b75dbe579ce4cb0901d5c1b70d236ac154427d86980"
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 20261105,
+      "target_index": 5,
+      "target": [
+        "0x3d9728289b7cff7",
+        "0x4239c5172407c56"
+      ],
+      "planted": 19302453559525
+    },
+    {
+      "workload_id": "Wf488c43ad90f",
+      "workload_sha256": "f488c43ad90f6c421384f9934baccdc33f49291cc5743ad708a581e4300705ff",
+      "curve_spec": {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 59
+      },
+      "curve": {
+        "slug": "icv1-f2m59-tm943548413-98844ecc",
+        "icv1": "ICV1:f2m-59-eeb35974:-943548413:576460753246971902:0x1:-7:unk:r:98844eccbb36",
+        "family": "koblitz",
+        "construction": "KoblitzCurve::new(1, 59)",
+        "field_degree": 59,
+        "field_bits": null,
+        "group_order": 576460753246971902,
+        "r": 25179555920633,
+        "cofactor": 22894,
+        "generator": [
+          "0x4637772649759e9",
+          "0x23c2d5da728b130"
+        ],
+        "automorphisms_available": 118,
+        "registered": true,
+        "ec1": "EC1N59Ce1h20858f64459b",
+        "curve_uid": "urn:ec-record:1:sha256:20858f64459bbef8a18a8b75dbe579ce4cb0901d5c1b70d236ac154427d86980"
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 20261105,
+      "target_index": 6,
+      "target": [
+        "0x1d42c04f1ff4790",
+        "0x3dda4171d3234f6"
+      ],
+      "planted": 6922788494817
+    },
+    {
+      "workload_id": "We92af59fb139",
+      "workload_sha256": "e92af59fb1396003eaf39cabd7527f6d2ab49ab986475c12051bab771400f56b",
+      "curve_spec": {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 59
+      },
+      "curve": {
+        "slug": "icv1-f2m59-tm943548413-98844ecc",
+        "icv1": "ICV1:f2m-59-eeb35974:-943548413:576460753246971902:0x1:-7:unk:r:98844eccbb36",
+        "family": "koblitz",
+        "construction": "KoblitzCurve::new(1, 59)",
+        "field_degree": 59,
+        "field_bits": null,
+        "group_order": 576460753246971902,
+        "r": 25179555920633,
+        "cofactor": 22894,
+        "generator": [
+          "0x4637772649759e9",
+          "0x23c2d5da728b130"
+        ],
+        "automorphisms_available": 118,
+        "registered": true,
+        "ec1": "EC1N59Ce1h20858f64459b",
+        "curve_uid": "urn:ec-record:1:sha256:20858f64459bbef8a18a8b75dbe579ce4cb0901d5c1b70d236ac154427d86980"
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 20261105,
+      "target_index": 7,
+      "target": [
+        "0x657040b31f6c2be",
+        "0x7eb08cd722a7b2d"
+      ],
+      "planted": 308305666568
+    }
+  ],
+  "executions": [
+    {
+      "seq": 0,
+      "round": 0,
+      "warmup": true,
+      "arm": 0,
+      "workload": 0,
+      "algorithm_seed": 6650967587973652635
+    },
+    {
+      "seq": 1,
+      "round": 0,
+      "warmup": true,
+      "arm": 1,
+      "workload": 0,
+      "algorithm_seed": 6650967587973652635
+    },
+    {
+      "seq": 2,
+      "round": 0,
+      "warmup": true,
+      "arm": 2,
+      "workload": 0,
+      "algorithm_seed": 6650967587973652635
+    },
+    {
+      "seq": 3,
+      "round": 0,
+      "warmup": true,
+      "arm": 3,
+      "workload": 0,
+      "algorithm_seed": 6650967587973652635
+    },
+    {
+      "seq": 4,
+      "round": 0,
+      "warmup": true,
+      "arm": 0,
+      "workload": 1,
+      "algorithm_seed": 3350203286277030597
+    },
+    {
+      "seq": 5,
+      "round": 0,
+      "warmup": true,
+      "arm": 1,
+      "workload": 1,
+      "algorithm_seed": 3350203286277030597
+    },
+    {
+      "seq": 6,
+      "round": 0,
+      "warmup": true,
+      "arm": 2,
+      "workload": 1,
+      "algorithm_seed": 3350203286277030597
+    },
+    {
+      "seq": 7,
+      "round": 0,
+      "warmup": true,
+      "arm": 3,
+      "workload": 1,
+      "algorithm_seed": 3350203286277030597
+    },
+    {
+      "seq": 8,
+      "round": 0,
+      "warmup": true,
+      "arm": 0,
+      "workload": 2,
+      "algorithm_seed": 8241710315866130021
+    },
+    {
+      "seq": 9,
+      "round": 0,
+      "warmup": true,
+      "arm": 1,
+      "workload": 2,
+      "algorithm_seed": 8241710315866130021
+    },
+    {
+      "seq": 10,
+      "round": 0,
+      "warmup": true,
+      "arm": 2,
+      "workload": 2,
+      "algorithm_seed": 8241710315866130021
+    },
+    {
+      "seq": 11,
+      "round": 0,
+      "warmup": true,
+      "arm": 3,
+      "workload": 2,
+      "algorithm_seed": 8241710315866130021
+    },
+    {
+      "seq": 12,
+      "round": 0,
+      "warmup": true,
+      "arm": 0,
+      "workload": 3,
+      "algorithm_seed": 13154952912312965993
+    },
+    {
+      "seq": 13,
+      "round": 0,
+      "warmup": true,
+      "arm": 1,
+      "workload": 3,
+      "algorithm_seed": 13154952912312965993
+    },
+    {
+      "seq": 14,
+      "round": 0,
+      "warmup": true,
+      "arm": 2,
+      "workload": 3,
+      "algorithm_seed": 13154952912312965993
+    },
+    {
+      "seq": 15,
+      "round": 0,
+      "warmup": true,
+      "arm": 3,
+      "workload": 3,
+      "algorithm_seed": 13154952912312965993
+    },
+    {
+      "seq": 16,
+      "round": 0,
+      "warmup": true,
+      "arm": 0,
+      "workload": 4,
+      "algorithm_seed": 2500743012356084194
+    },
+    {
+      "seq": 17,
+      "round": 0,
+      "warmup": true,
+      "arm": 1,
+      "workload": 4,
+      "algorithm_seed": 2500743012356084194
+    },
+    {
+      "seq": 18,
+      "round": 0,
+      "warmup": true,
+      "arm": 2,
+      "workload": 4,
+      "algorithm_seed": 2500743012356084194
+    },
+    {
+      "seq": 19,
+      "round": 0,
+      "warmup": true,
+      "arm": 3,
+      "workload": 4,
+      "algorithm_seed": 2500743012356084194
+    },
+    {
+      "seq": 20,
+      "round": 0,
+      "warmup": true,
+      "arm": 0,
+      "workload": 5,
+      "algorithm_seed": 6021552963242056625
+    },
+    {
+      "seq": 21,
+      "round": 0,
+      "warmup": true,
+      "arm": 1,
+      "workload": 5,
+      "algorithm_seed": 6021552963242056625
+    },
+    {
+      "seq": 22,
+      "round": 0,
+      "warmup": true,
+      "arm": 2,
+      "workload": 5,
+      "algorithm_seed": 6021552963242056625
+    },
+    {
+      "seq": 23,
+      "round": 0,
+      "warmup": true,
+      "arm": 3,
+      "workload": 5,
+      "algorithm_seed": 6021552963242056625
+    },
+    {
+      "seq": 24,
+      "round": 0,
+      "warmup": true,
+      "arm": 0,
+      "workload": 6,
+      "algorithm_seed": 11581611498464483383
+    },
+    {
+      "seq": 25,
+      "round": 0,
+      "warmup": true,
+      "arm": 1,
+      "workload": 6,
+      "algorithm_seed": 11581611498464483383
+    },
+    {
+      "seq": 26,
+      "round": 0,
+      "warmup": true,
+      "arm": 2,
+      "workload": 6,
+      "algorithm_seed": 11581611498464483383
+    },
+    {
+      "seq": 27,
+      "round": 0,
+      "warmup": true,
+      "arm": 3,
+      "workload": 6,
+      "algorithm_seed": 11581611498464483383
+    },
+    {
+      "seq": 28,
+      "round": 0,
+      "warmup": true,
+      "arm": 0,
+      "workload": 7,
+      "algorithm_seed": 15145042654798432576
+    },
+    {
+      "seq": 29,
+      "round": 0,
+      "warmup": true,
+      "arm": 1,
+      "workload": 7,
+      "algorithm_seed": 15145042654798432576
+    },
+    {
+      "seq": 30,
+      "round": 0,
+      "warmup": true,
+      "arm": 2,
+      "workload": 7,
+      "algorithm_seed": 15145042654798432576
+    },
+    {
+      "seq": 31,
+      "round": 0,
+      "warmup": true,
+      "arm": 3,
+      "workload": 7,
+      "algorithm_seed": 15145042654798432576
+    },
+    {
+      "seq": 32,
+      "round": 1,
+      "warmup": false,
+      "arm": 0,
+      "workload": 0,
+      "algorithm_seed": 8250193730960451533
+    },
+    {
+      "seq": 33,
+      "round": 1,
+      "warmup": false,
+      "arm": 1,
+      "workload": 0,
+      "algorithm_seed": 8250193730960451533
+    },
+    {
+      "seq": 34,
+      "round": 1,
+      "warmup": false,
+      "arm": 2,
+      "workload": 0,
+      "algorithm_seed": 8250193730960451533
+    },
+    {
+      "seq": 35,
+      "round": 1,
+      "warmup": false,
+      "arm": 3,
+      "workload": 0,
+      "algorithm_seed": 8250193730960451533
+    },
+    {
+      "seq": 36,
+      "round": 1,
+      "warmup": false,
+      "arm": 0,
+      "workload": 1,
+      "algorithm_seed": 2986246274881228507
+    },
+    {
+      "seq": 37,
+      "round": 1,
+      "warmup": false,
+      "arm": 1,
+      "workload": 1,
+      "algorithm_seed": 2986246274881228507
+    },
+    {
+      "seq": 38,
+      "round": 1,
+      "warmup": false,
+      "arm": 2,
+      "workload": 1,
+      "algorithm_seed": 2986246274881228507
+    },
+    {
+      "seq": 39,
+      "round": 1,
+      "warmup": false,
+      "arm": 3,
+      "workload": 1,
+      "algorithm_seed": 2986246274881228507
+    },
+    {
+      "seq": 40,
+      "round": 1,
+      "warmup": false,
+      "arm": 0,
+      "workload": 2,
+      "algorithm_seed": 9872715673945395865
+    },
+    {
+      "seq": 41,
+      "round": 1,
+      "warmup": false,
+      "arm": 1,
+      "workload": 2,
+      "algorithm_seed": 9872715673945395865
+    },
+    {
+      "seq": 42,
+      "round": 1,
+      "warmup": false,
+      "arm": 2,
+      "workload": 2,
+      "algorithm_seed": 9872715673945395865
+    },
+    {
+      "seq": 43,
+      "round": 1,
+      "warmup": false,
+      "arm": 3,
+      "workload": 2,
+      "algorithm_seed": 9872715673945395865
+    },
+    {
+      "seq": 44,
+      "round": 1,
+      "warmup": false,
+      "arm": 0,
+      "workload": 3,
+      "algorithm_seed": 11910842470105652934
+    },
+    {
+      "seq": 45,
+      "round": 1,
+      "warmup": false,
+      "arm": 1,
+      "workload": 3,
+      "algorithm_seed": 11910842470105652934
+    },
+    {
+      "seq": 46,
+      "round": 1,
+      "warmup": false,
+      "arm": 2,
+      "workload": 3,
+      "algorithm_seed": 11910842470105652934
+    },
+    {
+      "seq": 47,
+      "round": 1,
+      "warmup": false,
+      "arm": 3,
+      "workload": 3,
+      "algorithm_seed": 11910842470105652934
+    },
+    {
+      "seq": 48,
+      "round": 1,
+      "warmup": false,
+      "arm": 0,
+      "workload": 4,
+      "algorithm_seed": 7808267880364061634
+    },
+    {
+      "seq": 49,
+      "round": 1,
+      "warmup": false,
+      "arm": 1,
+      "workload": 4,
+      "algorithm_seed": 7808267880364061634
+    },
+    {
+      "seq": 50,
+      "round": 1,
+      "warmup": false,
+      "arm": 2,
+      "workload": 4,
+      "algorithm_seed": 7808267880364061634
+    },
+    {
+      "seq": 51,
+      "round": 1,
+      "warmup": false,
+      "arm": 3,
+      "workload": 4,
+      "algorithm_seed": 7808267880364061634
+    },
+    {
+      "seq": 52,
+      "round": 1,
+      "warmup": false,
+      "arm": 0,
+      "workload": 5,
+      "algorithm_seed": 9725319624086802735
+    },
+    {
+      "seq": 53,
+      "round": 1,
+      "warmup": false,
+      "arm": 1,
+      "workload": 5,
+      "algorithm_seed": 9725319624086802735
+    },
+    {
+      "seq": 54,
+      "round": 1,
+      "warmup": false,
+      "arm": 2,
+      "workload": 5,
+      "algorithm_seed": 9725319624086802735
+    },
+    {
+      "seq": 55,
+      "round": 1,
+      "warmup": false,
+      "arm": 3,
+      "workload": 5,
+      "algorithm_seed": 9725319624086802735
+    },
+    {
+      "seq": 56,
+      "round": 1,
+      "warmup": false,
+      "arm": 0,
+      "workload": 6,
+      "algorithm_seed": 14532263023450768035
+    },
+    {
+      "seq": 57,
+      "round": 1,
+      "warmup": false,
+      "arm": 1,
+      "workload": 6,
+      "algorithm_seed": 14532263023450768035
+    },
+    {
+      "seq": 58,
+      "round": 1,
+      "warmup": false,
+      "arm": 2,
+      "workload": 6,
+      "algorithm_seed": 14532263023450768035
+    },
+    {
+      "seq": 59,
+      "round": 1,
+      "warmup": false,
+      "arm": 3,
+      "workload": 6,
+      "algorithm_seed": 14532263023450768035
+    },
+    {
+      "seq": 60,
+      "round": 1,
+      "warmup": false,
+      "arm": 0,
+      "workload": 7,
+      "algorithm_seed": 4399692660529738705
+    },
+    {
+      "seq": 61,
+      "round": 1,
+      "warmup": false,
+      "arm": 1,
+      "workload": 7,
+      "algorithm_seed": 4399692660529738705
+    },
+    {
+      "seq": 62,
+      "round": 1,
+      "warmup": false,
+      "arm": 2,
+      "workload": 7,
+      "algorithm_seed": 4399692660529738705
+    },
+    {
+      "seq": 63,
+      "round": 1,
+      "warmup": false,
+      "arm": 3,
+      "workload": 7,
+      "algorithm_seed": 4399692660529738705
+    },
+    {
+      "seq": 64,
+      "round": 2,
+      "warmup": false,
+      "arm": 3,
+      "workload": 0,
+      "algorithm_seed": 6818095788993880746
+    },
+    {
+      "seq": 65,
+      "round": 2,
+      "warmup": false,
+      "arm": 2,
+      "workload": 0,
+      "algorithm_seed": 6818095788993880746
+    },
+    {
+      "seq": 66,
+      "round": 2,
+      "warmup": false,
+      "arm": 1,
+      "workload": 0,
+      "algorithm_seed": 6818095788993880746
+    },
+    {
+      "seq": 67,
+      "round": 2,
+      "warmup": false,
+      "arm": 0,
+      "workload": 0,
+      "algorithm_seed": 6818095788993880746
+    },
+    {
+      "seq": 68,
+      "round": 2,
+      "warmup": false,
+      "arm": 3,
+      "workload": 1,
+      "algorithm_seed": 2391079995224109666
+    },
+    {
+      "seq": 69,
+      "round": 2,
+      "warmup": false,
+      "arm": 2,
+      "workload": 1,
+      "algorithm_seed": 2391079995224109666
+    },
+    {
+      "seq": 70,
+      "round": 2,
+      "warmup": false,
+      "arm": 1,
+      "workload": 1,
+      "algorithm_seed": 2391079995224109666
+    },
+    {
+      "seq": 71,
+      "round": 2,
+      "warmup": false,
+      "arm": 0,
+      "workload": 1,
+      "algorithm_seed": 2391079995224109666
+    },
+    {
+      "seq": 72,
+      "round": 2,
+      "warmup": false,
+      "arm": 3,
+      "workload": 2,
+      "algorithm_seed": 298000887200337710
+    },
+    {
+      "seq": 73,
+      "round": 2,
+      "warmup": false,
+      "arm": 2,
+      "workload": 2,
+      "algorithm_seed": 298000887200337710
+    },
+    {
+      "seq": 74,
+      "round": 2,
+      "warmup": false,
+      "arm": 1,
+      "workload": 2,
+      "algorithm_seed": 298000887200337710
+    },
+    {
+      "seq": 75,
+      "round": 2,
+      "warmup": false,
+      "arm": 0,
+      "workload": 2,
+      "algorithm_seed": 298000887200337710
+    },
+    {
+      "seq": 76,
+      "round": 2,
+      "warmup": false,
+      "arm": 3,
+      "workload": 3,
+      "algorithm_seed": 10036054864973058230
+    },
+    {
+      "seq": 77,
+      "round": 2,
+      "warmup": false,
+      "arm": 2,
+      "workload": 3,
+      "algorithm_seed": 10036054864973058230
+    },
+    {
+      "seq": 78,
+      "round": 2,
+      "warmup": false,
+      "arm": 1,
+      "workload": 3,
+      "algorithm_seed": 10036054864973058230
+    },
+    {
+      "seq": 79,
+      "round": 2,
+      "warmup": false,
+      "arm": 0,
+      "workload": 3,
+      "algorithm_seed": 10036054864973058230
+    },
+    {
+      "seq": 80,
+      "round": 2,
+      "warmup": false,
+      "arm": 3,
+      "workload": 4,
+      "algorithm_seed": 9539269200873787129
+    },
+    {
+      "seq": 81,
+      "round": 2,
+      "warmup": false,
+      "arm": 2,
+      "workload": 4,
+      "algorithm_seed": 9539269200873787129
+    },
+    {
+      "seq": 82,
+      "round": 2,
+      "warmup": false,
+      "arm": 1,
+      "workload": 4,
+      "algorithm_seed": 9539269200873787129
+    },
+    {
+      "seq": 83,
+      "round": 2,
+      "warmup": false,
+      "arm": 0,
+      "workload": 4,
+      "algorithm_seed": 9539269200873787129
+    },
+    {
+      "seq": 84,
+      "round": 2,
+      "warmup": false,
+      "arm": 3,
+      "workload": 5,
+      "algorithm_seed": 4264860394932728641
+    },
+    {
+      "seq": 85,
+      "round": 2,
+      "warmup": false,
+      "arm": 2,
+      "workload": 5,
+      "algorithm_seed": 4264860394932728641
+    },
+    {
+      "seq": 86,
+      "round": 2,
+      "warmup": false,
+      "arm": 1,
+      "workload": 5,
+      "algorithm_seed": 4264860394932728641
+    },
+    {
+      "seq": 87,
+      "round": 2,
+      "warmup": false,
+      "arm": 0,
+      "workload": 5,
+      "algorithm_seed": 4264860394932728641
+    },
+    {
+      "seq": 88,
+      "round": 2,
+      "warmup": false,
+      "arm": 3,
+      "workload": 6,
+      "algorithm_seed": 8552550667834069667
+    },
+    {
+      "seq": 89,
+      "round": 2,
+      "warmup": false,
+      "arm": 2,
+      "workload": 6,
+      "algorithm_seed": 8552550667834069667
+    },
+    {
+      "seq": 90,
+      "round": 2,
+      "warmup": false,
+      "arm": 1,
+      "workload": 6,
+      "algorithm_seed": 8552550667834069667
+    },
+    {
+      "seq": 91,
+      "round": 2,
+      "warmup": false,
+      "arm": 0,
+      "workload": 6,
+      "algorithm_seed": 8552550667834069667
+    },
+    {
+      "seq": 92,
+      "round": 2,
+      "warmup": false,
+      "arm": 3,
+      "workload": 7,
+      "algorithm_seed": 10972608986521408370
+    },
+    {
+      "seq": 93,
+      "round": 2,
+      "warmup": false,
+      "arm": 2,
+      "workload": 7,
+      "algorithm_seed": 10972608986521408370
+    },
+    {
+      "seq": 94,
+      "round": 2,
+      "warmup": false,
+      "arm": 1,
+      "workload": 7,
+      "algorithm_seed": 10972608986521408370
+    },
+    {
+      "seq": 95,
+      "round": 2,
+      "warmup": false,
+      "arm": 0,
+      "workload": 7,
+      "algorithm_seed": 10972608986521408370
+    },
+    {
+      "seq": 96,
+      "round": 3,
+      "warmup": false,
+      "arm": 0,
+      "workload": 0,
+      "algorithm_seed": 4259201933722182335
+    },
+    {
+      "seq": 97,
+      "round": 3,
+      "warmup": false,
+      "arm": 1,
+      "workload": 0,
+      "algorithm_seed": 4259201933722182335
+    },
+    {
+      "seq": 98,
+      "round": 3,
+      "warmup": false,
+      "arm": 2,
+      "workload": 0,
+      "algorithm_seed": 4259201933722182335
+    },
+    {
+      "seq": 99,
+      "round": 3,
+      "warmup": false,
+      "arm": 3,
+      "workload": 0,
+      "algorithm_seed": 4259201933722182335
+    },
+    {
+      "seq": 100,
+      "round": 3,
+      "warmup": false,
+      "arm": 0,
+      "workload": 1,
+      "algorithm_seed": 2592621145991968278
+    },
+    {
+      "seq": 101,
+      "round": 3,
+      "warmup": false,
+      "arm": 1,
+      "workload": 1,
+      "algorithm_seed": 2592621145991968278
+    },
+    {
+      "seq": 102,
+      "round": 3,
+      "warmup": false,
+      "arm": 2,
+      "workload": 1,
+      "algorithm_seed": 2592621145991968278
+    },
+    {
+      "seq": 103,
+      "round": 3,
+      "warmup": false,
+      "arm": 3,
+      "workload": 1,
+      "algorithm_seed": 2592621145991968278
+    },
+    {
+      "seq": 104,
+      "round": 3,
+      "warmup": false,
+      "arm": 0,
+      "workload": 2,
+      "algorithm_seed": 14687076563106800279
+    },
+    {
+      "seq": 105,
+      "round": 3,
+      "warmup": false,
+      "arm": 1,
+      "workload": 2,
+      "algorithm_seed": 14687076563106800279
+    },
+    {
+      "seq": 106,
+      "round": 3,
+      "warmup": false,
+      "arm": 2,
+      "workload": 2,
+      "algorithm_seed": 14687076563106800279
+    },
+    {
+      "seq": 107,
+      "round": 3,
+      "warmup": false,
+      "arm": 3,
+      "workload": 2,
+      "algorithm_seed": 14687076563106800279
+    },
+    {
+      "seq": 108,
+      "round": 3,
+      "warmup": false,
+      "arm": 0,
+      "workload": 3,
+      "algorithm_seed": 7392709283317376187
+    },
+    {
+      "seq": 109,
+      "round": 3,
+      "warmup": false,
+      "arm": 1,
+      "workload": 3,
+      "algorithm_seed": 7392709283317376187
+    },
+    {
+      "seq": 110,
+      "round": 3,
+      "warmup": false,
+      "arm": 2,
+      "workload": 3,
+      "algorithm_seed": 7392709283317376187
+    },
+    {
+      "seq": 111,
+      "round": 3,
+      "warmup": false,
+      "arm": 3,
+      "workload": 3,
+      "algorithm_seed": 7392709283317376187
+    },
+    {
+      "seq": 112,
+      "round": 3,
+      "warmup": false,
+      "arm": 0,
+      "workload": 4,
+      "algorithm_seed": 17710893164555126392
+    },
+    {
+      "seq": 113,
+      "round": 3,
+      "warmup": false,
+      "arm": 1,
+      "workload": 4,
+      "algorithm_seed": 17710893164555126392
+    },
+    {
+      "seq": 114,
+      "round": 3,
+      "warmup": false,
+      "arm": 2,
+      "workload": 4,
+      "algorithm_seed": 17710893164555126392
+    },
+    {
+      "seq": 115,
+      "round": 3,
+      "warmup": false,
+      "arm": 3,
+      "workload": 4,
+      "algorithm_seed": 17710893164555126392
+    },
+    {
+      "seq": 116,
+      "round": 3,
+      "warmup": false,
+      "arm": 0,
+      "workload": 5,
+      "algorithm_seed": 11734423264525654703
+    },
+    {
+      "seq": 117,
+      "round": 3,
+      "warmup": false,
+      "arm": 1,
+      "workload": 5,
+      "algorithm_seed": 11734423264525654703
+    },
+    {
+      "seq": 118,
+      "round": 3,
+      "warmup": false,
+      "arm": 2,
+      "workload": 5,
+      "algorithm_seed": 11734423264525654703
+    },
+    {
+      "seq": 119,
+      "round": 3,
+      "warmup": false,
+      "arm": 3,
+      "workload": 5,
+      "algorithm_seed": 11734423264525654703
+    },
+    {
+      "seq": 120,
+      "round": 3,
+      "warmup": false,
+      "arm": 0,
+      "workload": 6,
+      "algorithm_seed": 6767073552636583373
+    },
+    {
+      "seq": 121,
+      "round": 3,
+      "warmup": false,
+      "arm": 1,
+      "workload": 6,
+      "algorithm_seed": 6767073552636583373
+    },
+    {
+      "seq": 122,
+      "round": 3,
+      "warmup": false,
+      "arm": 2,
+      "workload": 6,
+      "algorithm_seed": 6767073552636583373
+    },
+    {
+      "seq": 123,
+      "round": 3,
+      "warmup": false,
+      "arm": 3,
+      "workload": 6,
+      "algorithm_seed": 6767073552636583373
+    },
+    {
+      "seq": 124,
+      "round": 3,
+      "warmup": false,
+      "arm": 0,
+      "workload": 7,
+      "algorithm_seed": 12423766323449911402
+    },
+    {
+      "seq": 125,
+      "round": 3,
+      "warmup": false,
+      "arm": 1,
+      "workload": 7,
+      "algorithm_seed": 12423766323449911402
+    },
+    {
+      "seq": 126,
+      "round": 3,
+      "warmup": false,
+      "arm": 2,
+      "workload": 7,
+      "algorithm_seed": 12423766323449911402
+    },
+    {
+      "seq": 127,
+      "round": 3,
+      "warmup": false,
+      "arm": 3,
+      "workload": 7,
+      "algorithm_seed": 12423766323449911402
+    }
+  ]
+}

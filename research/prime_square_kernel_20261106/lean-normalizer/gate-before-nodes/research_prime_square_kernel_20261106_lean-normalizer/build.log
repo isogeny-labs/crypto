@@ -1,0 +1,28 @@
+ℹ [3139/3142] Replayed CauchyNormalizer
+info: CauchyNormalizer.lean:183:0: 'CauchyNormalizer.choose_all_ones' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CauchyNormalizer.lean:184:0: 'CauchyNormalizer.choose_unit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CauchyNormalizer.lean:185:0: 'CauchyNormalizer.weight_valuation' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CauchyNormalizer.lean:186:0: 'CauchyNormalizer.signedWeight_ratio_unit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CauchyNormalizer.lean:187:0: 'CauchyNormalizer.puncture_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CauchyNormalizer.lean:188:0: 'CauchyNormalizer.puncture_normalizer_unit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CauchyNormalizer.lean:189:0: 'CauchyNormalizer.cauchyRho_unit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CauchyNormalizer.lean:190:0: 'CauchyNormalizer.normalized_square_valuation' depends on axioms: [propext, Classical.choice, Quot.sound]
+✖ [3141/3142] Building KernelNodes (1.7s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/KernelNodes.lean -o /workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/.lake/build/lib/lean/KernelNodes.olean -i /workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/.lake/build/lib/lean/KernelNodes.ilean -c /workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/.lake/build/ir/KernelNodes.c --setup /workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/.lake/build/ir/KernelNodes.setup.json --json
+error: KernelNodes.lean:17:2: unsolved goals
+case pos
+a k : ℕ
+hp : 0 < 2 ^ (a + 1)
+hcount : 2 ^ (a + 1) - 1 + 1 = 2 ^ (a + 1)
+hm : k < 2 ^ (a + 1)
+⊢ ((∏ x ∈ Finset.range (2 ^ (a + 1)), if x = k then 1 else ↑k - 2 ^ a - (↑x - 2 ^ a)) /
+      ∏ x ∈ Finset.range (2 ^ (a + 1)), if x = 2 ^ a then 1 else 2 ^ a - 2 ^ a - (↑x - 2 ^ a)) =
+    (∏ j ∈ Finset.range (2 ^ (a + 1)), if j = k then 1 else ↑k - 2 ^ a - (↑j - 2 ^ a)) /
+      ∏ x ∈ Finset.range (2 ^ (a + 1)), if x = 2 ^ a then 1 else 2 ^ a - 2 ^ a - (↑x - 2 ^ a)
+info: KernelNodes.lean:71:0: 'CauchyNormalizer.baseKernel_node' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+info: KernelNodes.lean:72:0: 'CauchyNormalizer.squareKernel_node_preserved' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+info: KernelNodes.lean:73:0: 'CauchyNormalizer.squareKernel_valuation' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: KernelNodes.lean:74:0: 'CauchyNormalizer.squareKernel_origin' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- KernelNodes
+error: build failed

@@ -1,0 +1,26 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage[T1]{fontenc}
+\begin{document}
+\section*{Publication custody snapshot}
+31 October 2026, 00:24:23--00:24:50 UTC; additive forest checks recorded separately. Read-only scope: followup-continuation-v2 and canonical Lean modules.
+
+\begin{center}\begin{tabular}{lr}
+Initial custody maps &32\\
+Included files with matching bytes and hashes &798\\
+Explicit omissions &96\\
+Artifact-managed included files checked &18\\
+Additive forest maps / included files &2 / 12\\
+Canonical Lean modules matching reviewed source &13\\
+Resolving README/index link occurrences &35\\
+Checksum discrepancies &0
+\end{tabular}\end{center}
+
+Local retained bytes and artifact manifest pins were checked. This audit did not download remote objects; remote durability/readback is not independently asserted. Existing custody maps did not change during the initial snapshot. Later additions remain outside the dated observations.
+
+\textbf{Publication action.} At the snapshot, geometric-cycle-obstruction/archive.jsonl was 568,983 bytes and lacked an artifact manifest. Store policy needs application before staging. Other oversized hits belong to relation-adapter/target build cache and should be excluded, not stored. The checked binary path was not ignored by git, so use explicit staging exclusions.
+
+\textbf{Status and links.} README explicitly retains root typed tests as in progress; no final Rust-check success claim was found. Historical STATUS open threads lag completed graph and recovery reviews; append a current status update. All reviewed links resolve and all 13 canonical Lean sources match reviewed producer or replay copies.
+
+\textbf{Evidence.} snapshot.json records initial map hashes. included-checks.json lists each byte/hash check. audit.json records counts, links, source matches and size observations; addendum.json covers the two additive forest maps and final WeightedSameSupport reference. No root edits, builds, external jobs or scientific runs occurred.
+\end{document}

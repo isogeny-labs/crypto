@@ -1,0 +1,159 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.72in]{geometry}
+\usepackage{graphicx,booktabs,tabularx,array,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\title{ECDLP follow-ups: factor-base sweep, pencil pilot and Kummer gate}
+\author{Reproducible experiment report}
+\date{21 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Scope.} The frozen protocol covers four leads on 21 exact-order
+Scholten models, 60 separate targets per model. This report contains completed
+factor-base and jump experiments, a 540-target pencil pilot, checked branches of
+the published complete law, and an exact Kummer applicability gate. The full inversion-free law and full-cohort
+pencil collector remain open.
+All costs are cold one-target operation-count prices, not wall-speed claims.
+
+\section*{Factor-base and jump sweep}
+Five arms solved and source-verified all 1,260 targets each, with zero failures
+or cap exhaustions. All 6,300 same-process rho controls were also source-verified.
+All 1,260 incumbent count and phase records replay exactly.
+At $M+0.5S+10I$ and 0.1 source-addition equivalents (GAE) per declared native
+logical operation, matched negation rho totals 1,088,802,370 GAE.
+
+\begin{center}\small
+\begin{tabular}{lrrrr}
+\toprule
+Arm & Divisors processed & Total GAE & / external & / rho \\
+\midrule
+Full base, 16 jumps & 219,581,773 & 2,666,291,894 & 1.000000 & 2.448830 \\
+Full base, 8 jumps & 220,092,171 & 2,664,487,778 & 0.999323 & 2.447173 \\
+Full base, 32 jumps & 219,864,588 & 2,671,135,032 & 1.001816 & 2.453278 \\
+Half base, 16 jumps & 282,983,105 & 3,285,713,695 & 1.232316 & 3.017732 \\
+Quarter base, 16 jumps & 392,583,830 & 4,267,226,320 & 1.600435 & 3.919193 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The half and quarter bases rejected 35,385,164 and 110,402,348 split
+relations, respectively, when neither root was in the fixed target-blind
+base; all rejected candidates were charged. None of the five arms is below
+rho in the 36 pooled pricing cells. The 8-jump arm is below the 16-jump arm
+in 15 of 36 cells. Across bit sizes it is below at 16, 20, 24 and 40 bits,
+and above at 28, 32 and 36 bits. One seed was used per target; no uncertainty
+interval or isolated wall-time result was measured.
+
+\begin{center}
+\includegraphics[width=0.98\linewidth]{factor-base-grid.png}
+\end{center}
+
+\clearpage
+\section*{Kummer model and ordinary-addition gates}
+All 21 transferred quintics have five distinct finite rational Weierstrass
+roots. Exhaustive evaluation over each base field, derivative checks and
+reconstruction from the linear factors passed on 21/21 models. The six
+Weierstrass points including infinity are rational, giving full rational
+two-torsion on these models. This meets the field-of-definition condition
+for the fast-Kummer construction in
+\url{https://eprint.iacr.org/2005/314/}. The exact roots are in
+\path{results/kummer-model-gate.jsonl}; a fresh rerun matched byte-for-byte.
+\begin{center}
+\includegraphics[width=0.98\linewidth]{kummer-model-roots.png}
+\end{center}
+
+Set $P=\tau(G)$ and $Q=2P$. The unsigned quotient gives $K(Q)=K(-Q)$,
+but $K(P+Q)=K(3P)$ and $K(P-Q)=K(P)$ differ for order $r>4$.
+The source-order, Jacobian-arithmetic and distinct-output checks passed on
+21/21 exact-order models. This rules out binary ordinary addition from two
+unsigned Kummer inputs for the current arbitrary-jump walk. A differential
+walk with a known difference and sign/lift recovery has not been implemented
+or priced.
+\begin{center}
+\includegraphics[width=0.86\linewidth]{kummer-ambiguity.png}
+\end{center}
+
+\clearpage
+\section*{Point-driven pencil pilot}
+Nine original models, $p=739,1151,1187,3371,3527,3931,11731,11887,12143$, each ran
+60 separate targets. All 540 candidate and same-process rho scalars passed
+source multiplication. The independent validator recomputed all 540 scalar
+pairs; their replay matched every non-wall field in nine raw files.
+The direct F739 port also reproduced all 61 prior records after removing wall
+fields. Full measured setup cost is charged to each cold one-target solve.
+\begin{center}\small
+\begin{tabular}{rrrrr}
+\toprule
+$p$ & Verified & Relations & Modular row updates & Pencil/rho \\
+\midrule
+739 & 60/60 & 21,550 & 6,288,519 & 12.931178 \\
+1,151 & 60/60 & 33,703 & 20,344,734 & 28.666756 \\
+1,187 & 60/60 & 34,726 & 23,112,414 & 31.080921 \\
+3,371 & 60/60 & 98,666 & 442,470,426 & 246.117110 \\
+3,527 & 60/60 & 103,256 & 499,795,794 & 267.374941 \\
+3,931 & 60/60 & 114,989 & 690,243,338 & 332.187349 \\
+11,731 & 60/60 & 343,641 & 17,235,887,587 & 4,331.361006 \\
+11,887 & 60/60 & 348,343 & 17,655,108,982 & 3,856.238613 \\
+12,143 & 60/60 & 355,615 & 19,113,208,311 & 4,250.094923 \\
+\bottomrule
+\end{tabular}
+\end{center}
+Across the nine models and 36 pricing cells each, 0/324 pencil cells are below
+matched rho; cell ratios range from 7.870218 to 5,104.745253. The independent
+validator recomputed all three values in all 324 cells from raw rows.
+The price is $M+0.5S+10I$ plus 0.1 GAE per native logical operation; the
+independent validator recomputed 29 headline values from all nine models;
+the analyzer matched fresh rho counters to frozen controls on all nine. The 36-cell price grid and per-target
+JSONL are in \path{results/pencil-pilot/}. Upper-size runs are still open.
+One exploratory 28-bit target at $p=48{,}383$ also solved with both scalars
+source-verified. It recorded 20,814,919,424 modular row updates and a
+96,957.132823 pencil/rho ratio at the representative price. Its independent
+replay matched every non-wall field; an independent validator checked both
+source scalars and all 36 pricing cells. Their ratios range from 26.422722
+to 113,636.290374, with 0/36 below rho. See \texttt{PENCIL\_ONE\_TARGET.pdf}; this single target
+is separate from the seven complete curves.
+\begin{center}
+\includegraphics[width=0.98\linewidth]{pencil-pilot-cost.png}
+\end{center}
+
+\section*{Complete-law branch gate}
+Equations (13) through (18) of
+\url{https://doi.org/10.1007/s13389-024-00351-7}
+were implemented independently. Across the 21 normalized models and two
+projective scales, 13,608/13,608 degree-one-pair additions matched Cantor:
+760 inverse pairs, 752 doublings and 12,096 distinct-point additions.
+All 12,096 sampled 1+2 cases matched Cantor: 9,492 generic disjoint,
+1,304 inverse-support cancellations, 1,258 repeated-support additions
+with a distinct remaining point, and 42 triplings. Across 6,551 sampled
+2+2 additions, 5,040 were generic, 336 ordinary doublings, 483 degree-drop
+additions, 336 inverses, 294 shared-support additions, 42 same-polynomial
+mixed-sign additions, 13 special-point doublings and 7 degree-drop
+doublings. Every evaluated output matched Cantor. This does not prove
+exhaustive branch coverage; the full DLP cohort remains unexecuted.
+\begin{center}
+\includegraphics[width=0.98\linewidth]{complete-law-gate.png}
+\end{center}
+\begin{center}
+\includegraphics[width=0.67\linewidth]{complete-law-2plus2.png}
+\end{center}
+
+\clearpage
+\section*{Open requirements and evidence}
+The published complete inversion-free genus-2 formulas are only partly
+implemented and have not run the 1,260 targets. The point-driven pencil collector
+has 540 new complete target solves but no full-cohort result here. A differential
+Kummer collector remains unimplemented. These are open requirements, not
+negative end-to-end verdicts.
+
+The machine record consists of 35 raw matched JSONL arm files, 6,300 paired
+candidate/rho target rows, the full 36-cell price grid, summary JSON, 21
+Kummer witnesses and 21 model factorizations, nine complete pencil JSONL files with a 36-cell-per-model
+price grid, and a checksum manifest under
+\path{research/four_followups_20261021/}.
+The native analyzer pairs workload hashes, seeds, caps and source scalars;
+the full-base arm reproduces the frozen external-law counts and phases. A
+separate native validator recomputed 15 headline quantities from raw rows;
+an archive-input rerun was compared byte-for-byte across all 35 files.
+The plotting script only renders those recorded values. See
+\url{https://github.com/aburan28/crypto/pull/2304} for the review branch and
+\url{https://eprint.iacr.org/2024/623.pdf} for the separate complete-law path.
+\end{document}

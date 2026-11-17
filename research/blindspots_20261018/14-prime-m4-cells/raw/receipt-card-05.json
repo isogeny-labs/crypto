@@ -1,0 +1,198 @@
+{
+  "card_id": "CARD-BLINDSPOT-14-05",
+  "card_path": "research/blindspots_20261018/14-prime-m4-cells/card-05.yaml",
+  "card_sha256": "c982b9afb28e5c56f2ce8b43bcb3985f0a2ebedd8ac5a85dcf00e8eed9f9a7cb",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/blindspots_20261018/14-prime-m4-cells/raw",
+        "target/blindspots-14/card-05"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-dirs",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-14/card-05/b14",
+        "examples/blindspots_14_prime_m4.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 6.022,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 6.022,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-14/card-05/b14",
+        "tdec",
+        "--bits",
+        "16",
+        "--arms",
+        "b",
+        "--bx",
+        "8",
+        "--targets",
+        "16",
+        "--planted",
+        "2",
+        "--check",
+        "--t0",
+        "5",
+        "--t1",
+        "10",
+        "--bcap-madds",
+        "100000000000",
+        "--bcap-nnz",
+        "120000000",
+        "--bdeadline-s",
+        "400",
+        "--out",
+        "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx8-t05-10.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 254.349,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tdec-b-b16-bx8-t05-10",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx8-t05-10.jsonl": "55ab2d50272629e76294a3f4159d9ac40631b549eefeb370a251a9c7d60b5306"
+      },
+      "seconds": 254.349,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "55ab2d50272629e76294a3f4159d9ac40631b549eefeb370a251a9c7d60b5306",
+      "stdout_tail": [
+        "{\"kind\":\"cell\",\"bits\":16,\"p\":48479,\"a\":25392,\"b\":20877,\"n\":48383,\"B\":17,\"bx\":8,\"signed\":16,\"seed\":20261018}",
+        "{\"kind\":\"setup\",\"arm\":\"b\",\"bits\":16,\"B\":17,\"bx\":8,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":14467005},\"ms\":70.089,\"note\":\"S5 interpolated on 9^5 nodes; evaluation by resultants is uncounted setup\"}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":5,\"tkind\":\"random\",\"status\":\"done\",\"dim\":0,\"brute_roots\":0,\"planted_vanishes\":null,\"steps\":28,\"max_degree\":29,\"max_rows\":11746,\"max_cols\":15492,\"peak_nnz\":4792718,\"zero_rows\":12279,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":27487344688,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":78769},\"native\":27487423457,\"ms\":51594.382}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":6,\"tkind\":\"random\",\"status\":\"done\",\"dim\":0,\"brute_roots\":0,\"planted_vanishes\":null,\"steps\":28,\"max_degree\":29,\"max_rows\":11746,\"max_cols\":15492,\"peak_nnz\":4792713,\"zero_rows\":12279,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":27487538803,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":78769},\"native\":27487617572,\"ms\":51286.319}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":7,\"tkind\":\"random\",\"status\":\"done\",\"dim\":0,\"brute_roots\":0,\"planted_vanishes\":null,\"steps\":28,\"max_degree\":29,\"max_rows\":11746,\"max_cols\":15492,\"peak_nnz\":4792721,\"zero_rows\":12279,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":27487369112,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":78769},\"native\":27487447881,\"ms\":50469.924}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":8,\"tkind\":\"random\",\"status\":\"done\",\"dim\":0,\"brute_roots\":0,\"planted_vanishes\":null,\"steps\":28,\"max_degree\":29,\"max_rows\":11746,\"max_cols\":15492,\"peak_nnz\":4792693,\"zero_rows\":12279,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":27487410876,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":78745},\"native\":27487489621,\"ms\":49802.229}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":9,\"tkind\":\"random\",\"status\":\"done\",\"dim\":0,\"brute_roots\":0,\"planted_vanishes\":null,\"steps\":28,\"max_degree\":29,\"max_rows\":11746,\"max_cols\":15492,\"peak_nnz\":4792723,\"zero_rows\":12279,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":27487376987,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":78769},\"native\":27487455756,\"ms\":51098.420}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-14/card-05/b14"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-14/card-05"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "7d1ea060625db8a65b76b74aa12f974bfedcb091",
+  "dirty_after": [
+    "esearch/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx8-t05-10.jsonl",
+    "research/blindspots_20261018/14-prime-m4-cells/raw/card-05-tdec-b-b16-bx8-t05-10.stderr.log"
+  ],
+  "dirty_before": [
+    "examples/blindspots_15_genus3_la.rs"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

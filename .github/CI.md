@@ -1,0 +1,333 @@
+# CI scope and runtime
+
+Ordinary pull requests should validate the code and evidence they change,
+without rebuilding unrelated crates, packaging unrelated clients, or rerunning
+the entire historical research corpus. Failures and timeouts remain failures.
+
+## Observed baseline (2026-10-11)
+
+- The default branch has 348 workflows: 216 declare a pull-request trigger,
+  87 a push trigger, 292 manual dispatch, and five a schedule. These categories
+  overlap. Most historical research workflows already have path filters.
+- CodeQL analyzes five languages on every PR, including a README-only PR.
+- Rust lint compiles both the root crate and the independent `cd_attack` crate
+  on either crate's changes; archived research Rust also triggers it.
+- [Rust lint run 38008529000](https://github.com/aburan28/crypto/actions/runs/38008529000)
+  passed: rustfmt executed for 76 seconds, root clippy for 142 seconds, and
+  `cd_attack` clippy for 93 seconds. They waited approximately 219–222 minutes
+  for runners. Queue delay and execution time are different problems.
+- The ecbench job allows 300 minutes and replays every committed deterministic
+  run, including 320 column-sweep solves. It also performs dedicated historical
+  replays before replaying those sessions again in the corpus loop.
+
+The integration branch has 352 workflows. Its newer decision to retire
+99 completed-study gates from automatic events is preserved. This does not
+retire the n53 target-cyclic rank hash-only custody check: it remains an active
+PR gate on its listed inputs, while only the separate outcome job requires the
+`run-n53-rotation-once` label. Its historical preflight uses an isolated view
+with the original nested lock bytes from the released commit and checks that
+the live nested lock still matches the current root lock before substitution.
+The labeled outcome retains its original exact-current-source and head guards;
+the historical view does not authorize a measurement. The weak-curve conjecture
+gate keeps its census replay, tests, Lean proof and axiom checks. Its original
+60-minute Lean budget remains bound to its frozen workflow digest, as does the
+separate 60-minute `proofs` job in `weak-curve-lean.yml`.
+
+## Scope contract
+
+[ci-scope.mjs](scripts/ci-scope.mjs) compares local git trees, with NUL-delimited
+paths and both sides of renames. It has no changed-file API truncation. A missing
+base, failed fetch/diff, missing source, or manual/scheduled event selects all
+checks. PR comparisons use the tested merge tree against the event's base SHA;
+merge groups use their base SHA. Deleted files remain relevant.
+
+The core workflows keep their existing check names and run on every PR. Their
+jobs or expensive steps decide applicability after classification, so an
+irrelevant path cannot leave a required workflow permanently pending.
+
+| Change | Applicable expensive checks |
+| --- | --- |
+| README or ordinary prose | No CodeQL language analysis, Rust compilation or historical ecbench replay |
+| Root Rust source, Cargo dependencies, build/toolchain configuration | Root lint/compile; Rust CodeQL; shipped Rust packaging when consumed |
+| `cd_attack` source or dependencies | `cd_attack` clippy; Rust CodeQL |
+| Archived research Rust | Rust CodeQL; its existing research-specific workflow |
+| Compile-time JSON, SQL or research fixture | Root lint/compile, derived from `include_str!`/`include_bytes!` inputs |
+| Python/JS/C/CUDA source or respective dependencies | Corresponding CodeQL language; existing component checks |
+| Native client / shared GPU headers | Applicable native/CUDA PR packaging |
+| Workflow or classifier | The affected workflow; classifier changes exercise every scope |
+| Frozen ecbench session or bounds/spec data | Integrity checks and fresh PR correctness replays; exhaustive weekly/manual audit |
+
+Rust lint/compile and Rust packaging use sparse checkouts, then materialize the
+exact compile-time inputs discovered from maintained Rust source. This avoids
+checking out the multi-gigabyte research archives to compile the crate. Cargo's
+declared target paths and their Rust source modules are discovered from the
+current manifest and explicit `#[path]`/`include!` source dependencies, so
+newly added frozen examples and external modules remain covered by the
+all-target gate. Root lint retains `scripts/clippy-maintained.sh`, which selects
+maintained examples while the all-target gate compiles frozen sources. The
+release builds the six binaries it ships or smoke-tests, while rust-all-targets
+continues to check every root target. Rust release builds and ecbench use caches.
+Main-branch rolling releases retain their existing full packaging behavior.
+The ecbench workflow also starts on every PR/merge group so dependency and
+embedded-data changes cannot disappear behind an incomplete trigger allowlist.
+
+### Frozen workflow pins
+
+Some research evidence pins the exact bytes of the workflow that ran it
+(`FROZEN.json` fields such as `workflow_sha256`, source locks, manifests).
+Repository-wide CI changes (runner routing, the merge set, checkout fixes)
+rewrite those files, so the live bytes stop matching the pins. Neither side is
+edited to fix that. [frozen-workflow-pins.json](scripts/frozen-workflow-pins.json)
+lists every pinned workflow, its pinned SHA-256, the files that pin it, and the
+revision that still holds those bytes. The
+[Frozen workflow replays](workflows/frozen-workflow-replays.yml) job checks that
+custody and runs each study's unchanged `ci_replay.py` in an isolated view that
+restores the pinned workflow bytes from Git
+([frozen-workflow-check.mjs](scripts/frozen-workflow-check.mjs), which reads a
+pin from a `files`/`sha256` map, a dotted `key:` field, a JSON `pointer:`, or
+a coreutils `sha256sum` manifest, and overlays further pinned workflows with
+`--extra-workflow`). Live workflows are free to follow current CI policy. A per-study workflow whose own steps
+assert its pin runs them in the same view, by replay id:
+`node .github/scripts/run-frozen-workflow-replays.mjs --only <id> -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"`,
+with the step's original commands in `env.FROZEN_VIEW_STEP`. That form checks
+custody of that replay's pins only, and fetches the index revision when a
+shallow checkout lacks it. A replay whose study also pins source that has
+since changed on `main` may name an `input_view_manifest`
+(`frozen-input-view/v1`, read by `applyPinnedInputView`): each input is
+restored from a named revision after its digest is matched against the
+study's original freeze manifest (by `source_sha256` key or JSON pointer) and
+that manifest's SHA-256; for a coreutils `sha256sum` freeze,
+`original_manifest_format: "sha256sum"` reads it as its path-to-digest map and
+the pointer names one listed path. The overlay happens before the manifest's
+own digests are checked, so they check the restored bytes and any other drift
+still fails. The input then either equals a current twin
+(`current_equal`) or is named in a committed drift note
+(`current_drift_note`) that says why the checks only verify or replay frozen
+code. [symbolic-oaware-width-gate-source-view-v1.json](scripts/symbolic-oaware-width-gate-source-view-v1.json)
+is the example; [p192-anchor-eight-report-view-v1.json](scripts/p192-anchor-eight-report-view-v1.json)
+restores the P-192 report that the anchor-eight `ARTIFACTS.sha256` pins. A replay whose manifest pins a different version of its
+workflow than the index's top-level `revision` holds carries its own
+`revision`; custody then checks that its manifest pins its workflows' bytes
+at that commit, and the runner fetches it like the top-level one. A workflow
+marked `record` keeps custody of its pin
+but has no replay: either no check on `main` asserts the pin, or its `note`
+says why a workflow view cannot make that check pass (source drift, or a pin
+at a second revision).
+
+### Result-page triggers
+
+AGENTS.md section 7a has every result PR edit
+`docs/index-calculus-scoreboard.html`, often with `docs/ic-current-state.html`,
+so a workflow whose `paths:` filter matches either page runs on every result
+PR. [check-result-page-triggers.py](scripts/check-result-page-triggers.py)
+allows that only for the workflows listed in its `ALLOWED` table, each with
+its reason: the dashboard renderer, the site build, the curve-name scan, and
+one frozen workflow whose own bytes are pinned by its evidence. A frozen-result
+replay that never opens the pages fails the check (#1952 and #2060 removed six
+such triggers). It follows GitHub's glob rules, so `docs/**` or `**/*.html`
+count, and it also fails on an `ALLOWED` entry that no longer matches.
+Workflows with no path filter run on every PR by design and are not checked.
+
+## Budgets and evidence coverage
+
+Every job eligible for an ordinary PR or merge group has an explicit execution
+budget of at most 25 minutes, except the two exact frozen Lean proof workflows
+described below. Longer scientific budgets remain available on
+manual dispatch, scheduled work and main-branch recording, and explicitly
+requested one-shot label experiments retain their existing limits. Historical
+campaigns disabled by their owners remain disabled.
+
+The wider research workflows retain correctness tests and frozen evidence
+custody checks on PRs. Fresh paired timing panels, Callgrind/call-count profiles
+and their dependent result verification/upload steps run in the full lane.
+Immutable frozen panels react to their own snapshots and verifier inputs,
+instead of unrelated changes to live source. They keep their existing full
+manual measurement commands and archived results. PR validation does not
+create evidence commits or rewrite frozen sessions. Obsolete PR jobs cancel;
+manual measurements keep their existing cancellation policy.
+
+Historical replay manifests that bind workflow metadata retain their original
+bytes and hashes. Their historical custody checks use an isolated view with the
+exact frozen workflow revision. All other source and evidence comes from the
+current checkout, and native source tests still run there. Existing scientific
+source drift and a historical verifier syntax error remain visible failures.
+The rotated-admission custody command passes its historical replay, negative
+controls and current-interface check. The n53 hash-only custody command checks
+the original workflow and source freeze, historical lock-bound preflight,
+negative controls and optional archive. Its separate label-gated outcome still
+rejects changed released sources, including the current producer drift.
+
+The event-aware [budget checker](scripts/check-pr-budgets.py) rejects missing,
+unknown or over-budget timeouts on PR/merge-group jobs, accounting for job
+conditions and dependencies. Its fixtures preserve the separate rules for labeled, manual and disabled work.
+
+The only exceptions are the `proofs` job in `weak-curve-lean.yml` and the
+`evidence` job in `weak-curve-conjectures.yml`, each with a 60-minute timeout
+included in its Lean proof evidence seal. These frozen jobs perform a cold
+dependency build and fresh kernel replay; their hosted cold runtimes have not
+been measured. The checker allows each only while its workflow bytes match the
+hash in its evidence seal and that seal retains its reviewed hash. Any change
+to those bytes or the job identity makes the exception fail closed. Updating
+either timeout requires new proof evidence and a separate review. These
+exceptions do not permit other long jobs or justify altering scientific
+workloads.
+
+| Lane | Execution budget |
+| --- | --- |
+| Scope / syntax / changed-file format | Five minutes |
+| Each clippy crate | 15 minutes |
+| Root all-target compile / CodeQL language | 25 minutes |
+| Rust CodeQL database build | 25 minutes |
+| Rust CodeQL cache warming (`warm-rust-cache`, named exception) | 45 minutes |
+| Rust CodeQL queries (`analyze`, named exception) | 60 minutes |
+| Each PR or merge-group packaging component | 25 minutes |
+| ecbench PR harness (named exception) | 75 minutes (45 until 2026-11-11, when runs 42969362215 and 43000966973 were cancelled at that cap before the audit steps) |
+| ecbench weekly/manual exhaustive audit | Existing 300-minute scientific budget |
+
+The PR Rust CodeQL lane runs in three jobs that hand one database forward:
+build the complete database, evaluate the type-inference diagnostic query to
+completion and bundle the trimmed evaluation cache, then run the full retained
+query configuration against that cache. Type inference is about two thirds of
+query evaluation and every query depends on it, so splitting the query suite
+does not shorten a job; and an interrupted evaluation leaves no reusable cache,
+so each phase must finish in its own budget. Measured on a 4-core x86 host
+(CodeQL 2.27.2): the warming query took 2,111 s cold, and the full 37-query
+suite then took 438 s with identical results, against about 2,700 s cold.
+The query job keeps its 60-minute named exception; with the warmed cache it
+runs far below it.
+The cache-warming job is also a named exception (45 minutes, set after run
+39226121956 was cancelled at the old 25-minute cap). Measured "Warm cache
+(rust)" durations, 2026-10: 22 min 59 s, success (run 39007908280, 2026-10-17);
+25 min 16 s, cancelled at the cap mid-evaluation (run 39226121956,
+2026-10-19). Those are the only two runs found where the job ran to
+completion or to its cap; later runs were cancelled while queued. The 45-minute
+cap leaves about 20 minutes over the slower of them. Main, scheduled and manual scans keep the single job.
+
+The ecbench PR lane keeps unit/integration tests, session immutability,
+hash/seal/answer validation, bounds/frontier validation, fresh pinned smoke
+sessions, and claim-checker controls. For relevant source or evidence changes,
+it audits every committed session with `--replay 0`: hashes, seals, plans and
+recorded answers are still checked, while expensive historical solvers are not
+rerun on a PR. Fresh bounded smoke sessions retain `--replay 8`, and unit,
+integration and claim controls exercise current code. Prose-only changes skip the ecbench harness. These are bounded CI diagnostics: they do **not** certify exhaustive
+independent replay or change any existing claim or frozen evidence.
+
+The weekly Sunday/manual lane retains all-run historical independent receipts,
+frozen claim reconstruction, and the complete all-session replay. A timeout in
+either lane fails; no command turns failures into passes. The weekly lane has
+no automatic PR cancellation and uses the same scientific validation as before.
+
+The budgets are limits, not measured post-change completion times. Actual
+CodeQL, cross-platform packaging and ecbench sample times must be checked after
+deployment. The existing public queue data also indicates account-wide runner
+congestion, which local workflow changes cannot immediately clear. Authenticated default-branch metadata currently reports no branch protection
+or required status contexts. This change preserves check names and changes no
+repository settings.
+
+## Local validation
+
+```sh
+node --test .github/scripts/test-ci-scope.mjs
+node --test .github/scripts/test-frozen-workflow-check.mjs
+node .github/scripts/run-frozen-workflow-replays.mjs
+python3 -B scripts/test_workflows_parse.py -v
+python3 -B .github/scripts/test-pr-budgets.py -v
+python3 -B .github/scripts/check-pr-budgets.py
+python3 -B .github/scripts/test-result-page-triggers.py -v
+python3 -B .github/scripts/check-result-page-triggers.py
+actionlint .github/workflows/{codeql,ecbench,release,rust-all-targets,rust-lint,workflows-parse}.yml
+```
+
+`workflow-lint` also checks all workflow GitHub Actions expressions, triggers
+and job semantics with SHA-256 verified actionlint 1.7.12. Its YAML structure
+check keeps its existing job name. `workflows-parse` owns YAML regression
+fixtures, the historical-stage manual-only rule, classifier fixtures and the
+PR budget contract. Both jobs use sparse checkouts of the metadata they read.
+Frozen-workflow custody fixtures check the pinned manifest and workflow, current
+source retention, altered or deleted evidence, failure propagation and temporary
+view cleanup.
+The status dashboard schedule runs every ten minutes, respecting GitHub's
+five-minute minimum, and disabled historical campaigns use explicit conditions
+that remain false while passing the semantic linter.
+
+The classifier tests exercise real git history, dependencies, unrelated prose,
+workflow changes, embedded data, renames/deletions, newline-containing paths,
+more than 300 changed files, and fail-closed comparisons. No cryptographic
+algorithm, scientific result, or frozen session is modified by this change.
+
+## Runner capacity and stalled PRs (2026-10-22)
+
+Measured from the public Actions API on 2026-10-22 at about 17:00 UTC:
+
+- 807 workflow runs were queued, 790 of them for PRs. Sampled queued jobs had
+  waited a median of about 8 hours (maximum 9.7 hours). The waits were on the
+  self-hosted ARC pools, not on GitHub-hosted runners: 46 sampled jobs waited
+  for `crypto-eks-linux` (6 of its 11 runners busy) and 41 for
+  `crypto-eks-highmem`, which has `maxRunners: 1`.
+- `CRYPTO_EKS_HIGHMEM_WORKFLOWS` sends the always-on PR gates to that single
+  runner: `codeql.yml`, `rust-all-targets.yml`, `rust-lint.yml`,
+  `curve-names.yml`, `ecbench.yml`, `workflows-parse.yml` and
+  `workflow-lint.yml`. Every PR push queues those gates behind every other
+  PR's gates, one job at a time, including YAML parsing and the
+  scope classifier.
+- Each PR push starts a median of 16 workflow runs (up to 39). Of the latest
+  1,000 runs (8.5 hours), 549 were cancelled by a newer push to the same PR,
+  148 succeeded and 11 failed.
+- Of 187 open PRs, none had a complete green head. 40 waited on queued
+  checks, 41 had failing checks, 2 had conflicts, about 80 carried
+  `needs-human` and about 24 were based on another PR's branch.
+
+Rolling back the high-memory routing of the PR gates removes the one-runner
+bottleneck without a workflow change. Each workflow then falls back to
+`crypto-eks-linux` if it is listed in `CRYPTO_EKS_WORKFLOWS`, or otherwise to
+its original GitHub-hosted label. Queued jobs keep the label they were created
+with, so they must be cancelled and re-run (see
+[the ARC README](../taskq/deploy/eks-karpenter/arc/README.md)).
+
+`merge-sweeper.yml` applies the AGENTS.md merge gate to every open PR every
+30 minutes, so a green PR lands after its authoring session has ended. It
+reports only until `MERGE_SWEEPER_APPLY` is `true`.
+
+## CI tiers (2026-10-23)
+
+The three repositories opened about 1,125 PRs from 2026-10-15 to 2026-10-23
+(up to about 240 a day), and on 2026-10-23 about 1,000 runs were queued
+behind 11 EKS runners. The fix is to run less, not to wait longer:
+
+| PR state | What runs on each push |
+| --- | --- |
+| Draft | Fast tier only: `workflows-parse.yml`, `workflow-lint.yml`, `validation-gate.yml`, `ci-tier.yml` (its `full-tier` job skips), `pcc-gate.yml` (mandatory ledger/prose validation), and the four byte-pinned workflows below |
+| Ready for review | Full tier: every applicable workflow, as before |
+
+- Apart from the fast tier and byte-pinned exceptions, every workflow with a `pull_request` trigger gates each job on
+  `!github.event.pull_request.draft` and lists `ready_for_review` in its PR
+  types (label-only triggers are left alone), so marking a PR ready starts the
+  full tier on its head. `.github/scripts/draft_tier_gate.py` checks this in
+  `workflows-parse` and `--apply` adds it to a new workflow; other events
+  (push, schedule, dispatch) carry no PR payload and are unaffected.
+- `weak-curve-lean.yml`, `weak-curve-conjectures.yml`, `release.yml` and
+  `curve-covers.yml` are excluded: their bytes are pinned by sealed evidence
+  or an exact implementation-version dependency.
+- The merge sweeper requires successful `gate`, `size` and `artifacts` checks,
+  every applicable check/status to pass, and no unresolved review threads.
+  Review data is paginated; unavailable data holds the PR. A refused merge is
+  reported as refused and does not clear capacity labels.
+- A gated job on a draft reports `skipped`, so the merge sweeper also requires
+  a successful `full-tier` check on the head. Heads whose checks all started
+  before `ci-tier.yml` reached `main` predate the tiers and need no marker.
+- **Check budget:** the sweeper holds a PR whose head ran more than 30 checks
+  (`MERGE_SWEEPER_MAX_CHECKS`; skipped and neutral checks do not count) and
+  labels it `ci:over-budget`. On 2026-10-23, 9 of the 30 most recently
+  updated PRs were over.
+- **Capacity:** with `MERGE_SWEEPER_APPLY=true`, red, conflicted,
+  over-budget and `needs-human` PRs receive `ci:parked`; PRs beyond
+  `MERGE_SWEEPER_MAX_READY` (default 40) receive `ci:waiting` for merge
+  prioritization. These labels never change a PR's draft/ready state. Waiting
+  labels clear when PRs return within the prioritization cap. Drafts remain
+  drafts only when explicitly requested by the user.
+- **Lanes:** sessions working one study push to `lane/<lane>` with
+  `scripts/lane-push.sh <lane>` instead of opening a PR each; the lane has one
+  regular PR by default.
+
+Queued runs keep the workflow revision they were created with; only new events
+use the tiers.

@@ -1,0 +1,16 @@
+replicas: 2
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::104186811093:role/isolab-karpenter
+nodeSelector:
+  isolab.dev/role: system
+settings:
+  clusterName: isolab
+  interruptionQueue: isolab
+controller:
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      memory: 1Gi

@@ -1,0 +1,10 @@
+default(parisizemax,2000000000);
+read("e3_lib.gp");
+ctx(61,54,41);
+print("Cl=",Cl," Clp=",Clp," d=",Cd);
+tg=draw_targets(5,20);
+r=cellrun(12,4,tg[1],tg[2],tg[3]);
+print("NE=",r[1]," NT=",r[2]," WD=",r[13]," WX=",r[14]," fm=",r[12]," p5=",r[10]," nc1=",r[11]," nc3=",r[15],"/",r[16]," nh=",r[9]," mult=",r[8]);
+print(vector(20,i,r[5][i,2]));
+print(vector(20,i,r[3][i,2]));
+quit;

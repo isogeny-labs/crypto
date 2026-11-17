@@ -1,0 +1,5 @@
+# Saved-row phase conservation audit
+
+Read only the frozen standard-targets.csv and named raw JSONL sources. No solver execution, sampling, repricing, cost ranking or new trajectory. For factor-base and projective-law arms, require identity joins, unique native target keys, unsigned exact counters and phase-sum equality for every candidate/rho counter. Missing raw sources and unsupported schemas are explicit unresolved rows, not silently passed. Verify source-claimed scalar equality only as a record-consistency check, not elliptic scalar recomputation. Full 1,260-target cohort remains per arm.
+
+Controls before audit: coherent phases accepted; dropped phase, altered aggregate, duplicate phase, negative counter and empty phase list rejected. Exact input SHA256 and native exits retained. Source references: four_followups_review_20261022/src/main.rs target_rows/priced_target and four_followups_20261021/src/bin/analyze_factor_base.rs price/paired. All runtime costs remain outside this conservation check; no ratio is newly inferred.

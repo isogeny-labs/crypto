@@ -1,0 +1,58 @@
+[
+  {
+    "name": "source",
+    "source": "research/primefield-companion-followup-20261102/feature-native-shared-seeds/lib.rs",
+    "source_sha256": "3f452aad02841a9206caf47bf8e5284977a29d0a85c2d415d2e3d3d375e32db5",
+    "routed_sha256": "80352f1bdb883879f321fa16833c97d9b91ea7013ea69d28c170a71f08d7e79a",
+    "edits": [
+      [
+        "#[path=\"../feature-native-joint-window/lib.rs\"]",
+        "#[path=\"../../feature-native-joint-window/lib.rs\"]"
+      ],
+      [
+        "#[path=\"../feature-native-division/lib.rs\"]",
+        "#[path=\"../../feature-native-division/lib.rs\"]"
+      ],
+      [
+        "#[path=\"../feature-native-value-division/lib.rs\"]",
+        "#[path=\"../../feature-native-value-division/lib.rs\"]"
+      ],
+      [
+        "#[path=\"../feature-native-polynomial/lib.rs\"]",
+        "#[path=\"../polynomial.rs\"]"
+      ],
+      [
+        "include_str!(\"fixtures.tsv\")",
+        "include_str!(\"../../feature-native-shared-seeds/fixtures.tsv\")"
+      ],
+      [
+        "include_str!(\"points.tsv\")",
+        "include_str!(\"../../feature-native-shared-seeds/points.tsv\")"
+      ]
+    ]
+  },
+  {
+    "name": "recovery",
+    "source": "research/primefield-companion-followup-20261102/feature-native-recovery/lib.rs",
+    "source_sha256": "c873eba9bba34a2344dcc0f4ceb3980285ebcf6a2398e82a7a9b11afca952ffa",
+    "routed_sha256": "2984a88e0395a3877ea87846d13cbfd1b691b376053d852f8be796cd809f2e86",
+    "edits": [
+      [
+        "#[path=\"../feature-native-shared-seeds/lib.rs\"]",
+        "#[path=\"source.rs\"]"
+      ],
+      [
+        "#[path=\"../feature-native-signmask/lib.rs\"]",
+        "#[path=\"../../feature-native-signmask/lib.rs\"]"
+      ],
+      [
+        "include_str!(\"../feature-native-signmask/program.tsv\")",
+        "include_str!(\"../../feature-native-signmask/program.tsv\")"
+      ],
+      [
+        "include_str!(\"targets.tsv\")",
+        "include_str!(\"../../feature-native-recovery/targets.tsv\")"
+      ]
+    ]
+  }
+]

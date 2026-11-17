@@ -1,0 +1,49 @@
+{
+  "schema": "p739-enrollment-audit-validation/v2",
+  "tests": {
+    "passed": 10,
+    "failed": 0,
+    "cases": [
+      "u64max and original sequence mapping",
+      "missing execution",
+      "duplicate execution",
+      "adjacent seed mutation above2^53",
+      "wrong full workload",
+      "wrong resolved arm",
+      "invalid float seed",
+      "unexpected execution field rejected",
+      "missing execution field rejected",
+      "nonbijective CLI exits1 and retains JSON/PDF software fixture"
+    ]
+  },
+  "clippy_warnings_denied": true,
+  "mapped_workloads": 60,
+  "mapped_executions": 1080,
+  "resolved_arms": 3,
+  "missing": 0,
+  "duplicates": 0,
+  "extra_subset": 0,
+  "seed_mismatches": 0,
+  "sequence_positions_different": 900,
+  "fresh_plan_equal": true,
+  "outputs": {
+    "audit_sha256": "def56f34e31a2d6774b1daecd3cdc23c57a9d104c169fe87609763a18e7f33f0",
+    "pdf_sha256": "9c02d9bddea8386405a8149a3ab11738eff3920652f5f7e547fa7c7a58a53e2a",
+    "svg_sha256": "c46abf57c704074f2fa88d867cdbf7a3c24b6e9141e326f9dbc8178c0dc7c026"
+  },
+  "pdf_visual_inspection": {
+    "pages": 1,
+    "clipped_labels": false
+  },
+  "new_solver_executions": 0,
+  "new_plan_generation": 0,
+  "new_measurements": 0,
+  "general_admission_or_remaining_cohort_launch_authorized": false,
+  "parent_receipt_sha256": "e00faabcc6e311b4fa2f6cea893b74efa99bbc6673c9666080464f5ecc2796e1",
+  "corrections": [
+    "Execution objects require exactly six reviewed keys",
+    "Nonbijective or unequal fresh plan exits1 after retaining diagnostics"
+  ],
+  "fmt_check_passed": true,
+  "preservation": "Original packet untouched; original source copied to v1-source before edits. v2 manifests bind both."
+}

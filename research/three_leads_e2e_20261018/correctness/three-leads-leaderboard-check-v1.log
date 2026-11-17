@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/home/ec2-user/crypto-leads-audit/scripts/build_ic_leaderboard.py", line 2178, in <module>
+    sys.exit(main())
+  File "/home/ec2-user/crypto-leads-audit/scripts/build_ic_leaderboard.py", line 2150, in main
+    doc = build()
+  File "/home/ec2-user/crypto-leads-audit/scripts/build_ic_leaderboard.py", line 998, in build
+    ladder, kob, kob1 = ladder_rows(names), koblitz_rows(names), koblitz_one_target_rows(names)
+  File "/home/ec2-user/crypto-leads-audit/scripts/build_ic_leaderboard.py", line 388, in koblitz_rows
+    shares, counts = koblitz_phase_shares(a, n)
+  File "/home/ec2-user/crypto-leads-audit/scripts/build_ic_leaderboard.py", line 368, in koblitz_phase_shares
+    shares = {g: statistics.fmean(p[g] for p in per_set) for g in KOBLITZ_GROUPS}
+  File "/home/ec2-user/crypto-leads-audit/scripts/build_ic_leaderboard.py", line 368, in <dictcomp>
+    shares = {g: statistics.fmean(p[g] for p in per_set) for g in KOBLITZ_GROUPS}
+  File "/usr/lib64/python3.9/statistics.py", line 345, in fmean
+    raise StatisticsError('fmean requires at least one data point') from None
+statistics.StatisticsError: fmean requires at least one data point

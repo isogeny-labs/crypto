@@ -1,0 +1,991 @@
+//! The database: SQL that loads committed evidence into SQLite.
+//!
+//! `ecbench db sql <paths…> | sqlite3 ecbench.db` builds or extends an
+//! index over session directories, comparison files and factor-base
+//! dumps.  The schema is `docs/ecbench/schema.sql`, compiled in, so the
+//! file reviewers read is the one that runs.  No database driver is
+//! linked: the output is plain SQL with every literal escaped here.
+//!
+//! A session directory is audited (`ecbench verify --replay 0
+//! --allow-interrupted`) before any of its rows are emitted: a record
+//! whose seal fails, a records file that does not hash to the session's,
+//! a session that is not what its own spec, plan and host say, is refused
+//! with the reason and none of its rows are written.  One refused path
+//! does not stop the others: `ecbench db sql` skips it, reports it, and
+//! exits non-zero at the end.
+//!
+//! Every statement is idempotent, and only in the one way intended: an
+//! insert tolerates a conflict on its table's *primary key* when the row
+//! is the same row again, and nothing else.  A second row claiming an
+//! existing run id is a UNIQUE error; a key arriving with a different
+//! identity (a curve slug on another ICV1 string, a workload, method,
+//! factor-base or host id on another hash) is stopped by the schema's
+//! identity triggers; a failed CHECK is an error.  None is a silently
+//! dropped row.  The same holds for an arm (a session's arm name keeps its
+//! role and method), a session (its identity and, once complete, its
+//! records hash), a run (its figures) and a comparison (its content).  A session row is upserted, so a session loaded while
+//! running and again once complete ends up complete.  Load with
+//! `sqlite3 -bail` to stop at the first error.
+
+use std::fmt::Write as _;
+use std::path::Path;
+
+use serde_json::Value;
+
+use crate::cryptanalysis::ecbench::audit;
+use crate::cryptanalysis::ecbench::compare::Comparison;
+use crate::cryptanalysis::ecbench::host::{is_virtual, HostCapsule};
+use crate::cryptanalysis::ecbench::methods::FactorBaseDump;
+use crate::cryptanalysis::ecbench::record::{floor_s, Record};
+use crate::cryptanalysis::ecbench::runner::{read_records, read_session, PlanDoc, Session};
+
+pub const SCHEMA_SQL: &str = include_str!("../../../docs/ecbench/schema.sql");
+
+/// A SQL text literal, or NULL.
+fn t(s: Option<&str>) -> String {
+    match s {
+        Some(s) => format!("'{}'", s.replace('\'', "''")),
+        None => "NULL".into(),
+    }
+}
+
+fn ts(s: &str) -> String {
+    t(Some(s))
+}
+
+/// An integer literal, or NULL.
+fn i<T: Into<i128>>(v: Option<T>) -> String {
+    v.map(|x| x.into().to_string())
+        .unwrap_or_else(|| "NULL".into())
+}
+
+/// A real literal; NULL for non-finite.
+fn f(v: Option<f64>) -> String {
+    match v {
+        Some(x) if x.is_finite() => format!("{x:e}"),
+        _ => "NULL".into(),
+    }
+}
+
+fn b(v: bool) -> &'static str {
+    if v {
+        "1"
+    } else {
+        "0"
+    }
+}
+
+fn json_text(v: &impl serde::Serialize) -> String {
+    ts(&serde_json::to_string(v).unwrap_or_else(|_| "null".into()))
+}
+
+fn curve_rows(out: &mut String, w: &crate::cryptanalysis::ecbench::workload::Workload) {
+    let c = &w.curve;
+    let _ = writeln!(
+        out,
+        "INSERT INTO curves VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (slug) DO NOTHING;",
+        ts(&c.slug),
+        ts(&c.icv1),
+        ts(&c.family),
+        i(c.field_degree),
+        i(c.field_bits),
+        ts(&c.group_order.to_string()),
+        ts(&c.r.to_string()),
+        ts(&c.cofactor.to_string()),
+        f(Some((c.r.to_f64()).log2())),
+        c.automorphisms_available,
+        f(Some(floor_s(c.automorphisms_available))),
+        b(c.registered),
+    );
+    let _ = writeln!(
+        out,
+        "INSERT INTO curve_representations VALUES ({}, {}, {}, {}, {}) ON CONFLICT (slug, generator_x, generator_y) DO NOTHING;",
+        ts(&c.slug),
+        ts(&c.generator[0]),
+        ts(&c.generator[1]),
+        t(c.ec1.as_deref()),
+        t(c.curve_uid.as_deref()),
+    );
+    let _ = writeln!(
+        out,
+        "INSERT INTO curve_constructions VALUES ({}, {}) ON CONFLICT (slug, construction) DO NOTHING;",
+        ts(&c.slug),
+        ts(&c.construction),
+    );
+    let _ = writeln!(
+        out,
+        "INSERT INTO workloads VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (workload_id) DO NOTHING;",
+        ts(&w.workload_id),
+        ts(&w.workload_sha256),
+        ts(&c.slug),
+        ts(&c.generator[0]),
+        ts(&c.generator[1]),
+        ts(&w.target[0]),
+        ts(&w.target[1]),
+        ts(&w.target_law),
+        ts(&w.target_seed.to_string()),
+        w.target_index,
+        t(w.planted.map(|k| k.to_string()).as_deref()),
+    );
+}
+
+fn host_row(out: &mut String, h: &HostCapsule) {
+    let s = &h.stable;
+    let _ = writeln!(
+        out,
+        "INSERT INTO hosts VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (env_class_id) DO NOTHING;",
+        ts(&h.env_class_id),
+        ts(&h.env_class_sha256),
+        ts(&s.os),
+        ts(&s.arch),
+        t(s.kernel_release.as_deref()),
+        t(s.cpu_model.as_deref()),
+        ts(&s.features.join(" ")),
+        s.logical_cpus,
+        i(s.physical_cores),
+        s.numa_nodes,
+        i(is_virtual(s).map(i32::from)),
+        t(s.rustc_vv.as_deref().and_then(|v| v.lines().next())),
+        json_text(h),
+    );
+}
+
+fn session_rows(out: &mut String, s: &Session, dir: &Path) {
+    let plan = s.cpu_plan.as_ref();
+    let _ = writeln!(
+        out,
+        "INSERT INTO sessions VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (session_id) DO UPDATE SET finished_unix_ms = excluded.finished_unix_ms, status = excluded.status, records_sha256 = excluded.records_sha256, path = excluded.path;",
+        ts(&s.session_id),
+        ts(&s.label),
+        ts(&s.spec_id),
+        ts(&s.spec_sha256),
+        ts(&s.env_class_id),
+        t(s.git_commit.as_deref()),
+        i(s.git_dirty.map(i32::from)),
+        t(s.binary_sha256.as_deref()),
+        json_text(&s.options.cpus),
+        i(plan.map(|p| p.run_cpu)),
+        t(plan
+            .map(|p| p.reserved.iter().map(|c| c.to_string()).collect::<Vec<_>>().join(","))
+            .as_deref()),
+        i(plan.and_then(|p| p.node)),
+        i(s.preflight.as_ref().map(|p| i32::from(p.quiet))),
+        i(Some(s.started_unix_ms as i128)),
+        i(s.finished_unix_ms.map(|v| v as i128)),
+        ts(&s.status),
+        t(s.records_sha256.as_deref()),
+        ts(&dir.display().to_string()),
+    );
+}
+
+fn run_rows(out: &mut String, r: &Record) {
+    let m = &r.method;
+    let _ = writeln!(
+        out,
+        "INSERT INTO algorithms VALUES ({}, {}, {}, {}, {}, {}) ON CONFLICT (method_id) DO NOTHING;",
+        ts(&m.method_id),
+        ts(&m.method_sha256),
+        ts(&m.id),
+        ts(&m.family),
+        json_text(&m.params),
+        ts(&m.entry),
+    );
+    curve_rows(out, &r.workload);
+    if let Some(fb) = &r.factor_base {
+        let _ = writeln!(
+            out,
+            "INSERT INTO factor_bases VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (fb_id) DO NOTHING;",
+            ts(&fb.fb_id),
+            ts(&fb.fb_sha256),
+            ts(&r.workload.curve.slug),
+            ts(&fb.family),
+            json_text(&fb.params),
+            ts(&fb.description),
+            fb.signed_points,
+            fb.abscissae,
+            fb.columns,
+            i(fb.dimension),
+            ts(&fb.points_sha256),
+        );
+        if let Some(fbm_id) = r.fbm_id.as_deref() {
+            let cfg = crate::cryptanalysis::ecbench::fbm::config_from_ic_method(
+                &r.workload.curve.slug,
+                fb,
+                m,
+                crate::cryptanalysis::ecbench::fbm::INSTRUMENT_IC_PIPELINE,
+            );
+            if let Ok(sealed) = cfg.seal() {
+                if sealed.fbm_id == fbm_id {
+                    let _ = writeln!(
+                        out,
+                        "INSERT INTO factor_base_measurements VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (fbm_id) DO NOTHING;",
+                        ts(&sealed.fbm_id),
+                        ts(&sealed.fbm_sha256),
+                        ts(&sealed.config.curve),
+                        ts(&sealed.config.fb_id),
+                        ts(&sealed.config.fb_sha256),
+                        ts(&sealed.config.family),
+                        json_text(&sealed.config.fb_params),
+                        ts(&sealed.config.oracle),
+                        ts(&sealed.config.solver),
+                        ts(&sealed.config.linalg),
+                        ts(&sealed.config.instrument),
+                    );
+                }
+            }
+        }
+    }
+    let _ = writeln!(
+        out,
+        "INSERT INTO arms VALUES ({}, {}, {}, {}) ON CONFLICT (session_id, arm) DO NOTHING;",
+        ts(&r.session_id),
+        ts(&r.arm),
+        ts(&r.role),
+        ts(&m.method_id),
+    );
+    let tm = &r.time;
+    let _ = writeln!(
+        out,
+        "INSERT INTO runs (record_id, session_id, run_id, seq, round, warmup, arm, method_id, workload_id, fb_id, fbm_id, algorithm_seed, status, recovered, total_gae, s, ratio_to_floor, automorphisms_used, lower_bound, unpriced, deterministic, solve_wall_ns, process_wall_ns, user_ns, sys_ns, max_rss_kib, involuntary_switches, run_delay_ns, isolation_level, foreign_busy_ticks, steal_ticks, error) VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (record_id) DO NOTHING;",
+        ts(&r.record_id),
+        ts(&r.session_id),
+        ts(&r.run_id),
+        r.seq,
+        r.round,
+        b(r.warmup),
+        ts(&r.arm),
+        ts(&m.method_id),
+        ts(&r.workload.workload_id),
+        t(r.factor_base.as_ref().map(|fb| fb.fb_id.as_str())),
+        t(r.fbm_id.as_deref()),
+        ts(&r.algorithm_seed),
+        ts(&r.outcome.status),
+        t(r.outcome.recovered.as_deref()),
+        f(r.cost.total_gae),
+        f(r.cost.s),
+        f(r.boundaries.ratio_to_floor),
+        i(r.boundaries.automorphisms_used),
+        b(r.cost.lower_bound),
+        ts(&r.cost.unpriced.join(" ")),
+        b(r.cost.deterministic),
+        i(tm.solve_wall_ns.map(|v| v as i128)),
+        tm.process_wall_ns,
+        tm.user_ns,
+        tm.sys_ns,
+        tm.max_rss_kib,
+        tm.involuntary_switches,
+        i(tm.schedstat_solve.map(|s| s.run_delay_ns as i128)),
+        ts(r.isolation.level.name()),
+        i(r.isolation.foreign_busy_ticks),
+        i(r.isolation.steal_ticks.map(|v| v as i128)),
+        t(r.outcome.error.as_deref()),
+    );
+    for (ord, p) in r.phases.iter().enumerate() {
+        let _ = writeln!(
+            out,
+            "INSERT INTO phases VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (record_id, ord) DO NOTHING;",
+            ts(&r.record_id),
+            ord,
+            ts(&p.name),
+            p.adds,
+            p.doubles,
+            p.scalar_mults,
+            f(Some(p.gae)),
+            i(p.wall_ns.map(|v| v as i128)),
+            json_text(&p.native),
+        );
+    }
+    for (k, v) in &r.counters {
+        let _ = writeln!(
+            out,
+            "INSERT INTO run_counters VALUES ({}, {}, {}) ON CONFLICT (record_id, name) DO NOTHING;",
+            ts(&r.record_id),
+            ts(k),
+            v
+        );
+    }
+    if let Some(sv) = &r.solver {
+        let _ = writeln!(
+            out,
+            "INSERT INTO run_solver VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (record_id) DO NOTHING;",
+            ts(&r.record_id),
+            ts(&sv.name),
+            sv.calls,
+            sv.ops,
+            ts(&sv.op_unit),
+            sv.wall_ns,
+            sv.budget_exceeded,
+            i(sv.n_vars),
+            i(sv.n_equations),
+            i(sv.semi_regular_degree),
+            f(sv.solving_degree_mean),
+            i(sv.solving_degree_max),
+            i(sv.macaulay_rows),
+            i(sv.macaulay_columns),
+            i(sv.macaulay_degree),
+            i(sv.macaulay_rank),
+            i(sv.sat_variables),
+            i(sv.sat_clauses),
+            i(sv.sat_conflicts),
+            i(sv.sat_decisions),
+            i(sv.sat_propagations),
+            i(sv.first_fall_degree),
+            i(sv.last_fall_degree),
+            i(sv.solving_degree_sum),
+            i(sv.degree_of_regularity_observed),
+            t(sv.degree_story.as_deref()),
+            json_text(&sv.degree_trace),
+            json_text(&sv.extra),
+        );
+    }
+    if let (Some(fbm_id), Some(fb)) = (r.fbm_id.as_deref(), r.factor_base.as_ref()) {
+        let trials = r
+            .phases
+            .iter()
+            .find(|p| p.name == "relations")
+            .and_then(|p| p.native.get("trials").copied());
+        let relations = r
+            .phases
+            .iter()
+            .find(|p| p.name == "relations")
+            .and_then(|p| {
+                p.native
+                    .get("relations")
+                    .or_else(|| p.native.get("hits"))
+                    .copied()
+            });
+        let yield_per_trial = match (relations, trials) {
+            (Some(rel), Some(t)) if t > 0 => Some(rel as f64 / t as f64),
+            _ => None,
+        };
+        let cell_id = format!("{fbm_id}:{}", r.record_id);
+        let _ = writeln!(
+            out,
+            "INSERT INTO factor_base_measurement_cells VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (cell_id) DO NOTHING;",
+            ts(&cell_id),
+            ts(fbm_id),
+            ts(&r.record_id),
+            ts(&r.session_id),
+            f(r.cost.s),
+            f(r.cost.total_gae),
+            i(trials.map(|v| v as i128)),
+            i(relations.map(|v| v as i128)),
+            f(yield_per_trial),
+            f(r.solver.as_ref().and_then(|s| s.solving_degree_mean)),
+            i(r.solver
+                .as_ref()
+                .and_then(|s| s.solving_degree_max)
+                .map(|v| v as i128)),
+            i(r.solver
+                .as_ref()
+                .and_then(|s| s.semi_regular_degree)
+                .map(|v| v as i128)),
+            i(r.solver
+                .as_ref()
+                .and_then(|s| s.macaulay_rows)
+                .map(|v| v as i128)),
+            i(r.solver
+                .as_ref()
+                .and_then(|s| s.macaulay_columns)
+                .map(|v| v as i128)),
+            ts(&r.outcome.status),
+            json_text(&serde_json::json!({"fb_family": fb.family, "arm": r.arm})),
+        );
+    }
+    for (ord, bl) in r.isolation.blockers.iter().enumerate() {
+        let _ = writeln!(
+            out,
+            "INSERT INTO isolation_blockers VALUES ({}, {}, {}) ON CONFLICT (record_id, ord) DO NOTHING;",
+            ts(&r.record_id),
+            ord,
+            ts(bl)
+        );
+    }
+}
+
+fn comparison_row(out: &mut String, c: &Comparison) {
+    let _ = writeln!(
+        out,
+        "INSERT INTO comparisons VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (comparison_id) DO NOTHING;",
+        ts(&c.comparison_id),
+        ts(&c.a.session_id),
+        ts(&c.a.arm),
+        ts(&c.b.session_id),
+        ts(&c.b.arm),
+        ts(&c.ops.status),
+        f(c.ops.ratio_b_over_a),
+        f(c.ops.ci95.map(|x| x.0)),
+        f(c.ops.ci95.map(|x| x.1)),
+        b(c.ops.bounded),
+        ts(&c.wall.status),
+        // `wall_ratio` is the statistic `wall_ci_*` bounds: the v2
+        // per-operation ratio, or the v1 median per-pair ratio.
+        f(if c.schema == crate::cryptanalysis::ecbench::compare::COMPARISON_SCHEMA {
+            c.wall.median_ratio
+        } else {
+            c.wall.ratio_b_over_a
+        }),
+        f(c.wall.ci95.map(|x| x.0)),
+        f(c.wall.ci95.map(|x| x.1)),
+        ts(&c.verdict),
+        json_text(c),
+    );
+}
+
+/// A `vs_rho` claim (`ecbench claim build`), checked again at load time.
+fn claim_row(out: &mut String, c: &Value) -> Result<(), String> {
+    let s = |k: &str| c.get(k).and_then(Value::as_str);
+    let need = |k: &str| s(k).ok_or_else(|| format!("claim without {k}"));
+    let num = |k: &str| {
+        c.get(k)
+            .and_then(Value::as_f64)
+            .ok_or_else(|| format!("claim without {k}"))
+    };
+    let check = crate::cryptanalysis::ecbench::claim::check_vs_rho(c)?;
+    let _ = writeln!(
+        out,
+        "INSERT OR REPLACE INTO claims VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {});",
+        ts(need("run_id")?),
+        ts(need("candidate_id")?),
+        ts(need("candidate_manifest_sha256")?),
+        ts(need("workload_id")?),
+        ts(need("workload_manifest_sha256")?),
+        ts(c["ecbench_records"]["session"]
+            .as_str()
+            .ok_or("claim without its session")?),
+        ts(c["ecbench_records"]["ic"]
+            .as_str()
+            .ok_or("claim without its IC record")?),
+        ts(c["ecbench_records"]["rho"]
+            .as_str()
+            .ok_or("claim without its rho record")?),
+        i(c.get("n_or_bits").and_then(Value::as_u64)),
+        f(Some(num("ic_online_wall_ms")?)),
+        f(Some(num("rho_online_wall_ms")?)),
+        f(Some(num("online_speedup")?)),
+        b(c.get("independent_validation") == Some(&Value::Bool(true))),
+        t(s("ic_replay_certificate_sha256")),
+        ts(check["status"].as_str().unwrap_or("FAIL")),
+        ts(need("verdict")?),
+        json_text(c),
+    );
+    Ok(())
+}
+
+fn dump_rows(out: &mut String, d: &FactorBaseDump) {
+    let fb = &d.factor_base;
+    let c = &d.curve;
+    let _ = writeln!(
+        out,
+        "INSERT INTO curves VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (slug) DO NOTHING;",
+        ts(&c.slug),
+        ts(&c.icv1),
+        ts(&c.family),
+        i(c.field_degree),
+        i(c.field_bits),
+        ts(&c.group_order.to_string()),
+        ts(&c.r.to_string()),
+        ts(&c.cofactor.to_string()),
+        f(Some((c.r.to_f64()).log2())),
+        c.automorphisms_available,
+        f(Some(floor_s(c.automorphisms_available))),
+        b(c.registered),
+    );
+    let _ = writeln!(
+        out,
+        "INSERT INTO factor_bases VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (fb_id) DO NOTHING;",
+        ts(&fb.fb_id),
+        ts(&fb.fb_sha256),
+        ts(&c.slug),
+        ts(&fb.family),
+        json_text(&fb.params),
+        ts(&fb.description),
+        fb.signed_points,
+        fb.abscissae,
+        fb.columns,
+        i(fb.dimension),
+        ts(&fb.points_sha256),
+    );
+    for (idx, p) in d.points.iter().enumerate() {
+        let _ = writeln!(
+            out,
+            "INSERT INTO factor_base_points VALUES ({}, {}, {}, {}, {}, {}) ON CONFLICT (fb_id, idx) DO NOTHING;",
+            ts(&fb.fb_id),
+            idx,
+            ts(&p.x),
+            ts(&p.y),
+            p.col,
+            ts(&p.coef.to_string()),
+        );
+    }
+}
+
+/// Refuse a session directory that does not pass its integrity audit.  The
+/// database is an index of sealed evidence, so a row from a record whose
+/// seal fails, from a records file the session does not hash to, or from a
+/// session that disagrees with its own spec, plan or host capsule, must
+/// not be loaded: an unsealed tampered copy loaded first would otherwise
+/// win over the honest row loaded later.  No replay is run (`--replay 0`);
+/// an interrupted session is audited as such and loads with its status.
+fn verify_for_load(path: &Path) -> Result<(), String> {
+    let report = audit::audit_with(path, 0, true)
+        .map_err(|e| format!("{}: cannot audit, refusing to load: {e}", path.display()))?;
+    if report.ok {
+        return Ok(());
+    }
+    let shown: Vec<&str> = report.problems.iter().take(5).map(String::as_str).collect();
+    Err(format!(
+        "{}: refusing to load, the session fails its integrity audit ({} problems): {}",
+        path.display(),
+        report.problems.len(),
+        shown.join("; ")
+    ))
+}
+
+/// `kind`, curve and factor-base id read from an object's name, by the
+/// convention `factor-bases/<ICV1 slug>/<FB1 id>.json`.
+fn store_name_parts(name: &str) -> (String, Option<String>, Option<String>) {
+    let parts: Vec<&str> = name.split('/').collect();
+    let kind = parts[0].to_string();
+    if kind != "factor-bases" || parts.len() < 3 {
+        return (kind, None, None);
+    }
+    let file = parts[parts.len() - 1];
+    let stem = file.rsplit_once('.').map_or(file, |(s, _)| s);
+    let fb_id = stem.starts_with("FB1h").then(|| stem.to_string());
+    (kind, Some(parts[1].to_string()), fb_id)
+}
+
+/// Replace the store tables with the content of a store index.
+fn store_rows(out: &mut String, v: Value) -> Result<(), String> {
+    let index: crate::store::index::Index =
+        serde_json::from_value(v).map_err(|e| format!("store index: {e}"))?;
+    out.push_str(
+        "DELETE FROM store_superseded;\nDELETE FROM store_tags;\nDELETE FROM store_objects;\n",
+    );
+    for (name, e) in &index.entries {
+        crate::store::index::validate_name(name)?;
+        crate::store::index::validate_sha256(&e.sha256)?;
+        let (kind, curve, fb) = store_name_parts(name);
+        let _ = writeln!(
+            out,
+            "INSERT INTO store_objects VALUES ({}, {}, {}, {}, {}, {}, {}, {});",
+            ts(name),
+            ts(&e.sha256),
+            e.bytes,
+            ts(&kind),
+            t(curve.as_deref()),
+            t(fb.as_deref()),
+            ts(&e.description),
+            ts(&e.provenance),
+        );
+        for tag in &e.tags {
+            let _ = writeln!(
+                out,
+                "INSERT INTO store_tags VALUES ({}, {});",
+                ts(name),
+                ts(tag)
+            );
+        }
+        for old in &e.superseded {
+            let _ = writeln!(
+                out,
+                "INSERT INTO store_superseded VALUES ({}, {}, {});",
+                ts(name),
+                ts(&old.sha256),
+                old.bytes
+            );
+        }
+    }
+    Ok(())
+}
+
+/// SQL for one path: a session directory, a comparison file, a
+/// factor-base dump or a store index, recognised by content.
+pub fn sql_for_path(path: &Path) -> Result<String, String> {
+    let mut out = String::new();
+    if path.is_dir() {
+        let session = read_session(path)?;
+        verify_for_load(path)?;
+        let host: HostCapsule = serde_json::from_str(
+            &std::fs::read_to_string(path.join("host.json"))
+                .map_err(|e| format!("{}: {e}", path.join("host.json").display()))?,
+        )
+        .map_err(|e| format!("host.json: {e}"))?;
+        host_row(&mut out, &host);
+        session_rows(&mut out, &session, path);
+        // Arms that never produced a record still belong to the session.
+        if let Ok(text) = std::fs::read_to_string(path.join("plan.json")) {
+            if let Ok(plan) = serde_json::from_str::<PlanDoc>(&text) {
+                for w in &plan.workloads {
+                    curve_rows(&mut out, w);
+                }
+            }
+        }
+        for r in read_records(path)? {
+            run_rows(&mut out, &r);
+        }
+        if let Ok(rd) = std::fs::read_dir(path.join("comparisons")) {
+            let mut files: Vec<_> = rd.filter_map(|e| e.ok()).map(|e| e.path()).collect();
+            files.sort();
+            for f in files {
+                out.push_str(&sql_for_path(&f)?);
+            }
+        }
+        return Ok(out);
+    }
+    let text = std::fs::read_to_string(path).map_err(|e| format!("{}: {e}", path.display()))?;
+    let v: Value = serde_json::from_str(&text).map_err(|e| format!("{}: {e}", path.display()))?;
+    match v.get("schema").and_then(Value::as_str) {
+        Some(s) if crate::cryptanalysis::ecbench::compare::is_comparison_schema(s) => {
+            let c: Comparison = serde_json::from_value(v).map_err(|e| e.to_string())?;
+            comparison_row(&mut out, &c);
+        }
+        Some(crate::cryptanalysis::ecbench::methods::FB_DUMP_SCHEMA) => {
+            let d: FactorBaseDump = serde_json::from_value(v).map_err(|e| e.to_string())?;
+            dump_rows(&mut out, &d);
+        }
+        Some(crate::cryptanalysis::ecbench::claim::CLAIM_SCHEMA) => {
+            claim_row(&mut out, &v).map_err(|e| format!("{}: {e}", path.display()))?;
+        }
+        Some(crate::store::index::SCHEMA) => {
+            store_rows(&mut out, v).map_err(|e| format!("{}: {e}", path.display()))?;
+        }
+        other => {
+            return Err(format!(
+                "{}: not an ecbench file (schema {other:?})",
+                path.display()
+            ))
+        }
+    }
+    Ok(out)
+}
+
+/// What loading a list of paths gave: the SQL for those that loaded, and
+/// each path that was refused with its reason.
+#[derive(Debug, Default)]
+pub struct Batch {
+    pub sql: String,
+    pub refused: Vec<(std::path::PathBuf, String)>,
+}
+
+/// The schema, then every readable path's rows, in one transaction.  A path
+/// that cannot be loaded (unreadable, not ecbench, tampered) contributes no
+/// rows and is listed in [`Batch::refused`]; the others still load.
+pub fn sql_batch(paths: &[&Path]) -> Batch {
+    let mut batch = Batch {
+        sql: String::from(SCHEMA_SQL),
+        refused: Vec::new(),
+    };
+    batch.sql.push_str("\nBEGIN;\n");
+    for p in paths {
+        match sql_for_path(p) {
+            Ok(rows) => batch.sql.push_str(&rows),
+            Err(e) => batch.refused.push((p.to_path_buf(), e)),
+        }
+    }
+    batch.sql.push_str("COMMIT;\n");
+    batch
+}
+
+/// The schema, then every path's rows, in one transaction; an error if any
+/// path is refused.
+pub fn sql(paths: &[&Path]) -> Result<String, String> {
+    let batch = sql_batch(paths);
+    if let Some((_, e)) = batch.refused.first() {
+        return Err(e.clone());
+    }
+    Ok(batch.sql)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn store_names_give_their_curve_and_factor_base() {
+        assert_eq!(
+            store_name_parts("factor-bases/icv1-fp20-t727-cd198a38/FB1h4b3725c0aa92.json"),
+            (
+                "factor-bases".to_string(),
+                Some("icv1-fp20-t727-cd198a38".to_string()),
+                Some("FB1h4b3725c0aa92".to_string())
+            )
+        );
+        // A factor-base object that does not carry an FB1 id keeps its curve only.
+        assert_eq!(
+            store_name_parts("factor-bases/icv1-fp20-t727-cd198a38/notes.txt"),
+            (
+                "factor-bases".to_string(),
+                Some("icv1-fp20-t727-cd198a38".to_string()),
+                None
+            )
+        );
+        // Other kinds, and short names, read nothing from the name.
+        assert_eq!(
+            store_name_parts("evidence/x/y"),
+            ("evidence".to_string(), None, None)
+        );
+        assert_eq!(
+            store_name_parts("factor-bases/flat.json"),
+            ("factor-bases".to_string(), None, None)
+        );
+    }
+
+    #[test]
+    fn a_store_index_replaces_the_store_tables() {
+        let sha = "ab".repeat(32);
+        let v = serde_json::json!({
+            "schema": crate::store::index::SCHEMA,
+            "entries": {
+                "factor-bases/icv1-fp20-t727-cd198a38/FB1h4b3725c0aa92.json": {
+                    "sha256": sha, "bytes": 3992, "description": "it's a dump",
+                    "tags": ["fb"], "superseded": [{"sha256": "cd".repeat(32), "bytes": 7}]
+                }
+            }
+        });
+        let mut out = String::new();
+        store_rows(&mut out, v).unwrap();
+        assert!(out.starts_with("DELETE FROM store_superseded;"), "{out}");
+        assert!(out.contains("'it''s a dump'"), "{out}");
+        assert!(out.contains("INSERT INTO store_tags"), "{out}");
+        assert!(out.contains("INSERT INTO store_superseded"), "{out}");
+        assert!(out.contains("'FB1h4b3725c0aa92'"), "{out}");
+        // A forged digest or a hostile name is refused, not emitted.
+        let bad = serde_json::json!({"schema": crate::store::index::SCHEMA,
+            "entries": {"../x": {"sha256": sha, "bytes": 1}}});
+        assert!(store_rows(&mut String::new(), bad).is_err());
+    }
+
+    #[test]
+    fn literals_escape() {
+        assert_eq!(ts("it's"), "'it''s'");
+        assert_eq!(f(Some(f64::NAN)), "NULL");
+        assert_eq!(i::<i64>(None), "NULL");
+    }
+
+    // ── Loading tampered evidence ─────────────────────────────────────
+
+    use crate::cryptanalysis::ecbench::audit::tests::{fresh, tamper, RHO_SEQ};
+    use rusqlite::Connection;
+
+    fn run_sql(conn: &Connection, sql: &str) -> rusqlite::Result<()> {
+        conn.execute_batch(sql)
+    }
+
+    fn count(conn: &Connection, query: &str) -> i64 {
+        conn.query_row(query, [], |r| r.get(0)).unwrap()
+    }
+
+    /// A record whose bytes were edited and whose seal was not redone.
+    fn unsealed_tamper(dir: &Path) {
+        let text = std::fs::read_to_string(dir.join("records.jsonl")).unwrap();
+        let mut lines: Vec<String> = text.lines().map(String::from).collect();
+        let v: serde_json::Value = serde_json::from_str(&lines[RHO_SEQ]).unwrap();
+        let total = v["cost"]["total_gae"].to_string();
+        assert!(lines[RHO_SEQ].contains(&format!("\"total_gae\":{total}")));
+        lines[RHO_SEQ] =
+            lines[RHO_SEQ].replacen(&format!("\"total_gae\":{total}"), "\"total_gae\":1.0", 1);
+        std::fs::write(dir.join("records.jsonl"), lines.join("\n") + "\n").unwrap();
+    }
+
+    /// D3: an unsealed tampered copy loaded first used to win, the honest
+    /// row dropped by `DO NOTHING`.  It is refused, loudly, and the honest
+    /// session loads.
+    #[test]
+    fn an_unsealed_tampered_session_is_refused_not_loaded_first() {
+        let tampered = fresh("db-d3-tampered");
+        unsealed_tamper(&tampered);
+        let honest = fresh("db-d3-honest");
+        let err = sql_for_path(&tampered).unwrap_err();
+        assert!(err.contains("refusing to load"), "{err}");
+        assert!(err.contains("integrity audit"), "{err}");
+        // Loaded together, tampered first: the tampered one is reported and
+        // skipped, the honest one is the one in the database.
+        let batch = sql_batch(&[tampered.as_path(), honest.as_path()]);
+        assert_eq!(batch.refused.len(), 1);
+        assert_eq!(batch.refused[0].0, tampered);
+        let conn = Connection::open_in_memory().unwrap();
+        run_sql(&conn, &batch.sql).unwrap();
+        assert_eq!(count(&conn, "SELECT count(*) FROM runs"), 18);
+        let honest_total: f64 = conn
+            .query_row("SELECT total_gae FROM runs WHERE seq = 8", [], |r| r.get(0))
+            .unwrap();
+        assert!(honest_total > 1.5, "{honest_total}");
+        // The strict form errors on the same input.
+        assert!(sql(&[tampered.as_path(), honest.as_path()]).is_err());
+        for d in [tampered, honest] {
+            let _ = std::fs::remove_dir_all(&d);
+        }
+    }
+
+    #[test]
+    fn a_resealed_forgery_that_fails_the_audit_is_refused_too() {
+        let dir = fresh("db-resealed");
+        tamper(&dir, |recs, _| {
+            // Cost halved, S and ratio with it, seal and hash redone: only
+            // the phase-sum check sees it.
+            let r = &mut recs[RHO_SEQ];
+            let t = r["cost"]["total_gae"].as_f64().unwrap() / 2.0;
+            let sqrt_r = r["workload"]["curve"]["r"].as_f64().unwrap().sqrt();
+            let floor = r["boundaries"]["floor_s"].as_f64().unwrap();
+            r["cost"]["total_gae"] = serde_json::json!(t);
+            r["cost"]["s"] = serde_json::json!(t / sqrt_r);
+            r["boundaries"]["ratio_to_floor"] = serde_json::json!(t / sqrt_r / floor);
+        });
+        let err = sql_for_path(&dir).unwrap_err();
+        assert!(err.contains("phases sum to"), "{err}");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn one_bad_directory_does_not_abort_the_batch() {
+        let honest = fresh("db-batch");
+        let missing = std::env::temp_dir().join(format!("ecbench-no-such-{}", std::process::id()));
+        let batch = sql_batch(&[missing.as_path(), honest.as_path()]);
+        assert_eq!(batch.refused.len(), 1);
+        assert!(batch.sql.contains("INSERT INTO sessions"));
+        assert!(batch.sql.trim_end().ends_with("COMMIT;"));
+        let conn = Connection::open_in_memory().unwrap();
+        run_sql(&conn, &batch.sql).unwrap();
+        assert_eq!(count(&conn, "SELECT count(*) FROM sessions"), 1);
+        let _ = std::fs::remove_dir_all(&honest);
+    }
+
+    #[test]
+    fn loading_the_same_session_twice_changes_nothing() {
+        let dir = fresh("db-twice");
+        let sql = sql(&[dir.as_path()]).unwrap();
+        let conn = Connection::open_in_memory().unwrap();
+        run_sql(&conn, &sql).unwrap();
+        run_sql(&conn, &sql).unwrap();
+        assert_eq!(count(&conn, "SELECT count(*) FROM runs"), 18);
+        assert_eq!(count(&conn, "SELECT count(*) FROM arms"), 3);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn an_arm_keeps_its_role_and_method_for_the_session() {
+        let dir = fresh("db-arms");
+        let conn = Connection::open_in_memory().unwrap();
+        run_sql(&conn, &sql(&[dir.as_path()]).unwrap()).unwrap();
+        let (sid, arm, role, method): (String, String, String, String) = conn
+            .query_row(
+                "SELECT session_id, arm, role, method_id FROM arms WHERE arm = 'rho-neg'",
+                [],
+                |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
+            )
+            .unwrap();
+        let insert = |role: &str, method: &str| {
+            conn.execute_batch(&format!(
+                "INSERT INTO arms VALUES ('{sid}', '{arm}', '{role}', '{method}') ON CONFLICT (session_id, arm) DO NOTHING;"
+            ))
+        };
+        assert!(insert(&role, &method).is_ok(), "the same row again");
+        let e = insert("candidate", &method).unwrap_err().to_string();
+        assert!(e.contains("different role or method"), "{e}");
+        let other: String = conn
+            .query_row(
+                "SELECT method_id FROM arms WHERE arm = 'ic-p20-glv'",
+                [],
+                |r| r.get(0),
+            )
+            .unwrap();
+        assert!(insert(&role, &other).is_err());
+        assert_eq!(
+            count(
+                &conn,
+                "SELECT count(*) FROM arms WHERE arm = 'rho-neg' AND role = 'reference'"
+            ),
+            1
+        );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn a_differing_comparison_row_is_an_error_not_a_replacement() {
+        let conn = Connection::open_in_memory().unwrap();
+        run_sql(&conn, SCHEMA_SQL).unwrap();
+        let row = |json: &str, verb: &str, tail: &str| {
+            format!(
+                "{verb} INTO comparisons VALUES ('ECC1h000000000001', 'ECBS1ha', 'a', 'ECBS1ha', 'b', 'ok', 1.5, 1.0, 2.0, 1, 'refused', NULL, NULL, NULL, 'v', '{json}'){tail};"
+            )
+        };
+        let on_conflict = " ON CONFLICT (comparison_id) DO NOTHING";
+        run_sql(&conn, &row("{\"x\":1}", "INSERT", on_conflict)).unwrap();
+        // The same row again is a no-op.
+        run_sql(&conn, &row("{\"x\":1}", "INSERT", on_conflict)).unwrap();
+        assert_eq!(count(&conn, "SELECT count(*) FROM comparisons"), 1);
+        // A different one is an error, however it is spelled.
+        let e = run_sql(&conn, &row("{\"x\":2}", "INSERT", on_conflict))
+            .unwrap_err()
+            .to_string();
+        assert!(e.contains("different content"), "{e}");
+        assert!(run_sql(&conn, &row("{\"x\":2}", "INSERT OR REPLACE", "")).is_err());
+        let kept: String = conn
+            .query_row("SELECT json FROM comparisons", [], |r| r.get(0))
+            .unwrap();
+        assert_eq!(kept, "{\"x\":1}");
+    }
+
+    #[test]
+    fn a_complete_session_never_reverts_and_views_read_complete_sessions_only() {
+        let complete = fresh("db-views-complete");
+        let sql_complete = sql(&[complete.as_path()]).unwrap();
+        let conn = Connection::open_in_memory().unwrap();
+        run_sql(&conn, &sql_complete).unwrap();
+        assert!(count(&conn, "SELECT count(*) FROM arm_workload_summary") > 0);
+        assert!(count(&conn, "SELECT count(*) FROM method_by_curve") > 0);
+        assert!(count(&conn, "SELECT count(*) FROM ic_phase_split") > 0);
+        assert!(count(&conn, "SELECT count(*) FROM ic_yield") > 0);
+        // The same session loaded again as `running` is refused.
+        let reverted: String = sql_complete
+            .lines()
+            .map(|l| {
+                if l.starts_with("INSERT INTO sessions VALUES") {
+                    l.replace("'complete'", "'running'")
+                } else {
+                    l.to_string()
+                }
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
+        let e = run_sql(&conn, &reverted).unwrap_err().to_string();
+        assert!(e.contains("session id already loaded"), "{e}");
+
+        // A prefix of the plan marked `interrupted` is in the tables, with
+        // its status, and in no view.
+        let prefix = fresh("db-views-prefix");
+        tamper(&prefix, |recs, s| {
+            recs.truncate(10);
+            s["status"] = serde_json::json!("interrupted");
+            s["records_written"] = serde_json::json!(10);
+            s["status_counts"] = serde_json::json!({"verified": 10});
+        });
+        let conn = Connection::open_in_memory().unwrap();
+        run_sql(&conn, &sql(&[prefix.as_path()]).unwrap()).unwrap();
+        assert_eq!(count(&conn, "SELECT count(*) FROM runs"), 10);
+        assert_eq!(
+            count(
+                &conn,
+                "SELECT count(*) FROM sessions WHERE status = 'interrupted'"
+            ),
+            1
+        );
+        for view in [
+            "arm_workload_summary",
+            "method_by_curve",
+            "ic_phase_split",
+            "ic_yield",
+        ] {
+            assert_eq!(
+                count(&conn, &format!("SELECT count(*) FROM {view}")),
+                0,
+                "{view}"
+            );
+        }
+        for d in [complete, prefix] {
+            let _ = std::fs::remove_dir_all(&d);
+        }
+    }
+}

@@ -1,0 +1,193 @@
+{
+  "claim_scope": "exact_transfer_and_bound_64_known_answer_destination_solve; not_a_full_81_bit_dlp",
+  "cover": {
+    "certificate_replayed": true,
+    "construction": "binary_cubic_pullback_v1",
+    "degree": 3,
+    "genus": 3,
+    "map": "(u,v) -> (u^3, u*v + 1)",
+    "riemann_hurwitz_ramification_total": 4,
+    "separable": true,
+    "source_equation": "v^2 + u^2*v = u^7 + u"
+  },
+  "curve": {
+    "cofactor": 4,
+    "equation": "y^2 + x*y = x^3 + 1",
+    "field": "GF(2^83)",
+    "group_order": "9671406556923184866742756",
+    "modulus": "z^83 + z^45 + z^2 + z + 1",
+    "p": {
+      "infinity": false,
+      "x": "0x477f77103dfad59850800",
+      "y": "0x2fa5e737d542c4e4fd5c3"
+    },
+    "q": {
+      "infinity": false,
+      "x": "0x590a9c0709b34b0bcd3d4",
+      "y": "0x6aa49dc52796827db931a"
+    },
+    "q_relation": "Q=[37]P",
+    "slug": "icv1-f2m83-tm6151469093347-debefd74",
+    "subgroup_order": "2417851639230796216685689"
+  },
+  "curve_record": {
+    "a": 0,
+    "b": 1,
+    "curve": {
+      "coefficients": [
+        1,
+        0,
+        0,
+        0,
+        1
+      ],
+      "cofactor": 4,
+      "generator": [
+        "0x477f77103dfad59850800",
+        "0x2fa5e737d542c4e4fd5c3"
+      ],
+      "model": "binary Weierstrass",
+      "subgroup_order": "2417851639230796216685689",
+      "target_group": "prime-order subgroup"
+    },
+    "field": {
+      "characteristic": 2,
+      "degree": 83,
+      "element_encoding": "hex polynomial coefficient bitset, least significant bit is constant",
+      "modulus_exponents": [
+        83,
+        45,
+        2,
+        1,
+        0
+      ],
+      "representation": "polynomial"
+    },
+    "group_order": "9671406556923184866742756",
+    "label": "pinned-n83-k0-polynomial-basis-generator",
+    "n": 83,
+    "sources": [
+      "AGENTS.md section 8a",
+      "tools/ecdlp-surfaces/src/binary.rs",
+      "research/n83_genus3_image_solver_20261031/PROTOCOL.md"
+    ]
+  },
+  "destination_solver": {
+    "destination_verified": true,
+    "input_bound_exclusive": "64",
+    "name": "jacobian_image.bsgs",
+    "received_planted_scalar": false,
+    "recovered_scalar": "37",
+    "search": {
+      "jacobian_additions": 4,
+      "jacobian_doublings": 0,
+      "table_lookups": 5
+    },
+    "setup": {
+      "jacobian_additions": 8,
+      "jacobian_doublings": 4,
+      "scalar_multiplications": 1,
+      "table_inserts": 8
+    },
+    "source_replay_verified": true,
+    "verification": {
+      "jacobian_additions": 3,
+      "jacobian_doublings": 6,
+      "scalar_multiplications": 1
+    }
+  },
+  "fibers_and_composition": [
+    {
+      "input": "infinity",
+      "kind": "infinity_ramified_e3",
+      "pull_push_equals_three": true
+    },
+    {
+      "exceptional_pullback_two_torsion": true,
+      "input": {
+        "infinity": false,
+        "x": "0x0",
+        "y": "0x1"
+      },
+      "kind": "exceptional_two_torsion_ramified_e3",
+      "pull_push_equals_three": true,
+      "source_point": {
+        "u": "0x0",
+        "v": "0x0"
+      }
+    },
+    {
+      "formal_pushforward": {
+        "infinity": false,
+        "x": "0x72832a991095eb0b5777d",
+        "y": "0x161ea469ce31a465ff5ae"
+      },
+      "input": "P",
+      "kind": "generic_separable_degree3",
+      "pull_push_equals_three": true,
+      "three_times_input": {
+        "infinity": false,
+        "x": "0x72832a991095eb0b5777d",
+        "y": "0x161ea469ce31a465ff5ae"
+      }
+    },
+    {
+      "formal_pushforward": {
+        "infinity": false,
+        "x": "0x22d519c61cfc24c5c2ebb",
+        "y": "0x7934848e07376851ec074"
+      },
+      "input": "Q",
+      "kind": "generic_separable_degree3",
+      "pull_push_equals_three": true,
+      "three_times_input": {
+        "infinity": false,
+        "x": "0x22d519c61cfc24c5c2ebb",
+        "y": "0x7934848e07376851ec074"
+      }
+    }
+  ],
+  "image_order": {
+    "degree_inverse_mod_r": "1611901092820530811123793",
+    "exact_image_order": "2417851639230796216685689",
+    "p_image_nonidentity": true,
+    "q_image_nonidentity": true,
+    "r_prime_factor_provenance": "AGENTS.md section 8a; independently passed fixed-base Miller-Rabin bases 2..37",
+    "r_times_p_image_identity": true,
+    "r_times_q_image_identity": true,
+    "reason": "nonidentity element killed by prime r",
+    "subgroup_transfer_status": "injective_on_certified_r_subgroup"
+  },
+  "open_cost_obligation": "no certified conversion from genus-3 Cantor operations to source elliptic-curve GAE; no net speedup follows from this gate",
+  "pullbacks": {
+    "p": {
+      "u_coefficients_ascending": [
+        "0x477f77103dfad59850800",
+        "0x0",
+        "0x0",
+        "0x1"
+      ],
+      "v_coefficients_ascending": [
+        "0x0",
+        "0x0",
+        "0x5b4510dc8599a21a4e2d3"
+      ]
+    },
+    "q": {
+      "u_coefficients_ascending": [
+        "0x590a9c0709b34b0bcd3d4",
+        "0x0",
+        "0x0",
+        "0x1"
+      ],
+      "v_coefficients_ascending": [
+        "0x0",
+        "0x0",
+        "0xb8ac2120333f6d734d33"
+      ]
+    },
+    "thirty_seven_times_p_equals_q": true
+  },
+  "schema": "crypto.n83-genus3-image-gate/v1",
+  "status": "pass"
+}

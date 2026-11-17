@@ -1,0 +1,11 @@
+# Final full V3 prospective source review
+
+Disposition: source adequate for the final bounded full attempt. Binds published 79588ee0ee629dd9d247957bf8d6402bc6a6f855 and freeze dfde7d96367f321f0d4446c205290622c545f3d4364d7796c392d632391267eb. Independent inspection followed plan5af79bf...; no execution occurred.
+
+The actual V2 failure was terminal service garbage collection clearing InvocationID after native pre succeeded. V3 fallback does not accept arbitrary emptiness: it requires current unit not-found, empty invocation, inactive/failed state and absent exact cgroup; trusted manager journal entries must match captured invocation, unit, boot, PID1, UID0 and init.scope, with ordered start-success events. The journal query has a two-second maximum inside the phase; evidence is saved durably. Missing evidence, live replacement or remaining cgroup fails closed. Ordinary invocation-bound cleanup, guarded failed receipt handling and stop/wait limits remain.
+
+All frozen hashes and published Git bytes match. Four mathematical sources, names, runtime/closure/baseline/root pins remain unchanged. Native replay changes only workspace. Prior receipt bindings match. V3 requires fresh full pre and post checks; it cannot reuse the completed V2 pre. Prior charges300+900=1200, remaining45600 of46800, attempt3 of3,900/600/900 phases with2400 total,1CPU/8GiB/no retries, deadline2026-11-06 04:00UTC remain explicit.
+
+The twelve producer mock cases were source-inspected, not independently executed or treated as live qualification. The preread plan asked about phase-window timestamps: implementation checks ordering rather than numerical phase bounds; freshness rests on capturing the new manager invocation after absent-unit preflight and unique unit ownership. This is adequate under those stated assumptions; it does not claim resistance to a privileged actor replacing units/journal. Filesystem calls are not hard realtime guarantees; unresolved ownership prevents overlap.
+
+The old failed outer receipt and closed original-clock continuation remain preserved. Parent publication/admission precede execution; actual complete receipts determine machine result. This source review makes no new mathematical or kernel claim.

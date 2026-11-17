@@ -1,0 +1,181 @@
+name: N83 fresh-trial identity-pattern panel
+
+on:
+  push:
+    branches:
+      - codex/n83-aws-handoff-20261025
+    paths:
+      - .github/workflows/n83-natural-yield-pattern-panel.yml
+      - research/koblitz_n83_factor_base_sweep_20261008/verification/natural-yield-panel-20261025/protocol.json
+      - research/koblitz_n83_factor_base_sweep_20261008/verification/natural-yield-panel-20261025/run_panel.py
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: n83-natural-yield-pattern-panel
+  cancel-in-progress: false
+
+jobs:
+  build-worker:
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-aws-handoff-20261025'
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n83-natural-yield-pattern-panel.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n83-natural-yield-pattern-panel.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 25
+    steps:
+      - name: Check out pinned pattern worker source
+        uses: actions/checkout@v4
+        with:
+          ref: 83393dd87ef48f11963c582cd79b89296c4a1bea
+          fetch-depth: 1
+          path: source
+      - name: Build and account for the exact worker
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/n83-pattern-bin"
+          START_NS="$(date +%s%N)"
+          (cd source && /usr/bin/time -v -o "$RUNNER_TEMP/n83-pattern-bin/build.time" \
+            cargo build --release --example koblitz_n83_mixed_orbit_worker --locked) \
+            > "$RUNNER_TEMP/n83-pattern-bin/build.stdout" \
+            2> "$RUNNER_TEMP/n83-pattern-bin/build.stderr"
+          END_NS="$(date +%s%N)"
+          cp source/target/release/examples/koblitz_n83_mixed_orbit_worker \
+            "$RUNNER_TEMP/n83-pattern-bin/worker"
+          chmod 755 "$RUNNER_TEMP/n83-pattern-bin/worker"
+          SOURCE_COMMIT="$(git -C source rev-parse HEAD)" \
+          START_NS="$START_NS" END_NS="$END_NS" \
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, platform
+          root = pathlib.Path(os.environ['RUNNER_TEMP']) / 'n83-pattern-bin'
+          worker = root / 'worker'
+          data = {'schema':'n83.natural-pattern-build/v1',
+                  'source_commit':os.environ['SOURCE_COMMIT'],
+                  'worker_sha256':hashlib.sha256(worker.read_bytes()).hexdigest(),
+                  'build_wall_seconds_L0':(int(os.environ['END_NS'])-int(os.environ['START_NS']))/1e9,
+                  'uname':platform.uname()._asdict(),
+                  'selected_best_total_runtime':None}
+          assert data['source_commit'] == '83393dd87ef48f11963c582cd79b89296c4a1bea'
+          (root / 'build.json').write_text(json.dumps(data,indent=2,sort_keys=True)+'\n')
+          PY
+      - name: Retain exact worker and build receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-pattern-worker-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/n83-pattern-bin/
+          if-no-files-found: warn
+          retention-days: 90
+
+  solve-stratum:
+    needs: build-worker
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-aws-handoff-20261025'
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n83-natural-yield-pattern-panel.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n83-natural-yield-pattern-panel.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 55
+    strategy:
+      fail-fast: false
+      matrix:
+        stratum: [t1_m0, t1_m1, t2_m0, t2_m1]
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      PANEL: research/koblitz_n83_factor_base_sweep_20261008/verification/natural-yield-panel-20261025
+      BUNDLE: research/koblitz_n83_factor_base_sweep_20261008/verification/linux-xor-complete-inputs-20261025
+      PREFLIGHT: research/koblitz_n83_factor_base_sweep_20261008/verification/linux-xor-actions-preflight-20261025
+    steps:
+      - name: Check out frozen protocol
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          path: protocol
+      - name: Check out pinned mathematical worker source
+        uses: actions/checkout@v4
+        with:
+          ref: 83393dd87ef48f11963c582cd79b89296c4a1bea
+          fetch-depth: 1
+          path: source
+      - name: Download exact built worker
+        uses: actions/download-artifact@v4
+        with:
+          name: n83-pattern-worker-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/n83-pattern-bin
+      - name: Fetch pinned solver from qualified preflight artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/n83-pattern-meta"
+          gh api repos/aburan28/crypto/actions/artifacts/12593635829/zip \
+            > "$RUNNER_TEMP/n83-pattern-meta/preflight.zip"
+          printf '%s  %s\n' \
+            00713618c7c09188a9f75fef6ce6323af376428cc48d537491394c91429d1237 \
+            "$RUNNER_TEMP/n83-pattern-meta/preflight.zip" | sha256sum -c \
+            > "$RUNNER_TEMP/n83-pattern-meta/preflight.sha256-check"
+          unzip -q "$RUNNER_TEMP/n83-pattern-meta/preflight.zip" cryptominisat5 \
+            -d "$RUNNER_TEMP/n83-pattern-bin"
+          chmod 755 "$RUNNER_TEMP/n83-pattern-bin/cryptominisat5" \
+            "$RUNNER_TEMP/n83-pattern-bin/worker"
+          printf '%s  %s\n' \
+            0936420373bbdf22c2a3d37291e3a4ab4e041d7f41ae3ceed003373fb596ddb2 \
+            "$RUNNER_TEMP/n83-pattern-bin/cryptominisat5" | sha256sum -c
+          rm "$RUNNER_TEMP/n83-pattern-meta/preflight.zip"
+      - name: Install frozen Linux solver dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq 2>&1 | tee "$RUNNER_TEMP/n83-pattern-meta/apt-update.log"
+          sudo apt-get install -y -qq --no-install-recommends \
+            'cryptominisat=5.11.15+dfsg1-1.1build1' 2>&1 \
+            | tee "$RUNNER_TEMP/n83-pattern-meta/apt-install.log"
+          dpkg-query -W '-f=${Package}=${Version}\n' cryptominisat \
+            > "$RUNNER_TEMP/n83-pattern-meta/package.txt"
+          ldd "$RUNNER_TEMP/n83-pattern-bin/cryptominisat5" \
+            > "$RUNNER_TEMP/n83-pattern-meta/solver-ldd.txt"
+          if grep -q 'not found' "$RUNNER_TEMP/n83-pattern-meta/solver-ldd.txt"; then exit 1; fi
+          printf '%s  %s\n' \
+            0936420373bbdf22c2a3d37291e3a4ab4e041d7f41ae3ceed003373fb596ddb2 \
+            "$(command -v cryptominisat5)" | sha256sum -c
+      - name: Repeat positive wide-XOR solver smoke
+        run: |
+          set -euo pipefail
+          python3 "protocol/$PREFLIGHT/smoke.py" \
+            --out "$RUNNER_TEMP/n83-pattern-meta" \
+            > "$RUNNER_TEMP/n83-pattern-meta/positive-smoke.json"
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+      - name: Fresh-fetch and independently replay all S3 inputs
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check --only-binary=:all: \
+            --target "$RUNNER_TEMP/n83-pattern-pydeps" \
+            -r "protocol/$BUNDLE/requirements.txt"
+          PYTHONPATH="$RUNNER_TEMP/n83-pattern-pydeps" \
+            python3 "protocol/$BUNDLE/fetch.py" \
+              --out "$RUNNER_TEMP/n83-pattern-inputs" \
+              > "$RUNNER_TEMP/n83-pattern-meta/input-replay.json" \
+              2> "$RUNNER_TEMP/n83-pattern-meta/input-replay.stderr"
+      - name: Export and solve the frozen stratum
+        run: |
+          set -euo pipefail
+          python3 "protocol/$PANEL/run_panel.py" \
+            --protocol "protocol/$PANEL/protocol.json" \
+            --stratum '${{ matrix.stratum }}' \
+            --inputs "$RUNNER_TEMP/n83-pattern-inputs" \
+            --solver "$RUNNER_TEMP/n83-pattern-bin/cryptominisat5" \
+            --worker "$RUNNER_TEMP/n83-pattern-bin/worker" \
+            --source "$GITHUB_WORKSPACE/source" \
+            --build-receipt "$RUNNER_TEMP/n83-pattern-bin/build.json" \
+            --out "$RUNNER_TEMP/n83-pattern-results" \
+            > "$RUNNER_TEMP/n83-pattern-meta/panel-progress.jsonl" \
+            2> "$RUNNER_TEMP/n83-pattern-meta/panel.stderr"
+      - name: Preserve exact process streams and receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-natural-pattern-${{ matrix.stratum }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/n83-pattern-meta/
+            ${{ runner.temp }}/n83-pattern-results/
+          if-no-files-found: warn
+          retention-days: 90

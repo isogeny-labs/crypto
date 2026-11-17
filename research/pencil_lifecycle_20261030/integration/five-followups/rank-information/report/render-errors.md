@@ -1,0 +1,1 @@
+Initial rendering attempted unavailable cairosvg CLI; switched to installed rsvg-convert. Initial long source path overflowed page width; shortened to native_solver.rs, rerendered and inspected both pages. No mathematical content changed.

@@ -1,0 +1,1 @@
+Hydrate proof-attempts.tar.gz using official artifact tool and extract into a new path. Restore shared cache identities from attempt5/inputs.json. Do not overwrite retained attempts. Use a newly authorized finite software plan; check56.sh and runner56.py retain the original run5 invocation. All source versions and failures remain in separate attempt directories.

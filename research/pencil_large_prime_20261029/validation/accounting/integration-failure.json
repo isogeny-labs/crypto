@@ -1,0 +1,18 @@
+{
+  "schema": "pencil-accounting-integration-check/v1",
+  "status": "failed",
+  "command": "CARGO_TARGET_DIR=/tmp/pencil-primality-target cargo +1.99.1 test --manifest-path research/pencil_large_prime_20261029/Cargo.toml --features producer --lib",
+  "tool_session_id": 60252,
+  "passed": 38,
+  "failed": 1,
+  "ignored": 1,
+  "test": "native_solver::graph_adapter_tests::rho_boundary_hook_is_once_and_preserves_recorded_work",
+  "observation": {
+    "plain_key_comparisons": 94,
+    "hooked_key_comparisons": 82,
+    "preexisting_counters_equal": true
+  },
+  "cause": "Independent RandomState seeds in std HashMap lead to different actual key comparisons. New counters therefore violate current exact native replay assumptions.",
+  "receipt_scope": "Structured transcription of observed tool output; full raw stdout was not captured to a file.",
+  "resolution": "pending; retain priced work and resolve hash-state/replay contract before cohort"
+}

@@ -1,0 +1,67 @@
+   Compiling pencil-native-canonical-export v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_canonical_export)
+    Finished `release` profile [optimized] target(s) in 6.19s
+     Running unittests src/lib.rs (target/release/deps/pencil_native_canonical_export-0869950b83713121)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/release/deps/pencil_native_canonical_export-20e3c71f9ddce574)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/contracts.rs (target/release/deps/contracts-661f971fabcfd5c3)
+
+running 28 tests
+test protocol_semantic_unknown_comparison ... ok
+test draft_rejected ... ok
+test mapping_mismatch ... ok
+test manifest_integrity ... ok
+test seed_identity ... ok
+test no_history_evidence ... ok
+test unknown_history ... ok
+test missing_history ... ok
+test duplicate_record ... ok
+test restore_history ... FAILED
+test binary_identity ... ok
+test raw_hash ... ok
+test restore_generation_required ... FAILED
+test native_cli_validates_draft_without_freezing_and_rejects_invalid_draft ... ok
+test exact_u128_counter ... ok
+test complete_schema ... ok
+test exact_large_integer ... ok
+test failed_resources ... ok
+test wholly_missing ... ok
+test wrong_phases ... ok
+test semantic_check_rejects_changed_flow ... ok
+test exclusive_output ... ok
+test phase_sum_diagnostics ... ok
+test missing_no_fake_attempt ... ok
+test actual_schema_negative ... ok
+test semantic_check_rejects_wall_qualification ... ok
+test changed_attachment ... ok
+test native_cli_positive_and_negative_checker ... ok
+
+failures:
+
+---- restore_history stdout ----
+
+thread 'restore_history' (2382426) panicked at tests/contracts.rs:266:26:
+called `Result::unwrap()` on an `Err` value: "attempts exceed protocol retry admission"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- restore_generation_required stdout ----
+
+thread 'restore_generation_required' (2382425) panicked at tests/contracts.rs:357:5:
+assertion failed: f.run().unwrap_err().contains("checkpoint generation")
+
+
+failures:
+    restore_generation_required
+    restore_history
+
+test result: FAILED. 26 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.62s
+
+error: test failed, to rerun pass `--test contracts`

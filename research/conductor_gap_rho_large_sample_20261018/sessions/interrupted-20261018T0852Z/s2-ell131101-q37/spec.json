@@ -1,0 +1,83 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "conductor gap ell=131101, D=-19, hard kernel: crater vs 3 floors vs isomorphic twins, 1024 shared targets",
+ "description": "Large-sample rho retest of research/conductor_gap_cm_pairs_20261010 at ell=131101 under fresh seeds; rho.plain is the sqrt(2) positive control; twins are the representation-noise negative control. Curve roles, in order: crater, floor1, crater-twin(u=3), floor1-twin(u=3).",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 81640512137,
+    "a": 6206588639,
+    "b": 31351229805,
+    "gx": 3,
+    "gy": 17330771300,
+    "r": 81640511861,
+    "group_order": 81640511861
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 81640512137,
+    "a": 6064550680,
+    "b": 68678790390,
+    "gx": 2,
+    "gy": 25752399999,
+    "r": 81640511861,
+    "group_order": 81640511861
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 81640512137,
+    "a": 12890606937,
+    "b": 77343641622,
+    "gx": 27,
+    "gy": 59728264415,
+    "r": 81640511861,
+    "group_order": 81640511861
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 81640512137,
+    "a": 1385532258,
+    "b": 21204254329,
+    "gx": 18,
+    "gy": 42190702877,
+    "r": 81640511861,
+    "group_order": 81640511861
+   }
+  ],
+  "target_kind": "planted_shared",
+  "target_seed": 2026101802,
+  "targets_per_curve": 1024
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rho-plain",
+   "role": "baseline",
+   "method": {
+    "id": "rho.plain"
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261018,
+  "isolation_required": "L2",
+  "timeout_seconds": 300
+ }
+}

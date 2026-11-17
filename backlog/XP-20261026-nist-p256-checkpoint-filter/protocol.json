@@ -1,0 +1,428 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "EXP-NIST-FILTER-001",
+  "version": 1,
+  "created": "2026-10-26",
+  "repository": "crypto",
+  "study_dir": "backlog/XP-20261026-nist-p256-checkpoint-filter",
+  "authors": [
+    "NIST seed provenance research"
+  ],
+  "links": {
+    "spec": "experiments/specs/EXP-NIST-FILTER-001.yaml",
+    "card": "backlog/XP-20261026-nist-p256-checkpoint-filter/card.json",
+    "prior_result": "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R07-20261025/summary.json",
+    "source_snapshot": "crypto-autoresearcher@6a69b2d02ecd53f1649bcf56e23e4ffe91d953ad",
+    "status": "Submitted definition; not executed; input publication and environment gates remain blocked"
+  },
+  "question": "What duplicate and singleton counts does the identical native filter produce on the R08 checkpoint, and what next state does its controller request?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "The recorded native filter counters and their accounting agree on these exact pinned checkpoint inputs.",
+      "class": "exact_computation",
+      "decided_by": [
+        "C-inventory"
+      ]
+    },
+    {
+      "id": "C2",
+      "text": "Matrix rank, complete factorization, curve security and historical seed-selection motives are not established by this experiment.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "reference",
+      "role": "reference",
+      "description": "Replay R06 through the native filter; require the previously observed R07 inventory.",
+      "instrument": {
+        "repo": "bbuhrow/yafu",
+        "commit": "c7d90283972820f99b3b4920bfc1eff05c1f6342",
+        "build": [],
+        "binary_sha256": "bc7680adbdd7450a68120e73ef8aa88d0336c8ffa141343f50966c595ca6bae9",
+        "flags": {
+          "phase": "-nc1",
+          "dispatch": "-minrels 1",
+          "native_limit_seconds": "600",
+          "outer_limit_seconds": "660",
+          "timeout_patch": "Existing two-line printf correction, bound by executable hash"
+        },
+        "env": {
+          "LC_ALL": "C"
+        },
+        "threads": 2
+      },
+      "parameters": {
+        "raw_relation_lines": 4592399,
+        "expected_unique": 4518304,
+        "expected_singleton_survivors": 92,
+        "input_manifest": "backlog/XP-20261026-nist-p256-checkpoint-filter/reference-inputs.sha256",
+        "residual_decimal": "33492266050798185653682380062483799213318454801653963493134064721059735936944520907295931496614455858076048437184499090478420204888353",
+        "input_manifest_sha256": "9e2dca1a855cc6edf388992edccfb1f2f4caca4f55a701eabe1540df818ca778",
+        "relation_sha256": "1c4926cfcb63c8821ef209ebad4d3b0562980f73807574a8e32b3201430cced9"
+      }
+    },
+    {
+      "id": "candidate",
+      "role": "candidate",
+      "description": "Filter a new copy of the completed R08 checkpoint; its filter outcome is unobserved.",
+      "instrument": {
+        "repo": "bbuhrow/yafu",
+        "commit": "c7d90283972820f99b3b4920bfc1eff05c1f6342",
+        "build": [],
+        "binary_sha256": "bc7680adbdd7450a68120e73ef8aa88d0336c8ffa141343f50966c595ca6bae9",
+        "flags": {
+          "phase": "-nc1",
+          "dispatch": "-minrels 1",
+          "native_limit_seconds": "600",
+          "outer_limit_seconds": "660",
+          "timeout_patch": "Existing two-line printf correction, bound by executable hash"
+        },
+        "env": {
+          "LC_ALL": "C"
+        },
+        "threads": 2
+      },
+      "parameters": {
+        "raw_relation_lines": 10441117,
+        "input_manifest": "backlog/XP-20261026-nist-p256-checkpoint-filter/candidate-inputs.sha256",
+        "residual_decimal": "33492266050798185653682380062483799213318454801653963493134064721059735936944520907295931496614455858076048437184499090478420204888353",
+        "input_manifest_sha256": "c762d658bb751993bc7044fdabf5e9a4970863c2b58298b4758f10e053874a66",
+        "relation_sha256": "62106d7ae9e828ff433d019ba471cf743552b608421e889cd83f6af0296f20b0"
+      },
+      "same_instrument_as": "reference"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact recorded-counter inventory, no clock comparison or statistical effect; repeatability is gated by the required R06 regression replay."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "No general matrix-existence or factor detector claim is tested. A planted matrix-positive arm would be required for such a claim. The reference is a required full-path regression control against exact observed counts; absence of a matrix here licenses no universal negative."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No population or unusual-curve claim. Both inputs are exact saved states of the same integer and polynomial."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "input_checkpoint",
+        "levels": [
+          "R06",
+          "R08"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "target_and_polynomial",
+        "treatment": "fixed",
+        "value": "skipped_256_876-twist2; selected job and fb SHA-256 pinned",
+        "how": "Verify both input manifests before and after execution."
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "bc7680adbdd7450a68120e73ef8aa88d0336c8ffa141343f50966c595ca6bae9",
+        "how": "Same executable, two threads, parameters, seed and limits on both arms."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Record CPU, kernel, threads, memory and L0 blockers. No clock-based claim is admitted."
+      },
+      {
+        "name": "memory_layout_and_environment",
+        "treatment": "measured",
+        "how": "Fresh process and fresh copied state per arm; retain host facts and executable hash."
+      },
+      {
+        "name": "order_and_warmup",
+        "treatment": "fixed",
+        "value": "reference then candidate; no warmup",
+        "how": "Reference gates interpretation of candidate. No timing comparison."
+      },
+      {
+        "name": "seed",
+        "treatment": "fixed",
+        "value": "20261025",
+        "how": "One explicit seed fixed before future filtering."
+      },
+      {
+        "name": "preemption",
+        "treatment": "fixed",
+        "value": "nonpreemptible local host; no restore",
+        "how": "Interrupted runs are retained as incomplete; no retry under this decision."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unmasked exact inventory",
+        "how": "Freeze native analysis source; no arm ranking or discretionary exclusion."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-inventory",
+        "arms": [
+          "reference",
+          "candidate"
+        ],
+        "differs_in": [
+          "input_checkpoint"
+        ],
+        "design": "absolute",
+        "threshold": "Complete native counters reconcile exactly; reference reproduces unique=4518304, survivors=92, tracked ideals=0, passes=4. Candidate controller status is reported with no rank inference."
+      }
+    ],
+    "aa_not_applicable": "Exact inventory rather than a statistical or timing comparison.",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "A passing regression reference is a prerequisite to candidate interpretation; no clock or performance comparison.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        "20261025"
+      ],
+      "nonce": null,
+      "note": "Same fixed native seed for both arms."
+    },
+    "instance_sampling": {
+      "rule": "One checksum-pinned saved checkpoint per arm; no instance selection after filtering.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact logged counts and fixed checks; input sizes identify the arms. No statistical ranking.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exact inventory of two specified files; no population inference, p-value or power claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 240,
+      "per_sample_seconds": 139,
+      "threads": 2,
+      "estimated_total_seconds": 520,
+      "measured_on": "Planning model only: R07 native interval 85 s. Candidate unmeasured; linear row-count scaling gives about 193 s plus 240 s setup allowance. No comparative timing claim."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "unique_relations",
+        "name": "Relations after duplicate removal",
+        "unit": "relations",
+        "kind": "counted",
+        "definition": "Recorded integer native count after the specified filter stage for one complete execution.",
+        "source": "counts.json unique_relations",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "singleton_survivors",
+        "name": "Relations after singleton removal",
+        "unit": "relations",
+        "kind": "counted",
+        "definition": "Recorded integer native count after the specified filter stage for one complete execution.",
+        "source": "counts.json singleton_survivors",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "raw_relation_lines",
+        "name": "Original raw relation rows",
+        "unit": "relations",
+        "kind": "counted",
+        "definition": "Recorded integer native count after the specified filter stage for one complete execution.",
+        "source": "counts.json raw_relation_lines",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "raw_relation_lines",
+      "rejected_rows",
+      "free_relations",
+      "duplicates_removed",
+      "unique_relations",
+      "singleton_survivors",
+      "surviving_large_ideals",
+      "singleton_passes"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "threads",
+      "binary_sha256",
+      "input_sha256",
+      "isolation.level",
+      "isolation.blockers",
+      "exit_status",
+      "attempts",
+      "resumed"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "cairn",
+    "queue": null,
+    "placement": {
+      "cpus": 2,
+      "memory_mb": 16384,
+      "disk_gb": 24,
+      "spot": false,
+      "paid": false
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 900,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "One reference followed by one candidate, then stop. No new sieving, linear algebra, paid host or extra allocation.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stop on reference mismatch, nonzero exit, missing completion, timeout, interruption, source mutation or output cap; preserve every attempt.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "A failed reference blocks candidate interpretation.",
+    "Unknown controller outcome and incomplete filtering are incomplete executions, not mathematical negatives.",
+    "All clocks descriptive and wall_valid false; an interrupted run cannot resume as the same measurement."
+  ],
+  "decision_rule": {
+    "text": "Report completed_insufficient only with complete reconciled counters and an explicit native request for more. Report matrix_prerequisites_need_review only with the completed native return and retained prerequisite files, pending second review. Otherwise incomplete_execution. Never infer rank or a factor.",
+    "comparison_ids": [
+      "C-inventory"
+    ],
+    "threshold": "Exact reference counter match and complete candidate inventory; no survivor-count threshold is substituted for native filtering.",
+    "statistic": "Per-run exact native integer counts and controller status.",
+    "interval": "none; exact counter inventory, no inferential interval",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Raw native counts only; no speedup or hypothesis-test effect size.",
+    "verdict_vocabulary": [
+      "completed_insufficient",
+      "matrix_prerequisites_need_review",
+      "incomplete_execution"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "inspect_filter.rs",
+      "sha256": "cbcba282afb5381d57f52461276b1f80cae11ae7198418228e9894f767bdc5db"
+    },
+    "inputs": [
+      "native-filter.log",
+      "exit-status.txt",
+      "input-sha256.txt",
+      "controller-status.txt",
+      "output-files.txt"
+    ],
+    "outputs": [
+      "counts.json",
+      "experiment.export/v1",
+      "dated report and second-runner review"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Raw, unique and singleton counts per checkpoint, with matrix status separately stated."
+    ],
+    "report_dir": "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R09-filter-registered/reports"
+  },
+  "inadmissible": [
+    "Calling raw lines independent relations or a completion percentage.",
+    "Applying R07 survival fractions to R08 before filtering.",
+    "Changing budgets, seeds, input checkpoints or filter criteria after observing candidate results.",
+    "Treating file existence or singleton count as a rank proof.",
+    "Interpreting incomplete execution as a negative security result.",
+    "Claiming R08 collection or R07 filtering was preregistered by this later protocol."
+  ],
+  "literature": [
+    {
+      "ref": "https://github.com/bbuhrow/yafu/tree/c7d90283972820f99b3b4920bfc1eff05c1f6342",
+      "provenance": "retrieved",
+      "claim": "Native filter stages and controller state transition; source files inspected locally at this pin.",
+      "verified_by": "Codex, 2026-10-26"
+    },
+    {
+      "ref": "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R07-20261025/native-filter.log",
+      "provenance": "internal",
+      "claim": "Prior exact regression counts and native interval; not an unobserved experiment arm.",
+      "verified_by": "Codex, 2026-10-26"
+    },
+    {
+      "ref": "https://github.com/aburan28/crypto-autoresearcher/blob/6a69b2d02ecd53f1649bcf56e23e4ffe91d953ad/docs/experiment-protocol.md",
+      "provenance": "internal",
+      "claim": "Canonical protocol, export, restore and second-reader contracts.",
+      "verified_by": "Codex, 2026-10-26"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "bc184e610b4634dbb8ee305f49f51cb54762647f5776ec59816ad35be934c6fe",
+    "commit": "baa1951357b7ca586e902f4a81287ac2ef4855ef",
+    "frozen_at": "2026-10-26T21:43:13Z",
+    "filed_before_affected_data": true
+  }
+}

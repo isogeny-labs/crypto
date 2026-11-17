@@ -1,0 +1,65 @@
+{
+  "schema": "research.formal-component-review/v1",
+  "reviewer": "kummer_transitions",
+  "producer": "invariants_branches",
+  "producer_manifest_sha256": "754eb074e512005d3bfd5daec0a0ffb9d7be32380156f6f59e5cc962e94de619",
+  "producer_source_sha256": "289610b1b55a3616073a3845dccca3903bd84ad906ab4829a60b0ab1a6bfe4dc",
+  "claims": [
+    {
+      "name": "generic_word_decode",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "generic_guard_decode",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "generic_dispatch_decode",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "generic_outer_guard",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "generic_word_preserves",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    }
+  ],
+  "fresh_exit_codes": {
+    "main": 0,
+    "producer_controls": 0,
+    "readback": 0,
+    "reviewer_controls": 0
+  },
+  "axiom_declarations": 5,
+  "blocking_discrepancies": [],
+  "premises": [
+    "prime5<=p<2^31",
+    "canonical10coordinates and curve3",
+    "validity theorem fournonzero weights and original input validity",
+    "nonzero fieldK equivalent to wordK"
+  ],
+  "scope": "UInt64 value decoding, guards, Option results, composed polynomial validity",
+  "excluded": [
+    "counter/sideeffect execution equivalence",
+    "compiler proof",
+    "divisorclass sum",
+    "whole collector"
+  ],
+  "no_pow_in_source_branch": true,
+  "independent_binary_rechecker": false,
+  "producer_edited": false,
+  "scientific_execution": false,
+  "cost_ratio": null
+}

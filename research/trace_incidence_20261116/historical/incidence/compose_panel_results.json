@@ -1,0 +1,1075 @@
+{
+  "schema": "incidence-compose-panel/v1",
+  "source_sha256": "a2988083a9d6c3f03416623c8c2cf7efd793175ca81d882bb4f02e6658716906",
+  "base_source_sha256": "38852854c82224b807f6d23cc082e64cbf3b7d321aab8003e5be4ec5db961020",
+  "scope": "Supplement, two natural seeds on one curve per size plus one recovery regression; exact roots versus separately enumerated group oracle; not an independent scaling study.",
+  "records": [
+    {
+      "status": "relation",
+      "witness": [
+        {
+          "pool": 0,
+          "index": 2,
+          "sign": -1
+        },
+        {
+          "pool": 1,
+          "index": 3,
+          "sign": 1
+        },
+        {
+          "pool": 2,
+          "index": 7,
+          "sign": 1
+        }
+      ],
+      "recovery": {
+        "A": 2749,
+        "B": 3056,
+        "k": 3356
+      },
+      "root_candidates": 1,
+      "gcd_evaluations": 8,
+      "uninformative_matches_skipped": 0,
+      "group_counters": {
+        "group_addition_calls": 27,
+        "field_inversions": 24
+      },
+      "arm": "split_compose",
+      "gcd_degree": 1,
+      "gcd_coefficients": [
+        737,
+        1
+      ],
+      "phase_cpu_seconds": {
+        "preprocessing": 2.415170542635654e-06,
+        "modular_composition_incidence": 6.0062919896641e-06,
+        "incidence_gcd": 0.0,
+        "witness_and_scalar_recovery": 9.661602067183676e-07
+      },
+      "solver_core_bracket_cpu_seconds": 0.0,
+      "solver_total_wall_seconds": 0.00019713763055242406,
+      "counters": {
+        "interpolation_scalar_inversions": 8,
+        "denominator_scalar_inversions": 8,
+        "quotient_multiplications": 40,
+        "polynomial_product_coefficient_pairs": 2248,
+        "native_modular_compositions": 16
+      },
+      "dimensions": {
+        "quotient_dimension": 8,
+        "first_pool_iterations": 8,
+        "largest_stored_univariate_degree": 8,
+        "backend_internal_workspace": "Native FLINT compose_mod workspace; not a pair table; peak process RSS measured."
+      },
+      "peak_process_rss_kib": 24352,
+      "complexity_scope": "B iterations, 2B native degree-B modular compositions, 5B explicit quotient products, O(B^2) classical interpolation coefficient work. compose_mod internals uncounted; no subquadratic claim.",
+      "schema": "incidence-compose-result/v1",
+      "fixture_id": "b008_c0_natural_s0",
+      "B": 8,
+      "kind": "natural",
+      "fixture_sha256": "fe682825d4897bfb6853b065a470452e60ad62a990635c172d5e9821ad8352b5",
+      "fixture_generation": {
+        "accepted": 24,
+        "counter_scope": "Public alpha*P+beta*Q pool construction, including rejected draws; Python modular inverse internals not expanded into multiplications.",
+        "counters": {
+          "affine_additions": 270,
+          "affine_doublings": 533,
+          "field_inversions": 803,
+          "field_multiplications": 1606,
+          "field_squarings": 1336,
+          "group_add_calls": 851,
+          "scalar_bits": 533,
+          "scalar_multiplications": 48
+        },
+        "cpu_seconds": 0.0015111489999999894,
+        "draws": 24,
+        "rejected": {},
+        "secret_used_for_pool_generation": false,
+        "wall_seconds": 0.0015128809991438175
+      },
+      "solver_total_cpu_seconds": 0.00020742572351421193,
+      "batch_cpu_seconds": 0.08027375500000002,
+      "batch_wall_seconds": 0.0802679629996419,
+      "timing_repetitions": 387,
+      "cpu_affinity": [
+        1
+      ],
+      "flint_version": "0.9.0",
+      "phase_timing_scope": "Short inner CPU intervals unreliable/undersum; outer batch complete-call CPU is primary.",
+      "external_process_wall_seconds": 0.14380081300078018,
+      "external_process_cpu_seconds": 0.142005,
+      "process_startup_and_serialization_cpu_seconds": 0.061731244999999976,
+      "pool_generation_cpu_seconds": 0.0015111489999999894,
+      "complete_call_plus_pool_cpu_seconds": 0.0017185747235142013,
+      "root_parity": true,
+      "witness_verified": true
+    },
+    {
+      "status": "relation",
+      "witness": [
+        {
+          "pool": 0,
+          "index": 7,
+          "sign": -1
+        },
+        {
+          "pool": 1,
+          "index": 5,
+          "sign": -1
+        },
+        {
+          "pool": 2,
+          "index": 5,
+          "sign": 1
+        }
+      ],
+      "recovery": {
+        "A": 1961,
+        "B": 2959,
+        "k": 3356
+      },
+      "root_candidates": 1,
+      "gcd_evaluations": 8,
+      "uninformative_matches_skipped": 0,
+      "group_counters": {
+        "group_addition_calls": 37,
+        "field_inversions": 34
+      },
+      "arm": "split_compose",
+      "gcd_degree": 1,
+      "gcd_coefficients": [
+        2652,
+        1
+      ],
+      "phase_cpu_seconds": {
+        "preprocessing": 1.9535443037975705e-07,
+        "modular_composition_incidence": 2.8295544303797444e-06,
+        "incidence_gcd": 0.0,
+        "witness_and_scalar_recovery": 3.3058860759494286e-06
+      },
+      "solver_core_bracket_cpu_seconds": 0.0,
+      "solver_total_wall_seconds": 0.0001950668860145821,
+      "counters": {
+        "interpolation_scalar_inversions": 8,
+        "denominator_scalar_inversions": 8,
+        "quotient_multiplications": 40,
+        "polynomial_product_coefficient_pairs": 2248,
+        "native_modular_compositions": 16
+      },
+      "dimensions": {
+        "quotient_dimension": 8,
+        "first_pool_iterations": 8,
+        "largest_stored_univariate_degree": 8,
+        "backend_internal_workspace": "Native FLINT compose_mod workspace; not a pair table; peak process RSS measured."
+      },
+      "peak_process_rss_kib": 26144,
+      "complexity_scope": "B iterations, 2B native degree-B modular compositions, 5B explicit quotient products, O(B^2) classical interpolation coefficient work. compose_mod internals uncounted; no subquadratic claim.",
+      "schema": "incidence-compose-result/v1",
+      "fixture_id": "b008_c0_natural_s1",
+      "B": 8,
+      "kind": "natural",
+      "fixture_sha256": "c0676e85c6deb4acd8433be39bea882c984aa068bb14006d141e85f5400d5b03",
+      "fixture_generation": {
+        "accepted": 24,
+        "counter_scope": "Public alpha*P+beta*Q pool construction, including rejected draws; Python modular inverse internals not expanded into multiplications.",
+        "counters": {
+          "affine_additions": 259,
+          "affine_doublings": 535,
+          "field_inversions": 794,
+          "field_multiplications": 1588,
+          "field_squarings": 1329,
+          "group_add_calls": 842,
+          "scalar_bits": 535,
+          "scalar_multiplications": 48
+        },
+        "cpu_seconds": 0.0016537709999999706,
+        "draws": 24,
+        "rejected": {},
+        "secret_used_for_pool_generation": false,
+        "wall_seconds": 0.0016556160007894505
+      },
+      "solver_total_cpu_seconds": 0.00020274115443037977,
+      "batch_cpu_seconds": 0.080082756,
+      "batch_wall_seconds": 0.08000212799925066,
+      "timing_repetitions": 395,
+      "cpu_affinity": [
+        1
+      ],
+      "flint_version": "0.9.0",
+      "phase_timing_scope": "Short inner CPU intervals unreliable/undersum; outer batch complete-call CPU is primary.",
+      "external_process_wall_seconds": 0.14314954600013152,
+      "external_process_cpu_seconds": 0.14150800000000002,
+      "process_startup_and_serialization_cpu_seconds": 0.06142524400000002,
+      "pool_generation_cpu_seconds": 0.0016537709999999706,
+      "complete_call_plus_pool_cpu_seconds": 0.0018565121544303503,
+      "root_parity": true,
+      "witness_verified": true
+    },
+    {
+      "status": "relation",
+      "witness": [
+        {
+          "pool": 0,
+          "index": 8,
+          "sign": -1
+        },
+        {
+          "pool": 1,
+          "index": 2,
+          "sign": 1
+        },
+        {
+          "pool": 2,
+          "index": 5,
+          "sign": 1
+        }
+      ],
+      "recovery": {
+        "A": 16284,
+        "B": 2638,
+        "k": 1436
+      },
+      "root_candidates": 1,
+      "gcd_evaluations": 16,
+      "uninformative_matches_skipped": 0,
+      "group_counters": {
+        "group_addition_calls": 38,
+        "field_inversions": 35
+      },
+      "arm": "split_compose",
+      "gcd_degree": 1,
+      "gcd_coefficients": [
+        8051,
+        1
+      ],
+      "phase_cpu_seconds": {
+        "preprocessing": 2.7664661654140343e-07,
+        "modular_composition_incidence": 4.869666165413558e-05,
+        "incidence_gcd": 0.0,
+        "witness_and_scalar_recovery": 1.2562142857142788e-05
+      },
+      "solver_core_bracket_cpu_seconds": 0.0,
+      "solver_total_wall_seconds": 0.0005939840375093693,
+      "counters": {
+        "interpolation_scalar_inversions": 16,
+        "denominator_scalar_inversions": 16,
+        "quotient_multiplications": 80,
+        "polynomial_product_coefficient_pairs": 17168,
+        "native_modular_compositions": 32
+      },
+      "dimensions": {
+        "quotient_dimension": 16,
+        "first_pool_iterations": 16,
+        "largest_stored_univariate_degree": 16,
+        "backend_internal_workspace": "Native FLINT compose_mod workspace; not a pair table; peak process RSS measured."
+      },
+      "peak_process_rss_kib": 25856,
+      "complexity_scope": "B iterations, 2B native degree-B modular compositions, 5B explicit quotient products, O(B^2) classical interpolation coefficient work. compose_mod internals uncounted; no subquadratic claim.",
+      "schema": "incidence-compose-result/v1",
+      "fixture_id": "b016_c0_natural_s0",
+      "B": 16,
+      "kind": "natural",
+      "fixture_sha256": "363245825c8d62a99bd95db3b872a0032508452a36b7f3b16fd7e5cb58a4ec9b",
+      "fixture_generation": {
+        "accepted": 48,
+        "counter_scope": "Public alpha*P+beta*Q pool construction, including rejected draws; Python modular inverse internals not expanded into multiplications.",
+        "counters": {
+          "affine_additions": 689,
+          "affine_doublings": 1358,
+          "field_inversions": 2047,
+          "field_multiplications": 4094,
+          "field_squarings": 3405,
+          "group_add_calls": 2143,
+          "scalar_bits": 1358,
+          "scalar_multiplications": 96
+        },
+        "cpu_seconds": 0.0036216650000000516,
+        "draws": 48,
+        "rejected": {},
+        "secret_used_for_pool_generation": false,
+        "wall_seconds": 0.0036231119993317407
+      },
+      "solver_total_cpu_seconds": 0.0006056605413533833,
+      "batch_cpu_seconds": 0.08055285199999998,
+      "batch_wall_seconds": 0.08045152500017139,
+      "timing_repetitions": 133,
+      "cpu_affinity": [
+        1
+      ],
+      "flint_version": "0.9.0",
+      "phase_timing_scope": "Short inner CPU intervals unreliable/undersum; outer batch complete-call CPU is primary.",
+      "external_process_wall_seconds": 0.14904588500030513,
+      "external_process_cpu_seconds": 0.14728999999999998,
+      "process_startup_and_serialization_cpu_seconds": 0.066737148,
+      "pool_generation_cpu_seconds": 0.0036216650000000516,
+      "complete_call_plus_pool_cpu_seconds": 0.004227325541353435,
+      "root_parity": true,
+      "witness_verified": true
+    },
+    {
+      "status": "relation",
+      "witness": [
+        {
+          "pool": 0,
+          "index": 9,
+          "sign": 1
+        },
+        {
+          "pool": 1,
+          "index": 12,
+          "sign": 1
+        },
+        {
+          "pool": 2,
+          "index": 3,
+          "sign": 1
+        }
+      ],
+      "recovery": {
+        "A": 28106,
+        "B": 27159,
+        "k": 1436
+      },
+      "root_candidates": 1,
+      "gcd_evaluations": 16,
+      "uninformative_matches_skipped": 0,
+      "group_counters": {
+        "group_addition_calls": 39,
+        "field_inversions": 36
+      },
+      "arm": "split_compose",
+      "gcd_degree": 1,
+      "gcd_coefficients": [
+        13684,
+        1
+      ],
+      "phase_cpu_seconds": {
+        "preprocessing": 6.088582677165597e-07,
+        "modular_composition_incidence": 5.1297488188976413e-05,
+        "incidence_gcd": 0.0,
+        "witness_and_scalar_recovery": 0.0
+      },
+      "solver_core_bracket_cpu_seconds": 0.0,
+      "solver_total_wall_seconds": 0.0006199431731591348,
+      "counters": {
+        "interpolation_scalar_inversions": 16,
+        "denominator_scalar_inversions": 16,
+        "quotient_multiplications": 80,
+        "polynomial_product_coefficient_pairs": 17168,
+        "native_modular_compositions": 32
+      },
+      "dimensions": {
+        "quotient_dimension": 16,
+        "first_pool_iterations": 16,
+        "largest_stored_univariate_degree": 16,
+        "backend_internal_workspace": "Native FLINT compose_mod workspace; not a pair table; peak process RSS measured."
+      },
+      "peak_process_rss_kib": 24272,
+      "complexity_scope": "B iterations, 2B native degree-B modular compositions, 5B explicit quotient products, O(B^2) classical interpolation coefficient work. compose_mod internals uncounted; no subquadratic claim.",
+      "schema": "incidence-compose-result/v1",
+      "fixture_id": "b016_c0_natural_s1",
+      "B": 16,
+      "kind": "natural",
+      "fixture_sha256": "d2f94d735f242d12e938644145705427735db0ef493e55736af409cbda7eed97",
+      "fixture_generation": {
+        "accepted": 48,
+        "counter_scope": "Public alpha*P+beta*Q pool construction, including rejected draws; Python modular inverse internals not expanded into multiplications.",
+        "counters": {
+          "affine_additions": 690,
+          "affine_doublings": 1321,
+          "field_inversions": 2011,
+          "field_multiplications": 4022,
+          "field_squarings": 3332,
+          "group_add_calls": 2107,
+          "scalar_bits": 1321,
+          "scalar_multiplications": 96
+        },
+        "cpu_seconds": 0.004173713999999995,
+        "draws": 48,
+        "rejected": {},
+        "secret_used_for_pool_generation": false,
+        "wall_seconds": 0.004176176000328269
+      },
+      "solver_total_cpu_seconds": 0.0006316838267716535,
+      "batch_cpu_seconds": 0.08022384599999999,
+      "batch_wall_seconds": 0.08019229499950598,
+      "timing_repetitions": 127,
+      "cpu_affinity": [
+        1
+      ],
+      "flint_version": "0.9.0",
+      "phase_timing_scope": "Short inner CPU intervals unreliable/undersum; outer batch complete-call CPU is primary.",
+      "external_process_wall_seconds": 0.14403836499877798,
+      "external_process_cpu_seconds": 0.14342799999999994,
+      "process_startup_and_serialization_cpu_seconds": 0.06320415399999996,
+      "pool_generation_cpu_seconds": 0.004173713999999995,
+      "complete_call_plus_pool_cpu_seconds": 0.004805397826771649,
+      "root_parity": true,
+      "witness_verified": true
+    },
+    {
+      "status": "relation",
+      "witness": [
+        {
+          "pool": 0,
+          "index": 0,
+          "sign": 1
+        },
+        {
+          "pool": 1,
+          "index": 9,
+          "sign": 1
+        },
+        {
+          "pool": 2,
+          "index": 23,
+          "sign": 1
+        }
+      ],
+      "recovery": {
+        "A": 102272,
+        "B": 227578,
+        "k": 2473
+      },
+      "root_candidates": 1,
+      "gcd_evaluations": 32,
+      "uninformative_matches_skipped": 0,
+      "group_counters": {
+        "group_addition_calls": 22,
+        "field_inversions": 19
+      },
+      "arm": "split_compose",
+      "gcd_degree": 1,
+      "gcd_coefficients": [
+        18662,
+        1
+      ],
+      "phase_cpu_seconds": {
+        "preprocessing": 0.0,
+        "modular_composition_incidence": 0.0015128809199999992,
+        "incidence_gcd": 0.0,
+        "witness_and_scalar_recovery": 0.00012094920000000009
+      },
+      "solver_core_bracket_cpu_seconds": 0.0,
+      "solver_total_wall_seconds": 0.0032919032799691196,
+      "counters": {
+        "interpolation_scalar_inversions": 32,
+        "denominator_scalar_inversions": 32,
+        "quotient_multiplications": 160,
+        "polynomial_product_coefficient_pairs": 134176,
+        "native_modular_compositions": 64
+      },
+      "dimensions": {
+        "quotient_dimension": 32,
+        "first_pool_iterations": 32,
+        "largest_stored_univariate_degree": 32,
+        "backend_internal_workspace": "Native FLINT compose_mod workspace; not a pair table; peak process RSS measured."
+      },
+      "peak_process_rss_kib": 24400,
+      "complexity_scope": "B iterations, 2B native degree-B modular compositions, 5B explicit quotient products, O(B^2) classical interpolation coefficient work. compose_mod internals uncounted; no subquadratic claim.",
+      "schema": "incidence-compose-result/v1",
+      "fixture_id": "b032_c0_natural_s0",
+      "B": 32,
+      "kind": "natural",
+      "fixture_sha256": "a29e730d51ffd9247ffaf087fc50e634bc17f875fb7dc9bf97e954e7cee9614c",
+      "fixture_generation": {
+        "accepted": 96,
+        "counter_scope": "Public alpha*P+beta*Q pool construction, including rejected draws; Python modular inverse internals not expanded into multiplications.",
+        "counters": {
+          "affine_additions": 1613,
+          "affine_doublings": 3239,
+          "field_inversions": 4852,
+          "field_multiplications": 9704,
+          "field_squarings": 8091,
+          "group_add_calls": 5044,
+          "scalar_bits": 3239,
+          "scalar_multiplications": 192
+        },
+        "cpu_seconds": 0.00892008600000005,
+        "draws": 96,
+        "rejected": {},
+        "secret_used_for_pool_generation": false,
+        "wall_seconds": 0.00892214099985722
+      },
+      "solver_total_cpu_seconds": 0.0033165667999999994,
+      "batch_cpu_seconds": 0.08291416999999998,
+      "batch_wall_seconds": 0.08279612099977385,
+      "timing_repetitions": 25,
+      "cpu_affinity": [
+        1
+      ],
+      "flint_version": "0.9.0",
+      "phase_timing_scope": "Short inner CPU intervals unreliable/undersum; outer batch complete-call CPU is primary.",
+      "external_process_wall_seconds": 0.1443666420000227,
+      "external_process_cpu_seconds": 0.14391699999999996,
+      "process_startup_and_serialization_cpu_seconds": 0.06100282999999998,
+      "pool_generation_cpu_seconds": 0.00892008600000005,
+      "complete_call_plus_pool_cpu_seconds": 0.01223665280000005,
+      "root_parity": true,
+      "witness_verified": true
+    },
+    {
+      "status": "none",
+      "witness": null,
+      "recovery": null,
+      "root_candidates": 0,
+      "gcd_evaluations": 32,
+      "group_counters": {},
+      "arm": "split_compose",
+      "gcd_degree": 0,
+      "gcd_coefficients": [
+        1
+      ],
+      "phase_cpu_seconds": {
+        "preprocessing": 2.116320000000171e-06,
+        "modular_composition_incidence": 0.0012067326399999993,
+        "incidence_gcd": 0.0,
+        "witness_and_scalar_recovery": 0.0
+      },
+      "solver_core_bracket_cpu_seconds": 0.0003894469999999872,
+      "solver_total_wall_seconds": 0.003277167000123882,
+      "counters": {
+        "interpolation_scalar_inversions": 32,
+        "denominator_scalar_inversions": 32,
+        "quotient_multiplications": 160,
+        "polynomial_product_coefficient_pairs": 134176,
+        "native_modular_compositions": 64
+      },
+      "dimensions": {
+        "quotient_dimension": 32,
+        "first_pool_iterations": 32,
+        "largest_stored_univariate_degree": 32,
+        "backend_internal_workspace": "Native FLINT compose_mod workspace; not a pair table; peak process RSS measured."
+      },
+      "peak_process_rss_kib": 24400,
+      "complexity_scope": "B iterations, 2B native degree-B modular compositions, 5B explicit quotient products, O(B^2) classical interpolation coefficient work. compose_mod internals uncounted; no subquadratic claim.",
+      "schema": "incidence-compose-result/v1",
+      "fixture_id": "b032_c0_natural_s1",
+      "B": 32,
+      "kind": "natural",
+      "fixture_sha256": "f30069a4d8885db81f34f7d69e71880919f42a609192063eccbe9331b64d7665",
+      "fixture_generation": {
+        "accepted": 96,
+        "counter_scope": "Public alpha*P+beta*Q pool construction, including rejected draws; Python modular inverse internals not expanded into multiplications.",
+        "counters": {
+          "affine_additions": 1631,
+          "affine_doublings": 3292,
+          "field_inversions": 4923,
+          "field_multiplications": 9846,
+          "field_squarings": 8215,
+          "group_add_calls": 5117,
+          "scalar_bits": 3292,
+          "scalar_multiplications": 194
+        },
+        "cpu_seconds": 0.009351494999999987,
+        "draws": 97,
+        "rejected": {
+          "duplicate_abscissa": 1
+        },
+        "secret_used_for_pool_generation": false,
+        "wall_seconds": 0.009375334999276674
+      },
+      "solver_total_cpu_seconds": 0.00330837308,
+      "batch_cpu_seconds": 0.082709327,
+      "batch_wall_seconds": 0.08265093299996806,
+      "timing_repetitions": 25,
+      "cpu_affinity": [
+        1
+      ],
+      "flint_version": "0.9.0",
+      "phase_timing_scope": "Short inner CPU intervals unreliable/undersum; outer batch complete-call CPU is primary.",
+      "external_process_wall_seconds": 0.1441919950011652,
+      "external_process_cpu_seconds": 0.14354800000000006,
+      "process_startup_and_serialization_cpu_seconds": 0.060838673000000065,
+      "pool_generation_cpu_seconds": 0.009351494999999987,
+      "complete_call_plus_pool_cpu_seconds": 0.012659868079999987,
+      "root_parity": true,
+      "witness_verified": false
+    },
+    {
+      "status": "relation",
+      "witness": [
+        {
+          "pool": 0,
+          "index": 17,
+          "sign": 1
+        },
+        {
+          "pool": 1,
+          "index": 30,
+          "sign": -1
+        },
+        {
+          "pool": 2,
+          "index": 54,
+          "sign": 1
+        }
+      ],
+      "recovery": {
+        "A": 1505938,
+        "B": 1526003,
+        "k": 293302
+      },
+      "root_candidates": 1,
+      "gcd_evaluations": 64,
+      "uninformative_matches_skipped": 0,
+      "group_counters": {
+        "group_addition_calls": 68,
+        "field_inversions": 65
+      },
+      "arm": "split_compose",
+      "gcd_degree": 1,
+      "gcd_coefficients": [
+        2034446,
+        1
+      ],
+      "phase_cpu_seconds": {
+        "preprocessing": 0.0001202149999999999,
+        "modular_composition_incidence": 0.02875372933333333,
+        "incidence_gcd": 0.0,
+        "witness_and_scalar_recovery": 0.0
+      },
+      "solver_core_bracket_cpu_seconds": 0.029819579,
+      "solver_total_wall_seconds": 0.03092210766711408,
+      "counters": {
+        "interpolation_scalar_inversions": 64,
+        "denominator_scalar_inversions": 64,
+        "quotient_multiplications": 320,
+        "polynomial_product_coefficient_pairs": 1060928,
+        "native_modular_compositions": 128
+      },
+      "dimensions": {
+        "quotient_dimension": 64,
+        "first_pool_iterations": 64,
+        "largest_stored_univariate_degree": 64,
+        "backend_internal_workspace": "Native FLINT compose_mod workspace; not a pair table; peak process RSS measured."
+      },
+      "peak_process_rss_kib": 24400,
+      "complexity_scope": "B iterations, 2B native degree-B modular compositions, 5B explicit quotient products, O(B^2) classical interpolation coefficient work. compose_mod internals uncounted; no subquadratic claim.",
+      "schema": "incidence-compose-result/v1",
+      "fixture_id": "b064_c0_natural_s0",
+      "B": 64,
+      "kind": "natural",
+      "fixture_sha256": "0c906f627c211bbf7fa1ec4861bcb38b1979fbc8f9ae9babd990a02df8ae32f1",
+      "fixture_generation": {
+        "accepted": 192,
+        "counter_scope": "Public alpha*P+beta*Q pool construction, including rejected draws; Python modular inverse internals not expanded into multiplications.",
+        "counters": {
+          "affine_additions": 3870,
+          "affine_doublings": 7676,
+          "field_inversions": 11546,
+          "field_multiplications": 23092,
+          "field_squarings": 19222,
+          "group_add_calls": 11930,
+          "scalar_bits": 7676,
+          "scalar_multiplications": 384
+        },
+        "cpu_seconds": 0.021264905,
+        "draws": 192,
+        "rejected": {},
+        "secret_used_for_pool_generation": false,
+        "wall_seconds": 0.02126723299988953
+      },
+      "solver_total_cpu_seconds": 0.03105685533333333,
+      "batch_cpu_seconds": 0.093170566,
+      "batch_wall_seconds": 0.09289546699983475,
+      "timing_repetitions": 3,
+      "cpu_affinity": [
+        1
+      ],
+      "flint_version": "0.9.0",
+      "phase_timing_scope": "Short inner CPU intervals unreliable/undersum; outer batch complete-call CPU is primary.",
+      "external_process_wall_seconds": 0.16572881400134065,
+      "external_process_cpu_seconds": 0.16130099999999997,
+      "process_startup_and_serialization_cpu_seconds": 0.06813043399999998,
+      "pool_generation_cpu_seconds": 0.021264905,
+      "complete_call_plus_pool_cpu_seconds": 0.05232176033333333,
+      "root_parity": true,
+      "witness_verified": true
+    },
+    {
+      "status": "relation",
+      "witness": [
+        {
+          "pool": 0,
+          "index": 47,
+          "sign": 1
+        },
+        {
+          "pool": 1,
+          "index": 3,
+          "sign": -1
+        },
+        {
+          "pool": 2,
+          "index": 7,
+          "sign": 1
+        }
+      ],
+      "recovery": {
+        "A": 170211,
+        "B": 224359,
+        "k": 293302
+      },
+      "root_candidates": 1,
+      "gcd_evaluations": 64,
+      "uninformative_matches_skipped": 0,
+      "group_counters": {
+        "group_addition_calls": 128,
+        "field_inversions": 125
+      },
+      "arm": "split_compose",
+      "gcd_degree": 1,
+      "gcd_coefficients": [
+        921998,
+        1
+      ],
+      "phase_cpu_seconds": {
+        "preprocessing": 0.0,
+        "modular_composition_incidence": 0.02990944533333333,
+        "incidence_gcd": 0.0,
+        "witness_and_scalar_recovery": 0.0
+      },
+      "solver_core_bracket_cpu_seconds": 0.030485143999999992,
+      "solver_total_wall_seconds": 0.03174783866658496,
+      "counters": {
+        "interpolation_scalar_inversions": 64,
+        "denominator_scalar_inversions": 64,
+        "quotient_multiplications": 320,
+        "polynomial_product_coefficient_pairs": 1060928,
+        "native_modular_compositions": 128
+      },
+      "dimensions": {
+        "quotient_dimension": 64,
+        "first_pool_iterations": 64,
+        "largest_stored_univariate_degree": 64,
+        "backend_internal_workspace": "Native FLINT compose_mod workspace; not a pair table; peak process RSS measured."
+      },
+      "peak_process_rss_kib": 25764,
+      "complexity_scope": "B iterations, 2B native degree-B modular compositions, 5B explicit quotient products, O(B^2) classical interpolation coefficient work. compose_mod internals uncounted; no subquadratic claim.",
+      "schema": "incidence-compose-result/v1",
+      "fixture_id": "b064_c0_natural_s1",
+      "B": 64,
+      "kind": "natural",
+      "fixture_sha256": "629e5c3f1bac9c35b8c07bba88ef7f5925e31782715e2bbb6cf88b220fbf80e9",
+      "fixture_generation": {
+        "accepted": 192,
+        "counter_scope": "Public alpha*P+beta*Q pool construction, including rejected draws; Python modular inverse internals not expanded into multiplications.",
+        "counters": {
+          "affine_additions": 3893,
+          "affine_doublings": 7713,
+          "field_inversions": 11606,
+          "field_multiplications": 23212,
+          "field_squarings": 19319,
+          "group_add_calls": 11990,
+          "scalar_bits": 7713,
+          "scalar_multiplications": 384
+        },
+        "cpu_seconds": 0.021721301000000137,
+        "draws": 192,
+        "rejected": {},
+        "secret_used_for_pool_generation": false,
+        "wall_seconds": 0.021724202000768855
+      },
+      "solver_total_cpu_seconds": 0.03184993033333333,
+      "batch_cpu_seconds": 0.095549791,
+      "batch_wall_seconds": 0.09539265099920158,
+      "timing_repetitions": 3,
+      "cpu_affinity": [
+        1
+      ],
+      "flint_version": "0.9.0",
+      "phase_timing_scope": "Short inner CPU intervals unreliable/undersum; outer batch complete-call CPU is primary.",
+      "external_process_wall_seconds": 0.1557551620007871,
+      "external_process_cpu_seconds": 0.15511800000000012,
+      "process_startup_and_serialization_cpu_seconds": 0.05956820900000012,
+      "pool_generation_cpu_seconds": 0.021721301000000137,
+      "complete_call_plus_pool_cpu_seconds": 0.05357123133333347,
+      "root_parity": true,
+      "witness_verified": true
+    },
+    {
+      "status": "none",
+      "witness": null,
+      "recovery": null,
+      "root_candidates": 0,
+      "gcd_evaluations": 128,
+      "group_counters": {},
+      "arm": "split_compose",
+      "gcd_degree": 0,
+      "gcd_coefficients": [
+        1
+      ],
+      "phase_cpu_seconds": {
+        "preprocessing": 0.001083695999999995,
+        "modular_composition_incidence": 0.38363433999999996,
+        "incidence_gcd": 0.0,
+        "witness_and_scalar_recovery": 0.0
+      },
+      "solver_core_bracket_cpu_seconds": 0.384718036,
+      "solver_total_wall_seconds": 0.3859920719987713,
+      "counters": {
+        "interpolation_scalar_inversions": 128,
+        "denominator_scalar_inversions": 128,
+        "quotient_multiplications": 640,
+        "polynomial_product_coefficient_pairs": 8437888,
+        "native_modular_compositions": 256
+      },
+      "dimensions": {
+        "quotient_dimension": 128,
+        "first_pool_iterations": 128,
+        "largest_stored_univariate_degree": 128,
+        "backend_internal_workspace": "Native FLINT compose_mod workspace; not a pair table; peak process RSS measured."
+      },
+      "peak_process_rss_kib": 25868,
+      "complexity_scope": "B iterations, 2B native degree-B modular compositions, 5B explicit quotient products, O(B^2) classical interpolation coefficient work. compose_mod internals uncounted; no subquadratic claim.",
+      "schema": "incidence-compose-result/v1",
+      "fixture_id": "b128_c0_natural_s0",
+      "B": 128,
+      "kind": "natural",
+      "fixture_sha256": "b26fde653f5321d818199cd967265f1f61f97c368f4720b5770f04888d60d7ec",
+      "fixture_generation": {
+        "accepted": 384,
+        "counter_scope": "Public alpha*P+beta*Q pool construction, including rejected draws; Python modular inverse internals not expanded into multiplications.",
+        "counters": {
+          "affine_additions": 8928,
+          "affine_doublings": 17739,
+          "field_inversions": 26667,
+          "field_multiplications": 53334,
+          "field_squarings": 44406,
+          "group_add_calls": 27435,
+          "scalar_bits": 17739,
+          "scalar_multiplications": 768
+        },
+        "cpu_seconds": 0.05259813599999985,
+        "draws": 384,
+        "rejected": {},
+        "secret_used_for_pool_generation": false,
+        "wall_seconds": 0.05260274600004777
+      },
+      "solver_total_cpu_seconds": 0.38602912899999997,
+      "batch_cpu_seconds": 0.38602912899999997,
+      "batch_wall_seconds": 0.38606617400000687,
+      "timing_repetitions": 1,
+      "cpu_affinity": [
+        1
+      ],
+      "flint_version": "0.9.0",
+      "phase_timing_scope": "Short inner CPU intervals unreliable/undersum; outer batch complete-call CPU is primary.",
+      "external_process_wall_seconds": 0.4506330730000627,
+      "external_process_cpu_seconds": 0.44971000000000005,
+      "process_startup_and_serialization_cpu_seconds": 0.06368087100000008,
+      "pool_generation_cpu_seconds": 0.05259813599999985,
+      "complete_call_plus_pool_cpu_seconds": 0.4386272649999998,
+      "root_parity": true,
+      "witness_verified": false
+    },
+    {
+      "status": "relation",
+      "witness": [
+        {
+          "pool": 0,
+          "index": 36,
+          "sign": 1
+        },
+        {
+          "pool": 1,
+          "index": 126,
+          "sign": -1
+        },
+        {
+          "pool": 2,
+          "index": 40,
+          "sign": 1
+        }
+      ],
+      "recovery": {
+        "A": 10159982,
+        "B": 864710,
+        "k": 11280130
+      },
+      "root_candidates": 1,
+      "gcd_evaluations": 128,
+      "uninformative_matches_skipped": 0,
+      "group_counters": {
+        "group_addition_calls": 110,
+        "field_inversions": 107
+      },
+      "arm": "split_compose",
+      "gcd_degree": 1,
+      "gcd_coefficients": [
+        11485926,
+        1
+      ],
+      "phase_cpu_seconds": {
+        "preprocessing": 0.0,
+        "modular_composition_incidence": 0.375664811,
+        "incidence_gcd": 0.0,
+        "witness_and_scalar_recovery": 0.004003080999999964
+      },
+      "solver_core_bracket_cpu_seconds": 0.37966789199999995,
+      "solver_total_wall_seconds": 0.37952395100001013,
+      "counters": {
+        "interpolation_scalar_inversions": 128,
+        "denominator_scalar_inversions": 128,
+        "quotient_multiplications": 640,
+        "polynomial_product_coefficient_pairs": 8437888,
+        "native_modular_compositions": 256
+      },
+      "dimensions": {
+        "quotient_dimension": 128,
+        "first_pool_iterations": 128,
+        "largest_stored_univariate_degree": 128,
+        "backend_internal_workspace": "Native FLINT compose_mod workspace; not a pair table; peak process RSS measured."
+      },
+      "peak_process_rss_kib": 25860,
+      "complexity_scope": "B iterations, 2B native degree-B modular compositions, 5B explicit quotient products, O(B^2) classical interpolation coefficient work. compose_mod internals uncounted; no subquadratic claim.",
+      "schema": "incidence-compose-result/v1",
+      "fixture_id": "b128_c0_natural_s1",
+      "B": 128,
+      "kind": "natural",
+      "fixture_sha256": "294e68c38b702846d26ae9a829240494ed7a33b043df74691b8e345cbf983de5",
+      "fixture_generation": {
+        "accepted": 384,
+        "counter_scope": "Public alpha*P+beta*Q pool construction, including rejected draws; Python modular inverse internals not expanded into multiplications.",
+        "counters": {
+          "affine_additions": 8837,
+          "affine_doublings": 17677,
+          "field_inversions": 26514,
+          "field_multiplications": 53028,
+          "field_squarings": 44191,
+          "group_add_calls": 27282,
+          "scalar_bits": 17677,
+          "scalar_multiplications": 768
+        },
+        "cpu_seconds": 0.052384509999999995,
+        "draws": 384,
+        "rejected": {},
+        "secret_used_for_pool_generation": false,
+        "wall_seconds": 0.052769547000934836
+      },
+      "solver_total_cpu_seconds": 0.379718917,
+      "batch_cpu_seconds": 0.379718917,
+      "batch_wall_seconds": 0.3795856940014346,
+      "timing_repetitions": 1,
+      "cpu_affinity": [
+        1
+      ],
+      "flint_version": "0.9.0",
+      "phase_timing_scope": "Short inner CPU intervals unreliable/undersum; outer batch complete-call CPU is primary.",
+      "external_process_wall_seconds": 0.4385646890004864,
+      "external_process_cpu_seconds": 0.43793099999999985,
+      "process_startup_and_serialization_cpu_seconds": 0.05821208299999986,
+      "pool_generation_cpu_seconds": 0.052384509999999995,
+      "complete_call_plus_pool_cpu_seconds": 0.432103427,
+      "root_parity": true,
+      "witness_verified": true
+    },
+    {
+      "status": "relation",
+      "witness": [
+        {
+          "pool": 0,
+          "index": 14,
+          "sign": 1
+        },
+        {
+          "pool": 1,
+          "index": 3,
+          "sign": 1
+        },
+        {
+          "pool": 2,
+          "index": 13,
+          "sign": 1
+        }
+      ],
+      "recovery": {
+        "A": 28561,
+        "B": 31287,
+        "k": 11192
+      },
+      "root_candidates": 3,
+      "gcd_evaluations": 16,
+      "uninformative_matches_skipped": 1,
+      "group_counters": {
+        "group_addition_calls": 89,
+        "field_inversions": 84
+      },
+      "arm": "split_compose",
+      "gcd_degree": 3,
+      "gcd_coefficients": [
+        26494,
+        4132,
+        10923,
+        1
+      ],
+      "phase_cpu_seconds": {
+        "preprocessing": 3.5727131782945493e-07,
+        "modular_composition_incidence": 4.1047527131783226e-05,
+        "incidence_gcd": 0.0,
+        "witness_and_scalar_recovery": 1.3749356589147123e-05
+      },
+      "solver_core_bracket_cpu_seconds": 0.0,
+      "solver_total_wall_seconds": 0.0006127115348347214,
+      "counters": {
+        "interpolation_scalar_inversions": 16,
+        "denominator_scalar_inversions": 16,
+        "quotient_multiplications": 80,
+        "polynomial_product_coefficient_pairs": 17168,
+        "native_modular_compositions": 32
+      },
+      "dimensions": {
+        "quotient_dimension": 16,
+        "first_pool_iterations": 16,
+        "largest_stored_univariate_degree": 16,
+        "backend_internal_workspace": "Native FLINT compose_mod workspace; not a pair table; peak process RSS measured."
+      },
+      "peak_process_rss_kib": 24656,
+      "complexity_scope": "B iterations, 2B native degree-B modular compositions, 5B explicit quotient products, O(B^2) classical interpolation coefficient work. compose_mod internals uncounted; no subquadratic claim.",
+      "schema": "incidence-compose-result/v1",
+      "fixture_id": "uninformative_first_then_informative_control",
+      "B": 16,
+      "kind": "recovery_regression",
+      "fixture_sha256": "387ea693d836d29053b758ff5f2b5fcb23ef7ead8ed1c58a78efcd6f742ee868",
+      "fixture_generation": {
+        "accepted": 48,
+        "counter_scope": "Public alpha*P+beta*Q pool construction, including rejected draws; Python modular inverse internals not expanded into multiplications.",
+        "counters": {
+          "affine_additions": 691,
+          "affine_doublings": 1387,
+          "field_inversions": 2078,
+          "field_multiplications": 4156,
+          "field_squarings": 3465,
+          "group_add_calls": 2176,
+          "scalar_bits": 1387,
+          "scalar_multiplications": 98
+        },
+        "cpu_seconds": 0.003711929999999919,
+        "draws": 49,
+        "rejected": {
+          "duplicate_abscissa": 1
+        },
+        "secret_used_for_pool_generation": false,
+        "wall_seconds": 0.0037314150013116887
+      },
+      "solver_total_cpu_seconds": 0.0006228517751937986,
+      "batch_cpu_seconds": 0.08034787900000001,
+      "batch_wall_seconds": 0.08026948200131301,
+      "timing_repetitions": 129,
+      "cpu_affinity": [
+        1
+      ],
+      "flint_version": "0.9.0",
+      "phase_timing_scope": "Short inner CPU intervals unreliable/undersum; outer batch complete-call CPU is primary.",
+      "external_process_wall_seconds": 0.14109116600047855,
+      "external_process_cpu_seconds": 0.13951599999999997,
+      "process_startup_and_serialization_cpu_seconds": 0.05916812099999996,
+      "pool_generation_cpu_seconds": 0.003711929999999919,
+      "complete_call_plus_pool_cpu_seconds": 0.004334781775193718,
+      "root_parity": true,
+      "witness_verified": true
+    }
+  ]
+}

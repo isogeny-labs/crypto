@@ -1,0 +1,27 @@
+{
+  "command": [
+    "cargo",
+    "clippy",
+    "--manifest-path",
+    "taskq/deploy/eks-karpenter/resume/progress/Cargo.toml",
+    "--locked",
+    "--offline",
+    "--all-targets",
+    "-j",
+    "2",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "exit_code": 0,
+  "started_utc": "2026-10-30T19:12:06.671795+00:00",
+  "ended_utc": "2026-10-30T19:12:11.185378+00:00",
+  "source_manifest": "transport-source-hashes-v2.json",
+  "source_manifest_sha256": "3566690694242e469d0f06fb57dda47849956b58d58d05170e4f7fa00c3f9118",
+  "scientific_cohort_execution": false,
+  "purpose": "software regression; known-answer algorithm fixtures may execute",
+  "logs": {
+    "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr": "8d680be63fcc73758da685878f90bcac4266312aa52205ccdc5dc58b3dd85da2"
+  }
+}

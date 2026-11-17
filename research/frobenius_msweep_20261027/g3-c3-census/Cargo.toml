@@ -1,0 +1,20 @@
+[package]
+name = "g3-c3-census"
+version = "0.1.0"
+edition = "2021"
+description = "Cell G3: C3 census (H-BINSTD-c72284 Stage 2) - std-only; reuses the repo CDCL+XOR solver source by path"
+
+[dependencies]
+
+[[bin]]
+name = "g3census"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+debug = false
+
+[profile.test]
+opt-level = 3
+
+[workspace]

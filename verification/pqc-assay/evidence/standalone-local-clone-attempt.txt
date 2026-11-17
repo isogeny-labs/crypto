@@ -1,0 +1,10 @@
+Diagnostic: git clone --shared --no-checkout /workspace/crypto /workspace/assay-standalone-repro
+Exit status: 128; no proof or integrity check started.
+remote: warning: lazy fetching disabled; some objects may not be available
+remote: fatal: could not fetch e714b3785660ebf8b05e5de44c864c2bbbdf343f from promisor remote
+error: git upload-pack: git-pack-objects died with error.
+fatal: git upload-pack: aborting due to possible repository corruption on the remote side.
+remote: aborting due to possible repository corruption on the remote side.
+fatal: early EOF
+fatal: fetch-pack: invalid index-pack output
+The source checkout is blobless. A fresh sparse worktree was used for the initialization check instead; its output is preserved separately.

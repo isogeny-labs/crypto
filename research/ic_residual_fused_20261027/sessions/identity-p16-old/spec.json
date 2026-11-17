@@ -1,0 +1,51 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "identity-p16 local L0: rho, res2, res2-fused",
+  "description": "research/ic_residual_fused_20261027/README.md",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 53411,
+        "a": 4589,
+        "b": 186,
+        "group_order": 53117,
+        "r": 53117,
+        "gx": 43982,
+        "gy": 22687
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 20261105
+  },
+  "arms": [
+    {
+      "name": "rho",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "res2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "residual"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 0,
+    "order": "alternate_measured",
+    "seed": 20261106,
+    "isolation_required": "L0",
+    "timeout_seconds": 1800
+  }
+}

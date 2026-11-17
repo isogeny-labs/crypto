@@ -84,7 +84,12 @@ jobs:
         with:
           fetch-depth: 1
           filter: blob:none
+      # TEMPORARY store-outage fallback (2026-11-16): the artifact store
+      # bucket returns AllAccessDisabled/403 for every object. Keep the gate
+      # usable by continuing without the pulled data; remove this tolerance
+      # and the continue-on-error below once the store is reachable again.
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:

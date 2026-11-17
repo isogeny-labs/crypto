@@ -1,0 +1,3 @@
+# Kummer pruning independent review plan
+
+Frozen before reading the producer source or results. Check the exact claimed equality, assumptions and sign labels; inspect whether both sides are computed independently enough to test the intended identity. Inspect fixtures, positive/negative controls, original failure and amended test coverage. Retain failure as evidence rather than overwrite it. Verify repair scope and prohibit inference from fixed fixtures to universal collector completeness or speed. Recompute or replay only bounded existing offline software checks, command timeout at most120s. No scientific run, root edits or producer changes. Hash inspected sources and observations; distinguish source fidelity and software correctness from proof.

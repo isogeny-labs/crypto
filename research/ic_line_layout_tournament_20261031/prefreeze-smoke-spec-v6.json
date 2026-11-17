@@ -1,0 +1,78 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "v6 F4 local smoke (development check, not a measurement)",
+ "description": "counter enumeration only",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 28,
+    "seed": 2026110628902
+   }
+  ],
+  "targets_per_curve": 1,
+  "target_seed": 2026110628903
+ },
+ "arms": [
+  {
+   "name": "inc-walk",
+   "role": "reference",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=407",
+     "oracle": "mitm:negation_folded=1",
+     "targets": "walk",
+     "max_trials": "26479085"
+    }
+   }
+  },
+  {
+   "name": "cand-walk",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=407",
+     "oracle": "mitm:negation_folded=1,layout=lines",
+     "targets": "walk",
+     "max_trials": "26479085"
+    }
+   }
+  },
+  {
+   "name": "inc-stride-renew",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=407",
+     "oracle": "mitm:negation_folded=1",
+     "targets": "stride-renew",
+     "max_trials": "26479085"
+    }
+   }
+  },
+  {
+   "name": "cand-stride-renew",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=407",
+     "oracle": "mitm:negation_folded=1,layout=lines",
+     "targets": "stride-renew",
+     "max_trials": "26479085"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate_measured",
+  "seed": 2026110628904,
+  "isolation_required": "L0",
+  "timeout_seconds": 600
+ }
+}

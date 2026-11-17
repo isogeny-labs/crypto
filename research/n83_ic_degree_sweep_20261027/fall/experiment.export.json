@@ -1,0 +1,2297 @@
+{
+  "analysis": {
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "bytes": 218125,
+        "kind": "summary",
+        "path": "evidence/results.json",
+        "sha256": "95bc8431d46e11cffa11051b2ae9ff82c2b5c8cfc0dfef1b373629c50c4c94a2"
+      }
+    ],
+    "script": {
+      "bytes": 22794,
+      "kind": "analysis",
+      "path": "../src/bin/fall.rs",
+      "sha256": "37efbf8170ab4c454443a5e7cbb6514c2819a5abf5c3c4244e77d3b4025792eb"
+    },
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "binary_sha256": "eee9ed3594597d68048aaaf719cb8e40acd8093e6f77398935e92f5e286c7f4c",
+      "commit": "e691d32d84c539d8e8b252a477167c780d87e5e0",
+      "id": "koblitz",
+      "image_digest": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:2fc0eeffbefef8dbb507b4704d48156b2859c195e8e2217a625c06d1e9df3251",
+      "role": "reference"
+    },
+    {
+      "binary_sha256": "eee9ed3594597d68048aaaf719cb8e40acd8093e6f77398935e92f5e286c7f4c",
+      "commit": "e691d32d84c539d8e8b252a477167c780d87e5e0",
+      "id": "binary",
+      "image_digest": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:2fc0eeffbefef8dbb507b4704d48156b2859c195e8e2217a625c06d1e9df3251",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": "eee9ed3594597d68048aaaf719cb8e40acd8093e6f77398935e92f5e286c7f4c",
+      "commit": "e691d32d84c539d8e8b252a477167c780d87e5e0",
+      "id": "prime",
+      "image_digest": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:2fc0eeffbefef8dbb507b4704d48156b2859c195e8e2217a625c06d1e9df3251",
+      "role": "candidate"
+    }
+  ],
+  "backend": "isolab-k8s",
+  "created": "2026-10-27",
+  "export_id": "N83-FIRST-FALL-M2-M9-20261027-R3",
+  "files": [
+    {
+      "bytes": 218125,
+      "kind": "raw",
+      "path": "evidence/results.json",
+      "sha256": "95bc8431d46e11cffa11051b2ae9ff82c2b5c8cfc0dfef1b373629c50c4c94a2"
+    },
+    {
+      "bytes": 2034,
+      "kind": "raw",
+      "path": "evidence/controls.json",
+      "sha256": "19c30a7b840e41ed704cddff71ebb72ae28169c7c0d1636a056b1f035d6d45c0"
+    },
+    {
+      "bytes": 6912,
+      "kind": "raw",
+      "path": "evidence/replay.jsonl",
+      "sha256": "fd55dcf269ac137ac05226558f4237566fa0999dc8d3ea710d7b35e1384fa894"
+    },
+    {
+      "bytes": 5104,
+      "kind": "raw",
+      "path": "evidence/producer.jsonl",
+      "sha256": "80119b1e2f55c97608e7c7bdc1444d3371db1cb70999aecdd2fb177f2905f267"
+    },
+    {
+      "bytes": 5839,
+      "kind": "other",
+      "path": "evidence/raw-manifest.sha256",
+      "sha256": "4f7eb84543c887a8980eca9ec7925d0a9a65a84467691ec6dd25d5390e943878"
+    },
+    {
+      "bytes": 322,
+      "kind": "receipt",
+      "path": "request.json",
+      "sha256": "d2de24fb7d731dab1a7edbb68dc3f40c6d4dbe0d8e5cd40e7dce65f364915084"
+    },
+    {
+      "bytes": 1839,
+      "kind": "receipt",
+      "path": "submission.json",
+      "sha256": "53d21fce11f7f29ba59d1b9f7339d9b4974f4cc60af0ad9c49fd7e2f06dc4289"
+    },
+    {
+      "bytes": 5261,
+      "kind": "receipt",
+      "path": "terminal.json",
+      "sha256": "389cb5d47b91495605d5f549e26a1642e23e72ab092823f89d1c6edffd38df9e"
+    },
+    {
+      "bytes": 12555,
+      "kind": "analysis",
+      "path": "../src/bin/fall_report.rs",
+      "sha256": "aa9b63d06e144f50df6096891ecfb42fa48c63b7a9e1c71142de65025e61dd16"
+    }
+  ],
+  "flow": {
+    "attempted": 48,
+    "completed": 48,
+    "excluded": [],
+    "interrupted": 0,
+    "not_completed": 0,
+    "planned": 48,
+    "resumed": 0
+  },
+  "host": {
+    "class_id": "eks-spot-L0",
+    "path": "evidence/host.txt",
+    "sha256": "83e4754342bde39de0a77823e5ea96aea0b842cecca1b9a85be049b2bf73f8db",
+    "summary": {
+      "cpu_model": "Intel(R) Xeon(R) 6975P-C",
+      "hypervisor": "Amazon EC2",
+      "isolation_tier_max": "L0",
+      "kernel": "Linux n83-first-fall-m2-m9-20261027-r3-qbqmt 6.18.54-121.166.amzn2023.x86_64 #2 SMP PREEMPT_DYNAMIC Tue Oct  6 23:11:34 UTC 2026 x86_64 GNU/Linux",
+      "logical_cpus": 8,
+      "memory_bytes": null
+    }
+  },
+  "notes": [
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "48 certificate computations and fresh-process replays completed; 32 attained first-fall values; 16 lower bounds only. No last fall or regularity value follows. Active full goal remains unresolved for bound-only cells."
+    }
+  ],
+  "producer": {
+    "model": null,
+    "role": "producer",
+    "runtime": "codex",
+    "session": "n83-first-fall-m2-m9-20261027-r3"
+  },
+  "protocol": {
+    "path": "protocol.json",
+    "protocol_id": "N83-FIRST-FALL-M2-M9-20261027-R3",
+    "sha256": "ade777d99132049e9f34ad0ade714bf24e052ff675a254a6a31a0a195da1da52",
+    "version": 1
+  },
+  "reviews_dir": "reviews",
+  "runs": [
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/koblitz-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m2-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/koblitz-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m2-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/binary-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m2-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/binary-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m2-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/prime-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_lower_bound": 5
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m2-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/prime-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_lower_bound": 5
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m2-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/koblitz-m3-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/koblitz-m3-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/binary-m3-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/binary-m3-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/prime-m3-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_lower_bound": 5
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/prime-m3-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_lower_bound": 5
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/koblitz-m4-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m4-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/koblitz-m4-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m4-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/binary-m4-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m4-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/binary-m4-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m4-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/prime-m4-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_lower_bound": 5
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m4-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/prime-m4-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_lower_bound": 5
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m4-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/koblitz-m5-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m5-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/koblitz-m5-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m5-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/binary-m5-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m5-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/binary-m5-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m5-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/prime-m5-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_lower_bound": 5
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m5-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/prime-m5-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_lower_bound": 5
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m5-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/koblitz-m6-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m6-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/koblitz-m6-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m6-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/binary-m6-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m6-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/binary-m6-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m6-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/prime-m6-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_lower_bound": 5
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m6-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/prime-m6-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_lower_bound": 5
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m6-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/koblitz-m7-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m7-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/koblitz-m7-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m7-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/binary-m7-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m7-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/binary-m7-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m7-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/prime-m7-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_lower_bound": 5
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m7-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/prime-m7-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_lower_bound": 5
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m7-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/koblitz-m8-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m8-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/koblitz-m8-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m8-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/binary-m8-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m8-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/binary-m8-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m8-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/prime-m8-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_lower_bound": 5
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m8-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/prime-m8-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_lower_bound": 5
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m8-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/koblitz-m9-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m9-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/koblitz-m9-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m9-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/binary-m9-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m9-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/binary-m9-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 2,
+          "first_fall_lower_bound": 2
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m9-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/prime-m9-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_lower_bound": 5
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m9-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-first-fall-m2-m9-20261027-r3/3e5392d3-2859-4992-a8f1-cdcd00ca4071/certificates/prime-m9-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary EKS Spot process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_lower_bound": 5
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m9-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Explicit saved-equation witness or coefficient-minor replay in fresh process; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-first-fall-m2-m9-20261027-r3-qbqmt"
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "commit": "e691d32d84c539d8e8b252a477167c780d87e5e0",
+    "dirty": false,
+    "repo": "crypto"
+  }
+}

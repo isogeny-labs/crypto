@@ -1,0 +1,73 @@
+{
+ "source": "research/ecbench_sat_pdp_20261009/sessions/count-qualified-main/records.jsonl",
+ "n": {
+  "ic-sat-xor": 40,
+  "ic-mitm-frob": 40,
+  "ic-mitm": 40,
+  "rho-aa": 40,
+  "rho-strong": 40
+ },
+ "sqrt_r": 256.09959000357657,
+ "band": {
+  "0.0": {
+   "ic-sat-xor": 3.413061204286945,
+   "ic-mitm-frob": 17.072863596595127,
+   "ic-mitm": 387.2767329280569,
+   "rho-aa": 3.9975031547588946,
+   "rho-strong": 3.9975031547588946,
+   "sat_over_rho": 0.8537982515970773,
+   "frobmitm_over_rho": 4.270881831893103
+  },
+  "0.1": {
+   "ic-sat-xor": 30.31632567223779,
+   "ic-mitm-frob": 17.072863596595127,
+   "ic-mitm": 387.2767329280569,
+   "rho-aa": 4.132099231228672,
+   "rho-strong": 4.132099231228672,
+   "sat_over_rho": 7.336785487415144,
+   "frobmitm_over_rho": 4.13176514919235
+  },
+  "1.0": {
+   "ic-sat-xor": 272.44570588379537,
+   "ic-mitm-frob": 17.072863596595127,
+   "ic-mitm": 387.2767329280569,
+   "rho-aa": 5.343463919456667,
+   "rho-strong": 5.343463919456667,
+   "sat_over_rho": 50.98672134600997,
+   "frobmitm_over_rho": 3.1950928936619687
+  }
+ },
+ "sum_total_gae": {
+  "ic-sat-xor": 34963.343002999994,
+  "ic-mitm-frob": 174894.13469099998,
+  "ic-mitm": 3967256.500832,
+  "rho-aa": 40950.35675887027,
+  "rho-strong": 40950.35675887027
+ },
+ "sum_unpriced_ops": {
+  "ic-sat-xor": 2755966,
+  "ic-mitm-frob": 0,
+  "ic-mitm": 0,
+  "rho-aa": 13788,
+  "rho-strong": 13788
+ },
+ "break_even_w": 0.002183306027497222,
+ "break_even_w_conflict_rho_w1": 0.007175347502788597,
+ "wall": {
+  "ns_per_conflict_aggregate": 15101.48566600604,
+  "ns_per_conflict_median_record": 14895.881418702218,
+  "ns_per_gae": {
+   "ic-mitm.oracle_setup": 170.74634225082872,
+   "ic-mitm.verify": 158.8939024390244,
+   "ic-mitm-frob.oracle_setup": 241.49762510602204,
+   "ic-mitm-frob.verify": 157.5670731707317,
+   "ic-sat-xor.verify": 170.57926829268294
+  },
+  "implied_gae_per_conflict": [
+   62.53264668493614,
+   95.84163342072638
+  ],
+  "implied_lo_sat_over_rho_at_rho_w1": 3149.031532971018,
+  "implied_hi_sat_over_rho_at_rho_w1": 4826.071918795407
+ }
+}

@@ -1,0 +1,369 @@
+(00.000000) CRIU run id = 7a8b18c3-b9a8-4b9f-86e7-d089ec9a3e7e
+(00.000714) Version: 4.2.1 (gitid 0)
+(00.000717) Running on resume-process-restored Linux 6.18.54-121.166.amzn2023.x86_64 #2 SMP PREEMPT_DYNAMIC Tue Oct  6 23:11:34 UTC 2026 x86_64
+(00.000721) File /run/criu.kdat does not exist
+(00.000729) sockets: Probing sock diag modules
+(00.001926) sockets: Done probing
+(00.002224) PAGEMAP_SCAN is supported
+(00.002231) Pagemap is fully functional
+(00.002251) Found anon-shmem device at 1
+(00.002292) Hugetlb size 2 Mb is supported but cannot get dev's number
+(00.002303) Hugetlb size 1024 Mb is supported but cannot get dev's number
+(00.002305) Reset 30's dirty tracking
+(00.002322)  ... done
+(00.002331) Dirty track supported on kernel
+(00.002390) Found task size of 7ffffffff000
+(00.002926) net: Restoring netdev veth idx 10
+(00.003334) net: Dumping netns links
+(00.003344) net: 	LD: Got link 1, type 772
+(00.003345) net: 	LD: Got link 10, type 1
+(00.003411) Warn  (criu/kerndat.c:1642): CRIU was built without libnftables support
+(00.004667) vdso: Parsing at 7f4a622b7000 7f4a622b9000
+(00.004670) vdso: PT_LOAD p_vaddr: 0
+(00.004671) vdso: DT_HASH: 120
+(00.004671) vdso: DT_GNU_HASH: 170
+(00.004672) vdso: DT_STRTAB: 320
+(00.004672) vdso: DT_SYMTAB: 1d0
+(00.004673) vdso: DT_STRSZ: 83
+(00.004673) vdso: DT_SYMENT: 18
+(00.004673) vdso: nbucket 3 nchain e bucket 7f4a622b7128 chain 7f4a622b7134
+(00.004675) vdso: symbol __vdso_clock_gettime at address fd0
+(00.004675) vdso: symbol __vdso_getcpu at address 1050
+(00.004676) vdso: symbol __vdso_gettimeofday at address f90
+(00.004676) vdso: symbol __vdso_time at address fa0
+(00.004677) vdso: symbol __kernel_sigreturn at address 0
+(00.004677) vdso: symbol __kernel_rt_sigreturn at address 0
+(00.004678) vdso: symbol __vdso_clock_gettime64 at address 0
+(00.004678) vdso: rt [vdso] 7f4a622b7000-7f4a622b9000 [vvar] 7f4a622b1000-7f4a622b7000
+(00.004792) vdso: Parsing at 7f4a62036000 7f4a62038000
+(00.004794) vdso: PT_LOAD p_vaddr: 0
+(00.004795) vdso: DT_HASH: b4
+(00.004795) vdso: DT_GNU_HASH: f8
+(00.004796) vdso: DT_STRTAB: 208
+(00.004796) vdso: DT_SYMTAB: 148
+(00.004797) vdso: DT_STRSZ: ce
+(00.004797) vdso: DT_SYMENT: 10
+(00.004797) vdso: nbucket 3 nchain c bucket 7f4a620360bc chain 7f4a620360c8
+(00.004798) vdso: symbol __vdso_clock_gettime at address 1840
+(00.004799) vdso: symbol __vdso_getcpu at address 1900
+(00.004799) vdso: symbol __vdso_gettimeofday at address 17f0
+(00.004800) vdso: symbol __vdso_time at address 1800
+(00.004800) vdso: symbol __kernel_sigreturn at address 5a0
+(00.004801) vdso: symbol __kernel_rt_sigreturn at address 5b0
+(00.004801) vdso: symbol __vdso_clock_gettime64 at address 1850
+(00.004801) vdso: compat [vdso] 7f4a622b7000-7f4a622b9000 [vvar] 7f4a622b1000-7f4a622b7000
+(00.004906) cpu: x86_family 26 x86_vendor_id AuthenticAMD x86_model_id AMD EPYC 9R45
+(00.004910) cpu: fpu: xfeatures_mask 0x2e5 xsave_size 2440 xsave_size_max 2440 xsaves_size 2440
+(00.004921) cpu: fpu: x87 floating point registers     xstate_offsets      0 / 0      xstate_sizes    160 / 160   
+(00.004922) cpu: fpu: AVX registers                    xstate_offsets    576 / 576    xstate_sizes    256 / 256   
+(00.004923) cpu: fpu: AVX-512 opmask                   xstate_offsets    832 / 832    xstate_sizes     64 / 64    
+(00.004924) cpu: fpu: AVX-512 Hi256                    xstate_offsets    896 / 896    xstate_sizes    512 / 512   
+(00.004924) cpu: fpu: AVX-512 ZMM_Hi256                xstate_offsets   1408 / 1408   xstate_sizes   1024 / 1024  
+(00.004925) cpu: fpu: Protection Keys User registers   xstate_offsets   2432 / 2432   xstate_sizes      8 / 8     
+(00.053706) Found mmap_min_addr 0x10000
+(00.053714) files stat: fs/nr_open 1073741816
+(00.053721) rlimit: RLIMIT_NOFILE unlimited for self
+(00.053735) Dump CRIU run id = 183473e2-7d0c-46c8-bc17-6c32b039511e
+(00.053744) cpu: fpu:1 fxsr:1 xsave:1 xsaveopt:1 xsavec:1 xgetbv1:1 xsaves:1
+(00.053764) kernel pid_max=4194304
+(00.053765) Reading image tree
+(00.053772) Add mnt ns 6 pid 88
+(00.053773) Add net ns 2 pid 88
+(00.053773) Add pid ns 1 pid 88
+(00.053774) pstree pid_max=88
+(00.053780) Migrating process tree (SID 82->21)
+(00.053781) Will restore in 0 namespaces
+(00.053782) NS mask to use 0
+(00.053805) Collecting 51/56 (flags 3)
+(00.053809) No memfd.img image
+(00.053809)  `- ... done
+(00.053811) Collecting 40/54 (flags 2)
+(00.053818) Collected [work/tools/fixture] ID 0x1
+(00.053819) Collected [usr/lib64/libc.so.6] ID 0x2
+(00.053820) Collected [usr/lib64/libgcc_s-14-20250110.so.1] ID 0x3
+(00.053821) Collected [usr/lib64/ld-linux-x86-64.so.2] ID 0x4
+(00.053822) Collected [dev/null] ID 0x5
+(00.053823) Collected [work/fixture.stdout] ID 0x6
+(00.053823) Collected [work/fixture.stderr] ID 0x7
+(00.053824) Collected [work/progress.log] ID 0x8
+(00.053825) Collected [work] ID 0x9
+(00.053826) Collected [.] ID 0xa
+(00.053827)  `- ... done
+(00.053828) Collecting 46/69 (flags 0)
+(00.053829) No remap-fpath.img image
+(00.053830)  `- ... done
+(00.053831) tty: Standard stream is not a terminal, may fail later
+(00.053837) No apparmor.img image
+(00.053839) No cgroup.img image
+(00.053843) Running pre-restore scripts
+(00.053856) No pidns-1.img image
+(00.053882) Forking task with 88 pid (flags 0x0)
+(00.053883) Creating process using clone3()
+(00.053917) PID: real 88 virt 88
+(00.053986)     88: timens: monotonic 501 811793308
+(00.053992)     88: timens: boottime 501 811787018
+(00.054009)     88: Calling restore_sid() for init
+(00.054013)     88: Collecting 44/37 (flags 2)
+(00.054016)     88: No tty-info.img image
+(00.054018)     88:  `- ... done
+(00.054018)     88: Collecting 45/51 (flags 0)
+(00.054020)     88: No tty-data.img image
+(00.054021)     88:  `- ... done
+(00.054021)     88: Restoring namespaces 88 flags 0x0
+(00.054025)     88: Preparing info about shared resources
+(00.054030)     88: Collecting 48/38 (flags 0)
+(00.054031)     88: No filelocks.img image
+(00.054031)     88:  `- ... done
+(00.054032)     88: Collecting 42/27 (flags 0)
+(00.054033)     88: No pipes-data.img image
+(00.054033)     88:  `- ... done
+(00.054034)     88: Collecting 43/27 (flags 0)
+(00.054035)     88: No fifo-data.img image
+(00.054036)     88:  `- ... done
+(00.054036)     88: Collecting 41/70 (flags 0)
+(00.054037)     88: No sk-queues.img image
+(00.054038)     88:  `- ... done
+(00.054050)     88: Found 29 VMAs in image
+(00.054051)     88: vma 0x5627024aa000 0x5627024c0000
+(00.054052)     88: vma 0x5627024c0000 0x562702503000
+(00.054052)     88: vma 0x562702503000 0x562702507000
+(00.054052)     88: vma 0x562702507000 0x562702508000
+(00.054053)     88: vma 0x5627329a1000 0x5627329c2000
+(00.054053)     88: vma 0x7fba055d2000 0x7fba055d3000
+(00.054054)     88: vma 0x7fba055d3000 0x7fba055d5000
+(00.054054)     88: vma 0x7fba055d5000 0x7fba055d8000
+(00.054054)     88: vma 0x7fba055d8000 0x7fba05601000
+(00.054055)     88: vma 0x7fba05601000 0x7fba05777000
+(00.054055)     88: vma 0x7fba05777000 0x7fba057d0000
+(00.054056)     88: vma 0x7fba057d0000 0x7fba057d4000
+(00.054056)     88: vma 0x7fba057d4000 0x7fba057d6000
+(00.054056)     88: vma 0x7fba057d6000 0x7fba057e3000
+(00.054057)     88: vma 0x7fba057e3000 0x7fba057e7000
+(00.054057)     88: vma 0x7fba057e7000 0x7fba0580b000
+(00.054058)     88: vma 0x7fba0580b000 0x7fba0580f000
+(00.054058)     88: vma 0x7fba0580f000 0x7fba05810000
+(00.054058)     88: vma 0x7fba05810000 0x7fba05811000
+(00.054059)     88: vma 0x7fba05813000 0x7fba05815000
+(00.054059)     88: vma 0x7fba05815000 0x7fba0581b000
+(00.054060)     88: vma 0x7fba0581b000 0x7fba0581d000
+(00.054060)     88: vma 0x7fba0581d000 0x7fba0581f000
+(00.054060)     88: vma 0x7fba0581f000 0x7fba05847000
+(00.054061)     88: vma 0x7fba05847000 0x7fba05853000
+(00.054061)     88: vma 0x7fba05853000 0x7fba05855000
+(00.054062)     88: vma 0x7fba05855000 0x7fba05857000
+(00.054062)     88: vma 0x7fff158e4000 0x7fff15905000
+(00.054062)     88: vma 0xffffffffff600000 0xffffffffff601000
+(00.054065)     88: Collect fdinfo pid=88 fd=0 id=0x5
+(00.054066)     88: Collect fdinfo pid=88 fd=1 id=0x6
+(00.054067)     88: Collect fdinfo pid=88 fd=2 id=0x7
+(00.054068)     88: Collect fdinfo pid=88 fd=3 id=0x8
+(00.054084)     88: skqueue: Preparing SCMs
+(00.054085)     88: unix: ghost: Resolving addresses
+(00.054089)     88: File descs:
+(00.054090)     88:  `- type 1 ID 0x1
+(00.054090)     88:  `- type 1 ID 0x2
+(00.054091)     88:  `- type 1 ID 0x3
+(00.054091)     88:  `- type 1 ID 0x4
+(00.054091)     88:  `- type 1 ID 0x5
+(00.054092)     88:    `- FD 0 pid 88
+(00.054092)     88:  `- type 1 ID 0x6
+(00.054092)     88:    `- FD 1 pid 88
+(00.054093)     88:  `- type 1 ID 0x7
+(00.054093)     88:    `- FD 2 pid 88
+(00.054093)     88:  `- type 1 ID 0x8
+(00.054094)     88:    `- FD 3 pid 88
+(00.054094)     88:  `- type 1 ID 0x9
+(00.054095)     88:  `- type 1 ID 0xa
+(00.054125)     88: No parent images directory provided
+(00.054129)     88: Opened local page read 1 (parent 0)
+(00.054134)     88: nr_restored_pages: 34
+(00.054134)     88: nr_shared_pages:   0
+(00.054135)     88: nr_dropped_pages:  0
+(00.054135)     88: nr_enqueued:       17
+(00.054135)     88: nr_lazy:           0
+(00.054137)     88: Shrunk premap area to 0x7f4a61d08000(0)
+(00.054138)     88: Restore on-core sigactions for 88
+(00.054152)     88: Restoring children in alien sessions:
+(00.054152)     88: Restoring children in our session:
+(00.054155)     88: Restoring 88 to 21 pgid
+(00.054158)     88: Restoring resources
+(00.054160)     88: Opening fdinfo-s
+(00.054164)     88: 		Create fd for 0
+(00.054172)     88: File work/fixture.stdout could only be validated with file size
+(00.054173)     88: 		Create fd for 1
+(00.054176)     88: File work/fixture.stderr could only be validated with file size
+(00.054177)     88: 		Create fd for 2
+(00.054179)     88: 		Create fd for 3
+(00.054180)     88: Opening 0x005627024aa000-0x005627024c0000 0000000000000000 (20000041) vma
+(00.054189)     88: Opening 0x005627024c0000-0x00562702503000 0x00000000015000 (41) vma
+(00.054190)     88: Opening 0x00562702503000-0x00562702507000 0x00000000057000 (41) vma
+(00.054190)     88: Opening 0x00562702507000-0x00562702508000 0x0000000005a000 (41) vma
+(00.054191)     88: Opening 0x007fba055d8000-0x007fba05601000 0000000000000000 (20000041) vma
+(00.054198)     88: Opening 0x007fba05601000-0x007fba05777000 0x00000000029000 (20000041) vma
+(00.054199)     88: Opening 0x007fba05777000-0x007fba057d0000 0x0000000019f000 (20000041) vma
+(00.054199)     88: Opening 0x007fba057d0000-0x007fba057d4000 0x000000001f7000 (41) vma
+(00.054200)     88: Opening 0x007fba057d4000-0x007fba057d6000 0x000000001fb000 (41) vma
+(00.054200)     88: Opening 0x007fba057e3000-0x007fba057e7000 0000000000000000 (20000041) vma
+(00.054213)     88: Opening 0x007fba057e7000-0x007fba0580b000 0x00000000004000 (20000041) vma
+(00.054214)     88: Opening 0x007fba0580b000-0x007fba0580f000 0x00000000028000 (20000041) vma
+(00.054214)     88: Opening 0x007fba0580f000-0x007fba05810000 0x0000000002c000 (41) vma
+(00.054215)     88: Opening 0x007fba0581d000-0x007fba0581f000 0000000000000000 (20000041) vma
+(00.054220)     88: Opening 0x007fba0581f000-0x007fba05847000 0x00000000002000 (20000041) vma
+(00.054221)     88: Opening 0x007fba05847000-0x007fba05853000 0x0000000002a000 (20000041) vma
+(00.054221)     88: Opening 0x007fba05853000-0x007fba05855000 0x00000000036000 (41) vma
+(00.054222)     88: Opening 0x007fba05855000-0x007fba05857000 0x00000000038000 (41) vma
+(00.054233)     88: `- render 12 iovs (0x5627024c0000:4096...)
+(00.054234)     88: Restore via sigreturn
+(00.054248)     88: Parsed 400000-424000 vma
+(00.054249)     88: Parsed 400000-4c8000 vma
+(00.054250)     88: Parsed 400000-559000 vma
+(00.054250)     88: Parsed 400000-55a000 vma
+(00.054251)     88: Parsed 400000-562000 vma
+(00.054251)     88: Parsed 400000-594000 vma
+(00.054251)     88: Parsed 10f2000-1113000 vma
+(00.054252)     88: Parsed 7f4a62028000-7f4a6202b000 vma
+(00.054253)     88: Parsed 7f4a62028000-7f4a62038000 vma
+(00.054253)     88: Parsed 7f4a62028000-7f4a6203a000 vma
+(00.054254)     88: Parsed 7f4a62028000-7f4a6204d000 vma
+(00.054254)     88: Parsed 7f4a62028000-7f4a62076000 vma
+(00.054254)     88: Parsed 7f4a62028000-7f4a621ec000 vma
+(00.054255)     88: Parsed 7f4a62028000-7f4a62245000 vma
+(00.054255)     88: Parsed 7f4a62028000-7f4a62249000 vma
+(00.054257)     88: Parsed 7f4a62028000-7f4a6224b000 vma
+(00.054258)     88: Parsed 7f4a62028000-7f4a6225a000 vma
+(00.054258)     88: Parsed 7f4a62028000-7f4a6225c000 vma
+(00.054259)     88: Parsed 7f4a62028000-7f4a62260000 vma
+(00.054259)     88: Parsed 7f4a62028000-7f4a62261000 vma
+(00.054260)     88: Parsed 7f4a62028000-7f4a62262000 vma
+(00.054260)     88: Parsed 7f4a62028000-7f4a62263000 vma
+(00.054261)     88: Parsed 7f4a62028000-7f4a62265000 vma
+(00.054261)     88: Parsed 7f4a62028000-7f4a62269000 vma
+(00.054261)     88: Parsed 7f4a62028000-7f4a62277000 vma
+(00.054262)     88: Parsed 7f4a62028000-7f4a6227d000 vma
+(00.054262)     88: Parsed 7f4a62028000-7f4a6227e000 vma
+(00.054263)     88: Parsed 7f4a62028000-7f4a62281000 vma
+(00.054263)     88: Parsed 7f4a62028000-7f4a62289000 vma
+(00.054264)     88: Parsed 7f4a62028000-7f4a62299000 vma
+(00.054264)     88: Parsed 7f4a62028000-7f4a622a2000 vma
+(00.054265)     88: Parsed 7f4a62028000-7f4a622a4000 vma
+(00.054265)     88: Parsed 7f4a62028000-7f4a622a5000 vma
+(00.054265)     88: Parsed 7f4a62028000-7f4a622a6000 vma
+(00.054266)     88: Parsed 7f4a62028000-7f4a622ac000 vma
+(00.054266)     88: Parsed 7f4a62028000-7f4a622ad000 vma
+(00.054267)     88: Parsed 7f4a62028000-7f4a622ae000 vma
+(00.054267)     88: Parsed 7f4a62028000-7f4a622af000 vma
+(00.054268)     88: Parsed 7f4a62028000-7f4a622b1000 vma
+(00.054268)     88: Parsed 7f4a62028000-7f4a622b5000 vma
+(00.054269)     88: Parsed 7f4a62028000-7f4a622b7000 vma
+(00.054269)     88: Parsed 7f4a62028000-7f4a622b9000 vma
+(00.054269)     88: Parsed 7f4a62028000-7f4a622bb000 vma
+(00.054270)     88: Parsed 7f4a62028000-7f4a622e3000 vma
+(00.054270)     88: Parsed 7f4a62028000-7f4a622ef000 vma
+(00.054272)     88: Parsed 7f4a62028000-7f4a622f1000 vma
+(00.054272)     88: Parsed 7f4a62028000-7f4a622f3000 vma
+(00.054273)     88: Parsed 7ffc3b38f000-7ffc3b3b0000 vma
+(00.054274)     88: Parsed ffffffffff600000-ffffffffff601000 vma
+(00.054275)     88: 1 threads require 128K of memory
+(00.054276)     88: Found bootstrap VMA hint at: 0x10000 (needs ~160K)
+(00.054293)     88: 	call mremap(0x7f4a62028000, 8192, 8192, MAYMOVE | FIXED, 0x2b000)
+(00.054295)     88: 	call mremap(0x7f4a62038000, 8192, 8192, MAYMOVE | FIXED, 0x2d000)
+(00.054301)     88: x86: xsave runtime structure
+(00.054301)     88: x86: -----------------------
+(00.054301)     88: x86: cwd:0x37f swd:0 twd:0 fop:0 mxcsr:0x1f80 mxcsr_mask:0x2ffff
+(00.054302)     88: x86: magic1:0x46505853 extended_size:2444 xstate_bv:0x2a3 xstate_size:2440
+(00.054303)     88: x86: xstate_bv: 0x2a3
+(00.054304)     88: x86: -----------------------
+(00.054304)     88: Thread    0 stack  0x1d080 rt_sigframe  0x25080
+(00.054313)     88: Going to chroot into /proc/self/fd/11
+(00.054315)     88: Restoring umask to 22
+(00.054321)     88: task_args: 0x2a000
+task_args->pid: 88
+task_args->nr_threads: 1
+task_args->clone_restore_fn: 0x12240
+task_args->thread_args: 0x2a5c0
+(00.054323) pie: 88: Switched to the restorer 88
+(00.054369) pie: 88: Mapping native vDSO at 0x30000
+(00.054372) pie: 88: vdso: Using gettimeofday() on vdso at 0x36f90
+(00.054375) pie: 88: 	mmap(0x5627024aa000 -> 0x5627024c0000, 0x1 0x12 4)
+(00.054376) pie: 88: 	mmap(0x5627024c0000 -> 0x562702503000, 0x7 0x12 4)
+(00.054378) pie: 88: 	mmap(0x562702503000 -> 0x562702507000, 0x3 0x12 4)
+(00.054379) pie: 88: 	mmap(0x562702507000 -> 0x562702508000, 0x3 0x12 4)
+(00.054380) pie: 88: 	mmap(0x5627329a1000 -> 0x5627329c2000, 0x3 0x32 -1)
+(00.054382) pie: 88: 	mmap(0x7fba055d2000 -> 0x7fba055d3000, 0x0 0x32 -1)
+(00.054383) pie: 88: 	mmap(0x7fba055d3000 -> 0x7fba055d5000, 0x3 0x32 -1)
+(00.054384) pie: 88: 	mmap(0x7fba055d5000 -> 0x7fba055d8000, 0x3 0x32 -1)
+(00.054386) pie: 88: 	mmap(0x7fba055d8000 -> 0x7fba05601000, 0x1 0x12 5)
+(00.054387) pie: 88: 	mmap(0x7fba05601000 -> 0x7fba05777000, 0x5 0x12 5)
+(00.054388) pie: 88: 	mmap(0x7fba05777000 -> 0x7fba057d0000, 0x1 0x12 5)
+(00.054389) pie: 88: 	mmap(0x7fba057d0000 -> 0x7fba057d4000, 0x3 0x12 5)
+(00.054390) pie: 88: 	mmap(0x7fba057d4000 -> 0x7fba057d6000, 0x3 0x12 5)
+(00.054396) pie: 88: 	mmap(0x7fba057d6000 -> 0x7fba057e3000, 0x3 0x32 -1)
+(00.054398) pie: 88: 	mmap(0x7fba057e3000 -> 0x7fba057e7000, 0x1 0x12 6)
+(00.054399) pie: 88: 	mmap(0x7fba057e7000 -> 0x7fba0580b000, 0x5 0x12 6)
+(00.054400) pie: 88: 	mmap(0x7fba0580b000 -> 0x7fba0580f000, 0x1 0x12 6)
+(00.054401) pie: 88: 	mmap(0x7fba0580f000 -> 0x7fba05810000, 0x3 0x12 6)
+(00.054402) pie: 88: 	mmap(0x7fba05810000 -> 0x7fba05811000, 0x3 0x32 -1)
+(00.054404) pie: 88: 	mmap(0x7fba05813000 -> 0x7fba05815000, 0x3 0x32 -1)
+(00.054405) pie: 88: 	mmap(0x7fba05815000 -> 0x7fba0581b000, 0x1 0x32 -1)
+(00.054406) pie: 88: 	mmap(0x7fba0581b000 -> 0x7fba0581d000, 0x7 0x32 -1)
+(00.054407) pie: 88: 	mmap(0x7fba0581d000 -> 0x7fba0581f000, 0x1 0x12 7)
+(00.054408) pie: 88: 	mmap(0x7fba0581f000 -> 0x7fba05847000, 0x5 0x12 7)
+(00.054409) pie: 88: 	mmap(0x7fba05847000 -> 0x7fba05853000, 0x1 0x12 7)
+(00.054410) pie: 88: 	mmap(0x7fba05853000 -> 0x7fba05855000, 0x3 0x12 7)
+(00.054411) pie: 88: 	mmap(0x7fba05855000 -> 0x7fba05857000, 0x3 0x12 7)
+(00.054413) pie: 88: 	mmap(0x7fff158e4000 -> 0x7fff15905000, 0x3 0x132 -1)
+(00.054414) pie: 88: Preadv 0x5627024c0000:4096... (12 iovs)
+(00.054453) pie: 88: `- returned 139264
+(00.054454) pie: 88:    `- skip pagemap
+(00.054455) pie: 88:    `- skip pagemap
+(00.054455) pie: 88:    `- skip pagemap
+(00.054455) pie: 88:    `- skip pagemap
+(00.054456) pie: 88:    `- skip pagemap
+(00.054456) pie: 88:    `- skip pagemap
+(00.054457) pie: 88:    `- skip pagemap
+(00.054457) pie: 88:    `- skip pagemap
+(00.054458) pie: 88:    `- skip pagemap
+(00.054458) pie: 88:    `- skip pagemap
+(00.054458) pie: 88:    `- skip pagemap
+(00.054459) pie: 88:    `- skip pagemap
+(00.054460) pie: 88: vdso: Parsing at 0x7fba0581b000 0x7fba0581d000
+(00.054460) pie: 88: vdso: PT_LOAD p_vaddr: 0x0
+(00.054461) pie: 88: vdso: DT_HASH: 0x120
+(00.054461) pie: 88: vdso: DT_GNU_HASH: 0x170
+(00.054462) pie: 88: vdso: DT_STRTAB: 0x320
+(00.054462) pie: 88: vdso: DT_SYMTAB: 0x1d0
+(00.054463) pie: 88: vdso: DT_STRSZ: 0x83
+(00.054463) pie: 88: vdso: DT_SYMENT: 0x18
+(00.054464) pie: 88: vdso: nbucket 0x3 nchain 0xe bucket 0x7fba0581b128 chain 0x7fba0581b134
+(00.054464) pie: 88: vdso: symbol __vdso_clock_gettime at address 0xfd0
+(00.054465) pie: 88: vdso: symbol __vdso_getcpu at address 0x1050
+(00.054466) pie: 88: vdso: symbol __vdso_gettimeofday at address 0xf90
+(00.054466) pie: 88: vdso: symbol __vdso_time at address 0xfa0
+(00.054467) pie: 88: vdso: symbol __kernel_sigreturn at address 0x0
+(00.054467) pie: 88: vdso: symbol __kernel_rt_sigreturn at address 0x0
+(00.054468) pie: 88: vdso: symbol __vdso_clock_gettime64 at address 0x0
+(00.054469) pie: 88: vdso: image [vdso] 0x7fba0581b000-0x7fba0581d000 [vvar] 0x7fba05815000-0x7fba0581b000
+(00.054469) pie: 88: vdso: Runtime vdso/vvar matches dumpee, remap inplace
+(00.054472) pie: 88: vdso: Remap rt-vdso 0x36000 -> 0x7fba0581b000
+(00.054474) pie: 88: vdso: Remap rt-vvar 0x34000 -> 0x7fba05819000
+(00.054476) pie: 88: vdso: Remap rt-vvar 0x30000 -> 0x7fba05815000
+(00.054478) pie: 88: vdso: Using gettimeofday() on vdso at 0x7fba0581bf90
+(00.054489) pie: 88: Restoring scheduler params 0.0.0
+(00.054494) pie: 88: rseq: rseq_abi_pointer = 0x7fba055d6120 signature = 0x53053053
+(00.054498) pie: 88: 88: Restored
+(00.054509) Running post-restore scripts
+(00.054529) pidfile: Wrote pid 88 to /work/restored.pid (2 bytes)
+(00.054531) net: Unlock network
+(00.054539) pie: 88: seccomp: mode 0 on tid 88
+(00.054587) 88 was trapped
+(00.054593) 88 was trapped
+(00.054594) 88 (native) is going to execute the syscall 15, required is 15
+(00.054599) 88 was stopped
+(00.054607) 88 was trapped
+(00.054608) 88 (native) is going to execute the syscall 11, required is 11
+(00.054617) 88 was stopped
+(00.054618) Run late stage hook from criu master for external devices
+(00.054619) Running pre-resume scripts
+(00.054620) Restore finished successfully. Tasks resumed.
+(00.054621) Writing stats
+(00.055280) Running post-resume scripts

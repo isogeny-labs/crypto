@@ -1,0 +1,39 @@
+# Prime-field volcano (sampled): D = -4, ℓ = 2, depth 20, m = 0
+p = 132738671602697 (47 bits), trace t = 22946822, #E = 132738648655876 = 2^2 · 33184662163969
+t² − 4p = -4 · (1048576)²,  f = ℓ^k
+
+levels 0..=10 by breadth-first search, against the class numbers h(O_(ℓ^i)):
+  level  0:          1   expected          1  ok
+  level  1:          1   expected          1  ok
+  level  2:          2   expected          2  ok
+  level  3:          4   expected          4  ok
+  level  4:          8   expected          8  ok
+  level  5:         16   expected         16  ok
+  level  6:         32   expected         32  ok
+  level  7:         64   expected         64  ok
+  level  8:        128   expected        128  ok
+  level  9:        256   expected        256  ok
+  level 10:        512   expected        512  ok
+degree rule at the 512 expanded vertices: 0 violations
+  level 11: (sampled)  expected       1024
+  level 12: (sampled)  expected       2048
+  level 13: (sampled)  expected       4096
+  level 14: (sampled)  expected       8192
+  level 15: (sampled)  expected      16384
+  level 16: (sampled)  expected      32768
+  level 17: (sampled)  expected      65536
+  level 18: (sampled)  expected     131072
+  level 19: (sampled)  expected     262144
+  level 20: (sampled)  expected     524288
+random descents from the crater: 4 (degree rule at every step; levels inside the BFS range agree): 0 failures
+blind descent (p, t, ℓ and j only) from 75 sampled vertices: 0 give a level other than the sampled one
+group structure of 76 sampled curves (from point orders) against O_d/(π−1): 0 differ; prime subgroup r = 33184662163969 (44.9 bits), common to all: true
+wrote /home/user/crypto/research/volcano_tall_layers_20261018/specs/a3/spec_t10.json
+wrote /home/user/crypto/research/volcano_tall_layers_20261018/specs/a3/spec_t20.json
+wrote /home/user/crypto/research/volcano_tall_layers_20261018/specs/a3/spec_t38.json
+wrote /home/user/crypto/research/volcano_tall_layers_20261018/specs/a3/spec_t40.json
+wrote /home/user/crypto/research/volcano_tall_layers_20261018/specs/a3/spec_t150.json
+wrote /home/user/crypto/research/volcano_tall_layers_20261018/specs/a3/control.json
+wrote /home/user/crypto/research/volcano_tall_layers_20261018/specs/a3/vertices.json
+
+total 10.0 s — ALL CHECKS PASS

@@ -1,0 +1,84 @@
+# item 03 summary: 69 files, 10426 records
+
+## Controls
+selftest line present: true
+sensitivity control: false (3 rows, 2 outside the frozen 1% bound on the dinur change or failing)
+published-exponent control (asym): true
+parity agreement: 8856 real calls on hashed systems over cells ["c17-8-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c7-2-3", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2", "c13-6-2"], 710 with odd true parity, 0 wrong or model-unequal, 0 skipped
+real counter == counted model on 8856 of 8856 real calls
+real calls by arm and interior depth: [("dinur-L1", 4428), ("lptwy-L1", 4428)]
+controls pass: false (odd-parity real calls 710 of 400 required)
+
+## S_3 family (m = 2, quadratic): counted bit operations, log2
+cell        N   E  fes(desc)  fes(rand)  d%     dinur   (sched)         lptwy  dinur-t11  dinur-L2  dinur-L3     exh   mem(dinur)  rho_dinur  rho_lptwy
+c13-6-2     12  13     16.807     16.807 -0.01   24.928  11-1            25.440     22.811    33.801    42.973   18.508      15.25   3.591e-3   2.519e-3
+c17-8-2     16  17     21.170     21.170 -0.00   28.473  15-1            29.084     26.354    36.970    46.555   23.257      19.10   6.332e-3   4.147e-3
+c21-10-2    20  21     25.459     25.459 -0.00   32.474  19-1            32.764     30.354    39.408    49.306   27.852      23.09   7.735e-3   6.324e-3
+c25-12-2    24  25     29.700     29.700 -0.00   36.110  23-2            36.909     33.989    41.422    51.532   32.344      26.09   1.176e-2   6.761e-3
+c29-14-2    28  29     33.907     33.907 -0.00   39.818  27-3            40.715     37.696    43.381    53.401   36.765      29.09   1.662e-2   8.925e-3
+c33-16-2    32  33     38.087     38.087  0.00   43.637  31-4            44.698     41.515    46.061    55.012   41.132      32.15   2.135e-2   1.023e-2
+negative control: largest |log2 difference| between a descended draw and a random dense system of equal (N,E,d), dinur/lptwy/exh/t11 model rows: 0.00e0
+FES cost differs between draws only through the early-exit test (column d% = random mean over descended mean, in percent)
+
+## Affine relations among the equations of the descended draws (combos, linear rank, constant-one)
+c13-6-2    N=12: (1.0, 1.0, 0.0) on 8 draws (all equal: true)
+c17-8-2    N=16: (1.0, 1.0, 0.0) on 8 draws (all equal: true)
+c21-10-2   N=20: (1.0, 1.0, 0.0) on 8 draws (all equal: true)
+c25-12-2   N=24: (1.0, 1.0, 0.0) on 8 draws (all equal: true)
+c29-14-2   N=28: (1.0, 1.0, 0.0) on 8 draws (all equal: true)
+c33-16-2   N=32: (1.0, 1.0, 0.0) on 8 draws (all equal: true)
+
+## Fitted exponent c in 2^(cN) over the S_3 cells (slope of log2 cost against N; jackknife = leave-one-cell-out range, a stability interval)
+fes    c = 1.0632  [1.0571, 1.0683]  local(28->32) = 1.0451
+dinur  c = 0.9372  [0.9329, 0.9418]  local = 0.9548
+lptwy  c = 0.9666  [0.9594, 0.9795]  local = 0.9959
+
+## F4 (item 05 Boolean F4, grevlex), touches, per cell
+cell        N  finished/rows  statuses            geo-mean touches (log2)  range over targets (log2)   F4/FES(desc mean)
+c13-6-2     12    8/8          [("refuted", 8)]        17.570               [17.415, 17.757]          1.697
+c17-8-2     16    8/8          [("refuted", 8)]        21.147               [20.693, 21.689]          0.984
+c21-10-2    20    8/8          [("refuted", 8)]        28.847               [28.835, 28.858]          10.468
+c25-12-2    24    8/8          [("refuted", 8)]        32.357               [32.333, 32.386]          6.307
+c29-14-2    28    0/2          [("timelimit", 2)]         NaN               [inf, -inf]          NaN
+c33-16-2    32    0/1          [("timelimit", 1)]         NaN               [inf, -inf]          NaN
+c7-2-3      13    8/8          [("refuted", 8)]        14.725               [13.589, 15.432]          0.110  (vs FES floor)
+c10-3-3     19    8/8          [("refuted", 8)]        19.101               [18.030, 19.619]          0.026  (vs FES floor)
+c13-4-3     25    8/8          [("refuted", 8)]        25.985               [25.891, 26.094]          0.037  (vs FES floor)
+c16-5-3     31    8/8          [("refuted", 8)]        30.741               [30.646, 30.796]          0.013  (vs FES floor)
+F4 fitted c over the S_3 cells with >= 4 finished targets (4 cells): 1.3016 [1.2564, 1.4097]
+
+## S_4 family (m = 3 chain, cubic): log2 counted cost
+cell        N   E  fes-floor  dinur  (sched)        lptwy  dinur-t11  mem(dinur)  F4(geo)   rho_dinur(vs floor)
+c7-2-3      13  14     17.907  27.107  12-1          27.203     24.989      16.43    14.725   1.700e-3
+c10-3-3     19  20     24.392  32.911  18-1          33.392     30.791      22.21    19.101   2.726e-3
+c13-4-3     25  26     30.755  38.368  24-1          38.767     36.247      28.09    25.985   5.107e-3
+c16-5-3     31  32     37.044  44.369  30-2          44.666     42.247      33.09    30.741   6.238e-3
+
+## Crossover (counted model, E = N + 1, d = 2) and working set
+N= 32 fes   38.09  dinur   43.64 (31-4)  mem  32.15  cap2^43 43.64  cap2^35 43.64  lptwy   44.70
+N= 40 fes   46.39  dinur   50.64 (39-5)  mem  39.09  cap2^43 50.64  cap2^35 none  lptwy   52.33
+N= 48 fes   54.64  dinur   58.05 (47-7)  mem  45.21  cap2^43 74.57  cap2^35 none  lptwy   59.85
+N= 64 fes   71.04  dinur   71.69 (63-9)  mem  59.09  cap2^43 none  cap2^35 none  lptwy   74.69
+N= 80 fes   87.36  dinur   85.97 (79-13)  mem  71.33  cap2^43 none  cap2^35 none  lptwy   89.35
+N=100 fes  107.67  dinur  102.71 (99-15-9)  mem  89.09  cap2^43 none  cap2^35 none  lptwy  107.76
+N=128 fes  136.02  dinur  123.76 (127-23-15-11)  mem 109.09  cap2^43 none  cap2^35 none  lptwy  132.80
+N=160 fes  168.34  dinur  148.56 (147-31-23-15)  mem 133.09  cap2^43 none  cap2^35 none  lptwy  161.52
+N=200 fes  208.66  dinur  180.60 (154-39-29-19)  mem 165.09  cap2^43 none  cap2^35 none  lptwy  197.27
+N=256 fes  265.01  dinur  223.31 (255-59-45-31)  mem 201.09  cap2^43 none  cap2^35 none  lptwy  247.15
+N=320 fes  329.33  dinur  270.04 (319-71-55-39)  mem 253.09  cap2^43 none  cap2^35 none  lptwy  304.01
+N=400 fes  409.65  dinur  332.53 (399-89-69-49)  mem 315.09  cap2^43 none  cap2^35 none  lptwy  374.80
+{"item":"03","kind":"crossover","dinur_first_grid_N_below_fes":80,"dinur_first_grid_N_below_fes_mem43":-1,"dinur_first_grid_N_below_fes_mem35":-1,"lptwy_first_grid_N_below_fes":128,"nmax":400}
+
+## Exponent statement (asym routine)
+asymptotic exponent, least over schedules with up to L levels: d=2 L=1 0.8149, L=3 0.7361, L=60 0.6946; d=3 L=1 0.8762, L=60 0.8115; lptwy d=2 0.8762
+family m=2: required c < 1/2 - 1/m = 0.0000; published-form asymptotic c = 0.6946; distance remaining 0.6946; index-calculus exponent relative to rho 2/m + 2c = 2.3891 (above 1 loses)
+family m=3: required c < 1/2 - 1/m = 0.1667; published-form asymptotic c = 0.8115; distance remaining 0.6448; index-calculus exponent relative to rho 2/m + 2c = 2.2896 (above 1 loses)
+fitted c of dinur over the measured S_3 range: 0.9372; distance to required 0.9372; 2/m + 2c = 2.8745
+fitted c of lptwy over the measured S_3 range: 0.9666; distance to required 0.9666; 2/m + 2c = 2.9333
+fitted c of fes over the measured S_3 range: 1.0632; distance to required 1.0632; 2/m + 2c = 3.1265
+
+## Verdict by the frozen rule
+rho_dinur(32) = 2.135e-2, rho_lptwy(32) = 1.023e-2; fitted-exponent margin below FES (after the larger jackknife range): dinur 0.1148, lptwy 0.0765
+a control did not pass (the sensitivity bound): INCONCLUSIVE by the frozen rule; the branch the rule would give with that one control waived, descriptive only: TRADES (level: exponent over constant)
+arm (e) msolve: BLOCKED (not installed; no GMP/MPFR/FLINT headers; ~4 GB disk); unblock with a prebuilt msolve binary
+VERDICT: INCONCLUSIVE (level: n/a)

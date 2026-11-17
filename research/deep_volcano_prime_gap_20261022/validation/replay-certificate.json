@@ -1,0 +1,86 @@
+{
+  "schema": "validation-gate/replay/v1",
+  "status": "verified",
+  "independent": true,
+  "scalars_verified": true,
+  "runs": [
+    {
+      "run": "research/deep_volcano_prime_gap_20261022/run/sessions/spec",
+      "session_id": "ECBS1h41a98e7c2141",
+      "records": 4560,
+      "verified": 4560,
+      "replays_reproduced": 4560,
+      "replays_attempted": 4560,
+      "problems": 0,
+      "receipt": "research/deep_volcano_prime_gap_20261022/validation/spec.replay-all.verify.json",
+      "receipt_sha256": "532f2ea92105334d3b4582b4ff6dcd4672922067263996c7305cc2434c90151e",
+      "replay_mode": "full: ecbench verify --replay-all --exit-code (every measured run re-executed, counts required identical)",
+      "checks_all_true": true,
+      "sample_replay": {
+        "receipt": "research/deep_volcano_prime_gap_20261022/validation/spec.verify.json",
+        "receipt_sha256": "b0a3934caf52e348ed5b06506e159b2766ca9eec978015c0f4c55f7f24b0d925",
+        "command": "ecbench verify --replay 32 --exit-code",
+        "replays": 32,
+        "reproduced": 32,
+        "problems": 0,
+        "selection": "fixed even stride over seq (predictable)"
+      },
+      "auditor_binary_sha256": "a59c4014ff52100ed10c06b5d27a0572f9474d24c137fd18b24798237024f81f",
+      "records_sha256": "97a803e0f5edc87939d9d1a314366cf57a06f928beee82ee3cd8ad18c40cf67f"
+    },
+    {
+      "run": "research/deep_volcano_prime_gap_20261022/run/sessions/spec-aa",
+      "session_id": "ECBS1h4034bfcbccc4",
+      "records": 1520,
+      "verified": 1520,
+      "replays_reproduced": 1520,
+      "replays_attempted": 1520,
+      "problems": 0,
+      "receipt": "research/deep_volcano_prime_gap_20261022/validation/spec-aa.replay-all.verify.json",
+      "receipt_sha256": "25938bc51a9e584806f5adf5a89d76c83c9ccc72bf7b4d51b3ebe3ba174ceddd",
+      "replay_mode": "full: ecbench verify --replay-all --exit-code (every measured run re-executed, counts required identical)",
+      "checks_all_true": true,
+      "sample_replay": {
+        "receipt": "research/deep_volcano_prime_gap_20261022/validation/spec-aa.verify.json",
+        "receipt_sha256": "82e00f1391f0a2909dac8f442d683a534bdcbb0bf6983f7be6747a6d09391e0c",
+        "command": "ecbench verify --replay 32 --exit-code",
+        "replays": 32,
+        "reproduced": 32,
+        "problems": 0,
+        "selection": "fixed even stride over seq (predictable)"
+      },
+      "auditor_binary_sha256": "a59c4014ff52100ed10c06b5d27a0572f9474d24c137fd18b24798237024f81f",
+      "records_sha256": "f6e596bbf6fd92654b351840389923015b33c4384b4457d662d018600229fa46"
+    },
+    {
+      "run": "research/deep_volcano_prime_gap_20261022/run/sessions/spec-bsgs",
+      "session_id": "ECBS1h658495a369ec",
+      "records": 760,
+      "verified": 760,
+      "replays_reproduced": 760,
+      "replays_attempted": 760,
+      "problems": 0,
+      "receipt": "research/deep_volcano_prime_gap_20261022/validation/spec-bsgs.replay-all.verify.json",
+      "receipt_sha256": "683b5e4e6ffdb24db7056a660c70fa73c1bd4fbe260daae22407ef6d2c9faf2f",
+      "replay_mode": "full: ecbench verify --replay-all --exit-code (every measured run re-executed, counts required identical)",
+      "checks_all_true": true,
+      "sample_replay": {
+        "receipt": "research/deep_volcano_prime_gap_20261022/validation/spec-bsgs.verify.json",
+        "receipt_sha256": "0963a2055e8686d95f673adfeec77a0137e470f09e64fe3b19e68e0bfd3ac4dd",
+        "command": "ecbench verify --replay 32 --exit-code",
+        "replays": 32,
+        "reproduced": 32,
+        "problems": 0,
+        "selection": "fixed even stride over seq (predictable)"
+      },
+      "auditor_binary_sha256": "a59c4014ff52100ed10c06b5d27a0572f9474d24c137fd18b24798237024f81f",
+      "records_sha256": "3317ad4ffe616e5b04c274c7408d76400085d608497a4d75a31c742af66857d5"
+    }
+  ],
+  "replay_coverage": "All three sessions replayed in full (4560 + 1520 + 760 = 6840 of 6840 measured runs re-executed, all identical); each also passed the requested --replay 32 stride sample.",
+  "scalar_verification": "Every record: outcome verified, matches_target and matches_planted true, recovered == workload.planted. Independently, with own GNU bc affine elliptic-curve code (no producer code): [planted]G == target and target on the curve for all 6840 records.",
+  "binding": "ecbench binary sha256 a59c4014ff52100ed10c06b5d27a0572f9474d24c137fd18b24798237024f81f, the binary_sha256 every session recorded. Replays ran on the uncompressed records.jsonl / plan.json, whose bytes equal run/sessions/MANIFEST.sha256 and gunzip of the committed records.jsonl.gz / plan.json.gz. Inputs were untracked (working tree only) at validation time; this certificate holds for those hashes only.",
+  "independence_note": "Replays use the producer harness (ecbench verify); independence comes from the validator choosing and running them, and from the separate bc scalar check.",
+  "validator": "validator subagent",
+  "date": "2026-10-22T10:28:35Z"
+}

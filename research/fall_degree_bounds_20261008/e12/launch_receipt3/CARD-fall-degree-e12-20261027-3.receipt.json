@@ -1,0 +1,68 @@
+{
+  "card_id": "CARD-fall-degree-e12-20261027-3",
+  "card_path": "research/fall_degree_bounds_20261008/e12/launch3.card.yaml",
+  "card_sha256": "1ca3df81cb2b0a99527e84614a0ccad0a038d45150550aac493e0a0fb53e7c16",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/fall_degree_bounds_20261008/e10/aws_env.sh",
+        "taskq/deploy/ephemeral/ephemeral",
+        "run",
+        "--detach",
+        "--no-source",
+        "--type",
+        "m7i.4xlarge",
+        "--toolchain",
+        "rust",
+        "--ttl",
+        "24h",
+        "--name",
+        "fd-e12b-ell-20261027-r2",
+        "--",
+        "set -euo pipefail; mkdir -p \"$HOME/fdsrc\"; cd \"$HOME/fdsrc\"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-371035216942.tgz src.tgz --only-show-errors; echo \"4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f  src.tgz\" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 371035216942660c4615dfbb88d85a14afaf5c16 >\"$EPHEMERAL_OUT/source_commit\"; LEAN=1 KEEP=4 CMAX=4 research/fall_degree_bounds_20261008/e12/run_par.sh \"$EPHEMERAL_OUT\" 3:30:4 3:27:5 3:24:6 3:24:7"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 30.934,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "relaunch-e12b",
+      "index": 1,
+      "outputs": {},
+      "seconds": 30.934,
+      "stderr_sha256": "4c0da6e84dc6748ed4d0f1ce29bab5f4db3cc30ef737fa7349becd9a76ff2ffc",
+      "stderr_tail": [
+        "ephemeral: subnet-0c343d40111cce085: (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 4): There is no Spot capacity available that matches your request.; trying the next zone",
+        "ephemeral: subnet-052a1486b71ae8df1: (Unsupported) when calling the RunInstances operation: Your requested instance type (m7i.4xlarge) is not supported in your requested Availability Zone (us-east-1e). Please retry your request by not sp; trying the next zone",
+        "ephemeral: job 20261027-181036-fd-e12b-ell-20261027-r2-409f97",
+        "ephemeral:   m7i.4xlarge spot i-0067aaab305c936bb (resolve:ssm:/ephemeral/ami/rust-x86_64), ttl 24h (terminates by 2026-10-28T18:10:38Z)",
+        "ephemeral:   command: set -euo pipefail; mkdir -p \"$HOME/fdsrc\"; cd \"$HOME/fdsrc\"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-371035216942.tgz src.tgz --only-show-errors; echo \"4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f  src.tgz\" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 371035216942660c4615dfbb88d85a14afaf5c16 >\"$EPHEMERAL_OUT/source_commit\"; LEAN=1 KEEP=4 CMAX=4 research/fall_degree_bounds_20261008/e12/run_par.sh \"$EPHEMERAL_OUT\" 3:30:4 3:27:5 3:24:6 3:24:7",
+        "ephemeral:   s3://ephemeral-runs-104186811093-us-east-1/jobs/20261027-181036-fd-e12b-ell-20261027-r2-409f97/"
+      ],
+      "stdout_sha256": "21f1cbef8d374a69254c5566cff2b3a86da88eefb4a6811ac2787301607c9d02",
+      "stdout_tail": [
+        "20261027-181036-fd-e12b-ell-20261027-r2-409f97"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 1,
+  "commit": "76dda0b3f8bc0a6210b458f4d3e550ad01f46524",
+  "dirty_after": [
+    "research/fall_degree_bounds_20261008/e12/launch3.card.yaml",
+    "research/fall_degree_bounds_20261008/e12/launch_receipt3/relaunch-e12b.stderr",
+    "research/fall_degree_bounds_20261008/e12/launch_receipt3/relaunch-e12b.stdout"
+  ],
+  "dirty_before": [
+    "research/fall_degree_bounds_20261008/e12/launch3.card.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

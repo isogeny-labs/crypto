@@ -1,0 +1,33 @@
+{
+  "schema": "software-validation/v1",
+  "scope": "Public synthetic software fixtures for native canonical observation packaging; no cohort execution",
+  "language": "Rust",
+  "python_runtime_invoked": false,
+  "release_tests": {
+    "passed": 27,
+    "failed": 0,
+    "ignored": 0,
+    "command": "cargo +1.99.1 test --release --locked --manifest-path Cargo.toml",
+    "log": "validation/native-release-27.log",
+    "sha256": "ebad0c2915a139bfacc959755ea209e108d52e115be2b9cd7ec0ff04304a2f9e"
+  },
+  "clippy": {
+    "passed": true,
+    "command": "cargo +1.99.1 clippy --release --locked --all-targets --manifest-path Cargo.toml -- -D warnings",
+    "log": "validation/native-clippy-27.log",
+    "sha256": "4cbd35017c2a2f1ab744b3e3a88f316621f7c30014587a03e190886ec68199c5"
+  },
+  "historical_contract_tests": 17,
+  "native_cli_positive_negative_checks": true,
+  "canonical_schema": "experiment.export/v1 Draft2020-12",
+  "schema_validator": "jsonschema0.33.0",
+  "source_manifest": {
+    "path": "validation/SOURCE_SHA256SUMS",
+    "sha256": "5bbd25676bb5a432b1e5714e61fc6a6760f3d564943feff4634ac1289de85afe"
+  },
+  "adapter_sha256": "7d362de58647b0c2dc14b7ceff8e4423fbb8b65c78516f338579b9e735037927",
+  "cohort_targets_executed": 0,
+  "qualified_cost_ratio": null,
+  "qualification": "software-only; protocol/source/binary qualification and independent review remain separate",
+  "historical_python_artifacts_preserved": true
+}

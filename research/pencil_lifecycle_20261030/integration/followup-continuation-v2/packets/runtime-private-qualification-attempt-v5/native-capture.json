@@ -1,0 +1,66 @@
+{
+  "observed_utc": "2026-11-03T20:18:44.929724+00:00",
+  "commands": [
+    {
+      "name": "unit",
+      "argv": [
+        "sudo",
+        "-n",
+        "systemctl",
+        "show",
+        "pencil-private-24806e07-13ac-4791-92da-12dd595ae9e4.service",
+        "-p",
+        "ActiveState",
+        "-p",
+        "SubState",
+        "-p",
+        "LoadState",
+        "-p",
+        "ControlGroup",
+        "-p",
+        "MainPID",
+        "-p",
+        "CPUUsageNSec"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "loops",
+      "argv": [
+        "sudo",
+        "-n",
+        "losetup",
+        "--list",
+        "--json",
+        "--associated",
+        "/var/tmp/ppr-2d885f49-d570-4a8b-990e-7ea14ee9ea80/storage.ext4"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "journal",
+      "argv": [
+        "sudo",
+        "-n",
+        "journalctl",
+        "-u",
+        "pencil-private-24806e07-13ac-4791-92da-12dd595ae9e4.service",
+        "--no-pager"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "disk-stat",
+      "argv": [
+        "sudo",
+        "-n",
+        "stat",
+        "-c",
+        "%d %i %s %Y %Z %a %h",
+        "/var/tmp/ppr-2d885f49-d570-4a8b-990e-7ea14ee9ea80/storage.ext4"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "cgroup_absent": true
+}

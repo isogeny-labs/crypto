@@ -1,0 +1,7 @@
+# Additive musl source-isolation receipt fix
+
+The v1 finding is closed. The exact diff moves the identical source-root assertion from pre-receipt initialization to the first statement inside try. It now runs after receipt initialization and before cache lock acquisition or source commands. Its failure is caught as failed_or_interrupted and finally writes the receipt. The source/cache/build/time/ELF gates are otherwise unchanged; all v2 manifest hashes and sizes match, and the wrapper AST parses.
+
+The saved invalid-root control receipt contains AssertionError(), failed_or_interrupted, null binary hash and false image/scientific flags. Root reports exit1. There is no separate outer argv/exit receipt in the control directory, so this review distinguishes the observed failure receipt from root's exit report; the source's final exit expression yields1 for this status. No rerun is necessary to establish the narrow control-flow correction.
+
+The prior v1 proposal and review remain unchanged. External-input/configuration binding, source and cache ownership, and pre/post input inventory remain preparation obligations. Full checkout remains sufficient rather than intrinsically necessary; a sparse alternative still needs reviewed complete input closure. This correction establishes failure recording, not build qualification or execution admission. No reviewer build, checkout, source/cache access or native execution occurred.

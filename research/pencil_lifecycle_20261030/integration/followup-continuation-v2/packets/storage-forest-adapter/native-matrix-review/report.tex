@@ -1,0 +1,18 @@
+\documentclass[10pt]{article}\usepackage[margin=0.8in]{geometry}\usepackage[T1]{fontenc}\usepackage{lmodern,amsmath,hyperref}
+\title{Independent review: native matrix verifier}\date{1 November 2026}\begin{document}\maketitle
+Fresh offline compilation reproduced all 105 ordered rows across 21 models, twelve source pins and 133 fixed external bindings. Ten producer controls, eight added native reviewer tests and two actual CLI rejection cases passed.
+\section*{Binding and arithmetic}
+The exact published Rust source compiles the SHA256 of its external binding manifest. All 133 unique bound files must match before and after computation. The fixed historical summary supplies the 21-model set; theta/generic membership must agree. Each model requires five ordered matrices, canonical entries, nonzero canonical square scalars and prime $p\le2^{32}$.
+
+Row-column dot products use u128; four products sum below $2^{66}$. Signed i128 subtraction and extended-Euclid inverses reconstruct normalized roots. Every scalar/root pair agrees individually at its original action index. Literal loader/linear sections are also bound to both full source revisions, which remain distinct.
+\section*{Independent native controls}
+Eight reviewer tests cover nontrivial and near-bound inverses, negative normalization, prime 4294967291, near-modulus diagonal and Hadamard matrices, invalid scalars/entries, composite/oversized moduli, zero and shear matrices. They are fixed arithmetic controls, not point enumeration.
+
+Two actual CLI controls reject a substituted walk source and altered manifest with exit 1 and accepted=false. The final result is byte-identical to the initial replay; published source and original inputs remain unchanged.
+\section*{Correction, independence and scope}
+The earlier root review's Python verification path violated the native-language rule and is preserved as historical evidence. This replacement and this review execute Rust verification with thin shell orchestration. No Python checking or scientific generation was performed.
+
+The reviewer authored the earlier native producer but not this replacement verifier. Source and producer documentation were inspected before testing; the review is not blind. The scoped result checks frozen coefficients and source custody. It does not attest an executed collector binary, the full native row fold or geometric action interpretation. Compiler/dependency trust remains.
+
+Publication: \texttt{09e64fca5552e185b24359be7283660d1604d392}. Full hashes, controls, receipts and attestation accompany \texttt{REVIEW.md} and \texttt{status.json}. No cloud operations, new timings or cost ratios were produced.
+\end{document}

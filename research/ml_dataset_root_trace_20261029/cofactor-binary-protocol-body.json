@@ -1,0 +1,100 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "ML-COFACTOR-BINARY-ROOT-CLI-SOFTWARE-20261029",
+  "classification": "software_correctness_fixture",
+  "purpose": "Verify retained binary root certificates through native CLI generation, full semantic replay and restricted export across binary and Koblitz curves, odd/even degree and paired twists; exclude these fixtures from the scientific corpus.",
+  "inputs": {
+    "families": [
+      "binary",
+      "koblitz"
+    ],
+    "field_sizes": [
+      11,
+      12
+    ],
+    "m": 2,
+    "solver": "root",
+    "curve_seeds": 1,
+    "generators": 1,
+    "keys": 1,
+    "seed": 42,
+    "factor_base_size": 2,
+    "degree_bound": 4,
+    "work_limit": 50000,
+    "twists": [
+      false,
+      true
+    ],
+    "selected_shards": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "shard_count": 8,
+    "max_cases_per_invocation": 1,
+    "expected_cells": 8,
+    "cell_order": "solver fastest, twist, arity, key, generator, curve seed, field size, family slowest; singleton axes leave binary n11 false/true, binary n12 false/true, koblitz n11 false/true, koblitz n12 false/true"
+  },
+  "limits": {
+    "seconds_per_case": 20,
+    "memory_mib": 512,
+    "polled_trace_mib": 16,
+    "seconds_per_command": 45,
+    "total_runner_seconds": 1800,
+    "retries": 0
+  },
+  "acceptance": [
+    "clean binary source identity and immutable binary hash before and after each command",
+    "eight fixed cells cover every requested family/field/twist combination exactly once and each retains one binary root certificate",
+    "native dataset verify succeeds with semantic replay (not hashes-only)",
+    "export retains restricted certificates and representative certificate/private payload keys are absent from public features"
+  ],
+  "controls": {
+    "positive": "fixed natural seed42 targets; no planted PDP target, success requirement, resampling or adaptation after draw",
+    "negative": "separate source-bound Rust tests reject malformed and rehashed certificate/outcome/artifact tampering",
+    "aa": "not applicable: exact software assertions, no timing or statistical comparison"
+  },
+  "stopping": "any command or assertion failure stops fixture and retains all outputs; no automatic retry or substitution. Parent invokes bash script with an outer timeout --signal=TERM --kill-after=10s 1800s; internal commands use min(45 seconds, remaining 1800-second allowance).",
+  "design_notes": [
+    "Plan grammar and radix ordering inspected in PlanArgs, numbers and DatasetPlan::cell in current source; paired twists are unconditional in plan construction.",
+    "Natural curves/targets may fail bounded construction, lack an affine root target, or exhaust setup/native budgets. Preserve those outcomes and fail certificate acceptance where absent; never resample or silently reduce expected eight-cell coverage.",
+    "Partial or budget-exhausted outcomes with valid retained certificates may pass; PDP success is not required.",
+    "34 CLI commands: plan and preflight, followed by generate/verify/status/export for eight shards.",
+    "Script must be invoked with immutable executable absolute path, its SHA-256, exact clean build source commit and a new output directory; env-i clears cloud and publication credentials.",
+    "No generation or validation occurred during protocol preparation.",
+    "Pre-data amendment: require local XFS output under /var/tmp before any binary fixture data. Earlier prime NFS timeout and local-XFS follow-up are separate software observations, not evidence proving a storage cause or speed comparison. Preserve prior protocol hashes in the parent handoff."
+  ],
+  "exclusions": [
+    "scientific corpus rows",
+    "cloud worker publication",
+    "complete execution or instruction counts",
+    "independent scalar recovery requirement",
+    "PDP solve requirement",
+    "higher-m root elimination",
+    "fall-degree bound",
+    "model efficacy"
+  ],
+  "analysis": "Exact software validation of this combined source only. Preserve every outcome, verify retained root artifacts and restricted export. No timing comparison, scientific corpus, broad parameter coverage, or mathematical claim.",
+  "runner_sha256": "c1a3f8610a2c45590fe497c2f8ba7704bbf2cb6c6365fb8fb63c69a07a9484fe",
+  "variable_ledger": {
+    "output_storage": {
+      "fixed": "existing canonical parent under /var/tmp on XFS",
+      "check": "stat -f -c %T must equal xfs before output creation and again afterward",
+      "record": "output-filesystem.txt",
+      "publication": "Parent archives all completed or failed outputs to S3; runner performs no publication"
+    },
+    "resource_limits": "unchanged: 20 seconds per case, 45 seconds per command, 512 MiB, 16 MiB polled trace, 1800 seconds total, zero retries",
+    "binary": "fixed source a0619090bd99b18e828bc16b4b508ca7dafd58e0 and SHA256 cd74dccb67d1b49f8ad4ccbb69145bedb62b5a5880e2f25dd800f11be999d3e7"
+  },
+  "version": 1,
+  "amendment": {
+    "filed_before_affected_data": true,
+    "prior_protocol_sha256": "44119234a144d70d765cdf118d1892bae64f3b2f7b45a4deb38f3e6b645b6285",
+    "reason": "Validate combined exact-cofactor and both native root implementations at a new immutable source/binary. Keep prior inputs, resource limits, storage and zero-retry rule; preserve prior results separately."
+  }
+}

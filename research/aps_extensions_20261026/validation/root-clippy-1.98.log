@@ -1,0 +1,89 @@
+    Checking crypto v0.1.0 (/workspace/crypto)
+error: empty line after doc comment
+   --> src/cryptanalysis/jv_bitops.rs:281:1
+    |
+281 | / /// tally (work the reader cannot see), else `0`.
+282 | |
+    | |_^
+283 |   pub fn foreign() -> u64 {
+    |   -------------- the comment documents this function
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#empty_line_after_doc_comments
+    = note: `-D clippy::empty-line-after-doc-comments` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::empty_line_after_doc_comments)]`
+    = help: if the empty line is unintentional, remove it
+
+error: manual implementation of `.is_multiple_of()`
+   --> src/cryptanalysis/certicom131_symlp/gf2w.rs:481:12
+    |
+481 |         if m % q == 0 {
+    |            ^^^^^^^^^^ help: replace with: `m.is_multiple_of(q)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#manual_is_multiple_of
+    = note: `-D clippy::manual-is-multiple-of` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::manual_is_multiple_of)]`
+
+error: manual implementation of `.is_multiple_of()`
+   --> src/cryptanalysis/certicom131_symlp/gf2w.rs:483:19
+    |
+483 |             while m % q == 0 {
+    |                   ^^^^^^^^^^ help: replace with: `m.is_multiple_of(q)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#manual_is_multiple_of
+
+error: equality checks against false can be replaced by a negation
+   --> src/cryptanalysis/certicom131_symlp/gf2w.rs:495:12
+    |
+495 |         if poly_gcd_is_one(&f, &h) == false {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `!poly_gcd_is_one(&f, &h)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#bool_comparison
+    = note: `-D clippy::bool-comparison` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::bool_comparison)]`
+
+error: usage of `contains_key` followed by `insert` on a `HashMap`
+   --> src/cryptanalysis/certicom131_symlp/relgraph.rs:183:17
+    |
+183 | /                 if !prev.contains_key(&w) {
+184 | |                     prev.insert(w, (v, e));
+185 | |                     queue.push_back(w);
+186 | |                 }
+    | |_________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#map_entry
+    = note: `-D clippy::map-entry` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::map_entry)]`
+help: try
+    |
+183 ~                 if let std::collections::hash_map::Entry::Vacant(e) = prev.entry(w) {
+184 +                     e.insert((v, e));
+185 +                     queue.push_back(w);
+186 +                 }
+    |
+
+error: doc list item without indentation
+  --> src/cryptanalysis/ghs_smooth.rs:45:5
+   |
+45 | //!    Both are imaginary models with one rational point at infinity.
+   |     ^^^
+   |
+   = help: if this is supposed to be its own paragraph, add a blank line
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#doc_lazy_continuation
+   = note: `-D clippy::doc-lazy-continuation` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::doc_lazy_continuation)]`
+help: indent this line
+   |
+45 | //!      Both are imaginary models with one rational point at infinity.
+   |        ++
+
+error: initializer for `thread_local` value can be made `const`
+    --> src/cryptanalysis/koblitz_groebner.rs:3594:9
+     |
+3594 |         std::cell::Cell::new(false);
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `const { std::cell::Cell::new(false) }`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#missing_const_for_thread_local
+     = note: `-D clippy::missing-const-for-thread-local` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::missing_const_for_thread_local)]`
+
+error: could not compile `crypto` (lib) due to 7 previous errors

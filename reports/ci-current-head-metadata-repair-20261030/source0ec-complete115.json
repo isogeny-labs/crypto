@@ -1,0 +1,712 @@
+{
+  "run_id": 41020446877,
+  "source": "0ec73ded2ce65560ee2bfd663206375a6b67e5c1",
+  "completed_at": "2026-10-30T11:15:37Z",
+  "jobs": 34,
+  "jobs_success": 34,
+  "paths": 115,
+  "paths_with_native_replay_candidates": 113,
+  "paths_with_zero_eligible_static_audit": 2,
+  "eligible": 25181,
+  "reproduced": 25061,
+  "pinned_historical_drifts": 120,
+  "strict_final_checker": "success",
+  "coverage_artifact_id": 12972318479,
+  "artifact_api_size": 359117,
+  "local_artifact_zip_bytes_verified": false,
+  "scope": "Successful complete historical-source replay. Two sessions genuinely have zero native replay candidates and pass their strict pinned-input audits; these are not skipped eligible runs. This older source does not qualify later main/catalog integration; fresh41037582856 remains required.",
+  "rows": [
+    {
+      "path": "research/f6_ic_ecbench_ladder_20261005/sessions/n13",
+      "status": "identical",
+      "reproduced": 72,
+      "eligible": 72
+    },
+    {
+      "path": "research/f6_ic_ecbench_ladder_20261005/sessions/n19",
+      "status": "identical",
+      "reproduced": 72,
+      "eligible": 72
+    },
+    {
+      "path": "research/f4_f5_f6_cross_family_20261011/sessions/K13",
+      "status": "drift",
+      "reproduced": 16,
+      "eligible": 48
+    },
+    {
+      "path": "research/f4_f5_f6_cross_family_20261011/sessions/K19",
+      "status": "drift",
+      "reproduced": 16,
+      "eligible": 32
+    },
+    {
+      "path": "research/ecbench_rootfind_engine_20261012/sessions/claim-n13",
+      "status": "identical",
+      "reproduced": 168,
+      "eligible": 168
+    },
+    {
+      "path": "research/ecbench_rootfind_engine_20261012/sessions/claim-n13-v2",
+      "status": "drift",
+      "reproduced": 144,
+      "eligible": 168
+    },
+    {
+      "path": "research/ecbench_n37_rank_columns_20261004/sessions/mac_arm64_l0_01",
+      "status": "identical",
+      "reproduced": 320,
+      "eligible": 320
+    },
+    {
+      "path": "research/ecbench_n37_k8_k16_20261004/sessions/mac_arm64_l0_01",
+      "status": "identical",
+      "reproduced": 320,
+      "eligible": 320
+    },
+    {
+      "path": "research/ecbench_n37_online_ir_20261004/sessions/mac_arm64_l0_01",
+      "status": "identical",
+      "reproduced": 320,
+      "eligible": 320
+    },
+    {
+      "path": "research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01",
+      "status": "identical",
+      "reproduced": 320,
+      "eligible": 320
+    },
+    {
+      "path": "research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0-02",
+      "status": "identical",
+      "reproduced": 640,
+      "eligible": 640
+    },
+    {
+      "path": "research/ecbench_conductor_gap_20261012/sessions/ell8209-q29",
+      "status": "identical",
+      "reproduced": 48,
+      "eligible": 48
+    },
+    {
+      "path": "research/ecbench_conductor_gap_20261012/sessions/ell131101-q37",
+      "status": "identical",
+      "reproduced": 48,
+      "eligible": 48
+    },
+    {
+      "path": "research/ecbench_rho_optimized_20261014/sessions/run-20261014T012000Z",
+      "status": "identical",
+      "reproduced": 720,
+      "eligible": 720
+    },
+    {
+      "path": "research/ic_oracle_setup_blocked_20261020/sessions/A-1k-8k",
+      "status": "identical",
+      "reproduced": 560,
+      "eligible": 560
+    },
+    {
+      "path": "research/ic_oracle_setup_blocked_20261020/sessions/B-16k-r2",
+      "status": "identical",
+      "reproduced": 32,
+      "eligible": 32
+    },
+    {
+      "path": "research/f6_ic_ecbench_ladder_20261005/sessions/n7",
+      "status": "zero_eligible_static_audit",
+      "total_records": 96,
+      "reproduced": 0,
+      "eligible": 0
+    },
+    {
+      "path": "research/f6_ic_ecbench_ladder_20261005/sessions/n23",
+      "status": "drift",
+      "reproduced": 48,
+      "eligible": 72
+    },
+    {
+      "path": "research/f4_f5_f6_cross_family_20261011/sessions/R13",
+      "status": "drift",
+      "reproduced": 32,
+      "eligible": 40
+    },
+    {
+      "path": "research/f4_f5_f6_cross_family_20261011/sessions/R19",
+      "status": "drift",
+      "reproduced": 8,
+      "eligible": 24
+    },
+    {
+      "path": "research/f4_f5_f6_cross_family_20261011/sessions/X19",
+      "status": "zero_eligible_static_audit",
+      "total_records": 4,
+      "reproduced": 0,
+      "eligible": 0
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P16",
+      "status": "identical",
+      "reproduced": 560,
+      "eligible": 560
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P17",
+      "status": "identical",
+      "reproduced": 560,
+      "eligible": 560
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P18",
+      "status": "identical",
+      "reproduced": 560,
+      "eligible": 560
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P19",
+      "status": "identical",
+      "reproduced": 560,
+      "eligible": 560
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P20",
+      "status": "identical",
+      "reproduced": 560,
+      "eligible": 560
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P21",
+      "status": "identical",
+      "reproduced": 560,
+      "eligible": 560
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P22",
+      "status": "identical",
+      "reproduced": 560,
+      "eligible": 560
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P23",
+      "status": "identical",
+      "reproduced": 560,
+      "eligible": 560
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P24",
+      "status": "identical",
+      "reproduced": 560,
+      "eligible": 560
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P25",
+      "status": "identical",
+      "reproduced": 560,
+      "eligible": 560
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P26",
+      "status": "identical",
+      "reproduced": 560,
+      "eligible": 560
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P27",
+      "status": "identical",
+      "reproduced": 560,
+      "eligible": 560
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P28",
+      "status": "identical",
+      "reproduced": 560,
+      "eligible": 560
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P29",
+      "status": "identical",
+      "reproduced": 400,
+      "eligible": 400
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P30",
+      "status": "identical",
+      "reproduced": 400,
+      "eligible": 400
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P31",
+      "status": "identical",
+      "reproduced": 400,
+      "eligible": 400
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P32",
+      "status": "identical",
+      "reproduced": 400,
+      "eligible": 400
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P33",
+      "status": "identical",
+      "reproduced": 400,
+      "eligible": 400
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P34",
+      "status": "identical",
+      "reproduced": 400,
+      "eligible": 400
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P35",
+      "status": "identical",
+      "reproduced": 400,
+      "eligible": 400
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P36",
+      "status": "identical",
+      "reproduced": 400,
+      "eligible": 400
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P37",
+      "status": "identical",
+      "reproduced": 400,
+      "eligible": 400
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P38",
+      "status": "identical",
+      "reproduced": 400,
+      "eligible": 400
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P39",
+      "status": "identical",
+      "reproduced": 400,
+      "eligible": 400
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/holdout-P40",
+      "status": "identical",
+      "reproduced": 400,
+      "eligible": 400
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P16",
+      "status": "identical",
+      "reproduced": 88,
+      "eligible": 88
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P16-pair-ext1",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P17",
+      "status": "identical",
+      "reproduced": 96,
+      "eligible": 96
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P18",
+      "status": "identical",
+      "reproduced": 96,
+      "eligible": 96
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P18-pair-ext1",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P19",
+      "status": "identical",
+      "reproduced": 104,
+      "eligible": 104
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P20",
+      "status": "identical",
+      "reproduced": 112,
+      "eligible": 112
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P21",
+      "status": "identical",
+      "reproduced": 112,
+      "eligible": 112
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P21-pair-ext1",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P22",
+      "status": "identical",
+      "reproduced": 112,
+      "eligible": 112
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P22-pair-ext1",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P23",
+      "status": "identical",
+      "reproduced": 112,
+      "eligible": 112
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P23-pair-ext1",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P24",
+      "status": "identical",
+      "reproduced": 112,
+      "eligible": 112
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P24-pair-ext1",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P24-rf3-ext1",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P25",
+      "status": "identical",
+      "reproduced": 112,
+      "eligible": 112
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P25-pair-ext1",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P25-rf3-ext1",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P26",
+      "status": "identical",
+      "reproduced": 112,
+      "eligible": 112
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P26-pair-ext1",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P26-rf3-ext1",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P26-rf3-ext2",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P27",
+      "status": "identical",
+      "reproduced": 112,
+      "eligible": 112
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P27-pair-ext1",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P27-rf3-ext1",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P27-rf3-ext2",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P28",
+      "status": "identical",
+      "reproduced": 112,
+      "eligible": 112
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P28-rf3-ext1",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P28-rf3-ext2",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P28-rf3-ext3",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P29",
+      "status": "identical",
+      "reproduced": 64,
+      "eligible": 64
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P30",
+      "status": "identical",
+      "reproduced": 64,
+      "eligible": 64
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P31",
+      "status": "identical",
+      "reproduced": 64,
+      "eligible": 64
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P31-pair-ext1",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P32",
+      "status": "identical",
+      "reproduced": 64,
+      "eligible": 64
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P33",
+      "status": "identical",
+      "reproduced": 64,
+      "eligible": 64
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P34",
+      "status": "identical",
+      "reproduced": 64,
+      "eligible": 64
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P34-pair-ext1",
+      "status": "identical",
+      "reproduced": 16,
+      "eligible": 16
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P35",
+      "status": "identical",
+      "reproduced": 32,
+      "eligible": 32
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P35-pair-ext1",
+      "status": "identical",
+      "reproduced": 8,
+      "eligible": 8
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P36",
+      "status": "identical",
+      "reproduced": 32,
+      "eligible": 32
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P37",
+      "status": "identical",
+      "reproduced": 32,
+      "eligible": 32
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P38",
+      "status": "identical",
+      "reproduced": 32,
+      "eligible": 32
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P39",
+      "status": "identical",
+      "reproduced": 31,
+      "eligible": 31
+    },
+    {
+      "path": "research/bitop_ladder_20261019/sessions/train-P40",
+      "status": "identical",
+      "reproduced": 32,
+      "eligible": 32
+    },
+    {
+      "path": "research/ecbench_lazy_orbit_members_20261018/sessions/a0-n13",
+      "status": "identical",
+      "reproduced": 480,
+      "eligible": 480
+    },
+    {
+      "path": "research/ecbench_lazy_orbit_members_20261018/sessions/a0-n19",
+      "status": "identical",
+      "reproduced": 480,
+      "eligible": 480
+    },
+    {
+      "path": "research/ecbench_lazy_orbit_members_20261018/sessions/a0-n23",
+      "status": "identical",
+      "reproduced": 480,
+      "eligible": 480
+    },
+    {
+      "path": "research/ecbench_lazy_orbit_members_20261018/sessions/a0-n31",
+      "status": "identical",
+      "reproduced": 480,
+      "eligible": 480
+    },
+    {
+      "path": "research/ecbench_lazy_orbit_members_20261018/sessions/a0-n37",
+      "status": "identical",
+      "reproduced": 240,
+      "eligible": 240
+    },
+    {
+      "path": "research/ecbench_lazy_orbit_members_20261018/sessions/a0-n41",
+      "status": "identical",
+      "reproduced": 80,
+      "eligible": 80
+    },
+    {
+      "path": "research/ecbench_lazy_orbit_members_20261018/sessions/a1-n17",
+      "status": "identical",
+      "reproduced": 480,
+      "eligible": 480
+    },
+    {
+      "path": "research/ecbench_lazy_orbit_members_20261018/sessions/a1-n29",
+      "status": "identical",
+      "reproduced": 480,
+      "eligible": 480
+    },
+    {
+      "path": "research/ic_planner_validation_20261020/sessions/c24",
+      "status": "identical",
+      "reproduced": 192,
+      "eligible": 192
+    },
+    {
+      "path": "research/ic_planner_validation_20261020/sessions/c28",
+      "status": "identical",
+      "reproduced": 192,
+      "eligible": 192
+    },
+    {
+      "path": "research/ic_planner_validation_20261020/sessions/c30",
+      "status": "identical",
+      "reproduced": 192,
+      "eligible": 192
+    },
+    {
+      "path": "research/ic_planner_validation_20261020/sessions/r24",
+      "status": "identical",
+      "reproduced": 192,
+      "eligible": 192
+    },
+    {
+      "path": "research/ic_planner_validation_20261020/sessions/r26",
+      "status": "identical",
+      "reproduced": 192,
+      "eligible": 192
+    },
+    {
+      "path": "research/ic_planner_validation_20261020/sessions/r28",
+      "status": "identical",
+      "reproduced": 192,
+      "eligible": 192
+    },
+    {
+      "path": "research/twist_index_calculus_20261020/sessions/ecbench_b12_l0",
+      "status": "identical",
+      "reproduced": 270,
+      "eligible": 270
+    },
+    {
+      "path": "research/twist_index_calculus_20261020/sessions/ecbench_b12_pin_l0",
+      "status": "identical",
+      "reproduced": 270,
+      "eligible": 270
+    },
+    {
+      "path": "research/twist_index_calculus_20261020/sessions/ecbench_b12_pin_reg_l0",
+      "status": "identical",
+      "reproduced": 270,
+      "eligible": 270
+    },
+    {
+      "path": "research/twist_index_calculus_20261020/sessions/ecbench_b24_l0",
+      "status": "identical",
+      "reproduced": 270,
+      "eligible": 270
+    },
+    {
+      "path": "research/twist_index_calculus_20261020/sessions/ecbench_b24_pin_l0",
+      "status": "identical",
+      "reproduced": 270,
+      "eligible": 270
+    },
+    {
+      "path": "research/twist_index_calculus_20261020/sessions/ecbench_b24_pin_reg_l0",
+      "status": "identical",
+      "reproduced": 270,
+      "eligible": 270
+    },
+    {
+      "path": "research/twist_index_calculus_20261020/sessions/ecbench_b36_l0",
+      "status": "identical",
+      "reproduced": 270,
+      "eligible": 270
+    },
+    {
+      "path": "research/twist_index_calculus_20261020/sessions/ecbench_b36_pin_l0",
+      "status": "identical",
+      "reproduced": 270,
+      "eligible": 270
+    },
+    {
+      "path": "research/twist_index_calculus_20261020/sessions/ecbench_b36_pin_reg_l0",
+      "status": "identical",
+      "reproduced": 270,
+      "eligible": 270
+    }
+  ]
+}

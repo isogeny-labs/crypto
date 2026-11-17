@@ -1,0 +1,37 @@
+#include <gmpxx.h>
+#include <cstdint>
+#include <iostream>
+#include <stdexcept>
+#include <vector>
+using Q=mpq_class;
+using Poly=std::vector<Q>;
+void need(bool x){if(!x)throw std::runtime_error("exact check failed");}
+Poly times(Poly p,int c,int a){Poly r(p.size()+1);for(size_t k=0;k<p.size();++k){r[k]+=c*p[k];r[k+1]+=a*p[k];}return r;}
+Q cp(int l){Q v=1;for(int t=-l;t<l;++t)if(t)v*=-t;return v;}
+Poly chart(int l,int t,int delta,bool full){Poly p{Q(1)/cp(l)};for(int s=-l;s<l;++s)if(full||s!=delta)p=times(p,t-s,2*l);return p;}
+int val(Q q){if(q==0)return 100000;mpz_class n=q.get_num();if(n<0)n=-n;return int(mpz_scan1(n.get_mpz_t(),0))-int(mpz_scan1(q.get_den().get_mpz_t(),0));}
+Q eval(const Poly&p,int z){Q v=0;for(auto it=p.rbegin();it!=p.rend();++it)v=v*z+*it;return v;}
+unsigned mod(Q q,unsigned m){q.canonicalize();mpz_class inv,den=q.get_den(),mm=m;need(mpz_invert(inv.get_mpz_t(),den.get_mpz_t(),mm.get_mpz_t())!=0);mpz_class v=q.get_num()*inv;return unsigned(mpz_fdiv_ui(v.get_mpz_t(),m));}
+unsigned inv(int d,unsigned m){need(d%2!=0);return mod(Q(1)/Q(d),m);}
+unsigned mul(unsigned a,unsigned b,unsigned m){return unsigned((uint64_t(a)*b)%m);}
+unsigned power(unsigned a,unsigned b,unsigned m){unsigned r=1;while(b){if(b&1)r=mul(r,a,m);a=mul(a,a,m);b>>=1;}return r;}
+int main(){try{unsigned charts=0,coeffs=0,entries=0,weights=0;
+ for(int l:{4,8,16}){int oldmin=100000,newmin=100000;
+  for(int t=-l;t<l;++t)for(int d=-l+1;d<l;++d){Poly old=chart(l,t,d,false),p=old,c=chart(l,t,d,true);p.resize(c.size());if(d%2==0)for(size_t k=0;k<c.size();++k)p[k]-=c[k]/Q(1-d);
+   need(p[0]==old[0]);++charts;for(Q v:p){need(val(v)>=0);++coeffs;}
+   if(t%2!=0&&d%2==0){int a=100000,b=100000;for(Q v:old)a=std::min(a,val(v));for(Q v:p)b=std::min(b,val(v));need(b>=a+1);oldmin=std::min(oldmin,a);newmin=std::min(newmin,b);}
+  }
+  for(int t=-l;t<l;++t)if(t%2!=0)for(int z:{-1,0,1,3})for(unsigned q:{8U,12U,16U}){unsigned m=1U<<q;int T=t+2*l*z;Q exact_pref=eval(chart(l,t,0,true),z);unsigned pref=mod(exact_pref,m);
+   for(int x=0;x<l;++x)for(int y=0;y<l;++y)if(x%2==y%2){int d=y-x,y0=y%2,j=y/2;Poly p=chart(l,t,d,false),c=chart(l,t,d,true);p.resize(c.size());for(size_t k=0;k<c.size();++k)p[k]-=c[k]/Q(1-d);unsigned direct=mod(eval(p,z),m),sum=0;
+    unsigned a=inv(T-y0+x,m),b=inv(1-y0+x,m),factor=mod(Q(1-T),m);
+    for(unsigned k=0;k<q;++k){unsigned convolution=0;for(unsigned r=0;r<=k;++r)convolution=(convolution+mul(power(a,r+1,m),power(b,k-r+1,m),m))%m;
+     unsigned coefficient=mul(mul(mul(pref,factor,m),power(2,k,m),m),convolution,m);
+     need(coefficient%(1U<<std::min(k+2,q))==0);++weights;
+     if(k+2<q)sum=(sum+mul(coefficient,power(unsigned(j),k,m),m))%m;else need(coefficient==0);
+    }need(sum==direct);++entries;
+   }
+  }std::cout<<"L="<<l<<" degree_old="<<2*l-1<<" degree_new="<<2*l<<" odd_cross_content_old="<<oldmin<<" new="<<newmin<<'\n';
+ }
+ bool rejected=false;try{(void)inv(2,256);}catch(const std::runtime_error&){rejected=true;}need(rejected);
+ std::cout<<"charts="<<charts<<" integral_coefficients="<<coeffs<<" reconstructed_entries="<<entries<<" weighted_coefficients="<<weights<<" even_inverse_rejected=1\nPASS\n";
+ }catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}}

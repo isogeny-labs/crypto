@@ -1,0 +1,93 @@
+claim	value	source (crypto origin/main 12a2b3d85f unless prefixed; ar = crypto-autoresearcher origin/main; ca = cryptanalysis HEAD)
+H-PSEUDO offset explained	R 1.28-1.34; pooled 56 curves 1.005±0.008; +9% at 2^20 not excluded	ar:docs/reports/hpseudo-symnull-20261104/README.md:3-8
+xedni obstruction conditional	"conditional theorem repaired, several overbroad inferences refuted, algorithm-specific bridges still open"	research/jksst_xedni_audit_20261101/README.md:3-4
+l=8 four guesses suffice	"four guessed variables bring every ℓ = 8 draw back to degree 4" (run 2026-10-22)	research/dreg_closure_guess_20261022/RESULTS.md:1,9
+l=8 three guesses do not	"three guessed variables do not suffice at ℓ = 8 for this guess set" (2026-10-23)	research/dreg_closure_guess3_20261023/RESULTS.md:1,9
+planner rules withdrawn	1.41·N0 at w=1; 0.71·c0 at w>=0.3; withdrawn 2026-10-26 by ic-planner/4	research/ic_planner_weight_rule_20261021/README.md:3-6; research/ic_planner_weight_rule_binkob_20261026/README.md:3-7
+EcGFp5 m=5 degree	D = 2^16 = 65,536 at all three primes	research/ecgfp5_quotient_solve_20261101/README.md:27
+n=83 truncation	engine list; "FieldStructure truncates the field table to one 64-bit word"; regression test name	research/n83_msweep_20261024/README.md:12-19
+JV sieve matched negrho	below rho in every cell; VALIDATION.json validator VAL-20261103-c31c76	research/jv_sieve_negrho_20261102/README.md:14-22; VALIDATION.json:3
+JV sieve earlier withheld/V2 A4 failed	"V2 ... rho A/A rule A4 failed (rho comparisons withheld)"	research/jv_sieve_negrho_20261102/PROTOCOL.md:7
+JV scope	jv_cover weak class only, full rational 2-torsion, never prime order; accounting not improvement	research/jv_sieve_negrho_20261102/README.md:3
+torsion PR#3009 claim	"cost 1.5x (n = 23) to 16x (n = 31) on cofactor-4 curves"	research/ic_m2_torsion_n41_20261101/REPORT.md:27-28
+torsion n=31 replicate	13.3x [10.3, 17.5], 32 pairs	research/ic_m2_torsion_n41_20261101/REPORT.md:29-30
+torsion n=41	0.975 [0.641, 1.420] (recomputed; REPORT gave [0.643,1.433])	research/ic_m2_torsion_ratio_n37_20261101/REPORT.md:61-62
+torsion n=37 ratios	7.46, 6.45, 14.49, 6.31; h/K 0.30-10.84	research/ic_m2_torsion_ratio_n37_20261101/REPORT.md:24-27
+torsion bootstrap mawk	srand not reproducible; intervals move by at most 0.02; 0.134 off/on = 7.46 on/off; "No conclusion changes"	research/ic_m2_torsion_ratio_n37_20261101/REPORT.md:58-63
+DIGEST DISAGREES: torsion n37 "0.134 gain reversed to 7.46 penalty"	not a reversal; orientation change only	same lines; transfer.md item 8 is wrong
+Semaev 2015 t=2	d_ff=2 on 200/200; solver degree 2 on 154, 3 on 46, never 4	research/semaev_t2_trace_20261102/REPORT.md:3-10
+Hamming n=19 R=1.10	"the earlier n = 19 value 1.10 came from a single noisy subspace denominator"; R 0.27 [0.13,0.46], 0.32 [0.14,0.55]; NOT DECIDED	ar:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-nonlinear-frob-stable-bases.yaml:42-47
+EV-ICPERF-390707 twist	"FIVE UNVERIFIED SAT ANSWERS ARE TWIST DECOMPOSITIONS"; twist y^2+xy=x^3+1; instrument not invalidated, gap direction reproduced	ar:ledger/evidence/EV-ICPERF-390707.yaml:123,132; ar:knowledge/leads/ecdlp/ic-prime/LEAD-ICP-icperf-binary-pdp-solver.yaml:23-24
+certbin k=2	r=130873, E=5.004, ratios 3.397/7.593; 17->16 structural, 38->33; genuine/E 0.20,0.40,1.00,0.80	ar:analysis/ecdlp2m-iteration-20261009/certbin-k2-collision-audit/README.md:8-21,26-33
+DISCREPANCY in source: certbin "three of the four cells lie inside [1/2,2]"	its own table shows 0.40 (<0.5) at seed 11 k=3; draft quotes the four ratios instead	same file, Reading bullet 2 vs table
+fb-cost-model	"about 9 bits, identical across the band" corrected; 1.8/14.8/17.7 (n=17), 3.3/15.1/17.9 (n=19); validated 2026-11-06 VALIDATION.json (repo not opened)	ar:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-learned-cost-model-factor-base-selection.yaml:50-61
+#1862 harvest	1.0958, 1.0699, 0.9969, 0.9593; earlier ~7% on K0 n=13; F4 arms 7-1,250x strong rho	research/f4_harvest_remeasure_20261024/README.md:12-15,52-65
+byte counter share	83-99% of S at w=1; 17-58x vs 2.6-5x	research/ic_byte_counter_pricing_20261101/README.md:17-19
+option B	owner chose option B 2026-11-01; NON_OPERATION_COUNTERS	research/ic_byte_counter_pricing_20261101/README.md:7-10
+residual res4/rho	41-58x -> 3.6-4.8x at w=1; 24 comparisons unresolved -> res cheaper	research/ic_prime_residual_lp_20261026/README.md:145-160
+other studies resolved	36/136 planner_exhaustive, 2/6 binkob, direction changed 0	research/ic_byte_counter_pricing_20261101/README.md:134-140
+C1 6/8 -> 2/8	"Under the rule C1 is met in 2 of 8 cells, not 6 of 8"; leaderboard 2.59x unchanged	research/ic_byte_counter_pricing_20261101/README.md:144-160
+DIGEST DISAGREES: "w>0 gains were a byte-counter artefact"	byte pricing inflated residual-arm COSTS at w>0; only C1's eq gain was byte-driven	same file
+small root	CORR-20261024-b2a799; 0.8408 -> 0.2803; -0.0481 -> -0.6086 at (4,2); best -0.5161 at (32,0); eps_HG = eps_TOOL/n; no independent review	ar:analysis/smallroot-reach/CORRECTION.md:4,13-22,38-44
+Semaev-alternatives gate	"e < 1 at m = 4" wrong; s=1.93, cost p^{2/3}; correct s<m-3, e<(m-3)/4	research/semaev_alternatives_audit_20261104/README.md:7-10
+cofactor-clear	G_0 6.180 [5.915,6.456]; positive control 1.227 [1.149,1.311] <1.2; invalid_controls; prime field (prime-projected-abscissa)	research/ic_cofactor_clear_ab_20261103/README.md:12-20; PREREG.md:26-27
+Koblitz batch rho	1.17x -> 6.51x, 6.38x priced, 43.7x one target, k=32, Kuhn-Struik	research/ic_rho_koblitz_20260923/README.md:9,50-53
+accounting v2	0.182 [0.171,0.196], 0.223 [0.201,0.248], 0.678 [0.499,0.891]; setup 83.3->39.9, 71.3->29.3, 30.2->4.3; "not an algorithmic improvement"	research/ecbench_accounting_v2_20261023/REPORT.typ:23,32,85-92
+statistics v2	648.2/6.981 = 92.9x; 60.4x; 13.1x wider at K=2; point estimates unchanged	research/ecbench_statistics_v2_20261105/README.md:4,15-16,42-50
+in-house F4	10^3-10^7 more ops than brute grid; "383-46,911x faster than F4" not evidence	research/ic_sweeper_20261024/README.md:154-158
+calibration round 1	rho.plain 0.792; kangaroo.vow 0.601; band on point estimate; 8 effective targets; follow-up 64 fresh targets	research/ecbench_calibration_20261002/PROTOCOL-2.md:9-30; README.md:7,70
+independence	same Mac, rustc 1.93.1 vs 1.98; ECBENV2 values; ECBHW1 hardware class rejects	research/ecbench_independence_20261009/README.md:1-20
+allocator confound	10 pairs identical counts; 18.4-38.8x; IC online 1.067; "about 15% lower" not reproduced; malloc_trim and SolveProbe::read	research/ecbench_allocator_confound_20261023/README.md:3-7
+frontier v2	no ops leader prime toy/Koblitz toy; intervals ending -1.0, 0.0, 2.5 from one-size resamples	research/ecbench_frontier_v2_20261023/README.md (What changed table)
+n=29 orbit panel	0.366 [0.241,0.523]; Frobenius-folded BSGS; log2(r)=15.4; gap grows with r	research/ecbench_e2e_frontier_20261031/README.md:39-45
+E42	registered [900,960]; measured 245.6; mis-derived; E42b re-registered	research/e42_macaulay_tails_20261103/REPORT.typ:20-21
+class set-up omitted	16-58 GAE per solve (prime); 25-31 GAE (volcano)	research/prime_rho_automorphism_20261015/README.md:7-9; research/isogeny-volcano-cost_20261017/README.md:69-71
+prime automorphism rho	0.611 -> 0.647 [0.543,0.770]; 0.791 -> 0.819 [0.722,0.929]; no longer contains 0.707	research/prime_rho_automorphism_20261015/README.md:10-13
+volcano controls	0.697 -> 0.716 [0.598,0.857]; 0.707 -> 0.723 [0.621,0.843]	research/isogeny-volcano-cost_20261017/README.md:72-74
+negation audit	volcano-rho and ar index_calculus/rho.py lacked map; now {R,-R}	research/rho_negation_audit_20261020/README.md:7-10
+Cheon P-224	H3 failed, 5 of 84 sealed rho runs outside [0.3,4]; Cheon/rho withdrawn; Cheon-only scaling stands	research/cheon_p224_shape_20261022/REPORT.md:13-19
+wwalk	R4-I1: 1.82x, 1.86x vs 1.55x, 1.49x; use 1.9x not 1.43/1.49/1.55	research/curve25519_autolab_20261104/README.md:139,170-175
+HEC rho	R1 falsified; H1,H2 falsified; full-width median 1.390; 2.100 -> 1.481; 8-bit/full 1.418; "the 8-bit reference was slow at large N"	benchmarks/README.md:159-161
+DIGEST WORDING: HEC "its gains were falsified"	registered predictions R1/H1/H2 falsified; draft says that	benchmarks/README.md:159-160
+E27	1.4533-1.4634; x1.448-1.456 at 0 GAE; "a correction of the reference"; VAL-20261031-e27a1c valid	research/e27_walk_20261030/REPORT.typ:15-27; research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md:3428
+E29 crossing artefact	40.6 mod-n ops per step; order 24 loses at every weight; §9.33 crossing artefact	RESEARCH_GLV_INVARIANT_FACTOR_BASES.md ~3978-3982 (§9.39 E34)
+§9.19 errata	seven errors, no result/verdict/ranking changes	RESEARCH_GLV_INVARIANT_FACTOR_BASES.md:2706-2714
+Verschiebung	ratio 0.49 round 1; V^n=[2^n]∘π^{-1}; >= 2(c_dbl+2)/c_dbl = 2.5 at c_dbl=8	research/isogeny_loop_glv_20261011/README.md:27-36
+transfer audit v2	baseline +0.5 bit; Koblitz overstated 0.5 log2(n/d); 8-bit margin; refuted narrowed; v1 restored 2026-10-27	research/transfer_audit_20261011/PROTOCOL.md:328-375
+cover descent	846 -> 599 (576 k=6, 23 k=14), 41 marginal, 206 boundary	research/cover_descent_genus_floor_20261015/README.md:19-22; REPORT.typ:56
+weakclass B0	S_A/S_B0 2.53-2.64; f4_native_ops x8.3-8.5; B 1.85-1.88x; relabelling	research/ic_cover_weakclass_20261023/REPORT.md:13-15
+GHS census n4	floor 21 prediction failed -> 25; odd class 13 iff j not in F_{q^2} else 37, never 25; check bug	research/ghs_cover_census_n4_20261024/PROTOCOL.md:198-224
+curve25519 isogeny seed	V2 failed 0.641; interval [0.379,1.084]	research/curve25519_isogeny_seed_20261103/README.md:7,70
+CM canonical lift L9	CORR-20260810-930c42, DEC-20260810-3110d5; arity 2..9; p^{-1+o(1)}; exponent 1 vs 1/2	ar:knowledge/leads/ecdlp/transfer/LEAD-TRF-cm-canonical-lift-heights.yaml:13-20
+magic number MMT	legacy ec_trapdoor::magic_number; MMT Theorem 5(i); audit doc	research/weak_isogeny_classes_20261013/REPORT.md:30-37
+conductor CM pairs	SHF-20261016-3caa6f L5 (scope); SHF-20261017-e4d7f6 L-N2 withdrew; SHF-20261028-0f3f64 PPN-1 banner	research/conductor_gap_cm_pairs_20261010/README.md:1-11; PROTOCOL.md:54-95
+l=8209 lead	1.22 [1.005,1.46] 4 targets excluded by 12,288 paired solves; <1.2%	research/conductor_gap_rho_large_sample_20261018/README.md:121-127
+easy-gap tier	0.917 [0.851,0.988]; twin round floor-twin/crater-twin 1.040 [0.966,1.119]; coordinate models	research/conductor_gap_rho_large_sample_20261018/README.md:128-165
+round2 A0	floor paid 3.56x; 3.10 -> 1.00	research/isogeny_conductor_gap_round2_20261011/README.md:30-40
+drastic prime gap	0.5286 -> 0.946818, 99% [0.662209, 1.347377]	research/drastic_prime_conductor_gap_round2_20261012/README.md:18
+NIST skip	smaller P-224 root rejects published model; isomorphic; representation-dependent	research/nist_skip_criterion_20261025/REPORT.md:47-52
+EV-ECDLP-81f4d4	prior strong -> preliminary	ar:ledger/corrections/CORR-20261026-c94668.yaml:119-122
+WEAKCLASS I1	INVALID; A/A gate miscalibrated; rerun valid and BLIND	ar:docs/reports/weakclass-20261104/README.md; ar:docs/reports/weakclass-i1-20261104/README.md
+paired anomaly	NOT REPLICATED, 108 paired vs 108	ar:docs/reports/paired-anomaly-20261104/README.md:8
+CORR-20261102-7e3a91	x (Kummer) class only; u=x/y double-odd is polynomial ring	ar:ledger/corrections/CORR-20261102-7e3a91.yaml:2-9
+jet O(1)	"Jet oracle SIMULABLE with C=1 ... valid at all scales" WITHDRAWN; closure COUNTERMANDED; simulability open	ar:ledger/corrections/CORR-20260727-003.yaml:54-63,96-104
+EV-GGM-002 supersedes 001	supersedes: EV-GGM-001	ar:ledger/evidence/EV-GGM-002.yaml:3
+EV-ECDLP-8a5106	O-ARTIFACT, M4 misses 0.10 band; planted Z/n 16,18,20 bits; decision refine	ar:ledger/evidence/EV-ECDLP-8a5106.yaml:3-4,46,59
+ETH leads	L01,L05,L06,L08,L10,L12 refuted as stated; 1e5 edges 9-30x high; c>=1; 1.4x not 3.42x	research/ic_prime_eth_leads_20261031/LEADS.md:534-547
+DIGEST OMITS L01	source lists L01 among refuted	LEADS.md:547
+WDSat learned	3,092 with symmetry; 16,097 block core and learned, symmetry disabled; learned = ascending order	ca:experiments/ideas_learning_20261018/REPORT.md:20-38; research/ideas_execution_20261018/EXECUTION.md:16
+hashed ECDL attribution	AKS branch above u64; Fourier-network attribution corrected	research/hashed_ecdl_hash_prime_20261030/README.md:8-18
+Eigen-Seta	walk insecure, 5/5 ciphertexts (2026-10-11); NIST categories gate-count only, withdrawn unqualified	research/eigen_seta_prototype_20261011/README.md:10-16; research/eigen_seta_assessment_20261017/REPORT.md:45
+LLL note	f64 GS overflow; withdrawn 16 Oct SHF-20261016-3caa6f; 3/3 seed pairs; P-521 0/3 f64, 3/3 2048-bit; mechanism withdrawn 17 Oct SHF-20261017-e4d7f6; diagonal 2^500	papers/lll-degeneracy-note/README.md:11-50
+structural completeness	proven -> argued; P-N4, P-N5, P-N6	papers/structural-completeness/README.md:57-68
+isogeny-class-rho	"no test fired was false"; KW p=0.039; KS defect; tie corrections; null provisional	papers/isogeny-class-rho/REVIEW-20261019.md:10-14; README.md:18-24
+Kummer Recover	1,257 wrong + 3 D=0 of 1,260 with literal Eqs; corrected all 1,260	research/kummer_recover_20261022/REPORT.md:7-24
+lit2026 W11(e)	cards use opposite prime-search direction from Algorithm 3	research/lit2026_w11_generic_engineering_20261011/README.md:20,189
+EV-ECTD-8c098d	fabrication defect in rho-substitution prose	ar:ledger/evidence/EV-ECTD-8c098d.yaml:71,155
+DEC-20261023-26a6de	KN-LIT-7593 resolves to unrelated AES paper	ar:knowledge/leads/ecdlp/transfer/LEAD-TRF-kernel-of-reduction-lemma.yaml:30-31 (the DEC record itself not opened)
+synthetic volcano	"Invented data"	research/synthetic_volcano_ecdlp_20261018/README.md:3
+frobenius quotient followup	SAT runs supplied as note, not reproduced	research/frobenius_quotient_followup_20260926/README.md:16-23
+ghs scalar3	mechanism is a rediscovery	research/ghs_scalar3_frobenius_gate_20261027/REPORT.md:7
+DROPPED: Hecke D79 / Prym figures	cited records not located (digest says so); not included	ic-prime.md item 8
+EXCLUDED (not corrections): F6-IC few-candidate "in the limit it is the MITM oracle"	scope note	research/f6_few_candidates_20261105/README.md:39
+EXCLUDED (not corrections): N 64 vs N 45 unresolved; 24/28-bit relabelling	verdicts of one study	research/prime_base_oracle_tuning_20261029/README.md:14-15

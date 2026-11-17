@@ -1,0 +1,68 @@
+{
+  "aa_failures": [
+    {
+      "case": "q18-aa_batch",
+      "ratio": 1.2771051697234552,
+      "repeat": 1
+    },
+    {
+      "case": "q28-aa_serial",
+      "ratio": 1.1720264671975522,
+      "repeat": 2
+    },
+    {
+      "case": "q26-aa_batch",
+      "ratio": 0.8619670531507326,
+      "repeat": 3
+    },
+    {
+      "case": "q29-aa_batch",
+      "ratio": 1.3502002341921877,
+      "repeat": 3
+    }
+  ],
+  "decision": "unknown_gate_failed",
+  "gate_passed": false,
+  "invalid_arms": [
+    {
+      "issues": [
+        "runner marked arm invalid",
+        "host noise or memory event"
+      ],
+      "serial": 553
+    }
+  ],
+  "invalid_pairs": [
+    {
+      "case": "q28-comparison",
+      "issues": [
+        "invalid or absent arm",
+        "pair receipt mismatch"
+      ],
+      "repeat": 2
+    }
+  ],
+  "measurement_tier": "tier1_instance",
+  "median_phase_and_rss": {
+    "batch": {
+      "peak_rss_kib": 5556.0,
+      "setup_ns": 81718091.5,
+      "total_charged_ns": 3835804011.0,
+      "walk_ns": 3754098254.5
+    },
+    "serial": {
+      "peak_rss_kib": 5560,
+      "setup_ns": 81708223,
+      "total_charged_ns": 10576191782,
+      "walk_ns": 10494946658
+    }
+  },
+  "memory_failures": [],
+  "paired_ratio_descriptive": null,
+  "q_cluster_bootstrap95": null,
+  "raw_manifest_sha256": "694468acea0068e0c6d1a3a58301b1dc213ae62c73bb36e61f39542fcf94792b",
+  "raw_summary_sha256": "bc2d4e86b8cf93a9d6280128161a791e0fe0f4eedab879607cff0deabeacf5f6",
+  "schema": "rho-worker-batch-audit-v1",
+  "structural_issues": [],
+  "valid_q_clusters": 31
+}

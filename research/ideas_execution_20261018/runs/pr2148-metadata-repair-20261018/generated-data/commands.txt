@@ -1,0 +1,24 @@
+# Run in /workspace/crypto unless otherwise noted. No Git/index mutation.
+# Environment: PYTHONDONTWRITEBYTECODE=1 for Python builder/check commands.
+# Runtime network policy: unrestricted/enforced; Git materialization and checks used explicit tool network permission.
+conductor check --summary 'Regenerate living IC leaderboard from existing frozen committed inputs' --scope path:docs/ic/leaderboard.json --scope path:docs/ic/LEADERBOARD.md --scope path:docs/ic-leaderboard.html
+# Unavailable: exit127. No Conductor task or scope reservation was created; root delegated these paths exclusively.
+git rev-parse HEAD
+git ls-tree -r -z 55da3adf5dc96be86687583c5ae967a686bc1a09 -- <exact source paths, dynamic candidate directories, six v3 parameters, ledger, builder scripts>
+git show 55da3adf5dc96be86687583c5ae967a686bc1a09:<exact missing tracked path>
+# Materialization helper and exhaustive path/blob/SHA256 receipt preserve exact expanded paths:
+PYTHONDONTWRITEBYTECODE=1 python3 /tmp/pr-followup-20261018/crypto/leaderboard/materialize_inputs.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/build_ic_leaderboard.py
+PYTHONDONTWRITEBYTECODE=1 python3 /tmp/pr-followup-20261018/crypto/leaderboard/inspect_delta.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/build_ic_leaderboard.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_check_ic_leaderboard_paths.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/check_ic_leaderboard_paths.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/build_lab_browser.py --check
+
+# Parent authorized downstream browser output only after exact /tmp candidate proof.
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/build_lab_browser.py --out /tmp/pr-followup-20261018/crypto/leaderboard/browser-candidate.json
+PYTHONDONTWRITEBYTECODE=1 python3 /tmp/pr-followup-20261018/crypto/leaderboard/inspect_browser_delta.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/build_lab_browser.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/build_lab_browser.py --check
+# Final receipts verify all219original input hashes and four reviewed output hashes:
+PYTHONDONTWRITEBYTECODE=1 python3 /tmp/pr-followup-20261018/crypto/leaderboard/write_report.py

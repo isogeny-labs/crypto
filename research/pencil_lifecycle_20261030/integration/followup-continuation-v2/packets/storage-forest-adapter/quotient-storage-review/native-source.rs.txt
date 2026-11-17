@@ -1,0 +1,41 @@
+849: fn pdiv(f: &Field, a: &[u64], b: &[u64]) -> (Poly, Poly) {
+850:     geometry_events::record(0, 0, 0, 1);
+851:     assert!(!b.is_empty());
+852:     let mut r = trim(geometry_events::copied(a));
+853:     let mut q = geometry_events::initialized(vec![0; a.len().saturating_sub(b.len()) + 1]);
+854:     let il = if geometry_events::last_is(b, 1) {
+855:         1
+856:     } else {
+857:         f.inv(*geometry_events::last(b).unwrap())
+858:     };
+859:     while {
+860:         geometry_events::record(0, 0, 0, 1);
+861:         !r.is_empty() && {
+862:             geometry_events::record(0, 0, 0, 1);
+863:             r.len() >= b.len()
+864:         }
+865:     } {
+866:         let j = r.len() - b.len();
+867:         let c = if il == 1 {
+868:             *geometry_events::last(&r).unwrap()
+869:         } else {
+870:             f.mul(*geometry_events::last(&r).unwrap(), il)
+871:         };
+872:         geometry_events::record(0, 1, 0, 0);
+873:         q[j] = c;
+874:         for (k, &x) in b.iter().enumerate() {
+875:             geometry_events::record(2, 0, 0, 0);
+876:             r[j + k] = f.sub(r[j + k], f.mul(c, x));
+877:         }
+878:         r = trim(r);
+879:     }
+880:     (trim(q), r)
+881: }
+882: fn prem(f: &Field, a: &[u64], b: &[u64]) -> Poly {
+883:     pdiv(f, a, b).1
+884: }
+885: fn pexact(f: &Field, a: &[u64], b: &[u64]) -> Poly {
+886:     let (q, r) = pdiv(f, a, b);
+887:     geometry_events::record(0, 0, 0, 1);
+888:     assert!(r.is_empty(), "inexact polynomial division");
+889:     q

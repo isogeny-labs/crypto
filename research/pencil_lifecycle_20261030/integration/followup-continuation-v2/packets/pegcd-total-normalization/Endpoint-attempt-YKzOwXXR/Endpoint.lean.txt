@@ -1,0 +1,34 @@
+import Stored
+set_option autoImplicit false
+namespace Pegcd
+open Polynomial ScaleTrim MonicRemainder MonicTermination MonicZeroTest NativeDivision PencilWordRefinement WideModPow
+
+theorem total_normalization (p : UInt64) [Fact p.toNat.Prime]
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31) (a b : List UInt64)
+ (ha : Canon p a) (hna : Normal a) (hc : Canon p b) (hn : Normal b)
+ (han : wordsPoly p a ≠ 0) :
+ ∃ out g, ∃ hg : g ≠ [],
+ StoredTrace p a b (initial (wordsPoly p a) (wordsPoly p b)) out g ∧
+ Canon p g ∧ Normal g ∧ out.r0 = wordsPoly p g ∧
+ let c : ZMod p.toNat := ((inverseGenerator p (g.getLast hg)).toNat : ZMod p.toNat)
+ c ≠ 0 ∧
+ C c*out.r0=(C c*out.s0)*wordsPoly p a+(C c*out.t0)*wordsPoly p b ∧
+ (C c*out.r0)∣wordsPoly p a ∧ (C c*out.r0)∣wordsPoly p b := by
+ obtain ⟨out,g,hw,ht,hend,hcg,hng,hg⟩ := stored_total p hp hb a b ha hna hc hn
+ have hv := trace_valid (wordsPoly p a) (wordsPoly p b) _ out ht (initial_valid _ _)
+ have hnonzero := endpoint_nonzero _ _ out hv hend han
+ have hgne : g ≠ [] := by
+   intro he
+   apply hnonzero
+   simpa [he,wordsPoly,listPoly] using hg
+ have hlast : (g.getLast hgne).toNat < p.toNat := hcg _ (List.getLast_mem hgne)
+ have hln : g.getLast hgne ≠ 0 := by
+   intro he
+   apply hng
+   simp [List.getLast?_eq_some_getLast hgne,he]
+ have hinv : ((inverseGenerator p (g.getLast hgne)).toNat : ZMod p.toNat) ≠ 0 := by
+   rw [generator_decode p _ hp hlast hln]
+   exact inv_ne_zero (canonical_word_nonzero p _ (by omega) hlast hln)
+ have hnorm := normalized_endpoint _ _ out hv hend _ hinv
+ exact ⟨out,g,hgne,hw,hcg,hng,hg,hinv,hnorm.1,hnorm.2.1,hnorm.2.2.1⟩
+end Pegcd

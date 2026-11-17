@@ -1,0 +1,865 @@
+{
+ "schema": "validator-report/v1 (validation-gate/v1 companion)",
+ "status": "pass_with_errata",
+ "disposition": "validated",
+ "disposition_scope": "The measured T7 component claims at k = 20, m = 2, mode full: census coverage (3 x 1000 lo), the frozen L* selection, the 28 engine cells, and the verdicts P0-P8. This is not a pass of the validation gate: T7 has no matched rho row (a component result; PROTOCOL.md and README.md say so) and makes no leaderboard or benchmarks/ row. The errata below are reporting and instrument-logging errata. None of them changes a number that a prediction verdict depends on.",
+ "independent": true,
+ "validator": "validator subagent (core tier, claude-opus-5-5). Not the producer of T7.",
+ "date": "2026-11-03",
+ "validated_commit": "2b330f250a1bca382b81023d95d556fccd7078d3",
+ "tree_state": "HEAD = 2b330f250a (the freeze commit). PROTOCOL.md, scripts/run.sh, scripts/select.py and scripts/lo_list.txt are byte-identical to their blobs in 2b330f250a (git diff HEAD: empty). README.md, analysis/ and data/ are untracked. They were produced after the freeze and are not committed, so this validation is bound to the sha256 values in raw_data and bound_files. Sibling wave-2 leads also have untracked files; they are outside this validation. Git was used read-only only (rev-parse, log, status, show, diff). Nothing was staged or committed.",
+ "artifact_hashes_at_validation": {
+  "PROTOCOL.md": "32ddd3785b35546322764670287dbf3cb4bf9a1bdcd15447ef1f43377319bba0",
+  "README.md": "5db0453c1c8e92bd1b16760e7f6a4becbc903d507f1e61b8189d15c9e7cbcedf",
+  "scripts/run.sh": "d0f5ba87bce00fc644a29a5c8dbefdc656382ddfa477b32f75f4240249792f18",
+  "scripts/select.py": "342a19b215a8524c7ea4e8c4c2859ca940addc95a8859125ebc718600815e857",
+  "analysis/analyze.py": "b950963910318b38f018af6c8edc59f274cc3e66aa0920d4a856dc36d84e27b4",
+  "analysis/analyze.out": "6f1f248546c9c9f8b20f09b8dddc406bcff0f5c67dbc74807f0063c2121e05f0",
+  "analysis/summary.json": "da4f040fed8f197e0a54ba605c5f525dc7b00ab173ee8f4778bf1f6611d6cf8a"
+ },
+ "instrument": {
+  "binary": "/home/user/ctarget/release/curve25519_family",
+  "sha256": "7a438b1d8ce9d7a0b8049a4331599727e9574ea4201f9c7957befa3184ba98be",
+  "checks": "Matches PROTOCOL.md, data/binary.sha256 and the isogeny-seed study's engine/ and data/ binary.sha256. Re-hashed by the validator before and after its replay, with the same value. The binary's source commit and toolchain are not recorded anywhere; the hash is its only identity."
+ },
+ "requirements": [
+  {
+   "id": "R1",
+   "requirement": "Protocol frozen before data",
+   "result": "pass",
+   "evidence": "git: 2b330f250a (2026-11-03T16:54:44Z) adds PROTOCOL.md, scripts/run.sh, scripts/select.py and scripts/lo_list.txt. The worktree hashes equal the committed blobs (32ddd378..., d0f5ba87..., 342a19b2..., 84dd67a9...). data/run.log starts at 17:05:12Z, after the commit. Git proves commit order, not compute order; the file mtimes (PROTOCOL 16:54, data 17:05-17:10) agree."
+  },
+  {
+   "id": "R2",
+   "requirement": "Data files match data/SHA256SUMS",
+   "result": "pass",
+   "evidence": "sha256sum -c data/SHA256SUMS: 96/96 OK. data/census.SHA256SUMS: 3/3 OK. data/engine/SHA256SUMS: 28/28 OK. data/ holds 98 files. The 2 not in data/SHA256SUMS are data/SHA256SUMS itself and data/engine/SHA256SUMS (verified on its own; minor note)."
+  },
+  {
+   "id": "R3",
+   "requirement": "Frozen inputs regenerate",
+   "result": "pass",
+   "evidence": "scripts/lo_list.txt regenerates byte-identically from the PROTOCOL rule: the anchors 0, 1, 34, 68, then random.Random(2026110307).randrange(1, p), skipping repeats and anchors, to 1000 values. sha256 84dd67a9...a5c5. Validator script: scratchpad lolist.py."
+  },
+  {
+   "id": "R4",
+   "requirement": "Re-run cells of scripts/run.sh with the same command and compare all count fields except wall_s",
+   "result": "pass",
+   "evidence": "The validator re-ran all 28 engine cells with run.sh's cell() command, one process at a time (F4COST_PLANTED=20, ulimit -v 3500000, timeout 4000, target seed 2026111500 + t, binary hash checked). It also re-ran 11 census calls (env -u F4COST_PLANTED): (t, lo) = the 5 anchors, the 3 L*, 785212@t4, 934310@t6 and 0@t6. Every JSON field except wall_s is identical in 28/28 cells and 11/11 rows. The binary exited 0 in all 39 calls, and every stderr is empty. Outputs are in the validator scratchpad (t7v/replay/); data/ was not touched."
+  },
+  {
+   "id": "R5",
+   "requirement": "Independent recomputation of the decisive quantity (exact m = 2 subgroup coverage)",
+   "result": "pass",
+   "evidence": "Own Python implementation, sharing no engine code. It builds the k = 20 curve from p = 1048573 and A = 926 (short Weierstrass; #E = 1049624 = 8r is verified by a Legendre point count; s = A/3 = 349833 = pkm_t0_shift; d = 3s^2 + a = 1). It builds the t0-bits base (roots z of z^2 - wz + d, x = z + s, both signs) and the bits base (x in [lo, lo + 2^t)), forms all ordered pair sums, and tests [r]S = O. All 3000 census rows reproduce exactly in columns, base_points, covered_points, covered_points_all_cosets and coverage_exact. A direct [r]S test on every distinct sum reproduces t0-bits L* (82, 212, 424), lo = 0 (4, 36, 148), all 5 P0a anchors, bits lo = 0 (12, 42, 162), bits@797820 t4 = 78 (11 columns), bits@976503 t5 = 198 (24), bits@908172 t6 = 536 (42) and bits@233902 t5 = 184. Every t0 base is closed under T0 and negation. Isogeny-base coverage (64, 214, 34, 80, 528) was not recomputed independently. It agrees with the engine replay and with the prior iso-census (curve25519_isogeny_seed_20261103/data/k20.jsonl), and its counting code (decomposable_points + subgroup filter) is the code validated here on the t0 and bits bases."
+  },
+  {
+   "id": "R6",
+   "requirement": "Recompute every README number from the data",
+   "result": "pass_with_errata",
+   "evidence": "The 28-row engine table matches the JSON cell by cell in all 11 columns (308 cells). The selection table, search-cost table, per-relation ratio table, P3 ratio lists, cost totals, exploratory figures and the rho-multiple of the search cost (2122020/936 = 2.27e3; 29300272/547 = 5.36e4) all agree; see headline. Disagreements: E2 and E3 (errata)."
+  },
+  {
+   "id": "R7",
+   "requirement": "Recompute every prediction verdict",
+   "result": "pass",
+   "evidence": "Validator verdicts equal README verdicts for all 13 rows: P0a held (5/5), P0b held (6/6), P0 held (11/11), P1 held (0.64575, 0.59745, 0.53405), P2a held (6.708, 5.085, 2.929), P2b held (20.5, 5.889), P3 held 5/5 (deg/terms equal; mul-adds/target ratios 0.98251-1.00880; coverage = census), P4 FAILED 0/4 (0.951218, 0.951220, 0.933952, 0.933961), P4b FAILED 0/4, P5 held 5/5 (6.040, 3.941, 32.456, 17.372, 79.156), P6 held 5/5 (0.04878, 0.04878, 0.16980, 0.17131, 0.34295), P7 held (t0-bits@L* cheapest in 0/5 cells; the isogeny arm is strictly cheapest in every cell, by 1.88x, 1.88x, 2.67x, 2.68x and 63x over the next arm), P8 held 28/28. No arm was capped or undecided, so none was excluded from P7."
+  },
+  {
+   "id": "R8",
+   "requirement": "Failed predictions reported as failed; nothing retuned",
+   "result": "pass",
+   "evidence": "P4 and P4b are reported as failed in the Answer and the predictions table. The rule, bands, lo list, seeds and arms are unchanged from the freeze. The post-data items (columns proxy, covered-per-column selection, census-mismatch note) are labelled exploratory. analysis/analyze.py is disclosed as a post-hoc decision script."
+  },
+  {
+   "id": "R9",
+   "requirement": "Claims stay within scope",
+   "result": "pass",
+   "evidence": "Every claim is a component claim at k = 20, m = 2, mode full, t in {4, 5, 6}, G in {0, 3, 4}, one target seed per t. There is no leaderboard or benchmarks/ row. The rho gap is given as distance remaining ('Rho remains ahead'), not as a gate. The P4-direction result ('beats the best known bits@L per relation') is labelled per-relation only. It notes that the frames come from unmatched censuses and that t0-bits@L* needs more columns (1.56x and 1.09x worse on a columns x per-rel proxy, labelled exploratory). Note: 'all 4 primary cells' are two exact coverage ratios (82/78 and 198/212), each read at G = 0 and G = 3, not four independent observations; the README gives both values."
+  },
+  {
+   "id": "R10",
+   "requirement": "Certificate discipline",
+   "result": "not_applicable",
+   "evidence": "T7 claims no discrete-log solve, factor-base relation or closure. Per-relation costs are derived (mul-adds per target / coverage_exact), and coverage_exact was recomputed independently (R5). The 6 random-target hits and the planted completeness counts (P8) are checked only by the harness re-summing the returned base points (curve.add, outside F4) and by replay determinism. The relations are not emitted, so they cannot be re-verified independently. No claim rests on them."
+  },
+  {
+   "id": "R11",
+   "requirement": "Controls: unmodified baseline, reference arms, matched rho",
+   "result": "pass (component scope)",
+   "evidence": "Every cell carries t0-bits@0 (the unmodified baseline), bits (lo = 0, at t = 4 and 5), the best-known bits@L, isogeny@S* (t = 4, 5) and isogeny@1093, all in one unit (counted F4 mul-adds). P0b replays 6 published reference cells exactly. There is no matched rho arm, and both PROTOCOL.md and README.md disclose it, so the validation gate is not passed by construction."
+  },
+  {
+   "id": "R12",
+   "requirement": "Reporting contract and the section 5a band",
+   "result": "pass_with_errata",
+   "evidence": "One unit (counted F4 mul-adds) and one table per phase. The selection search is priced separately in group ops. Ratios are given against t0-bits@0, best bits@L and the isogeny tower. The README does not list the engine's unpriced native counters per arm (E4). The validator priced them at 0, 0.1 and 1 per native op, in mul-add units (pkm_*_fp_mults_uncharged, pkm_t0_target_inversions, pkm_t0_base_*; setup amortised over 100 targets). P4, P5, P6 and P7 keep their verdicts at every weight; the largest shift is P4 at t = 4, G = 3, from 0.951220 to 0.951711. The m = 83 / ECC2K-130 disclosure rules do not apply (prime-field miniature)."
+  },
+  {
+   "id": "R13",
+   "requirement": "Reproducibility bindings",
+   "result": "pass_with_errata",
+   "evidence": "Commands are in scripts/run.sh (frozen). Seeds: target seed 2026111500 + t, lo list seed 2026110307. The binary is pinned by hash. A single run is shown by data/run.log (one start line, 17:05:12Z to 17:08:42Z). Gaps: the binary's source commit and toolchain are not recorded; the .status rc field does not record the binary's exit code (E1); the after-run binary re-hash and the 3 pre-launch timing probes are not in the artifacts (the validator's own re-hash agrees)."
+  },
+  {
+   "id": "R14",
+   "requirement": "Landing policy (AGENTS.md section 13: large files go through the store)",
+   "result": "open (not a measurement defect)",
+   "evidence": "data/census_t4.jsonl, data/census_t5.jsonl and data/census_t6.jsonl (942536, 945197 and 947639 bytes) are data-suffixed files over 64 KiB. Policy puts them in s3://setec-astronomy-artifacts with a .artifacts.json manifest; no manifest exists. The research-visuals report, graph and PDF are also absent (disclosed in the README). Both must be resolved before this lands in a PR; neither affects the numbers."
+  }
+ ],
+ "predictions": {
+  "P0a": "held (validator: 5/5)",
+  "P0b": "held (6/6)",
+  "P0": "held (11/11)",
+  "P1": "held (3/3)",
+  "P2a": "held (3/3)",
+  "P2b": "held (2/2)",
+  "P3": "held (5/5)",
+  "P4": "failed (0/4)",
+  "P4b": "failed (0/4)",
+  "P5": "held (5/5)",
+  "P6": "held (5/5)",
+  "P7": "held (0 of 5 cells; no fresh-seed confirmation triggered)",
+  "P8": "held (28/28)"
+ },
+ "errata": [
+  {
+   "id": "E1",
+   "severity": "minor (instrument logging)",
+   "where": "scripts/run.sh cell(); README 'Instrument and integrity'",
+   "text": "In run.sh, `echo \"end $(date -u +%FT%TZ) rc=$?\"` expands $? after the command substitution, so the recorded rc is date's exit status, not the binary's (checked in bash: `false; echo \"$(date) rc=$?\"` prints rc=0). The README's '28/28 cells with rc=0 in .status' is therefore not evidence of the engine's exit code. Effect on results: none. The validator's replay recorded the binary's own rc = 0 in 28/28 cells with identical outputs. Fix the logger in future scripts; frozen evidence is not rewritten."
+  },
+  {
+   "id": "E2",
+   "severity": "trivial (practicality note)",
+   "where": "README 'Instrument and integrity'",
+   "text": "'Load average at cell starts was 6.3 to 7.9': the 28 .status start lines show 5.84 to 7.91 (t0lo0_t4_g0 and t0sel_t4_g0 start at 5.84). 6.26 is the first 'cell done' line in run.log. Counts are deterministic, so no result is affected."
+  },
+  {
+   "id": "E3",
+   "severity": "trivial (wording)",
+   "where": "README 'Why P4 failed'",
+   "text": "'P3 held, so the per-relation ratio is exactly that coverage ratio (78/82 = 0.9512; 198/212 = 0.9340)'. The measured P4 ratios are 0.951218, 0.951220, 0.933952 and 0.933961, against 78/82 = 0.951220 and 198/212 = 0.933962. They agree to at most 1.1e-5 relative because the mul-adds/target ratios are 0.9999893-1.0000000, so 'exactly' should read 'to within 1.1e-5'."
+  },
+  {
+   "id": "E4",
+   "severity": "minor (reporting contract)",
+   "where": "README rankings (P4, P5, P7 'cheapest arm')",
+   "text": "The unpriced native counters of each arm are not listed: pkm_system_fp_mults_uncharged, pkm_grid_fp_mults_uncharged, pkm_t0_target_fp_mults_uncharged, pkm_t0_target_inversions, pkm_t0_base_map_fp_mults_uncharged and pkm_t0_base_inversions. Validator band check (0, 0.1 and 1 per native op): every verdict and the cheapest arm in every cell are unchanged, so the conclusions stand. The listing should be added where the rankings are cited."
+  },
+  {
+   "id": "E5",
+   "severity": "trivial (citation)",
+   "where": "README and PROTOCOL 'Distance remaining'",
+   "text": "'The generic index-calculus baseline is 7.8x rho there (curve25519_algebraic_ecbench_20261102)'. That study's own session measures proj-a at 7.04 / 7.06 / 7.17x rho-neg (w = 0 / 0.1 / 1). It quotes 7.8-7.9x for an earlier 48-run baseline. Cite the range or name the earlier source. The 18x / 9.6e5x / 5.9e6x figures match that README (18.2 / 9.55e5 / 5.85e6). The 547-936 rho group-op range comes from the frame-search README and was not re-derived here."
+  }
+ ],
+ "notes": [
+  "isogeny@595 (frozen T7 arm, t = 4) is one of five seeds with J = covered = 64 in curve25519_isogeny_seed_20261103/data/k20.jsonl: 595 (15 columns), 700 (13), 885 (11), 1162 (14) and 1907 (13). That study's analyse.py breaks ties toward more columns (key -columns). PROTOCOL.md's paraphrase 'then columns' is ambiguous, and T7's own t0 rule breaks ties toward fewer columns. T7 used the published selection as frozen, so this is not a T7 erratum. P5 and P7 are per-relation verdicts at equal coverage 64 and do not depend on the choice.",
+  "The selection search pricing (frozen) counts 2^t quotient square roots per lo. It does not count the square root of rhs(x) per abscissa, up to 2^(t+1) per lo. Adding it would only raise the reported 2.1e6-2.9e7 search cost, so the README's 'Rho remains ahead' direction is unaffected.",
+  "Host: nproc = 3 at validation time (the PROTOCOL says a 4-core host). Another lead's f4cost and an ecbench exec were running during the validator replay. Counts were identical regardless."
+ ],
+ "recompute_agrees": "62/64 headline numbers within rel_tol. The 2 disagreements are E2 (load average) and E3 ('exactly'). No prediction-bearing number disagrees.",
+ "headline": [
+  {
+   "name": "L*(t=4)",
+   "claimed": 940986,
+   "recomputed": 940986,
+   "agrees": true
+  },
+  {
+   "name": "L* covered (t=4)",
+   "claimed": 82,
+   "recomputed": 82,
+   "agrees": true
+  },
+  {
+   "name": "L* columns (t=4)",
+   "claimed": 18,
+   "recomputed": 18,
+   "agrees": true
+  },
+  {
+   "name": "census mean covered (t=4)",
+   "claimed": 12.224,
+   "recomputed": 12.224,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "census sd covered (t=4)",
+   "claimed": 10.5636,
+   "recomputed": 10.563608474380334,
+   "rel_tol": 1e-05,
+   "agrees": true
+  },
+  {
+   "name": "lo=0 percentile (t=4)",
+   "claimed": 0.159,
+   "recomputed": 0.159,
+   "agrees": true
+  },
+  {
+   "name": "P1 t0 mean / bits mean (t=4)",
+   "claimed": 0.64575,
+   "recomputed": 0.6457474907554147,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "P2a covered(L*)/mean (t=4)",
+   "claimed": 6.7081,
+   "recomputed": 6.708115183246073,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "gain vs lo=0 (t=4)",
+   "claimed": 20.5,
+   "recomputed": 20.5,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "L*/best bits covered (t=4)",
+   "claimed": 1.0513,
+   "recomputed": 1.0512820512820513,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "selection search group ops (t=4)",
+   "claimed": 2122020,
+   "recomputed": 2122020.482516493,
+   "rel_tol": 1e-06,
+   "agrees": true
+  },
+  {
+   "name": "L*(t=5)",
+   "claimed": 388414,
+   "recomputed": 388414,
+   "agrees": true
+  },
+  {
+   "name": "L* covered (t=5)",
+   "claimed": 212,
+   "recomputed": 212,
+   "agrees": true
+  },
+  {
+   "name": "L* columns (t=5)",
+   "claimed": 28,
+   "recomputed": 28,
+   "agrees": true
+  },
+  {
+   "name": "census mean covered (t=5)",
+   "claimed": 41.688,
+   "recomputed": 41.688,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "census sd covered (t=5)",
+   "claimed": 26.0714,
+   "recomputed": 26.071414537765303,
+   "rel_tol": 1e-05,
+   "agrees": true
+  },
+  {
+   "name": "lo=0 percentile (t=5)",
+   "claimed": 0.453,
+   "recomputed": 0.453,
+   "agrees": true
+  },
+  {
+   "name": "P1 t0 mean / bits mean (t=5)",
+   "claimed": 0.59745,
+   "recomputed": 0.5974547122219676,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "P2a covered(L*)/mean (t=5)",
+   "claimed": 5.0854,
+   "recomputed": 5.085396277106121,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "gain vs lo=0 (t=5)",
+   "claimed": 5.8889,
+   "recomputed": 5.888888888888889,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "L*/best bits covered (t=5)",
+   "claimed": 1.0707,
+   "recomputed": 1.0707070707070707,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "selection search group ops (t=5)",
+   "claimed": 7860633,
+   "recomputed": 7860632.918332555,
+   "rel_tol": 1e-06,
+   "agrees": true
+  },
+  {
+   "name": "L*(t=6)",
+   "claimed": 113278,
+   "recomputed": 113278,
+   "agrees": true
+  },
+  {
+   "name": "L* covered (t=6)",
+   "claimed": 424,
+   "recomputed": 424,
+   "agrees": true
+  },
+  {
+   "name": "L* columns (t=6)",
+   "claimed": 56,
+   "recomputed": 56,
+   "agrees": true
+  },
+  {
+   "name": "census mean covered (t=6)",
+   "claimed": 144.752,
+   "recomputed": 144.752,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "census sd covered (t=6)",
+   "claimed": 60.807,
+   "recomputed": 60.806993808278335,
+   "rel_tol": 1e-05,
+   "agrees": true
+  },
+  {
+   "name": "lo=0 percentile (t=6)",
+   "claimed": 0.558,
+   "recomputed": 0.558,
+   "agrees": true
+  },
+  {
+   "name": "P1 t0 mean / bits mean (t=6)",
+   "claimed": 0.53405,
+   "recomputed": 0.5340456302942652,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "P2a covered(L*)/mean (t=6)",
+   "claimed": 2.9291,
+   "recomputed": 2.929147783795733,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "gain vs lo=0 (t=6)",
+   "claimed": 2.8649,
+   "recomputed": 2.864864864864865,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "L*/best bits covered (t=6)",
+   "claimed": 0.791,
+   "recomputed": 0.7910447761194029,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "selection search group ops (t=6)",
+   "claimed": 29300272,
+   "recomputed": 29300271.831959292,
+   "rel_tol": 1e-06,
+   "agrees": true
+  },
+  {
+   "name": "t=4 tie at 82 (count)",
+   "claimed": 2,
+   "recomputed": 2,
+   "agrees": true
+  },
+  {
+   "name": "P6 per-rel t0sel/t0lo0 (t=4,G=0)",
+   "claimed": 0.04878,
+   "recomputed": 0.048780595949583685,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "P4 per-rel t0sel/bitsbest (t=4,G=0)",
+   "claimed": 0.95122,
+   "recomputed": 0.9512183508190148,
+   "rel_tol": 1e-05,
+   "agrees": true
+  },
+  {
+   "name": "P5 per-rel t0sel/min iso (t=4,G=0)",
+   "claimed": 6.0396,
+   "recomputed": 6.039570857834283,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "cheapest arm (t=4,G=0)",
+   "claimed": "isosel",
+   "recomputed": "isosel",
+   "agrees": true
+  },
+  {
+   "name": "P6 per-rel t0sel/t0lo0 (t=4,G=3)",
+   "claimed": 0.04878,
+   "recomputed": 0.048780570167389584,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "P4 per-rel t0sel/bitsbest (t=4,G=3)",
+   "claimed": 0.95122,
+   "recomputed": 0.9512195121951219,
+   "rel_tol": 1e-05,
+   "agrees": true
+  },
+  {
+   "name": "P5 per-rel t0sel/min iso (t=4,G=3)",
+   "claimed": 3.9415,
+   "recomputed": 3.9414811610599054,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "cheapest arm (t=4,G=3)",
+   "claimed": "isosel",
+   "recomputed": "isosel",
+   "agrees": true
+  },
+  {
+   "name": "P6 per-rel t0sel/t0lo0 (t=5,G=0)",
+   "claimed": 0.1698,
+   "recomputed": 0.1697969587969226,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "P4 per-rel t0sel/bitsbest (t=5,G=0)",
+   "claimed": 0.93395,
+   "recomputed": 0.9339523039360582,
+   "rel_tol": 1e-05,
+   "agrees": true
+  },
+  {
+   "name": "P5 per-rel t0sel/min iso (t=5,G=0)",
+   "claimed": 32.456,
+   "recomputed": 32.455541329070286,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "cheapest arm (t=5,G=0)",
+   "claimed": "isosel",
+   "recomputed": "isosel",
+   "agrees": true
+  },
+  {
+   "name": "P6 per-rel t0sel/t0lo0 (t=5,G=3)",
+   "claimed": 0.17131,
+   "recomputed": 0.17130599333648863,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "P4 per-rel t0sel/bitsbest (t=5,G=3)",
+   "claimed": 0.93396,
+   "recomputed": 0.9339606526601788,
+   "rel_tol": 1e-05,
+   "agrees": true
+  },
+  {
+   "name": "P5 per-rel t0sel/min iso (t=5,G=3)",
+   "claimed": 17.372,
+   "recomputed": 17.371827997600292,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "cheapest arm (t=5,G=3)",
+   "claimed": "isosel",
+   "recomputed": "isosel",
+   "agrees": true
+  },
+  {
+   "name": "P6 per-rel t0sel/t0lo0 (t=6,G=4)",
+   "claimed": 0.34295,
+   "recomputed": 0.34295260679416006,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "P4 per-rel t0sel/bitsbest (t=6,G=4)",
+   "claimed": 1.25142,
+   "recomputed": 1.2514238229371468,
+   "rel_tol": 1e-05,
+   "agrees": true
+  },
+  {
+   "name": "P5 per-rel t0sel/min iso (t=6,G=4)",
+   "claimed": 79.156,
+   "recomputed": 79.15587010633371,
+   "rel_tol": 0.0001,
+   "agrees": true
+  },
+  {
+   "name": "cheapest arm (t=6,G=4)",
+   "claimed": "iso1093",
+   "recomputed": "iso1093",
+   "agrees": true
+  },
+  {
+   "name": "total f4_muladds (28 cells)",
+   "claimed": 68333109436,
+   "recomputed": 68333109436,
+   "agrees": true
+  },
+  {
+   "name": "total planted_muladds",
+   "claimed": 11475927434,
+   "recomputed": 11475927434,
+   "agrees": true
+  },
+  {
+   "name": "exploratory corr(covered, columns) t=4",
+   "claimed": 0.831,
+   "recomputed": 0.8307386241689678,
+   "rel_tol": 0.001,
+   "agrees": true
+  },
+  {
+   "name": "exploratory corr(covered, columns) t=5",
+   "claimed": 0.88,
+   "recomputed": 0.8803822328639372,
+   "rel_tol": 0.001,
+   "agrees": true
+  },
+  {
+   "name": "exploratory corr(covered, columns) t=6",
+   "claimed": 0.936,
+   "recomputed": 0.9357518381443026,
+   "rel_tol": 0.001,
+   "agrees": true
+  },
+  {
+   "name": "exploratory columns x per-rel proxy t0sel/bitsbest t=4",
+   "claimed": 1.56,
+   "recomputed": 1.556541019955654,
+   "rel_tol": 0.01,
+   "agrees": true
+  },
+  {
+   "name": "exploratory columns x per-rel proxy t0sel/bitsbest t=5",
+   "claimed": 1.09,
+   "recomputed": 1.0896207614368751,
+   "rel_tol": 0.01,
+   "agrees": true
+  },
+  {
+   "name": "load average at cell starts, min (README '6.3 to 7.9')",
+   "claimed": 6.3,
+   "recomputed": 5.84,
+   "rel_tol": 0.01,
+   "agrees": false
+  },
+  {
+   "name": "load average at cell starts, max",
+   "claimed": 7.9,
+   "recomputed": 7.91,
+   "rel_tol": 0.01,
+   "agrees": true
+  },
+  {
+   "name": "P4 ratio equals coverage ratio 'exactly' (t=5,G=0): 198/212",
+   "claimed": 0.9339622641509434,
+   "recomputed": 0.9339523039360582,
+   "rel_tol": 1e-09,
+   "agrees": false
+  }
+ ],
+ "raw_data": [
+  {
+   "path": "scripts/lo_list.txt",
+   "sha256": "84dd67a906ad91ab48f4d333c335b3da6d0c540ffa6588a106dcf2086b54a5c5"
+  },
+  {
+   "path": "data/census_t4.jsonl",
+   "sha256": "061fbb1ab1288c7f0220028844404a02420c86fdfd42a8314abcb9caf24ba38d"
+  },
+  {
+   "path": "data/census_t5.jsonl",
+   "sha256": "53895c92ac4d7639354add5f7d44be6278c1d59876ef187cea94fae5509b32c7"
+  },
+  {
+   "path": "data/census_t6.jsonl",
+   "sha256": "f519f2b5c2e78db49fa338495670a90e0e5ec553fc9d466d277d69b8b8dc37a4"
+  },
+  {
+   "path": "data/selection.json",
+   "sha256": "373207935d2f207b5f69248c34e48926705cd6db556b704e327d17680eb62081"
+  },
+  {
+   "path": "data/selection.txt",
+   "sha256": "103af36755638ea247ddf3ccd53c828d4b7a53cf7dbd82c15d9b649af12a1d60"
+  },
+  {
+   "path": "data/run.log",
+   "sha256": "19ec77f9ab1aafde3183da1cc90b07a9e9ee6b749598c44ee1517dd02c9ed204"
+  },
+  {
+   "path": "data/binary.sha256",
+   "sha256": "9b7dee65df7d8145a69bc4d26371bd61b81ce31454790015fd6c6c8bff49bdd6"
+  },
+  {
+   "path": "data/census.SHA256SUMS",
+   "sha256": "02dc6e41280a2497baa6a68cc3be1b3d382766be927e728919f1d0409787dbd4"
+  },
+  {
+   "path": "data/SHA256SUMS",
+   "sha256": "a719e1dc375e21c97bcc1556d6f7eb6295586d342942631f0d15801affcf0007"
+  },
+  {
+   "path": "data/engine/SHA256SUMS",
+   "sha256": "f7fe2936b570c758b80872ab32e138bcc59499690de2228fd9f1afd9b91a30cb"
+  },
+  {
+   "path": "data/engine/bitsbest_t4_g0.json",
+   "sha256": "124f3bfa7e0b6f572f10e11e65b422552dcea9409e6b3ddab92d5fe3c25301ac"
+  },
+  {
+   "path": "data/engine/bitsbest_t4_g3.json",
+   "sha256": "b73976bf99319164eda21b12fa543eac376068de45709bc942bf6f11cad36c71"
+  },
+  {
+   "path": "data/engine/bitsbest_t5_g0.json",
+   "sha256": "fe5dc7ac71460d877a83f40c34d24b416d81fe5331300f916095ba6309212e0c"
+  },
+  {
+   "path": "data/engine/bitsbest_t5_g3.json",
+   "sha256": "f21f4148dfbde056795de8e50d9847ff308b42f348887d22d9ec45f72f802a93"
+  },
+  {
+   "path": "data/engine/bitsbest_t6_g4.json",
+   "sha256": "bf1bd10cde06f593323364923b8997feed245702cc405a0423326dc137d449c2"
+  },
+  {
+   "path": "data/engine/bitslo0_t4_g0.json",
+   "sha256": "5896a01a9da198c59c81194e3af86e917dec54d474982ff71f18bc8653d20a5c"
+  },
+  {
+   "path": "data/engine/bitslo0_t4_g3.json",
+   "sha256": "c7f0124ff26eeaf2800312a64dcb463ef116a7e690034ca5ac43d48c2bc03693"
+  },
+  {
+   "path": "data/engine/bitslo0_t5_g0.json",
+   "sha256": "bd00a9a3219b8358be6de8131cbbdee71094063c2e1925a6b838e67aa42ba343"
+  },
+  {
+   "path": "data/engine/bitslo0_t5_g3.json",
+   "sha256": "07bbfbfc1209e7e08af97157cc70edafadef2e00bbf8428aea22bbf7644d3b18"
+  },
+  {
+   "path": "data/engine/iso1093_t4_g0.json",
+   "sha256": "2ae512ee018cb1c57e046686c215a127f134282a7a173f93d3f7365dfaa32d60"
+  },
+  {
+   "path": "data/engine/iso1093_t4_g3.json",
+   "sha256": "275a1e9382913329f9167534b1a60c269252034634e6dae74d8139cb8612e874"
+  },
+  {
+   "path": "data/engine/iso1093_t5_g0.json",
+   "sha256": "b4532577f19eec6205de91abc240c20c62d808c0b66c235fdf73c4e7af31771f"
+  },
+  {
+   "path": "data/engine/iso1093_t5_g3.json",
+   "sha256": "cdba31cbe48ead2f2637c825acab467466b5f7720eadb72a690ac22f8b8be4d1"
+  },
+  {
+   "path": "data/engine/iso1093_t6_g4.json",
+   "sha256": "902968cdeb0cbb4843ffda72b666dae7b48fdd0405c1f80c1fa52c6ba6889525"
+  },
+  {
+   "path": "data/engine/isosel_t4_g0.json",
+   "sha256": "21d9e2d6b9694050aa9b4b20f11dbde3e6cd760151aa74402e827af7538a90be"
+  },
+  {
+   "path": "data/engine/isosel_t4_g3.json",
+   "sha256": "93df2d55905af11818855297f181186984f79c9c5ae53319b9c9daf470429e1f"
+  },
+  {
+   "path": "data/engine/isosel_t5_g0.json",
+   "sha256": "d63e275b8aeeb019ed3a55713c998b0c4fb732edd588452cab727a283bc31b9a"
+  },
+  {
+   "path": "data/engine/isosel_t5_g3.json",
+   "sha256": "b3254587c2db71600f22dc5f0a68565d6babd16c8cd6d7fc8cdb4be81dadeb5f"
+  },
+  {
+   "path": "data/engine/t0lo0_t4_g0.json",
+   "sha256": "39dc769c37da827db5c87ccc49932fb67dea5450a14b6bbe98234777371ad454"
+  },
+  {
+   "path": "data/engine/t0lo0_t4_g3.json",
+   "sha256": "80349e8be0b470d4cebbf2627bd7eec7fab5f8ffc0d75c53559716e8287ca80b"
+  },
+  {
+   "path": "data/engine/t0lo0_t5_g0.json",
+   "sha256": "4c060a3f9c78e14524df39c7b8e85603fb4d9cf50029ecbe265c0df07bff2007"
+  },
+  {
+   "path": "data/engine/t0lo0_t5_g3.json",
+   "sha256": "9a22ef876ef433bb8bed6718508f70aca6c9be0e279cb95909e98a9c55f039cc"
+  },
+  {
+   "path": "data/engine/t0lo0_t6_g4.json",
+   "sha256": "84976b9875183ee445d1749c297e8d7e16a5415c801886861938bc25aaa16c8e"
+  },
+  {
+   "path": "data/engine/t0sel_t4_g0.json",
+   "sha256": "eeb32d2149707d613656a80d1435e55af72a394d9e90394685e9ea0f316c501a"
+  },
+  {
+   "path": "data/engine/t0sel_t4_g3.json",
+   "sha256": "4e9172731f4e77129bf482f449e5c16f125bfa5c7043aa224d3d8920ad2b71b2"
+  },
+  {
+   "path": "data/engine/t0sel_t5_g0.json",
+   "sha256": "d406a38d77003900b042a98d0f3ea5a9ca28bc683b3719a23c84893cb2085ab2"
+  },
+  {
+   "path": "data/engine/t0sel_t5_g3.json",
+   "sha256": "89ac11d6e10121537c45b83abbd5303cfc05ca65fe4dc753bf2c677d290fa987"
+  },
+  {
+   "path": "data/engine/t0sel_t6_g4.json",
+   "sha256": "79e2524dd06ffd5c7a6ee8f005dcf0949f179ad65b75ff24621e1c49eb651f5d"
+  },
+  {
+   "path": "data/engine/bitsbest_t4_g0.status",
+   "sha256": "01debf46cbfc7e6b816cfbc3d31858fac4e6eb8044c2bf75c10ed23d64b99a47"
+  },
+  {
+   "path": "data/engine/bitsbest_t4_g3.status",
+   "sha256": "975cf4f8e4d498b5e38c3a9606e6db25fc78afd2ac86b1cced53403d1cbe297f"
+  },
+  {
+   "path": "data/engine/bitsbest_t5_g0.status",
+   "sha256": "149bfb9a0bbb947df12d801776a708f5bee32a2049e3d5bea31b639e1fbd6ec8"
+  },
+  {
+   "path": "data/engine/bitsbest_t5_g3.status",
+   "sha256": "98c45ecf29fbd6f23969ebcb0f401c67b625566a555a7be7cc70cf18446d380b"
+  },
+  {
+   "path": "data/engine/bitsbest_t6_g4.status",
+   "sha256": "141869eecb85e93b60241e63834e7f3defdf6f813201d36827b77d502d0918c6"
+  },
+  {
+   "path": "data/engine/bitslo0_t4_g0.status",
+   "sha256": "7c6a6f7b5af2bbcc93468eb3a08c42adf39e90815ba5a84bbe50028b30d1427c"
+  },
+  {
+   "path": "data/engine/bitslo0_t4_g3.status",
+   "sha256": "7f9d5c428ea184ef85f18781b28faa1bd2bbca11f60a3105b25e7490a57137a9"
+  },
+  {
+   "path": "data/engine/bitslo0_t5_g0.status",
+   "sha256": "a04c3c6944c3d80cfff7ba545ab13dd8c594cb495d707a2c7dbafda3d96c711b"
+  },
+  {
+   "path": "data/engine/bitslo0_t5_g3.status",
+   "sha256": "c25b0975f761943c3b69220b05ce862e4955c57542b76f6732d88fb22f8d93d7"
+  },
+  {
+   "path": "data/engine/iso1093_t4_g0.status",
+   "sha256": "ee37a875dbcf13fd9fbde424072a5e62b48ad0710838cbbe0b868016901a02f2"
+  },
+  {
+   "path": "data/engine/iso1093_t4_g3.status",
+   "sha256": "6b3d5ae5e6cf89068cc8538813dad2017b616f4dd329b1ea54a787cfea49a4f4"
+  },
+  {
+   "path": "data/engine/iso1093_t5_g0.status",
+   "sha256": "e39358be3e03f2019d4a9d0d1dffef9eb9dc3c04d56e91890f852ce1dd67be5d"
+  },
+  {
+   "path": "data/engine/iso1093_t5_g3.status",
+   "sha256": "c31f6d86cf825c1d31b58efca085ccf2fab896d2d8e495cc3d24ac568ded0f27"
+  },
+  {
+   "path": "data/engine/iso1093_t6_g4.status",
+   "sha256": "b621a4ba9b25f94b754553f3370647170a81bf9b1ec30e08244928a045612dc6"
+  },
+  {
+   "path": "data/engine/isosel_t4_g0.status",
+   "sha256": "c454ec32d7274a5aa89c1b2ae7f19006edbef41b5d4ba7c326eb1171abc9b10c"
+  },
+  {
+   "path": "data/engine/isosel_t4_g3.status",
+   "sha256": "064f9ec2911e94b5bf20aedb0075599385171ae0739b91c3ee2cbe77bc3523c6"
+  },
+  {
+   "path": "data/engine/isosel_t5_g0.status",
+   "sha256": "47083064dc43297b61391c976312d41ded95fad67591a673211ca6c83dce6b5b"
+  },
+  {
+   "path": "data/engine/isosel_t5_g3.status",
+   "sha256": "44e03fa8c05fb0fe606627ab3646971ba15c1f79462e4a44f37bf47cabdda99c"
+  },
+  {
+   "path": "data/engine/t0lo0_t4_g0.status",
+   "sha256": "721bfee92eeae4bc96d227f4e7ef13f736189a04d65cb762cead66d8d50d8f66"
+  },
+  {
+   "path": "data/engine/t0lo0_t4_g3.status",
+   "sha256": "df50818d78fd249bd9cf18cd28055a97bb08ca9419785eb67743b522fadb11a6"
+  },
+  {
+   "path": "data/engine/t0lo0_t5_g0.status",
+   "sha256": "6e58d6e0df85bc5f6c11d1ac9cf34e067d833a9bf41f7a5aa0277670cd7ea366"
+  },
+  {
+   "path": "data/engine/t0lo0_t5_g3.status",
+   "sha256": "51a365170ade7c4e7844765270506cb1eca97e372a2d35af0df36d42c6571028"
+  },
+  {
+   "path": "data/engine/t0lo0_t6_g4.status",
+   "sha256": "3c406d4c413885d305c97d3e96dbaffb2481bff9524fa94df8c9e23b47258701"
+  },
+  {
+   "path": "data/engine/t0sel_t4_g0.status",
+   "sha256": "cb0f263b33f323bb05787a8bd3ac447ad6d67f75892b300b1c54c0d95ea20f4f"
+  },
+  {
+   "path": "data/engine/t0sel_t4_g3.status",
+   "sha256": "615978e1562389ebfd7d2a7f2c5b864868ee219058ccbf13765a8bf98ecd71da"
+  },
+  {
+   "path": "data/engine/t0sel_t5_g0.status",
+   "sha256": "a1d6bf04fcd0ae360ea39c213a2e961a60be2843e0799e47502636e2b52aeac0"
+  },
+  {
+   "path": "data/engine/t0sel_t5_g3.status",
+   "sha256": "30d39c8f05f39bd1e1fbe3f1168f4d336fa3037a0d14f526709310823a0441a6"
+  },
+  {
+   "path": "data/engine/t0sel_t6_g4.status",
+   "sha256": "ffedf113510df1070c69446d1b6dc91af1efb548e2bc59be73479ef0d1877a59"
+  }
+ ],
+ "validator_scripts": "Validator scratchpad /tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/t7v/: ec.py (independent curve and base code), census_check.py (all 3000 rows), keyframes.py (direct [r]S on key frames), lolist.py, replay.sh with replay/ outputs, recompute.py, make_report.py. These are not repository files."
+}

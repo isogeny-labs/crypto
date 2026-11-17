@@ -1,0 +1,50 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "E3b F4 full solve (E3b-PROTOCOL frozen before runs), e3-c1 sem-chain-t3",
+ "description": "research/generator_effect_ic_20261019/E3b-PROTOCOL.md: F4 run on every trial to a full solve, targets 0 and 1 of E3's e3-c1 workload, coupled to E3's measured sem-grid records.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 9061313,
+    "a": 9061310,
+    "b": 1749481,
+    "group_order": 9059959,
+    "r": 9059959,
+    "gx": 0,
+    "gy": 3566041
+   }
+  ],
+  "targets_per_curve": 1,
+  "target_seed": 20261019,
+  "target_kind": "planted_shared"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "sem-chain-t3",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=3",
+     "oracle": "pkm-semaev:m=3,crosscheck=1"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261019,
+  "isolation_required": "L0",
+  "timeout_seconds": 259200
+ }
+}

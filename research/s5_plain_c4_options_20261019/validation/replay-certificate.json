@@ -1,0 +1,58 @@
+{
+  "schema": "s5-plain-c4-replay/v1",
+  "status": "verified",
+  "independent": true,
+  "independence": "a fresh release build of the committed source in a new target directory, run as new processes, compared with the committed records by jq (validation/replay.sh), not by the runner. Same host as the original runs (Apple M4 Pro); not a second machine.",
+  "scalars_verified": true,
+  "source_commit": "ca88b39179601525bf52d1a7ccac0580dc470aa5",
+  "binary": "target/release/examples/gaudry_quartic_c4_options",
+  "rustc": "rustc 1.93.1 (01f6ddf75 2026-02-11) (Homebrew)",
+  "compared": "S5 runs: every counted phase of every solve (wall times excluded), the solver decomposition set, the oracle set and their agreement. Rho reference: group and subgroup order, and every run's steps, group operations, F_p multiplications, look-aheads, restarts and verified logarithm.",
+  "runs": [
+    {
+      "run": "s5_p269_seed1_r13",
+      "committed": "research/s5_plain_c4_options_20261019/raw/s5_p269_seed1_r13.json",
+      "replay": "research/s5_plain_c4_options_20261019/validation/replay/s5_p269_seed1_r13.json",
+      "solves": 39,
+      "identical": true,
+      "scalars_verified": true,
+      "group_replay": true
+    },
+    {
+      "run": "s5_p269_seed1",
+      "committed": "research/s5_plain_c4_options_20261019/raw/s5_p269_seed1.json",
+      "replay": "research/s5_plain_c4_options_20261019/validation/replay/s5_p269_seed1.json",
+      "solves": 16,
+      "identical": true,
+      "scalars_verified": true,
+      "group_replay": true
+    },
+    {
+      "run": "s5_p269_seed1_constructed4_replay",
+      "committed": "research/s5_plain_c4_options_20261019/raw/s5_p269_seed1_constructed4_replay.json",
+      "replay": "research/s5_plain_c4_options_20261019/validation/replay/s5_p269_seed1_constructed4_replay.json",
+      "solves": 4,
+      "identical": true,
+      "scalars_verified": true,
+      "group_replay": true
+    },
+    {
+      "run": "generic_d4-7",
+      "committed": "research/s5_plain_c4_options_20261019/raw/generic_d4-7.json",
+      "replay": "research/s5_plain_c4_options_20261019/validation/replay/generic_d4-7.json",
+      "solves": 12,
+      "identical": true,
+      "scalars_verified": true,
+      "group_replay": true
+    },
+    {
+      "run": "rho_reference",
+      "committed": "research/s5_plain_c4_options_20261019/validation/rho_reference.json",
+      "replay": "research/s5_plain_c4_options_20261019/validation/replay/rho_reference.json",
+      "solves": 20,
+      "identical": true,
+      "scalars_verified": true,
+      "group_replay": true
+    }
+  ]
+}

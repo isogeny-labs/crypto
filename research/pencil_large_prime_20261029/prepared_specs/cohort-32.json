@@ -1,0 +1,95 @@
+{
+  "arms": [
+    {
+      "name": "pencil",
+      "role": "candidate",
+      "method": {
+        "id": "ic.three_leads_genus2_pencil_symbolic_v2",
+        "params": {
+          "small_denominator": "8",
+          "matrix_coefficient_cap": "25000000"
+        }
+      }
+    },
+    {
+      "name": "rho",
+      "role": "reference",
+      "method": {
+        "id": "rho.three_leads_negation_v1",
+        "params": {
+          "trial_cap": "18668300"
+        }
+      }
+    },
+    {
+      "name": "rho_AA",
+      "role": "control",
+      "method": {
+        "id": "rho.three_leads_negation_v1",
+        "params": {
+          "trial_cap": "18668300"
+        }
+      }
+    }
+  ],
+  "description": "Prepared specification; execution requires a frozen experiment protocol and admission. Public synthetic archived targets; fixed denominator8 selected before symbolic cohort observations. Cold/online clocks, failures and memory retained; no full-price GAE claim.",
+  "label": "pencil-symbolic-paired-32",
+  "measurement": {
+    "isolation_required": "L2",
+    "order": "shuffle",
+    "rounds": 5,
+    "seed": 2026101801,
+    "timeout_seconds": 3600,
+    "warmup": 1,
+    "algorithm_seed_round": "measured_index"
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 32257112622,
+        "b": 13592517110,
+        "family": "scholten",
+        "group_order": 34737000016,
+        "gx": 9903146036,
+        "gy": 25331215426,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 186379,
+        "parameter": 0,
+        "r": 2171062501
+      },
+      {
+        "a": 25220622765,
+        "b": 28947617854,
+        "family": "scholten",
+        "group_order": 34763763088,
+        "gx": 16063473908,
+        "gy": 6564187048,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 186451,
+        "parameter": 0,
+        "r": 2172735193
+      },
+      {
+        "a": 4676670217,
+        "b": 28464813565,
+        "family": "scholten",
+        "group_order": 34813108816,
+        "gx": 27226522704,
+        "gy": 12819096376,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 186583,
+        "parameter": 0,
+        "r": 2175819301
+      }
+    ],
+    "target_seed": 202610181260,
+    "targets_per_curve": 60
+  }
+}

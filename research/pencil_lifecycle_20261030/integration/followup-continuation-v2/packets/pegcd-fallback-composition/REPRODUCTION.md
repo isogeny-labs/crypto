@@ -1,0 +1,3 @@
+# Reproduction
+
+Restore archived .lean.txt files as .lean in a fresh directory. check.sh and replay.sh retain source-host paths: inspect and adapt them to the restored location and pinned dependency/toolchain locations. dependencies.txt and each before.sha256 identify imported helpers and original hashes. Compiled caches and check-native are omitted; this is not a self-contained toolchain archive. replay1 records fresh exits and axiom readbacks. The checker inventory lists exactly 15 names. Original interrupted agent files remain under /var/tmp/pencil-pegcd-formal-20261101-v1; root repairs are separate. No independent review is asserted.

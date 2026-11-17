@@ -1,0 +1,186 @@
+{
+  "sources": [
+    {
+      "id": "S-INSIDE-GAP-20261102",
+      "title": "Inside fake-to-true gap: n = 4 search, family and field-equation bound",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "research/inside_gap_n4_20261102/PROTOCOL.md (frozen; Amendments 1-2), inside_gap_n4.rs, family_n8.rs, independent_falls.py, results/, and papers/ic-negative-results/lean/IcNegative/InsideGap.lean.",
+      "repository_path": "research/inside_gap_n4_20261102/PROTOCOL.md"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "CEX-INSIDE-GAP-THREE",
+      "label": "{XYW+XY+W, XZW+XW+1}: d_F(inside) = 4, d'_F = 1",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "Over F_2 in four variables, F = {XYW + XY + W, XZW + XW + 1} has d'_F = 1 and, with the field equations inside, d_F = 4: gap 3, the maximum possible for n >= 2.",
+      "scope": "Found in the Q3 sample (multilinear degree <= 3, n = 4); exact, two independent implementations (Rust census, Python linear algebra). Four variables: outside the two-variable Lean encoding.",
+      "assumptions": [
+        "Equality reading",
+        "Field equations inside"
+      ],
+      "source_refs": [
+        "S-INSIDE-GAP-20261102"
+      ],
+      "tags": [
+        "counterexample",
+        "first-fall-degree",
+        "exact"
+      ],
+      "evidence_class": "counterexample",
+      "formal": {
+        "state": "native_exact",
+        "artifacts": [
+          {
+            "path": "research/inside_gap_n4_20261102/inside_gap_n4.rs",
+            "decl": "eval_pair"
+          },
+          {
+            "path": "research/inside_gap_n4_20261102/independent_falls.py",
+            "decl": "true_first_fall_inside"
+          }
+        ]
+      },
+      "cited_by": [
+        {
+          "path": "research/inside_gap_n4_20261102/results/q3.txt",
+          "use": "measures"
+        },
+        {
+          "path": "research/inside_gap_n4_20261102/results/independent.txt",
+          "use": "measures"
+        }
+      ]
+    },
+    {
+      "id": "CEX-INSIDE-GAP-N1-FAMILY",
+      "label": "n = 1: {X^k, X^k+1} has inside gap k - 1",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "In one variable over F_2, F = {X^k, X^k + 1} (k >= 2): X + (X + 1) = 1 is a fake fall at 1, and with the field equation inside X^k + (X^k + 1) = 1 is a true fall at k, with none below (only X^2 + X is admissible below k, and one generator never falls). So d_F(inside) - d'_F = k - 1.",
+      "scope": "Hand proof; checked k = 2..8 by both implementations. The only unbounded case: with two or more variables the field equations alone fall at 4.",
+      "assumptions": [
+        "Equality reading",
+        "n = 1"
+      ],
+      "source_refs": [
+        "S-INSIDE-GAP-20261102"
+      ],
+      "tags": [
+        "counterexample",
+        "first-fall-degree",
+        "family"
+      ],
+      "evidence_class": "counterexample",
+      "formal": {
+        "state": "native_exact",
+        "artifacts": [
+          {
+            "path": "research/inside_gap_n4_20261102/family_n8.rs",
+            "decl": "main"
+          },
+          {
+            "path": "research/inside_gap_n4_20261102/independent_falls.py",
+            "decl": "fake_first_fall"
+          }
+        ]
+      },
+      "cited_by": [
+        {
+          "path": "research/inside_gap_n4_20261102/results/family_rust.txt",
+          "use": "measures"
+        }
+      ]
+    },
+    {
+      "id": "MEAS-INSIDE-GAP-N4",
+      "label": "Inside gap census n = 2, 3, 4: maxima 1, 2, 3",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "Exact inside-gap census (d_F(inside) - d'_F, cap 6): all pairs of degree <= 2 with n = 2 (1,891) max 1; n = 3 (521,731) max 2; n = 4 multilinear degree <= 2 exhaustive (2,092,035) max 2; n = 4 degree <= 2 sample (2,000,000) max 2; n = 4 multilinear degree <= 3 sample (2,000,000) max 3 (592 pairs). No undetermined system.",
+      "scope": "Pairs only. The maximum 3 meets the proved bound for n >= 2.",
+      "assumptions": [],
+      "source_refs": [
+        "S-INSIDE-GAP-20261102"
+      ],
+      "tags": [
+        "census",
+        "first-fall-degree",
+        "exact"
+      ],
+      "evidence_class": "measurement",
+      "cited_by": [
+        {
+          "path": "research/inside_gap_n4_20261102/results/series.txt",
+          "use": "measures"
+        },
+        {
+          "path": "research/inside_gap_n4_20261102/results/q1.txt",
+          "use": "measures"
+        },
+        {
+          "path": "research/inside_gap_n4_20261102/results/q2.txt",
+          "use": "measures"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "IG-001",
+      "from": "CEX-INSIDE-GAP-THREE",
+      "to": "GAP-FAKE-GAP-INSIDE-BOUNDED",
+      "relation": "qualifies",
+      "statement": "Attains the bound 3, so it is tight.",
+      "source_refs": [
+        "S-INSIDE-GAP-20261102"
+      ]
+    },
+    {
+      "id": "IG-002",
+      "from": "CEX-INSIDE-GAP-N1-FAMILY",
+      "to": "GAP-FAKE-GAP-INSIDE-BOUNDED",
+      "relation": "qualifies",
+      "statement": "With one variable there is no field-equation fall at 4 and the gap is unbounded.",
+      "source_refs": [
+        "S-INSIDE-GAP-20261102"
+      ]
+    },
+    {
+      "id": "IG-003",
+      "from": "MEAS-INSIDE-GAP-N4",
+      "to": "GAP-FAKE-GAP-INSIDE-BOUNDED",
+      "relation": "measures",
+      "statement": "Census maxima 1, 2, 3 for n = 2, 3, 4.",
+      "source_refs": [
+        "S-INSIDE-GAP-20261102"
+      ]
+    },
+    {
+      "id": "IG-004",
+      "from": "GAP-FAKE-GAP-INSIDE-BOUNDED",
+      "to": "DEF-FIRST-FALL-DEGREE",
+      "relation": "qualifies",
+      "statement": "Under the equality reading with the field equations inside, d_F <= 4 for every system in n >= 2 variables: the inside placement measures nothing beyond 4 unless trivial field-equation falls are excluded.",
+      "source_refs": [
+        "S-INSIDE-GAP-20261102"
+      ]
+    },
+    {
+      "id": "IG-005",
+      "from": "GAP-FAKE-GAP-INSIDE-BOUNDED",
+      "to": "CLAIM-NAGAO-LEMMA4",
+      "relation": "qualifies",
+      "statement": "In the inside placement Lemma 4 can only fail when d'_F < 4, since d_F <= 4 always (n >= 2).",
+      "source_refs": [
+        "S-INSIDE-GAP-20261102"
+      ]
+    }
+  ],
+  "research_targets": []
+}

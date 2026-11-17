@@ -1,0 +1,40 @@
+{
+  "schema": "research.formal-component-result/v1",
+  "scope": "conditional distinct degree-one plus degree-one UInt64 branch invariant",
+  "theorem": "PencilWordRefinement.distinct_word_branch_preserves",
+  "source_sha256": "4673c15776638973f5967f1cb13f91f8ac7ec8071bd9f8580f0b1afd9270d3b0",
+  "premises": [
+    "prime5<=p<2^31",
+    "two degree-one WordD1 inputs with eight canonical coordinates",
+    "four word weights nonzero",
+    "both normalized degree-one supports divide common f minus v squared",
+    "distinct normalized affine x"
+  ],
+  "conclusions": [
+    "literal guard distinct",
+    "literal degree-two payload canonical",
+    "output word z and w nonzero",
+    "normalized degree-two output support divides common f minus v squared"
+  ],
+  "external_source_conditions": [
+    "Field.n=1",
+    "tables=None",
+    "ordinary execution/counter headroom"
+  ],
+  "boundaries": [
+    "f arbitrary polynomial: algebraic divisibility, not geometric Jacobian assumptions",
+    "source word model not compiler equivalence",
+    "other branches/counters/class-sum/whole-walk excluded"
+  ],
+  "independent_review": "pending",
+  "cost_ratio": null,
+  "scientific_execution": false,
+  "receipts": {
+    "attempt1": 0,
+    "controls1": 1,
+    "readback1": 0,
+    "controls2": 1,
+    "controls3": 1,
+    "controls4": 0
+  }
+}

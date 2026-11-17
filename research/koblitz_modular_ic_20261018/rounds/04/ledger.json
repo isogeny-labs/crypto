@@ -1,0 +1,437 @@
+{
+  "failed_and_partial_runs": [
+    {
+      "cause": "ledger builder moved a borrowed symbolic expression; corrected with an explicit clone",
+      "file": "record-build-01.log"
+    },
+    {
+      "cause": "new pairing metadata changed the historical unpaired serialization; restored the original format without changing its frozen file",
+      "file": "replay-01.log"
+    },
+    {
+      "cause": "used nonnegative residue representatives for the elliptic Frobenius as an integer lift; corrected to the signed companion matrix",
+      "file": "q1-run-01.log"
+    },
+    {
+      "cause": "degree-one Rabin special case initialized X outside the field; corrected before successful modular enumeration",
+      "file": "m1-run-01.log"
+    },
+    {
+      "cause": "prime-field point count omitted the projective point in a11 initialization; corrected a11=4 and all Hecke sums pass",
+      "file": "m3-run-01.log"
+    },
+    {
+      "cause": "unpaired level bases are not used for cross-point relations; replaced by the separately frozen paired experiment",
+      "file": "m3-modular-transport.json"
+    },
+    {
+      "cause": "rank4/544; structural four-fiber obstruction, not a solver",
+      "file": "m4-direct-modular-relations.json"
+    },
+    {
+      "cause": "no complete zero support; no row admitted",
+      "file": "m5-interior-function.json"
+    },
+    {
+      "cause": "binary identity residual, natural-smul simplification and matrix multiplication scope; final build succeeds",
+      "file": "lean-build-01.log and lean-build-02.log"
+    }
+  ],
+  "identity_certificates": [
+    {
+      "degree": 7,
+      "direct_Lean_statement": true,
+      "file": "identity-modular49-change.json",
+      "id": "IDC1h5c93d35226502b13"
+    },
+    {
+      "degree": 2,
+      "direct_Lean_statement": true,
+      "file": "identity-polarization-pullback.json",
+      "id": "IDC1h7a01e3d29f1f37ab"
+    },
+    {
+      "degree": 3,
+      "direct_Lean_statement": false,
+      "file": "identity-velu-integer-lift.json",
+      "id": "IDC1h5d4af0a173c60eeb"
+    }
+  ],
+  "interior_function_attempt": {
+    "complete_ordinary_zero_degree": 9240,
+    "failure": "incomplete zero divisor; pole divisor also not resolved",
+    "function": "x(P)+1",
+    "known_zeros_by_base": [
+      {
+        "source": [
+          6,
+          57
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          6,
+          63
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          11,
+          56
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          11,
+          51
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          20,
+          42
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          20,
+          62
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          26,
+          40
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          26,
+          50
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          28,
+          55
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          28,
+          43
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          31,
+          54
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          31,
+          41
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          32,
+          12
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          36,
+          16
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          38,
+          4
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          41,
+          20
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          42,
+          11
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          47,
+          2
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          48,
+          19
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          50,
+          28
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          55,
+          6
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          56,
+          31
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          60,
+          9
+        ],
+        "zeros": 0
+      },
+      {
+        "source": [
+          63,
+          26
+        ],
+        "zeros": 0
+      }
+    ],
+    "missing_ordinary_zero_degree": 9240,
+    "psi11_at_x1_coefficients_in_b": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1
+    ],
+    "rank_change": 0,
+    "rational_b_roots_with_multiplicities": [],
+    "relation_admitted": false,
+    "remaining_b_degree": 15,
+    "remaining_b_polynomial": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1
+    ],
+    "represented_zeros": 0,
+    "schema": "koblitz.round04/m5-v1"
+  },
+  "modular_base": {
+    "extensions": 10,
+    "points": 2034,
+    "primary_polynomial_input": "phi_j_11.txt"
+  },
+  "new_named_lean_theorems": 11,
+  "parent_commit": "f5b90fb286dde2e8b0fa15b127a37514a8d64258",
+  "performance_measured": false,
+  "proof_map": "PROOF_MAP.md",
+  "quotients": {
+    "all_other_quotient_coordinate_equations": false,
+    "explicit_natural_quotient": "(a,Q) -> a-diag(Q)",
+    "geometric_kernel_order_each_sign": 25,
+    "global_minimum3_forms": 2,
+    "integral_modules": 14,
+    "rational_point_checks": [
+      {
+        "a": 0,
+        "addition_checks": 1936,
+        "points": 44
+      },
+      {
+        "a": 1,
+        "addition_checks": 484,
+        "points": 22
+      }
+    ]
+  },
+  "raw_sha256": {
+    "gl2b-integral-polarizations.json": "6ed54d07948a4d375c2407dc4f084a2c80c499538fa3dcd3efb5a9fab2a356de",
+    "lean-audit-01.log": "cbb4f85f8d3d671a6540bd6d242e232e708305e589035222f7ce5078524612cc",
+    "lean-build-01.log": "a6814618491abc53f4c925f7054a189f283dd67adf536a8d9972d03d964e69a3",
+    "lean-build-02.log": "87ae8b32731ba39258f11090068824366cde4cdc2035c6e4d08ffcdeb54c215c",
+    "lean-build-03.log": "6212629442d48263345823aa1deaf847db740e4259a9fda9e353708560ac0e60",
+    "m1-modular-base.json": "d94582df74213ff449aaa7c6d515407a1ddd7a9531cc628807118d8388200f02",
+    "m1-run-01.log": "b1ee40d4984a32c494c05e28f948da5253834eda19a0761666dff7caacda6684",
+    "m1-run-02.log": "6659a7c4282a8620853cc2096342ca157ce331d615fdcfb357c098f654a4be8b",
+    "m3-modular-transport.json": "cc05a8b527ae046d9e0a94a5955213bd6fe330c1e25d9d1dd0dda5701c231bb2",
+    "m3-run-01.log": "d946c4592a4e6469012009955ce8e5c71268ae75c0c4f9d3e8cc3967bfbce53f",
+    "m3-run-02.log": "692a15fe909a1f2f861036b7113682c9039a3fa961a1d5be6235780609d6ddbb",
+    "m3b-paired-transport.json": "b02236f27e56cd6e121320939f2eb878836c164898e16c386560c946e7cb709c",
+    "m3b-run-01.log": "9d3780f045e7bf0ed5822dba089640cdbad2483b0e0fd9bfd1acae3938c4febf",
+    "m4-direct-modular-relations.json": "6a723a6d79c90d2fe76208ecbe6bad829db249ba7df5a9e1c605e67fb253b182",
+    "m4-run-01.log": "8664f09632b6e3e0a70d53b28be21f857dfb9e83f794ca400e4b8dc5e6bd865f",
+    "m5-interior-function.json": "c858d9075e4a683ad51406f43350288715cb88cb2091793a0e65c7a388fbec9b",
+    "m5-run-01.log": "aeadc7ed4ae3c972ead8868fa1200465302fa3a6463a053fade51330749dc116",
+    "native-tests-01.log": "29e359d57983e3914cdf2580ed337069bbd4194982ba901b105adef0161d2872",
+    "native-tests-02.log": "224b16d7bd9febcb432a33e0550de9a596ae60054f705c8da96f035a1ac675b8",
+    "phi_j_11.txt": "985c6a76ca7cc2802ba3f9fd48112fe0d82ffe11dbaa5f49c57526658338b352",
+    "q1-quotient-lattices.json": "063f01d395781a5c1fe6ba6ad74503d1f611e6d4b6111b73556a921c5f12d028",
+    "q1-run-01.log": "56de3b5953cb6570693a4297eb8e043f856c9cd0f02366ac0d8c9246777e3573",
+    "q1-run-02.log": "3389ccc221b78d20047e88e0c475ea3f44c79ecd4e4d8d77c9bf3179778535b9",
+    "q2-natural-quotient.json": "96f62b11b230b7d0f774ee758af627f7f72330389a378c14ace686975bbdf664",
+    "q2-run-01.log": "b1a0af242ddc20f4e56037ee691e8e0f85cc8895ac42942a6b78382059421a49",
+    "replay-01.log": "9592e45349fff9f74d83ee5fd89c33ac128010a9afb0c7965fbf7922a6bd2529",
+    "replay-02.log": "7536f7370d8a9bd9a0457958089c06c1daceedbbdb4927aa74f62039093cd3bd",
+    "root-tests-01.log": "c40557d660d48d6962355393cb4a4dbdd697491dfc890f8c1a63f1764e92ae19",
+    "verify-01.log": "8763ee23e03a038b56e83d938e5af310c1e84b5dcc3cfda5fe16e1539acf4af0"
+  },
+  "relations": {
+    "closed_degrees": {
+      "30": 524,
+      "6": 20
+    },
+    "columns": 544,
+    "geometric_points": 15840,
+    "missing_rank": 539,
+    "nonzero_images_by_sign": [
+      510,
+      520
+    ],
+    "principal_rows": 102,
+    "rank_mod11": 4,
+    "recoveries_attempted": 0
+  },
+  "requirements": [
+    {
+      "next": "construct a characteristic-two quotient presentation for a determinant19 graph, or prove its polarized decomposition",
+      "open": "equations and polarization decomposition for the other graph quotients, especially determinant19",
+      "status": "partial",
+      "track": "explicit polarized quotient geometry",
+      "verified": "natural determinant-five quotient equations, rational inverse, all group additions and two geometric order25 kernels; fourteen explicit integral quotient modules"
+    },
+    {
+      "next": "certify the induced polarization/composition on the order11 subgroup, including projector denominators",
+      "open": "global scheme/character correspondence bridge not formalized; no reverse subgroup-to-Jacobian map or optimal saturation certificate",
+      "status": "partial",
+      "track": "n5 F2 modular-factor map",
+      "verified": "actual 11-isogeny transport of both7 stages, paired bases, canonical modular Frobenius, nonzero closed-divisor projections to both trace-zero groups"
+    },
+    {
+      "next": "factor the degree15 b-polynomial for x(P)+1, construct its missing level49/11 closed orbits, resolve poles, then seek rows outside the four-fiber span",
+      "open": "539 ranks to unique scale; individual descent; level-dependent zero/pole support",
+      "status": "partial",
+      "track": "direct modular relations",
+      "verified": "102 actual full-fiber principal norm rows on544 closed points, rank4; cusp elimination exposed"
+    },
+    {
+      "open": "full modular moduli/descent, Weil/Miller correctness, actual principal-divisor and polarization bridges",
+      "status": "partial",
+      "track": "Lean proofs",
+      "verified": "11 new named structural theorems; actual kernel build and axiom audit"
+    },
+    {
+      "reason": "user assesses significance; no timing protocol",
+      "status": "not attempted",
+      "track": "IC efficiency assessment"
+    }
+  ],
+  "schema": "koblitz.round04-ledger/v1",
+  "scope": "same-agent construction/replay, separate maintained-library arithmetic checker; no independent external audit; no IC timing claim",
+  "source_sha256": {
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRelations.lean": "38febde27b80bc8783c9fc014f39ef36a4c2c00ac32b19f1aafb1f5c30719835",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound03.lean": "cbf32205f263a982b80c0ac50c9148d042355ddbb9cd1038b2871abc8d25925c",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound04.lean": "dd6466228c1ccbb86717ef967056a5ad66ceea77f3e42bebc2bbf011077a3489",
+    "research/koblitz_modular_ic_20261018/lean/lake-manifest.json": "dd6855f919d952755062d0a96ab10b510c4e8bdcd237b1926cef3787bbb1fc4e",
+    "research/koblitz_modular_ic_20261018/lean/lakefile.toml": "ada6daaf60c3845393fcb62a8f200a96a033c5bd89fda980a0d80579b59bbd61",
+    "research/koblitz_modular_ic_20261018/lean/lean-toolchain": "d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b",
+    "research/koblitz_modular_ic_20261018/native/Cargo.lock": "faa6768a05ea62e43872b76d917c03daa005e3e66fb411e1acbad983d5d447cf",
+    "research/koblitz_modular_ic_20261018/native/Cargo.toml": "e40f354535b1dfdba71099cea508ba2adc9d2a69c5958b72774302aeaa7d80c1",
+    "research/koblitz_modular_ic_20261018/native/src/census.rs": "d0aa1d5e1990f23d98e6a8534131fbaeaa01a371068213f273261af29b4d1b16",
+    "research/koblitz_modular_ic_20261018/native/src/delpezzo.rs": "61997725ce39c1dbefc2c333a5849002b338748f2c50de68a30437f6cb0f5fac",
+    "research/koblitz_modular_ic_20261018/native/src/delpezzo_conic.rs": "8fd0d10cba53383d5558735738dfdb422157201c2892da94b4e11043a7b248c8",
+    "research/koblitz_modular_ic_20261018/native/src/gluing.rs": "b0a85d943bc93bf836089df4c58ed3a47c6619f25e24225aad35c6fefada2d53",
+    "research/koblitz_modular_ic_20261018/native/src/klein_transfer.rs": "007814c025dd856c198754a9bff53c1c22313424b8e72a33caa10893f071cc12",
+    "research/koblitz_modular_ic_20261018/native/src/main.rs": "7ec041be51fd878e5268bc9aa78feda6cffee8b008a623998cdb868e042b08f0",
+    "research/koblitz_modular_ic_20261018/native/src/modular_geometry.rs": "527c62539a4ba67edd416de3b43d0172280f80c26ef76e630c524544cc734075",
+    "research/koblitz_modular_ic_20261018/native/src/modular_screen.rs": "05bdf66c216a9cc4464c26b0aca72dac5a2f480b34c2c600e2c4c2f1f996763d",
+    "research/koblitz_modular_ic_20261018/native/src/n5_relations.rs": "180df20d5738d2c4b4fe43114c18fa31239450d6865577eeb1b451c267f4ea8d",
+    "research/koblitz_modular_ic_20261018/native/src/polarized.rs": "acc7e659b66a2717eb1ffe840deeb779cda3776744a5b53dffc4f20259f588be",
+    "research/koblitz_modular_ic_20261018/native/src/quotient_geometry.rs": "0c43e248899f0a432330b796eac8cc8ade400504c1ac26fc89aad1db83b77d82",
+    "research/koblitz_modular_ic_20261018/native/src/round02.rs": "57edff50eba8d500f6bb8c41c5b9d3e6a8ca26644ac985a399ccf838e15d2c02",
+    "research/koblitz_modular_ic_20261018/native/src/round03_record.rs": "f1a8ed8032d3ee5e1322baa9bb90e15a2a10c70ac7e24a4d5736e0bd1b7fe79c",
+    "research/koblitz_modular_ic_20261018/native/src/round04.rs": "e5218295472d9a0a856883feab99618e945215783818a5e464d07602353d642b",
+    "research/koblitz_modular_ic_20261018/native/src/round04_record.rs": "e20e8f45555a9e508f79f2b749860e22e534d3dafc68e5bc0fabc411826a24a7",
+    "research/koblitz_modular_ic_20261018/native/src/round04_verify.rs": "a92696d7b480e8e16f503003909f222f7bf132eb85c47468ac1e187c42737265",
+    "research/koblitz_modular_ic_20261018/native/src/round_record.rs": "1df832a5136ae05c423efc8d2a8c6b5f4d59f85836468d766cd986502f1f9502",
+    "research/koblitz_modular_ic_20261018/rounds/04/PROTOCOL.md": "4c063e4163e639a3e22041deaa367ba7d6711c58aab10b79dce595ce73d268c6",
+    "research/koblitz_modular_ic_20261018/rounds/04/REPLAY.sh": "6e46936549e4bf76c4dd87cdc446940c0c3c3b9142c46b0d20045295a685ce4d",
+    "src/binary_ecc/cover_transfer.rs": "6e801f14abf087b2a6610aa320faf602d176ac764f5eee8e9d88611cdacfa896",
+    "src/binary_ecc/curve.rs": "ceb94d849e17ec0ae678463f2d8a0a3f970f6de6713003abf0544395eb1dcd62",
+    "src/binary_ecc/f2m.rs": "cd25cffcb1d904be8fd8da059f4f0379c1bb60e566592f741e5ca3ee68223548",
+    "src/binary_ecc/hyperelliptic.rs": "09ce8a689aa8e190f51c871f9e94467271ea731b9629f69d322ae716de507c5c",
+    "src/binary_ecc/mod.rs": "84ece02cbf6f897317b236239c47efb0738d0e8e9f3d8530d2d4793609426099",
+    "src/binary_ecc/poly_f2m.rs": "4d76cd2e1fefe1a0decc2b118b12b896577e1fed30c9ee37fece6104487ce55c",
+    "src/cryptanalysis/curve_construction/gf2k.rs": "5c65e8789ce137643e7d256b11b0d1fca9a7770b34d492527749d8ff8efe011e",
+    "src/cryptanalysis/curve_construction/lpoly.rs": "d49576745ec42d9090807a88edb89b6372bfa2c43532240a66017becd31c5ccf",
+    "src/cryptanalysis/curve_construction/modular.rs": "048d106dec860cfbd5ef7b0a49095132c35c07a3ea2265e4c3995dfd5c970871",
+    "src/cryptanalysis/curve_construction/weil.rs": "9f1148e1ecd60e8d77470380639c8dd73856bb22ae2163a2fca23d6e37ddabf4",
+    "src/cryptanalysis/identity_certificate.rs": "d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270",
+    "src/hash/sha256.rs": "2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf"
+  },
+  "transport": {
+    "a11": 4,
+    "actual_Hecke_targets_per_source": 12,
+    "fixed_Weil_pairing": true,
+    "supported_sources": 24,
+    "unsupported_nonzero_j_sources": 18
+  }
+}

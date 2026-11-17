@@ -1,0 +1,38 @@
+{
+ "note": "Engineering change to ecbench harness overhead (wall time only); counted results unchanged. The rho reference is the rho.negation reference arm each session runs beside every other arm.",
+ "replay_certificate": {
+  "path": "../../research/ecbench_overhead_review_20261022/replay-certificate.json",
+  "sha256": "859fcc6573d3495d93ea4c3b25c4f4127d72bbf28d6fda89e4b329bc1eec29d9"
+ },
+ "rho_reference": {
+  "band_source": "../../research/ecbench_overhead_review_20261022/band/smoke-prime-20-final.json (ic.pipeline mitm vs rho.negation, 20-bit curve, 3 sessions)",
+  "binary_or_process": "ecbench 03d7abd4e (this change) for the headline sessions; every arm of a session runs in that session's binary",
+  "gae_band": {
+   "0": {
+    "ic": 10.492236407208546,
+    "rho": 1.3185300051675068
+   },
+   "0.1": {
+    "ic": 11.902105672804817,
+    "rho": 1.428559367304441
+   },
+   "1": {
+    "ic": 24.59092906317123,
+    "rho": 2.4188236265368515
+   }
+  },
+  "kind": "negation",
+  "matches_protocol": true,
+  "order_holds_across_band": true,
+  "protocol": "each spec's rho.negation reference arm (role reference), run in every session on the same curve and targets as every other arm; prime-order curves (A = 2), so negation is the strongest symmetry available",
+  "same_binary_or_process": true,
+  "same_unit": true,
+  "strongest_available": true,
+  "unit": "ecbench.gae (counted group operations, S = GAE/sqrt(r))"
+ },
+ "schema": "validation-gate/v1",
+ "validator_report": {
+  "path": "../../research/ecbench_overhead_review_20261022/validator-report.json",
+  "sha256": "cc475a107771c2eafe53124d3e56188cbe0bbf49fe7535f2321cf7efac150b75"
+ }
+}

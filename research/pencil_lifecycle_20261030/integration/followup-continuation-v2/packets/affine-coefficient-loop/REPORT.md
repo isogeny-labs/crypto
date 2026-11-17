@@ -1,0 +1,15 @@
+# Affine coefficient accumulation and bounded word arithmetic
+
+T-1142, 2026-10-31. Producer formal/source-binding packet; independent source-fidelity review pending.
+
+The symbolic nested loop computes C(scale^-1)*P(aX+b), where P is the polynomial represented by the first n input coefficients. This is proved for arbitrary n over a field. A row contributes C(c*scale^-1)*(aX+b)^k. Inner and outer prefix invariants establish accumulation order, slot updates change only the selected coefficient, and dropping a last zero coefficient preserves the represented polynomial. The final equation is connected directly to the preceding T_m normalization by taking scale=a^m.
+
+The helper's binomial recurrence is separately modeled with natural numbers and UInt64 multiplication/division. For every0<=j<=k<=5 the word result equals Nat.choose k j. Every multiplication intermediate before division is at most30; denominators are positive, and30<2^64. These are finite kernel-checked statements, not a generalized no-overflow claim. Degree6 produces an intermediate60 and is explicitly outside that30 bound. Loop index inequalities establish j<n and j<=k, including nonnegative subtraction, under k<n and j<k+1.
+
+Fixed controls cover constant/linear/quadratic rows with a2,b3,c4,scale2:2;6+4X;18+24X+8X². The middle coefficient24 rejects12 from omission of the binomial factor. Zero coefficients, empty input, slot isolation, final index, choose(5,2)=10 and the attained30 product are included. Thirteen main declarations and fourteen controls receive separate named axiom readback. Source/dependency hashes and native exits are checked. Main attempts passed with one unused-simp warning; the first control attempt failed on mapped rational constants, the correction passed, and controls were rebuilt after the final UInt64 theorem was added.
+
+Source excerpt and full-file hashes bind genus2_model_gate.rs:1-56. Its inverse call requires a nonzero scale; the algebraic identity remains meaningful at zero using the field's totalized inverse but is not an execution claim for that branch. The source uses choose%p; connecting encoded prime-field values, field-operation results and that reduction to abstract field coefficients remains a separate correspondence obligation. The UInt64 theorem models the bounded choose recurrence, not the compiled Rust binary or all field operations. Literal array/trim/compiler behavior and geometric divisor-class transport remain separate bindings.
+
+Relevant primary sources reviewed: Mathlib Taylor and Eval/Coeff documentation, plus the pinned Data/Nat/Choose/Sum.lean add_pow theorem. https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Polynomial/Taylor.html ; https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Polynomial/Eval/Coeff.html . Established binomial composition is reused; no novelty claim.
+
+No scientific campaign, curve enumeration, timing or cost ratio. Frozen cohort and campaign limits unchanged. Diagram describes proof dependencies; no performance data were generated. Independent semantic review and binary rechecking are not claimed.

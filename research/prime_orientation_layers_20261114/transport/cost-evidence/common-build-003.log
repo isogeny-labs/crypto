@@ -1,0 +1,27 @@
+'OrientationRationalSize.Bits.add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.grid_natAbs_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_chart_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_anchor_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_derivative_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_diagonal_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_absolute_left_coefficient_bits' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.cleared_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.integer_bivariate_clearing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.Rep.geometric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.geometric_denominator_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+../cost-evidence/common-draft-003.lean.txt:415:71: error(lean.invalidField): Invalid field `den`: The environment does not contain `Nat.le.den`, so it is not possible to project the field `den` from an expression
+  actual_chart_slope_bits a u x y t hu hy ht
+of type
+  (max (chartSlope a u x y t).num.natAbs (chartSlope a u x y t).den).le (2 ^ (a + 1 + (a + a + 1)))
+../cost-evidence/common-draft-003.lean.txt:414:72: error: unsolved goals
+a u x y : ℕ
+t : ℤ
+m : ℕ → ℕ
+hu : u ≤ a
+hy : y < 2 ^ a
+ht : ↑t ∈ grid a
+⊢ (actualDenomRep a u x y t m).den ≤ 2 ^ denominatorSize a u x y m
+'OrientationCommonDenominator.actualDenomRep' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actualDenomRep_bound' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

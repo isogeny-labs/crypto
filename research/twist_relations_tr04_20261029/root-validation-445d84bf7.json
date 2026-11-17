@@ -1,0 +1,65 @@
+{
+  "schema": "tr04.collected-root-validation/v1",
+  "collected_at": "2026-10-29T23:24:44.144Z",
+  "scope": "Completed default-feature root-library development validation at the exact source below; separate from PR2857/0044 evidence and standalone native checks",
+  "source": "445d84bf7f57750e0e34bd7a65992c36c0da92ec",
+  "tree": "d07bbebd386dedb208daf4e911e3d7a22faf5b39",
+  "command": "cargo test --release --locked --lib",
+  "started_at": "2026-10-29T22:11:17Z",
+  "finished_at": "2026-10-29T23:23:56Z",
+  "cargo_exit_code": 0,
+  "log": {
+    "path": "/workspace/tr04-root-445d84bf7-validation.log",
+    "bytes": 481622,
+    "sha256": "8014e6a48a0d8903d2221a47085b46620c4cae0cdb1ec1a746234ef2bd261ef9"
+  },
+  "exit_receipt": "/workspace/tr04-root-445d84bf7-exit.json",
+  "outer_test_count": 5512,
+  "terminal_full_summary": {
+    "status": "ok",
+    "passed": 5389,
+    "failed": 0,
+    "ignored": 123,
+    "measured": 0,
+    "filtered_out": 0,
+    "diagnostic_test_seconds": 2760.76,
+    "log_offset": 481513,
+    "text": "test result: ok. 5389 passed; 0 failed; 123 ignored; 0 measured; 0 filtered out; finished in 2760.76s"
+  },
+  "nested_summaries": [
+    {
+      "status": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 5511,
+      "diagnostic_test_seconds": 0,
+      "log_offset": 223158,
+      "text": "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5511 filtered out; finished in 0.00s"
+    },
+    {
+      "status": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 5511,
+      "diagnostic_test_seconds": 0,
+      "log_offset": 423255,
+      "text": "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5511 filtered out; finished in 0.00s"
+    }
+  ],
+  "consistency_checks": {
+    "source_matches_expected": true,
+    "tree_matches_receipt": true,
+    "log_hash_matches_exit_receipt": true,
+    "terminal_total_matches_outer_start": true,
+    "terminal_summary_is_unfiltered": true,
+    "tracked_worktree_clean": true
+  },
+  "completion_verified": true,
+  "validation_passed": true,
+  "new_tests_launched_by_collector": false,
+  "source_or_process_changes_by_collector": false
+}

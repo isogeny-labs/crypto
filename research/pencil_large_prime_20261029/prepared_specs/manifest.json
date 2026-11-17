@@ -1,0 +1,27 @@
+{
+  "schema": "pencil-prepared-specs/v1",
+  "status": "not_frozen_not_launch_authorization",
+  "source_archive_sha256": "550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339",
+  "small_denominator": 8,
+  "matrix_coefficient_cap": 25000000,
+  "memory_cap_gib": 8,
+  "per_execution_timeout_seconds": 3600,
+  "gate_order": [
+    "gate-p739.json",
+    "gate-p186379-target0.json"
+  ],
+  "extension_condition": "upper target verifies under the original resource gate and independent replay; retain failure and do not automatically extend after censoring",
+  "measured_seed_semantics": "index0 preserves archived seed; indices1..4 are additional predetermined paired algorithm streams, not repetitions of index0",
+  "qualified_ratios_available": false,
+  "files": {
+    "cohort-16.json": "1c5a421d5ad629be5ed66c360e7eafa49a35d3eebaec4bf7651848587828ee79",
+    "cohort-20.json": "33104eb19ee7a8995bccb43a3768824643b6ec6dae45bca4da809f88503fb639",
+    "cohort-24.json": "cbc91d501e44fb101a96ff0ce9a7d96cbd37d2761e910fa62cbd47dfd56ac315",
+    "cohort-28.json": "04c87c844c9216993cfa90aecbb1606080338232ebfa6ab91f12b6881d4b477c",
+    "cohort-32.json": "0bcb2f5f8811a370997724bf0186330fba14a896346d9206d3f67d8368cb22a3",
+    "cohort-36.json": "39cac1b85cb9672e5e5f3418957c994a005b59432dd2b6ca74226bed60d832fe",
+    "cohort-40.json": "fee38c5c381107272d65a89daa8151f75aa249082d0e9c82f1014211fdee2587",
+    "gate-p186379-target0.json": "d4ec180d5a2cf65617a5821b565ec0d4952435a77669da65ca77852d2723c32c",
+    "gate-p739.json": "a2c25a203ad4c39aaea57287e1705dd4b3db394cd10507fff009980ec8634c18"
+  }
+}

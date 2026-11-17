@@ -1,0 +1,307 @@
+{
+  "schema": "isolab.eks.recovery-state/v1",
+  "request": {
+    "schema": "isolab.eks.resumable/v1",
+    "run_name": "ecbench-periodic-20261022-b",
+    "deadline_unix_seconds": 1792650847,
+    "build": {
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+      "source_revision": "cb2ec6873f30b683f7885b53c410d69965f02c20",
+      "ecbench_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9"
+    },
+    "runtime_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0ecb5bf15e2f22b8d12242c3cb306735b1e44e696c698f2dade470b517869dd9",
+    "spec": {
+      "arms": [
+        {
+          "method": {
+            "id": "rho.negation"
+          },
+          "name": "rho-neg",
+          "role": "reference"
+        },
+        {
+          "method": {
+            "id": "rho.plain"
+          },
+          "name": "rho-plain",
+          "role": "baseline"
+        },
+        {
+          "method": {
+            "id": "rho.negation"
+          },
+          "name": "rho-neg-aa",
+          "role": "control"
+        }
+      ],
+      "description": "Isolation and correctness validation after a computation-only restore; independent fresh warmup and A/A. No algorithm speed claim.",
+      "label": "Periodic CRIU checkpoint rotation and distinct fresh L2 epoch qualification",
+      "measurement": {
+        "isolation_required": "L2",
+        "order": "alternate",
+        "rounds": 600,
+        "seed": 1,
+        "timeout_seconds": 120,
+        "warmup": 1
+      },
+      "schema": "ecbench.spec/v1",
+      "workloads": {
+        "curves": [
+          {
+            "bits": 32,
+            "kind": "prime_search",
+            "seed": 59297
+          }
+        ],
+        "target_seed": 20261002,
+        "targets_per_curve": 2
+      }
+    },
+    "instance_type": "c8a.2xlarge",
+    "checkpoint_interval_seconds": 30,
+    "max_restores": 2
+  },
+  "request_sha256": "ed92a0e90d771b6780055281e5d4fe5175314d990ab914bf52202b75e1fa8d55",
+  "owner_build": "isolab-recovery-controller:d7207b02-3696-4245-82d8-85334a06f105",
+  "phase": "failed",
+  "attempt": 1,
+  "restores": 1,
+  "next_generation": 3,
+  "checkpoint_generation": null,
+  "current_pod_uid": "165b5107-ec64-431a-8e1e-7ea1fb62d0bf",
+  "current_instance": "i-085d4c562929528bc",
+  "original_node_runtime": {
+    "architecture": "amd64",
+    "containerRuntimeVersion": "containerd://2.3.5+unknown",
+    "kernelVersion": "6.18.54-121.166.amzn2023.x86_64",
+    "osImage": "Amazon Linux 2023.12.20261012"
+  },
+  "terminated_instances": [
+    "i-0ae9215e018bebc9a"
+  ],
+  "generations": [
+    {
+      "number": 1,
+      "request_sha256": "ed92a0e90d771b6780055281e5d4fe5175314d990ab914bf52202b75e1fa8d55",
+      "snapshot_name": "ecbench-periodic-20261022-b-g1",
+      "snapshot_id": "snap-0d025b1c76948a8a5",
+      "archive_key": "recovery/runs/ecbench-periodic-20261022-b/generations/g1/checkpoint.tar",
+      "archive_version": "LTgiSBzssaKXOfrfjXjz9qEjGZLQTN_V",
+      "archive_sha256": "57c2dad45da251957022231e35eb225ddddeed9ea72ce40614d140a80b6f1fc2",
+      "manifest_sha256": "71748d2323684e1294aa499b1741c3a127ef79cecf68c067f35c8f876f0e5042",
+      "archive_bytes": 46489600,
+      "source_instance": "i-0ae9215e018bebc9a",
+      "source_pod_uid": "9a4a8f68-600d-4ccb-9b3b-7fe25202f142",
+      "committed_unix_seconds": 1792647506,
+      "snapshot_ready": true,
+      "encrypted": true,
+      "readback_verified": true
+    },
+    {
+      "number": 2,
+      "request_sha256": "ed92a0e90d771b6780055281e5d4fe5175314d990ab914bf52202b75e1fa8d55",
+      "snapshot_name": "ecbench-periodic-20261022-b-g2",
+      "snapshot_id": "snap-042f5c51ec9f5df38",
+      "archive_key": "recovery/runs/ecbench-periodic-20261022-b/generations/g2/checkpoint.tar",
+      "archive_version": "GH1tHPzJEH7UzY4pNT.7ntm8fSEKTA.W",
+      "archive_sha256": "266176d0d9a9b0ab00f6b16dc670cb55e206c17ef3102fe5d63086394aa620f9",
+      "manifest_sha256": "f3890745754a7f06f961ef43922a186b8a552a06dd22f27bc1d27cffa1491d9c",
+      "archive_bytes": 36321280,
+      "source_instance": "i-0ae9215e018bebc9a",
+      "source_pod_uid": "9a4a8f68-600d-4ccb-9b3b-7fe25202f142",
+      "committed_unix_seconds": 1792647640,
+      "snapshot_ready": true,
+      "encrypted": true,
+      "readback_verified": true
+    }
+  ],
+  "last_checkpoint_at": 1792648096,
+  "selected_generation": 2,
+  "failure": "fresh benchmark epoch failed; measurement is not retried",
+  "benchmark_job": "ecbench-periodic-20261022-b-epoch-1",
+  "benchmark_uid": "0e1512e7-e739-4bbb-b1fa-8163f9d8f2df",
+  "benchmark_manifest": {
+    "apiVersion": "batch/v1",
+    "kind": "Job",
+    "metadata": {
+      "annotations": {
+        "isolab.dev/logical-run": "ecbench-periodic-20261022-b",
+        "isolab.dev/recovery-request": "ed92a0e90d771b6780055281e5d4fe5175314d990ab914bf52202b75e1fa8d55"
+      },
+      "labels": {
+        "isolab.dev/job": "true"
+      },
+      "name": "ecbench-periodic-20261022-b-epoch-1",
+      "namespace": "isolab"
+    },
+    "spec": {
+      "activeDeadlineSeconds": 2526,
+      "backoffLimit": 0,
+      "template": {
+        "metadata": {
+          "annotations": {
+            "karpenter.sh/do-not-disrupt": "true"
+          },
+          "labels": {
+            "isolab.dev/job": "true"
+          }
+        },
+        "spec": {
+          "affinity": {
+            "podAntiAffinity": {
+              "requiredDuringSchedulingIgnoredDuringExecution": [
+                {
+                  "labelSelector": {
+                    "matchLabels": {
+                      "isolab.dev/job": "true"
+                    }
+                  },
+                  "topologyKey": "kubernetes.io/hostname"
+                }
+              ]
+            }
+          },
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "bash",
+                "-c",
+                "#!/usr/bin/env bash\n# Runs inside the pinned task image. argv[1] is literal spec JSON, not code.\nset -euo pipefail\nmkdir -p \"$ISOLAB_OUTPUT_DIR\"\nfinish() {\n  run_exit=$?\n  trap - EXIT TERM INT\n  set +e\n  printf '{\"exit_code\":%s,\"job_name\":\"%s\",\"pod_uid\":\"%s\",\"node_name\":\"%s\"}\\n' \"$run_exit\" \"$ISOLAB_JOB_ID\" \"$POD_UID\" \"$NODE_NAME\" > \"$ISOLAB_OUTPUT_DIR/job-exit.json\"\n  (\n    set -e\n    cd \"$ISOLAB_OUTPUT_DIR\"\n    shopt -s globstar nullglob\n    for artifact in **/*; do\n      if [[ -f \"$artifact\" && \"$artifact\" != SHA256SUMS ]]; then sha256sum \"$artifact\"; fi\n    done\n  ) > \"$ISOLAB_OUTPUT_DIR/SHA256SUMS\"\n  hash_exit=$?\n  if [[ \"$hash_exit\" != 0 ]]; then exit 90; fi\n  if aws s3 cp \"$ISOLAB_OUTPUT_DIR/\" \"$ISOLAB_RESULTS_URI\" --recursive --only-show-errors; then\n    printf 'Artifacts saved: %s\\n' \"$ISOLAB_RESULTS_URI\"\n  else\n    exit 91\n  fi\n  exit \"$run_exit\"\n}\ntrap finish EXIT\ntrap 'exit 143' TERM\ntrap 'exit 130' INT\ncp /opt/isolab/build-info.json \"$ISOLAB_OUTPUT_DIR/build-info.json\"\nsha256sum /usr/local/bin/ecbench > \"$ISOLAB_OUTPUT_DIR/binary.sha256\"\n# Validate build identity before any warmup or measured execution.\njq -e --arg source \"${2:?expected source revision}\" --arg binary \"${3:?expected binary hash}\" \\\n  '.source_revision==$source and .ecbench_sha256==$binary' \\\n  \"$ISOLAB_OUTPUT_DIR/build-info.json\" >/dev/null || exit 44\n[[ $(cut -d' ' -f1 \"$ISOLAB_OUTPUT_DIR/binary.sha256\") == \"$3\" ]] || exit 44\nprintf '%s\\n' \"$1\" > \"$ISOLAB_OUTPUT_DIR/input-spec.json\"\nspec=\"$ISOLAB_OUTPUT_DIR/input-spec.json\"\njq -e '.schema == \"ecbench.spec/v1\" and .measurement.isolation_required == \"L2\"\n  and .measurement.rounds >= 5 and .measurement.warmup >= 1\n  and ([.arms[] | select(.role == \"reference\")] | length > 0)\n  and ([.arms[] | select(.role == \"control\")] | length > 0)' \"$spec\" >/dev/null\naws sts get-caller-identity > \"$ISOLAB_OUTPUT_DIR/runner-identity.json\"\ncat /proc/self/status > \"$ISOLAB_OUTPUT_DIR/process-status.txt\"\ncat /sys/fs/cgroup/cpuset.cpus.effective > \"$ISOLAB_OUTPUT_DIR/pod-cpuset.txt\"\n# A separate whole core remains for the parent shell and harness. No busy\n# override, threshold override, automatic retry, or selective record removal.\nsleep 60\necbench run --spec \"$spec\" --out \"$ISOLAB_OUTPUT_DIR/session\" --cpus auto > \"$ISOLAB_OUTPUT_DIR/run-summary.json\" 2> \"$ISOLAB_OUTPUT_DIR/run.stderr\"\necbench verify --dir \"$ISOLAB_OUTPUT_DIR/session\" --replay-all --exit-code --out \"$ISOLAB_OUTPUT_DIR/audit.json\" > \"$ISOLAB_OUTPUT_DIR/audit.stdout\" 2> \"$ISOLAB_OUTPUT_DIR/audit.stderr\"\ncat \"$ISOLAB_OUTPUT_DIR/audit.stderr\"\njq -e '.ok and .regraded and .records_bound and .records>0\n  and .verified_records==.records and (.replays|length)>0\n  and all(.replays[]; .reproduced==true)' \"$ISOLAB_OUTPUT_DIR/audit.json\" >/dev/null || exit 41\n# The audit authenticates and regrades the records; this additional gate\n# rejects a correct computation whose measurement did not achieve L2.\njq -s '{required:\"L2\",executions:length,\n  invalid_outcomes:[.[] | select(.outcome.status != \"verified\" or .outcome.matches_target != true) | {seq,arm,outcome}],\n  below_l2:[.[] | select(.isolation.level != \"L2\" and .isolation.level != \"L3\") | {seq,arm,isolation}],\n  grades:(group_by(.isolation.level)|map({level:.[0].isolation.level,count:length}))}\n  | .accepted=(.executions > 0 and (.below_l2|length)==0 and (.invalid_outcomes|length)==0)' \\\n  \"$ISOLAB_OUTPUT_DIR/session/records.jsonl\" > \"$ISOLAB_OUTPUT_DIR/l2-gate.json\"\njq -e '.accepted' \"$ISOLAB_OUTPUT_DIR/l2-gate.json\" >/dev/null || exit 42\nreference=$(jq -r '.arms[] | select(.role==\"reference\") | .name' \"$spec\" | head -1)\ncontrol=$(jq -r '.arms[] | select(.role==\"control\") | .name' \"$spec\" | head -1)\necbench compare --dir \"$ISOLAB_OUTPUT_DIR/session\" --a \"$reference\" --b \"$control\" --json \\\n  > \"$ISOLAB_OUTPUT_DIR/control-comparison.json\"\njq -e '.wall.status==\"admitted\" and .wall.pairs_below_level==0 and .wall.aa_pairs>=5\n  and .wall.aa_ci95!=null' \"$ISOLAB_OUTPUT_DIR/control-comparison.json\" >/dev/null || exit 43\n",
+                "isolab-ecbench",
+                "{\"arms\":[{\"method\":{\"id\":\"rho.negation\"},\"name\":\"rho-neg\",\"role\":\"reference\"},{\"method\":{\"id\":\"rho.plain\"},\"name\":\"rho-plain\",\"role\":\"baseline\"},{\"method\":{\"id\":\"rho.negation\"},\"name\":\"rho-neg-aa\",\"role\":\"control\"}],\"description\":\"Isolation and correctness validation after a computation-only restore; independent fresh warmup and A/A. No algorithm speed claim.\",\"label\":\"Periodic CRIU checkpoint rotation and distinct fresh L2 epoch qualification\",\"measurement\":{\"isolation_required\":\"L2\",\"order\":\"alternate\",\"rounds\":600,\"seed\":1,\"timeout_seconds\":120,\"warmup\":1},\"schema\":\"ecbench.spec/v1\",\"workloads\":{\"curves\":[{\"bits\":32,\"kind\":\"prime_search\",\"seed\":59297}],\"target_seed\":20261002,\"targets_per_curve\":2}}",
+                "cb2ec6873f30b683f7885b53c410d69965f02c20",
+                "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9"
+              ],
+              "env": [
+                {
+                  "name": "HOME",
+                  "value": "/work"
+                },
+                {
+                  "name": "AWS_REGION",
+                  "value": "us-east-2"
+                },
+                {
+                  "name": "AWS_DEFAULT_REGION",
+                  "value": "us-east-2"
+                },
+                {
+                  "name": "POD_UID",
+                  "valueFrom": {
+                    "fieldRef": {
+                      "fieldPath": "metadata.uid"
+                    }
+                  }
+                },
+                {
+                  "name": "NODE_NAME",
+                  "valueFrom": {
+                    "fieldRef": {
+                      "fieldPath": "spec.nodeName"
+                    }
+                  }
+                },
+                {
+                  "name": "ISOLAB_JOB_ID",
+                  "value": "ecbench-periodic-20261022-b-epoch-1"
+                },
+                {
+                  "name": "ISOLAB_OUTPUT_DIR",
+                  "value": "/work/results"
+                },
+                {
+                  "name": "ISOLAB_RESULTS_URI",
+                  "value": "s3://isolab-results-104186811093-us-east-2/runs/ecbench-periodic-20261022-b-epoch-1/$(POD_UID)/"
+                },
+                {
+                  "name": "RAYON_NUM_THREADS",
+                  "value": "4"
+                },
+                {
+                  "name": "OMP_NUM_THREADS",
+                  "value": "4"
+                }
+              ],
+              "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+              "name": "task",
+              "resources": {
+                "limits": {
+                  "cpu": "4",
+                  "ephemeral-storage": "10Gi",
+                  "memory": "4Gi"
+                },
+                "requests": {
+                  "cpu": "4",
+                  "ephemeral-storage": "10Gi",
+                  "memory": "4Gi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "readOnlyRootFilesystem": true
+              },
+              "volumeMounts": [
+                {
+                  "mountPath": "/work",
+                  "name": "work"
+                },
+                {
+                  "mountPath": "/tmp",
+                  "name": "tmp"
+                }
+              ],
+              "workingDir": "/work"
+            }
+          ],
+          "nodeSelector": {
+            "isolab.dev/cpu-isolation": "v4",
+            "isolab.dev/pool": "cpu-spot",
+            "node.kubernetes.io/instance-type": "c8a.2xlarge"
+          },
+          "restartPolicy": "Never",
+          "securityContext": {
+            "fsGroup": 1000,
+            "runAsGroup": 1000,
+            "runAsNonRoot": true,
+            "runAsUser": 1000,
+            "seccompProfile": {
+              "type": "RuntimeDefault"
+            }
+          },
+          "serviceAccountName": "runner",
+          "terminationGracePeriodSeconds": 60,
+          "tolerations": [
+            {
+              "effect": "NoSchedule",
+              "key": "isolab.dev/workload",
+              "operator": "Equal",
+              "value": "cpu"
+            }
+          ],
+          "volumes": [
+            {
+              "emptyDir": {
+                "sizeLimit": "8Gi"
+              },
+              "name": "work"
+            },
+            {
+              "emptyDir": {
+                "sizeLimit": "1Gi"
+              },
+              "name": "tmp"
+            }
+          ]
+        }
+      },
+      "ttlSecondsAfterFinished": 86400
+    }
+  },
+  "benchmark_create_attempted": true
+}

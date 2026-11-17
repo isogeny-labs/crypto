@@ -1,0 +1,1211 @@
+//! # The stages of an index-calculus pipeline, as plug points.
+//!
+//! An elliptic-curve index-calculus attack is the same five stages
+//! whatever the variant, and each stage has one job with a stable
+//! interface.  This module states those interfaces as traits so that a
+//! variant is a *choice at each stage* rather than a fork of the whole
+//! pipeline.
+//!
+//! ```text
+//!   instance ──► factor base ──► targets ──► decomposition ──► relations ──► logarithm
+//!                    │              │             │                │
+//!            FactorBaseBuilder  TargetSource  DecompositionOracle  RelationSolver
+//!                                                   │
+//!                                             SystemSolver
+//!                                        (algebraic oracles only)
+//! ```
+//!
+//! ## What each stage owes the pipeline
+//!
+//! Every stage is handed a `&mut GroupOps` and must charge **every**
+//! group operation it performs to it.  That is not a formality: the
+//! whole point of the framework is that the end-to-end cost is the sum
+//! of the stages, so a stage that does uncounted work makes the total a
+//! fiction.  Engine-native work that is not a group operation — square
+//! roots, table lookups, SAT conflicts, monomial operations — is
+//! charged to the stage's own counters and converted once, at the end,
+//! by the calibration.  See `docs/ic/FRAMEWORK.md` for the accounting
+//! contract in full.
+//!
+//! ## Why the traits are generic over the group
+//!
+//! A prime-field curve, a random binary curve and a Koblitz curve differ
+//! in their arithmetic and in what symmetries the factor base can fold,
+//! but not in the shape of the pipeline.  [`CountedGroup`] is the
+//! repository's existing abstraction for "a group whose every operation
+//! is counted", so the stages are generic over it and a plug-in written
+//! once runs on any regime whose group implements it.
+
+use std::collections::BTreeMap;
+use std::time::Duration;
+
+use serde::{Deserialize, Serialize};
+
+use crate::cryptanalysis::ic_boundary::{
+    CompletionRule, CountedGroup, FactorBase, GroupOps, OracleCounters, Relation, RowStatus,
+};
+use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+
+/// The matrix contract consumed by the collector and [`RelationSolverFactory`].
+/// The older [`RelationSolver`] interface below additionally carries metadata.
+pub use crate::cryptanalysis::ic_boundary::RelationSolver as RelationMatrix;
+
+/// Free-form parameters a plug-in reads its configuration from.
+///
+/// Deliberately untyped: a factor-base builder wants a size, a subspace
+/// dimension or a fold, and the framework should not need editing to
+/// let a new plug-in take a parameter it invented.  A plug-in validates
+/// what it reads and returns a clear error when a parameter is missing
+/// or absurd, rather than defaulting silently.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct Params(pub BTreeMap<String, String>);
+
+impl Params {
+    pub fn get(&self, key: &str) -> Option<&str> {
+        self.0.get(key).map(|s| s.as_str())
+    }
+
+    /// A required integer parameter.
+    pub fn u64(&self, key: &str) -> Result<u64, String> {
+        let raw = self
+            .get(key)
+            .ok_or_else(|| format!("missing parameter `{key}`"))?;
+        raw.parse()
+            .map_err(|_| format!("parameter `{key}` is not a number: `{raw}`"))
+    }
+
+    /// An optional integer parameter with a default.
+    pub fn u64_or(&self, key: &str, default: u64) -> Result<u64, String> {
+        match self.get(key) {
+            None => Ok(default),
+            Some(raw) => raw
+                .parse()
+                .map_err(|_| format!("parameter `{key}` is not a number: `{raw}`")),
+        }
+    }
+
+    /// An optional flag; absent is `false`.
+    pub fn flag(&self, key: &str) -> bool {
+        matches!(self.get(key), Some("1" | "true" | "yes"))
+    }
+
+    pub fn set(&mut self, key: &str, value: impl Into<String>) -> &mut Self {
+        self.0.insert(key.into(), value.into());
+        self
+    }
+
+    /// Parse a plug-in spec, `name` or `name:k=v,k=v`, into its name and
+    /// parameters.
+    ///
+    /// `,` ends a parameter, so a value that is itself a list takes `;`
+    /// between its items: `koblitz-orbit:divisor=1;2`.  Written with a
+    /// `,`, the second item arrives as a token with no `=`; that is
+    /// refused here with a message that names the `;`, rather than
+    /// guessed at, because reading `divisor=1,2` as `divisor=1` would
+    /// silently build a different factor base.
+    pub fn parse_spec(spec: &str) -> Result<(String, Params), String> {
+        let (name, rest) = spec.split_once(':').unwrap_or((spec, ""));
+        if name.is_empty() || name.chars().any(char::is_whitespace) {
+            return Err(format!("invalid plug-in name `{name}`"));
+        }
+        let mut params = Params::default();
+        let mut previous: Option<&str> = None;
+        for kv in rest.split(',').filter(|s| !s.is_empty()) {
+            let Some((k, v)) = kv.split_once('=') else {
+                return Err(match previous {
+                    Some(prev) => format!(
+                        "stray token `{kv}` after `{prev}` in plug-in spec `{spec}`: `,` separates \
+                         parameters, so separate the items of a list value with `;` \
+                         (`{prev};{kv}`, not `{prev},{kv}`; quote the argument in a shell)"
+                    ),
+                    None => format!("parameter `{kv}` is not key=value"),
+                });
+            };
+            let key = k.trim();
+            if key.is_empty() {
+                return Err(format!("empty parameter name in plug-in spec `{spec}`"));
+            }
+            if params.get(key).is_some() {
+                return Err(format!(
+                    "duplicate parameter `{key}` in plug-in spec `{spec}`"
+                ));
+            }
+            params.set(key, v.trim());
+            previous = Some(kv);
+        }
+        Ok((name.to_string(), params))
+    }
+}
+
+/// Everything a stage may need to know about the instance it is
+/// running on, and nothing it may not.
+///
+/// In particular there is **no field for the secret**.  A stage that
+/// could read `k` could fake a relation, and a pipeline that can fake a
+/// relation measures nothing.  The runner holds the planted logarithm
+/// and uses it once, to verify the recovered answer.
+pub struct InstanceCtx<'a, G: CountedGroup> {
+    pub group: &'a G,
+    pub generator: G::Elt,
+    /// `Q = [k]G`, the point whose logarithm the pipeline must recover.
+    pub target: G::Elt,
+    /// The prime order of the subgroup the logarithm lives in.
+    pub r: u64,
+    /// `#E / r`.
+    pub cofactor: u64,
+    /// `#E`, the order of the whole curve group.
+    pub group_order: u64,
+    /// A name for the instance, used in reports.
+    pub name: String,
+    /// The field degree for binary regimes, `None` for prime fields.
+    pub field_degree: Option<u32>,
+}
+
+/// **Stage 1 — the factor base.**
+///
+/// Chooses the subset `F ⊂ E` that relations are written over, and the
+/// column map that says which unknown each point contributes to.  The
+/// column map is what lets a base fold by negation (`P` and `−P` share
+/// a column with opposite signs) or by the Frobenius (a whole orbit
+/// shares one), which is why it is the builder's job and not the
+/// runner's.
+///
+/// The build cost belongs to the pipeline's total, so charge it to
+/// `ops` and to `FactorBase::cost`.
+pub trait FactorBaseBuilder<G: CountedGroup> {
+    fn name(&self) -> &str;
+
+    /// One line on what this base is and what it costs, for the report.
+    fn describe(&self, params: &Params) -> String;
+
+    /// The parameters this builder reads, with a word on each, so that
+    /// `ic bench --list` can tell a user what to pass.
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[]
+    }
+
+    fn build(
+        &self,
+        ctx: &InstanceCtx<G>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<FactorBase<G::Elt>, String>;
+
+    /// Columns whose logarithm the base knows before any relation, in the
+    /// relation matrix's convention `x = h·log_G(seed)`. The pipeline enters
+    /// each as a unit row ahead of the relation search. Empty for every base
+    /// whose seeds are found points rather than the generator.
+    fn known_column_logs(
+        &self,
+        _ctx: &InstanceCtx<G>,
+        _params: &Params,
+    ) -> Result<Vec<(usize, u64)>, String> {
+        Ok(Vec::new())
+    }
+}
+
+/// Constructs a fresh relation matrix after the factor base fixes its width.
+///
+/// A factory may borrow application state. It receives no planted logarithm.
+/// Completion and verification policy belong to this contract rather than to
+/// a hard-coded string comparison in the runner. Returned matrices must start
+/// empty and obey [`RelationMatrix`]'s accounting and incremental-query rules.
+pub trait RelationSolverFactory {
+    fn name(&self) -> &str;
+
+    fn create(&self, columns: usize, modulus: u64) -> Result<Box<dyn RelationMatrix + '_>, String>;
+
+    fn completion_rule(&self) -> CompletionRule {
+        CompletionRule::TargetPinned
+    }
+
+    /// Check a representative of every factor-base column after recovery.
+    /// Requires [`CompletionRule::FullRank`].
+    fn verify_base_columns(&self) -> bool {
+        false
+    }
+}
+
+/// All replaceable stages needed by the runner. The caller owns the plug-ins;
+/// there is no global registry, required allocator scheme, or thread model.
+pub struct PipelineStages<'a, G: CountedGroup> {
+    pub factor_base: &'a dyn FactorBaseBuilder<G>,
+    pub oracle: &'a mut dyn DecompositionOracle<G>,
+    pub matrix: &'a dyn RelationSolverFactory,
+}
+
+/// The shape of an algebraic system, for the report's degree columns.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct SystemShape {
+    pub n_vars: usize,
+    pub n_equations: usize,
+    /// The degree of each equation, in the variables the solver sees.
+    pub degrees: Vec<u32>,
+    /// The semi-regular degree of a system with these degrees: what a
+    /// system with no exploitable structure would reach.
+    pub semi_regular_degree: Option<u32>,
+}
+
+/// **Stage 3 — the point decomposition problem.**
+///
+/// Given a target point `R`, find `m` factor-base points summing to it,
+/// returned as indices into `fb.points`.  `None` means this `R` does
+/// not decompose over this base, which is the common case and must be
+/// cheap.
+///
+/// An oracle that works by solving an algebraic system reports the
+/// system it built through [`DecompositionOracle::last_system`], so the
+/// degree columns of the report are filled from the real system rather
+/// than from a model of it.
+pub trait DecompositionOracle<G: CountedGroup> {
+    fn name(&self) -> &str;
+
+    /// How many factor-base points a relation from this oracle has.
+    fn summands(&self) -> u32;
+
+    fn describe(&self, params: &Params) -> String;
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[]
+    }
+
+    /// Prepare for a run: build whatever table or precomputation the
+    /// oracle needs, charging it to `ops`.  Called once per run, after
+    /// the factor base exists.
+    fn prepare(
+        &mut self,
+        _ctx: &InstanceCtx<G>,
+        _fb: &FactorBase<G::Elt>,
+        _params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        Ok(())
+    }
+
+    /// Native work performed by `prepare`, charged to the oracle setup
+    /// phase after preparation completes. Existing oracles default to none.
+    fn setup_native(&self) -> BTreeMap<String, u64> {
+        BTreeMap::new()
+    }
+
+    /// Read, without counting or deciding anything, the memory
+    /// [`Self::decompose`] will read for `point`, so that a caller that
+    /// knows several targets ahead can overlap their cache misses.  The
+    /// default does nothing; it never changes a result or a counter.
+    fn touch(&self, _ctx: &InstanceCtx<G>, _point: &G::Elt) {}
+    /// Work performed by `prepare` that only `bitop/v1` prices (table
+    /// insert attempts, canonicalisation tables), by `ecbench::work`
+    /// counter name; kept out of `setup_native` so committed records
+    /// replay.  An oracle whose set-up work is all counted also returns
+    /// the marker `counted:table_insert_attempts`.
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        BTreeMap::new()
+    }
+
+    /// Verified homogeneous relations found during `prepare`. Each row has
+    /// one coefficient per factor-base column; the framework appends a zero
+    /// target coefficient and enters it with right-hand side zero before
+    /// drawing targets. Existing oracles seed no rows.
+    fn setup_rows(&self) -> &[Vec<u64>] {
+        &[]
+    }
+
+    /// Decompose `point`, or decide it does not decompose.
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: G::Elt,
+    ) -> Option<Vec<usize>>;
+
+    /// Select the cache-line relation guard.  Both representations return
+    /// identical membership answers; the default preserves every recorded
+    /// run's hash-map path.
+    fn line_guard(&self) -> bool {
+        false
+    }
+
+    /// A stored ladder `[2^i]G` (already paid for in `prepare`) that the
+    /// pipeline's recovery check `[d]G` may read instead of a
+    /// double-and-add, charged to the same verification ops.  `None` (the
+    /// default) keeps every recorded run's check.
+    fn recovery_ladder(&self) -> Option<Vec<G::Elt>> {
+        None
+    }
+
+    /// **The large-prime seam.**  Decompose `point = [a]G + [b]Q`, or
+    /// store what partially decomposed and hand back whatever complete
+    /// relations the stored partials now merge into.  The default is
+    /// [`decompose`] wrapped as one [`Relation::Summands`], so an
+    /// oracle without large primes behaves exactly as before; the
+    /// Frobenius pair-table oracle overrides it when `large_primes` is
+    /// set (`ic_framework::large_prime`).  Every merged row returned
+    /// here must already hold as a group equation.
+    ///
+    /// [`decompose`]: DecompositionOracle::decompose
+    #[allow(clippy::too_many_arguments)]
+    fn decompose_relations(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: G::Elt,
+        _a: u64,
+        _b: u64,
+    ) -> Vec<Relation> {
+        match self.decompose(ctx, fb, ops, counters, point) {
+            Some(summands) => vec![Relation::Summands(summands)],
+            None => Vec::new(),
+        }
+    }
+
+    /// Native counters the oracle accumulated over the relation phase
+    /// beyond [`OracleCounters`], folded into the relation phase's
+    /// counters by name.  The large-prime collector reports its partials,
+    /// merges and verification work here.
+    fn relation_counters(&self) -> BTreeMap<String, u64> {
+        BTreeMap::new()
+    }
+
+    /// Relation-phase work that only `bitop/v1` prices, as
+    /// [`setup_work_native`](Self::setup_work_native) is for set-up.
+    fn relation_work_native(&self) -> BTreeMap<String, u64> {
+        BTreeMap::new()
+    }
+
+    /// The algebraic system the last [`decompose`] built, when it built
+    /// one.  Table oracles return `None` and their degree columns stay
+    /// empty, which is correct: they solve no system.
+    ///
+    /// [`decompose`]: DecompositionOracle::decompose
+    fn last_system(&self) -> Option<SystemShape> {
+        None
+    }
+
+    /// Everything the oracle's [`SystemSolver`] cost over the run so
+    /// far, when it uses one.  The runner prices this into `S` and
+    /// fills the report's degree columns from it.  Table oracles return
+    /// `None`.
+    fn solver_totals(&self) -> Option<SolverTotals> {
+        None
+    }
+}
+
+/// Totals an algebraic oracle accumulates over its solver calls.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct SolverTotals {
+    /// Advisory degree-of-regularity forecast over the calls seen so far
+    /// (`crate::cryptanalysis::dreg_forecast`), fed by
+    /// [`absorb_outcome`](Self::absorb_outcome).  Built at the first call
+    /// that reports a degree: a capped engine's cap (`extra["max_degree"]`)
+    /// is the censoring bound, an uncapped one gets the Boolean ring's own
+    /// ceiling, the variable count.  An engine that reports no degree at
+    /// all (SAT, exhaustive search) leaves it `None` and says why in
+    /// `forecast_unavailable`.  Never priced, never a stopping rule.
+    #[serde(skip)]
+    pub forecaster: Option<crate::cryptanalysis::dreg_forecast::Forecaster>,
+    #[serde(skip)]
+    pub forecast_unavailable: Option<String>,
+    pub solver: String,
+    pub calls: u64,
+    pub ops: u64,
+    pub op_unit: String,
+    pub wall_ns: u64,
+    pub peak_bytes: u64,
+    /// Calls that ran out of budget, counted apart from refutations.
+    pub budget_exceeded: u64,
+    pub solving_degree_sum: u64,
+    pub solving_degree_max: u32,
+    pub calls_with_a_degree: u64,
+    /// Smallest first-fall degree seen over the calls (the run's measured
+    /// first fall), largest last-fall degree, and the observed degree of
+    /// regularity of the shared system shape.  Diagnostic, never priced.
+    pub first_fall_degree: Option<u32>,
+    pub last_fall_degree: Option<u32>,
+    pub degree_of_regularity_observed: Option<u32>,
+    /// The per-degree history of the single most detailed call seen (the
+    /// one with the most recorded steps), kept for the trace drawing.
+    pub degree_trace: Vec<DegreeStep>,
+    /// The shape of the last system, which is the shape of every system
+    /// on one base: the descent's variable and equation counts do not
+    /// depend on the target.
+    pub shape: Option<SystemShape>,
+    pub extra: BTreeMap<String, u64>,
+}
+
+/// The `SolverCost::extra` flag by which an engine says its `bitop_*`
+/// keys count its whole call (`ecbench::work::SOLVER_BITOP_KEYS`).
+const BITOP_COMPLETE: &str = "bitop_complete";
+
+impl SolverTotals {
+    pub fn absorb(
+        &mut self,
+        shape: &SystemShape,
+        cost: Option<&SolverCost>,
+        budget_exceeded: bool,
+    ) {
+        self.calls += 1;
+        self.shape = Some(shape.clone());
+        self.budget_exceeded += u64::from(budget_exceeded);
+        // `bitop_complete` is a flag, not a total: the run's `bitop_*`
+        // counts cover all of its work only if every call's did, so it
+        // stays 1 while every call reports 1 and drops to 0 at the first
+        // that does not (an unmeasured call included).
+        let complete = cost.and_then(|c| c.extra.get(BITOP_COMPLETE)).copied() == Some(1);
+        if self.calls == 1 {
+            if complete {
+                self.extra.insert(BITOP_COMPLETE.into(), 1);
+            }
+        } else if !complete {
+            if let Some(flag) = self.extra.get_mut(BITOP_COMPLETE) {
+                *flag = 0;
+            }
+        }
+        let Some(c) = cost else { return };
+        self.ops += c.ops;
+        if self.op_unit.is_empty() {
+            self.op_unit = c.op_unit.clone();
+        }
+        self.wall_ns += c.wall_ns;
+        self.peak_bytes = self.peak_bytes.max(c.peak_bytes);
+        if let Some(d) = c.solving_degree {
+            self.solving_degree_sum += d as u64;
+            self.solving_degree_max = self.solving_degree_max.max(d);
+            self.calls_with_a_degree += 1;
+        }
+        // Degree falls: first fall is the smallest over the run, last fall
+        // the largest; the observed degree of regularity is a property of
+        // the shared system shape, so keep the largest any call reported.
+        if let Some(ff) = c.first_fall_degree {
+            self.first_fall_degree = Some(self.first_fall_degree.map_or(ff, |cur| cur.min(ff)));
+        }
+        if let Some(lf) = c.last_fall_degree {
+            self.last_fall_degree = Some(self.last_fall_degree.map_or(lf, |cur| cur.max(lf)));
+        }
+        if let Some(dr) = c.degree_of_regularity_observed {
+            self.degree_of_regularity_observed = Some(
+                self.degree_of_regularity_observed
+                    .map_or(dr, |cur| cur.max(dr)),
+            );
+        }
+        // Keep the richest single-call trace (most recorded steps).
+        if c.degree_trace.len() > self.degree_trace.len() {
+            self.degree_trace = c.degree_trace.clone();
+        }
+        // A key that names a maximum (`*_max`) is the maximum over
+        // calls; every other key is a total over the run.
+        for (k, v) in &c.extra {
+            if k == BITOP_COMPLETE {
+                continue;
+            }
+            let entry = self.extra.entry(k.clone()).or_insert(0);
+            if k.ends_with("_max") {
+                *entry = (*entry).max(*v);
+            } else {
+                *entry += v;
+            }
+        }
+    }
+
+    /// [`absorb`](Self::absorb), then feed the degree-of-regularity
+    /// forecaster with what the call decided: `found` is whether the
+    /// solve produced a decomposition.  A decided call observes its
+    /// solving degree (the engine's, or else the highest degree it
+    /// built); a budget-exceeded call is right-censored at the highest
+    /// degree built.  A call that reports neither degree is counted in
+    /// the totals but not in the forecast.
+    pub fn absorb_outcome(
+        &mut self,
+        shape: &SystemShape,
+        cost: Option<&SolverCost>,
+        budget_exceeded: bool,
+        found: bool,
+    ) {
+        use crate::cryptanalysis::dreg_forecast::{Forecaster, Outcome, SolveObservation};
+        self.absorb(shape, cost, budget_exceeded);
+        let Some(c) = cost else {
+            return;
+        };
+        let exhausted = budget_exceeded || c.timed_out;
+        let degree = c.solving_degree.or(c.degree_reached);
+        if self.forecaster.is_none() && self.forecast_unavailable.is_none() {
+            let cap = c
+                .extra
+                .get("max_degree")
+                .copied()
+                .filter(|b| *b > 0 && *b <= u64::from(u32::MAX))
+                .map(|b| b as u32);
+            if cap.is_none() && degree.is_none() {
+                self.forecast_unavailable = Some(
+                    "the solver reports neither a degree cap (`max_degree`) nor a solving degree: no degree-of-regularity forecast".into(),
+                );
+                return;
+            }
+            // An uncapped engine (a full Gröbner basis) is bounded by the
+            // Boolean ring's own ceiling, the variable count.
+            let bound = cap.unwrap_or_else(|| shape.n_vars.clamp(1, u32::MAX as usize) as u32);
+            let mut f = Forecaster::new(bound).with_work_unit(&c.op_unit);
+            f.set_shape(crate::cryptanalysis::dreg_forecast::SystemShape {
+                variables: shape.n_vars,
+                equation_degrees: shape.degrees.iter().copied().filter(|d| *d > 0).collect(),
+                boolean: true,
+            });
+            self.forecaster = Some(f);
+        }
+        let Some(f) = self.forecaster.as_mut() else {
+            return;
+        };
+        if degree.is_none() {
+            return;
+        }
+        f.observe(SolveObservation {
+            outcome: if exhausted {
+                Outcome::Exhausted
+            } else if found {
+                Outcome::Decomposed
+            } else {
+                Outcome::Refuted
+            },
+            solving_degree: degree,
+            censored_above: c.degree_reached.unwrap_or(0),
+            work: c.ops,
+            relation_phase: true,
+            relation: found,
+        });
+    }
+
+    /// Feed the forecaster from an oracle that totals its own degrees: a
+    /// Macaulay solve at a fixed `degree` under a fixed `bound`.  An
+    /// `exhausted` call (a degenerate system that the matrix at this degree
+    /// did not resolve) is right-censored at `degree`; a decided call
+    /// observes `degree` and whether it `found` a decomposition.  Creates
+    /// the forecaster from the recorded shape and unit on first use.
+    pub fn observe_degree(
+        &mut self,
+        bound: u32,
+        degree: u32,
+        work: u64,
+        exhausted: bool,
+        found: bool,
+    ) {
+        use crate::cryptanalysis::dreg_forecast::{Forecaster, Outcome, SolveObservation};
+        if self.forecaster.is_none() {
+            let mut f = Forecaster::new(bound.max(1)).with_work_unit(&self.op_unit);
+            if let Some(shape) = &self.shape {
+                f.set_shape(crate::cryptanalysis::dreg_forecast::SystemShape {
+                    variables: shape.n_vars,
+                    equation_degrees: shape.degrees.iter().copied().filter(|d| *d > 0).collect(),
+                    boolean: false,
+                });
+            }
+            self.forecaster = Some(f);
+            self.forecast_unavailable = None;
+        }
+        if let Some(f) = self.forecaster.as_mut() {
+            f.observe(SolveObservation {
+                outcome: if exhausted {
+                    Outcome::Exhausted
+                } else if found {
+                    Outcome::Decomposed
+                } else {
+                    Outcome::Refuted
+                },
+                solving_degree: Some(degree),
+                censored_above: degree,
+                work,
+                relation_phase: true,
+                relation: found,
+            });
+        }
+    }
+
+    pub fn solving_degree_mean(&self) -> Option<f64> {
+        (self.calls_with_a_degree > 0)
+            .then(|| self.solving_degree_sum as f64 / self.calls_with_a_degree as f64)
+    }
+
+    pub fn semi_regular_degree(&self) -> Option<u32> {
+        self.shape.as_ref()?.semi_regular_degree
+    }
+
+    /// Mean solving degree over the semi-regular degree: below one is
+    /// the structure the solver exploited.
+    pub fn degree_over_bound(&self) -> Option<f64> {
+        Some(self.solving_degree_mean()? / self.semi_regular_degree()? as f64)
+    }
+}
+
+/// A boolean polynomial system, the common currency between an
+/// algebraic decomposition oracle and a solver.
+///
+/// `F_2` and the boolean quotient `v² = v` are the setting every
+/// Weil-descended Semaev system lands in, so a solver that speaks this
+/// speaks to all of them.  A solver over a larger field adapts at its
+/// own boundary.
+#[derive(Clone, Debug)]
+pub struct BooleanSystem {
+    pub equations: Vec<F2BoolPoly>,
+    pub n_vars: usize,
+}
+
+impl BooleanSystem {
+    pub fn shape(&self) -> SystemShape {
+        let degrees: Vec<u32> = self
+            .equations
+            .iter()
+            .filter_map(|p| p.terms.iter().map(|t| t.degree()).max())
+            .collect();
+        SystemShape {
+            n_vars: self.n_vars,
+            n_equations: self.equations.len(),
+            semi_regular_degree: crate::cryptanalysis::ic_descent_degrees::semi_regular_degree(
+                self.n_vars,
+                &degrees
+                    .iter()
+                    .copied()
+                    .filter(|d| *d > 0)
+                    .collect::<Vec<_>>(),
+            ),
+            degrees,
+        }
+    }
+
+    /// 64-bit word operations (`bitop/v1`'s `word_op`) of one
+    /// [`shape`](Self::shape) call that returned `shape`: a popcount a
+    /// term and a store an equation for the degrees; then the
+    /// semi-regular series on `i128` coefficients (two words each), with
+    /// `top = n_vars + 1` — the numerator's `n_vars · top` additions, the
+    /// denominator's `top − d + 1` additions per positive degree `d`, and
+    /// the long division's multiply-subtracts (six words each) up to the
+    /// degree it stops at.
+    pub fn shape_word_ops(&self, shape: &SystemShape) -> u64 {
+        let terms: u64 = self.equations.iter().map(|p| p.terms.len() as u64).sum();
+        let v = self.n_vars as u64;
+        let top = v + 1;
+        let den: u64 = shape
+            .degrees
+            .iter()
+            .filter(|&&d| d > 0 && u64::from(d) <= top)
+            .map(|&d| top - u64::from(d) + 1)
+            .sum();
+        let stop = shape.semi_regular_degree.map_or(top, u64::from);
+        terms + self.equations.len() as u64 + 2 * (v * top + den) + 6 * (stop * (stop + 1) / 2)
+    }
+}
+
+/// What a solver concluded.
+#[derive(Clone, Debug, Serialize)]
+pub enum SolverVerdict {
+    /// Solutions found, as bitmasks over the system's variables.
+    Solved(Vec<crate::cryptanalysis::pq_groebner_f2::Mask>),
+    /// The system is inconsistent: this target does not decompose.
+    Unsatisfiable,
+    /// The budget ran out.  **Not** the same as unsatisfiable, and a
+    /// pipeline must not treat it as one: an oracle that reports a
+    /// timeout as "no decomposition" silently lowers its own hit rate
+    /// and the relation phase it feeds becomes unmeasurable.
+    BudgetExceeded,
+}
+
+/// One working degree of a Gröbner/Macaulay solve, recorded so a run's
+/// degree history can be replayed and drawn.  Purely diagnostic: nothing
+/// here is priced into `S`, compared by the audit replay, or used as a
+/// stopping rule — it is the same contract the solver block carries.
+///
+/// A **degree fall** at working degree `degree` is a step that produced a
+/// fresh generator of degree strictly below `degree` (`fresh_min_degree <
+/// degree`), or the constant polynomial `1` (an inconsistency fall), or a
+/// realized Hilbert value below the semi-regular prediction at this degree.
+/// `is_fall` is the engine's own verdict; `hilbert_expected`/`_realized`
+/// carry the series values when the engine exposes them (`None` otherwise).
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct DegreeStep {
+    /// The working (step) degree `d`.
+    pub degree: u32,
+    /// Critical pairs / S-polynomials processed at this degree.
+    #[serde(default, skip_serializing_if = "is_zero_u64")]
+    pub pairs: u64,
+    /// Fresh generators (new leading terms) produced at this degree.
+    #[serde(default, skip_serializing_if = "is_zero_u64")]
+    pub fresh: u64,
+    /// The smallest degree among the fresh generators; a fall when `< degree`.
+    #[serde(default, skip_serializing_if = "is_zero_u32")]
+    pub fresh_min_degree: u32,
+    /// Macaulay/echelon matrix shape at this degree, where the engine reports it.
+    #[serde(default, skip_serializing_if = "is_zero_u64")]
+    pub rows: u64,
+    #[serde(default, skip_serializing_if = "is_zero_u64")]
+    pub cols: u64,
+    #[serde(default, skip_serializing_if = "is_zero_u64")]
+    pub rank: u64,
+    #[serde(default, skip_serializing_if = "is_zero_u64")]
+    pub nnz: u64,
+    /// The engine's verdict that a degree fall occurred at this degree.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub is_fall: bool,
+    /// Semi-regular (expected) and realized Hilbert values at this degree,
+    /// when the engine computes the series.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hilbert_expected: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hilbert_realized: Option<i64>,
+}
+
+fn is_zero_u64(v: &u64) -> bool {
+    *v == 0
+}
+fn is_zero_u32(v: &u32) -> bool {
+    *v == 0
+}
+fn is_false(v: &bool) -> bool {
+    !*v
+}
+
+/// What a solver call cost, in the engine's own units plus the ones
+/// every engine can report.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct SolverCost {
+    /// The engine's native operation count.
+    pub ops: u64,
+    /// What one `ops` is: `monomial operations`, `conflicts`,
+    /// `field multiplications`, `word XORs`.  Carried so the
+    /// calibration can convert it and so two engines are never added
+    /// together in the wrong unit.
+    pub op_unit: String,
+    pub wall_ns: u64,
+    /// The engine's own peak footprint in bytes, where it can report
+    /// one; an operating-system sample is not required.
+    pub peak_bytes: u64,
+    /// The highest degree the computation reached.
+    pub degree_reached: Option<u32>,
+    /// The highest degree at which it learned something new — the
+    /// solving degree, and the one to compare against a degree bound.
+    pub solving_degree: Option<u32>,
+    /// First-fall degree: the smallest working degree at which a degree
+    /// fall occurred (the measured onset of structure the solver exploits).
+    pub first_fall_degree: Option<u32>,
+    /// Last-fall degree: the largest working degree at which a degree fall
+    /// occurred (governs the solving degree of a structured system).
+    pub last_fall_degree: Option<u32>,
+    /// Observed degree of regularity: the first degree at which the realized
+    /// Hilbert series of the computed ideal is non-positive, when the engine
+    /// exposes the series.  Distinct from the advisory `dreg_forecast`.
+    pub degree_of_regularity_observed: Option<u32>,
+    pub timed_out: bool,
+    /// Anything else the engine counts and wants in the report.
+    pub extra: BTreeMap<String, u64>,
+    /// Per-working-degree history of this call (diagnostic; empty unless the
+    /// engine was asked to record it).
+    pub degree_trace: Vec<DegreeStep>,
+}
+
+/// **Stage 3b — the polynomial system solver.**
+///
+/// This is the plug point for F4, F5, XL, a SAT solver, exhaustive
+/// search, or anything else that decides a boolean system.  It is
+/// deliberately independent of the curve: a solver knows nothing about
+/// elliptic curves, and an implementer does not have to.
+///
+/// A solver **must** respect `budget` and report `BudgetExceeded`
+/// rather than running on, and **must not** return `Unsatisfiable`
+/// unless it has decided the system.
+pub trait SystemSolver: Send + Sync {
+    fn name(&self) -> &str;
+
+    fn describe(&self) -> String;
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[]
+    }
+
+    /// Whether this solver can decide a system of this shape at all.
+    /// A solver that would blow up is better declining than timing out
+    /// on every target of a sweep.
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        let _ = shape;
+        true
+    }
+
+    /// Whether `Solved` carries **every** solution (a complete
+    /// enumeration) or only one (a first-solution search, as a CDCL
+    /// solver returns).  The two are different workloads and are never
+    /// ranked against each other: the accounting contract keeps them
+    /// on separate leaderboards, and a comparison checks a first-solution
+    /// engine only for membership in the reference's solution set.
+    fn finds_every_solution(&self) -> bool {
+        true
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost);
+}
+
+/// **Stage 4 — the relation matrix.**
+///
+/// Accumulates relations and decides when the target's logarithm is
+/// determined.  Kept behind a trait because the choice between a dense
+/// incremental elimination, a structured Gaussian elimination and a
+/// Wiedemann or Lanczos method is one of the real levers of an
+/// index-calculus attack, and it is the one most often left unpriced.
+pub trait RelationSolver {
+    fn name(&self) -> &str;
+
+    fn describe(&self) -> String;
+
+    /// Add a relation row over `Z/rZ` with right-hand side `rhs`.
+    fn add_row(&mut self, row: Vec<u64>, rhs: u64) -> RowStatus;
+
+    /// The value of the target's column, once it is determined.
+    fn pinned(&self, col: usize) -> Option<u64>;
+
+    fn rank(&self) -> usize;
+
+    /// Rows that added nothing to the rank.
+    fn dependent(&self) -> u64;
+
+    /// The work done, in whatever the method counts; `row_ops` for an
+    /// elimination, matrix-vector products for an iterative method.
+    fn work(&self) -> (u64, &'static str);
+}
+
+/// **Stage 2 — where trial points come from.**
+///
+/// Kept as a small enum rather than a trait: there are two designs that
+/// matter, the repository has measured both, and the difference between
+/// them is a documented result (§10.2 and §11.1 of the ledger note)
+/// rather than an extension point.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
+pub enum Targets {
+    /// A fresh `[a]G + [b]Q` per trial: two scalar multiplications.
+    #[default]
+    Random,
+    /// An r-adding walk: one group addition per trial, with the guard
+    /// that no target is presented twice.
+    Walk,
+    /// The same guarded walk with native Montgomery additions on supported
+    /// single-word prime curves.
+    WalkPrimeFast,
+    /// Synchronized independent prime walks, with ordinary additions done
+    /// separately.  The paired reference for the batch variants.
+    WalkPrimeSerial4,
+    WalkPrimeSerial8,
+    WalkPrimeSerial16,
+    /// The same lane schedule with Montgomery batch inversion.
+    WalkPrimeBatch4,
+    WalkPrimeBatch8,
+    WalkPrimeBatch16,
+    /// Wide lane schedules: enough targets per round to fill a GPU batch
+    /// (`rootfind-subtract-gpu`).  The same walk per lane.
+    WalkPrimeBatch256,
+    WalkPrimeBatch1024,
+    /// Residual matching (lead L3): the walk subtracts a base point at
+    /// every step and relations come from collisions of the residuals;
+    /// the oracle is not consulted.  See `ic_framework::residual`.
+    Residual,
+    /// `Residual` with the jump and the base-point subtraction fused into one
+    /// group addition per step (`16 * |F|` precomputed sums, counted at setup).
+    /// See `ic_framework::residual::collect_residual_fused_and_solve`.
+    ResidualFused,
+    /// Fused step with distinguished-point storage and probing.
+    ResidualFusedDp,
+    /// Negation-equivariant walk on a large step set with distinguished points.
+    ResidualFusedEq,
+    /// `ResidualFusedEq` whose restarts cost one addition (previous start plus a jump).
+    ResidualFusedEqChain,
+    /// `R ← R + S` for one drawn `S = [s]G + [t]Q`: one addition per
+    /// target, with no jump table to set up.  See `TargetSource::Stride`.
+    Stride,
+    /// `Stride` with a new stride after every relation.  See
+    /// `TargetSource::StrideRenew`.
+    StrideRenew,
+    /// `R = Q + [k]G`: no scalar multiplication, for a base with a known
+    /// column logarithm (`generator_orbit=1`). `TargetSource::StrideGenerator`.
+    StrideGenerator,
+    /// `StrideRenew` probing the repeat guard only on targets that
+    /// decompose.  See `TargetSource::StrideRenewDeferredGuard`.
+    StrideRenewDeferredGuard,
+}
+
+impl Targets {
+    pub fn name(self) -> &'static str {
+        match self {
+            Targets::Random => "random",
+            Targets::Walk => "walk",
+            Targets::WalkPrimeFast => "walk-prime-fast",
+            Targets::WalkPrimeSerial4 => "walk-prime-serial-4",
+            Targets::WalkPrimeSerial8 => "walk-prime-serial-8",
+            Targets::WalkPrimeSerial16 => "walk-prime-serial-16",
+            Targets::WalkPrimeBatch4 => "walk-prime-batch-4",
+            Targets::WalkPrimeBatch8 => "walk-prime-batch-8",
+            Targets::WalkPrimeBatch16 => "walk-prime-batch-16",
+            Targets::WalkPrimeBatch256 => "walk-prime-batch-256",
+            Targets::WalkPrimeBatch1024 => "walk-prime-batch-1024",
+            Targets::Residual => "residual",
+            Targets::ResidualFused => "residual-fused",
+            Targets::ResidualFusedDp => "residual-fused-dp",
+            Targets::ResidualFusedEq => "residual-fused-eq",
+            Targets::ResidualFusedEqChain => "residual-fused-eq-chain",
+            Targets::Stride => "stride",
+            Targets::StrideRenew => "stride-renew",
+            Targets::StrideGenerator => "stride-generator",
+            Targets::StrideRenewDeferredGuard => "stride-renew-deferred-guard",
+        }
+    }
+
+    pub fn parse(s: &str) -> Result<Self, String> {
+        match s {
+            "random" => Ok(Targets::Random),
+            "walk" => Ok(Targets::Walk),
+            "walk-prime-fast" => Ok(Targets::WalkPrimeFast),
+            "walk-prime-serial-4" => Ok(Targets::WalkPrimeSerial4),
+            "walk-prime-serial-8" => Ok(Targets::WalkPrimeSerial8),
+            "walk-prime-serial-16" => Ok(Targets::WalkPrimeSerial16),
+            "walk-prime-batch-4" => Ok(Targets::WalkPrimeBatch4),
+            "walk-prime-batch-8" => Ok(Targets::WalkPrimeBatch8),
+            "walk-prime-batch-16" => Ok(Targets::WalkPrimeBatch16),
+            "walk-prime-batch-256" => Ok(Targets::WalkPrimeBatch256),
+            "walk-prime-batch-1024" => Ok(Targets::WalkPrimeBatch1024),
+            "residual" => Ok(Targets::Residual),
+            "residual-fused" => Ok(Targets::ResidualFused),
+            "residual-fused-dp" => Ok(Targets::ResidualFusedDp),
+            "residual-fused-eq" => Ok(Targets::ResidualFusedEq),
+            "residual-fused-eq-chain" => Ok(Targets::ResidualFusedEqChain),
+            "stride" => Ok(Targets::Stride),
+            "stride-renew" => Ok(Targets::StrideRenew),
+            "stride-generator" => Ok(Targets::StrideGenerator),
+            "stride-renew-deferred-guard" => Ok(Targets::StrideRenewDeferredGuard),
+            other => Err(format!(
+                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16/256/1024, residual, residual-fused, residual-fused-dp, residual-fused-eq, residual-fused-eq-chain, stride, stride-renew or stride-renew-deferred-guard"
+            )),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Params, SolverCost, SolverTotals, SystemShape};
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
+
+    /// `bitop_complete` survives the totals only while every call set it;
+    /// the other `bitop_*` keys add up.
+    #[test]
+    fn bitop_complete_is_a_flag_over_calls() {
+        let shape = SystemShape {
+            n_vars: 2,
+            n_equations: 1,
+            degrees: Vec::new(),
+            semi_regular_degree: None,
+        };
+        let cost = |complete: bool| {
+            let mut c = SolverCost {
+                ops: 1,
+                op_unit: "word XORs (elimination only)".into(),
+                ..Default::default()
+            };
+            c.extra.insert("bitop_word_ops".into(), 5);
+            if complete {
+                c.extra.insert("bitop_complete".into(), 1);
+            }
+            c
+        };
+        let mut all = SolverTotals::default();
+        for _ in 0..3 {
+            all.absorb(&shape, Some(&cost(true)), false);
+        }
+        assert_eq!(all.extra["bitop_complete"], 1);
+        assert_eq!(all.extra["bitop_word_ops"], 15);
+        all.absorb(&shape, Some(&cost(false)), false);
+        assert_eq!(all.extra["bitop_complete"], 0);
+        all.absorb(&shape, Some(&cost(true)), false);
+        assert_eq!(all.extra["bitop_complete"], 0);
+        let mut late = SolverTotals::default();
+        late.absorb(&shape, Some(&cost(false)), false);
+        late.absorb(&shape, Some(&cost(true)), false);
+        assert!(!late.extra.contains_key("bitop_complete"));
+    }
+
+    /// `absorb_outcome` builds the degree-of-regularity forecaster from the
+    /// engine's degree cap, observes decided and censored calls, and leaves
+    /// an engine without a cap with a stated reason instead of a forecast.
+    #[test]
+    fn absorb_outcome_feeds_the_degree_forecaster_or_says_why_not() {
+        use crate::cryptanalysis::dreg_forecast::Outcome;
+        let shape = SystemShape {
+            n_vars: 6,
+            n_equations: 6,
+            degrees: vec![2; 6],
+            semi_regular_degree: Some(3),
+        };
+        let cost = |built: u32, exhausted: bool| {
+            let mut c = SolverCost {
+                ops: 100,
+                op_unit: "word XORs (elimination only)".into(),
+                degree_reached: Some(built),
+                timed_out: exhausted,
+                ..Default::default()
+            };
+            c.extra.insert("max_degree".into(), 3);
+            c
+        };
+        let mut t = SolverTotals::default();
+        t.absorb_outcome(&shape, Some(&cost(2, false)), false, true);
+        t.absorb_outcome(&shape, Some(&cost(2, false)), false, false);
+        t.absorb_outcome(&shape, Some(&cost(3, true)), true, false);
+        // A call without a degree is totalled but not observed.
+        let mut bare = cost(2, false);
+        bare.degree_reached = None;
+        t.absorb_outcome(&shape, Some(&bare), false, true);
+        assert_eq!(t.calls, 4);
+        let f = t.forecaster.as_ref().expect("forecaster from max_degree");
+        let obs = f.observations();
+        assert_eq!(obs.len(), 3);
+        assert_eq!(obs[0].outcome, Outcome::Decomposed);
+        assert!(obs[0].relation);
+        assert_eq!(obs[1].outcome, Outcome::Refuted);
+        assert_eq!(obs[2].outcome, Outcome::Exhausted);
+        assert_eq!(obs[2].censored_above, 3);
+        let fc = f.forecast();
+        assert_eq!(fc.degree_bound, 3);
+        assert_eq!(fc.semi_regular_degree, Some(3));
+        assert_eq!(fc.shape.as_ref().map(|s| s.variables), Some(6));
+        assert_eq!(fc.decided, 2);
+        assert_eq!(fc.censored, 1);
+        assert!(t.forecast_unavailable.is_none());
+
+        // An uncapped engine that reports its solving degree is bounded by
+        // the ring's ceiling, the variable count.
+        let mut uncapped = SolverTotals::default();
+        let full = SolverCost {
+            ops: 9,
+            op_unit: "word XORs (elimination only)".into(),
+            degree_reached: Some(4),
+            solving_degree: Some(3),
+            ..Default::default()
+        };
+        uncapped.absorb_outcome(&shape, Some(&full), false, true);
+        let fc = uncapped.forecaster.as_ref().unwrap().forecast();
+        assert_eq!(fc.degree_bound, 6);
+        assert_eq!(fc.all_targets.decided, 1);
+        assert_eq!(
+            uncapped.forecaster.as_ref().unwrap().observations()[0].solving_degree,
+            Some(3)
+        );
+
+        let mut sat = SolverTotals::default();
+        let conflicts = SolverCost {
+            ops: 7,
+            op_unit: "conflicts".into(),
+            ..Default::default()
+        };
+        sat.absorb_outcome(&shape, Some(&conflicts), false, false);
+        assert!(sat.forecaster.is_none());
+        assert!(sat
+            .forecast_unavailable
+            .as_deref()
+            .is_some_and(|s| s.contains("max_degree")));
+        // Plain `absorb` never starts a forecast.
+        let mut plain = SolverTotals::default();
+        plain.absorb(&shape, Some(&cost(2, false)), false);
+        assert!(plain.forecaster.is_none() && plain.forecast_unavailable.is_none());
+    }
+
+    /// A fixed-degree oracle feeds the forecaster directly: decided calls at
+    /// the Macaulay degree, degenerate systems censored there.
+    #[test]
+    fn observe_degree_feeds_fixed_degree_oracles() {
+        use crate::cryptanalysis::dreg_forecast::Outcome;
+        let mut t = SolverTotals {
+            solver: "d4-macaulay".into(),
+            op_unit: "F_p multiplications".into(),
+            shape: Some(SystemShape {
+                n_vars: 5,
+                n_equations: 4,
+                degrees: vec![8; 4],
+                semi_regular_degree: Some(14),
+            }),
+            ..Default::default()
+        };
+        t.observe_degree(14, 14, 1000, false, true);
+        t.observe_degree(14, 14, 1000, false, false);
+        t.observe_degree(14, 14, 400, true, false);
+        let f = t.forecaster.as_ref().unwrap();
+        let obs = f.observations();
+        assert_eq!(obs.len(), 3);
+        assert_eq!(obs[0].outcome, Outcome::Decomposed);
+        assert_eq!(obs[1].outcome, Outcome::Refuted);
+        assert_eq!(obs[2].outcome, Outcome::Exhausted);
+        assert_eq!(obs[2].censored_above, 14);
+        let fc = f.forecast();
+        assert_eq!(fc.degree_bound, 14);
+        assert_eq!(fc.cost.unit, "F_p multiplications");
+        assert_eq!(fc.all_targets.predicted_degree, Some(14));
+    }
+
+    #[test]
+    fn ambiguous_plugin_parameters_are_rejected() {
+        for spec in [
+            "",
+            ":x=1",
+            "two words:x=1",
+            "engine:=1",
+            "engine:size=1, size=2",
+        ] {
+            assert!(Params::parse_spec(spec).is_err(), "accepted {spec:?}");
+        }
+    }
+
+    #[test]
+    fn a_plugin_spec_splits_into_name_and_parameters() {
+        let (name, p) = Params::parse_spec("binary-subspace:dimension=6, no_fold = 1").unwrap();
+        assert_eq!(name, "binary-subspace");
+        assert_eq!(p.get("dimension"), Some("6"));
+        assert_eq!(p.get("no_fold"), Some("1"));
+
+        let (name, p) = Params::parse_spec("subtract").unwrap();
+        assert_eq!(name, "subtract");
+        assert!(p.0.is_empty());
+    }
+
+    /// `;` is the list separator on the command line: the value reaches
+    /// the plug-in whole, where `,` would have ended the parameter.
+    #[test]
+    fn a_semicolon_list_value_survives_the_spec() {
+        let (name, p) = Params::parse_spec("koblitz-orbit:divisor=1;2").unwrap();
+        assert_eq!(name, "koblitz-orbit");
+        assert_eq!(p.get("divisor"), Some("1;2"));
+
+        let (_, p) = Params::parse_spec("koblitz-symmetrised:divisor=0;1;2,no_fold=1").unwrap();
+        assert_eq!(p.get("divisor"), Some("0;1;2"));
+        assert_eq!(p.get("no_fold"), Some("1"));
+    }
+
+    /// `divisor=1,2` is not read as `divisor=1`: that would build a
+    /// different factor base without a word.  The message names the `;`.
+    #[test]
+    fn a_comma_list_is_refused_with_the_semicolon_named() {
+        let err = Params::parse_spec("koblitz-orbit:divisor=1,2").unwrap_err();
+        assert!(err.contains("stray token `2`"), "{err}");
+        assert!(err.contains("`divisor=1;2`"), "{err}");
+        assert!(err.contains("`;`"), "{err}");
+
+        // the stray token is attributed to the parameter before it
+        let err = Params::parse_spec("koblitz-orbit:no_fold=1,divisor=0,1").unwrap_err();
+        assert!(err.contains("`divisor=0;1`"), "{err}");
+    }
+
+    #[test]
+    fn a_bare_first_token_is_just_not_key_value() {
+        let err = Params::parse_spec("koblitz-orbit:divisor").unwrap_err();
+        assert_eq!(err, "parameter `divisor` is not key=value");
+    }
+}

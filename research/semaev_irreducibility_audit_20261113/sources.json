@@ -1,0 +1,161 @@
+{
+  "schema": "semaev-s3-irreducibility-source-plan/v1",
+  "created": "2026-11-13T16:29:06.879758+00:00",
+  "formal": {
+    "project": "research/semaev_irreducibility_audit_20261113/lean",
+    "theorem": "SemaevIrreducibilityAudit.actual_S3_absolute_irreducibility_with_control",
+    "statement": "theorem actual_S3_absolute_irreducibility_with_control : (∀ (K : Type) [Field K] (a b : K), (2:K)≠0 → Irreducible (sourceMv a b) ∧ (sourceMv a b).IsSymmetric ∧ (∀ x y z : K, MvPolynomial.eval ![x,y,z] (sourceMv a b)=SemaevS3.S3 a b x y z) ∧ ∀ (L : Type) [Field L] (f : K →+* L), Irreducible (MvPolynomial.map f (sourceMv a b))) ∧ ¬ Irreducible (sourceMv (0:ZMod 2) 0)",
+    "decl_sha256": "c4e043d69cf67dc96e73cf41fbbf473ac0de192b56b1e39fb869595dd90f30ce",
+    "scope": "Actual literal short-Weierstrass three-variable S3 polynomial only: for every field with2!=0 and arbitrarya,b it is irreducible and IsSymmetric, evaluates exactly to the existing SemaevS3.S3, and remains irreducible after every field homomorphism/scalar extension, including algebraic closure. Actual nested rational-function discriminant/no-root proof, proved coefficient embedding and primitive Gauss bridge, actual MV algebra equivalences and elementary-symmetric identity. Direct F2a=b0nonirreducibility control via a nonunit square; not a refutation of the qualified source or distinct ordinary characteristic2 model. No higher-arity symmetry/absolute irreducibility/arbitrary-split normalization, generic solver complexity or new native-execution theorem.",
+    "sources": [
+      {
+        "path": "research/semaev_irreducibility_audit_20261113/lean/ActualPolynomial.lean",
+        "bytes": 6747,
+        "sha256": "14cc8645cc0857bf78d346bb68eaf583f3306da2bdac5afe15d28c5e43b93208"
+      },
+      {
+        "path": "research/semaev_irreducibility_audit_20261113/lean/OddDegree.lean",
+        "bytes": 2217,
+        "sha256": "10cf21a4e615cae792a2ed8f792a8431ba3ec46badd77caabfd8f2c8a44e08b2"
+      },
+      {
+        "path": "research/semaev_irreducibility_audit_20261113/lean/PrimitiveBridge.lean",
+        "bytes": 4563,
+        "sha256": "25ea8613c399b65c09160821d12198c683ae83ac63932637d291b61f962bb0e9"
+      },
+      {
+        "path": "research/semaev_irreducibility_audit_20261113/lean/S3FunctionField.lean",
+        "bytes": 3455,
+        "sha256": "9bd3ed26c720410dbf73689cb5fe4445da3e0027f7ef26f232f5996c79456a75"
+      },
+      {
+        "path": "research/semaev_irreducibility_audit_20261113/lean/lake-manifest.json",
+        "bytes": 3822,
+        "sha256": "9e76086c603b2685c4c626c0af3d09422205a338fa69116ce786171b6e540517"
+      },
+      {
+        "path": "research/semaev_irreducibility_audit_20261113/lean/lakefile.toml",
+        "bytes": 310,
+        "sha256": "76d65ce8e02856c749f6500e9addd21a0a69656168a6981515290846d07d5a7e"
+      },
+      {
+        "path": "research/semaev_irreducibility_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "research/semaev_irreducibility_audit_20261113/evidence/attempts.tar.gz",
+      "bytes": 7918,
+      "sha256": "356f9f00fc89bf949f8841a59bc5b3972c9326637aaa5f12a512b6e887bdf047"
+    },
+    {
+      "path": "research/semaev_irreducibility_audit_20261113/evidence/attempts.json",
+      "bytes": 4254,
+      "sha256": "90f5e2f31a6c7017c09edd76c70237b8931eae6b631d3cd22e5a1bbcf7bb3192"
+    },
+    {
+      "path": "research/semaev_irreducibility_audit_20261113/evidence/gate.tar.gz",
+      "bytes": 1852,
+      "sha256": "62ca255e86a14ecb9da7772b8f112309652ad8c78fe7c1ce97278ebdc9f4b370"
+    },
+    {
+      "path": "research/semaev_irreducibility_audit_20261113/evidence/gate.json",
+      "bytes": 1194,
+      "sha256": "ad8a08f4dadc1dfe9c39e2cec86d4f6700ab217b296f4d5aaea77abf0976d41b"
+    },
+    {
+      "path": "research/semaev_irreducibility_audit_20261113/evidence/source-review.json",
+      "bytes": 2213,
+      "sha256": "b36539416c647139170248d7eef4c8eb5a4050e339e2c403188bfee7df3afc60"
+    },
+    {
+      "path": "research/semaev_irreducibility_audit_20261113/evidence/prior-source-review.json",
+      "bytes": 1934,
+      "sha256": "1dd9edff27582290435cb51b7ab095f3c2b19d3ea93b8df205d0179aa9df9906"
+    },
+    {
+      "path": "research/semaev_irreducibility_audit_20261113/proof-map.json",
+      "bytes": 1624,
+      "sha256": "86110d132cc4ed591cee87286abb85c52786a81b683c485c9866f1aff9197b46"
+    },
+    {
+      "path": "research/semaev_irreducibility_audit_20261113/render_report.py",
+      "bytes": 7265,
+      "sha256": "ee98b65bad33e5cbed1239a413f0b57d1975f90c380f344a48e1833c9cee57c7"
+    },
+    {
+      "path": "research/semaev_irreducibility_audit_20261113/reports/layout.json",
+      "bytes": 207,
+      "sha256": "4d4661eca304f88f2ac576ee282a1b6209e9b5e740358ebf271a31115378177e"
+    },
+    {
+      "path": "research/semaev_irreducibility_audit_20261113/reports/proof-flow.svg",
+      "bytes": 2830,
+      "sha256": "e5fc736c6bcfba8ff4922a67b9f03f64bf7345a5e1078f027b3ac70a1ca4babb"
+    },
+    {
+      "path": "research/semaev_irreducibility_audit_20261113/reports/report.pdf",
+      "bytes": 47611,
+      "sha256": "f351dbd808353ce9d3c0aff1ddd9d9ac5f24c0831a01ef0072399b067bd7a376"
+    }
+  ],
+  "gate": {
+    "archive": "research/semaev_irreducibility_audit_20261113/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "declarations": 64,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/semaev_irreducibility_audit_20261113/evidence/attempts.tar.gz",
+    "files": 23,
+    "roundtrip_equal": true
+  },
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "native_decide": false,
+    "custom_axioms": false,
+    "waivers": false,
+    "added_elaboration_options": false,
+    "actual_MV_source_polynomial": true,
+    "all_field_scalar_extensions": true,
+    "actual_IsSymmetric": true,
+    "characteristic_two_direct_negation": true,
+    "higher_arity_irreducibility_or_symmetry": false,
+    "arbitrary_split_normalization": false,
+    "qualified_source_refuted": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_storage_upload": 0
+  }
+}

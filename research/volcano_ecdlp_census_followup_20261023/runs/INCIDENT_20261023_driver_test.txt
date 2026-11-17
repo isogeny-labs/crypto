@@ -1,0 +1,14 @@
+Incident record (2026-10-23, before Phase B started)
+
+While testing the start script on a scratch copy, the Phase B driver was launched
+with a stand-in binary and without the scratch STUDY override. It therefore ran on
+this directory for about 90 seconds, wrote a progress header carrying the stand-in
+binary sha256 (0b38413e...), and committed and pushed 8 stand-in sessions
+(V5-D-L0..L6-c0, V5-Ua-L1-c0) to this branch. They hold no measurement: the stand-in
+writes a fixed one-line record. The driver was stopped by hand, the 8 commits were
+reverted in one commit (the history keeps them), and the uncommitted leftovers were
+moved out of the tree. No real Phase B session had run. The real campaign starts from
+an empty runs/progress.jsonl with the frozen binary (ac4bc5b2...).
+
+Prevention: scripts/run_phase_b.sh now refuses (exit 2, before touching anything) when
+ECB or ECB_SHA is overridden while STUDY is this directory.

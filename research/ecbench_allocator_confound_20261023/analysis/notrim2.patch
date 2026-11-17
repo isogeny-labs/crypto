@@ -1,0 +1,34 @@
+--- a/src/cryptanalysis/ecbench/record.rs
++++ b/src/cryptanalysis/ecbench/record.rs
+@@ -136,7 +136,7 @@
+     {
+         // SAFETY: no preconditions; consolidates every arena's fastbins
+         // and releases free pages.
+-        facts.trim_result = Some(unsafe { libc::malloc_trim(0) });
++        facts.trim_result = Some(0);
+         facts.pre_solve_trim = true;
+     }
+     #[cfg(not(all(target_os = "linux", target_env = "gnu")))]
+@@ -249,14 +249,15 @@
+ 
+ impl SolveProbe {
+     fn read() -> Self {
+-        let cpu = current_cpu();
++        // Study ablation (notrim2.patch): no /proc reads, so no incidental allocation.
++        let _ = (own_thread_count, irq_counts, cpu_schedstat, own_rusage, schedstat_all_tasks);
+         Self {
+-            threads: own_thread_count(),
+-            irq: cpu.and_then(irq_counts),
+-            cpu_sched: cpu.and_then(cpu_schedstat),
+-            rusage: own_rusage(),
+-            schedstat_all: schedstat_all_tasks(),
+-            cpu,
++            threads: None,
++            irq: None,
++            cpu_sched: None,
++            rusage: None,
++            schedstat_all: None,
++            cpu: current_cpu(),
+         }
+     }
+ 

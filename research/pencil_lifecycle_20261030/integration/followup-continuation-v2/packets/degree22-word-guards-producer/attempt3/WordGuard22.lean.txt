@@ -1,0 +1,61 @@
+import WordAdd11
+import Guard22
+import WordErrorExclusion
+set_option autoImplicit false
+set_option maxRecDepth 6000
+set_option maxHeartbeats 1000000
+namespace PencilWordRefinement
+
+def guardBTree (a : WeightedWord) : FieldExpr :=
+ .mul (.leaf 2) (.sub
+  (.mul (.sub (.mul (.leaf a.q) (.leaf a.s)) (.leaf a.t)) (.leaf a.t))
+  (.mul (.mul (.leaf a.r) (.leaf a.s)) (.leaf a.s)))
+def guardBWord (p : UInt64) (a : WeightedWord) : UInt64 :=
+ let n1 := wordSub p ((a.q*a.s)%p) a.t
+ let n2 := (a.r*a.s)%p
+ (2*(wordSub p ((n1*a.t)%p) ((n2*a.s)%p)))%p
+
+theorem guardB_decode (p : UInt64) [Fact p.toNat.Prime]
+ (hfive : 5<=p.toNat) (hbound : p.toNat<2^31) (a : WeightedWord)
+ (ha : a.canonical p) :
+ (guardBWord p a).toNat<p.toNat ∧
+ ((guardBWord p a).toNat:ZMod p.toNat)=Degree22Guards.doubleB
+  (a.q.toNat:ZMod p.toNat) (a.r.toNat:ZMod p.toNat)
+  (a.s.toNat:ZMod p.toNat) (a.t.toNat:ZMod p.toNat) := by
+ have hg : (guardBTree a).good p := by
+  rcases ha with ⟨aq,ar,ass,att,az,aw⟩
+  simp [guardBTree,FieldExpr.good,aq,ar,ass,att] <;> omega
+ have h := FieldExpr.composition p hfive hbound _ hg
+ refine ⟨h.1,?_⟩
+ change (((guardBTree a).word p).toNat:ZMod p.toNat)=_
+ rw [h.2];rfl
+
+theorem word_double_b_zero_forces_point_arm (p : UInt64) [Fact p.toNat.Prime]
+ (hfive : 5<=p.toNat) (hbound : p.toNat<2^31) (a b : WeightedWord)
+ (ha : a.canonical p) (hb : b.canonical p)
+ (hbranch : crossPreludeWord p a b=some .sameUDouble)
+ (hB : guardBWord p a=0) : a.s≠0 := by
+ have hp : 0<p.toNat := by omega
+ obtain ⟨_,dec⟩ := guardB_decode p hfive hbound a ha
+ have hzero : Degree22Guards.doubleB (a.q.toNat:ZMod p.toNat)
+  (a.r.toNat:ZMod p.toNat) (a.s.toNat:ZMod p.toNat) (a.t.toNat:ZMod p.toNat)=0 := by
+  rw [←dec,hB];simp
+ have hodd : (2:ZMod p.toNat)≠0 := by
+  intro h
+  have hh : 2=(0:Nat) := (canonical_equality p.toNat 2 0 (by omega) hp).mp (by simpa using h)
+  omega
+ rw [cross_prelude_decode p a b hfive hbound ha hb] at hbranch
+ unfold crossPreludeField at hbranch
+ split_ifs at hbranch with hsupport
+ have hc := Option.some.inj hbranch
+ unfold ProjectiveLawRuntime.classifySameU22 at hc
+ split_ifs at hc with hi he hs
+ have hn := Degree22Guards.double_b_zero_forces_point_arm
+  (a.q.toNat:ZMod p.toNat) (a.r.toNat:ZMod p.toNat)
+  (a.s.toNat:ZMod p.toNat) (a.t.toNat:ZMod p.toNat)
+  (a.z.toNat:ZMod p.toNat) (b.z.toNat:ZMod p.toNat)
+  (a.w.toNat:ZMod p.toNat) (b.w.toNat:ZMod p.toNat)
+  (b.s.toNat:ZMod p.toNat) (b.t.toNat:ZMod p.toNat)
+  hodd he.1 he.2 hi hzero
+ intro hh;apply hn;rw [hh];simp
+end PencilWordRefinement

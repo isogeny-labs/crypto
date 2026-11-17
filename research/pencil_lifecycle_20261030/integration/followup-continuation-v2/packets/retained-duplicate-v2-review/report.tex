@@ -1,0 +1,13 @@
+\documentclass[11pt]{article}\usepackage[margin=.85in]{geometry}\usepackage[T1]{fontenc}\begin{document}\section*{Archival v2 source review}
+Both required v1 reporting corrections are implemented. No remaining source-level blocker was found for the fixed source-bound gate. No native compilation or execution was performed.
+
+\textbf{Failure propagation.} Nested invariant\_error, candidate\_rejected and noncanonical\_label now set the failed-disposition list/count/flag, make audit\_pass false and cause exit1. Coverage completion remains separate.
+
+\textbf{Accounting.} Setup and constructor copies enter a ledger keyed physical archive row. Repeated values must agree; aggregation counts each target once. Inconsistency or malformed phase invalidates totals and audit\_pass. Native code changes only by an explanatory nonadditive metadata field.
+
+\textbf{Preserved scope.} All manifest hashes/sizes match. Archive, index, labels, fixture and duplicate helper are unchanged. The60 p739 targets/420 cases, target-local state, all-comparison policy, terminal graph cutoff and120-second plus5-second cap remain fixed. AST parsing passed; wrapper was not run.
+
+\textbf{Reachable paths.} Successful result paths always emit both setup phases. Missing-phase paths are recognized binding/panic/poison failures. Missing target output fails coverage. Unknown statuses or absent ledger entries could evade arbitrary external-log validation, but are not reachable successful outputs of this frozen producer. No speculative repair is required. Failed-audit totals describe observed entries, not complete runtime charges.
+
+The v1 candidate/review remain immutable. Root retains admission. No native result, informative-duplicate count, natural yield or complete cost is claimed.
+\end{document}

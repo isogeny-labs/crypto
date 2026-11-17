@@ -1,0 +1,26 @@
+{
+  "kind": "recorded-values-only/v1",
+  "rule_source": "results/criterion-truth-table.tsv",
+  "population": "21 recorded eligible curves; 10 published, 11 skipped",
+  "calibration_population": 4480,
+  "calibration_series": [
+    {
+      "label": "Generation features (1,100)",
+      "count": 1835
+    },
+    {
+      "label": "With primality-gate models",
+      "count": 4368
+    },
+    {
+      "label": "Union of 15 search families",
+      "count": 4385
+    }
+  ],
+  "calibration_sources": [
+    "results/extended-generation.json",
+    "results/primality-generation.json",
+    "results/calibration-union.json"
+  ],
+  "uncertainty": "complete finite enumeration; no sampling interval inferred; exchangeability is an explicit model assumption"
+}

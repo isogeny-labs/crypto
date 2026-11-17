@@ -1,0 +1,8 @@
+/private/tmp/crypto-n83-k16627/.github/scripts/ci-scope.mjs:50
+    const root = /\.rs$/.test(file) && maintained.test(file) || frozenExamples.test(file) || cargoSources.has(file) || rustConfig.test(file) || embedded.has(file);
+          ^
+
+SyntaxError: Identifier 'root' has already been declared
+    at checkSyntax (node:internal/main/check_syntax:72:5)
+
+Node.js v26.7.0

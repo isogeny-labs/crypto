@@ -1,0 +1,3859 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "twist-progression-preflight-20261027-v1",
+  "created": "2026-10-27T06:34:29Z",
+  "protocol": {
+    "path": "research/twist_routes_1_3_20261021/execution-v4/preflight.protocol.json",
+    "sha256": "fbacd35fd61fbd77320fc3c1921292a01f3d33294e7c1b4974484a7f276578b1",
+    "protocol_id": "twist-progression-preflight-v3",
+    "version": 3
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": "GPT-6",
+    "session": "twist-progression-20261027",
+    "role": "research-and-implementation"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "d01d7bb63cc577a4299200ae3c560767b6d68650",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": "research/twist_routes_1_3_20261021/execution-v4/HOST.json",
+    "sha256": "d5428357b6f9b2527bb49eb8b1474df54a9e2798332c8d6aa60410b31acfba72",
+    "class_id": null,
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": 5,
+      "memory_bytes": 18882674688,
+      "kernel": "Linux 6.18.55 #1 SMP Wed Oct 14 19:45:18 UTC 2026 x86_64 GNU/Linux",
+      "hypervisor": "KVM",
+      "isolation_tier_max": "L0"
+    }
+  },
+  "arms": [
+    {
+      "id": "direct-chain",
+      "role": "baseline",
+      "binary_sha256": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "commit": "d01d7bb63cc577a4299200ae3c560767b6d68650"
+    },
+    {
+      "id": "direct-aa",
+      "role": "control_aa",
+      "binary_sha256": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "commit": "d01d7bb63cc577a4299200ae3c560767b6d68650"
+    },
+    {
+      "id": "hybrid-eight",
+      "role": "candidate",
+      "binary_sha256": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "commit": "d01d7bb63cc577a4299200ae3c560767b6d68650"
+    },
+    {
+      "id": "companion-curve",
+      "role": "candidate",
+      "binary_sha256": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "commit": "d01d7bb63cc577a4299200ae3c560767b6d68650"
+    },
+    {
+      "id": "group-mitm",
+      "role": "reference",
+      "binary_sha256": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "commit": "d01d7bb63cc577a4299200ae3c560767b6d68650"
+    },
+    {
+      "id": "group-aa",
+      "role": "control_aa",
+      "binary_sha256": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "commit": "d01d7bb63cc577a4299200ae3c560767b6d68650"
+    },
+    {
+      "id": "planted-positive",
+      "role": "control_positive",
+      "binary_sha256": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "commit": "d01d7bb63cc577a4299200ae3c560767b6d68650"
+    },
+    {
+      "id": "unshifted-twist",
+      "role": "control_negative",
+      "binary_sha256": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "commit": "d01d7bb63cc577a4299200ae3c560767b6d68650"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "preflight-000",
+      "arm": "direct-aa",
+      "instance_id": "icv1-fp10-t47-852299b7-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 1.140177116
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:21:59Z",
+      "finished_at": "2026-10-27T01:22:00Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-000"
+    },
+    {
+      "run_id": "preflight-001",
+      "arm": "direct-chain",
+      "instance_id": "icv1-fp10-t47-852299b7-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 1.151489857
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:00Z",
+      "finished_at": "2026-10-27T01:22:01Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-001"
+    },
+    {
+      "run_id": "preflight-002",
+      "arm": "hybrid-eight",
+      "instance_id": "icv1-fp10-t47-852299b7-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.615354728
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:01Z",
+      "finished_at": "2026-10-27T01:22:02Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-002"
+    },
+    {
+      "run_id": "preflight-003",
+      "arm": "group-aa",
+      "instance_id": "icv1-fp10-t47-852299b7-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.399261287
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:02Z",
+      "finished_at": "2026-10-27T01:22:02Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-003"
+    },
+    {
+      "run_id": "preflight-004",
+      "arm": "group-mitm",
+      "instance_id": "icv1-fp10-t47-852299b7-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.41220229
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:02Z",
+      "finished_at": "2026-10-27T01:22:02Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-004"
+    },
+    {
+      "run_id": "preflight-005",
+      "arm": "companion-curve",
+      "instance_id": "icv1-fp10-t47-852299b7-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.529414627
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:03Z",
+      "finished_at": "2026-10-27T01:22:03Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-005"
+    },
+    {
+      "run_id": "preflight-006",
+      "arm": "direct-aa",
+      "instance_id": "icv1-fp10-t47-852299b7-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 2.939745765
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:03Z",
+      "finished_at": "2026-10-27T01:22:06Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-006"
+    },
+    {
+      "run_id": "preflight-007",
+      "arm": "direct-chain",
+      "instance_id": "icv1-fp10-t47-852299b7-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 2.588500475
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:06Z",
+      "finished_at": "2026-10-27T01:22:09Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-007"
+    },
+    {
+      "run_id": "preflight-008",
+      "arm": "hybrid-eight",
+      "instance_id": "icv1-fp10-t47-852299b7-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 2.308404348
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:09Z",
+      "finished_at": "2026-10-27T01:22:11Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-008"
+    },
+    {
+      "run_id": "preflight-009",
+      "arm": "group-aa",
+      "instance_id": "icv1-fp10-t47-852299b7-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.301226298
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:11Z",
+      "finished_at": "2026-10-27T01:22:11Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-009"
+    },
+    {
+      "run_id": "preflight-010",
+      "arm": "group-mitm",
+      "instance_id": "icv1-fp10-t47-852299b7-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.412813608
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:11Z",
+      "finished_at": "2026-10-27T01:22:12Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-010"
+    },
+    {
+      "run_id": "preflight-011",
+      "arm": "companion-curve",
+      "instance_id": "icv1-fp10-t47-852299b7-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 2.644368209
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:12Z",
+      "finished_at": "2026-10-27T01:22:15Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-011"
+    },
+    {
+      "run_id": "preflight-012",
+      "arm": "direct-aa",
+      "instance_id": "icv1-fp12-t61-a9fcb1fd-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.593313742
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:15Z",
+      "finished_at": "2026-10-27T01:22:15Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-012"
+    },
+    {
+      "run_id": "preflight-013",
+      "arm": "direct-chain",
+      "instance_id": "icv1-fp12-t61-a9fcb1fd-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.406408581
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:15Z",
+      "finished_at": "2026-10-27T01:22:16Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-013"
+    },
+    {
+      "run_id": "preflight-014",
+      "arm": "hybrid-eight",
+      "instance_id": "icv1-fp12-t61-a9fcb1fd-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.597956399
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:16Z",
+      "finished_at": "2026-10-27T01:22:16Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-014"
+    },
+    {
+      "run_id": "preflight-015",
+      "arm": "group-aa",
+      "instance_id": "icv1-fp12-t61-a9fcb1fd-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.565199986
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:16Z",
+      "finished_at": "2026-10-27T01:22:17Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-015"
+    },
+    {
+      "run_id": "preflight-016",
+      "arm": "group-mitm",
+      "instance_id": "icv1-fp12-t61-a9fcb1fd-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.5733342
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:17Z",
+      "finished_at": "2026-10-27T01:22:18Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-016"
+    },
+    {
+      "run_id": "preflight-017",
+      "arm": "companion-curve",
+      "instance_id": "icv1-fp12-t61-a9fcb1fd-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 1.171204471
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:18Z",
+      "finished_at": "2026-10-27T01:22:19Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-017"
+    },
+    {
+      "run_id": "preflight-018",
+      "arm": "direct-aa",
+      "instance_id": "icv1-fp12-t61-a9fcb1fd-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 1.886316781
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:19Z",
+      "finished_at": "2026-10-27T01:22:21Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-018"
+    },
+    {
+      "run_id": "preflight-019",
+      "arm": "direct-chain",
+      "instance_id": "icv1-fp12-t61-a9fcb1fd-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 2.914914604
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:21Z",
+      "finished_at": "2026-10-27T01:22:24Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-019"
+    },
+    {
+      "run_id": "preflight-020",
+      "arm": "hybrid-eight",
+      "instance_id": "icv1-fp12-t61-a9fcb1fd-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.822032473
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:24Z",
+      "finished_at": "2026-10-27T01:22:25Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-020"
+    },
+    {
+      "run_id": "preflight-021",
+      "arm": "group-aa",
+      "instance_id": "icv1-fp12-t61-a9fcb1fd-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.360196821
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:25Z",
+      "finished_at": "2026-10-27T01:22:25Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-021"
+    },
+    {
+      "run_id": "preflight-022",
+      "arm": "group-mitm",
+      "instance_id": "icv1-fp12-t61-a9fcb1fd-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.357502477
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:25Z",
+      "finished_at": "2026-10-27T01:22:26Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-022"
+    },
+    {
+      "run_id": "preflight-023",
+      "arm": "companion-curve",
+      "instance_id": "icv1-fp12-t61-a9fcb1fd-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 2.572683819
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:26Z",
+      "finished_at": "2026-10-27T01:22:28Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-023"
+    },
+    {
+      "run_id": "preflight-024",
+      "arm": "direct-aa",
+      "instance_id": "icv1-fp14-t113-1169939b-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.447242061
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:28Z",
+      "finished_at": "2026-10-27T01:22:29Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-024"
+    },
+    {
+      "run_id": "preflight-025",
+      "arm": "direct-chain",
+      "instance_id": "icv1-fp14-t113-1169939b-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.54868712
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:29Z",
+      "finished_at": "2026-10-27T01:22:29Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-025"
+    },
+    {
+      "run_id": "preflight-026",
+      "arm": "hybrid-eight",
+      "instance_id": "icv1-fp14-t113-1169939b-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 1.186396064
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:29Z",
+      "finished_at": "2026-10-27T01:22:31Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-026"
+    },
+    {
+      "run_id": "preflight-027",
+      "arm": "group-aa",
+      "instance_id": "icv1-fp14-t113-1169939b-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.585318272
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:31Z",
+      "finished_at": "2026-10-27T01:22:31Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-027"
+    },
+    {
+      "run_id": "preflight-028",
+      "arm": "group-mitm",
+      "instance_id": "icv1-fp14-t113-1169939b-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.662962229
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:31Z",
+      "finished_at": "2026-10-27T01:22:32Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-028"
+    },
+    {
+      "run_id": "preflight-029",
+      "arm": "companion-curve",
+      "instance_id": "icv1-fp14-t113-1169939b-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.427069748
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:32Z",
+      "finished_at": "2026-10-27T01:22:32Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-029"
+    },
+    {
+      "run_id": "preflight-030",
+      "arm": "direct-aa",
+      "instance_id": "icv1-fp14-t113-1169939b-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 2.534336934
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:32Z",
+      "finished_at": "2026-10-27T01:22:35Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-030"
+    },
+    {
+      "run_id": "preflight-031",
+      "arm": "direct-chain",
+      "instance_id": "icv1-fp14-t113-1169939b-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 2.813653495
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:35Z",
+      "finished_at": "2026-10-27T01:22:38Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-031"
+    },
+    {
+      "run_id": "preflight-032",
+      "arm": "hybrid-eight",
+      "instance_id": "icv1-fp14-t113-1169939b-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 1.918881803
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:38Z",
+      "finished_at": "2026-10-27T01:22:40Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-032"
+    },
+    {
+      "run_id": "preflight-033",
+      "arm": "group-aa",
+      "instance_id": "icv1-fp14-t113-1169939b-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.427230307
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:40Z",
+      "finished_at": "2026-10-27T01:22:40Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-033"
+    },
+    {
+      "run_id": "preflight-034",
+      "arm": "group-mitm",
+      "instance_id": "icv1-fp14-t113-1169939b-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.300397596
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:40Z",
+      "finished_at": "2026-10-27T01:22:41Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-034"
+    },
+    {
+      "run_id": "preflight-035",
+      "arm": "companion-curve",
+      "instance_id": "icv1-fp14-t113-1169939b-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 2.809283191
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:41Z",
+      "finished_at": "2026-10-27T01:22:44Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-035"
+    },
+    {
+      "run_id": "preflight-036",
+      "arm": "direct-aa",
+      "instance_id": "icv1-fp6-tm7-fc20da94-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 1.394766995
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:44Z",
+      "finished_at": "2026-10-27T01:22:45Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-036"
+    },
+    {
+      "run_id": "preflight-037",
+      "arm": "direct-chain",
+      "instance_id": "icv1-fp6-tm7-fc20da94-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.867148352
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:45Z",
+      "finished_at": "2026-10-27T01:22:46Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-037"
+    },
+    {
+      "run_id": "preflight-038",
+      "arm": "hybrid-eight",
+      "instance_id": "icv1-fp6-tm7-fc20da94-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.380959201
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:46Z",
+      "finished_at": "2026-10-27T01:22:46Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-038"
+    },
+    {
+      "run_id": "preflight-039",
+      "arm": "group-aa",
+      "instance_id": "icv1-fp6-tm7-fc20da94-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.226144933
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:46Z",
+      "finished_at": "2026-10-27T01:22:47Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-039"
+    },
+    {
+      "run_id": "preflight-040",
+      "arm": "group-mitm",
+      "instance_id": "icv1-fp6-tm7-fc20da94-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.731119754
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:47Z",
+      "finished_at": "2026-10-27T01:22:47Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-040"
+    },
+    {
+      "run_id": "preflight-041",
+      "arm": "companion-curve",
+      "instance_id": "icv1-fp6-tm7-fc20da94-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 1.5938210879999999
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:47Z",
+      "finished_at": "2026-10-27T01:22:49Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-041"
+    },
+    {
+      "run_id": "preflight-042",
+      "arm": "direct-aa",
+      "instance_id": "icv1-fp6-tm7-fc20da94-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 3.064865776
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:49Z",
+      "finished_at": "2026-10-27T01:22:52Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-042"
+    },
+    {
+      "run_id": "preflight-043",
+      "arm": "direct-chain",
+      "instance_id": "icv1-fp6-tm7-fc20da94-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 2.8781031500000003
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:52Z",
+      "finished_at": "2026-10-27T01:22:55Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-043"
+    },
+    {
+      "run_id": "preflight-044",
+      "arm": "hybrid-eight",
+      "instance_id": "icv1-fp6-tm7-fc20da94-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 2.180996602
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:55Z",
+      "finished_at": "2026-10-27T01:22:57Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-044"
+    },
+    {
+      "run_id": "preflight-045",
+      "arm": "group-aa",
+      "instance_id": "icv1-fp6-tm7-fc20da94-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.858598667
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:57Z",
+      "finished_at": "2026-10-27T01:22:58Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-045"
+    },
+    {
+      "run_id": "preflight-046",
+      "arm": "group-mitm",
+      "instance_id": "icv1-fp6-tm7-fc20da94-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.754849049
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:58Z",
+      "finished_at": "2026-10-27T01:22:59Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-046"
+    },
+    {
+      "run_id": "preflight-047",
+      "arm": "companion-curve",
+      "instance_id": "icv1-fp6-tm7-fc20da94-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 2.584493272
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:22:59Z",
+      "finished_at": "2026-10-27T01:23:02Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-047"
+    },
+    {
+      "run_id": "preflight-048",
+      "arm": "direct-aa",
+      "instance_id": "icv1-fp8-tm21-71e3bcb7-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 1.275046402
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:23:02Z",
+      "finished_at": "2026-10-27T01:23:03Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-048"
+    },
+    {
+      "run_id": "preflight-049",
+      "arm": "direct-chain",
+      "instance_id": "icv1-fp8-tm21-71e3bcb7-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.532875284
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:23:03Z",
+      "finished_at": "2026-10-27T01:23:04Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-049"
+    },
+    {
+      "run_id": "preflight-050",
+      "arm": "hybrid-eight",
+      "instance_id": "icv1-fp8-tm21-71e3bcb7-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.424976346
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:23:04Z",
+      "finished_at": "2026-10-27T01:23:04Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-050"
+    },
+    {
+      "run_id": "preflight-051",
+      "arm": "group-aa",
+      "instance_id": "icv1-fp8-tm21-71e3bcb7-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.219332989
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:23:04Z",
+      "finished_at": "2026-10-27T01:23:04Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-051"
+    },
+    {
+      "run_id": "preflight-052",
+      "arm": "group-mitm",
+      "instance_id": "icv1-fp8-tm21-71e3bcb7-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.458355608
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:23:04Z",
+      "finished_at": "2026-10-27T01:23:05Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-052"
+    },
+    {
+      "run_id": "preflight-053",
+      "arm": "companion-curve",
+      "instance_id": "icv1-fp8-tm21-71e3bcb7-curve-orbit-c1-b8-m2-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 1.462289405
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:23:05Z",
+      "finished_at": "2026-10-27T01:23:06Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-053"
+    },
+    {
+      "run_id": "preflight-054",
+      "arm": "direct-aa",
+      "instance_id": "icv1-fp8-tm21-71e3bcb7-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 2.059154812
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:23:06Z",
+      "finished_at": "2026-10-27T01:23:08Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-054"
+    },
+    {
+      "run_id": "preflight-055",
+      "arm": "direct-chain",
+      "instance_id": "icv1-fp8-tm21-71e3bcb7-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 2.622860328
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:23:08Z",
+      "finished_at": "2026-10-27T01:23:11Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-055"
+    },
+    {
+      "run_id": "preflight-056",
+      "arm": "hybrid-eight",
+      "instance_id": "icv1-fp8-tm21-71e3bcb7-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 1.241694495
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:23:11Z",
+      "finished_at": "2026-10-27T01:23:12Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-056"
+    },
+    {
+      "run_id": "preflight-057",
+      "arm": "group-aa",
+      "instance_id": "icv1-fp8-tm21-71e3bcb7-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.237438493
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:23:12Z",
+      "finished_at": "2026-10-27T01:23:13Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-057"
+    },
+    {
+      "run_id": "preflight-058",
+      "arm": "group-mitm",
+      "instance_id": "icv1-fp8-tm21-71e3bcb7-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 0.221709617
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:23:13Z",
+      "finished_at": "2026-10-27T01:23:13Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-058"
+    },
+    {
+      "run_id": "preflight-059",
+      "arm": "companion-curve",
+      "instance_id": "icv1-fp8-tm21-71e3bcb7-curve-orbit-c1-b8-m3-s0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "operational_elapsed_seconds_not_performance": 2.597297651
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Operational sizing only; not admitted performance or pooled with main data."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "operational-preflight-not-main-performance"
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:23:13Z",
+      "finished_at": "2026-10-27T01:23:16Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "research/twist_routes_1_3_20261021/execution-v4/runs/preflight-v1/cell-059"
+    }
+  ],
+  "flow": {
+    "planned": 60,
+    "attempted": 60,
+    "completed": 48,
+    "not_completed": 12,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": [
+      {
+        "rule": "operational-preflight-not-main-performance",
+        "run_ids": [
+          "preflight-000",
+          "preflight-001",
+          "preflight-002",
+          "preflight-003",
+          "preflight-004",
+          "preflight-005",
+          "preflight-006",
+          "preflight-007",
+          "preflight-008",
+          "preflight-009",
+          "preflight-010",
+          "preflight-011",
+          "preflight-012",
+          "preflight-013",
+          "preflight-014",
+          "preflight-015",
+          "preflight-016",
+          "preflight-017",
+          "preflight-018",
+          "preflight-019",
+          "preflight-020",
+          "preflight-021",
+          "preflight-022",
+          "preflight-023",
+          "preflight-024",
+          "preflight-025",
+          "preflight-026",
+          "preflight-027",
+          "preflight-028",
+          "preflight-029",
+          "preflight-030",
+          "preflight-031",
+          "preflight-032",
+          "preflight-033",
+          "preflight-034",
+          "preflight-035",
+          "preflight-036",
+          "preflight-037",
+          "preflight-038",
+          "preflight-039",
+          "preflight-040",
+          "preflight-041",
+          "preflight-042",
+          "preflight-043",
+          "preflight-044",
+          "preflight-045",
+          "preflight-046",
+          "preflight-047",
+          "preflight-048",
+          "preflight-049",
+          "preflight-050",
+          "preflight-051",
+          "preflight-052",
+          "preflight-053",
+          "preflight-054",
+          "preflight-055",
+          "preflight-056",
+          "preflight-057",
+          "preflight-058",
+          "preflight-059"
+        ]
+      }
+    ]
+  },
+  "files": [
+    {
+      "path": "research/twist_routes_1_3_20261021/execution-v4/preflight.protocol.json",
+      "sha256": "e44f8fc614c8fd8b812f1a6d708789e345af2ab9bc09ce812a5bf8e1121d836b",
+      "bytes": 20626,
+      "kind": "protocol"
+    },
+    {
+      "path": "research/twist_routes_1_3_20261021/execution-v4/PREFLIGHT_RUNTIME.json",
+      "sha256": "a233bd6381b6748852b0a27b88d9b4814a9e3e29dace2ce5805edde61dddc71b",
+      "bytes": 9279,
+      "kind": "analysis"
+    }
+  ],
+  "analysis": {
+    "script": null,
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "research/twist_routes_1_3_20261021/execution-v4/PREFLIGHT_RUNTIME.json",
+        "sha256": "a233bd6381b6748852b0a27b88d9b4814a9e3e29dace2ce5805edde61dddc71b",
+        "bytes": 9279,
+        "kind": "analysis"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "Exact pinned scientific source; the worktree also contains subsequent metadata and this exporter. No native wall-time performance is admitted. Independent reviewer/host replay is absent.",
+      "by": "native exporter"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

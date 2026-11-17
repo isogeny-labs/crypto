@@ -1,0 +1,26 @@
+{
+  "schema": "release-binding-source-review/v1",
+  "task": "T-1995",
+  "status": "supported_pending_final_release",
+  "freeze_sha256": "362856bff8013d6d91e2c17a6af906650273b60e4fc048efd59a283eefb154c5",
+  "manifest_sha256": "f3c41b91a916dc9b195953750f4dfc43bcbc62916d43866b7fd448e4fbdac68c",
+  "release_draft_sha256": "e9293174c4bd0a273e6cf1455ef1c91eb05da143707c2a13492683deb2898f9e",
+  "prior_source_review_sha256": "22f663edf24bd45707631e6533557e3f6ff573d853490c08b5154d8ede449efd",
+  "charged_seconds": 7140,
+  "remaining_seconds": 36060,
+  "proposed_charge_seconds": 3600,
+  "blocking_source_findings": [],
+  "checks": [
+    "Frozen file hashes match",
+    "Launcher, replay, original theorem and controls retain previously reviewed hashes",
+    "Pinned terminal and ledger receipts match exact native bytes",
+    "Ledger entries sum to 7140; remaining balance is 36060",
+    "Release remains false and does not invent publication or live-lease evidence"
+  ],
+  "pending": [
+    "Root publication and independent review commit",
+    "Root current lease and serial no-overlap readback",
+    "Final release record with released=true and exact receipt hashes"
+  ],
+  "runtime_executed": false
+}

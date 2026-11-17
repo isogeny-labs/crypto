@@ -1,0 +1,625 @@
+{
+  "flow": {
+    "attempted": 13,
+    "completed": 10,
+    "invalid_or_incomplete": 3,
+    "planned": 13
+  },
+  "identity": {
+    "configuration": {
+      "codec": "bv",
+      "columns": 3,
+      "p": 101,
+      "schema": "atlas.input/v1",
+      "seed": 42,
+      "source_dirty": true,
+      "source_revision": "ecb2e20aac22d99fd628f4c8b4861dcd57645135",
+      "targets_per_panel": 1
+    },
+    "external_replay_binary_sha256": "6891b40cfc0f855d01085de7f9ea4936aad0cc706f6659ea3bb09f6d372ee6ca",
+    "query_manifest_sha256": "e8620bf6141bf16f3c6b579d9217ba022dc90df87b6ba0d5c0eebe518778503d",
+    "solver_binary_sha256": "f6aa070c73728253a404a4a6f3f97b6d5306f61c215150f3ccaaaa709b326470",
+    "study_binary_sha256": "9ebd2683174a4cc47372d97f56b416bf84b04e46b821703654a5a371457e35ce",
+    "timeout_seconds": 30
+  },
+  "independent_standing": "unverified",
+  "producer_check_passed": false,
+  "rows": [
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/workspace/crypto/research/curve25519_atlas_carry_rank_20261104/followup-20261104T2136/unit-example2/inputs/source-holdout-0-mod.smt2"
+      ],
+      "arm": "source",
+      "artifacts": [
+        {
+          "bytes": 1012,
+          "path": "0000.solver.out",
+          "sha256": "4e9f68f4bc9fcd950c1c358d22b9b871a351ce076ee195f0f3c3708edfa5a189"
+        },
+        {
+          "bytes": 0,
+          "path": "0000.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "8e75f236fdb916af137d228f3aaf5f594ca022f0a560347893de1bd75fe5bda0",
+      "encoding": "mod",
+      "expected": "unsat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 0,
+      "observed": "unsat",
+      "producer_check_passed": true,
+      "query": "source-holdout-0-mod.smt2",
+      "query_sha256": "25b6f8164f852a34bdc3af1206c87e52ef88801c0d887970dca377f20ccc4267",
+      "replay_artifacts": [
+        {
+          "bytes": 100,
+          "path": "0000.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0000.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 1,
+      "solver_rlimit": 9076608
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/workspace/crypto/research/curve25519_atlas_carry_rank_20261104/followup-20261104T2136/unit-example2/inputs/source-aa-holdout-0-mod.smt2"
+      ],
+      "arm": "source-aa",
+      "artifacts": [
+        {
+          "bytes": 1012,
+          "path": "0001.solver.out",
+          "sha256": "48a3ebd4c67026502f5df63d919270aede33805b6746c77a1919203f1fd5649c"
+        },
+        {
+          "bytes": 0,
+          "path": "0001.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "8e75f236fdb916af137d228f3aaf5f594ca022f0a560347893de1bd75fe5bda0",
+      "encoding": "mod",
+      "expected": "unsat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 1,
+      "observed": "unsat",
+      "producer_check_passed": true,
+      "query": "source-aa-holdout-0-mod.smt2",
+      "query_sha256": "25b6f8164f852a34bdc3af1206c87e52ef88801c0d887970dca377f20ccc4267",
+      "replay_artifacts": [
+        {
+          "bytes": 100,
+          "path": "0001.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0001.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 1,
+      "solver_rlimit": 9076608
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/workspace/crypto/research/curve25519_atlas_carry_rank_20261104/followup-20261104T2136/unit-example2/inputs/positive-holdout-0-mod.smt2"
+      ],
+      "arm": "positive",
+      "artifacts": [
+        {
+          "bytes": 2955,
+          "path": "0002.solver.out",
+          "sha256": "b286602e35b9c7f30f744064426167fa0fef32bbb4dd35f7501167c42dc7da41"
+        },
+        {
+          "bytes": 0,
+          "path": "0002.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "8e75f236fdb916af137d228f3aaf5f594ca022f0a560347893de1bd75fe5bda0",
+      "encoding": "mod",
+      "expected": "sat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 2,
+      "observed": "sat",
+      "producer_check_passed": true,
+      "query": "positive-holdout-0-mod.smt2",
+      "query_sha256": "65298cc5b918ece05ae7abc3e4b39c1417dc00007903519746bf86e293e75da9",
+      "replay_artifacts": [
+        {
+          "bytes": 78,
+          "path": "0002.replay.out",
+          "sha256": "43d3dddb04cb7c19c78bd2b7babe7897a8f60924f6e32480cbb345580675c4b9"
+        },
+        {
+          "bytes": 0,
+          "path": "0002.replay.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 100,
+          "path": "0002.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0002.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": 0,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 0,
+      "solver_rlimit": 2592765
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/workspace/crypto/research/curve25519_atlas_carry_rank_20261104/followup-20261104T2136/unit-example2/inputs/source-holdout-0-carry.smt2"
+      ],
+      "arm": "source",
+      "artifacts": [
+        {
+          "bytes": 1087,
+          "path": "0003.solver.out",
+          "sha256": "d3b2cb98566b2493833e64cc873887fdd3f1d6999e1ce44f79dcbc0fe0d08e16"
+        },
+        {
+          "bytes": 0,
+          "path": "0003.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "8e75f236fdb916af137d228f3aaf5f594ca022f0a560347893de1bd75fe5bda0",
+      "encoding": "carry",
+      "expected": "unsat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 3,
+      "observed": "unsat",
+      "producer_check_passed": true,
+      "query": "source-holdout-0-carry.smt2",
+      "query_sha256": "15add47e3244ca873ffadf9e165f3d1165da5b7d08757a05b906fa1bc1bb9e36",
+      "replay_artifacts": [
+        {
+          "bytes": 100,
+          "path": "0003.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0003.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 1,
+      "solver_rlimit": 85409974
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/workspace/crypto/research/curve25519_atlas_carry_rank_20261104/followup-20261104T2136/unit-example2/inputs/positive-holdout-0-carry.smt2"
+      ],
+      "arm": "positive",
+      "artifacts": [
+        {
+          "bytes": 13015,
+          "path": "0004.solver.out",
+          "sha256": "83517d52ded6aa121f0be149ba6efc3e81c51bdd0f22db6993b908bbd758ab2b"
+        },
+        {
+          "bytes": 0,
+          "path": "0004.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "8e75f236fdb916af137d228f3aaf5f594ca022f0a560347893de1bd75fe5bda0",
+      "encoding": "carry",
+      "expected": "sat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 4,
+      "observed": "sat",
+      "producer_check_passed": true,
+      "query": "positive-holdout-0-carry.smt2",
+      "query_sha256": "ee013e9f8dec91db7e1fcb9a08c28e80231107a6bc7fe816c9ef4e7e56766138",
+      "replay_artifacts": [
+        {
+          "bytes": 78,
+          "path": "0004.replay.out",
+          "sha256": "43d3dddb04cb7c19c78bd2b7babe7897a8f60924f6e32480cbb345580675c4b9"
+        },
+        {
+          "bytes": 0,
+          "path": "0004.replay.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 100,
+          "path": "0004.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0004.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": 0,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 0,
+      "solver_rlimit": 68772253
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/workspace/crypto/research/curve25519_atlas_carry_rank_20261104/followup-20261104T2136/unit-example2/inputs/same_support-holdout-0-mod.smt2"
+      ],
+      "arm": "same_support",
+      "artifacts": [
+        {
+          "bytes": 1012,
+          "path": "0005.solver.out",
+          "sha256": "d8482b96b81311f66737dd35799163e99d53a455aa6e1dc03b70523a6df4a85e"
+        },
+        {
+          "bytes": 0,
+          "path": "0005.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "85e49993de89f918c3b5347bf95113087032387314021d43f86956cda95bf5b5",
+      "encoding": "mod",
+      "expected": "unsat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 5,
+      "observed": "unsat",
+      "producer_check_passed": true,
+      "query": "same_support-holdout-0-mod.smt2",
+      "query_sha256": "587e356113e569f3bd96c4933622b37f23292f51fc896e17dc57d342b69df177",
+      "replay_artifacts": [
+        {
+          "bytes": 100,
+          "path": "0005.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0005.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 1,
+      "solver_rlimit": 8048476
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/workspace/crypto/research/curve25519_atlas_carry_rank_20261104/followup-20261104T2136/unit-example2/inputs/same_support-holdout-0-carry.smt2"
+      ],
+      "arm": "same_support",
+      "artifacts": [
+        {
+          "bytes": 1087,
+          "path": "0006.solver.out",
+          "sha256": "f790f6acb0bb27095e6a1d2909fcddff246a94911ceea528600fab265b58c6f8"
+        },
+        {
+          "bytes": 0,
+          "path": "0006.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "85e49993de89f918c3b5347bf95113087032387314021d43f86956cda95bf5b5",
+      "encoding": "carry",
+      "expected": "unsat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 6,
+      "observed": "unsat",
+      "producer_check_passed": true,
+      "query": "same_support-holdout-0-carry.smt2",
+      "query_sha256": "04afd7c042c266fab48ce9100fc5ac1a81b748d02b4185f73a41e0fefa6a0fc2",
+      "replay_artifacts": [
+        {
+          "bytes": 100,
+          "path": "0006.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0006.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 1,
+      "solver_rlimit": 92132058
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/workspace/crypto/research/curve25519_atlas_carry_rank_20261104/followup-20261104T2136/unit-example2/inputs/target_native-holdout-0-mod.smt2"
+      ],
+      "arm": "target_native",
+      "artifacts": [
+        {
+          "bytes": 1012,
+          "path": "0007.solver.out",
+          "sha256": "821e1e65f7836e12077dfb96e63cee6f505301852f19d278e3904fcba6368bf2"
+        },
+        {
+          "bytes": 0,
+          "path": "0007.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "5bd01ca00efcec04102e160e86f9ce6539d93e8686d083808b665f552a29c7d4",
+      "encoding": "mod",
+      "expected": "unsat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 7,
+      "observed": "unsat",
+      "producer_check_passed": true,
+      "query": "target_native-holdout-0-mod.smt2",
+      "query_sha256": "666036dbfaa58109cbeb666e21cff61c5ad916c053c9b49c5a44acace41256a3",
+      "replay_artifacts": [
+        {
+          "bytes": 100,
+          "path": "0007.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0007.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 1,
+      "solver_rlimit": 8810116
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/workspace/crypto/research/curve25519_atlas_carry_rank_20261104/followup-20261104T2136/unit-example2/inputs/target_native-holdout-0-carry.smt2"
+      ],
+      "arm": "target_native",
+      "artifacts": [
+        {
+          "bytes": 264,
+          "path": "0008.solver.out",
+          "sha256": "48dfb8836d5e61848b0a6f6604c6900320f6d08d98cb58c6c5a007149058176c"
+        },
+        {
+          "bytes": 0,
+          "path": "0008.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "5bd01ca00efcec04102e160e86f9ce6539d93e8686d083808b665f552a29c7d4",
+      "encoding": "carry",
+      "expected": "unsat",
+      "external_replay_exit": null,
+      "independent_standing": "unverified",
+      "index": 8,
+      "observed": "timeout",
+      "producer_check_passed": false,
+      "query": "target_native-holdout-0-carry.smt2",
+      "query_sha256": "30413ddcca48e8e8bdd766a861526d00a57474e4a0aec070d8e183c5e124d854",
+      "replay_artifacts": [],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 0,
+      "solver_rlimit": 68506090
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/workspace/crypto/research/curve25519_atlas_carry_rank_20261104/followup-20261104T2136/unit-example2/inputs/mixed-holdout-0-mod.smt2"
+      ],
+      "arm": "mixed",
+      "artifacts": [
+        {
+          "bytes": 2960,
+          "path": "0009.solver.out",
+          "sha256": "f1bd8a6e7ca7a9cc1e6a071317c0d7517ca65ecc8a8877f3bc5028cfb2053f06"
+        },
+        {
+          "bytes": 0,
+          "path": "0009.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "41a6fe5944ff202970bb5045895893d4d9a7a0fed69eaaacd6ec652347d7dac8",
+      "encoding": "mod",
+      "expected": "sat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 9,
+      "observed": "sat",
+      "producer_check_passed": true,
+      "query": "mixed-holdout-0-mod.smt2",
+      "query_sha256": "8d51e45cfa8caceec0fcf2f2a32cdcf6d27b0364ddf0d53ecbd3c6f311670aef",
+      "replay_artifacts": [
+        {
+          "bytes": 78,
+          "path": "0009.replay.out",
+          "sha256": "43d3dddb04cb7c19c78bd2b7babe7897a8f60924f6e32480cbb345580675c4b9"
+        },
+        {
+          "bytes": 0,
+          "path": "0009.replay.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 100,
+          "path": "0009.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0009.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": 0,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 0,
+      "solver_rlimit": 6348943
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/workspace/crypto/research/curve25519_atlas_carry_rank_20261104/followup-20261104T2136/unit-example2/inputs/mixed-holdout-0-carry.smt2"
+      ],
+      "arm": "mixed",
+      "artifacts": [
+        {
+          "bytes": 264,
+          "path": "0010.solver.out",
+          "sha256": "978c232c848b627c7e6084dc9e5a3684aacdafceb37ca30ba83eb256947df8b3"
+        },
+        {
+          "bytes": 0,
+          "path": "0010.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "41a6fe5944ff202970bb5045895893d4d9a7a0fed69eaaacd6ec652347d7dac8",
+      "encoding": "carry",
+      "expected": "sat",
+      "external_replay_exit": null,
+      "independent_standing": "unverified",
+      "index": 10,
+      "observed": "timeout",
+      "producer_check_passed": false,
+      "query": "mixed-holdout-0-carry.smt2",
+      "query_sha256": "d2a1dacf90ed23c0c0ddf503371ebcc29b4db031da3afc4c30454d65f3cad1ba",
+      "replay_artifacts": [],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 0,
+      "solver_rlimit": 99314202
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/workspace/crypto/research/curve25519_atlas_carry_rank_20261104/followup-20261104T2136/unit-example2/inputs/random-holdout-0-mod.smt2"
+      ],
+      "arm": "random",
+      "artifacts": [
+        {
+          "bytes": 1012,
+          "path": "0011.solver.out",
+          "sha256": "e1d5bf5cdca1f14495d273db26dbb578bead2a97607de00282f60c42545b6876"
+        },
+        {
+          "bytes": 0,
+          "path": "0011.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "dc59bc1e0d22ddb5b564901f26711e76db2bf95b9b9af09598f3ec0854451fff",
+      "encoding": "mod",
+      "expected": "unsat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 11,
+      "observed": "unsat",
+      "producer_check_passed": true,
+      "query": "random-holdout-0-mod.smt2",
+      "query_sha256": "a0af290679e4b9da481dff9b3073129dd7cc425d81f0dc757ea03a1ed3339622",
+      "replay_artifacts": [
+        {
+          "bytes": 100,
+          "path": "0011.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0011.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 1,
+      "solver_rlimit": 7939734
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/workspace/crypto/research/curve25519_atlas_carry_rank_20261104/followup-20261104T2136/unit-example2/inputs/random-holdout-0-carry.smt2"
+      ],
+      "arm": "random",
+      "artifacts": [
+        {
+          "bytes": 265,
+          "path": "0012.solver.out",
+          "sha256": "163d5edfdae22dce0f8002204c64a89d5b89bdce74a6e6e8853336ceeee60e25"
+        },
+        {
+          "bytes": 0,
+          "path": "0012.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "dc59bc1e0d22ddb5b564901f26711e76db2bf95b9b9af09598f3ec0854451fff",
+      "encoding": "carry",
+      "expected": "unsat",
+      "external_replay_exit": null,
+      "independent_standing": "unverified",
+      "index": 12,
+      "observed": "timeout",
+      "producer_check_passed": false,
+      "query": "random-holdout-0-carry.smt2",
+      "query_sha256": "b48dc356c48ba0d31e067df4d93cec0b614b10fd4126b0812744ea0d1e308dda",
+      "replay_artifacts": [],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 0,
+      "solver_rlimit": 103499681
+    }
+  ],
+  "schema": "atlas.solver-run/v1"
+}

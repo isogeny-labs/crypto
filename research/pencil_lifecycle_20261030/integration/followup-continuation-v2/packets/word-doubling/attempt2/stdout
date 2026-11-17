@@ -1,0 +1,41 @@
+/var/tmp/pencil-doubling-word-composition-20261031-v1/WordDoubling.lean:73:78: error: unsolved goals
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+hfive : 5 ≤ p.toNat
+hb : p.toNat < 2 ^ 31
+a0 a1 a2 a3 : UInt64
+a : WordD1
+h0 : a0.toNat < p.toNat
+h1 : a1.toNat < p.toNat
+h2 : a2.toNat < p.toNat
+h3 : a3.toNat < p.toNat
+hp : 0 < p.toNat
+ht : UInt64.toNat 2 < p.toNat
+hth : UInt64.toNat 3 < p.toNat
+hfv : (5 % p).toNat < p.toNat
+hx : a.x.toNat < p.toNat
+hy : a.y.toNat < p.toNat
+hz : a.z.toNat < p.toNat
+hw : a.w.toNat < p.toNat
+⊢ 2 < p.toNat ∧ ((2 < p.toNat ∧ 3 < p.toNat) ∧ 5 % p.toNat < p.toNat) ∧ (2 < p.toNat ∧ 3 < p.toNat) ∧ 2 < p.toNat
+/var/tmp/pencil-doubling-word-composition-20261031-v1/WordDoubling.lean:75:55: warning: This simp argument is unused:
+  ht
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [dblExpr, FieldExpr.good, h0, h1, h2, h3, hx, hy, hz, hw, hth, hfv]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-doubling-word-composition-20261031-v1/WordDoubling.lean:75:58: warning: This simp argument is unused:
+  hth
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [dblExpr, FieldExpr.good, h0, h1, h2, h3, hx, hy, hz, hw, ht, hfv]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-doubling-word-composition-20261031-v1/WordDoubling.lean:75:62: warning: This simp argument is unused:
+  hfv
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [dblExpr, FieldExpr.good, h0, h1, h2, h3, hx, hy, hz, hw, ht, hth]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

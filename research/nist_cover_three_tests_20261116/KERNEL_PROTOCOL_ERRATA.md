@@ -1,0 +1,3 @@
+# Standing clarification for the frozen kernel protocol
+
+The frozen [ACTUAL_KERNEL_PROTOCOL.md](ACTUAL_KERNEL_PROTOCOL.md),pinned by unsigned PCC-20261116-3f440b,uses the word "proves" in its degree12 divisor argument. That sentence states the readable geometric implication of the stated assumptions;it is not a compiled theorem or independently verified claim. A later prose-lint invocation flags the missing inline standing tag on that frozen line. Its bytes are preserved to maintain the pre-call/PCC bindings. The [quotient report](POLARIZED_QUOTIENT.md) states the complete argument and its producer standing explicitly. [pcc:unverified]

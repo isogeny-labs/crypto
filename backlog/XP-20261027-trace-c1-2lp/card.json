@@ -1,0 +1,22 @@
+{
+  "schema":"backlog.card/v1",
+  "id":"XP-20261027-trace-c1-2lp",
+  "title":"Complete and measure algebraic C1 on standard and trace-selected lines",
+  "created":"2026-10-27",
+  "authors":["native IC research"],
+  "status":"blocked",
+  "status_note":"Exact MITM reference implemented; algebraic C1, complete pricing, final protocol freeze and authorised EKS/checkpoint access remain required.",
+  "blocked_on":["problem:problems/trace-c1-2lp-measurement.md"],
+  "links":{"lead":"research/trace_c1_2lp_20261027/README.md","notes":["research/trace_c1_2lp_20261027/PROTOCOL.md"],"prs":[2686]},
+  "question":"Does the selected x-line lower fully priced one-target algebraic C1 2LP cost on the matched N=4d toy ladder?",
+  "decision_value":"Compare complete measured trial, combination and LA cost with relation yield; retain a null or negative result and identify which phase cancels or preserves the modelled advantage.",
+  "protocol":{"path":null,"blob":null},
+  "code":{"repo":"crypto","commit":null,"branch":"research/trace-c1-2lp-20261027","build":[["cargo","build","--release","--bin","ecbench","--example","trace_line_replay"]]},
+  "resources":{"cpus":4,"ram_gb":8,"disk_gb":32,"gpu":null,"est_core_hours":null,"est_wall_hours":null,"notes":"No authorised pilot; no measured runtime or power. Final design is 1792 rows across four sizes and a holdout constructor seed. The 1800-second cap is a proposed per-job stop, not an estimate."},
+  "run":{"argv":["target/release/ecbench","run","--spec","research/trace_c1_2lp_20261027/reference-d3.json","--out","{out}"],"env":{"RAYON_NUM_THREADS":"1","OMP_NUM_THREADS":"1"},"timeout_per_shard_s":1800},
+  "shards":{"count":1,"scheme":"single","params":{},"stop":"all"},
+  "checkpoint":{"file":null,"resume_flag":null},
+  "outputs":{"result_schema":"ecbench.session/v1","verify":["target/release/examples/trace_line_replay","{out}/records.jsonl"],"land":"research/trace_c1_2lp_20261027"},
+  "cairn":{"mode":"lab-task","space":"unassigned","tasks":["XP-20261027-trace-c1-2lp"],"ttl_s":86400,"env":{"name":"trace-c1-2lp","recipe":"Build the reviewed pinned commit and digest-pinned image only after the algebraic oracle, pricing and final protocol are complete."},"exec":{"cpus":4,"memory_mb":8192,"timeout_s":1800,"sandbox":"auto","publish":"runs/XP-20261027-trace-c1-2lp"},"notes":"Blocked card; reference argv is not final algebraic C1 launch. No queue task or funding mutation was submitted.","funding":{"units":200000,"rationale":"Proposed priority comparable to the narrow conductor replication card; review required before queue promotion."}},
+  "owner_hint":"native IC research and authorised Iso Lab runner"
+}

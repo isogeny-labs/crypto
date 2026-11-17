@@ -1,0 +1,196 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h085fdef17210ed0e",
+  "statement": {
+    "name": "literal evaluated norm-derivative factor",
+    "source": "NormTargetFiber.normQuotientTargetFactor after target substitutions; literal factoring only, no curve premise, parameter divisibility, specialization, or row-equivalence assertion",
+    "variables": [
+      "B",
+      "Z",
+      "D",
+      "F",
+      "C"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "const",
+                  "args": 2
+                },
+                {
+                  "op": "var",
+                  "args": "Z"
+                },
+                {
+                  "op": "var",
+                  "args": "B"
+                },
+                {
+                  "op": "var",
+                  "args": "D"
+                }
+              ]
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "F"
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "B"
+                      },
+                      {
+                        "op": "var",
+                        "args": "B"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "const",
+                "args": 2
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "Z"
+                  },
+                  {
+                    "op": "var",
+                    "args": "Z"
+                  }
+                ]
+              },
+              {
+                "op": "var",
+                "args": "B"
+              },
+              {
+                "op": "var",
+                "args": "C"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "var",
+          "args": "B"
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "const",
+                      "args": 2
+                    },
+                    {
+                      "op": "var",
+                      "args": "Z"
+                    },
+                    {
+                      "op": "var",
+                      "args": "D"
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "F"
+                      },
+                      {
+                        "op": "var",
+                        "args": "B"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "const",
+                    "args": 2
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "Z"
+                      },
+                      {
+                        "op": "var",
+                        "args": "Z"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "var",
+                    "args": "C"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 2316557835925716994,
+  "value_digest": "e51df6e19426f97bf1ec6e47aab4c93814791294b9e32e8d3f009a4a081a3949",
+  "independence": "unsigned literal algebra certificate; conditional ring/field and parameter-polynomial proofs are separate",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/prime_norm_rank_20261112/lean/NormTargetFiber.lean",
+    "sha256": "ed73420455b680f6dd0c25cb560ba233e064765a9f7f0e107ba0c72633e60a06"
+  }
+}

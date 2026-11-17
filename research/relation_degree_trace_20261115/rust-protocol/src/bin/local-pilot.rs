@@ -23,6 +23,10 @@ mod matched_fresh;
 mod relation_ablations;
 #[path = "../rank_relations.rs"]
 mod rank_relations;
+#[path = "../direct_paired.rs"]
+mod direct_paired;
+#[path = "../identity_paired.rs"]
+mod identity_paired;
 #[path = "../callgrind_capture.rs"]
 mod callgrind_capture;
 #[path = "../phase_capture.rs"]
@@ -773,6 +777,11 @@ fn main() -> Result<()> {
     let a: Vec<_> = std::env::args().collect();
     match a.get(1).map(String::as_str){
     Some("prepare")if a.len()==4=>prepare(Path::new(&a[2]),&a[3]),
+    Some("identity-crosscheck")if a.len()==4=>identity_paired::crosscheck(Path::new(&a[2]),Path::new(&a[3])),
+    Some("identity-paired")if a.len()==5=>identity_paired::run(Path::new(&a[2]),Path::new(&a[3]),&a[4]),
+    Some("identity-paired-report")if a.len()==5=>identity_paired::report(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
+    Some("direct-paired")if a.len()==5=>direct_paired::run(Path::new(&a[2]),Path::new(&a[3]),&a[4]),
+    Some("direct-paired-report")if a.len()==5=>direct_paired::report(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
     Some("rank-matrix-probe")if a.len()==3=>rank_relations::matrix_probe(Path::new(&a[2])),
     Some("rank-matrix-audit")if a.len()==4=>rank_relations::matrix_audit(Path::new(&a[2]),Path::new(&a[3])),
     Some("rank-study")if a.len()==5=>rank_relations::run(Path::new(&a[2]),Path::new(&a[3]),&a[4]),

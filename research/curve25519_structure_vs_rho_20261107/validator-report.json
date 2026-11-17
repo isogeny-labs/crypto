@@ -1,0 +1,49 @@
+{
+  "schema": "validator-report/v1",
+  "track": "structure",
+  "track_dir": "research/curve25519_structure_vs_rho_20261107",
+  "date": "2026-11-07",
+  "status": "pass_with_errata",
+  "independent_recomputation": {
+    "code": "validator's own pure-Python scripts (scratchpad v1.py, v2.py, v3.py), not the producer's",
+    "results": {
+      "#E": "1,049,624 = 8r, r prime; only rational 2-torsion abscissa x = 0 (A^2-4 non-residue) -> 2-part cyclic Z/8: reproduced",
+      "twist": "1,047,524 = 4 * 261,881, 261,881 prime, gcd(r, #twist) = 1: reproduced",
+      "trace": "t = -1050, t^2 - 4p = -3,091,792 = -4 * 1597 * 22^2, 1597 prime: reproduced",
+      "j(E), j(E')": "481,878; 498,925; #E' = 8r; E' 2-torsion x = 0, 924, 928: reproduced",
+      "embedding degree": "131,202 = r - 1: reproduced",
+      "|X(<G>)|, |X ∩ 1/X|": "65,601; 0 (exact, all r points, independent generator): reproduced",
+      "x(P+T0) = 1/x(P)": "2000/2000 on multiples of G: reproduced",
+      "conductor at 11": "own division polynomial psi_11 (deg 60, lead 11); deg gcd(psi_11, X^(p^k) - X) = 0, 5, 5, 0, 60 for k = 1, 5, 10, 11, 55: Jordan block, End = Z[pi]: reproduced",
+      "least non-scalar degree in Z[pi]": "norm(pi + 525) = 772,948: reproduced",
+      "least degree with eigenvalue order 3 / 9 on <G>, Z[pi] incl. scalars": "3,106,548,472 / 260,404,884: reproduced",
+      "lever factors": "(1 + w(m-1)C_phi)/sqrt(m) with C_phi 140 / 270 gives 0.577/16.74/162.2 and 0.333/72.3/720.3; T0 ratio 0.9017/0.8851 = 1.019 +- 0.017: reproduced",
+      "quoted rho-neg S": "1.447 (T5) and 1.544 (T12) appear in curve25519_ic_atlas_20261104/REPORT.md section 6: quote accurate"
+    }
+  },
+  "protocol_timing": "PROTOCOL.md mtime 19:36:01, scripts/levers.py 19:37:44, data/levers.json 19:37:54, conductor11 19:38:41/19:38:55: protocol precedes data (file times only; no run log)",
+  "ecbench": "no ecbench session; nothing to audit for single-target rule",
+  "relabelling": "none found; no rho or BSGS presented as index calculus; w = 0 endomorphism row explicitly rejected by the band",
+  "code_changes": "none by this track (modified src/ files belong to other tracks)",
+  "errata": [
+    {"claim": "Summary: all 8 frozen predictions passed; README C6 verdict 'passed as stated'", "problem": "C6 predicted the least small-order-eigenvalue degree under O_K to be 'of order 10^6'; levers.json gives 69,197 (m = 9, order 10^5) and 20,808,909 (m = 3, order 10^7). The magnitude part failed. C6 also listed m = 4, which does not divide r - 1.", "fix": "Score C6 as partially failed (>= 1597 bound passed, order-10^6 magnitude failed) and say '7 of 8 passed, C6 partly failed'."},
+    {"claim": "C5 E[8] key 0.872 +- 0.019", "problem": "Protocol froze 2,000 trials per key; the E[8] key ran 600. The deviation is shown but not flagged as a deviation.", "fix": "Mark it as a protocol deviation in the C5 row."},
+    {"claim": "C4 passed (including {±P + E[8]} on E(F_p): (r-1)/2 classes of size 16)", "problem": "levers.json C4 records only the negation and T0-key class counts; the E[8] class count was not computed exactly.", "fix": "Say that the E[8] part of C4 was not checked exactly (only by the C5 Monte Carlo)."},
+    {"claim": "'One correction to STRUCTURE-R4 ... least non-scalar degree is 772,948, not 1597'", "problem": "STRUCTURE-R4 states 1597 = |D_K|/4 as a lower bound valid for any End between Z[pi] and O_K, and lists conductor 22. It did not claim End = O_K, so it was not wrong; the track sharpened the bound.", "fix": "Call it a sharpening of STRUCTURE-R4's lower bound (1597 -> 772,948), not a correction."},
+    {"claim": "Endomorphism fold factor 0.577 (m = 3) at w = 0; C_phi >= 140", "problem": "C_phi >= 140 is a heuristic (sqrt-Velu per prime factor, ignoring extension-field kernels), not a proven lower bound. Also, since pi is the identity on E(F_p), each endomorphism acts there as the scalar [a+b], so the counted alternative is a scalar multiplication (~25 GAE), which gives a factor far above 1 even at w = 0. The sub-1 value at w = 0 is an artifact of choosing a native isogeny-chain evaluation. The verdict does not change.", "fix": "Write 'approx' rather than '>=' for C_phi, or label it heuristic, and note the scalar-multiplication route."},
+    {"claim": "README result sentences all carry [pcc:unverified]", "problem": "Some result sentences are untagged: section 4 'STRUCTURE-R4's statement holds.' and 'The conclusion holds with a 484x larger margin.'; section 6 'It is the only place on this curve where a solve cheaper than the lab's rho-neg looks available...'.", "fix": "Tag them [pcc:unverified]."},
+    {"claim": "REPORT.pdf as the track's PDF report", "problem": "It is a plain-text render with no figure (the producer disclosed this); the research-visuals rule expects the graph in the report.", "fix": "Re-render with the SVG embedded when a typesetting engine is available."}
+  ],
+  "refuted_claims": [
+    "Summary 'all 8 passed': C6's frozen 'order 10^6' magnitude prediction failed (69,197 and 2.08e7 under O_K).",
+    "Claim 7's causal attribution ('the 1.6-1.7x gap is walk overhead, not structure') is not supported by any measurement in this track; the quoted S values are accurate, the cause is unverified."
+  ],
+  "upheld_claims": [
+    "No curve-structure lever beats rho-neg across w = 0, 0.1, 1 on k = 20 (derived; the key numbers were reproduced independently).",
+    "T0 translation maps <G> to the other coset; |X ∩ 1/X| = 0.",
+    "T0 and E[8] class keys give (r-1)/2 classes; factor about 1 or worse.",
+    "End(E) = Z[pi], conductor 22, least non-scalar degree 772,948.",
+    "Endomorphism folds fail the 5a band (below 1 only at w = 0).",
+    "Twist 4r' with gcd 1; E' order 8r with Z/2 x Z/4 and j not 0 or 1728; Frobenius is trivial on E(F_p)."
+  ]
+}

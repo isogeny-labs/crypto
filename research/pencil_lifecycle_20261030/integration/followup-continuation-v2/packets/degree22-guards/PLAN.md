@@ -1,0 +1,7 @@
+# Prospective degree-two dispatch source map and guard proof
+
+Read retained gate.rs, canonical SameSupport/WeightedSameSupport/InvariantBranches/RuntimeSemantics/WordClassifier proofs, and projective_law PROOF_AUDIT (same-support and doubling derivations). Publisher DOI10.1007/s13389-024-00351-7 lookup failed via web on this turn; rely on retained primary formula transcription and source-audit notes for implementation scope, not a fresh paper completeness endorsement.
+
+Map exact branch precedence and existing proof coverage. New smallest nonduplicated target: native double22 b_zero_identity cannot follow the same-u equal branch of add22_weighted over an odd-characteristic field. Native b=2*((q*s-t)*t-(r*s)*s); s=0 implies b=-2*t², hence t=0. Equal crossed ordinates then force inverse predicate, contrary to the earlier inverse false guard. This proof needs no validity or weight hypotheses, so applies in particular to the original-validity/nonzero-weight domain. Keep direct double22 callers and characteristic2 boundary explicit. Prove field statement and fixed positive/negative controls, separate axiom readback. Native UInt64 composition, output validity, class sums, counters and compiler are excluded.
+
+Private bounded Lean validation only: pinned dependencies,120 seconds per command. Preserve attempts, no scientific trials or canonical edits. Report source hashes, map, theorem assumptions, controls, receipts, PDF/SVG/JSON. Parent handles session log and eventual integration.

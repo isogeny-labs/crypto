@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+"""R104 source-order fiber and leading-residue diagram."""
+from pathlib import Path
+
+root = Path(__file__).resolve().parent
+svg = '''<svg xmlns="http://www.w3.org/2000/svg" width="900" height="280" viewBox="0 0 900 280">
+<rect width="900" height="280" fill="white"/>
+<text x="30" y="34" font-size="21" font-family="sans-serif">R104: leading residue in the x=1 source-order fiber</text>
+<rect x="30" y="70" width="255" height="130" rx="8" fill="#e8f2ff" stroke="#234e80"/>
+<text x="45" y="101" font-size="17" font-family="sans-serif">y=0 component</text>
+<text x="45" y="133" font-size="16" font-family="sans-serif">length 3 x 8 x 2 = 48</text>
+<text x="45" y="164" font-size="16" font-family="sans-serif">H = y^2 q^7, nonzero</text>
+<rect x="325" y="70" width="255" height="130" rx="8" fill="#e8f2ff" stroke="#234e80"/>
+<text x="340" y="101" font-size="17" font-family="sans-serif">y=1 component</text>
+<text x="340" y="133" font-size="16" font-family="sans-serif">length 4 x 8 x 2 = 64</text>
+<text x="340" y="164" font-size="16" font-family="sans-serif">H = 0</text>
+<rect x="620" y="70" width="250" height="130" rx="8" fill="#fff0d7" stroke="#a05d16"/>
+<text x="635" y="101" font-size="17" font-family="sans-serif">Reduced points</text>
+<text x="635" y="133" font-size="16" font-family="sans-serif">residues 0 and 0</text>
+<text x="635" y="164" font-size="16" font-family="sans-serif">q = l^2+l+1</text>
+<text x="35" y="242" font-size="15" font-family="sans-serif">R104 leading104-01 and fresh replay; exact source-order dimension 112; normalization remains next</text>
+</svg>\n'''
+(root / "diagram.svg").write_text(svg)

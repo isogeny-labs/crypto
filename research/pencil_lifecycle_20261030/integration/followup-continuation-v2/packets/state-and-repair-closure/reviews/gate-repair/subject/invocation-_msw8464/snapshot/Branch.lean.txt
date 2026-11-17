@@ -1,0 +1,26 @@
+import Stored
+set_option autoImplicit false
+namespace StoredDivisor
+open Polynomial MumfordNormalization MumfordValidity AffineCoefficientLoop CoefficientTraversal TraversalPolynomial WordCoefficient ScaleTrim
+noncomputable def mappedPolys (d : Fin 3) (p : UInt64) [Fact p.toNat.Prime]
+ (u : Fin (d.val+1)→UInt64) (v : Fin d.val→UInt64) (a b : UInt64) :
+ (ZMod p.toNat)[X] × (ZMod p.toNat)[X] :=
+ if d.val=0 then (sourcePoly (extend p u) (d.val+1),sourcePoly (extend p v) d.val)
+ else (wordsPoly p (storeU d p u a b),wordsPoly p (storeV d p v a b))
+
+theorem mapped_valid (d : Fin 3) (p : UInt64) [Fact p.toNat.Prime]
+ (u : Fin (d.val+1)→UInt64) (v : Fin d.val→UInt64) (a b : UInt64) (f : (ZMod p.toNat)[X])
+ (hp : 1<p.toNat) (hb : p.toNat<2^31)
+ (hu : ∀i,(u i).toNat<p.toNat) (hv : ∀i,(v i).toNat<p.toNat)
+ (ha : a.toNat<p.toNat) (hbeta : b.toNat<p.toNat) (ha0 : a≠0)
+ (hdeg : (sourcePoly (extend p u) (d.val+1)).natDegree=d.val)
+ (hvalid : Valid f (sourcePoly (extend p u) (d.val+1)) (sourcePoly (extend p v) d.val)) :
+ Valid (T 6 (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat) f)
+  (mappedPolys d p u v a b).1 (mappedPolys d p u v a b).2 ∧
+ (mappedPolys d p u v a b).1.natDegree=d.val := by
+ by_cases hd : d.val=0
+ · simp only [mappedPolys,if_pos hd]
+   exact ⟨unchanged_identity_branch f _ _ _ hvalid (hdeg.trans hd),hdeg⟩
+ · simp only [mappedPolys,if_neg hd]
+   exact stored_valid d p u v a b f hp hb hu hv ha hbeta ha0 hdeg hvalid
+end StoredDivisor

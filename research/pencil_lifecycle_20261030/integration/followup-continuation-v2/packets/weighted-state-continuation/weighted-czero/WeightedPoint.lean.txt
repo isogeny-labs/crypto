@@ -1,0 +1,61 @@
+import PayloadScale
+set_option autoImplicit false
+set_option maxHeartbeats 2000000
+namespace WeightedCZero
+open Polynomial CZeroInterpolation CZeroOutput
+variable {K : Type*} [Field K]
+
+theorem reconstruct (d : D2 K) (hz:d.z≠0) (hw:d.w≠0) :
+ weight (d.q/d.z^2) (d.r/d.z^4) (d.s/(d.z^3*d.w)) (d.t/(d.z^5*d.w)) d.z d.w=d := by
+ cases d with
+ | mk q r s t z w =>
+   simp only [weight,D2.mk.injEq] at *
+   constructor
+   · field_simp
+   constructor
+   · field_simp
+   constructor
+   · field_simp
+   constructor
+   · field_simp
+   exact ⟨True.intro,True.intro⟩
+
+theorem scaled_x (n b z w : K) (hb:b≠0) (hz:z≠0) (hw:w≠0) :
+ (n*z^18*w^2)/(b*z^9*w)^2=n/b^2 := by field_simp <;> ring
+
+theorem scaled_y (n b z w : K) (hb:b≠0) (hz:z≠0) (hw:w≠0) :
+ (n*z^45*w^5)/((b*z^9*w)^5*1)=n/b^5 := by field_simp <;> ring
+
+theorem decoded_payload (q1 r1 s1 t1 q2 r2 s2 t2 z1 w1 z2 w2 : K)
+ (hz1:z1≠0) (hw1:w1≠0) (hz2:z2≠0) (hw2:w2≠0)
+ (hb:bnum q1 r1 q2 r2≠0) :
+ let o:=payload (weight q1 r1 s1 t1 z1 w1) (weight q2 r2 s2 t2 z2 w2)
+ let a:=anum q1 r1 s1 t1 q2 r2 s2 t2/bnum q1 r1 q2 r2
+ let x:=q1+q2+a^2
+ o.z≠0 ∧ o.w≠0 ∧ o.x/o.z^2=x ∧
+ o.y/(o.z^5*o.w)=-(ordinate s1 t1-C a*CZeroInterpolation.support q1 r1).eval x := by
+ dsimp only
+ rw [payload_scale]
+ dsimp only
+ have hz:=mul_ne_zero hz1 hz2
+ have hw:=mul_ne_zero hw1 hw2
+ refine ⟨mul_ne_zero (mul_ne_zero hb (pow_ne_zero 9 hz)) hw,one_ne_zero,?_,?_⟩
+ · rw [scaled_x _ _ _ _ hb hz hw,scalar_x_decode _ _ _ _ hb]
+ · rw [scaled_y _ _ _ _ hb hz hw,scalar_y_decode _ _ _ _ _ _ _ hb]
+   simp only [ordinate,CZeroInterpolation.support,eval_sub,eval_add,eval_mul,eval_pow,eval_X,eval_C]
+   ring
+
+theorem weighted_on_curve (f : K[X]) (q1 r1 s1 t1 q2 r2 s2 t2 z1 w1 z2 w2 : K)
+ (hz1:z1≠0) (hw1:w1≠0) (hz2:z2≠0) (hw2:w2≠0)
+ (hf:f.natDegree=5) (hm:f.Monic) (h4:f.coeff 4=0)
+ (hb:bnum q1 r1 q2 r2≠0) (hc:cnum q1 r1 s1 t1 q2 r2 s2 t2=0)
+ (h1:CZeroInterpolation.support q1 r1∣f-(ordinate s1 t1)^2)
+ (h2:CZeroInterpolation.support q2 r2∣f-(ordinate s2 t2)^2) :
+ let o:=payload (weight q1 r1 s1 t1 z1 w1) (weight q2 r2 s2 t2 z2 w2)
+ o.z≠0 ∧ o.w≠0 ∧ (o.y/(o.z^5*o.w))^2=f.eval (o.x/o.z^2) := by
+ have h:=decoded_payload q1 r1 s1 t1 q2 r2 s2 t2 z1 w1 z2 w2 hz1 hw1 hz2 hw2 hb
+ dsimp only at h ⊢
+ refine ⟨h.1,h.2.1,?_⟩
+ rw [h.2.2.1,h.2.2.2]
+ exact czero_output f q1 r1 s1 t1 q2 r2 s2 t2 hf hm h4 hb hc h1 h2
+end WeightedCZero

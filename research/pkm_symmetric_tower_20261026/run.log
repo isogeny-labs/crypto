@@ -1,0 +1,10 @@
+2026-10-26T17:57:58Z stopped by operator: m=2 t=9 target 1 plain-chain exceeded the 900 s budget (ran ~55 min, 4.4 GB RSS; the F4 budget is not checked inside a step); its symmetric row was not run
+2026-10-26T17:58:03Z start m=3 run: --m 3 --t-max-m3 5 --random 2 --budget 900, wrapped in timeout 3600, 10 GB cap
+m3 exit=134
+2026-10-26T18:18:53Z m=3 run ended exit 134 (abort) during N=15 plain-smp1 after N=15 plain-chain target 0 hit the 900 s budget; rerun: symmetric arm only, m=3 t<=5
+
+real	1m26.765s
+user	4m53.188s
+sys	0m10.383s
+m3-sym exit=0
+note: at 17:59Z a 'git stash -u' unlinked rows_m3.jsonl and run.log while the m=3 run was writing them; both streams were recovered from /proc/6010/fd/{1,2} by 'tail -c +1 -f --pid' into rows_m3.jsonl and run_m3_stderr.log (no rows lost: the first 18 rows were present at recovery and the file was followed to the end)

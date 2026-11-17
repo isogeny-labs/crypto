@@ -1,0 +1,141 @@
+{
+  "id": "IDC1hb79cfe74b833e0be",
+  "independence": "same-session native issuer and replay; Lean kernel checks the universal identity separately",
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "proof": null,
+  "schema": "identity.certificate/v1",
+  "seed": 1101,
+  "statement": {
+    "degree_bound": 4,
+    "lhs": {
+      "args": [
+        {
+          "args": "d",
+          "op": "var"
+        },
+        {
+          "args": [
+            {
+              "args": "d",
+              "op": "var"
+            },
+            {
+              "args": "l",
+              "op": "var"
+            }
+          ],
+          "op": "add"
+        }
+      ],
+      "op": "mul"
+    },
+    "name": "Exact elimination of one affine Boolean selector",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "d",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "l",
+                      "op": "var"
+                    },
+                    {
+                      "args": "u",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": "d",
+                  "op": "var"
+                },
+                {
+                  "args": "l",
+                  "op": "var"
+                },
+                {
+                  "args": {
+                    "args": [
+                      {
+                        "args": "l",
+                        "op": "var"
+                      },
+                      {
+                        "args": "u",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "mul"
+                  },
+                  "op": "neg"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": "l",
+              "op": "var"
+            },
+            {
+              "args": "l",
+              "op": "var"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "u",
+                      "op": "var"
+                    },
+                    {
+                      "args": "u",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": {
+                    "args": "u",
+                    "op": "var"
+                  },
+                  "op": "neg"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "PencilElimination.elimination_identity; complete root projection requires a field",
+    "variables": [
+      "d",
+      "l",
+      "u"
+    ]
+  },
+  "value_digest": "c0d40a5e018f20b0feb5ddea0b30628803084723422af2c99735c41e4dfc555c"
+}

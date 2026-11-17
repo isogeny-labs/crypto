@@ -1,0 +1,19 @@
+compile mode. Write a frozen command card for executor-mechanical for this decided measurement. Write the card to /home/user/crypto/research/eigen_seta_speedups_20261017/CARD.md (create directories as needed) and reply with its path and full text.
+
+Measurement (decided, preregistered): wall/CPU time of the Eigen-Séta KEM before vs after decapsulation/keygen speed changes, same host, sequential, nothing else running.
+
+Binaries (already built; do not rebuild):
+- arm `base`  = /tmp/eigenx-base/release/examples/bench_kem   (eigenx main fc02c6b)
+- arm `new`   = /tmp/eigenx-target/release/examples/bench_kem (eigenx branch claude/eigenx-scheme-assessment-0z5d0u at 1eeb2d3, default flags)
+- arm `native`= /tmp/eigenx-target-native/release/examples/bench_kem (same source 1eeb2d3, RUSTFLAGS='-C target-cpu=native')
+Usage: bench_kem <SET> <keys> <trials> <jobs>; prints tab-separated records to stdout.
+
+Run ID: run-20261017T2350Z-speedups. Output dir: /home/user/crypto/research/eigen_seta_speedups_20261017/records/run-20261017T2350Z-speedups/
+Steps, strictly sequential, in this order (interleaved arms per set to limit drift):
+0. Precondition: `pgrep -c valgrind` must print 0 (exit status 1); if any valgrind is running, stop and report (do not wait or retry).
+1. Write host.txt: output of `lscpu`, `nproc`, `uname -a`, `rustc --version`, `date -u +%Y-%m-%dT%H:%MZ`, and `uptime`.
+2. For SET,keys,trials in (L1,3,5), (L3,2,3), (L5,1,3): for ARM in base,new,native: run `<binary of ARM> SET keys trials 1 > <outdir>/<ARM>_<SET>.tsv 2> <outdir>/<ARM>_<SET>.err` with `timeout 3600`; record exit status in <outdir>/exit_status.txt as a line `<ARM> <SET> <status>`.
+3. Run `uptime >> <outdir>/host.txt` at the end.
+Also: sha256sum of the three binaries into <outdir>/binaries.sha256 before step 2.
+Write RUN_ID file at /home/user/crypto/research/eigen_seta_speedups_20261017/records/RUN_ID containing the run id.
+The executor computes nothing and interprets nothing. Expected total runtime: up to ~60 minutes; each step command must run in the foreground with an explicit timeout of 3600000 ms in the Bash tool, one step per call.

@@ -1,0 +1,25 @@
+import SizeComposition
+set_option autoImplicit false
+namespace SizeControls
+open UnionSize
+
+def sizes : Sizes 3 := ⟨#[2,1,3],rfl⟩
+def tied : Sizes 2 := ⟨#[1,1],rfl⟩
+theorem tie_chooses_first (h : System.Platform.numBits=64) : child tied 0 1=0 ∧ parent tied 0 1=1 := by
+ simp [child,parent,forward,sizeAt,update,sizes,tied,USize.le_iff_toNat_le,USize.toNat_ofNat,USize.toNat_add,USize.size,h]
+theorem smaller_first (h : System.Platform.numBits=64) : child sizes 0 2=0 ∧ parent sizes 0 2=2 := by
+ simp [child,parent,forward,sizeAt,update,sizes,tied,USize.le_iff_toNat_le,USize.toNat_ofNat,USize.toNat_add,USize.size,h]
+theorem smaller_second (h : System.Platform.numBits=64) : child sizes 2 0=0 ∧ parent sizes 2 0=2 := by
+ simp [child,parent,forward,sizeAt,update,sizes,tied,USize.le_iff_toNat_le,USize.toNat_ofNat,USize.toNat_add,USize.size,h]
+theorem parent_addition (h : System.Platform.numBits=64) : sizeAt (update sizes 0 2) 2=5 := by
+ apply USize.toNat.inj
+ simp [child,parent,forward,sizeAt,update,sizes,tied,USize.le_iff_toNat_le,USize.toNat_ofNat,USize.toNat_add,USize.size,h]
+theorem child_stale_retained (h : System.Platform.numBits=64) : sizeAt (update sizes 0 2) 0=2 := by
+ simp [child,parent,forward,sizeAt,update,sizes,tied,USize.le_iff_toNat_le,USize.toNat_ofNat,USize.toNat_add,USize.size,h]
+theorem unrelated_unchanged (h : System.Platform.numBits=64) : sizeAt (update sizes 0 2) 1=1 := by
+ simp [child,parent,forward,sizeAt,update,sizes,tied,USize.le_iff_toNat_le,USize.toNat_ofNat,USize.toNat_add,USize.size,h]
+-- Without a strict representability bound, modular machine addition wraps.
+theorem overflow_boundary (h : System.Platform.numBits=64) : ((USize.ofNat (USize.size-1))+1).toNat=0 := by
+ simp [USize.toNat_add,USize.toNat_ofNat,USize.size,h]
+
+end SizeControls

@@ -1,0 +1,184 @@
+{
+  "card_id": "CARD-ic-cofactor-clear-ab-20261103-1",
+  "card_path": "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.yaml",
+  "card_sha256": "e3fea81d58a29f73f5cdd95aaedab56d432d92d802b0d371e4d9f0b578f85d90",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "git-head",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "69c7549f5b0c1f9c1de287f6f53a9382f99f1b286572f8d1c822a8526af2dd25",
+      "stdout_tail": [
+        "11173ecd0230a9ceedc4d833736402934fdcb95e"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--quiet",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.125,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tracked-tree-clean",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.125,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--porcelain",
+        "--untracked-files=no"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.13,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "git-status",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.13,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "./target/release/ecbench"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.042,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "binary-sha256",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.042,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ff54ff2f7eea4e0644377f0f8c1c5c179a5614f1f8ea1e46bb08ab8c96a9fdf5",
+      "stdout_tail": [
+        "b38cffb4f64c4ec7289ee4ef19bf60560d2d99684d4f996114eb403560081ec4  ./target/release/ecbench"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ic_cofactor_clear_ab_20261103/specs/v2-treatment.json",
+        "--out",
+        "research/ic_cofactor_clear_ab_20261103/sessions/v2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 2,
+          "seconds": 2.968,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 2,
+      "id": "run-v2",
+      "index": 5,
+      "outputs": {},
+      "seconds": 2.968,
+      "stderr_sha256": "d0d6ed9daa68e4f03745d27b14aff29b4e76ac1a64aa020af19002d3cf77f172",
+      "stderr_tail": [
+        "ecbench: host is not quiet (PSI cpu some avg10 5.23 > 5.00); wait, or pass --allow-busy to record runs below L2"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 8,
+  "commit": "11173ecd0230a9ceedc4d833736402934fdcb95e",
+  "dirty_after": [
+    "research/ic_cofactor_clear_ab_20261103/PREREG.md",
+    "research/ic_cofactor_clear_ab_20261103/analysis.sh",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.binary-sha256.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.binary-sha256.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.git-head.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.git-head.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.git-status.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.git-status.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.run-v2.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.run-v2.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.tracked-tree-clean.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.tracked-tree-clean.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.yaml",
+    "research/ic_cofactor_clear_ab_20261103/protocol-h1-control.json",
+    "research/ic_cofactor_clear_ab_20261103/protocol-v2.json",
+    "research/ic_cofactor_clear_ab_20261103/specs/h1-negative-control.json",
+    "research/ic_cofactor_clear_ab_20261103/specs/v2-treatment.json"
+  ],
+  "dirty_before": [
+    "research/ic_cofactor_clear_ab_20261103/PREREG.md",
+    "research/ic_cofactor_clear_ab_20261103/analysis.sh",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.yaml",
+    "research/ic_cofactor_clear_ab_20261103/protocol-h1-control.json",
+    "research/ic_cofactor_clear_ab_20261103/protocol-v2.json",
+    "research/ic_cofactor_clear_ab_20261103/specs/h1-negative-control.json",
+    "research/ic_cofactor_clear_ab_20261103/specs/v2-treatment.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 5"
+}

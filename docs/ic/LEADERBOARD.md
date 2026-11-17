@@ -1609,3 +1609,26 @@ Pivot rules F, S and H in the chain solve (E39, engineering of the echelon; thir
 
 The order-24 shortfall was noise (E41, reference correction; not shown as a row). E34's apparent step shortfall of the order-24 walk is two sampling errors in opposite directions; on 512 fresh walks per arm both walks run at their ideal step count, and a 32-jump table fix is not resolved. Re-measured, the order-24 reference on E18's j = 0 curves is stronger than E34 reported: 1.761 / 1.418 / 1.275 against E29's order-6 walk and 1.696 / 1.320 / 1.162 against the cheap order-6 walk at 0 / 0.1 / 1 GAE (the band-ranked order-24 arm), so E18's ψ-row distances to rho lengthen by those factors; the GLS rows above are unchanged (order 24 does not apply there). Independently replayed byte for byte (validator report: pass, six errata), but like E34 it compares rho walks only and cannot pass the validation gate (note §9.52 and §9.53). Read the [report](../../research/e41_twist24_shortfall_20261102/REPORT.pdf), [summary](../../experiments/48_twist24_shortfall/summary.json) and [validator report](../../research/e41_twist24_shortfall_20261102/validator-report.json).
 
+
+<!-- BEGIN RELATION IDENTITY 20261117 -->
+## Exact Rust identity checking (development polynomial kernel)
+
+engineering diagnostic; unsigned producer evidence. Fixed p2147483647, seed7, n3/4/6 polynomial kernels. Ordinary95 neutral controls reject n4/n6; prospective simultaneous screens pass. No15x, new-target, intrinsic-regularity or ranked ECDLP claim. [pcc:unverified]
+
+Ratios above1 favor the denominator.25 paired main blocks/case; work and full-paid accounting. [pcc:unverified]
+
+|n|Comparison|Work median|Work lower1/720|Paid median|Paid lower1/720|Ordinary95 pass|Simultaneous pass|
+|---|---|---:|---:|---:|---:|---|---|
+|3|prefix-Singular/prefix-Rust|3.242510|3.084746|1.306792|1.285010|True|True|
+|3|frontier-Rust/prefix-Rust|1.158349|1.080994|1.023303|1.010834|True|True|
+|3|frontier-Singular/frontier-Rust|3.022390|2.743968|1.301915|1.271720|True|True|
+|4|prefix-Singular/prefix-Rust|3.067128|2.938723|1.286039|1.266683|False|True|
+|4|frontier-Rust/prefix-Rust|1.236276|1.183741|1.033552|1.024787|False|True|
+|4|frontier-Singular/frontier-Rust|2.643183|2.556982|1.275320|1.260958|False|True|
+|6|prefix-Singular/prefix-Rust|2.907275|2.799336|1.254269|1.234975|False|True|
+|6|frontier-Rust/prefix-Rust|1.355531|1.284129|1.048089|1.035972|False|True|
+|6|frontier-Singular/frontier-Rust|2.430102|2.348420|1.241667|1.228848|False|True|
+
+[Result](../../research/relation_degree_trace_20261115/native-identity-20261117/RESULT.md); native source `research/relation_degree_trace_20261115/native-identity-20261117/report-01/audit.json`. All checks remain included; old rejected studies retained. [pcc:unverified]
+
+<!-- END RELATION IDENTITY 20261117 -->

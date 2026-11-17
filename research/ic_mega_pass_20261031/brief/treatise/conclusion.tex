@@ -1,0 +1,74 @@
+\chapter{Conclusion}\label{ch:conclusion}
+
+Four months of work on elliptic-curve index calculus produced four kinds of
+result.
+
+\paragraph{Theory.}
+\begin{itemize}
+\item \emph{What is fixed for every curve.} The summation cover's monodromy
+  is $(\ZZ/2)^{m-2}$ everywhere. Its fibres split completely where relation
+  search operates. The mean yield at a given base size is a double count.
+  So no choice of curve or base geometry can raise the \emph{mean}
+  decomposition yield at matched base size. Coverage, the cost of the
+  membership oracle and the difficulty of the solve remain free, and the
+  engineering of Part~\ref{part:algorithms} works on those.
+\item \emph{What is open.} For three presentations of the decomposition
+  system the first fall degree is a constant of the presentation, and the
+  last fall degree is not bounded by it:
+  \begin{itemize}
+  \item proved for the guarded chain;
+  \item certified on named instances of binary Weil descent;
+  \item measured for prime-field Kummer towers.
+  \end{itemize}
+  The subexponential claims for binary curves assume exactly the step
+  these results show is not automatic. Whether the last fall degree grows
+  without bound is unproved.
+\end{itemize}
+
+\paragraph{Engineering.} The decomposition oracle became two to five
+orders of magnitude cheaper where root finding applies. The Gröbner
+engines improved by one to two orders in counted work. Factor bases
+closed under known-logarithm maps, a $k$-sum table, and set-up and linear
+algebra engineering each cut a constant. None of this changed an exponent
+on a prime field or a prime-degree binary field. The prime-field $k$-sum
+oracle moved its exponent from $0.62$ to $0.52$, but it is generic, and
+its limit is baby-step giant-step.
+
+\paragraph{Measurement.} At a matched reference, priced across a band and
+replayed, rho is cheaper on every prime-order curve the programme measured:
+\begin{itemize}
+\item $4.7$--$18\times$ on Koblitz curves of 37--47 bits;
+\item $5.3$--$102\times$ on prime curves of 20--40 bits;
+\item $10.6$--$38\times$ on random binary curves.
+\end{itemize}
+Nineteen leaderboard rows passed a validation gate that demands independent
+replay, recomputation and a matched rho. None of them is below its
+reference. Every online win disappeared under an equal-advice audit, and
+the corrections forced by matching, pricing and replaying lengthened the
+measured distance more often than any single improvement shortened it.
+
+\paragraph{Where index calculus wins.} In weak extension-field families
+($E_0/\FF_{q^3}$ through genus-3 covers, Joux--Vitse covers of
+$E(\FF_{p^6})$, and perhaps $k=4$ in characteristic two) the measured cost
+crosses or approaches rho, as theory predicts. The plane-quartic route
+measured exponent $\approx1$ against rho's $1.5$, at $0.005\times$ negation
+rho near $q=2^{21}$. These are known algorithms; the programme's
+contribution there is fair measurement.
+
+\paragraph{What would change the picture.} Three items, in order of what
+they would settle:
+\begin{enumerate}
+\item \emph{A proved lower bound on the last fall degree that grows with
+  $n$}, for any presentation of the binary decomposition system. It would
+  answer the question left open by Huang, Kosters and Yeo and by
+  Kousidis and Wiemers, and it is the only result that bears on the
+  subexponential claims.
+\item \emph{More certified instances} at $n=33$--$51$, with public
+  certificates, to show whether the last fall degree reaches 6.
+\item \emph{The frozen $k=4$ replication} at $m=14$--$17$, the cheapest
+  experiment that could put a measured crossover on record. It would be
+  in a weak family.
+\end{enumerate}
+Nothing here concerns a deployed curve. The open problems of
+Chapter~\ref{sec:open} state each remaining question as the experiment or
+proof that would settle it.

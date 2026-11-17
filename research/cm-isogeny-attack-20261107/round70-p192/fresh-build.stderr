@@ -1,0 +1,20 @@
+   Compiling autocfg v1.5.1
+   Compiling num-traits v0.2.19
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.154
+   Compiling num-integer v0.1.47
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling num-bigint v0.4.8
+   Compiling shifted-fiber v0.1.0 (/tmp/p192-round70-fresh/native)
+warning: unused variable: `b`
+  --> src/main.rs:36:71
+   |
+36 | fn field_fibers<const P: i64, const D: i64>(t: &Tables<P, D>, a: i64, b: i64) -> Vec<Value> {
+   |                                                                       ^ help: if this is intentional, prefix it with an underscore: `_b`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `shifted-fiber` (bin "shifted-fiber") generated 1 warning (run `cargo fix --bin "shifted-fiber" -p shifted-fiber` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 13.50s

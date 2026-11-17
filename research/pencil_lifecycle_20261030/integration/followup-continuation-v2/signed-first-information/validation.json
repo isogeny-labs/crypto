@@ -1,0 +1,27 @@
+{
+  "schema": "software.validation/v1",
+  "classification": "saved-artifact derivation and correctness checks, no timing comparison",
+  "python": "3.9.25 (main, Jul 15 2026, 00:00:00) \n[GCC 11.5.0 20240719 (Red Hat 11.5.0-5)]",
+  "platform": "Linux-6.18.54-121.166.amzn2023.x86_64-x86_64-with-glibc2.34",
+  "address_space_kib": 1048576,
+  "wall_timeout_seconds": 180,
+  "kill_grace_seconds": 5,
+  "commands": [
+    {
+      "command": "(ulimit -v 1048576; timeout -k 5 180 python3 research/pencil_lifecycle_20261030/integration/followup-continuation-v2/signed-first-information/run.py)",
+      "exit": 0
+    },
+    {
+      "command": "(ulimit -v 1048576; timeout -k 5 180 python3 research/pencil_lifecycle_20261030/integration/followup-continuation-v2/signed-first-information/initial-check_only.py)",
+      "historical_note": "Executed as check_only.py before amendment; source and output preserved under initial names",
+      "exit": 0
+    },
+    {
+      "command": "(ulimit -v 1048576; timeout -k 5 180 python3 research/pencil_lifecycle_20261030/integration/followup-continuation-v2/signed-first-information/check_only.py)",
+      "exit": 0
+    }
+  ],
+  "collector_invocations": 0,
+  "cloud_jobs_launched": 0,
+  "producer_retries": 0
+}

@@ -1,0 +1,75 @@
+{
+  "schema": "cubic-permutation-family-verification/v1",
+  "source_commit": "a798bd52d011a81db4f404555297e43e7f231cdf",
+  "claim_id": "PCC-20261114-2d6d52",
+  "declaration_sha256": "bb894ca30f297e8548c0a85fdbce66f660ae55191557c09b50f5f846b9c3dcaa",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 6,
+  "gate_declarations": 26,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 69,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-2d6d52",
+    "claim_sha256": "fb0f0db4ed5338415e99a7a763e7ab63eeaffa6884da4f3779e300454c1f3e17",
+    "commit": "a798bd52d011a81db4f404555297e43e7f231cdf",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/cubic_permutation_count_audit_20261114/lean (CubicCountCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T15:39:33Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-2d6d52",
+    "claim_sha256": "fb0f0db4ed5338415e99a7a763e7ab63eeaffa6884da4f3779e300454c1f3e17",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46954,
+    "sha256": "93c6a30cbc039f1d4b1ef568eedbe78de332148ed2e333b443bf0dea954c61cb",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 26,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "point_count_not_assumed": true,
+    "point_equivalence_not_assumed": true,
+    "actual_point_order_consequence": true,
+    "general_geometric_supersingularity_proved": false,
+    "Hasse_proved": false,
+    "fulltorsionfield_bridge_proved": false,
+    "qualified_source_refuted": false,
+    "novelty_claim": false,
+    "canonical_corpus_promoted": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schema": "kummer-coordinate-manifest/v1",
+  "study_id": "KUMMER-COORDINATES-20261022",
+  "protocol_frozen_before_run": "PROTOCOL.md",
+  "public_cohort_archive": "research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst",
+  "public_cohort_archive_sha256": "550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339",
+  "theta_input": "research/kummer_theta_20261022/results/theta-models.jsonl",
+  "theta_input_sha256": "b76424d8195335452c679c69b7c759a22e5721ce4811ff005304a61ab5bbab87",
+  "producer_command": "research/kummer_coordinates_20261022/target/release/kummer-coordinate-gate",
+  "validator_command": "research/kummer_coordinates_20261022/target/release/validate",
+  "target_files": "results/target-gate-{16,20,24,28,32,36,40}.jsonl",
+  "exception_file": "results/coordinate-exceptions.jsonl",
+  "aggregate": "results/summary.json",
+  "pdf": "COORDINATE_GATE.pdf",
+  "graph": ["coordinate-cohort.svg", "coordinate-cohort.png"],
+  "cost_status": "unmeasured; all candidate/rho cost fields null"
+}

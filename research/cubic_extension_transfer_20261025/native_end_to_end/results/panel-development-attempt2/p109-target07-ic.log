@@ -1,0 +1,21 @@
+CONSTRUCTION_READY
+CALIBRATION_READY
+INVERSION_START 1 0
+INVERSION_DONE 0 divisors=2
+INVERSION_START 1 1
+INVERSION_DONE 1 divisors=2
+INVERSION_START 1 2
+INVERSION_DONE 2 divisors=2
+NATIVE_SCALAR_SPLITS k=1293169 attempts=32 success=false
+NATIVE_GROUP_FAILURE operation=3 left=11 right=1293169 direct_error=None origin=(26, 50) left_u=[96, 21, 19, 1] left_v=[56, 54, 106] fc=[[1, 70, 101, 84, 65], [48, 48, 40, 78, 0], [102, 37, 3, 0, 0], [2, 61, 0, 0, 0], [102, 0, 0, 0, 0]]
+GROUP_CHART_RETRY 1 native Jacobian arithmetic retry budget exhausted for operation 3
+NATIVE_GROUP_FAILURE operation=1 left=5 right=3 direct_error=Some(Infinity) origin=(12, 23) left_u=[21, 57, 38, 1] left_v=[39, 66, 59] fc=[[1, 70, 101, 84, 65], [48, 48, 40, 78, 0], [102, 37, 3, 0, 0], [2, 61, 0, 0, 0], [102, 0, 0, 0, 0]]
+NATIVE_GROUP_RIGHT u=[90, 15, 80, 1] v=[10, 88, 42]
+GROUP_CHART_RETRY 2 native Jacobian arithmetic retry budget exhausted for operation 1
+NATIVE_SCALAR_SPLITS k=1293169 attempts=32 success=false
+NATIVE_GROUP_FAILURE operation=3 left=6 right=1293169 direct_error=None origin=(7, 86) left_u=[33, 101, 73, 1] left_v=[90, 47, 103] fc=[[1, 70, 101, 84, 65], [48, 48, 40, 78, 0], [102, 37, 3, 0, 0], [2, 61, 0, 0, 0], [102, 0, 0, 0, 0]]
+GROUP_CHART_RETRY 3 native Jacobian arithmetic retry budget exhausted for operation 3
+NATIVE_SCALAR_SPLITS k=1293169 attempts=3 success=true
+ACTUAL_TRANSFER_READY
+NATIVE_SCALAR_SPLITS k=1293169 attempts=3 success=true
+passed native actual transfer p=109 arm=ic

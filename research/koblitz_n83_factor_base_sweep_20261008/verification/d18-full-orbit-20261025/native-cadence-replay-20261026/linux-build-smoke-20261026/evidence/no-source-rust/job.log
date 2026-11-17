@@ -1,0 +1,9 @@
+[ephemeral 23:04:22] phase: booting
+[ephemeral 23:04:24] phase: setup
+[ephemeral 23:04:26] toolchain preset: rust (baked into the image: 2026-10-16T22:38:40Z)
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+[ephemeral 23:04:40] phase: running (/bin/bash -lc rustc --version > "$EPHEMERAL_OUT/rustc.txt" && aws --version > "$EPHEMERAL_OUT/aws.txt" 2>&1)
+[ephemeral 23:04:41] command exited 0
+[ephemeral 23:04:42] phase: uploading
+[ephemeral 23:04:42] phase: done
+[ephemeral 23:04:42] terminating

@@ -1,0 +1,618 @@
+{
+  "scope": "quadratic twists, characteristic > 3; all points valid",
+  "seed_policy": "fixed integer seeds embedded in source",
+  "source_sha256": "e7c4e31fab0a5de1844d5c160c08a19c3d785d62bdab9e7b34781cd1b47fbe8e",
+  "symbolic": {
+    "sympy_version": "1.14.0",
+    "canonical_equals_symmetric": true,
+    "twist_parameter_cancels": true,
+    "isomorphism_equation": true,
+    "symmetric_s3": "(s2-a)^2 - 4*s1*(s3+b)",
+    "vieta": {
+      "s1": "d*m^2",
+      "s2": "a-2*d*m*n",
+      "s3": "d*n^2-b"
+    }
+  },
+  "exhaustive": {
+    "counts": {
+      "field_elements_checked": 1086,
+      "extension_points_checked": 260064,
+      "twist_group_law_checks": 289440,
+      "scalar_preservation_checks": 94176,
+      "mixed_sums_landing_in_plus": 30384,
+      "nonzero_odd_twist_exclusions": 127368,
+      "s3_ordered_triples_checked": 4188162,
+      "s4_ordered_quadruples_checked": 113342,
+      "shared_odd_prime_cases": 274,
+      "associativity_checks": 17112,
+      "curve_models": 942
+    },
+    "examples": {
+      "two_torsion_exception": {
+        "p": 5,
+        "a": 0,
+        "b": 1,
+        "d": 2,
+        "A": "(0, 1)",
+        "B": "(4, 0)",
+        "R": "(2, 2)",
+        "B_order": 2
+      },
+      "two_primary_product_failure": {
+        "p": 5,
+        "a": 1,
+        "b": 0,
+        "d": 2,
+        "n": 4,
+        "twist_order": 8,
+        "extension_order": 32,
+        "extension_2_torsion": 4,
+        "product_2_torsion": 16
+      },
+      "shared_prime_nonzero_trace": {
+        "p": 5,
+        "a": 1,
+        "b": 1,
+        "r": 3,
+        "trace": -3,
+        "n": 9,
+        "twist_order": 3
+      }
+    },
+    "per_prime": [
+      {
+        "p": 5,
+        "nonsquare": 2,
+        "nonsingular_models": 20
+      },
+      {
+        "p": 7,
+        "nonsquare": 3,
+        "nonsingular_models": 42
+      },
+      {
+        "p": 11,
+        "nonsquare": 2,
+        "nonsingular_models": 110
+      },
+      {
+        "p": 13,
+        "nonsquare": 2,
+        "nonsingular_models": 156
+      },
+      {
+        "p": 17,
+        "nonsquare": 3,
+        "nonsingular_models": 272
+      },
+      {
+        "p": 19,
+        "nonsquare": 2,
+        "nonsingular_models": 342
+      }
+    ],
+    "elapsed_seconds": 23.969993164000698
+  },
+  "no_transfer": {
+    "smooth_twist": {
+      "p": 1009,
+      "a": 1,
+      "b": 206,
+      "d": 11,
+      "curve_order": 1019,
+      "twist_order": 1001,
+      "twist_factorization": {
+        "7": 1,
+        "11": 1,
+        "13": 1
+      },
+      "P": "(0, 288)",
+      "Q": "(521, 596)",
+      "recovered_log": 617,
+      "twist_r_torsion_points": 1,
+      "theorem": "Every homomorphism from the order-1019 group to the order-1001 group is zero."
+    },
+    "anomalous_twist": {
+      "p": 11,
+      "a": 1,
+      "b": 6,
+      "curve_order": 13,
+      "twist_order": 11,
+      "trace": -1,
+      "original_anomalous": false
+    }
+  },
+  "subfield_descent": {
+    "p": 7,
+    "base_quadratic_nonsquare": 3,
+    "delta": "1+1u",
+    "source_a": "4+2u",
+    "source_b": "3+6u",
+    "subfield_a": 1,
+    "subfield_b": 1,
+    "j": 1,
+    "source_order": 45,
+    "subfield_order": 5,
+    "subfield_model_over_K_order": 55,
+    "subgroup_order": 3,
+    "source_point": "(3, 3+2u)",
+    "mapped_point": "(2+5u, (0)+(0+4u)v)",
+    "mapped_point_K_rational": false,
+    "splitting_field_size": 2401,
+    "group_law_checks": 2025,
+    "trace_zero_points_checked": 45
+  },
+  "trace_zero": [
+    {
+      "p": 5,
+      "extension_degree": 2,
+      "modulus": [
+        3,
+        0,
+        1
+      ],
+      "base_order": 9,
+      "extension_order": 27,
+      "trace_zero_order": 3,
+      "dimension": 1,
+      "trace_surjective": true,
+      "frobenius_minus_identity_image_equals_kernel": true,
+      "ic_q_exponent": null,
+      "generic_q_exponent": 0.5,
+      "exponent_values_are_theoretical_not_runtime_measurements": true
+    },
+    {
+      "p": 5,
+      "extension_degree": 3,
+      "modulus": [
+        1,
+        1,
+        0,
+        1
+      ],
+      "base_order": 9,
+      "extension_order": 108,
+      "trace_zero_order": 12,
+      "dimension": 2,
+      "trace_surjective": true,
+      "frobenius_minus_identity_image_equals_kernel": true,
+      "ic_q_exponent": 1.0,
+      "generic_q_exponent": 1.0,
+      "exponent_values_are_theoretical_not_runtime_measurements": true
+    },
+    {
+      "p": 5,
+      "extension_degree": 5,
+      "modulus": [
+        1,
+        4,
+        0,
+        0,
+        0,
+        1
+      ],
+      "base_order": 9,
+      "extension_order": 3069,
+      "trace_zero_order": 341,
+      "dimension": 4,
+      "trace_surjective": true,
+      "frobenius_minus_identity_image_equals_kernel": true,
+      "ic_q_exponent": 1.5,
+      "generic_q_exponent": 2.0,
+      "exponent_values_are_theoretical_not_runtime_measurements": true
+    },
+    {
+      "p": 7,
+      "extension_degree": 3,
+      "modulus": [
+        1,
+        1,
+        0,
+        1
+      ],
+      "base_order": 5,
+      "extension_order": 380,
+      "trace_zero_order": 76,
+      "dimension": 2,
+      "trace_surjective": true,
+      "frobenius_minus_identity_image_equals_kernel": true,
+      "ic_q_exponent": 1.0,
+      "generic_q_exponent": 1.0,
+      "exponent_values_are_theoretical_not_runtime_measurements": true
+    }
+  ],
+  "pairings": [
+    {
+      "p": 43,
+      "d": 2,
+      "a": 1,
+      "b": 0,
+      "r": 11,
+      "embedding_degree": 2,
+      "P": "(31, 18)",
+      "S0": "(39, 3)",
+      "S": "(39, 0+3u)",
+      "Q": "(13, 24)",
+      "pairing_generator": "2+25u",
+      "pairing_target": "11+19u",
+      "secret": 7,
+      "bilinearity_checks": 121,
+      "all_logs_recovered": 11,
+      "index_calculus": {
+        "recovered_log": 7,
+        "factor_base": [
+          "u+1",
+          "u+2",
+          "u+3",
+          "u+4",
+          "u+5",
+          "u+6"
+        ],
+        "projected_factor_base_logs": [
+          5,
+          5,
+          10,
+          6,
+          9,
+          8
+        ],
+        "projection_exponent": 168,
+        "relation_attempts": 45,
+        "smooth_relations": 7,
+        "relation_rank": 6,
+        "independent_relations": [
+          {
+            "coefficients": [
+              -3,
+              -3,
+              -3,
+              1,
+              -2,
+              -1
+            ],
+            "rhs": 8
+          },
+          {
+            "coefficients": [
+              0,
+              0,
+              -1,
+              0,
+              -3,
+              -1
+            ],
+            "rhs": 10
+          },
+          {
+            "coefficients": [
+              -3,
+              1,
+              0,
+              0,
+              -2,
+              0
+            ],
+            "rhs": 5
+          },
+          {
+            "coefficients": [
+              -3,
+              -6,
+              0,
+              5,
+              0,
+              1
+            ],
+            "rhs": 4
+          },
+          {
+            "coefficients": [
+              -1,
+              0,
+              5,
+              -2,
+              1,
+              0
+            ],
+            "rhs": 9
+          },
+          {
+            "coefficients": [
+              0,
+              0,
+              4,
+              0,
+              0,
+              0
+            ],
+            "rhs": 7
+          }
+        ],
+        "individual_log_attempts": 6
+      },
+      "restricted_two_factor_family": null
+    },
+    {
+      "p": 67,
+      "d": 2,
+      "a": 1,
+      "b": 0,
+      "r": 17,
+      "embedding_degree": 2,
+      "P": "(62, 65)",
+      "S0": "(31, 29)",
+      "S": "(31, 0+29u)",
+      "Q": "(59, 4)",
+      "pairing_generator": "40+30u",
+      "pairing_target": "30+58u",
+      "secret": 11,
+      "bilinearity_checks": 289,
+      "all_logs_recovered": 17,
+      "index_calculus": {
+        "recovered_log": 11,
+        "factor_base": [
+          "u+1",
+          "u+2",
+          "u+3",
+          "u+4",
+          "u+5",
+          "u+6"
+        ],
+        "projected_factor_base_logs": [
+          13,
+          13,
+          6,
+          7,
+          5,
+          2
+        ],
+        "projection_exponent": 264,
+        "relation_attempts": 53,
+        "smooth_relations": 7,
+        "relation_rank": 6,
+        "independent_relations": [
+          {
+            "coefficients": [
+              0,
+              0,
+              3,
+              0,
+              0,
+              1
+            ],
+            "rhs": 3
+          },
+          {
+            "coefficients": [
+              1,
+              5,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 10
+          },
+          {
+            "coefficients": [
+              0,
+              0,
+              0,
+              1,
+              1,
+              0
+            ],
+            "rhs": 12
+          },
+          {
+            "coefficients": [
+              2,
+              1,
+              1,
+              1,
+              0,
+              0
+            ],
+            "rhs": 1
+          },
+          {
+            "coefficients": [
+              3,
+              -1,
+              0,
+              2,
+              0,
+              0
+            ],
+            "rhs": 6
+          },
+          {
+            "coefficients": [
+              0,
+              4,
+              0,
+              0,
+              3,
+              0
+            ],
+            "rhs": 16
+          }
+        ],
+        "individual_log_attempts": 3
+      },
+      "restricted_two_factor_family": {
+        "attempts": 2448,
+        "smooth_relations": 272,
+        "rank": 5,
+        "unknowns": 6,
+        "exhaustive_within_stated_family": true
+      }
+    },
+    {
+      "p": 211,
+      "d": 2,
+      "a": 1,
+      "b": 0,
+      "r": 53,
+      "embedding_degree": 2,
+      "P": "(11, 169)",
+      "S0": "(195, 138)",
+      "S": "(195, 0+138u)",
+      "Q": "(201, 16)",
+      "pairing_generator": "115+156u",
+      "pairing_target": "22+66u",
+      "secret": 35,
+      "bilinearity_checks": 2809,
+      "all_logs_recovered": 53,
+      "index_calculus": {
+        "recovered_log": 35,
+        "factor_base": [
+          "u+1",
+          "u+2",
+          "u+3",
+          "u+4",
+          "u+5",
+          "u+6"
+        ],
+        "projected_factor_base_logs": [
+          12,
+          12,
+          22,
+          43,
+          15,
+          38
+        ],
+        "projection_exponent": 840,
+        "relation_attempts": 218,
+        "smooth_relations": 7,
+        "relation_rank": 6,
+        "independent_relations": [
+          {
+            "coefficients": [
+              1,
+              0,
+              -2,
+              3,
+              1,
+              0
+            ],
+            "rhs": 6
+          },
+          {
+            "coefficients": [
+              0,
+              1,
+              -1,
+              -1,
+              -2,
+              3
+            ],
+            "rhs": 31
+          },
+          {
+            "coefficients": [
+              0,
+              2,
+              0,
+              1,
+              0,
+              -1
+            ],
+            "rhs": 29
+          },
+          {
+            "coefficients": [
+              0,
+              0,
+              2,
+              0,
+              0,
+              -3
+            ],
+            "rhs": 36
+          },
+          {
+            "coefficients": [
+              -2,
+              0,
+              0,
+              0,
+              -2,
+              0
+            ],
+            "rhs": 52
+          },
+          {
+            "coefficients": [
+              -1,
+              -3,
+              -2,
+              0,
+              0,
+              2
+            ],
+            "rhs": 37
+          }
+        ],
+        "individual_log_attempts": 27
+      },
+      "restricted_two_factor_family": null
+    }
+  ],
+  "transported_relation_collection": [
+    {
+      "p": 101,
+      "a": 1,
+      "b": 46,
+      "r": 109,
+      "x_bound": 10,
+      "factor_base_size": 8,
+      "ordered_pairs": 64,
+      "original_target_hits": 0,
+      "transported_twist_target_hits": 0,
+      "full_relation_histograms_equal": true,
+      "total_verification_seconds": 0.00036701199860544875
+    },
+    {
+      "p": 211,
+      "a": 0,
+      "b": 2,
+      "r": 199,
+      "x_bound": 14,
+      "factor_base_size": 4,
+      "ordered_pairs": 16,
+      "original_target_hits": 0,
+      "transported_twist_target_hits": 0,
+      "full_relation_histograms_equal": true,
+      "total_verification_seconds": 0.00010156300049857236
+    },
+    {
+      "p": 401,
+      "a": 1,
+      "b": 16,
+      "r": 379,
+      "x_bound": 20,
+      "factor_base_size": 18,
+      "ordered_pairs": 324,
+      "original_target_hits": 2,
+      "transported_twist_target_hits": 2,
+      "full_relation_histograms_equal": true,
+      "total_verification_seconds": 0.0023138640008255607
+    },
+    {
+      "p": 809,
+      "a": 1,
+      "b": 16,
+      "r": 821,
+      "x_bound": 28,
+      "factor_base_size": 26,
+      "ordered_pairs": 676,
+      "original_target_hits": 0,
+      "transported_twist_target_hits": 0,
+      "full_relation_histograms_equal": true,
+      "total_verification_seconds": 0.004870763999861083
+    }
+  ],
+  "total_seconds": 29.618470302000787
+}

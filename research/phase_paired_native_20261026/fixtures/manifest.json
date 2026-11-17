@@ -1,0 +1,174 @@
+{
+ "curve": {
+  "equation": "y^2 + x*y = x^3 + 1",
+  "generator": [
+   "0x12b9",
+   "0x1bc4"
+  ],
+  "group_order": 8012,
+  "lambda_relation": "pi(P) = [lambda]P on H, lambda^2 - t*lambda + 2 = 0 mod r",
+  "modulus": "0x201b",
+  "n": 13,
+  "odd_subgroup_order": 2003,
+  "trace_t": -1
+ },
+ "factor_space": {
+  "admissible_x_phases_free": 65,
+  "admissible_x_phases_known_zero": 5,
+  "basis": [
+   "0x16d1",
+   "0x19a",
+   "0x15a6",
+   "0x7df"
+  ],
+  "representatives": [
+   {
+    "index": 0,
+    "point": [
+     "0x19a",
+     "0x1d65"
+    ],
+    "x": "0x19a"
+   },
+   {
+    "index": 1,
+    "point": [
+     "0x2ed",
+     "0x9c"
+    ],
+    "x": "0x2ed"
+   },
+   {
+    "index": 2,
+    "point": [
+     "0x645",
+     "0x1233"
+    ],
+    "x": "0x645"
+   },
+   {
+    "index": 3,
+    "point": [
+     "0x110e",
+     "0x7ab"
+    ],
+    "x": "0x110e"
+   },
+   {
+    "index": 4,
+    "point": [
+     "0x15a6",
+     "0x1842"
+    ],
+    "x": "0x15a6"
+   }
+  ],
+  "rng": "random.Random(seed*1000 + n) into run.factor_space",
+  "s": 4,
+  "seed": 20260930
+ },
+ "schema": "frobenius_quotient_sat/paired_fixed_budget/manifest/v1",
+ "target_rng": "random.Random(target_seed*10000 + n*10 + i), i=1,2,3 for sets a,b,c",
+ "target_seed": 20261011,
+ "target_sets": {
+  "a": {
+   "name": "planted_random_phase",
+   "targets": [
+    {
+     "R": [
+      "0x391",
+      "0x17ec"
+     ],
+     "id": "a0"
+    },
+    {
+     "R": [
+      "0x1e43",
+      "0x8c7"
+     ],
+     "id": "a1"
+    },
+    {
+     "R": [
+      "0x1b27",
+      "0x16"
+     ],
+     "id": "a2"
+    },
+    {
+     "R": [
+      "0x33f",
+      "0x5db"
+     ],
+     "id": "a3"
+    }
+   ]
+  },
+  "b": {
+   "name": "planted_phase0",
+   "targets": [
+    {
+     "R": [
+      "0x180c",
+      "0x19b2"
+     ],
+     "id": "b0"
+    },
+    {
+     "R": [
+      "0x1926",
+      "0x1f20"
+     ],
+     "id": "b1"
+    },
+    {
+     "R": [
+      "0xd2",
+      "0x80d"
+     ],
+     "id": "b2"
+    },
+    {
+     "R": [
+      "0x1bf1",
+      "0x85"
+     ],
+     "id": "b3"
+    }
+   ]
+  },
+  "c": {
+   "name": "uniform_random",
+   "targets": [
+    {
+     "R": [
+      "0x35d",
+      "0x186c"
+     ],
+     "id": "c0"
+    },
+    {
+     "R": [
+      "0x1912",
+      "0xe11"
+     ],
+     "id": "c1"
+    },
+    {
+     "R": [
+      "0x12d3",
+      "0x10ba"
+     ],
+     "id": "c2"
+    },
+    {
+     "R": [
+      "0x1259",
+      "0x3a"
+     ],
+     "id": "c3"
+    }
+   ]
+  }
+ }
+}

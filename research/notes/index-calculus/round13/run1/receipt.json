@@ -1,0 +1,321 @@
+{
+  "card_id": "CARD-HEIC-ROUND13-1",
+  "card_path": "research/notes/index-calculus/round13/CARD-HEIC-ROUND13-1.yaml",
+  "card_sha256": "e536ff90d0a2ad1416ddcad2b534a2d64da6ab9c2611e51a3f0bc390ec2558e1",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r13/attempt1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r13-mkdir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/isolated_bench.py",
+        "run",
+        "--wait",
+        "--cpus",
+        "3",
+        "--max-other-cpu",
+        "1.0",
+        "--out",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r13/attempt1/isolated_bench.jsonl",
+        "--label",
+        "R13",
+        "--",
+        "sh",
+        "-c",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r13/hyperelliptic_rho_negation_full_width > /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r13/attempt1/R13.txt 2>&1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 773.66,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r13-rho",
+      "index": 2,
+      "outputs": {},
+      "seconds": 773.66,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "wc",
+        "-l",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r13/attempt1/R13.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r13-lines",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a5d889878107f0b667bb7f2cc772ab2fc5058625826d28eee2ef35e3fa91b3e2",
+      "stdout_tail": [
+        "26 /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r13/attempt1/R13.txt"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "1,20p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r13/attempt1/R13.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r13-lines-1-20",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "1dda34778833928c868ac9ea3b26d912cd37f02ab33b2d1763f8b9844d691933",
+      "stdout_tail": [
+        "Round thirteen. Full-width DP rho on divisors vs on \u00b1-classes, 40 seeds per row from 0xc0ffee; counted group operations, means per run.",
+        " g    p         N  walk plain   walk fold   ratio fruitless  S_walk p  S_walk f  S ratio  ok",
+        " 2   41      1321          50          36   0.715      3.4%     1.385     0.991    0.969   y",
+        " 2   61      1399          46          35   0.753      3.6%     1.240     0.933    0.975   y",
+        " 2  101      4663          85          60   0.701      3.4%     1.244     0.872    0.955   y",
+        " 2  151      7949         114          80   0.698      3.5%     1.284     0.897    0.942   y",
+        " 2  211     11813         182         104   0.570      3.6%     1.676     0.955    0.887   y",
+        " 2  251     61667         325         325   1.001      2.8%     1.308     1.310    1.000   y",
+        " 3   23      6299         106          96   0.901      3.6%     1.340     1.208    0.982   y",
+        " 3   31      7333         113          74   0.652      3.9%     1.317     0.859    0.933   y",
+        " 3   41      6679         109          76   0.694      5.5%     1.333     0.926    0.943   y",
+        " 3   61    124459         491         358   0.731      2.9%     1.390     1.016    0.880   y",
+        " 3  101    364747         896         965   1.077      3.1%     1.484     1.598    1.044   y",
+        " 3  151   1180351        1583        2688   1.698      4.6%     1.457     2.474    1.474   y",
+        " 3  211   4620611        2604       10375   3.984      5.3%     1.212     4.827    3.272   y",
+        " 4   17      5639         101          72   0.710      3.3%     1.346     0.956    0.949   y",
+        " 4   23     30223         224         158   0.705      3.0%     1.286     0.907    0.914   y",
+        " 4   31    239753         630         996   1.580      3.3%     1.287     2.033    1.286   y",
+        " 4   41    333041         766         932   1.217      4.3%     1.327     1.615    1.115   y",
+        " 4   61  16790591        6069       25173   4.148      5.7%     1.481     6.143    3.748   y"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "21,40p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r13/attempt1/R13.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r13-lines-21-40",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "f1eb459f7b140e145a60d05f6dcfb832f4c826cd7acde2d50107eb1b748e4f34",
+      "stdout_tail": [
+        "",
+        "N1 (median folded/plain walk ops, N >= 1e5, 7 rows): 1.580 (<= 0.80) -> FALSIFIED",
+        "N2 (max fruitless share of folded walk ops): 5.7% (<= 10%) -> HOLDS",
+        "N3 (median folded S_walk, N >= 1e5): 2.033 (<= 1.05) -> FALSIFIED",
+        "N4 (every run verified): HOLDS",
+        "Ideal S_walk: plain sqrt(pi/2) = 1.2533, folded sqrt(pi/4) = 0.8862, ratio 0.7071."
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "41,60p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r13/attempt1/R13.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r13-lines-41-60",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "61,80p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r13/attempt1/R13.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r13-lines-61-80",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "81,100p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r13/attempt1/R13.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r13-lines-81-100",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "tail",
+        "-n",
+        "1",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r13/attempt1/isolated_bench.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r13-record",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "c9a09d21e4f6ef173ca45b6380be24c1c00df2c8595a207c28db3aa636a5aa2b",
+      "stdout_tail": [
+        "{\"host\": {\"cpu_model\": \"Intel(R) Xeon(R) Processor @ 2.10GHz\", \"kernel\": \"6.18.44-fc-v139\", \"logical_cpus\": 4, \"machine\": \"x86_64\", \"python\": \"3.11.17\"}, \"label\": \"R13\", \"left_on_reserved\": {\"kernel_threads\": 29, \"user_threads\": []}, \"mode\": \"run\", \"preflight\": {\"conditions\": {\"loadavg\": [0.06, 0.01, 0.0], \"psi_cpu\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 1.34, \"avg300\": 0.22, \"avg60\": 0.85, \"total\": 854679.0}}, \"psi_memory\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}}, \"unix_time\": 1792375514.5533278}, \"settle\": {\"other_cpu_seconds\": 0.16, \"seconds\": 2.0, \"top\": {\"claude[125]\": 0.16}}}, \"reserved_cpus\": [3], \"run\": {\"after\": {\"loadavg\": [1.01, 0.95, 0.6], \"psi_cpu\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 940522.0}}, \"psi_memory\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}}, \"unix_time\": 1792376286.1345313}, \"before\": {\"loadavg\": [0.06, 0.01, 0.0], \"psi_cpu\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 1.34, \"avg300\": 0.22, \"avg60\": 0.85, \"total\": 854682.0}}, \"psi_memory\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}}, \"unix_time\": 1792375514.5607722}, \"command\": [\"sh\", \"-c\", \"/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r13/hyperelliptic_rho_negation_full_width > /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r13/attempt1/R13.txt 2>&1\"], \"contended\": false, \"cpus\": [3], \"exit_status\": 0, \"involuntary_switches\": 1046, \"major_faults\": 0, \"max_rss_kib\": 13380, \"minor_faults\": 3686, \"other_cpu_seconds\": 4.809999999999998, \"other_top\": {\"6[82]\": 0.06, \"claude[125]\": 3.81, \"environment-man[88]\": 0.45, \"kcompactd0[46]\": 0.03, \"kworker/0:1-events[11]\": 0.02, \"kworker/3:1-events_power_efficient[52]\": 0.04, \"kworker/u16:0-events_unbound[12]\": 0.01, \"process_api[1]\": 0.35}, \"system_seconds\": 0.014686, \"user_seconds\": 762.741172, \"voluntary_switches\": 4, \"wall_seconds\": 771.573563403}, \"schema\": \"isolated-bench/1\", \"threads_moved\": 54}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 9,
+  "commit": "41718e59ec131eb072fee239671cf25981cbdd6a",
+  "dirty_after": [
+    "research/notes/index-calculus/round13/CARD-HEIC-ROUND13-1.yaml",
+    "research/notes/index-calculus/round13/run1/cmd1.stderr",
+    "research/notes/index-calculus/round13/run1/cmd1.stdout",
+    "research/notes/index-calculus/round13/run1/cmd2.stderr",
+    "research/notes/index-calculus/round13/run1/cmd2.stdout",
+    "research/notes/index-calculus/round13/run1/cmd3.stdout",
+    "research/notes/index-calculus/round13/run1/cmd4.stdout",
+    "research/notes/index-calculus/round13/run1/cmd5.stdout",
+    "research/notes/index-calculus/round13/run1/cmd6.stdout",
+    "research/notes/index-calculus/round13/run1/cmd7.stdout",
+    "research/notes/index-calculus/round13/run1/cmd8.stdout",
+    "research/notes/index-calculus/round13/run1/cmd9.stdout"
+  ],
+  "dirty_before": [
+    "research/notes/index-calculus/round13/CARD-HEIC-ROUND13-1.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

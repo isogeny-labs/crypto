@@ -1,0 +1,11 @@
+error[E0433]: cannot find module or crate `blake3` in this scope
+   --> /workspace/nagao-e2e/research/extension_ic_graph_20261115/nagao-e2e/native/jv_sieve_graph_compare.rs:519:26
+    |
+519 |             let digest = blake3::hash(&bytes).to_hex().to_string();
+    |                          ^^^^^^ use of unresolved module or unlinked crate `blake3`
+    |
+    = help: you might be missing a crate named `blake3`
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0433`.

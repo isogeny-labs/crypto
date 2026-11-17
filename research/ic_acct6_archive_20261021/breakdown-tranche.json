@@ -1,0 +1,159 @@
+{
+  "schema": "ic-acct6.breakdown/v1",
+  "label": "re-runs of card 2 priced with the rules at 42f23b5e4",
+  "roots": [
+    "research/ic_acct6_archive_20261021/sessions"
+  ],
+  "session_dirs": 2,
+  "unreadable": [],
+  "totals": {
+    "records": 640,
+    "complete": 120,
+    "incomplete": 520,
+    "errors": 0
+  },
+  "by_method_family": {
+    "ic.shared_rank|koblitz": {
+      "records": 520,
+      "complete": 0,
+      "incomplete": 520,
+      "errors": 0
+    },
+    "rho.signed_frobenius_strong|koblitz": {
+      "records": 120,
+      "complete": 120,
+      "incomplete": 0,
+      "errors": 0
+    }
+  },
+  "by_reason": {
+    "uncounted:gauss_column_scans_and_pivot_inversions": 520,
+    "uncounted:relation_row_construction": 520,
+    "uncounted:table_insert_attempts": 520,
+    "uncounted:walk_bookkeeping": 520
+  },
+  "by_config": {
+    "ic.shared_rank {\"factor_base\":\"compact-orbit-scan:columns=12,raw_x_cap=1000000\",\"rank_max_trials\":\"100000\",\"rank_seed\":\"202610042032\",\"target_max_attempts\":\"512\"}": {
+      "records": 40,
+      "complete": 0,
+      "incomplete": 40,
+      "errors": 0
+    },
+    "ic.shared_rank {\"factor_base\":\"compact-orbit-scan:columns=16,raw_x_cap=1000000\",\"rank_max_trials\":\"100000\",\"rank_seed\":\"202610042032\",\"target_max_attempts\":\"512\"}": {
+      "records": 200,
+      "complete": 0,
+      "incomplete": 200,
+      "errors": 0
+    },
+    "ic.shared_rank {\"factor_base\":\"compact-orbit-scan:columns=24,raw_x_cap=1000000\",\"rank_max_trials\":\"100000\",\"rank_seed\":\"202610042032\",\"target_max_attempts\":\"512\"}": {
+      "records": 40,
+      "complete": 0,
+      "incomplete": 40,
+      "errors": 0
+    },
+    "ic.shared_rank {\"factor_base\":\"compact-orbit-scan:columns=4,raw_x_cap=1000000\",\"rank_max_trials\":\"100000\",\"rank_seed\":\"202610042032\",\"target_max_attempts\":\"512\"}": {
+      "records": 40,
+      "complete": 0,
+      "incomplete": 40,
+      "errors": 0
+    },
+    "ic.shared_rank {\"factor_base\":\"compact-orbit-scan:columns=42,raw_x_cap=1000000\",\"rank_max_trials\":\"100000\",\"rank_seed\":\"202610042032\",\"target_max_attempts\":\"512\"}": {
+      "records": 80,
+      "complete": 0,
+      "incomplete": 80,
+      "errors": 0
+    },
+    "ic.shared_rank {\"factor_base\":\"compact-orbit-scan:columns=8,raw_x_cap=1000000\",\"rank_max_trials\":\"100000\",\"rank_seed\":\"202610042032\",\"target_max_attempts\":\"512\"}": {
+      "records": 120,
+      "complete": 0,
+      "incomplete": 120,
+      "errors": 0
+    },
+    "rho.signed_frobenius_strong {\"dp_bits\":\"8\",\"lanes\":\"32\",\"step_cap_factor\":\"2000\"}": {
+      "records": 120,
+      "complete": 120,
+      "incomplete": 0,
+      "errors": 0
+    }
+  },
+  "sessions": [
+    {
+      "dir": "research/ic_acct6_archive_20261021/sessions/p001-mac_arm64_l0_01",
+      "session_id": "ECBS1ha496e7faaa7d",
+      "spec_id": "ECS1h76742ce139b5",
+      "records_all": 384,
+      "process_wall_ns_all": 22770589607,
+      "counted": {
+        "records": 320,
+        "complete": 40,
+        "incomplete": 280,
+        "errors": 0
+      },
+      "methods": {
+        "ic.shared_rank": {
+          "records": 280,
+          "complete": 0,
+          "incomplete": 280,
+          "errors": 0
+        },
+        "rho.signed_frobenius_strong": {
+          "records": 40,
+          "complete": 40,
+          "incomplete": 0,
+          "errors": 0
+        }
+      },
+      "reasons": {
+        "uncounted:gauss_column_scans_and_pivot_inversions": 280,
+        "uncounted:relation_row_construction": 280,
+        "uncounted:table_insert_attempts": 280,
+        "uncounted:walk_bookkeeping": 280
+      },
+      "incomplete_configs": [
+        "ic.shared_rank {\"factor_base\":\"compact-orbit-scan:columns=12,raw_x_cap=1000000\",\"rank_max_trials\":\"100000\",\"rank_seed\":\"202610042032\",\"target_max_attempts\":\"512\"}",
+        "ic.shared_rank {\"factor_base\":\"compact-orbit-scan:columns=16,raw_x_cap=1000000\",\"rank_max_trials\":\"100000\",\"rank_seed\":\"202610042032\",\"target_max_attempts\":\"512\"}",
+        "ic.shared_rank {\"factor_base\":\"compact-orbit-scan:columns=24,raw_x_cap=1000000\",\"rank_max_trials\":\"100000\",\"rank_seed\":\"202610042032\",\"target_max_attempts\":\"512\"}",
+        "ic.shared_rank {\"factor_base\":\"compact-orbit-scan:columns=4,raw_x_cap=1000000\",\"rank_max_trials\":\"100000\",\"rank_seed\":\"202610042032\",\"target_max_attempts\":\"512\"}",
+        "ic.shared_rank {\"factor_base\":\"compact-orbit-scan:columns=42,raw_x_cap=1000000\",\"rank_max_trials\":\"100000\",\"rank_seed\":\"202610042032\",\"target_max_attempts\":\"512\"}",
+        "ic.shared_rank {\"factor_base\":\"compact-orbit-scan:columns=8,raw_x_cap=1000000\",\"rank_max_trials\":\"100000\",\"rank_seed\":\"202610042032\",\"target_max_attempts\":\"512\"}"
+      ]
+    },
+    {
+      "dir": "research/ic_acct6_archive_20261021/sessions/p002-mac_arm64_l0_01",
+      "session_id": "ECBS1h5596f00b4230",
+      "spec_id": "ECS1hffb616feec1a",
+      "records_all": 384,
+      "process_wall_ns_all": 18470356882,
+      "counted": {
+        "records": 320,
+        "complete": 80,
+        "incomplete": 240,
+        "errors": 0
+      },
+      "methods": {
+        "ic.shared_rank": {
+          "records": 240,
+          "complete": 0,
+          "incomplete": 240,
+          "errors": 0
+        },
+        "rho.signed_frobenius_strong": {
+          "records": 80,
+          "complete": 80,
+          "incomplete": 0,
+          "errors": 0
+        }
+      },
+      "reasons": {
+        "uncounted:gauss_column_scans_and_pivot_inversions": 240,
+        "uncounted:relation_row_construction": 240,
+        "uncounted:table_insert_attempts": 240,
+        "uncounted:walk_bookkeeping": 240
+      },
+      "incomplete_configs": [
+        "ic.shared_rank {\"factor_base\":\"compact-orbit-scan:columns=16,raw_x_cap=1000000\",\"rank_max_trials\":\"100000\",\"rank_seed\":\"202610042032\",\"target_max_attempts\":\"512\"}",
+        "ic.shared_rank {\"factor_base\":\"compact-orbit-scan:columns=8,raw_x_cap=1000000\",\"rank_max_trials\":\"100000\",\"rank_seed\":\"202610042032\",\"target_max_attempts\":\"512\"}"
+      ]
+    }
+  ]
+}

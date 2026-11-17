@@ -1,0 +1,70 @@
+{
+  "checked_commit": "66cbd2a526cb5556dac5d699727ceff95f95a434",
+  "status": "passed",
+  "checks": {
+    "artifact-committed-check.log": "artifacts check: no data files committed\n",
+    "large-files-check.log": "check-large-files: no added or modified file over 10485760 bytes\n",
+    "naming-diff.log": "curve names: 0 problem(s)\n",
+    "backlog-committed-check.log": "XP-20261025-known-factor-base-roots: ok\nXP-20261025-signed-base-cache: ok\n"
+  },
+  "metrics_command": "timeout 60 python3 tools/progress_metrics.py --ref HEAD --since 2026-10-01",
+  "metrics_stderr": "",
+  "new_metrics": [
+    {
+      "metric": "ic.twist.known_roots.verified_targets",
+      "value": 800.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "verified separate recoveries",
+      "better": "higher",
+      "kind": "gauge",
+      "label": "ic.twist.known_roots.verified_targets",
+      "source": "research/quadratic_twist_evidence_20261021/native/known-roots-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.known_roots.reference.main.prefix_target1.membership_evals",
+      "value": 645.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "membership evaluations",
+      "better": "lower",
+      "kind": "gauge",
+      "label": "F43 prefix/Q=P cold membership requests; unpriced",
+      "source": "research/quadratic_twist_evidence_20261021/native/known-roots-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.known_roots.reference.twist.prefix_target1.membership_evals",
+      "value": 258.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "membership evaluations",
+      "better": "lower",
+      "kind": "gauge",
+      "label": "F43 prefix/Q=P cold membership requests; unpriced",
+      "source": "research/quadratic_twist_evidence_20261021/native/known-roots-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.known_roots.known_roots.main.prefix_target1.membership_evals",
+      "value": 4.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "membership evaluations",
+      "better": "lower",
+      "kind": "gauge",
+      "label": "F43 prefix/Q=P cold membership requests; unpriced",
+      "source": "research/quadratic_twist_evidence_20261021/native/known-roots-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.known_roots.known_roots.twist.prefix_target1.membership_evals",
+      "value": 4.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "membership evaluations",
+      "better": "lower",
+      "kind": "gauge",
+      "label": "F43 prefix/Q=P cold membership requests; unpriced",
+      "source": "research/quadratic_twist_evidence_20261021/native/known-roots-20261025/audit.json"
+    }
+  ],
+  "scope": "Committed-tree metadata checks; native sources/results remain unchanged. Exporter uses committed records only; no new research computation."
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "prospective-source-review/v1",
+  "task": "T-1643",
+  "reviewed_commit": "7ff045f7d0957dfe0ae27f2f31297509ada53c91",
+  "freeze_sha256": "8a4966a5579fc01f739dd727a9c8c6248caf4f5ef497897bac7279f7ce4edba9",
+  "status": "source_adequate_for_bounded_attempt",
+  "machine_status": "not_executed",
+  "independent_source_inspection": true,
+  "prior_review_immutable": "d758faea9222eaccc1537b48590fe0c36ab4951a",
+  "findings": [
+    {
+      "id": "R1",
+      "status": "addressed",
+      "basis": "Native read/decode/status validation guarded; failed row retained. Compiler failure reaches post iff terminal owner confirmed and remaining budget sufficient. Unknown termination blocks next phase."
+    },
+    {
+      "id": "R2",
+      "status": "addressed_at_source_scope",
+      "basis": "Finite wait reserves12s; RuntimeMax limit-15; TimeoutStopSec5; GNU timeout limit-20 plus5 kill grace; bounded queries and stop; captured InvocationID checked before cleanup; client group reaping separate from terminal/cgroup verification."
+    }
+  ],
+  "preservation": {
+    "frozen_hashes_and_git_bytes_match": true,
+    "four_lean_texts_identical": true,
+    "names_identical": true,
+    "runtime_pins_identical": true,
+    "closure_baseline_runtime_roots_identical": true,
+    "replay_only_workspace_changed": true,
+    "full_custody_each_phase_files": 16736,
+    "full_custody_each_phase_bytes": 3111892318,
+    "compiler_calls": 4,
+    "axiom_names": 30
+  },
+  "mock_controls": {
+    "producer_cases": 6,
+    "source_inspected": true,
+    "independently_executed": false,
+    "live_systemd_qualification": false
+  },
+  "residual_observations": [
+    "Local filesystem reads, fsync and cgroup traversal are not hard realtime primitives; uninterruptible I/O cannot be guaranteed killed. Unknown termination must stop overlap and be reconciled by owner.",
+    "Invocation identity check followed by stop assumes exclusive ownership of unique unit name; external replacement is not atomic with systemctl stop.",
+    "Receipt serialization errors or exhausted post allowance remain incomplete custody, never success.",
+    "Source plan does not establish live cgroup enforcement or native kernel success."
+  ],
+  "accounting": {
+    "campaign_seconds": 46800,
+    "prior_debit": 300,
+    "remaining_before_attempt": 46500,
+    "attempt_seconds": 2400,
+    "deadline_utc": "2026-11-06T04:00:00Z",
+    "cpu": 1,
+    "memory_gib": 8,
+    "automatic_retries": 0,
+    "waiver": "Dollar-facts only"
+  },
+  "next": "Parent publication and admission; retain full actual pre/compiler/post receipts and ownership reconciliation."
+}

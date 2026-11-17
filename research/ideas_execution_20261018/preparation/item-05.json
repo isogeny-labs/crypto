@@ -1,0 +1,39 @@
+{
+  "item": 5,
+  "title": "Six block-aware elimination orders",
+  "original_requirement": "Run six monomial/variable/block orders on fixed descent cells; measure D and Macaulay size.",
+  "acceptance_criteria": [
+    "Natural, reversed, interleaved, two block-elimination directions and weighted grevlex on byte-identical systems.",
+    "Exact solution/consequence agreement, D, rows, columns, nnz, peak RSS, counted work and time.",
+    "Order implementation respects actual monomial-order semantics; variable permutations alone are labeled as such."
+  ],
+  "source_bindings": [
+    {
+      "repository": "cryptanalysis",
+      "path": "experiments/pdp-scaling/boolean_f5b.py"
+    },
+    {
+      "repository": "cryptanalysis",
+      "path": "experiments/pdp-scaling/boolean_basis.py"
+    },
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/pq_groebner_f2.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/groebner_f4.rs"
+    }
+  ],
+  "source_supported_commands": [],
+  "remaining_gaps": [
+    "Boolean engines hard-code leading-bit/rank assumptions; six-order adapter and order-aware monomial indexing are absent from inspected CLI.",
+    "Need immutable order-independent system export and full certificate checks for every order."
+  ],
+  "dependencies": [],
+  "existing_evidence_notes": [],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "Monomial, variable and block elimination orders tuned to the descent block structure. Your literature frontier found no prior work, and the engines run fixed grevlex. Six orders on fixed cells, measuring D and Macaulay size."
+}

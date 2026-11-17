@@ -1,0 +1,189 @@
+{
+  "schema": "pkm.repaired-source-final-native-validation/v1",
+  "recorded_utc": "2026-11-05T06:54:02.263130+00:00",
+  "tested_source_commit": "b022566e0c6723fef4695a59e054ae4fbdcd1fd0",
+  "collection_head": "d4611ed3cb1175488c8a5afea91f6ce1d14b1339",
+  "source_objects": {
+    "src": "025be22060d2f94766bf7abab5e0592e6e686ed5",
+    "crates": "768da888f70103c8c62ef3120982951ee5bc527e",
+    "Cargo.toml": "27bd18ea4dd995f969ddff7ef859c3b88612551c",
+    "Cargo.lock": "efc8d1888cb0f579d2045003195d517ce93d9e3c",
+    "examples/pkm_oracle_program.rs": "0b2d978683664b8c3d1ab6663a3b0cf75dc68d4e",
+    "examples/pkm_oracle_program": "6acb74a9bb88b3aa29a26cbe94d22d1a6a6d557d",
+    "examples/pkm_symmetric_complete.rs": "0fb50ab47dab4256dd29f4ac8eb84fb5313168e8",
+    "examples/hecke_target_router.rs": "6cbba7cbe8b673b313c08583d0a9fd00e343bf75",
+    "tools/factor-base": "7ddafa821c968783132462b62f2e051c508e7172",
+    "tools/volcano-cli": "52b1c64049002561f3ff55b149c300cdb4656f34",
+    "scripts/checkpoint.sh": "6a2a37967047b1a46ed62a4123f4c69f08a55d04",
+    "tools/lean": "b53b7f1eac6e4688f782c7e83d87fd9847867020",
+    "tests": "944fa03b7a0db26878e679649c7cbf24f4b53c57",
+    "research/prime_ecdlp_three_leads_20261029/lean": "1c366822536c08b212a7d36045580ee715f327a0",
+    "research/aps_measurement_20261029/spec-controls.json": "c11e5f1515b0080aae37539e8321cc82be573f3c",
+    "research/aps_measurement_20261029/spec-orbit-controls.json": "4f832f6190d8347f42892e304fec986453e59f66",
+    "backlog/XP-20261029-pkm-verified-oracle-program/card.json": "e99f0d598cd89d839060e991b9b157efbd6f286a"
+  },
+  "all_17_objects_clean_and_equal": true,
+  "actual_binaries": [
+    {
+      "path": "target/release/examples/hecke_target_router-6e81e88a18c69d16",
+      "bytes": 5171760,
+      "sha256": "6c67779a63778eec530da71f862a6c686f155566d798726bed3e9f5ad2102d69"
+    },
+    {
+      "path": "target/release/examples/pkm_oracle_program-b579e2b69708ec40",
+      "bytes": 7056552,
+      "sha256": "a2bca1ce7fcc8e2d0e775a762f1854f6a125fbf541e5bd855ff0ee1c42ae1a6c"
+    },
+    {
+      "path": "target/release/examples/pkm_symmetric_complete-ef87e23769b87cd0",
+      "bytes": 6531144,
+      "sha256": "cef48569cc8813e77766d1e3a9054fa57370896b4cab59f9e9583510d2b8fcfe"
+    },
+    {
+      "path": "target/release/examples/pkm_oracle_program",
+      "bytes": 6604696,
+      "sha256": "77ba5db612948027921af539bce30e939d2a05ef40339ded151f8752b23dcdfc"
+    },
+    {
+      "path": "target/release/backlog",
+      "bytes": 5758896,
+      "sha256": "7f63e7c789c9e5a0916403628649dc459db99cc650735e98ed908c784a3dea76"
+    },
+    {
+      "path": "target/release/deps/crypto_lib-68f0c4e7d1291d56",
+      "bytes": 286141384,
+      "sha256": "0dff007d543f72a584fe68f95c65065ca78c690e3b122f1adbb9df45fdede991"
+    }
+  ],
+  "scoped_receipt": "../scoped-pass-20261030T2029Z/receipt.json",
+  "scoped_outcome": "23 examples, strict lint/fmt, CLI build/refusal message+exit1, backlog and library build PASS",
+  "captures": {
+    "library-build.log": {
+      "raw_bytes": 195,
+      "raw_sha256": "32a4730dc695486fa65f20debd0519aacd487fe9002d10639928bd68dc0179e6",
+      "stored_bytes": 195,
+      "stored_sha256": "32a4730dc695486fa65f20debd0519aacd487fe9002d10639928bd68dc0179e6",
+      "raw_is_exact_prefix": true
+    },
+    "library-build.started": {
+      "raw_bytes": 21,
+      "raw_sha256": "37f25d9f397adc3ae7f2072b61b2ebc67fe11ddb0c8aec7642966f4b83004378",
+      "stored_bytes": 21,
+      "stored_sha256": "37f25d9f397adc3ae7f2072b61b2ebc67fe11ddb0c8aec7642966f4b83004378",
+      "raw_is_exact_prefix": true
+    },
+    "library-build.exit": {
+      "raw_bytes": 2,
+      "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "stored_bytes": 2,
+      "stored_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "raw_is_exact_prefix": true
+    },
+    "library-build.finished": {
+      "raw_bytes": 21,
+      "raw_sha256": "d2727df1799e2a08e9fb87db5aaf5e47f84dcaa3591b9c3529b042a8a9c642d5",
+      "stored_bytes": 21,
+      "stored_sha256": "d2727df1799e2a08e9fb87db5aaf5e47f84dcaa3591b9c3529b042a8a9c642d5",
+      "raw_is_exact_prefix": true
+    },
+    "library-test.started": {
+      "raw_bytes": 21,
+      "raw_sha256": "39b6dc694d0074c89a2ae68a66d3203ddf8013d3e2f2afe958584f40210b15e2",
+      "stored_bytes": 21,
+      "stored_sha256": "39b6dc694d0074c89a2ae68a66d3203ddf8013d3e2f2afe958584f40210b15e2",
+      "raw_is_exact_prefix": true
+    },
+    "library-test.exit": {
+      "raw_bytes": 4,
+      "raw_sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+      "stored_bytes": 4,
+      "stored_sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+      "raw_is_exact_prefix": true
+    },
+    "library-test.finished": {
+      "raw_bytes": 21,
+      "raw_sha256": "9af0993e48dd9242db23ddc1985d8136f8274def63777b983c53700c10fdcee2",
+      "stored_bytes": 21,
+      "stored_sha256": "9af0993e48dd9242db23ddc1985d8136f8274def63777b983c53700c10fdcee2",
+      "raw_is_exact_prefix": true
+    },
+    "supervisor.log": {
+      "raw_bytes": 171,
+      "raw_sha256": "9a0fdcf2cdc1317db9737da29f4a2b5b90675866c25d47db8c70548eaa4e6b32",
+      "stored_bytes": 171,
+      "stored_sha256": "9a0fdcf2cdc1317db9737da29f4a2b5b90675866c25d47db8c70548eaa4e6b32",
+      "raw_is_exact_prefix": true
+    },
+    "supervisor.exit": {
+      "raw_bytes": 4,
+      "raw_sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+      "stored_bytes": 4,
+      "stored_sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+      "raw_is_exact_prefix": true
+    },
+    "supervisor.finished": {
+      "raw_bytes": 21,
+      "raw_sha256": "9af0993e48dd9242db23ddc1985d8136f8274def63777b983c53700c10fdcee2",
+      "stored_bytes": 21,
+      "stored_sha256": "9af0993e48dd9242db23ddc1985d8136f8274def63777b983c53700c10fdcee2",
+      "raw_is_exact_prefix": true
+    },
+    "focused-chain-bound-20261105.log": {
+      "raw_bytes": 705,
+      "raw_sha256": "3ee1b46735b2be4478971259eb2b61cb0fb736db9bafa8a1276aec444bd2b5cb",
+      "stored_bytes": 775,
+      "stored_sha256": "f27fdba6c7adf24d91cc44355f53d3d7aa7b17a638425143d0a159e76351e0a7",
+      "raw_is_exact_prefix": true
+    }
+  },
+  "full_library": {
+    "status": "failed and capped incomplete",
+    "declared": 5848,
+    "passed": 2272,
+    "failed": 1,
+    "failed_tests": [
+      "cryptanalysis::binary_semaev_chain_sat::tests::source_bound_covers_degree_83_without_constructing_a_model"
+    ],
+    "ignored": 48,
+    "active_at_cap": 1,
+    "active_tests": [
+      "cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies"
+    ],
+    "not_reached": 3526,
+    "should_panic_annotations": 3,
+    "parser": "unique Rust harness lines including optional should-panic annotation; all declared states reconcile",
+    "command": "timeout 2400 cargo test --release --lib --locked -j2 -- --test-threads=1",
+    "started": "2026-10-30T20:48:46Z",
+    "finished": "2026-10-30T21:28:46Z",
+    "execution_cap_seconds": 2400,
+    "wrapper_exit": 124,
+    "supervisor_exit": 124,
+    "cargo_exit": null,
+    "final_suite_summary": false,
+    "raw_log": {
+      "status": "NOT_UPLOADED",
+      "local_path": "/workspace/pkm-scalar-certificates-20261030/repaired-main-cc5addeba/library-test.log",
+      "bytes": 221629,
+      "sha256": "41ca32cee963b13adb6b5638abc52191de20f676b038874957a6b06e5e5ebebf",
+      "object_uri": null,
+      "bounded_excerpt": "library-excerpt.log",
+      "reason": "No approved artifact/checkpoint transport identity configured; raw log over64KiB remains outside Git; no compression or splitting"
+    }
+  },
+  "focused_failure": {
+    "command": "target/release/deps/crypto_lib-68f0c4e7d1291d56 cryptanalysis::binary_semaev_chain_sat::tests::source_bound_covers_degree_83_without_constructing_a_model --exact --nocapture",
+    "exit": 101,
+    "log": "focused-chain-bound-20261105.log",
+    "observed": "assertion at1105: Some(190568) != None",
+    "source_blob": "4e2111e29f64c5fece73f2c52dd9aff9c6e7f69f",
+    "upstream_main_blob": "4e2111e29f64c5fece73f2c52dd9aff9c6e7f69f",
+    "inherited": true
+  },
+  "formal_receipt": "../../integration-0cc5/proof-receipt.json",
+  "formal_equivalence": "../formal-dependency-identity.json",
+  "formal_rerun": false,
+  "scientific_panels": 0,
+  "comparison_admissible": false,
+  "research_goal_complete": false,
+  "duplicate_old_recipe_restarted": false
+}

@@ -1,0 +1,210 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "karpenter.sh/v1",
+            "kind": "NodeClaim",
+            "metadata": {
+                "annotations": {
+                    "karpenter.sh/nodeclaim-min-values-relaxed": "false",
+                    "karpenter.sh/nodepool-hash": "9728748700477503641",
+                    "karpenter.sh/nodepool-hash-version": "v3"
+                },
+                "creationTimestamp": "2026-11-15T19:29:16Z",
+                "finalizers": [
+                    "karpenter.sh/termination"
+                ],
+                "generateName": "cpu-l2-spot-",
+                "generation": 1,
+                "labels": {
+                    "isolab.dev/cpu-isolation": "v6",
+                    "isolab.dev/pool": "cpu-l2-spot",
+                    "isolab.dev/role": "worker",
+                    "karpenter.k8s.aws/ec2nodeclass": "cpu-l2",
+                    "karpenter.sh/nodepool": "cpu-l2-spot"
+                },
+                "name": "cpu-l2-spot-l7hpn",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "karpenter.sh/v1",
+                        "blockOwnerDeletion": true,
+                        "kind": "NodePool",
+                        "name": "cpu-l2-spot",
+                        "uid": "cba8a4ef-bdfc-4275-8a29-b96c544d07fc"
+                    }
+                ],
+                "resourceVersion": "14688410",
+                "uid": "60530aa3-b7d1-49b3-94e9-9a3adbc0158e"
+            },
+            "spec": {
+                "expireAfter": "Never",
+                "nodeClassRef": {
+                    "group": "karpenter.k8s.aws",
+                    "kind": "EC2NodeClass",
+                    "name": "cpu-l2"
+                },
+                "requirements": [
+                    {
+                        "key": "karpenter.k8s.aws/ec2nodeclass",
+                        "operator": "In",
+                        "values": [
+                            "cpu-l2"
+                        ]
+                    },
+                    {
+                        "key": "isolab.dev/pool",
+                        "operator": "In",
+                        "values": [
+                            "cpu-l2-spot"
+                        ]
+                    },
+                    {
+                        "key": "karpenter.k8s.aws/instance-cpu",
+                        "operator": "In",
+                        "values": [
+                            "16",
+                            "32",
+                            "8"
+                        ]
+                    },
+                    {
+                        "key": "karpenter.sh/capacity-type",
+                        "operator": "In",
+                        "values": [
+                            "spot"
+                        ]
+                    },
+                    {
+                        "key": "karpenter.sh/nodepool",
+                        "operator": "In",
+                        "values": [
+                            "cpu-l2-spot"
+                        ]
+                    },
+                    {
+                        "key": "isolab.dev/cpu-isolation",
+                        "operator": "In",
+                        "values": [
+                            "v6"
+                        ]
+                    },
+                    {
+                        "key": "isolab.dev/role",
+                        "operator": "In",
+                        "values": [
+                            "worker"
+                        ]
+                    },
+                    {
+                        "key": "karpenter.k8s.aws/instance-category",
+                        "operator": "In",
+                        "values": [
+                            "c",
+                            "m",
+                            "r"
+                        ]
+                    },
+                    {
+                        "key": "karpenter.k8s.aws/instance-family",
+                        "operator": "NotIn",
+                        "values": [
+                            "c7i-flex",
+                            "c8i-flex",
+                            "m7i-flex",
+                            "m8i-flex"
+                        ]
+                    },
+                    {
+                        "key": "kubernetes.io/arch",
+                        "operator": "In",
+                        "values": [
+                            "amd64"
+                        ]
+                    },
+                    {
+                        "key": "kubernetes.io/os",
+                        "operator": "In",
+                        "values": [
+                            "linux"
+                        ]
+                    },
+                    {
+                        "key": "karpenter.k8s.aws/instance-generation",
+                        "operator": "Gte",
+                        "values": [
+                            "6"
+                        ]
+                    },
+                    {
+                        "key": "node.kubernetes.io/instance-type",
+                        "operator": "In",
+                        "values": [
+                            "m8a.2xlarge"
+                        ]
+                    }
+                ],
+                "resources": {
+                    "requests": {
+                        "cpu": "4180m",
+                        "ephemeral-storage": "10Gi",
+                        "memory": "24680Mi",
+                        "pods": "4"
+                    }
+                },
+                "taints": [
+                    {
+                        "effect": "NoSchedule",
+                        "key": "isolab.dev/workload",
+                        "value": "cpu"
+                    },
+                    {
+                        "effect": "NoSchedule",
+                        "key": "isolab.dev/measurement",
+                        "value": "l2"
+                    }
+                ],
+                "terminationGracePeriod": "1h0m0s"
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-15T19:29:16Z",
+                        "message": "object is awaiting reconciliation",
+                        "observedGeneration": 1,
+                        "reason": "AwaitingReconciliation",
+                        "status": "Unknown",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastTransitionTime": "2026-11-15T19:29:16Z",
+                        "message": "Error creating fleet request: A fleet launch was requested but this would exceed your fleet request quota",
+                        "observedGeneration": 1,
+                        "reason": "FleetQuotaExceeded",
+                        "status": "Unknown",
+                        "type": "Launched"
+                    },
+                    {
+                        "lastTransitionTime": "2026-11-15T19:29:16Z",
+                        "message": "Node not registered with cluster",
+                        "observedGeneration": 1,
+                        "reason": "NodeNotFound",
+                        "status": "Unknown",
+                        "type": "Registered"
+                    },
+                    {
+                        "lastTransitionTime": "2026-11-15T19:29:16Z",
+                        "message": "Initialized=Unknown, Launched=Unknown, Registered=Unknown",
+                        "observedGeneration": 1,
+                        "reason": "ReconcilingDependents",
+                        "status": "Unknown",
+                        "type": "Ready"
+                    }
+                ]
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

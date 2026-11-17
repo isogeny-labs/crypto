@@ -1,0 +1,36 @@
+✖ [3139/3140] Building NormWeightedCount (5.9s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/NormWeightedCount.lean -o /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean/NormWeightedCount.olean -i /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean/NormWeightedCount.ilean -c /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/ir/NormWeightedCount.c --setup /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/ir/NormWeightedCount.setup.json --json
+error: NormWeightedCount.lean:26:44: Type mismatch
+  single_le_sum (fun x x_1 => Nat.zero_le (?m.58 x)) (mem_univ i)
+has type
+  ?m.58 i ≤ ∑ x, ?m.58 x
+but is expected to have type
+  w i * e i ≤ ∑ j, w j * e j
+error: NormWeightedCount.lean:62:4: Type mismatch: After simplification, term
+  hi
+ has type
+  (w i * e i + t i) / w i = (w i * e' i + t' i) / w i
+but is expected to have type
+  e i = e' i
+error: NormWeightedCount.lean:97:4: Type mismatch: After simplification, term
+  hc
+ has type
+  Fintype.card (↥(monomials w D) × ↥(Fintype.piFinset fun i => range (w i))) ≤ (v + (1 + L) - 1).choose L
+but is expected to have type
+  #(monomials w D) * ∏ i, w i ≤ (v + L).choose L
+error: NormWeightedCount.lean:99:2: Type mismatch: After simplification, term
+  hc'
+ has type
+  #(monomials w D) * ∏ i, w i ≤ (D + ∑ i, (w i - 1) + v).choose v
+but is expected to have type
+  #(monomials w D) * ∏ i, w i ≤ (D + ∑ i, w i).choose v
+error: NormWeightedCount.lean:111:6: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ∏ i, ?f ↑i
+in the target expression
+  ∏ i, (↑i + 1) = v.factorial
+
+v : ℕ
+⊢ ∏ i, (↑i + 1) = v.factorial
+Some required targets logged failures:
+- NormWeightedCount
+error: build failed

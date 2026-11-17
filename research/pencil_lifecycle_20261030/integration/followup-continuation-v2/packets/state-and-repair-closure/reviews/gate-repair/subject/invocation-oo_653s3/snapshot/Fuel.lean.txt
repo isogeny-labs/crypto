@@ -1,0 +1,42 @@
+import Descent
+set_option autoImplicit false
+namespace MonicTermination
+open Polynomial ScaleTrim MonicRemainder
+
+theorem sufficient_fuel (p : UInt64) [Fact p.toNat.Prime] (b : List UInt64)
+ (hp : 0<p.toNat) (hb : p.toNat<2^31) (hbs : Canon p b) (hm : b.getLast?=some 1)
+ (fuel : Nat) (r : List UInt64) (hrs : Canon p r) (hf : r.length≤fuel) :
+ ∃out,loop p b fuel r=some out ∧ (out=[] ∨ out.length<b.length) := by
+ induction fuel generalizing r with
+ | zero =>
+   have he : r=[] := List.length_eq_zero_iff.mp (by omega)
+   subst r
+   exact ⟨[],by simp [loop],Or.inl rfl⟩
+ | succ fuel ih =>
+   rw [loop]
+   split_ifs with hr hl
+   · exact ⟨r,rfl,Or.inl hr⟩
+   · have hs:=selected_correct p b r hr hl hp hb hbs hrs
+     have hd:=selected_shorter p b r hr hl hp hb hbs hrs hm
+     exact ih _ hs.1 (by omega)
+   · exact ⟨r,rfl,Or.inr (by omega)⟩
+
+theorem checked_total (p : UInt64) [Fact p.toNat.Prime] (b a : List UInt64)
+ (hp : 0<p.toNat) (hb : p.toNat<2^31) (hbs : Canon p b) (ha : Canon p a)
+ (hm : b.getLast?=some 1) (fuel : Nat) (hf : a.length≤fuel) :
+ ∃out,checkedPrem p b a fuel=some out ∧ Canon p out ∧
+ (out=[] ∨ out.length<b.length) ∧ (wordsPoly p b∣wordsPoly p out ↔ wordsPoly p b∣wordsPoly p a) := by
+ obtain ⟨out,ho,ht⟩:=sufficient_fuel p b hp hb hbs hm fuel (trimFuel a.length a)
+  (trim_good p _ a ha) (le_trans (trim_length _ _) hf)
+ have hc:=loop_correct p b hp hb hbs fuel (trimFuel a.length a) out (trim_good p _ a ha) ho
+ refine ⟨out,?_,hc.1,ht,?_⟩
+ · simpa [checkedPrem,hm,premModel] using ho
+ · simpa only [trim_preserves] using hc.2
+
+theorem input_length_suffices (p : UInt64) [Fact p.toNat.Prime] (b a : List UInt64)
+ (hp : 0<p.toNat) (hb : p.toNat<2^31) (hbs : Canon p b) (ha : Canon p a)
+ (hm : b.getLast?=some 1) : checkedPrem p b a a.length≠none := by
+ obtain ⟨out,ho,_⟩:=checked_total p b a hp hb hbs ha hm a.length le_rfl
+ rw [ho]
+ simp
+end MonicTermination

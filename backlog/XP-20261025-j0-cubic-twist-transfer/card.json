@@ -1,0 +1,102 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261025-j0-cubic-twist-transfer",
+  "title": "Construct a cubic j0 twist transfer before comparing useful S3 yield",
+  "status": "draft",
+  "status_note": "Unexecuted alternative, deferred behind the already registered F13 degree-two route. New p41 models would require strict canonical registration/publication checks; no permission to upload a new registry payload is inferred. No lease/promotion claimed.",
+  "created": "2026-10-25",
+  "authors": [
+    "research reasoning lane"
+  ],
+  "owner_hint": "Existing PR2381 research continuation",
+  "question": "Can the standard rational j0 degree-three map to the minus27b model give a verified non-isomorphic quadratic-twist subgroup transfer and a bounded actual useful-row/solver-degree comparison benefiting the source DLP?",
+  "decision_value": "An independently verified scalar-preserving map permits a meaningful source-matched curve comparison; a failed map, killed subgroup or absent joint yield/degree gain is retained. A matched-base conservation control identifies basis effects without treating them as general impossibility.",
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "codex/quadratic-twist-evidence-import",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "research/quadratic_twist_evidence_20261021/native/metadata/Cargo.toml"
+      ]
+    ]
+  },
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "run": {
+    "argv": [
+      "research/quadratic_twist_evidence_20261021/run-cubic-transfer.sh",
+      "{out}"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1"
+    },
+    "timeout_per_shard_s": 3600
+  },
+  "shards": {
+    "scheme": "single",
+    "count": 1,
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "resources": {
+    "cpus": 2,
+    "ram_gb": 4,
+    "disk_gb": 4,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Use existing local resources; native command caps600 seconds and one iteration envelope3600 seconds. Estimates remain null until the implementation and protocol are fixed; no paid compute or upload requested."
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unassigned",
+    "tasks": [
+      "XP-20261025-j0-cubic-twist-transfer"
+    ],
+    "env": {
+      "name": "crypto-rust",
+      "recipe": "Draft: native exact model registration/strict metadata, point-formula subgroup transfer and independent useful S3 solver comparison. No experiment has run."
+    },
+    "exec": {
+      "cpus": 2,
+      "memory_mb": 4096,
+      "timeout_s": 3600,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261025-j0-cubic-twist-transfer"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "No funding, paid resource or task reservation requested."
+    },
+    "ttl_s": 86400,
+    "notes": "Draft only; no Cairn lease, run or publication performed."
+  },
+  "outputs": {
+    "result_schema": "quadratic-twist-cubic-transfer/v1",
+    "verify": [],
+    "land": "research/quadratic_twist_evidence_20261021"
+  },
+  "links": {
+    "prs": [
+      2381
+    ],
+    "lead": "crypto-autoresearcher:LEAD-ICP-isogeny-transported-relation-yield",
+    "notes": [
+      "research/quadratic_twist_evidence_20261021/reports/direct-sign-20261025/README.md",
+      "research/quadratic_twist_evidence_20261021/CONTINUATION.md"
+    ]
+  },
+  "blocked_on": []
+}

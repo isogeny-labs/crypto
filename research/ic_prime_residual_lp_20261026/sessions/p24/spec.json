@@ -1,0 +1,129 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "prime residual collector (large-prime limit |D| = r) against the plan, curve p24",
+  "description": "research/ic_prime_residual_lp_20261026/PROTOCOL.md. plan = ic plan output; resB = the same pipeline with targets=residual (ic_framework::residual) on a base of B abscissae.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 16777199,
+        "a": 16777196,
+        "b": 31,
+        "group_order": 16782299,
+        "r": 16782299,
+        "gx": 2,
+        "gy": 5412647
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261031
+  },
+  "arms": [
+    {
+      "name": "rho",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=128",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "walk"
+        }
+      },
+      "name": "plan",
+      "role": "candidate"
+    },
+    {
+      "name": "res4",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=4",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "residual"
+        }
+      }
+    },
+    {
+      "name": "res8",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=8",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "residual"
+        }
+      }
+    },
+    {
+      "name": "res16",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=16",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "residual"
+        }
+      }
+    },
+    {
+      "name": "res32",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "residual"
+        }
+      }
+    },
+    {
+      "name": "res64",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=64",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "residual"
+        }
+      }
+    },
+    {
+      "name": "resN0",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=128",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "residual"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 20261101,
+    "isolation_required": "L2",
+    "timeout_seconds": 1800
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "version": 20,
+  "protocol_sha256": "134711fad2c4d3b68c3e7b928a6946953051c01fe45d9021fb9984f64b86aa8c",
+  "source_commit": "37b17fcf7b40a2e3a044a3c2af888041b24c7195",
+  "source_archive_sha256": "5e013bb3cec6c2e3496aa65aa3d58546e2e98d62c95f6464e20a24febde41f78",
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "rate_cap_usd_hour": 0.9,
+  "files": {
+    "controller.sh": "e8b694bf78a73a5709c2ce85d8132294c597ef34e4cecd515abef9962b2b026e",
+    "bootstrap.sh": "bba746653109dbca5b39a9c06fd7b46061881959353f351f285a2dbd9edee7f6",
+    "pod-command.sh": "32a72486016c0b874da64173660906c3ff05665f51e9d8c2425db92204eabd99",
+    "prepare-request.py": "183c767654da2b6cbe70e1a42c09e95ba06af1a6639a1d47ddfbccedb42b7fac",
+    "source-checkout.sha256": "4388fb8cc8e3063fa5d87a732b445e9612054cc55c4a991afc0832274b9f3e0f",
+    "receipt.json": "c3e1cd3fe62e80a7eefe63cea620a422c3f6329d5228fa72af2958febd39c62c"
+  },
+  "notes": [
+    "One GPU; worker18000/controller18300s; all clocks L0.",
+    "1235 original Git materialized blobs verified; source archive fresh GET byte-equal.",
+    "60-second partial artifact copies, no solver restoration. Full preflight before data; final archive SHA/replay checks required.",
+    "Controller lifecycle unchanged from regression-tested V19 except version paths. GPU memory must come from nvidia-smi, not provider host RAM metadata."
+  ]
+}

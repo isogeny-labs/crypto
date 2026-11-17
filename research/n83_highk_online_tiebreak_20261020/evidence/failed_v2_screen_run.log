@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/workspace/crypto/research/n83_highk_online_tiebreak_20261020/runpod_runner.py", line 136, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/workspace/crypto/research/n83_highk_online_tiebreak_20261020/runpod_runner.py", line 125, in main
+    bind_provider(receipt, receipt_path, head_sha)
+  File "/workspace/crypto/research/n83_highk_online_tiebreak_20261020/runpod_runner.py", line 63, in bind_provider
+    snapshot = prior_adapter.v1_snapshot()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto/research/n83_highk_online_distribution_20261020/runpod_runner.py", line 38, in v1_snapshot
+    cpu_stat = read(cpu, 'cpu.stat')
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto/research/n83_highk_online_distribution_20261020/runpod_runner.py", line 33, in read
+    value = (directory / name).read_text().strip()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sys/fs/cgroup/cpu/cpu.stat'

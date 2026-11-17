@@ -1,0 +1,15 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | inc | 64/64 | 1.616 | 1.660 | 2.051 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | inc-aa | 64/64 | 1.616 | 1.660 | 2.051 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | inc-run | 64/64 | 1.883 | 1.926 | 2.309 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | rho-neg | 64/64 | 1.038 | 1.135 | 2.010 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp28-tm27314-a41e3b62 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp28-tm27314-a41e3b62 | inc vs inc-run | inc < inc-run |
+| icv1-fp28-tm27314-a41e3b62 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp28-tm27314-a41e3b62 | inc-aa vs inc-run | inc-aa < inc-run |
+| icv1-fp28-tm27314-a41e3b62 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp28-tm27314-a41e3b62 | inc-run vs rho-neg | rho-neg < inc-run |

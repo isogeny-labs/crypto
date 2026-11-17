@@ -1,0 +1,232 @@
+{
+  "branch": "aburan28/inspiring-dijkstra-ay05qi",
+  "closed_utc": "2026-11-14T06:28:49+00:00",
+  "commands": [
+    {
+      "argv": [
+        "target/release/examples/prime_fast_j0_rho_multi",
+        "research/ic_e222_m221_20261106/results/pf_j0/rhoks_30_T3000_rep.jsonl",
+        "30",
+        "3000",
+        "2"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-14T06:28:46+00:00",
+      "wall_s": 2.093
+    }
+  ],
+  "commit": "5f832cf95ac6f027c1fc66ee147637b93800236d",
+  "commit_dirty": true,
+  "created_utc": "2026-11-14T06:27:34+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261114T0627Z-j0-multirho-restart-fix",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "rho_ks_over_ic_28b_t3000",
+      "note": "median wall time: batched folded multi-target rho (Kuhn-Struik restarts) / symmetric multi-target IC; below 1 means rho is faster",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.43
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "rho_ks_over_ic_30b_t3000",
+      "note": "median wall time: batched folded multi-target rho (Kuhn-Struik restarts) / symmetric multi-target IC; below 1 means rho is faster",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.34
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "rho_ks_over_ic_30b_t1000",
+      "note": "median wall time: batched folded multi-target rho (Kuhn-Struik restarts) / symmetric multi-target IC; below 1 means rho is faster",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.28
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "rho_ks_over_ic_26b_t1000",
+      "note": "median wall time: batched folded multi-target rho (Kuhn-Struik restarts) / symmetric multi-target IC; below 1 means rho is faster",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.39
+    }
+  ],
+  "problem": "ecdlp-prime-multi-target",
+  "raw": [
+    {
+      "bytes": 468,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoks_26_T1000.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/24/24a66342bedfc5643c2a323dbaeb924a21c4c7eb97eca97338360cb2b6291e4f",
+      "sha256": "24a66342bedfc5643c2a323dbaeb924a21c4c7eb97eca97338360cb2b6291e4f",
+      "uploaded": false
+    },
+    {
+      "bytes": 454,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoks_26_T20.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/46/46f4e0c05fb5ddf454737b248433bd7d04b70bb89b4971533cc34a837e50b624",
+      "sha256": "46f4e0c05fb5ddf454737b248433bd7d04b70bb89b4971533cc34a837e50b624",
+      "uploaded": false
+    },
+    {
+      "bytes": 477,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoks_26_T200.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/38/3819bb7c1b21ba3f86d54abcc462c37e7b8ad46c052933f279d454206ffc0822",
+      "sha256": "3819bb7c1b21ba3f86d54abcc462c37e7b8ad46c052933f279d454206ffc0822",
+      "uploaded": false
+    },
+    {
+      "bytes": 456,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoks_28_T1000.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a9/a97fe1954ab6fbdbbb1f79134b7cd4ca884758036ff478bc92802a814aab18ae",
+      "sha256": "a97fe1954ab6fbdbbb1f79134b7cd4ca884758036ff478bc92802a814aab18ae",
+      "uploaded": false
+    },
+    {
+      "bytes": 456,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoks_28_T200.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/07/07ffb1114b1ae07d0148df9e47d72d5ab2a8342c2159dc9aa2ceacf55efdf1c7",
+      "sha256": "07ffb1114b1ae07d0148df9e47d72d5ab2a8342c2159dc9aa2ceacf55efdf1c7",
+      "uploaded": false
+    },
+    {
+      "bytes": 464,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoks_28_T3000.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a9/a9e0aa8cab957baf1a694c049726d1a55e89fc6fab32c36b730404e52445f52f",
+      "sha256": "a9e0aa8cab957baf1a694c049726d1a55e89fc6fab32c36b730404e52445f52f",
+      "uploaded": false
+    },
+    {
+      "bytes": 472,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoks_30_T1000.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d4/d4673b73e1e1d24a36797c7fd87da20d464ac547437218c37c8981cded28d500",
+      "sha256": "d4673b73e1e1d24a36797c7fd87da20d464ac547437218c37c8981cded28d500",
+      "uploaded": false
+    },
+    {
+      "bytes": 451,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoks_30_T200.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8b/8b24a088a64f4bd121a6d70af5a35e0dd74604476087ab66c1a7aaa2c5f6bc23",
+      "sha256": "8b24a088a64f4bd121a6d70af5a35e0dd74604476087ab66c1a7aaa2c5f6bc23",
+      "uploaded": false
+    },
+    {
+      "bytes": 488,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoks_30_T3000.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fe/fe8427607c67f69dcf509f08d11a015d7ee0a58b84abbb051860a258e48c8779",
+      "sha256": "fe8427607c67f69dcf509f08d11a015d7ee0a58b84abbb051860a258e48c8779",
+      "uploaded": false
+    },
+    {
+      "bytes": 473,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoall_26_T1000.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f0/f07b2831a90b006494aec19c391df8ab6beb536ca8460f06b5951b58999cf3b1",
+      "sha256": "f07b2831a90b006494aec19c391df8ab6beb536ca8460f06b5951b58999cf3b1",
+      "uploaded": false
+    },
+    {
+      "bytes": 456,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoall_26_T20.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/17/1786e058302f7ee20f7e65dd8947ffc6d92c8ff5558a334ca81a2aa04d843bed",
+      "sha256": "1786e058302f7ee20f7e65dd8947ffc6d92c8ff5558a334ca81a2aa04d843bed",
+      "uploaded": false
+    },
+    {
+      "bytes": 451,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoall_26_T200.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ea/eacf983b281010c1187d303f84adf57af65c9b5e19404d33a460fe7a6c97eaec",
+      "sha256": "eacf983b281010c1187d303f84adf57af65c9b5e19404d33a460fe7a6c97eaec",
+      "uploaded": false
+    },
+    {
+      "bytes": 464,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoall_28_T1000.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fd/fd76adc2d06804b692ea12dff386c5d71a5b1e7077d7283727e0dc86e0f66abf",
+      "sha256": "fd76adc2d06804b692ea12dff386c5d71a5b1e7077d7283727e0dc86e0f66abf",
+      "uploaded": false
+    },
+    {
+      "bytes": 448,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoall_28_T200.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/71/714175e2af3feccc4164e8e4a18e3eaf0988ea01550441455aaafa8857688906",
+      "sha256": "714175e2af3feccc4164e8e4a18e3eaf0988ea01550441455aaafa8857688906",
+      "uploaded": false
+    },
+    {
+      "bytes": 476,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoall_28_T3000.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1f/1f5b30878fb1dc67a9c956f58f67bc59525f19934367e36be149166104bee132",
+      "sha256": "1f5b30878fb1dc67a9c956f58f67bc59525f19934367e36be149166104bee132",
+      "uploaded": false
+    },
+    {
+      "bytes": 476,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoall_30_T1000.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/45/459ca2b794481b22f0d6742bb45a0d836d67158170f7e646d0d031190c12930a",
+      "sha256": "459ca2b794481b22f0d6742bb45a0d836d67158170f7e646d0d031190c12930a",
+      "uploaded": false
+    },
+    {
+      "bytes": 461,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoall_30_T200.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/80/802d1ad78cd2bd345d2a743aea97d6506b2a3ba0624be12b17ded35e2f46e4cc",
+      "sha256": "802d1ad78cd2bd345d2a743aea97d6506b2a3ba0624be12b17ded35e2f46e4cc",
+      "uploaded": false
+    },
+    {
+      "bytes": 480,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoall_30_T3000.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c3/c310b9764adb2f3c80e63f59a74ce0cbead572fb82f5eb73b6bf78be87d8f4b7",
+      "sha256": "c310b9764adb2f3c80e63f59a74ce0cbead572fb82f5eb73b6bf78be87d8f4b7",
+      "uploaded": false
+    },
+    {
+      "bytes": 472,
+      "path": "research/ic_e222_m221_20261106/results/pf_j0/rhoks_30_T3000_rep.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/11/11d40c0b97b10214985f4c067a5a526df8874532878b4dc29b262f8c73ec1fc4",
+      "sha256": "11d40c0b97b10214985f4c067a5a526df8874532878b4dc29b262f8c73ec1fc4",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_e222_m221_20261106/figures/multirho_restart_fix.pdf",
+    "png": [],
+    "svg": [
+      "research/ic_e222_m221_20261106/figures/multirho_restart_fix.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "j0-multirho-restart-fix",
+  "status": "measured",
+  "summary": "Multi-target rho with Kuhn-Struik restarts beats symmetric multi-target IC at every cell (rho/IC 0.28-0.83); earlier IC lead was a restart bug",
+  "validation": null
+}

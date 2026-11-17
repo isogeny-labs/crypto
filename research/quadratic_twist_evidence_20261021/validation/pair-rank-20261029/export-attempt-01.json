@@ -1,0 +1,276 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "QT-pair-rank-20261029-attempt-01",
+  "created": "2026-10-29T23:52:17Z",
+  "protocol": {
+    "path": "../../PAIR_RANK_20261029.protocol.json",
+    "sha256": "a89bfebc5982a78eea6c0fef40eb4a4b328206849bff69d4cf28e39787c82787",
+    "protocol_id": "QT-pair-rank-20261029",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": null,
+    "role": "bounded native exact census and independent replay"
+  },
+  "source": {
+    "repo": "isogeny-labs/crypto",
+    "commit": "11853a0f66ac9c86cfb86e37d16685113e5f1de0",
+    "dirty": null
+  },
+  "backend": "local",
+  "host": {
+    "path": null,
+    "sha256": null,
+    "class_id": null,
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": null
+    }
+  },
+  "arms": [
+    {
+      "id": "cpp",
+      "role": "reference",
+      "binary_sha256": "1dbfae089dc26e9668ee70324e8485ecd538268c3bf80a4880b9e7f8038149fc",
+      "commit": "11853a0f66ac9c86cfb86e37d16685113e5f1de0"
+    },
+    {
+      "id": "rust",
+      "role": "candidate",
+      "binary_sha256": null,
+      "commit": "11853a0f66ac9c86cfb86e37d16685113e5f1de0"
+    },
+    {
+      "id": "domain",
+      "role": "control_positive",
+      "binary_sha256": null,
+      "commit": "11853a0f66ac9c86cfb86e37d16685113e5f1de0"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "01-cpp",
+      "arm": "cpp",
+      "instance_id": "0",
+      "seed": 2381,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "rank_pair_defects": 0,
+          "cases": 4485,
+          "queries": 119912,
+          "actual_arms": 96,
+          "actual_queries": 896
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "deterministic exact computation; no clock isolation/performance result"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "independent unordered-pair Euclidean arithmetic/Gauss-Jordan Rust audit; domain control row is nested in the same two native executions"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "existing local host;2buildworkers"
+    },
+    {
+      "run_id": "01-rust",
+      "arm": "rust",
+      "instance_id": "0",
+      "seed": 2381,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "rank_pair_defects": 0,
+          "cases": 4485,
+          "queries": 119912,
+          "actual_arms": 96,
+          "actual_queries": 896
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "deterministic exact computation; no clock isolation/performance result"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "independent unordered-pair Euclidean arithmetic/Gauss-Jordan Rust audit; domain control row is nested in the same two native executions"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "existing local host;2buildworkers"
+    },
+    {
+      "run_id": "01-domain",
+      "arm": "domain",
+      "instance_id": "0",
+      "seed": 2381,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "domain_rank_losses": 2
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "deterministic exact computation; no clock isolation/performance result"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "independent unordered-pair Euclidean arithmetic/Gauss-Jordan Rust audit; domain control row is nested in the same two native executions"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "existing local host;2buildworkers"
+    }
+  ],
+  "flow": {
+    "planned": 3,
+    "attempted": 3,
+    "completed": 3,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "../../native/pair-rank-20261029/audit.json",
+      "sha256": "98dca59b47704add23958245b823ef4ae7be687289413e4d330a81df0be82c98",
+      "bytes": 253,
+      "kind": "raw"
+    },
+    {
+      "path": "../../native/pair-rank-20261029/cases-manifest.json",
+      "sha256": "f80fbaacc03d1de1a3c016c91a6e5a93231e0f6809a6c63431cc5ae1bde6631e",
+      "bytes": 2727,
+      "kind": "raw"
+    },
+    {
+      "path": "RUNS.sha256",
+      "sha256": "1fb46b8cca71e2ce670fffb6dcb3a58d8e3a2ae87828de41d6b2a116d5f6b020",
+      "bytes": 22030,
+      "kind": "raw"
+    },
+    {
+      "path": "runs.tar.xz",
+      "sha256": "7c679cb541bf09deaa8c9c6ae1b2633a63f689eeab8283997828daaa3e4fa2a1",
+      "bytes": 26752,
+      "kind": "raw"
+    },
+    {
+      "path": "../../native/pair-rank-audit/main.rs",
+      "sha256": "bd0ab97beebd808c4d7d7572c6ef3fe2d1c68ff5631e2dbe4e63651e5ebbdd20",
+      "bytes": 7418,
+      "kind": "other"
+    },
+    {
+      "path": "attempt-01-summary.json",
+      "sha256": "1871962b75e767673cc388dc6e4ec586dec9232d8a8454087c868459b3c02fe6",
+      "bytes": 841,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../../native/pair-rank-audit/frozen-analysis.rs",
+      "sha256": "674b86e6fb542bbd01b2eec8e20af409df373fca8dd53a720bdb0b28d1595ff1",
+      "bytes": 7322
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "exact command/exit/native records",
+      "text": "Three arm records describe two engine invocations and their nested positive-domain controls, not three independent scientific samples. Two full native contracts were run overall; second changes only Lean source binding after a syntax simplification fix. Every original output retained."
+    },
+    {
+      "kind": "observation",
+      "by": "source bindings",
+      "text": "Effective source committed and checked by hashes. Whole-worktree dirty state was not captured at launch,so dirty=null. Build caches are ignored;no clean-state or speed claim inferred."
+    },
+    {
+      "kind": "observation",
+      "by": "raw scope",
+      "text": "Declared r3single-call calibration precedes canonical freeze. Main data follow frozen protocol. Compiler/permission/missing-utility infrastructure probes are separately retained. Root validation still incomplete;all broader gates remain."
+    },
+    {
+      "kind": "observation",
+      "by": "canonical analysis hash check",
+      "text": "Freeze pinned the analyzer before its pilot-only entry guard was added. Restored those exact frozen bytes from630 as frozen-analysis.rs, compiled a separate binary and replayed both output sets. Receipts equal prior independent audit. Frozen protocol/hash unchanged; no semantic predicate or case changed."
+    }
+  ],
+  "reviews_dir": "reviews"
+}

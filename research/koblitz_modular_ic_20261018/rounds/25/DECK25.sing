@@ -1,0 +1,53 @@
+// Appended to original r/circuit and the literal retained nuEquation.
+option(redSB);
+poly A=1+c;
+poly Delta=b^3*(b+c*A^3);
+poly D=diff(nuEquation,n);
+if(D!=A^2*Delta){ERROR("nu source coefficient mismatch");}
+ideal original=nn[49],nn[53],nn[239],nn[241],nn[243];
+ideal units=nn[1],nn[12],nn[2],nn[2],nn[20],nn[37],nn[65],nn[75];
+ideal kernelCoefficients=b+l^2+A*l,A*n+b*l,n^2+b*n;
+map sig=r,n+b,l+A,b,c;
+ideal shifted=sig(original);ideal shiftedUnits=sig(units);ideal shiftedKernel=sig(kernelCoefficients);
+int k;
+print("SOURCE_RESIDUAL_INVARIANCE");
+for(k=1;k<=5;k++){shifted[k]-original[k];if(shifted[k]!=original[k]){ERROR("source residual not exactly invariant");}}
+print("REGISTERED_ENTRY_INVARIANCE");
+for(k=1;k<=8;k++){shiftedUnits[k]-units[k];if(shiftedUnits[k]!=units[k]){ERROR("registered entry not invariant");}}
+print("KERNEL_COEFFICIENT_INVARIANCE");
+for(k=1;k<=3;k++){shiftedKernel[k]-kernelCoefficients[k];if(shiftedKernel[k]!=kernelCoefficients[k]){ERROR("kernel coefficient not invariant");}}
+poly sourceNu=n;poly sourceLambda=l;
+poly imageN=sig(sourceNu);poly imageL=sig(sourceLambda);
+poly twiceN=sig(imageN);poly twiceL=sig(imageL);
+print("INVOLUTION_RESIDUALS");twiceN-n;twiceL-l;
+if(twiceN!=n || twiceL!=l){ERROR("not involutive");}
+poly shiftedEquation=sig(nuEquation);
+print("GENERIC_NU_EQUATION_INVARIANCE");shiftedEquation-nuEquation;
+if(shiftedEquation!=nuEquation){ERROR("nu equation not exactly invariant");}
+ring q=2,(l,z,b,c),lp;
+map get=r,0,l,b,c;
+poly R=get(nuEquation);poly D=get(D);poly A=1+c;
+poly Delta=b^3*(b+c*A^3);
+poly H=z^8+Delta*z^2+A^2*Delta*z+b^4*(b^2+A^2*b+c*A^4);
+poly quad=l^2+A*l+z+b;
+ideal I=std(ideal(quad,H));
+poly p2=reduce(A*R+b*D*l,I);
+poly p3=reduce(R^2+b*D*R,I);
+if(deg(p2,intvec(1,0,0,0))>0 || deg(p3,intvec(1,0,0,0))>0){ERROR("quotient coordinate still depends on lambda");}
+poly g2=gcd(p2,D);poly g3=gcd(p3,D^2);
+poly N2=p2/g2;poly E2=D/g2;
+poly N3=p3/g3;poly E3=D^2/g3;
+print("S2_NUMERATOR_DENOMINATOR_Z_DEGREE");N2;E2;deg(N2,intvec(0,1,0,0));
+print("S3_NUMERATOR_DENOMINATOR_Z_DEGREE");N3;E3;deg(N3,intvec(0,1,0,0));
+print("S2_S3_CLEARED_RESIDUALS");
+poly check2=reduce(E2*(A*R+b*D*l)-D*N2,I);
+poly check3=reduce(E3*(R^2+b*D*R)-D^2*N3,I);
+check2;check3;
+if(check2!=0 || check3!=0){ERROR("quotient coordinate certificate failed");}
+poly identity=reduce(A^2*N3*E2^2+N2^2*E3+A*b*N2*E2*E3+b^2*(z+b)*E2^2*E3,I);
+print("MIXED_NORM_RELATION_RESIDUAL");identity;
+if(identity!=0){ERROR("mixed quotient norm relation failed");}
+write("quotient-coordinates.dump","ring q=2,(z,b,c),lp;");
+write("quotient-coordinates.dump","poly N2="+string(N2)+";poly E2="+string(E2)+";");
+write("quotient-coordinates.dump","poly N3="+string(N3)+";poly E3="+string(E3)+";");
+print("DECK25_ALL_CHECKS_PASS");quit;

@@ -1,0 +1,143 @@
+{
+  "schema": "pencil-terminal-checkpoint-observation/v1",
+  "observed_utc": "2026-10-30T14:47:26.502550+00:00",
+  "archive": {
+    "archive_bytes": 254126080,
+    "archive_key": "recovery/runs/pencil-p186379-20261030-c1/generations/g18/checkpoint.tar",
+    "archive_sha256": "189608efac4d356e0ff3584db7e53d9b8626994ed205cc6408ae3d80e4330a3d",
+    "archive_version": "MGJcgs3vsVD4Kt0ekHiKJA.5TxM2xHir",
+    "committed_unix_seconds": 1793346517,
+    "encrypted": true,
+    "manifest_sha256": "5a15ffbb68c9afed940eda5433e979d218bf51f88c92a4fc334643d1ed096f83",
+    "number": 18,
+    "readback_verified": true,
+    "request_sha256": "92897e1dc5fb7fb10b3df9eceeed01aa88ea083b5a67be1431e915bf3231d907",
+    "snapshot_id": "snap-03e8985a3c657faef",
+    "snapshot_name": "pencil-p186379-20261030-c1-g18",
+    "snapshot_ready": true,
+    "source_instance": "i-04d58c2b309fb6549",
+    "source_pod_uid": "3a7ab215-49d1-4982-8c78-5a0c71646842"
+  },
+  "archive_and_selected_hashes_verified": true,
+  "rows": [
+    {
+      "record_id": "ECR1hc433070a0dfa",
+      "seq": 0,
+      "arm": "rho",
+      "round": 0,
+      "warmup": true,
+      "outcome": {
+        "status": "verified",
+        "recovered": "34864137",
+        "matches_target": true,
+        "matches_planted": true,
+        "error": null,
+        "exit": "exit 0",
+        "stderr_sha256": null
+      }
+    },
+    {
+      "record_id": "ECR1h06a081858b58",
+      "seq": 1,
+      "arm": "rho_AA",
+      "round": 0,
+      "warmup": true,
+      "outcome": {
+        "status": "verified",
+        "recovered": "34864137",
+        "matches_target": true,
+        "matches_planted": true,
+        "error": null,
+        "exit": "exit 0",
+        "stderr_sha256": null
+      }
+    },
+    {
+      "record_id": "ECR1h438b9ba3dfc0",
+      "seq": 2,
+      "arm": "pencil",
+      "round": 0,
+      "warmup": true,
+      "outcome": {
+        "status": "timeout",
+        "recovered": null,
+        "matches_target": null,
+        "matches_planted": null,
+        "error": "watchdog expired",
+        "exit": "signal 9",
+        "stderr_sha256": null
+      }
+    },
+    {
+      "record_id": "ECR1ha36228f66009",
+      "seq": 3,
+      "arm": "rho",
+      "round": 1,
+      "warmup": false,
+      "outcome": {
+        "status": "verified",
+        "recovered": "34864137",
+        "matches_target": true,
+        "matches_planted": true,
+        "error": null,
+        "exit": "exit 0",
+        "stderr_sha256": null
+      }
+    },
+    {
+      "record_id": "ECR1h81ea950642bc",
+      "seq": 4,
+      "arm": "pencil",
+      "round": 1,
+      "warmup": false,
+      "outcome": {
+        "status": "timeout",
+        "recovered": null,
+        "matches_target": null,
+        "matches_planted": null,
+        "error": "watchdog expired",
+        "exit": "signal 9",
+        "stderr_sha256": null
+      }
+    },
+    {
+      "record_id": "ECR1h8f7b50faaf32",
+      "seq": 5,
+      "arm": "rho_AA",
+      "round": 1,
+      "warmup": false,
+      "outcome": {
+        "status": "verified",
+        "recovered": "34864137",
+        "matches_target": true,
+        "matches_planted": true,
+        "error": null,
+        "exit": "exit 0",
+        "stderr_sha256": null
+      }
+    },
+    {
+      "record_id": "ECR1hdc7a036a0279",
+      "seq": 6,
+      "arm": "rho",
+      "round": 2,
+      "warmup": false,
+      "outcome": {
+        "status": "verified",
+        "recovered": "34864137",
+        "matches_target": true,
+        "matches_planted": true,
+        "error": null,
+        "exit": "exit 0",
+        "stderr_sha256": null
+      }
+    }
+  ],
+  "terminal_failure": "CRIU dump failed; retained log, no generation committed",
+  "last_committed_generation": 18,
+  "failed_generation": 19,
+  "scientific_replay_performed": false,
+  "total_active_worker_seconds": null,
+  "total_spend_usd": null,
+  "independent_review_completed": false
+}

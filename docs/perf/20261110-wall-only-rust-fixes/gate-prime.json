@@ -1,0 +1,112 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "identity gate: wall-only Rust fixes 2026-11-10, prime curves",
+  "description": "Baseline binary (4e909cd242) against the candidate binary on the same spec and seeds: every counter, steps, gae, recovered and replay digest must be identical. Not a performance claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 24,
+        "seed": 59297
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 20261110
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-plain",
+      "role": "baseline",
+      "method": {
+        "id": "rho.plain"
+      }
+    },
+    {
+      "name": "bsgs",
+      "role": "candidate",
+      "method": {
+        "id": "bsgs.textbook"
+      }
+    },
+    {
+      "name": "bsgs-neg",
+      "role": "candidate",
+      "method": {
+        "id": "bsgs.negation"
+      }
+    },
+    {
+      "name": "kangaroo",
+      "role": "candidate",
+      "method": {
+        "id": "kangaroo.vow"
+      }
+    },
+    {
+      "name": "ic-mitm-igauss",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "ic-mitm-sgauss",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "ic-rf-mitm-sgauss",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "rootfind-mitm:m=3",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "ic-rf-pairs",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=24",
+          "oracle": "rootfind-pairs:m=3"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate_measured",
+    "seed": 20261110,
+    "isolation_required": "L0",
+    "timeout_seconds": 300
+  }
+}

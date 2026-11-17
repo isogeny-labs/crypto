@@ -1,0 +1,37 @@
+APS measurement instrument — development correctness, not performance data
+Base d188c5a6775dff07129084ab2f3f7ae39547c9fc plus the pinned task inputs.
+Final code: final-input-sha256.txt and integration-source-sha256.txt.
+Rust1.99.1 release opt-level3/CGU256; tests2threads, Rayon1.
+
+Current final-source commands: cargo test --release --locked TARGET
+--lib ecbench::aps: 14 passed, 0 failed, 0 ignored; exit0.
+--lib ecbench::audit: 43 passed, 0 failed, 0 ignored; exit0.
+--lib aps_single_relation: 34 passed, 0 failed, 0 ignored; exit0.
+--lib f4_fp: 67 passed, 0 failed, 0 ignored; exit0.
+--test aps_ecbench: 4 passed, 0 failed, 0 ignored; exit0.
+--example aps_single_relation_check: 10 passed, 0 failed, 0 ignored; exit0.
+Strict Rust1.98.0 and1.99.1 clippy --release --locked --lib --tests
+--example aps_single_relation_check -- -D warnings: both exit0.
+Formatting and workflow actionlint: exit0.
+Source-linked one-page report: build/text-preservation passed; visually inspected.
+
+Earlier PRE-LINT boundary (pre-lint-input-sha256.txt):
+Full cargo test --release --locked --lib: 5397 passed,6 failed,123 ignored; exit101.
+Five failures lacked tracked gpu/certicom emulator sources; the historical
+bounds control lacked its tracked session. Original final stderr confirms
+these causes. Restored18 exact Git blobs, with no source/assertion changes.
+The six-device subset passed6/0 and bounds control1/0 after restoration;
+these targeted reruns include every failing case. The original full run is
+not rewritten as a pass, and no final-source full-suite pass is claimed.
+Existing ecbench integration passed22/0 at the pre-lint boundary.
+
+All earlier failures and review-cancelled builds retain their own source
+pins and private originals; digests/exits are in original-log-sha256.txt.
+Native scratch-session audit is a correctness control at L0: APS is static-
+audited with incomplete costs; only the rho record receives count replay.
+No benchmark, admitted L2/A-A measurement, speed/scaling result, external
+solver comparison, checkpoint upload, EKS launch or complete-cost claim.
+
+Published source pin: 3d504e2062016046f854307a82e1026df199cbd6; tree5a58bae05d7ea3d0097c205d0c70837bb3c83d49.
+This source tree matches the validated task code; later evidence-only metadata
+does not turn the earlier broad suite into a new-head full run.

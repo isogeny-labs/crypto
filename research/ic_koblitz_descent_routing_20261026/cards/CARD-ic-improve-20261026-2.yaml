@@ -1,0 +1,464 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-ic-improve-20261026-2
+experiment_id: ic_improve_20261026
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: cd3af7078c8ecc48aaed91c4e3745218fd18a9e0
+receipt: research/ic_koblitz_descent_routing_20261026/cards/CARD-ic-improve-20261026-2.receipt.json
+binds:
+- path: research/ic_planner_weight_rule_binkob_20261026/PROTOCOL.md
+  sha256: 63fe09d312b80b521fc47ac75d0110e9447d64bb53236e03d78903083036caed
+- path: research/ic_planner_weight_rule_binkob_20261026/PROTOCOL_AMENDMENT_1.md
+  sha256: aaf77118179f8fc759036381f61a5207e946fd3515fcb53f5084cfe853b70b2f
+- path: research/ic_koblitz_descent_routing_20261026/PROTOCOL.md
+  sha256: a9fba66700595462f1974bc92b48cdfa0b514e68be0ae9cb678d4e9c991294e4
+- path: research/ic_planner_weight_rule_binkob_20261026/specs/B-hk19.json
+  sha256: 168e3374a1136563f024f3398894ad0aa988da756a11b61c44ae2b0efd9da9c9
+- path: research/ic_planner_weight_rule_binkob_20261026/specs/B-hk23.json
+  sha256: 6e0de6fe179280f31cd5e6be106adc9ca876d55f6e726235c15da7a835e0ee0b
+- path: research/ic_planner_weight_rule_binkob_20261026/specs/B-hk39.json
+  sha256: f87944cb4a8008d3f0f9ab33aa8522a4d92c4b4c59cf9677e2d2225bb54ce19d
+- path: research/ic_koblitz_descent_routing_20261026/specs/k47.json
+  sha256: d475639419928835cf4d87bf493da753668c4d7b6fd4749fa5b16573e1ff912b
+- path: research/ic_koblitz_descent_routing_20261026/specs/k41.json
+  sha256: 9f9ab87967c3705943906ca91732ce77a32ca9196cad3920794e91faf15f7a11
+- path: research/ic_koblitz_descent_routing_20261026/specs/k53.json
+  sha256: 8f84d5921f8a9f9a4924c7049ec618158cc18f3aa7aa47863d5a6e7e112521ca
+- path: ./target/release/ecbench
+  sha256: d0ff6d067e9f29aa011ecfd99575d8767c4672d805978eea6b9e3e59b75185fa
+- path: ./target/release/ic
+  sha256: 08a28a6b329eb2102b9f05f9b78fe063247867a55b80c1a7eea7a4d190401108
+- path: ./target/release/examples/ic_residual_curve_free_null
+  sha256: 1e4ca6f573d68fe890af0be76e5cf50aecd7cb905b3ee17167e8a5b56ee7fadb
+must_not_exist:
+- research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk19
+- research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk19.audit.json
+- research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk23
+- research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk23.audit.json
+- research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk39
+- research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk39.audit.json
+- research/ic_koblitz_descent_routing_20261026/sessions/k47
+- research/ic_koblitz_descent_routing_20261026/sessions/k47.audit.json
+- research/ic_koblitz_descent_routing_20261026/sessions/k41
+- research/ic_koblitz_descent_routing_20261026/sessions/k41.audit.json
+- research/ic_koblitz_descent_routing_20261026/sessions/k53
+- research/ic_koblitz_descent_routing_20261026/sessions/k53.audit.json
+commands:
+- id: git-clean
+  argv:
+  - python3
+  - -c
+  - import subprocess,sys; out=subprocess.run(['git','status','--porcelain','--untracked-files=all','--',':(exclude)research/ic_planner_weight_rule_binkob_20261026/cards',':(exclude)research/ic_koblitz_descent_routing_20261026/cards'],capture_output=True,text=True).stdout; sys.exit(1 if out.strip() else 0)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: sessions-absent
+  argv:
+  - python3
+  - -c
+  - import os,sys; sys.exit(1 if any(os.path.exists(p) for p in ['research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk19', 'research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk23', 'research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk39', 'research/ic_koblitz_descent_routing_20261026/sessions/k47', 'research/ic_koblitz_descent_routing_20261026/sessions/k41', 'research/ic_koblitz_descent_routing_20261026/sessions/k53', 'research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk19.audit.json', 'research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk23.audit.json', 'research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk39.audit.json', 'research/ic_koblitz_descent_routing_20261026/sessions/k47.audit.json', 'research/ic_koblitz_descent_routing_20261026/sessions/k41.audit.json', 'research/ic_koblitz_descent_routing_20261026/sessions/k53.audit.json']) else 0)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-record
+  argv:
+  - df
+  - -h
+  - /
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/ic_koblitz_descent_routing_20261026/cards/CARD-ic-improve-20261026-2.disk-start.stdout
+- id: disk-before-run-b-hk19
+  argv: &id001
+  - python3
+  - -c
+  - import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-b-hk19
+  argv: &id002
+  - python3
+  - -c
+  - "import re, sys, time\nstart = time.time()\nheld = 0\nwhile True:\n    value = float(re.search(r'some avg10=([0-9.]+)', open('/proc/pressure/cpu').read()).group(1))\n    if value <= 1.0:\n        held += 1\n    else:\n        held = 0\n    if held >= 6:\n        sys.exit(0)\n    if time.time() - start >= 1800:\n        sys.exit(1)\n    time.sleep(5)\n"
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-b-hk19
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_planner_weight_rule_binkob_20261026/specs/B-hk19.json
+  - --out
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk19
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 172800
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-2.run-b-hk19.stdout
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-2.run-b-hk19.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk19/session.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk19/plan.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk19/spec.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk19/host.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk19/records.jsonl
+- id: disk-before-run-b-hk23
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-b-hk23
+  argv: *id002
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-b-hk23
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_planner_weight_rule_binkob_20261026/specs/B-hk23.json
+  - --out
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk23
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 172800
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-2.run-b-hk23.stdout
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-2.run-b-hk23.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk23/session.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk23/plan.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk23/spec.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk23/host.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk23/records.jsonl
+- id: disk-before-run-b-hk39
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-b-hk39
+  argv: *id002
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-b-hk39
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_planner_weight_rule_binkob_20261026/specs/B-hk39.json
+  - --out
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk39
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 172800
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-2.run-b-hk39.stdout
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-2.run-b-hk39.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk39/session.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk39/plan.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk39/spec.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk39/host.json
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk39/records.jsonl
+- id: disk-before-run-k47
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-k47
+  argv: *id002
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-k47
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_koblitz_descent_routing_20261026/specs/k47.json
+  - --out
+  - research/ic_koblitz_descent_routing_20261026/sessions/k47
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 172800
+  success_exit_codes:
+  - 0
+  stdout: research/ic_koblitz_descent_routing_20261026/cards/CARD-ic-improve-20261026-2.run-k47.stdout
+  stderr: research/ic_koblitz_descent_routing_20261026/cards/CARD-ic-improve-20261026-2.run-k47.stderr
+  outputs:
+  - research/ic_koblitz_descent_routing_20261026/sessions/k47/session.json
+  - research/ic_koblitz_descent_routing_20261026/sessions/k47/plan.json
+  - research/ic_koblitz_descent_routing_20261026/sessions/k47/spec.json
+  - research/ic_koblitz_descent_routing_20261026/sessions/k47/host.json
+  - research/ic_koblitz_descent_routing_20261026/sessions/k47/records.jsonl
+- id: disk-before-run-k41
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-k41
+  argv: *id002
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-k41
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_koblitz_descent_routing_20261026/specs/k41.json
+  - --out
+  - research/ic_koblitz_descent_routing_20261026/sessions/k41
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 172800
+  success_exit_codes:
+  - 0
+  stdout: research/ic_koblitz_descent_routing_20261026/cards/CARD-ic-improve-20261026-2.run-k41.stdout
+  stderr: research/ic_koblitz_descent_routing_20261026/cards/CARD-ic-improve-20261026-2.run-k41.stderr
+  outputs:
+  - research/ic_koblitz_descent_routing_20261026/sessions/k41/session.json
+  - research/ic_koblitz_descent_routing_20261026/sessions/k41/plan.json
+  - research/ic_koblitz_descent_routing_20261026/sessions/k41/spec.json
+  - research/ic_koblitz_descent_routing_20261026/sessions/k41/host.json
+  - research/ic_koblitz_descent_routing_20261026/sessions/k41/records.jsonl
+- id: disk-before-run-k53
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run-k53
+  argv: *id002
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run-k53
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_koblitz_descent_routing_20261026/specs/k53.json
+  - --out
+  - research/ic_koblitz_descent_routing_20261026/sessions/k53
+  - --cpus
+  - auto
+  - --wait
+  - --quiet
+  timeout_seconds: 172800
+  success_exit_codes:
+  - 0
+  stdout: research/ic_koblitz_descent_routing_20261026/cards/CARD-ic-improve-20261026-2.run-k53.stdout
+  stderr: research/ic_koblitz_descent_routing_20261026/cards/CARD-ic-improve-20261026-2.run-k53.stderr
+  outputs:
+  - research/ic_koblitz_descent_routing_20261026/sessions/k53/session.json
+  - research/ic_koblitz_descent_routing_20261026/sessions/k53/plan.json
+  - research/ic_koblitz_descent_routing_20261026/sessions/k53/spec.json
+  - research/ic_koblitz_descent_routing_20261026/sessions/k53/host.json
+  - research/ic_koblitz_descent_routing_20261026/sessions/k53/records.jsonl
+- id: disk-before-verify-b-hk19
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-b-hk19
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk19
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk19.audit.json
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-2.verify-b-hk19.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk19.audit.json
+- id: count-b-hk19
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk19.audit.json')); s=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk19/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-b-hk23
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-b-hk23
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk23
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk23.audit.json
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-2.verify-b-hk23.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk23.audit.json
+- id: count-b-hk23
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk23.audit.json')); s=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk23/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-b-hk39
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-b-hk39
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk39
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk39.audit.json
+  stderr: research/ic_planner_weight_rule_binkob_20261026/cards/CARD-ic-improve-20261026-2.verify-b-hk39.stderr
+  outputs:
+  - research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk39.audit.json
+- id: count-b-hk39
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk39.audit.json')); s=json.load(open('research/ic_planner_weight_rule_binkob_20261026/sessions/B-hk39/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-k47
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-k47
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_koblitz_descent_routing_20261026/sessions/k47
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_koblitz_descent_routing_20261026/sessions/k47.audit.json
+  stderr: research/ic_koblitz_descent_routing_20261026/cards/CARD-ic-improve-20261026-2.verify-k47.stderr
+  outputs:
+  - research/ic_koblitz_descent_routing_20261026/sessions/k47.audit.json
+- id: count-k47
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_koblitz_descent_routing_20261026/sessions/k47.audit.json')); s=json.load(open('research/ic_koblitz_descent_routing_20261026/sessions/k47/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-k41
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-k41
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_koblitz_descent_routing_20261026/sessions/k41
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_koblitz_descent_routing_20261026/sessions/k41.audit.json
+  stderr: research/ic_koblitz_descent_routing_20261026/cards/CARD-ic-improve-20261026-2.verify-k41.stderr
+  outputs:
+  - research/ic_koblitz_descent_routing_20261026/sessions/k41.audit.json
+- id: count-k41
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_koblitz_descent_routing_20261026/sessions/k41.audit.json')); s=json.load(open('research/ic_koblitz_descent_routing_20261026/sessions/k41/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-before-verify-k53
+  argv: *id001
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: verify-k53
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_koblitz_descent_routing_20261026/sessions/k53
+  - --replay
+  - '12'
+  - --exit-code
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/ic_koblitz_descent_routing_20261026/sessions/k53.audit.json
+  stderr: research/ic_koblitz_descent_routing_20261026/cards/CARD-ic-improve-20261026-2.verify-k53.stderr
+  outputs:
+  - research/ic_koblitz_descent_routing_20261026/sessions/k53.audit.json
+- id: count-k53
+  argv:
+  - python3
+  - -c
+  - import json,sys; a=json.load(open('research/ic_koblitz_descent_routing_20261026/sessions/k53.audit.json')); s=json.load(open('research/ic_koblitz_descent_routing_20261026/sessions/k53/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+bus_address: executor-mechanical-ic-improve-20261026-1
+background: true
+write_scope:
+- research/ic_planner_weight_rule_binkob_20261026/sessions/
+- research/ic_planner_weight_rule_binkob_20261026/cards/
+- research/ic_koblitz_descent_routing_20261026/sessions/
+- research/ic_koblitz_descent_routing_20261026/cards/
+stop_when:
+- The run command exits with status 2.
+- Any command in the card exits with a status other than 0, or times out.
+- A count command exits with status 1, meaning a verify command reported a verified count below the executions planned for its session.
+- The disk has less than 1000000000 bytes free before a session or an audit.
+- The working tree has a change outside research/ic_planner_weight_rule_binkob_20261026/cards and research/ic_koblitz_descent_routing_20261026/cards before the first session.
+- 'On any stop: report the printed text verbatim, retry nothing and edit nothing.'

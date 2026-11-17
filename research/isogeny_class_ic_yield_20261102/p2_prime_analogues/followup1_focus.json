@@ -1,0 +1,136 @@
+{
+  "schema": "p2.followup-focus/v1",
+  "protocol": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/FOLLOWUP_c32A_m3.md",
+  "written": "2026-11-02",
+  "note": "Design table frozen before any data of follow-up 1. Written by the experiment director from classes.json and the seed rules in FOLLOWUP_c32A_m3.md section 4; the iso models are re-verified in Rust by `p2tool spec --focus` (on curve, n*G = O, j equal to curve 80's j) and the spec generator must stop if any value differs.",
+  "class_id": "c32A",
+  "m": 3,
+  "classes_json_sha256": "7e79c642399cdda52e0e6666123cf8abcad27dbf68c9ff7dda14f0d3316adb47",
+  "p": 4127505313,
+  "n": 4127376823,
+  "primary": {
+    "index": 80,
+    "j": 2659937662,
+    "a": 2098853238,
+    "b": 2053580094,
+    "gx": 5,
+    "gy": 930016827
+  },
+  "comparator_indices": [
+    7,
+    11,
+    19,
+    32,
+    34,
+    35,
+    40,
+    57,
+    58,
+    86,
+    96,
+    101,
+    104,
+    105,
+    123
+  ],
+  "comparator_rule": {
+    "iso_base_indices_from_classes_json": [
+      34,
+      96,
+      35,
+      58,
+      32,
+      86,
+      123,
+      40
+    ],
+    "seeded_draw_indices_in_order_drawn": [
+      101,
+      11,
+      104,
+      7,
+      57,
+      105,
+      19
+    ],
+    "rule": "Prg('p2-followup1-comparators-c32A-curve80'): i = next() % 128; skip i if i = 80, i in the 8 iso-base indices or already drawn; stop at 7 draws. Prg is p2tool's: next() = u64 little-endian of the first 8 bytes of sha256('<seed>|<counter>'), counter from 0."
+  },
+  "iso_models": [
+    {
+      "of": 80,
+      "k": 0,
+      "u": 2607263620,
+      "a": 1736545239,
+      "b": 670059822,
+      "gx": 2398501799,
+      "gy": 37278376
+    },
+    {
+      "of": 80,
+      "k": 1,
+      "u": 546563133,
+      "a": 2756078494,
+      "b": 2767074568,
+      "gx": 1842302841,
+      "gy": 1118314861
+    },
+    {
+      "of": 80,
+      "k": 2,
+      "u": 864156487,
+      "a": 769224333,
+      "b": 2892586485,
+      "gx": 1079145463,
+      "gy": 3997121675
+    },
+    {
+      "of": 80,
+      "k": 3,
+      "u": 90595761,
+      "a": 1367106111,
+      "b": 2410803936,
+      "gx": 2713540264,
+      "gy": 1379036841
+    },
+    {
+      "of": 80,
+      "k": 4,
+      "u": 861977280,
+      "a": 1942031057,
+      "b": 2567371340,
+      "gx": 1101749681,
+      "gy": 3897793884
+    },
+    {
+      "of": 80,
+      "k": 5,
+      "u": 1712401383,
+      "a": 3228839901,
+      "b": 1653346288,
+      "gx": 4095240360,
+      "gy": 3589338063
+    },
+    {
+      "of": 80,
+      "k": 6,
+      "u": 1056100772,
+      "a": 128753903,
+      "b": 3253258347,
+      "gx": 1510792163,
+      "gy": 568462318
+    },
+    {
+      "of": 80,
+      "k": 7,
+      "u": 1234643133,
+      "a": 578265141,
+      "b": 663777597,
+      "gx": 2428157992,
+      "gy": 3512006157
+    }
+  ],
+  "iso_rule": "Prg('p2-followup1-iso-c32A-80'): for k = 0..7, u_k = 2 + next() % (p - 3); (a,b) -> (u^4 a, u^6 b), G -> (u^2 x, u^3 y), as in `p2tool build` step 6; u_k are 8 distinct values.",
+  "fresh_seed": 363589115,
+  "fresh_seed_rule": "S = (u64 from Prg('p2-followup1-seed-c32A-m3-curve80').next()) mod 10^9 = 363589115; --seed S gives target_seed S and measurement.seed S mod 1000 + 1 = 116 (P2 main cell used 20261102 and 103)",
+  "workload_order": "primary (index 80), comparators in ascending index, iso models k = 0..7: 24 workloads"
+}

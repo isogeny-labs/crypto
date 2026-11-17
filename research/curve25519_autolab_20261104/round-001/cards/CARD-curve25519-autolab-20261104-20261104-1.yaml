@@ -1,0 +1,62 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-curve25519-autolab-20261104-20261104-1
+experiment_id: curve25519_autolab_20261104
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 5840364fa4f38a0c47dcdd7f167c580394813cb1
+receipt: research/curve25519_autolab_20261104/round-001/cards/CARD-curve25519-autolab-20261104-20261104-1.receipt.json
+binds:
+  - {path: research/curve25519_autolab_20261104/round-001/PROTOCOL.md, sha256: dcb40115f107e11385969e44d3ab94a069066645b55eda2f46e87a1aec50c85b}
+  - {path: target/release/ecbench, sha256: 3fd22853485e388782ac0821295c56f81725fc832fd3610978be8088b5098bca}
+  - {path: research/curve25519_autolab_20261104/round-001/specs/train-k20.json, sha256: 028bdec8ad447cc26c3d803e36986140be5f5fd7994ff0bf3b1237a44122bb0f}
+  - {path: research/curve25519_autolab_20261104/round-001/specs/train-k24.json, sha256: 6b11e83ef1c9c8e8074cdf0abcb7d130d692289f27456c4df66ac417cf465359}
+must_not_exist: ["research/curve25519_autolab_20261104/round-001/sessions/train-k20", "research/curve25519_autolab_20261104/round-001/sessions/train-k24"]
+commands:
+  - id: run-train-k20
+    argv: ["target/release/ecbench", "run", "--wait", "--spec", "research/curve25519_autolab_20261104/round-001/specs/train-k20.json", "--out", "research/curve25519_autolab_20261104/round-001/sessions/train-k20", "--cpus", "auto", "--allow-busy"]
+    timeout_seconds: 461400
+    success_exit_codes: [0]
+    stdout: research/curve25519_autolab_20261104/round-001/cards/CARD-curve25519-autolab-20261104-20261104-1.run-train-k20.stdout
+    stderr: research/curve25519_autolab_20261104/round-001/cards/CARD-curve25519-autolab-20261104-20261104-1.run-train-k20.stderr
+    outputs: [research/curve25519_autolab_20261104/round-001/sessions/train-k20/session.json]
+  - id: verify-train-k20
+    argv: ["target/release/ecbench", "verify", "--dir", "research/curve25519_autolab_20261104/round-001/sessions/train-k20", "--replay", "8", "--out", "research/curve25519_autolab_20261104/round-001/analysis/verify-train-k20.json"]
+    timeout_seconds: 461400
+    success_exit_codes: [0]
+    stdout: research/curve25519_autolab_20261104/round-001/cards/CARD-curve25519-autolab-20261104-20261104-1.verify-train-k20.stdout
+    stderr: research/curve25519_autolab_20261104/round-001/cards/CARD-curve25519-autolab-20261104-20261104-1.verify-train-k20.stderr
+    outputs: [research/curve25519_autolab_20261104/round-001/analysis/verify-train-k20.json]
+  - id: band-train-k20
+    argv: ["target/release/ecbench", "band", "--dir", "research/curve25519_autolab_20261104/round-001/sessions/train-k20", "--json", "research/curve25519_autolab_20261104/round-001/analysis/band-train-k20.json", "--ranks"]
+    timeout_seconds: 600
+    success_exit_codes: [0]
+    stdout: research/curve25519_autolab_20261104/round-001/analysis/band-train-k20.txt
+    stderr: research/curve25519_autolab_20261104/round-001/cards/CARD-curve25519-autolab-20261104-20261104-1.band-train-k20.stderr
+    outputs: [research/curve25519_autolab_20261104/round-001/analysis/band-train-k20.json]
+  - id: run-train-k24
+    argv: ["target/release/ecbench", "run", "--wait", "--spec", "research/curve25519_autolab_20261104/round-001/specs/train-k24.json", "--out", "research/curve25519_autolab_20261104/round-001/sessions/train-k24", "--cpus", "auto", "--allow-busy"]
+    timeout_seconds: 461400
+    success_exit_codes: [0]
+    stdout: research/curve25519_autolab_20261104/round-001/cards/CARD-curve25519-autolab-20261104-20261104-1.run-train-k24.stdout
+    stderr: research/curve25519_autolab_20261104/round-001/cards/CARD-curve25519-autolab-20261104-20261104-1.run-train-k24.stderr
+    outputs: [research/curve25519_autolab_20261104/round-001/sessions/train-k24/session.json]
+  - id: verify-train-k24
+    argv: ["target/release/ecbench", "verify", "--dir", "research/curve25519_autolab_20261104/round-001/sessions/train-k24", "--replay", "8", "--out", "research/curve25519_autolab_20261104/round-001/analysis/verify-train-k24.json"]
+    timeout_seconds: 461400
+    success_exit_codes: [0]
+    stdout: research/curve25519_autolab_20261104/round-001/cards/CARD-curve25519-autolab-20261104-20261104-1.verify-train-k24.stdout
+    stderr: research/curve25519_autolab_20261104/round-001/cards/CARD-curve25519-autolab-20261104-20261104-1.verify-train-k24.stderr
+    outputs: [research/curve25519_autolab_20261104/round-001/analysis/verify-train-k24.json]
+  - id: band-train-k24
+    argv: ["target/release/ecbench", "band", "--dir", "research/curve25519_autolab_20261104/round-001/sessions/train-k24", "--json", "research/curve25519_autolab_20261104/round-001/analysis/band-train-k24.json", "--ranks"]
+    timeout_seconds: 600
+    success_exit_codes: [0]
+    stdout: research/curve25519_autolab_20261104/round-001/analysis/band-train-k24.txt
+    stderr: research/curve25519_autolab_20261104/round-001/cards/CARD-curve25519-autolab-20261104-20261104-1.band-train-k24.stderr
+    outputs: [research/curve25519_autolab_20261104/round-001/analysis/band-train-k24.json]
+bus_address: executor-mechanical-curve25519-autolab-20261104
+background: true
+write_scope: [research/curve25519_autolab_20261104/round-001]
+stop_when:
+- Any command exits nonzero or reaches its timeout; retain the session directory and the logs as evidence.

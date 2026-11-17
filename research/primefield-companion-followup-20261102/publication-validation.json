@@ -1,0 +1,34 @@
+{
+  "observed_at": "2026-11-02T17:07:10.090138+00:00",
+  "source_commit": "f208412",
+  "files_verified": 110,
+  "source_locks_verified": 55,
+  "python_syntax_files": 46,
+  "software_tests": {
+    "passed": 21,
+    "failed": 0,
+    "scope": "13 instrument/admission/resource tests and 8 codec tests; no research kernels"
+  },
+  "numerical_AST_preservation": {
+    "stages": true,
+    "verify_before_return": true,
+    "main_after_declared_guard_and_output_routing": true
+  },
+  "artifacts": {
+    "uploaded": 5,
+    "remote_verified": 5,
+    "problems": 0
+  },
+  "numerical_trials_for_publication": 0,
+  "repository_rust_suite": {
+    "command": "cargo test --offline --release --lib -j 2",
+    "timeout_seconds": 180,
+    "exit_code": 124,
+    "status": "capped_during_compilation",
+    "test_results_produced": false,
+    "log_sha256": "d901a72f48b90f1e1138d8b278a76226ca9a0e9b027b31f771094a1c4a58dd27",
+    "tested_commit": "7c21d0752221e4dc520cd37551d9c1c6fd20a307"
+  },
+  "protocol_validation_findings": 0,
+  "diff_check": "One preserved space-only context line in historical companion-trace-codec/integration.patch"
+}

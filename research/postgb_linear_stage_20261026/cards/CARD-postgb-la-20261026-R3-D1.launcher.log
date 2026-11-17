@@ -1,0 +1,50 @@
+launched by the main session (PROTOCOL_AMENDMENTS 2-3), 2026-10-27T08:23:37Z
+card: CARD-postgb-la-20261026-R3-D1 (sha256 08b2f8f937a6afcdf0d85fba5495dfffcc018cbfb4fc3923762aa45f87db3166)
+commit: 25ccc40c3e17ed94acae22352d55ddba147d1b8d
+receipt: research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R3-D1.receipt.json sha256 5f535d5c0a676d4910ba09a277492af4789b8ef3b80b61c50854c6b0383c5857
+status: completed
+command 1 (git-clean): ["python3", "-c", "import subprocess,sys; out=subprocess.run(['git','status','--porcelain','--untracked-files=all','--',':(exclude)research/postgb_linear_stage_20261026/cards'],capture_output=True,text=True).stdout; sys.exit(1 if out.strip() else 0)"] exit 0 (0.778 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (output-absent): ["python3", "-c", "import os,sys; sys.exit(1 if os.path.exists('research/postgb_linear_stage_20261026/runs/R3-D1.json') or os.path.exists('research/postgb_linear_stage_20261026/runs/R3-D1.instances.jsonl') else 0)"] exit 0 (0.023 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (mkdir-runs): ["mkdir", "-p", "research/postgb_linear_stage_20261026/runs"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 4 (disk-record): ["df", "-h", "/"] exit 0 (0.003 s) succeeded
+  stdout sha256 cd92b1c0bdbcd9511dd046437a969fa10974fa0122af5df279836c033e17fa4c; last 2 lines:
+    Filesystem      Size  Used Avail Use% Mounted on
+    /dev/vda        252G   33G  6.8G  83% /
+command 5 (lscpu-record): ["lscpu"] exit 0 (0.005 s) succeeded
+  stdout sha256 35aff9c9dd67ea379067ea6d72263b3e9c6305b94cf02227c955888621eeca93; last 20 lines:
+    NUMA node0 CPU(s):                       0-3
+    Vulnerability Gather data sampling:      Not affected
+    Vulnerability Ghostwrite:                Not affected
+    Vulnerability Indirect target selection: Mitigation; Aligned branch/return thunks
+    Vulnerability Itlb multihit:             Not affected
+    Vulnerability L1tf:                      Not affected
+    Vulnerability Mds:                       Not affected
+    Vulnerability Meltdown:                  Not affected
+    Vulnerability Mmio stale data:           Vulnerable: Clear CPU buffers attempted, no microcode; SMT Host state unknown
+    Vulnerability Old microcode:             Not affected
+    Vulnerability Reg file data sampling:    Not affected
+    Vulnerability Retbleed:                  Mitigation; Enhanced IBRS
+    Vulnerability Spec rstack overflow:      Not affected
+    Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl
+    Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+    Vulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI Vulnerable
+    Vulnerability Srbds:                     Not affected
+    Vulnerability Tsa:                       Not affected
+    Vulnerability Tsx async abort:           Vulnerable: Clear CPU buffers attempted, no microcode; SMT Host state unknown
+    Vulnerability Vmscape:                   Not affected
+command 6 (disk-before-run): ["python3", "-c", "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"] exit 0 (0.037 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 7 (quiet-before-run): ["python3", "-c", "import re, sys, time\nstart = time.time()\nheld = 0\nwhile True:\n    value = float(re.search(r'some avg10=([0-9.]+)', open('/proc/pressure/cpu').read()).group(1))\n    if value <= 1.0:\n        held += 1\n    else:\n        held = 0\n    if held >= 6:\n        sys.exit(0)\n    if time.time() - start >= 1800:\n        sys.exit(1)\n    time.sleep(5)\n"] exit 0 (55.041 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 8 (run): ["./target/release/examples/jv_cover", "--exp", "dlp", "--sizes", "53,101", "--seeds", "2", "--rho-runs", "4", "--check-every", "64", "--json", "research/postgb_linear_stage_20261026/runs/R3-D1.json"] exit 0 (956.157 s) succeeded
+  stdout sha256 d3a36a311df6636eaee6cfc6aea1da103f3bed2cf962934d05fc388797d77ba5; last 4 lines:
+    p=   53 seed=1 l=2^32.4 |F|=  30 c_add E 331 J 2121 stop None (0 stopped) trace false (0 replayed, 0 mismatches) | residuals 19020 decomposable 31 (0.00163 vs 1/720 0.00139) relations 31 (floor 22320, ratio 0.85) | incomplete 7 timed out 0 cross-checked 298 mismatches 0 | C_cov 9.455e5 | unknowns 31 (filtered 0) phi 1.03 row 7.0 LA attempts 1 ops 25235 (26.3·u²) | solved true correct true | S 7.316e2 | rho S 1.102 ± 0.204 (4 runs) | S/rho 663.984 = relation 663.970 + la 0.0149 (last 0.0149) | predicted 664.554 | 333 s
+    p=   53 seed=2 l=2^32.4 |F|=  32 c_add E 331 J 2122 stop None (0 stopped) trace false (0 replayed, 0 mismatches) | residuals 8486 decomposable 33 (0.00389 vs 1/720 0.00139) relations 33 (floor 23760, ratio 0.36) | incomplete 5 timed out 0 cross-checked 133 mismatches 0 | C_cov 9.524e5 | unknowns 33 (filtered 0) phi 1.03 row 7.0 LA attempts 1 ops 28579 (26.2·u²) | solved true correct true | S 3.288e2 | rho S 1.151 ± 0.689 (4 runs) | S/rho 285.732 = relation 285.715 + la 0.0161 (last 0.0161) | predicted 640.926 | 177 s
+    p=  101 seed=1 l=2^37.9 |F|=  52 c_add E 331 J 2122 stop None (0 stopped) trace false (0 replayed, 0 mismatches) | residuals 40100 decomposable 53 (0.00132 vs 1/720 0.00139) relations 53 (floor 38160, ratio 1.05) | incomplete 4 timed out 0 cross-checked 0 mismatches 0 | C_cov 9.521e5 | unknowns 52 (filtered 1) phi 1.00 row 7.0 LA attempts 1 ops 70721 (26.2·u²) | solved true correct true | S 2.244e2 | rho S 1.483 ± 0.521 (4 runs) | S/rho 151.356 = relation 151.352 + la 0.0045 (last 0.0045) | predicted 136.931 | 170 s
+    p=  101 seed=2 l=2^37.9 |F|=  49 c_add E 331 J 2122 stop None (0 stopped) trace false (0 replayed, 0 mismatches) | residuals 65422 decomposable 50 (0.00076 vs 1/720 0.00139) relations 50 (floor 36000, ratio 1.82) | incomplete 3 timed out 0 cross-checked 0 mismatches 0 | C_cov 9.504e5 | unknowns 50 (filtered 0) phi 1.02 row 7.0 LA attempts 1 ops 65401 (26.2·u²) | solved true correct true | S 3.655e2 | rho S 1.249 ± 0.577 (4 runs) | S/rho 292.501 = relation 292.496 + la 0.0049 (last 0.0049) | predicted 162.203 | 266 s
+  output research/postgb_linear_stage_20261026/runs/R3-D1.json: 3bd45f6891724a700d86744d63bf4e3bd4094a9fc73dd3b964badce911f0c885
+  output research/postgb_linear_stage_20261026/runs/R3-D1.instances.jsonl: fdeec87b64ca7ff19b31d4cc38ab4fd5aa67aa731c5a376ebf5806a1e6913242
+exit 0

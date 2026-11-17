@@ -1,0 +1,328 @@
+{
+  "schema": "supersingular-quadratic-fields-source-plan/v1",
+  "created": "2026-11-10T13:55:18.469627+00:00",
+  "status": "Preissue frozen sources; whole42gatePASS/0failures/0trusted.",
+  "formal": {
+    "project": "research/supersingular_quadratic_fields_audit_20261110/lean",
+    "theorem": "QuadraticFieldCertificateAudit.quadratic_field_model_audit_certificate",
+    "statement": "theorem quadratic_field_model_audit_certificate : Fintype.card F4=4 ∧ Fintype.card F9=9 ∧ Fintype.card (F4×F4×F4×F4×F4)=1024 ∧ Fintype.card (F9×F9×F9×F9×F9)=59049 ∧ (∀ E : WeierstrassCurve.Affine F4,E.Δ≠0 → SourceSupersingular E → (Nat.card E.Point=1 ∨ Nat.card E.Point=3 ∨ Nat.card E.Point=5 ∨ Nat.card E.Point=7 ∨ Nat.card E.Point=9) ∧ ∀ r : ℕ,Nat.Prime r → r∣Nat.card E.Point → embeddingDegree 4 r≤6 ∧ Nat.Coprime r 4 ∧ ∃ P : E.Point,addOrderOf P=r) ∧ (∀ E : WeierstrassCurve.Affine F9,E.Δ≠0 → SourceSupersingular E → (Nat.card E.Point=4 ∨ Nat.card E.Point=7 ∨ Nat.card E.Point=10 ∨ Nat.card E.Point=13 ∨ Nat.card E.Point=16) ∧ ∀ r : ℕ,Nat.Prime r → r∣Nat.card E.Point → embeddingDegree 9 r≤6 ∧ Nat.Coprime r 9 ∧ ∃ P : E.Point,addOrderOf P=r) ∧ (E4.Δ≠0 ∧ Nat.card E4.Point=7 ∧ SourceSupersingular E4 ∧ (∃ P : E4.Point,addOrderOf P=7) ∧ embeddingDegree 4 7=3) ∧ (E9.Δ≠0 ∧ Nat.card E9.Point=13 ∧ SourceSupersingular E9 ∧ (∃ P : E9.Point,addOrderOf P=13) ∧ embeddingDegree 9 13=3)",
+    "decl_sha256": "9adcb240763c1096be6d80a31ec96f5d3c693e608ad5f7c58a1b25b33250c9b5",
+    "sources": [
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/CompleteSquare.lean",
+        "bytes": 1677,
+        "sha256": "3ae98649905738a661a03d6face4f5b747cdaabc4fe232a7957c20e6e4912591"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/ExtensionControls.lean",
+        "bytes": 2411,
+        "sha256": "f93261f20ea71d3343d5051fd4401defd10eae0814e30559f72c29bb918f3d2d"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/FibreBound.lean",
+        "bytes": 1867,
+        "sha256": "4c034d6d0a5d239e66595d79a6c1fcdc437f0792cc276602091308cab575f086"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/NonaryClassification.lean",
+        "bytes": 2021,
+        "sha256": "22e093fd5b60168cd08a4eaa98be02a7e6e2600b48ff8880c9a7a9962e9be728"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/NormalizedAll.lean",
+        "bytes": 511,
+        "sha256": "2de44243c9f22060729fa07349fb8c564f6cf89b6b3c2cd427a17ad437f9a68f"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/NormalizedCase00.lean",
+        "bytes": 249,
+        "sha256": "58b6805577c0bb996f4f5c8825640669983f2c7dc56dce7664a884a62df37107"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/NormalizedCase01.lean",
+        "bytes": 246,
+        "sha256": "8876e69d1c12b00f34754119a5e7905257998380364a41eedf737c6557f93e11"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/NormalizedCase02.lean",
+        "bytes": 246,
+        "sha256": "80f1afaf59a0e64e20171190661dc41de65b3ac86d2ba96f4fa0f7adf9a22ffc"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/NormalizedCase10.lean",
+        "bytes": 246,
+        "sha256": "09ef9ee6e6839b8827cb27f052b07cb6cfdb6953229802700e21a94b0dbc192e"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/NormalizedCase11.lean",
+        "bytes": 246,
+        "sha256": "f4f347f4e70d5e082e7b092d3cf727dff40a04d9608b818a353f20bf83485916"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/NormalizedCase12.lean",
+        "bytes": 246,
+        "sha256": "6201b157460f79bf8baa6800b015a92623d53b9bcd7124e8707748acc3fd49bf"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/NormalizedCase20.lean",
+        "bytes": 246,
+        "sha256": "eb54d0f26261455d6315489405eba7e33bdd53d5229743a8a06fd19e0385cb61"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/NormalizedCase21.lean",
+        "bytes": 246,
+        "sha256": "c3796b6d8b970506fd7ae2808304332b8292d417adf45012fa1f651a2eb3ff03"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/NormalizedCase22.lean",
+        "bytes": 246,
+        "sha256": "eb5386c2efaa398b14c3a81fb03fb8726d26c163b370fe27f484ed5f58c43485"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/NormalizedPredicate.lean",
+        "bytes": 423,
+        "sha256": "5112884ca4f9e9c7fe8f68806748f50f0083a3175caca2f33a620b01e6fc88ce"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/QuadraticCertificate.lean",
+        "bytes": 2197,
+        "sha256": "38a293e58b814c3f79a9363ca9f3a3530c4c41fdcc25faf816ff689093388595"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/QuadraticModels.lean",
+        "bytes": 1269,
+        "sha256": "8030cc8693354f6cab629ff945edff78c0d0503a223421992c101bf7b15574ad"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/QuaternaryClassification.lean",
+        "bytes": 2091,
+        "sha256": "ff8e1ac0de1a8e7dea2912a443b41d3ca0bd21a3ed7ae12b6b2638cd8e0abcc8"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/SourceTrace.lean",
+        "bytes": 515,
+        "sha256": "497e71affeba266b37c27394e787dc3b84cd71526268ed51b82d27a3cc660353"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/lake-manifest.json",
+        "bytes": 4396,
+        "sha256": "bf5c1d5124abde0e4a990b1ddd1ce84bda4a6b19f7ab961ca2c350dbc665252b"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/lakefile.toml",
+        "bytes": 639,
+        "sha256": "4a85139351a9e746952b372e519ed6443f56e6371897732ea69ce98794c45d43"
+      },
+      {
+        "path": "research/supersingular_quadratic_fields_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/supersingular_small_characteristic_20261110/lean/AllPrimeFieldModels.lean",
+        "bytes": 6106,
+        "sha256": "b5f94cf22cb8d78fec024b136725a6302c8a0e0cc029e2f8491b07da307d3e45"
+      },
+      {
+        "path": "research/supersingular_small_characteristic_20261110/lean/PrimeFieldControls.lean",
+        "bytes": 6492,
+        "sha256": "beb959fa2bea5c702af27bcff9139bd760099db66e169fd9697d27db6f6ac057"
+      },
+      {
+        "path": "research/supersingular_small_characteristic_20261110/lean/lake-manifest.json",
+        "bytes": 4097,
+        "sha256": "10f1e32be697000701a0f2c5bf41e44233ddbf4d016d54ec0b8e3608fb40837a"
+      },
+      {
+        "path": "research/supersingular_small_characteristic_20261110/lean/lakefile.toml",
+        "bytes": 296,
+        "sha256": "dd143bac32c45dd6ebb5d3c37eb44b835bab06b422c40650e1303e87aacde055"
+      },
+      {
+        "path": "research/supersingular_small_characteristic_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/StructuralAudit.lean",
+        "bytes": 4216,
+        "sha256": "fa6f8c3383b7b1ec9249155287c1e9bb4602c4b747aeea390d2684affa474e86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RationalCounterexample.lean",
+        "bytes": 1477,
+        "sha256": "780be0d45d23fc0198e8bc5a77003cd473d4cdc1cf7d14c5fa9abe1cf5190eb1"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/SupersingularTraceClasses.lean",
+        "bytes": 7821,
+        "sha256": "6f50f299794aecf2e85e42ffa651001f4a7a69b3f7e0f7daf3a6f8ef5aaff275"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/TorsionBoundaries.lean",
+        "bytes": 11120,
+        "sha256": "8cce3dc81692549da50df802c41178c9ef908bb39cbf065f4d82cb8323afff47"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lakefile.toml",
+        "bytes": 1038,
+        "sha256": "7a607847ad1f457ed8fc93699c13d81c398d6b585896f990f3bc6b656d5815ec"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ],
+    "scope": "Actual computable fieldsF4/F9, actual cardinalities/characteristics, all1024/59049general models through structural proof and729normalized kernel cases. Source trace criterion, actual point-count classification, every prime-divisor modular bound≤6/coprimality/actual order-r point. Explicit actual curves of prime orders7/13have modulardegree3. No geometric supersingularity equivalence or full torsion-field interpretation."
+  },
+  "artifacts": [
+    {
+      "path": "research/supersingular_quadratic_fields_audit_20261110/evidence/attempts.tar.gz",
+      "bytes": 6847,
+      "sha256": "faed5a164eafcf2ef0a34e0a6ee47e7373191fd98e153e43a72f5b2ecc94c4af"
+    },
+    {
+      "path": "research/supersingular_quadratic_fields_audit_20261110/evidence/attempts.json",
+      "bytes": 9639,
+      "sha256": "313fac2cd3e2c064def9ed0d41a50e63f9a61af6b3f036efab05be2394780533"
+    },
+    {
+      "path": "research/supersingular_quadratic_fields_audit_20261110/evidence/gate.tar.gz",
+      "bytes": 3084,
+      "sha256": "91fae5f6f902bbf8063e75ab86e0c9526b0ccc80f21c45a35aec5505bbece1cf"
+    },
+    {
+      "path": "research/supersingular_quadratic_fields_audit_20261110/evidence/gate.json",
+      "bytes": 1253,
+      "sha256": "d6ae9a79fc7f3bd0502a95e6f744ed2630003fd683176c296345835df0294717"
+    },
+    {
+      "path": "research/supersingular_quadratic_fields_audit_20261110/evidence/source-review.json",
+      "bytes": 3003,
+      "sha256": "d1e87db03ed60d455bf733b04edb268442920d12b4f5c3646b05dd6bc0543af0"
+    },
+    {
+      "path": "research/supersingular_quadratic_fields_audit_20261110/evidence/QuadraticModels-resource-01.log",
+      "bytes": 134,
+      "sha256": "b5e253d64c2a1429d51b3d0c471c8e52dc106fa780381e1375deae1759937023"
+    }
+  ],
+  "gate": {
+    "archive": "research/supersingular_quadratic_fields_audit_20261110/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 42,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/supersingular_quadratic_fields_audit_20261110/evidence/attempts.tar.gz",
+    "files": 57,
+    "roundtrip_equal": true
+  },
+  "proof_outline": [
+    "Construct actual computable quadratic fields with root-free polynomial hypotheses proved in their prime fields; exact field/cardinality/characteristic/populations.",
+    "Generic monic degree2fibre root bound and explicit sigma equivalence give countedE≤2q+1; trace gcd yields every F4count case.",
+    "Generic char3completed-square equation equivalence, coordinate inverse and counted-cardinality equality cover every general F9model.",
+    "Nine separate81-model exact kernel decisions, joined by explicit9way coefficient exhaustion, classify all729normalized models.",
+    "Transfer classification to actual nonsingular point groups using frozen counted bridge.",
+    "Trace-square and prime-divisor arithmetic prove modular bound/coprimality; explicit-equality Cauchy proves actual prime-order point.",
+    "Actual nonsingular controls have7/13points, source criterion and exact degree3."
+  ],
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "native_decide": false,
+    "paid_compute": 0,
+    "native_experiment": false,
+    "new_IDC_sampling": false,
+    "sampled_identity_supplement": "None; all new field/coordinate/count statements are proved exactly in Lean.",
+    "lean4checker": "Unavailable; actual kernel/transitive axiom gate.",
+    "resource_deviation": "First combined census proof interrupted SIGTERM/143for memory use; exact source/log/resource snapshot retained. Replaced by generic F4bound and serialized F9kernel cases, same complete model coverage.",
+    "case_import_chain": "Serializes heavy proof compilation in ordinary Lake; each case has its own kernel proof.",
+    "advisories": "Legacy module advisories retained; no waiver/increased elaboration limits or issued source edits."
+  },
+  "source_review": {
+    "schema": "supersingular-quadratic-fields-source-review/v1",
+    "created": "2026-11-10T13:55:18.469351+00:00",
+    "sources": [
+      {
+        "id": "S-FST-2010",
+        "url": "https://link.springer.com/content/pdf/10.1007/s00145-009-9048-z.pdf",
+        "pdf_sha256": "2acd937be8567abfb26bb3861e3aaf34312270c36df9a86f91cf9676c3caf785",
+        "read_scope": "Printedpp230–231trace/supersingularity definition and Definition2.1/Remark2.2reread; p237trace-square list retained from prior read. Not a full-paper-read claim.",
+        "effect": "Exact actual-field criterion gcd(q+1−#E,q)≠1; modular multiplicative order kept distinct from full torsion-field containment."
+      },
+      {
+        "id": "S-WATERHOUSE-1969",
+        "url": "https://www.numdam.org/item/ASENS_1969_4_2_4_521_0.pdf",
+        "pdf_sha256": "7be2bf9dde45454afa3dd9a0ea1ba05acbe952b6b573a0c37c2b1b8f0cccbb47",
+        "read_scope": "Theorem4.1and proof beginning, printedpp536–537/PDF17–18reread; prior visual inspection retained. Not full-paper read.",
+        "effect": "Known possible trace patterns. Current F4/F9counts are proved directly, not assumed from the classification."
+      }
+    ],
+    "repository_reads": [
+      "Frozen AllPrimeFieldModels actual counted-to-Point bridge",
+      "PrimeFieldControls explicit-DecidableEq Cauchy wrapper",
+      "SupersingularTraceClasses prime-divisor modular order/coprimality lemmas",
+      "Old sourceSupersingular API is prime-field-only; new generic actual-cardinality source predicate is separate"
+    ],
+    "Mathlib_reads": [
+      "QuadraticAlgebra explicit coordinates/product equivalence/root-free Field instance and inverse",
+      "Polynomial monic degree2root cardinal bound",
+      "Fintype option/sigma/product/equivalence counts",
+      "CharP algebra maps",
+      "Actual affine Point, finite Cauchy and ZMod order APIs"
+    ],
+    "KB": "MCP absent, fresh scripts/research-kb status127/no executable; bounded primary/repository/Mathlib fallback. Conductor absent.",
+    "scope": "Actual computable fieldsF4/F9, actual cardinalities/characteristics, all1024/59049general models through structural proof and729normalized kernel cases. Source trace criterion, actual point-count classification, every prime-divisor modular bound≤6/coprimality/actual order-r point. Explicit actual curves of prime orders7/13have modulardegree3. No geometric supersingularity equivalence or full torsion-field interpretation.",
+    "coverage_method": {
+      "F4": "Allmodels by generic≤2q+1root bound plus trace gcd, not a claimed1024-row native census.",
+      "F9": "Generic char3equation/count bijection reduces every general model to729normalized models; nine81-model kernel obligations and explicit coefficient exhaustion."
+    },
+    "remaining": [
+      "higher extensions n≥3",
+      "geometric p-rank/endomorphism equivalence",
+      "full torsion/roots-of-unity field identification",
+      "general classification/Hasse bridges outside actual checked fields"
+    ],
+    "novelty": "Known finite-field theory; no novelty claim."
+  }
+}

@@ -1,0 +1,85 @@
+CARD SWB-RECOMPUTE-16  (frozen before dispatch; experiment-director style; mechanical tier)
+GOAL  Recompute, from raw records committed in this repository, the headline numbers of the benchmark directories listed below (these directories have NO row in benchmarks/README.md; ROW n is a pseudo-id O<n>; use row_no = 1000+n in the output; the HEADLINE is the first sentence of the directory README; the numbers there are what you recompute), and check the identical-output claims. COMPUTE AND COPY ONLY. You do not judge, classify, explain or repair anything.
+REPO  /home/user/crypto (cwd). Read everything; write ONLY under research/validation_sweep_20261019/B-benchmarks/scripts/recompute/ and research/validation_sweep_20261019/B-benchmarks/recompute/.
+TOOLS  python3 -I (isolated mode) for every computation; grep/ls/zcat/xz -dc/tar -tf/sed for reading. FORBIDDEN: cargo/rustc builds or tests, running any benchmark or ecbench/crypto binary, network access, editing or deleting any file outside the two write dirs, git commands other than read-only (git log/show/ls-files).
+PER ROW (do these in order; at most 25 tool calls per row, then record status cannot_define for what is left):
+ 1. Open the row's study directories (listed per row) and read the README/PROTOCOL/REPORT only as needed to find which raw files hold per-run records.
+ 2. From the row's HEADLINE copy up to 10 numeric claims, preferring ratios, speedups, quotients, medians, intervals and counts (verbatim string each).
+ 3. For each, find the raw per-run/per-pair records in the repo that the number is computed from. Write ONE script per row at scripts/recompute/<row_no>.py (python3 -I, reads only committed files, prints the computed values with the field names used). Run it. If the aggregation (median vs mean, paired vs pooled, which rounds are excluded) is not stated in the study, try the study's stated rule; if still undefined record status cannot_define and say which choice is missing. Never pick the aggregation that happens to match.
+ 4. status per claim: match (relative difference <= 1% or equal at the precision the row prints), mismatch (state both numbers), no_raw_in_repo (the records are not in the repo), cannot_define, partial.
+ 5. If the HEADLINE or MEASURED text claims identical/bit-identical/equal outputs, counters, answers, digests or checksums between arms: find the corresponding fields in the raw records of both arms and report n_compared, n_equal, n_differ, files. If the raw records contain no such field, status no_raw_in_repo.
+ 6. Copy verbatim (path:line) every sentence in the row's study files that points to data outside the repo (drive.google.com, /Volumes, SSD, /Users, s3://, gs://, store:<name>, Modal volume, 'not committed', 'scratch'). For each store:<name> check store/index.json lists it (yes/no).
+ 7. Copy verbatim from the study files: (a) the A/A or null-control result lines (path:line), (b) the isolation tier or isolation statement (path:line), (c) whether PROTOCOL/spec is committed in git before the first raw record (run `git log --diff-filter=A --format=%H%x20%cI -- <protocol path>` and `git log --diff-filter=A --format=%H%x20%cI -- <first raw file>` and print both dates; if either is empty say so).
+OUTPUT  Write research/validation_sweep_20261019/B-benchmarks/recompute/SWB-RECOMPUTE-16.jsonl, one JSON object per row: {"row_no":int,"slug":str,"claims":[{"claimed":str,"computed":str,"definition":str,"files":[str],"status":str}],"identical":{"claimed":bool,"n_compared":int|null,"n_equal":int|null,"n_differ":int|null,"files":[str],"status":str},"offrepo_refs":[str],"aa_lines":[str],"isolation_lines":[str],"protocol_git_date":str,"first_raw_git_date":str,"script":str,"notes":str}. notes holds only facts you saw, never opinions. Then reply with the file path and one line per row: row_no, number of match/mismatch/no_raw/cannot_define claims.
+STOP_WHEN  a row's study directory does not exist; a file you must read is unreadable; you are about to write outside the two write dirs. Report the stop verbatim and continue with the next row.
+ROWS
+
+--- ROW 1001 | 2026-10-14 | 20261014-p61-class-pilot
+MEASURED: This directory mirrors the visual performance artifacts for the certified
+HEADLINE: `p61-i0025` selected-class launch study.
+HOST (as reported): 
+STUDY DIRS: research/p61_isogeny_class_20261014
+RAW CANDIDATES (largest first): research/p61_isogeny_class_20261014/reports/run-20261014T0902Z/certification-terminal-manifest.json, research/p61_isogeny_class_20261014/reports/run-20261014T0902Z/certified-prefix-x000000000000-x000000000320-manifest.json, research/p61_isogeny_class_20261014/reports/run-20261014T0902Z/certified-prefix-x000000000000-x000000016704-manifest.json, research/p61_isogeny_class_20261014/reports/run-20261014T0902Z/parallel-verifier-release-manifest.json, research/p61_isogeny_class_20261014/reports/run-20261014T0902Z/timings.json, research/p61_isogeny_class_20261014/reports/run-20261015T0436Z-adjacency-pilot/metrics.json
+
+--- ROW 1002 | 2026-10-12 | 20261012-lit2026-w5-gate-first-rref
+MEASURED: [Source study](../../research/lit2026_w5_lane_batched_f4_20261011/README.md) and [run report](../../research/lit2026_w5_lane_batched_f4_20261011/reports/run-20261012T0008Z/report.pdf) remain the source of truth. These browsing copies were added during integration on 2026-10-12. The PDFs and SVGs are
+HEADLINE: Original/candidate word-XOR ratios 1.64 / 1.93 / 2.19 / 2.41; process-CPU previous/candidate ratios 2.85–3.69, as reported
+HOST (as reported): Host and scope: Shared Apple M4 Pro, 14 cores; L0, unpinned. The integration adds no measurement or independent replay.
+STUDY DIRS: research/lit2026_w5_lane_batched_f4_20261011/README.md; research/lit2026_w5_lane_batched_f4_20261011/reports/run-20261012T0008Z/report.pdf
+RAW CANDIDATES (largest first): benchmarks/20261012-lit2026-w5-gate-first-rref/copies.json, research/lit2026_w5_lane_batched_f4_20261011/reports/run-20261011T2225Z/raw/diag-lanes-echelon.jsonl, research/lit2026_w5_lane_batched_f4_20261011/reports/run-20261011T2225Z/raw/diag-lanes-rref.jsonl, research/lit2026_w5_lane_batched_f4_20261011/reports/run-20261011T2225Z/raw/r1-K1_17-lanes.jsonl, research/lit2026_w5_lane_batched_f4_20261011/reports/run-20261011T2225Z/raw/r3-K1_17-lanes.jsonl, research/lit2026_w5_lane_batched_f4_20261011/reports/run-20261011T2225Z/summary.json
+
+--- ROW 1003 | 2026-10-12 | 20261012-lit2026-w12-zero-minor
+MEASURED: [Source study](../../research/lit2026_w12_flagged_claims_20261011/README.md) and [run report](../../research/lit2026_w12_flagged_claims_20261011/reports/run-20261012T0009Z/report.pdf) remain the source of truth. These browsing copies were added during integration on 2026-10-12. The PDFs and SVGs are
+HEADLINE: Zero-minor/rho counted field-operation cost 260–6715×; search-phase log-cost slope 0.905 [0.769, 1.021]; negative result
+HOST (as reported): Host and scope: Shared Apple M4 Pro, macOS; L0; primary unit is counted F_p operations. The integration adds no measurement or independent replay.
+STUDY DIRS: research/lit2026_w12_flagged_claims_20261011/README.md; research/lit2026_w12_flagged_claims_20261011/reports/run-20261012T0009Z/report.pdf
+RAW CANDIDATES (largest first): benchmarks/20261012-lit2026-w12-zero-minor/copies.json, research/lit2026_w12_flagged_claims_20261011/reports/run-20261012T0009Z/dsweep-failed-c70d57ec7.log, research/lit2026_w12_flagged_claims_20261011/reports/run-20261012T0009Z/dsweep.json, research/lit2026_w12_flagged_claims_20261011/reports/run-20261012T0009Z/dsweep.log, research/lit2026_w12_flagged_claims_20261011/reports/run-20261012T0009Z/fits.json, research/lit2026_w12_flagged_claims_20261011/reports/run-20261012T0009Z/scaling.json
+
+--- ROW 1004 | 2026-10-12 | 20261012-glv-gls-4d-confirmation
+MEASURED: [Source study](../../research/isogeny_loop_glv_20261012) and [run/result record](../../research/isogeny_loop_glv_20261012/reports/run-20261012T0216Z-bench-confirm/report.pdf) remain the source of truth. The PDF and SVG files below are byte-identical browsing copies added during integration on 2026-1
+HEADLINE: Projective GLV-GLS-4 median 105,273 ns versus GLS-2 114,823 ns: 1.091×; A/A 0.989
+HOST (as reported): Host and isolation: Different Intel Xeon @2.80 GHz, 4 CPUs; pinned core 3; load 1.23→1.21 with another build starting; not isolated. Original host/isolation wording and measurement qualifications are preserved in the copied PDFs and [verbatim source report](SOURCE_REPORT.md).
+STUDY DIRS: research/isogeny_loop_glv_20261012; research/isogeny_loop_glv_20261012/reports/run-20261012T0216Z-bench-confirm/report.pdf
+RAW CANDIDATES (largest first): benchmarks/20261012-glv-gls-4d-confirmation/copies.json, research/isogeny_loop_glv_20261012/bench_D3019.json, research/isogeny_loop_glv_20261012/bench_D431.json, research/isogeny_loop_glv_20261012/bench_D71.json, research/isogeny_loop_glv_20261012/bench_run1.json, research/isogeny_loop_glv_20261012/bench_run2.json
+
+--- ROW 1005 | 2026-10-12 | 20261012-f4-fp-vs-msolve
+MEASURED: 
+HEADLINE: 
+HOST (as reported): 
+STUDY DIRS: 
+RAW CANDIDATES (largest first): 
+
+--- ROW 1006 | 2026-10-12 | 20261012-f4-f5-performance-history
+MEASURED: [Source study](../../research/f4_f5_history_20261012) and [run/result record](../../research/f4_f5_history_20261012/reports/run-20261012T0009Z/report.pdf) remain the source of truth. The PDF and SVG files below are byte-identical browsing copies added during integration on 2026-10-12. PNGs render th
+HEADLINE: Seven frozen perf-history snapshots; F4/F5 instruction and diagnostic-runtime series, plus distinct allocation groups; no new timing measurement
+HOST (as reported): Host and isolation: Historical hosts/compilers/profilers differ; connections break at changed fingerprints; worker-thread coverage incomplete. Original host/isolation wording and measurement qualifications are preserved in the copied PDFs and [verbatim source report](SOURCE_REPORT.md).
+STUDY DIRS: research/f4_f5_history_20261012; research/f4_f5_history_20261012/reports/run-20261012T0009Z/report.pdf; research/f4_f5_history_20261012/archives/pr-1677-baa6242188
+RAW CANDIDATES (largest first): benchmarks/20261012-f4-f5-performance-history/copies.json, research/f4_f5_history_20261012/archives/pr-1677-baa6242188/MANIFEST.json, research/f4_f5_history_20261012/records/library-completed-names.txt, research/f4_f5_history_20261012/records/library-expected-names.txt, research/f4_f5_history_20261012/records/library-expected-tests.txt, research/f4_f5_history_20261012/records/library-passed-names.txt
+
+--- ROW 1007 | 2026-10-12 | 20261012-f4-f5-native-hashing
+MEASURED: [Source study](../../research/f4_f5_hash_20261012/REPORT.md) and [combined run report](report.pdf) retain the measured claims. These browsing copies pin commit [31088bfce](https://github.com/aburan28/crypto/tree/31088bfce9d9cc86fb55a655b064b5472db263ae/research/f4_f5_hash_20261012), study tree `e00b
+HEADLINE: Five paired A/B/A′ rounds across eleven frozen Boolean systems record 3.715% fewer complete-F5 instruction references (95% interval 3.714–3.726%) and 45.136% fewer standalone criterion instruction references (45.121–45.155%). F4 is neutral under the 2% gate. Every result digest and word-XOR count matched; allocation requests, cumulative requested bytes and tracked peak live bytes did not regress.
+HOST (as reported): 
+STUDY DIRS: research/f4_f5_hash_20261012/REPORT.md
+RAW CANDIDATES (largest first): benchmarks/20261012-f4-f5-native-hashing/SOURCE.json, benchmarks/20261012-f4-f5-native-hashing/SOURCE.sha256, benchmarks/20261012-f4-f5-native-hashing/SOURCE_TREE.json, benchmarks/20261012-f4-f5-native-hashing/copies.json, research/f4_f5_hash_20261012/records/comparison.json, research/f4_f5_hash_20261012/records/full-library.log
+
+--- ROW 1008 | 2026-10-12 | 20261012-f4-f5-fused-readback
+MEASURED: 
+HEADLINE: 
+HOST (as reported): 
+STUDY DIRS: 
+RAW CANDIDATES (largest first): 
+
+--- ROW 1009 | 2026-10-12 | 20261012-f4-f5-dense-packing
+MEASURED: 
+HEADLINE: 
+HOST (as reported): 
+STUDY DIRS: 
+RAW CANDIDATES (largest first): 
+
+--- ROW 1010 | 2026-10-11 | 20261011-pdp-split-hybrid
+MEASURED: [Source study](../../research/pdp_split_dreg_20261011) and [run/result record](../../research/pdp_split_dreg_20261011) remain the source of truth. The PDF and SVG files below are byte-identical browsing copies added during integration on 2026-10-12. PNGs render the corresponding exact SVG at 150 dpi
+HEADLINE: Amended 192-run grid exact; closest relation-phase projection 22.8× strong rho or 391× signed-Frobenius rho; initial read-out defect preserved
+HOST (as reported): Host and isolation: PDP shared cloud container,no isolation; matchedrho L2 on most records; projection uses calibration from another host. Original host/isolation wording and measurement qualifications are preserved in the copied PDFs and [verbatim source report](SOURCE_REPORT.md).
+STUDY DIRS: research/pdp_split_dreg_20261011
+RAW CANDIDATES (largest first): benchmarks/20261011-pdp-split-hybrid/copies.json, research/pdp_split_dreg_20261011/ANALYSIS-runs-v1.json, research/pdp_split_dreg_20261011/ANALYSIS.json, research/pdp_split_dreg_20261011/runs-v2/3-0-13-5.jsonl, research/pdp_split_dreg_20261011/runs/3-0-13-5.jsonl, research/pdp_split_dreg_20261011/sessions/rho-01/plan.json

@@ -1,0 +1,36 @@
+{
+ "created_at": "2026-11-05T17:46:05Z",
+ "id": "PCC-20261105-db06e4",
+ "kind": "execution",
+ "producer": {
+  "commit": "1d56500c52c8b887ab1b39ff0f759665ecccea49",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/primefield-companion-followup-20261102/feature-native-adaptive-fibers/receipt.json",
+    "sha256": "65f21c54a4423666265ed2b949aa42949cc6a6c1564b3e36724d0ff0d81b7d0a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/primefield-companion-followup-20261102/feature-native-adaptive-fibers/test.log",
+    "sha256": "186cacf12a35f3f26979bdda6996cd5c1575d783f0dd3e077e684982d58c7c54"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/primefield-companion-followup-20261102/feature-native-adaptive-fibers/checker-receipt.json",
+    "sha256": "e175af95ec389b9f37d278f8eaa2121423e6404697053fb29863e24177c9494a"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Bounded local correctness records; no trusted execution verdict or runtime comparison",
+ "statement": "Saved adaptive decoder receipts report49 passing tests, all479 coefficient-field inputs, eight public-point integrations and four exceptional sign requests; separate polynomial checker accepts the packet and rejects a coefficient corruption."
+}

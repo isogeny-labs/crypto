@@ -1,0 +1,129 @@
+{
+  "schema": "formal.review/v1",
+  "reviewed_commit": "1ef3c786cc1ac3041bf584a80b15bf9869735f64",
+  "main_context": "fdb5f599e9d35584b1df9466d3c9a46f10d2e89e",
+  "native_sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+  "machine_status": "passed",
+  "fidelity": "faithful_scoped",
+  "outcome": "validated_scoped",
+  "main_declarations": 5,
+  "producer_controls": 7,
+  "producer_readbacks": 12,
+  "reviewer_controls": 3,
+  "reviewer_readbacks": 3,
+  "false_exit": 1,
+  "checker_rejections": 3,
+  "failures_retained": [
+    {
+      "path": "reviewer-attempt1",
+      "cause": "wrong namespace for Canon",
+      "exit": 1,
+      "accepted": false
+    }
+  ],
+  "claims": [
+    {
+      "name": "StoredInput.lists_three_two",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "StoredInput.accessor_shape",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "StoredInput.stored_inputs",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "StoredInput.degree_two_inputs",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "StoredInput.stored_fast_calls",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "StoredControls.degree_zero_padding",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "StoredControls.degree_one_trim",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "StoredControls.degree_two_trim",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "StoredControls.malformed_storage",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "StoredControls.actual_extract",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "StoredControls.actual_inputs_valid",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "StoredControls.actual_stored_fast",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    }
+  ],
+  "review_attestation": {
+    "reviewer": "/root/array_independent_review",
+    "non_author": true,
+    "joints_owned": [
+      "stored shape and decoded validity",
+      "coefficient extraction",
+      "successful fast branch join"
+    ],
+    "sources_read": [
+      "input/*.lean",
+      "metadata/native.rs:126-170,943-1061",
+      "metadata/current-main-native.rs",
+      "metadata/current-main-dated-session-log.md:newest entries and pencil matches",
+      "metadata/review-plan.md",
+      "metadata/REPORT.md",
+      "producer original and successful before.sha256 inventories",
+      "prior review execution scripts only"
+    ],
+    "sibling_reports_accessed": false,
+    "blind_rederivation": false,
+    "inherited_context": true,
+    "verdict": "holds"
+  },
+  "cache_boundary": "fresh targets; reused compiler and helper caches; retained deeper union inventories checked before and after; no independent binary rechecker",
+  "scope_exclusions": [
+    "native validator equivalence",
+    "physical execution",
+    "full dispatch",
+    "cost measurements",
+    "Picard classes"
+  ]
+}

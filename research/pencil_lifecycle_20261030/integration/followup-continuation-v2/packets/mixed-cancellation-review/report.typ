@@ -1,0 +1,22 @@
+#set page(paper:"a4",margin:18mm)
+#set text(size:10pt)
+#text(size:18pt,weight:"bold")[Independent mixed-degree cancellation review]
+#image("diagram.svg",width:100%)
+
+#text("Independent source-fidelity review supports the mixed degree1+2 shared-support prelude and cancellation slice as stated. Fresh isolated Lean checks of MixedCancellation, WordMixed, Controls, Readback and reviewer boundary controls all exited0. Nine named declarations have only propext, Classical.choice and Quot.sound in their axiom readback. No producer file was changed.")
+
+#text("The field proof starts with the original two polynomial-divisibility validity predicates and nonzero representation weights. Kraw=Z^4 Zb^4 W*u(x); Kraw=0 therefore yields u(x)=0. Independently, u(T)=(T-x)(T-(-q-x)), so divisibility of f-v² by u gives validity at both supports. Degree-one validity yields y²=v(x)² and hence y=-v(x) or y=v(x). The proof does not assume output identities or validity as hypotheses.")
+
+#text("The literal Rust add12_weighted_complete source at lines828-878 matches the field rawK/rawY3/rawW3/other expressions and word expression tree, including nested multiplication and subtraction. Scaled ordinate tests have common factor D=Z^5 Zb^5 W Wb. Source tests cancellation first; mismatch is only the later failure of positive coincidence. Thus zero ordinates choose cancellation. The output p4 has normalized x=-q-x_input and y=v(x_output), with weights Z*Zb and Wb nonzero.")
+
+#text("Repeated support is included: no inverse of the difference between the two roots is introduced. The producer full F7 theorem control uses repeated support, zero ordinate and nonunit weights. Its rational control uses original input divisibilities and nonunit weights. Reviewer-only controls separately check zero-ordinate cancellation precedence and equal nonzero-ordinate passage to positiveCoincidence. A noncanonical nonzero UInt64 value7 decodes to0 in ZMod7, demonstrating why the canonicality premise is necessary.")
+
+#text("The word theorem requires prime5<=p<2^31, all10 input words canonical, four nonzero word weights and the two original normalized validity predicates. FieldExpr composition supplies canonical intermediate values and decoding. Canonical equality reflection supplies exact guard agreement; canonical_word_nonzero connects nonzero words to nonzero field weights. Output nonzero words follow from decoded nonzero weights. The bounded modulus ensures intermediate canonical products and sums avoid UInt64 wraparound in the modeled arithmetic.")
+
+#text("The scope is value correspondence for retained Field.n=1,tables=None source semantics, under ordinary execution and counter headroom. The pure mixedWords bundle evaluates unused p4 values on common dispatch; no side-effect, operation-count, allocation or compiler correspondence follows. common and positiveCoincidence are branch markers: generic mixed addition, tripling and the secondary positive-coincidence result are excluded. Polynomial support validity is established; no divisor-class group-law theorem or smooth genus-two model is asserted.")
+
+#text("Provenance: the exact projective source hash and all producer manifest entries were checked. The historical Cargo-relative native path is absent in this snapshot; the proof lineage instead explicitly binds retained src/cryptanalysis/three_leads.rs SHA d354a3912db6ea6af70019920708610fe848a232119b0949d8a7c968aedf6354. Its relevant Field fragments were inspected and matched the value model. This review does not assert a successful current Cargo build or linkage.")
+
+#text("Fresh target modules were compiled in the reviewer directory with the existing pinned Lean toolchain and dependency union, each bounded120seconds. Cached dependency binaries remain within the Lean/toolchain trust boundary; no independent binary/kernel rechecker was used. Dependency bindings were inventoried after initial field/word replay and checked unchanged after the remaining checks. This is source-fidelity review with a pre-proof plan and elementary algebra derivation, not a claimed blind review of unseen producer statements.")
+
+#text("No blocking discrepancy was found within the stated cancellation slice. The inspected field and word claims have machine status passed, fidelity faithful_scoped, and review outcome validated_scoped. No scientific trial, trajectory, timing measurement or official research-status transition was performed. Existing producer failed attempts and warnings remain preserved.")

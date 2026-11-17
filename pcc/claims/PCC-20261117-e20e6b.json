@@ -1,0 +1,79 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T08:53:24Z",
+ "id": "PCC-20261117-e20e6b",
+ "kind": "statement",
+ "producer": {
+  "commit": "9a7726f6e6844d32c21ca216bf3324a200f6fc98",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-search-v1/native-v1/controls.json",
+    "sha256": "b78bfe310b4043c55baca721b28aeab3ec21e32f6768ab806244c9f4840addc8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-search-v1/POSTCALL.json",
+    "sha256": "c945b36aacecac207ea9ddfcd9ac936bc77816eee95cf979e6cf68306ca32da8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-search-v1/PRECALL.json",
+    "sha256": "c1ff5382df0396e26dcfe560f001cd0e7b7d6d1b5d1a6bee8316f0646ef30cbf"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-search-v1/SOURCE_QUALIFICATION.json",
+    "sha256": "cb985dd31fbe0e6ab1b085e63f89affa6dfb60f8e123d8ec812097d567fca169"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-search-v1/source-v1.tar.xz",
+    "sha256": "0035ab51a4942f1421f2866d6a09a299015c228869354890478843856f9c18aa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-search-v1/ERRATA.md",
+    "sha256": "5ddcca6f22a66ac88ab593f09678f311fbd827c57ef507a34a402932a8f39234"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-search-v1/LAUNCH_NOTE.md",
+    "sha256": "fdbf41936f149849b6b69809c32b0c7a9d2de1efee8a99bf41b08c9cde72686e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-search-v1/development/unit-qualified.log",
+    "sha256": "431e8a5bd56868321296168ef28c70416545ff12d9e7c59f488af7fbf6f4537e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-search-v1/development/clippy-qualified.log",
+    "sha256": "fc193def522aada970a5186c5ea19daf824df4cdcf628d39c1202e2ec28a4c6e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "section-search-v1 fixed native residual identities",
+ "statement": "Rust issuer produced IDC1h5aa2ca2649f9d3c6 and IDC1ha8ad4123fd0897a8 over the maintained 2^61-1 evaluation field. Each has32issuer+32extra fixed checks and a plus-one refusal. Nine maintained identity-module tests,fmt,strictClippy and build pass. Source9/compiled5/binary pre-post match. These are unsigned development controls, not a native quotient query, coefficient solve, Curve25519-field or formal identity theorem; launcher deviation disclosed."
+}

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 555" role="img" aria-label="Unknown-log relation pipeline; full-width pilot pending">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10" fill="#48677b"/></marker></defs>
+<rect width="1120" height="555" fill="#f6f9fc"/>
+<g font-family="Arial,sans-serif" fill="#18394e">
+<text x="28" y="38" font-size="25" font-weight="bold">From unknown base logs to an independently checked target</text>
+<text x="28" y="65" font-size="15">Implementation + development controls · 2026-10-27 · original full-width pilot NOT RUN</text>
+<g stroke="#8aa9bb" stroke-width="1.5" fill="white">
+<rect x="28" y="100" width="235" height="124" rx="12"/><rect x="305" y="100" width="235" height="124" rx="12"/><rect x="582" y="100" width="235" height="124" rx="12"/><rect x="859" y="100" width="235" height="124" rx="12"/>
+</g>
+<g font-size="17" font-weight="bold"><text x="44" y="130">Unchanged public inputs</text><text x="321" y="130">Longer decompositions</text><text x="598" y="130">Verified setup relations</text><text x="875" y="130">Target descent + replay</text></g>
+<g font-size="14"><text x="44" y="157">P, Q and 12 unknown-log Bᵢ</text><text x="44" y="181">Original source C0 / G0 / K0</text><text x="44" y="205">No scalar witness inputs</text>
+<text x="321" y="157">Six-plus-six generic MITM</text><text x="321" y="181">cᵢ ∈ [−12,12] in the pilot</text><text x="321" y="205">Keep duplicate representations</text>
+<text x="598" y="157">Random tP = Σ cᵢBᵢ</text><text x="598" y="181">Retain failed/dependent probes</text><text x="598" y="205">Derive logs only at rank 12</text>
+<text x="875" y="157">Q = Σ cᵢBᵢ → k = Σ cᵢlog Bᵢ</text><text x="875" y="181">Check every base log and kP=Q</text><text x="875" y="205">Separate affine/Euclid checker</text></g>
+<g stroke="#48677b" stroke-width="2" marker-end="url(#arrow)"><path d="M266 162H300"/><path d="M543 162H577"/><path d="M820 162H854"/></g>
+<rect x="28" y="264" width="510" height="154" rx="12" fill="#e8f5ef" stroke="#62a283"/>
+<text x="46" y="294" font-size="19" font-weight="bold">Verified development controls</text>
+<g font-size="15"><text x="46" y="321">Small r=139 fixture: rank 12; 138/138 nonzero targets</text><text x="46" y="347">Real CLI control: 13 rows retained, independent rank 12</text><text x="46" y="373">129 source-field arithmetic checks; 7 rejection controls</text><text x="46" y="399">These are correctness tests, not original-corpus recoveries.</text></g>
+<rect x="562" y="264" width="532" height="154" rx="12" fill="#fff6e7" stroke="#bf9960" stroke-dasharray="7 4"/>
+<text x="580" y="294" font-size="19" font-weight="bold">Full-width execution still gated</text>
+<g font-size="15"><text x="580" y="321">Calculated table payload 9,566,497,092 bytes (not RSS)</text><text x="580" y="347">Need authorized durable checkpoint + correct custom image</text><text x="580" y="373">Need configured Iso Lab route; no Job/Pod exists yet</text><text x="580" y="399">No speedup, new Gröbner or new regularity claim</text></g>
+<text x="28" y="460" font-size="16" font-weight="bold">Original requirement remains open: 46 curves × 10 generators × 10 keys.</text>
+<text x="28" y="489" font-size="14">A one-point pilot is a prerequisite. The transported factor base preserves relations across the degree-2 graph.</text>
+<text x="28" y="519" font-size="13">Evidence and reproduction: PROTOCOL.md · public_source_case.json · validation/ · test.sh · independent verify.cpp</text>
+</g></svg>

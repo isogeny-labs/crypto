@@ -1,0 +1,23 @@
+import Add11
+open Polynomial Add11Distinct
+noncomputable abbrev f : Polynomial ℚ := X^5-X+X^2
+lemma v0 : (X-C (0:ℚ)) ∣ f-(C (0:ℚ))^2 := by
+  refine ⟨X^4-1+X,?_⟩
+  norm_num [f]
+  ring
+lemma v1 : (X-C (1:ℚ)) ∣ f-(C (1:ℚ))^2 := by
+  refine ⟨X^4+X^3+X^2+2*X+1,?_⟩
+  norm_num [f]
+  ring
+example : let q := -((0:ℚ)+1)
+    let r := (0:ℚ)*1
+    let s := (0:ℚ)-1
+    let t := (0:ℚ)*1-1*0
+    let w := (0:ℚ)-1
+    w ≠ 0 ∧ (X^2+C q*X+C r) ∣ f-(C (s/w)*X+C (t/w))^2 := by
+  exact distinct_preserves_mumford f 0 0 1 1 (by norm_num) v0 v1
+example : ((0:ℚ)-1)/((0:ℚ)-1) = 1 := by norm_num
+-- Equal x and arbitrary invalid y values reach the modeled distinct fallback;
+-- the real Rust assertion rejects these. The main theorem excludes this input.
+example : classify (0:ℚ) 1 0 2 = .distinct := by norm_num [classify]
+example : (0:ℚ)-(0:ℚ) = 0 := by norm_num

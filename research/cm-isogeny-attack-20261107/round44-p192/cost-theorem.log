@@ -1,0 +1,36 @@
+{
+  "all_checks_pass": true,
+  "exact_weight_controls": 2480,
+  "general_identity": "C_cache-kappa*C_base=(m-kappa)*(5*cM+cS), kappa=(m+1)/2",
+  "raw_state_words": {
+    "cached": "2m+2",
+    "baseline": 4
+  },
+  "P192_state_bytes": {
+    "cached": 288,
+    "baseline": 96
+  },
+  "equal_walk_count_condition": "cI>3*cM+sqrt(m)*B*(5*cM+cS) for ideal gain under MSI model",
+  "equal_storage_ideal_work_ratio_lower_bound": "(m+1)/(2*sqrt(m))",
+  "P192_ratio_lower_bound_squared": "9/5",
+  "positive_unbatched_control": {
+    "weights": {
+      "M": 1,
+      "S": 1,
+      "I": 80
+    },
+    "cache": 107,
+    "baseline": 83,
+    "candidate_over_baseline_squared_lt5": true
+  },
+  "equal_storage_control": {
+    "baseline_per_transition": "95/3",
+    "candidate_over_baseline_squared_gt5": true
+  },
+  "limits": [
+    "Field-operation cost model, not total runtime",
+    "Ideal sqrt(m) collision gain assumed generously; actual walks may cycle",
+    "Raw state accounting excludes allocator overhead, histories, tables and compression",
+    "No lower bound on alternative orbit representations"
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "schema": "nist-report-and-experiment-validation/v1",
+  "base_commit": "baa1951357b7ca586e902f4a81287ac2ef4855ef",
+  "counter_checker_tests": {
+    "passed": 6,
+    "failed": 0,
+    "source": "backlog/XP-20261026-nist-p256-checkpoint-filter/inspect_filter.rs"
+  },
+  "wrong_checkpoint_preflight_rejected": true,
+  "reference_and_candidate_input_preflights_passed": true,
+  "prospective_filter_experiment_executed": false,
+  "prospective_filter_queue_task": null,
+  "whole_target_prime_and_product_replay": "passed_partial_partition_unchanged_444_bit_residual",
+  "protocol_schema": "experiment.protocol/v1",
+  "schema_source_repository_commit": "6a69b2d02ecd53f1649bcf56e23e4ffe91d953ad",
+  "schema_validation": "native Go Draft202012 schema validation passed; canonical Python checker not run under repository language policy",
+  "frozen_canonical_hash_verified": true,
+  "frozen_analysis_source_hash_verified": true,
+  "expspec_validation": "passed_draft_spec_not_approved_to_run",
+  "backlog_validation": "passed_using_existing_cached_backlog_binary; current_schema_checked_separately",
+  "local_document_links": {
+    "checked": 90,
+    "broken": 0
+  },
+  "report_pdf": {
+    "pages": 2,
+    "all_pages_visually_inspected": true,
+    "policy": "PDFs are explicitly kept in Git by current artifact policy"
+  },
+  "full_rust_library_test": {
+    "status": "blocked_on_unchanged_base_syntax_error",
+    "exit_status": 101,
+    "file": "src/cryptanalysis/binary_semaev_chain_sat.rs",
+    "base_blob": "3803524139ef5382d85f835107339d66d5909a6d",
+    "diagnostic": "unclosed delimiter in impl ChainedS3Encoding / verify_external_assignment",
+    "raw_log": "evidence/library-validation-base-error.log"
+  },
+  "local_repository_validation_gate": {
+    "status": "not_passed_in_sparse_checkout",
+    "exit_status": 1,
+    "reported_rows": 84,
+    "scope": "Unrelated existing leaderboard/benchmark evidence and archival histories; gate inputs are unchanged from base. Full materialized-data CI remains authoritative."
+  },
+  "conductor": {
+    "available": false,
+    "observed_error": "conductor: command not found",
+    "task_created": false
+  },
+  "progress_exporter": {
+    "status": "passed",
+    "source_ref": "ba09a5e482f0a8faa7fac0ec76c1ed5ce029c4b2",
+    "elapsed_ms": 11315,
+    "nist_samples": 18,
+    "latest_main_raw_relation_lines": 10441117,
+    "implementation_changed": false,
+    "worktree_reads": false,
+    "estimates_added": false
+  },
+  "archive": {
+    "compression_integrity_verified": true,
+    "archived_relation_file_stream_hash_verified": true,
+    "canonical_repack_byte_identical": true,
+    "independent_whole_target_product_and_prime_replay": true,
+    "full_fresh_directory_extraction_performed": false,
+    "full_fresh_directory_extraction_reason": "Constrained local disk; archive relation bytes were independently streamed and hashed without allocating another 1.1 GiB tree.",
+    "remote_publication_verified": false
+  },
+  "retained_setup_errors": [
+    "Initial replay used the run root instead of its target directory; corrected native replay passes.",
+    "Initial Rust stable alias did not exist; use installed 1.98.0.",
+    "System go is not the Go compiler; installed verified official Go 1.23.10.",
+    "Initial schema metadata used repository/provenance labels outside enum; corrected before freezing.",
+    "Sparse-checkout helper has no applied profile; materialized only tracked benchmark indexes with git restore."
+  ],
+  "artifact_policy_check": "passed_after_first_commit; full archive ignored, PDFs explicitly kept by current policy",
+  "source_whitespace_check": "passed; byte-preserved received logs/HTTP headers/job and generated SVG excluded rather than altered"
+}

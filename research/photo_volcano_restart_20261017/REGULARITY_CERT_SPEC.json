@@ -1,0 +1,151 @@
+{
+  "phase": "exact-generator-homogenized-system-regularity",
+  "ROOT": "/workspace/photo_volcano_restart_20261017",
+  "source_public_base": "5cb553810e5bbfbd8691ec614ffcaacefc625757",
+  "commands": [
+    {
+      "id": "native-certificates",
+      "argv": [
+        "./regularity_cert",
+        "run",
+        "/workspace/photo_volcano_restart_20261017",
+        "/workspace/photo_volcano_restart_20261017/sessions/regularity_cert_20261025"
+      ],
+      "outputs": [
+        "sessions/regularity_cert_20261025/summary.json",
+        "sessions/regularity_cert_20261025/cases.jsonl",
+        "sessions/regularity_cert_20261025/controls.jsonl",
+        "sessions/regularity_cert_20261025/setups.jsonl",
+        "sessions/regularity_cert_20261025/verify.gp"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "sessions/regularity_cert_20261025.native-certificates.stdout",
+      "stderr": "sessions/regularity_cert_20261025.native-certificates.stderr"
+    },
+    {
+      "id": "prepare-independent-toy",
+      "argv": [
+        "./regularity_cert",
+        "toy",
+        "/workspace/photo_volcano_restart_20261017",
+        "/workspace/photo_volcano_restart_20261017/sessions/regularity_cert_20261025/toy"
+      ],
+      "outputs": [
+        "sessions/regularity_cert_20261025/toy/toy.sing"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "sessions/regularity_cert_20261025.prepare-independent-toy.stdout",
+      "stderr": "sessions/regularity_cert_20261025.prepare-independent-toy.stderr"
+    },
+    {
+      "id": "independent-resolution",
+      "argv": [
+        "./measure_process",
+        "sessions/regularity_cert_20261025/toy.resources.json",
+        "sessions/regularity_cert_20261025/toy.stdout",
+        "sessions/regularity_cert_20261025/toy.stderr",
+        "/usr/bin/env",
+        "LD_LIBRARY_PATH=/workspace/photo_volcano_restart_20261017/runtime/singular_root/usr/lib/x86_64-linux-gnu:/workspace/photo_volcano_restart_20261017/runtime/root/usr/lib/x86_64-linux-gnu",
+        "SINGULARPATH=/workspace/photo_volcano_restart_20261017/runtime/singular_root/usr/share/singular/LIB",
+        "runtime/singular_root/usr/bin/Singular",
+        "-q",
+        "--no-rc",
+        "--no-shell",
+        "--cpus=1",
+        "--threads=1",
+        "--flint-threads=1",
+        "--random=20261025",
+        "sessions/regularity_cert_20261025/toy/toy.sing"
+      ],
+      "outputs": [
+        "sessions/regularity_cert_20261025/toy.resources.json",
+        "sessions/regularity_cert_20261025/toy.stdout",
+        "sessions/regularity_cert_20261025/toy.stderr"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "sessions/regularity_cert_20261025.independent-resolution.stdout",
+      "stderr": "sessions/regularity_cert_20261025.independent-resolution.stderr"
+    },
+    {
+      "id": "independent-actual-field",
+      "argv": [
+        "./measure_process",
+        "sessions/regularity_cert_20261025/gp.resources.json",
+        "sessions/regularity_cert_20261025/gp.stdout",
+        "sessions/regularity_cert_20261025/gp.stderr",
+        "/usr/bin/env",
+        "LD_LIBRARY_PATH=/workspace/photo_volcano_restart_20261017/runtime/root/usr/lib/x86_64-linux-gnu",
+        "runtime/root/usr/bin/gp",
+        "-q",
+        "-f",
+        "-s",
+        "256M",
+        "sessions/regularity_cert_20261025/verify.gp"
+      ],
+      "outputs": [
+        "sessions/regularity_cert_20261025/gp.resources.json",
+        "sessions/regularity_cert_20261025/gp.stdout",
+        "sessions/regularity_cert_20261025/gp.stderr"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "sessions/regularity_cert_20261025.independent-actual-field.stdout",
+      "stderr": "sessions/regularity_cert_20261025.independent-actual-field.stderr"
+    },
+    {
+      "id": "audit",
+      "argv": [
+        "./regularity_cert",
+        "audit",
+        "/workspace/photo_volcano_restart_20261017",
+        "/workspace/photo_volcano_restart_20261017/sessions/regularity_cert_20261025"
+      ],
+      "outputs": [
+        "sessions/regularity_cert_20261025/independent_audit.json"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "sessions/regularity_cert_20261025.audit.stdout",
+      "stderr": "sessions/regularity_cert_20261025.audit.stderr"
+    }
+  ],
+  "write_scope": [
+    "sessions/regularity_cert_20261025",
+    "sessions/regularity_cert_20261025.native-certificates.stdout",
+    "sessions/regularity_cert_20261025.native-certificates.stderr",
+    "sessions/regularity_cert_20261025.native-certificates.stdout",
+    "sessions/regularity_cert_20261025.native-certificates.stderr",
+    "sessions/regularity_cert_20261025.prepare-independent-toy.stdout",
+    "sessions/regularity_cert_20261025.prepare-independent-toy.stderr",
+    "sessions/regularity_cert_20261025.independent-resolution.stdout",
+    "sessions/regularity_cert_20261025.independent-resolution.stderr",
+    "sessions/regularity_cert_20261025.independent-actual-field.stdout",
+    "sessions/regularity_cert_20261025.independent-actual-field.stderr",
+    "sessions/regularity_cert_20261025.audit.stdout",
+    "sessions/regularity_cert_20261025.audit.stderr",
+    "cards"
+  ],
+  "must_not_exist": [
+    "sessions/regularity_cert_20261025"
+  ],
+  "retries": "none",
+  "background": false,
+  "stop_when": [
+    "Any command exits outside success_exit_codes.",
+    "Any declared output is missing.",
+    "The final independent audit is not passed."
+  ]
+}

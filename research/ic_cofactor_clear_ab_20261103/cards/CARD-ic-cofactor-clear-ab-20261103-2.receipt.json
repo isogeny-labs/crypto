@@ -1,0 +1,404 @@
+{
+  "card_id": "CARD-ic-cofactor-clear-ab-20261103-2",
+  "card_path": "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.yaml",
+  "card_sha256": "ec018c9bdcb015233e29849c02e8a93182e4d84bfcac301bf7958fb007b065a8",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "git-head",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "69c7549f5b0c1f9c1de287f6f53a9382f99f1b286572f8d1c822a8526af2dd25",
+      "stdout_tail": [
+        "11173ecd0230a9ceedc4d833736402934fdcb95e"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--quiet",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.114,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tracked-tree-clean",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.114,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--porcelain",
+        "--untracked-files=no"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.13,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "git-status",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.13,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "./target/release/ecbench"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.045,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "binary-sha256",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.045,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ff54ff2f7eea4e0644377f0f8c1c5c179a5614f1f8ea1e46bb08ab8c96a9fdf5",
+      "stdout_tail": [
+        "b38cffb4f64c4ec7289ee4ef19bf60560d2d99684d4f996114eb403560081ec4  ./target/release/ecbench"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ic_cofactor_clear_ab_20261103/specs/v2-treatment.json",
+        "--out",
+        "research/ic_cofactor_clear_ab_20261103/sessions/v2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 116.894,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-v2",
+      "index": 5,
+      "outputs": {},
+      "seconds": 116.894,
+      "stderr_sha256": "666fc120d6d16b5025f47b7bb36bac695c5b5be6e5bf361f7998c5a2c2e25438",
+      "stderr_tail": [
+        "2782/2800 rho-plain      icv1-fp26-tm3572-d2959353 Wf961048e6592  verified S=1.930 L1",
+        "2783/2800 ic-raw         icv1-fp26-tm3572-d2959353 Wf961048e6592  verified S=36.895 L2",
+        "2784/2800 ic-clear       icv1-fp26-tm3572-d2959353 Wf961048e6592  verified S=10.817 L2",
+        "2785/2800 ic-raw-aa      icv1-fp26-tm3572-d2959353 Wf961048e6592  verified S=36.895 L2",
+        "2786/2800 rho-neg        icv1-fp26-tm3572-d2959353 Wbeb64a4c4480  verified S=1.411 L1",
+        "2787/2800 rho-plain      icv1-fp26-tm3572-d2959353 Wbeb64a4c4480  verified S=1.461 L1",
+        "2788/2800 ic-raw         icv1-fp26-tm3572-d2959353 Wbeb64a4c4480  verified S=88.069 L2",
+        "2789/2800 ic-clear       icv1-fp26-tm3572-d2959353 Wbeb64a4c4480  verified S=14.298 L2",
+        "2790/2800 ic-raw-aa      icv1-fp26-tm3572-d2959353 Wbeb64a4c4480  verified S=88.069 L2",
+        "2791/2800 rho-neg        icv1-fp26-tm3572-d2959353 W399b6746364d  verified S=1.366 L1",
+        "2792/2800 rho-plain      icv1-fp26-tm3572-d2959353 W399b6746364d  verified S=0.399 L1",
+        "2793/2800 ic-raw         icv1-fp26-tm3572-d2959353 W399b6746364d  verified S=12.331 L2",
+        "2794/2800 ic-clear       icv1-fp26-tm3572-d2959353 W399b6746364d  verified S=14.426 L2",
+        "2795/2800 ic-raw-aa      icv1-fp26-tm3572-d2959353 W399b6746364d  verified S=12.331 L2",
+        "2796/2800 rho-neg        icv1-fp26-tm3572-d2959353 W90f8393a1dc7  verified S=0.394 L1",
+        "2797/2800 rho-plain      icv1-fp26-tm3572-d2959353 W90f8393a1dc7  verified S=1.414 L1",
+        "2798/2800 ic-raw         icv1-fp26-tm3572-d2959353 W90f8393a1dc7  verified S=55.179 L2",
+        "2799/2800 ic-clear       icv1-fp26-tm3572-d2959353 W90f8393a1dc7  verified S=15.122 L2",
+        "2800/2800 ic-raw-aa      icv1-fp26-tm3572-d2959353 W90f8393a1dc7  verified S=55.179 L2",
+        "session ECBS1hd7774432e6f8 complete -> research/ic_cofactor_clear_ab_20261103/sessions/v2 (2800 records: {\"verified\": 2800})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_cofactor_clear_ab_20261103/sessions/v2",
+        "--replay-all"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 27.927,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-v2",
+      "index": 6,
+      "outputs": {},
+      "seconds": 27.927,
+      "stderr_sha256": "a939d9decf1b55bb6ca9f9d40754d0a6f1ac3b7d17ea8848c9fc726ed06b9dc7",
+      "stderr_tail": [
+        "audit OK: 2800 records, 2800 verified, 2240 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "c05b4c7173e7d6d00abe48b02e5f07d5141870bc1902562b820f92b68d11d6d7",
+      "stdout_tail": [
+        "      \"seq\": 2799,",
+        "      \"record_id\": \"ECR1h7a9e3f9f3107\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"replay_selection\": \"all\",",
+        "  \"replay_candidates\": 2240,",
+        "  \"files\": {",
+        "    \"host.json\": \"afcb610f70362658d9834998292fbcd6e225db2ead5683a2cb4a126861e53ed9\",",
+        "    \"plan.json\": \"b314750cc44c911b20a050903df2d32e2be6fe35676cfd16de830e2bb4a94dac\",",
+        "    \"records.jsonl\": \"92215c146fb4a479ec5aa016fd7c3ebd35010be985f830e8612ff5c4ef5a288a\",",
+        "    \"session.json\": \"8bace78b1e540ac53b968cb145dd44ee4b14eb2655fff78a8f33c632403ac68c\",",
+        "    \"spec.json\": \"6c34ea6f879433301f041e3a9ad91a632da510720198f211d8cd076fd671ace3\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"b38cffb4f64c4ec7289ee4ef19bf60560d2d99684d4f996114eb403560081ec4\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h67c27d1dfb15\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1hd21b654a34b7\",",
+        "  \"audited_unix_ms\": 1793672560871",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ic_cofactor_clear_ab_20261103/specs/h1-negative-control.json",
+        "--out",
+        "research/ic_cofactor_clear_ab_20261103/sessions/h1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 193.763,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-h1",
+      "index": 7,
+      "outputs": {},
+      "seconds": 193.763,
+      "stderr_sha256": "2848ce49ed24d7a73e07bbc3be54524811017ab139a7d34037f110f312d5d1bc",
+      "stderr_tail": [
+        "2782/2800 rho-plain      icv1-fp26-tm2939-d70f30fd Wd72ffd5bdb93  verified S=1.278 L2",
+        "2783/2800 ic-raw         icv1-fp26-tm2939-d70f30fd Wd72ffd5bdb93  verified S=45.439 L2",
+        "2784/2800 ic-clear       icv1-fp26-tm2939-d70f30fd Wd72ffd5bdb93  verified S=45.748 L2",
+        "2785/2800 ic-raw-aa      icv1-fp26-tm2939-d70f30fd Wd72ffd5bdb93  verified S=45.439 L2",
+        "2786/2800 rho-neg        icv1-fp26-tm2939-d70f30fd Wddc0efed47d7  verified S=1.951 L2",
+        "2787/2800 rho-plain      icv1-fp26-tm2939-d70f30fd Wddc0efed47d7  verified S=2.010 L2",
+        "2788/2800 ic-raw         icv1-fp26-tm2939-d70f30fd Wddc0efed47d7  verified S=31.812 L2",
+        "2789/2800 ic-clear       icv1-fp26-tm2939-d70f30fd Wddc0efed47d7  verified S=32.121 L2",
+        "2790/2800 ic-raw-aa      icv1-fp26-tm2939-d70f30fd Wddc0efed47d7  verified S=31.812 L2",
+        "2791/2800 rho-neg        icv1-fp26-tm2939-d70f30fd Wb6ac9475dd2f  verified S=0.685 L1",
+        "2792/2800 rho-plain      icv1-fp26-tm2939-d70f30fd Wb6ac9475dd2f  verified S=2.386 L2",
+        "2793/2800 ic-raw         icv1-fp26-tm2939-d70f30fd Wb6ac9475dd2f  verified S=41.874 L2",
+        "2794/2800 ic-clear       icv1-fp26-tm2939-d70f30fd Wb6ac9475dd2f  verified S=42.183 L2",
+        "2795/2800 ic-raw-aa      icv1-fp26-tm2939-d70f30fd Wb6ac9475dd2f  verified S=41.874 L2",
+        "2796/2800 rho-neg        icv1-fp26-tm2939-d70f30fd W9687f748be89  verified S=0.907 L2",
+        "2797/2800 rho-plain      icv1-fp26-tm2939-d70f30fd W9687f748be89  verified S=0.695 L1",
+        "2798/2800 ic-raw         icv1-fp26-tm2939-d70f30fd W9687f748be89  verified S=32.547 L2",
+        "2799/2800 ic-clear       icv1-fp26-tm2939-d70f30fd W9687f748be89  verified S=32.856 L2",
+        "2800/2800 ic-raw-aa      icv1-fp26-tm2939-d70f30fd W9687f748be89  verified S=32.547 L2",
+        "session ECBS1ha02d58b9932d complete -> research/ic_cofactor_clear_ab_20261103/sessions/h1 (2800 records: {\"verified\": 2800})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_cofactor_clear_ab_20261103/sessions/h1",
+        "--replay-all"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 83.024,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-h1",
+      "index": 8,
+      "outputs": {},
+      "seconds": 83.024,
+      "stderr_sha256": "a939d9decf1b55bb6ca9f9d40754d0a6f1ac3b7d17ea8848c9fc726ed06b9dc7",
+      "stderr_tail": [
+        "audit OK: 2800 records, 2800 verified, 2240 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "84f45a289a52583ee4ba908637b4b8e8c9bc30f7b82f0985a15d46059beb5910",
+      "stdout_tail": [
+        "      \"seq\": 2799,",
+        "      \"record_id\": \"ECR1hc8e0cb27d166\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"replay_selection\": \"all\",",
+        "  \"replay_candidates\": 2240,",
+        "  \"files\": {",
+        "    \"host.json\": \"a1a646bb45ec522971cb05538028bff870d011b0aa3824d39935d6557c16afeb\",",
+        "    \"plan.json\": \"b1795983438232b8364b5e52061a1352989c0d81f5dc1ff38e34a29da9b41696\",",
+        "    \"records.jsonl\": \"79837645f2b75e8b07725f364e24c5a9bcce689a8d704b58951bfb1148d39955\",",
+        "    \"session.json\": \"dcb091e2c7c66699c184812ef8d1397cdd25e4f5eb5c97adb2aa4461cdba337f\",",
+        "    \"spec.json\": \"46f18137ec0dccc118d540c5521d50ce867bfbf2fd4c5e972484d12c70ece59b\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"b38cffb4f64c4ec7289ee4ef19bf60560d2d99684d4f996114eb403560081ec4\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h67c27d1dfb15\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1hd21b654a34b7\",",
+        "  \"audited_unix_ms\": 1793672837662",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 8,
+  "commit": "11173ecd0230a9ceedc4d833736402934fdcb95e",
+  "dirty_after": [
+    "research/ic_cofactor_clear_ab_20261103/PREREG.md",
+    "research/ic_cofactor_clear_ab_20261103/analysis.sh",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.binary-sha256.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.binary-sha256.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.git-head.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.git-head.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.git-status.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.git-status.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.receipt.json",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.run-v2.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.run-v2.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.tracked-tree-clean.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.tracked-tree-clean.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.yaml",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.binary-sha256.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.binary-sha256.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.git-head.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.git-head.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.git-status.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.git-status.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.run-h1.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.run-h1.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.run-v2.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.run-v2.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.tracked-tree-clean.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.tracked-tree-clean.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.verify-h1.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.verify-h1.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.verify-v2.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.verify-v2.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.yaml",
+    "research/ic_cofactor_clear_ab_20261103/cards/attempt1-host-busy/CARD-ic-cofactor-clear-ab-20261103-1.receipt.json",
+    "research/ic_cofactor_clear_ab_20261103/cards/attempt1-host-busy/CARD-ic-cofactor-clear-ab-20261103-1.run-v2.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/attempt1-host-busy/CARD-ic-cofactor-clear-ab-20261103-1.run-v2.stdout",
+    "research/ic_cofactor_clear_ab_20261103/protocol-h1-control.json",
+    "research/ic_cofactor_clear_ab_20261103/protocol-v2.json",
+    "research/ic_cofactor_clear_ab_20261103/sessions/h1/host.json",
+    "research/ic_cofactor_clear_ab_20261103/sessions/h1/plan.json",
+    "research/ic_cofactor_clear_ab_20261103/sessions/h1/records.jsonl",
+    "research/ic_cofactor_clear_ab_20261103/sessions/h1/session.json",
+    "research/ic_cofactor_clear_ab_20261103/sessions/h1/spec.json",
+    "research/ic_cofactor_clear_ab_20261103/sessions/v2/host.json",
+    "research/ic_cofactor_clear_ab_20261103/sessions/v2/plan.json",
+    "research/ic_cofactor_clear_ab_20261103/sessions/v2/records.jsonl",
+    "research/ic_cofactor_clear_ab_20261103/sessions/v2/session.json",
+    "research/ic_cofactor_clear_ab_20261103/sessions/v2/spec.json",
+    "research/ic_cofactor_clear_ab_20261103/specs/h1-negative-control.json",
+    "research/ic_cofactor_clear_ab_20261103/specs/v2-treatment.json"
+  ],
+  "dirty_before": [
+    "research/ic_cofactor_clear_ab_20261103/PREREG.md",
+    "research/ic_cofactor_clear_ab_20261103/analysis.sh",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.binary-sha256.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.binary-sha256.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.git-head.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.git-head.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.git-status.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.git-status.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.receipt.json",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.run-v2.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.run-v2.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.tracked-tree-clean.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.tracked-tree-clean.stdout",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-1.yaml",
+    "research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.yaml",
+    "research/ic_cofactor_clear_ab_20261103/cards/attempt1-host-busy/CARD-ic-cofactor-clear-ab-20261103-1.receipt.json",
+    "research/ic_cofactor_clear_ab_20261103/cards/attempt1-host-busy/CARD-ic-cofactor-clear-ab-20261103-1.run-v2.stderr",
+    "research/ic_cofactor_clear_ab_20261103/cards/attempt1-host-busy/CARD-ic-cofactor-clear-ab-20261103-1.run-v2.stdout",
+    "research/ic_cofactor_clear_ab_20261103/protocol-h1-control.json",
+    "research/ic_cofactor_clear_ab_20261103/protocol-v2.json",
+    "research/ic_cofactor_clear_ab_20261103/specs/h1-negative-control.json",
+    "research/ic_cofactor_clear_ab_20261103/specs/v2-treatment.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

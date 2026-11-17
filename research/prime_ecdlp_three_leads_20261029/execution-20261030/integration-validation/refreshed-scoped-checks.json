@@ -1,0 +1,210 @@
+{
+  "schema": "pkm.refreshed-scoped-validation/v1",
+  "recorded_utc": "2026-10-30T10:59:35.306985+00:00",
+  "source_merge": "2acf618dd960011237d6628d32edc1ea5e018785",
+  "metadata_head_at_capture": "92145502d648c9e2b410ba233825208ec10d4b53",
+  "source_objects": {
+    "src": "5ce39be7d8d70c4bf250ef67f0d041940eb741ce",
+    "crates": "58421f9db55a9d525480e8be7189cb604970013d",
+    "tools/factor-base": "f9174d17fb0dd4d628e7873af65024eb6590f544",
+    "tools/volcano-cli": "f7b0683e86a320729dc28eb287158826786dd1ff",
+    "Cargo.toml": "33b564da80e3ced6f4ec8df6feaee862c9fa2333",
+    "Cargo.lock": "1c792ecacbbd8c46e82443a95b35ee9400888080",
+    "examples/pkm_oracle_program.rs": "401b724fd002139db3c184a1abe15c9276e94c43",
+    "examples/pkm_oracle_program": "c8a7700ee497c2a4228ab5d1bd2cbbb1e07c29d2",
+    "examples/pkm_symmetric_complete.rs": "0fb50ab47dab4256dd29f4ac8eb84fb5313168e8",
+    "examples/hecke_target_router.rs": "6cbba7cbe8b673b313c08583d0a9fd00e343bf75",
+    "tools/lean": "7717e915c52bc3e7d05636f8607e468cf64da5fd",
+    "scripts/checkpoint.sh": "6a2a37967047b1a46ed62a4123f4c69f08a55d04",
+    "research/prime_ecdlp_three_leads_20261029/lean": "4be707064b1430fc0e16b00fc1f3b0c3b6a82ade",
+    "tests": "8fa07275361911cb2e21ac3cf0a33f0394b79091",
+    "research/aps_measurement_20261029/spec-controls.json": "c11e5f1515b0080aae37539e8321cc82be573f3c",
+    "research/aps_measurement_20261029/spec-orbit-controls.json": "4f832f6190d8347f42892e304fec986453e59f66"
+  },
+  "all_58_original_non_log_index_pr_blobs_unchanged": true,
+  "records": {
+    "native-tests": {
+      "exit": 0,
+      "expected_exit": 0,
+      "started": "2026-10-30T09:50:37Z",
+      "finished": "2026-10-30T10:14:54Z"
+    },
+    "clippy": {
+      "exit": 0,
+      "expected_exit": 0,
+      "started": "2026-10-30T10:14:57Z",
+      "finished": "2026-10-30T10:17:28Z"
+    },
+    "rustfmt": {
+      "exit": 0,
+      "expected_exit": 0,
+      "started": "2026-10-30T10:17:30Z",
+      "finished": "2026-10-30T10:17:30Z"
+    },
+    "cli-build": {
+      "exit": 0,
+      "expected_exit": 0,
+      "started": "2026-10-30T10:17:32Z",
+      "finished": "2026-10-30T10:17:43Z"
+    },
+    "cli-gate": {
+      "exit": 1,
+      "expected_exit": 1,
+      "started": "2026-10-30T10:17:44Z",
+      "finished": "2026-10-30T10:17:46Z"
+    },
+    "backlog-build": {
+      "exit": 0,
+      "expected_exit": 0,
+      "started": "2026-10-30T10:17:48Z",
+      "finished": "2026-10-30T10:17:57Z"
+    },
+    "backlog-validate": {
+      "exit": 0,
+      "expected_exit": 0,
+      "started": "2026-10-30T10:17:58Z",
+      "finished": "2026-10-30T10:17:58Z"
+    },
+    "library-build": {
+      "exit": 0,
+      "expected_exit": 0,
+      "started": "2026-10-30T10:17:59Z",
+      "finished": "2026-10-30T10:50:14Z"
+    }
+  },
+  "example_tests": {
+    "passed": 20,
+    "failed": 0,
+    "ignored": 0,
+    "suites": {
+      "pkm_oracle_program": 12,
+      "pkm_symmetric_complete": 4,
+      "hecke_target_router": 4
+    },
+    "scope": "development checks; includes all35 finite m4 fixture targets and positive 2sum control in all3 presentations"
+  },
+  "compiled_checkpoint_gate_refusal_message_verified": true,
+  "full_library": {
+    "status": "RUNNING; no full-suite outcome",
+    "declared": 5646,
+    "started": "2026-10-30T10:50:16Z",
+    "execution_cap_seconds": 2400,
+    "supervisor_pid": 16905,
+    "wrapper_pid_at_observation": 21249,
+    "exit": null,
+    "final_counts": null,
+    "raw_log": {
+      "local_path": "/workspace/pr2949-integration-20261030/refresh-954c0bb02/library-test.log",
+      "state": "growing; final bytes/digest not yet recorded",
+      "upload_state": "NOT_UPLOADED",
+      "final_bytes": null,
+      "final_sha256": null
+    }
+  },
+  "binaries": [
+    {
+      "path": "target/release/examples/hecke_target_router-400337dfe79d54df",
+      "bytes": 5157160,
+      "sha256": "fb4a346b5fd6ddd2320d529e7a97d75f51f4ee1cea84c507ba2180d05e991d17"
+    },
+    {
+      "path": "target/release/examples/pkm_oracle_program-9b34922ca9c096c6",
+      "bytes": 6944352,
+      "sha256": "8a9703d7c024da219f6836dc4072204b97aaaca8e4f554a0c20b47213eaf2bf8"
+    },
+    {
+      "path": "target/release/examples/pkm_symmetric_complete-54795fd1798bb6d4",
+      "bytes": 6512072,
+      "sha256": "bb12866b71de01259633483b5d5f4000b40d15f2beb29e5d1752157868a99497"
+    },
+    {
+      "path": "target/release/examples/pkm_oracle_program",
+      "bytes": 6529216,
+      "sha256": "efe4205197a5e06f15aed48e0451fb583ff84b52fd289662e55274ed176e1848"
+    },
+    {
+      "path": "target/release/backlog",
+      "bytes": 5744144,
+      "sha256": "e492375dfb9e5186a1aea12b89949f6624ce34a0b046f51087aa4b5b06172505"
+    },
+    {
+      "path": "target/release/deps/crypto_lib-cd696b7f650051ce",
+      "bytes": 282333088,
+      "sha256": "020595221168d602a333f93832f7a180f8a8f3d04c178c4a15201a7764ed86a1"
+    }
+  ],
+  "captures": {
+    "refresh-native-tests.log": {
+      "captured_bytes": 2258,
+      "captured_sha256": "56935e1d29e76b16760a78a5fcdc4a5cf22e538988ede3ddb810d1067da430d0",
+      "stored_bytes": 2408,
+      "stored_sha256": "5d5604ee8c4b8def332dc0535b6e3773b707b8e9a780cbc40535049533819944",
+      "representation": "exact capture prefix plus footer",
+      "raw_local_path": "/workspace/pr2949-integration-20261030/refresh-954c0bb02/native-tests.log"
+    },
+    "refresh-clippy.log": {
+      "captured_bytes": 110,
+      "captured_sha256": "52c2be98a258e1439f9228785a0fc052e3bd8ee3cc2b2c6d867678625aac7a7f",
+      "stored_bytes": 110,
+      "stored_sha256": "52c2be98a258e1439f9228785a0fc052e3bd8ee3cc2b2c6d867678625aac7a7f",
+      "representation": "exact capture",
+      "raw_local_path": "/workspace/pr2949-integration-20261030/refresh-954c0bb02/clippy.log"
+    },
+    "refresh-rustfmt.log": {
+      "captured_bytes": 0,
+      "captured_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored_bytes": 0,
+      "stored_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "representation": "exact capture",
+      "raw_local_path": "/workspace/pr2949-integration-20261030/refresh-954c0bb02/rustfmt.log"
+    },
+    "refresh-cli-build.log": {
+      "captured_bytes": 110,
+      "captured_sha256": "e8f2c2b9c6b16d94c7f498f35cf6406e03e93cce00548e72c175ee33515eb2b2",
+      "stored_bytes": 110,
+      "stored_sha256": "e8f2c2b9c6b16d94c7f498f35cf6406e03e93cce00548e72c175ee33515eb2b2",
+      "representation": "exact capture",
+      "raw_local_path": "/workspace/pr2949-integration-20261030/refresh-954c0bb02/cli-build.log"
+    },
+    "refresh-cli-gate.log": {
+      "captured_bytes": 251,
+      "captured_sha256": "a89f01f0046ad87792f10745e614b650f3ab2f8c6c8129ef26aede343c438b33",
+      "stored_bytes": 251,
+      "stored_sha256": "a89f01f0046ad87792f10745e614b650f3ab2f8c6c8129ef26aede343c438b33",
+      "representation": "exact capture",
+      "raw_local_path": "/workspace/pr2949-integration-20261030/refresh-954c0bb02/cli-gate.log"
+    },
+    "refresh-backlog-build.log": {
+      "captured_bytes": 109,
+      "captured_sha256": "6d5a6f7658bdd267144f3b3c5c1d9b18edfa685428121d4dceb15c40892ec373",
+      "stored_bytes": 109,
+      "stored_sha256": "6d5a6f7658bdd267144f3b3c5c1d9b18edfa685428121d4dceb15c40892ec373",
+      "representation": "exact capture",
+      "raw_local_path": "/workspace/pr2949-integration-20261030/refresh-954c0bb02/backlog-build.log"
+    },
+    "refresh-backlog-validate.log": {
+      "captured_bytes": 44,
+      "captured_sha256": "00c228dbeecbb17c54e2ba4cba835117d7849e10c05f255aec11e31877b78e2e",
+      "stored_bytes": 44,
+      "stored_sha256": "00c228dbeecbb17c54e2ba4cba835117d7849e10c05f255aec11e31877b78e2e",
+      "representation": "exact capture",
+      "raw_local_path": "/workspace/pr2949-integration-20261030/refresh-954c0bb02/backlog-validate.log"
+    },
+    "refresh-library-build.log": {
+      "captured_bytes": 195,
+      "captured_sha256": "258a729e40b380d6cb77eeab97f2c409036ba47cd4fab704578c767626fb24ac",
+      "stored_bytes": 195,
+      "stored_sha256": "258a729e40b380d6cb77eeab97f2c409036ba47cd4fab704578c767626fb24ac",
+      "representation": "exact capture",
+      "raw_local_path": "/workspace/pr2949-integration-20261030/refresh-954c0bb02/library-build.log"
+    }
+  },
+  "lean": "project/gate objects unchanged from earlier fresh13-declaration/zero-trusted audit and kernel replay; no repeated run claimed",
+  "auto_merge_paused": true,
+  "local_commits_unpushed": true,
+  "required_remote_checks": "not established on integrated head",
+  "scientific_panels_run": 0,
+  "comparison_admissible": false,
+  "goal_complete": false,
+  "historical_receipts_preserved": true
+}

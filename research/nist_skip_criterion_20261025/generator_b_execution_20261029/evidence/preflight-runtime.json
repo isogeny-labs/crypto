@@ -1,0 +1,25 @@
+{
+  "kind": "synthetic-planning-runtime-observations/v1",
+  "input_class": "synthetic-development",
+  "actual_cohort_read": false,
+  "observed_seconds": {
+    "positive": 0.04,
+    "production": 0.17,
+    "verification": 0.458
+  },
+  "resolution_seconds": 0.001,
+  "host_cpu": "model name\t: AMD EPYC 9V74 80-Core Processor",
+  "host_kernel": "Linux 6.18.55",
+  "isolation": "shared local host; no admitted performance comparison",
+  "model": {
+    "formula": "positive + 512*(synthetic production + synthetic verifier)",
+    "safety_multiplier": 512,
+    "estimated_total_seconds": 321.576,
+    "assumptions": "Heuristic planning allowance for much wider field/group arithmetic; cryptographic size classes are not directly timed in this preflight. Not a mathematical upper bound or measured NIST runtime."
+  },
+  "actual_phase_limits_seconds": {
+    "positive": 30,
+    "production": 300,
+    "verification": 300
+  }
+}

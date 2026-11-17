@@ -1,0 +1,325 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-prime-medium-rho-p4-confirm-20261108-1
+experiment_id: prime_medium_rho_p4_confirm_20261108
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+receipt: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.receipt.json
+binds:
+- path: research/prime_medium_rho_p4_confirm_20261108/protocol.json
+  sha256: 37979c36e39b67facfc927c3c1115020720d082471cf91e46f8ff9388a936700
+- path: research/prime_medium_rho_p4_confirm_20261108/PROTOCOL.md
+  sha256: 9cab1777d6a55eaa8737dd506def167788f3ae0c28a272ef5cab34f2b8662873
+- path: research/prime_medium_rho_p4_confirm_20261108/receipts/publication-receipt.json
+  sha256: 5e0d9d350adc4a25aee61a3a410a183abc0dbe15fe3b33e8b034f39fdfd22ed8
+- path: research/prime_medium_rho_p4_confirm_20261108/specs/spec-ids.json
+  sha256: 30854efed4314040e649386aa8d928919b6608a20a7ef07fe0e674ab55535bdc
+- path: research/prime_medium_rho_p4_confirm_20261108/cards/wait_launcher_result.sh
+  sha256: 8f285937790f0f5f87e4bb2d66ab1481cb65d76e1de7b742abf8e9e5b88a05f2
+- path: research/prime_medium_rho_p4_confirm_20261108/cards/check_session_complete.sh
+  sha256: c2dbc75919b34531a1385d2438bc32decb162281051d5399cbd4aa891e5e78b3
+- path: research/prime_medium_rho_p4_confirm_20261108/cards/fetch_session.sh
+  sha256: a6a472659e4f4489aa7205535b2407f12e5d497b495ae01501a9ed56cdd1175a
+- path: research/prime_medium_rho_p4_confirm_20261108/cards/run_recorded.sh
+  sha256: 607ea0e53aa33d04aaee32231963e869a0f729c320668d8f5fcd83cde3ced140
+- path: research/prime_medium_rho_p4_confirm_20261108/cards/record_raw.sh
+  sha256: 3115d8c370fbaf9fa21e100f6caa2b4daef4e1a340079e8ed69d088d03587ba7
+- path: research/prime_medium_rho_p4_confirm_20261108/cards/frozen-ecbench.sha256
+  sha256: a873fd0c167303030a558ad982650f5f70bedcd56c6d8e3714e8bb33ecd95e96
+- path: research/primefield-companion-schur-20261101/tools/experiment_protocol.py
+  sha256: 0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4
+- path: research/primefield-companion-schur-20261101/schemas/experiment-protocol.v1.json
+  sha256: a9b948f2be323f862b98301eb7a5aa147ecc29db35041737f0aa3dfd03ad2443
+- path: scripts/checkpoint.sh
+  sha256: 6fc6b9311461111ecf55cdb70ae4dd52a408d0b0bf6b44fbe1177788756c12e8
+- path: tools/benchrec.py
+  sha256: a3c03754409cd88bce7faadc49a70da4cc0e239f45b7f2abdf08241cb3bd7bc0
+- path: tools/task_card.py
+  sha256: 9425ae71f4c855923d337fe8304dee0d630b6d7c81e9a7e81099ef4129caa812
+- path: taskq/deploy/eks-karpenter/remote/validate-request
+  sha256: dc6b59d32e937db5c049704102fe0d5ca0db7af9ac2bd8de67270bcafc230426
+- path: taskq/deploy/eks-karpenter/remote/launch-remote
+  sha256: de27df3830fb54589e5d030e416d2e6887f7d590bc03db2e50d7456449fc7362
+- path: taskq/deploy/eks-karpenter/remote/run-request
+  sha256: c4f75c585ca6c689bdbe3fa4840459df5347696db8901a3e23296239d21e6819
+- path: taskq/deploy/eks-karpenter/remote/current-run-request-buildspec.yml
+  sha256: 35504896fd8e9eae15690bda0ddd11c2a453ec1c463b8cbeb3c1224f286f335e
+- path: taskq/deploy/eks-karpenter/remote/verify-build
+  sha256: 6a020d533df4f18645726377b53d17fddb9efbe693c4b8a42a1d2e24169f7556
+- path: taskq/deploy/eks-karpenter/remote/check-ready
+  sha256: 746440f29360983290eb9c22d435ccf8ca1d49ba66f84af8db2b7326a04f44ea
+- path: research/prime_medium_rho_p4_confirm_20261108/requests/PC.request.json
+  sha256: 37cf8d43bf7da90bcb0a8e1d381fd70a43530795a8cf9ed39ab643115b0294a1
+- path: research/prime_medium_rho_p4_confirm_20261108/specs/PC.json
+  sha256: 1ac9d9a185a229524de15eec7951f2361a49b1b1f1626205c7c492b253c32b97
+- path: /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  sha256: a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9
+must_not_exist:
+- research/prime_medium_rho_p4_confirm_20261108/receipts/PC
+- research/prime_medium_rho_p4_confirm_20261108/sessions/PC
+- research/prime_medium_rho_p4_confirm_20261108/sessions/PC.pod
+- research/prime_medium_rho_p4_confirm_20261108/sessions/PC.audit.json
+commands:
+- id: checkpoint-gate
+  argv:
+  - scripts/checkpoint.sh
+  - gate
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.checkpoint-gate.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.checkpoint-gate.stderr
+- id: head-ancestor
+  argv:
+  - git
+  - merge-base
+  - --is-ancestor
+  - 75cf6c230728b6e9cefe30f175402bad1af7ccb4
+  - HEAD
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.head-ancestor.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.head-ancestor.stderr
+- id: head-paths-unchanged
+  argv:
+  - git
+  - diff
+  - --quiet
+  - 75cf6c230728b6e9cefe30f175402bad1af7ccb4
+  - HEAD
+  - --
+  - research/prime_medium_rho_p4_confirm_20261108
+  - :(exclude)research/prime_medium_rho_p4_confirm_20261108/cards
+  - :(exclude)research/prime_medium_rho_p4_confirm_20261108/receipts
+  - :(exclude)research/prime_medium_rho_p4_confirm_20261108/sessions
+  - taskq/
+  - tools/task_card.py
+  - tools/benchrec.py
+  timeout_seconds: 120
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.head-paths-unchanged.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.head-paths-unchanged.stderr
+- id: protocol-check
+  argv:
+  - python3
+  - research/primefield-companion-schur-20261101/tools/experiment_protocol.py
+  - validate
+  - research/prime_medium_rho_p4_confirm_20261108/protocol.json
+  timeout_seconds: 300
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.protocol-check.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.protocol-check.stderr
+- id: protocol-frozen-hash
+  argv:
+  - jq
+  - -e
+  - --arg
+  - h
+  - 26fd5c574d585f57d39cf298dbfb48b3569d952c1693526e253853bfca02ae0c
+  - .freeze.status == "frozen" and .freeze.protocol_sha256 == $h
+  - research/prime_medium_rho_p4_confirm_20261108/protocol.json
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.protocol-frozen-hash.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.protocol-frozen-hash.stderr
+- id: frozen-ecbench-sha
+  argv:
+  - sha256sum
+  - -c
+  - research/prime_medium_rho_p4_confirm_20261108/cards/frozen-ecbench.sha256
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.frozen-ecbench-sha.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.frozen-ecbench-sha.stderr
+- id: publication-receipt-identity
+  argv:
+  - jq
+  - -e
+  - --arg
+  - s
+  - 1514deb4793dc4fe4ae14f55876dbe6e8d358c0d
+  - .schema == "isolab.git-publication/v1" and .source_revision == $s
+  - research/prime_medium_rho_p4_confirm_20261108/receipts/publication-receipt.json
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.publication-receipt-identity.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.publication-receipt-identity.stderr
+- id: build-identity
+  argv:
+  - jq
+  - -e
+  - -n
+  - --arg
+  - i
+  - 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5
+  - --arg
+  - s
+  - dbd587a01aefba0634acc459ea30cfb9bbf49a09
+  - --arg
+  - b
+  - a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9
+  - '[inputs | .job.build == {image_uri:$i, source_revision:$s, ecbench_sha256:$b} and .provenance.source_revision == $s] | length == 1 and all'
+  - research/prime_medium_rho_p4_confirm_20261108/requests/PC.request.json
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.build-identity.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.build-identity.stderr
+- id: validate-pc
+  argv:
+  - taskq/deploy/eks-karpenter/remote/validate-request
+  - research/prime_medium_rho_p4_confirm_20261108/requests/PC.request.json
+  timeout_seconds: 120
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.validate-pc.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.validate-pc.stderr
+- id: request-job-pc
+  argv:
+  - jq
+  - -e
+  - --arg
+  - job
+  - prime-medium-rho-p4-20261108-pc
+  - .job.job_name == $job and .job.seconds == 3600 and .job.memory == "4Gi" and .job.instance_type == "c8a.2xlarge"
+  - research/prime_medium_rho_p4_confirm_20261108/requests/PC.request.json
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.request-job-pc.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.request-job-pc.stderr
+- id: launch-pc
+  argv:
+  - research/prime_medium_rho_p4_confirm_20261108/cards/run_recorded.sh
+  - taskq/deploy/eks-karpenter/remote/launch-remote
+  - research/prime_medium_rho_p4_confirm_20261108/requests/PC.request.json
+  timeout_seconds: 1800
+  success_exit_codes:
+  - 0
+  - 26
+  env:
+    AWS_REGION: us-east-2
+    AWS_DEFAULT_REGION: us-east-2
+    ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+    ISOLAB_CODEBUILD_PROJECT: isolab-experiment-launcher
+    ISOLAB_CLIENT_OUTPUT: research/prime_medium_rho_p4_confirm_20261108/receipts/PC
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.launch-pc.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.launch-pc.stderr
+  outputs:
+  - research/prime_medium_rho_p4_confirm_20261108/receipts/PC/result.json
+- id: admit-pc
+  argv:
+  - research/prime_medium_rho_p4_confirm_20261108/cards/check_session_complete.sh
+  - prime-medium-rho-p4-20261108-pc
+  - research/prime_medium_rho_p4_confirm_20261108/receipts/PC
+  - '2016'
+  timeout_seconds: 600
+  success_exit_codes:
+  - 0
+  env: &id001
+    AWS_REGION: us-east-2
+    AWS_DEFAULT_REGION: us-east-2
+    ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.admit-pc.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.admit-pc.stderr
+  outputs:
+  - research/prime_medium_rho_p4_confirm_20261108/receipts/PC/admission.json
+- id: record-pc
+  argv:
+  - jq
+  - -c
+  - '{job_name, job_uid, pod_uid, state, exit_code, launcher, results_uri, receipt_uri, request_sha256}'
+  - research/prime_medium_rho_p4_confirm_20261108/receipts/PC/result.json
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.record-pc.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.record-pc.stderr
+- id: fetch-pc
+  argv:
+  - research/prime_medium_rho_p4_confirm_20261108/cards/fetch_session.sh
+  - PC
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  env: *id001
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.fetch-pc.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.fetch-pc.stderr
+  outputs:
+  - research/prime_medium_rho_p4_confirm_20261108/sessions/PC/records.jsonl
+- id: session-identity-pc
+  argv:
+  - jq
+  - -e
+  - --arg
+  - b
+  - a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9
+  - --arg
+  - s
+  - ECS1hb04ab3761ef6
+  - --argjson
+  - n
+  - '2016'
+  - .binary_sha256 == $b and .spec_id == $s and .status == "complete" and .executions_planned == $n and .records_written == $n
+  - research/prime_medium_rho_p4_confirm_20261108/sessions/PC/session.json
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.session-identity-pc.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.session-identity-pc.stderr
+- id: verify-pc
+  argv:
+  - /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench
+  - verify
+  - --dir
+  - research/prime_medium_rho_p4_confirm_20261108/sessions/PC
+  - --replay-all
+  - --out
+  - research/prime_medium_rho_p4_confirm_20261108/sessions/PC.audit.json
+  timeout_seconds: 1800
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.verify-pc.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.verify-pc.stderr
+  outputs:
+  - research/prime_medium_rho_p4_confirm_20261108/sessions/PC.audit.json
+- id: audit-pass-pc
+  argv:
+  - jq
+  - -e
+  - --argjson
+  - n
+  - '2016'
+  - .ok == true and .session_status == "complete" and (.problems | length) == 0 and .planned_executions == $n and .records == $n
+  - research/prime_medium_rho_p4_confirm_20261108/sessions/PC.audit.json
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.audit-pass-pc.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.audit-pass-pc.stderr
+- id: add-raw-pc
+  argv:
+  - research/prime_medium_rho_p4_confirm_20261108/cards/record_raw.sh
+  - PC
+  timeout_seconds: 300
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.add-raw-pc.stdout
+  stderr: research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-1.add-raw-pc.stderr
+bus_address: executor-mechanical-prime-medium-rho-p4
+background: true
+write_scope:
+- research/prime_medium_rho_p4_confirm_20261108/
+- benchmarks/records/20261108T0512Z-prime-medium-rho-p4-confirm.json
+- .resume/
+stop_when:
+- Any command exits with a code outside its success_exit_codes or reaches its timeout, including an admit step, a session-identity step or an audit-pass step; return the tool output verbatim, start no later job, and resubmit no job.
+- The tool exits 2 before running any command; return `refused` with the IMPEDIMENT line.
+notes: 'Frozen EKS L2 ecbench jobs of the positive control job PC (bsgs.textbook / bsgs.negation, 33-41 bit). Image 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5, ecbench a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9, source dbd587a01aefba0634acc459ea30cfb9bbf49a09. Each launch step is the only step that submits that job and it appears once; it runs launch-remote under the study''s benchmark record through run_recorded.sh and accepts exit 0 or 26 (26 is a launcher build that did not succeed, for example a pod that ended with exit 42 or 43). The admit step after it fails unless the job is a complete session with a passing pod audit and a pod exit of 0, 42 or 43 (PROTOCOL.md section 10: levels gate wall time, never counts). A stop after a submission is reconciled by the director against the saved receipts of that job, never by a new submission; an interrupted launch is finished with the matching
+  resume card whose id ends in -R- and the job name (R-PC, R-M1 to R-M9). Run the card detached and strictly alone: no other card of this study may run at the same time, because benchrec rewrites the record file after each wrapped command. Expected duration about 20 minutes. The tool writes its receipt when the last command ends.'

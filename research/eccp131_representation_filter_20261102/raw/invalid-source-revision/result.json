@@ -1,0 +1,402 @@
+{
+  "arms": [
+    {
+      "base_design": "small_x",
+      "generation_ms": 227.649467,
+      "selected": {
+        "aa_identical": true,
+        "combiner_name": "add",
+        "config": {
+          "combiner": 1,
+          "offset": 120,
+          "source": 1,
+          "width": 6
+        },
+        "configurations_evaluated": 3450,
+        "enumeration_class": "post-add coordinate: requires all Theta(B^2) EC pair sums",
+        "pre_add": false,
+        "source_name": "pair_sum_y",
+        "test": {
+          "log2_enrichment": 0.1391627476716252,
+          "null_ci95": [
+            0.01204231141990564,
+            0.017221487791652695
+          ],
+          "null_hits": 118,
+          "null_rate": 0.014404296875,
+          "ratio_lower95": 0.7769952719822756,
+          "relation_ci95": [
+            0.013381014590614625,
+            0.01881109895213056
+          ],
+          "relation_hits": 130,
+          "relation_rate": 0.015869140625,
+          "samples_each": 8192
+        },
+        "training": {
+          "log2_enrichment": 0.707446507246151,
+          "null_ci95": [
+            0.006973116704285116,
+            0.012988986621592162
+          ],
+          "null_hits": 39,
+          "null_rate": 0.009521484375,
+          "ratio_lower95": 0.9435351167008302,
+          "relation_ci95": [
+            0.012255565007829483,
+            0.01990213185555554
+          ],
+          "relation_hits": 64,
+          "relation_rate": 0.015625,
+          "samples_each": 4096
+        }
+      },
+      "size": 64,
+      "sweep_ms": 87.0852,
+      "test_seed": 131002,
+      "train_seed": 131001
+    },
+    {
+      "base_design": "random_base",
+      "generation_ms": 224.77533699999998,
+      "selected": {
+        "aa_identical": true,
+        "combiner_name": "sub_either",
+        "config": {
+          "combiner": 2,
+          "offset": 72,
+          "source": 3,
+          "width": 7
+        },
+        "configurations_evaluated": 3450,
+        "enumeration_class": "endpoint-residue buckets: O(B + residue-pair classes + output) before EC additions",
+        "pre_add": true,
+        "source_name": "endpoint_xor",
+        "test": {
+          "log2_enrichment": -0.09425032579605097,
+          "null_ci95": [
+            0.012934084336833792,
+            0.01828192442884911
+          ],
+          "null_hits": 126,
+          "null_rate": 0.015380859375,
+          "ratio_lower95": 0.6587004265755917,
+          "relation_ci95": [
+            0.01204231141990564,
+            0.017221487791652695
+          ],
+          "relation_hits": 118,
+          "relation_rate": 0.014404296875,
+          "samples_each": 8192
+        },
+        "training": {
+          "log2_enrichment": 0.9233787183970875,
+          "null_ci95": [
+            0.007803362608721715,
+            0.014110035683156804
+          ],
+          "null_hits": 43,
+          "null_rate": 0.010498046875,
+          "ratio_lower95": 1.145162101227722,
+          "relation_ci95": [
+            0.01615827811132198,
+            0.024780246099068624
+          ],
+          "relation_hits": 82,
+          "relation_rate": 0.02001953125,
+          "samples_each": 4096
+        }
+      },
+      "size": 64,
+      "sweep_ms": 88.032129,
+      "test_seed": 131005,
+      "train_seed": 131004
+    },
+    {
+      "base_design": "small_x",
+      "generation_ms": 232.780389,
+      "selected": {
+        "aa_identical": true,
+        "combiner_name": "target_equal",
+        "config": {
+          "combiner": 4,
+          "offset": 0,
+          "source": 3,
+          "width": 7
+        },
+        "configurations_evaluated": 3450,
+        "enumeration_class": "endpoint-residue buckets: O(B + residue-pair classes + output) before EC additions",
+        "pre_add": true,
+        "source_name": "endpoint_xor",
+        "test": {
+          "log2_enrichment": -0.22153698399096444,
+          "null_ci95": [
+            0.014501140535805621,
+            0.020131234949595272
+          ],
+          "null_hits": 140,
+          "null_rate": 0.01708984375,
+          "ratio_lower95": 0.6092514076054716,
+          "relation_ci95": [
+            0.012264983229877385,
+            0.01748686837021209
+          ],
+          "relation_hits": 120,
+          "relation_rate": 0.0146484375,
+          "samples_each": 8192
+        },
+        "training": {
+          "log2_enrichment": 0.6798216870625974,
+          "null_ci95": [
+            0.009483101104023409,
+            0.016332887119857586
+          ],
+          "null_hits": 51,
+          "null_rate": 0.012451171875,
+          "ratio_lower95": 0.9893093604789985,
+          "relation_ci95": [
+            0.01615827811132198,
+            0.024780246099068624
+          ],
+          "relation_hits": 82,
+          "relation_rate": 0.02001953125,
+          "samples_each": 4096
+        }
+      },
+      "size": 128,
+      "sweep_ms": 86.482977,
+      "test_seed": 131002,
+      "train_seed": 131001
+    },
+    {
+      "base_design": "random_base",
+      "generation_ms": 223.56342600000002,
+      "selected": {
+        "aa_identical": true,
+        "combiner_name": "xor",
+        "config": {
+          "combiner": 0,
+          "offset": 0,
+          "source": 3,
+          "width": 6
+        },
+        "configurations_evaluated": 3450,
+        "enumeration_class": "endpoint-residue buckets: O(B + residue-pair classes + output) before EC additions",
+        "pre_add": true,
+        "source_name": "endpoint_xor",
+        "test": {
+          "log2_enrichment": 0.12806503878829475,
+          "null_ci95": [
+            0.01204231141990564,
+            0.017221487791652695
+          ],
+          "null_hits": 118,
+          "null_rate": 0.014404296875,
+          "ratio_lower95": 0.7705036698312248,
+          "relation_ci95": [
+            0.013269219543422037,
+            0.018678867805057578
+          ],
+          "relation_hits": 129,
+          "relation_rate": 0.0157470703125,
+          "samples_each": 8192
+        },
+        "training": {
+          "log2_enrichment": 0.813345359899987,
+          "null_ci95": [
+            0.009483101104023409,
+            0.016332887119857586
+          ],
+          "null_hits": 51,
+          "null_rate": 0.012451171875,
+          "ratio_lower95": 1.0966216449300135,
+          "relation_ci95": [
+            0.017910997539834456,
+            0.02693011660255863
+          ],
+          "relation_hits": 90,
+          "relation_rate": 0.02197265625,
+          "samples_each": 4096
+        }
+      },
+      "size": 128,
+      "sweep_ms": 89.459073,
+      "test_seed": 131005,
+      "train_seed": 131004
+    },
+    {
+      "base_design": "small_x",
+      "generation_ms": 223.199648,
+      "selected": {
+        "aa_identical": true,
+        "combiner_name": "add",
+        "config": {
+          "combiner": 1,
+          "offset": 56,
+          "source": 0,
+          "width": 6
+        },
+        "configurations_evaluated": 3450,
+        "enumeration_class": "post-add coordinate: requires all Theta(B^2) EC pair sums",
+        "pre_add": false,
+        "source_name": "pair_sum_x",
+        "test": {
+          "log2_enrichment": 0.16469648664050116,
+          "null_ci95": [
+            0.010821118067309756,
+            0.015758393007327294
+          ],
+          "null_hits": 107,
+          "null_rate": 0.0130615234375,
+          "ratio_lower95": 0.7783143385353092,
+          "relation_ci95": [
+            0.012264983229877385,
+            0.01748686837021209
+          ],
+          "relation_hits": 120,
+          "relation_rate": 0.0146484375,
+          "samples_each": 8192
+        },
+        "training": {
+          "log2_enrichment": 0.7434350894957639,
+          "null_ci95": [
+            0.008012003642312424,
+            0.014389218391066402
+          ],
+          "null_hits": 44,
+          "null_rate": 0.0107421875,
+          "ratio_lower95": 1.001863239049793,
+          "relation_ci95": [
+            0.014416028944668636,
+            0.02261990533371949
+          ],
+          "relation_hits": 74,
+          "relation_rate": 0.01806640625,
+          "samples_each": 4096
+        }
+      },
+      "size": 256,
+      "sweep_ms": 91.845207,
+      "test_seed": 131002,
+      "train_seed": 131001
+    },
+    {
+      "base_design": "random_base",
+      "generation_ms": 222.18768699999998,
+      "selected": {
+        "aa_identical": true,
+        "combiner_name": "xor",
+        "config": {
+          "combiner": 0,
+          "offset": 88,
+          "source": 3,
+          "width": 6
+        },
+        "configurations_evaluated": 3450,
+        "enumeration_class": "endpoint-residue buckets: O(B + residue-pair classes + output) before EC additions",
+        "pre_add": true,
+        "source_name": "endpoint_xor",
+        "test": {
+          "log2_enrichment": -0.010454357637166366,
+          "null_ci95": [
+            0.014276809132963331,
+            0.019867513963906423
+          ],
+          "null_hits": 138,
+          "null_rate": 0.016845703125,
+          "ratio_lower95": 0.7129578182916508,
+          "relation_ci95": [
+            0.01416469941058563,
+            0.01973559749201855
+          ],
+          "relation_hits": 137,
+          "relation_rate": 0.0167236328125,
+          "samples_each": 8192
+        },
+        "training": {
+          "log2_enrichment": 0.6835263352047457,
+          "null_ci95": [
+            0.009061008054248611,
+            0.015779332686631765
+          ],
+          "null_hits": 49,
+          "null_rate": 0.011962890625,
+          "ratio_lower95": 0.9825273598423211,
+          "relation_ci95": [
+            0.015503626084669948,
+            0.023971426901219724
+          ],
+          "relation_hits": 79,
+          "relation_rate": 0.019287109375,
+          "samples_each": 4096
+        }
+      },
+      "size": 256,
+      "sweep_ms": 88.290047,
+      "test_seed": 131005,
+      "train_seed": 131004
+    }
+  ],
+  "curve": {
+    "cofactor": 1,
+    "digest_sha256": "9d386a6d39b0f9aa9fe36cb9a0610364ac4f2e180fb9cad5987684aaae65c2db",
+    "field_bits": 131,
+    "name": "ECCp-131",
+    "subgroup_bits": 131
+  },
+  "elapsed_seconds": 2.831242149,
+  "limitations": [
+    "The frozen family contains simple bit-slice coordinate predicates only; a null does not rule out other algebraic filters.",
+    "Local wall times are development diagnostics and are not admitted performance measurements.",
+    "The published-target MITM probe is bounded to B=128 and does not infer a zero logarithm from a miss.",
+    "F4 and F5 are unavailable at exact 131-bit width in the current dispatched backend and are not relabelled as measured."
+  ],
+  "mitm": {
+    "base_size": 128,
+    "distinct_pair_points": 32768,
+    "pair_entries": 32768,
+    "planted_found": true,
+    "planted_query_ms": 0.019569,
+    "planted_replayed": true,
+    "planted_terms": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        -1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        3,
+        1
+      ]
+    ],
+    "published_found": false,
+    "published_query_ms": 197.91762,
+    "setup_ms": 210.829956,
+    "signed_points": 256
+  },
+  "protocol_file_sha256": "ae6b1782c2612e7d12e7688f69c747d4511a19e46707b775f89a1d1255c63a77",
+  "protocol_sha256": "20949a2eac68e6c8cc5e49cbe3926d370baac2814f7666e9d9343fd443b24dca",
+  "samples": {
+    "heldout_relation_and_null_each": 8192,
+    "training_relation_and_null_each": 4096
+  },
+  "schema": "eccp131.representation-filter/v1",
+  "solver_control": {
+    "all_determined": true,
+    "columns": 16,
+    "elapsed_ms": 0.208736,
+    "rank": 16,
+    "recovered_exactly": true,
+    "rows": 16
+  },
+  "source_revision": "68cc86da7c69b4ca7fc113bb5a2493c0902f3aa7",
+  "status": "complete",
+  "verdict": "no_qualifying_filter_in_frozen_family"
+}

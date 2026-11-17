@@ -1,0 +1,22 @@
+ Documenting hashed-ecdl-tensor v0.1.0 (/workspace/crypto/crates/hashed-ecdl-tensor)
+    Checking hashed-ecdl-tensor v0.1.0 (/workspace/crypto/crates/hashed-ecdl-tensor)
+error: unresolved link to `coefficient`
+   --> src/binary.rs:504:60
+    |
+504 | /// Orbit representative with the exact coefficient rep = [coefficient]point.
+    |                                                            ^^^^^^^^^^^ no item named `coefficient` in scope
+    |
+    = help: to escape `[` and `]` characters, add '\' before them like `\[` or `\]`
+    = note: `-D rustdoc::broken-intra-doc-links` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(rustdoc::broken_intra_doc_links)]`
+
+error: unresolved link to `2p,4p`
+   --> src/reduction.rs:242:36
+    |
+242 |     /// Optional fixed prime s in [2p,4p], as permitted by the source. Supplied
+    |                                    ^^^^^ no item named `2p,4p` in scope
+    |
+    = help: to escape `[` and `]` characters, add '\' before them like `\[` or `\]`
+
+error: could not document `hashed-ecdl-tensor`
+warning: build failed, waiting for other jobs to finish...

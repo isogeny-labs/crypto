@@ -1,0 +1,305 @@
+{
+  "schema": "crypto.autoresearch.mechanical-task-card.v1",
+  "card_id": "CARD-semaev-qubo-annealing-20261110-F6-RUN-01",
+  "experiment_id": "semaev_qubo_annealing_20261110",
+  "author_role": "experiment-director",
+  "executor_role": "executor-mechanical",
+  "kind": "frozen_command",
+  "commit": "8c3b356ff45ec268ea7d0a21f28050200aa4c515",
+  "receipt": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.receipt.json",
+  "binds": [
+    {
+      "path": "/home/user/crypto/research/semaev_qubo_annealing_20261110/PROTOCOL.md",
+      "sha256": "7c427397febd48f48ba9941152997628ab6f0ec308fcb0dc7d550c12222387eb"
+    },
+    {
+      "path": "/home/user/crypto/research/semaev_qubo_annealing_20261110/FREEZE.sha256",
+      "sha256": "6284fe55cdf859eb057ac2095d6853a10cb492d36a394e6afdbc5a6cb338ff0e"
+    },
+    {
+      "path": "/home/user/crypto/research/semaev_qubo_annealing_20261110/tool/Cargo.toml",
+      "sha256": "69fa9a7ee61e4e8814462bb57765f56295802a455d1795a631936c702fc8f61f"
+    },
+    {
+      "path": "/home/user/crypto/research/semaev_qubo_annealing_20261110/tool/Cargo.lock",
+      "sha256": "a1e70b445783b45e612a8ab1c862018b98769babefefb8c293684f7ec1c94aea"
+    },
+    {
+      "path": "/home/user/crypto/research/semaev_qubo_annealing_20261110/tool/src/main.rs",
+      "sha256": "88d7dd340c8b48164696db4d0a670537e1e574c3d32938f3d0c8fbd540dad61f"
+    },
+    {
+      "path": "/home/user/crypto/research/semaev_qubo_annealing_20261110/tool/target/release/semaev_qubo_annealing",
+      "sha256": "c70c8310f6752cd64f326c6feb8aa625f5b9a556e6b0ea93a535a250c187ba9f"
+    }
+  ],
+  "must_not_exist": [
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.receipt.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run",
+    "research/semaev_qubo_annealing_20261110/results/run.json",
+    "research/semaev_qubo_annealing_20261110/results/run.stdout.txt",
+    "research/semaev_qubo_annealing_20261110/results/run.stderr.txt",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.verify-freeze.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.git-head.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.rustc-version.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cargo-version.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.nproc.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.uname.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cpu-model.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.build.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.test.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.binary-sha256.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.result-sha256.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.result-table.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.verify-freeze.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.git-head.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.rustc-version.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cargo-version.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.nproc.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.uname.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cpu-model.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.build.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.test.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.binary-sha256.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.result-sha256.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.result-table.stderr"
+  ],
+  "commands": [
+    {
+      "id": "verify-freeze",
+      "argv": [
+        "sha256sum",
+        "-c",
+        "FREEZE.sha256"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "cwd": "research/semaev_qubo_annealing_20261110",
+      "stdout": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.verify-freeze.stdout",
+      "stderr": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.verify-freeze.stderr",
+      "outputs": [
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.verify-freeze.stdout"
+      ]
+    },
+    {
+      "id": "git-head",
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.git-head.stdout",
+      "stderr": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.git-head.stderr",
+      "outputs": [
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.git-head.stdout"
+      ]
+    },
+    {
+      "id": "rustc-version",
+      "argv": [
+        "rustc",
+        "-Vv"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.rustc-version.stdout",
+      "stderr": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.rustc-version.stderr",
+      "outputs": [
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.rustc-version.stdout"
+      ]
+    },
+    {
+      "id": "cargo-version",
+      "argv": [
+        "cargo",
+        "-V"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cargo-version.stdout",
+      "stderr": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cargo-version.stderr",
+      "outputs": [
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cargo-version.stdout"
+      ]
+    },
+    {
+      "id": "nproc",
+      "argv": [
+        "nproc"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.nproc.stdout",
+      "stderr": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.nproc.stderr",
+      "outputs": [
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.nproc.stdout"
+      ]
+    },
+    {
+      "id": "uname",
+      "argv": [
+        "uname",
+        "-a"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.uname.stdout",
+      "stderr": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.uname.stderr",
+      "outputs": [
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.uname.stdout"
+      ]
+    },
+    {
+      "id": "cpu-model",
+      "argv": [
+        "lscpu"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cpu-model.stdout",
+      "stderr": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cpu-model.stderr",
+      "outputs": [
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cpu-model.stdout"
+      ]
+    },
+    {
+      "id": "build",
+      "argv": [
+        "cargo",
+        "build",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/semaev_qubo_annealing_20261110/tool/Cargo.toml"
+      ],
+      "timeout_seconds": 3600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.build.stdout",
+      "stderr": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.build.stderr",
+      "outputs": [
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.build.stdout"
+      ]
+    },
+    {
+      "id": "test",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/semaev_qubo_annealing_20261110/tool/Cargo.toml"
+      ],
+      "timeout_seconds": 3600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.test.stdout",
+      "stderr": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.test.stderr",
+      "outputs": [
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.test.stdout"
+      ]
+    },
+    {
+      "id": "binary-sha256",
+      "argv": [
+        "sha256sum",
+        "/home/user/crypto/research/semaev_qubo_annealing_20261110/tool/target/release/semaev_qubo_annealing"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.binary-sha256.stdout",
+      "stderr": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.binary-sha256.stderr",
+      "outputs": [
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.binary-sha256.stdout"
+      ]
+    },
+    {
+      "id": "run-full",
+      "argv": [
+        "/home/user/crypto/research/semaev_qubo_annealing_20261110/tool/target/release/semaev_qubo_annealing",
+        "--protocol",
+        "/home/user/crypto/research/semaev_qubo_annealing_20261110/PROTOCOL.md",
+        "--n",
+        "12,16,20,24,28",
+        "--instances",
+        "20",
+        "--boot",
+        "1000",
+        "--out",
+        "research/semaev_qubo_annealing_20261110/results/run.json"
+      ],
+      "timeout_seconds": 28800,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/semaev_qubo_annealing_20261110/results/run.stdout.txt",
+      "stderr": "research/semaev_qubo_annealing_20261110/results/run.stderr.txt",
+      "outputs": [
+        "research/semaev_qubo_annealing_20261110/results/run.json",
+        "research/semaev_qubo_annealing_20261110/results/run.stdout.txt"
+      ]
+    },
+    {
+      "id": "result-sha256",
+      "argv": [
+        "sha256sum",
+        "research/semaev_qubo_annealing_20261110/results/run.json"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.result-sha256.stdout",
+      "stderr": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.result-sha256.stderr",
+      "outputs": [
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.result-sha256.stdout"
+      ]
+    },
+    {
+      "id": "result-table",
+      "argv": [
+        "cat",
+        "research/semaev_qubo_annealing_20261110/results/run.stdout.txt"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.result-table.stdout",
+      "stderr": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.result-table.stderr",
+      "outputs": [
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.result-table.stdout"
+      ]
+    }
+  ],
+  "bus_address": "executor-mechanical-semaev-qubo-annealing",
+  "background": true,
+  "write_scope": [
+    "research/semaev_qubo_annealing_20261110/"
+  ],
+  "stop_when": [
+    "Any command exits with a status other than 0 or reaches its timeout; report the printed text verbatim, retry nothing and edit nothing.",
+    "The verify-freeze command prints any line not ending in OK, or the test command prints no line containing test result: ok. 8 passed; 0 failed; report the printed text verbatim.",
+    "The run-full command exits with a nonzero status; report the printed text verbatim, the tool exits nonzero on a solution-verification or fatal setup failure."
+  ],
+  "notes": "Frozen full run of study semaev_qubo_annealing_20261110 (PROTOCOL.md sections 2, 5, 6; FREEZE.sha256). Counts only (cost evaluations to first c = 0); no timing is a result. Execution route: local host. The isolab-eks route is unavailable from this session (no aws CLI) and the GitHub route takes only ecbench specs, so this is local evidence; the section 9a confirmatory EKS run is open. The host is shared with other studies. The tool has no --threads flag (it uses std::thread::available_parallelism, nproc printed 4 at compile time), so the requested --threads 2 is not in the card; see specification_errors. --boot 1000 is the tool's own flag and default. The run-full command has an 8-hour limit, so it runs detached: run the card, then run wait until the receipt status is no longer detached. The cpu-model step runs lscpu in place of reading /proc/cpuinfo, because the card runner takes no shell pipe. The binary bound in binds is the build already on disk before this card; the binary-sha256 step records the digest of the binary this card builds. The result-table step prints results/run.stdout.txt."
+}

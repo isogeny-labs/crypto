@@ -1,0 +1,35 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp28-tm4378-d002c9d0 | 25.00 | c1-x10-j8-g | 24/24 | 1.733 | 1.780 | 2.201 | — |
+| icv1-fp28-tm4378-d002c9d0 | 25.00 | inc-c2 | 24/24 | 1.740 | 1.779 | 2.127 | — |
+| icv1-fp28-tm4378-d002c9d0 | 25.00 | rho-neg | 24/24 | 0.891 | 0.973 | 1.716 | — |
+| icv1-fp28-tm4250-44fba591 | 25.00 | c1-x10-j8-g | 24/24 | 1.730 | 1.776 | 2.194 | — |
+| icv1-fp28-tm4250-44fba591 | 25.00 | inc-c2 | 24/24 | 1.844 | 1.888 | 2.286 | — |
+| icv1-fp28-tm4250-44fba591 | 25.00 | rho-neg | 24/24 | 1.141 | 1.249 | 2.218 | — |
+| icv1-fp28-tm17914-b06fd2c7 | 25.00 | c1-x10-j8-g | 24/24 | 1.684 | 1.720 | 2.046 | — |
+| icv1-fp28-tm17914-b06fd2c7 | 25.00 | inc-c2 | 24/24 | 1.694 | 1.724 | 1.997 | — |
+| icv1-fp28-tm17914-b06fd2c7 | 25.00 | rho-neg | 24/24 | 0.946 | 1.034 | 1.827 | — |
+| icv1-fp28-tm21298-bd3b771b | 25.00 | c1-x10-j8-g | 24/24 | 1.673 | 1.714 | 2.089 | — |
+| icv1-fp28-tm21298-bd3b771b | 25.00 | inc-c2 | 24/24 | 2.014 | 2.043 | 2.302 | — |
+| icv1-fp28-tm21298-bd3b771b | 25.00 | rho-neg | 24/24 | 0.862 | 0.942 | 1.659 | — |
+| icv1-fp28-tm29890-9a501a3e | 25.00 | c1-x10-j8-g | 24/24 | 1.737 | 1.789 | 2.265 | — |
+| icv1-fp28-tm29890-9a501a3e | 25.00 | inc-c2 | 24/24 | 1.869 | 1.905 | 2.233 | — |
+| icv1-fp28-tm29890-9a501a3e | 25.00 | rho-neg | 24/24 | 1.157 | 1.266 | 2.249 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp28-tm4378-d002c9d0 | c1-x10-j8-g vs inc-c2 | unresolved inside the band |
+| icv1-fp28-tm4378-d002c9d0 | c1-x10-j8-g vs rho-neg | rho-neg < c1-x10-j8-g |
+| icv1-fp28-tm4378-d002c9d0 | inc-c2 vs rho-neg | rho-neg < inc-c2 |
+| icv1-fp28-tm4250-44fba591 | c1-x10-j8-g vs inc-c2 | c1-x10-j8-g < inc-c2 |
+| icv1-fp28-tm4250-44fba591 | c1-x10-j8-g vs rho-neg | unresolved inside the band |
+| icv1-fp28-tm4250-44fba591 | inc-c2 vs rho-neg | rho-neg < inc-c2 |
+| icv1-fp28-tm17914-b06fd2c7 | c1-x10-j8-g vs inc-c2 | unresolved inside the band |
+| icv1-fp28-tm17914-b06fd2c7 | c1-x10-j8-g vs rho-neg | rho-neg < c1-x10-j8-g |
+| icv1-fp28-tm17914-b06fd2c7 | inc-c2 vs rho-neg | rho-neg < inc-c2 |
+| icv1-fp28-tm21298-bd3b771b | c1-x10-j8-g vs inc-c2 | c1-x10-j8-g < inc-c2 |
+| icv1-fp28-tm21298-bd3b771b | c1-x10-j8-g vs rho-neg | rho-neg < c1-x10-j8-g |
+| icv1-fp28-tm21298-bd3b771b | inc-c2 vs rho-neg | rho-neg < inc-c2 |
+| icv1-fp28-tm29890-9a501a3e | c1-x10-j8-g vs inc-c2 | unresolved inside the band |
+| icv1-fp28-tm29890-9a501a3e | c1-x10-j8-g vs rho-neg | rho-neg < c1-x10-j8-g |
+| icv1-fp28-tm29890-9a501a3e | inc-c2 vs rho-neg | unresolved inside the band |

@@ -1,0 +1,104 @@
+[Container] 2026/10/22 05:42:39.983789 Running on CodeBuild On-demand
+
+[Container] 2026/10/22 05:42:39.983811 Waiting for agent ping
+
+[Container] 2026/10/22 05:42:41.364326 Waiting for DOWNLOAD_SOURCE
+
+[Container] 2026/10/22 05:42:42.319149 Phase is DOWNLOAD_SOURCE
+
+[Container] 2026/10/22 05:42:42.319927 CODEBUILD_SRC_DIR=/codebuild/output/src1111077232/src
+
+[Container] 2026/10/22 05:42:42.320415 YAML location is /codebuild/output/src1111077232/src/resume/buildspec.yml
+
+[Container] 2026/10/22 05:42:42.320950 Selecting shell bash as specified in buildspec.
+
+[Container] 2026/10/22 05:42:42.322072 Setting HTTP client timeout to higher timeout for S3 source
+
+[Container] 2026/10/22 05:42:42.322209 Processing environment variables
+
+[Container] 2026/10/22 05:42:42.388031 No runtime version selected in buildspec.
+
+[Container] 2026/10/22 05:42:42.400780 Moving to directory /codebuild/output/src1111077232/src
+
+[Container] 2026/10/22 05:42:42.400860 Cache is not defined in the buildspec
+
+[Container] 2026/10/22 05:42:42.434528 Skip cache due to: no paths specified to be cached
+
+[Container] 2026/10/22 05:42:42.434813 Registering with agent
+
+[Container] 2026/10/22 05:42:42.464463 Phases found in YAML: 1
+
+[Container] 2026/10/22 05:42:42.464477  BUILD: 4 commands
+
+[Container] 2026/10/22 05:42:42.464732 Phase complete: DOWNLOAD_SOURCE State: SUCCEEDED
+
+[Container] 2026/10/22 05:42:42.464763 Phase context status code:  Message: 
+
+[Container] 2026/10/22 05:42:42.602732 Entering phase INSTALL
+
+[Container] 2026/10/22 05:42:42.637800 Phase complete: INSTALL State: SUCCEEDED
+
+[Container] 2026/10/22 05:42:42.637820 Phase context status code:  Message: 
+
+[Container] 2026/10/22 05:42:42.669447 Entering phase PRE_BUILD
+
+[Container] 2026/10/22 05:42:42.671862 Phase complete: PRE_BUILD State: SUCCEEDED
+
+[Container] 2026/10/22 05:42:42.671873 Phase context status code:  Message: 
+
+[Container] 2026/10/22 05:42:42.744572 Entering phase BUILD
+
+[Container] 2026/10/22 05:42:42.779512 Running command export PATH="$CODEBUILD_SRC_DIR/bin:$PATH"
+
+
+
+[Container] 2026/10/22 05:42:42.789027 Running command export ISOLAB_DEPLOY_DIR="$CODEBUILD_SRC_DIR/deploy" ISOLAB_KUBE_CONTEXT=isolab
+
+
+
+[Container] 2026/10/22 05:42:42.797122 Running command chmod +x bin/* deploy/submit-job deploy/remote/verify-build resume/run-controller
+
+
+
+[Container] 2026/10/22 05:42:42.805485 Running command resume/run-controller
+
+request.json: OK
+
+isolab-eks-recovery: fresh benchmark epoch failed; measurement is not retried
+
+
+
+[Container] 2026/10/22 05:54:34.981446 Command did not exit successfully resume/run-controller exit status 1
+
+[Container] 2026/10/22 05:54:34.985996 Phase complete: BUILD State: FAILED
+
+[Container] 2026/10/22 05:54:34.986009 Phase context status code: COMMAND_EXECUTION_ERROR Message: Error while executing command: resume/run-controller. Reason: exit status 1
+
+[Container] 2026/10/22 05:54:35.084707 Entering phase POST_BUILD
+
+[Container] 2026/10/22 05:54:35.087045 Phase complete: POST_BUILD State: SUCCEEDED
+
+[Container] 2026/10/22 05:54:35.087055 Phase context status code:  Message: 
+
+[Container] 2026/10/22 05:54:35.168068 Set report auto-discover timeout to 5 seconds
+
+[Container] 2026/10/22 05:54:35.168102 Expanding base directory path:  .
+
+[Container] 2026/10/22 05:54:35.169483 Assembling file list
+
+[Container] 2026/10/22 05:54:35.169493 Expanding .
+
+[Container] 2026/10/22 05:54:35.170831 Expanding file paths for base directory .
+
+[Container] 2026/10/22 05:54:35.170839 Assembling file list
+
+[Container] 2026/10/22 05:54:35.170841 Expanding **/*
+
+[Container] 2026/10/22 05:54:35.172261 No matching auto-discover report paths found
+
+[Container] 2026/10/22 05:54:35.172276 Report auto-discover file discovery took 0.004208 seconds
+
+[Container] 2026/10/22 05:54:35.172284 Phase complete: UPLOAD_ARTIFACTS State: SUCCEEDED
+
+[Container] 2026/10/22 05:54:35.172288 Phase context status code:  Message: 
+

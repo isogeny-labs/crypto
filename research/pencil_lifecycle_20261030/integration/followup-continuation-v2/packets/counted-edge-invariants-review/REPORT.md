@@ -1,0 +1,11 @@
+# Independent counted-edge review
+
+Fresh independent checks passed for the owner, aggregate and fixed-control Lean modules. All thirteen named axiom readbacks passed, eight fixed controls compiled, three malformed inventories were rejected, and the false owner-change theorem failed as expected. Source-fidelity review accepted the composition at its stated scope against published producer commit cfee380501.
+
+The reviewer checked the ordered two finds, derivation of returned roots, and branchwise owner-fiber and root-cardinality preservation. The same-root path leaves owner and sizes unchanged; the distinct-root path uses the native size-selected orientation. The semantic dispatcher projection and exact counter theorem retain the same branch arguments. Output owner and cardinality properties are derived rather than supplied as assumptions.
+
+Incoming relation truth, canonical prime words/signs, initial forest and component certificates remain premises. Exact integer counters require explicit UInt64 no-overflow bounds. The reverse two-node fixture tests orientation only, not valid cardinality; the universal reverse theorem has valid-input hypotheses. The proof models successful values; native arrays, allocation, interrupted mutation and complete collector iteration remain outside this review.
+
+Six Lean calls were used within the prospective eight-call bound. The first reviewer wrapper incorrectly extracted a quoted dependency path and failed before checking the theorem. That invocation and its 1,368-file inventory are retained. The corrected wrapper checked unchanged source, with five calls and 30,005 dependency/toolchain files unchanged before and after. Imported binaries were reused; no independent binary/kernel rechecker or immutable dependency-tree copy was claimed.
+
+The reviewer had disclosed preliminary producer-source familiarity and read the producer report. They did not author the producer proofs or use sibling verdicts; this is an independent source/replay review, not blind rederivation. This additive report preserves the producer packet and copies the exact review records. Both evidence directories, including generated oleans and the failed wrapper outputs, are archived without another proof invocation. No scientific execution, timing measurement or cost-ratio update occurred.

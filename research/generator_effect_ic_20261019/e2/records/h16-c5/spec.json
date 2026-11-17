@@ -1,0 +1,72 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "E2 cofactor ladder (research/generator_effect_ic_20261019/E2.md), h = 16, curve c5",
+ "description": "Experiment E2 of research/generator_effect_ic_20261019 (PROTOCOL frozen in E2.md). One 24-bit a = -3 curve with #E = 16*r, r prime, B = ceil(#E^(1/3)) = 218, 768 planted_shared targets, 1 round. Arms: rho-neg, ic-abscissa, ic-knownlog-random (seed 20261019) and its A/A ic-knownlog-random-aa (seed 20261020), IC arms mitm:negation_folded=1,m=2. No security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "a": 10338506,
+    "b": 193268,
+    "group_order": 10339792,
+    "gx": 8101358,
+    "gy": 2813902,
+    "kind": "prime_explicit",
+    "p": 10338509,
+    "r": 646237
+   }
+  ],
+  "targets_per_curve": 768,
+  "target_seed": 20261019,
+  "target_kind": "planted_shared"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "ic-abscissa",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=218",
+     "oracle": "mitm:negation_folded=1,m=2"
+    }
+   }
+  },
+  {
+   "name": "ic-knownlog-random",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "known-log:size=218,scalars=random,seed=20261019",
+     "oracle": "mitm:negation_folded=1,m=2"
+    }
+   }
+  },
+  {
+   "name": "ic-knownlog-random-aa",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "known-log:size=218,scalars=random,seed=20261020",
+     "oracle": "mitm:negation_folded=1,m=2"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261019,
+  "isolation_required": "L0",
+  "timeout_seconds": 600
+ }
+}

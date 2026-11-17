@@ -1,0 +1,41 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "../../research/ecbench_rho_chained_vs_v5v6_20261111/validation/replay-certificate.json",
+  "sha256": "2ddb157e51a130449d433be7149b48b5a5b06a0a2dec737ac62082c08e09d1b3"
+ },
+ "validator_report": {
+  "path": "../../research/ecbench_rho_chained_vs_v5v6_20261111/validation/validator-report.json",
+  "sha256": "9e049a9463f03d31406489575e5532540f9c3fdb7f1ea1729f956f9aee227b7e"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "rho row: rho.negation_v5 against rho.negation_chained (A = 2), same prime curves, targets and seeds, interleaved; rho.negation anchors both",
+  "unit": "ecbench.gae (counted group-addition equivalents), S = GAE / sqrt(r)",
+  "binary_or_process": "ecbench binary sha256 55289451c55542bef35161ecb7a4ab5a99b3527529e0efee51df7ee56d1f2bdb, session ECBS1h56930a35f003",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 0.9771282624847729,
+    "rho": 3.821543119031105
+   },
+   "0.1": {
+    "ic": 1.0770775242949457,
+    "rho": 4.196627741225189
+   },
+   "1": {
+    "ic": 1.9766208805865035,
+    "rho": 7.572389340971938
+   }
+  },
+  "order_holds_across_band": true,
+  "arms": {
+   "ic": "v5",
+   "rho": "chained"
+  }
+ },
+ "note": "Local L0 container session; GAE is deterministic and replayed. 'ic' is the candidate arm, 'rho' the reference arm named in arms. Band values: run-weighted means of ecbench band mean_s."
+}

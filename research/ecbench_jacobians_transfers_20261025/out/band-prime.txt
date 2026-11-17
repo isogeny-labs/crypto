@@ -1,0 +1,20 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp16-t55-01daca8b | 15.98 | iso3-rho-neg | 12/12 | 1.897 | 3.340 | 16.325 | — |
+| icv1-fp16-t55-01daca8b | 15.98 | qcover-rho-plain | 12/12 | 31064.820 | 31064.820 | 31064.820 | — |
+| icv1-fp16-t55-01daca8b | 15.98 | rho-neg | 12/12 | 2.031 | 2.174 | 3.457 | — |
+| icv1-fp16-t55-01daca8b | 15.98 | rho-neg-aa | 12/12 | 2.031 | 2.174 | 3.457 | — |
+| icv1-fp16-t55-01daca8b | 15.98 | rho-plain | 12/12 | 2.023 | 2.023 | 2.023 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp16-t55-01daca8b | iso3-rho-neg vs qcover-rho-plain | iso3-rho-neg < qcover-rho-plain |
+| icv1-fp16-t55-01daca8b | iso3-rho-neg vs rho-neg | unresolved inside the band |
+| icv1-fp16-t55-01daca8b | iso3-rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp16-t55-01daca8b | iso3-rho-neg vs rho-plain | unresolved inside the band |
+| icv1-fp16-t55-01daca8b | qcover-rho-plain vs rho-neg | rho-neg < qcover-rho-plain |
+| icv1-fp16-t55-01daca8b | qcover-rho-plain vs rho-neg-aa | rho-neg-aa < qcover-rho-plain |
+| icv1-fp16-t55-01daca8b | qcover-rho-plain vs rho-plain | rho-plain < qcover-rho-plain |
+| icv1-fp16-t55-01daca8b | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp16-t55-01daca8b | rho-neg vs rho-plain | rho-plain < rho-neg |
+| icv1-fp16-t55-01daca8b | rho-neg-aa vs rho-plain | rho-plain < rho-neg-aa |

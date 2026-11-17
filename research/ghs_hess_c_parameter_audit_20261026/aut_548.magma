@@ -1,0 +1,18 @@
+K<w> := GF(512);
+k<a> := GF(8);
+Embed(k,K);
+fromint := func<n | &+[(Integers()!((n div 2^i) mod 2))*w^i : i in [0..8]]>;
+E := EllipticCurve([K|1,0,0,0,fromint(155)]);
+C,h := WeilDescent(E,k,fromint(392) : HyperellipticImage := false);
+Q,hyp := CanonicalImage(C,CanonicalMap(C));
+assert not hyp and IsNonsingular(Q) and Genus(Q) eq 3;
+B,beta := AutomorphismGroupOfPlaneQuartic(Q : explicit:=true);
+print "base_group_order", #B;
+print "base_group_name", GroupName(B);
+A,phi := AutomorphismGroupOfPlaneQuartic(Q : geometric:=true, explicit:=true);
+print "geometric_group_order", #A;
+print "geometric_group_name", GroupName(A);
+for i in [1..Ngens(A)] do
+    print "geometric_generator_order", Order(A.i);
+    print "geometric_generator_matrix", phi(A.i);
+end for;

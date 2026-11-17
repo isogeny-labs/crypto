@@ -1,0 +1,9 @@
+greedy combo1 = base + geo-576x1: 5.819649999999999 B/s vs 5.58825  2392 MHz, 271.03 W, 39
+  keep
+greedy combo2 = combo1 + pair-clmul: 5.7966 B/s vs 5.819649999999999  2362 MHz, 283.82 W, 37
+  drop
+greedy combo3 = combo1 + no-square-table: 5.78165 B/s vs 5.819649999999999  2347 MHz, 282.40 W, 37
+  drop
+greedy combo4 = combo1 + phase-popc: 5.6964500000000005 B/s vs 5.819649999999999  2362 MHz, 295.71 W, 38
+  drop
+greedy result: combo1 (THREADS=576 MINBLOCKS=1) at 5.819649999999999 B/s

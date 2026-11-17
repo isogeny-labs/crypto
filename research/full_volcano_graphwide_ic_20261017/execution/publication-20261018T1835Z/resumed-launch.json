@@ -1,0 +1,74 @@
+{
+  "schema": "volcano-preserved-deadline-resume/v1",
+  "created_utc": "2026-10-18T19:00:02.987333+00:00",
+  "baseline_vertices": 6137,
+  "queue_vertices": 24823,
+  "argv": [
+    "nohup",
+    "/workspace/volcano_ic_repaired_survey_20261017/volcano-ic-driver",
+    "run",
+    "/workspace/volcano_ic_repaired_survey_20261017",
+    "24823",
+    "177220",
+    "6442450944"
+  ],
+  "original_deadline_ms": "1792527222570",
+  "original_deadline_utc": "2026-10-20T20:13:42.570000+00:00",
+  "remaining_seconds": 177220,
+  "max_spool_bytes": 6442450944,
+  "free_bytes_before": 9676521472,
+  "spool_logical_bytes_before": 930904025,
+  "frozen_sha256": {
+    "ecbench": "35d89073f4d666b094c213a1d31b0c819b63600123e067c111af3c947d7609a9",
+    "volcano-ic-driver": "b8b489c7225c64ed492ffce39286c995f5ca820960956cf706c0d3110f5bdd2d",
+    "queue.jsonl": "45e277bede6017c30a49405096afefab3d34a18553ecd6b1a79238f2b9559728"
+  },
+  "before_status": {
+    "campaign": "/workspace/volcano_ic_repaired_survey_20261017",
+    "coverage": [
+      {
+        "graph": "mixed",
+        "state": "audited",
+        "vertices": 2056
+      },
+      {
+        "graph": "mixed",
+        "state": "queued",
+        "vertices": 8014
+      },
+      {
+        "graph": "three",
+        "state": "audited",
+        "vertices": 2038
+      },
+      {
+        "graph": "three",
+        "state": "queued",
+        "vertices": 4523
+      },
+      {
+        "graph": "two",
+        "state": "audited",
+        "vertices": 2043
+      },
+      {
+        "graph": "two",
+        "state": "queued",
+        "vertices": 6149
+      }
+    ]
+  },
+  "previous_clean_stop": {
+    "elapsed_seconds": 4960,
+    "finished_ms": "1792348189279",
+    "pid": 3298,
+    "reason": "stop_requested",
+    "spool_bytes": 934974400,
+    "vertices_this_invocation": 604
+  },
+  "authoring_head": "b17ea20953bfdfb61850c22e0061e4999145b402",
+  "scope": "Same frozen bounded survey and child budgets; separate runtime epoch, all clocks unqualified; original72h deadline is not reset. No host-survival guarantee.",
+  "pid": 50943,
+  "launch_utc": "2026-10-18T19:00:02.991751+00:00",
+  "log_path": "/workspace/volcano_ic_repaired_survey_20261017/worker-resume-20261018T1835Z.log"
+}

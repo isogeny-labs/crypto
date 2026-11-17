@@ -1,0 +1,132 @@
+\chapter*{Introduction}\addcontentsline{toc}{chapter}{Introduction}\label{ch:intro}
+
+For a subgroup $\langle G\rangle$ of prime order $r$ on an elliptic curve
+$E/\FF_q$, Pollard rho~\cite{pollard1978,vanoorschot1999} computes discrete
+logarithms in about $\sqrt{\pi r/(2A)}$ group operations, where $A$ is the
+number of efficiently computable automorphisms~\cite{wiener1998,gallant2000}.
+No algorithm is known to beat it on curves of cryptographic shape.
+
+Index calculus breaks finite-field discrete logarithms in subexponential
+time. It reached elliptic curves through Semaev's summation
+polynomials~\cite{semaev2004} and the extension-field analyses of
+Gaudry~\cite{gaudry2009} and Diem~\cite{diem2011}. It is the method that
+should exploit the most structure. The question is \emph{where it crosses
+rho}: on which curves, at which sizes, under which accounting.
+
+This treatise records what one research programme learned about that
+question between July and October 2026. The programme spanned three
+repositories (\texttt{crypto}, \texttt{crypto-autoresearcher},
+\texttt{cryptanalysis}), several thousand commits and several hundred
+preregistered studies. Two companion documents organise the same work
+differently:
+\begin{itemize}
+\item a programme record~\cite{icprogram2026}, chronological and
+  exhaustive, with study catalogues;
+\item an improvement ledger~\cite{icledger2026}, organised as a ratchet of
+  incumbents.
+\end{itemize}
+This document organises it as a treatise:
+\begin{itemize}
+\item the theory that constrains index calculus on elliptic curves;
+\item the algorithms engineered against those constraints;
+\item the measured frontier against a fairly priced rho;
+\item what remains open.
+\end{itemize}
+It runs no new experiment. It re-verified one certificate
+(\S\ref{sec:fd-binary}), adds no improvement of its own, and cites the
+committed artefact behind every number.
+
+\section*{The argument in brief}
+
+\paragraph{1. Where the cost lives (Part~\ref{part:foundations}).} An index
+calculus pays for factor-base set-up, relation collection, linear algebra
+and the target's descent. Relation collection costs
+(trials per relation) $\times$ (cost of one decomposition). Chapter~\ref{ch:model}
+writes this out and maps every lever the programme pulled to the term it
+moves.
+
+\paragraph{2. What is fixed for every curve (Chapter~\ref{ch:cover}).} The
+Galois group of the summation cover is $(\ZZ/2)^{m-2}$ for every curve,
+field and characteristic. Its fibres over $\FF_q$ split by an exact law,
+and they split completely on the factor-base locus. The mean decomposition
+yield at fixed base size is a double count. Three consequences follow:
+\begin{itemize}
+\item no curve has anomalous monodromy to exploit;
+\item no fibre census can find an anomalous relation rate;
+\item no factor-base geometry can raise mean yield.
+\end{itemize}
+The design space that remains is the cost of the oracle, the algebraic
+difficulty of the decomposition system, the linear algebra, and where the
+problem lives.
+
+\paragraph{3. How hard is the decomposition system (Chapter~\ref{ch:falldegree})?}
+Every subexponential claim for prime-degree binary curves assumes that the
+solving degree stays near the first fall degree. In three presentations we
+prove that the first fall degree is a constant of the presentation, and
+show that the last fall degree, which equals the solving degree for
+unsatisfiable systems, is not bounded by it:
+\begin{itemize}
+\item it is proved to differ for an explicit-membership chain ($(4,5)$
+  exactly at $B=3$);
+\item it is certified to differ, by independently checked closure
+  certificates, for binary Weil descent ($\ge5$ against 2 at $n=33$--$45$);
+\item it is measured to differ for prime-field Kummer towers (6 against 4).
+\end{itemize}
+A proof that the last fall degree grows without bound remains the open
+problem, as Huang, Kosters and Yeo~\cite{hky2015} and Kousidis and
+Wiemers~\cite{kousidis2019} left it.
+
+\paragraph{4. What engineering bought (Part~\ref{part:algorithms}).}
+Root-finding oracles made the decomposition step two to five orders of
+magnitude cheaper where they apply. Gröbner engines improved one to two
+orders in counted work. Factor bases closed under maps of known logarithm
+cut linear algebra by constant factors. On the cold one-target frontier
+none of this changed the conclusion: the stages these changes leave alone
+(relation yield per probe, table set-up) now dominate.
+
+\paragraph{5. Where index calculus wins (Chapter~\ref{ch:extension} and
+Chapter~\ref{sec:transfer}).} Only in weak extension-field families does
+the measured cost cross or approach a fairly priced rho:
+\begin{itemize}
+\item $E_0/\FF_{q^3}$ through a genus-3 GHS cover, by double-large-prime
+  hyperelliptic index calculus or by Diem's plane-quartic index calculus;
+\item the Joux--Vitse cover of $E(\FF_{p^6})$;
+\item possibly $k=4$ over $\FF_{(2^m)^4}$.
+\end{itemize}
+These are known theoretical results. The contribution here is matched,
+priced, verified measurement. None of these families is deployed.
+
+\paragraph{6. What the measurements say (Part~\ref{part:frontier}).} At a
+matched reference, rho is cheaper on every prime and prime-degree binary
+curve measured: $4.7$--$18\times$ on Koblitz curves of 37--47 bits, and
+$10.5$--$102\times$ on prime curves of 20--40 bits, with the gap widening as
+$r^{1/6}$. Every apparent online win disappeared against Bernstein--Lange
+rho with equal advice~\cite{bl2012}. Matching the reference, pricing native
+work and replaying records each moved recorded gaps upward. Chapter~\ref{ch:audit}
+lists every such correction.
+
+\section*{Conventions}
+
+\begin{itemize}
+\item \emph{Unit.} Costs are group-addition equivalents per $\sqrt r$
+  ($S$) unless a family uses its own counted unit, such as $\FF_q$
+  multiplications.
+\item \emph{Ratios.} ``$X\times$'' is baseline over candidate when it
+  describes an improvement, and IC over rho when it describes a distance.
+  Each sentence says which.
+\item \emph{Intervals.} Intervals are 95\%, as the source recorded them.
+\item \emph{Change classes.} Every change is an \cls{advance} (an exponent
+  or crossover moves under complete accounting), \cls{engineering} (a
+  constant moves), \cls{relabelling} or \cls{accounting}. Against rho, the
+  programme produced no \cls{advance} on any prime-order curve of
+  cryptographic shape.
+\item \emph{Paths.} Artefact paths are relative to the \texttt{crypto}
+  repository, unless prefixed \texttt{crypto-autoresearcher:} or
+  \texttt{cryptanalysis:}.
+\end{itemize}
+
+\paragraph{What this treatise does not claim.} No speed-up on a deployed
+curve, no key recovery, no asymptotic sub-rho algorithm for prime fields,
+and no statement about the security of ECC2K-130, P-256 or secp256k1. The
+programme's GPU Pollard-rho work on ECC2K-130 is published separately (IACR
+ePrint 2026/2469) and is not repeated here.

@@ -1,0 +1,15 @@
+# Prime-field word coefficient update
+
+T-1149, 2026-10-31. Producer formal/source-binding packet; independent source-fidelity review pending.
+
+The checked update decodes to o+c*choose(k,j)*a^j*b^(k-j)/s and remains canonical. Hypotheses: prime modulus 1<p<2^31; canonical input words o,c,a,b,s,iw;0<=j<=k<=5; nonzero s; and the directly checkable word certificate (s*iw)%p=1. The theorem derives iw's inverse decoding from that certificate using the existing bounded multiplication result. It certifies a supplied inverse word, not its generator.
+
+Supporting results: the source-style binary exponentiation model unrolls symbolically for every exponent 0..5 and decodes to the expected power; three right shifts drain these exponents. Reducing the bounded chooseWord result modulo p preserves its ZMod value and yields a canonical word. Nested multiplication follows the source term's parenthesization; addition uses the existing no-overflow theorem. The prior coefficient-loop packet supplies the connection from such contributions to polynomial composition.
+
+Nine main declarations and seventeen fixed controls receive named axiom readback. At p=17, a=2, b=3, c=4, scale=2, inverse=9, k=2, j=1, the word term is 7, agreeing with 24 mod17; updating prior slot 10 yields0. Controls cover reduced choose values, zero exponent/base, (-1)^5, invalid indices, wrong/zero/noncanonical inverse certificates, and an excluded overflowing multiplication. The noncanonical inverse26 passes the product test for scale 2 modulo 17 but fails the full canonical witness. Natural multiplication and UInt64 multiplication differ for2^63 times 2 modulo 5; the input is outside the theorem domain.
+
+The source mapping is odd-characteristic n=1 arithmetic without diagnostic tables. Source Field::inv rejects zero and calls Field::bi, whose modpow uses u128 products. This packet verifies a supplied inverse through a word product certificate; the arbitrary-exponent inversion generator, literal vector execution/compiler equivalence and geometric class transport remain separate bindings. Field/loop source hashes and exact excerpts are retained.
+
+Main attempt2 failed because an existing nonzero-decoding lemma needed its explicit import; later attempts passed. The first control compile required explicit unfolding of the witness predicate for decidability; corrected controls passed. No missing proof is filled by an axiom. Strict native exit and unchanged source/dependency hash checks apply to each attempt. Compiled dependencies remain part of the Lean trust boundary; independent binary rechecking is not claimed.
+
+Primary references: existing UInt64Residue, CrossScaling and WordAdd11 proof sources; official Mathlib ZMod.Basic natCast_mod documentation (https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/ZMod/Basic.html). No novelty claim. No scientific campaign, timing, curve enumeration or cost ratio. Frozen cohort and campaign limits unchanged. Diagram depicts correspondence dependencies.

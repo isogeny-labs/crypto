@@ -1,0 +1,191 @@
+{
+  "schema": "research.bounded-software-graph-integration/v1",
+  "exit_code": 0,
+  "models": 21,
+  "arms": {
+    "eager": {
+      "states": 63,
+      "graph_status_counts": {
+        "recovery_failed": 2,
+        "nonsplit": 26,
+        "inserted": 35
+      },
+      "cycles": 0,
+      "terminal_returns": 0,
+      "signed_recovery_successes": 61
+    },
+    "candidate": {
+      "states": 63,
+      "graph_status_counts": {
+        "degree_gate_skip": 2,
+        "nonsplit": 26,
+        "inserted": 35
+      },
+      "cycles": 0,
+      "terminal_returns": 0,
+      "signed_recovery_successes": 63
+    }
+  },
+  "controls": [
+    {
+      "cycles": 1,
+      "graph_operations": 8,
+      "name": "positive_cycle",
+      "negative_cycles": 0,
+      "ring": {
+        "add": 39,
+        "inv": 1,
+        "mul": 1
+      },
+      "rows": [
+        {
+          "answer": null,
+          "dense_answer": null,
+          "equation": [
+            1,
+            1,
+            2,
+            -1,
+            91,
+            0
+          ]
+        },
+        {
+          "answer": null,
+          "dense_answer": null,
+          "equation": [
+            2,
+            1,
+            3,
+            -1,
+            91,
+            0
+          ]
+        },
+        {
+          "answer": 7,
+          "dense_answer": 7,
+          "equation": [
+            1,
+            1,
+            3,
+            -1,
+            74,
+            1
+          ]
+        }
+      ],
+      "scope": "synthetic signed-equation control",
+      "stop_prefix": 3,
+      "zero_coefficient": 0
+    },
+    {
+      "cycles": 1,
+      "graph_operations": 4,
+      "name": "negative_anchor",
+      "negative_cycles": 1,
+      "ring": {
+        "add": 27,
+        "inv": 2,
+        "mul": 3
+      },
+      "rows": [
+        {
+          "answer": null,
+          "dense_answer": null,
+          "equation": [
+            1,
+            1,
+            1,
+            1,
+            20,
+            0
+          ]
+        },
+        {
+          "answer": 7,
+          "dense_answer": 7,
+          "equation": [
+            1,
+            1,
+            0,
+            1,
+            3,
+            1
+          ]
+        }
+      ],
+      "scope": "synthetic signed-equation control",
+      "stop_prefix": 2,
+      "zero_coefficient": 0
+    },
+    {
+      "cycles": 2,
+      "graph_operations": 11,
+      "name": "zero_then_positive",
+      "negative_cycles": 0,
+      "ring": {
+        "add": 53,
+        "inv": 1,
+        "mul": 1
+      },
+      "rows": [
+        {
+          "answer": null,
+          "dense_answer": null,
+          "equation": [
+            1,
+            1,
+            2,
+            -1,
+            91,
+            0
+          ]
+        },
+        {
+          "answer": null,
+          "dense_answer": null,
+          "equation": [
+            1,
+            1,
+            2,
+            -1,
+            91,
+            0
+          ]
+        },
+        {
+          "answer": null,
+          "dense_answer": null,
+          "equation": [
+            2,
+            1,
+            3,
+            -1,
+            91,
+            0
+          ]
+        },
+        {
+          "answer": 7,
+          "dense_answer": 7,
+          "equation": [
+            1,
+            1,
+            3,
+            -1,
+            74,
+            1
+          ]
+        }
+      ],
+      "scope": "synthetic signed-equation control",
+      "stop_prefix": 4,
+      "zero_coefficient": 1
+    }
+  ],
+  "scientific_execution": false,
+  "timing_ratio": null,
+  "independent_review": "pending",
+  "matching_emitted_equations": true
+}

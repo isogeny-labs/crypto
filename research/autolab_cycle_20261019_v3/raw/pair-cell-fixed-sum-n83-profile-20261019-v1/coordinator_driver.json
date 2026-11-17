@@ -1,0 +1,55 @@
+{
+  "anchor_receipt_sha256": "8ce904d6ae6af46cb9f1542796ac5bb9619debe0ad2e71aa5f98a56de62aebac",
+  "change": "journal memory retention only",
+  "checkpoint_driver_sha256": "6096efbdcc2e0038f5406280013b33e1b5e0bc164eef7ee267a95dc9bfcc51f6",
+  "journal_bytes": 12385636039,
+  "journal_records": 670,
+  "journal_sha256": "89552248c8ba4626608096b04c3b84052742c343c41301a15194d1db51ca1fbd",
+  "last_record_sha256": "ef576f90d18f98fcb41806f99ccce6de04c6b21aa8aa7c1548511839c2fde67b",
+  "original_runner_sha256": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+  "original_runner_unmodified": true,
+  "schema": "rootfinding-checkpoint-driver/v1",
+  "scientific_identity": {
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.pair_cell_obstruction_20261019_v1.launch",
+      "pair-cell-fixed-sum-n83-profile-20261019-v1",
+      "fixed"
+    ],
+    "cpu": 0,
+    "files_sha256": {
+      "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+      "lab/runner_checkpoint_20261018.py": "6096efbdcc2e0038f5406280013b33e1b5e0bc164eef7ee267a95dc9bfcc51f6",
+      "lab/runner_checkpoint_anchor_20261018.json": "bd3ac09c86deac9947b6cd672b7589184544ea7a54f5201f7e6fea02baaa238d",
+      "lab/runner_stream_20261017.py": "440f59ee94ec09b56115f1e6bb34881369bd600cbec91cc2ea4ead6c3768cb1d",
+      "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+      "research/pair_cell_obstruction_20261019_v1/PROOF.md": "4f9dfbf9396db83219ed0441a480b49be10efb7c2a46a7313e689c0adbadc284",
+      "research/pair_cell_obstruction_20261019_v1/field.hpp": "f3d7c4f62ce7bf9eca49ce1b2783bb1bb29b0617c392db13e68c6e3f46324394",
+      "research/pair_cell_obstruction_20261019_v1/launch.py": "31f360cec843848e29c77daa8182a04b397e9642778c1b7876439a4d7b943f6a",
+      "research/pair_cell_obstruction_20261019_v1/native": "9badb4a379cafd579ea45320ac3ffacbeed7e9849d2433633bf79ca3b2ad51d4",
+      "research/pair_cell_obstruction_20261019_v1/native.cpp": "f57d688e86d47bdc156baeb73ef3c183d10a89d58e52d1f1a572c59bd6293b15"
+    },
+    "hypothesis": "Conditioning p=x+y enables at least one positive-dimensional whole-cell emptiness certificate with exact recovery of every declared pair fiber, unlike the refuted unconditioned relaxation.",
+    "input_paths": [],
+    "memory_limit_mb": 4096,
+    "process_runner_sha256": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+    "runner_sha256": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+    "source_paths": [
+      "lab/runner.py",
+      "lab/runner_checkpoint_20261018.py",
+      "lab/runner_checkpoint_anchor_20261018.json",
+      "lab/runner_stream_20261017.py",
+      "performance/GATE.md",
+      "research/pair_cell_obstruction_20261019_v1/native.cpp",
+      "research/pair_cell_obstruction_20261019_v1/field.hpp",
+      "research/pair_cell_obstruction_20261019_v1/native",
+      "research/pair_cell_obstruction_20261019_v1/launch.py",
+      "research/pair_cell_obstruction_20261019_v1/PROOF.md"
+    ],
+    "timeout_seconds": 90
+  },
+  "streaming_driver_sha256": "440f59ee94ec09b56115f1e6bb34881369bd600cbec91cc2ea4ead6c3768cb1d",
+  "verification": "raw full-prefix rehash anchored to prior complete canonical validation; terminal and every suffix record verified by original codec",
+  "worker_supervision": "unchanged original run_cold_process"
+}

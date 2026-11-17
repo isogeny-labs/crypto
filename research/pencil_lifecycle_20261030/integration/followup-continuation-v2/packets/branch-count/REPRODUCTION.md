@@ -1,0 +1,1 @@
+Restore .lean.txt to .lean and exact dependency paths. Compile CountHelpers, CountDispatch, CounterUpdate, BranchControls and BranchReadback sequentially. ExpectedFailure must fail. audit-readback.py validates retained readback; fresh independent review needs fresh pinned receipts. render-report.py reads graph-data.json and renders editable flow.svg and report.pdf.

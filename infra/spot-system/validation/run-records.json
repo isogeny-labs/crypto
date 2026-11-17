@@ -1,0 +1,176 @@
+{
+  "schema": "spot.run-record-validation/v1",
+  "observed_utc": "2026-10-19T07:10:19.210918+00:00",
+  "requirements": {
+    "portable_record": "verified complete: experiment.run/v1 + Draft2020-12 JSON Schema",
+    "launcher_independent_resume": "verified complete: stable CLI, no original job list or launcher environment",
+    "corrupt_checkpoint_fallback": "verified complete: native Rust handoff test",
+    "resume_only_safety": "verified complete: refuses missing state and mismatched durable identity",
+    "aws_managed_admission": "verified complete: worker IAM/configuration and explicit managed wake",
+    "existing_experiments": "preserved; original process alive, source IP still protected",
+    "interactive_laptop_apps": "not executed; existing installer still requires laptop access and Codex trust"
+  },
+  "runtime_sha256": "fb8949d0ebe04eefffd0bbaa3a987468c497a92d49314b242814d8638a7f1932",
+  "managed_instance": "i-041ce6f4d176afe48",
+  "native_cloud_handoff": {
+    "schema": "experiment.cloud-handoff-proof/v1",
+    "record_schema": "experiment.run/v1",
+    "restored_progress": 3,
+    "final_progress": 12,
+    "original_jobs_manifest_removed": true,
+    "launcher_session_not_required": true,
+    "inherited_credentials_not_serialized": true,
+    "worker_iam_and_managed_wake": "passed",
+    "runtime_config_used_without_original_environment": true,
+    "original_source_untouched": true
+  },
+  "original_source_guard": {
+    "state": "ready",
+    "endpoint_instance_id": "i-01f85a6c905181498",
+    "protected_source_active": true
+  },
+  "source_cli": "/home/ec2-user/.local/bin/experiment-runner",
+  "existing_run_backfill": {
+    "id": "native-durability-smoke-20261018",
+    "phase": "complete",
+    "path": "state/native-durability-smoke-20261018/run.json",
+    "started_or_replayed": false
+  },
+  "tests": {
+    "infrastructure_passed": 83,
+    "native_passed": 20,
+    "release_library_passed": 4399,
+    "release_library_ignored": 118,
+    "example_passed": 2,
+    "clippy": "passed",
+    "cfn_lint": "passed",
+    "json_schema": "passed"
+  },
+  "archive": {
+    "path": "run-record-evidence.tar.gz",
+    "bytes": 78800,
+    "sha256": "44473ceec6eb69f93bbd2de8cde58505791d2c7ce6e0966c3109c60ddda605de"
+  },
+  "files": [
+    {
+      "path": "cfn-lint.txt",
+      "bytes": 204,
+      "sha256": "5dc52adfaa5c8acfda29be273b1e5dea61048c472ef8ec9d048bff074efedf31"
+    },
+    {
+      "path": "clippy.txt",
+      "bytes": 624,
+      "sha256": "d406480a2dba135336af400dfe39d1557f272018ceb4550c0ac90a5d2c0fb11f"
+    },
+    {
+      "path": "cloud-proof-command.json",
+      "bytes": 4113,
+      "sha256": "905027b18033f35545ba8bbc6aed82f5590e6e2cd84e46d302dacbba2f796796"
+    },
+    {
+      "path": "cloud-proof-permission-failure.json",
+      "bytes": 914,
+      "sha256": "8e057f3887f9be7996bd5a2c10e1739a6ed7432e96fa547ec1a5c32fbd4a8abc"
+    },
+    {
+      "path": "cloud-proof-result.json",
+      "bytes": 1195,
+      "sha256": "4b8ce958b2bada92e53785965876fb3540af3d849d92dee5554524f66208c702"
+    },
+    {
+      "path": "cloud-proof-stale-runtime-failure.json",
+      "bytes": 980,
+      "sha256": "1b015b61348b363ddd8ed1647a73f1adf34c4b0359b7a41e63351adc1c1bec13"
+    },
+    {
+      "path": "cloud-proof.py",
+      "bytes": 3718,
+      "sha256": "7e2e3f56d8f8719d5594c35f38e80b89130f112ccfaa10b07386a27a6d7a7421"
+    },
+    {
+      "path": "commands.json",
+      "bytes": 1730,
+      "sha256": "aa99fed654d3664068b8c704dbcca2dfdd63c88f819a0ee55a150cc70c312dbb"
+    },
+    {
+      "path": "example-run.json",
+      "bytes": 1220,
+      "sha256": "71d4f85cb03e1a864d96c60651464474c36a49b0ef6978f15f04d9e5044afb6e"
+    },
+    {
+      "path": "example.txt",
+      "bytes": 512,
+      "sha256": "362e7f7189059f7e81265f4d653940c78ad1ee86e6ee1c1be9c82665135d8752"
+    },
+    {
+      "path": "library.txt",
+      "bytes": 379037,
+      "sha256": "f4b8b2ba0a97be3ee2a6468badfd3cd870c5a73a997f13360f06c271d55e1ed3"
+    },
+    {
+      "path": "managed-final-result.json",
+      "bytes": 1376,
+      "sha256": "1405d4fabb1e03d10028080a3821ea6b85d8da9ff2e55bda7593221b9a95bb54"
+    },
+    {
+      "path": "managed-inspection-command.json",
+      "bytes": 788,
+      "sha256": "fd38ec6661894ceb695dfc47dfe58b092f9704515ab0bc6a6c3dfa0d89b2f8cb"
+    },
+    {
+      "path": "managed-inspection-result.json",
+      "bytes": 1257,
+      "sha256": "4ea2029a354bd07316aa06031ef46420191a834084262a4af025714554f49dbe"
+    },
+    {
+      "path": "managed-update-command.json",
+      "bytes": 2027,
+      "sha256": "3a4e125c1604fabf2f9e342efd629367a1420b7d4c715c6fcd3c3d478ac3bd02"
+    },
+    {
+      "path": "native.txt",
+      "bytes": 2500,
+      "sha256": "80bd7ecf4bffcac3f4f6a3006cf5cfcf679964bf88450df87b53ad1a54ff5ea6"
+    },
+    {
+      "path": "original-ip.json",
+      "bytes": 534,
+      "sha256": "ed62c91a116aceef6dd512a39f75f32392d86ec86666e4d0028c8cd5f0654b78"
+    },
+    {
+      "path": "original-process.txt",
+      "bytes": 32,
+      "sha256": "cee9f46fb66faf4fa6f4a7f07e2438b0c790dcb155d7030fbe7968fb748d1d88"
+    },
+    {
+      "path": "python.txt",
+      "bytes": 592,
+      "sha256": "5a06f92120ec272ff0b482e0ae14e1034668f4b86bc0d330db46235499a3ea1b"
+    },
+    {
+      "path": "runtime-deploy-result.txt",
+      "bytes": 321,
+      "sha256": "72557b56f62533cc9c76ae6b1d8b874c7d6085924d6d110557da0c46ad928daa"
+    },
+    {
+      "path": "schema-validation.txt",
+      "bytes": 122,
+      "sha256": "1a34e2ca6bf2d185f5cad373327366090ad2b8090182052a17b0e202758eb4a2"
+    },
+    {
+      "path": "source-guard.json",
+      "bytes": 98,
+      "sha256": "363744f6b24ffe544f8646ec651eb3f47a795847ea358fe0e5c2ad2eec8d1999"
+    },
+    {
+      "path": "template-size-failure.txt",
+      "bytes": 223,
+      "sha256": "60223615d4aa791c9c3709265d00130ba7c31dc467443f100ce37c5a0a48fd6d"
+    }
+  ],
+  "limits": [
+    "Metadata does not embed checkpoint data or install missing application dependencies",
+    "Legacy CRIU remains its separate tested recovery contract",
+    "Synthetic launcher labels do not establish interactive harness UI integration"
+  ]
+}

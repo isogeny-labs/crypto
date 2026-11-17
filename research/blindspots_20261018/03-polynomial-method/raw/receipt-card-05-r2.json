@@ -1,0 +1,420 @@
+{
+  "card_id": "CARD-BLINDSPOT-03-05-r2",
+  "card_path": "research/blindspots_20261018/03-polynomial-method/card-05-r2.yaml",
+  "card_sha256": "21d868adc12556e25d16b896b5b1ece2154ebc4edffc662f6427d7c8a1f46245",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-03-r2/c05"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-build-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-03-r2/c05/b05",
+        "examples/blindspots_05_elimination_orders.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 4.317,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build-b05",
+      "index": 2,
+      "outputs": {},
+      "seconds": 4.317,
+      "stderr_sha256": "68c726b2922de2b59f9658ee1bf338ad10c01ad3911f3a25af38414155bbe22c",
+      "stderr_tail": [
+        "    |",
+        "458 | fn poly_degree(p: &Poly) -> u32 {",
+        "    |    ^^^^^^^^^^^",
+        "",
+        "warning: field `nv` is never read",
+        "   --> examples/blindspots_05_elimination_orders.rs:549:5",
+        "    |",
+        "548 | struct Order {",
+        "    |        ----- field in this struct",
+        "549 |     nv: usize,",
+        "    |     ^^",
+        "",
+        "warning: constant `FIXED_ARMS` is never used",
+        "    --> examples/blindspots_05_elimination_orders.rs:1334:7",
+        "     |",
+        "1334 | const FIXED_ARMS: [&str; 6] = [\"grevlex\", \"blkLI\", \"blkIL\", \"wdeg\", \"mindeg\", \"tw\"];",
+        "     |       ^^^^^^^^^^",
+        "",
+        "warning: 4 warnings emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-03-r2/c05/b05",
+        "run",
+        "--draws",
+        "research/blindspots_20261018/03-polynomial-method/draws.tsv",
+        "--cell",
+        "c29-14-2",
+        "--targets",
+        "0-1",
+        "--arms",
+        "grevlex",
+        "--time-limit",
+        "80",
+        "--total-limit",
+        "170"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 160.089,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "f4-c29-14-2",
+      "index": 3,
+      "outputs": {},
+      "seconds": 160.089,
+      "stderr_sha256": "29b47572edab10397b2bef543ffbd512c91412ab6467bbd1914bbbdc0ce3184c",
+      "stderr_tail": [
+        "c29-14-2 t0 grevlex: timelimit D=4 steps=5 touches=38344327444 80.0s",
+        "c29-14-2 t1 grevlex: timelimit D=4 steps=5 touches=38593503033 80.0s"
+      ],
+      "stdout_sha256": "decd079c451b21afe1a4ad200d3a4fa893cdd9e76762ba0f6087f88dc261c1ac",
+      "stdout_tail": [
+        "{\"cell\":\"c29-14-2\",\"m\":2,\"n\":29,\"ell\":14,\"nv\":28,\"target\":0,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"timelimit\",\"d_mat\":4,\"d_sel\":4,\"steps\":5,\"pairs_sel\":23961,\"pairs_gen\":67023,\"rows_max\":25511,\"cols_max\":21514,\"rc_max\":548843654,\"nnz_max\":20350835,\"cols_sum\":28782,\"rows_sum\":28522,\"touches\":38344327444,\"build\":14987966,\"elim\":36116060565,\"back\":2213278913,\"zero_red\":5217,\"new_elems\":4680,\"g_size\":4709,\"ms\":80018.0,\"ms_sym\":465.1,\"ms_elim\":54362.3,\"ms_back\":3523.8,\"ms_add\":584.7,\"rss_kb\":189124,\"step_rows\":[28,49,1139,1795,25511],\"step_cols\":[224,303,3263,3478,21514],\"pg_edges\":378,\"pg_pairs\":378,\"width_mindeg\":27,\"width_minfill\":27}",
+        "{\"cell\":\"c29-14-2\",\"m\":2,\"n\":29,\"ell\":14,\"nv\":28,\"target\":1,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"timelimit\",\"d_mat\":4,\"d_sel\":4,\"steps\":5,\"pairs_sel\":24012,\"pairs_gen\":67058,\"rows_max\":25440,\"cols_max\":21391,\"rc_max\":544187040,\"nnz_max\":20534588,\"cols_sum\":28620,\"rows_sum\":28418,\"touches\":38593503033,\"build\":15189508,\"elim\":36366250523,\"back\":2212063002,\"zero_red\":5266,\"new_elems\":4679,\"g_size\":4708,\"ms\":80042.9,\"ms_sym\":394.6,\"ms_elim\":55675.0,\"ms_back\":3571.8,\"ms_add\":569.2,\"rss_kb\":190220,\"step_rows\":[28,47,1139,1764,25440],\"step_cols\":[224,295,3263,3447,21391],\"pg_edges\":378,\"pg_pairs\":378,\"width_mindeg\":27,\"width_minfill\":27}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-03-r2/c05/b05",
+        "run",
+        "--draws",
+        "research/blindspots_20261018/03-polynomial-method/draws.tsv",
+        "--cell",
+        "c7-2-3",
+        "--targets",
+        "0-7",
+        "--arms",
+        "grevlex",
+        "--time-limit",
+        "20",
+        "--total-limit",
+        "25"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.014,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "f4-c7-2-3",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.014,
+      "stderr_sha256": "df3204d3dd5ee45421cc285307b92b46f0b42b081f2d012a621de995b09acabb",
+      "stderr_tail": [
+        "c7-2-3 t0 grevlex: refuted D=4 steps=8 touches=44209 0.0s",
+        "c7-2-3 t1 grevlex: refuted D=4 steps=7 touches=38859 0.0s",
+        "c7-2-3 t2 grevlex: refuted D=3 steps=10 touches=12323 0.0s",
+        "c7-2-3 t3 grevlex: refuted D=4 steps=8 touches=40198 0.0s",
+        "c7-2-3 t4 grevlex: refuted D=3 steps=13 touches=23966 0.0s",
+        "c7-2-3 t5 grevlex: refuted D=4 steps=7 touches=35426 0.0s",
+        "c7-2-3 t6 grevlex: refuted D=3 steps=9 touches=19815 0.0s",
+        "c7-2-3 t7 grevlex: refuted D=3 steps=9 touches=20228 0.0s"
+      ],
+      "stdout_sha256": "ff84e4af1b0c6029a4c8b74815f14a6ac4333fd32166483fcfcd84836cc9e190",
+      "stdout_tail": [
+        "{\"cell\":\"c7-2-3\",\"m\":3,\"n\":7,\"ell\":2,\"nv\":13,\"target\":0,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":8,\"pairs_sel\":345,\"pairs_gen\":482,\"rows_max\":533,\"cols_max\":460,\"rc_max\":245180,\"nnz_max\":4156,\"cols_sum\":919,\"rows_sum\":991,\"touches\":44209,\"build\":7529,\"elim\":34922,\"back\":1758,\"zero_red\":249,\"new_elems\":96,\"g_size\":110,\"ms\":1.4,\"ms_sym\":0.3,\"ms_elim\":0.3,\"ms_back\":0.0,\"ms_add\":0.4,\"rss_kb\":3032,\"step_rows\":[6,15,110,153,58,74,533,42],\"step_cols\":[23,30,166,96,38,81,460,25],\"pg_edges\":70,\"pg_pairs\":78,\"width_mindeg\":10,\"width_minfill\":10}",
+        "{\"cell\":\"c7-2-3\",\"m\":3,\"n\":7,\"ell\":2,\"nv\":13,\"target\":1,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":7,\"pairs_sel\":320,\"pairs_gen\":465,\"rows_max\":407,\"cols_max\":339,\"rc_max\":137973,\"nnz_max\":3312,\"cols_sum\":767,\"rows_sum\":814,\"touches\":38859,\"build\":6559,\"elim\":30854,\"back\":1446,\"zero_red\":221,\"new_elems\":99,\"g_size\":113,\"ms\":1.2,\"ms_sym\":0.2,\"ms_elim\":0.3,\"ms_back\":0.0,\"ms_add\":0.4,\"rss_kb\":3032,\"step_rows\":[6,14,104,151,55,77,407],\"step_cols\":[22,28,160,94,34,90,339],\"pg_edges\":70,\"pg_pairs\":78,\"width_mindeg\":10,\"width_minfill\":10}",
+        "{\"cell\":\"c7-2-3\",\"m\":3,\"n\":7,\"ell\":2,\"nv\":13,\"target\":2,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":3,\"d_sel\":3,\"steps\":10,\"pairs_sel\":161,\"pairs_gen\":280,\"rows_max\":191,\"cols_max\":167,\"rc_max\":27313,\"nnz_max\":1321,\"cols_sum\":515,\"rows_sum\":473,\"touches\":12323,\"build\":3004,\"elim\":8638,\"back\":681,\"zero_red\":103,\"new_elems\":58,\"g_size\":72,\"ms\":0.6,\"ms_sym\":0.1,\"ms_elim\":0.2,\"ms_back\":0.0,\"ms_add\":0.2,\"rss_kb\":3032,\"step_rows\":[6,16,112,29,19,28,191,4,0,68],\"step_cols\":[23,31,167,40,18,24,143,4,0,65],\"pg_edges\":70,\"pg_pairs\":78,\"width_mindeg\":10,\"width_minfill\":10}",
+        "{\"cell\":\"c7-2-3\",\"m\":3,\"n\":7,\"ell\":2,\"nv\":13,\"target\":3,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":8,\"pairs_sel\":262,\"pairs_gen\":416,\"rows_max\":393,\"cols_max\":340,\"rc_max\":133620,\"nnz_max\":3599,\"cols_sum\":790,\"rows_sum\":775,\"touches\":40198,\"build\":6319,\"elim\":31970,\"back\":1909,\"zero_red\":172,\"new_elems\":90,\"g_size\":104,\"ms\":1.1,\"ms_sym\":0.2,\"ms_elim\":0.3,\"ms_back\":0.0,\"ms_add\":0.3,\"rss_kb\":3044,\"step_rows\":[5,15,109,31,25,27,170,393],\"step_cols\":[22,30,166,41,30,22,139,340],\"pg_edges\":70,\"pg_pairs\":78,\"width_mindeg\":10,\"width_minfill\":10}",
+        "{\"cell\":\"c7-2-3\",\"m\":3,\"n\":7,\"ell\":2,\"nv\":13,\"target\":4,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":3,\"d_sel\":3,\"steps\":13,\"pairs_sel\":239,\"pairs_gen\":401,\"rows_max\":160,\"cols_max\":166,\"rc_max\":18094,\"nnz_max\":1512,\"cols_sum\":548,\"rows_sum\":528,\"touches\":23966,\"build\":4104,\"elim\":19010,\"back\":852,\"zero_red\":160,\"new_elems\":79,\"g_size\":93,\"ms\":0.9,\"ms_sym\":0.1,\"ms_elim\":0.2,\"ms_back\":0.0,\"ms_add\":0.3,\"rss_kb\":3044,\"step_rows\":[5,16,109,160,55,74,11,25,18,5,4,0,46],\"step_cols\":[21,31,166,103,32,78,28,35,16,5,4,0,29],\"pg_edges\":70,\"pg_pairs\":78,\"width_mindeg\":10,\"width_minfill\":10}",
+        "{\"cell\":\"c7-2-3\",\"m\":3,\"n\":7,\"ell\":2,\"nv\":13,\"target\":5,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":7,\"pairs_sel\":311,\"pairs_gen\":418,\"rows_max\":534,\"cols_max\":459,\"rc_max\":245106,\"nnz_max\":3490,\"cols_sum\":888,\"rows_sum\":949,\"touches\":35426,\"build\":6658,\"elim\":27642,\"back\":1126,\"zero_red\":221,\"new_elems\":90,\"g_size\":104,\"ms\":1.2,\"ms_sym\":0.3,\"ms_elim\":0.3,\"ms_back\":0.0,\"ms_add\":0.4,\"rss_kb\":3072,\"step_rows\":[6,15,112,154,46,82,534],\"step_cols\":[23,30,167,98,30,81,459],\"pg_edges\":70,\"pg_pairs\":78,\"width_mindeg\":10,\"width_minfill\":10}",
+        "{\"cell\":\"c7-2-3\",\"m\":3,\"n\":7,\"ell\":2,\"nv\":13,\"target\":6,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":3,\"d_sel\":3,\"steps\":9,\"pairs_sel\":226,\"pairs_gen\":403,\"rows_max\":153,\"cols_max\":165,\"rc_max\":18480,\"nnz_max\":1324,\"cols_sum\":505,\"rows_sum\":478,\"touches\":19815,\"build\":3696,\"elim\":15199,\"back\":920,\"zero_red\":147,\"new_elems\":79,\"g_size\":93,\"ms\":0.7,\"ms_sym\":0.1,\"ms_elim\":0.2,\"ms_back\":0.0,\"ms_add\":0.2,\"rss_kb\":3072,\"step_rows\":[6,14,112,153,55,74,20,9,35],\"step_cols\":[23,29,165,96,35,74,38,13,32],\"pg_edges\":70,\"pg_pairs\":78,\"width_mindeg\":10,\"width_minfill\":10}",
+        "{\"cell\":\"c7-2-3\",\"m\":3,\"n\":7,\"ell\":2,\"nv\":13,\"target\":7,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":3,\"d_sel\":3,\"steps\":9,\"pairs_sel\":228,\"pairs_gen\":414,\"rows_max\":154,\"cols_max\":163,\"rc_max\":18256,\"nnz_max\":1448,\"cols_sum\":497,\"rows_sum\":464,\"touches\":20228,\"build\":3963,\"elim\":15375,\"back\":890,\"zero_red\":144,\"new_elems\":84,\"g_size\":98,\"ms\":0.8,\"ms_sym\":0.2,\"ms_elim\":0.2,\"ms_back\":0.0,\"ms_add\":0.3,\"rss_kb\":3072,\"step_rows\":[6,15,112,154,52,74,13,21,17],\"step_cols\":[23,30,163,97,29,76,33,31,15],\"pg_edges\":70,\"pg_pairs\":78,\"width_mindeg\":10,\"width_minfill\":10}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-03-r2/c05/b05",
+        "run",
+        "--draws",
+        "research/blindspots_20261018/03-polynomial-method/draws.tsv",
+        "--cell",
+        "c10-3-3",
+        "--targets",
+        "0-7",
+        "--arms",
+        "grevlex",
+        "--time-limit",
+        "20",
+        "--total-limit",
+        "25"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.069,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "f4-c10-3-3",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.069,
+      "stderr_sha256": "d5fb66a2a79c2f8a3e7d6df6bceb8262cb079ac0e529bb1c5ce2df2733abdbab",
+      "stderr_tail": [
+        "c10-3-3 t0 grevlex: refuted D=4 steps=10 touches=684052 0.0s",
+        "c10-3-3 t1 grevlex: refuted D=4 steps=12 touches=702155 0.0s",
+        "c10-3-3 t2 grevlex: refuted D=4 steps=10 touches=404910 0.0s",
+        "c10-3-3 t3 grevlex: refuted D=4 steps=12 touches=805004 0.0s",
+        "c10-3-3 t4 grevlex: refuted D=4 steps=12 touches=401271 0.0s",
+        "c10-3-3 t5 grevlex: refuted D=4 steps=12 touches=752121 0.0s",
+        "c10-3-3 t6 grevlex: refuted D=4 steps=10 touches=267667 0.0s",
+        "c10-3-3 t7 grevlex: refuted D=4 steps=10 touches=791540 0.0s"
+      ],
+      "stdout_sha256": "b419139cffc4e6305e67fd9cff1b874ab0d555b818e6aeb897ccceb8e892fec3",
+      "stdout_tail": [
+        "{\"cell\":\"c10-3-3\",\"m\":3,\"n\":10,\"ell\":3,\"nv\":19,\"target\":0,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":10,\"pairs_sel\":1084,\"pairs_gen\":1630,\"rows_max\":1850,\"cols_max\":1891,\"rc_max\":3498350,\"nnz_max\":34505,\"cols_sum\":3506,\"rows_sum\":3503,\"touches\":684052,\"build\":51401,\"elim\":589851,\"back\":42800,\"zero_red\":792,\"new_elems\":292,\"g_size\":312,\"ms\":9.2,\"ms_sym\":1.6,\"ms_elim\":2.6,\"ms_back\":0.3,\"ms_add\":3.0,\"rss_kb\":3544,\"step_rows\":[9,18,221,215,91,54,542,1850,114,389],\"step_cols\":[43,49,446,234,83,55,347,1891,73,285],\"pg_edges\":153,\"pg_pairs\":171,\"width_mindeg\":15,\"width_minfill\":15}",
+        "{\"cell\":\"c10-3-3\",\"m\":3,\"n\":10,\"ell\":3,\"nv\":19,\"target\":1,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":12,\"pairs_sel\":1005,\"pairs_gen\":1665,\"rows_max\":2098,\"cols_max\":2108,\"rc_max\":4422584,\"nnz_max\":36768,\"cols_sum\":3619,\"rows_sum\":3617,\"touches\":702155,\"build\":51031,\"elim\":620993,\"back\":30131,\"zero_red\":733,\"new_elems\":272,\"g_size\":292,\"ms\":8.3,\"ms_sym\":1.3,\"ms_elim\":3.1,\"ms_back\":0.3,\"ms_add\":2.3,\"rss_kb\":3604,\"step_rows\":[9,19,223,243,57,55,684,2098,174,23,13,19],\"step_cols\":[43,51,449,262,60,55,424,2108,112,27,13,15],\"pg_edges\":153,\"pg_pairs\":171,\"width_mindeg\":15,\"width_minfill\":15}",
+        "{\"cell\":\"c10-3-3\",\"m\":3,\"n\":10,\"ell\":3,\"nv\":19,\"target\":2,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":10,\"pairs_sel\":1061,\"pairs_gen\":1559,\"rows_max\":2038,\"cols_max\":1892,\"rc_max\":3855896,\"nnz_max\":19871,\"cols_sum\":3236,\"rows_sum\":3561,\"touches\":404910,\"build\":40533,\"elim\":341670,\"back\":22707,\"zero_red\":845,\"new_elems\":216,\"g_size\":236,\"ms\":6.7,\"ms_sym\":1.2,\"ms_elim\":2.3,\"ms_back\":0.2,\"ms_add\":1.6,\"rss_kb\":3660,\"step_rows\":[9,20,226,226,754,118,103,2038,47,20],\"step_cols\":[43,52,448,245,280,60,167,1892,32,17],\"pg_edges\":153,\"pg_pairs\":171,\"width_mindeg\":15,\"width_minfill\":15}",
+        "{\"cell\":\"c10-3-3\",\"m\":3,\"n\":10,\"ell\":3,\"nv\":19,\"target\":3,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":12,\"pairs_sel\":1133,\"pairs_gen\":1785,\"rows_max\":2066,\"cols_max\":2094,\"rc_max\":4326204,\"nnz_max\":38000,\"cols_sum\":3572,\"rows_sum\":3655,\"touches\":805004,\"build\":55945,\"elim\":712243,\"back\":36816,\"zero_red\":865,\"new_elems\":268,\"g_size\":288,\"ms\":8.8,\"ms_sym\":1.3,\"ms_elim\":3.1,\"ms_back\":0.3,\"ms_add\":2.5,\"rss_kb\":3660,\"step_rows\":[9,19,224,217,742,89,93,2066,155,10,16,15],\"step_cols\":[43,51,448,236,268,77,212,2094,90,17,21,15],\"pg_edges\":153,\"pg_pairs\":171,\"width_mindeg\":15,\"width_minfill\":15}",
+        "{\"cell\":\"c10-3-3\",\"m\":3,\"n\":10,\"ell\":3,\"nv\":19,\"target\":4,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":12,\"pairs_sel\":1050,\"pairs_gen\":1551,\"rows_max\":1488,\"cols_max\":1358,\"rc_max\":2020704,\"nnz_max\":16455,\"cols_sum\":2771,\"rows_sum\":3061,\"touches\":401271,\"build\":37703,\"elim\":341580,\"back\":21988,\"zero_red\":827,\"new_elems\":223,\"g_size\":243,\"ms\":5.9,\"ms_sym\":0.9,\"ms_elim\":1.9,\"ms_back\":0.2,\"ms_add\":1.7,\"rss_kb\":3660,\"step_rows\":[9,19,223,240,744,129,121,1488,39,25,10,14],\"step_cols\":[43,51,449,259,270,68,187,1358,36,30,10,10],\"pg_edges\":153,\"pg_pairs\":171,\"width_mindeg\":15,\"width_minfill\":15}",
+        "{\"cell\":\"c10-3-3\",\"m\":3,\"n\":10,\"ell\":3,\"nv\":19,\"target\":5,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":12,\"pairs_sel\":1133,\"pairs_gen\":1837,\"rows_max\":1976,\"cols_max\":2005,\"rc_max\":3961880,\"nnz_max\":36143,\"cols_sum\":3551,\"rows_sum\":3636,\"touches\":752121,\"build\":54504,\"elim\":666945,\"back\":30672,\"zero_red\":858,\"new_elems\":275,\"g_size\":295,\"ms\":8.4,\"ms_sym\":1.4,\"ms_elim\":2.9,\"ms_back\":0.2,\"ms_add\":2.5,\"rss_kb\":3668,\"step_rows\":[9,19,224,228,745,92,115,1976,171,22,19,16],\"step_cols\":[43,51,449,247,271,80,240,2005,104,26,21,14],\"pg_edges\":153,\"pg_pairs\":171,\"width_mindeg\":15,\"width_minfill\":15}",
+        "{\"cell\":\"c10-3-3\",\"m\":3,\"n\":10,\"ell\":3,\"nv\":19,\"target\":6,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":10,\"pairs_sel\":812,\"pairs_gen\":1515,\"rows_max\":1452,\"cols_max\":1322,\"rc_max\":1919544,\"nnz_max\":16399,\"cols_sum\":2595,\"rows_sum\":2665,\"touches\":267667,\"build\":31841,\"elim\":215638,\"back\":20188,\"zero_red\":591,\"new_elems\":221,\"g_size\":241,\"ms\":5.3,\"ms_sym\":0.8,\"ms_elim\":1.6,\"ms_back\":0.2,\"ms_add\":1.5,\"rss_kb\":3668,\"step_rows\":[9,19,222,221,78,112,488,1452,60,4],\"step_cols\":[43,51,448,240,81,62,299,1322,46,3],\"pg_edges\":153,\"pg_pairs\":171,\"width_mindeg\":15,\"width_minfill\":15}",
+        "{\"cell\":\"c10-3-3\",\"m\":3,\"n\":10,\"ell\":3,\"nv\":19,\"target\":7,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":10,\"pairs_sel\":1107,\"pairs_gen\":1897,\"rows_max\":1896,\"cols_max\":1918,\"rc_max\":3636528,\"nnz_max\":33401,\"cols_sum\":3696,\"rows_sum\":3689,\"touches\":791540,\"build\":57121,\"elim\":672973,\"back\":61446,\"zero_red\":790,\"new_elems\":317,\"g_size\":337,\"ms\":9.4,\"ms_sym\":1.4,\"ms_elim\":3.0,\"ms_back\":0.3,\"ms_add\":3.2,\"rss_kb\":3668,\"step_rows\":[9,19,225,222,71,90,589,1896,46,522],\"step_cols\":[43,51,449,241,74,71,396,1918,69,384],\"pg_edges\":153,\"pg_pairs\":171,\"width_mindeg\":15,\"width_minfill\":15}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-03-r2/c05/b05",
+        "run",
+        "--draws",
+        "research/blindspots_20261018/03-polynomial-method/draws.tsv",
+        "--cell",
+        "c13-4-3",
+        "--targets",
+        "0-7",
+        "--arms",
+        "grevlex",
+        "--time-limit",
+        "30",
+        "--total-limit",
+        "50"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.496,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "f4-c13-4-3",
+      "index": 6,
+      "outputs": {},
+      "seconds": 1.496,
+      "stderr_sha256": "bf41f0297e55d4721828f9ff1ae96f2f13bca96e7d406b2025ea3b3714da2f96",
+      "stderr_tail": [
+        "c13-4-3 t0 grevlex: refuted D=4 steps=8 touches=65316725 0.3s",
+        "c13-4-3 t1 grevlex: refuted D=4 steps=10 touches=66687654 0.2s",
+        "c13-4-3 t2 grevlex: refuted D=4 steps=9 touches=70582134 0.2s",
+        "c13-4-3 t3 grevlex: refuted D=4 steps=11 touches=64949672 0.2s",
+        "c13-4-3 t4 grevlex: refuted D=4 steps=8 touches=63596700 0.1s",
+        "c13-4-3 t5 grevlex: refuted D=4 steps=10 touches=66855976 0.2s",
+        "c13-4-3 t6 grevlex: refuted D=4 steps=8 touches=71650291 0.2s",
+        "c13-4-3 t7 grevlex: refuted D=4 steps=8 touches=62211653 0.2s"
+      ],
+      "stdout_sha256": "52ddda1921303e3d107662608a20ef5088b233c6c6190a13304c8bc66e980a57",
+      "stdout_tail": [
+        "{\"cell\":\"c13-4-3\",\"m\":3,\"n\":13,\"ell\":4,\"nv\":25,\"target\":0,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":8,\"pairs_sel\":4831,\"pairs_gen\":6911,\"rows_max\":10685,\"cols_max\":10275,\"rc_max\":109788375,\"nnz_max\":678039,\"cols_sum\":20145,\"rows_sum\":18444,\"touches\":65316725,\"build\":954806,\"elim\":61402322,\"back\":2959597,\"zero_red\":3745,\"new_elems\":1086,\"g_size\":1112,\"ms\":252.4,\"ms_sym\":24.7,\"ms_elim\":158.4,\"ms_back\":7.6,\"ms_add\":38.3,\"rss_kb\":10148,\"step_rows\":[12,15,333,333,4193,118,2755,10685],\"step_cols\":[69,67,873,591,6399,119,1752,10275],\"pg_edges\":268,\"pg_pairs\":300,\"width_mindeg\":20,\"width_minfill\":20}",
+        "{\"cell\":\"c13-4-3\",\"m\":3,\"n\":13,\"ell\":4,\"nv\":25,\"target\":1,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":10,\"pairs_sel\":5612,\"pairs_gen\":9221,\"rows_max\":10764,\"cols_max\":10347,\"rc_max\":111375108,\"nnz_max\":674872,\"cols_sum\":22038,\"rows_sum\":20779,\"touches\":66687654,\"build\":1042779,\"elim\":62526271,\"back\":3118604,\"zero_red\":4367,\"new_elems\":1245,\"g_size\":1271,\"ms\":201.7,\"ms_sym\":17.3,\"ms_elim\":120.7,\"ms_back\":6.2,\"ms_add\":35.7,\"rss_kb\":10332,\"step_rows\":[12,18,333,334,4192,119,2767,10764,137,2103],\"step_cols\":[69,70,865,592,6389,120,1764,10347,206,1616],\"pg_edges\":268,\"pg_pairs\":300,\"width_mindeg\":20,\"width_minfill\":20}",
+        "{\"cell\":\"c13-4-3\",\"m\":3,\"n\":13,\"ell\":4,\"nv\":25,\"target\":2,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":9,\"pairs_sel\":5843,\"pairs_gen\":9154,\"rows_max\":11097,\"cols_max\":10694,\"rc_max\":118671318,\"nnz_max\":731214,\"cols_sum\":21871,\"rows_sum\":20913,\"touches\":70582134,\"build\":1119838,\"elim\":66216152,\"back\":3246144,\"zero_red\":4592,\"new_elems\":1251,\"g_size\":1277,\"ms\":171.9,\"ms_sym\":15.2,\"ms_elim\":102.3,\"ms_back\":5.6,\"ms_add\":32.7,\"rss_kb\":10840,\"step_rows\":[12,17,334,337,4198,2627,11097,205,2086],\"step_cols\":[69,69,864,595,6385,1370,10694,251,1574],\"pg_edges\":268,\"pg_pairs\":300,\"width_mindeg\":20,\"width_minfill\":20}",
+        "{\"cell\":\"c13-4-3\",\"m\":3,\"n\":13,\"ell\":4,\"nv\":25,\"target\":3,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":11,\"pairs_sel\":5383,\"pairs_gen\":9422,\"rows_max\":10068,\"cols_max\":9646,\"rc_max\":97115928,\"nnz_max\":640221,\"cols_sum\":21549,\"rows_sum\":20028,\"touches\":64949672,\"build\":993761,\"elim\":60849312,\"back\":3106599,\"zero_red\":4128,\"new_elems\":1255,\"g_size\":1281,\"ms\":191.5,\"ms_sym\":17.7,\"ms_elim\":114.4,\"ms_back\":6.1,\"ms_add\":36.3,\"rss_kb\":11048,\"step_rows\":[12,17,338,351,4237,145,2571,10068,139,1868,282],\"step_cols\":[69,69,869,609,6437,131,1722,9646,216,1543,238],\"pg_edges\":268,\"pg_pairs\":300,\"width_mindeg\":20,\"width_minfill\":20}",
+        "{\"cell\":\"c13-4-3\",\"m\":3,\"n\":13,\"ell\":4,\"nv\":25,\"target\":4,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":8,\"pairs_sel\":4812,\"pairs_gen\":6896,\"rows_max\":10930,\"cols_max\":10527,\"rc_max\":115060110,\"nnz_max\":690636,\"cols_sum\":20181,\"rows_sum\":18515,\"touches\":63596700,\"build\":954193,\"elim\":59669357,\"back\":2973150,\"zero_red\":3736,\"new_elems\":1076,\"g_size\":1102,\"ms\":138.1,\"ms_sym\":14.7,\"ms_elim\":85.7,\"ms_back\":4.3,\"ms_add\":20.0,\"rss_kb\":11052,\"step_rows\":[12,18,336,354,4270,117,2478,10930],\"step_cols\":[69,70,877,612,6479,118,1429,10527],\"pg_edges\":268,\"pg_pairs\":300,\"width_mindeg\":20,\"width_minfill\":20}",
+        "{\"cell\":\"c13-4-3\",\"m\":3,\"n\":13,\"ell\":4,\"nv\":25,\"target\":5,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":10,\"pairs_sel\":5487,\"pairs_gen\":9321,\"rows_max\":10027,\"cols_max\":9609,\"rc_max\":96349443,\"nnz_max\":649568,\"cols_sum\":21413,\"rows_sum\":20060,\"touches\":66855976,\"build\":1020940,\"elim\":62650649,\"back\":3184387,\"zero_red\":4215,\"new_elems\":1272,\"g_size\":1298,\"ms\":155.6,\"ms_sym\":13.0,\"ms_elim\":87.3,\"ms_back\":5.3,\"ms_add\":36.2,\"rss_kb\":10936,\"step_rows\":[12,17,336,353,4262,147,2619,10027,1956,331],\"step_cols\":[69,69,870,611,6474,133,1766,9609,1576,236],\"pg_edges\":268,\"pg_pairs\":300,\"width_mindeg\":20,\"width_minfill\":20}",
+        "{\"cell\":\"c13-4-3\",\"m\":3,\"n\":13,\"ell\":4,\"nv\":25,\"target\":6,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":8,\"pairs_sel\":5876,\"pairs_gen\":9461,\"rows_max\":11098,\"cols_max\":10695,\"rc_max\":118693110,\"nnz_max\":732627,\"cols_sum\":21852,\"rows_sum\":20967,\"touches\":71650291,\"build\":1139976,\"elim\":67265074,\"back\":3245241,\"zero_red\":4620,\"new_elems\":1256,\"g_size\":1282,\"ms\":191.0,\"ms_sym\":17.3,\"ms_elim\":116.4,\"ms_back\":6.0,\"ms_add\":31.0,\"rss_kb\":10936,\"step_rows\":[12,16,337,350,4264,2633,11098,2257],\"step_cols\":[69,68,868,608,6473,1376,10695,1695],\"pg_edges\":268,\"pg_pairs\":300,\"width_mindeg\":20,\"width_minfill\":20}",
+        "{\"cell\":\"c13-4-3\",\"m\":3,\"n\":13,\"ell\":4,\"nv\":25,\"target\":7,\"arm\":\"grevlex\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":8,\"pairs_sel\":4585,\"pairs_gen\":6600,\"rows_max\":10236,\"cols_max\":9668,\"rc_max\":98961648,\"nnz_max\":625650,\"cols_sum\":19521,\"rows_sum\":17759,\"touches\":62211653,\"build\":905712,\"elim\":58790152,\"back\":2515789,\"zero_red\":3519,\"new_elems\":1066,\"g_size\":1092,\"ms\":182.7,\"ms_sym\":15.6,\"ms_elim\":116.9,\"ms_back\":5.6,\"ms_add\":29.9,\"rss_kb\":10936,\"step_rows\":[12,17,336,351,4231,159,2417,10236],\"step_cols\":[69,69,870,609,6431,129,1676,9668],\"pg_edges\":268,\"pg_pairs\":300,\"width_mindeg\":20,\"width_minfill\":20}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-rf",
+        "target/blindspots-03-r2/c05"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.01,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-build-dir",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.01,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 7,
+  "commit": "d4737d55df423c113b484f04f21d052860eda4e5",
+  "dirty_after": [
+    "examples/blindspots_13_rho_negation.rs",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-build-b03.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-build-b03.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-crossover.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-crossover.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c13-6-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c13-6-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c17-8-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c17-8-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c21-10-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c21-10-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c25-12-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c25-12-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c29-14-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c29-14-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-03-r2-build-b03.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-03-r2-build-b03.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-03-r2-fes-c33-16-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-03-r2-fes-c33-16-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-build-b05.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-build-b05.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-f4-c13-6-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-f4-c13-6-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-f4-c17-8-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-f4-c17-8-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-f4-c21-10-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-f4-c21-10-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-f4-c25-12-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-f4-c25-12-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-05-r2-build-b05.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-05-r2-build-b05.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-05-r2-f4-c10-3-3.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-05-r2-f4-c10-3-3.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-05-r2-f4-c13-4-3.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-05-r2-f4-c13-4-3.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-05-r2-f4-c29-14-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-05-r2-f4-c29-14-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-05-r2-f4-c7-2-3.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-05-r2-f4-c7-2-3.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/receipt-card-02-r2.json",
+    "research/blindspots_20261018/03-polynomial-method/raw/receipt-card-03-r2.json",
+    "research/blindspots_20261018/03-polynomial-method/raw/receipt-card-04-r2.json"
+  ],
+  "dirty_before": [
+    "examples/blindspots_13_rho_negation.rs",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-build-b03.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-build-b03.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-crossover.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-crossover.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c13-6-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c13-6-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c17-8-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c17-8-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c21-10-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c21-10-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c25-12-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c25-12-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c29-14-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-02-r2-fes-c29-14-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-03-r2-build-b03.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-03-r2-build-b03.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-03-r2-fes-c33-16-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-03-r2-fes-c33-16-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-build-b05.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-build-b05.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-f4-c13-6-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-f4-c13-6-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-f4-c17-8-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-f4-c17-8-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-f4-c21-10-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-f4-c21-10-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-f4-c25-12-2.stderr.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/card-04-r2-f4-c25-12-2.stdout.log",
+    "research/blindspots_20261018/03-polynomial-method/raw/receipt-card-02-r2.json",
+    "research/blindspots_20261018/03-polynomial-method/raw/receipt-card-03-r2.json",
+    "research/blindspots_20261018/03-polynomial-method/raw/receipt-card-04-r2.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

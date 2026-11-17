@@ -1,0 +1,14 @@
+digraph bridge {
+ graph [rankdir=TB,bgcolor="white",pad="0.2",nodesep="0.35",ranksep="0.35"];
+ node [shape=box,style="rounded,filled",fillcolor="#e9f3fa",fontname="Helvetica",fontsize=13,margin="0.16"];
+ edge [fontname="Helvetica",fontsize=11,color="#334155"];
+ source [label="Actual D.8 Boolean contraction\nM real ports; immutable A(Y), B(X)"];
+ affine [label="Each output bit: N or D - N\nD^M F = cleared contraction"];
+ degree [label="Actual packed polynomial\ndegree at most 2 M (2 L - 1)"];
+ local [label="Actual integral local series\nconstructed D and reciprocal"];
+ quotient [label="Any ring homomorphism\nincluding finite jet quotients"];
+ recovery [label="OPEN: tapered Hermite recovery\nall levels and exact precision",fillcolor="#fff2d4",style="rounded,filled,dashed"];
+ cost [label="OPEN: full recursive evaluator\nuniform modes and bit costs",fillcolor="#fff2d4",style="rounded,filled,dashed"];
+ source -> affine; affine -> degree; affine -> local; local -> quotient;
+ degree -> recovery [style=dashed]; quotient -> recovery [style=dashed]; recovery -> cost [style=dashed];
+}

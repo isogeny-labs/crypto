@@ -1,0 +1,15 @@
+PencilWordRefinement.canonical_product_bound (p a b : ℕ) (hp : p < 2 ^ 31) (ha : a < p) (hb : b < p) : a * b < 2 ^ 64
+'PencilWordRefinement.canonical_product_bound' depends on axioms: [propext, Quot.sound]
+PencilWordRefinement.uint64_mul_mod (p a b : UInt64) (hp : p.toNat < 2 ^ 31) (ha : a.toNat < p.toNat)
+  (hb : b.toNat < p.toNat) : (a * b % p).toNat = a.toNat * b.toNat % p.toNat
+'PencilWordRefinement.uint64_mul_mod' depends on axioms: [propext, Quot.sound]
+PencilWordRefinement.uint64_mul_decode (p a b : UInt64) (hp : p.toNat < 2 ^ 31) (ha : a.toNat < p.toNat)
+  (hb : b.toNat < p.toNat) : ↑(a * b % p).toNat = ↑a.toNat * ↑b.toNat
+'PencilWordRefinement.uint64_mul_decode' depends on axioms: [propext, Quot.sound]
+PencilWordRefinement.uint64_square_decode (p a : UInt64) (hp : p.toNat < 2 ^ 31) (ha : a.toNat < p.toNat) :
+  ↑(a * a % p).toNat = ↑a.toNat ^ 2
+'PencilWordRefinement.uint64_square_decode' depends on axioms: [propext, Quot.sound]
+PencilWordRefinement.uint64_mul_canonical (p a b : UInt64) (hp : 0 < p.toNat) : (a * b % p).toNat < p.toNat
+'PencilWordRefinement.uint64_mul_canonical' depends on axioms: [propext]
+UInt64.toNat_mul (a b : UInt64) : (a * b).toNat = a.toNat * b.toNat % 2 ^ 64
+UInt64.toNat_mod (a b : UInt64) : (a % b).toNat = a.toNat % b.toNat

@@ -1,0 +1,1672 @@
+{
+  "a": 1,
+  "arm_wall_s": 600.0,
+  "experiment": "R6.1 end-to-end through ic_framework::run_pipeline (the ic bench pipeline)",
+  "h": 2,
+  "instance": "icv1-f2m17-tm101-00378d4e",
+  "max_trials": 20000,
+  "n": 17,
+  "node_budget": 4096,
+  "planted": 36919,
+  "r": 65587,
+  "rho_floor_S_derived": 0.8862269254527579,
+  "rows": [
+    {
+      "S": 542.8968935954107,
+      "arm": "mitm-m2",
+      "call_outcomes": {
+        "found": 114,
+        "refuted": 72
+      },
+      "columns": 240,
+      "ell": 9,
+      "exhausted": false,
+      "extra": null,
+      "full_report": {
+        "decomposition": {
+          "cost": {
+            "gae": 8154.954732,
+            "group_ops": {
+              "adds": 2913,
+              "doubles": 5238,
+              "scalar_mults": 372
+            },
+            "native": {
+              "canonicalisations": 0,
+              "direct_relations_skipped": 0,
+              "frobfold_mismatches": 0,
+              "inversions": 0,
+              "lift_failures": 0,
+              "lookups": 186,
+              "relations": 114,
+              "repeated_targets_skipped": 0,
+              "s4_hits": 0,
+              "s4_pairs": 0,
+              "sqrt_solves": 0,
+              "target_guard_probes": 186,
+              "trials": 186,
+              "unliftable_systems": 0
+            },
+            "wall_ns": 1048830
+          },
+          "description": "a table of pair sums probed once per target (m = 2) or once per R − P (m = 3), built in full",
+          "gae_before_solver": 8154.954732,
+          "hit_rate": 0.6129032258064516,
+          "name": "mitm",
+          "relations_found": 114,
+          "setup": {
+            "gae": 130816.0,
+            "group_ops": {
+              "adds": 130816,
+              "doubles": 0,
+              "scalar_mults": 0
+            },
+            "native": {},
+            "wall_ns": 15246010
+          },
+          "solver": null,
+          "summands": 2,
+          "system": null,
+          "targets_tried": 186
+        },
+        "exhausted": false,
+        "factor_base": {
+          "abscissae": 256,
+          "columns": 240,
+          "cost": {
+            "gae": 27.163738,
+            "group_ops": {
+              "adds": 0,
+              "doubles": 0,
+              "scalar_mults": 0
+            },
+            "native": {
+              "abscissae_scanned": 0,
+              "as_solves": 0,
+              "cofactor_multiplications": 256,
+              "derived_counts": 1,
+              "frobenius_coordinate_squarings": 16320,
+              "frobenius_maps": 511
+            },
+            "wall_ns": 1982088
+          },
+          "description": "F_x random V",
+          "name": "r6-fixed-subspace",
+          "points_per_column": 2.129166666666667,
+          "signed_points": 511
+        },
+        "group_order": 131174,
+        "instance": "icv1-f2m17-tm101-00378d4e",
+        "label": "r6-fixed-subspace + mitm[m=2] + — + random",
+        "linear_algebra": {
+          "cost": {
+            "gae": 16.553394,
+            "group_ops": {
+              "adds": 0,
+              "doubles": 0,
+              "scalar_mults": 0
+            },
+            "native": {
+              "columns": 241,
+              "pinned_by_repeated_row": 0,
+              "rank": 114,
+              "repeated_column_rows": 0,
+              "row_ops": 1199,
+              "rows": 114,
+              "single_column_rows": 2,
+              "two_column_rows": 112
+            },
+            "wall_ns": 192105
+          },
+          "dependent": 0,
+          "name": "incremental-gauss",
+          "rank": 114,
+          "rows": 114,
+          "work": 1199,
+          "work_unit": "row_ops"
+        },
+        "log2_r": 16.001122266128682,
+        "r": 65587,
+        "recovered": 36919,
+        "rho_s": null,
+        "s": 542.8968935954107,
+        "s_over_rho": null,
+        "spec": {
+          "factor_base": "r6-fixed-subspace",
+          "factor_base_params": {},
+          "linalg": "",
+          "max_trials": 20000,
+          "oracle": "mitm",
+          "oracle_params": {
+            "m": "2"
+          },
+          "seed": 123212651130,
+          "solver": null,
+          "solver_budget_seconds": 0,
+          "solver_params": {},
+          "targets": "Random"
+        },
+        "total_gae": 139035.671864,
+        "verified": true,
+        "verify": {
+          "gae": 21.0,
+          "group_ops": {
+            "adds": 6,
+            "doubles": 15,
+            "scalar_mults": 1
+          },
+          "native": {},
+          "wall_ns": 2604
+        },
+        "wall_seconds": 0.016530934
+      },
+      "hit_rate": 0.6129032258064516,
+      "instance": "icv1-f2m17-tm101-00378d4e",
+      "label": "r6-fixed-subspace + mitm[m=2] + — + random",
+      "m": 2,
+      "per_call": [
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "refuted",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 0,
+          "splits": 0,
+          "wall_ms_contended": 0.0,
+          "word_xors": 0
+        }
+      ],
+      "r": 65587,
+      "reductions_total": 0,
+      "relations_found": 114,
+      "solver_budget_exceeded": null,
+      "solver_calls": null,
+      "solver_ops": null,
+      "targets_tried": 186,
+      "total_gae": 139035.671864,
+      "verified": true,
+      "wall_s_contended": 0.016530934,
+      "wall_truncated": false
+    }
+  ],
+  "seed": 123212651130,
+  "v_seed": 370935120
+}

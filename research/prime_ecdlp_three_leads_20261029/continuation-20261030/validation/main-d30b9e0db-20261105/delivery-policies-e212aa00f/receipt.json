@@ -1,0 +1,43 @@
+{
+  "schema": "pkm.local-delivery-policies/v1",
+  "recorded_utc": "2026-11-05T11:46:28.891952+00:00",
+  "tested_head": "e212aa00ff6f6ee239a247c666267a0a85e70f97",
+  "base": "d30b9e0db7ec00c55330effef5f64532f97cd160",
+  "wrapper_exit": 0,
+  "passed": [
+    "PR-delta whitespace",
+    "size",
+    "artifacts",
+    "benchrec37current",
+    "PCCprefix112chain"
+  ],
+  "captures": {
+    "artifacts.log": {
+      "path": "artifacts.log.json",
+      "bytes": 41,
+      "sha256": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934"
+    },
+    "benchrec.log": {
+      "path": "benchrec.log.json",
+      "bytes": 52,
+      "sha256": "edb93f3fb65973557b2a971cbf34983528e61662e524059d93cf3382b2fedeb8"
+    },
+    "pcc-prefix.log": {
+      "path": "pcc-prefix.log.json",
+      "bytes": 30,
+      "sha256": "5ec4c0ae68ba2ca0e30550bc27d691d91d63ab4da51a2c9c6b63dab4ec40304e"
+    },
+    "size.log": {
+      "path": "size.log.json",
+      "bytes": 65,
+      "sha256": "322761bcb838f5da662927750da20634e40f03f900e2c31c260a13cd2d9a78ec"
+    },
+    "whitespace.log": {
+      "path": "whitespace.log.json",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "excludes": "globalPCC13 failures, strictclippy2, clockcontrol2 and capped full-library; no current GitHub CI pass claimed",
+  "pcc_standing": "unverified producer observation"
+}

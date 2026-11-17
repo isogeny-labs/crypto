@@ -1,0 +1,27 @@
+    Checking num-bigint v0.5.1
+    Checking num-rational v0.4.2
+    Checking ecdl-tensor-ic v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029/crates/ecdl-tensor-ic)
+    Checking hashed-ecdl-tensor v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029/crates/hashed-ecdl-tensor)
+    Checking redis v1.7.1
+    Checking crypto v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029)
+error: unnecessary `>= y + 1` or `x - 1 >=`
+   --> src/cryptanalysis/ecbench/diagnostics.rs:391:12
+    |
+391 |         if paths.len() >= MAX_FILES + 1 {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: change it to: `paths.len() > MAX_FILES`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#int_plus_one
+    = note: `-D clippy::int-plus-one` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::int_plus_one)]`
+
+error: this creates an owned instance just for comparison
+   --> src/cryptanalysis/ecbench/diagnostics.rs:369:40
+    |
+369 |         || record["algorithm_seed"] != context.identity.seed.to_string()
+    |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `context.identity.seed`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#cmp_owned
+    = note: `-D clippy::cmp-owned` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::cmp_owned)]`
+
+error: could not compile `crypto` (lib) due to 2 previous errors

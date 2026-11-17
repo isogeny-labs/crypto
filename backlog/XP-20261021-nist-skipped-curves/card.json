@@ -1,0 +1,247 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261021-nist-skipped-curves",
+  "title": "Run upstream DiSSECT and independent algebra on four skipped NIST seed candidates",
+  "created": "2026-10-21",
+  "authors": [
+    "NIST seed provenance research"
+  ],
+  "status": "draft",
+  "status_note": "Jobs are implemented on the candidate branch. Not queued. Ready promotion needs the merged implementation pin, resumable shards and a selected execution environment; numerical result auditing remains a subsequent task.",
+  "blocked_on": [],
+  "links": {
+    "lead": "backlog/XP-20261021-nist-skipped-curves/README.md",
+    "notes": [
+      "research/nist_seed_provenance_20261016/README.md",
+      "research/nist_seed_skip_filter_20261017/README.md"
+    ],
+    "prs": [
+      2333
+    ]
+  },
+  "question": "Which structural similarities, twists, isogenies and upstream trait discrepancies occur on the four selected skipped seed candidates compared with published P-224 and P-256?",
+  "decision_value": "Independent checks distinguish valid structural differences from upstream tool defects and unavailable generator-dependent data. The full default trait denominator supports a reproducible comparison before choosing a historical selection hypothesis to investigate; the jobs alone do not explain the skips.",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "a488ce7277b587ee3bf19590faa65cdce27f86ac"
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "codex/nist-skipped-curve-jobs",
+    "build": []
+  },
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 4,
+    "disk_gb": 32,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "23 independent shards, each bounded by 3600 seconds plus at most 10 seconds termination grace. The 23 core-hour configured ceiling is not a runtime estimate. Runtime installation is separate."
+  },
+  "run": {
+    "argv": [
+      "bash",
+      "backlog/XP-20261021-nist-skipped-curves/run.sh",
+      "run",
+      "{job}",
+      "{out}"
+    ],
+    "env": {
+      "DISSECT_ROOT": "/opt/DiSSECT",
+      "DISSECT_DEPS": "/opt/dissect-deps",
+      "SAGE_BIN": "sage",
+      "GP_BIN": "gp",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1"
+    },
+    "timeout_per_shard_s": 3615
+  },
+  "shards": {
+    "count": 23,
+    "scheme": "list",
+    "params": {
+      "items": [
+        {
+          "name": "cofactor",
+          "vars": {
+            "job": "cofactor"
+          }
+        },
+        {
+          "name": "discriminant",
+          "vars": {
+            "job": "discriminant"
+          }
+        },
+        {
+          "name": "twist_order",
+          "vars": {
+            "job": "twist_order"
+          }
+        },
+        {
+          "name": "kn_factorization",
+          "vars": {
+            "job": "kn_factorization"
+          }
+        },
+        {
+          "name": "torsion_extension",
+          "vars": {
+            "job": "torsion_extension"
+          }
+        },
+        {
+          "name": "conductor",
+          "vars": {
+            "job": "conductor"
+          }
+        },
+        {
+          "name": "embedding",
+          "vars": {
+            "job": "embedding"
+          }
+        },
+        {
+          "name": "class_number",
+          "vars": {
+            "job": "class_number"
+          }
+        },
+        {
+          "name": "small_prime_order",
+          "vars": {
+            "job": "small_prime_order"
+          }
+        },
+        {
+          "name": "division_polynomials",
+          "vars": {
+            "job": "division_polynomials"
+          }
+        },
+        {
+          "name": "volcano",
+          "vars": {
+            "job": "volcano"
+          }
+        },
+        {
+          "name": "isogeny_extension",
+          "vars": {
+            "job": "isogeny_extension"
+          }
+        },
+        {
+          "name": "trace_factorization",
+          "vars": {
+            "job": "trace_factorization"
+          }
+        },
+        {
+          "name": "isogeny_neighbors",
+          "vars": {
+            "job": "isogeny_neighbors"
+          }
+        },
+        {
+          "name": "q_torsion",
+          "vars": {
+            "job": "q_torsion"
+          }
+        },
+        {
+          "name": "hamming_x",
+          "vars": {
+            "job": "hamming_x"
+          }
+        },
+        {
+          "name": "square_4p1",
+          "vars": {
+            "job": "square_4p1"
+          }
+        },
+        {
+          "name": "pow_distance",
+          "vars": {
+            "job": "pow_distance"
+          }
+        },
+        {
+          "name": "multiples_x",
+          "vars": {
+            "job": "multiples_x"
+          }
+        },
+        {
+          "name": "x962_invariant",
+          "vars": {
+            "job": "x962_invariant"
+          }
+        },
+        {
+          "name": "brainpool_overlap",
+          "vars": {
+            "job": "brainpool_overlap"
+          }
+        },
+        {
+          "name": "weierstrass",
+          "vars": {
+            "job": "weierstrass"
+          }
+        },
+        {
+          "name": "algebra",
+          "vars": {
+            "job": "algebra"
+          }
+        }
+      ]
+    },
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "nist-skipped-job/v1 receipt with raw upstream JSON or native algebra JSONL",
+    "verify": [
+      "bash",
+      "backlog/XP-20261021-nist-skipped-curves/run.sh",
+      "verify",
+      "{out}"
+    ],
+    "land": "research/nist_skipped_curve_dissection_20261021"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261021-nist-skipped-curves/shard-{k}"
+    ],
+    "ttl_s": 7200,
+    "env": {
+      "name": "nist-skipped-sage98-pari",
+      "recipe": "Install SageMath 9.8 and PARI/GP with seadata, Bash, git, jq, ripgrep and GNU timeout. Check out the pinned unmodified upstream source at /opt/DiSSECT and install pymongo 4.6.3 plus dnspython 2.6.1 into /opt/dissect-deps; see README.md. Select and pin the completed environment before ready promotion."
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 4096,
+      "timeout_s": 3615,
+      "sandbox": "auto",
+      "sandbox_reason": "",
+      "publish": "runs/XP-20261021-nist-skipped-curves/shard-{k}"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Unqueued candidate branch; no priority against the existing funded cards until implementation and environment review."
+    },
+    "notes": "No shared task, lease, funding or paid compute has been created. This is a job-definition PR; raw numerical results will land in a follow-up PR."
+  }
+}

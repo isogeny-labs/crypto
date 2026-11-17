@@ -1,0 +1,61 @@
+{
+  "kind": "software-validation-procedures",
+  "source_commit": "9c3d14b03950affa0237529ce5b55238eda011b5",
+  "rust_toolchain": "1.98",
+  "procedure_recorded_utc": "2026-10-28T17:45:42.809836+00:00",
+  "research_experiment": false,
+  "scientific_generation": false,
+  "verified_cloud_dataset_cells": 0,
+  "source_files": {
+    "src/ml_dataset/budget.rs": "fbbdfc6c9ce7a8b2401cf80a399ec0fbb4e8bc6aab9b61dc601712c03edaeee9",
+    "src/ml_dataset/mod.rs": "e627c6a8488d60a3bf49f2caba93f556bbe92a193b0faa076c4ab33222c08a3f",
+    "Cargo.toml": "7c9a0729099c978029be8d5b4551a2f02d477e67f7bad6c80a62407861baa800",
+    "Cargo.lock": "a86d5ade7e2c17cf603be75dc5dceaecfcbf274dfba89e672dabcf236500ec44"
+  },
+  "root_build_rs_present": false,
+  "commands": [
+    [
+      "bash",
+      "scripts/clippy-maintained.sh"
+    ],
+    [
+      "cargo",
+      "test",
+      "--release",
+      "--lib",
+      "--locked",
+      "ml_dataset::",
+      "--",
+      "--test-threads=2"
+    ],
+    [
+      "cargo",
+      "build",
+      "--release",
+      "--bin",
+      "crypto",
+      "--locked"
+    ],
+    [
+      "python3",
+      "check_launch_cli.py",
+      "9c3d14b03950affa0237529ce5b55238eda011b5"
+    ],
+    [
+      "cargo",
+      "test",
+      "--release",
+      "--lib",
+      "--locked",
+      "--",
+      "--test-threads=2"
+    ]
+  ],
+  "legacy_binary_sha256": "45033ec8a975ab14818e989ffe29842e8558dd556f9dfde5229e12a423faa179",
+  "legacy_source_commit": "23b3c0e527d621aebf6532db61744fab77867f48",
+  "limits": [
+    "Offline CLI records are synthetic and never activated",
+    "New admission and actual cloud owner reconciliation are different evidence",
+    "No speed or mathematical result follows from software checks"
+  ]
+}

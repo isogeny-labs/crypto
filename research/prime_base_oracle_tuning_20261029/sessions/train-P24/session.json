@@ -1,0 +1,56 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1hc463af97cc77",
+  "label": "XP-20261016-prime-base-oracle-tuning Stage T (train), 24-bit fresh prime-order curve",
+  "spec_id": "ECS1h9ba8fcbccd0d",
+  "spec_sha256": "9ba8fcbccd0d8e28f2b2ecdb108d1462ee75c4d707fdc1f133c2dca186bc86d8",
+  "env_class_id": "ECBENV3hc4d998f5ae3f",
+  "host_sha256": "bb770a03db621352bcdd90a097f8d41433db062edb60dfd8f10de136849c10ad",
+  "plan_sha256": "530f6f4c4c36b19203beb36cf078a7664474eaa5cf6fe93edce6c75fbaa82afe",
+  "binary_sha256": "bf5eec6d61fbe83a7e6911bf73d05d847cc0ab23fd6db3342290a26b9f3807d9",
+  "git_commit": null,
+  "git_dirty": null,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "b9e4decea4304c93d55c1bc864aad1cc167f3b53bbd7223d8faa77f517543298",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/tmp/claude-0/awsvenv/bin:/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1793237410606,
+  "finished_unix_ms": 1793237439171,
+  "status": "complete",
+  "executions_planned": 232,
+  "records_written": 232,
+  "records_sha256": "ece0a426320ed118783515bb76bfff0345a12fb2543df146cf4103385341f661",
+  "status_counts": {
+    "verified": 232
+  },
+  "last_seq": 231
+}

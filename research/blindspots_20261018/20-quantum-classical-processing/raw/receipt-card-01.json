@@ -1,0 +1,257 @@
+{
+  "card_id": "CARD-BLINDSPOT-20-01",
+  "card_path": "research/blindspots_20261018/20-quantum-classical-processing/card-01.yaml",
+  "card_sha256": "26c24b5dc3628a3a8b29a87679bedb33d2262bdd6ff7a0b883a50581430372a2",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-20/card-01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-o",
+        "target/blindspots-20/card-01/b20",
+        "examples/blindspots_20_quantum_classical.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2.902,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 2.902,
+      "stderr_sha256": "37075a5136d93b0a585fb378292988546e0f65b4ed0f2fcf09466e6cf9214e5f",
+      "stderr_tail": [
+        "warning: field `sigma` is never read",
+        "   --> examples/blindspots_20_quantum_classical.rs:250:5",
+        "    |",
+        "248 | struct Params {",
+        "    |        ------ field in this struct",
+        "249 |     m: u32,",
+        "250 |     sigma: u32,",
+        "    |     ^^^^^",
+        "    |",
+        "    = note: `Params` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis",
+        "    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default",
+        "",
+        "warning: 1 warning emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-20/card-01/b20",
+        "--mode",
+        "selftest"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.106,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "selftest",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.106,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "fc9da4942ff579ecb48c3f8329f4aaead3b4a98624fa6e47c89005076476a6d3",
+      "stdout_tail": [
+        "{\"kind\":\"selftest\",\"gate\":\"rnsl_formulas\",\"pass\":true,\"detail\":\"qubits=2330 toffoli_over_table=1.0218\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"sampler_exact_r29_s1_l4\",\"pass\":true,\"detail\":\"max_abs_diff=6.245e-17 sum=1.000000000000\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"sampler_exact_r31_s2_l3\",\"pass\":true,\"detail\":\"max_abs_diff=1.978e-16 sum=1.000000000000\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"sampler_exact_r13_s0_l4\",\"pass\":true,\"detail\":\"max_abs_diff=5.551e-17 sum=1.000000000000\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"lll_babai\",\"pass\":true,\"detail\":\"determinant preserved, planted point recovered (50 bases)\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"bsgs\",\"pass\":true,\"detail\":\"recovered_all=true mean_adds=30.4 model=39.5 ratio=0.769\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"window_vs_haner\",\"pass\":true,\"detail\":\"best_window=16 model_T=9.823e8 haner_range=[2.319e9,7.387e9]\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"search_vs_criterion\",\"pass\":true,\"detail\":\"mismatches=0/150\"}",
+        "{\"kind\":\"selftest_done\",\"all_pass\":true}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-20/card-01/b20",
+        "--mode",
+        "model",
+        "--seed",
+        "20",
+        "--toy-m",
+        "16",
+        "--toy-runs",
+        "2000",
+        "--toy-trials",
+        "300"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 24.123,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "model",
+      "index": 4,
+      "outputs": {},
+      "seconds": 24.123,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "7f2f7000383c8a146be24c0f90255c129df778c4c0c3f8200e4d8a9842e40535",
+      "stdout_tail": [
+        "{\"kind\":\"tier\",\"n\":521,\"tier_log2\":40,\"nu\":-68,\"ell\":453,\"quantum_ops\":981,\"saved_vs_2m\":61,\"classical_g_log2\":38.825525852537865,\"classical_native_log2\":38.82552584559143,\"classical_s1_log2\":39.82552584906465,\"bt_log2\":74.65105169117894}",
+        "{\"kind\":\"tier\",\"n\":521,\"tier_log2\":50,\"nu\":-88,\"ell\":433,\"quantum_ops\":961,\"saved_vs_2m\":81,\"classical_g_log2\":48.82552584559625,\"classical_native_log2\":48.82552584558947,\"classical_s1_log2\":49.82552584559286,\"bt_log2\":94.65105169117894}",
+        "{\"kind\":\"tier\",\"n\":521,\"tier_log2\":58,\"nu\":-104,\"ell\":417,\"quantum_ops\":945,\"saved_vs_2m\":97,\"classical_g_log2\":56.82552584558949,\"classical_native_log2\":56.82552584558947,\"classical_s1_log2\":57.825525845589475,\"bt_log2\":110.65105169117894}",
+        "{\"kind\":\"arm\",\"n\":521,\"labels\":\"scaling-context\",\"arm\":\"A0\",\"family\":\"baseline\",\"nu\":0,\"ops_a\":521,\"ops_b\":521,\"ops_per_run\":1042,\"expected_runs\":1,\"p_used\":1,\"band_points\":1,\"central_qubits\":4719,\"central_toffoli_per_run\":1150212175542.828,\"central_toffoli_expected\":1150212175542.828,\"central_product\":5427851256386605,\"ratio_product_min\":1,\"ratio_product_max\":1,\"ratio_toffoli_min\":1,\"ratio_toffoli_max\":1,\"ratio_qubits_min\":1,\"ratio_qubits_max\":1,\"ratio_product_vs_A0p_min\":0.6024485396506707,\"ratio_product_vs_A0p_max\":0.6024485396506707,\"window_min\":0,\"window_max\":0,\"table_additions_log2_max\":null,\"classical_g_log2\":null,\"classical_native_log2\":null,\"s_c0_log2\":null,\"s_c01_log2\":null,\"s_c1_log2\":null,\"rho_distance_bits_c1\":null,\"capped\":false,\"verdict\":\"BASELINE\",\"verdict_vs_A0p\":\"BASELINE\",\"level\":\"constant\",\"note\":\"committed baseline: Shor 2m additions, success taken as 1\"}",
+        "{\"kind\":\"arm\",\"n\":521,\"labels\":\"scaling-context\",\"arm\":\"A0p\",\"family\":\"baseline-measured-success\",\"nu\":0,\"ops_a\":521,\"ops_b\":521,\"ops_per_run\":1042,\"expected_runs\":1.6598928110604256,\"p_used\":0.6024485396506707,\"band_points\":1,\"central_qubits\":4719,\"central_toffoli_per_run\":1150212175542.828,\"central_toffoli_expected\":1909228921377.7124,\"central_product\":9009651279981424,\"ratio_product_min\":1.6598928110604254,\"ratio_product_max\":1.6598928110604254,\"ratio_toffoli_min\":1.6598928110604256,\"ratio_toffoli_max\":1.6598928110604256,\"ratio_qubits_min\":1,\"ratio_qubits_max\":1,\"ratio_product_vs_A0p_min\":1,\"ratio_product_vs_A0p_max\":1,\"window_min\":0,\"window_max\":0,\"table_additions_log2_max\":null,\"classical_g_log2\":null,\"classical_native_log2\":null,\"s_c0_log2\":null,\"s_c01_log2\":null,\"s_c1_log2\":null,\"rho_distance_bits_c1\":null,\"capped\":false,\"verdict\":\"BASELINE-ADJUSTED\",\"verdict_vs_A0p\":\"BASELINE\",\"level\":\"constant\",\"note\":\"A0 with the single-run success measured at toy m (Wilson UPPER bound, the side that favours the baseline)\"}",
+        "{\"kind\":\"arm\",\"n\":521,\"labels\":\"scaling-context\",\"arm\":\"E1-0\",\"family\":\"ekera-single\",\"nu\":0,\"ops_a\":528,\"ops_b\":521,\"ops_per_run\":1049,\"expected_runs\":1.007259609828602,\"p_used\":0.992792712268253,\"band_points\":1,\"central_qubits\":4719,\"central_toffoli_per_run\":1157939128737.4534,\"central_toffoli_expected\":1166345315017.3586,\"central_product\":5503983541566915,\"ratio_product_min\":1.014026229088487,\"ratio_product_max\":1.014026229088487,\"ratio_toffoli_min\":1.014026229088487,\"ratio_toffoli_max\":1.014026229088487,\"ratio_qubits_min\":1,\"ratio_qubits_max\":1,\"ratio_product_vs_A0p_min\":0.6108986208818354,\"ratio_product_vs_A0p_max\":0.6108986208818354,\"window_min\":0,\"window_max\":0,\"table_additions_log2_max\":null,\"classical_g_log2\":11.213408040858337,\"classical_native_log2\":4.857980995127572,\"s_c0_log2\":11.213408040858337,\"s_c01_log2\":11.215168943292307,\"s_c1_log2\":11.230921088137896,\"rho_distance_bits_c1\":249.09482697659826,\"capped\":false,\"verdict\":\"MATCHES\",\"verdict_vs_A0p\":\"ADVANCES\",\"level\":\"constant\",\"note\":\"sigma=7, B_eta=0, B_Delta=100, ell=m\"}",
+        "{\"kind\":\"arm\",\"n\":521,\"labels\":\"scaling-context\",\"arm\":\"E1-2^20\",\"family\":\"ekera-single-tier\",\"nu\":-28,\"ops_a\":528,\"ops_b\":493,\"ops_per_run\":1021,\"expected_runs\":1.007259609828602,\"p_used\":0.992792712268253,\"band_points\":1,\"central_qubits\":4719,\"central_toffoli_per_run\":1127031315958.9512,\"central_toffoli_expected\":1135213123577.429,\"central_product\":5357070730161887,\"ratio_product_min\":0.9869597520489466,\"ratio_product_max\":0.9869597520489466,\"ratio_toffoli_min\":0.9869597520489467,\"ratio_toffoli_max\":0.9869597520489467,\"ratio_qubits_min\":1,\"ratio_qubits_max\":1,\"ratio_product_vs_A0p_min\":0.594592461315876,\"ratio_product_vs_A0p_max\":0.594592461315876,\"window_min\":0,\"window_max\":0,\"table_additions_log2_max\":null,\"classical_g_log2\":18.832792686804908,\"classical_native_log2\":18.82552715198596,\"s_c0_log2\":18.832792686804908,\"s_c01_log2\":18.96963721729173,\"s_c1_log2\":19.82916449312194,\"rho_distance_bits_c1\":240.49658357161422,\"capped\":false,\"verdict\":\"MATCHES\",\"verdict_vs_A0p\":\"ADVANCES\",\"level\":\"constant\",\"note\":\"sigma=7, B_eta=0, B_Delta=100, ell=m+nu(tier)\"}",
+        "{\"kind\":\"arm\",\"n\":521,\"labels\":\"scaling-context\",\"arm\":\"E1-2^30\",\"family\":\"ekera-single-tier\",\"nu\":-48,\"ops_a\":528,\"ops_b\":473,\"ops_per_run\":1001,\"expected_runs\":1.007259609828602,\"p_used\":0.992792712268253,\"band_points\":1,\"central_qubits\":4719,\"central_toffoli_per_run\":1104954306831.4497,\"central_toffoli_expected\":1112975843977.4795,\"central_product\":5252133007729726,\"ratio_product_min\":0.967626554163561,\"ratio_product_max\":0.967626554163561,\"ratio_toffoli_min\":0.967626554163561,\"ratio_toffoli_max\":0.967626554163561,\"ratio_qubits_min\":1,\"ratio_qubits_max\":1,\"ratio_product_vs_A0p_min\":0.582945204483048,\"ratio_product_vs_A0p_max\":0.582945204483048,\"window_min\":0,\"window_max\":0,\"table_additions_log2_max\":null,\"classical_g_log2\":28.825532961067964,\"classical_native_log2\":28.825525847934056,\"s_c0_log2\":28.825532961067964,\"s_c01_log2\":28.96303583817081,\"s_c1_log2\":29.825529404505392,\"rho_distance_bits_c1\":230.50021866023076,\"capped\":false,\"verdict\":\"MATCHES\",\"verdict_vs_A0p\":\"ADVANCES\",\"level\":\"constant\",\"note\":\"sigma=7, B_eta=0, B_Delta=100, ell=m+nu(tier)\"}",
+        "{\"kind\":\"arm\",\"n\":521,\"labels\":\"scaling-context\",\"arm\":\"E1-2^40\",\"family\":\"ekera-single-tier\",\"nu\":-68,\"ops_a\":528,\"ops_b\":453,\"ops_per_run\":981,\"expected_runs\":1.007259609828602,\"p_used\":0.992792712268253,\"band_points\":1,\"central_qubits\":4719,\"central_toffoli_per_run\":1082877297703.9482,\"central_toffoli_expected\":1090738564377.5298,\"central_product\":5147195285297563,\"ratio_product_min\":0.9482933562781751,\"ratio_product_max\":0.9482933562781751,\"ratio_toffoli_min\":0.9482933562781751,\"ratio_toffoli_max\":0.9482933562781751,\"ratio_qubits_min\":1,\"ratio_qubits_max\":1,\"ratio_product_vs_A0p_min\":0.5712979476502198,\"ratio_product_vs_A0p_max\":0.5712979476502198,\"window_min\":0,\"window_max\":0,\"table_additions_log2_max\":null,\"classical_g_log2\":38.825525852537865,\"classical_native_log2\":38.82552584559143,\"s_c0_log2\":38.825525852537865,\"s_c01_log2\":38.963029375656305,\"s_c1_log2\":39.82552584906465,\"rho_distance_bits_c1\":220.5002222156715,\"capped\":false,\"verdict\":\"ADVANCES\",\"verdict_vs_A0p\":\"ADVANCES\",\"level\":\"constant\",\"note\":\"sigma=7, B_eta=0, B_Delta=100, ell=m+nu(tier)\"}",
+        "{\"kind\":\"arm\",\"n\":521,\"labels\":\"scaling-context\",\"arm\":\"E1-2^50\",\"family\":\"ekera-single-tier\",\"nu\":-88,\"ops_a\":528,\"ops_b\":433,\"ops_per_run\":961,\"expected_runs\":1.007259609828602,\"p_used\":0.992792712268253,\"band_points\":1,\"central_qubits\":4719,\"central_toffoli_per_run\":1060800288576.4467,\"central_toffoli_expected\":1068501284777.5801,\"central_product\":5042257562865400,\"ratio_product_min\":0.9289601583927891,\"ratio_product_max\":0.9289601583927891,\"ratio_toffoli_min\":0.9289601583927892,\"ratio_toffoli_max\":0.9289601583927892,\"ratio_qubits_min\":1,\"ratio_qubits_max\":1,\"ratio_product_vs_A0p_min\":0.5596506908173916,\"ratio_product_vs_A0p_max\":0.5596506908173916,\"window_min\":0,\"window_max\":0,\"table_additions_log2_max\":null,\"classical_g_log2\":48.82552584559625,\"classical_native_log2\":48.82552584558947,\"s_c0_log2\":48.82552584559625,\"s_c01_log2\":48.96302936934557,\"s_c1_log2\":49.82552584559286,\"rho_distance_bits_c1\":210.5002222191433,\"capped\":true,\"verdict\":\"TRADES\",\"verdict_vs_A0p\":\"TRADES\",\"level\":\"constant\",\"note\":\"sigma=7, B_eta=0, B_Delta=100, ell=m+nu(tier)\"}",
+        "{\"kind\":\"arm\",\"n\":521,\"labels\":\"scaling-context\",\"arm\":\"E1-2^58\",\"family\":\"ekera-single-tier\",\"nu\":-104,\"ops_a\":528,\"ops_b\":417,\"ops_per_run\":945,\"expected_runs\":1.007259609828602,\"p_used\":0.992792712268253,\"band_points\":1,\"central_qubits\":4719,\"central_toffoli_per_run\":1043138681274.4456,\"central_toffoli_expected\":1050711461097.6204,\"central_product\":4958307384919670,\"ratio_product_min\":0.9134936000844804,\"ratio_product_max\":0.9134936000844804,\"ratio_toffoli_min\":0.9134936000844806,\"ratio_toffoli_max\":0.9134936000844806,\"ratio_qubits_min\":1,\"ratio_qubits_max\":1,\"ratio_product_vs_A0p_min\":0.550332885351129,\"ratio_product_vs_A0p_max\":0.550332885351129,\"window_min\":0,\"window_max\":0,\"table_additions_log2_max\":null,\"classical_g_log2\":56.82552584558949,\"classical_native_log2\":56.82552584558947,\"s_c0_log2\":56.82552584558949,\"s_c01_log2\":56.963029369339424,\"s_c1_log2\":57.825525845589475,\"rho_distance_bits_c1\":202.50022221914668,\"capped\":true,\"verdict\":\"TRADES\",\"verdict_vs_A0p\":\"TRADES\",\"level\":\"constant\",\"note\":\"sigma=7, B_eta=0, B_Delta=100, ell=m+nu(tier)\"}",
+        "{\"kind\":\"arm\",\"n\":521,\"labels\":\"scaling-context\",\"arm\":\"E2-s2\",\"family\":\"ekera-lattice\",\"nu\":0,\"ops_a\":528,\"ops_b\":261,\"ops_per_run\":789,\"expected_runs\":2.2451643780895165,\"p_used\":0.9873565700022643,\"band_points\":1,\"central_qubits\":4719,\"central_toffoli_per_run\":870938010079.9338,\"central_toffoli_expected\":1955398995755.6357,\"central_product\":9227527860970846,\"ratio_product_min\":1.7000332958854398,\"ratio_product_max\":1.7000332958854398,\"ratio_toffoli_min\":1.7000332958854398,\"ratio_toffoli_max\":1.7000332958854398,\"ratio_qubits_min\":1,\"ratio_qubits_max\":1,\"ratio_product_vs_A0p_min\":1.0241825764636998,\"ratio_product_vs_A0p_max\":1.0241825764636998,\"window_min\":0,\"window_max\":0,\"table_additions_log2_max\":null,\"classical_g_log2\":6.97338167497138,\"classical_native_log2\":10.25474126151244,\"s_c0_log2\":6.97338167497138,\"s_c01_log2\":7.9532400141392605,\"s_c1_log2\":10.395980334408392,\"rho_distance_bits_c1\":249.92976773032777,\"capped\":false,\"verdict\":\"REGRESSES\",\"verdict_vs_A0p\":\"MATCHES\",\"level\":\"constant\",\"note\":\"lattice over subsets, toy-measured cumulative success (cycle success 0.987); native work is the toy mean to stop\"}",
+        "{\"kind\":\"arm\",\"n\":521,\"labels\":\"scaling-context\",\"arm\":\"E2-s3\",\"family\":\"ekera-lattice\",\"nu\":0,\"ops_a\":528,\"ops_b\":174,\"ops_per_run\":702,\"expected_runs\":3.2354628438716158,\"p_used\":0.9873565700022643,\"band_points\":1,\"central_qubits\":4719,\"central_toffoli_per_run\":774903020375.3024,\"central_toffoli_expected\":2507169930028.18,\"central_product\":11831334899802982,\"ratio_product_min\":2.1797456011495906,\"ratio_product_max\":2.1797456011495906,\"ratio_toffoli_min\":2.179745601149591,\"ratio_toffoli_max\":2.179745601149591,\"ratio_qubits_min\":1,\"ratio_qubits_max\":1,\"ratio_product_vs_A0p_min\":1.3131845542225442,\"ratio_product_vs_A0p_max\":1.3131845542225442,\"window_min\":0,\"window_max\":0,\"table_additions_log2_max\":null,\"classical_g_log2\":8.451513359130379,\"classical_native_log2\":12.316344707204637,\"s_c0_log2\":8.451513359130379,\"s_c01_log2\":9.748353326507571,\"s_c1_log2\":12.412119044437945,\"rho_distance_bits_c1\":247.9136290202982,\"capped\":false,\"verdict\":\"REGRESSES\",\"verdict_vs_A0p\":\"REGRESSES\",\"level\":\"constant\",\"note\":\"lattice over subsets, toy-measured cumulative success (cycle success 0.987); native work is the toy mean to stop\"}",
+        "{\"kind\":\"arm\",\"n\":521,\"labels\":\"scaling-context\",\"arm\":\"W(A0)\",\"family\":\"windowed\",\"nu\":0,\"ops_a\":521,\"ops_b\":521,\"ops_per_run\":1042,\"expected_runs\":1,\"p_used\":1,\"band_points\":27,\"central_qubits\":4767,\"central_toffoli_per_run\":50784012592.50328,\"central_toffoli_expected\":50784012592.50328,\"central_product\":242087388028463.13,\"ratio_product_min\":0.033936961966446924,\"ratio_product_max\":0.09546127682474137,\"ratio_toffoli_min\":0.03231165810502553,\"ratio_toffoli_max\":0.0884106522352189,\"ratio_qubits_min\":1.007628734901462,\"ratio_qubits_max\":1.2309811400720492,\"ratio_product_vs_A0p_min\":0.020445273176866303,\"ratio_product_vs_A0p_max\":0.05751050681625385,\"window_min\":18,\"window_max\":24,\"table_additions_log2_max\":29.459431618637296,\"classical_g_log2\":null,\"classical_native_log2\":null,\"s_c0_log2\":29.459431618637296,\"s_c01_log2\":29.459431618637296,\"s_c1_log2\":29.459431618637296,\"rho_distance_bits_c1\":230.86631644609886,\"capped\":false,\"verdict\":\"ADVANCES\",\"verdict_vs_A0p\":\"ADVANCES\",\"level\":\"constant\",\"note\":\"committed baseline: Shor 2m additions, success taken as 1\"}",
+        "{\"kind\":\"arm\",\"n\":521,\"labels\":\"scaling-context\",\"arm\":\"W(E1-0)\",\"family\":\"windowed\",\"nu\":0,\"ops_a\":528,\"ops_b\":521,\"ops_per_run\":1049,\"expected_runs\":1.007259609828602,\"p_used\":0.992792712268253,\"band_points\":27,\"central_qubits\":4767,\"central_toffoli_per_run\":50784012592.50328,\"central_toffoli_expected\":51152684709.455666,\"central_product\":243844848009975.16,\"ratio_product_min\":0.03418333106909144,\"ratio_product_max\":0.09807737421719374,\"ratio_toffoli_min\":0.0325462281357832,\"ratio_toffoli_max\":0.09058786664539982,\"ratio_qubits_min\":1.007628734901462,\"ratio_qubits_max\":1.2309811400720492,\"ratio_product_vs_A0p_min\":0.020593697882969535,\"ratio_product_vs_A0p_max\":0.05908657086992071,\"window_min\":18,\"window_max\":24,\"table_additions_log2_max\":29.459431618637296,\"classical_g_log2\":11.213408040858337,\"classical_native_log2\":4.857980995127572,\"s_c0_log2\":29.459436259229886,\"s_c01_log2\":29.459436264897477,\"s_c1_log2\":29.4594363159058,\"rho_distance_bits_c1\":230.86631174883036,\"capped\":false,\"verdict\":\"ADVANCES\",\"verdict_vs_A0p\":\"ADVANCES\",\"level\":\"constant\",\"note\":\"sigma=7, B_eta=0, B_Delta=100, ell=m\"}",
+        "{\"kind\":\"arm\",\"n\":521,\"labels\":\"scaling-context\",\"arm\":\"W(E1-2^40)\",\"family\":\"windowed\",\"nu\":-68,\"ops_a\":528,\"ops_b\":453,\"ops_per_run\":981,\"expected_runs\":1.007259609828602,\"p_used\":0.992792712268253,\"band_points\":27,\"central_qubits\":4767,\"central_toffoli_per_run\":47321466279.37806,\"central_toffoli_expected\":47665001661.08369,\"central_product\":227219062918385.94,\"ratio_product_min\":0.03185264940528975,\"ratio_product_max\":0.09230811691029998,\"ratio_toffoli_min\":0.030327167126525258,\"ratio_toffoli_max\":0.08428083555414068,\"ratio_qubits_min\":1.0072049162958254,\"ratio_qubits_max\":1.2309811400720492,\"ratio_product_vs_A0p_min\":0.019189582118221613,\"ratio_product_vs_A0p_max\":0.055610890230513604,\"window_min\":17,\"window_max\":24,\"table_additions_log2_max\":29.357552004618082,\"classical_g_log2\":38.825525852537865,\"classical_native_log2\":38.82552584559143,\"s_c0_log2\":38.8275616002996,\"s_c01_log2\":38.96488017409684,\"s_c1_log2\":39.82654408202148,\"rho_distance_bits_c1\":220.49920398271468,\"capped\":false,\"verdict\":\"ADVANCES\",\"verdict_vs_A0p\":\"ADVANCES\",\"level\":\"constant\",\"note\":\"sigma=7, B_eta=0, B_Delta=100, ell=m+nu(tier)\"}",
+        "{\"kind\":\"arm\",\"n\":521,\"labels\":\"scaling-context\",\"arm\":\"EH-128\",\"family\":\"ekera-hastad-promise\",\"nu\":0,\"ops_a\":128,\"ops_b\":64,\"ops_per_run\":192,\"expected_runs\":1.0101010101010102,\"p_used\":0.99,\"band_points\":1,\"central_qubits\":4719,\"central_toffoli_per_run\":211939287624.01434,\"central_toffoli_expected\":214080088509.1054,\"central_product\":1010243937674468.4,\"ratio_product_min\":0.18612225905891933,\"ratio_product_max\":0.18612225905891933,\"ratio_toffoli_min\":0.18612225905891933,\"ratio_toffoli_max\":0.18612225905891933,\"ratio_qubits_min\":1,\"ratio_qubits_max\":1,\"ratio_product_vs_A0p_min\":0.11212908316652975,\"ratio_product_vs_A0p_max\":0.11212908316652975,\"window_min\":0,\"window_max\":0,\"table_additions_log2_max\":null,\"classical_g_log2\":null,\"classical_native_log2\":null,\"s_c0_log2\":null,\"s_c01_log2\":null,\"s_c1_log2\":null,\"rho_distance_bits_c1\":null,\"capped\":false,\"verdict\":\"N/A-promise-problem\",\"verdict_vs_A0p\":\"N/A-promise-problem\",\"level\":\"constant\",\"note\":\"short-logarithm promise problem; success >= 0.99 cited from Ekera-Hastad, not measured; classical lattice not measured\"}",
+        "{\"kind\":\"arm\",\"n\":521,\"labels\":\"scaling-context\",\"arm\":\"EH-160\",\"family\":\"ekera-hastad-promise\",\"nu\":0,\"ops_a\":160,\"ops_b\":80,\"ops_per_run\":240,\"expected_runs\":1.0101010101010102,\"p_used\":0.99,\"band_points\":1,\"central_qubits\":4719,\"central_toffoli_per_run\":264924109530.0179,\"central_toffoli_expected\":267600110636.38174,\"central_product\":1262804922093085.5,\"ratio_product_min\":0.23265282382364916,\"ratio_product_max\":0.23265282382364916,\"ratio_toffoli_min\":0.23265282382364916,\"ratio_toffoli_max\":0.23265282382364916,\"ratio_qubits_min\":1,\"ratio_qubits_max\":1,\"ratio_product_vs_A0p_min\":0.1401613539581622,\"ratio_product_vs_A0p_max\":0.1401613539581622,\"window_min\":0,\"window_max\":0,\"table_additions_log2_max\":null,\"classical_g_log2\":null,\"classical_native_log2\":null,\"s_c0_log2\":null,\"s_c01_log2\":null,\"s_c1_log2\":null,\"rho_distance_bits_c1\":null,\"capped\":false,\"verdict\":\"N/A-promise-problem\",\"verdict_vs_A0p\":\"N/A-promise-problem\",\"level\":\"constant\",\"note\":\"short-logarithm promise problem; success >= 0.99 cited from Ekera-Hastad, not measured; classical lattice not measured\"}",
+        "{\"kind\":\"arm\",\"n\":521,\"labels\":\"scaling-context\",\"arm\":\"EH-192\",\"family\":\"ekera-hastad-promise\",\"nu\":0,\"ops_a\":192,\"ops_b\":96,\"ops_per_run\":288,\"expected_runs\":1.0101010101010102,\"p_used\":0.99,\"band_points\":1,\"central_qubits\":4719,\"central_toffoli_per_run\":317908931436.0215,\"central_toffoli_expected\":321120132763.6581,\"central_product\":1515365906511702.5,\"ratio_product_min\":0.27918338858837893,\"ratio_product_max\":0.27918338858837893,\"ratio_toffoli_min\":0.279183388588379,\"ratio_toffoli_max\":0.279183388588379,\"ratio_qubits_min\":1,\"ratio_qubits_max\":1,\"ratio_product_vs_A0p_min\":0.16819362474979463,\"ratio_product_vs_A0p_max\":0.16819362474979463,\"window_min\":0,\"window_max\":0,\"table_additions_log2_max\":null,\"classical_g_log2\":null,\"classical_native_log2\":null,\"s_c0_log2\":null,\"s_c01_log2\":null,\"s_c1_log2\":null,\"rho_distance_bits_c1\":null,\"capped\":false,\"verdict\":\"N/A-promise-problem\",\"verdict_vs_A0p\":\"N/A-promise-problem\",\"level\":\"constant\",\"note\":\"short-logarithm promise problem; success >= 0.99 cited from Ekera-Hastad, not measured; classical lattice not measured\"}",
+        "{\"kind\":\"model_done\",\"cap_log2\":40}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-20/card-01/b20"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-20/card-01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "07de1c9766a7296001f9addf4b2d131b42d7d392",
+  "dirty_after": [
+    "esearch/blindspots_20261018/10-kernel-program-search/raw-r2/state/n31-c.jsonl",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/receipt-card-09-r2.json",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n31-c-b.stderr.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n31-c-b.stdout.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/card-01-build.stderr.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/card-01-build.stdout.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/model.jsonl",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/model.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/selftest-card-01.jsonl",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/selftest-card-01.log"
+  ],
+  "dirty_before": [
+    "esearch/blindspots_20261018/10-kernel-program-search/raw-r2/state/n31-c.jsonl",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/receipt-card-09-r2.json",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n31-c-b.stderr.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n31-c-b.stdout.log"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

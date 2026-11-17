@@ -1,0 +1,48 @@
+✖ [3138/3139] Building CodedProjection (4.3s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/audit/coded-projection-lean/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/audit/coded-projection-lean/CodedProjection.lean -o /workspace/audit/coded-projection-lean/.lake/build/lib/lean/CodedProjection.olean -i /workspace/audit/coded-projection-lean/.lake/build/lib/lean/CodedProjection.ilean -c /workspace/audit/coded-projection-lean/.lake/build/ir/CodedProjection.c --setup /workspace/audit/coded-projection-lean/.lake/build/ir/CodedProjection.setup.json --json
+error: CodedProjection.lean:23:56: typeclass instance problem is stuck
+  Ring ?m.23
+
+Note: Lean will not try to resolve this typeclass instance problem because the type argument to `Ring` is a metavariable. This argument must be fully determined before Lean will try to resolve the typeclass.
+
+Hint: Adding type annotations and supplying implicit arguments to functions can give Lean more information for typeclass resolution. For example, if you have a variable `x` that you intend to be a `Nat`, but Lean reports it as having an unresolved type like `?m`, replacing `x` with `(x : Nat)` can get typeclass resolution un-stuck.
+error: CodedProjection.lean:29:20: typeclass instance problem is stuck
+  OfNat (Matrix G G ?m.9) 0
+
+Note: Lean will not try to resolve this typeclass instance problem because the first type argument to `OfNat` contains metavariables. This argument must be fully determined before Lean will try to resolve the typeclass.
+
+Hint: Adding type annotations and supplying implicit arguments to functions can give Lean more information for typeclass resolution. For example, if you have a variable `x` that you intend to be a `Nat`, but Lean reports it as having an unresolved type like `?m`, replacing `x` with `(x : Nat)` can get typeclass resolution un-stuck.
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  Matrix G G ?m.9
+due to the absence of the instance above
+error: CodedProjection.lean:39:4: typeclass instance problem is stuck
+  Ring ?m.39
+
+Note: Lean will not try to resolve this typeclass instance problem because the type argument to `Ring` is a metavariable. This argument must be fully determined before Lean will try to resolve the typeclass.
+
+Hint: Adding type annotations and supplying implicit arguments to functions can give Lean more information for typeclass resolution. For example, if you have a variable `x` that you intend to be a `Nat`, but Lean reports it as having an unresolved type like `?m`, replacing `x` with `(x : Nat)` can get typeclass resolution un-stuck.
+error: CodedProjection.lean:52:32: typeclass instance problem is stuck
+  OfNat (Matrix G G ?m.16) 0
+
+Note: Lean will not try to resolve this typeclass instance problem because the first type argument to `OfNat` contains metavariables. This argument must be fully determined before Lean will try to resolve the typeclass.
+
+Hint: Adding type annotations and supplying implicit arguments to functions can give Lean more information for typeclass resolution. For example, if you have a variable `x` that you intend to be a `Nat`, but Lean reports it as having an unresolved type like `?m`, replacing `x` with `(x : Nat)` can get typeclass resolution un-stuck.
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  Matrix G G ?m.16
+due to the absence of the instance above
+error: CodedProjection.lean:64:49: typeclass instance problem is stuck
+  Ring (?m.46 y x)
+
+Note: Lean will not try to resolve this typeclass instance problem because the type argument to `Ring` contains metavariables. This argument must be fully determined before Lean will try to resolve the typeclass.
+
+Hint: Adding type annotations and supplying implicit arguments to functions can give Lean more information for typeclass resolution. For example, if you have a variable `x` that you intend to be a `Nat`, but Lean reports it as having an unresolved type like `?m`, replacing `x` with `(x : Nat)` can get typeclass resolution un-stuck.
+error: CodedProjection.lean:78:15: Unknown identifier `mismatched_pair_annihilates`
+error: CodedProjection.lean:82:14: Unknown constant `projected_is_matrix_product`
+error: CodedProjection.lean:83:14: Unknown constant `nonzero_syndrome_annihilates`
+error: CodedProjection.lean:84:14: Unknown constant `zero_syndrome_preserves`
+error: CodedProjection.lean:85:14: Unknown constant `mismatched_pair_annihilates`
+error: CodedProjection.lean:86:14: Unknown constant `matched_pair_preserves`
+info: CodedProjection.lean:87:0: 'CodedProjection.weighted_pair_diagonal' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- CodedProjection
+error: build failed

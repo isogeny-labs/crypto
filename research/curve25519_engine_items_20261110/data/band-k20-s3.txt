@@ -1,0 +1,17 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg | 64/64 | 1.569 | 1.681 | 2.689 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg-chained | 64/64 | 2.627 | 2.866 | 5.014 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | twcj | 64/64 | 2.173 | 2.319 | 3.632 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | twcj-cv0 | 64/64 | 1.919 | 2.065 | 3.378 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-tm1050-4295f05e | rho-neg vs rho-neg-chained | rho-neg < rho-neg-chained |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs twcj | rho-neg < twcj |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs twcj-cv0 | rho-neg < twcj-cv0 |
+| icv1-fp20-tm1050-4295f05e | rho-neg-chained vs twcj | twcj < rho-neg-chained |
+| icv1-fp20-tm1050-4295f05e | rho-neg-chained vs twcj-cv0 | twcj-cv0 < rho-neg-chained |
+| icv1-fp20-tm1050-4295f05e | twcj vs twcj-cv0 | twcj-cv0 < twcj |

@@ -1,0 +1,82 @@
+{
+  "schema": "ic_profile/v1",
+  "created": "2026-10-29",
+  "unit": "ecbench.gae (group-addition equivalents), cold, per solve",
+  "binary": {
+    "ecbench_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9",
+    "source_revision": "cb2ec6873f30b683f7885b53c410d69965f02c20",
+    "built_at": "2026-10-19T17:55:04Z",
+    "architecture": "linux/amd64"
+  },
+  "runs": {
+    "prime-20": {
+      "job_name": "crypto-ic-profile-prime-20261029",
+      "job_uid": "c04cb41c-328b-4fc6-81f1-7b953fa8ae8c",
+      "pod_uid": "5c5df343-dc30-48c8-ba17-fbb278fd6716",
+      "admitted": true,
+      "admission": "L2 accepted: 144/144 executions, no invalid outcomes",
+      "exit_code": 0,
+      "curve": "prime_search bits=20 seed=59297",
+      "targets_per_curve": 8,
+      "rounds": 5,
+      "warmup": 1,
+      "records_uri": "s3://isolab-results-104186811093-us-east-2/runs/crypto-ic-profile-prime-20261029/5c5df343-dc30-48c8-ba17-fbb278fd6716/",
+      "arms": {
+        "rho-neg": {"S_median": 1.077, "S_min": 0.385, "S_max": 2.275, "total_gae_median": 808, "n": 40},
+        "ic-n45": {"S_median": 9.929, "S_min": 6.392, "S_max": 14.122, "total_gae_median": 7444, "n": 40},
+        "ic-n45-aa": {"S_median": 9.929, "n": 40, "equals_ic_n45": true}
+      },
+      "ic_phase_median_gae": {
+        "factor_base": 0,
+        "oracle_setup": 2070,
+        "relations": 5348,
+        "linear_algebra": 0,
+        "verify": 26
+      },
+      "ic_counters_median": {
+        "targets_tried": 3853,
+        "relations_found": 28,
+        "matrix_rows": 28,
+        "matrix_work_row_ops": 288
+      },
+      "derived": {
+        "S_ratio_ic_over_rho": 9.22,
+        "relations_share_of_priced_gae": 0.718,
+        "oracle_setup_share_of_priced_gae": 0.278,
+        "relation_yield": 0.00727,
+        "gae_per_relation_trial": 1.388
+      },
+      "unpriced": ["sqrt_solves", "lookups", "row_ops", "legendre_symbols", "target_guard_probes"]
+    },
+    "koblitz-m31": {
+      "job_name": "crypto-ic-profile-koblitz-20261029",
+      "job_uid": "42cb3802-844f-4ad6-b41a-9c2cb2f2d802",
+      "pod_uid": "1c406d5d-80b1-4426-9293-f001f4944153",
+      "admitted": false,
+      "admission": "L2 rejected: seq 42 (rho-neg) graded L1 at 64.8 preemptions/s; 287/288 L2. Data kept as a diagnostic, not a result.",
+      "exit_code": 42,
+      "curve": "koblitz a=0 n=31 (icv1-f2m31-tm90707-c95f16f5)",
+      "targets_per_curve": 16,
+      "rounds": 5,
+      "warmup": 1,
+      "records_uri": "s3://isolab-results-104186811093-us-east-2/runs/crypto-ic-profile-koblitz-20261029/1c406d5d-80b1-4426-9293-f001f4944153/",
+      "arms": {
+        "rho-neg": {"S_median": 1.247, "S_min": 0.301, "S_max": 2.800, "n": 80},
+        "ic-frob-m3": {"S_median": 2495.870, "S_min": 105.368, "S_max": 14638.5, "n": 80},
+        "ic-frob-m3-aa": {"equals_ic_frob_m3": true}
+      },
+      "ic_phase_median_gae": {
+        "factor_base": 7,
+        "oracle_setup": 191,
+        "relations": null,
+        "linear_algebra": 0,
+        "verify": 25
+      },
+      "derived": {
+        "S_ratio_ic_over_rho": 2001.5,
+        "relations_share_of_priced_gae": ">0.9999",
+        "note": "relations phase is 10^6-10^7 GAE on individual runs; it is the whole cost"
+      }
+    }
+  }
+}

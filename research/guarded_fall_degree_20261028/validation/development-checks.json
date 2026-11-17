@@ -1,0 +1,55 @@
+{
+  "schema": "guarded-fall-degree-development-checks/v1",
+  "date": "2026-10-28",
+  "scope": "Development checks on public historical or already-proved fixtures; no scientific sweep or performance measurement.",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "checks": [
+    {
+      "command": "cargo test --locked --manifest-path research/guarded_fall_degree_20261028/native/Cargo.toml",
+      "exit_code": 0,
+      "tests_passed": 24,
+      "tests_failed": 0,
+      "detail": "13 sparse replay tests and 11 repository identity-record tests."
+    },
+    {
+      "command": "cargo test --locked --manifest-path research/guarded_fall_degree_20261028/extensions/char2_compute/native/Cargo.toml",
+      "exit_code": 0,
+      "tests_passed": 4,
+      "tests_failed": 0,
+      "detail": "Includes genuine extension-field laws, normalization, lower-certificate and upper-DAG checks, and the pinned GF16 cube-orbit exact-four fixture."
+    },
+    {
+      "command": "cargo run --locked --release --manifest-path research/guarded_fall_degree_20261028/native/Cargo.toml --bin fall-degree-replay -- verify research/guarded_fall_degree_20261028/evidence/p101_problem.json research/guarded_fall_degree_20261028/evidence/p101_upper_D5.json",
+      "exit_code": 0,
+      "nodes_replayed": 391,
+      "maximum_intermediate_degree": 5,
+      "valid_refutation": true
+    },
+    {
+      "command": "cargo run --locked --release --manifest-path research/guarded_fall_degree_20261028/native/Cargo.toml --bin identity_records -- check",
+      "exit_code": 0,
+      "records_accepted": 4,
+      "detail": "Each serialized record passes 32 statement-bound points plus 32 extra checker points; this probabilistic native check does not execute Lean."
+    },
+    {
+      "command": "cargo fmt --manifest-path <each of the two native Cargo.toml files> -- --check",
+      "exit_code": 0,
+      "packages_checked": 2
+    },
+    {
+      "command": "cargo clippy --locked --manifest-path <each of the two native Cargo.toml files> --all-targets -- -D warnings",
+      "exit_code": 0,
+      "packages_checked": 2
+    }
+  ],
+  "lean_receipt": "../formal/VERIFICATION.json",
+  "formal_source_sha256": "7aa8afec68e132b490bb256e168df6e62dbdb5bf2ac3118aa66e92cd55fce661",
+  "incomplete_library_attempt": {
+    "command": "cargo test --release --lib --locked -- --test-threads=4",
+    "status": "interrupted_by_workspace_restart_without_final_result",
+    "exit_code": null,
+    "log": "library-tests-interrupted.log.gz",
+    "uncompressed_log_sha256": "f407474e057047a4c4f91b76d2734bd77a947c5757e2d1df0dcbc293418e1fcd"
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "schema": "pkm.final-pinned-native-validation/v1",
+  "recorded_utc": "2026-10-30T18:29:00.185016+00:00",
+  "tested_source_commit": "faade165a46fd51e5a0903ba8e4df85a134c68db",
+  "metadata_head_before_receipt": "56a69f8c8d9a397eb2fe9b9a452c0ea1a5a74cd8",
+  "source_objects": {
+    "src": "5ce39be7d8d70c4bf250ef67f0d041940eb741ce",
+    "crates": "41894a5b26ffd9f5236ab0a0b4d8969597b420a4",
+    "Cargo.toml": "33b564da80e3ced6f4ec8df6feaee862c9fa2333",
+    "Cargo.lock": "1c792ecacbbd8c46e82443a95b35ee9400888080",
+    "examples/pkm_oracle_program.rs": "0b2d978683664b8c3d1ab6663a3b0cf75dc68d4e",
+    "examples/pkm_oracle_program": "6acb74a9bb88b3aa29a26cbe94d22d1a6a6d557d",
+    "examples/pkm_symmetric_complete.rs": "0fb50ab47dab4256dd29f4ac8eb84fb5313168e8",
+    "examples/hecke_target_router.rs": "6cbba7cbe8b673b313c08583d0a9fd00e343bf75",
+    "tools/factor-base": "f9174d17fb0dd4d628e7873af65024eb6590f544",
+    "tools/volcano-cli": "f7b0683e86a320729dc28eb287158826786dd1ff",
+    "scripts/checkpoint.sh": "6a2a37967047b1a46ed62a4123f4c69f08a55d04",
+    "tools/lean": "7717e915c52bc3e7d05636f8607e468cf64da5fd",
+    "tests": "8fa07275361911cb2e21ac3cf0a33f0394b79091",
+    "research/prime_ecdlp_three_leads_20261029/lean": "1c366822536c08b212a7d36045580ee715f327a0",
+    "research/aps_measurement_20261029/spec-controls.json": "c11e5f1515b0080aae37539e8321cc82be573f3c",
+    "research/aps_measurement_20261029/spec-orbit-controls.json": "4f832f6190d8347f42892e304fec986453e59f66",
+    "backlog/XP-20261029-pkm-verified-oracle-program/card.json": "e99f0d598cd89d839060e991b9b157efbd6f286a"
+  },
+  "source_objects_clean_and_equal": 17,
+  "binaries_verified_at_collection": [
+    {
+      "path": "target/release/examples/hecke_target_router-400337dfe79d54df",
+      "bytes": 5157120,
+      "sha256": "c718063fb64d4a85977771dbe6ac0a5522186f930cfb33599dfb899649051d3b"
+    },
+    {
+      "path": "target/release/examples/pkm_oracle_program-9b34922ca9c096c6",
+      "bytes": 7037880,
+      "sha256": "9b94d98b4707d144d658702e70452fc65404a8eafab59ecf2fd28a6008d3fdb0"
+    },
+    {
+      "path": "target/release/examples/pkm_symmetric_complete-54795fd1798bb6d4",
+      "bytes": 6512424,
+      "sha256": "5287938d57836b01f077aabcfe7e2119c7c6063714bdee843de53630399a1471"
+    },
+    {
+      "path": "target/release/examples/pkm_oracle_program",
+      "bytes": 6585960,
+      "sha256": "417e55b27c4a4aad15f16758db8cd1558f02912bf8de17ce5839f53e20de65a5"
+    },
+    {
+      "path": "target/release/backlog",
+      "bytes": 5744104,
+      "sha256": "44e665417ac402a8481d55adbdc2b735b29869b1c22dc8a8e0f1e831000b4b7a"
+    },
+    {
+      "path": "target/release/deps/crypto_lib-cd696b7f650051ce",
+      "bytes": 282338408,
+      "sha256": "ced1eee02ba4c4f66d2e120a5e192af99015839ef2ba6c59c9e37f017b478c9a"
+    }
+  ],
+  "scoped_receipt": "../scoped-20261030T1703Z/receipt.json",
+  "scoped_outcome": "23 examples and all scoped lint/fmt/build/CLI-refusal/backlog checks PASS",
+  "proof_receipt": "../proof-final-receipt.json",
+  "proof_scope": "unchanged18 declarations/zero trusted; official module replay against imports,not--fresh",
+  "full_library": {
+    "status": "capped incomplete",
+    "command": "timeout 2400 cargo test --release --lib --locked -j2 -- --test-threads=1",
+    "started": "2026-10-30T16:47:54Z",
+    "finished": "2026-10-30T17:27:54Z",
+    "execution_budget_seconds": 2400,
+    "declared": 5646,
+    "passed": 2208,
+    "failed": 0,
+    "ignored": 47,
+    "active_at_cap": 1,
+    "not_reached": 3390,
+    "active_tests": [
+      "cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies"
+    ],
+    "count_parser": "Rust harness test lines including optional - should panic annotation; unique names; all declared states reconcile",
+    "wrapper_exit": 124,
+    "cargo_exit": null,
+    "supervisor_exit": 124,
+    "final_suite_summary": false,
+    "jv_source_blob": "568a67fb3a7e4067036c7b5985648c477a46290d",
+    "raw_log": {
+      "schema": "pkm.unuploaded-artifact/v1",
+      "status": "NOT_UPLOADED",
+      "path": "/workspace/pkm-scalar-certificates-20261030/integrated/library-test.log",
+      "bytes": 214615,
+      "sha256": "34fdd95ea133361298e8911f9a5899c431a5e9af97b73e7828e1b5289cdf87bd",
+      "reason": "approved checkpoint/artifact transport and runtime identity unavailable",
+      "object_uri": null,
+      "no_compression_or_splitting": true,
+      "bounded_excerpt": "library-excerpt.log"
+    }
+  },
+  "no_duplicate_validation_launched": true,
+  "new_remote_0cc5_validation": false,
+  "scientific_panels": 0,
+  "comparison_admissible": false,
+  "research_goal_complete": false
+}

@@ -1,0 +1,66 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "exhaustive, Koblitz curve k59: pipeline, pipeline at 0.71 c0, §23 descent, strong rho",
+  "description": "research/ic_planner_exhaustive_20261026/PROTOCOL.md",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 59
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261105
+  },
+  "arms": [
+    {
+      "name": "rho",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=298,raw_x_cap=100000000",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "targets": "walk"
+        }
+      },
+      "name": "pipeline",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=212,raw_x_cap=100000000",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "targets": "walk"
+        }
+      },
+      "name": "pipeline71",
+      "role": "baseline"
+    },
+    {
+      "name": "descent",
+      "role": "baseline",
+      "method": {
+        "id": "ic.koblitz_descent"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 20261106,
+    "isolation_required": "L2",
+    "timeout_seconds": 1800
+  }
+}

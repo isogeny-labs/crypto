@@ -1,0 +1,102 @@
+{
+  "schema": "software.runtime-qualification-supervisor/v2",
+  "passed_cases": [
+    "Q0",
+    "Q1",
+    "Q2",
+    "Q3",
+    "Q4"
+  ],
+  "failure": null,
+  "cleanup_complete": true,
+  "elapsed_seconds": 6.383614638005383,
+  "cap_seconds": 300,
+  "image_id": "sha256:3a2bb98af4743c888d969c9df00f0769a64e3704e57e97e937769d384e3c8409",
+  "binary_sha256": "d0e2d1426115f5efecced07c298d691e1bcc7d5378015f992edc615dc9384f5b",
+  "private_endpoint_sha256": "b915b6aa93f073e963d635704a478014507db6451a64c443923318f606422962",
+  "host_preexec_ancestry": [
+    {
+      "pid": 26758,
+      "start_ticks": 23817169,
+      "cgroup": "/system.slice/pencil-private-24806e07-13ac-4791-92da-12dd595ae9e4.service/payload/9e81ce53b0ba96d10a06021642f3092563e34bd60ae3dd936eecdf66907719d9",
+      "container_id": "9e81ce53b0ba96d10a06021642f3092563e34bd60ae3dd936eecdf66907719d9",
+      "nonce": "6bc4cc02-21fa-4dd5-b91e-0a9f7237e50c",
+      "cgroup_device": 27,
+      "cgroup_inode": 271518
+    },
+    {
+      "pid": 27097,
+      "start_ticks": 23817354,
+      "cgroup": "/system.slice/pencil-private-24806e07-13ac-4791-92da-12dd595ae9e4.service/payload/33650ee567d251b2d62548e4e3a6799a5a4507f471d51dd4c7433e1870fde51b",
+      "container_id": "33650ee567d251b2d62548e4e3a6799a5a4507f471d51dd4c7433e1870fde51b",
+      "nonce": "2062d4bb-7978-4a0f-be96-2330fc66102d",
+      "cgroup_device": 27,
+      "cgroup_inode": 271597
+    },
+    {
+      "pid": 27426,
+      "start_ticks": 23817491,
+      "cgroup": "/system.slice/pencil-private-24806e07-13ac-4791-92da-12dd595ae9e4.service/payload/9ffd3e7d0ba5bbb690213611bf99cc7e71bc03e833cd1137da017ffe58a62c52",
+      "container_id": "9ffd3e7d0ba5bbb690213611bf99cc7e71bc03e833cd1137da017ffe58a62c52",
+      "nonce": "3c789511-154f-4f78-b2bb-1943e11ccef8",
+      "cgroup_device": 27,
+      "cgroup_inode": 271676
+    }
+  ],
+  "preexec_pids_observations": [
+    {
+      "schema": "software.preexec-pids/v1",
+      "case": "Q1",
+      "nonce": "6bc4cc02-21fa-4dd5-b91e-0a9f7237e50c",
+      "pid": 1,
+      "uid": 1000,
+      "gid": 1000,
+      "cgroup_mapping": "0::/",
+      "cgroup_device": 27,
+      "cgroup_inode": 271518,
+      "pids_max": 1,
+      "pids_current": 1,
+      "monotonic_seconds": 238171,
+      "monotonic_nanoseconds": 769103253,
+      "boundary": "before_tested_program_exec"
+    },
+    {
+      "schema": "software.preexec-pids/v1",
+      "case": "Q2",
+      "nonce": "2062d4bb-7978-4a0f-be96-2330fc66102d",
+      "pid": 1,
+      "uid": 1000,
+      "gid": 1000,
+      "cgroup_mapping": "0::/",
+      "cgroup_device": 27,
+      "cgroup_inode": 271597,
+      "pids_max": 1,
+      "pids_current": 1,
+      "monotonic_seconds": 238173,
+      "monotonic_nanoseconds": 631181790,
+      "boundary": "before_tested_program_exec"
+    },
+    {
+      "schema": "software.preexec-pids/v1",
+      "case": "Q3",
+      "nonce": "3c789511-154f-4f78-b2bb-1943e11ccef8",
+      "pid": 1,
+      "uid": 1000,
+      "gid": 1000,
+      "cgroup_mapping": "0::/",
+      "cgroup_device": 27,
+      "cgroup_inode": 271676,
+      "pids_max": 1,
+      "pids_current": 1,
+      "monotonic_seconds": 238174,
+      "monotonic_nanoseconds": 981890878,
+      "boundary": "before_tested_program_exec"
+    }
+  ],
+  "effective_pids_observed_before_each_tested_exec": true,
+  "effective_before_container_start_proved": false,
+  "qualification_complete": true,
+  "status": "amended_software_qualification_passed",
+  "scientific_execution": false,
+  "note": "Held gate release requires host PID/cgroup ancestry within owned service. Effective pids.max is observed after container startup and before tested exec by a no-fork PID1 gate; no earlier or continuous-enforcement claim."
+}

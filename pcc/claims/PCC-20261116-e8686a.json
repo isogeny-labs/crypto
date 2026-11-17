@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T19:36:58Z",
+ "id": "PCC-20261116-e8686a",
+ "kind": "statement",
+ "producer": {
+  "commit": "11b937cdc732fbbf8e60ffad19235f84f286853f",
+  "model": "",
+  "session": "p256-aux-resume-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_aux_smooth_20261114/continuation_20261116/report.pdf",
+    "sha256": "605d645738d4e7cc1935bb779f093ccdcf2c249ed35dc4612298f010f8577d47"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_aux_smooth_20261114/continuation_20261116/evidence/offline-checks.log",
+    "sha256": "3cb2739f5adc7f851bf2a5c2ed70c702e315d08f3a2a6f474bc522592a8c7467"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": ".github/workflows/p256-aux-linear.yml",
+    "sha256": "b45af395924ed22e01a18194d5176a1f9f857c55fe72861a8eb262b510ba367c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_aux_smooth_20261114/continuation_20261116/evidence/root-release-lib.log",
+    "sha256": "da0e282c8bf12df86aeee12c9d3c1186ea30759e514c94caca73067eed10a9c3"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/p256_aux_smooth_20261114/continuation_20261116",
+ "statement": "Continuation publication QA retains72 byte-reproducible native certificate cases, offline replay of16 matched raw/reduced CAS control cells, explicit failure receipts, a source-linked two-page visually inspected PDF, and an offline-only CI workflow. Root release-lib cannot start locally because cargo is absent; no compiler failure is attributed. Original measurement/regularity goals remain open; this is unsigned development/publication evidence."
+}

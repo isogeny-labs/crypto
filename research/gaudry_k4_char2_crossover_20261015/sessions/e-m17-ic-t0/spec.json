@@ -1,0 +1,40 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Part E: IC (Frobenius, wiedemann), m = 17, h = 2, target 0 of seed 202610150301 only",
+  "description": "PROTOCOL.md amendment (see README): the first target of SPEC-E-m17-ic as its own session, so a container restart loses one target and not two. Same workload as the rho run of SPEC-E-m17-rho target 0 (Wd5f7dba84d0e) and the target of the interrupted IC session.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "f2m4_torsion",
+        "m": 17,
+        "seed": 1,
+        "max_cofactor": 2
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 202610150301
+  },
+  "arms": [
+    {
+      "name": "ic-wied",
+      "role": "reference",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "bin-t-line",
+          "oracle": "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "50000000",
+          "linalg": "wiedemann"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 202610150411,
+    "isolation_required": "L2",
+    "timeout_seconds": 259200
+  }
+}

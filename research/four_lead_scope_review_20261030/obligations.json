@@ -1,0 +1,25 @@
+{
+  "schema":"published-law-obligation-review/v1",
+  "review_id":"published-law-scope-20261030",
+  "task":"T-930",
+  "scope":"independent static source-to-claim review; public synthetic mathematical research",
+  "original_full_goal_complete":false,
+  "fresh_compilations":0,"fresh_solver_runs":0,"fresh_replays":0,
+  "review_sha256":"e1b8db071b88136bfe98876d3c9de69fbee300f5df5f03adbc16ac55ec1fc253",
+  "runtime_sha256":"5976e7f30b3e9c5c49a5fc0f4095404b7322832e4b02f467bc3cb7e0d9dcc8c0",
+  "runtime_semantics_sha256":"9e015c3c79f465b2b16f6e0dae5c744f9de3400f51646f746c61c54c4722c318",
+  "author_source":{"url":"https://raw.githubusercontent.com/ozbayelif/jac-on-jac/ec98e115ed359c8b7facf559eb0d9f240703f6f5/jac-on-jac.m","sha256":"7416a7fffaafff371738e7498a6795057372e1c477e0079297eebf2347c2e72a","executed_in_magma":false,"n6_power_of_w":2},
+  "normalization":{"identity_inversions":0,"nonidentity_inversions":2,"scope":"explicit inverse calls in normalize; not total pipeline count"},
+  "retained_context":{"report":"../projective_law_followup_20261022/REPORT.md","report_sha256":"60141b9887a2fd91e857366c0e7086e5b00d359cb41e2ae97c197d7b82077d70","targets_per_arm":1260,"collector_arms":2,"claim_status":"reported in retained report; no recomputation here","new_cost_ratio":null},
+  "obligations":[
+    {"id":"O1","topic":"pinned author W squared and runtime selection","status":"source_inspected","source":"../projective_law_followup_20261022/src/bin/projective_law_gate.rs:772"},
+    {"id":"O2","topic":"eight polynomial certificate outputs, 145 identities","status":"retained_evidence_inspected_not_rerun","source":"../projective_law_followup_20261022/results/"},
+    {"id":"O3","topic":"actual Proj isomorphism and smoothness","status":"formal_declarations_inspected_retained_compilation_only","source":"../projective_law_followup_20261022/formal/WeightedProjCrossInjective.lean"},
+    {"id":"O4","topic":"actual-quintic common22 rational branch order one","status":"conditional_formal_declaration_inspected","source":"../projective_law_followup_20261022/formal/WeightedProjSourceBranchActualQuintic.lean"},
+    {"id":"O5","topic":"compiled runtime expressions and predicates linked to proof polynomials","status":"open","source":"../projective_law_followup_20261022/formal/RuntimeSemantics.lean"},
+    {"id":"O6","topic":"exceptional closure, None exclusion and nonzero output weights","status":"open_universal_obligation","source":"../projective_law_followup_20261022/src/bin/projective_law_gate.rs:606"},
+    {"id":"O7","topic":"interpolant orders at all finite places and infinity","status":"open_beyond_existing_local_theorems","source":"../projective_law_followup_20261022/formal/PROJECTIVE_BRANCH_ZERO_ORDER.md"},
+    {"id":"O8","topic":"concrete principal divisor and global Pic0 equality","status":"open","source":"../projective_law_followup_20261022/formal/RuntimeSemantics.lean:292"}
+  ],
+  "correction":{"date":"2026-10-30","kind":"additive stale-checklist correction","preserves_historical_records":true,"text":"Later Proj isomorphism, smoothness and actual-quintic branch-order declarations supersede older descriptions that these bridges are wholly missing. Compiled semantics and global divisor-class obligations remain."}
+}

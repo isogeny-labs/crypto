@@ -1,0 +1,30 @@
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:23:66: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:31:7: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HSub ?m.174[X] ℕ ?m.256
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:31:43: error: unsolved goals
+h5 : 5 = 0
+⊢ ?m.171 = 1 + (2 * X ^ 5 + 3 * X ^ 4 + 3 * X ^ 3 + 2 * X ^ 2 + X - 2) * 5
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:32:18: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  5
+in the target expression
+  (2 * X ^ 5 + 3 * X ^ 4 + 3 * X ^ 3 + 2 * X ^ 2 + X - 2) * 5 + 1 = 1
+
+h5 : 5 = 0
+⊢ (2 * X ^ 5 + 3 * X ^ 4 + 3 * X ^ 3 + 2 * X ^ 2 + X - 2) * 5 + 1 = 1
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:30:1: error: 'calc' expression has type
+  ?m.171 = 1
+but is expected to have type
+  4 * (X ^ 5 + X ^ 2 + -X) + 3 * (X ^ 4 + 3 * X ^ 3 + 4 * X ^ 2 + 3 * X + 3) * (2 * X + -1) = 1
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:43:1: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`

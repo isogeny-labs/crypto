@@ -1,0 +1,25 @@
+{
+  "command": [
+    "cargo",
+    "clippy",
+    "--locked",
+    "--offline",
+    "--lib",
+    "-j",
+    "2",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "exit_code": 0,
+  "started_utc": "2026-10-30T19:05:25.007840+00:00",
+  "ended_utc": "2026-10-30T19:06:27.728903+00:00",
+  "source_manifest": "validation-source-hashes-v6.json",
+  "source_manifest_sha256": "85b5dd285638b34ab4d28cea3b64ce18e483e8b76bb80eb22a40b187d76a16e5",
+  "scientific_cohort_execution": false,
+  "purpose": "software regression; known-answer algorithm fixtures may execute",
+  "logs": {
+    "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr": "0bab6381ffd4bdb7236d25cc2cc5414b701197f60ccef79b7ea5db68907c038a"
+  }
+}

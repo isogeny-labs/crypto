@@ -1,0 +1,26 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | f1-x05 | 64/64 | 1.736 | 1.788 | 2.256 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | f1-x07 | 64/64 | 1.838 | 1.898 | 2.443 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | f1-x09 | 64/64 | 1.861 | 1.921 | 2.469 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | f2-inc | 64/64 | 2.152 | 2.187 | 2.508 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | rho-aa | 64/64 | 1.189 | 1.296 | 2.264 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | rho-neg | 64/64 | 1.189 | 1.296 | 2.264 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp24-tm1578-e83ed1b2 | f1-x05 vs f1-x07 | f1-x05 < f1-x07 |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x05 vs f1-x09 | f1-x05 < f1-x09 |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x05 vs f2-inc | f1-x05 < f2-inc |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x05 vs rho-aa | unresolved inside the band |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x05 vs rho-neg | unresolved inside the band |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x07 vs f1-x09 | f1-x07 < f1-x09 |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x07 vs f2-inc | f1-x07 < f2-inc |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x07 vs rho-aa | rho-aa < f1-x07 |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x07 vs rho-neg | rho-neg < f1-x07 |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x09 vs f2-inc | f1-x09 < f2-inc |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x09 vs rho-aa | rho-aa < f1-x09 |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x09 vs rho-neg | rho-neg < f1-x09 |
+| icv1-fp24-tm1578-e83ed1b2 | f2-inc vs rho-aa | rho-aa < f2-inc |
+| icv1-fp24-tm1578-e83ed1b2 | f2-inc vs rho-neg | rho-neg < f2-inc |
+| icv1-fp24-tm1578-e83ed1b2 | rho-aa vs rho-neg | unresolved inside the band |

@@ -1,0 +1,36 @@
+{
+  "schema": "ideas-execution-cost-protocol/v1",
+  "item": 2,
+  "classification": "derived conditional cost model, not an attack measurement",
+  "frozen_before_execution": true,
+  "source_revision": "e063d98475589d9aba7ae265a8cba830927e3156",
+  "source_model": "examples/descent_degree_cost.rs",
+  "curves": ["historical-ecc2k130-model", "sect233k1", "sect233r1", "sect283k1", "sect283r1", "sect409k1", "sect409r1", "sect571k1", "sect571r1"],
+  "summands": [3, 4, 5, 6],
+  "degree_models": ["free", "constant4", "constant5", "constant6", "guess1_degree4", "guess_m_times_ell_minus6_degree4"],
+  "column_work_exponents": [1.0, 2.0, 2.2],
+  "assumed_group_equivalents_per_column_work_unit": [0.1, 1.0, 10.0],
+  "ell_search": "every integer from 4 through the field degree",
+  "unknowns": "(m-2)*n + m*ell",
+  "attempts_log2": "ell + max(log2(m!) + n - m*ell, 0)",
+  "oracle_work_log2": "guesses + w*log2(sum_{j=0..D} binomial(N-guesses,j))",
+  "relation_algebra_log2": "log2(m) + 2*ell",
+  "rho": "sqrt(pi*r/(2*A)); A=2*n for Koblitz and A=2 for ordinary; idealized orbit discount",
+  "historical_control": "n=131, log2(r)=129, m=4 constant4 w=1 gives 68.43; w=2 gives 93.91, within 0.02 bits",
+  "validity": ["finite output in every row", "all registered curve orders bound to the pinned BinaryCurve constructor source", "historical anchors pass", "optimum is an exhaustive discrete minimization"],
+  "limitations": [
+    "The column-work conversion weights are assumptions, not measured calibrations.",
+    "Constant degrees at deployed sizes are unverified; degree4 is a counterfactual sensitivity arm.",
+    "The guessed-variable law is hypothetical, not an observed scaling law.",
+    "Natural relation probability uses the existing uniform-tuple heuristic.",
+    "Successful extraction, base construction and miscellaneous overhead are unpriced; modeled sums are partial costs.",
+    "Group-operation and column-work mixtures do not establish a deployed-curve security result.",
+    "This calculation does not run ECDLP on a deployed curve."
+  ],
+  "reservation": {
+    "command": "conductor check --summary 'Execute the twenty-item index-calculus research roadmap' --scope path:research/ideas_execution_20261018",
+    "exit_status": 127,
+    "error": "conductor: command not found",
+    "workaround": "single branch with explicit disjoint local agent write scopes; no shared ledger transitions"
+  }
+}

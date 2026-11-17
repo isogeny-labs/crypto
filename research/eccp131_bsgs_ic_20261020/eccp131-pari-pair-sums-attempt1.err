@@ -1,0 +1,51 @@
+  ***   syntax error, unexpected end of file, expecting )-> or ',' or ')': 
+  ***   while(#base<target_size,
+  ***                          ^-
+  ***   syntax error, unexpected ')', expecting end of file: );
+  ***                                                        ^--
+  ***   syntax error, unexpected end of file, expecting )-> or ',' or ')': 
+  ***   for(i=1,target_size,
+  ***                      ^-
+  ***   at top-level: s=elladd(E,base[i],base[i])
+  ***                                 ^-----------
+  ***   incorrect type in gtos [integer expected] (t_POL).
+  ***   at top-level: ...#s==2,listput(keys,lift(s[1])))
+  ***                                             ^------
+  ***   incorrect type in _[_] OCcompo1 [not a vector] (t_POL).
+  ***   syntax error, unexpected end of file, expecting )-> or ',' or ')': 
+  ***   for(j=i+1,target_size,
+  ***                        ^-
+  ***   at top-level: s=elladd(E,base[i],base[j])
+  ***                                 ^-----------
+  ***   incorrect type in gtos [integer expected] (t_POL).
+  ***   at top-level: ...#s==2,listput(keys,lift(s[1])))
+  ***                                             ^------
+  ***   incorrect type in _[_] OCcompo1 [not a vector] (t_POL).
+  ***   at top-level: s=ellsub(E,base[i],base[j])
+  ***                                 ^-----------
+  ***   incorrect type in gtos [integer expected] (t_POL).
+  ***   at top-level: ...#s==2,listput(keys,lift(s[1])))
+  ***                                             ^------
+  ***   incorrect type in _[_] OCcompo1 [not a vector] (t_POL).
+  ***   syntax error, unexpected ')', expecting end of file: );
+  ***                                                        ^--
+  ***   syntax error, unexpected ')', expecting end of file: );
+  ***                                                        ^--
+        0.06 real         0.01 user         0.00 sys
+            10043392  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                 792  page reclaims
+                  24  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                   0  voluntary context switches
+                 142  involuntary context switches
+           204773134  instructions retired
+            74599354  cycles elapsed
+             7602584  peak memory footprint

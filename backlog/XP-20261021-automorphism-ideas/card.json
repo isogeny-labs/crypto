@@ -1,0 +1,104 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261021-automorphism-ideas",
+  "title": "Automorphism paper follow-ups: folded-base ablation and gated map/walk/lifting checks",
+  "created": "2026-10-21",
+  "authors": [
+    "automorphism literature review"
+  ],
+  "status": "blocked",
+  "status_note": "Planning only. PROTOCOL.md is a draft. The proposed examples/automorphism_ideas.rs harness and independent verifier do not exist yet; no experiment was run or scheduled.",
+  "blocked_on": [
+    "note:Select and freeze registered curve/subgroup fixtures and full admissible point-set digests",
+    "note:Implement the native ablation harness, independent equation/action verifier and resumable checkpoint format",
+    "note:Complete full-paper reading for modern negation recipes and Xedni before activating the relevant workstreams",
+    "note:Freeze PROTOCOL.md and pin the implementation commit before marking ready"
+  ],
+  "links": {
+    "lead": "research/automorphism_ideas_20261021/README.md",
+    "notes": [
+      "research/notes/ecdlp-general/RESEARCH_TORSION_AUXILIARY_INPUTS.md section 7"
+    ],
+    "prs": []
+  },
+  "question": "Does an incremental automorphism treatment improve the existing folded baseline while preserving the admissible point set, exact subgroup action and matched single-target accounting?",
+  "decision_value": "The first ablation determines whether further engineering should target coefficient transport, matrix costs or relation generation. Map and walk audits distinguish additional effective actions from already priced symmetry. Lifting remains a separate literature-gated proposal until an explicit algorithm changes the known obstruction.",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": null
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "main",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--example",
+        "automorphism_ideas"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 4,
+    "disk_gb": 1,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Placeholder envelope for a bounded native toy correctness audit only, not a runtime estimate or performance experiment. Reassess and freeze resources before ready."
+  },
+  "run": {
+    "argv": [
+      "target/release/examples/automorphism_ideas",
+      "--protocol",
+      "backlog/XP-20261021-automorphism-ideas/PROTOCOL.md",
+      "--out",
+      "{out}"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 3600
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "automorphism-ideas/v1 (proposed; native schema and checker not implemented)",
+    "verify": [],
+    "land": "research/automorphism_ideas_20261021/runs"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261021-automorphism-ideas"
+    ],
+    "ttl_s": 3600,
+    "env": {
+      "name": "native-automorphism-audit",
+      "recipe": "Blocked: pin native toolchain and implementation build after the harness and checker exist."
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 4096,
+      "timeout_s": 3600,
+      "sandbox": "auto",
+      "sandbox_reason": "",
+      "publish": "runs/XP-20261021-automorphism-ideas"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Unscheduled design with unresolved fixtures and verifier. No funding or execution is authorized by this card; prioritize executable funded cards until the protocol and expected cost are frozen."
+    },
+    "notes": "Not published or queued. Build/run arguments name a proposed future harness and are not executable today."
+  }
+}

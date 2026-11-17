@@ -1,0 +1,36 @@
+selftest: number theory ok
+selftest: cell 16 ok (p=48479, n=48383, bx=8)
+selftest: cell 20 ok (p=661603, n=660917, bx=15)
+selftest: cell 24 ok (p=10539323, n=10542893, bx=29)
+selftest: cell 28 ok (p=248685287, n=248685841, bx=63)
+selftest: S3 ok
+selftest: S5 interpolated in 0.06s
+selftest: S5 ok (vanishes on planted sums, interpolation exact)
+selftest: arm a, 16 bits: 200 targets agree with the pair table (8 decomposable); 20 planted found
+selftest: arm a, 20 bits: 200 targets agree with the pair table (13 decomposable); 20 planted found
+selftest: arm b bx=4 planted=true: dim Some(24) = brute 24 (madds 12966121, steps 12, 26 ms)
+selftest: arm b bx=4 planted=false: dim Some(0) = brute 0 (madds 13322960, steps 12, 23 ms)
+selftest: arm b bx=4 planted=true: dim Some(12) = brute 12 (madds 13293491, steps 12, 24 ms)
+selftest: arm b bx=4 planted=true: dim Some(24) = brute 24 (madds 12965615, steps 12, 23 ms)
+selftest: arm b bx=4 planted=false: dim Some(0) = brute 0 (madds 13322203, steps 12, 23 ms)
+selftest: arm b bx=4 planted=true: dim Some(12) = brute 12 (madds 13293350, steps 12, 24 ms)
+selftest: arm b bx=5 planted=true: dim Some(24) = brute 24 (madds 155233177, steps 16, 340 ms)
+selftest: arm b bx=5 planted=false: dim Some(0) = brute 0 (madds 155743427, steps 16, 371 ms)
+selftest: arm b bx=5 planted=true: dim Some(12) = brute 12 (madds 155714688, steps 16, 278 ms)
+selftest: arm b bx=5 planted=true: dim Some(24) = brute 24 (madds 155237892, steps 16, 274 ms)
+selftest: arm b bx=5 planted=false: dim Some(0) = brute 0 (madds 155745124, steps 16, 261 ms)
+selftest: arm b bx=5 planted=true: dim Some(12) = brute 12 (madds 155714299, steps 16, 244 ms)
+selftest: arm b bx=6 planted=true: dim Some(24) = brute 24 (madds 1158363890, steps 20, 2090 ms)
+selftest: arm b bx=6 planted=false: dim Some(0) = brute 0 (madds 1158902994, steps 20, 2473 ms)
+selftest: arm b bx=6 planted=true: dim Some(12) = brute 12 (madds 1158867132, steps 20, 2320 ms)
+selftest: arm b bx=6 planted=true: dim Some(24) = brute 24 (madds 1158373513, steps 20, 2591 ms)
+selftest: arm b bx=6 planted=false: dim Some(0) = brute 0 (madds 1158904240, steps 20, 1836 ms)
+selftest: arm b bx=6 planted=true: dim Some(12) = brute 12 (madds 1158866532, steps 20, 2294 ms)
+selftest: full IC arm a, 16 bits, run 0: ok, 148 attempts, 9 hits, rank 9
+selftest: full IC arm a, 16 bits, run 1: ok, 189 attempts, 12 hits, rank 9
+selftest: full IC arm a, 16 bits, run 2: ok, 158 attempts, 9 hits, rank 9
+selftest: rho 16 bits run 0: ok, 508 adds, 20 walks
+selftest: rho 16 bits run 1: ok, 310 adds, 6 walks
+selftest: rho 16 bits run 2: ok, 524 adds, 10 walks
+selftest: reach control ok (0.05556, 0.10000, 0.11905)
+SELFTEST OK (21.7s)

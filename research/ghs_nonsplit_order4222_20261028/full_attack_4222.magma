@@ -1,0 +1,99 @@
+ticAll := Cputime();
+F2 := GF(2);
+P<X> := PolynomialRing(F2);
+L<z> := ext<F2 | X^24+X^16+X^15+X^14+X^13+X^10+X^9+X^7+X^5+X^3+1>;
+K := FiniteField(2,12); Embed(K,L);
+k := FiniteField(2,4); Embed(k,K); Embed(k,L);
+P2<x,y,z0> := ProjectiveSpace(K,2);
+C0 := Curve(P2,(K!(L!(1+z+z^3+z^4+z^5+z^7+z^8+z^10+z^11+z^12+z^14+z^15+z^17+z^20))*x^0*z0^2+K!(L!(1))*x^1*z0^1+K!(L!(1))*x^2*z0^0)*(y^2+y*z0)+(K!(L!(z+z^3+z^4+z^5+z^7+z^8+z^9+z^10+z^13+z^16+z^22))*x^0*z0^4+K!(L!(z+z^2+z^4+z^8+z^13+z^14+z^15+z^16+z^18+z^19+z^21+z^22+z^23))*x^1*z0^3));
+print "GENUS", Genus(C0);
+pt := C0![K!(L!(0)),K!(L!(z+z^2+z^4+z^5+z^6+z^7+z^8+z^9+z^10+z^11+z^12+z^13+z^14+z^16+z^17+z^18+z^19+z^21+z^23)),K!1];
+E0,toE := EllipticCurve(C0,pt);
+E := EllipticCurve([K|1,K!(L!(1+z^2+z^3+z^4+z^6+z^7+z^8+z^10+z^14+z^18+z^20+z^22)),0,0,K!(L!(z+z^3+z^4+z^10+z^12+z^15+z^19+z^20))]);
+print "SOURCE_ORDER", #E;
+ok,iso := IsIsomorphic(E0,E);
+print "ISOMORPHIC",ok;
+assert ok;
+polys := DefiningPolynomials(toE);
+G := E![K!(L!(1+z+z^3+z^4+z^10+z^12+z^15+z^19+z^20)),K!(L!(1+z+z^5+z^6+z^7+z^8+z^10+z^11+z^17+z^22+z^23))];
+assert G ne E!0 and 2111*G eq E!0;
+T<Tvar> := PolynomialRing(K);
+A := L!(1+z+z^4+z^5+z^7+z^13+z^14+z^16+z^19+z^20+z^22);
+pole := L!(z+z^2+z^5+z^6+z^7+z^12+z^16+z^17+z^18+z^20+z^21+z^22+z^23);
+function SplitFiber(P)
+  P0 := P@@iso;
+  pre := P0@@toE;
+  for cp in RationalPoints(pre) do
+    if cp[3] ne 0 then
+      pc := C0!cp;
+      if iso(toE(pc)) eq P then
+        xx := pc[1]/pc[3]; yy := pc[2]/pc[3];
+        f1 := K!(A^16/(L!xx+pole^16) + A^65536/(L!xx+pole));
+        rr := Roots(Tvar^2+Tvar+f1);
+        if #rr eq 2 then
+          return true,xx,yy,rr[1][1],rr[2][1];
+        end if;
+      end if;
+    end if;
+  end for;
+  return false,K!0,K!0,K!0,K!0;
+end function;
+
+Target := 7*G;
+P2q<Xq,Yq,Zq> := ProjectiveSpace(k,2);
+Quartic := Curve(P2q,(k!(L!(1)))*Xq^4*Yq^0*Zq^0+(k!(L!(1+z+z^3+z^4+z^5+z^7+z^8+z^10+z^11+z^12+z^14+z^15+z^17+z^20)))*Xq^3*Yq^1*Zq^0+(k!(L!(z+z^3+z^5+z^6+z^9+z^11+z^13+z^14+z^16+z^20)))*Xq^2*Yq^2*Zq^0+(k!(L!(z+z^2+z^4+z^5+z^7+z^8+z^9+z^10+z^11+z^13+z^16+z^18+z^22)))*Xq^1*Yq^3*Zq^0+(k!(L!(1+z+z^2+z^4+z^5+z^7+z^8+z^9+z^10+z^11+z^13+z^16+z^18+z^22)))*Xq^0*Yq^4*Zq^0+(k!(L!(1+z^2+z^3+z^9+z^12+z^13+z^14+z^15+z^16+z^17+z^18+z^20+z^22)))*Xq^1*Yq^2*Zq^1+(k!(L!(1+z^2+z^3+z^9+z^12+z^13+z^14+z^15+z^16+z^17+z^18+z^20+z^22)))*Xq^0*Yq^3*Zq^1+(k!(L!(1+z+z^3+z^4+z^5+z^7+z^8+z^10+z^11+z^12+z^14+z^15+z^17+z^20)))*Xq^2*Yq^0*Zq^2+(k!(L!(z+z^2+z^5+z^6+z^11+z^12+z^15+z^17+z^18+z^22)))*Xq^0*Yq^2*Zq^2+(k!(L!(1+z^2+z^3+z^9+z^12+z^13+z^14+z^15+z^16+z^17+z^18+z^20+z^22)))*Xq^0*Yq^1*Zq^3+(k!(L!(1+z^4+z^6+z^7+z^8+z^9+z^10+z^12+z^13+z^15+z^16+z^17)))*Xq^0*Yq^0*Zq^4);
+assert IsNonsingular(Quartic) and Genus(Quartic) eq 3;
+QK := BaseChange(Quartic,K);
+RQ := CoordinateRing(Ambient(Quartic));
+pp := K!(L!(z^2+z^3+z^4+z^6+z^8+z^9+z^11+z^13+z^17+z^18+z^22+z^23));
+vv := K!(L!(z+z^3+z^5+z^8+z^9+z^11+z^13));
+function MapPoint(xx,y0,y1)
+    uu := pp*y0+vv*y1;
+    pt := QK![(K!(L!(1+z^4+z^6+z^7+z^8+z^9+z^10+z^12+z^13+z^15+z^16+z^17)))*xx^3*uu^6+(K!(L!(1+z^4+z^6+z^7+z^8+z^9+z^10+z^12+z^13+z^15+z^16+z^17)))*xx^3*uu^4+(K!(L!(z^2+z^3+z^9+z^12+z^13+z^14+z^15+z^16+z^17+z^18+z^20+z^22)))*xx^3*uu^3+(K!(L!(z^2+z^3+z^9+z^12+z^13+z^14+z^15+z^16+z^17+z^18+z^20+z^22)))*xx^3*uu^1+(K!(L!(1+z^2+z^3+z^4+z^6+z^7+z^8+z^10+z^14+z^18+z^20+z^22)))*xx^2*uu^6+(K!(L!(z^2+z^3+z^4+z^6+z^7+z^8+z^10+z^14+z^18+z^20+z^22)))*xx^2*uu^4+(K!(L!(1+z+z^2+z^5+z^6+z^11+z^12+z^15+z^17+z^18+z^22)))*xx^2*uu^3+(K!(L!(z+z^3+z^5+z^6+z^9+z^11+z^13+z^14+z^16+z^20)))*xx^2*uu^2+(K!(L!(1+z^4+z^6+z^7+z^8+z^9+z^10+z^12+z^13+z^15+z^16+z^17)))*xx^2*uu^1+(K!(L!(z+z^3+z^5+z^6+z^9+z^11+z^13+z^14+z^16+z^20)))*xx^2*uu^0+(K!(L!(z+z^3+z^5+z^6+z^9+z^11+z^13+z^14+z^16+z^20)))*xx^1*uu^6+(K!(L!(z+z^3+z^5+z^6+z^9+z^11+z^13+z^14+z^16+z^20)))*xx^1*uu^4+(K!(L!(1)))*xx^1*uu^3+(K!(L!(z^2+z^3+z^9+z^12+z^13+z^14+z^15+z^16+z^17+z^18+z^20+z^22)))*xx^1*uu^2+(K!(L!(1)))*xx^1*uu^1+(K!(L!(1)))*xx^1*uu^0+(K!(L!(z+z^3+z^5+z^6+z^9+z^11+z^13+z^14+z^16+z^20)))*xx^0*uu^6+(K!(L!(1+z+z^2+z^4+z^5+z^7+z^8+z^9+z^10+z^11+z^13+z^16+z^18+z^22)))*xx^0*uu^4+(K!(L!(1)))*xx^0*uu^3+(K!(L!(z^4+z^6+z^7+z^8+z^9+z^10+z^12+z^13+z^15+z^16+z^17)))*xx^0*uu^2+(K!(L!(z+z^2+z^5+z^6+z^11+z^12+z^15+z^17+z^18+z^22)))*xx^0*uu^1+(K!(L!(z^4+z^6+z^7+z^8+z^9+z^10+z^12+z^13+z^15+z^16+z^17)))*xx^0*uu^0,(K!(L!(1+z^4+z^6+z^7+z^8+z^9+z^10+z^12+z^13+z^15+z^16+z^17)))*xx^3*uu^4+(K!(L!(z^2+z^3+z^9+z^12+z^13+z^14+z^15+z^16+z^17+z^18+z^20+z^22)))*xx^3*uu^1+(K!(L!(1+z^2+z^3+z^4+z^6+z^7+z^8+z^10+z^14+z^18+z^20+z^22)))*xx^2*uu^4+(K!(L!(1+z+z^2+z^5+z^6+z^11+z^12+z^15+z^17+z^18+z^22)))*xx^2*uu^1+(K!(L!(z+z^3+z^5+z^6+z^9+z^11+z^13+z^14+z^16+z^20)))*xx^2*uu^0+(K!(L!(z+z^3+z^5+z^6+z^9+z^11+z^13+z^14+z^16+z^20)))*xx^1*uu^4+(K!(L!(1)))*xx^1*uu^1+(K!(L!(z^2+z^3+z^9+z^12+z^13+z^14+z^15+z^16+z^17+z^18+z^20+z^22)))*xx^1*uu^0+(K!(L!(z+z^3+z^5+z^6+z^9+z^11+z^13+z^14+z^16+z^20)))*xx^0*uu^4+(K!(L!(1)))*xx^0*uu^1+(K!(L!(z^4+z^6+z^7+z^8+z^9+z^10+z^12+z^13+z^15+z^16+z^17)))*xx^0*uu^0,(K!(L!(1+z^4+z^6+z^7+z^8+z^9+z^10+z^12+z^13+z^15+z^16+z^17)))*xx^3*uu^5+(K!(L!(z^2+z^3+z^9+z^12+z^13+z^14+z^15+z^16+z^17+z^18+z^20+z^22)))*xx^3*uu^2+(K!(L!(1+z^2+z^3+z^4+z^6+z^7+z^8+z^10+z^14+z^18+z^20+z^22)))*xx^2*uu^5+(K!(L!(1+z+z^2+z^5+z^6+z^11+z^12+z^15+z^17+z^18+z^22)))*xx^2*uu^2+(K!(L!(z+z^3+z^5+z^6+z^9+z^11+z^13+z^14+z^16+z^20)))*xx^2*uu^1+(K!(L!(z+z^3+z^5+z^6+z^9+z^11+z^13+z^14+z^16+z^20)))*xx^1*uu^5+(K!(L!(1)))*xx^1*uu^2+(K!(L!(z^2+z^3+z^9+z^12+z^13+z^14+z^15+z^16+z^17+z^18+z^20+z^22)))*xx^1*uu^1+(K!(L!(z+z^3+z^5+z^6+z^9+z^11+z^13+z^14+z^16+z^20)))*xx^0*uu^5+(K!(L!(1)))*xx^0*uu^2+(K!(L!(z^4+z^6+z^7+z^8+z^9+z^10+z^12+z^13+z^15+z^16+z^17)))*xx^0*uu^1];
+    assert pt in QK;
+    return pt;
+end function;
+function OrbitDiv(pt)
+    xx := pt[1]/pt[3]; yy := pt[2]/pt[3];
+    xs := [xx,xx^16,xx^256]; ys := [yy,yy^16,yy^256];
+    assert #Seqset(xs) eq 3;
+    mx := &*[Tvar-xs[i]:i in [1..3]];
+    iy := &+[ys[i]*(Tvar-xs[(i mod 3)+1])*(Tvar-xs[((i+1) mod 3)+1]) /
+          ((xs[i]-xs[(i mod 3)+1])*(xs[i]-xs[((i+1) mod 3)+1])):i in [1..3]];
+    assert Degree(iy) le 2;
+    fx := &+[(RQ!(k!Coefficient(mx,i)))*Xq^i*Zq^(3-i):i in [0..3]];
+    hy := Yq*Zq + &+[(RQ!(k!Coefficient(iy,i)))*Xq^i*Zq^(2-i):i in [0..2]];
+    place_div := Divisor(Quartic,ideal<RQ|fx,hy>);
+    assert Degree(place_div) eq 3;
+    return place_div;
+end function;
+function FiberDiv(P)
+    ok,xx,y0,y1a,y1b := SplitFiber(P);
+    assert ok;
+    return OrbitDiv(MapPoint(xx,y0,y1a)) + OrbitDiv(MapPoint(xx,y0,y1b));
+end function;
+dR := FiberDiv(2*G);
+dG := FiberDiv(3*G);
+dT := FiberDiv(2*G+Target);
+DD := dG-dR; TT := dT-dR;
+print "MAP_CPU", Cputime(ticAll);
+b0 := IsPrincipal(DD); br := IsPrincipal(2111*DD); b7 := IsPrincipal(TT-7*DD);
+print "MAP_ORDER_CHECKS", b0, br, b7;
+assert not b0 and br and b7;
+F256 := FiniteField(2,8); Embed(k,F256);
+Q256 := BaseChange(Quartic,F256);
+R256 := CoordinateRing(Ambient(Q256));
+function Lift(V)
+    return Divisor(Q256,ideal<R256|[R256!f:f in Basis(Ideal(V))]>);
+end function;
+D256 := Lift(dG)-Lift(dR); T256 := Lift(dT)-Lift(dR);
+c0 := IsPrincipal(D256); cr := IsPrincipal(2111*D256); c7 := IsPrincipal(T256-7*D256);
+print "LIFT_ORDER_CHECKS", c0, cr, c7;
+assert not c0 and cr and c7;
+P0 := RationalPoints(Q256)[1]; D0 := Divisor(P0);
+print "PRE_INDEX_CPU", Cputime(ticAll);
+SetVerbose("CurveIndexcal",1); tic := Cputime();
+answer := IndexCalculus(D256,T256,D0,2111,200,260);
+print "INDEX_ANSWER",answer,"INDEX_CPU",Cputime(tic);
+assert answer eq 7 and answer*G eq Target;
+print "FULL_SOURCE_VERIFIED",true,"FULL_CPU",Cputime(ticAll);

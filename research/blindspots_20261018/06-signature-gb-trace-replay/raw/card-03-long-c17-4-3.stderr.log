@@ -1,0 +1,19 @@
+c17-4-3 t0 f4: refuted D=4 steps=10 zero=7762 touches=319194055 0.6s
+memory allocation of 3221225472 bytes failed
+stack backtrace:
+   0: std::alloc::rust_oom
+             at /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/alloc.rs:424:5
+   1: __rustc::__rust_alloc_error_handler
+             at /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/alloc.rs:423:1
+   2: alloc::alloc::handle_alloc_error::rt_error
+             at /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/alloc/src/alloc.rs:551:13
+   3: alloc::alloc::handle_alloc_error
+             at /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/alloc/src/alloc.rs:557:9
+   4: alloc::raw_vec::handle_error
+             at /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/alloc/src/raw_vec/mod.rs:890:38
+   5: <alloc::raw_vec::RawVec<blindspots_06_signature_gb::Cand>>::grow_one
+   6: <blindspots_06_signature_gb::Sig>::step
+   7: blindspots_06_signature_gb::exec_n
+   8: blindspots_06_signature_gb::mode_run
+   9: blindspots_06_signature_gb::main
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.

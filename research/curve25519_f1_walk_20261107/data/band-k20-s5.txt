@@ -1,0 +1,26 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-tm1050-4295f05e | 17.00 | f1-x05 | 64/64 | 2.323 | 2.393 | 3.017 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | f1-x07 | 64/64 | 2.348 | 2.405 | 2.925 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | f1-x09 | 64/64 | 2.416 | 2.477 | 3.034 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | f2-inc | 64/64 | 2.809 | 2.855 | 3.272 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-aa | 64/64 | 1.534 | 1.644 | 2.642 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg | 64/64 | 1.534 | 1.644 | 2.642 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-tm1050-4295f05e | f1-x05 vs f1-x07 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | f1-x05 vs f1-x09 | f1-x05 < f1-x09 |
+| icv1-fp20-tm1050-4295f05e | f1-x05 vs f2-inc | f1-x05 < f2-inc |
+| icv1-fp20-tm1050-4295f05e | f1-x05 vs rho-aa | rho-aa < f1-x05 |
+| icv1-fp20-tm1050-4295f05e | f1-x05 vs rho-neg | rho-neg < f1-x05 |
+| icv1-fp20-tm1050-4295f05e | f1-x07 vs f1-x09 | f1-x07 < f1-x09 |
+| icv1-fp20-tm1050-4295f05e | f1-x07 vs f2-inc | f1-x07 < f2-inc |
+| icv1-fp20-tm1050-4295f05e | f1-x07 vs rho-aa | rho-aa < f1-x07 |
+| icv1-fp20-tm1050-4295f05e | f1-x07 vs rho-neg | rho-neg < f1-x07 |
+| icv1-fp20-tm1050-4295f05e | f1-x09 vs f2-inc | f1-x09 < f2-inc |
+| icv1-fp20-tm1050-4295f05e | f1-x09 vs rho-aa | rho-aa < f1-x09 |
+| icv1-fp20-tm1050-4295f05e | f1-x09 vs rho-neg | rho-neg < f1-x09 |
+| icv1-fp20-tm1050-4295f05e | f2-inc vs rho-aa | rho-aa < f2-inc |
+| icv1-fp20-tm1050-4295f05e | f2-inc vs rho-neg | rho-neg < f2-inc |
+| icv1-fp20-tm1050-4295f05e | rho-aa vs rho-neg | unresolved inside the band |

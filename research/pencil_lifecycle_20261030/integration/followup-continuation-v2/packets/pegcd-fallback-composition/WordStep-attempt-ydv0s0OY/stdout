@@ -1,0 +1,23 @@
+/var/tmp/pencil-pegcd-root-continuation-20261101-v1/WordStep.lean:11:15: error(lean.unknownIdentifier): Unknown identifier `Normal`
+
+Note: It is not possible to treat `Normal` as an implicitly bound variable here because the `autoImplicit` option is set to `false`.
+/var/tmp/pencil-pegcd-root-continuation-20261101-v1/WordStep.lean:12:43: error: unsolved goals
+p a : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+b input : List UInt64
+hp : 1 < p.toNat
+hb : p.toNat < 2 ^ 31
+ha : a.toNat < p.toNat
+hn : a ≠ 0
+hbs : Canon p b
+hi : Canon p input
+hm : b.getLast? = some a
+A B : (ZMod p.toNat)[X]
+z : State (ZMod p.toNat)
+h0 : z.r0 = wordsPoly p input
+h1 : z.r1 = wordsPoly p b
+hv : Valid A B z
+⊢ ∃ q out,
+    NonmonicDivision.divide p a b input input.length = some (q, out) ∧
+      Canon p out ∧ sorry ∧ (out = [] ∨ out.length < b.length) ∧ Valid A B (step z q (wordsPoly p out))
+/var/tmp/pencil-pegcd-root-continuation-20261101-v1/WordStep.lean:13:1: error: unexpected identifier; expected command

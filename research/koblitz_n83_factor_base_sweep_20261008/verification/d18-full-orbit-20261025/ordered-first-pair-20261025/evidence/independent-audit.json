@@ -1,0 +1,67 @@
+{
+  "binary_sha256": "371b32ca7ebe1bacd679182b7ee0984b0d6697ae7ab74a1619896249c49a464b",
+  "legacy_wall_cap_misclassified": true,
+  "natural": {
+    "cap_receipt": {
+      "budget_seconds": 2400,
+      "choice_pin_policy": "none",
+      "elapsed_process_wall_ms": 2400008.9132080004,
+      "isolation": "L0_shared_host_no_hard_cgroup",
+      "mode": "natural",
+      "root_choice_pinned": false,
+      "root_encoding": "shared_root_bits",
+      "schema": "n83.full-d18-m4-cap/v1",
+      "search_policy": "phase_zero_first_ordered_first_pair",
+      "selected_best_total_runtime": null,
+      "status": "UNKNOWN_wall_cap"
+    },
+    "import_ms": 60846.817834,
+    "maximum_resident_set_bytes": 4401053696,
+    "model_ms": 302.607208,
+    "phases": [
+      "started",
+      "import_checked",
+      "model_constructed"
+    ],
+    "relation": null,
+    "search_ms": null,
+    "status": "UNKNOWN_wall_cap",
+    "supervisor_wall_seconds": 2401.1263727920013
+  },
+  "negative_controls": {
+    "changed_row_digest": "REJECTED",
+    "changed_target": "REJECTED"
+  },
+  "object_sha256": "eaef94ef45b3d2d4cd2ec2f40c1173b4cdb2a437b7e618a858c73fb1caf3902b",
+  "positive": {
+    "import_ms": 66994.335459,
+    "maximum_resident_set_bytes": 4338335744,
+    "model_ms": 384.791167,
+    "phases": [
+      "started",
+      "import_checked",
+      "model_constructed",
+      "solver_returned"
+    ],
+    "relation": {
+      "group_replay": "PASS",
+      "indices": [
+        0,
+        166,
+        332,
+        498
+      ],
+      "row_decimal_blake3": "b3bd9bf4a43afb05f1090a192e90a1c80070b5edb253526c2686af1b64b3db19",
+      "tamper_rejected": true
+    },
+    "search_ms": 1076.6202090000002,
+    "solver_conflicts": 0,
+    "status": "PASS_CONSTRUCTED_CONTROL",
+    "supervisor_wall_seconds": 69.87519966599939
+  },
+  "reported_natural_status": "PRODUCER_FAILURE",
+  "schema": "n83.d18-ordered-first-pair-independent-audit/v1",
+  "selected_best_total_runtime": null,
+  "source_commit": "c2d39e4948ab3a9dbf2e67ad705476441c6a5d02",
+  "status": "PASS_CENSORED_NATURAL"
+}

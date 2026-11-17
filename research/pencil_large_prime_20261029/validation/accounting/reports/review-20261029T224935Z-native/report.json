@@ -1,0 +1,1530 @@
+{
+  "cohort": {
+    "expected_executions": 22680,
+    "expected_measured_pairs": 6300,
+    "expected_warmup_executions": 3780,
+    "expected_workloads": 1260,
+    "observed_executions": 0
+  },
+  "evidence": [
+    {
+      "binding": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/accounting/aggregate/actual-plan-only-summary-final.json",
+        "sha256": "9c0d055e2af7f6f79ce201b9b0c2a22691da0af55e8f6f127acec7070bb7e665"
+      },
+      "id": "plan",
+      "scope": "named plan-only input; not historical experiments"
+    },
+    {
+      "binding": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/accounting_amendment_20261029/first_gate_authorization.json",
+        "sha256": "e04f26d0cab6850f3c477e9521ea4359c46f64ec436ce899b3b4049867710600"
+      },
+      "id": "first-gate",
+      "scope": "Explicit user approval of larger FIRST gate only; cumulative budget, original deadline, IAM/controller, freeze and launch remain pending."
+    },
+    {
+      "binding": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_preparation/validation/receipt.json",
+        "sha256": "46843c028008698dc4eaa47370191904cf274791402d8953e23868e725d62ea3"
+      },
+      "id": "native-preparation",
+      "scope": "Current native preparation software and run-free parity only; actual frozen archive reextracted with current source543 instrument. Does not independently reproduce the instrument build."
+    },
+    {
+      "binding": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_canonical_export/validation/receipt.json",
+        "sha256": "aeef1f2bc1984f248121a786996cfb6ed5008750a825d47712e53092ad4ea0f6"
+      },
+      "id": "native-canonical",
+      "scope": "Native canonical packaging/protocol software fixtures only; distinct from empirical targets and previous producer/analyzer suites."
+    },
+    {
+      "binding": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_review_report/validation-layout.json",
+        "sha256": "37da6488934ed19fb48102e16de777a0c7935519f36245bd31399e4708864023"
+      },
+      "id": "native-report",
+      "scope": "Native renderer software fixtures only; includes pdflatex PDF test and historical validation-scope preservation."
+    },
+    {
+      "binding": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/instrument_build_40938439022/receipt.json",
+        "sha256": "59fd9e0e1f4573d9492bcca710b5351cd0175f788b197a7c82939e177ab1a1a1"
+      },
+      "id": "instrument543",
+      "scope": "Previously verified static ecbench build source543, separate from native tooling; plan-only checks and no solver execution."
+    },
+    {
+      "binding": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/hash_one_ci_20261029/correction.json",
+        "sha256": "2c83885fbefef25323bf968aefdb1ea96c1b67bdd4ed7dcae84cb7c5d68014fe"
+      },
+      "id": "root-full",
+      "scope": "Source0cd test-only correction validation lane: full default-parallel release suite failed. Exact source-file hashes are retained in receipt; focused passes do not replace this result."
+    },
+    {
+      "binding": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/hash_one_ci_20261029/correction.json",
+        "sha256": "2c83885fbefef25323bf968aefdb1ea96c1b67bdd4ed7dcae84cb7c5d68014fe"
+      },
+      "id": "root-focused",
+      "scope": "Separate bounded serial reruns of the two failed tests from the exact same compiled binary; not a passing full-suite result."
+    },
+    {
+      "binding": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_canonical_export/validation/historical-hash-receipt.json",
+        "sha256": "6fe3e515c1c2a5ba81116d4c93ea95e16313fc2781e9fbf19c8c0180a94dc6c2"
+      },
+      "id": "canonical-hash",
+      "scope": "Separate supplemental historical hash test, not a rerun or total of the 28-test suite. Earlier category-confusion failure retained; raw-file digest differs from canonical body digest by definition."
+    }
+  ],
+  "historical_report": "validation/accounting/reports/review-20261029T1906Z; retained unchanged, Python renderer superseded for new reports",
+  "interpretation": "No empirical cost ratio is available in this snapshot. Software validation and prepared inputs do not constitute independent protocol, binary, resource or launch admission.",
+  "observation_boundary": "Zero executions refers to this named plan-only input, not historical experiments. Per-source software scopes are distinct and counts are never pooled.",
+  "observations": [
+    {
+      "id": "first-gate",
+      "scope": "Explicit user approval of larger FIRST gate only; cumulative budget, original deadline, IAM/controller, freeze and launch remain pending.",
+      "values": {
+        "coefficient_cap": 25000000,
+        "seconds_per_execution": 3600,
+        "targets": 60
+      }
+    },
+    {
+      "id": "native-preparation",
+      "scope": "Current native preparation software and run-free parity only; actual frozen archive reextracted with current source543 instrument. Does not independently reproduce the instrument build.",
+      "values": {
+        "archive_reextracted": true,
+        "archive_workloads": 1260,
+        "cohort_slots": 22680,
+        "exact_retained_specs": true,
+        "software_tests": 3,
+        "solver_executions": 0,
+        "tests_failed": 0
+      }
+    },
+    {
+      "id": "native-canonical",
+      "scope": "Native canonical packaging/protocol software fixtures only; distinct from empirical targets and previous producer/analyzer suites.",
+      "values": {
+        "clippy_passed": true,
+        "empirical_targets": 0,
+        "qualified_cost_ratio": null,
+        "tests_failed": 0,
+        "tests_passed": 28
+      }
+    },
+    {
+      "id": "native-report",
+      "scope": "Native renderer software fixtures only; includes pdflatex PDF test and historical validation-scope preservation.",
+      "values": {
+        "clippy_exit_code": 0,
+        "empirical_targets": 0,
+        "tests_failed": 0,
+        "tests_passed": 8
+      }
+    },
+    {
+      "id": "instrument543",
+      "scope": "Previously verified static ecbench build source543, separate from native tooling; plan-only checks and no solver execution.",
+      "values": {
+        "archive_targets": 1260,
+        "prepared_plans": 9,
+        "solver_executions": 0,
+        "source": "543a54b4b1c3be7052872af3ffe393a44c69a3c3"
+      }
+    },
+    {
+      "id": "root-full",
+      "scope": "Source0cd test-only correction validation lane: full default-parallel release suite failed. Exact source-file hashes are retained in receipt; focused passes do not replace this result.",
+      "values": {
+        "exit_code": 101,
+        "failed": 2,
+        "ignored": 123,
+        "passed": 5275
+      }
+    },
+    {
+      "id": "root-focused",
+      "scope": "Separate bounded serial reruns of the two failed tests from the exact same compiled binary; not a passing full-suite result.",
+      "values": {
+        "allocator_failed": 0,
+        "allocator_passed": 1,
+        "exit_code": 0,
+        "gpu_failed": 0,
+        "gpu_passed": 1
+      }
+    },
+    {
+      "id": "canonical-hash",
+      "scope": "Separate supplemental historical hash test, not a rerun or total of the 28-test suite. Earlier category-confusion failure retained; raw-file digest differs from canonical body digest by definition.",
+      "values": {
+        "empirical_executions": 0,
+        "independent_bytes_match": true,
+        "runtime_source_changed": false,
+        "targeted_test_passed": 1
+      }
+    }
+  ],
+  "ratios": [
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 0,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 0
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 1,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 0
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 10,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 0
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 10,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 0,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 0
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 10,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 1,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 0
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 10,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 10,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 0
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 100,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 0,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 0
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 100,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 1,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 0
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 100,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 10,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 0
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1000,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 0,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 0
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1000,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 1,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 0
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1000,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 10,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 0
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 0,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 1
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 1,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 1
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 10,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 1
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 10,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 0,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 1
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 10,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 1,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 1
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 10,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 10,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 1
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 100,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 0,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 1
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 100,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 1,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 1
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 100,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 10,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 1
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1000,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 0,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 1
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1000,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 1,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 1
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1000,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 10,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 1
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 0,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 2
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 1,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 2
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 10,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 2
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 10,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 0,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 2
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 10,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 1,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 2
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 10,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 10,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 2
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 100,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 0,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 2
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 100,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 1,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 2
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 100,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 10,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 2
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1000,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 0,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 2
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1000,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 1,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 2
+    },
+    {
+      "admitted_pairs": 0,
+      "algorithm_ratio_of_sums": null,
+      "candidate_sum": null,
+      "candidate_sum_including_calibration": null,
+      "complete": false,
+      "expected_pairs": 6300,
+      "inversion": 1000,
+      "missing_or_ineligible_pairs": 6300,
+      "native_tenths": 10,
+      "partial_admitted_sums_diagnostic_only": {
+        "candidate": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "candidate_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_including_calibration": {
+          "denominator": "1",
+          "numerator": "0"
+        }
+      },
+      "qualified_ratio": null,
+      "ratio_of_sums_including_calibration": null,
+      "reference_sum": null,
+      "reference_sum_including_calibration": null,
+      "square_twice": 2
+    }
+  ],
+  "renderer_source_sha256": "80762786c36dcb56a3148b38e70974375432425f240087af786d65f10cceeeba",
+  "request": {
+    "observations": [
+      {
+        "fields": {
+          "coefficient_cap": "/scope/matrix_coefficient_cap",
+          "seconds_per_execution": "/scope/timeout_seconds_per_execution",
+          "targets": "/scope/target_count"
+        },
+        "id": "first-gate",
+        "scope": "Explicit user approval of larger FIRST gate only; cumulative budget, original deadline, IAM/controller, freeze and launch remain pending.",
+        "source": {
+          "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/accounting_amendment_20261029/first_gate_authorization.json",
+          "sha256": "e04f26d0cab6850f3c477e9521ea4359c46f64ec436ce899b3b4049867710600"
+        }
+      },
+      {
+        "fields": {
+          "archive_reextracted": "/archive_extraction_validation/actual_frozen_archive_reextracted_in_this_validation",
+          "archive_workloads": "/archive_plan_parity/observed_workloads",
+          "cohort_slots": "/prepared_plan_parity/cohort_planned_executions",
+          "exact_retained_specs": "/prepared_plan_parity/prepared_specs_and_manifest_exact_retained_bytes",
+          "software_tests": "/software_checks/1/tests_passed",
+          "solver_executions": "/execution_boundary/solver_executions_performed",
+          "tests_failed": "/software_checks/1/tests_failed"
+        },
+        "id": "native-preparation",
+        "scope": "Current native preparation software and run-free parity only; actual frozen archive reextracted with current source543 instrument. Does not independently reproduce the instrument build.",
+        "source": {
+          "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_preparation/validation/receipt.json",
+          "sha256": "46843c028008698dc4eaa47370191904cf274791402d8953e23868e725d62ea3"
+        }
+      },
+      {
+        "fields": {
+          "clippy_passed": "/clippy/passed",
+          "empirical_targets": "/cohort_targets_executed",
+          "qualified_cost_ratio": "/qualified_cost_ratio",
+          "tests_failed": "/release_tests/failed",
+          "tests_passed": "/release_tests/passed"
+        },
+        "id": "native-canonical",
+        "scope": "Native canonical packaging/protocol software fixtures only; distinct from empirical targets and previous producer/analyzer suites.",
+        "source": {
+          "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_canonical_export/validation/receipt.json",
+          "sha256": "aeef1f2bc1984f248121a786996cfb6ed5008750a825d47712e53092ad4ea0f6"
+        }
+      },
+      {
+        "fields": {
+          "clippy_exit_code": "/clippy_exit_code",
+          "empirical_targets": "/empirical_targets",
+          "tests_failed": "/tests_failed",
+          "tests_passed": "/tests_passed"
+        },
+        "id": "native-report",
+        "scope": "Native renderer software fixtures only; includes pdflatex PDF test and historical validation-scope preservation.",
+        "source": {
+          "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_review_report/validation-layout.json",
+          "sha256": "37da6488934ed19fb48102e16de777a0c7935519f36245bd31399e4708864023"
+        }
+      },
+      {
+        "fields": {
+          "archive_targets": "/archive_targets_matched",
+          "prepared_plans": "/prepared_plans_exactly_equal",
+          "solver_executions": "/solver_executions_performed",
+          "source": "/source_revision"
+        },
+        "id": "instrument543",
+        "scope": "Previously verified static ecbench build source543, separate from native tooling; plan-only checks and no solver execution.",
+        "source": {
+          "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/instrument_build_40938439022/receipt.json",
+          "sha256": "59fd9e0e1f4573d9492bcca710b5351cd0175f788b197a7c82939e177ab1a1a1"
+        }
+      },
+      {
+        "fields": {
+          "exit_code": "/release_validation/exit_code",
+          "failed": "/release_validation/failed",
+          "ignored": "/release_validation/ignored",
+          "passed": "/release_validation/passed"
+        },
+        "id": "root-full",
+        "scope": "Source0cd test-only correction validation lane: full default-parallel release suite failed. Exact source-file hashes are retained in receipt; focused passes do not replace this result.",
+        "source": {
+          "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/hash_one_ci_20261029/correction.json",
+          "sha256": "2c83885fbefef25323bf968aefdb1ea96c1b67bdd4ed7dcae84cb7c5d68014fe"
+        }
+      },
+      {
+        "fields": {
+          "allocator_failed": "/bounded_same_binary_confirmation/allocator/failed",
+          "allocator_passed": "/bounded_same_binary_confirmation/allocator/passed",
+          "exit_code": "/bounded_same_binary_confirmation/exit_code",
+          "gpu_failed": "/bounded_same_binary_confirmation/gpu/failed",
+          "gpu_passed": "/bounded_same_binary_confirmation/gpu/passed"
+        },
+        "id": "root-focused",
+        "scope": "Separate bounded serial reruns of the two failed tests from the exact same compiled binary; not a passing full-suite result.",
+        "source": {
+          "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/hash_one_ci_20261029/correction.json",
+          "sha256": "2c83885fbefef25323bf968aefdb1ea96c1b67bdd4ed7dcae84cb7c5d68014fe"
+        }
+      },
+      {
+        "fields": {
+          "empirical_executions": "/cohort_executions",
+          "independent_bytes_match": "/independent_bytes_match_rust",
+          "runtime_source_changed": "/runtime_source_changed",
+          "targeted_test_passed": "/additional_software_tests_passed"
+        },
+        "id": "canonical-hash",
+        "scope": "Separate supplemental historical hash test, not a rerun or total of the 28-test suite. Earlier category-confusion failure retained; raw-file digest differs from canonical body digest by definition.",
+        "source": {
+          "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_canonical_export/validation/historical-hash-receipt.json",
+          "sha256": "6fe3e515c1c2a5ba81116d4c93ea95e16313fc2781e9fbf19c8c0180a94dc6c2"
+        }
+      }
+    ],
+    "plan_summary": {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/accounting/aggregate/actual-plan-only-summary-final.json",
+      "sha256": "9c0d055e2af7f6f79ce201b9b0c2a22691da0af55e8f6f127acec7070bb7e665"
+    },
+    "schema": "pencil-native-review-report-request/v1",
+    "snapshot": "2026-10-29T22:49:35Z",
+    "title": "Pencil mathematical study: native preparation evidence"
+  },
+  "schema": "pencil-accounting-review-report/v2",
+  "scope": "Public synthetic known-answer mathematical research. Evidence observations only; no judgments, new cohort executions or qualification.",
+  "snapshot": "2026-10-29T22:49:35Z",
+  "title": "Pencil mathematical study: native preparation evidence"
+}

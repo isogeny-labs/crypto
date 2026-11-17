@@ -1,0 +1,100 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "chain-free Koblitz IC: m = 2 half-dimension base against the m = 3 one-link chain, K_0 / F_2^23",
+ "description": "LEADS.md L2, the chained comparison. At n = 23 (the largest size the inherited-F4 m = 3 oracle has completed before, research/pdp_root_finder_ecbench_20261013) the m = 2 pair-table arms at dimension 8, 10, 12 are run against the m = 3 one-link chain at dimension 8 and 10 with the inherited-F4 oracle, the strong rho reference and its A/A control. Counted operations; every phase charged; a measurement, not a performance claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 0,
+    "n": 23
+   }
+  ],
+  "targets_per_curve": 4,
+  "target_seed": 20261002
+ },
+ "arms": [
+  {
+   "name": "rho-strong",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  },
+  {
+   "name": "rho-strong-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  },
+  {
+   "name": "ic-m2-d8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "koblitz-standard-subspace:dimension=8",
+     "oracle": "pdp3-koblitz:m=2,engine=rootfind-negfold",
+     "max_trials": "2000000"
+    }
+   }
+  },
+  {
+   "name": "ic-m2-d10",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "koblitz-standard-subspace:dimension=10",
+     "oracle": "pdp3-koblitz:m=2,engine=rootfind-negfold",
+     "max_trials": "2000000"
+    }
+   }
+  },
+  {
+   "name": "ic-m2-d12",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "koblitz-standard-subspace:dimension=12",
+     "oracle": "pdp3-koblitz:m=2,engine=rootfind-negfold",
+     "max_trials": "2000000"
+    }
+   }
+  },
+  {
+   "name": "ic-m3-d8-f4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "koblitz-standard-subspace:dimension=8",
+     "oracle": "pdp3-koblitz:m=3,engine=inherited-f4,degree=3,node_budget=8192",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "ic-m3-d10-f4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "koblitz-standard-subspace:dimension=10",
+     "oracle": "pdp3-koblitz:m=3,engine=inherited-f4,degree=3,node_budget=8192",
+     "max_trials": "200000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 202610181530,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

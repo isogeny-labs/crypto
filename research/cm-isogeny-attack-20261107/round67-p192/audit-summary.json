@@ -1,0 +1,160 @@
+{
+  "small": [
+    {
+      "r": 7,
+      "queries": 200,
+      "candidate": [
+        99404,
+        4274,
+        1400
+      ],
+      "expanded": [
+        133036,
+        5976,
+        1400
+      ]
+    },
+    {
+      "r": 19,
+      "queries": 2144,
+      "candidate": [
+        3295513,
+        123267,
+        19296
+      ],
+      "expanded": [
+        4535925,
+        168425,
+        19296
+      ]
+    },
+    {
+      "r": 199,
+      "queries": 350,
+      "candidate": [
+        12338608,
+        261615,
+        10150
+      ],
+      "expanded": [
+        19264532,
+        384488,
+        10150
+      ]
+    }
+  ],
+  "P192": {
+    "candidate": {
+      "queries": 24,
+      "selected": [
+        34569,
+        1461,
+        168
+      ],
+      "numerator_formation_and_norm_counts": [
+        32634,
+        1152,
+        0
+      ],
+      "denominator_formation_and_norm_counts": [
+        864,
+        0,
+        0
+      ],
+      "division_counts": [
+        144,
+        144,
+        0
+      ]
+    },
+    "expanded": {
+      "queries": 24,
+      "selected": [
+        56637,
+        1605,
+        168
+      ],
+      "numerator_formation_and_norm_counts": [
+        54486,
+        1296,
+        0
+      ],
+      "denominator_formation_and_norm_counts": [
+        1080,
+        0,
+        0
+      ],
+      "division_counts": [
+        144,
+        144,
+        0
+      ]
+    },
+    "target_setups": [
+      {
+        "H_Q_cache_counts": [
+          20,
+          0,
+          0
+        ],
+        "H_Q_coefficient_slots": 5,
+        "algebra_counts": [
+          172,
+          16,
+          0
+        ],
+        "persistent_polynomial_coefficient_slots": 13,
+        "point_counts": [
+          27,
+          7,
+          7
+        ],
+        "point_slots": 8,
+        "target": "public_Q"
+      },
+      {
+        "H_Q_cache_counts": [
+          20,
+          0,
+          0
+        ],
+        "H_Q_coefficient_slots": 5,
+        "algebra_counts": [
+          172,
+          16,
+          0
+        ],
+        "persistent_polynomial_coefficient_slots": 13,
+        "point_counts": [
+          27,
+          7,
+          7
+        ],
+        "point_slots": 8,
+        "target": "mu_G"
+      },
+      {
+        "H_Q_cache_counts": [
+          20,
+          0,
+          0
+        ],
+        "H_Q_coefficient_slots": 5,
+        "algebra_counts": [
+          172,
+          16,
+          0
+        ],
+        "persistent_polynomial_coefficient_slots": 13,
+        "point_counts": [
+          27,
+          7,
+          7
+        ],
+        "point_slots": 8,
+        "target": "relation_lambda_G"
+      }
+    ]
+  },
+  "counter_scope": "small K multiplications include inverse powers; P192 explicit multiplication/inverse calls exclude inverse internals; no timing or combined-model ratio"
+}

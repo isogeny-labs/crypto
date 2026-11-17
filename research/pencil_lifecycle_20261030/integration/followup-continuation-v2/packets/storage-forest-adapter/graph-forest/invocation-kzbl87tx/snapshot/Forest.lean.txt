@@ -1,0 +1,85 @@
+import Union
+set_option autoImplicit false
+namespace GraphForest
+open SignedGraphAlgebra GraphFind GraphUnion
+variable {K : Type*} [Field K] [DecidableEq K] {n : Nat}
+inductive Reach (s : GraphFind.State K n) : Fin n → Fin n → Prop
+ | refl (x : Fin n) : Reach s x x
+ | step (x y : Fin n) : Reach s (s.parent x) y → Reach s x y
+
+theorem root_reach (s : GraphFind.State K n) (x y : Fin n)
+ (hx : s.parent x=x) (h : Reach s x y) : y=x := by
+ induction h with
+ | refl => rfl
+ | step a b h ih => exact ih (by simpa [hx] using hx) |>.trans hx
+
+theorem reach_parent (s : GraphFind.State K n) (x c : Fin n) (hne : x≠c) :
+ Reach s x c ↔ Reach s (s.parent x) c := by
+ constructor
+ · intro h
+   cases h with
+   | refl => exact False.elim (hne rfl)
+   | step a b h => exact h
+ · exact Reach.step x c
+noncomputable def bumped (s : GraphFind.State K n) (rank : Fin n → Nat)
+ (child parent : Fin n) : Fin n → Nat := by
+ classical
+ exact fun x=>if Reach s x child then rank x+rank parent+1 else rank x
+
+theorem attach_forest (s : GraphFind.State K n) (rank : Fin n → Nat)
+ (child parent : Fin n) (p : Potential K) (hf : Forest s rank)
+ (hp : s.parent parent=parent) (hd : parent≠child) :
+ Forest (compress s child parent p) (bumped s rank child parent) := by
+ classical
+ have hnp : ¬Reach s parent child := by
+   intro h; exact hd (root_reach s parent child hp h).symm
+ intro x
+ by_cases hx : x=child
+ · subst x
+   right
+   have hparent : (compress s child parent p).parent child=parent := by simp [compress]
+   rw [hparent]
+   simp only [bumped,if_neg hnp,if_pos (Reach.refl child)]
+   omega
+ · cases hf x with
+   | inl hr => left; simpa [compress,hx] using hr
+   | inr hr =>
+     right
+     have he : Reach s x child ↔ Reach s (s.parent x) child := reach_parent s x child hx
+     simp only [compress,hx,if_false,bumped]
+     by_cases hxc : Reach s x child
+     · rw [if_pos hxc,if_pos (he.mp hxc)]; omega
+     · rw [if_neg hxc,if_neg (fun h=>hxc (he.mpr h))]; exact hr
+
+theorem find_preserves_roots (s t : GraphFind.State K n) (x r z : Fin n)
+ (p : Potential K) (h : Run s x t r p) (rank : Fin n → Nat) (hf : Forest s rank)
+ (hz : s.parent z=z) : t.parent z=z := by
+ induction h with
+ | root => exact hz
+ | step t x r q hne rec ih =>
+   have hzx : z≠x := by intro he; subst z; exact hne hz
+   have htroot := ih
+   simpa [compress,hzx] using htroot
+theorem attachment_roots (s : GraphFind.State K n) (child parent : Fin n)
+ (p : Potential K) (hp : s.parent parent=parent) (hd : parent≠child) :
+ (compress s child parent p).parent child=parent ∧
+ (compress s child parent p).parent parent=parent := by
+ constructor
+ · simp [compress]
+ · simpa [compress,hd] using hp
+
+theorem component_transferred (s : GraphFind.State K n) (child parent x : Fin n)
+ (p : Potential K) (h : Reach s x child) :
+ Reach (compress s child parent p) x parent := by
+ induction h with
+ | refl =>
+   apply Reach.step
+   simpa [compress] using (Reach.refl (s:=compress s child parent p) parent)
+ | step a b h ih =>
+   by_cases ha : a=child
+   · subst a
+     apply Reach.step
+     simpa [compress] using (Reach.refl (s:=compress s child parent p) parent)
+   · apply Reach.step
+     simpa [compress,ha] using ih
+end GraphForest

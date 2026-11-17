@@ -1,0 +1,191 @@
+{
+  "schema": "ecbench.audit/v1",
+  "session_id": "ECBS1hcb2b066d0931",
+  "session_status": "complete",
+  "records_bound": true,
+  "ok": false,
+  "problems": [
+    "replay of seq 2: differs in phase counts",
+    "replay of seq 5: differs in phase counts",
+    "replay of seq 8: differs in phase counts",
+    "replay of seq 11: differs in phase counts",
+    "replay of seq 14: differs in phase counts",
+    "replay of seq 17: differs in phase counts",
+    "replay of seq 20: differs in phase counts",
+    "replay of seq 23: differs in phase counts"
+  ],
+  "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "host_hash": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "replays": false,
+    "session_complete": true,
+    "spec_id": true,
+    "workloads": true
+  },
+  "records": 24,
+  "verified_records": 24,
+  "regraded": true,
+  "replays": [
+    {
+      "seq": 0,
+      "record_id": "ECR1hebb184eeb01b",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 1,
+      "record_id": "ECR1h0bd238e5e584",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 2,
+      "record_id": "ECR1hc4e084daf6e6",
+      "reproduced": false,
+      "detail": "differs in phase counts"
+    },
+    {
+      "seq": 3,
+      "record_id": "ECR1h0a4381ad271d",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 4,
+      "record_id": "ECR1he048d188147c",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 5,
+      "record_id": "ECR1h7c6c74b5a3a9",
+      "reproduced": false,
+      "detail": "differs in phase counts"
+    },
+    {
+      "seq": 6,
+      "record_id": "ECR1h7df885c9a255",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 7,
+      "record_id": "ECR1h348c304040d5",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 8,
+      "record_id": "ECR1h2d98178a6a1d",
+      "reproduced": false,
+      "detail": "differs in phase counts"
+    },
+    {
+      "seq": 9,
+      "record_id": "ECR1h19c6e8e9535d",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 10,
+      "record_id": "ECR1h97a04c8b2703",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 11,
+      "record_id": "ECR1h76ae605824da",
+      "reproduced": false,
+      "detail": "differs in phase counts"
+    },
+    {
+      "seq": 12,
+      "record_id": "ECR1h02e0b69a465a",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 13,
+      "record_id": "ECR1h6de582c1c160",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 14,
+      "record_id": "ECR1h866b2700006d",
+      "reproduced": false,
+      "detail": "differs in phase counts"
+    },
+    {
+      "seq": 15,
+      "record_id": "ECR1h944553f68f77",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 16,
+      "record_id": "ECR1hd158c02f9379",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 17,
+      "record_id": "ECR1h20bb4fa89616",
+      "reproduced": false,
+      "detail": "differs in phase counts"
+    },
+    {
+      "seq": 18,
+      "record_id": "ECR1hc66fb43990cc",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 19,
+      "record_id": "ECR1h1243687aaf67",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 20,
+      "record_id": "ECR1hdd6d172e2aad",
+      "reproduced": false,
+      "detail": "differs in phase counts"
+    },
+    {
+      "seq": 21,
+      "record_id": "ECR1h782da7497850",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 22,
+      "record_id": "ECR1hbdbe4f2c2edf",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 23,
+      "record_id": "ECR1hc745333ab1d8",
+      "reproduced": false,
+      "detail": "differs in phase counts"
+    }
+  ],
+  "files": {
+    "host.json": "1163c5530c5400cded975b5f1260f64367eec7250b74f7e0c39017abde9ef136",
+    "plan.json": "3f67ce63708ebf94376b4c94ba982f3f6dd2d8f5cedcffefd578f20c02c976a7",
+    "records.jsonl": "d4c821d76977864c2ed7aa739932fb3e4df4fa11e4e15dbd1fd8c1576f75eae9",
+    "session.json": "c9a9963ad736b1799307025ed11c685d41ea319784e2b5b3be55f8f65bbc9e72",
+    "spec.json": "83ef27d29b13c3201468a99f618e4d628d2431578fd2e82047497487febbf198"
+  },
+  "auditor_binary_sha256": "eaba5eb0db487c36752194d41e5d23c27ec2171cefc81b2e6d73ec811558ff57",
+  "auditor_env_class_id": "ECBENV2h61599de43162",
+  "auditor_hardware_class_id": "ECBHW1he9e33daae9e7",
+  "audited_unix_ms": 1792738025045
+}

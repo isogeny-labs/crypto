@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T11:31:11Z",
+ "id": "PCC-20261117-8dcb9c",
+ "kind": "statement",
+ "producer": {
+  "commit": "feb933d2b8176e29a09127a18b7f92765959255e",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_inverse_20261117/actual-result-queue-and-PR-publication-04/ACTUAL_REGULAR_PR15_PUBLICATION.json",
+    "sha256": "6893c553319433465723d785b793db34bf2adb85071cf3f1503b9512445510d5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_inverse_20261117/actual-result-queue-and-PR-publication-04/EXACT_REGULAR_PR15_READBACK.json",
+    "sha256": "2159add71f0371b85dcc6d96a1c03445d7e58a0327adc2d5d62da0c9a0fc29e3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_inverse_20261117/actual-result-queue-and-PR-publication-04/ALL_CHANGED_FILENAMES_AT_RESULT15.json",
+    "sha256": "1d778b7f27335fe5bc63d91e636b99f7489d5c4b75e326269932969e897ce761"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Regular PR4544 now contains exact previously checked result57199d2, verified by head readback and all440 remote/local filenames plus exact final title/body. Native15, conditional Lean, reports, provider12 and full current CI custody are in the regular PR. CLI Git push authentication was rejected; existing authorized GitHub app performed an expected-SHA force=false fast-forward to the same already-public commit. Initial immediately stale PR metadata is preserved and reconciled without repeating the ref update. No CI green, manual merge or gate waiver is inferred."
+}

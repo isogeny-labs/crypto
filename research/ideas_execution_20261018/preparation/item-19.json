@@ -1,0 +1,48 @@
+{
+  "item": 19,
+  "title": "Publish negatives and formalize two theorems",
+  "original_requirement": "Write the negative-results ECDLP manuscript covering the six named results and formalize the two requested theorems in Lean.",
+  "acceptance_criteria": [
+    "Link every claim to its exact proof, counterexample or experiment and hypotheses. Separate conditional barriers from bounded experimental negatives.",
+    "Place the manuscript under papers/, with bibliography, reproducibility bundle and explicit review/submission status.",
+    "Faithfully state the two Lean theorems, audit axioms and check the build. Claim publication or submission only with its actual receipt."
+  ],
+  "source_bindings": [
+    {
+      "repository": "crypto",
+      "path": "papers/README.md"
+    },
+    {
+      "repository": "crypto",
+      "path": "papers/paper.mk"
+    },
+    {
+      "repository": "crypto",
+      "path": "research/conductor_gap_cm_pairs_20261010/lean/GenericInvariance.lean"
+    },
+    {
+      "repository": "crypto",
+      "path": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md"
+    },
+    {
+      "repository": "crypto-autoresearcher",
+      "path": "experiments/EXP-SEMBIN-db9bc3/specification.yaml"
+    },
+    {
+      "repository": "crypto-autoresearcher",
+      "path": "experiments/EXP-SEMBIN-d9767f/specification.yaml"
+    }
+  ],
+  "source_supported_commands": [],
+  "remaining_gaps": [
+    "A current proof inventory and novelty audit must bind exact sources for all six named negative results before a synthesis claim.",
+    "No manuscript or Lean proof of the two requested theorems is delivered by this preparation. The existing GenericInvariance.lean is an adjacent reference.",
+    "Lean/toolchain and renderer availability remain to be confirmed. Reviewed theorem assumptions are part of the acceptance criteria."
+  ],
+  "dependencies": [],
+  "existing_evidence_notes": [],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "Publish the negative results. Nagao's Lemma 4 is false, Semaev 2015's Assumption 1 fails off the diagonal, the compact-orbit pipeline is provably generic, yield is conserved, the monodromy is C₂^{m−2}, and isogeny oracles are generic. The publication list has no ECDLP entry. Formalising the two theorems in Lean would make them citable."
+}

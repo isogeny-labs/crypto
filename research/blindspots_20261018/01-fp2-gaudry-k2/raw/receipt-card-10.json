@@ -1,0 +1,288 @@
+{
+  "card_id": "CARD-BLINDSPOT-01-10",
+  "card_path": "research/blindspots_20261018/01-fp2-gaudry-k2/card-10.yaml",
+  "card_sha256": "748758fa75f7470243b6a1eac3c9b0686881f9a08d891b3f49553504616841e0",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-01/card-10"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-o",
+        "target/blindspots-01/card-10/b01",
+        "examples/blindspots_01_fp2_gaudry.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 8.356,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 8.356,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-01/card-10/b01",
+        "run",
+        "--family",
+        "prime",
+        "--bits",
+        "40",
+        "--idx",
+        "0",
+        "--arms",
+        "ic-a:0-1,rho-neg:0-7",
+        "--inv-cost",
+        "4",
+        "--crosscheck",
+        "10",
+        "--quiet",
+        "--out",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b40-i0.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 52.339,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "prime-b40-i0",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b40-i0.jsonl": "b8468f3a60bc77a2889ed870de92b990c619f003196aebf4c6bf120d5dd58b5e"
+      },
+      "seconds": 52.339,
+      "stderr_sha256": "64d7cccf231f32048f0e252c64988b85a9ae6e0aeba28a444776f570b48e313e",
+      "stderr_tail": [
+        "[fp2-prime-b40-i0-p958627] n = 918964248883, r = 918964248883, cofactor 1"
+      ],
+      "stdout_sha256": "becca9fea1d5eaaca2b8105649170db7911a55d3e36cbfc0b082125f4a0b84fc",
+      "stdout_tail": [
+        "prime b40 i0 t0 ic-a: verified=true gae=139883369 S(w0)=145.92 S(w1)=176.51 wall=24.9s",
+        "prime b40 i0 t1 ic-a: verified=true gae=146789860 S(w0)=153.13 S(w1)=187.15 wall=25.6s",
+        "prime b40 i0 t0 rho-neg: verified=true gae=779452 S(w0)=0.81 S(w1)=3.25 wall=0.2s",
+        "prime b40 i0 t1 rho-neg: verified=true gae=543279 S(w0)=0.57 S(w1)=2.26 wall=0.2s",
+        "prime b40 i0 t2 rho-neg: verified=true gae=767841 S(w0)=0.80 S(w1)=3.20 wall=0.3s",
+        "prime b40 i0 t3 rho-neg: verified=true gae=864953 S(w0)=0.90 S(w1)=3.60 wall=0.3s",
+        "prime b40 i0 t4 rho-neg: verified=true gae=402543 S(w0)=0.42 S(w1)=1.67 wall=0.1s",
+        "prime b40 i0 t5 rho-neg: verified=true gae=640618 S(w0)=0.67 S(w1)=2.67 wall=0.2s",
+        "prime b40 i0 t6 rho-neg: verified=true gae=795333 S(w0)=0.83 S(w1)=3.31 wall=0.2s",
+        "prime b40 i0 t7 rho-neg: verified=true gae=376661 S(w0)=0.39 S(w1)=1.57 wall=0.1s"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-01/card-10/b01",
+        "run",
+        "--family",
+        "prime",
+        "--bits",
+        "40",
+        "--idx",
+        "1",
+        "--arms",
+        "ic-a:0-1,rho-neg:0-7",
+        "--inv-cost",
+        "4",
+        "--crosscheck",
+        "10",
+        "--quiet",
+        "--out",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b40-i1.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 48.414,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "prime-b40-i1",
+      "index": 4,
+      "outputs": {
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b40-i1.jsonl": "1dfbe217a2701f72a74353a56392f2c5538949517b336b191bd8bde109c5a997"
+      },
+      "seconds": 48.414,
+      "stderr_sha256": "b070ec0e03279780e4a684ef34622b2e9a7f36c6d33de0d5fdbeb7a0abb35646",
+      "stderr_tail": [
+        "[fp2-prime-b40-i1-p814007] n = 662608213873, r = 662608213873, cofactor 1"
+      ],
+      "stdout_sha256": "07b95d245c49cda554913e93392ba2682ba98bc2f283a9761ebac1af4b5d4fa7",
+      "stdout_tail": [
+        "prime b40 i1 t0 ic-a: verified=true gae=136560165 S(w0)=167.76 S(w1)=202.43 wall=23.0s",
+        "prime b40 i1 t1 ic-a: verified=true gae=136278331 S(w0)=167.42 S(w1)=200.67 wall=22.9s",
+        "prime b40 i1 t0 rho-neg: verified=true gae=1141585 S(w0)=1.40 S(w1)=5.61 wall=0.4s",
+        "prime b40 i1 t1 rho-neg: verified=true gae=130164 S(w0)=0.16 S(w1)=0.63 wall=0.0s",
+        "prime b40 i1 t2 rho-neg: verified=true gae=926237 S(w0)=1.14 S(w1)=4.55 wall=0.3s",
+        "prime b40 i1 t3 rho-neg: verified=true gae=1228777 S(w0)=1.51 S(w1)=6.03 wall=0.4s",
+        "prime b40 i1 t4 rho-neg: verified=true gae=631453 S(w0)=0.78 S(w1)=3.10 wall=0.2s",
+        "prime b40 i1 t5 rho-neg: verified=true gae=1282207 S(w0)=1.58 S(w1)=6.30 wall=0.4s",
+        "prime b40 i1 t6 rho-neg: verified=true gae=1020284 S(w0)=1.25 S(w1)=5.01 wall=0.4s",
+        "prime b40 i1 t7 rho-neg: verified=true gae=1150221 S(w0)=1.41 S(w1)=5.65 wall=0.4s"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-01/card-10/b01",
+        "run",
+        "--family",
+        "prime",
+        "--bits",
+        "40",
+        "--idx",
+        "2",
+        "--arms",
+        "ic-a:0-1,rho-neg:0-7",
+        "--inv-cost",
+        "4",
+        "--crosscheck",
+        "10",
+        "--quiet",
+        "--out",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b40-i2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 61.278,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "prime-b40-i2",
+      "index": 5,
+      "outputs": {
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b40-i2.jsonl": "dab5c21a3ebb62dd6410dcdfc1fce5bb4ea3b49c0188a449fd5f8d6ff89b22ab"
+      },
+      "seconds": 61.278,
+      "stderr_sha256": "ad86772f08aa4499155a5102c8cf0ffd666165e907a1be078915edfe64f9ba43",
+      "stderr_tail": [
+        "[fp2-prime-b40-i2-p1013063] n = 1026296762221, r = 1026296762221, cofactor 1"
+      ],
+      "stdout_sha256": "72c2afddf9ed3422440cbebde0c2966bb0e5d9c7fc654f29ddd593e6c5a6f76e",
+      "stdout_tail": [
+        "prime b40 i2 t0 ic-a: verified=true gae=171756666 S(w0)=169.54 S(w1)=214.97 wall=30.0s",
+        "prime b40 i2 t1 ic-a: verified=true gae=166364549 S(w0)=164.22 S(w1)=194.66 wall=28.8s",
+        "prime b40 i2 t0 rho-neg: verified=true gae=548620 S(w0)=0.54 S(w1)=2.16 wall=0.2s",
+        "prime b40 i2 t1 rho-neg: verified=true gae=1822399 S(w0)=1.80 S(w1)=7.19 wall=0.7s",
+        "prime b40 i2 t2 rho-neg: verified=true gae=1256708 S(w0)=1.24 S(w1)=4.96 wall=0.5s",
+        "prime b40 i2 t3 rho-neg: verified=true gae=402311 S(w0)=0.40 S(w1)=1.58 wall=0.1s",
+        "prime b40 i2 t4 rho-neg: verified=true gae=396175 S(w0)=0.39 S(w1)=1.56 wall=0.1s",
+        "prime b40 i2 t5 rho-neg: verified=true gae=192895 S(w0)=0.19 S(w1)=0.76 wall=0.1s",
+        "prime b40 i2 t6 rho-neg: verified=true gae=559474 S(w0)=0.55 S(w1)=2.20 wall=0.2s",
+        "prime b40 i2 t7 rho-neg: verified=true gae=1285557 S(w0)=1.27 S(w1)=5.07 wall=0.4s"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-01/card-10/b01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.008,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.008,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "3c59424a743406c3d272fbafb0f14f936d51812d",
+  "dirty_after": [
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b40-i0.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b40-i1.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b40-i2.jsonl",
+    "xamples/blindspots_06_signature_gb.rs"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/05-elimination-orders/raw/card-09-build.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-09-build.stdout.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-09-grevlex-c17-4-4-t1.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-09-grevlex-c17-4-4-t1.stdout.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/receipt-card-09.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

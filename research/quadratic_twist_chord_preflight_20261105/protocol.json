@@ -1,0 +1,570 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "TWIST-CHORD-F37-COMPLETENESS-20261105",
+  "version": 1,
+  "created": "2026-11-05",
+  "repository": "crypto",
+  "study_dir": "research/quadratic_twist_chord_preflight_20261105",
+  "authors": [
+    "Codex, producer"
+  ],
+  "links": {
+    "proposal_pr": "https://github.com/isogeny-labs/crypto/pull/3438",
+    "note": "DRAFT ONLY. No producer, auditor, proof project, runner or frozen analysis exists. No data, upload, signed PCC verification or experiment result is claimed."
+  },
+  "question": "Does the complete three-branch target-chord solver reproduce every ordered signed relation on all declared F37 policy/query cells, including diagonals and identity, without an oracle supplying algebraic answers?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Proposed curve-line, membership and branch coverage identities; faithful Lean and source-bound identity checks remain unimplemented.",
+      "class": "theorem",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Every completed cell has exactly the independently reconstructed ordered signed rows and actual source binding. This is an unexecuted exact finite census target.",
+      "class": "exact_computation",
+      "decided_by": [
+        "C-coverage"
+      ]
+    },
+    {
+      "id": "C3",
+      "text": "Useful collector advantage, lower intrinsic regularity, complete cost and original scalar recovery from legitimate public setup are not established by this component census.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "pair-reference",
+      "role": "reference",
+      "description": "Independent C++ point-pair reference and polynomial-witness auditor; unimplemented.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "not-implemented",
+            "independent-cpp-reference"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "launch_ready": "false"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "field": 37,
+        "relation_field": 19,
+        "source": {
+          "A": 7,
+          "B": 19,
+          "P": [
+            1,
+            8
+          ]
+        },
+        "twist": {
+          "A": 28,
+          "B": 33,
+          "d": 35,
+          "U": [
+            32,
+            29
+          ]
+        },
+        "roles": [
+          "main",
+          "twist",
+          "matched",
+          "pulled_back"
+        ],
+        "policies_per_role": 84,
+        "queries_per_policy": 19,
+        "planned_cells": 6384,
+        "nonidentity_cells": 6048,
+        "scope_note": "Repeated finite policy/query/control cells on 19 public subgroup points, not independent DLP challenges. Identity included. Actual Phi/I=[10]D source binding must be rechecked before freeze."
+      }
+    },
+    {
+      "id": "chord",
+      "role": "candidate",
+      "description": "Rust target-chord solver with distinct, diagonal and identity branches; unimplemented.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "not-implemented",
+            "rust-chord"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "launch_ready": "false"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "field": 37,
+        "relation_field": 19,
+        "source": {
+          "A": 7,
+          "B": 19,
+          "P": [
+            1,
+            8
+          ]
+        },
+        "twist": {
+          "A": 28,
+          "B": 33,
+          "d": 35,
+          "U": [
+            32,
+            29
+          ]
+        },
+        "roles": [
+          "main",
+          "twist",
+          "matched",
+          "pulled_back"
+        ],
+        "policies_per_role": 84,
+        "queries_per_policy": 19,
+        "planned_cells": 6384,
+        "nonidentity_cells": 6048,
+        "scope_note": "Repeated finite policy/query/control cells on 19 public subgroup points, not independent DLP challenges. Identity included. Actual Phi/I=[10]D source binding must be rechecked before freeze."
+      }
+    },
+    {
+      "id": "chord-aa",
+      "role": "control_aa",
+      "description": "Fresh same-code deterministic replay, not a timing-noise estimate.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "not-implemented",
+            "rust-chord"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "launch_ready": "false"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "field": 37,
+        "relation_field": 19,
+        "source": {
+          "A": 7,
+          "B": 19,
+          "P": [
+            1,
+            8
+          ]
+        },
+        "twist": {
+          "A": 28,
+          "B": 33,
+          "d": 35,
+          "U": [
+            32,
+            29
+          ]
+        },
+        "roles": [
+          "main",
+          "twist",
+          "matched",
+          "pulled_back"
+        ],
+        "policies_per_role": 84,
+        "queries_per_policy": 19,
+        "planned_cells": 6384,
+        "nonidentity_cells": 6048,
+        "scope_note": "Repeated finite policy/query/control cells on 19 public subgroup points, not independent DLP challenges. Identity included. Actual Phi/I=[10]D source binding must be rechecked before freeze."
+      },
+      "same_instrument_as": "chord"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Embedded branch inclusion assertions precede other queries in each policy: O from B0+(-B0), each 2Bi, and B0+B1. These target points are already in the complete 19-query census; run distinct points first, require every planted signed row, and retain duplicates as assertions, not extra independent challenges. No branch miss is a null result."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No random-population comparative claim is made. Semantic false source/map/columns/roots/diagonal/row/rank/witness/missing-query controls must reject rehashed altered payloads without a receipt; later public-log/scalar/free-second-call controls remain deferred until those components exist."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "encoding",
+        "levels": [
+          "point-pair-reference",
+          "target-chord"
+        ]
+      },
+      {
+        "name": "role",
+        "levels": [
+          "main",
+          "twist",
+          "matched",
+          "pulled_back"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "finite_fixture",
+        "treatment": "fixed",
+        "value": "Exact E/F37(7,19), d35 T(28,33), P(1,8), U(32,29), subgroup order19",
+        "how": "Recheck actual public source map, inverse and subgroup before freeze; no invented registry ID."
+      },
+      {
+        "name": "policies_queries",
+        "treatment": "crossed",
+        "value": "4 roles x84 policies x19 queries",
+        "how": "All size-three unsigned bases and all subgroup point queries. Retain column/sign transport."
+      },
+      {
+        "name": "instrument",
+        "treatment": "crossed",
+        "value": "Rust chord and separate C++ reference/auditor",
+        "how": "No shared field/group/polynomial arithmetic. Each model receives the same solver. Coverage equality is exact, not an unconfounded algorithm cost comparison."
+      },
+      {
+        "name": "host_layout_load",
+        "treatment": "measured",
+        "how": "Record CPU/kernel/memory pressure/build identities. No timed primary or performance inference."
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "One thread per instrument, no more than two local workers overall."
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": "Embedded positive queries first, then remaining actual points; interleave instruments and alternate model-first order by policy index.",
+        "how": "Deterministic exact census; no warmup removal or clock-based inference."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "Unmasked exploratory finite-fixture design",
+        "how": "Freeze native analysis before affected census data; fixture and earlier cap results are public and known."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-coverage",
+        "arms": [
+          "pair-reference",
+          "chord"
+        ],
+        "differs_in": [
+          "encoding",
+          "instrument"
+        ],
+        "design": "absolute",
+        "threshold": "ZERO row/source/branch defects in EVERY required cell; no average may hide a defect."
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "chord",
+          "chord-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": true
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261105
+      ],
+      "nonce": null,
+      "note": "Deterministic enumeration only. This fixed seed is a record label, not a random sample or hidden held-out fixture."
+    },
+    "instance_sampling": {
+      "rule": "Complete 6384 policy/query cells. Inside each policy, deduplicate O,2B0,2B1,2B2,B0+B1 as priority query points, then append all other subgroup points in lexicographic serialized-point order. No target scalar enters solver input.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Known finite exact coverage census with visible equations. No blinded confirmatory or statistical comparison claim.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 6384,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exact exhaustive coverage design, not a significance test or evidence of statistical power. All 6384 cells are required; repeated query/control points are not independent challenges."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 2,
+      "estimated_total_seconds": null,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "row_defects",
+        "name": "Missing and extra ordered signed rows",
+        "unit": "rows per cell",
+        "kind": "exact",
+        "definition": "Set and ordered multiplicity difference between candidate rows and independent reference; zero is required for EVERY cell.",
+        "source": "future audit per-cell row_defects",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "branch_defects",
+        "name": "Missed planted branches",
+        "unit": "branch assertions per cell",
+        "kind": "exact",
+        "definition": "Every planted diagonal, distinct and identity signed row must appear through the appropriate production path.",
+        "source": "future audit branch_defects",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "rank",
+        "name": "Coefficient rank",
+        "unit": "dimension over F19",
+        "kind": "exact",
+        "definition": "Rank of deduplicated original-column coefficient rows, after explicit sign/map transport.",
+        "source": "future audit coefficient_rank",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "poly_degree",
+        "name": "Univariate polynomial degree",
+        "unit": "degree per named polynomial",
+        "kind": "exact",
+        "definition": "Actual U,W,Delta and diagonal membership degrees with zero-polynomial handling. GCD matrix degree is null, not zero.",
+        "source": "future cases degree_ledger",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "field_add_requests",
+      "field_mul_requests",
+      "field_inverse_requests",
+      "polynomial_term_visits",
+      "polynomial_division_steps",
+      "root_extraction_requests",
+      "group_add_requests",
+      "map_requests",
+      "row_updates",
+      "failed_branches"
+    ],
+    "record": [
+      "source_commit",
+      "binary_sha256",
+      "rustc_or_cxx_version",
+      "cpu_model",
+      "kernel_release",
+      "threads",
+      "memory_pressure",
+      "all_query_failures",
+      "all_ordered_sign_lifts"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "max_existing_workers": 2,
+      "paid_compute": false,
+      "iteration_envelope_seconds": 3600,
+      "stage_cap_seconds": 600,
+      "launch_ready": false,
+      "pending_checkpoint_prefix": "s3://setec-astronomy-artifacts/checkpoints/crypto/codex__twist-chord-preflight/"
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 600,
+    "checkpoint": {
+      "policy": "application",
+      "interval_seconds": 600,
+      "grace_seconds": 30,
+      "restore_validation": "manifest_sha256",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Do not launch until explicit exact-prefix approval, actual current official checkpoint success and a separately frozen complete native/proof/analysis contract. This draft is not launch-ready.",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "Full census requires all 6384 cells per arm, including identity. A 600-second stage or 3600-second iteration stop preserves failed/incomplete coverage; it never becomes a smaller successful census.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "A wrong row/source/branch, failed A/A replay or missed planted relation invalidates the instrument; preserve exact source/log/payload and amend before rerun.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any row, source, column, branch or witness defect invalidates coverage.",
+    "Incomplete/timeout coverage is reported; no favorable subset or silent whole-scope substitution.",
+    "Scientific/proof launch without actual approved official checkpoint is forbidden.",
+    "Independent reference may not seed candidate root finding, stopping, setup logs or target scalar."
+  ],
+  "decision_rule": {
+    "text": "A finite coverage pass requires every declared cell complete with zero row/source/branch defects, all A/A rows equal and all meaningful semantic controls rejecting altered payloads without receipt. Otherwise invalid_instrument or incomplete_coverage, never a yield or speed result.",
+    "comparison_ids": [
+      "C-coverage"
+    ],
+    "threshold": "Every required cell and control passes its exact predicate. No statistical test.",
+    "statistic": "Per-cell exact missing/extra ordered signed rows, complete case membership and branch inclusion; no averaging away a defect.",
+    "interval": "not_applicable_exact_finite_census",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact defect counts per cell; actual polynomial degrees and unpriced request vectors separately.",
+    "verdict_vocabulary": [
+      "finite_coverage_pass",
+      "invalid_instrument",
+      "incomplete_coverage",
+      "not_executed"
+    ]
+  },
+  "analysis_plan": {
+    "script": null,
+    "inputs": [
+      "future native case records and source bindings",
+      "future independent audit and altered semantic payloads"
+    ],
+    "outputs": [
+      "future experiment.export/v1",
+      "future native per-cell coverage and degree ledger",
+      "future report graph/PDF and proof map"
+    ],
+    "blinded": false,
+    "frozen_before_data": false
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Current design diagram only; after data, native-emitted per-model branch/degree/request graph."
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Treating this draft/schema check as scientific execution, proof, independent signed validation or launch approval.",
+    "Calling a low displayed univariate degree intrinsic regularity, F4/F5 solving degree or a complete cost reduction.",
+    "Omitting diagonal/identity/failed/blocked cases, using scalar labels or a point-pair oracle to supply candidate answers.",
+    "Reporting per-query union of identical complete row sets as strict useful-rank complementarity.",
+    "Pricing a dual collector call as one solve or adding different operation units with equal weight.",
+    "Claiming all 6384 repeated policy/query/control records are distinct DLP challenges.",
+    "Paid compute, EKS, AWS probes, arbitrary result assets, broad-credential fallback, alternate uploader or a gate bypass."
+  ],
+  "literature": [
+    {
+      "ref": "https://eprint.iacr.org/2004/031",
+      "provenance": "retrieved",
+      "claim": "Summation polynomial background; not the proposed chord-completeness proof.",
+      "verified_by": "Primary metadata read2026-11-05; formula is a new unverified proof target."
+    },
+    {
+      "ref": "https://arxiv.org/html/1503.08001v2",
+      "provenance": "retrieved",
+      "claim": "Sections2,4,5 distinguish summation equations, first-fall degree and degree of regularity.",
+      "verified_by": "Primary text read2026-11-05."
+    },
+    {
+      "ref": "crypto-autoresearcher:knowledge/leads/ecdlp/ic-engine/LEAD-ICE-prime-field-semaev-solving-degree.yaml",
+      "provenance": "kb",
+      "claim": "Eliminants/subresultants and transported membership are existing mechanism families, not a new invention claim.",
+      "verified_by": "Current record read2026-11-05; atlas main b9c6c32a70d273a22355019b59ed897d6ad733eb."
+    },
+    {
+      "ref": "crypto:research/prime_factor_base_degree_20261031/SECANT_GRAPH.md",
+      "provenance": "internal",
+      "claim": "Existing secant/group correspondence with all four signs, tangent and identity handling. An antecedent and applicable later source-side cost baseline, not a new result here.",
+      "verified_by": "Source read2026-11-05; full geometric bridge is described as written, not fully Lean formalized."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "kind": "operational-archive-packaging-status/v1",
+  "source_snapshot": "backend-manifest-002.json",
+  "attempt": "tar with xz -T1 -3",
+  "status": "operator requested stop before archive completion",
+  "reason": "Change the lossless container for the large running-progress checkpoint; no raw data changed.",
+  "partial_archive_admitted": false,
+  "partial_bytes": 84418560,
+  "partial_sha256": "e5cd931f7f7a1170982616cbf18dc7b3db014ccb97fa48fb71ec698dbf78af9e",
+  "replacement": "backend-progress-002.tar.zst",
+  "initial_partial_hash_was_in_flight_and_is_not_admitted": true,
+  "initial_inflight_partial_sha256": "0607ad54e51170247199c44c62eadf833ac52a93af46c0cf99a1dfcea060678c",
+  "first_stop_identity_guard_failed_without_sending_signal": true,
+  "partial_was_renamed_before_old_compressor_stopped": true,
+  "final_old_compressor_signal": "SIGTERM to verified own xz child74333",
+  "tar_exit_status": 2,
+  "compressor_shell_status": 143,
+  "partial_preserved_outside_git": true,
+  "replacement_sha256": "c8ad8ca8a50755c81bfeb84b8c0f642548ecd4969d96af2e3d97f16f318a69d4",
+  "immutable_source_snapshot_unchanged": true
+}

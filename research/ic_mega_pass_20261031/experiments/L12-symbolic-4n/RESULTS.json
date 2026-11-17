@@ -1,0 +1,813 @@
+{
+ "experiment": "L12-symbolic-4n",
+ "date": "2026-11-02",
+ "security_claims": "none",
+ "model": "generic Frobenius model Z: K-valued a^e b^f, a_i^2=a_{i+1}, bit-degree=wt(e)+wt(f); W2=M4\u2229P<=3, W3=(M4+Var*W2)\u2229P<=3",
+ "relations_symbolic": [
+  {
+   "pivot": "a0*a1*b3",
+   "multiplier": "c*z^3",
+   "poly": {
+    "a0*a1*b3": "[c, 1; z, 3]",
+    "a1*b0*b3": "[z, 4; z^4 + c, 1]",
+    "a2*b0*b3": "Mat([z^8 + c*z^2 + c^2, 1])",
+    "b0*b1": "[z, 4; z^4 + c, 1; z^8 + c*z^2 + c^2, 1]",
+    "b0*b2": "Mat([z^16 + c*z^8 + c^4, 1])",
+    "b0*b3": "[z, 4; z^8 + z^6 + c^2, 1]",
+    "a0*b1": "[z, 7; z^8 + c*z^2 + c^2, 1]",
+    "a0*b2": "[c, 1; z, 7]",
+    "a0*b3": "Mat([z, 9])",
+    "a0*a1": "[c, 1; z, 11]",
+    "a1*b0": "[z, 12; z^4 + c, 1]",
+    "a2*b0": "[z, 8; z^8 + c*z^2 + c^2, 1]",
+    "b0": "[c, 1; z, 4; z^10 + c*z^8 + c*z^6 + c*z^4 + c^2*z^2 + c^3, 1]",
+    "a0": "[c, 2; z, 9]"
+   },
+   "expanded": {
+    "a0*a1*b3": "c*z^3",
+    "a1*b0*b3": "z^8 + c*z^4",
+    "a2*b0*b3": "z^8 + c*z^2 + c^2",
+    "b0*b1": "z^16 + c*z^12 + c*z^10 + c^2*z^8 + c^2*z^6 + c^3*z^4",
+    "b0*b2": "z^16 + c*z^8 + c^4",
+    "b0*b3": "z^12 + z^10 + c^2*z^4",
+    "a0*b1": "z^15 + c*z^9 + c^2*z^7",
+    "a0*b2": "c*z^7",
+    "a0*b3": "z^9",
+    "a0*a1": "c*z^11",
+    "a1*b0": "z^16 + c*z^12",
+    "a2*b0": "z^16 + c*z^10 + c^2*z^8",
+    "b0": "c*z^14 + c^2*z^12 + c^2*z^10 + c^2*z^8 + c^3*z^6 + c^4*z^4",
+    "a0": "c^2*z^9"
+   }
+  },
+  {
+   "pivot": "a0*a2*b3",
+   "multiplier": "c",
+   "poly": {
+    "a0*a2*b3": "Mat([c, 1])",
+    "a1*b0*b3": "Mat([z, 5])",
+    "a2*b0*b3": "[z, 1; z^4 + c, 1]",
+    "b0*b1": "[z, 3; z^10 + c^2*z^2 + c^2, 1]",
+    "b0*b2": "[z, 1; z^12 + c*z^8 + c*z^6 + (c^2 + c)*z^4 + c^2*z^2 + c^3, 1]",
+    "b0*b3": "[z, 5; z^4 + z^2 + c, 1]",
+    "a0*b1": "[z, 4; z^8 + c^2, 1]",
+    "a0*b2": "[c, 1; z^8 + z^4 + c*z^2 + c^2, 1]",
+    "a0*b3": "[z, 4; z^2 + c, 1]",
+    "a0*a2": "[c, 1; z, 8]",
+    "a1*b0": "Mat([z, 13])",
+    "a2*b0": "[z, 9; z^4 + c, 1]",
+    "b0": "[c, 1; z, 5; z^6 + c*z^4 + c^2, 1]",
+    "a0": "[c, 3; z, 4]"
+   },
+   "expanded": {
+    "a0*a2*b3": "c",
+    "a1*b0*b3": "z^5",
+    "a2*b0*b3": "z^5 + c*z",
+    "b0*b1": "z^13 + c^2*z^5 + c^2*z^3",
+    "b0*b2": "z^13 + c*z^9 + c*z^7 + (c^2 + c)*z^5 + c^2*z^3 + c^3*z",
+    "b0*b3": "z^9 + z^7 + c*z^5",
+    "a0*b1": "z^12 + c^2*z^4",
+    "a0*b2": "c*z^8 + c*z^4 + c^2*z^2 + c^3",
+    "a0*b3": "z^6 + c*z^4",
+    "a0*a2": "c*z^8",
+    "a1*b0": "z^13",
+    "a2*b0": "z^13 + c*z^9",
+    "b0": "c*z^11 + c^2*z^9 + c^3*z^5",
+    "a0": "c^3*z^4"
+   }
+  },
+  {
+   "pivot": "a0*a3*b1",
+   "multiplier": "z^7",
+   "poly": {
+    "a0*a3*b1": "Mat([z, 7])",
+    "a3*b0*b1": "[z, 4; z^4 + c, 1]",
+    "a3*b0*b2": "Mat([z^8 + c*z^2 + c^2, 1])",
+    "b0*b1": "[z, 12; z^4 + c, 1]",
+    "b0*b2": "[z, 8; z^8 + c*z^2 + c^2, 1]",
+    "a0*b1": "Mat([z, 15])",
+    "a0*a1": "[c, 1; z, 3; z^8 + c*z^2 + c^2, 1]",
+    "a0*a2": "[c, 1; z, 7]",
+    "a0*a3": "Mat([z, 9])",
+    "a1*b0": "[z, 4; z^4 + c, 1; z^8 + c*z^2 + c^2, 1]",
+    "a2*b0": "Mat([z^16 + c*z^8 + c*z^6 + c^4, 1])",
+    "a3*b0": "[z, 4; z^8 + z^6 + z^4 + c^2, 1]",
+    "b0": "[c, 1; z, 4; z^10 + c*z^8 + c*z^6 + c^2*z^2 + c^3, 1]",
+    "a0": "[c, 2; z, 9]"
+   },
+   "expanded": {
+    "a0*a3*b1": "z^7",
+    "a3*b0*b1": "z^8 + c*z^4",
+    "a3*b0*b2": "z^8 + c*z^2 + c^2",
+    "b0*b1": "z^16 + c*z^12",
+    "b0*b2": "z^16 + c*z^10 + c^2*z^8",
+    "a0*b1": "z^15",
+    "a0*a1": "c*z^11 + c^2*z^5 + c^3*z^3",
+    "a0*a2": "c*z^7",
+    "a0*a3": "z^9",
+    "a1*b0": "z^16 + c*z^12 + c*z^10 + c^2*z^8 + c^2*z^6 + c^3*z^4",
+    "a2*b0": "z^16 + c*z^8 + c*z^6 + c^4",
+    "a3*b0": "z^12 + z^10 + z^8 + c^2*z^4",
+    "b0": "c*z^14 + c^2*z^12 + c^2*z^10 + c^3*z^6 + c^4*z^4",
+    "a0": "c^2*z^9"
+   }
+  },
+  {
+   "pivot": "a0*a3*b2",
+   "multiplier": "z^3",
+   "poly": {
+    "a0*a3*b2": "Mat([z, 3])",
+    "a3*b0*b1": "Mat([z, 4])",
+    "a3*b0*b2": "Mat([z^4 + c, 1])",
+    "b0*b1": "Mat([z, 12])",
+    "b0*b2": "[z, 8; z^4 + c, 1]",
+    "a0*b2": "Mat([z, 11])",
+    "a0*a1": "[z, 3; z^8 + c^2, 1]",
+    "a0*a2": "[z, 3; z^8 + c*z^2 + c^2, 1]",
+    "a0*a3": "Mat([z, 7])",
+    "a1*b0": "[z, 4; z^8 + z^6 + c^2, 1]",
+    "a2*b0": "Mat([z^12 + c*z^8 + c*z^6 + (c^2 + c)*z^4 + c^2*z^2 + c^3, 1])",
+    "a3*b0": "[z, 4; z^4 + z^2 + c, 1]",
+    "b0": "[c, 1; z, 4; z^6 + c*z^4 + c^2, 1]",
+    "a0": "[c, 1; z, 7; z^2 + c, 1]"
+   },
+   "expanded": {
+    "a0*a3*b2": "z^3",
+    "a3*b0*b1": "z^4",
+    "a3*b0*b2": "z^4 + c",
+    "b0*b1": "z^12",
+    "b0*b2": "z^12 + c*z^8",
+    "a0*b2": "z^11",
+    "a0*a1": "z^11 + c^2*z^3",
+    "a0*a2": "z^11 + c*z^5 + c^2*z^3",
+    "a0*a3": "z^7",
+    "a1*b0": "z^12 + z^10 + c^2*z^4",
+    "a2*b0": "z^12 + c*z^8 + c*z^6 + (c^2 + c)*z^4 + c^2*z^2 + c^3",
+    "a3*b0": "z^8 + z^6 + c*z^4",
+    "b0": "c*z^10 + c^2*z^8 + c^3*z^4",
+    "a0": "c*z^9 + c^2*z^7"
+   }
+  }
+ ],
+ "relations_rref_F2zc": [
+  {
+   "a0*a3*b1": "1",
+   "a3*b0*b1": "(z^4 + c)/z^3",
+   "a3*b0*b2": "(z^8 + c*z^2 + c^2)/z^7",
+   "b0*b1": "z^9 + c*z^5",
+   "b0*b2": "z^9 + c*z^3 + c^2*z",
+   "a0*b1": "z^8",
+   "a0*a1": "(c*z^8 + c^2*z^2 + c^3)/z^4",
+   "a0*a2": "c",
+   "a0*a3": "z^2",
+   "a1*b0": "(z^12 + c*z^8 + c*z^6 + c^2*z^4 + c^2*z^2 + c^3)/z^3",
+   "a2*b0": "(z^16 + c*z^8 + c*z^6 + c^4)/z^7",
+   "a3*b0": "(z^8 + z^6 + z^4 + c^2)/z^3",
+   "b0": "(c*z^10 + c^2*z^8 + c^2*z^6 + c^3*z^2 + c^4)/z^3",
+   "a0": "c^2*z^2"
+  },
+  {
+   "a0*a1*b3": "1",
+   "a1*b0*b3": "1/c*z^5 + z",
+   "a2*b0*b3": "(z^8 + c*z^2 + c^2)/(c*z^3)",
+   "b0*b1": "1/c*z^13 + z^9 + z^7 + c*z^5 + c*z^3 + c^2*z",
+   "b0*b2": "(z^16 + c*z^8 + c^4)/(c*z^3)",
+   "b0*b3": "1/c*z^9 + 1/c*z^7 + c*z",
+   "a0*b1": "1/c*z^12 + z^6 + c*z^4",
+   "a0*b2": "z^4",
+   "a0*b3": "1/c*z^6",
+   "a0*a1": "z^8",
+   "a1*b0": "1/c*z^13 + z^9",
+   "a2*b0": "1/c*z^13 + z^7 + c*z^5",
+   "b0": "z^11 + c*z^9 + c*z^7 + c*z^5 + c^2*z^3 + c^3*z",
+   "a0": "c*z^6"
+  },
+  {
+   "a0*a3*b2": "1",
+   "a3*b0*b1": "z",
+   "a3*b0*b2": "(z^4 + c)/z^3",
+   "b0*b1": "z^9",
+   "b0*b2": "z^9 + c*z^5",
+   "a0*b2": "z^8",
+   "a0*a1": "z^8 + c^2",
+   "a0*a2": "z^8 + c*z^2 + c^2",
+   "a0*a3": "z^4",
+   "a1*b0": "z^9 + z^7 + c^2*z",
+   "a2*b0": "(z^12 + c*z^8 + c*z^6 + (c^2 + c)*z^4 + c^2*z^2 + c^3)/z^3",
+   "a3*b0": "z^5 + z^3 + c*z",
+   "b0": "c*z^7 + c^2*z^5 + c^3*z",
+   "a0": "c*z^6 + c^2*z^4"
+  },
+  {
+   "a0*a2*b3": "1",
+   "a1*b0*b3": "1/c*z^5",
+   "a2*b0*b3": "1/c*z^5 + z",
+   "b0*b1": "1/c*z^13 + c*z^5 + c*z^3",
+   "b0*b2": "1/c*z^13 + z^9 + z^7 + (c + 1)*z^5 + c*z^3 + c^2*z",
+   "b0*b3": "1/c*z^9 + 1/c*z^7 + z^5",
+   "a0*b1": "1/c*z^12 + c*z^4",
+   "a0*b2": "z^8 + z^4 + c*z^2 + c^2",
+   "a0*b3": "1/c*z^6 + z^4",
+   "a0*a2": "z^8",
+   "a1*b0": "1/c*z^13",
+   "a2*b0": "1/c*z^13 + z^9",
+   "b0": "z^11 + c*z^9 + c^2*z^5",
+   "a0": "c^2*z^4"
+  }
+ ],
+ "certificate": {
+  "certs": [
+   {
+    "nterms": 10,
+    "positions": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "ok": true
+   },
+   {
+    "nterms": 10,
+    "positions": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "ok": true
+   },
+   {
+    "nterms": 10,
+    "positions": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "ok": true
+   },
+   {
+    "nterms": 10,
+    "positions": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "ok": true
+   }
+  ],
+  "lcm_denominators": "c*z^7",
+  "factored": "[c, 1; z, 7]"
+ },
+ "exact_counts_F2zc": {
+  "L3": [
+   16,
+   16,
+   0
+  ],
+  "L4_p0": [
+   37,
+   41,
+   4
+  ],
+  "L5_p0": [
+   66,
+   74,
+   8
+  ],
+  "L6_p0": [
+   103,
+   115,
+   12
+  ],
+  "L4_p1": "not completed (stopped at budget); padding invariance numeric only"
+ },
+ "numeric_translation": [
+  {
+   "rankM4": 42,
+   "dimW2": 27,
+   "rankS3": 76,
+   "dimW2win": 16,
+   "dimW3win": 16,
+   "ngens": 44,
+   "nprods": 162,
+   "L": 3,
+   "p": 0,
+   "new": 0,
+   "pred": 0,
+   "sec": 0.0
+  },
+  {
+   "rankM4": 215,
+   "dimW2": 85,
+   "rankS3": 385,
+   "dimW2win": 16,
+   "dimW3win": 16,
+   "ngens": 224,
+   "nprods": 850,
+   "L": 3,
+   "p": 1,
+   "new": 0,
+   "pred": 0,
+   "sec": 0.1
+  },
+  {
+   "rankM4": 616,
+   "dimW2": 175,
+   "rankS3": 1162,
+   "dimW2win": 16,
+   "dimW3win": 16,
+   "ngens": 636,
+   "nprods": 2450,
+   "L": 3,
+   "p": 2,
+   "new": 0,
+   "pred": 0,
+   "sec": 0.3
+  },
+  {
+   "rankM4": 106,
+   "dimW2": 52,
+   "rankS3": 186,
+   "dimW2win": 37,
+   "dimW3win": 41,
+   "ngens": 111,
+   "nprods": 416,
+   "L": 4,
+   "p": 0,
+   "new": 4,
+   "pred": 4,
+   "sec": 0.0
+  },
+  {
+   "rankM4": 381,
+   "dimW2": 126,
+   "rankS3": 701,
+   "dimW2win": 37,
+   "dimW3win": 41,
+   "ngens": 395,
+   "nprods": 1512,
+   "L": 4,
+   "p": 1,
+   "new": 4,
+   "pred": 4,
+   "sec": 0.1
+  },
+  {
+   "rankM4": 932,
+   "dimW2": 232,
+   "rankS3": 1796,
+   "dimW2win": 37,
+   "dimW3win": 41,
+   "ngens": 959,
+   "nprods": 3712,
+   "L": 4,
+   "p": 2,
+   "new": 4,
+   "pred": 4,
+   "sec": 1.3
+  },
+  {
+   "rankM4": 215,
+   "dimW2": 85,
+   "rankS3": 385,
+   "dimW2win": 66,
+   "dimW3win": 74,
+   "ngens": 224,
+   "nprods": 850,
+   "L": 5,
+   "p": 0,
+   "new": 8,
+   "pred": 8,
+   "sec": 0.0
+  },
+  {
+   "rankM4": 616,
+   "dimW2": 175,
+   "rankS3": 1162,
+   "dimW2win": 66,
+   "dimW3win": 74,
+   "ngens": 636,
+   "nprods": 2450,
+   "L": 5,
+   "p": 1,
+   "new": 8,
+   "pred": 8,
+   "sec": 0.2
+  },
+  {
+   "rankM4": 1341,
+   "dimW2": 297,
+   "rankS3": 2631,
+   "dimW2win": 66,
+   "dimW3win": 74,
+   "ngens": 1376,
+   "nprods": 5346,
+   "L": 5,
+   "p": 2,
+   "new": 8,
+   "pred": 8,
+   "sec": 3.3
+  },
+  {
+   "rankM4": 381,
+   "dimW2": 126,
+   "rankS3": 701,
+   "dimW2win": 103,
+   "dimW3win": 115,
+   "ngens": 395,
+   "nprods": 1512,
+   "L": 6,
+   "p": 0,
+   "new": 12,
+   "pred": 12,
+   "sec": 0.1
+  },
+  {
+   "rankM4": 932,
+   "dimW2": 232,
+   "rankS3": 1796,
+   "dimW2win": 103,
+   "dimW3win": 115,
+   "ngens": 959,
+   "nprods": 3712,
+   "L": 6,
+   "p": 1,
+   "new": 12,
+   "pred": 12,
+   "sec": 0.9
+  },
+  {
+   "rankM4": 1855,
+   "dimW2": 370,
+   "rankS3": 3695,
+   "dimW2win": 103,
+   "dimW3win": 115,
+   "ngens": 1899,
+   "nprods": 7400,
+   "L": 6,
+   "p": 2,
+   "new": 12,
+   "pred": 12,
+   "sec": 7.4
+  },
+  {
+   "rankM4": 616,
+   "dimW2": 175,
+   "rankS3": 1162,
+   "dimW2win": 148,
+   "dimW3win": 164,
+   "ngens": 636,
+   "nprods": 2450,
+   "L": 7,
+   "p": 0,
+   "new": 16,
+   "pred": 16,
+   "sec": 0.2
+  },
+  {
+   "rankM4": 1341,
+   "dimW2": 297,
+   "rankS3": 2631,
+   "dimW2win": 148,
+   "dimW3win": 164,
+   "ngens": 1376,
+   "nprods": 5346,
+   "L": 7,
+   "p": 1,
+   "new": 16,
+   "pred": 16,
+   "sec": 3.1
+  },
+  {
+   "rankM4": 932,
+   "dimW2": 232,
+   "rankS3": 1796,
+   "dimW2win": 201,
+   "dimW3win": 221,
+   "ngens": 959,
+   "nprods": 3712,
+   "L": 8,
+   "p": 0,
+   "new": 20,
+   "pred": 20,
+   "sec": 1.0
+  },
+  {
+   "rankM4": 1855,
+   "dimW2": 370,
+   "rankS3": 3695,
+   "dimW2win": 201,
+   "dimW3win": 221,
+   "ngens": 1899,
+   "nprods": 7400,
+   "L": 8,
+   "p": 1,
+   "new": 20,
+   "pred": 20,
+   "sec": 7.1
+  }
+ ],
+ "shifts": {
+  "n31_L4": {
+   "dimW2": 37,
+   "dimW3": 41,
+   "dim_W2_plus_shifts": 41,
+   "dim_W3_plus_shifts": 41,
+   "nshifts": 4,
+   "shifts_in_W3": true,
+   "indep_mod_W2": true,
+   "complete": true
+  },
+  "n31_L5": {
+   "dimW2": 66,
+   "dimW3": 74,
+   "dim_W2_plus_shifts": 74,
+   "dim_W3_plus_shifts": 74,
+   "nshifts": 8,
+   "shifts_in_W3": true,
+   "indep_mod_W2": true,
+   "complete": true
+  },
+  "n31_L6": {
+   "dimW2": 103,
+   "dimW3": 115,
+   "dim_W2_plus_shifts": 115,
+   "dim_W3_plus_shifts": 115,
+   "nshifts": 12,
+   "shifts_in_W3": true,
+   "indep_mod_W2": true,
+   "complete": true
+  },
+  "n31_L7": {
+   "dimW2": 148,
+   "dimW3": 164,
+   "dim_W2_plus_shifts": 164,
+   "dim_W3_plus_shifts": 164,
+   "nshifts": 16,
+   "shifts_in_W3": true,
+   "indep_mod_W2": true,
+   "complete": true
+  },
+  "n33_L4": {
+   "dimW2": 37,
+   "dimW3": 41,
+   "dim_W2_plus_shifts": 41,
+   "dim_W3_plus_shifts": 41,
+   "nshifts": 4,
+   "shifts_in_W3": true,
+   "indep_mod_W2": true,
+   "complete": true
+  },
+  "n33_L5": {
+   "dimW2": 66,
+   "dimW3": 74,
+   "dim_W2_plus_shifts": 74,
+   "dim_W3_plus_shifts": 74,
+   "nshifts": 8,
+   "shifts_in_W3": true,
+   "indep_mod_W2": true,
+   "complete": true
+  },
+  "n33_L6": {
+   "dimW2": 103,
+   "dimW3": 115,
+   "dim_W2_plus_shifts": 115,
+   "dim_W3_plus_shifts": 115,
+   "nshifts": 12,
+   "shifts_in_W3": true,
+   "indep_mod_W2": true,
+   "complete": true
+  },
+  "n33_L7": {
+   "dimW2": 148,
+   "dimW3": 164,
+   "dim_W2_plus_shifts": 164,
+   "dim_W3_plus_shifts": 164,
+   "nshifts": 16,
+   "shifts_in_W3": true,
+   "indep_mod_W2": true,
+   "complete": true
+  },
+  "n35_L4": {
+   "dimW2": 37,
+   "dimW3": 41,
+   "dim_W2_plus_shifts": 41,
+   "dim_W3_plus_shifts": 41,
+   "nshifts": 4,
+   "shifts_in_W3": true,
+   "indep_mod_W2": true,
+   "complete": true
+  },
+  "n35_L5": {
+   "dimW2": 66,
+   "dimW3": 74,
+   "dim_W2_plus_shifts": 74,
+   "dim_W3_plus_shifts": 74,
+   "nshifts": 8,
+   "shifts_in_W3": true,
+   "indep_mod_W2": true,
+   "complete": true
+  },
+  "n35_L6": {
+   "dimW2": 103,
+   "dimW3": 115,
+   "dim_W2_plus_shifts": 115,
+   "dim_W3_plus_shifts": 115,
+   "nshifts": 12,
+   "shifts_in_W3": true,
+   "indep_mod_W2": true,
+   "complete": true
+  },
+  "n35_L7": {
+   "dimW2": 148,
+   "dimW3": 164,
+   "dim_W2_plus_shifts": 164,
+   "dim_W3_plus_shifts": 164,
+   "nshifts": 16,
+   "shifts_in_W3": true,
+   "indep_mod_W2": true,
+   "complete": true
+  }
+ },
+ "sym_vs_numeric": {
+  "L9_n31_s2": true,
+  "L9_n31_s3": true,
+  "Z_n29_0": [
+   37,
+   41,
+   true
+  ],
+  "Z_n29_1": [
+   37,
+   41,
+   true
+  ],
+  "Z_n29_2": [
+   37,
+   41,
+   true
+  ],
+  "Z_n31_0": [
+   37,
+   41,
+   true
+  ],
+  "Z_n31_1": [
+   37,
+   41,
+   true
+  ],
+  "Z_n31_2": [
+   37,
+   41,
+   true
+  ],
+  "Z_n33_0": [
+   37,
+   41,
+   true
+  ],
+  "Z_n33_1": [
+   37,
+   41,
+   true
+  ],
+  "Z_n33_2": [
+   37,
+   41,
+   true
+  ],
+  "Z_n35_0": [
+   37,
+   41,
+   true
+  ],
+  "Z_n35_1": [
+   37,
+   41,
+   true
+  ],
+  "Z_n35_2": [
+   37,
+   41,
+   true
+  ],
+  "Z_n37_0": [
+   37,
+   41,
+   true
+  ],
+  "Z_n37_1": [
+   37,
+   41,
+   true
+  ],
+  "Z_n37_2": [
+   37,
+   41,
+   true
+  ]
+ },
+ "dump_checks": [
+  {
+   "n": 31,
+   "s": 2,
+   "dimW2": 2821,
+   "dimW3": 2945,
+   "new_total": 124,
+   "per_relation": [
+    {
+     "in_W3": 31,
+     "in_W2": 0
+    },
+    {
+     "in_W3": 31,
+     "in_W2": 0
+    },
+    {
+     "in_W3": 31,
+     "in_W2": 0
+    },
+    {
+     "in_W3": 31,
+     "in_W2": 0
+    }
+   ],
+   "span_mod_W2": 124,
+   "pred": 124
+  },
+  {
+   "n": 33,
+   "s": 0,
+   "dimW2": 3201,
+   "dimW3": 3333,
+   "new_total": 132,
+   "per_relation": [
+    {
+     "in_W3": 33,
+     "in_W2": 0
+    },
+    {
+     "in_W3": 33,
+     "in_W2": 0
+    },
+    {
+     "in_W3": 33,
+     "in_W2": 0
+    },
+    {
+     "in_W3": 33,
+     "in_W2": 0
+    }
+   ],
+   "span_mod_W2": 132,
+   "pred": 132
+  },
+  {
+   "n": 35,
+   "s": 0,
+   "dimW2": 3605,
+   "dimW3": 3745,
+   "new_total": 140,
+   "per_relation": [
+    {
+     "in_W3": 35,
+     "in_W2": 0
+    },
+    {
+     "in_W3": 35,
+     "in_W2": 0
+    },
+    {
+     "in_W3": 35,
+     "in_W2": 0
+    },
+    {
+     "in_W3": 35,
+     "in_W2": 0
+    }
+   ],
+   "span_mod_W2": 140,
+   "pred": 140
+  }
+ ],
+ "controls": {
+  "independent_coefficients_z_j_c_j": "W2win 39, W3win 73 (not 37/41): Frobenius coupling of coefficients is essential",
+  "c=0": "dims 37/41 kept, RREF changes (1/c normalization)"
+ },
+ "predictions": {
+  "P1": "held (37/41, 4 relations identical to L9 n31 s2 and s3)",
+  "P2": "held (37/41 at n=29..37, 15 draws)",
+  "P3": "held (4(L-3), L=3..8 numeric, L=3..6 exact over F2(z,c); shifts span new space)",
+  "P4": "held, stronger: certificates use only F_0,F_1,F_2 and multipliers at positions 0..3 (10 rows each)",
+  "P5": "failed: RREF denominators c and z^k; coefficients not affine in c_j (e.g. c^3=c_0 c_1)"
+ },
+ "proof_status": {
+  "inclusion": "rigorous for every n>=5, every V, z*c!=0 (homomorphism Z->real functions; certificate denominators c*z^7)",
+  "count_in_model": "exact over F2(z,c) for windows L<=6 (p=0); translation-free-rank-4 conjectured for all L",
+  "gap": "independence mod real W2 and completeness (no other round-3 falls) not proven for the real system; verified per instance at n=31 s2, 33 s0, 35 s0; false at n=29 (82 extra) and n=27"
+ }
+}

@@ -1,0 +1,52 @@
+{
+ "schema": "e2x-validator-build/v1",
+ "repository_head_at_start": "f23c53871 (branch claude/glv-endomorphism-index-calculus-pe7ige, PR #2152); working tree clean except .resume/ (gitignored)",
+ "source": "git archive <commit> of the build inputs only: Cargo.toml, Cargo.lock, src/, examples/, crates/, tools/, isogeny_algos/, benches/, research/pencil_large_prime_20261029, every explicit [[bin]]/[[example]]/[[bench]] path of Cargo.toml, and the 58 include_str!/include_bytes! targets of the library present at the commit (under docs/, research/, tests/). Every exported file was checked equal to its blob at the commit (git hash-object): 789dc2ff6 tree 4,591 files, 0e4fccce1 tree 4,594 files, 0 mismatches each.",
+ "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0 (c980f4866 2026-06-30); the producer's toolchain is not recorded in its records",
+ "host": "Intel(R) Xeon(R) Processor @ 2.80GHz, 4 vCPU, Linux 6.18.44-fc-v185, 15.7 GiB RAM: the validator's local container, not isolab-eks. The replay admits operation counts only (no wall time is compared or claimed), so a local run suffices.",
+ "flags": "CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build --release --offline",
+ "recorded_binary_commits": {
+  "stage_0_stage_a_registered_control": "789dc2ff62a8a6d9497a93542e3e59e07cf2c862",
+  "supplementary_control": "0e4fccce1ad1baf7ace18a550483771f02315838"
+ },
+ "builds": [
+  {
+   "commit": "789dc2ff62a8a6d9497a93542e3e59e07cf2c862",
+   "tree": "/dev/shm/val-tree-789",
+   "target_dir": "/dev/shm/val-target: a fresh, empty target directory on tmpfs",
+   "command": "cd /dev/shm/val-tree-789 && CARGO_TARGET_DIR=/dev/shm/val-target CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build --release --offline --example e28_tau",
+   "attempts": [
+    "2026-10-31T07:23:59Z-07:35:39Z: first attempt, `Finished release profile [optimized] target(s) in 11m 44s`"
+   ],
+   "binaries": [
+    {
+     "name": "e28_tau (789dc2ff6)",
+     "sha256": "8514e21fb31d316d2de796ac67f7b5ef435959583f4fc5f14ede61e99abab6f3",
+     "bytes": 5814904
+    }
+   ],
+   "extra": "After e28_tau was built and hashed, examples/val_e28_dump_params.rs (= research/e28_tau_20261030/replay/dump_params.rs) was added to the tree and built against the same library (1.5 s) only to dump the 40 curves' coefficients for replay/curve_check.rs; it is not a replay binary."
+  },
+  {
+   "commit": "0e4fccce1ad1baf7ace18a550483771f02315838",
+   "tree": "/dev/shm/val-tree-0e4 (re-exported after the restart, 2026-10-31T14:04Z; 4,594 files equal to their blobs)",
+   "target_dir": "/dev/shm/val-target-0e4: a fresh, empty target directory on tmpfs (the root filesystem has ~0.5 GB free); nothing reused from the producer's target/",
+   "command": "cd /dev/shm/val-tree-0e4 && CARGO_TARGET_DIR=/dev/shm/val-target-0e4 CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build --release --offline --example e28_tau --example e29_twist --example e30_audit --example quartic_pipeline_gls",
+   "attempts": [
+    "2026-10-31T07:36:44Z attempt 1: shared target directory with the 789dc2ff6 build. VOID: cargo hashes the workspace's own path package by its relative path and judged the 789dc2ff6 library fresh by mtime (the exported files carry the commits' older mtimes), so the 0e4fccce1 examples failed to compile against it (unresolved E29/E30 imports). No binary of this attempt was used.",
+    "2026-10-31T07:37:25Z attempt 2: fresh target directory /dev/shm/val-target-0e4; lost when the container restarted (~14:00Z wiped /dev/shm) before its binaries were used.",
+    "2026-10-31 attempt 3: 2026-10-31T14:17:06Z Finished `release` profile [optimized] target(s) in 12m 20s (started 2026-10-31T14:04:35Z); fresh target dir /dev/shm/val-target-0e4"
+   ],
+   "binaries": [
+    {
+     "name": "e28_tau (0e4fccce1)",
+     "sha256": "b0b188fb43874ff94027859998fe6fc6f4fe5fb03e9625426ae4bccc131a7843",
+     "bytes": 5855304
+    }
+   ]
+  }
+ ],
+ "run_command": "BIN_789=<e28_tau 789dc2ff6> research/e28_tau_20261030/replay/replay.sh (Stage 0 + Stage A, 2026-10-31T07:36:41Z-07:43:03Z), then BIN_789=... BIN_0E4=<e28_tau 0e4fccce1> replay.sh (supplementary control only; the rest is skipped as present)",
+ "environment": "Stage 0: RAYON_NUM_THREADS=4 exported by the script after Stage 0 (Stage 0 is serial). Stage A and the control: RAYON_NUM_THREADS=4 as in run_stage_a.sh (each 64-target batch is drawn sequentially and collected in order).",
+ "concurrency": "The Stage A replay shared the 4 vCPUs with the 0e4fccce1 build; only wall-clock fields (wall_ms, ms) are affected, and they are listed, not compared."
+}

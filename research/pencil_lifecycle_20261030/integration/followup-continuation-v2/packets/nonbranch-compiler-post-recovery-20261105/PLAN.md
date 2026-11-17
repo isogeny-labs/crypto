@@ -1,0 +1,7 @@
+# Compiler/post-only operational recovery
+
+The complete native pre receipt passed all16,736 files and3,111,892,318 bytes. The original supervisor marked failure when systemd garbage collection removed the terminal unit identity. Original receipts remain unchanged. This amendment gates continuation on exact full pre/hash/runtime bindings, zero compiler calls, absent compiler/post markers, same boot, zero wait-client exit, original PID/cgroup absence and matching privileged-manager start/success journal records. [pcc:unverified]
+
+Only compiler600 seconds and post900 seconds may run. Both original clocks remain: outer UTC1793899533.779805 and native monotonic108324.666895319, each with2,400-second ceiling. At least1,500 seconds must remain before admission. The original absolute2026-11-06T04:00Z deadline and resource limits remain. No repeated pre, no retries, no clock reset, no partial hashes. The exact original replay.py/freeze/workspace are used. [pcc:unverified]
+
+For later garbage-collected terminal units, only exact boot/unit/captured InvocationID privileged PID1/UID0 manager start+success records plus current unit/cgroup absence establish terminal custody. An arbitrary empty owner is rejected. Non-GC ownership checks and bounded wait/cleanup remain. Publication and independent prospective review must precede execution; this packet itself runs no payload. Reports can follow the bounded attempt. [pcc:unverified]

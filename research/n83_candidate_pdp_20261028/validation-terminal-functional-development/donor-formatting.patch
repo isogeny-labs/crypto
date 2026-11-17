@@ -1,0 +1,36 @@
+diff --git a/research/n83_candidate_pdp_20261028/src/prime_first_fall_donor.rs b/research/n83_candidate_pdp_20261028/src/prime_first_fall_donor.rs
+index 2c6bd8866966..60501554a7dc 100644
+--- a/research/n83_candidate_pdp_20261028/src/prime_first_fall_donor.rs
++++ b/research/n83_candidate_pdp_20261028/src/prime_first_fall_donor.rs
+@@ -466,10 +466,24 @@ mod suffix_tests {
+ }
+ 
+ // Public adapters for the separate prime first-fall instrument. Original donor above is unchanged.
+-pub fn field() -> u128 { P }
+-pub fn modular_mul(a:u128,b:u128,p:u128)->u128 { mulmod(a,b,p) }
+-pub fn modular_pow(a:u128,b:u128,p:u128)->u128 { powmod(a,b,p) }
+-pub fn primality()->Value { prime_certificate() }
+-pub fn source(input:&Value,text:&str,arm:&str)->Value { validate_source(input,text,arm) }
+-pub fn rank(n:usize,i:usize,p:u128)->Value { rank_certificate(n,i,p) }
+-pub fn independent_controls()->Value { controls() }
++pub fn field() -> u128 {
++    P
++}
++pub fn modular_mul(a: u128, b: u128, p: u128) -> u128 {
++    mulmod(a, b, p)
++}
++pub fn modular_pow(a: u128, b: u128, p: u128) -> u128 {
++    powmod(a, b, p)
++}
++pub fn primality() -> Value {
++    prime_certificate()
++}
++pub fn source(input: &Value, text: &str, arm: &str) -> Value {
++    validate_source(input, text, arm)
++}
++pub fn rank(n: usize, i: usize, p: u128) -> Value {
++    rank_certificate(n, i, p)
++}
++pub fn independent_controls() -> Value {
++    controls()
++}

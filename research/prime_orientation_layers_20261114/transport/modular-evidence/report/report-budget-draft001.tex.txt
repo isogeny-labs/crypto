@@ -1,0 +1,126 @@
+\documentclass[10pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,graphicx,hyperref}
+\usepackage[margin=.74in]{geometry}
+\setlength{\parindent}{0pt}\setlength{\parskip}{7pt}
+\begin{document}
+\begin{center}{\Large Actual integer-literal and denominator budgets}\\[4pt]
+Local successor --- 15 November 2026\end{center}
+\textbf{Working result.} Draft040 locally elaborates218 theorem statements,
+including prior local work, with exit0/no warnings. Printed central actual
+input-volume and work-precision dependency lists are standard. The new
+invariant bounds actual constructed positive denominator and every explicit
+integer literal, then their static binary encoding volume. This is local
+source evidence outside shared Transport53/57/fresh; all records are
+unsigned/defaultnot\_covered [pcc:unverified].
+
+\textbf{Exact invariant.} For Packed object$s$, define
+\[
+ \mathrm{Budget}(B,s):\quad 0<s.d\le2^B,\qquad
+ |n|\le2^B\text{ for every integer literal }n\text{ in }s.e.
+\]
+This bounds the denominator and expression literals. It is not a bound on
+all dense polynomial coefficients, nor a cost of building the object.
+Rational atoms use the existing actual reduced numerator/denominator Bits
+predicate. Arithmetic add/multiply budgets are$B+C$; negation preserves$B$.
+Cross-denominator literals inserted by addition are bounded from actual child
+denominators. Powers/products use$Bk$ or sums of budgets; geometric clearing
+also uses$Bk$, with$k=0$ and empty products handled explicitly
+[pcc:unverified].
+
+\textbf{Actual instantiation.} Preserve the actual signed grid, retained
+node and bounded-port hypotheses. Let
+\[
+ H=2^{a+1}(2a+1),\qquad
+ S=(a+1)+2H+i+\sum_{j<u}(2j+i+1)m_j,
+\]
+\[
+ A=3a+2,\quad F_j=2j+3a+3,\quad P=2^{a+1}A,
+ \quad C=\sum_{j<u}F_jm_j.
+\]
+Actual affine root charts have budget$A$, factor charts have budget$F_j$,
+and the puncture product has budget$P$. This charges the entire grid upper
+bound, not a favorable small source set. Actual normalizer and diagonal
+budgets are$H$ and$S$, derived from scalar Bits and their exact finite-product
+identities [pcc:unverified].
+
+Actual row and denominator expressions have budgets
+\[
+ B_N=A+S+H+P+C,
+\]
+\[
+ B_D(x,y)=A+(u+2a+1)
+   +\sum_{j\in\mathrm{mask}(u,x,y)}(u+j+a+1)m_j.
+\]
+Thus the actual Packed approximation has budget
+\[
+ B_A(x,y,k)=B_N+kB_D(x,y).
+\]
+The derivation uses actual grid, mask, slopes, normalizer, diagonal and row
+constructors. No favorable representation, literal height or denominator
+witness is supplied. The bound is deliberately conservative; no optimal
+height or improved runtime is asserted [pcc:unverified].
+
+\textbf{Evidence.} Generic invariant local197 data PCC-20261115-bcba75;
+actual construction local209 data2443e5; static input/precision local218
+dataf46b4f (same prefix). Receipts018--020 preserve failed035/037/039 and
+accepted036/038/040 sources and exact compiler logs/exits. No inherited
+shared-gate or fresh-replay coverage.
+
+\newpage
+\begin{center}{\Large Static encoding volume and work precision}\end{center}
+Collect explicit integer leaves into a static literal list. Its length equals
+\texttt{castLeaves}, the previously proved number of explicit literal-cast
+events. For sign/magnitude encoding, define
+\[
+ \mathrm{width}(n)=\mathrm{Nat.size}(|n|)+1.
+\]
+If$|n|\le2^B$, the exact Nat.size lemmas give$\mathrm{width}(n)\le B+2$,
+including zero and negative integers. Therefore
+\[
+ \sum_{n\in\mathrm{literals}(e)}\mathrm{width}(n)
+ \le\mathrm{castLeaves}(e)(B+2)
+ \le\mathrm{nodes}(e)(B+2).
+\]
+For the actual approximation, the prior actual node bound$N_*$ and newly
+derived$B_A$ give static input volume at most$N_*(B_A+2)$. This bounds an
+encoding, not the cost of constructing, reading or reducing those integers.
+The current event tag records cast kind without payload; a payload-sensitive
+or weighted operational correspondence remains a next obligation
+[pcc:unverified].
+
+For actual right label$(r,b)$, form$B_R=b+B_A(r,y,k)$. The actual scalar-only
+right denominator is positive and satisfies
+\[
+ 0<d\le2^{B_R},\qquad E=v_2(d)\le B_R,
+ \qquad p+E\le p+B_R.
+\]
+Here$p$ is auxiliary binary precision, not the elliptic-curve field prime.
+The noncrossing branch uses denominator1. These precision caps coexist with
+the earlier, potentially tighter denominator-specific bounds; they do not
+replace the original canonical-value/domain premises or establish bit cost
+[pcc:unverified].
+
+\begin{center}
+\includegraphics[width=\linewidth,height=1.5in,keepaspectratio]{budget-dependencies-001.pdf}
+\end{center}
+
+\textbf{Preparation remains charged.} A zero power or geometric output can
+discard an operand after eager code/scalar construction. The output budget
+does not price those discarded inputs or make their preparation free.
+Likewise one cast event is not a constant-time integer reduction. Next link
+actual cast payloads to the static stream and derive weighted bit costs for
+explicit integer/finite-ring primitives, while counting scalar/rational and
+AST preparation, normalization, sorting, indexing, allocation, trace/logging,
+inversion, quotient/odd-part preparation and retained memory. All labels,
+entries, creation/modes/children, recursion and public expected-cost bridges
+remain charged or open at their original scope [pcc:unverified].
+
+\textbf{Sources and preservation.} Actual scalar Bits/Packed construction;
+pinned finite sums/products and Nat.size\_le\_size/size\_pow primary sources.
+KB unavailable as logged; standard size algebra reused without novelty,
+measured speed or tested extracted-executable claims. Earlier archives86/48/40
+and Transport151/final16/cost51 remain exact. Failed sources/raw diagnostics
+retained, with no paid/cloud/native attack/fixture or timing campaign
+[pcc:unverified].
+\end{document}

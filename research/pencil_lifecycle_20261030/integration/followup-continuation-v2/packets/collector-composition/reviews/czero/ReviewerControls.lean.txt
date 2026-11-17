@@ -1,0 +1,38 @@
+import CZeroControls
+set_option autoImplicit false
+namespace ReviewerCZero
+open Polynomial CZeroInterpolation
+noncomputable def u1 : ℚ[X] := support 1 2
+noncomputable def u2 : ℚ[X] := support 0 1
+noncomputable def v1 : ℚ[X] := ordinate 4 5
+noncomputable def v2 : ℚ[X] := ordinate 1 2
+noncomputable def l : ℚ[X] := v1-C 3*u1
+noncomputable def f : ℚ[X] := l^2+u1*u2
+
+theorem input_one : u1∣f-v1^2 := by
+ refine ⟨-2*C 3*v1+(C 3)^2*u1+u2,?_⟩
+ simp only [f,l]; ring
+
+theorem input_two : u2∣f-v2^2 := by
+ have h : l=v2-C 3*u2 := CZeroControls.explicit_common_interpolant
+ refine ⟨-2*C 3*v2+(C 3)^2*u2+u1,?_⟩
+ simp only [f,h]; ring
+
+theorem full_product_application : u1*u2∣f-l^2 := by
+ have h:=product_divides_residual (1:ℚ) 2 4 5 0 1 1 2 f
+   (by norm_num [bnum]) (by norm_num [cnum]) input_one input_two
+ norm_num [anum,bnum] at h
+ exact h
+
+theorem equal_q_coprime : IsCoprime (support (0:ℚ) 1) (support 0 2) :=
+ support_coprime 0 1 0 2 (by norm_num [bnum])
+
+theorem sign_boundary :
+ (ordinate (4:ℚ) 5+C 3*support 1 2).eval 0 ≠
+ (ordinate (1:ℚ) 2+C 3*support 0 1).eval 0 := by
+ norm_num [ordinate,CZeroInterpolation.support]
+
+theorem normalized_output_ordinate :
+ (3:ℚ)*((1+10)*10+2)-4*10-5 = -l.eval 10 := by
+ norm_num [l,v1,u1,ordinate,CZeroInterpolation.support]
+end ReviewerCZero

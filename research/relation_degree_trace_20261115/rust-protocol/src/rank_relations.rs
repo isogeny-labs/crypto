@@ -157,7 +157,7 @@ fn better(gain: usize, cost: usize, id: usize, bgain: usize, bcost: usize, bid: 
     let rhs = bgain as u128 * cost as u128;
     lhs > rhs || (lhs == rhs && (cost, id) < (bcost, bid))
 }
-fn select(inputs: &[Poly], n: usize, class: usize) -> Result<(Vec<Row>, Value)> {
+pub(super) fn select(inputs: &[Poly], n: usize, class: usize) -> Result<(Vec<Row>, Value)> {
     if class >= CLASSES.len() {
         return Err("unregistered class".into());
     }

@@ -1,0 +1,208 @@
+{
+  "schema": "ecbench.comparison/v2",
+  "comparison_id": "ECC1had36aa2421c6",
+  "resample_seed": 20261101,
+  "a": {
+    "session_id": "ECBS1h5f332ac24107",
+    "arm": "rho-strong-v2",
+    "method_id": "ECM1h978325b3547a",
+    "method": "rho.signed_frobenius_strong_v2",
+    "measured": 4,
+    "verified": 4,
+    "statuses": {
+      "verified": 4
+    },
+    "mean_s": 2.3652334952400675,
+    "mean_ratio_to_floor": 9.622784414021481,
+    "lower_bound": true,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 4,
+      "median_s": 2.354061531185849,
+      "max_s": 2.5328129560533497,
+      "max_over_median": 1.0759331999182942,
+      "top_run_share": 0.26771278196745996,
+      "top_run_id": "ECM1h978325b3547aW5c9d1db9375aR8",
+      "heavy_tail": true
+    },
+    "unpriced_counts": {
+      "canonicalisations_uncharged": 46,
+      "partition_hashes_uncharged": 33,
+      "table_inserts_uncharged": 9,
+      "table_queries_uncharged": 13
+    }
+  },
+  "b": {
+    "session_id": "ECBS1h5f332ac24107",
+    "arm": "rho-strong-v2-aa",
+    "method_id": "ECM1h978325b3547a",
+    "method": "rho.signed_frobenius_strong_v2",
+    "measured": 4,
+    "verified": 4,
+    "statuses": {
+      "verified": 4
+    },
+    "mean_s": 2.3652334952400675,
+    "mean_ratio_to_floor": 9.622784414021481,
+    "lower_bound": true,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 4,
+      "median_s": 2.354061531185849,
+      "max_s": 2.5328129560533497,
+      "max_over_median": 1.0759331999182942,
+      "top_run_share": 0.26771278196745996,
+      "top_run_id": "ECM1h978325b3547aW5c9d1db9375aR7",
+      "heavy_tail": true
+    },
+    "unpriced_counts": {
+      "canonicalisations_uncharged": 46,
+      "partition_hashes_uncharged": 33,
+      "table_inserts_uncharged": 9,
+      "table_queries_uncharged": 13
+    }
+  },
+  "workloads": [
+    {
+      "workload_id": "W5c9d1db9375a",
+      "slug": "icv1-f2m13-t181-515ee569",
+      "r": 2003,
+      "floor_s": 0.2457951247243632,
+      "pairs": 4,
+      "a_mean_s": 2.3652334952400675,
+      "b_mean_s": 2.3652334952400675,
+      "ratio_b_over_a": 1.0,
+      "censored_pairs": 0
+    }
+  ],
+  "curves": [
+    {
+      "slug": "icv1-f2m13-t181-515ee569",
+      "log2_r": 10.967946705812707,
+      "workloads": 1,
+      "pairs": 4,
+      "ratio_b_over_a": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ],
+      "ci_method": "within_t",
+      "indicative": true,
+      "censored_pairs": 0,
+      "ci95_bootstrap": [
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "ops": {
+    "status": "ok",
+    "unit": "ecbench.gae",
+    "ratio_b_over_a": 1.0,
+    "ci95": [
+      1.0,
+      1.0
+    ],
+    "ci_method": "within_t",
+    "pairs": 4,
+    "unpaired_runs": 0,
+    "same_seeds": true,
+    "same_session": true,
+    "pooled_curves": 1,
+    "bounded": true,
+    "resamples": 4000,
+    "workloads": 1,
+    "dof": 3.0,
+    "indicative": true,
+    "interval_scope": "within_workload",
+    "ci95_bootstrap": [
+      1.0,
+      1.0
+    ],
+    "ci_bootstrap_method": "within",
+    "censored_pairs": 0,
+    "verified_only_ratio": 1.0,
+    "band": {
+      "weights": [
+        0.0,
+        0.1,
+        1.0
+      ],
+      "ratio_b_over_a": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "order": "unresolved inside the band",
+      "pairs": 4,
+      "note": "point ratios of totals; rank only where the order holds at every weight"
+    }
+  },
+  "wall": {
+    "status": "descriptive",
+    "reasons": [
+      "4 admitted pairs; at least 5 are needed"
+    ],
+    "required_level": "L0",
+    "pairs": 4,
+    "pairs_below_level": 0,
+    "median_ratio": 0.933823014140145,
+    "ci95": null,
+    "aa_arms": null,
+    "aa_pairs": 0,
+    "aa_median_ratio": null,
+    "aa_ci95": null,
+    "outside_noise": null,
+    "ratio_b_over_a": 0.9508856853711528,
+    "ns_per_gae_a": 1001.147692139196,
+    "ns_per_gae_b": 951.9770093975272,
+    "ns_per_gae_upper_bound_arms": [
+      "rho-strong-v2",
+      "rho-strong-v2-aa"
+    ],
+    "method_call_wall_ratio": 0.9629713515942857,
+    "method_call_wall_ci95": [
+      0.8670968061410286,
+      1.0694467070156672
+    ],
+    "method_call_wall_ci95_bootstrap": [
+      0.9232168028046841,
+      1.0269584748827283
+    ],
+    "process_wall_ratio": 1.0107153033195662,
+    "process_wall_ci95": [
+      0.9382857355552329,
+      1.0887359635280616
+    ],
+    "process_wall_ci95_bootstrap": [
+      0.9829051968664251,
+      1.0611008641044464
+    ],
+    "self_aa": false
+  },
+  "quality": {
+    "score": 0,
+    "rubric": "average paired isolation points (L0=0, L1=40, L2=75, L3=90); +10 only for an L2-or-higher A/A 95% interval containing 1 within [0.9,1.1]",
+    "paired_attempts": 4,
+    "verified_pairs": 4,
+    "admitted_pairs": 0,
+    "levels": {
+      "L0": 4
+    },
+    "p95_foreign_busy_percent": null,
+    "p95_run_queue_percent": 0.0,
+    "contention_observed_runs": 0,
+    "notes": [
+      "A/A bonus unavailable: the spec permits wall runs below L2",
+      "contention telemetry is incomplete"
+    ]
+  },
+  "verdict": "ops (ok): rho-strong-v2-aa / rho-strong-v2 = 1.0000 [1.000, 1.000] (within_t, df 3) over 4 pairs on 1 workloads, 1 curve(s), INDICATIVE: one workload, the interval does not generalise to other targets, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0000, w=0.1: 1.0000, w=1: 1.0000): unresolved inside the band; heavy tail in rho-strong-v2: top run is 27% of the arm's total S (max/median 1.1); more runs needed; heavy tail in rho-strong-v2-aa: top run is 27% of the arm's total S (max/median 1.1); more runs needed; wall: descriptive (ns/GAE 0.9509, not a result: 4 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-v2, rho-strong-v2-aa is an upper bound on its cost per operation (GAE is a lower bound)",
+  "legacy_comparison_id": "ECC1hd5f9164988a3",
+  "a_session_status": "complete",
+  "b_session_status": "complete",
+  "allow_interrupted": false,
+  "admissible": true
+}

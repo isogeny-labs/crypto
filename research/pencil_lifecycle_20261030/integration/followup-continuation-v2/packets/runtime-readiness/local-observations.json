@@ -1,0 +1,70 @@
+[
+  {
+    "command": [
+      "docker",
+      "--version"
+    ],
+    "started_at": "2026-10-31T01:32:53.343374+00:00",
+    "exit_code": 0,
+    "stdout": "Docker version 25.0.14, build 0bab007\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "docker",
+      "--host=unix:///var/run/docker.sock",
+      "info",
+      "--format",
+      "{{json .ServerVersion}} {{json .OSType}} {{json .Architecture}}"
+    ],
+    "started_at": "2026-10-31T01:32:53.359834+00:00",
+    "exit_code": 0,
+    "stdout": "\"\" \"\" \"\"\n",
+    "stderr": "permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get \"http://%2Fvar%2Frun%2Fdocker.sock/v1.44/info\": dial unix /var/run/docker.sock: connect: permission denied\n"
+  },
+  {
+    "command": [
+      "id"
+    ],
+    "started_at": "2026-10-31T01:32:53.388734+00:00",
+    "exit_code": 0,
+    "stdout": "uid=1000(ec2-user) gid=1000(ec2-user) groups=1000(ec2-user),4(adm),10(wheel),190(systemd-journal) context=system_u:system_r:unconfined_service_t:s0\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "rustup",
+      "target",
+      "list",
+      "--installed",
+      "--toolchain",
+      "1.99.1"
+    ],
+    "started_at": "2026-10-31T01:32:53.391270+00:00",
+    "exit_code": 0,
+    "stdout": "x86_64-unknown-linux-gnu\nx86_64-unknown-linux-musl\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "stat",
+      "-c",
+      "%a %U %G %n",
+      "/var/run/docker.sock"
+    ],
+    "started_at": "2026-10-31T01:32:53.561921+00:00",
+    "exit_code": 0,
+    "stdout": "660 root docker /var/run/docker.sock\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "file",
+      "/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc"
+    ],
+    "started_at": "2026-10-31T01:32:53.563826+00:00",
+    "exit_code": 0,
+    "stdout": "/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc: POSIX shell script, ASCII text executable\n",
+    "stderr": ""
+  }
+]

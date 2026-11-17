@@ -1,0 +1,20 @@
+{
+  "acceptance": "producer and independent 4096-point replay pass; otherwise retain censored row",
+  "claim_scope": "local diagnostic; no Tier 1 or rho speedup selection",
+  "comparisons": [
+    "k4250_minus_k4300",
+    "k4250_minus_k4405"
+  ],
+  "new_arm": "k4250_wide3",
+  "previous_arms": [
+    "k4300_wide3",
+    "k4405_wide3"
+  ],
+  "schema": "n83.wide3-fresh4096-k4250-plan/v1",
+  "selected_online_candidate_id": null,
+  "statistic": "paired mean target_ms difference on fixture order",
+  "status": "FROZEN_BEFORE_K4250_RUN",
+  "target_count": 4096,
+  "targets_sha256": "281a088cc49658973375ab88359d65a3b4d51d2819a297872b5fe5da01783895",
+  "uncertainty": "two-sided 99 percent circular moving-block bootstrap of 64 consecutive fixture indices, 20000 resamples per comparison, PCG64 seed 20261021"
+}

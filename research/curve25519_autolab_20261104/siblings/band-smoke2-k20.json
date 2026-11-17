@@ -1,0 +1,129 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp20-tm898-793f1c4c",
+      "log2_r": 17.000429204845545,
+      "arm": "rho-neg",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1.3372502709561422,
+        1.4278003301778444,
+        2.2427508631731543
+      ],
+      "charged_sum": 11621.0,
+      "native_sum": 7869,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-tm898-793f1c4c",
+      "log2_r": 17.000429204845545,
+      "arm": "tw2cj-lazy",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        2.5336525656924835,
+        2.718699649482568,
+        4.384123403593329
+      ],
+      "charged_sum": 22018.0,
+      "native_sum": 16081,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 631.7083333333334
+      }
+    },
+    {
+      "curve": "icv1-fp20-tm898-793f1c4c",
+      "log2_r": 17.000429204845545,
+      "arm": "tw2cj-lazy-sib8-p256",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        2.361159823573625,
+        2.661175218671882,
+        5.361313774556205
+      ],
+      "charged_sum": 20519.0,
+      "native_sum": 26072,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "sibling_lift_products": 42.375,
+        "sibling_second_points": 337.1666666666667,
+        "table_insert_attempts": 668.7916666666666
+      }
+    },
+    {
+      "curve": "icv1-fp20-tm898-793f1c4c",
+      "log2_r": 17.000429204845545,
+      "arm": "tw2cj-lazy-sib8-p64",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1.7251575649405808,
+        2.016692162777892,
+        4.640503543313687
+      ],
+      "charged_sum": 14992.0,
+      "native_sum": 25335,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "sibling_lift_products": 41.416666666666664,
+        "sibling_second_points": 325.6666666666667,
+        "table_insert_attempts": 650.125
+      }
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp20-tm898-793f1c4c",
+      "a": "rho-neg",
+      "b": "tw2cj-lazy",
+      "verdict": "rho-neg < tw2cj-lazy"
+    },
+    {
+      "curve": "icv1-fp20-tm898-793f1c4c",
+      "a": "rho-neg",
+      "b": "tw2cj-lazy-sib8-p256",
+      "verdict": "rho-neg < tw2cj-lazy-sib8-p256"
+    },
+    {
+      "curve": "icv1-fp20-tm898-793f1c4c",
+      "a": "rho-neg",
+      "b": "tw2cj-lazy-sib8-p64",
+      "verdict": "rho-neg < tw2cj-lazy-sib8-p64"
+    },
+    {
+      "curve": "icv1-fp20-tm898-793f1c4c",
+      "a": "tw2cj-lazy",
+      "b": "tw2cj-lazy-sib8-p256",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp20-tm898-793f1c4c",
+      "a": "tw2cj-lazy",
+      "b": "tw2cj-lazy-sib8-p64",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp20-tm898-793f1c4c",
+      "a": "tw2cj-lazy-sib8-p256",
+      "b": "tw2cj-lazy-sib8-p64",
+      "verdict": "tw2cj-lazy-sib8-p64 < tw2cj-lazy-sib8-p256"
+    }
+  ]
+}

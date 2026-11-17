@@ -1,0 +1,19 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\begin{document}
+\title{UInt64 same-support classifier correspondence}
+\author{Producer proof packet; independent review pending}
+\date{31 October 2026}\maketitle
+\section*{Checked statement}
+For a prime modulus $5\le p<2^{31}$ and canonical UInt64 inputs $s_1,t_1,s_2,t_2<p$, the literal word-value classifier equals the existing field classifier after decoding into $\mathbf Z/p\mathbf Z$. The order is inverse first, equal second, zero subtraction third, otherwise mixed. The theorem stops before doubling or other payload computations.
+\section*{Connection proved}
+Word negation is $(p-(b\bmod p))\bmod p$. Since $b\bmod p<p$, subtraction does not wrap. Word subtraction is $(a+\operatorname{neg}(b))\bmod p$. Canonicality and $p<2^{31}$ bound the sum below $2^{64}$. Existing residue equality/negation/subtraction lemmas then translate every predicate while preserving branch order. The all-zero overlap is kernel-checked to select the inverse branch.
+
+The new proof uses actual Lean UInt64 operations, not merely a natural-number formula. The connection from the Rust source to these expressions remains a manual fragment mapping; no Rust compiler-correctness theorem is asserted.
+\section*{Evidence}
+NatClassifier and WordClassifier compiled successfully. A separate native process checked the final type and five named axiom readbacks; only propext, Classical.choice and Quot.sound occur. Compile commands were individually bounded at 120 seconds. Existing pinned Mathlib Field.ZMod objects supplied the missing field instance; five files were copied into a private dependency union. No installation, download, scientific trial or runtime cost comparison occurred.
+\section*{Retained failures}
+The first NatClassifier attempt failed on dependent rewrite motives. Replacing that proof step with simplification preserved the statement. A word-subtraction attempt failed because simplification had changed the expression before its no-wrap inequality matched. The corrected proof supplies the inequality in the normalized expression. A prematurely launched API probe failed before its imported object existed. All native receipts remain. Earlier missing-field-instance attempts remain in the original packet.
+\section*{Source and remaining obligations}
+The Rust fragments are Field::neg/sub in three\_leads.rs and the inverse/equal/zero tests at projective\_law\_gate.rs:921--933. The $n=1$, table-free, odd-prime route is intended. Counters, loop-state side effects, and exceptional execution are outside this value theorem. Prior multiplication lemmas can support the next composition of 16 multiplies and four squares; that composition and reachable-input validity are not asserted here. The field classifier itself is a manually defined abstraction. Separate source-fidelity review remains required before promotion.
+\end{document}

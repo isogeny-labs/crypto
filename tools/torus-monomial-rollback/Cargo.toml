@@ -1,0 +1,14 @@
+[package]
+name = "torus-monomial-rollback"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+num-bigint = "0.4"
+serde_json = { version = "1", features = ["arbitrary_precision"] }
+torus-s4 = { path = "../torus-s4" }
+torus-affine-closure = { path = "../torus-affine-closure" }
+torus-monomial-cancellation = { path = "../torus-monomial-cancellation" }

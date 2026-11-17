@@ -1,0 +1,512 @@
+{
+  "schema": "profile/v1",
+  "kind": "nsys-summary",
+  "trace": "cuda,nvtx,osrt",
+  "kernels": [
+    {
+      "Time (%)": 76.6,
+      "Total Time (ns)": 1338874452,
+      "Instances": 8,
+      "Avg (ns)": 167359306.5,
+      "Med (ns)": 167338435.0,
+      "Min (ns)": 166815743,
+      "Max (ns)": 167775781,
+      "StdDev (ns)": 288209.1,
+      "Name": "explicit_relations::search_right_persistent(explicit_relations::Curve, explicit_relations::Bases, unsigned int, explicit_relations::Point, unsigned long, const explicit_relations::DenseRow *, unsigned long, unsigned long long *, const unsigned long *, unsigned int, explicit_relations::RightPartials)"
+    },
+    {
+      "Time (%)": 7.3,
+      "Total Time (ns)": 128110264,
+      "Instances": 1,
+      "Avg (ns)": 128110264.0,
+      "Med (ns)": 128110264.0,
+      "Min (ns)": 128110264,
+      "Max (ns)": 128110264,
+      "StdDev (ns)": 0.0,
+      "Name": "explicit_relations::build_right_cache(explicit_relations::Curve, explicit_relations::Bases, unsigned int, unsigned long, explicit_relations::CachedPoint *)"
+    },
+    {
+      "Time (%)": 7.0,
+      "Total Time (ns)": 121708157,
+      "Instances": 18,
+      "Avg (ns)": 6761564.3,
+      "Med (ns)": 6762558.0,
+      "Min (ns)": 6745470,
+      "Max (ns)": 6779838,
+      "StdDev (ns)": 10156.1,
+      "Name": "void cub::_V_300200_SM_890::detail::merge_sort::DeviceMergeSortMergeKernel<cub::_V_300200_SM_890::detail::merge_sort::policy_hub<explicit_relations::DenseRow *>::Policy600, explicit_relations::DenseRow *, cub::_V_300200_SM_890::NullType *, explicit_relations::DenseRow *, cub::_V_300200_SM_890::NullType *, unsigned long long, explicit_relations::DenseRowLess, explicit_relations::DenseRow, cub::_V_300200_SM_890::NullType, cub::_V_300200_SM_890::detail::merge_sort::VSMemHelper>(bool, T4, T5, T6, T8 *, T9 *, T7, T6 *, T6, cub::_V_300200_SM_890::detail::vsmem_t)"
+    },
+    {
+      "Time (%)": 4.1,
+      "Total Time (ns)": 72367704,
+      "Instances": 1,
+      "Avg (ns)": 72367704.0,
+      "Med (ns)": 72367704.0,
+      "Min (ns)": 72367704,
+      "Max (ns)": 72367704,
+      "StdDev (ns)": 0.0,
+      "Name": "void explicit_relations::build_negative_filter<explicit_relations::DenseRow>(const T1 *, unsigned long, unsigned long long *, unsigned long)"
+    },
+    {
+      "Time (%)": 2.4,
+      "Total Time (ns)": 42515110,
+      "Instances": 1,
+      "Avg (ns)": 42515110.0,
+      "Med (ns)": 42515110.0,
+      "Min (ns)": 42515110,
+      "Max (ns)": 42515110,
+      "StdDev (ns)": 0.0,
+      "Name": "explicit_relations::build_left(explicit_relations::Curve, explicit_relations::Bases, unsigned int, unsigned long, explicit_relations::DenseRow *)"
+    },
+    {
+      "Time (%)": 0.9,
+      "Total Time (ns)": 15569870,
+      "Instances": 18,
+      "Avg (ns)": 864992.8,
+      "Med (ns)": 902072.5,
+      "Min (ns)": 291362,
+      "Max (ns)": 1252395,
+      "StdDev (ns)": 293371.8,
+      "Name": "void cub::_V_300200_SM_890::detail::merge_sort::DeviceMergeSortPartitionKernel<explicit_relations::DenseRow *, unsigned long long, explicit_relations::DenseRowLess, explicit_relations::DenseRow>(bool, T1, T4 *, T2, T2, T2 *, T3, T2, int)"
+    },
+    {
+      "Time (%)": 0.8,
+      "Total Time (ns)": 13107736,
+      "Instances": 1,
+      "Avg (ns)": 13107736.0,
+      "Med (ns)": 13107736.0,
+      "Min (ns)": 13107736,
+      "Max (ns)": 13107736,
+      "StdDev (ns)": 0.0,
+      "Name": "void cub::_V_300200_SM_890::detail::for_each::static_kernel<cub::_V_300200_SM_890::detail::for_each::policy_hub_t::policy_500_t, unsigned long, cub::_V_300200_SM_890::detail::for_each::op_wrapper_t<unsigned long, thrust::_V_300200_SM_890::detail::construct1_via_allocator<thrust::_V_300200_SM_890::device_allocator<explicit_relations::CachedPoint>>, thrust::_V_300200_SM_890::device_ptr<explicit_relations::CachedPoint>>>(T2, T3)"
+    },
+    {
+      "Time (%)": 0.4,
+      "Total Time (ns)": 7844488,
+      "Instances": 1,
+      "Avg (ns)": 7844488.0,
+      "Med (ns)": 7844488.0,
+      "Min (ns)": 7844488,
+      "Max (ns)": 7844488,
+      "StdDev (ns)": 0.0,
+      "Name": "void cub::_V_300200_SM_890::detail::merge_sort::DeviceMergeSortBlockSortKernel<cub::_V_300200_SM_890::detail::merge_sort::policy_hub<explicit_relations::DenseRow *>::Policy600, explicit_relations::DenseRow *, cub::_V_300200_SM_890::NullType *, explicit_relations::DenseRow *, cub::_V_300200_SM_890::NullType *, unsigned long long, explicit_relations::DenseRowLess, explicit_relations::DenseRow, cub::_V_300200_SM_890::NullType, cub::_V_300200_SM_890::detail::merge_sort::VSMemHelper>(bool, T2, T3, T4, T5, T6, T8 *, T9 *, T7, cub::_V_300200_SM_890::detail::vsmem_t)"
+    },
+    {
+      "Time (%)": 0.2,
+      "Total Time (ns)": 3224925,
+      "Instances": 1,
+      "Avg (ns)": 3224925.0,
+      "Med (ns)": 3224925.0,
+      "Min (ns)": 3224925,
+      "Max (ns)": 3224925,
+      "StdDev (ns)": 0.0,
+      "Name": "void cub::_V_300200_SM_890::detail::for_each::static_kernel<cub::_V_300200_SM_890::detail::for_each::policy_hub_t::policy_500_t, unsigned long, cub::_V_300200_SM_890::detail::for_each::op_wrapper_t<unsigned long, thrust::_V_300200_SM_890::detail::construct1_via_allocator<thrust::_V_300200_SM_890::device_allocator<explicit_relations::DenseRow>>, thrust::_V_300200_SM_890::device_ptr<explicit_relations::DenseRow>>>(T2, T3)"
+    },
+    {
+      "Time (%)": 0.2,
+      "Total Time (ns)": 2991196,
+      "Instances": 1,
+      "Avg (ns)": 2991196.0,
+      "Med (ns)": 2991196.0,
+      "Min (ns)": 2991196,
+      "Max (ns)": 2991196,
+      "StdDev (ns)": 0.0,
+      "Name": "void explicit_relations::build_prefix<explicit_relations::DenseRow>(const T1 *, unsigned long, unsigned long, unsigned int, unsigned long *)"
+    },
+    {
+      "Time (%)": 0.0,
+      "Total Time (ns)": 254050,
+      "Instances": 2,
+      "Avg (ns)": 127025.0,
+      "Med (ns)": 127025.0,
+      "Min (ns)": 1344,
+      "Max (ns)": 252706,
+      "StdDev (ns)": 177739.8,
+      "Name": "void cub::_V_300200_SM_890::detail::for_each::static_kernel<cub::_V_300200_SM_890::detail::for_each::policy_hub_t::policy_500_t, unsigned long, thrust::_V_300200_SM_890::cuda_cub::__uninitialized_fill::functor<thrust::_V_300200_SM_890::device_ptr<unsigned long long>, unsigned long long>>(T2, T3)"
+    },
+    {
+      "Time (%)": 0.0,
+      "Total Time (ns)": 149506,
+      "Instances": 12,
+      "Avg (ns)": 12458.8,
+      "Med (ns)": 12448.0,
+      "Min (ns)": 12320,
+      "Max (ns)": 12801,
+      "StdDev (ns)": 117.9,
+      "Name": "explicit_relations::hash_base_wide(explicit_relations::Curve, unsigned long, unsigned long, unsigned long, unsigned long, explicit_relations::Point *)"
+    },
+    {
+      "Time (%)": 0.0,
+      "Total Time (ns)": 83297,
+      "Instances": 12,
+      "Avg (ns)": 6941.4,
+      "Med (ns)": 6912.0,
+      "Min (ns)": 6784,
+      "Max (ns)": 7168,
+      "StdDev (ns)": 130.5,
+      "Name": "void cub::_V_300200_SM_890::detail::merge_sort::DeviceMergeSortBlockSortKernel<cub::_V_300200_SM_890::detail::merge_sort::policy_hub<thrust::_V_300200_SM_890::detail::normal_iterator<thrust::_V_300200_SM_890::device_ptr<explicit_relations::Point>>>::Policy600, thrust::_V_300200_SM_890::detail::normal_iterator<thrust::_V_300200_SM_890::device_ptr<explicit_relations::Point>>, cub::_V_300200_SM_890::NullType *, thrust::_V_300200_SM_890::detail::normal_iterator<thrust::_V_300200_SM_890::device_ptr<explicit_relations::Point>>, cub::_V_300200_SM_890::NullType *, unsigned int, explicit_relations::PointLess, explicit_relations::Point, cub::_V_300200_SM_890::NullType, cub::_V_300200_SM_890::detail::merge_sort::VSMemHelper>(bool, T2, T3, T4, T5, T6, T8 *, T9 *, T7, cub::_V_300200_SM_890::detail::vsmem_t)"
+    },
+    {
+      "Time (%)": 0.0,
+      "Total Time (ns)": 32352,
+      "Instances": 2,
+      "Avg (ns)": 16176.0,
+      "Med (ns)": 16176.0,
+      "Min (ns)": 16096,
+      "Max (ns)": 16256,
+      "StdDev (ns)": 113.1,
+      "Name": "explicit_relations::build_partial(explicit_relations::Curve, explicit_relations::Bases, unsigned int, unsigned int, unsigned long, explicit_relations::Point *)"
+    },
+    {
+      "Time (%)": 0.0,
+      "Total Time (ns)": 18688,
+      "Instances": 1,
+      "Avg (ns)": 18688.0,
+      "Med (ns)": 18688.0,
+      "Min (ns)": 18688,
+      "Max (ns)": 18688,
+      "StdDev (ns)": 0.0,
+      "Name": "void cub::_V_300200_SM_890::detail::for_each::static_kernel<cub::_V_300200_SM_890::detail::for_each::policy_hub_t::policy_500_t, unsigned long, thrust::_V_300200_SM_890::cuda_cub::__uninitialized_fill::functor<thrust::_V_300200_SM_890::device_ptr<unsigned long>, unsigned long>>(T2, T3)"
+    },
+    {
+      "Time (%)": 0.0,
+      "Total Time (ns)": 15074,
+      "Instances": 14,
+      "Avg (ns)": 1076.7,
+      "Med (ns)": 960.0,
+      "Min (ns)": 928,
+      "Max (ns)": 2016,
+      "StdDev (ns)": 319.3,
+      "Name": "void cub::_V_300200_SM_890::detail::for_each::static_kernel<cub::_V_300200_SM_890::detail::for_each::policy_hub_t::policy_500_t, unsigned long, cub::_V_300200_SM_890::detail::for_each::op_wrapper_t<unsigned long, thrust::_V_300200_SM_890::detail::construct1_via_allocator<thrust::_V_300200_SM_890::device_allocator<explicit_relations::Point>>, thrust::_V_300200_SM_890::device_ptr<explicit_relations::Point>>>(T2, T3)"
+    },
+    {
+      "Time (%)": 0.0,
+      "Total Time (ns)": 14208,
+      "Instances": 12,
+      "Avg (ns)": 1184.0,
+      "Med (ns)": 1184.0,
+      "Min (ns)": 1152,
+      "Max (ns)": 1248,
+      "StdDev (ns)": 27.3,
+      "Name": "void cub::_V_300200_SM_890::detail::select::DeviceSelectSweepKernel<cub::_V_300200_SM_890::detail::select::policy_hub<explicit_relations::Point, cub::_V_300200_SM_890::NullType, int, (bool)0, (cub::_V_300200_SM_890::SelectImpl)1>::Policy1000, thrust::_V_300200_SM_890::detail::normal_iterator<thrust::_V_300200_SM_890::device_ptr<explicit_relations::Point>>, cub::_V_300200_SM_890::NullType *, thrust::_V_300200_SM_890::detail::normal_iterator<thrust::_V_300200_SM_890::device_ptr<explicit_relations::Point>>, long *, cub::_V_300200_SM_890::ScanTileState<int, (bool)1>, cuda::std::__4::__not_fn_t<explicit_relations::IsInfinity>, cub::_V_300200_SM_890::NullType, int, cub::_V_300200_SM_890::detail::select::streaming_context_t<long, (bool)1>, (cub::_V_300200_SM_890::SelectImpl)1>(T2, T3, T4, T5, T6, T7, T8, T9, int, T10, cub::_V_300200_SM_890::detail::vsmem_t)"
+    },
+    {
+      "Time (%)": 0.0,
+      "Total Time (ns)": 11616,
+      "Instances": 8,
+      "Avg (ns)": 1452.0,
+      "Med (ns)": 1472.0,
+      "Min (ns)": 1248,
+      "Max (ns)": 1504,
+      "StdDev (ns)": 83.7,
+      "Name": "explicit_relations::resolve_persistent_winner(explicit_relations::Curve, explicit_relations::Bases, unsigned int, explicit_relations::Point, const explicit_relations::DenseRow *, unsigned long, unsigned long long *, const unsigned long *, unsigned int, explicit_relations::RightPartials)"
+    },
+    {
+      "Time (%)": 0.0,
+      "Total Time (ns)": 9728,
+      "Instances": 12,
+      "Avg (ns)": 810.7,
+      "Med (ns)": 800.0,
+      "Min (ns)": 800,
+      "Max (ns)": 832,
+      "StdDev (ns)": 15.8,
+      "Name": "void cub::_V_300200_SM_890::detail::scan::DeviceCompactInitKernel<cub::_V_300200_SM_890::ScanTileState<int, (bool)1>, long *>(T1, int, T2)"
+    }
+  ],
+  "cuda_api": [
+    {
+      "Time (%)": 70.5,
+      "Total Time (ns)": 1339120926,
+      "Num Calls": 20,
+      "Avg (ns)": 66956046.3,
+      "Med (ns)": 12920.0,
+      "Min (ns)": 10060,
+      "Max (ns)": 167866495,
+      "StdDev (ns)": 84120244.8,
+      "Name": "cudaMemcpy"
+    },
+    {
+      "Time (%)": 20.6,
+      "Total Time (ns)": 390995926,
+      "Num Calls": 4,
+      "Avg (ns)": 97748981.5,
+      "Med (ns)": 100380736.5,
+      "Min (ns)": 2992410,
+      "Max (ns)": 187242043,
+      "StdDev (ns)": 78612850.6,
+      "Name": "cudaDeviceSynchronize"
+    },
+    {
+      "Time (%)": 7.6,
+      "Total Time (ns)": 144812105,
+      "Num Calls": 46,
+      "Avg (ns)": 3148089.2,
+      "Med (ns)": 5065.0,
+      "Min (ns)": 1840,
+      "Max (ns)": 127396189,
+      "StdDev (ns)": 18764195.0,
+      "Name": "cudaFree"
+    },
+    {
+      "Time (%)": 0.9,
+      "Total Time (ns)": 16782542,
+      "Num Calls": 56,
+      "Avg (ns)": 299688.3,
+      "Med (ns)": 2720.0,
+      "Min (ns)": 640,
+      "Max (ns)": 13113386,
+      "StdDev (ns)": 1795913.1,
+      "Name": "cudaStreamSynchronize"
+    },
+    {
+      "Time (%)": 0.3,
+      "Total Time (ns)": 6444719,
+      "Num Calls": 45,
+      "Avg (ns)": 143216.0,
+      "Med (ns)": 6360.0,
+      "Min (ns)": 2290,
+      "Max (ns)": 2180314,
+      "StdDev (ns)": 364764.9,
+      "Name": "cudaMalloc"
+    },
+    {
+      "Time (%)": 0.1,
+      "Total Time (ns)": 1154114,
+      "Num Calls": 77,
+      "Avg (ns)": 14988.5,
+      "Med (ns)": 4850.0,
+      "Min (ns)": 4020,
+      "Max (ns)": 134521,
+      "StdDev (ns)": 22849.0,
+      "Name": "cudaLaunchKernel"
+    },
+    {
+      "Time (%)": 0.0,
+      "Total Time (ns)": 322051,
+      "Num Calls": 49,
+      "Avg (ns)": 6572.5,
+      "Med (ns)": 3600.0,
+      "Min (ns)": 3380,
+      "Max (ns)": 45661,
+      "StdDev (ns)": 8573.9,
+      "Name": "cudaLaunchKernelExC_v11060"
+    },
+    {
+      "Time (%)": 0.0,
+      "Total Time (ns)": 243664,
+      "Num Calls": 14,
+      "Avg (ns)": 17404.6,
+      "Med (ns)": 16025.0,
+      "Min (ns)": 15591,
+      "Max (ns)": 28940,
+      "StdDev (ns)": 3533.8,
+      "Name": "cudaMemGetInfo"
+    },
+    {
+      "Time (%)": 0.0,
+      "Total Time (ns)": 175260,
+      "Num Calls": 13,
+      "Avg (ns)": 13481.5,
+      "Med (ns)": 11820.0,
+      "Min (ns)": 9360,
+      "Max (ns)": 36490,
+      "StdDev (ns)": 6947.3,
+      "Name": "cudaMemcpyAsync"
+    },
+    {
+      "Time (%)": 0.0,
+      "Total Time (ns)": 155522,
+      "Num Calls": 17,
+      "Avg (ns)": 9148.4,
+      "Med (ns)": 8280.0,
+      "Min (ns)": 2780,
+      "Max (ns)": 38391,
+      "StdDev (ns)": 9011.4,
+      "Name": "cudaMemsetAsync"
+    },
+    {
+      "Time (%)": 0.0,
+      "Total Time (ns)": 22841,
+      "Num Calls": 77,
+      "Avg (ns)": 296.6,
+      "Med (ns)": 220.0,
+      "Min (ns)": 90,
+      "Max (ns)": 3861,
+      "StdDev (ns)": 444.5,
+      "Name": "cuKernelGetName"
+    },
+    {
+      "Time (%)": 0.0,
+      "Total Time (ns)": 12459,
+      "Num Calls": 19,
+      "Avg (ns)": 655.7,
+      "Med (ns)": 580.0,
+      "Min (ns)": 250,
+      "Max (ns)": 1250,
+      "StdDev (ns)": 248.5,
+      "Name": "cuLibraryGetKernel"
+    },
+    {
+      "Time (%)": 0.0,
+      "Total Time (ns)": 3770,
+      "Num Calls": 1,
+      "Avg (ns)": 3770.0,
+      "Med (ns)": 3770.0,
+      "Min (ns)": 3770,
+      "Max (ns)": 3770,
+      "StdDev (ns)": 0.0,
+      "Name": "cuModuleGetLoadingMode"
+    }
+  ],
+  "memory_ops": [
+    {
+      "Time (%)": 89.7,
+      "Total Time (ns)": 302435,
+      "Count": 17,
+      "Avg (ns)": 17790.3,
+      "Med (ns)": 352.0,
+      "Min (ns)": 320,
+      "Max (ns)": 296867,
+      "StdDev (ns)": 71916.4,
+      "Operation": "[CUDA memset]"
+    },
+    {
+      "Time (%)": 10.1,
+      "Total Time (ns)": 33888,
+      "Count": 32,
+      "Avg (ns)": 1059.0,
+      "Med (ns)": 1024.0,
+      "Min (ns)": 992,
+      "Max (ns)": 1344,
+      "StdDev (ns)": 90.3,
+      "Operation": "[CUDA memcpy Device-to-Host]"
+    },
+    {
+      "Time (%)": 0.2,
+      "Total Time (ns)": 736,
+      "Count": 1,
+      "Avg (ns)": 736.0,
+      "Med (ns)": 736.0,
+      "Min (ns)": 736,
+      "Max (ns)": 736,
+      "StdDev (ns)": 0.0,
+      "Operation": "[CUDA memcpy Host-to-Device]"
+    }
+  ],
+  "nvtx": [
+    {
+      "Time (%)": 78.5,
+      "Total Time (ns)": 18990685,
+      "Instances": 16,
+      "Avg (ns)": 1186917.8,
+      "Med (ns)": 19270.0,
+      "Min (ns)": 12400,
+      "Max (ns)": 13154917,
+      "StdDev (ns)": 3332631.8,
+      "Style": "PushPop",
+      "Range": "CCCL:thrust::for_each_n"
+    },
+    {
+      "Time (%)": 10.7,
+      "Total Time (ns)": 2582948,
+      "Instances": 16,
+      "Avg (ns)": 161434.3,
+      "Med (ns)": 15055.0,
+      "Min (ns)": 7480,
+      "Max (ns)": 2324935,
+      "StdDev (ns)": 576992.7,
+      "Style": "PushPop",
+      "Range": "CCCL:cub::DeviceFor::ForEachN"
+    },
+    {
+      "Time (%)": 4.8,
+      "Total Time (ns)": 1167247,
+      "Instances": 24,
+      "Avg (ns)": 48635.3,
+      "Med (ns)": 41795.0,
+      "Min (ns)": 39721,
+      "Max (ns)": 118870,
+      "StdDev (ns)": 21382.0,
+      "Style": "PushPop",
+      "Range": "CCCL:thrust::remove_if"
+    },
+    {
+      "Time (%)": 2.7,
+      "Total Time (ns)": 646676,
+      "Instances": 24,
+      "Avg (ns)": 26944.8,
+      "Med (ns)": 22985.0,
+      "Min (ns)": 22060,
+      "Max (ns)": 58441,
+      "StdDev (ns)": 9917.2,
+      "Style": "PushPop",
+      "Range": "CCCL:thrust::sort"
+    },
+    {
+      "Time (%)": 1.5,
+      "Total Time (ns)": 362352,
+      "Instances": 3,
+      "Avg (ns)": 120784.0,
+      "Med (ns)": 59500.0,
+      "Min (ns)": 30140,
+      "Max (ns)": 272712,
+      "StdDev (ns)": 132389.9,
+      "Style": "PushPop",
+      "Range": "CCCL:uninitialized_fill_n"
+    },
+    {
+      "Time (%)": 1.1,
+      "Total Time (ns)": 256142,
+      "Instances": 1,
+      "Avg (ns)": 256142.0,
+      "Med (ns)": 256142.0,
+      "Min (ns)": 256142,
+      "Max (ns)": 256142,
+      "StdDev (ns)": 0.0,
+      "Style": "PushPop",
+      "Range": "CCCL:cub::DeviceMergeSort"
+    },
+    {
+      "Time (%)": 0.3,
+      "Total Time (ns)": 80630,
+      "Instances": 3,
+      "Avg (ns)": 26876.7,
+      "Med (ns)": 24660.0,
+      "Min (ns)": 16040,
+      "Max (ns)": 39930,
+      "StdDev (ns)": 12098.3,
+      "Style": "PushPop",
+      "Range": "CCCL:cub::DeviceFor::Bulk"
+    },
+    {
+      "Time (%)": 0.3,
+      "Total Time (ns)": 72341,
+      "Instances": 29,
+      "Avg (ns)": 2494.5,
+      "Med (ns)": 1790.0,
+      "Min (ns)": 220,
+      "Max (ns)": 19010,
+      "StdDev (ns)": 3263.7,
+      "Style": "PushPop",
+      "Range": "CCCL:thrust::two_system_copy"
+    },
+    {
+      "Time (%)": 0.2,
+      "Total Time (ns)": 45471,
+      "Instances": 50,
+      "Avg (ns)": 909.4,
+      "Med (ns)": 580.0,
+      "Min (ns)": 70,
+      "Max (ns)": 17031,
+      "StdDev (ns)": 2339.4,
+      "Style": "PushPop",
+      "Range": "CCCL:thrust::copy"
+    }
+  ],
+  "timeline": {
+    "kernel_launches": 126,
+    "span_ns": 1762704102,
+    "kernel_busy_ns": 1746902421,
+    "kernel_coverage": 0.9910355453407801
+  }
+}

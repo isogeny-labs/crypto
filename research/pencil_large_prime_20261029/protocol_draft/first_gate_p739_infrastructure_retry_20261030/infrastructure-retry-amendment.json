@@ -1,0 +1,50 @@
+{
+  "schema": "pencil-infrastructure-retry-amendment/v1",
+  "parent_protocol": {
+    "path": "parent-version4-protocol.json",
+    "sha256": "788a79b8c6d479239b7e0a0f8c1498f963d78039a78dee4b4ef1d93e1763a2b3",
+    "canonical_hash": "e0e7a38ae6e96aef36b0cbe92ac60c6d4a386f864e63d3072601a21c2b705d23",
+    "source_commit": "e85853ca5cd8048ea4fe404a7d9e74f73006b718"
+  },
+  "failed_attempt": {
+    "run_name": "pencil-p739-20261029",
+    "phase": "failed",
+    "infrastructure_attempt": 0,
+    "permission_error": "EACCES progress executable mode0700; corrected image receipt establishes executable-mode cause",
+    "payload_pid": null,
+    "checkpoint_generation": null,
+    "benchmark_job": null,
+    "evidence_manifest": {
+      "path": "failed-attempt0/SHA256SUMS",
+      "sha256": "a76f75c4df468ea00d633fd4e6e9822987b0d90ac30c106bc8a3877b312c3d9c"
+    }
+  },
+  "retry": {
+    "run_name": "pencil-p739-20261030-a1",
+    "infrastructure_attempt": 1,
+    "max_attempts": 2,
+    "status": "corrected image verified; independent review and retry request pending",
+    "runtime_change": "Only /opt/isolab/recovery/isolab-criu-progress executable mode0700 to0755; directories and all bytes unchanged",
+    "corrected_runtime_digest": "sha256:e82333a5e77a03270335589848783e1d0cf55e42c7c2f5f35732ee8ba54523fd",
+    "review": null
+  },
+  "resource_envelope": {
+    "outer_deadline_utc": "2026-10-30T03:32:22Z",
+    "internal_guard_deadline_utc": "2026-10-30T01:44:17Z",
+    "cumulative_active_worker_seconds": 14400,
+    "reset": false,
+    "prior_infrastructure_costs": "Retain and report first attempt allocation/controller costs and all observed intervals; no invented numeric cost"
+  },
+  "unchanged": [
+    "60 prescribed targets and1080 planned slots",
+    "scientific spec and algorithms",
+    "empirical source543a54b4 and binarya1c8ca89",
+    "analysis source99b10d5c and binaries",
+    "all seeds and controls",
+    "original external deadline and internal guard",
+    "reviewed runtime archive bytes"
+  ],
+  "execution_boundary": "Failed supervisor reports pid/starttime/generation null; no target rerun or checkpoint generation observed. No scientific outcome is inferred from this infrastructure failure.",
+  "freeze_performed": false,
+  "launch_performed": false
+}

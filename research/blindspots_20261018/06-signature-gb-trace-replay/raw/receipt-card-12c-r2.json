@@ -1,0 +1,220 @@
+{
+  "card_id": "CARD-BLINDSPOT-06-12C-r2",
+  "card_path": "research/blindspots_20261018/06-signature-gb-trace-replay/card-12c-r2.yaml",
+  "card_sha256": "bb48ce29f2a7c5b817061d3fce16d5e434c7414630c00f62b1b5c08639dd8fe2",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-06/card-12c-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-06/card-12c-r2/b06",
+        "examples/blindspots_06_signature_gb.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 5.551,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 5.551,
+      "stderr_sha256": "534e456a84b8eb9748e5146865686528dea0cea832873dd87827c6bae00fa961",
+      "stderr_tail": [
+        "",
+        "warning: fields `ratios`, `bounds`, `zero_r`, and `sym_r` are never read",
+        "    --> examples/blindspots_06_signature_gb.rs:3056:5",
+        "     |",
+        "3053 | struct ArmCell {",
+        "     |        ------- fields in this struct",
+        "...",
+        "3056 |     ratios: Vec<f64>, // exact ratios (both refuted)",
+        "     |     ^^^^^^",
+        "3057 |     bounds: Vec<f64>, // upper bounds for the censored targets",
+        "     |     ^^^^^^",
+        "...",
+        "3061 |     zero_r: f64,",
+        "     |     ^^^^^^",
+        "...",
+        "3064 |     sym_r: f64,",
+        "     |     ^^^^^",
+        "",
+        "warning: 4 warnings emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-06/card-12c-r2/b06",
+        "run",
+        "--draws",
+        "research/blindspots_20261018/06-signature-gb-trace-replay/draws.tsv",
+        "--cell",
+        "c15-3-4",
+        "--targets",
+        "12-15",
+        "--arms",
+        "f4r,f4n",
+        "--trace-target",
+        "16",
+        "--time-limit",
+        "90",
+        "--total-limit",
+        "300"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 127.872,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "replay-c15-3-4-c",
+      "index": 3,
+      "outputs": {},
+      "seconds": 127.872,
+      "stderr_sha256": "8796c41c6555f49d77ebaa5889927691e15f97e5a4a92a406722384b9ee499a6",
+      "stderr_tail": [
+        "c15-3-4 t16 f4 (trace): refuted touches=11088230851 20.3s",
+        "c15-3-4 t12 f4r: refuted D=4 steps=16 zero=20130 touches=11445522440 FALLBACK 21.3s",
+        "c15-3-4 t12 f4n: refuted D=4 steps=19 zero=10942 touches=4764911200 11.2s",
+        "c15-3-4 t13 f4r: refuted D=4 steps=19 zero=8851 touches=1145208767 FALLBACK 2.8s",
+        "c15-3-4 t13 f4n: refuted D=4 steps=16 zero=2686 touches=809158670 1.4s",
+        "c15-3-4 t14 f4r: refuted D=4 steps=17 zero=20368 touches=11422973915 FALLBACK 23.5s",
+        "c15-3-4 t14 f4n: refuted D=4 steps=20 zero=9953 touches=5663015832 12.9s",
+        "c15-3-4 t15 f4r: refuted D=4 steps=17 zero=19771 touches=11449912765 FALLBACK 24.7s",
+        "c15-3-4 t15 f4n: refuted D=4 steps=20 zero=10662 touches=3656189729 9.7s"
+      ],
+      "stdout_sha256": "394408a581c038ca5c33005c9a4eccf27e2f1c7c92b6d47439f96a596f571af1",
+      "stdout_tail": [
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":16,\"arm\":\"f4\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":17,\"pairs_cand\":26692,\"pairs_sel\":26692,\"pairs_gen\":61133,\"pairs_drop\":0,\"d_k0\":0,\"d_sing\":0,\"d_dup\":0,\"d_k1\":0,\"d_k2\":0,\"d_k3\":0,\"d_k4\":0,\"d_k5\":0,\"rows_s\":26691,\"zero_build\":1,\"zero_elim\":20323,\"zero_red\":20324,\"super_top\":0,\"rows_max\":44865,\"cols_max\":48262,\"rc_max\":2086626285,\"nnz_max\":20829465,\"cols_sum\":137158,\"rows_sum\":103158,\"touches\":11088230851,\"build\":20442370,\"elim\":9975715795,\"back\":1092072686,\"new_elems\":6368,\"g_size\":6413,\"sym_tests\":217920420,\"replay\":\"na\",\"replay_touches\":0,\"fb_touches\":0,\"ms\":20280.1,\"ms_pairs\":0.0,\"ms_sym\":243.3,\"ms_elim\":17659.7,\"ms_back\":1243.0,\"ms_add\":913.5,\"rss_kb\":207400,\"hwm_reset\":true,\"mem_est_kb\":108285,\"log_d\":[2,2,3,3,3,2,3,4,2,3,4,3,3,3,4,3,2],\"log_rows\":[14,33,467,577,2054,238,419,8382,85,1583,27155,1892,2198,1947,44865,10533,716],\"log_touch\":[2347,3475,455522,1199581,2146809,2166435,2222347,13211640,13214447,14716032,839634108,843981919,859765542,861684519,10959309878,11088064049,11088230851],\"log_zero\":[0,1,35,44,1504,1602,1622,2072,2083,2147,4088,4088,4114,4117,14869,20022,20324],\"log_new\":[11,16,107,271,280,280,295,594,596,677,2042,2119,2341,2365,5860,6333,6368],\"trace\":1}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":12,\"arm\":\"f4r\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":16,\"pairs_cand\":26433,\"pairs_sel\":26433,\"pairs_gen\":60688,\"pairs_drop\":11041,\"d_k0\":0,\"d_sing\":0,\"d_dup\":0,\"d_k1\":0,\"d_k2\":0,\"d_k3\":0,\"d_k4\":0,\"d_k5\":0,\"rows_s\":26432,\"zero_build\":1,\"zero_elim\":20129,\"zero_red\":20130,\"super_top\":0,\"rows_max\":44833,\"cols_max\":49888,\"rc_max\":2079085542,\"nnz_max\":20582057,\"cols_sum\":138977,\"rows_sum\":104661,\"touches\":11445522440,\"build\":20301256,\"elim\":9984208934,\"back\":1052646982,\"new_elems\":6303,\"g_size\":6348,\"sym_tests\":215682451,\"replay\":\"fallback\",\"replay_touches\":388365268,\"fb_touches\":11057157172,\"ms\":21305.5,\"ms_pairs\":0.0,\"ms_sym\":209.6,\"ms_elim\":17968.1,\"ms_back\":1411.6,\"ms_add\":911.6,\"rss_kb\":217440,\"hwm_reset\":true,\"mem_est_kb\":103996,\"log_d\":[2,2,3,3,3,2,3,4,2,3,4,3,3,3,4,3],\"log_rows\":[14,32,468,525,2051,229,411,9041,72,1591,28776,1891,2191,1980,44833,10556],\"log_touch\":[2640,3691,448438,1167385,2045305,2061409,2110933,12594550,12596935,14250461,807953789,812533798,828601172,830571917,10924846937,11057157172],\"log_zero\":[0,1,36,45,1505,1603,1623,2076,2087,2151,4093,4093,4119,4122,14977,20130],\"log_new\":[12,17,108,273,282,282,297,596,598,679,2019,2097,2326,2350,5837,6303]}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":12,\"arm\":\"f4n\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":19,\"pairs_cand\":26719,\"pairs_sel\":16681,\"pairs_gen\":52391,\"pairs_drop\":10038,\"d_k0\":0,\"d_sing\":0,\"d_dup\":0,\"d_k1\":0,\"d_k2\":0,\"d_k3\":0,\"d_k4\":0,\"d_k5\":0,\"rows_s\":16680,\"zero_build\":1,\"zero_elim\":10941,\"zero_red\":10942,\"super_top\":0,\"rows_max\":49159,\"cols_max\":53326,\"rc_max\":2099384254,\"nnz_max\":10325725,\"cols_sum\":183335,\"rows_sum\":131591,\"touches\":4764911200,\"build\":16258045,\"elim\":4392025825,\"back\":356627330,\"new_elems\":5739,\"g_size\":5784,\"sym_tests\":401648068,\"replay\":\"ok\",\"replay_touches\":4764911200,\"fb_touches\":0,\"ms\":11225.4,\"ms_pairs\":0.0,\"ms_sym\":353.7,\"ms_elim\":9355.0,\"ms_back\":498.5,\"ms_add\":841.3,\"rss_kb\":217852,\"hwm_reset\":true,\"mem_est_kb\":64861,\"log_d\":[2,2,3,3,3,2,3,4,3,4,2,3,3,3,3,4,3,3,4],\"log_rows\":[14,28,433,464,692,104,526,8611,582,17544,66,2003,1968,2014,1987,37872,6024,1500,49159],\"log_touch\":[2777,3803,350931,999625,1288044,1294043,1359821,8740626,8879201,220514311,220516229,226405986,227523196,229785190,230909410,3524276272,3553964691,3554763190,4764911200],\"log_zero\":[0,0,8,8,77,100,191,314,361,1131,1132,1157,1157,1157,1157,2976,4452,4454,10942],\"log_new\":[12,17,107,247,302,302,317,578,603,1643,1645,1777,1804,1845,1869,4574,4622,4662,5739]}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":13,\"arm\":\"f4r\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":19,\"pairs_cand\":11590,\"pairs_sel\":11590,\"pairs_gen\":29830,\"pairs_drop\":10846,\"d_k0\":0,\"d_sing\":0,\"d_dup\":0,\"d_k1\":0,\"d_k2\":0,\"d_k3\":0,\"d_k4\":0,\"d_k5\":0,\"rows_s\":11560,\"zero_build\":30,\"zero_elim\":8821,\"zero_red\":8851,\"super_top\":0,\"rows_max\":24527,\"cols_max\":24836,\"rc_max\":491913512,\"nnz_max\":3842201,\"cols_sum\":75478,\"rows_sum\":59593,\"touches\":1145208767,\"build\":6521425,\"elim\":616523312,\"back\":132690966,\"new_elems\":2739,\"g_size\":2784,\"sym_tests\":93071483,\"replay\":\"fallback\",\"replay_touches\":389473064,\"fb_touches\":755735703,\"ms\":2762.1,\"ms_pairs\":0.0,\"ms_sym\":94.2,\"ms_elim\":1458.9,\"ms_back\":241.6,\"ms_add\":198.8,\"rss_kb\":176536,\"hwm_reset\":true,\"mem_est_kb\":34634,\"log_d\":[2,2,3,3,3,2,3,4,2,3,4,3,3,2,3,2,3,3,4],\"log_rows\":[13,33,464,558,2063,254,745,7891,43,858,13913,971,1127,69,1293,204,2980,1587,24527],\"log_touch\":[2240,3476,434767,1114508,2005130,2013606,2050344,5772191,5773570,6943778,615319295,616786901,621750571,621757231,627434508,627451435,629253044,629461355,755735703],\"log_zero\":[0,1,33,42,1496,1639,1647,2076,2081,2135,2931,2931,2954,2957,3051,3086,3897,4347,8851],\"log_new\":[10,15,106,263,278,278,293,502,505,594,1737,1802,1970,1978,2176,2195,2308,2323,2739]}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":13,\"arm\":\"f4n\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":16,\"pairs_cand\":9431,\"pairs_sel\":5996,\"pairs_gen\":25356,\"pairs_drop\":3435,\"d_k0\":0,\"d_sing\":0,\"d_dup\":0,\"d_k1\":0,\"d_k2\":0,\"d_k3\":0,\"d_k4\":0,\"d_k5\":0,\"rows_s\":5984,\"zero_build\":12,\"zero_elim\":2674,\"zero_red\":2686,\"super_top\":0,\"rows_max\":12990,\"cols_max\":21839,\"rc_max\":283688610,\"nnz_max\":4232307,\"cols_sum\":65600,\"rows_sum\":33174,\"touches\":809158670,\"build\":3648668,\"elim\":664069245,\"back\":141440757,\"new_elems\":3310,\"g_size\":3355,\"sym_tests\":62912659,\"replay\":\"ok\",\"replay_touches\":809158670,\"fb_touches\":0,\"ms\":1350.8,\"ms_pairs\":0.0,\"ms_sym\":53.6,\"ms_elim\":950.8,\"ms_back\":141.9,\"ms_add\":181.8,\"rss_kb\":176536,\"hwm_reset\":true,\"mem_est_kb\":24238,\"log_d\":[2,2,3,3,3,2,3,4,4,2,3,3,4,2,3,3],\"log_rows\":[13,29,434,496,769,177,789,6359,3453,22,733,670,12990,253,4172,1815],\"log_touch\":[2240,3444,313833,865890,1280077,1286576,1323523,3434457,69896240,69897428,72826972,73223243,806829207,806840219,808027589,809158670],\"log_zero\":[0,0,7,7,96,181,219,371,415,415,441,441,1070,1147,2425,2686],\"log_new\":[10,15,102,229,302,302,317,481,1049,1052,1207,1229,3086,3086,3145,3310]}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":14,\"arm\":\"f4r\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":17,\"pairs_cand\":26689,\"pairs_sel\":26689,\"pairs_gen\":60956,\"pairs_drop\":11308,\"d_k0\":0,\"d_sing\":0,\"d_dup\":0,\"d_k1\":0,\"d_k2\":0,\"d_k3\":0,\"d_k4\":0,\"d_k5\":0,\"rows_s\":26688,\"zero_build\":1,\"zero_elim\":20367,\"zero_red\":20368,\"super_top\":0,\"rows_max\":48353,\"cols_max\":53116,\"rc_max\":2414893879,\"nnz_max\":20427734,\"cols_sum\":147931,\"rows_sum\":113482,\"touches\":11422973915,\"build\":20147428,\"elim\":9949995771,\"back\":1063204459,\"new_elems\":6321,\"g_size\":6366,\"sym_tests\":236042297,\"replay\":\"fallback\",\"replay_touches\":389626257,\"fb_touches\":11033347658,\"ms\":23547.1,\"ms_pairs\":0.0,\"ms_sym\":229.7,\"ms_elim\":20206.8,\"ms_back\":1192.7,\"ms_add\":1081.7,\"rss_kb\":217684,\"hwm_reset\":true,\"mem_est_kb\":103238,\"log_d\":[2,2,3,3,3,2,3,4,2,3,4,3,3,3,4,3,2],\"log_rows\":[14,33,465,562,2072,233,423,9060,97,1813,32018,2132,2411,2280,48353,10796,720],\"log_touch\":[2172,3230,438366,1109387,2030121,2050107,2085893,12758738,12761733,14478224,822682833,827281701,843592384,845691477,10909534620,11033183451,11033347658],\"log_zero\":[0,1,33,42,1502,1600,1620,2049,2060,2122,4078,4078,4104,4107,14913,20066,20368],\"log_new\":[11,15,106,263,272,272,287,586,587,676,2030,2107,2329,2356,5824,6284,6321]}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":14,\"arm\":\"f4n\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":20,\"pairs_cand\":27832,\"pairs_sel\":16739,\"pairs_gen\":64528,\"pairs_drop\":11093,\"d_k0\":0,\"d_sing\":0,\"d_dup\":0,\"d_k1\":0,\"d_k2\":0,\"d_k3\":0,\"d_k4\":0,\"d_k5\":0,\"rows_s\":16735,\"zero_build\":4,\"zero_elim\":9949,\"zero_red\":9953,\"super_top\":0,\"rows_max\":46884,\"cols_max\":60886,\"rc_max\":2503416468,\"nnz_max\":12442036,\"cols_sum\":215286,\"rows_sum\":166189,\"touches\":5663015832,\"build\":20487320,\"elim\":4894230330,\"back\":748298182,\"new_elems\":6786,\"g_size\":6831,\"sym_tests\":505690924,\"replay\":\"ok\",\"replay_touches\":5663015832,\"fb_touches\":0,\"ms\":12949.7,\"ms_pairs\":0.0,\"ms_sym\":382.3,\"ms_elim\":10688.0,\"ms_back\":868.5,\"ms_add\":889.7,\"rss_kb\":218616,\"hwm_reset\":true,\"mem_est_kb\":79076,\"log_d\":[2,2,3,3,3,3,2,3,4,2,3,4,3,3,3,4,3,4,3,3],\"log_rows\":[14,25,422,470,663,757,141,636,9775,104,2272,38605,2626,2605,2498,43518,6386,46884,1917,5871],\"log_touch\":[2172,3138,275705,759978,1150841,2171239,2181799,2247945,12731123,12733838,14745363,661846378,666499983,668168926,668674299,4601250062,4628901990,5575168415,5586893192,5663015832],\"log_zero\":[0,0,1,1,1,202,222,313,572,573,595,1209,1209,1209,1209,3210,4730,9231,9239,9953],\"log_new\":[11,15,97,196,284,339,339,354,640,641,725,1994,2061,2090,2093,4975,4981,6120,6323,6786]}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":15,\"arm\":\"f4r\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":17,\"pairs_cand\":26113,\"pairs_sel\":26113,\"pairs_gen\":60541,\"pairs_drop\":13499,\"d_k0\":0,\"d_sing\":0,\"d_dup\":0,\"d_k1\":0,\"d_k2\":0,\"d_k3\":0,\"d_k4\":0,\"d_k5\":0,\"rows_s\":26110,\"zero_build\":3,\"zero_elim\":19768,\"zero_red\":19771,\"super_top\":0,\"rows_max\":44444,\"cols_max\":50043,\"rc_max\":2047935076,\"nnz_max\":20894853,\"cols_sum\":139131,\"rows_sum\":104618,\"touches\":11449912765,\"build\":20606610,\"elim\":9964589625,\"back\":1075644359,\"new_elems\":6342,\"g_size\":6387,\"sym_tests\":217514814,\"replay\":\"fallback\",\"replay_touches\":389072171,\"fb_touches\":11060840594,\"ms\":24686.1,\"ms_pairs\":0.0,\"ms_sym\":307.3,\"ms_elim\":20970.4,\"ms_back\":1405.8,\"ms_add\":1001.7,\"rss_kb\":223960,\"hwm_reset\":true,\"mem_est_kb\":109010,\"log_d\":[2,2,3,3,2,2,3,4,2,3,4,3,3,3,4,3,2],\"log_rows\":[14,32,467,556,133,218,1986,8964,81,1571,28853,1881,2165,2019,44444,10533,701],\"log_touch\":[2336,3285,409262,1111391,1118496,1132493,1485892,12389821,12392424,13994207,862370630,866972962,883350280,885379918,10928440373,11060672601,11060840594],\"log_zero\":[0,1,35,44,52,133,1160,1610,1621,1683,3526,3526,3552,3555,14316,19469,19771],\"log_new\":[12,16,107,271,280,280,295,594,595,677,2031,2108,2330,2354,5840,6305,6342]}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":15,\"arm\":\"f4n\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":20,\"pairs_cand\":24288,\"pairs_sel\":15969,\"pairs_gen\":48642,\"pairs_drop\":8319,\"d_k0\":0,\"d_sing\":0,\"d_dup\":0,\"d_k1\":0,\"d_k2\":0,\"d_k3\":0,\"d_k4\":0,\"d_k5\":0,\"rows_s\":15965,\"zero_build\":4,\"zero_elim\":10658,\"zero_red\":10662,\"super_top\":0,\"rows_max\":56474,\"cols_max\":60341,\"rc_max\":2839456246,\"nnz_max\":8513998,\"cols_sum\":205913,\"rows_sum\":148613,\"touches\":3656189729,\"build\":14758558,\"elim\":3422127526,\"back\":219303645,\"new_elems\":5307,\"g_size\":5352,\"sym_tests\":436145687,\"replay\":\"ok\",\"replay_touches\":3656189729,\"fb_touches\":0,\"ms\":9724.2,\"ms_pairs\":0.0,\"ms_sym\":336.0,\"ms_elim\":8409.5,\"ms_back\":306.9,\"ms_add\":576.9,\"rss_kb\":223812,\"hwm_reset\":true,\"mem_est_kb\":60882,\"log_d\":[2,2,3,3,3,3,2,3,4,4,2,3,3,3,4,3,3,3,3,4],\"log_rows\":[14,27,422,472,672,699,128,658,9207,18583,94,2260,2260,2379,43410,6604,1476,1387,1387,56474],\"log_touch\":[2336,3249,264494,799640,1233352,2045282,2056275,2163366,8661995,174422033,174424299,177872566,179219828,182560610,2230184399,2263876127,2264911711,2265395769,2266026880,3656189729],\"log_zero\":[0,0,1,1,1,168,191,305,610,1051,1052,1069,1069,1069,2672,4353,4354,4354,4355,10662],\"log_new\":[12,16,100,213,306,370,370,385,597,1455,1456,1584,1624,1724,4137,4166,4203,4213,4227,5307]}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-06/card-12c-r2/b06"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-06/card-12c-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "75c6b76f9ef1b184258050b7ef61feb4b9606966",
+  "dirty_after": [
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-12c-r2-replay-c15-3-4-c.stderr.log",
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-12c-r2-replay-c15-3-4-c.stdout.log"
+  ],
+  "dirty_before": [
+    "esearch/blindspots_20261018/10-kernel-program-search/raw-r2/state-1/n41-b.jsonl",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/receipt-card-07-r2.json",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n41-b-a.stderr.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n41-b-a.stdout.log"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

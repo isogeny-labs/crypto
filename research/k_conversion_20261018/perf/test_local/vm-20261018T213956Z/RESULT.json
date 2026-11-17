@@ -1,0 +1,121 @@
+{
+ "status": "ok",
+ "selftest": true,
+ "reportable": false,
+ "host": {
+  "kind": "host",
+  "status": "ok",
+  "dry": 1,
+  "host": "vm",
+  "utc": "20261018T213956Z",
+  "uname": "Linux vm 6.18.44-fc-v139 #1 SMP PREEMPT_DYNAMIC @0 x86_64 x86_64 x86_64 GNU/Linux ",
+  "cpu_model": " Intel(R) Xeon(R) Processor @ 2.10GHz ",
+  "logical_cpus": 4,
+  "mem_total_kb": 16479424,
+  "perf_event_paranoid": "2",
+  "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07) ",
+  "commit": "ee7a5d972b5dfdf93518ab77beb5e3b144e7d31d",
+  "dirty_files": 10,
+  "binary_sha256": "238ea7cf57ca33beab3e400073a024d4f8a25074bc3e83424fe5cc919f0e379f",
+  "PAR": 1,
+  "REPS": 2,
+  "rayon_threads": 1,
+  "taskset": true
+ },
+ "unit": "instructions:u (perf_event_open interval counters); cycles are in raw.jsonl and are not used in K",
+ "I_step": {
+  "n61": {
+   "per_seed": {
+    "1": 97.97240046607806
+   },
+   "aa_spread": {
+    "1": 0.024481401355084243
+   },
+   "median": 97.97240046607806,
+   "min": 97.97240046607806,
+   "max": 97.97240046607806,
+   "n": 1
+  }
+ },
+ "cells": [
+  {
+   "label": "m3-16-6",
+   "degree": 3,
+   "columns": [
+    4861
+   ],
+   "draws": [
+    0
+   ],
+   "I_col": {
+    "median": 3601.449187409998,
+    "min": 3601.449187409998,
+    "max": 3601.449187409998,
+    "n": 1
+   },
+   "K_n61": {
+    "median": 36.759834098960994,
+    "min": 36.759834098960994,
+    "max": 36.759834098960994,
+    "n": 1
+   }
+  }
+ ],
+ "draws": [
+  {
+   "label": "m3-16-6",
+   "degree": 3,
+   "draw": 0,
+   "columns": 4861,
+   "n_vars": 34,
+   "engine_counters_constant_over_repeats": true,
+   "closure_word_ops": 9130386,
+   "refuted": false,
+   "instructions": [
+    19049805,
+    15963484
+   ],
+   "cycles": [
+    1194,
+    1194
+   ],
+   "secs": [
+    0.019,
+    0.016
+   ],
+   "vmhwm_kb": 7304,
+   "aa_spread": 0.17629426358660563,
+   "I_col": 3601.449187409998,
+   "I_word": 1.917404642038135,
+   "K_n61": 36.759834098960994
+  }
+ ],
+ "deg4_growth_by_columns": [],
+ "controls": {
+  "aa_max_spread": 0.17629426358660563,
+  "aa_limit": 0.005,
+  "aa_pass": false,
+  "engine_counters_constant": true,
+  "deg3_vs_callgrind": [
+   {
+    "label": "m3-16-6",
+    "draw": 0,
+    "perf_instructions": 17506644.5,
+    "callgrind_ir": 146733805,
+    "ratio": 0.11930887023613952,
+    "columns_match": true,
+    "word_ops_match": true
+   }
+  ],
+  "pos_pass": false,
+  "rho_perf_over_callgrind_info": {
+   "n61": 0.13504533153055806
+  },
+  "null_whole_process": [],
+  "null_pass": false,
+  "no_multiplexing": true,
+  "no_failed_jobs": true,
+  "all_pass": false
+ },
+ "failed": []
+}

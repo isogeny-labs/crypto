@@ -1,0 +1,31 @@
+'PencilWordRefinement.canonical_equality' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PencilWordRefinement.neg_decode' depends on axioms: [propext, Quot.sound]
+'PencilWordRefinement.sub_decode' depends on axioms: [propext, Quot.sound]
+'PencilWordRefinement.neg_equality_reflection' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PencilWordRefinement.sub_zero_reflection' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PencilWordRefinement.bounded_prime_neg_sub' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PencilWordRefinement.canonical_product_bound' depends on axioms: [propext, Quot.sound]
+'PencilWordRefinement.uint64_mul_mod' depends on axioms: [propext, Quot.sound]
+'PencilWordRefinement.uint64_mul_decode' depends on axioms: [propext, Quot.sound]
+'PencilWordRefinement.uint64_square_decode' depends on axioms: [propext, Quot.sound]
+'PencilWordRefinement.uint64_mul_canonical' depends on axioms: [propext]
+InvariantBranches.weight_decode.{u_1} {K : Type u_1} [Field K] (q r s t z w : K) (hz : z ≠ 0) (hw : w ≠ 0) :
+  q * z ^ 2 / z ^ 2 = q ∧ r * z ^ 4 / z ^ 4 = r ∧ s * (z ^ 3 * w) / (z ^ 3 * w) = s ∧ t * (z ^ 5 * w) / (z ^ 5 * w) = t
+InvariantBranches.weight_validity.{u_1} {K : Type u_1} [Field K] (f : Polynomial K) (q r s t z w : K) (hz : z ≠ 0)
+  (hw : w ≠ 0)
+  (hv :
+    Polynomial.X ^ 2 + Polynomial.C q * Polynomial.X + Polynomial.C r ∣
+      f - (Polynomial.C s * Polynomial.X + Polynomial.C t) ^ 2) :
+  Polynomial.X ^ 2 + Polynomial.C (q * z ^ 2 / z ^ 2) * Polynomial.X + Polynomial.C (r * z ^ 4 / z ^ 4) ∣
+    f - (Polynomial.C (s * (z ^ 3 * w) / (z ^ 3 * w)) * Polynomial.X + Polynomial.C (t * (z ^ 5 * w) / (z ^ 5 * w))) ^ 2
+InvariantBranches.negation_validity.{u_1} {K : Type u_1} [Field K] (f u v : Polynomial K) (h : u ∣ f - v ^ 2) :
+  u ∣ f - (-v) ^ 2
+InvariantBranches.shared_zero_q_implies_same_support.{u_1} {K : Type u_1} [Field K] (q1 q2 r1 r2 : K) (hq : q1 - q2 = 0)
+  (hb : (q1 - q2) * (q2 * r1 - q1 * r2) - (r1 - r2) ^ 2 = 0) : q1 = q2 ∧ r1 = r2
+InvariantBranches.shared_zero_q_excluded.{u_1} {K : Type u_1} [Field K] (q1 q2 r1 r2 : K)
+  (hdifferent : ¬(q1 = q2 ∧ r1 = r2)) (hb : (q1 - q2) * (q2 * r1 - q1 * r2) - (r1 - r2) ^ 2 = 0) : q1 - q2 ≠ 0
+'InvariantBranches.weight_decode' depends on axioms: [propext, Classical.choice, Quot.sound]
+'InvariantBranches.weight_validity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'InvariantBranches.negation_validity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'InvariantBranches.shared_zero_q_implies_same_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'InvariantBranches.shared_zero_q_excluded' depends on axioms: [propext, Classical.choice, Quot.sound]

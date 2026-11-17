@@ -1,0 +1,10 @@
+digraph signed_cache {
+ graph [rankdir=LR,bgcolor="white",pad="0.2",label="Ordered lifts and source answers stay equal",labelloc=t];
+ node [shape=box,style="rounded,filled",fillcolor="#eef2f6",fontname="Helvetica",fontsize=11];
+ a [label="Two base points\nFour signed entries"];
+ b [label="Checked curve/sign bindings\nTwo inverse additions"];
+ c [label="Same S3 roots\nTwo reads per sign test"];
+ d [label="Same ordered point sums\nSame rows and base logs"];
+ e [label="Actual source map\nAll 800 scalars pass"];
+ a->b->c->d->e;
+}

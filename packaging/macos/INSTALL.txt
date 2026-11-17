@@ -1,0 +1,51 @@
+CryptoCLI
+=========
+
+This package installs:
+
+  /usr/local/bin/ic
+  /usr/local/bin/crax
+  /usr/local/share/cryptocli/version.json
+  /usr/local/share/cryptocli/ecc2k130/codegen/*.py
+
+`ic` is the curve-inspection and index-calculus CLI. `crax` is the attack
+suite from isogeny-labs/cryptanalysis. The Python engine is included for
+`ic fixed` and `ic ecc2k130`; those commands need python3 on PATH.
+
+Install
+-------
+
+Double-click "CryptoCLI Installer.pkg", or run:
+
+  sudo installer -pkg "/Volumes/CryptoCLI/CryptoCLI Installer.pkg" -target /
+
+The installer needs administrator privileges because it writes to
+/usr/local.
+
+This build is unsigned and not notarized unless the distributor supplied a
+Developer ID. If macOS blocks it, right-click the .pkg and choose Open, or
+remove the quarantine attribute from the mounted volume:
+
+  xattr -dr com.apple.quarantine "/Volumes/CryptoCLI/CryptoCLI Installer.pkg"
+
+Update
+------
+
+Check for a newer release:
+
+  ic update --check
+
+Install it:
+
+  sudo ic update
+
+`ic update` downloads the matching macOS archive from the latest
+isogeny-labs/crypto GitHub release, verifies SHA256SUMS, and replaces
+`ic`, `crax` and the Python engine. Use `ic update --version v0.1.6201` to
+pin a release, or `--dry-run` to verify without replacing anything.
+
+Uninstall
+---------
+
+  sudo rm -f /usr/local/bin/ic /usr/local/bin/crax
+  sudo rm -rf /usr/local/share/cryptocli

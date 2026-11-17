@@ -1,0 +1,62 @@
+{
+  "schema": "crypto.md-sm3-stream-s3-acceptance/v1",
+  "checked_at_utc": "2026-10-24T04:35:07.042403+00:00",
+  "source_base_commit": "912b8fc2709e1c0c0be84d4bbeb9fe77f415c117",
+  "source_state": "committed streamed hash implementation",
+  "binary_sha256": "405895bf17e48945725fcb599dc86c85062d72e41f766b0135bc0daf16863b0b",
+  "bucket": "setec-astronomy-artifacts",
+  "region": "us-east-2",
+  "aws_profile": "ecc-challenges-new",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/20261024T043500Z-0a8868fb",
+  "logical_name": "evidence/crypto-md-sm3-stream/20261024T043500Z-0a8868fb/input.bin",
+  "object": {
+    "key": "ic/v1/acceptance/20261024T043500Z-0a8868fb/sha256/dc/dceb11fea27458999b9aa5d4fbea9519d01712ec5b930b228df516f0632b0fba",
+    "sha256": "dceb11fea27458999b9aa5d4fbea9519d01712ec5b930b228df516f0632b0fba",
+    "bytes": 1048577
+  },
+  "checks": {
+    "local_comparisons": 48,
+    "local_algorithms": [
+      "md4",
+      "md5",
+      "sm3"
+    ],
+    "local_size_cases": [
+      0,
+      1,
+      55,
+      56,
+      63,
+      64,
+      65,
+      111,
+      112,
+      127,
+      128,
+      65535,
+      65536,
+      65537,
+      1048577,
+      8388745
+    ],
+    "remote_download_status": "bytes_ok",
+    "fresh_cache_reference_matches": {
+      "md4": "d2386707662496c327a08272f0fd76ab",
+      "md5": "8330c10c4507ff55084112e504574952",
+      "sm3": "2eeca5e4dfbdaadaf24817a27a2921ccdb3c27424017ec78ef30ad9226cfd62a"
+    },
+    "release_binary_tests_passed": 29,
+    "release_binary_tests_failed": 0
+  },
+  "external_reference": {
+    "md4": "OpenSSL legacy provider",
+    "md5": "Python hashlib",
+    "sm3": "Python hashlib"
+  },
+  "cleanup": {
+    "objects_deleted": 1,
+    "prefix_empty": true,
+    "errors": []
+  },
+  "source_commit": "b167f617065"
+}

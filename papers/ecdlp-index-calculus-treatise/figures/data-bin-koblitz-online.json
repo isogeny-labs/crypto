@@ -1,0 +1,629 @@
+{
+ "_comment": "Koblitz one-target online phase after reusable IC preparation. Panel a: rho with no table on the same public point (rho/IC, >1 means IC faster online). Panel b: rho given a Bernstein-Lange table of equal or smaller advice (IC/rho, >1 means rho faster online). Values copied from the sources; extracted by data10/fx-tmp/extract_koblitz_online.py (scratch).",
+ "sources": [
+  {
+   "repo": "crypto",
+   "path": "docs/ic/boundary_targets.json",
+   "ref": "origin/main",
+   "blob": "5da9c3b71114c18f0b509c1aa1feed4213e88afd"
+  },
+  {
+   "repo": "crypto",
+   "path": "research/n83_dense_root_20261013/analysis_primary.json",
+   "ref": "origin/main",
+   "blob": "69b71f1bcc84fe7202814967ecf5548d2a0fb173"
+  },
+  {
+   "repo": "crypto",
+   "path": "research/ic_next10_20261014/09-equal-advice/results.json",
+   "ref": "origin/main",
+   "blob": "257b0f09fc81fb20a3595ec38db61ca8ba4369c3"
+  },
+  {
+   "repo": "crypto",
+   "path": "research/ic_next10_20261014/09-equal-advice/README.md",
+   "ref": "origin/main",
+   "blob": "0e6dd6e7fc43df3be8f119703e73f92d0c7ac30d"
+  },
+  {
+   "repo": "crypto",
+   "path": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k3300/analysis.json",
+   "ref": "origin/main",
+   "blob": "2e8ff83080763a2e131cfdb9f3046785b7645f96"
+  },
+  {
+   "repo": "crypto",
+   "path": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k600/analysis.json",
+   "ref": "origin/main",
+   "blob": "994f9b32fe03eae6293f5f2bbf49680e1625bdeb"
+  },
+  {
+   "repo": "crypto",
+   "path": "research/20261016-n83-precomputed-rho-control/records/run-38855595549/k600/analysis.json",
+   "ref": "origin/main",
+   "blob": "5733053c612f098dee0043d656e239100bb20504"
+  },
+  {
+   "repo": "crypto",
+   "path": "research/20261016-n83-precomputed-rho-control/README.md",
+   "ref": "origin/main",
+   "blob": "193f5ff1bae39643b47e31159b007c106040efc2"
+  },
+  {
+   "repo": "crypto",
+   "path": "research/validation_sweep_20261019/B-benchmarks/VERDICT_TABLE.md",
+   "ref": "origin/main",
+   "blob": "8472222713bc3a484988e68541a3198c501cb2a6"
+  }
+ ],
+ "a_tableless_rho": [
+  {
+   "id": "n61-K600-R4",
+   "n": 61,
+   "base": "compact orbit, 600 columns, 73,200 points",
+   "points": 1,
+   "runs": 4,
+   "ic_online_ms": 58.994333,
+   "rho_online_ms": 7365.181667,
+   "rho_over_ic": 124.85,
+   "range": [
+    27.62,
+    124.85
+   ],
+   "note": "fresh reproduction R4; R1-R3 frozen 2026-09-25 on the same point",
+   "standing": "exploratory: no isolation receipt",
+   "source": "docs/ic/boundary_targets.json"
+  },
+  {
+   "id": "n71-K600-R2",
+   "n": 71,
+   "base": "compact orbit u128, 600 columns, 85,200 points",
+   "points": 1,
+   "runs": 3,
+   "ic_online_ms": 10.208,
+   "rho_online_ms": 29237.4,
+   "rho_over_ic": 2864.1,
+   "range": [
+    1532.8,
+    4893.5
+   ],
+   "note": "median of three repeats of one point",
+   "standing": "exploratory: no isolation receipt",
+   "source": "docs/ic/boundary_targets.json"
+  },
+  {
+   "id": "n73-K600-R3",
+   "n": 73,
+   "base": "compact orbit u128, 600 columns, 87,600 points",
+   "points": 1,
+   "runs": 3,
+   "ic_online_ms": 543.8117500000001,
+   "rho_online_ms": 646995.649916,
+   "rho_over_ic": 1189.7419463922945,
+   "range": [
+    184.8588383342762,
+    2094.667646891953
+   ],
+   "note": "median of three repeats of one point",
+   "standing": "exploratory: shared host",
+   "source": "docs/ic/boundary_targets.json"
+  },
+  {
+   "id": "n83-a1-K600-R1",
+   "n": 83,
+   "base": "$a=1$, compact orbit u128, 600 columns, 99,600 points",
+   "points": 1,
+   "runs": 3,
+   "ic_online_ms": 7939.137707999999,
+   "rho_online_ms": 64952.48304199999,
+   "rho_over_ic": 8.181301978998246,
+   "range": [
+    5.549638582319933,
+    12.671208207334514
+   ],
+   "note": "median of three repeats of one point",
+   "standing": "exploratory: shared host; re-measured slower (1.382x)",
+   "source": "docs/ic/boundary_targets.json"
+  },
+  {
+   "id": "n83-K1798-dense",
+   "n": 83,
+   "base": "$a=1$, dense root index, 1,798 columns, 298,468 points",
+   "points": 1,
+   "runs": 1,
+   "ic_online_ms": 63.324124999999995,
+   "rho_online_ms": 1173.29325,
+   "rho_over_ic": 18.528376823209165,
+   "range": null,
+   "note": "one point",
+   "standing": "sweep 110.1: contradicted as a win",
+   "source": "research/n83_dense_root_20261013/analysis_primary.json"
+  },
+  {
+   "id": "n61-K500-x86_64",
+   "n": 61,
+   "base": "$a=0$, orbit, $K=500$, x86_64 pinned",
+   "points": 64,
+   "runs": 1,
+   "ic_online_ms": null,
+   "rho_online_ms": null,
+   "rho_over_ic": 13.94,
+   "ci95": [
+    9.808,
+    19.128
+   ],
+   "range": [
+    1.063,
+    648.55
+   ],
+   "run_id": "20261012T202048Z-5521627904",
+   "note": "median over 64 one-target workloads, bootstrap 95% interval",
+   "standing": "admitted 12 Oct; sweep 87.1: validated w/ caveats, retired as a win",
+   "source": "docs/ic/boundary_targets.json"
+  },
+  {
+   "id": "n61-K500-arm64",
+   "n": 61,
+   "base": "$a=0$, orbit, $K=500$, arm64 unpinned",
+   "points": 64,
+   "runs": 1,
+   "ic_online_ms": null,
+   "rho_online_ms": null,
+   "rho_over_ic": 12.873,
+   "ci95": [
+    7.301,
+    19.083
+   ],
+   "range": [
+    0.701,
+    968.035
+   ],
+   "run_id": "20261012T173628Z-3fd988ea23",
+   "note": "median over 64 one-target workloads, bootstrap 95% interval",
+   "standing": "admitted 12 Oct; retired as a win",
+   "source": "docs/ic/boundary_targets.json"
+  },
+  {
+   "id": "n61-K800-arm64",
+   "n": 61,
+   "base": "$a=0$, orbit, $K=800$, arm64 unpinned",
+   "points": 64,
+   "runs": 1,
+   "ic_online_ms": null,
+   "rho_online_ms": null,
+   "rho_over_ic": 37.13,
+   "ci95": [
+    21.439,
+    58.541
+   ],
+   "range": [
+    0.593,
+    1421.687
+   ],
+   "run_id": "20261031T073321Z-5ff6094e6f",
+   "note": "31 Oct; pinned x86 host not re-run at K=800",
+   "standing": "producer-reported; no VALIDATION.json",
+   "source": "docs/ic/boundary_targets.json"
+  },
+  {
+   "id": "n71-K600-arm64",
+   "n": 71,
+   "base": "$a=0$, orbit, $K=600$, arm64 unpinned",
+   "points": 16,
+   "runs": 1,
+   "ic_online_ms": null,
+   "rho_online_ms": null,
+   "rho_over_ic": 6.122,
+   "ci95": [
+    3.9984897683181506,
+    11.894407189299415
+   ],
+   "range": [
+    0.2926882592321631,
+    294.9006019857314
+   ],
+   "note": "31 Oct",
+   "standing": "pending independent validation (boundary_targets.json)",
+   "source": "docs/ic/boundary_targets.json"
+  }
+ ],
+ "b_equal_advice_rho": [
+  {
+   "id": "n41-ic_K100",
+   "n": 41,
+   "ic_base": "$K=100$",
+   "ic_advice_bytes": 43689632,
+   "rho_arm": "Bernstein--Lange table",
+   "rho_table_bytes": 43689632,
+   "advice_vs_ic": "equal",
+   "targets": 64,
+   "ic_online_ms_median": 32.5417665,
+   "ic_online_ms_mean": 42.460751734375,
+   "rho_online_ms_median": 0.063126,
+   "rho_online_ms_mean": 0.13376121875,
+   "stat": "ratio of means",
+   "ic_over_rho": 317.43693823345194,
+   "ci95": [
+    137.0087570889115,
+    739.1242461519417
+   ],
+   "median_ratio": 489.74415910609036,
+   "median_ratio_ci95": [
+    360.1140103403437,
+    739.5032433318503
+   ],
+   "plain_rho_over_ic": 3.5604702128538586,
+   "plain_rho_over_ic_ci95": [
+    2.6558612388525633,
+    4.8764892942590645
+   ],
+   "band": null,
+   "standing": "sweep 74.1: validated; no VALIDATION.json",
+   "source": "research/ic_next10_20261014/09-equal-advice/results.json"
+  },
+  {
+   "id": "n53-ic_K200",
+   "n": 53,
+   "ic_base": "$K=200$",
+   "ic_advice_bytes": 320078656,
+   "rho_arm": "Bernstein--Lange table",
+   "rho_table_bytes": 20004912,
+   "advice_vs_ic": "1/16",
+   "targets": 64,
+   "ic_online_ms_median": 140.0098985,
+   "ic_online_ms_mean": 219.2267775,
+   "rho_online_ms_median": 0.22569050000000002,
+   "rho_online_ms_mean": 1.0545399375,
+   "stat": "ratio of means",
+   "ic_over_rho": 207.88854902899303,
+   "ci95": [
+    102.58344703792143,
+    629.5842497293762
+   ],
+   "median_ratio": 545.8049376963868,
+   "median_ratio_ci95": [
+    296.67131635858306,
+    905.663200960555
+   ],
+   "plain_rho_over_ic": 3.6055855790120472,
+   "plain_rho_over_ic_ci95": [
+    2.443854113210987,
+    5.573033327861455
+   ],
+   "band": null,
+   "standing": "sweep 74.1: validated; no VALIDATION.json",
+   "source": "research/ic_next10_20261014/09-equal-advice/results.json"
+  },
+  {
+   "id": "n61-ic_K256",
+   "n": 61,
+   "ic_base": "$K=256$",
+   "ic_advice_bytes": 365504512,
+   "rho_arm": "Bernstein--Lange table",
+   "rho_table_bytes": 5711008,
+   "advice_vs_ic": "1/64",
+   "targets": 64,
+   "ic_online_ms_median": 830.0850515,
+   "ic_online_ms_mean": 1440.1186843125001,
+   "rho_online_ms_median": 2.2328669999999997,
+   "rho_online_ms_mean": 6.51434778125,
+   "stat": "ratio of means",
+   "ic_over_rho": 221.06874435803675,
+   "ci95": [
+    150.27586921361163,
+    327.37891942861677
+   ],
+   "median_ratio": 195.68079703143005,
+   "median_ratio_ci95": [
+    162.90284648878483,
+    254.3259688232859
+   ],
+   "plain_rho_over_ic": 0.8450631920397803,
+   "plain_rho_over_ic_ci95": [
+    0.625488417126475,
+    1.1714789525792788
+   ],
+   "band": null,
+   "standing": "sweep 74.1: validated; no VALIDATION.json",
+   "source": "research/ic_next10_20261014/09-equal-advice/results.json"
+  },
+  {
+   "id": "n61-ic_K360",
+   "n": 61,
+   "ic_base": "$K=360$",
+   "ic_advice_bytes": 728186432,
+   "rho_arm": "Bernstein--Lange table",
+   "rho_table_bytes": 5711008,
+   "advice_vs_ic": "1/128",
+   "targets": 64,
+   "ic_online_ms_median": 222.370178,
+   "ic_online_ms_mean": 345.962331171875,
+   "rho_online_ms_median": 2.2328669999999997,
+   "rho_online_ms_mean": 6.51434778125,
+   "stat": "ratio of means",
+   "ic_over_rho": 53.10774659093966,
+   "ci95": [
+    35.19533341954215,
+    80.49525111392802
+   ],
+   "median_ratio": 84.31816469188149,
+   "median_ratio_ci95": [
+    33.6598521486161,
+    119.80923765751037
+   ],
+   "plain_rho_over_ic": 3.5176988435675836,
+   "plain_rho_over_ic_ci95": [
+    2.598599666016141,
+    4.87234113532186
+   ],
+   "band": null,
+   "standing": "sweep 74.1: validated; no VALIDATION.json",
+   "source": "research/ic_next10_20261014/09-equal-advice/results.json"
+  },
+  {
+   "id": "n83-K3300-bl_a2_wall_equal-run2",
+   "n": 83,
+   "ic_base": "$K=3300$",
+   "ic_peak_rss_bytes": 10793168896,
+   "ic_target_independent_ms": 681566.158388,
+   "rho_arm": "Bernstein--Lange table, time-matched (a')",
+   "rho_table_bytes": 317202832,
+   "rho_setup_ms": 680180.545952,
+   "run": 2,
+   "targets": 16,
+   "ic_online_ms_median": 32.78367,
+   "ic_online_ms_mean": 49.25594350000001,
+   "rho_online_ms_median": 8.113225,
+   "rho_online_ms_mean": 8.9128240625,
+   "stat": "median of paired ratios",
+   "ic_over_rho": 3.7439725113415134,
+   "ci95": [
+    2.6511071437947535,
+    11.046660189151496
+   ],
+   "targets_where_ic_slower": 14,
+   "plain_rho_over_ic": 70.89582192116438,
+   "plain_rho_over_ic_ci95": [
+    19.174683141827344,
+    92.37005724302855
+   ],
+   "band": [
+    {
+     "w": 0.0,
+     "median_ratio": 0.00018951238463433585,
+     "mean_ratio": 0.00017229571112901073,
+     "ic_mean_gae": 5.0,
+     "rho_mean_gae": 29019.875
+    },
+    {
+     "w": 0.1,
+     "median_ratio": 0.1653509852605776,
+     "mean_ratio": 0.22841477717176886,
+     "ic_mean_gae": 7953.462499999999,
+     "rho_mean_gae": 34820.2625
+    },
+    {
+     "w": 1.0,
+     "median_ratio": 0.6610608674768848,
+     "mean_ratio": 0.9134244961863859,
+     "ic_mean_gae": 79489.625,
+     "rho_mean_gae": 87023.75
+    }
+   ],
+   "standing": "sweep 24.1: validated w/ caveats; no VALIDATION.json",
+   "source": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k3300/analysis.json"
+  },
+  {
+   "id": "n83-K3300-bl_b_memory_matched-run2",
+   "n": 83,
+   "ic_base": "$K=3300$",
+   "ic_peak_rss_bytes": 10793168896,
+   "ic_target_independent_ms": 681566.158388,
+   "rho_arm": "Bernstein--Lange table, memory-matched (b)",
+   "rho_table_bytes": 10518659872,
+   "rho_setup_ms": 5293004.66803,
+   "run": 2,
+   "targets": 16,
+   "ic_online_ms_median": 32.78367,
+   "ic_online_ms_mean": 49.25594350000001,
+   "rho_online_ms_median": 1.166846,
+   "rho_online_ms_mean": 1.1832150624999997,
+   "stat": "median of paired ratios",
+   "ic_over_rho": 40.606904977458164,
+   "ci95": [
+    24.269498848781158,
+    71.71507791856973
+   ],
+   "targets_where_ic_slower": 15,
+   "plain_rho_over_ic": 70.89582192116438,
+   "plain_rho_over_ic_ci95": [
+    19.174683141827344,
+    92.37005724302855
+   ],
+   "band": [
+    {
+     "w": 0.0,
+     "median_ratio": 0.00337609723160027,
+     "mean_ratio": 0.003274662300450266,
+     "ic_mean_gae": 5.0,
+     "rho_mean_gae": 1526.875
+    },
+    {
+     "w": 0.1,
+     "median_ratio": 2.9457497397225585,
+     "mean_ratio": 4.341557776943809,
+     "ic_mean_gae": 7953.462499999999,
+     "rho_mean_gae": 1831.9375
+    },
+    {
+     "w": 1.0,
+     "median_ratio": 11.7778403332958,
+     "mean_ratio": 17.365292190060078,
+     "ic_mean_gae": 79489.625,
+     "rho_mean_gae": 4577.5
+    }
+   ],
+   "standing": "sweep 24.1: validated w/ caveats; no VALIDATION.json",
+   "source": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k3300/analysis.json"
+  },
+  {
+   "id": "n83-K600-bl_a2_wall_equal-run2",
+   "n": 83,
+   "ic_base": "$K=600$",
+   "ic_peak_rss_bytes": 5749805056,
+   "ic_target_independent_ms": 773668.247623,
+   "rho_arm": "Bernstein--Lange table, time-matched (a')",
+   "rho_table_bytes": 511704192,
+   "rho_setup_ms": 772681.44959,
+   "run": 2,
+   "targets": 16,
+   "ic_online_ms_median": 563.8835245,
+   "ic_online_ms_mean": 1966.9830378750005,
+   "rho_online_ms_median": 5.171888,
+   "rho_online_ms_mean": 5.909738375,
+   "stat": "median of paired ratios",
+   "ic_over_rho": 81.5222228726163,
+   "ci95": [
+    46.35073590855334,
+    236.59088795605322
+   ],
+   "targets_where_ic_slower": 16,
+   "plain_rho_over_ic": 3.624546341302027,
+   "plain_rho_over_ic_ci95": [
+    0.9270828952532768,
+    4.4820131497458275
+   ],
+   "band": [
+    {
+     "w": 0.0,
+     "median_ratio": 0.0002335193704317773,
+     "mean_ratio": 0.00020547540587813768,
+     "ic_mean_gae": 5.0,
+     "rho_mean_gae": 24333.8125
+    },
+    {
+     "w": 0.1,
+     "median_ratio": 6.57391617442415,
+     "mean_ratio": 20.44465103853489,
+     "ic_mean_gae": 596924.1375000001,
+     "rho_mean_gae": 29197.081250000003
+    },
+    {
+     "w": 1.0,
+     "median_ratio": 26.30586925029985,
+     "mean_ratio": 81.8073550876087,
+     "ic_mean_gae": 5969196.375,
+     "rho_mean_gae": 72966.5
+    }
+   ],
+   "standing": "sweep 24.1: validated w/ caveats; no VALIDATION.json",
+   "source": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k600/analysis.json"
+  },
+  {
+   "id": "n83-K600-bl_a_time_matched-run1",
+   "n": 83,
+   "ic_base": "$K=600$",
+   "ic_peak_rss_bytes": 5749669888,
+   "ic_target_independent_ms": 784712.3347910001,
+   "rho_arm": "Bernstein--Lange table, time-bounded (a), 650 s",
+   "rho_table_bytes": 303799968,
+   "rho_setup_ms": 650588.9491,
+   "run": 1,
+   "targets": 16,
+   "ic_online_ms_median": 580.2756445,
+   "ic_online_ms_mean": 2024.8438572500002,
+   "rho_online_ms_median": 3.3333905,
+   "rho_online_ms_mean": 4.170025749999999,
+   "stat": "median of paired ratios",
+   "ic_over_rho": 214.7322696999192,
+   "ci95": [
+    47.93806919242425,
+    483.8370962244671
+   ],
+   "targets_where_ic_slower": 16,
+   "plain_rho_over_ic": 5.24592079111877,
+   "plain_rho_over_ic_ci95": [
+    1.2644400217111667,
+    6.324398660072309
+   ],
+   "band": [
+    {
+     "w": 0.0,
+     "median_ratio": 0.0004729921483303377,
+     "mean_ratio": 0.0003749144726359299,
+     "ic_mean_gae": 5.0,
+     "rho_mean_gae": 13336.375
+    },
+    {
+     "w": 0.1,
+     "median_ratio": 13.317054226890292,
+     "mean_ratio": 37.30689878631704,
+     "ic_mean_gae": 596924.1375000001,
+     "rho_mean_gae": 16000.36875
+    },
+    {
+     "w": 1.0,
+     "median_ratio": 53.30841224747475,
+     "mean_ratio": 149.31833382581246,
+     "ic_mean_gae": 5969196.375,
+     "rho_mean_gae": 39976.3125
+    }
+   ],
+   "standing": "sweep 24.1: validated w/ caveats; no VALIDATION.json",
+   "source": "research/20261016-n83-precomputed-rho-control/records/run-38855595549/k600/analysis.json"
+  },
+  {
+   "id": "n83-K600-bl_b_memory_matched-run2",
+   "n": 83,
+   "ic_base": "$K=600$",
+   "ic_peak_rss_bytes": 5749805056,
+   "ic_target_independent_ms": 773668.247623,
+   "rho_arm": "Bernstein--Lange table, memory-matched (b)",
+   "rho_table_bytes": 5670068800,
+   "rho_setup_ms": 1904420.470172,
+   "run": 2,
+   "targets": 16,
+   "ic_online_ms_median": 563.8835245,
+   "ic_online_ms_mean": 1966.9830378750005,
+   "rho_online_ms_median": 1.189073,
+   "rho_online_ms_mean": 1.7291015000000003,
+   "stat": "median of paired ratios",
+   "ic_over_rho": 395.5308252246306,
+   "ci95": [
+    177.93409702379475,
+    1134.4503343353358
+   ],
+   "targets_where_ic_slower": 16,
+   "plain_rho_over_ic": 3.624546341302027,
+   "plain_rho_over_ic_ci95": [
+    0.9270828952532768,
+    4.4820131497458275
+   ],
+   "band": [
+    {
+     "w": 0.0,
+     "median_ratio": 0.0025438819638768763,
+     "mean_ratio": 0.0016824749206082147,
+     "ic_mean_gae": 5.0,
+     "rho_mean_gae": 2971.8125
+    },
+    {
+     "w": 0.1,
+     "median_ratio": 71.6117412597791,
+     "mean_ratio": 167.40053108047715,
+     "ic_mean_gae": 596924.1375000001,
+     "rho_mean_gae": 3565.8437499999995
+    },
+    {
+     "w": 1.0,
+     "median_ratio": 286.5304546996946,
+     "mean_ratio": 669.7837356410508,
+     "ic_mean_gae": 5969196.375,
+     "rho_mean_gae": 8912.125
+    }
+   ],
+   "standing": "sweep 24.1: validated w/ caveats; no VALIDATION.json",
+   "source": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k600/analysis.json"
+  }
+ ]
+}

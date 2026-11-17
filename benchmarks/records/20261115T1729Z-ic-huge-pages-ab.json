@@ -1,0 +1,362 @@
+{
+  "branch": "aburan28/laughing-darwin-3qdnk2",
+  "closed_utc": "2026-11-15T18:07:17+00:00",
+  "commands": [
+    {
+      "argv": [
+        "env",
+        "BIN=/dev/shm/hp/ic",
+        "ISO=/tmp/claude-0/rulev9/bin/isolated_bench",
+        "bash",
+        "research/ic_tool_program/explorations/huge-pages-20261115/ab/run.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T17:30:02+00:00",
+      "wall_s": 2171.119
+    }
+  ],
+  "commit": "35eb722035ac3de55937240eaeaace539480e6a2",
+  "commit_dirty": true,
+  "created_utc": "2026-11-15T17:29:55+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-ic-huge-pages"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T1729Z-ic-huge-pages-ab",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 23,
+      "name": "filter_off_over_on_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9894334863013007,
+        1.0861092980702935
+      ],
+      "unit": "ratio",
+      "value": 1.0667210747209819
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 23,
+      "name": "filter_aa_k0n53",
+      "note": "A/A off/off; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.956932559985951,
+        1.0495881660545323
+      ],
+      "unit": "ratio",
+      "value": 1.007316210958665
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 23,
+      "name": "admitted_off_over_on_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0097799250013855,
+        1.1131916383044216
+      ],
+      "unit": "ratio",
+      "value": 1.0760358449579497
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 23,
+      "name": "admitted_aa_k0n53",
+      "note": "A/A off/off; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.954487109266288,
+        1.0697512852050381
+      ],
+      "unit": "ratio",
+      "value": 0.9936946952799995
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 23,
+      "name": "collect_off_over_on_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0014300876699684,
+        1.0656469438857197
+      ],
+      "unit": "ratio",
+      "value": 1.0288942306773046
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 23,
+      "name": "collect_aa_k0n53",
+      "note": "A/A off/off; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9880771348656641,
+        1.029646220134441
+      ],
+      "unit": "ratio",
+      "value": 0.9975502951567751
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 23,
+      "name": "build_off_over_on_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0307037348992043,
+        1.1183700438445452
+      ],
+      "unit": "ratio",
+      "value": 1.0754475156152812
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 23,
+      "name": "build_aa_k0n53",
+      "note": "A/A off/off; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9774596548399014,
+        1.1089481879287586
+      ],
+      "unit": "ratio",
+      "value": 1.0252541002390572
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 23,
+      "name": "setup_off_over_on_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0173272018833923,
+        1.0737752933483873
+      ],
+      "unit": "ratio",
+      "value": 1.0546058553084412
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 23,
+      "name": "setup_aa_k0n53",
+      "note": "A/A off/off; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9960499188903091,
+        1.111428052828853
+      ],
+      "unit": "ratio",
+      "value": 1.018536182234212
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "filter_off_over_on_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0982633020516266,
+        1.1743050690650239
+      ],
+      "unit": "ratio",
+      "value": 1.1157391391895075
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "filter_aa_k0n61",
+      "note": "A/A off/off; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9493377912363832,
+        1.0164374078053333
+      ],
+      "unit": "ratio",
+      "value": 0.9857451205160304
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "admitted_off_over_on_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0734194861786328,
+        1.1082477784940377
+      ],
+      "unit": "ratio",
+      "value": 1.0837492033947118
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "admitted_aa_k0n61",
+      "note": "A/A off/off; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9737560669867515,
+        1.011154533720109
+      ],
+      "unit": "ratio",
+      "value": 0.9906579495433447
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "collect_off_over_on_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0250381802837005,
+        1.0710539245572663
+      ],
+      "unit": "ratio",
+      "value": 1.0467990415670427
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "collect_aa_k0n61",
+      "note": "A/A off/off; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9619806823821148,
+        1.0138080977171033
+      ],
+      "unit": "ratio",
+      "value": 0.9868535955289628
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "build_off_over_on_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9905253391327046,
+        1.0720848200558946
+      ],
+      "unit": "ratio",
+      "value": 1.0355998892293097
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "build_aa_k0n61",
+      "note": "A/A off/off; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9614583085972014,
+        1.0281545593206398
+      ],
+      "unit": "ratio",
+      "value": 1.0098062333040732
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "setup_off_over_on_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.027181593474149,
+        1.0702909337050628
+      ],
+      "unit": "ratio",
+      "value": 1.0400940958652325
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "setup_aa_k0n61",
+      "note": "A/A off/off; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9640665241595734,
+        1.0192791048915526
+      ],
+      "unit": "ratio",
+      "value": 0.9930865502835435
+    }
+  ],
+  "problem": "ic:koblitz_setup_phase",
+  "raw": [
+    {
+      "bytes": 183136,
+      "path": "/tmp/claude-0/-home-user/7f658e4a-7634-5acc-b973-cdb225b38f41/scratchpad/hp-runs.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/36/36017448f07ca39755cedb81ca4a3b1e2c59321a36dec448610ace38a3080098",
+      "sha256": "36017448f07ca39755cedb81ca4a3b1e2c59321a36dec448610ace38a3080098",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261115-ic-huge-pages/report.pdf",
+    "png": [
+      "benchmarks/20261115-ic-huge-pages/ab.png"
+    ],
+    "svg": [
+      "benchmarks/20261115-ic-huge-pages/ab.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-huge-pages-ab",
+  "status": "measured",
+  "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+  "validation": null
+}

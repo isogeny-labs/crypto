@@ -1,0 +1,50 @@
+{
+  "standing": "unverified producer checks",
+  "qualification": "demonstrated_on_cases",
+  "fresh_outputs": [
+    {
+      "record": "transport.json",
+      "fresh_sha256": "a5b8ccdc7415b0de3a9b6bb46d66cec5c77beea414c6e595aaa92f8d89d30e67",
+      "byte_identical": true
+    },
+    {
+      "record": "cofactor-reference.json",
+      "fresh_sha256": "a5b8ccdc7415b0de3a9b6bb46d66cec5c77beea414c6e595aaa92f8d89d30e67",
+      "byte_identical": true
+    },
+    {
+      "record": "P192-transport.json",
+      "fresh_sha256": "c5c9843ad9097c8d68ca5c5bc490269f660fdc2c76e8678100971549b7a8afaf",
+      "byte_identical": true
+    },
+    {
+      "record": "B-only.json",
+      "fresh_sha256": "cd7fcc0d8f9fbab59fc89d8e1d5d6d37d6014f25e1137ba55bcf0726ef910c63",
+      "byte_identical": true
+    },
+    {
+      "record": "B-reference.json",
+      "fresh_sha256": "cd7fcc0d8f9fbab59fc89d8e1d5d6d37d6014f25e1137ba55bcf0726ef910c63",
+      "byte_identical": true
+    }
+  ],
+  "changed_records": {
+    "changed_jet_coefficient_exit": 101,
+    "changed_P192_image_exit": 101
+  },
+  "broad_library_check": {
+    "command": "CARGO_BUILD_JOBS=1 timeout 120 cargo test --release --lib --manifest-path /home/ec2-user/crypto/Cargo.toml",
+    "exit": 124,
+    "checkout": "legacy /home/ec2-user/crypto; not publication-head pass"
+  },
+  "P192_scope": "point-map evaluation/retraction only, zero graph norms",
+  "cloud_submissions": 0,
+  "final_source_commit": "1a99b4ea0cb388c3d1e56e4724cd3dc8b0627060",
+  "B_only": {
+    "cases": 49,
+    "queries": 343,
+    "calibrations": 7,
+    "C_coefficients": 0,
+    "changed_transcripts_rejected": 49
+  }
+}

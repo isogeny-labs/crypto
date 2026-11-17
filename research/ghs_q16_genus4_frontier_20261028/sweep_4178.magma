@@ -1,0 +1,339 @@
+SetSeed(20261028); F2:=GF(2); P<X>:=PolynomialRing(F2);
+K<w>:=ext<F2|X^12+X^7+X^6+X^5+X^3+X+1>;
+k:=FiniteField(2,4); Embed(k,K);
+E:=EllipticCurve([K|1,w^5,0,0,1+w+w^2+w^3+w^4]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",31,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,1+w^2+w^4+w^6+w^8]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",341,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,1+w^2+w^3+w^4+w^5+w^7+w^8]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",445,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,1+w^3+w^5+w^6+w^7+w^8]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",489,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,w^2+w^4+w^5+w^6+w^7+w^8]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",500,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,1+w^3+w^5+w^9]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",553,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,1+w^2+w^4+w^5+w^6+w^9]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",629,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,w+w^2+w^5+w^10]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",1062,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,w^4+w^6+w^8+w^9+w^10]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",1872,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,w^2+w^3+w^4+w^6+w^8+w^9+w^10]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",1884,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,1+w^2+w^3+w^6+w^11]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",2125,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,1+w+w^2+w^5+w^6+w^7+w^11]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",2279,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,1+w+w^2+w^3+w^8+w^11]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",2319,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,w+w^2+w^4+w^5+w^7+w^8+w^11]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",2486,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,w^3+w^4+w^5+w^7+w^8+w^11]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",2488,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,w+w^2+w^4+w^5+w^9+w^11]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",2614,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,w^2+w^7+w^9+w^11]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",2692,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,w^2+w^4+w^6+w^7+w^9+w^11]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",2772,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,w^3+w^4+w^5+w^8+w^9+w^11]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",2872,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,1+w+w^2+w^3+w^4+w^5+w^6+w^10+w^11]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",3199,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,1+w+w^2+w^9+w^10+w^11]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",3591,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,1+w+w^2+w^5+w^6+w^7+w^9+w^10+w^11]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",3815,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,w+w^3+w^6+w^8+w^9+w^10+w^11]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",3914,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;
+E:=EllipticCurve([K|1,w^5,0,0,w^2+w^3+w^4+w^5+w^7+w^8+w^9+w^10+w^11]);
+assert #E eq 4178;
+counts:=[Integers()|0:i in [0..99]]; errors:=0;
+for i in [0..4094] do
+  try
+    g:=WeilDescentGenus(E,k,w^i);
+    assert g le 99;
+    counts[g+1]+:=1;
+  catch e
+    errors+:=1;
+  end try;
+end for;
+assert &+counts+errors eq 4095;
+print "B",4028,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"ERRORS",errors;

@@ -1,0 +1,385 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "HASHED-ECDL-CPU-SCALE-20261030",
+  "version": 1,
+  "created": "2026-10-30",
+  "repository": "crypto",
+  "study_dir": "research/hashed_ecdl_cpu_20261030/scale",
+  "authors": [
+    "Codex"
+  ],
+  "links": {},
+  "question": "Which fixed20..40-bit public-target recoveries complete on one CPU thread under a120s per-cell bound?",
+  "claims": [
+    {
+      "id": "C1",
+      "class": "exact_computation",
+      "text": "Fixed public targets are recovered and independently replayed within explicit limits; failures and unattempted levels remain visible.",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "class": "out_of_scope",
+      "text": "No performance comparison, asymptotic claim, largest globally feasible scale, statistical population estimate or cryptographic-size attack.",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "u",
+      "role": "baseline",
+      "description": "Parameter-keyed cached MITM,8slots,batch64",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "scale",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "m": 8,
+        "batch": 64,
+        "max_rows": 20000000
+      }
+    },
+    {
+      "id": "x",
+      "role": "control_aa",
+      "description": "Second invocation of identical cached CPU binary",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "scale",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "m": 8,
+        "batch": 64,
+        "max_rows": 20000000
+      },
+      "same_instrument_as": "u"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Small known-answer recoveries and all-target oracle unit tests validate the path before launch. Ladder targets derive only from public x search, no logarithm constructed."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Every completed execution corrupts its scalar and requires independent verification rejection outside the reported interval."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "field_bits",
+        "levels": [
+          20,
+          24,
+          28,
+          32,
+          36,
+          40
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_and_build",
+        "treatment": "fixed",
+        "value": "One frozen commit with shared wide-field/deferred-provenance reduction on all arms; original CPU oracle vs parameter-keyed cached oracle.",
+        "how": "Original reduction included verbatim; only oracle variant changes. Capture rustc and hashes."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "Six checked prime-frontier curves, seeds101,202,8slots,tau=2ceil(r^(1/8))+2,max_trials16,max_rows20M,max_columns16384",
+        "how": "Public point from first decodable2*x, x starts seed*1009 modp; solver receives only public P,Q. No scalar is constructed."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Same EKS job, CPU2,memory4Gi; one software thread per cell; shared VM L0. Capture CPUinfo, affinity, kernel, cgroups. No certified clocks."
+      },
+      {
+        "name": "memory_layout",
+        "treatment": "randomized",
+        "how": "Fresh process per cell; cap1000000 retained tuple rows. Record retained sum-table bytes, not RSS. No reuse between complete recoveries."
+      },
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "how": "Latin four-arm rotation with alternating reversal by round and case."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Frozen Rust analyzer reads neutral labels and exact full certificate bytes; labels decoded in report."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-aa",
+        "arms": [
+          "u",
+          "x"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-absolute",
+        "arms": [
+          "u"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Exact certificate verified and kP=Q for each completed fixed public target; incomplete cells remain failures."
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Identical u/x paths; per-target reference repetition, increasing-size feasibility stop. No comparative latency inference.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "Explicit fixed seeds101,202 at every level."
+    },
+    "instance_sampling": {
+      "rule": "Six fixed prime-frontier curves from shared source; two independently specified public target searches per curve.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Identical arms, no treatment difference or timing hypothesis.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 6,
+    "replicates": 2,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exact certificate verification, no inference or latency hypothesis."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 1500,
+      "measured_on": "Unmeasured conservative ceiling; no warmup or performance inference. Complete raw runtime charged."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "relations",
+        "name": "Verified retained relations",
+        "unit": "relations",
+        "kind": "exact",
+        "definition": "Retained relation count in the independently replayed complete certificate; attempts separately include failed queries.",
+        "source": "rows.csv relations",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "wall_seconds",
+        "name": "Complete CPU recovery diagnostic",
+        "unit": "seconds",
+        "kind": "timed",
+        "definition": "Curve and public-target construction, all solve stages/trials, independent archive replay and serialization; excludes file I/O, process launch and external replay process.",
+        "source": "rows.csv wall_seconds",
+        "aggregation": "per_row",
+        "resolution": "Rust Instant representation",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "monotonic",
+    "counters": [
+      "relations",
+      "attempts",
+      "preparations",
+      "built_rows",
+      "probed_rows",
+      "query_inversions",
+      "table_bytes"
+    ],
+    "record": [
+      "CPUinfo, kernel, process affinity and cgroups",
+      "rustc and executable/source hashes",
+      "every complete certificate",
+      "all stage durations and cumulative structural counters"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab CPU Spot",
+    "placement": {
+      "cpu": 2,
+      "memory": "4Gi",
+      "threads": 1,
+      "runtime_image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+      "runtime_source": "cb2ec6873f30 (crypto main ancestor)",
+      "binary_source": "Frozen standalone CPU source commit; explicit hashes for scale and verifier."
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 1500,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "At each of6increasing levels run both seeds101,202 and identical armsu/x. Stop before nextlevel if any cell timesout120s,fails or replayfails60s. One job1500s,no retry.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "An unverified scalar is never a completion. Missing cases must match recorded stop; preserve all errors/timeouts."
+  ],
+  "decision_rule": {
+    "text": "Report per-cell verified recovery or bound/failure and the largest level with both recoveries. L0 durations descriptive only.",
+    "comparison_ids": [
+      "C-absolute"
+    ],
+    "threshold": "Certificate replay plus public kP=Q and corruption rejection.",
+    "statistic": "Exact verified completions and retained full certificates.",
+    "interval": "exact counts; diagnostic full observed range, no confidence interval",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "None; no comparative timing claim.",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "analyze.rs",
+      "sha256": "e03abd22f720277e1293cb6a9fb556e12d4d1b4739b9b247479a48ab3a1d13c2"
+    },
+    "inputs": [
+      "rows.csv",
+      "status.csv",
+      "*.verify"
+    ],
+    "outputs": [
+      "analysis.log",
+      "scale.svg"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Complete successful CPU recovery durations, with all failed/unattempted cells separately disclosed."
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Certified speedup from L0 clocks",
+    "Calling retained table capacity total peak memory",
+    "Ignoring preparation or discarded trials",
+    "Calling cached MITM tensor contraction or algebraic progress",
+    "Claiming largest feasible scale or rho/external advantage without matched measurements"
+  ],
+  "literature": [
+    {
+      "ref": "https://www.hyperelliptic.org/EFD/precomp.pdf",
+      "provenance": "retrieved",
+      "claim": "Bernstein and Lange describe standard affine arithmetic and precomputation/batch inversion tradeoffs; this code applies known methods, no novelty claim.",
+      "verified_by": "Primary paper read before implementation,2026-10-30 UTC"
+    },
+    {
+      "ref": "src/cryptanalysis/hashed_ecdl.rs",
+      "provenance": "retrieved",
+      "claim": "Existing reduction, checked group operations, lexicographic exhaustive oracle and independent verifier define exact output semantics.",
+      "verified_by": "Shared reduction from84e11440cc04; cache key based only on validated modulus, coefficients and full prime order."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "91e3449df0ae301d9d882db910f334a1e4ffa9e93cbd1ba93630f9d3b16f7510",
+    "commit": "ef904056652ea9656091241b8a68da5d346a2ff7",
+    "frozen_at": "2026-10-30T03:30:24Z",
+    "filed_before_affected_data": true
+  }
+}

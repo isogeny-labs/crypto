@@ -27,6 +27,47 @@ pub use dlp::{
 mod counted_linear;
 pub use counted_linear::CountedRelationSystem;
 
+/// Sparse homogeneous kernels reusable by extension-field IC collectors.
+#[path = "jv_sparse_kernel.rs"]
+pub mod sparse_kernel;
+
+#[path = "jv_extension_sparse_dlp.rs"]
+mod extension_sparse_dlp;
+#[path = "jv_sparse_collection_rank.rs"]
+mod sparse_collection_rank;
+pub use extension_sparse_dlp::{
+    run_extension_sparse_dlp_on, run_extension_sparse_table_dlp_on, ExtensionSparseDlpOptions,
+};
+pub use sparse_collection_rank::Options as SparseCollectionRankOptions;
+
+/// Grounded signed witnesses for already-checked one/two-quadratic relations.
+#[path = "jv_quadratic_pair_graph.rs"]
+pub mod quadratic_pair_graph;
+
+/// Checked principal sources with at most two irreducible quadratic classes.
+#[path = "jv_quadratic_pair_relation.rs"]
+pub mod quadratic_pair_relation;
+
+#[path = "jv_quartic_discriminant.rs"]
+pub mod quartic_discriminant;
+
+#[path = "jv_extension_quadratic_pair_dlp.rs"]
+mod extension_quadratic_pair_dlp;
+pub use extension_quadratic_pair_dlp::{
+    run_extension_discriminant_pair_dlp_on, run_extension_quadratic_pair_dlp_on,
+    DiscriminantPairDlpOptions, QuadraticPairDlpOptions,
+};
+
+/// Deferred activation keeps checked ungrounded edges until a unit anchor arrives.
+#[path = "jv_deferred_pair_graph.rs"]
+pub mod deferred_pair_graph;
+#[path = "jv_extension_deferred_pair_dlp.rs"]
+mod extension_deferred_pair_dlp;
+pub use extension_deferred_pair_dlp::{
+    run_extension_adapted_deferred_pair_dlp_on, run_extension_deferred_pair_dlp_on,
+    run_extension_unit_deferred_pair_dlp_on, DeferredPairDlpOptions,
+};
+
 #[path = "jv_homogeneous_quotient.rs"]
 mod homogeneous_quotient;
 
@@ -154,6 +195,18 @@ impl TwoLargePrimeSieve {
             shared,
             (self.setup.m - 2) as u8,
         )
+    }
+
+    /// Degree-nine norms with at least five small roots, selected from the
+    /// existing complete counter table. All remaining factors need admission.
+    pub fn sieve_line_quadratic_pairs(
+        &self,
+        ring: &FpRing,
+        line: &Line,
+        ctr: &mut Counters,
+        shared: Option<&SharedB>,
+    ) -> (Vec<u64>, SieveCost) {
+        extension_quadratic_pair_dlp::sieve_line_quadratic_pairs(ring, self, line, ctr, shared)
     }
 
     fn split(&self, full: &SieveRel, id: u64, modulus: u64) -> Option<PartialRelation> {

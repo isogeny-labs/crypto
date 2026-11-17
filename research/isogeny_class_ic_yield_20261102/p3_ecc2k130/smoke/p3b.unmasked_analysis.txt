@@ -1,0 +1,39 @@
+rows: 66  (sha256 0b0445778987d471226da3d043c0b5037d3541f709be45bf3ca489616cc6e41b)
+
+== per (k, arm): attempts x curves, Dreg (mean, sd, distribution), solutions mean, time medians ==
+k=3       aa  n=3      dreg mean 6.000 sd 0.000 hist {6: 3} sol_mean 0.0000 t_med 0.0052s
+k=3      iso  n=3      dreg mean 6.000 sd 0.000 hist {6: 3} sol_mean 0.0000 t_med 0.0040s
+k=3     main  n=3      dreg mean 6.000 sd 0.000 hist {6: 3} sol_mean 0.0000 t_med 0.0036s
+k=3     null  n=1      dreg mean 6.000 sd 0.000 hist {6: 1} sol_mean 0.0000 t_med 0.0053s
+k=3  planted  n=3      dreg mean 8.000 sd 0.000 hist {8: 3} sol_mean 4.0000 t_med 0.1370s
+k=3     stdv  n=9      dreg mean 6.000 sd 0.000 hist {6: 9} sol_mean 0.0000 t_med 0.0031s
+k=4       aa  n=3      dreg mean 7.000 sd 0.000 hist {7: 3} sol_mean 0.0000 t_med 2.5943s
+k=4      iso  n=3      dreg mean 7.000 sd 0.000 hist {7: 3} sol_mean 0.0000 t_med 2.2703s
+k=4     main  n=3      dreg mean 7.000 sd 0.000 hist {7: 3} sol_mean 0.0000 t_med 2.4357s
+k=4     null  n=1      dreg mean 7.000 sd 0.000 hist {7: 1} sol_mean 0.0000 t_med 2.4913s
+k=4  planted  n=3      dreg mean 7.667 sd 0.577 hist {7: 1, 8: 2} sol_mean 4.3333 t_med 2.4474s
+k=4     stdv  n=9      dreg mean 6.000 sd 0.000 hist {6: 9} sol_mean 0.0000 t_med 0.0161s
+k=5       aa  n=3      dreg mean 8.000 sd 0.000 hist {8: 3} sol_mean 0.0000 t_med 9.4689s
+k=5      iso  n=3      dreg mean 8.000 sd 0.000 hist {8: 3} sol_mean 0.0000 t_med 10.1888s
+k=5     main  n=3      dreg mean 8.000 sd 0.000 hist {8: 3} sol_mean 0.0000 t_med 9.9648s
+k=5     null  n=1      dreg mean 8.000 sd 0.000 hist {8: 1} sol_mean 0.0000 t_med 10.5709s
+k=5  planted  n=3      dreg mean 8.000 sd 0.000 hist {8: 3} sol_mean 5.0000 t_med 9.7545s
+k=5     stdv  n=9      dreg mean 6.000 sd 0.000 hist {6: 9} sol_mean 0.0000 t_med 0.0651s
+
+isomorphic-model control (Frobenius conjugate instance): 9/9 identical (dreg, solutions, refuted)
+A/A repeat: 9/9 identical counts; time ratio repeat/first median 1.001, sd 0.213 (noise floor for the time column)
+within-orbit Dreg spread (same V, x_R; curves of one orbit are Galois conjugates but V is NOT conjugated, so this is a between-presentation spread):
+  #distinct dreg values per (k, attempt, orbit): {1: 9}
+
+== main arm mean dreg by (k, orbit) ==
+k=3 orbit=A n=1 mean=6.000 sd=0.000
+k=3 orbit=B n=1 mean=6.000 sd=0.000
+k=3 orbit=crater n=1 mean=6.000 sd=0.000
+k=4 orbit=A n=1 mean=7.000 sd=0.000
+k=4 orbit=B n=1 mean=7.000 sd=0.000
+k=4 orbit=crater n=1 mean=7.000 sd=0.000
+k=5 orbit=A n=1 mean=8.000 sd=0.000
+k=5 orbit=B n=1 mean=8.000 sd=0.000
+k=5 orbit=crater n=1 mean=8.000 sd=0.000
+
+Decision rule, null set and thresholds: PROTOCOL.md section 6.  Masked output hides arm names; rerun with --unmask only after the analysis is frozen.

@@ -1,0 +1,3 @@
+# Frozen retained preexec software execution review
+
+Review already-completed root execution /var/tmp/pencil-preexec-native-execution-20261031-v2 only. Verify admission/proposal/source/helper/compiler hashes; confirm exact commands, environments, exit receipts and output counts; inspect fixture coverage, production host-negative path, ELF headers/dynamic dependencies, link maps and disassembly source call paths. Distinguish 45 fixed software assertions from actual kernel/container qualification. No compiler/helper/gate/Docker/CLI rerun. Bind all consumed artifacts in review custody; disclose source-supervisor reviewer role and prior private-musl compiler prerequisite authorship. No repairs or execution admission.

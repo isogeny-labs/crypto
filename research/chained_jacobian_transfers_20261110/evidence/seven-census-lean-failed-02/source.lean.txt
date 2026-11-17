@@ -1,0 +1,33 @@
+import Init.Grind.Module.Basic
+
+/-! Exact shadow consequences on explicit annihilated modules. No actual
+abelian varieties,tangent spaces or geometric torsion are constructed. -/
+set_option autoImplicit false
+namespace SevenCensusControls
+open Lean.Grind
+
+theorem nonzero_seven_shadow_rejected {A : Type} [IntModule A]
+    (a : A) (ha : (7 : Int) • a=0) (hne : a≠0) :
+    (4976069 : Int) • a=0 ∧ (1244018 : Int) • a = -a ∧
+    (1244018 : Int) • a≠a := by
+  have hz : (4976069 : Int) • a=0 := by grind
+  have hn : (1244018 : Int) • a = -a := by grind
+  refine ⟨hz, hn, ?_⟩
+  intro he
+  have h2 : (2 : Int) • a=0 := by grind
+  apply hne
+  calc
+    a = (7 : Int) • a - (3 : Int) • ((2 : Int) • a) := by grind
+    _ = 0 := by rw [ha, h2]; grind
+
+theorem deeper_shadow_retains_finite_controls {A V W : Type}
+    [IntModule A] [IntModule V] [IntModule W]
+    (a : A) (v : V) (w : W)
+    (ha : (12317 : Int) • a=0) (hv : (101 : Int) • v=0)
+    (hw : (7 : Int) • w=0) :
+    (8708120 : Int) • a=a ∧ (8708120 : Int) • v=v ∧
+    (8708120 : Int) • w=w := by grind
+
+end SevenCensusControls
+#print axioms SevenCensusControls.nonzero_seven_shadow_rejected
+#print axioms SevenCensusControls.deeper_shadow_retains_finite_controls

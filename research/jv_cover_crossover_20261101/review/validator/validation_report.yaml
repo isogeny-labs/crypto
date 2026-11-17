@@ -1,0 +1,107 @@
+validation_report:
+  id: VAL-20261101-8c569f
+  task_id: validator-breakthrough dispatch for research/jv_cover_crossover_20261101 (PR #3194); no TASK-* card id was supplied
+  tier: review-breakthrough (validator-breakthrough), independent session, at most 2 threads
+  snapshot:
+    repo_head: 4def6153d12fc1acc6f12b5971027126661585a3
+    study_commit: 3b946d69b647f75e05a3441ef2eba3b898bf4bf7
+    artifact_store_commit: 470a02cdea67e92aec00931f2175d91fd5170466
+    pr_merge: 14e56a5e850137a3f2235020f9dc3a72a509ced1
+    predecessor: research/jv_cover_p_scaling_20261024 (6e9bb8e97f)
+  claim_scope: >-
+    Weak class only (genus-3 Joux-Vitse cover of E(F_{p^6}) over F_{p^2}, full rational 2-torsion,
+    #E = 4l, l prime, l ~ 2^60.1..2^61.9), p = 1301/1451/1601, seeds 1-3, solver jv_cover --exp dlp
+    with the fast post-GB linear stage, reference rhodp (32-adding walk, no negation map, 4 walkers,
+    dp_bits 18, 9 runs per prime), harness unit (F_p multiplications at c_add_e = 331 per affine
+    addition), unpriced native work at weight 0, frozen percentile-bootstrap rule.
+  run_ids:
+    - research/jv_cover_crossover_20261101/results/dlp_p{1301,1451,1601}_s{1,2,3}.json
+    - research/jv_cover_crossover_20261101/results/rhodp_p{1301,1451,1601}_s{1,2,3}.json
+    - research/jv_cover_crossover_20261101/results/rhostrong_p{1301,1451,1601}_run{0,1}.json
+    - research/jv_cover_crossover_20261101/results/calib_p251_s{1,2}.json
+    - research/jv_cover_crossover_20261101/results/repro_dlp_p1009_s1.json
+  artifact_checks:
+    - FROZEN.sha matches sha256 of PROTOCOL.md (6643ce68...b761) and run.sh (f2f4b8da...6362); both files touched by one commit only
+    - all 28 result records present, every exit status 0 in walls.txt, versions.txt binary sha 4a1284e9...9752, T0 02:32:47Z, total 24850 s
+    - probe/dlp_p1301_s1.{json,log} byte-identical to the reused dlp_p1301_s1.{json,log}
+    - scaling.png in the artifact store (.artifacts.json sha c351ac6c...), expected
+    - fit/ rebuilt (cargo --offline, scratch target dir) and rerun: fit.txt, fit.json, table.md, scaling.svg byte-identical to the committed files
+    - jv_cover rebuilt on 4def6153d1: sha 50d0be85...274e differs from the recorded 4a1284e9...9752; cause: 39 unrelated src files changed after the 02:11Z build (main 692afe2e4c), no cover source changed; behaviour verified identical by replay
+    - replay p=1301 seed 3 (rebuilt binary, 2 threads, 764 s): every non-time field identical to the record (total_muls 409975021213, relation_digest 4667961897523824477, f4_muls, lin_muls, s); only f4_muls_per_test_sum differs (thread-count dependent by construction)
+    - reference determinism: rhodp p=251 (2 threads, 2 runs) and rhostrong p=503 (2 instances) repeated invocations bit-identical apart from wall time
+    - freeze before data not verifiable from git (single post-run commit); consistent with the probe/T0 timestamps; taken on the producer's record
+  metric_recomputations:
+    - cover S = total_muls/(c_add_e sqrt l) recomputed on all 10 cover records, equal to recorded s; component sum (setup+base+stream+weil+f4+lin+post+verify+la_muls) equals total_muls on all
+    - l prime (Miller-Rabin) and p^6/(4l) = 1.000000 on all 9 instances; rhodp and rhostrong records carry the same l per (p, seed)
+    - c_add_e = 331 = 2M + S + I with M = S = 55, I = 166 F_p multiplications (harness tower), measured by unit_costs on every instance
+    - rhodp S = group_ops/sqrt(l) recomputed on 27 + 16 runs; rhostrong s_harness = (55 mul + 55 sq + 166 inv)/(331 sqrt l) recomputed on 18 runs; tuned (24, 18, 62) reproduces muls_tuned
+    - per-prime geometric means 1.3097 / 1.0810 / 0.8108; rhodp means 1.6509 / 1.3947 / 1.3805; rhostrong 0.9709 / 1.0172 / 0.8915
+    - S/rhodp 0.7933 [0.588, 1.118] / 0.7751 [0.647, 0.970] / 0.5874 [0.448, 0.812] (own RNG, 1e6 resamples; study 0.793 [0.587, 1.119] / 0.775 [0.645, 0.970] / 0.587 [0.448, 0.811]); verdicts reproduced: 1451 and 1601 below, 1301 not resolved
+    - S/rhostrong 1.3489 [1.089, 1.699] / 1.0628 [0.810, 1.477] / 0.9095 [0.649, 1.339]; verdicts reproduced: 1301 above, others not resolved
+    - refit A: n = 26, slope -2.0985 se 0.0533 [-2.208, -1.989], p* 1263.6, cluster bootstrap slope [-2.236, -1.974], p* [1196, 1350] (study -2.098, 1264 [1197, 1348])
+    - reproduction control: total_muls 429320392173 vs 452313823812 (0.949165); f4_muls, residuals, relations identical; lin_muls 90400879953 vs 113394312494 (0.797226); all other change is post_muls +902
+    - section 5a native counts: rhodp 1.6509 / 1.3947 / 1.3805 per sqrt l (derived), rhostrong 16.47 / 17.25 / 15.12 (measured)
+  control_checks:
+    - calibration p=251: rhodp 1.5393 sd 0.6659 n 16 vs rho_e 1.2638 sd 0.5583 n 32; diff +0.2755; Welch df 25.85; t 2.0561 (own incomplete-beta inversion); CI [-0.122, +0.673] contains 0 -> frozen rule met; reproduced exactly
+    - calibration design finding: rho_e_dp polls the stop flag every 2^20 steps; expected excess 3*2^19 steps = 0.199 S-units at p=251 (72% of the observed difference), <= 0.0014 at the new primes; net difference ~ +0.08; the README's caution (b) attributes the 0.28 to the wrong mechanism
+    - reproduction control: FAILED as the study reports; cause identified and measured: JV_LIN default switched from sparse to fast in e6ff48ea72 (algorithm 5489ca74d8, counter fix b8b4a97983); JV_LIN=sparse with the rebuilt binary reproduces the predecessor's p=1009 s1 and p=251 s1 records bit-for-bit (lin_muls 113394312494 and 18413836422); fast gives 0.797 and 0.858 of the sparse lin count respectively
+    - correctness: independent dd*G = Q check (own tower arithmetic, adjugate inversion, own group law) on the replayed instance p=1301 seed 3: l prime, G and Q on the curve, l*G = O, dd*G = Q, dd = d = 886293798800496412, negative control (dd-1)*G != Q; the other 8 cover runs and all rho runs rest on the binary's planted-log comparison on the same code path
+    - null object: not applicable (ratio of two measured solver costs on the same instances; the in-run rho is the baseline)
+  heuristic_validation_checks: []
+  cost_model_checks:
+    - unit declared on both sides (F_p multiplications at 331 per group addition); every phase of the cover charged incl. Wiedemann LA; rho arms charge every group operation of every walker plus multipliers; seeds recorded; success probability 1 (every run solved at the first attempt, no capped walk); memory not reported by any arm
+    - comparability limit: the binary's own tuned price (137.7 F_p mults per rho step, 0.416 of the harness 331) reverses the sign: cover 1.91 / 1.86 / 1.41 x rhodp and 3.24 / 2.55 / 2.19 x rhostrong (model); pricing the cover's emitted lower bound f4_native_ops at the protocol's w = 0.1 raises cover S to 1.9-4.2 (rhodp 1.52-1.82): the cover is above both references at every w > 0 (model); the study states no band ranking is possible and every number is a w = 0 lower-bound comparison, which this validation confirms
+    - instrument margin: under the predecessor's linear stage the cover S would be ~5.4% higher; 1451's upper end becomes ~1.02 (not resolved), 1601 stays below (~0.86)
+    - interval method: a Welch-t interval on ln(S/rho) (not the frozen rule) resolves nothing (1451 [0.52, 1.15], 1601 [0.34, 1.02]); the below verdicts are a property of the frozen percentile bootstrap with 3 seeds
+  proof_architecture_checks: []
+  verdict: passed
+  verdict_meaning: >-
+    The receipt is admissible evidence: the records are complete, bound, reproducible (rebuild,
+    bit-identical replay, deterministic references), and every reported number follows from them.
+    The frozen-rule verdicts "below measured rho at p" against rhodp at 1451 and 1601 are reproduced
+    and stand as stated. This does not support a claim of beating rho: not against the negation-map
+    rhostrong, not under the tuned price, not under any section-5a weight above 0, not under a
+    t-based interval; 1451 lies inside the instrument-change margin; scale l ~ 2^61, weak class only.
+  limitations:
+    - the "below" verdicts are unit-bound (harness 331 per addition, w = 0) and reverse under the binary's own tuned price and any w > 0
+    - not below the strongest reference run (rhostrong): 1301 above, 1451/1601 not resolved
+    - 3 cover seeds per prime; the frozen percentile bootstrap is coarse in the seed direction (10 support points); a t interval resolves nothing
+    - 1451 verdict within the 5.4% instrument-change margin (fast vs sparse linear stage)
+    - calibration control confounded at p=251 by the 2^20 stop-poll lag (0.199 S-units); it neither establishes nor excludes a 0.3 bias, though the mechanism is absent at the new primes
+    - correctness independently verified on 1 of 9 cover runs; the rest and all rho runs on the producer's planted-log flag
+    - F_p-multiplication counters (f4_fp, Fq, FastStats) taken as the instrument (consistency verified; F4 not re-implemented); prior independent validations exist (research/postgb_linear_stage_20261026)
+    - rhodp reference at the new primes not re-measured (27 recorded runs recomputed, not rerun); study rhodp used 4 walkers, this validation's cap was 2 threads
+    - freeze before data rests on the producer's record and timestamps
+    - memory not reported by any arm
+    - scale l ~ 2^61 (p^6 ~ 2^63), weak class only; no statement about prime-order or deployed curves
+  artifact_paths:
+    - research/jv_cover_crossover_20261101/review/validator/validation_report.yaml
+    - research/jv_cover_crossover_20261101/review/validator/recompute.rs
+    - research/jv_cover_crossover_20261101/review/validator/verify_log.rs
+    - research/jv_cover_crossover_20261101/review/validator/receipts/recompute_output.txt
+    - research/jv_cover_crossover_20261101/review/validator/receipts/verify_log_output.txt
+    - research/jv_cover_crossover_20261101/review/validator/receipts/replay_dlp_p1301_s3.json
+    - research/jv_cover_crossover_20261101/review/validator/receipts/replay_dlp_p1301_s3.log
+    - research/jv_cover_crossover_20261101/review/validator/receipts/replay_vs_record.txt
+    - research/jv_cover_crossover_20261101/review/validator/receipts/dump_p1301_s3.jsonl
+    - research/jv_cover_crossover_20261101/review/validator/receipts/hashes.txt
+    - research/jv_cover_crossover_20261101/review/validator/receipts/cmp_dlp.sh
+    - research/jv_cover_crossover_20261101/review/validator/receipts/post_replay.sh
+    - research/jv_cover_crossover_20261101/review/validator/receipts/followup/ (rhodp/rhostrong determinism pairs, dlp_p251_s1_{fast,sparse}.json, dlp_p1009_s1_sparse.json, walls.txt, COMPARISONS.txt)
+  review_attestation:
+    joints_owned: [receipts and integrity, metric definitions, replay, reproduction-control failure, calibration]
+    sources_read:
+      - research/jv_cover_crossover_20261101/{PROTOCOL.md,README.md,run.sh,fit.txt,fit.json,table.md,.artifacts.json,.gitignore}
+      - research/jv_cover_crossover_20261101/fit/src/main.rs
+      - research/jv_cover_crossover_20261101/results/* (all records and logs listed above, walls.txt, versions.txt, FROZEN.sha, probe/)
+      - research/jv_cover_p_scaling_20261024/{README.md (c_add_e lines), PROTOCOL.md (cost-model lines), run.sh, run_1009.sh, results/dlp_p*.json, results/walls.txt, results/versions.txt, results/probe/bin.sha, results/fit.txt}
+      - research/jv_sieve_strong_rho_20261019/review-20261020/README.md, original-README.md (grep)
+      - research/postgb_linear_stage_20261026/README.md (sections), PROTOCOL_AMENDMENT_3.md
+      - src/cryptanalysis/jv_cover.rs (field tower, EllE, rho_e, rho_e_dp, run_rho_dp, unit_costs, generate_spec, group_order_4_prime, NagaoCost, run_cover_dlp_mode report assembly, linear_stage_from_basis, dump_instance, lin_mode), the predecessor-tree copy at 6e9bb8e97f
+      - src/cryptanalysis/jv_rho_strong.rs (StrongRun, harness_prices, TUNED, OpCounts, walk loop)
+      - src/cryptanalysis/zero_dim_la.rs (FastStats, counter sites)
+      - examples/jv_cover.rs (argument handling, rhostrong/rhodp dispatch)
+      - git history of the above files between 6e9bb8e97f and HEAD
+      - docs/session-logs/2026-11-01.md (grep for the study), producer scratchpad probe files and binaries (sha only)
+    read_sibling_reports: false  (a review/red_team/ directory exists; not opened)
+    verdict: passed

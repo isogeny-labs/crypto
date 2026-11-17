@@ -1,0 +1,22 @@
+    Checking three-leads-study v0.1.0 (/home/ec2-user/crypto-leads-audit/research/three_leads_e2e_20261018/native)
+error: very complex type used. Consider factoring parts into `type` definitions
+   --> analysis.rs:209:25
+    |
+209 |     let mut aggregates: BTreeMap<(String, String, String), Vec<(&Value, &Value)>> = BTreeMap::new();
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#type_complexity
+    = note: `-D clippy::type-complexity` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::type_complexity)]`
+
+error: manual implementation of `.is_multiple_of()`
+  --> coverage.rs:53:34
+   |
+53 |     if r < 5 || exponent != 1 || order / r % r == 0 {
+   |                                  ^^^^^^^^^^^^^^^^^^ help: replace with: `(order / r).is_multiple_of(r)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+   = note: `-D clippy::manual-is-multiple-of` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::manual_is_multiple_of)]`
+
+error: could not compile `three-leads-study` (bin "three-leads-study") due to 2 previous errors

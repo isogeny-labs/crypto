@@ -1,0 +1,14 @@
+
+mod eager;mod pruned;
+use serde_json::{Value,json};
+fn main(){
+ let f:Value=serde_json::from_str(include_str!("../fixtures.json")).unwrap();let mut out=vec![];
+ for fixture in f.as_array().unwrap(){for forced in [false,true]{let e=eager::fixture_check(fixture,forced);let p=pruned::fixture_check(fixture,forced);for(x,y)in e.as_array().unwrap().iter().zip(p.as_array().unwrap()){
+ for key in ["next","choice","labels","fallback","fallback_checks","transition_checks","validation_failed"]{assert_eq!(x[key],y[key],"semantic field {key}");}
+ let mut deltas=serde_json::Map::new();for key in ["m","a","i"]{let a=x["ops"][key].as_u64().unwrap();let b=y["ops"][key].as_u64().unwrap();assert!(a>=b);deltas.insert(key.to_string(),json!(a-b));}
+ out.push(json!({"eager":x,"pruned":y,"counter_delta":deltas}));
+ }}}
+ // 2 choices * 3 results in each of 3 calls; None, Some without repair, Some with repair.
+ let mut control_cases=0;for c in 0..2{for d0 in 0..3{for m in 0..3{for d1 in 0..3{let cv=|v|if v==0{None}else{Some(v)};let old=if c==0{cv(d0).zip(cv(m))}else{cv(m).zip(cv(d1))};let new=match c{0=>cv(d0).zip(cv(m)),_=>cv(m).zip(cv(d1))};assert_eq!(old,new);control_cases+=1;}}}}
+ println!("{}",json!({"schema":"kummer-pruning-software-equivalence/v1","rows":out,"dispatcher_cases":control_cases,"scientific_execution":false}));
+}

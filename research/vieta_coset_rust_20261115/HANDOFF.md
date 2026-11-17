@@ -1,5 +1,145 @@
 # Vieta Rust port: continuation receipt
 
+## Results publication tracking — PR4525
+
+Latest concrete artifact blocker: at head5ac77b08ee, official migration failed
+S3 HeadObject403 (job/log/ambiguity retained in speed/evidence/artifact-migration-
+blocker.json and artifact-migration-failure.log). No object presence/absence or
+local S3 availability is established. Nine original policy blobs remain.
+Do not repack/rename committed evidence or weaken policy; operator/store access
+repair is required before the official bot can migrate them. Draft stays blocked.
+
+New bounded publication follow-up is confirmed enabled: first10:20:13UTC,
+then4hour intervals, maximum3occurrences. Exact service receipt is
+`speed-20261117/evidence/followup-schedule.json`; inherited environment details
+are unavailable, so no future local execution availability is asserted.
+Old terminal automation stays OFF. No measurement active or permitted rerun.
+
+Full results are pushed; draft PR4525 tracks remaining official record/publication
+blockers under the newly merged draft-first AGENTS.md rule. No measurement is
+active and no benchmark should be rerun. All source/protocol/binary pins match.
+Record0418 is still OPEN because the official censored-close is blocked by
+unchanged main historical0828 archive command1; scoped open-record audit0findings
+for1301raw/6metrics/2successful supervised commands. Future closure must use the
+official helper after the inherited blocker is repaired, never a local exclusion
+or status mutation. Canonical exports deliberately retain360/60 seed failures.
+New data PCC-20261117-dcce99 is unverified, with explicit registration/clock scope.
+Exact main ledger prefix plus1 unchanged local body uses official append_entry;
+chain/prefix0errors;151 inherited claim_type errors identical on base/head.
+Full journal block multisets include both PR4509 automated merge parents and
+all local/main publication blocks. Official artifact bot must handle9 policy
+files (8PNG and1derived control log); audit its diff against exact parent blobs
+and manifests without a local S3 availability claim. No rebase/force push/admin,
+empty refresh, gate weakening, protected promotion or unrelated record repair.
+Original terminal automation remains disabled. Monitor current head gate/size/
+artifacts/reviews; keep bounded4h cadence and stop after3 unchanged check-ins.
+
+## Speed matrix finished — 17 November, final local result
+
+No measurement is active. speed-20261117 completed504/504 primary calls,72warmups,
+432retained; all504 replayed on84inputs. Separate calibration72/72 replayed on12.
+All12 exact count/positive timing-control groups pass, all10 qualifier pins match.
+Main supervisor04:56:42–05:55:40UTC exit0; official wall3535.874s, contended=false,
+PSI unavailable/unmovable host threads -> belowL2 diagnostic only.
+
+Actual result: conditioned word62/m16384 half query8.072s vs Euclid/Newton4.944s
+and schoolbook12.448s; half uses1.4437× fewer query multiplications than Newton.
+Full costs8.192s half /5.065s Newton /0.129s lookup. All12 groups' Newton/half
+query elapsed medians are below1; keep HalfGcd explicit/opt-in. No profile-based
+cause or admitted speedup is claimed. See speed/RESULTS.md and PAIRED_COSTS.md.
+
+**Registration failure retained:** frozen explicit_list supplied6 config seeds,
+but official helper cycles seeds over arm/instance/replicate. Actual per-config
+rule/source was published before calls and followed; native audit checks26file
+hashes/576cell/96input scopes. Nonetheless canonical exports fail360main/60pilot
+seed checks. Numeric instance mapping and enum metadata errors were corrected;
+actual seeds never relabeled, protocols/measurements unchanged, no reruns/gate
+weakening. Both failed canonical logs/REGISTRATION_ERRATA.md remain. Do not claim
+file-verified export pass or strict protocol qualification.
+
+Main4-page and pilot2-page reports/4graphs rendered, every page inspected, tiny
+ratios displayed nonzero. Bench copies and per-run reports exist. Official
+benchrec censored-close failed on unchanged main historical0828 archive command1
+without successful integer exit; our record0418 remains open with1301raw/6count
+metrics. Evidence/record-close-blocker.json proves identical main bytes. Do not
+change another study's record/exclusions to close ours. No progress promotion.
+
+PR4509 was observed merged05:59:12 as507c877dbf00de8574df5211cbb30344e740d87d,
+head6fbd33440be8... . Check actual checks before reporting any green status.
+The full results need a fresh same-lane follow-up publication after normal main
+merge, preserving full parent journal multisets/exact main PCC ledger prefix.
+Current fetched main0c64ba98b8... has unchanged qualified source/historical blocker.
+No paid/cloud/S3 operation; old terminal automation remains OFF. Lean21/0trusted
+component checks pass, full arbitrary tower NF/signed standing incomplete; shared
+PR26 CI never started due account billing lock, auto-merge unavailable there.
+
+## Renewed speed measurement — 17 November, 05:10 UTC
+
+User explicitly renewed implementation/audit work and then requested measured
+speedup. New study `speed-20261117` reuses unchanged opt-in HalfGcd/general
+rational tower source and charges full certified descriptor + point-base
+construction to every arm. Old matrices/protocols/pins remain immutable.
+
+**Primary measurement ACTIVE at this checkpoint. Do not start another run,
+compile, lint, prove, render or analyze concurrently.** Persistent supervisor
+PID37940 started around04:56UTC. Check `speed-20261117/run/main-supervisor.json`
+for actual completion and `main-supervisor.log` for progress. Fixed504-call panel:
+6 configurations ×6 arms ×(2 warmups+12 retained); two populations stay separate.
+Budget7200s outer/1400s configuration/135s worker/60s per arithmetic stage.
+No retries or post-freeze tuning. Isolated local/Git-only; no paid/cloud/S3 work.
+
+Calibration completed72/72, replay checked72 on12 distinct inputs, no failed rows.
+Native point forecast3553.997s, not an outcome. Frozen measured source27bc4bf511,
+qualifier ecf84d40b263..., analysis222598cbc12a..., main protocolf88b57e6b52d... .
+All10 manifest pins matched before launch; remote publication951e9da8cab7...
+verified against13 exact Git blobs. Unique main-publication/pre-call-main receipts
+exist. The copied immutable qualifier and driver in ignored run/bin must not be
+changed. BelowL2 host: local elapsed ratios diagnostic, wall_valid=false.
+
+A deferred bounded post-run watcher PID38413 runs only after the supervisor
+receipt exists; `/tmp/vieta-speed-await-main.log` records hash checks, frozen
+summary and BigUint complete-set replay. Do not duplicate/overwrite its summary
+or replay outputs. Metadata/export/render source is being prepared separately
+under speed/metadata and plot_recorded.py; no compilation during the timed panel.
+After the run, finish exports, controls, report/figures/PDF/bench copies, close
+the open0418 bench record censored, and publish actual counts/diagnostic ratios.
+
+New Lean gate PASS21 theorems/0trusted: shared actual-degree NF law23569e7f1da1
+(PR26 in aburan28/crypto-lean), bridge to existing V/lastFallDegree, literal F17
+projector/full-fiber certificates, nilpotent controls. Full arbitrary-depth NF
+instance and independent signed standing remain incomplete; do not promote the
+hand bound. Additional Rust order19 curve diagonal test is nonempty and passes.
+The alternate checker probe failed incompatible object headers; no alternate
+pass. Shared PR26 does not permit auto-merge.
+
+PR4500 merged04:27:07 as a8bbe6758f before later failing gate/artifact checks;
+actual receipt in speed/evidence/pr4500-merge-status.json. No green claim.
+Branch deletion caused lane publisher to start from main, with a shared journal
+conflict. No maintained open PR existed then; normal mergea26ad8477b preserved
+full parent journal block multisets and exact main PCC prefix. Source/calibration/
+proof follow-up PR4509 is ready, MERGE auto-merge enabled; at05:03 MERGEABLE/BLOCKED,
+no reviews, relevant checks still running. Do not busy poll. Diagnose actual
+scope failures without weakening gates. Original terminal automation stays OFF.
+
+## PR4410 merged; terminal closeout — 17 November, 01:41 UTC
+
+PR4410 merged at2026-11-16T23:16:15Z as2b15288e325bcfea86175601c1321d1520c9d6d2
+from0396799e4f. Required PCC/artifact jobs failed before that merge; size passed.
+Do not describe it as green CI or infer why GitHub accepted it. Selected logs
+show missing claim_type errors, shared403 downloads, artifact-manifest JSON
+Extra data, and a rustfmt scope setup missing-file error. See
+next-20261116/closeout-20261117/STATUS.json, CI_JOB_EXCERPTS.json and CLOSEOUT.md.
+
+Recorded publication-window episodeE-e353fbdbd1ca and matching partial lesson
+outcomeO-c9d953fa0a47. Original prompt/intervention timestamps/full-session costs
+are incomplete; no zero-intervention or unsupervised-success claim. Revert
+check due2026-11-30T23:16:15Z is not yet performed. Automation2624 disabled with
+service success; stop this study's polling. Source/data/protocol/report/selected
+claim files match the published head at recording base2043bee6ae. No benchmark,
+cloud/S3 action, gate change or protected promotion. General scientific standing
+remains unverified. Publish this metadata-only closeout as a small follow-up;
+no implementation or measurement work remains active.
+
 ## Automated merge audit and repair — 16 November, 21:53 UTC
 
 PR4410 advanced automatically todb2b11314c by merging maina8b29cbbe0 into97fea7bf45.

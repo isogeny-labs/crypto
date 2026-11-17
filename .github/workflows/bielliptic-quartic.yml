@@ -1,0 +1,59 @@
+name: Bounded bielliptic quartic diagnostic
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+    paths:
+      - '**/cryptanalysis/bielliptic_quartic.rs'
+      - '**/bin/quartic_ic.rs'
+      - '**/cryptanalysis/mod.rs'
+      - '**/Cargo.toml'
+      - 'tools/check_bielliptic_quartic.*'
+      - 'research/bielliptic_quartic_20261005/**'
+      - 'experiments/bielliptic-quartic/**'
+      - '.github/workflows/bielliptic-quartic.yml'
+  push:
+    branches: [main]
+    paths:
+      - '**/cryptanalysis/bielliptic_quartic.rs'
+      - '**/bin/quartic_ic.rs'
+      - '**/cryptanalysis/mod.rs'
+      - '**/Cargo.toml'
+      - 'tools/check_bielliptic_quartic.*'
+      - 'research/bielliptic_quartic_20261005/**'
+      - 'experiments/bielliptic-quartic/**'
+      - '.github/workflows/bielliptic-quartic.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  replay:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Free hosted runner disk before Rust installation
+        if: runner.environment == 'github-hosted'
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h /
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.87.0'
+          components: rustfmt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Native mathematical tests and bounded CLI replay
+        run: bash tools/check_bielliptic_quartic.sh

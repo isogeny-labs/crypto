@@ -1,0 +1,16 @@
+bsgs-neg: S over 512 runs
+ic-mitm: S over 2048 runs
+ic-mitm-plus1: S over 248 runs
+rho-neg: S over 2048 runs
+rho-neg-aa: S over 248 runs
+ic-mitm: relation yield over 2048 runs
+ic-mitm-plus1: relation yield over 248 runs
+        bsgs-neg               S: floor/crater 1.0000 90% [1.0000, 1.0000] p=1.0000 equiv=true | horizontal tau 0.0000 (null p95 NaN) p=1.0000 maxz p=1.0000 | model tau 0.0000 (null p95 0.0000) p=1.0000 maxz p=1.0000
+         ic-mitm               S: floor/crater 1.0773 90% [0.9929, 1.1637] p=0.0422 equiv=false | horizontal tau 0.0611 (null p95 0.0404) p=0.0005 maxz p=0.0025 | model tau 0.1021 (null p95 0.0964) p=0.0170 maxz p=0.8301
+   ic-mitm-plus1               S: floor/crater 1.1320 90% [0.9420, 1.3562] p=0.1321 equiv=false | horizontal tau 0.1240 (null p95 0.1372) p=0.0915 maxz p=0.3118 | model tau 0.0000 (null p95 0.0000) p=1.0000 maxz p=1.0000
+         rho-neg               S: floor/crater 1.0152 90% [0.9502, 1.0883] p=0.5960 equiv=false | horizontal tau 0.0158 (null p95 0.0395) p=0.4028 maxz p=0.4243 | model tau 0.0772 (null p95 0.0992) p=0.4203 maxz p=0.2669
+      rho-neg-aa               S: floor/crater 1.0327 90% [0.9065, 1.1835] p=0.5128 equiv=false | horizontal tau 0.0000 (null p95 0.1355) p=0.9195 maxz p=0.9600 | model tau 0.0000 (null p95 0.0000) p=1.0000 maxz p=1.0000
+         ic-mitm  relation_yield: floor/crater 0.9259 90% [0.8818, 0.9761] p=0.0007 equiv=false | horizontal tau 0.0299 (null p95 0.0267) p=0.0240 maxz p=0.0185 | model tau 0.1098 (null p95 0.0688) p=0.0005 maxz p=0.0715
+   ic-mitm-plus1  relation_yield: floor/crater 0.9628 90% [0.8563, 1.0763] p=0.5225 equiv=false | horizontal tau 0.0706 (null p95 0.0967) p=0.2474 maxz p=0.4113 | model tau 0.0000 (null p95 0.0000) p=1.0000 maxz p=1.0000
+bsgs exactness: {"arm":"bsgs-neg","exact":true,"max_distinct_cost_per_target":1,"paired_targets":2}
+pair: {"a":"ic-mitm-plus1","b":"ic-mitm","ci95":[1.0507736955130467,1.076310599410748],"classes":1,"excludes_1":true,"matched_workloads":248,"metric":"relation_yield","ratio":1.0631509271934239}

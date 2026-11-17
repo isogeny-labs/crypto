@@ -1,0 +1,89 @@
+name: Disable retired workflows (one-shot)
+# Disables workflows that PRs could not edit because sealed protocols hash their files.
+# Disabling leaves the files and seals untouched. Dispatch once with apply=true; undo with
+# `gh workflow enable <file>`. Delete this file afterwards.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Actually disable (false = dry run, prints the list)"
+        type: boolean
+        default: false
+permissions:
+  actions: write
+  contents: read
+jobs:
+  disable:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|disable-retired-workflows.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|disable-retired-workflows.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      APPLY: ${{ inputs.apply }}
+    steps:
+      - name: Disable
+        run: |
+          set -u
+          fail=0
+          while read -r w; do
+            [ -n "$w" ] || continue
+            if [ "$APPLY" = true ]; then
+              gh workflow disable "$w" -R "$REPO" && echo "disabled $w" || { echo "FAILED $w"; fail=1; }
+            else
+              echo "would disable $w"
+            fi
+          done <<'LIST'
+          boolean-quadratic-state.yml
+          compact-k-boundary.yml
+          compact-orbit-point-panel.yml
+          compact-orbit-strong-rho.yml
+          compact-s3-batch.yml
+          compact-s3-prefilter.yml
+          compact-swap-quotient.yml
+          ecc2k130-263-all-lines.yml
+          ecc2k130-base-window-hosted-screen.yml
+          ecc2k130-base-window-source-lock.yml
+          ecc2k130-dag-linux-v2-outcome-replay.yml
+          ecc2k130-factor-base-orbit-holdouts.yml
+          ecc2k130-leaf7-bridge-freeze.yml
+          ecc2k130-m10-capacity-once.yml
+          ecc2k130-m3-base-selector-source.yml
+          ecc2k130-m3-four-policy.yml
+          ecc2k130-n13-oaware-remaining-unsat-proof.yml
+          ecc2k130-n13-oaware-sat-benchmark.yml
+          ecc2k130-n13-oaware-unsat-proof.yml
+          ecc2k130-n13-s5-fullpoint-control.yml
+          ecc2k130-n13-s5-solver-panel.yml
+          ecc2k130-n19-s6-fullpoint-exporter.yml
+          ecc2k130-native-fullpoint-edge.yml
+          ecc2k130-native-m3-chain.yml
+          ecc2k130-oaware-sparse-dense-sat.yml
+          ecc2k130-phase-charged-successor-design.yml
+          ecc2k130-rotated-nearthreshold-slot.yml
+          ecc2k130-rotated-phase-selector.yml
+          ecc2k130-rotated-slot-placement.yml
+          ecc2k130-rotated-solver-admission.yml
+          ecc2k130-s3-sparse-cnf.yml
+          ecc2k130-s3-sparse-n19-growth.yml
+          ecc2k130-s3-sparse-n19-linear-replay.yml
+          ecc2k130-symbolic-dag-dimacs-gate.yml
+          ecc2k130-symbolic-dag-dimacs-linux-preparation.yml
+          ecc2k130-symbolic-dag-dimacs-linux-v2-check.yml
+          ecc2k130-symbolic-dag-dimacs-linux-v2-measure.yml
+          ecc2k130-symbolic-dag-fullpoint.yml
+          ecc2k130-symbolic-oaware-width-gate.yml
+          f5-support-cut19-confirm.yml
+          ic-e2e-benchmark.yml
+          ic-generic-backend-qualification-v2.yml
+          ic-generic-backend-qualification.yml
+          ic-improvement-round3.yml
+          ic-improvement.yml
+          ic-measurement.yml
+          ic-native-sat-registration.yml
+          ic-producer.yml
+          isogeny-invariant-baseline.yml
+          n37-four-policy-support.yml
+          n53-target-cyclic-rank.yml
+          nist-rtxpro6000-run.yml
+          LIST
+          exit $fail

@@ -33,15 +33,28 @@ def key(r):
     return (r["p"], r["curve_seed"], r.get("target_seed", r["curve_seed"]), r["seed"])
 
 
+DUPLICATES = {"compared": 0}
+
+
 def arm(rows, name):
     d = {}
     for r in rows:
         if r.get("kind") == "run" and r.get("g", r.get("genus")) == 4 and r["arm"] == name:
-            d[key(r)] = r  # a re-run row replaces an earlier identical one
+            k = key(r)
+            if k in d:
+                a = {f: v for f, v in d[k].items() if f != "wall_ns"}
+                b = {f: v for f, v in r.items() if f != "wall_ns"}
+                if a != b:
+                    raise SystemExit(f"determinism check failed for {name} {k}")
+                DUPLICATES["compared"] += 1
+            d[k] = r
     return d
 
 
-new = load(*(f"genus4_lean_rho_20261116/p{p}.jsonl" for p in PRIMES))
+import glob
+# Every data file of this study: run.sh outputs, resume.sh / percurve.sh re-runs after the
+# container restarts (session log 2026-11-17, declared before reading results).
+new = load(*sorted(os.path.relpath(f, RES) for f in glob.glob(os.path.join(HERE, "p*.jsonl"))))
 old = load("genus4_rho_refs_20261116/run.jsonl", "genus4_scale_20261116/p8209.jsonl",
            "genus4_scale_20261116/p16411a.jsonl", "genus4_scale_20261116/p16411b.jsonl",
            "genus4_scale_20261116/p16411a_resume.jsonl", "genus4_scale_20261116/p8209_plain.jsonl",
@@ -138,7 +151,7 @@ def boot(p, keys, reading, w, floored=False):
             "refs": sorted(refs), "rho_means": costs, "n_runs": len(keys)}
 
 
-out = {"gates": gate_ok, "gate_failures": {g: v[:20] for g, v in gates.items()}, "g3_checked": g3_checked,
+out = {"duplicate_rows_identical": DUPLICATES["compared"], "gates": gate_ok, "gate_failures": {g: v[:20] for g, v in gates.items()}, "g3_checked": g3_checked,
        "per_prime": {}, "slope": {}, "claims": "[pcc:unverified]"}
 keys_by_p = {p: sorted(k for k in W if k[0] == p and k in Bw and k in Q) for p in PRIMES}
 for p in PRIMES:
@@ -197,6 +210,7 @@ open(os.path.join(HERE, "tables.md"), "w").write("\n".join(L) + "\n")
 
 import matplotlib
 matplotlib.use("Agg")
+matplotlib.rcParams["svg.fonttype"] = "none"  # keep figures under the 64 KB artifact threshold
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
@@ -215,7 +229,7 @@ for reading, ax in zip(["Q3", "Q4"], axs):
     ax.legend()
 fig.tight_layout()
 fig.savefig(os.path.join(HERE, "figure.svg"))
-fig.savefig(os.path.join(HERE, "figure.png"), dpi=150)
+fig.savefig(os.path.join(HERE, "figure.png"), dpi=90)
 with PdfPages(os.path.join(HERE, "REPORT.pdf")) as pdf:
     pdf.savefig(fig)
     for src in ["RESULTS.md", "tables.md"]:

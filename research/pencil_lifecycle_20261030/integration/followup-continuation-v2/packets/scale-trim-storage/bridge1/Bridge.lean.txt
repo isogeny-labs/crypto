@@ -1,0 +1,50 @@
+import Trim
+set_option autoImplicit false
+namespace ScaleTrim
+open Polynomial MumfordNormalization AffineCoefficientLoop CoefficientTraversal TraversalPolynomial WordCoefficient
+variable {K : Type*} [CommRing K]
+theorem listPoly_coefficient (xs : List K) (i : Nat) :
+ (listPoly xs).coeff i=(xs[i]?).getD 0 := by
+ induction xs generalizing i with
+ | nil => simp [listPoly]
+ | cons x xs ih =>
+   cases i with
+   | zero => simp [listPoly]
+   | succ i => simp [listPoly,coeff_X_mul,ih]
+
+theorem wordsPoly_coefficient (p : UInt64) (xs : List UInt64) (i : Nat) :
+ (wordsPoly p xs).coeff i=(((xs[i]?).getD 0).toNat : ZMod p.toNat) := by
+ rw [wordsPoly,listPoly_coefficient]
+ simp only [List.getElem?_map]
+ cases h : xs[i]? <;> simp
+
+theorem wordsPoly_array {n : Nat} (p : UInt64) [Fact p.toNat.Prime] (xs : State n) :
+ wordsPoly p xs.val.toList=decodedPoly p xs := by
+ apply Polynomial.ext
+ intro i
+ rw [wordsPoly_coefficient,decodedPoly,sourcePoly_coefficient]
+ by_cases hi : i<n
+ · have hb : i<xs.val.size := by rw [xs.property]; exact hi
+   simp [extend,hi,CoefficientTraversal.read,Array.getElem?_eq_getElem,hb]
+ · have hb : xs.val.size≤i := by rw [xs.property]; omega
+   simp [hi,Array.getElem?_eq_none,hb]
+
+theorem postprocessed_transform {n : Nat} (hn : n≤6) (p : UInt64) [Fact p.toNat.Prime]
+ (c : Fin n→UInt64) (a b : UInt64) (m : Fin 6) (capacity : Nat)
+ (hp : 1<p.toNat) (hb : p.toNat<2^31) (hc : ∀i,(c i).toNat<p.toNat)
+ (ha : a.toNat<p.toNat) (hbeta : b.toNat<p.toNat) (ha0 : a≠0) :
+ let out := (transform hn p c a b (smallPow p a m)).val.toList
+ wordsPoly p (pad capacity (trimFuel out.length out))=
+ T m.val (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat) (sourcePoly (extend p c) n) := by
+ dsimp only
+ rw [trim_pad_preserves,wordsPoly_array]
+ exact transform_computed_scale hn p c a b m hp hb hc ha hbeta ha0
+
+theorem postprocessed_capacity {n : Nat} (hn : n≤6) (p : UInt64)
+ (c : Fin n→UInt64) (a b : UInt64) (m : Fin 6) (capacity : Nat) (hcap : n≤capacity) :
+ let out := (transform hn p c a b (smallPow p a m)).val.toList
+ (pad capacity (trimFuel out.length out)).length=capacity := by
+ dsimp only
+ apply trim_pad_capacity
+ simpa only [Array.length_toList,(transform hn p c a b (smallPow p a m)).property] using hcap
+end ScaleTrim

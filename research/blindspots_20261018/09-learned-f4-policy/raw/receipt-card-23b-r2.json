@@ -1,0 +1,245 @@
+{
+  "card_id": "CARD-BLINDSPOT-09-23b-r2",
+  "card_path": "research/blindspots_20261018/09-learned-f4-policy/card-23b-r2.yaml",
+  "card_sha256": "3e419419e90fb6c257e5d3a77adf095ace9b83acb71c56eb4aa48c76137bab66",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-09/card-23b-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-09/card-23b-r2/b09",
+        "examples/blindspots_09_learned_f4.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 10.457,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 10.457,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-09/card-23b-r2/b09",
+        "fit",
+        "--n",
+        "21",
+        "--ell",
+        "5",
+        "--m",
+        "3",
+        "--seed",
+        "20261018",
+        "--out",
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2-c23b",
+        "--samples",
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.samples.0,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.samples.6,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.samples.12,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.samples.18,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.samples.24,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.samples.30"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.313,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fit-21-5-3-c23b",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2-c23b.model": "f837405ce94a6276e0f0ccfd9c3d602f23a9e0248f37e4405ea06eb8e4af055a"
+      },
+      "seconds": 0.313,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "3b67714f3e246e419bd6875c1d68d47a28d8d31a875c597aebf7e2c41568fc69",
+      "stdout_tail": [
+        "{\"tool\":\"b09\",\"mode\":\"fit\",\"cell\":\"21-5-3\",\"pair_samples\":137655,\"pos_rate\":0.159122,\"recall_at_tau\":0.9800,\"sel_rate_at_tau\":0.8760,\"precision_at_tau\":0.1780,\"row_samples\":9600,\"ridge_r2\":0.7061,\"order_wins\":[30, 0, 1, 1, 0],\"order_matrices\":32,\"order_best_xors\":103160708839,\"order_default_xors\":103246708749}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-09/card-23b-r2/b09",
+        "eval",
+        "--n",
+        "21",
+        "--ell",
+        "5",
+        "--m",
+        "3",
+        "--seed",
+        "20261018",
+        "--role",
+        "test",
+        "--from",
+        "30",
+        "--to",
+        "32",
+        "--arms",
+        "a,b50,c,d,p,r50",
+        "--model",
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2-c23b.model",
+        "--trace",
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.trace.0,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.trace.6,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.trace.12,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.trace.18,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.trace.24,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.trace.30",
+        "--cap",
+        "30000000000",
+        "--rel-cap",
+        "1.5"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 121.07,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "eval-21-5-3-test-30-32",
+      "index": 4,
+      "outputs": {},
+      "seconds": 121.07,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "1ce043d34144ea53652b98b05a3f7b893880debb4a11b4ce1778cbf001b91808",
+      "stdout_tail": [
+        "{\"tool\":\"b09\",\"cell\":\"21-5-3\",\"role\":\"test\",\"idx\":30,\"arm\":\"a\",\"x_r\":39510,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":16972987967,\"xors\":16891876852,\"mat_words\":81111115,\"rows\":109919,\"steps\":9,\"pairs\":14907,\"field_pairs\":6327,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":68655,\"cols_max\":65962,\"divisor_tests\":34356125,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":7069,\"peak_matrix_mb\":540,\"wall_ms\":8978,\"rss_kb\":270568}",
+        "{\"tool\":\"b09\",\"cell\":\"21-5-3\",\"role\":\"test\",\"idx\":30,\"arm\":\"b50\",\"x_r\":39510,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":6776203112,\"xors\":6702818884,\"mat_words\":73384228,\"rows\":127853,\"steps\":37,\"pairs\":11827,\"field_pairs\":2724,\"deferred\":14530,\"policy_ops\":2465732,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":63332,\"cols_max\":64413,\"divisor_tests\":43447060,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":11269,\"peak_matrix_mb\":486,\"wall_ms\":3805,\"rss_kb\":270568}",
+        "{\"tool\":\"b09\",\"cell\":\"21-5-3\",\"role\":\"test\",\"idx\":30,\"arm\":\"c\",\"x_r\":39510,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":16971351131,\"xors\":16890235721,\"mat_words\":81115410,\"rows\":109929,\"steps\":9,\"pairs\":14907,\"field_pairs\":6327,\"deferred\":0,\"policy_ops\":1362576,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":68659,\"cols_max\":65966,\"divisor_tests\":34359386,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":7069,\"peak_matrix_mb\":540,\"wall_ms\":9079,\"rss_kb\":273616}",
+        "{\"tool\":\"b09\",\"cell\":\"21-5-3\",\"role\":\"test\",\"idx\":30,\"arm\":\"d\",\"x_r\":39510,\"solutions\":0,\"outcome\":\"cap_touch\",\"check\":true,\"touches\":25665737205,\"xors\":25576929118,\"mat_words\":88808087,\"rows\":105714,\"steps\":9,\"pairs\":20141,\"field_pairs\":3956,\"deferred\":25380,\"policy_ops\":395816,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":63895,\"cols_max\":64955,\"divisor_tests\":160840959,\"label_xors\":0,\"basis_hash\":0,\"basis_len\":0,\"nstd\":0,\"pairs_left\":14789,\"peak_matrix_mb\":494,\"wall_ms\":19191,\"rss_kb\":697012}",
+        "{\"tool\":\"b09\",\"cell\":\"21-5-3\",\"role\":\"test\",\"idx\":30,\"arm\":\"p\",\"x_r\":39510,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":17455855954,\"xors\":17374731580,\"mat_words\":81124374,\"rows\":109944,\"steps\":9,\"pairs\":14907,\"field_pairs\":6327,\"deferred\":0,\"policy_ops\":845538,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":68659,\"cols_max\":65966,\"divisor_tests\":34363282,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":7069,\"peak_matrix_mb\":540,\"wall_ms\":10773,\"rss_kb\":697012}",
+        "{\"tool\":\"b09\",\"cell\":\"21-5-3\",\"role\":\"test\",\"idx\":30,\"arm\":\"r50\",\"x_r\":39510,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":20554713785,\"xors\":20459913075,\"mat_words\":94800710,\"rows\":179584,\"steps\":41,\"pairs\":12584,\"field_pairs\":5042,\"deferred\":17604,\"policy_ops\":904858,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":66149,\"cols_max\":66016,\"divisor_tests\":76367682,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":9745,\"peak_matrix_mb\":520,\"wall_ms\":9775,\"rss_kb\":697012}",
+        "{\"tool\":\"b09\",\"cell\":\"21-5-3\",\"role\":\"test\",\"idx\":31,\"arm\":\"a\",\"x_r\":65718,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":16972408200,\"xors\":16891251176,\"mat_words\":81157024,\"rows\":110252,\"steps\":9,\"pairs\":15155,\"field_pairs\":6336,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":68640,\"cols_max\":65969,\"divisor_tests\":34411406,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":7014,\"peak_matrix_mb\":539,\"wall_ms\":9041,\"rss_kb\":697012}",
+        "{\"tool\":\"b09\",\"cell\":\"21-5-3\",\"role\":\"test\",\"idx\":31,\"arm\":\"b50\",\"x_r\":65718,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":6784785474,\"xors\":6711221760,\"mat_words\":73563714,\"rows\":126368,\"steps\":40,\"pairs\":11784,\"field_pairs\":2716,\"deferred\":14475,\"policy_ops\":2447832,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":63557,\"cols_max\":64669,\"divisor_tests\":42233226,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":11079,\"peak_matrix_mb\":490,\"wall_ms\":3883,\"rss_kb\":697012}",
+        "{\"tool\":\"b09\",\"cell\":\"21-5-3\",\"role\":\"test\",\"idx\":31,\"arm\":\"c\",\"x_r\":65718,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":16960030797,\"xors\":16878883772,\"mat_words\":81147025,\"rows\":110243,\"steps\":9,\"pairs\":15155,\"field_pairs\":6336,\"deferred\":0,\"policy_ops\":1383834,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":68631,\"cols_max\":65960,\"divisor_tests\":34408158,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":7014,\"peak_matrix_mb\":539,\"wall_ms\":9698,\"rss_kb\":697012}",
+        "{\"tool\":\"b09\",\"cell\":\"21-5-3\",\"role\":\"test\",\"idx\":31,\"arm\":\"d\",\"x_r\":65718,\"solutions\":0,\"outcome\":\"cap_touch\",\"check\":true,\"touches\":25610343500,\"xors\":25525448704,\"mat_words\":84894796,\"rows\":101791,\"steps\":9,\"pairs\":18570,\"field_pairs\":3725,\"deferred\":23734,\"policy_ops\":368232,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":61044,\"cols_max\":64790,\"divisor_tests\":157175718,\"label_xors\":0,\"basis_hash\":0,\"basis_len\":0,\"nstd\":0,\"pairs_left\":15334,\"peak_matrix_mb\":471,\"wall_ms\":18290,\"rss_kb\":697012}",
+        "{\"tool\":\"b09\",\"cell\":\"21-5-3\",\"role\":\"test\",\"idx\":31,\"arm\":\"p\",\"x_r\":65718,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":17464214102,\"xors\":17383028371,\"mat_words\":81185731,\"rows\":110266,\"steps\":9,\"pairs\":15155,\"field_pairs\":6336,\"deferred\":0,\"policy_ops\":858585,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":68640,\"cols_max\":65969,\"divisor_tests\":34444328,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":7014,\"peak_matrix_mb\":539,\"wall_ms\":10278,\"rss_kb\":697012}",
+        "{\"tool\":\"b09\",\"cell\":\"21-5-3\",\"role\":\"test\",\"idx\":31,\"arm\":\"r50\",\"x_r\":65718,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":18458049104,\"xors\":18360218033,\"mat_words\":97831071,\"rows\":183152,\"steps\":42,\"pairs\":12378,\"field_pairs\":5111,\"deferred\":17467,\"policy_ops\":896556,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":65880,\"cols_max\":66112,\"divisor_tests\":76944132,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":9882,\"peak_matrix_mb\":519,\"wall_ms\":8172,\"rss_kb\":697012}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-09/card-23b-r2/b09"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-09/card-23b-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "afd79e8c013a1cd32635f886a0a8dae6d918f72a",
+  "dirty_after": [
+    "research/blindspots_20261018/09-learned-f4-policy/raw/eval-21-5-3-test-30-32-r2.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/eval-21-5-3-test-30-32-r2.stderr.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw/relay-15.txt",
+    "research/blindspots_20261018/10-kernel-program-search/raw/relay-16.txt"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

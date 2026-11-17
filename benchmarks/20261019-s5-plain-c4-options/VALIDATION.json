@@ -1,0 +1,37 @@
+{
+  "schema": "validation-gate/v1",
+  "note": "Benchmarks row 20261019-s5-plain-c4-options: a solver-stage measurement (plain S5 decomposition cost C4 on §11.17 instances), not an IC-versus-rho win. The rho reference gives the distance remaining. See research/s5_plain_c4_options_20261019/README.md, Validation.",
+  "replay_certificate": {
+    "path": "../../research/s5_plain_c4_options_20261019/validation/replay-certificate.json",
+    "sha256": "ed4fcf37ac0eeb769c67df4b0d9fcb6ff7db218e9978382c0fb1f86bed51fc60"
+  },
+  "validator_report": {
+    "path": "../../research/s5_plain_c4_options_20261019/validation/validator-report.json",
+    "sha256": "53fd49713871223bb9f5c34d2b2a17685519efc5271d635547db9d5bcfa2c7e2"
+  },
+  "rho_reference": {
+    "kind": "negation",
+    "protocol": "Supplied after the measurement, to meet the validation gate: the study registered no rho reference because it measures one stage. The thread reference of RESEARCH_RESIDUAL_WALKS.md §11.16 is plain r-adding rho (rho4, S about 1.3) priced in F_p multiplications; this uses the stricter one the same protocol unit admits: one-target negation-map rho on the §11.17 curve itself (p = 269, seed 1, #E = 189 * 27703979), in its prime subgroup, 20 runs, every logarithm verified. Negation is the strongest symmetry on this curve: j(E) is not in F_p^2 and a, b != 0 (validation/curve_info.json). IC side is a lower bound: one measured decomposition (C4, sparsest + chains + replay), without the other decompositions, the linear algebra or any unpriced work. Rho unpriced native work per run: one table lookup, one insert and one partition hash per step and one canonicalisation and one hash per walk attempt (5 steps + 2 look-aheads), priced at w group-addition equivalents of 97 F_p multiplications each.",
+    "unit": "F_p multiplications (counted)",
+    "binary_or_process": "examples/gaudry_quartic_c4_options: the rho runs ran in its build of ca88b3917; the C4 records come from the original build (cb2ec6873 plus the PlainOptions wrapper), and the ca88b3917 build reproduced every C4 count of those records exactly (validation/replay-certificate.json), so both arms are counted by the same binary and the same Fp4 counters",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "gae_band": {
+      "0": {
+        "ic": 86897990971.75,
+        "rho": 773556.2
+      },
+      "0.1": {
+        "ic": 86897990971.75,
+        "rho": 1025086.9
+      },
+      "1": {
+        "ic": 86897990971.75,
+        "rho": 3288863.2
+      }
+    },
+    "order_holds_across_band": true
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h00cd6b411d10",
+  "label": "isogeny volcano: planted IC control (factor base + 1)",
+  "spec_id": "ECS1h3ef382ca354e",
+  "spec_sha256": "3ef382ca354e0dbfffa9dba55a10c612503cb347a5ab3c9811915d50137cf8d1",
+  "env_class_id": "ECBENV2hb713bc484c2e",
+  "host_sha256": "489909a086c27ff7240fe788d70b0da1038332f8732401bd0c67e9be3e8dc95c",
+  "plan_sha256": "d28b3af72581697e2d3e61c241567e452e22afde16b70c5e1f15fa1f5dda2d10",
+  "binary_sha256": "7da27ec3f0dadbae565181b0faa74582eb94a8f36cf6fe806eecc7b4b1fa7a9f",
+  "git_commit": "156f80c821a1f36a2973c10bb9a807d8e0bfefea",
+  "git_dirty": false,
+  "options": {
+    "cpus": "inherit",
+    "lock_path": "/tmp/crypto-bench-g2.lock",
+    "wait_for_lock": true,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": {
+    "run_cpu": 3,
+    "reserved": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "node": 0,
+    "request": "inherit",
+    "unreserved_siblings": [],
+    "observed": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  "preflight": {
+    "quiet": false,
+    "reasons": [
+      "CPU 3 was busy 2.000s of the 2.0s settle",
+      "PSI cpu some avg10 52.37 > 5.00"
+    ],
+    "settle_seconds": 2.0,
+    "reserved_busy_seconds": {
+      "0": 0.07,
+      "1": 0.06,
+      "2": 0.05,
+      "3": 2.0
+    },
+    "before": {
+      "unix_ms": 1792228933773,
+      "loadavg": [
+        3.9228515625,
+        3.7607421875,
+        2.25
+      ],
+      "psi_cpu_some_avg10": 51.34,
+      "psi_cpu_some_total_us": 449122679,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "0": {
+          "busy": 21335,
+          "idle": 94863,
+          "steal": 546
+        },
+        "1": {
+          "busy": 20567,
+          "idle": 95147,
+          "steal": 559
+        },
+        "2": {
+          "busy": 17838,
+          "idle": 97571,
+          "steal": 524
+        },
+        "3": {
+          "busy": 74008,
+          "idle": 41136,
+          "steal": 882
+        }
+      }
+    },
+    "after": {
+      "unix_ms": 1792228935774,
+      "loadavg": [
+        3.9228515625,
+        3.7607421875,
+        2.25
+      ],
+      "psi_cpu_some_avg10": 52.37,
+      "psi_cpu_some_total_us": 451048983,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "0": {
+          "busy": 21342,
+          "idle": 95055,
+          "steal": 547
+        },
+        "1": {
+          "busy": 20573,
+          "idle": 95339,
+          "steal": 559
+        },
+        "2": {
+          "busy": 17843,
+          "idle": 97765,
+          "steal": 525
+        },
+        "3": {
+          "busy": 74208,
+          "idle": 41136,
+          "steal": 882
+        }
+      }
+    }
+  },
+  "eviction": {
+    "moved_count": 0,
+    "failed_user_threads": 52,
+    "failed_kernel_threads": 69
+  },
+  "runner_on_run_cpu": false,
+  "runner_cpus": [
+    0,
+    1,
+    2
+  ],
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1792228935779,
+  "finished_unix_ms": 1792229174085,
+  "status": "complete",
+  "executions_planned": 560,
+  "records_written": 560,
+  "records_sha256": "ccbe70cb4570cd469d1f5ae7251b91d798eaa86c6f52c0c34015060fb635fc32",
+  "status_counts": {
+    "verified": 560
+  }
+}

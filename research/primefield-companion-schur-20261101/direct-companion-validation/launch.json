@@ -1,0 +1,38 @@
+{
+  "observed_utc": "2026-11-01T19:48:39.525215+00:00",
+  "predata_commit": "8a4876f",
+  "session_id": 27352,
+  "producer_pid": 1936658,
+  "start_ticks": "6357860",
+  "timeout_seconds": 900,
+  "attempts": 1,
+  "restart_allowed": false,
+  "command": "timeout 900 ../.audit-venv/bin/python -u direct-companion-validation/check.py",
+  "protocol": {
+    "status": "frozen",
+    "protocol_sha256": "a60f8d67c16a3aa439b226797824f3f87dd9e3717dd1aa21638a7489e038d1e7",
+    "commit": "bbf1e3c29de11aee1562e820c3b3b8ca941a1126",
+    "frozen_at": "2026-11-01T19:45:50Z",
+    "filed_before_affected_data": true
+  },
+  "reconciliation": {
+    "no_prior_run_outputs": true,
+    "diem": {
+      "deadline_utc": 1792521741.993407,
+      "durable_records": 50,
+      "expected_records": 52,
+      "launcher_pid": null,
+      "native": true,
+      "observed": 1793560007,
+      "pending": false,
+      "state": "deadline-expired"
+    },
+    "legacy": {
+      "observed": 1793562516,
+      "pending": false,
+      "state": "complete"
+    },
+    "external_jobs_changed": false,
+    "saved_freeze_and_EKS_reconciliation": "packed-dual-lift-validation/migration-reconciliation.json"
+  }
+}

@@ -1,0 +1,3 @@
+# Verification envelope correction before second attempt
+
+First attempt stopped at Comparator startup with failed-to-create-thread; no theorem checked. Preserve replay1 and execution logs. Local host inspection showed unlimited process count,887 observed threads and38GiB available memory; exact cause remains unproven. Second bounded software proof attempt explicitly limits Lean thread stack to16MiB and address space to8GiB while retaining3.5GiB Lean heap, one worker and295+5second outer ceiling. This is an infrastructure adjustment, not a theorem-source change or scientific rerun. Stop and report if infrastructure fails again. No input/proof source changes.

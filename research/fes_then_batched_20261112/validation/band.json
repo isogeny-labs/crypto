@@ -1,0 +1,1308 @@
+{
+  "schema": "validator-band/v1",
+  "rule": "S(w) = [G - C + w (U + n_C)] / sqrt r, computed exactly as (group adds + doubles + w (U + n_C)) / sqrt r (G - C equals the group ops to <= 1e-12 GAE/sqrt r, recompute.json band_formula_vs_counts_max_abs_err). C, n_C: price_phase's ten native counters with a non-null unit (pinned on Koblitz, measured on random binary) plus the solver's own ops. U: *_uncharged natives (none in these reports) plus work_native.table_insert_attempts behind counted:table_insert_attempts (2026-11-08 default reading; the pair table's per-step inserts; 0 for descent-algebraic). Rho: no unpriced counter emitted, U_rho = 0, S_rho(w) = mean s (lower bound at w > 0). Mean over the arm's 3 repeats (rho: 16 runs).",
+  "weights": [
+    0,
+    0.1,
+    1
+  ],
+  "instances": [
+    {
+      "name": "koblitz-n13",
+      "instance": "icv1-f2m13-t181-515ee569",
+      "regime": "koblitz",
+      "r": 2003,
+      "calibration": "pinned",
+      "rho_method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+      "S": {
+        "fes-then-batched": {
+          "0": 16.229139782761838,
+          "0.1": 3723.718401340424,
+          "1": 37091.12175535938
+        },
+        "inherited-f4": {
+          "0": 15.70778146023163,
+          "0.1": 5310.133573051476,
+          "1": 52959.96569737266
+        },
+        "fes-then-inherited": {
+          "0": 16.229139782761838,
+          "0.1": 3723.718401340424,
+          "1": 37091.12175535938
+        },
+        "pair-table": {
+          "0": 197.48308459840757,
+          "0.1": 217.00646418195674,
+          "1": 392.7168804338991
+        },
+        "rho": {
+          "0": 2.8921421945358907,
+          "0.1": 2.8921421945358907,
+          "1": 2.8921421945358907
+        }
+      },
+      "S_at_run_calibration": {
+        "fes-then-batched": 101.90548388541748,
+        "inherited-f4": 137.94599157901436,
+        "fes-then-inherited": 101.90548388541748,
+        "pair-table": 197.77592030683306,
+        "rho": 2.8921421945358907
+      },
+      "counts_mean": {
+        "pair-table": {
+          "group_gae": 8838.333333333334,
+          "U": 8192,
+          "n_C": 545.6666666666666,
+          "targets_tried": 47.333333333333336,
+          "relations": 31.333333333333332
+        },
+        "inherited-f4": {
+          "group_gae": 703,
+          "U": 0,
+          "n_C": 2369514.3333333335,
+          "targets_tried": 47.333333333333336,
+          "relations": 31.333333333333332
+        },
+        "fes-then-inherited": {
+          "group_gae": 726.3333333333334,
+          "U": 0,
+          "n_C": 1659282.6666666667,
+          "targets_tried": 50.666666666666664,
+          "relations": 33.666666666666664
+        },
+        "fes-then-batched": {
+          "group_gae": 726.3333333333334,
+          "U": 0,
+          "n_C": 1659282.6666666667,
+          "targets_tried": 50.666666666666664,
+          "relations": 33.666666666666664
+        }
+      },
+      "ratio_ftb_over_if4": {
+        "0": 1.0331910858226647,
+        "0.1": 0.7012475957738638,
+        "1": 0.7003615139652455
+      },
+      "ratio_ftb_over_rho": {
+        "0": 5.611459842266216,
+        "0.1": 1287.5295026557221,
+        "1": 12824.791887976824
+      },
+      "orders": {
+        "ftb_vs_if4": {
+          "order": {
+            "0": ">",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "flips inside the band: unresolved",
+          "strict_order_holds": false
+        },
+        "ftb_vs_pair": {
+          "order": {
+            "0": "<",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "flips inside the band: unresolved",
+          "strict_order_holds": false
+        },
+        "ftb_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "if4_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "fti_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "pair_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "ftb_vs_if4_diag_bitop": {
+          "order": {
+            "0": ">",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "flips inside the band: unresolved",
+          "strict_order_holds": false
+        },
+        "ic_min_vs_rho_ext_kn1": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        }
+      },
+      "diagnostics": {
+        "bitop_band_ftb": {
+          "0": 16.229139782761838,
+          "0.1": 13023.896592428033,
+          "1": 130092.90366623546
+        },
+        "bitop_band_if4": {
+          "0": 15.70778146023163,
+          "0.1": 37565.87660223622,
+          "1": 375517.3959892201
+        },
+        "all_counted_band": {
+          "pair-table": {
+            "0": 197.48308459840757,
+            "0.1": 250.31977139642996,
+            "1": 725.8499525786314
+          },
+          "inherited-f4": {
+            "0": 15.70778146023163,
+            "0.1": 37599.18990945069,
+            "1": 375850.52906136477
+          },
+          "fes-then-inherited": {
+            "0": 16.229139782761838,
+            "0.1": 13059.77796177977,
+            "1": 130451.71735975285
+          },
+          "fes-then-batched": {
+            "0": 16.229139782761838,
+            "0.1": 13059.77796177977,
+            "1": 130451.71735975285
+          }
+        },
+        "rho_ext_k1": {
+          "0": 2.8921421945358907,
+          "0.1": 2.996320759341481,
+          "1": 3.9339278425917934
+        },
+        "rho_ext_kn1": {
+          "0": 2.8921421945358907,
+          "0.1": 4.350642101814155,
+          "1": 17.47714126731853
+        }
+      }
+    },
+    {
+      "name": "char2-n15",
+      "instance": "icv1-f2m15-tm249-9e24ae34",
+      "regime": "char2",
+      "r": 5503,
+      "calibration": "measured",
+      "rho_method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+      "S": {
+        "fes-then-batched": {
+          "0": 10.36187363865097,
+          "0.1": 5638.803121757472,
+          "1": 56294.774354826855
+        },
+        "inherited-f4": {
+          "0": 10.36187363865097,
+          "0.1": 6662.886505128018,
+          "1": 66535.60818853231
+        },
+        "fes-then-inherited": {
+          "0": 10.36187363865097,
+          "0.1": 6662.886505128018,
+          "1": 66535.60818853231
+        },
+        "pair-table": {
+          "0": 473.2761070531448,
+          "0.1": 520.3152388826564,
+          "1": 943.667425348261
+        },
+        "rho": {
+          "0": 2.2798593397270315,
+          "0.1": 2.2798593397270315,
+          "1": 2.2798593397270315
+        }
+      },
+      "S_at_run_calibration": {
+        "fes-then-batched": 277.50794998800285,
+        "inherited-f4": 326.0374052640938,
+        "fes-then-inherited": 326.0374052640938,
+        "pair-table": 473.7342412871305,
+        "rho": 2.2798593397270315
+      },
+      "counts_mean": {
+        "pair-table": {
+          "group_gae": 35108.666666666664,
+          "U": 34322,
+          "n_C": 572.6666666666666,
+          "targets_tried": 45.666666666666664,
+          "relations": 27.666666666666668
+        },
+        "inherited-f4": {
+          "group_gae": 768.6666666666666,
+          "U": 0,
+          "n_C": 4934989.666666667,
+          "targets_tried": 45.666666666666664,
+          "relations": 27.666666666666668
+        },
+        "fes-then-inherited": {
+          "group_gae": 768.6666666666666,
+          "U": 0,
+          "n_C": 4934989.666666667,
+          "targets_tried": 45.666666666666664,
+          "relations": 27.666666666666668
+        },
+        "fes-then-batched": {
+          "group_gae": 768.6666666666666,
+          "U": 0,
+          "n_C": 4175302,
+          "targets_tried": 45.666666666666664,
+          "relations": 27.666666666666668
+        }
+      },
+      "ratio_ftb_over_if4": {
+        "0": 1,
+        "0.1": 0.8463003410635358,
+        "1": 0.8460849143410926
+      },
+      "ratio_ftb_over_rho": {
+        "0": 4.544961813254497,
+        "0.1": 2473.3118502094117,
+        "1": 24692.213845774826
+      },
+      "orders": {
+        "ftb_vs_if4": {
+          "order": {
+            "0": "=",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)",
+          "strict_order_holds": false
+        },
+        "ftb_vs_pair": {
+          "order": {
+            "0": "<",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "flips inside the band: unresolved",
+          "strict_order_holds": false
+        },
+        "ftb_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "if4_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "fti_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "pair_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "ftb_vs_if4_diag_bitop": {
+          "order": {
+            "0": "=",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)",
+          "strict_order_holds": false
+        },
+        "ic_min_vs_rho_ext_kn1": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        }
+      },
+      "diagnostics": {
+        "bitop_band_ftb": {
+          "0": 10.36187363865097,
+          "0.1": 38497.11414788573,
+          "1": 384877.88461610937
+        },
+        "bitop_band_if4": {
+          "0": 10.36187363865097,
+          "0.1": 42703.4960816701,
+          "1": 426941.70395395317
+        },
+        "all_counted_band": {
+          "pair-table": {
+            "0": 473.2761070531448,
+            "0.1": 553.1393719021627,
+            "1": 1271.9087555433237
+          },
+          "inherited-f4": {
+            "0": 10.36187363865097,
+            "0.1": 42736.320214689615,
+            "1": 427269.9452841482
+          },
+          "fes-then-inherited": {
+            "0": 10.36187363865097,
+            "0.1": 42689.78165212434,
+            "1": 426804.5596584955
+          },
+          "fes-then-batched": {
+            "0": 10.36187363865097,
+            "0.1": 38529.93828090524,
+            "1": 385206.12594630447
+          }
+        },
+        "rho_ext_k1": {
+          "0": 2.2798593397270315,
+          "0.1": 2.384921593852664,
+          "1": 3.3304818809833536
+        },
+        "rho_ext_kn1": {
+          "0": 2.2798593397270315,
+          "0.1": 3.9608554057371474,
+          "1": 19.08981999982819
+        }
+      }
+    },
+    {
+      "name": "koblitz-n17",
+      "instance": "icv1-f2m17-tm101-00378d4e",
+      "regime": "koblitz",
+      "r": 65587,
+      "calibration": "pinned",
+      "rho_method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+      "S": {
+        "fes-then-batched": {
+          "0": 5.423671314665525,
+          "0.1": 12496.434687596751,
+          "1": 124915.53383413551
+        },
+        "inherited-f4": {
+          "0": 5.423671314665525,
+          "0.1": 15302.977251721755,
+          "1": 152980.95947538555
+        },
+        "fes-then-inherited": {
+          "0": 5.423671314665525,
+          "0.1": 15302.977251721755,
+          "1": 152980.95947538555
+        },
+        "pair-table": {
+          "0": 492.99050679816963,
+          "0.1": 542.4935145922194,
+          "1": 988.0205847386673
+        },
+        "rho": {
+          "0": 1.72515895083561,
+          "0.1": 1.72515895083561,
+          "1": 1.72515895083561
+        }
+      },
+      "S_at_run_calibration": {
+        "fes-then-batched": 249.6630393672519,
+        "inherited-f4": 304.5028810702545,
+        "fes-then-inherited": 304.5028810702545,
+        "pair-table": 493.17414873475377,
+        "rho": 1.72515895083561
+      },
+      "counts_mean": {
+        "pair-table": {
+          "group_gae": 126254.66666666667,
+          "U": 125000,
+          "n_C": 1777,
+          "targets_tried": 149.66666666666666,
+          "relations": 95.66666666666667
+        },
+        "inherited-f4": {
+          "group_gae": 1389,
+          "U": 0,
+          "n_C": 39176972,
+          "targets_tried": 149.66666666666666,
+          "relations": 95.66666666666667
+        },
+        "fes-then-inherited": {
+          "group_gae": 1389,
+          "U": 0,
+          "n_C": 39176972,
+          "targets_tried": 149.66666666666666,
+          "relations": 95.66666666666667
+        },
+        "fes-then-batched": {
+          "group_gae": 1389,
+          "U": 0,
+          "n_C": 31989428,
+          "targets_tried": 149.66666666666666,
+          "relations": 95.66666666666667
+        }
+      },
+      "ratio_ftb_over_if4": {
+        "0": 1,
+        "0.1": 0.8166015332859992,
+        "1": 0.8165430146503576
+      },
+      "ratio_ftb_over_rho": {
+        "0": 3.143867590889801,
+        "0.1": 7243.642495402462,
+        "1": 72408.1301457066
+      },
+      "orders": {
+        "ftb_vs_if4": {
+          "order": {
+            "0": "=",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)",
+          "strict_order_holds": false
+        },
+        "ftb_vs_pair": {
+          "order": {
+            "0": "<",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "flips inside the band: unresolved",
+          "strict_order_holds": false
+        },
+        "ftb_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "if4_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "fti_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "pair_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "ftb_vs_if4_diag_bitop": {
+          "order": {
+            "0": "=",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)",
+          "strict_order_holds": false
+        },
+        "ic_min_vs_rho_ext_kn1": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        }
+      },
+      "diagnostics": {
+        "bitop_band_ftb": {
+          "0": 5.423671314665525,
+          "0.1": 76531.2875604094,
+          "1": 765264.062562262
+        },
+        "bitop_band_if4": {
+          "0": 5.423671314665525,
+          "0.1": 91080.28833499596,
+          "1": 910754.0703081274
+        },
+        "all_counted_band": {
+          "pair-table": {
+            "0": 492.99050679816963,
+            "0.1": 604.926778671674,
+            "1": 1612.3532255332127
+          },
+          "inherited-f4": {
+            "0": 5.423671314665525,
+            "0.1": 91142.7215990754,
+            "1": 911378.402948922
+          },
+          "fes-then-inherited": {
+            "0": 5.423671314665525,
+            "0.1": 91117.83479625033,
+            "1": 911129.5349206714
+          },
+          "fes-then-batched": {
+            "0": 5.423671314665525,
+            "0.1": 76593.72082448886,
+            "1": 765888.3952030566
+          }
+        },
+        "rho_ext_k1": {
+          "0": 1.72515895083561,
+          "0.1": 1.8258033915379166,
+          "1": 2.7316033578586763
+        },
+        "rho_ext_kn1": {
+          "0": 1.72515895083561,
+          "0.1": 3.536758883477129,
+          "1": 19.841158277250802
+        }
+      }
+    },
+    {
+      "name": "koblitz-n19",
+      "instance": "icv1-f2m19-tm797-9c54981b",
+      "regime": "koblitz",
+      "r": 262543,
+      "calibration": "pinned",
+      "rho_method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+      "S": {
+        "fes-then-batched": {
+          "0": 4.013223011397812,
+          "0.1": 25920.437855715532,
+          "1": 259168.25955005272
+        },
+        "inherited-f4": {
+          "0": 4.013223011397812,
+          "0.1": 29199.51090282689,
+          "1": 291958.9900211662
+        },
+        "fes-then-inherited": {
+          "0": 4.013223011397812,
+          "0.1": 29199.51090282689,
+          "1": 291958.9900211662
+        },
+        "pair-table": {
+          "0": 1063.0929524630844,
+          "0.1": 1169.7080046903227,
+          "1": 2129.2434747354687
+        },
+        "rho": {
+          "0": 1.3541944158049875,
+          "0.1": 1.3541944158049875,
+          "1": 1.3541944158049875
+        }
+      },
+      "S_at_run_calibration": {
+        "fes-then-batched": 413.6429251478514,
+        "inherited-f4": 465.45227929221073,
+        "fes-then-inherited": 465.45227929221073,
+        "pair-table": 1063.2573946747616,
+        "rho": 1.3541944158049875
+      },
+      "counts_mean": {
+        "pair-table": {
+          "group_gae": 544717.6666666666,
+          "U": 542882,
+          "n_C": 3402.3333333333335,
+          "targets_tried": 276.3333333333333,
+          "relations": 186.33333333333334
+        },
+        "inherited-f4": {
+          "group_gae": 2056.3333333333335,
+          "U": 0,
+          "n_C": 149594664.66666666,
+          "targets_tried": 276.3333333333333,
+          "relations": 186.33333333333334
+        },
+        "fes-then-inherited": {
+          "group_gae": 2056.3333333333335,
+          "U": 0,
+          "n_C": 149594664.66666666,
+          "targets_tried": 276.3333333333333,
+          "relations": 186.33333333333334
+        },
+        "fes-then-batched": {
+          "group_gae": 2056.3333333333335,
+          "U": 0,
+          "n_C": 132793038.66666667,
+          "targets_tried": 276.3333333333333,
+          "relations": 186.33333333333334
+        }
+      },
+      "ratio_ftb_over_if4": {
+        "0": 1,
+        "0.1": 0.8877010968428961,
+        "1": 0.8876872040530889
+      },
+      "ratio_ftb_over_rho": {
+        "0": 2.9635501110910956,
+        "0.1": 19140.85418843452,
+        "1": 191381.86993334536
+      },
+      "orders": {
+        "ftb_vs_if4": {
+          "order": {
+            "0": "=",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)",
+          "strict_order_holds": false
+        },
+        "ftb_vs_pair": {
+          "order": {
+            "0": "<",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "flips inside the band: unresolved",
+          "strict_order_holds": false
+        },
+        "ftb_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "if4_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "fti_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "pair_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "ftb_vs_if4_diag_bitop": {
+          "order": {
+            "0": "=",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)",
+          "strict_order_holds": false
+        },
+        "ic_min_vs_rho_ext_kn1": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        }
+      },
+      "diagnostics": {
+        "bitop_band_ftb": {
+          "0": 4.013223011397812,
+          "0.1": 129571.8068579294,
+          "1": 1295681.9495721916
+        },
+        "bitop_band_if4": {
+          "0": 4.013223011397812,
+          "0.1": 142335.95938198455,
+          "1": 1423323.474812743
+        },
+        "all_counted_band": {
+          "pair-table": {
+            "0": 1063.0929524630844,
+            "0.1": 1290.839162333257,
+            "1": 3340.5550511648107
+          },
+          "inherited-f4": {
+            "0": 4.013223011397812,
+            "0.1": 142457.0905396275,
+            "1": 1424534.786389172
+          },
+          "fes-then-inherited": {
+            "0": 4.013223011397812,
+            "0.1": 142405.0232483996,
+            "1": 1424014.1134768932
+          },
+          "fes-then-batched": {
+            "0": 4.013223011397812,
+            "0.1": 129692.93801557236,
+            "1": 1296893.261148621
+          }
+        },
+        "rho_ext_k1": {
+          "0": 1.3541944158049875,
+          "0.1": 1.445604368534609,
+          "1": 2.2682939431012024
+        },
+        "rho_ext_kn1": {
+          "0": 1.3541944158049875,
+          "0.1": 3.1823934703974173,
+          "1": 19.636184961729285
+        }
+      }
+    },
+    {
+      "name": "char2-n21",
+      "instance": "icv1-f2m21-tm1325-b6925563",
+      "regime": "char2",
+      "r": 1049239,
+      "calibration": "measured",
+      "rho_method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+      "S": {
+        "fes-then-batched": {
+          "0": 4.343028240500238,
+          "0.1": 75725.35306294866,
+          "1": 757214.443375322
+        },
+        "inherited-f4": {
+          "0": 4.343028240500238,
+          "0.1": 89674.69299189786,
+          "1": 896707.8426648141
+        },
+        "fes-then-inherited": {
+          "0": 4.343028240500238,
+          "0.1": 89674.69299189786,
+          "1": 896707.8426648141
+        },
+        "pair-table": {
+          "0": 1975.3638823993108,
+          "0.1": 2173.5465832713758,
+          "1": 3957.1908911199594
+        },
+        "rho": {
+          "0": 1.236852691768793,
+          "0.1": 1.236852691768793,
+          "1": 1.236852691768793
+        }
+      },
+      "S_at_run_calibration": {
+        "fes-then-batched": 3726.08856942955,
+        "inherited-f4": 4411.627175036939,
+        "fes-then-inherited": 4411.627175036939,
+        "pair-table": 1975.8534727419612,
+        "rho": 1.236852691768793
+      },
+      "counts_mean": {
+        "pair-table": {
+          "group_gae": 2023412,
+          "U": 2020050,
+          "n_C": 9982.333333333334,
+          "targets_tried": 846.6666666666666,
+          "relations": 529
+        },
+        "inherited-f4": {
+          "group_gae": 4448.666666666667,
+          "U": 0,
+          "n_C": 918514628,
+          "targets_tried": 846.6666666666666,
+          "relations": 529
+        },
+        "fes-then-inherited": {
+          "group_gae": 4448.666666666667,
+          "U": 0,
+          "n_C": 918514628,
+          "targets_tried": 846.6666666666666,
+          "relations": 529
+        },
+        "fes-then-batched": {
+          "group_gae": 4448.666666666667,
+          "U": 0,
+          "n_C": 775628236,
+          "targets_tried": 846.6666666666666,
+          "relations": 529
+        }
+      },
+      "ratio_ftb_over_if4": {
+        "0": 1,
+        "0.1": 0.8444450773842123,
+        "1": 0.8444382967868899
+      },
+      "ratio_ftb_over_rho": {
+        "0": 3.511354480127604,
+        "0.1": 61224.2295035601,
+        "1": 612210.6928452798
+      },
+      "orders": {
+        "ftb_vs_if4": {
+          "order": {
+            "0": "=",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)",
+          "strict_order_holds": false
+        },
+        "ftb_vs_pair": {
+          "order": {
+            "0": "<",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "flips inside the band: unresolved",
+          "strict_order_holds": false
+        },
+        "ftb_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "if4_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "fti_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "pair_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "ftb_vs_if4_diag_bitop": {
+          "order": {
+            "0": "=",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)",
+          "strict_order_holds": false
+        },
+        "ic_min_vs_rho_ext_kn1": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        }
+      },
+      "diagnostics": {
+        "bitop_band_ftb": {
+          "0": 4.343028240500238,
+          "0.1": 376600.2233385519,
+          "1": 3765963.146131354
+        },
+        "bitop_band_if4": {
+          "0": 4.343028240500238,
+          "0.1": 439460.7847025396,
+          "1": 4394568.759771232
+        },
+        "all_counted_band": {
+          "pair-table": {
+            "0": 1975.3638823993108,
+            "0.1": 2514.3967855899605,
+            "1": 7365.692914305808
+          },
+          "inherited-f4": {
+            "0": 4.343028240500238,
+            "0.1": 439801.6349048582,
+            "1": 4397977.261794417
+          },
+          "fes-then-inherited": {
+            "0": 4.343028240500238,
+            "0.1": 439750.96657831763,
+            "1": 4397470.578529011
+          },
+          "fes-then-batched": {
+            "0": 4.343028240500238,
+            "0.1": 376941.0735408705,
+            "1": 3769371.6481545395
+          }
+        },
+        "rho_ext_k1": {
+          "0": 1.236852691768793,
+          "0.1": 1.3341302926018543,
+          "1": 2.2096287000994064
+        },
+        "rho_ext_kn1": {
+          "0": 1.236852691768793,
+          "0.1": 3.3769599100961427,
+          "1": 22.637924875042287
+        }
+      }
+    },
+    {
+      "name": "koblitz-n23",
+      "instance": "icv1-f2m23-tm5197-1f85e9e1",
+      "regime": "koblitz",
+      "r": 4196903,
+      "calibration": "pinned",
+      "rho_method": "signed-Frobenius r-adding walk, distinguished points (koblitz_signed_frobenius_rho_reference)",
+      "S": {
+        "fes-then-batched": {
+          "0": 3.2961794403779137,
+          "0.1": 139357.70839874932,
+          "1": 1393547.4183725296
+        },
+        "inherited-f4": {
+          "0": 3.2961794403779137,
+          "0.1": 170787.24082462015,
+          "1": 1707842.742631238
+        },
+        "fes-then-inherited": {
+          "0": 3.2961794403779137,
+          "0.1": 170787.24082462015,
+          "1": 1707842.742631238
+        },
+        "pair-table": {
+          "0": 3986.1437652208533,
+          "0.1": 4385.307304307319,
+          "1": 7977.779156085511
+        },
+        "rho": {
+          "0": 0.8776249303242816,
+          "0.1": 0.8776249303242816,
+          "1": 0.8776249303242816
+        }
+      },
+      "S_at_run_calibration": {
+        "fes-then-batched": 1674.3269780864368,
+        "inherited-f4": 2051.1670718726286,
+        "fes-then-inherited": 2051.1670718726286,
+        "pair-table": 3986.3299992406196,
+        "rho": 0.8776249303242816
+      },
+      "counts_mean": {
+        "pair-table": {
+          "group_gae": 8166151.333333333,
+          "U": 8160800,
+          "n_C": 16601.666666666668,
+          "targets_tried": 1376.3333333333333,
+          "relations": 861.3333333333334
+        },
+        "inherited-f4": {
+          "group_gae": 6752.666666666667,
+          "U": 0,
+          "n_C": 3498738679.3333335,
+          "targets_tried": 1376.3333333333333,
+          "relations": 861.3333333333334
+        },
+        "fes-then-inherited": {
+          "group_gae": 6752.666666666667,
+          "U": 0,
+          "n_C": 3498738679.3333335,
+          "targets_tried": 1376.3333333333333,
+          "relations": 861.3333333333334
+        },
+        "fes-then-batched": {
+          "group_gae": 6752.666666666667,
+          "U": 0,
+          "n_C": 2854862459,
+          "targets_tried": 1376.3333333333333,
+          "relations": 861.3333333333334
+        }
+      },
+      "ratio_ftb_over_if4": {
+        "0": 1,
+        "0.1": 0.8159725968162602,
+        "1": 0.8159694002186173
+      },
+      "ratio_ftb_over_rho": {
+        "0": 3.755795131252685,
+        "0.1": 158789.5963110993,
+        "1": 1587862.1609548114
+      },
+      "orders": {
+        "ftb_vs_if4": {
+          "order": {
+            "0": "=",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)",
+          "strict_order_holds": false
+        },
+        "ftb_vs_pair": {
+          "order": {
+            "0": "<",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "flips inside the band: unresolved",
+          "strict_order_holds": false
+        },
+        "ftb_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "if4_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "fti_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "pair_vs_rho": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        },
+        "ftb_vs_if4_diag_bitop": {
+          "order": {
+            "0": "=",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)",
+          "strict_order_holds": false
+        },
+        "ic_min_vs_rho_ext_kn1": {
+          "order": {
+            "0": ">",
+            "0.1": ">",
+            "1": ">"
+          },
+          "verdict": "holds: first above second at every w",
+          "strict_order_holds": true
+        }
+      },
+      "diagnostics": {
+        "bitop_band_ftb": {
+          "0": 3.2961794403779137,
+          "0.1": 560740.4640443437,
+          "1": 5607374.974828473
+        },
+        "bitop_band_if4": {
+          "0": 3.2961794403779137,
+          "0.1": 782011.7663138873,
+          "1": 7820087.9975239085
+        },
+        "all_counted_band": {
+          "pair-table": {
+            "0": 3986.1437652208533,
+            "0.1": 4926.616588562425,
+            "1": 13390.87199863657
+          },
+          "inherited-f4": {
+            "0": 3.2961794403779137,
+            "0.1": 782553.0755981425,
+            "1": 7825501.09036646
+          },
+          "fes-then-inherited": {
+            "0": 3.2961794403779137,
+            "0.1": 782520.2512286156,
+            "1": 7825172.846671191
+          },
+          "fes-then-batched": {
+            "0": 3.2961794403779137,
+            "0.1": 561281.7733285987,
+            "1": 5612788.067671024
+          }
+        },
+        "rho_ext_k1": {
+          "0": 0.8776249303242816,
+          "0.1": 0.8951823576487103,
+          "1": 1.0531992035685698
+        },
+        "rho_ext_kn1": {
+          "0": 0.8776249303242816,
+          "0.1": 1.2990031861105735,
+          "1": 5.0914074881872
+        }
+      }
+    }
+  ],
+  "gae_band_basis": "for each weight, the instance with the smallest S(fes-then-batched)/S(rho) (docs/ic/runs/VALIDATION.json convention)",
+  "gae_band": {
+    "0": {
+      "ic": 4.013223011397812,
+      "rho": 1.3541944158049875
+    },
+    "0.1": {
+      "ic": 3723.718401340424,
+      "rho": 2.8921421945358907
+    },
+    "1": {
+      "ic": 37091.12175535938,
+      "rho": 2.8921421945358907
+    }
+  },
+  "gae_band_detail": {
+    "0": {
+      "ic": 4.013223011397812,
+      "rho": 1.3541944158049875,
+      "instance": "koblitz-n19",
+      "ratio": 2.9635501110910956
+    },
+    "0.1": {
+      "ic": 3723.718401340424,
+      "rho": 2.8921421945358907,
+      "instance": "koblitz-n13",
+      "ratio": 1287.5295026557221
+    },
+    "1": {
+      "ic": 37091.12175535938,
+      "rho": 2.8921421945358907,
+      "instance": "koblitz-n13",
+      "ratio": 12824.791887976824
+    }
+  },
+  "summary": {
+    "ftb_vs_if4": [
+      {
+        "name": "koblitz-n13",
+        "order": {
+          "0": ">",
+          "0.1": "<",
+          "1": "<"
+        },
+        "verdict": "flips inside the band: unresolved"
+      },
+      {
+        "name": "char2-n15",
+        "order": {
+          "0": "=",
+          "0.1": "<",
+          "1": "<"
+        },
+        "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+      },
+      {
+        "name": "koblitz-n17",
+        "order": {
+          "0": "=",
+          "0.1": "<",
+          "1": "<"
+        },
+        "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+      },
+      {
+        "name": "koblitz-n19",
+        "order": {
+          "0": "=",
+          "0.1": "<",
+          "1": "<"
+        },
+        "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+      },
+      {
+        "name": "char2-n21",
+        "order": {
+          "0": "=",
+          "0.1": "<",
+          "1": "<"
+        },
+        "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+      },
+      {
+        "name": "koblitz-n23",
+        "order": {
+          "0": "=",
+          "0.1": "<",
+          "1": "<"
+        },
+        "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+      }
+    ],
+    "ftb_vs_if4_strict_holds_on": 0,
+    "ftb_vs_pair_strict_holds_on": 0,
+    "every_ic_arm_above_rho_at_every_w": true,
+    "instances": 6
+  }
+}

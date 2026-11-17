@@ -1,0 +1,26 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\begin{document}
+\title{Literal weighted constructor invariant}
+\author{Private component proof packet; independent review pending}
+\date{31 October 2026}\maketitle
+Four Lean theorems compile: canonical output and field decoding of the literal UInt64 constructor; preservation of normalized Mumford validity and nonzero weights; the unit-weight degree-two from\_affine specialization; and composition with the existing same-support zero-slope error exclusion. Separate controls and axiom readback pass.
+\section*{Exact source connection}
+The constructor uses $z^2,z^3,z^4,z^5$ through reduced word products and returns $qz^2,rz^4,s(z^3w),t(z^5w),z,w$. The parenthesization $s(z^3w)$ matches the actual source; it differs from the earlier cross-scaling tree $(sz^3)w$. Existing bounded multiplication refinement supplies canonicality and decoding. Nonzero weights allow cancellation in the normalized Mumford divisibility predicate.
+\includegraphics[width=\linewidth]{diagram.png}
+\newpage
+\section*{Assumptions and controls}
+The decoding theorem assumes positive $p<2^{31}$ and canonical inputs. Validity preservation additionally assumes prime $p$, nonzero weights and affine support divisibility. The initialization/error composition uses $5\le p<2^{31}$. External Rust correspondence assumes Field.n=1, tables=None, normal execution and counter headroom. Shared expression subtrees are a value model, not an operation-count model.
+
+A nonunit-weight control uses $p=5$, $(q,r,s,t,z,w)=(0,0,0,1,2,3)$ and $f=X^5+X^2+1$. The full invariant holds; output $t=1,z=2,w=3$ is checked. A zero-weight control confirms the constructor retains zero. Equal unit-weight inputs take the sameUDouble prelude branch.
+
+Separate readback lists only propext and Quot.sound for decoding, and propext, Classical.choice and Quot.sound for the validity/composition statements. Both constructor compilation stages succeed. Raw source, commands and receipts are retained beside this PDF.
+\section*{Collector boundary}
+The exact retained gate and collector sources match current repository HEAD (hash prefixes 5976e7f3 and 96246448). The collector checks initial affine validity before from\_affine. This packet handles the degree-two constructor, conditional on canonical coefficients and the mathematical divisibility predicate. Connecting the native validity check and transfer output to those premises is separate. Identity addition passes through its operand; nonidentity addition closure is the next substantive dependency for jump/walk induction.
+
+Next construction: generic branch output nonzero weights and normalized congruence, beginning with generic 1+2. No scientific trial or cost ratio is reported.
+\section*{Evidence and prior work}
+See Constructor.lean, Literal.lean, Controls.lean, Readback.lean, sources.json and REPORT.md. Prior InvariantBranches and WordErrorExclusion results are reused. Literature assumptions follow Ozbay Gurler--Hisil, DOI 10.1007/s13389-024-00351-7, sections 2--4. This is an implementation connection, with no new addition-law claim.
+\end{document}

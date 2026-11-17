@@ -1,0 +1,31 @@
+--- a/materialize.py
++++ b/materialize.py
+@@ -64,6 +64,28 @@
+  quota,period=controls['cpu.max'].split();assert quota!='max' and int(quota)<=2*int(period)
+  assert controls['memory.max']==str(4*1024**3) and controls['memory.swap.max']=='0' and controls['pids.max']=='512'
+  R['cgroup']={'path':str(cg),'controls':controls};checkpoint()
++ # Record the worker's own inherited limits before any child command.
++ # This policy does not set or raise a limit and does not predict RSS demand.
++ R['phase']='native-inherited-limit-qualification'
++ R['native_limits']={'policy':'require-soft-hard-infinity-AS-DATA/v1',
++  'pid':os.getpid(),'status':'incomplete','limit_mutation_performed':False}
++ checkpoint()
++ raw_limits=Path('/proc/self/limits').read_bytes()
++ R['native_limits']['proc_self_limits_utf8']=raw_limits.decode('utf-8',errors='strict')
++ R['native_limits']['proc_self_limits_sha256']=hashlib.sha256(raw_limits).hexdigest()
++ R['native_limits']['proc_self_limits_bytes']=len(raw_limits)
++ checkpoint()
++ inherited={}
++ for name,kind in [('RLIMIT_AS',resource.RLIMIT_AS),('RLIMIT_DATA',resource.RLIMIT_DATA)]:
++  soft,hard=resource.getrlimit(kind)
++  inherited[name]={'soft':soft,'hard':hard,'soft_is_infinity':soft==resource.RLIM_INFINITY,
++   'hard_is_infinity':hard==resource.RLIM_INFINITY}
++  R['native_limits']['getrlimit']=inherited;checkpoint()
++ qualified=all(v['soft_is_infinity'] and v['hard_is_infinity'] for v in inherited.values())
++ R['native_limits']['status']='qualified' if qualified else 'rejected'
++ R['native_limits']['rlim_infinity_constant']=resource.RLIM_INFINITY
++ checkpoint()
++ if not qualified:raise RuntimeError('native inherited AS/DATA policy rejects a finite soft or hard limit')
+  R['workspace_mount']=cmd(['findmnt','-T',str(W.parent),'-J','-o','TARGET,SOURCE,FSTYPE,OPTIONS']).decode();R['output_mount']=cmd(['findmnt','-T',str(OUT),'-J','-o','TARGET,SOURCE,FSTYPE,OPTIONS']).decode();checkpoint()
+  required={F[k] for k in ('historical_source_manifest','concat_addendum','candidate','registry_archives','tool_manifest')}|{str(Path(__file__).resolve()),str(P/'materialize_safety.py')}
+  assert required<=set(F['input_files'])
