@@ -22,5 +22,7 @@ Run the index-calculus autolab (`ic-autolab` skill, Curve25519-family loop `rese
 - [x] Train, select, assess, ratchet, report and PDF for round 38: no challenger at k = 20 or 24 (no holdout); PR with the result and `ratchet.svg`.
 - [ ] Next lever (code, not a re-sweep): the generic configuration space is exhausted at k = 20, 24, 28, 32; add a family (fewer unknowns, cheaper price per point, or a construction change per `ideas/OBSTRUCTION.md`) to `families.json` and its oracle in ecbench, then round 39.
 - [ ] Fix or report the `hashed-ecdl-tensor` standalone build failure on `main` (`crate::metrics` undeclared in `lib.rs`).
+- [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
+- [x] Track every task first in docs/ACTIVE.md and a draft PR; roll /goal out to isogeny-labs repos (claude, started 2026-11-17, branch track-first-active, PR #4499)
 
 ## Blocked / questions for the owner
