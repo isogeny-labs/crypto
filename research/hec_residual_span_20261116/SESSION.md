@@ -3010,3 +3010,10 @@ What was done: freeze8a056b49bd3 hashespass/exit0;115nonsingulartrace systems,10
 Decisions made: genericrationalinverseargumentseparatefromfinitechecks;no novelty/runtime/10xclaim. Canonicalnormalization/exceptionalplaces/completeJacobiantransportstillrequired.
 Open threads: canonicaladjoints/smoothmodel andcompleteoriginaltargettransport;full10xgenus2+goalactiveunachieved,independentreviewopen.
 Errors: no scientificfailure;unusedhelperwarningsonly.Gitcustody/noS3/no merge.
+
+## Smith discriminant and branch gate frozen
+
+What was done: derived discriminant squareclass via signed sums/Vandermonde, compiled dynamic polynomial exact square check on6maps plus genericity/pole branch checks. F61native specializations/irreducibility witnesses included.
+Decisions made: distinguish plane square index from ramification, arithmetic from geometric connectedness; conditional ramificationtotal12 not a global model certificate. Git freeze precedes sole600CPU invocation.
+Open threads: execute exact gate; canonical adjoints, geometric connectedness and full target transport remain.
+Errors: none in compile; no scientific execution yet.
