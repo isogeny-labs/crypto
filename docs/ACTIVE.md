@@ -15,6 +15,8 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [ ] Account complete prime-field costs for guarded cubic inverse16 (Codex, started 2026-11-17, branch work/chained-primefield-cost16-source, PR #4544; in progress)
+
 - [x] Prove and test cubic-subfield inverse15 for closed Richelot fibres (Codex, started 2026-11-17, branch work/chained-cubic-inverse15-source, PR #4544; in progress)
 - [x] Complete native12 provider ZIP byte custody (Codex, started 2026-11-17, branch work/chained-cubic-inverse15-source, PR #4544; in progress)
 
