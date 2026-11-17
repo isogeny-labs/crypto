@@ -2205,3 +2205,17 @@ What was done: PR4561mergedexternallywhilepreparing, newbranchresearch/hec-targe
 Decisions made: retaincorrectbootstrapalternative, allineligiblequery/fallbackcosts included,no uniform10xclaim. No mergebythissession. OriginalPRclosedbyexternalmerge, successor containsnewtestonly.
 Open threads: mathematical useful-rank/cost mechanism+independenttargets, originalgenus2+10x/review/publication/genus3/4coverage.
 Errors: origin/main trackingrefwasstale;rebasedontoverifiedFETCH_HEADmain ratherthanassumetrackingupdated. No scientificfailure/retry/S3/cloud.
+
+## Homogeneous complete-component witness gate frozen
+
+What was done: compiled overflow-checked Rust gate, homogeneous T-kD row-span queries for all48 branches on original12 targets; n5/7/9 module scope controls and annihilator/projection proof. Successor branch rebased onto fetched main after external PR4582 merge.
+Decisions made: Git replaces unavailable S3 custody; source/protocol/native/binary hashes pushed before one120CPU invocation; unresolved branches retained. Existing own T-7093 reservation confirmed by CLI, check allow, attachment returned own-scope conflict. No merge or auto-merge.
+Open threads: execute once after checkpoint push; retain complete raw output and qualify evidence. No cost or genus3/4 curve conclusion from module controls.
+Errors: attach service rejected existing own reservation; CLI confirmed task already claimed. Build only unused-function warnings.
+
+## Homogeneous all-component existence gate passed
+
+What was done: pushed freeze33b96ad90bb, verified INPUT hashes, once-only exit0;48/48 homogeneous matrix witnesses on12 originaltargets,0 unresolved,48 weightmutations rejected;3 finite-module projection/scope controls pass. Raw weights/stderr/exit and outputhashes retained in Git.
+Decisions made: stronger all-component format supports proposed rank-independent theorem under explicit annihilator/membership/splitting assumptions; existing prime-order genus2 certificate unchanged. No construction/verification cost or genus3/4 curve conclusion. [pcc:unverified].
+Open threads: packet-bound homogeneous verifier then full counted construction/verification; independent validation and broader speedup objective remain.
+Errors: none in scientific invocation; no rerun/S3/cloud/merge.
