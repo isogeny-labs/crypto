@@ -1805,3 +1805,10 @@ What was done: freezef0f7c529ce4 once-onlyexit0;12certificates/84mutations agree
 Decisions made: scopedverifiedlookup improvement, no fullgain; nativebinding unchangeddominates, densewitness cost remains. Failedv1retained.
 Open threads: soundFrobenius/Bezout actionproof anddegree/root principalcertificate equivalence, completecost andchangedproducer.
 Errors: onlypreviousv1instrumentationfailure, correctedprospectively; no overwrite/S3/cloud.
+
+## Degree/root principal certificate frozen
+
+What was done: compiled cacheanchorvalidity plus disjointdistinctresidualroot certificate; algebraicproof andoverlapcounterexample recorded. Nativeaction/binding/index/witness retained.
+Decisions made: scoped equivalence onproducerdisjointdomain, not unrestricted multiplicities; onepositive/fournegativelemma controls plus12cert/84mutationagreement and24costcalls. Assertions [pcc:unverified].
+Open threads: pushfreeze then once-only120CPU invocation.
+Errors: none in compile, no science yet.
