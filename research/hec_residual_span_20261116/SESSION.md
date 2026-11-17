@@ -1735,3 +1735,10 @@ What was done: compiled countedtransport/lift/genericIC/originalverify onfourret
 Decisions made: map/quotientderivationfree makescandidate LOWERBOUND notfullcoldcost; favorableoutcome cannotpromote beforemissingcosts. NativeFastoracle/Fastsolver/seed20260916/triallimit200000fixed. Assertions [pcc:unverified].
 Open threads: pushfreeze then once-only120CPU invocation; inspectnegativeadmission beforefullsetuppricing.
 Errors: none in compile; disk973MiBfree, scientificexecutionnotyet.
+
+## Optimistic quotient backend rejected
+
+What was done: freezee278e13933c once-onlyexit0;8calls/4originaltargets complete/exactrepeat/originalverify; freeconstruction candidatebase19.069-21.832x,ell43.792-72.403xsourcearm0; losesbothmoduliagainstarm1too. Rawphasevectors retained,summaryderived. Assertions [pcc:unverified].
+Decisions made: close THISgenericfullFBtransportbackend as10xcandidate, notallquotients/algorithms. UniformfullFBsmoothstate count231881/411491 identicalonboth endpoints is a deduction, notexecuted enumeration; no automaticyieldbenefit.
+Open threads: successor changedproducer/linearalgebra mechanism and completecostcase, originalgoalopen; independentverification/publicationartifacts remain.
+Errors: none,no rerun/S3/cloud.
