@@ -1,0 +1,35 @@
+Traceback (most recent call last):
+  File "/workspace/crypto-integrate/scripts/build_lab_browser.py", line 389, in _read_sparse_blob
+    raise OSError("unexpected or unavailable blob")
+OSError: unexpected or unavailable blob
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/crypto-integrate/scripts/build_lab_browser.py", line 1033, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/workspace/crypto-integrate/scripts/build_lab_browser.py", line 1008, in main
+    fresh = build()
+            ^^^^^^^
+  File "/workspace/crypto-integrate/scripts/build_lab_browser.py", line 901, in build
+    return _build(source)
+           ^^^^^^^^^^^^^^
+  File "/workspace/crypto-integrate/scripts/build_lab_browser.py", line 931, in _build
+    sessions, methods, fbs, yields = ecbench_sessions(by_slug, source)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-integrate/scripts/build_lab_browser.py", line 551, in ecbench_sessions
+    s = load_file(session_path, source)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-integrate/scripts/build_lab_browser.py", line 414, in load_file
+    return json.loads(source.read_text(path))
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-integrate/scripts/build_lab_browser.py", line 409, in read_text
+    return self.read_bytes(path).decode("utf-8", errors)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-integrate/scripts/build_lab_browser.py", line 404, in read_bytes
+    return self._read_sparse_blob(relative)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-integrate/scripts/build_lab_browser.py", line 399, in _read_sparse_blob
+    raise OSError(f"cannot read sparse input HEAD:{relative}: {error}") from error
+OSError: cannot read sparse input HEAD:research/ecbench_factor_bases_20261013/sessions/koblitz17-algebraic/session.json: unexpected or unavailable blob
