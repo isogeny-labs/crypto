@@ -2,7 +2,7 @@
 
 Status: design gate completed before the first Lean edit. Lean 4.34.1 and
 Mathlib `d13f23b723b8a846827a245b89c10fc7d3f11612` build all declarations.
-The repository proof gate passes 19 audited declarations with zero failing
+The repository proof gate passes 23 audited declarations with zero failing
 and zero trusted-native; retained receipt:
 `proof-gate-v1/research_h113_binary_trinary_winding_20261117/`.
 
@@ -48,6 +48,10 @@ It does not assert that any measured winding predicate is exact.
 
    |{q in cohort | candidate(q)=label(q)}| = |cohort|
      => for every q in cohort, candidate(q)=label(q),
+
+   state(k)=m/base^k
+     => state(k+1)=state(k)/base
+     => state(log_base(m)+1)=0,
    ```
 
    followed by generic radix-six reconstruction and an independent injective
@@ -80,6 +84,10 @@ It does not assert that any measured winding predicate is exact.
 | `full_score_supplies_baseSix` | endpoint | `H113BinaryTrinaryWinding` | finite point type and natural-valued candidate/label | native score equals cohort cardinality |
 | `radixReconstruct_eq` | generic law; crypto-lean upstream candidate | `H113BinaryTrinaryWinding` | `ℕ` | radix at least two; exact remainder oracle |
 | `baseSixReconstruct_eq` | endpoint | `H113BinaryTrinaryWinding` | `ℕ` | exact base-six oracle |
+| `radixRoundState` | algorithmic state definition | `H113BinaryTrinaryWinding` | `ℕ` | none |
+| `radixRoundState_succ` | generic law; crypto-lean upstream candidate | `H113BinaryTrinaryWinding` | `ℕ` | none |
+| `radixRoundState_log_succ_zero` | generic law; crypto-lean upstream candidate | `H113BinaryTrinaryWinding` | `ℕ` | radix at least two |
+| `baseSix_round_bound` | endpoint | `H113BinaryTrinaryWinding` | `ℕ` | none |
 | `baseSix_group_step` | endpoint | `H113BinaryTrinaryWinding` | `AddCommGroup A` | exact digit and inverse-six action |
 | `inverse_six_on_cyclic` | generic law; crypto-lean upstream candidate | `H113BinaryTrinaryWinding` | `AddCommGroup A` | generator order relation and integer Bezout certificate `inv6*6=1+q*r` |
 | `baseSix_cyclic_group_step` | endpoint | `H113BinaryTrinaryWinding` | `AddCommGroup A` | exact digit, generator order relation, and integer inverse-six certificate |
@@ -101,6 +109,7 @@ It does not assert that any measured winding predicate is exact.
 | quotient update | `m / 6` | `Nat.div` |
 | radix decomposition | `(m % 6) + 6 * (m / 6) = m` | `Nat.mod_add_div` plus commutativity normalization |
 | termination of recursive decoding | quotient is smaller for radix `≥ 2` | existing natural division bound, discharged by `omega` |
+| logarithmic query bound | `m / base^(log base m + 1) = 0` | `Nat.lt_pow_succ_log_self` and `Nat.div_eq_of_lt` |
 | inverse multiplication by six | `inv6 • (6 • X) = X` | explicit hypothesis; concrete subgroup instance remains a separate obligation |
 | inverse multiplication by six on `<G>` | `inverse_six_on_cyclic` | derived from `r • G = 0` and `inv6*6 = 1 + q*r`; no global inverse-action hypothesis |
 | final EC equality implies scalar equality | injectivity of `fun k => k • G` on admitted domain | explicit `Function.Injective` hypothesis |
@@ -160,6 +169,21 @@ Repeated application is represented by `radixReconstruct`; its generic
 strong-induction theorem is instantiated at radix six. Final EC verification
 is a separate injectivity endpoint.
 
+### Exact round bound
+
+```text
+state(k)   = m / base^k
+state(k+1) = (m / base^k) / base                       [div-div, pow-succ]
+m          < base^(log_base(m)+1)                      [Nat log bound]
+state(log_base(m)+1) = 0.                              [division below divisor]
+```
+
+The base-six endpoint therefore needs at most `Nat.log 6 m + 1` digit queries
+for scalar `m`. This is an exact query-count theorem, not a measured runtime
+claim: end-to-end polynomial bit cost additionally requires the public digit
+predicate to exist and each winding query to use polynomial-time field/group
+arithmetic.
+
 ### Prime-order inverse-six certificate
 
 ```text
@@ -200,7 +224,7 @@ ELAN_HOME=/workspace/.elan-h113 XDG_CACHE_HOME=/workspace/.cache-h113 \
   tools/lean/proof-gate.sh \
   --out research/h113_binary_trinary_winding_20261117/proof-gate-v1 \
   research/h113_binary_trinary_winding_20261117
-# PASS  19 thm  0 trusted
+# PASS  23 thm  0 trusted
 ```
 
 The transitive axiom audit reports only `propext`, `Classical.choice`, and

@@ -159,6 +159,30 @@ theorem baseSixReconstruct_eq
     ∀ k, radixReconstruct 6 (by omega) oracle k = k := by
   exact radixReconstruct_eq 6 (by omega) oracle hexact
 
+/-- The canonical scalar remaining after `rounds` exact radix divisions. -/
+def radixRoundState (base scalar rounds : ℕ) : ℕ :=
+  scalar / base ^ rounds
+
+/-- One more round divides the canonical remaining scalar by the radix. -/
+theorem radixRoundState_succ (base scalar rounds : ℕ) :
+    radixRoundState base scalar (rounds + 1) =
+      radixRoundState base scalar rounds / base := by
+  simp [radixRoundState, Nat.pow_succ, Nat.div_div_eq_div_mul]
+
+/-- Exact radix division reaches zero after at most `log_base(scalar) + 1`
+rounds for every radix at least two. -/
+theorem radixRoundState_log_succ_zero
+    (base scalar : ℕ) (hbase : 2 ≤ base) :
+    radixRoundState base scalar (Nat.log base scalar + 1) = 0 := by
+  apply Nat.div_eq_of_lt
+  simpa [radixRoundState] using
+    (Nat.lt_pow_succ_log_self (by omega : 1 < base) scalar)
+
+/-- The frozen decoder's exact digit-query bound. -/
+theorem baseSix_round_bound (scalar : ℕ) :
+    radixRoundState 6 scalar (Nat.log 6 scalar + 1) = 0 := by
+  exact radixRoundState_log_succ_zero 6 scalar (by omega)
+
 end Oracle
 
 section GroupDecoder
@@ -307,6 +331,10 @@ end GroupDecoder
 #print axioms full_score_supplies_baseSix
 #print axioms radixReconstruct_eq
 #print axioms baseSixReconstruct_eq
+#print axioms radixRoundState
+#print axioms radixRoundState_succ
+#print axioms radixRoundState_log_succ_zero
+#print axioms baseSix_round_bound
 #print axioms baseSix_group_step
 #print axioms inverse_six_on_cyclic
 #print axioms baseSix_cyclic_group_step

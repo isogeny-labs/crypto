@@ -14,7 +14,7 @@ must bind and record its own final pushed commit.
 | Test the frozen H113 producer on all 28 rows and 9,096 targets | blocked | Mandatory checkpoint upload failed before execution. |
 | Preserve candidate, null-control, decoder and operation-count output | implemented but unverified | Producer serializes these fields; no raw TSV or result JSON exists. |
 | Verify independently, including tamper rejection | implemented but unverified | Paired cryptanalysis verifier compiles and self-tests; it has no measured artifact to open. |
-| Prove the structural and conditional decoder obligations | verified complete at the conditional scope | Pinned Lake build passes; proof gate reports 19 declarations, zero failing and zero trusted-native. |
+| Prove the structural and conditional decoder obligations | verified complete at the conditional scope | Pinned Lake build passes; proof gate reports 23 declarations, zero failing and zero trusted-native. |
 | Establish an exact public digit oracle and subexponential prime-field ECDLP algorithm | not established | This requires an exact predicate on the frozen out-of-sample cohort and an applicability argument beyond tiny curves. |
 
 ## Admission command and observed output
