@@ -16,16 +16,24 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - name: Check out exact PR source
+      - name: Check out exact PR source (candidate files only)
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs
+            research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay_d6.rs
+          sparse-checkout-cone-mode: false
       - name: Reuse immutable original native prime31 library
         uses: actions/checkout@v4
         with:
           ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
           path: prime31-native-pinned
           persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
       - name: Pin Rust 1.100.0
         run: rustup toolchain install 1.100.0 --profile minimal
       - name: Overlay only original Macaulay example plus prospective degree6 wrapper
