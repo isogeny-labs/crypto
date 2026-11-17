@@ -1434,3 +1434,10 @@ What was done: correctedbedc21855ef single invocation exits0;66of67seeds reach68
 Decisions made: symbolic seed is unknownvariable, notfreeDLP; positive finite reachability justifies actual sparseproducer qualification with prospectivelyfixedseed. No oraclecost or novelty/10xclaim.
 Open threads: implement actual parameterbucketing/residualdivision/closure with allscansandfailurescharged; originalgenus2+goalopen.
 Errors: no scientificfailure/retry; earlierdiskpreparationerrorpreserved. NoS3/cloud.
+
+## Actual sparse inactivation producer frozen
+
+What was done: compiled no-support-file sparse bucketing/linear-residual producer on6originaltargets,fixedseed1,all16anchors generated. Exact rows/labels/originalSparse-vs-constraints and terminalnativeFast checks; hashes frozen.
+Decisions made: structural gate before nativecost; scans only orbit-member pool, duplicates/discovery and exclusions explicit. Pointvisits nottotalcost.
+Open threads: execute once and retain stalls; prospective fresh coldcost ifqualified.
+Errors: coordination500onchecks/renewal while ownT7071lease stillvaliduntil02:38PST; no competingholder. No science before pushedfreeze.
