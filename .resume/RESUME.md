@@ -88132,3 +88132,39 @@ Normal guarded new branch/tag/regular PR/body lint and actual CI, original gate 
 
 ## Errors
 Original missing-base prefix0 explicitly rejected; unchanged verifier1 after full blob hydration, canonical and source forks preserved without choose/rechain. Current-main root AGENTS/keyring/PCC/artifact config+tools/gate workflows absent per bd5fdc pinned tree. Their absence is not replaced by archival sources or claimed signed/green admission. [pcc:unverified]
+
+
+---
+
+2026-11-17T00:20:20.273481+00:00
+# Publish regular chart/audit PR4472 and queue original merge method
+
+## What was done
+PCC-20261117-9cf968: normal main-based bd8a72c41a31 branch/tag atomic push/readbacks0, regular PR4472 created00:16:21,81 files/zero deletions, exact PRbody lint0, canonical ledger unchanged. Actual00:18 PRopen/mergedfalse/headbd8a/stateblocked, auto-merge methodmerge queued. NewCI wrapper replay pending; next own sourceCI observation01:07UTC. [pcc:unverified]
+
+## Decisions made
+Keep remote bd8a stable for its own CI and continue unblocked mathematical work. Checkpoint publication/next source units on normal child tags only meanwhile. Read exact Consumer balanced.rs/nonsplit_map and existing Root Richelot/Balanced/IndependentMap Lean sources before choosing the divisor transport protocol. All original LP/store/PCC/gates and negative/paid/vault constraints persist. [pcc:unverified]
+
+## Open threads
+First own4472CI/full original artifacts at01:07; actual finalhead/source may differ due external activity. Six whole new-source objects need original store per unchanged archival cb9/config diagnostic1; active main trust/policy/gates absent, not waived. Actual balanced divisor/Richelot nonmonic factor/exceptional support and orientation remain next. [pcc:unverified]
+
+## Errors
+Connector auto-queue inferred squash and GraphQL rejected that method; normal documented gh --auto --merge with exact-head guard0, actual methodmerge readback retained, no alternate identity or authorization workaround. First staged whitespace treated frozen PDF xrefs as text because base attributes vanished; scoped REPORT.pdf binary file typing fixed this without changing PDF bytes, finalcomplete delta0. Both raw failed output and original policy diagnostic retained. Missing canonical trust files/fork not repaired by side choosing. [pcc:unverified]
+
+
+---
+
+2026-11-17T00:39:05.253536+00:00
+# Preregister shifted balanced class adapter12 from exact prior arithmetic
+
+## What was done
+PCC-20261117-a38dff: prospective13-model unit12,12 monic vectors copied from nativef88c0c plus separate x6+1 ramified auxiliary; exact9 primary source files from ConsumerE079/RootEB3 Gitblobs checked. Galbraith8.3.8/10 and10.4.9/10/14/19 reread in full relevant arguments, cached PDF hashes match. PCC-20261117-465331: written local-chart/Picard/reference-K/lost-pole/Frobenius/opposite-sign argument, conditional Richelot conjugation[2], not Lean or executable composition. Public queue3904 exact53183chars/readback00:20:42 retained whole. [pcc:unverified]
+
+## Decisions made
+Reuse unchanged FpPoly/Fp2 and existing balanced composition/reduction core. New shifted adapter and pointwise oracle will cover planned226 witnesses/3952 ordered pairs, losses0/1/2 each direction, all six shapes, closed quadratic and auxiliary ramified support, opposite-b group negation and three per-model mutants. No new Lean declaration, no old full-class or chart producer rerun. Normal protocol/publication child tag first, remote4472bd8a held for ownCI01:07. [pcc:unverified]
+
+## Open threads
+Implement/freeze/publish full source before offline/j1/120s compiler/native calls; preserve every outcome and exact old-source extraction. Actual Richelot factors/correspondence/dual[2] remain subsequent. Original canonical trust/store/gates, full LP/admission/cost and paid/vault constraints remain. [pcc:unverified]
+
+## Errors
+Conductor remains127 on the explicit new code scope; exact new request/output retained, documented unavailable fallback. No new adapter code/build/call yet. All earlier ledger forks, missing baseline trust, PDF typing, connector squash rejection and original CI/storage failures remain preserved. [pcc:unverified]
