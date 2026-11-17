@@ -1180,7 +1180,7 @@ fn rr9_b8_exceptional_fibre_audit(ar: &mut Arithmetic) -> Value {
 /// supplied zero: F(T)=0 alone is insufficient to distinguish T from -T.
 fn rr9_complete_seven_signed_leaves(
     ar: &mut Arithmetic, leaves: &[Point; 7], residual: Point,
-) -> Result<Option<Point>, String> {
+) -> Result<Point, String> {
     let (rx, _) = residual.ok_or("seven-anchor completion excludes R=O")?;
     if leaves.iter().any(|q| q.is_none()) {
         return Err("seven-anchor completion excludes supplied infinity".into());
