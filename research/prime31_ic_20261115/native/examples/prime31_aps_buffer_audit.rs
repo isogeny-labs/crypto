@@ -17,6 +17,54 @@ const APS_KEYS: [&str; 8] = [
     "rejected_identity",
 ];
 
+const PRIME: u64 = 2_147_483_647;
+const CURVE_A: u64 = 847_514_846;
+const CURVE_B: u64 = 2_087_444_724;
+const GENERATOR: (u64, u64) = (625_037_715, 2_100_627_251);
+
+// Independent scalar-point replay: simple affine Weierstrass arithmetic,
+// not the APS implementation or the main library's verifier. All outside
+// measured complete-cold solve calls; the caller's k is never passed into
+// any APS or rho arm.
+fn fm(a:u64,b:u64)->u64{((a as u128*b as u128)%PRIME as u128) as u64}
+fn fa(a:u64,b:u64)->u64{let z=a+b;if z>=PRIME {z-PRIME}else{z}}
+fn fs(a:u64,b:u64)->u64{if a>=b{a-b}else{a+PRIME-b}}
+fn pow(mut a:u64,mut k:u64)->u64{
+    let mut r=1;
+    while k>0 {if k&1!=0{r=fm(r,a)};a=fm(a,a);k>>=1;}
+    r
+}
+fn on_curve(q:(u64,u64))->bool{
+    q.0<PRIME && q.1<PRIME &&
+    fm(q.1,q.1)==fa(fa(fm(fm(q.0,q.0),q.0),fm(CURVE_A,q.0)),CURVE_B)
+}
+fn ec_add(a:Option<(u64,u64)>,b:Option<(u64,u64)>)->Option<(u64,u64)>{
+    match (a,b){
+        (None,x)|(x,None)=>x,
+        (Some((x,y)),Some((u,v)))=>{
+            if x==u && fa(y,v)==0 {return None;}
+            let (numer,denom)=if x==u{
+                (fa(fm(3,fm(x,x)),CURVE_A),fm(2,y))
+            }else{(fs(v,y),fs(u,x))};
+            assert_ne!(denom,0,"unexpected noninvertible denominator");
+            let slope=fm(numer,pow(denom,PRIME-2));
+            let xp=fs(fs(fm(slope,slope),x),u);
+            let yp=fs(fm(slope,fs(x,xp)),y);
+            Some((xp,yp))
+        }
+    }
+}
+fn ec_mul(mut k:u64,p:(u64,u64))->Option<(u64,u64)>{
+    let mut out=None;
+    let mut base=Some(p);
+    while k!=0{
+        if k&1!=0 {out=ec_add(out,base);}
+        base=ec_add(base,base);
+        k>>=1;
+    }
+    out
+}
+
 fn load(path: &str) -> Result<Value, String> {
     let s = fs::read_to_string(path).map_err(|e| format!("{path}: {e}"))?;
     serde_json::from_str(&s).map_err(|e| format!("{path}: {e}"))
@@ -44,7 +92,13 @@ fn validate_panel(v: &Value, label: &str) -> Result<(), String> {
         }
         let k = number(&c["caller_known_scalar_verifier_only"], "caller k")?;
         if k == 0 || k >= 2147446831 { return Err(format!("{label}: invalid caller k")); }
-        if !c["public_Q"].is_array() { return Err(format!("{label}: no public Q")); }
+        let q=c["public_Q"].as_array().ok_or_else(||format!("{label}: no public Q"))?;
+        if q.len()!=2 {return Err(format!("{label}: bad public point length")); }
+        let x=number(&q[0], "public_Q.x")?;
+        let y=number(&q[1], "public_Q.y")?;
+        if !on_curve((x,y)) || ec_mul(k,GENERATOR)!=Some((x,y)) {
+            return Err(format!("{label}: independent elliptic scalar replay mismatch case {i}"));
+        }
         for key in ARMS {
             let a=&c[key];
             if a["complete_target_scalar_recovered"] != true {
@@ -157,6 +211,18 @@ mod tests {
         assert!(validate_panel(&json!({}),"bad").is_err());
         assert!(run(&[]).is_err());
         assert!(number(&json!(null),"missing").is_err());
+    }
+    #[test]
+    fn independent_affine_curve_controls() {
+        assert!(on_curve(GENERATOR));
+        assert_eq!(ec_mul(0,GENERATOR),None);
+        assert_eq!(ec_mul(1,GENERATOR),Some(GENERATOR));
+        assert_eq!(ec_mul(2147446831,GENERATOR),None);
+        let q=ec_mul(2,GENERATOR);
+        assert_eq!(q,ec_add(Some(GENERATOR),Some(GENERATOR)));
+        assert!(on_curve(q.unwrap()));
+        let neg=Some((GENERATOR.0,fs(0,GENERATOR.1)));
+        assert_eq!(ec_add(Some(GENERATOR),neg),None);
     }
     #[test]
     fn price_and_result_guard() {
