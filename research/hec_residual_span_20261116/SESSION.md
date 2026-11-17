@@ -3017,3 +3017,10 @@ What was done: derived discriminant squareclass via signed sums/Vandermonde, com
 Decisions made: distinguish plane square index from ramification, arithmetic from geometric connectedness; conditional ramificationtotal12 not a global model certificate. Git freeze precedes sole600CPU invocation.
 Open threads: execute exact gate; canonical adjoints, geometric connectedness and full target transport remain.
 Errors: none in compile; no scientific execution yet.
+
+## Smith branch identities pass and F61 normalized genus deduced
+
+What was done: freeze9949caac151 hashespass/exit0.6exactdisc=delta4*I² identities,degree32/14;allcritical/pair/polegenericitychecks pass.120nativecomparisons,irreducibleF61specializationst4/t11pass. Combined prior smoothrationalpointst1rho8/t0rho39 witharithmeticirreducibility toexcludeconstantfielddecomposition;branchdifferent12 givesgenus3.
+Decisions made: square_indexrawfieldisnotanactualintegralbasisindex;conditionalgenericchart/localinertiaargument pluscertificates distinctfromcomputednormalization/nonhyperellipticity. Preserve4nonsquareobstructions.
+Open threads: canonicaladjoints/smoothplanequarticandcompleteoriginaltargettransport;full10xgenus2+goalactiveunachieved,independentreviewopen.
+Errors: no scientificfailure/no compilewarnings.Gitcustody/noS3/no merge.

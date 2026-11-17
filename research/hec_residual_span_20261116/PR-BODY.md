@@ -66,3 +66,7 @@ Freeze `44693a66ca8` qualifies both original F61 maps on a restricted nonsingula
 ### Rational trace-pairing inverse
 
 `native-smith-trace/DERIVATION.md` derives inverse expressions over F61(t,rho) through cubic traces and a four-dimensional nondegenerate quartic trace pairing. Under freeze `8a056b49bd3`, the native implementation passes 115 trace systems, reproduces all 109 frozen chart b-polynomials without sigma search, and passes four synthetic sign-orbit controls. The generic argument is not independently reviewed. Smooth canonical normalization, exceptional places and complete target transport remain open; no speedup is claimed.
+
+### Exact discriminant and branch data
+
+Freeze `9949caac151` verifies disc(P)=delta4*I² as exact polynomials on all six maps, squarefree/disjoint critical and paired-branch values, and pole genericity. Both F61 quartics have irreducible specializations (t=4,11); 120 native discriminant checks pass. Combined with previously checked smooth rational points, the recorded deduction establishes geometric connectedness and genus3 of their normalized sign-triple covers via tame ramification12. This is not a computed smooth/canonical model or a nonhyperellipticity/transport/speed certificate; independent review remains open. Raw square_index names a square factor, not a computed integral-basis index. See `native-smith-branch/RESULTS.md` and `CONNECTEDNESS.md`.
