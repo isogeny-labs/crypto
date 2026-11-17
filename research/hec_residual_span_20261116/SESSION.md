@@ -2240,3 +2240,10 @@ What was done: derive same anchor/t givesoneprincipalrelation regardless pair, a
 Decisions made: same openPR4587 extended, no newbranch; Gitfreeze beforeone120CPU, no paircount=rank or eligiblecost=coldgain claim. Sources truncated-quotient/gain-graph; KB source:91b6bbe9fb73267bbeb5d7c97f493b26 and source:23ec376126e8b485c89c2064b8a8f518 backgroundonly, revision9b2119e8fbac482b98b50521c0d604bb.
 Open threads: measure coverage first, then decide whether fullcollector canjustifyknownrootrequirement; original10x objective unchanged.
 Errors: none, releaseoverflowcheckedbuild succeeded; no scientificexecutionyet.
+
+## Multiroot bucket kernel qualified, samebucket rank path closed
+
+What was done: freeze5c41bff6150 pushed, inputhashespass, onceexit0;334g-known rootrecoveries exact/native/oracle pass, allpairssamepolynomial, repeated16vectors. Eligible233/233g2,75/775g3,26/672g4 withallrationalpoints;1346 insufficientbuckets retained. Vieta REDCs466/150/52vsdeclaredfullreference13938/7462/3842.
+Decisions made: optionalfastkernel only, reference notfastesttruncatedkernel; allpairenumeration cannotaddrank withinfixedpencil. g4previous28splitvs26eligible leaves2multiplicitycases requiringfallback. No smallFB/cold/fullsolver/10xgain inference. Assertions [pcc:unverified].
+Open threads: independentpencilgeneration/productivity mechanism withallscan/failurecosts, original10x/genus3/4qualification andindependentvalidation.
+Errors: none,no retry/S3/cloud/merge.
