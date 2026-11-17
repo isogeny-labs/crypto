@@ -438,6 +438,33 @@ struct Jac<E> {
     z: E,
 }
 
+/// Precomputed affine multiples of a fixed base point, see
+/// [`Curve::fixed_base_table`].
+#[derive(Clone, Debug)]
+pub struct FixedBaseTable<E> {
+    window: usize,
+    span: usize,
+    digits: usize,
+    points: Vec<Option<Pt<E>>>,
+}
+
+impl<E> FixedBaseTable<E> {
+    /// Window width in bits.
+    pub fn window(&self) -> usize {
+        self.window
+    }
+
+    /// Number of table entries (all `digits·(2^window − 1)` of them).
+    pub fn len(&self) -> usize {
+        self.points.len()
+    }
+
+    /// Whether the table holds no entries.
+    pub fn is_empty(&self) -> bool {
+        self.points.is_empty()
+    }
+}
+
 impl<F: PrimeField> Curve<F> {
     fn jac_infinity(&self, f: &mut F) -> Jac<F::E> {
         Jac {
@@ -563,9 +590,16 @@ impl<F: PrimeField> Curve<F> {
     /// inversion.  The affine ladder this replaces inverted once per
     /// addition, which dominated every prime-field relation probe.
     pub fn mul_big(&self, f: &mut F, p: &Pt<F::E>, k: &BigUint) -> Option<Pt<F::E>> {
+        let acc = self.mul_big_jac(f, p, k);
+        self.jac_to_affine(f, acc)
+    }
+
+    /// [`Curve::mul_big`] without the final inversion, for callers that
+    /// batch several products before converting to affine.
+    fn mul_big_jac(&self, f: &mut F, p: &Pt<F::E>, k: &BigUint) -> Jac<F::E> {
         let bits = k.bits() as usize;
         if bits == 0 {
-            return None;
+            return self.jac_infinity(f);
         }
         let three = f.embed_u64(3);
         let minus_three = f.neg(three);
@@ -577,7 +611,132 @@ impl<F: PrimeField> Curve<F> {
                 acc = self.jac_add_affine(f, acc, p, a_minus_three);
             }
         }
+        acc
+    }
+
+    /// `2P` and `P + Q` batched: convert `n` Jacobian points to affine with
+    /// a single field inversion (Montgomery's trick).  Every input must be
+    /// finite; infinity is reported as `None`.
+    fn jac_batch_to_affine(&self, f: &mut F, pts: &[Jac<F::E>]) -> Vec<Option<Pt<F::E>>> {
+        let n = pts.len();
+        if n == 0 {
+            return Vec::new();
+        }
+        let mut prefix = Vec::with_capacity(n);
+        let mut acc = f.one();
+        for p in pts {
+            acc = f.mul(acc, p.z);
+            prefix.push(acc);
+        }
+        let mut inv = match f.inv(acc) {
+            Some(v) => v,
+            None => return vec![None; n],
+        };
+        let mut out = vec![None; n];
+        for i in (0..n).rev() {
+            let before = if i == 0 { f.one() } else { prefix[i - 1] };
+            let zinv = f.mul(inv, before);
+            inv = f.mul(inv, pts[i].z);
+            if zinv == f.zero() {
+                continue;
+            }
+            let z2 = f.sqr(zinv);
+            let z3 = f.mul(z2, zinv);
+            out[i] = Some(Pt {
+                x: f.mul(pts[i].x, z2),
+                y: f.mul(pts[i].y, z3),
+            });
+        }
+        out
+    }
+
+    /// Affine multiples `[j·2^(w·i)]P`, `j = 1..2^w - 1`, for fixed-base
+    /// multiplication by many scalars.
+    ///
+    /// The prime-field relation probe evaluates `[a]G` once per candidate, so
+    /// the base is fixed and a table turns each multiplication into one
+    /// `bits/w` mixed additions plus a single inversion, instead of
+    /// `bits` doublings and additions.
+    pub fn fixed_base_table(
+        &self,
+        f: &mut F,
+        p: &Pt<F::E>,
+        window: usize,
+    ) -> Option<FixedBaseTable<F::E>> {
+        if !(1..=12).contains(&window) {
+            return None;
+        }
+        let span = (1usize << window) - 1;
+        // `j·2^(w·i)·P` is the identity only when the order divides the
+        // multiple, which cannot happen while the order exceeds `span`.
+        if self.order <= BigUint::from(span as u64) {
+            return None;
+        }
+        let digits = (self.order.bits() as usize).div_ceil(window);
+        let three = f.embed_u64(3);
+        let minus_three = f.neg(three);
+        let a_minus_three = self.a == minus_three;
+        let mut points: Vec<Option<Pt<F::E>>> = Vec::with_capacity(digits * span);
+        let mut base = Jac {
+            x: p.x,
+            y: p.y,
+            z: f.one(),
+        };
+        for i in 0..digits {
+            let base_affine = self.jac_to_affine(f, base)?;
+            let mut acc = self.jac_infinity(f);
+            let mut multiples = Vec::with_capacity(span);
+            for _ in 0..span {
+                acc = self.jac_add_affine(f, acc, &base_affine, a_minus_three);
+                multiples.push(acc);
+            }
+            points.extend(self.jac_batch_to_affine(f, &multiples));
+            if i + 1 < digits {
+                for _ in 0..window {
+                    base = self.jac_double(f, base, a_minus_three);
+                }
+            }
+        }
+        Some(FixedBaseTable {
+            window,
+            span,
+            digits,
+            points,
+        })
+    }
+
+    /// `[k]P` against a table built by [`Curve::fixed_base_table`].
+    pub fn mul_fixed(
+        &self,
+        f: &mut F,
+        table: &FixedBaseTable<F::E>,
+        k: &BigUint,
+    ) -> Option<Pt<F::E>> {
+        let acc = self.mul_fixed_jac(f, table, k);
         self.jac_to_affine(f, acc)
+    }
+
+    /// [`Curve::mul_fixed`] without the final inversion.
+    fn mul_fixed_jac(&self, f: &mut F, table: &FixedBaseTable<F::E>, k: &BigUint) -> Jac<F::E> {
+        let three = f.embed_u64(3);
+        let minus_three = f.neg(three);
+        let a_minus_three = self.a == minus_three;
+        let mut acc = self.jac_infinity(f);
+        for d in 0..table.digits {
+            let mut digit = 0usize;
+            for j in 0..table.window {
+                if k.bit((d * table.window + j) as u64) {
+                    digit |= 1usize << j;
+                }
+            }
+            if digit == 0 {
+                continue;
+            }
+            if let Some(pt) = table.points[d * table.span + digit - 1] {
+                acc = self.jac_add_affine(f, acc, &pt, a_minus_three);
+            }
+        }
+        acc
     }
 
     /// A uniform element of the subgroup of order [`Curve::order`] other
@@ -952,6 +1111,27 @@ pub fn exact_ic_probe_with_arity<F: PrimeField>(
         .enumerate()
         .map(|(i, p)| (f.key(p.x), i))
         .collect();
+    // Every candidate multiplies the same generator: a fixed-base table
+    // replaces a full ladder with `bits/window` mixed additions.
+    let total_candidates = setup_candidates.saturating_add(target_candidates) as usize;
+    let window = if total_candidates >= 512 {
+        8
+    } else if total_candidates >= 128 {
+        6
+    } else {
+        4
+    };
+    let table = if total_candidates >= 32 {
+        c.fixed_base_table(&mut f, g, window)
+    } else {
+        None
+    };
+    let mul_g = |c: &Curve<F>, f: &mut F, k: &BigUint| -> Option<Pt<F::E>> {
+        match &table {
+            Some(t) => c.mul_fixed(f, t, k),
+            None => c.mul_big(f, g, k),
+        }
+    };
     let mut rng = StdRng::seed_from_u64(seed);
     let mut relations = Vec::new();
     let bits = c.order.bits() as usize;
@@ -969,44 +1149,94 @@ pub fn exact_ic_probe_with_arity<F: PrimeField>(
             break a;
         }
     };
-    for candidate in 0..setup_candidates {
-        let a = nonzero_scalar(&mut rng);
-        let Some(r) = c.mul_big(&mut f, g, &a) else {
-            return Err("nonzero generator scalar produced infinity".into());
-        };
-        if let Some(terms) = checked_relation(c, &mut f, &base, &index, &keys, &r, relation_arity)?
-        {
-            relations.push(ExactIcRelation {
-                candidate,
-                coefficient: a.to_str_radix(16),
-                target_dependent: false,
-                terms,
-            });
+    // Batch candidate generators in Jacobian coordinates and pay one
+    // inversion per chunk instead of one per candidate.
+    const CHUNK: usize = 256;
+    let three = f.embed_u64(3);
+    let minus_three = f.neg(three);
+    let a_minus_three = c.a == minus_three;
+    let mut chunk_scalars: Vec<(u64, BigUint)> = Vec::with_capacity(CHUNK);
+    let mut chunk_points: Vec<Jac<F::E>> = Vec::with_capacity(CHUNK);
+    let mut candidate = 0u64;
+    while candidate < setup_candidates {
+        let end = (candidate + CHUNK as u64).min(setup_candidates);
+        chunk_scalars.clear();
+        chunk_points.clear();
+        while candidate < end {
+            let a = nonzero_scalar(&mut rng);
+            let jac = match &table {
+                Some(t) => c.mul_fixed_jac(&mut f, t, &a),
+                None => c.mul_big_jac(&mut f, g, &a),
+            };
+            if f.is_zero(jac.z) {
+                return Err("nonzero generator scalar produced infinity".into());
+            }
+            chunk_scalars.push((candidate, a));
+            chunk_points.push(jac);
+            candidate += 1;
+        }
+        let affine = c.jac_batch_to_affine(&mut f, &chunk_points);
+        for ((index_of, a), r) in chunk_scalars.iter().zip(affine) {
+            let r = r.ok_or("generator multiple was infinite")?;
+            if let Some(terms) =
+                checked_relation(c, &mut f, &base, &index, &keys, &r, relation_arity)?
+            {
+                relations.push(ExactIcRelation {
+                    candidate: *index_of,
+                    coefficient: a.to_str_radix(16),
+                    target_dependent: false,
+                    terms,
+                });
+            }
         }
     }
     let setup_relations = relations.len();
     let setup_rank = relation_system(&relations, size, false, &c.order)?.0;
-    for candidate in 0..target_candidates {
-        let a = if candidate == 0 {
-            BigUint::zero()
-        } else {
-            nonzero_scalar(&mut rng)
-        };
-        let r = if a.is_zero() {
-            Some(*q)
-        } else {
-            c.mul_big(&mut f, g, &a)
-                .and_then(|ag| c.add_points(&mut f, q, &ag))
-        };
-        let Some(r) = r else { continue };
-        if let Some(terms) = checked_relation(c, &mut f, &base, &index, &keys, &r, relation_arity)?
-        {
-            relations.push(ExactIcRelation {
-                candidate,
-                coefficient: a.to_str_radix(16),
-                target_dependent: true,
-                terms,
-            });
+    let mut candidate = 0u64;
+    while candidate < target_candidates {
+        let end = (candidate + CHUNK as u64).min(target_candidates);
+        chunk_scalars.clear();
+        chunk_points.clear();
+        while candidate < end {
+            let a = if candidate == 0 {
+                BigUint::zero()
+            } else {
+                nonzero_scalar(&mut rng)
+            };
+            let jac = if a.is_zero() {
+                Jac {
+                    x: q.x,
+                    y: q.y,
+                    z: f.one(),
+                }
+            } else {
+                let ag = match &table {
+                    Some(t) => c.mul_fixed_jac(&mut f, t, &a),
+                    None => c.mul_big_jac(&mut f, g, &a),
+                };
+                c.jac_add_affine(&mut f, ag, q, a_minus_three)
+            };
+            if f.is_zero(jac.z) {
+                candidate += 1;
+                continue;
+            }
+            chunk_scalars.push((candidate, a));
+            chunk_points.push(jac);
+            candidate += 1;
+        }
+        let affine = c.jac_batch_to_affine(&mut f, &chunk_points);
+        for ((index_of, a), r) in chunk_scalars.iter().zip(affine) {
+            let Some(r) = r else { continue };
+            if let Some(terms) =
+                checked_relation(c, &mut f, &base, &index, &keys, &r, relation_arity)?
+            {
+                relations.push(ExactIcRelation {
+                    candidate: *index_of,
+                    coefficient: a.to_str_radix(16),
+                    target_dependent: true,
+                    terms,
+                });
+            }
         }
     }
     let target_relations = relations.len() - setup_relations;
@@ -1016,7 +1246,7 @@ pub fn exact_ic_probe_with_arity<F: PrimeField>(
         .filter(|_| determined)
         .map(|s| s.values[size].clone());
     let verified = if let Some(ref x) = scalar {
-        c.mul_big(&mut f, g, x).as_ref() == Some(q)
+        mul_g(c, &mut f, x).as_ref() == Some(q)
     } else {
         false
     };
