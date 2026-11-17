@@ -633,3 +633,17 @@ Run replay and retain results, then establish actual solver cost on C4 inputs.
 
 ### Errors
 Previous coordination task lease retry budget exhausted; released it and claimed separate replay taskT7017. No arithmetic run failure.
+
+## Exact-order replay passed; parent PR merged externally
+
+### What was done
+At010ae1959c6once-onlyreplayerexits0:39exactpointorders,threewholeorders,threeWeilreconstructions; allbasecounts/interval/LCMchecks pass. SharednativeCantorarithmeticandretainedextensioncountinputs explicitly disclosed. Local observations only. [pcc:unverified]
+
+### Decisions made
+PR4507wasmergedexternallyat29195579cf9withhead dace194b68b while next verifier was prepared. Preserve execution commit and move subsequent commits to a successor review PR; do not edit merged PR.
+
+### Open threads
+Source/orbit replay, then actual C4 solver cold-cost comparison. Independent extension re-enumeration remains absent.
+
+### Errors
+No arithmetic replay failures. Remote branch was deleted by parent merge and recreated by checkpoint push; no cleanup or rerun.

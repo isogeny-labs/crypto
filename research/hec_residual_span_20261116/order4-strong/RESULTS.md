@@ -23,3 +23,9 @@ Raw hashes verified under Git custody while S3 is unavailable. No field/grid rep
 At pushed checkpoint `af4e654edd2`, the standalone determinant/interpolation replayer exited 0. It accepted all 381 positive witnesses, covering all 127 candidate exponents for each of the three models; there were zero unresolved records. Both matrix controls passed. Source, binary, input and output hashes are retained in `REPLAY.INPUT.sha256` and `REPLAY.OUTPUT.sha256`. These are local arithmetic replay observations, not a signed PCC verdict. [pcc:unverified]
 
 The verifier does not import the producer's trace/Newton or polynomial-gcd implementation. It has not independently re-enumerated extension point counts or replayed exact point orders, interval uniqueness, or source projections. Those remain the next qualification gate. No new model selection, target solve, or performance measurement occurred in this replay.
+
+## Exact-order certificate implementation replay
+
+At pushed checkpoint `010ae1959c6`, the order-certificate checker exited 0 on all 39 retained exact point orders, three selected whole-order certificates and three Weil reconstructions. Every recorded base-field count was recomputed; LCM accumulation, prime-factor non-annihilation, branch order two, interval endpoints and unique multiples passed. Integer square-root controls passed. [pcc:unverified]
+
+The replay shares native Cantor arithmetic and consumes retained extension counts. It therefore separates interval/certificate logic from producer code, but is neither a second group implementation nor independent extension counting. Source/orbit receipt replay remains pending. The large-prime proper-factor Hasse argument is documented prospectively in `ORDER-REPLAY-PROTOCOL.md`; it is additional reasoning under the exact-order/count premises, not a new attack.
