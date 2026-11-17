@@ -1,0 +1,12 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",ranksep=.3];
+ node [shape=box,fontname="Helvetica",fontsize=12,style="rounded,filled",fillcolor="#edf4fa"];
+ input [label="ACTUAL 72-COEFFICIENT POLYNOMIAL Q\nMasked rows q_j, degree(q_j) <= 15-2j"];
+ cubic [label="ACTUAL CUBIC REDUCTION\nA=sum q_(2s) f^s, B=sum q_(2s+1) f^s\nConstructed D: Q=C(A)+C(B)Y+(Y^2-f)D"];
+ bounds [label="IF degree(f) <= 3\ndegree(A) <= 15, degree(B) <= 13\nActual monic remainder = C(A)+C(B)Y"];
+ finite [label="ACTUAL LINEAR 30-COORDINATE MAP\n16 coefficients of A + 14 of B\nZero iff whole remainder zero"];
+ kernel [label="RESTRICT TO ACTUAL 70-JET KERNEL\nZero iff Y^2-f divides Q\n30 is capacity, NOT rank"];
+ next [label="OPEN: nonzero image on valid curve input\nProve actual quotient/local-jet/rank bridges\nThen norm / scalar / growing finder / full cost",fillcolor="#fff2d9",style="rounded,filled,dashed"];
+ input -> cubic -> bounds -> finite -> kernel;
+ kernel -> next [style=dashed,label="not inferred"];
+}
