@@ -61,12 +61,20 @@ fastest; local baseline + measured optimization.
   than the sweep (0.87×).
 - Gap to 1-thread rho: ≈33× (28-b) to ≈120× (32-b), widening (IC p^{2/3} vs rho
   √p, i.e. p^{1/6}) — Gaudry's prime-field verdict confirmed. No sub-rho claim.
+- **End-to-end (full single-target solve, near-optimal B):** batched lock-step
+  pair-table solver (`ic_multi_solve_ex`, table+batched) is the fastest existing
+  path — **53× (28-b) / 177× (32-b)** over the default sweep `ic_solve`, and
+  1.5×/2.2× over the single-walk `ic_solve_table` (amortized inverse: one per
+  lock-step round vs one per walk step). Margin over the sweep grows with p.
+  Still ≈22×/43× slower than 1-thread rho.
 
 ## Open threads (unfinished, pick up next time)
 
-- Promote `ic_solve_table` (B auto-tuned ≈ p^{1/3}) to the default single-target
-  prime IC solver; the sweep is strictly dominated. (Code change not yet made —
-  only the measurement + regression test.)
+- Promote the **batched** `ic_multi_solve_ex` (table+batched, B auto-tuned
+  ≈ p^{1/3}) to the default single-target prime IC solver; the sweep is strictly
+  dominated (53–177×) and the single-walk table by 1.5–2.2×. (Default not yet
+  switched — measurement + regression test only; wiring a `strategy` default
+  into `ic_solve`/callers is the next code step.)
 - Frontier walls to attack next: (a) O(B²) pair-table build + memory (binding at
   the optimum); (b) dense O(B³) LA just past it — relations are sparse (≤3
   nonzeros), so sparse structured elimination/Lanczos → ~O(B²); (c) measure the

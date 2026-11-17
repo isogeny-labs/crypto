@@ -109,12 +109,36 @@ was **yes** on every row (identical recovered log).
    (`O(p^{2/3})` IC vs `O(√p)` rho, i.e. `p^{1/6}`), consistent with Gaudry's
    prime-field verdict. No rho-beating or sub-rho claim is made.
 
+## End-to-end: the three full single-target solvers
+
+Total wall time of a complete single-target DLP solve at the near-optimal `B`,
+same planted `k`, same host (`--e2e-b`). `sweep` = default `ic_solve`
+(summands 2); `table` = `ic_solve_table` (single-walk pair table); `batched` =
+`ic_multi_solve_ex(table, batched)` (lock-step lanes, one inversion per round,
+shared factor-base-log solve + per-target phase). All recover the planted `k`.
+
+| bits | B | sweep `ic_solve` | table `ic_solve_table` | batched `ic_multi_solve_ex` | rho 1-thr |
+|--:|--:|--:|--:|--:|--:|
+| 28 | 960  | 4.96 s (1.00×) | 0.1415 s (**35×**) | 0.0930 s (**53×**) | 0.0041 s |
+| 32 | 1920 | 71.43 s (1.00×) | 0.9004 s (**79×**) | 0.4030 s (**177×**) | 0.0093 s |
+
+- The **batched lock-step solver is the fastest existing single-target prime IC
+  solver**, `53×` (28-bit) → `177×` (32-bit) over the default sweep — the margin
+  grows with `p`. It beats the single-walk table by `1.5× → 2.2×`: the gain is
+  the amortized modular inverse (one per lock-step round over all lanes instead
+  of one per walk step).
+- It is still `≈22×` (28-bit) / `≈43×` (32-bit) slower than 1-thread rho; the
+  gap is real and widens with `p` (Gaudry). No sub-rho claim.
+
 ## Takeaways / recommendations
 
-- **Make `ic_solve_table` (with `B` auto-tuned to `≈ p^{1/3}`) the default
-  single-target prime IC solver** and demote the sweep: the sweep is strictly
-  dominated at every size measured (same answer, `16–59×` slower total). A
-  regression test (`ic_solve_table_agrees_with_sweep`) now pins the agreement.
+- **Make the batched lock-step pair-table solver (`ic_multi_solve_ex`, table +
+  batched) the default single-target prime IC solver**, with `B` auto-tuned to
+  `≈ p^{1/3}`: it is `53–177×` faster than the default sweep `ic_solve`
+  (growing with `p`), and `1.5–2.2×` faster than the single-walk
+  `ic_solve_table`. The sweep is strictly dominated at every size measured (same
+  answer). A regression test (`ic_solve_table_agrees_with_sweep`) pins the
+  sweep/table agreement; `ic_multi_solve` already has its own tests.
 - **Next levers on the frontier (to raise the usable `B` and shrink the gap):**
   (a) the `O(B²)` pair-table build and its `O(B²)` memory are the binding wall
   at the optimum; (b) the dense `O(B³)` linear algebra is the wall just past it

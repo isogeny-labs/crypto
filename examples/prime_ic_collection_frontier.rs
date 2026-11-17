@@ -38,8 +38,8 @@
 use std::time::Instant;
 
 use crypto_lib::cryptanalysis::prime_fast::{
-    collect_relations, collect_relations_table, find_a3_curve, rho_parallel, solve_relations,
-    FastFactorBase, PairTable, RhoConfig,
+    collect_relations, collect_relations_table, find_a3_curve, ic_multi_solve_ex, ic_solve,
+    ic_solve_table, rho_parallel, solve_relations, FastFactorBase, PairTable, RhoConfig,
 };
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -53,6 +53,8 @@ struct Args {
     extra: usize,
     json: Option<String>,
     rho: bool,
+    /// If > 0, also run the three full single-target solvers end to end at this B.
+    e2e_b: usize,
 }
 
 fn parse_args() -> Args {
@@ -65,6 +67,7 @@ fn parse_args() -> Args {
         extra: 16,
         json: None,
         rho: true,
+        e2e_b: 0,
     };
     let mut i = 1;
     while i < argv.len() {
@@ -86,6 +89,7 @@ fn parse_args() -> Args {
             "--extra" => a.extra = next(&mut i).parse().unwrap_or(a.extra),
             "--json" => a.json = Some(next(&mut i)),
             "--no-rho" => a.rho = false,
+            "--e2e-b" => a.e2e_b = next(&mut i).parse().unwrap_or(0),
             other => eprintln!("ignoring unknown argument {other}"),
         }
         i += 1;
@@ -203,6 +207,66 @@ fn main() {
             }));
         }
         println!();
+
+        // ── end-to-end: three full single-target solvers at one B ───────
+        if args.e2e_b > 0 {
+            let b = args.e2e_b;
+            let mw = args.max_targets;
+            println!("### End-to-end single-target solve at B={b} (total wall s)\n");
+            println!("| solver | total s | relations/targets | vs sweep | vs rho (1 thr) |");
+            println!("|:--|--:|--:|--:|--:|");
+            // sweep (default ic_solve, summands=2)
+            let ((x_sw, rep_sw), sw_s) = {
+                let (r, s) = secs(|| ic_solve(&fc, g, q, b, args.extra, 2, mw, args.seed));
+                (r.expect("ic_solve"), s)
+            };
+            assert_eq!(x_sw, k, "ic_solve wrong log");
+            // table single-walk (ic_solve_table)
+            let ((x_tb, rep_tb), tb_s) = {
+                let (r, s) = secs(|| ic_solve_table(&fc, g, q, b, args.extra, mw, args.seed));
+                (r.expect("ic_solve_table"), s)
+            };
+            assert_eq!(x_tb, k, "ic_solve_table wrong log");
+            // batched lock-step table (ic_multi_solve_ex, table+batched), single target
+            let ((logs_ba, rep_ba), ba_s) = {
+                let (r, s) = secs(|| {
+                    ic_multi_solve_ex(&fc, g, &[q], b, args.extra, mw, args.seed, true, true)
+                });
+                (r.expect("ic_multi_solve_ex"), s)
+            };
+            assert_eq!(logs_ba.first().copied().flatten(), Some(k), "batched wrong log");
+            let rows = |t: f64| format!("{t:.4}");
+            println!(
+                "| sweep `ic_solve` | {} | {}/{} | 1.00× | {:.3}× |",
+                rows(sw_s),
+                rep_sw.relations,
+                rep_sw.targets,
+                rho_wall / sw_s
+            );
+            println!(
+                "| table `ic_solve_table` | {} | {}/{} | {:.2}× | {:.3}× |",
+                rows(tb_s),
+                rep_tb.relations,
+                rep_tb.targets,
+                sw_s / tb_s,
+                rho_wall / tb_s
+            );
+            println!(
+                "| batched `ic_multi_solve_ex` | {} | {}/{} | {:.2}× | {:.3}× |",
+                rows(ba_s),
+                rep_ba.determined_logs,
+                rep_ba.targets_walked.first().copied().unwrap_or(0),
+                sw_s / ba_s,
+                rho_wall / ba_s
+            );
+            println!();
+            out.push(json!({
+                "section": "e2e", "bits": bits, "B": b,
+                "sweep_total_s": sw_s, "table_total_s": tb_s, "batched_total_s": ba_s,
+                "rho_wall_s_1thread": rho_wall,
+                "table_vs_sweep": sw_s / tb_s, "batched_vs_sweep": sw_s / ba_s,
+            }));
+        }
     }
 
     if let Some(path) = &args.json {
