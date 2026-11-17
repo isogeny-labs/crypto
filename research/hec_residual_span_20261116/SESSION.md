@@ -1665,3 +1665,10 @@ What was done: implemented all56indexmultisets/120permutations, binomialbiquadra
 Decisions made: no conjectural12index shortcut; exceptionalidentity/kernel cases included, no silentdiscard. Producer assertions [pcc:unverified].
 Open threads: pushfreeze, once-only bounded invocation then quotientnormalization ifchecks pass.
 Errors: none in compile; no science yet.
+
+## General Kummer quintic finite gate completed
+
+What was done: freeze02eb85bf333 single invocation exits0; spaces12+12 combinedrank20 intersection4; fourquinticvectors retained;67samples sourcequartic/nonzeromap,134translationchecks and2211kernel/negationseparation pairs pass. Producer assertions [pcc:unverified].
+Decisions made: mapcandidate finitequalification, not exhaustive morphism proof; no exceptionalpoints dropped.
+Open threads: imagequartic interpolation/exactsubstitution then quotientcurve/targetrecovery and fullcost.
+Errors: none, no rerun/S3/cloud.
