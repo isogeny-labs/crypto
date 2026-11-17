@@ -2681,3 +2681,10 @@ What was done: compiledtwoexistingpencilmodules withauditfalse, same22publicfixt
 Decisions made: entireAPIandinternalverificationcounted; externaldriverchecksafterdisable. Allnewregressionskept; fieldsseparate, no component-to-runtime10xclaim. One600CPUprocessafterGitfreeze.
 Open threads: priceactualextractionandcompletepencilpipeline againststrongestexistingcounts.
 Errors: pre-freeze extra closingbrace innewdriver failedcompile, correctedbeforeanyrun; inheritedunusedmodulewarnings remain. No S3/cloud/merge.
+
+## Complete generic tailpencil counts qualify, broad moderate gains retained
+
+What was done: freeze96bd0f8bbdc hashespass, onecountgate exit0;88completecalls allnativeverified/repeatedfullvectors/reportreplayexact. Fullnorm/tailcompletebase ratiosg21.091-1.272,g31.165-1.232,g41.049-1.089; subgroup16vectorsunchanged. Bestpriorwalk/Fast/Dense/Hybridbase ratiosg21.079-1.445,g31.766-3.854,g41.110-2.397; subgroupg21.049-5.298,g32.140-3.814,g4.725-2.151.
+Decisions made:22/22baseREDCimprove and21/22bothfieldsREDCimprove;g4p31source17subgroupregression1806->2490retained.220comparisons/44priorenvelopes/44substitutionrowsretained. No10xfield/wall/newmathclaim; keepallsixcontrols. Nextsharedgenericcatalogue/rootlookuporweightedLPgraphmechanismneedsowncost/qualification, notsingle-sidedprepareddataadvantage.
+Open threads: genericcatalogue/root-table equivalence andfairshared-costgate ifpursued; full10xgoalstillopenandindependentreviewpending.
+Errors: no scientificfailure; pre-freeze compiledelimitererroralreadyrecorded. No S3/cloud/merge.
