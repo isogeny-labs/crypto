@@ -2758,3 +2758,10 @@ What was done: added exclusive nonarithmetic counterlabels around validate/prepa
 Decisions made: newpartitionnotwallbenchmark. Conditionalperfield Amdahlbudgets only fixedstage substitutions, notuniversal lowerbound; require90percentremovablecountfor10x withinthat model. One600CPUrun afterGitfreeze.
 Open threads: executepartition and choose next mathematicalconstruction bydominantcompletecost; no10xestablished.
 Errors: inherited unusedimport/helper warnings only; no S3/cloud/merge. Ownscopecheckallows/attachsameexistingreservation.
+
+## Generic phase partition qualifies and limits collector-only substitutions
+
+What was done: freeze5bc31259f9e inputhashpass,44freshcalls exit0, alloldtotals/Reports/lookups/nativeanswersreplay. Everyphase sums all16counters/modulus and repeats exact.132conditionalgroupbudgets derived. Zeroingcollection gives baseupperratio g21.77-8.37,g31.79-3.94,g42.88-6.07; none10. SubgroupREDC entirelyLP+solve. p4001source1 rowconstruction59784 exceedsoracle17024; validation+prep+verify18944 exceeds10xbasebudget15851.
+Decisions made: nextmechanismmustaccountforrowproduction/LPpayload andsoundpublicvalidation/verify; no fixed-collector-only10xbaseclaim. Conditionalfieldboundsnotruntimeoruniversal mathlowerbounds. Avoidphasecount-to-wallpromotion and vacuousInfinitysubgroupbound.
+Open threads: derive integratedconstruction costcase; deferredLPpayload graph classicalcandidateonly, not10x ornovelty. Fullgoalactive/unachieved.
+Errors: no scientificfailures, inheritedunusedimportwarnings. No S3/cloud/merge; no unchangedrerun.
