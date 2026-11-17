@@ -1,0 +1,28 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-17T21:22:39Z",
+ "id": "PCC-20261117-d4d88d",
+ "kind": "theorem",
+ "producer": {
+  "commit": "4ce098bdb050a46ca425fe75b0db87edcf0ac059",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "e3fb7841894f2d37e574d66208f03b5b9976ef3d1c4ddcb53b746248a47315f7",
+   "kind": "lean",
+   "project": "research/ecdlp_weakness_lean_20261104/lean",
+   "theorem": "KZGToxicWaste.forgeProof_accepts"
+  },
+  {
+   "decl_sha256": "eff39fd78517c2251cc1b475856377b437f45c29d74c5f7ecfaa8e4562c7be75",
+   "kind": "lean",
+   "project": "research/ecdlp_weakness_lean_20261104/lean",
+   "theorem": "KZGToxicWaste.scalarVerify_at_trapdoor_iff"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Lean v4.34.1 / Mathlib v4.34.1; scalar-coordinate surrogate only; no equivalence to a pairing verifier, degree bound, ceremony model, trapdoor recovery, or computational security theorem.",
+ "statement": "For the scalar-coordinate KZG surrogate c=q*(tau-z)+y, known tau constructs an accepting proof when tau\u2260z; at z=tau, verification is equivalent to c=y."
+}

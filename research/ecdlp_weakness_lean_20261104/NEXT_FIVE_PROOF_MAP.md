@@ -59,7 +59,7 @@ parameterized protocol.
 5. **Missing components only.** The named scalar map and its two endpoints.
 6. **Inheritance.** Ring operations and normalization come from `ZMod`;
    cancellation comes from its field instance under `[Fact q.Prime]`. The
-   abstract exact-order-group bridge is already proved separately by
+   abstract exact-order-group bridge is already available separately as
    `JKSSTCyclicECDLP.orderScalarMap_injective`; this module isolates the
    coordinate omission countermodel and normalized-coordinate endpoint.
 
@@ -72,7 +72,7 @@ parameterized protocol.
    fields and a finite domain tag. Encoding frames the encoded domain and every
    list field by an ordered tag and its natural-token length. Decoding consumes
    the exact ordered frames and rejects trailing input.
-4. **Assembly probe.** Prove `decode (encode t) = some t`; injectivity is then
+4. **Assembly probe.** Establish `decode (encode t) = some t`; injectivity is then
    exactly `Function.LeftInverse.injective` after removing `some`.
 5. **Missing components only.** Raw concatenation alias, framed encoder,
    frame parser, and the left-inverse lemma.
