@@ -1,5 +1,10 @@
 # Extension-field algebraic IC with graph elimination
 
+The [17 November Nagao unit-elimination component](rho-parity/README.md)
+adds an opt-in five-variable finder with exact lifting and the existing checked
+row materializer. Its fixed-fixture counts and dashboard exclusion are recorded
+separately; frozen stage41–43 data and whole-pipeline status are unchanged.
+
 The [native quadratic remainder component](quadratic-remainder-component/README.md)
 adds a reusable opt-in degree-nine extractor and bounded signed class-graph
 adapter to the library. Its separate frozen-source release suite reports19

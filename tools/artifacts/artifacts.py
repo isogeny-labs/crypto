@@ -356,8 +356,25 @@ class Remote:
                          "--metadata", f"sha256={digest}", "--no-progress", "--only-show-errors")
 
     def get_args(self, digest: str, dest: Path) -> list[str]:
-        return self._aws("s3", "cp", f"s3://{self.bucket}/{self.key(digest)}", str(dest),
-                         "--no-progress", "--only-show-errors")
+        # The object key is already exact. High-level `s3 cp` first issues a
+        # HEAD request, whose generic 403 hides S3's useful GetObject errors
+        # (notably AllAccessDisabled). Stream the object directly instead.
+        # ensure_cached still checks both SHA-256 and length before publishing.
+        return self._aws("s3api", "get-object", "--bucket", self.bucket,
+                         "--key", self.key(digest), str(dest))
+
+    def download_error(self, digest: str, stderr: str) -> str:
+        message = f"download {self.key(digest)} from {self.describe()}: {stderr.strip()}"
+        if "AllAccessDisabled" in stderr:
+            return message + ("; S3 has disabled access to this resource. The bucket owner must "
+                              "restore access or provide a verified replacement store "
+                              "(ARTIFACTS_REMOTE); changing IAM grants or retrying cannot repair it.")
+        if "NoSuchKey" in stderr or "(404)" in stderr:
+            return message + "; object is absent: restore the exact manifest SHA-256 bytes to the store."
+        if "AccessDenied" in stderr or "(403)" in stderr:
+            return message + ("; verify the remote and s3:GetObject permission. Without s3:ListBucket, "
+                              "S3 can also return 403 for a missing key; do not treat it as absence.")
+        return message
 
     def _run(self, argv: list[str]) -> subprocess.CompletedProcess:
         try:
@@ -440,7 +457,7 @@ class Remote:
         p = self._run(self.get_args(digest, dest))
         if p.returncode != 0:
             dest.unlink(missing_ok=True)
-            die(f"download {self.key(digest)}: {p.stderr.strip()}")
+            die(self.download_error(digest, p.stderr))
 
 
 # ---------------------------------------------------------------------------
