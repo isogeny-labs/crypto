@@ -1,0 +1,17 @@
+timestamp_utc,source_sha,curve_n,curve_a,factor_base_hash,natural_trials,natural_relations,planted_count,planted_verified,unsat_count,unsat_hits,wall_seconds,relations_per_sec,success_rate,status,anomaly,host_cpu,run_url,details
+2026-11-17T19:32:10.820403+00:00,71eac8ba97adf10cea364808bd2593a11ff99e4a,23,0,,,,,,,,,,,failed,"run failed: RuntimeError: Cargo build rc=101: m|[0m     pub degree_of_regularity_observed: Option<u32>,
+     [1m[94m|[0m     [1m[94m----------------------------------------------[0m [1m[94mfirst use of `degree_of_regularity_observed`[0m
+[1m[94m...[0m
+[1m[94m6469[0m [1m[94m|[0m     pub degree_of_regularity_observed: Option<u32>,
+     [1m[94m|[0m     [1m[91m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [1m[91mused more than once[0m
+
+[1m[33mwarning[0m[1m: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency[0m
+   [1m[94m--> [0msrc/ml_dataset/koblitz_m3.rs:125:14
+    [1m[94m|[0m
+[1m[94m125[0m [1m[94m|[0m             .fetch_update(
+    [1m[94m|[0m              [1m[33m^^^^^^^^^^^^[0m
+    [1m[94m|[0m
+    [1m[94m= [0m[1mnote[0m: `#[warn(deprecated)]` on by default
+[1m[96mhelp[0m: replace the use of the deprecated method
+    [1m[94m|[0m
+[1m[94m125[0m [91m- [0m ",AMD EPYC 7763 64-Core Processor,https://github.com/isogeny-labs/crypto/actions/runs/44158400387,"Cargo build rc=101: m|[0m     pub degree_of_regularity_observed: Option<u32>,      [1m[94m|[0m     [1m[94m----------------------------------------------[0m [1m[94mfirst use of `degree_of_regularity_observed`[0m [1m[94m...[0m [1m[94m6469[0m [1m[94m|[0m     pub degree_of_regularity_observed: Option<u32>,      [1m[94m|[0m     [1m[91m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [1m[91mused more than once[0m  [1m[33mwarning[0m[1m: use of deprecated method `std::sy"
