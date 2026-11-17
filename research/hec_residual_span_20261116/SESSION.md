@@ -3024,3 +3024,10 @@ What was done: freeze9949caac151 hashespass/exit0.6exactdisc=delta4*I² identiti
 Decisions made: square_indexrawfieldisnotanactualintegralbasisindex;conditionalgenericchart/localinertiaargument pluscertificates distinctfromcomputednormalization/nonhyperellipticity. Preserve4nonsquareobstructions.
 Open threads: canonicaladjoints/smoothplanequarticandcompleteoriginaltargettransport;full10xgenus2+goalactiveunachieved,independentreviewopen.
 Errors: no scientificfailure/no compilewarnings.Gitcustody/noS3/no merge.
+
+## Smith infinity resolution and adjoint subsystem frozen
+
+What was done: compiled exact local degree10 blowups/repeated-tangent completeness checks, node/cusp/tacnode controls and36degree7monomial adjoint coefficient constraints with Laurent cancellation and native nullspace validation.
+Decisions made: fail unsupported tangent cases;noactualpath/delta/dimensionexpected;finiteconstraintsstillpending. Gitfreeze precedes sole600CPU invocation.
+Open threads: runlocalresolution;thencombinefiniteadjoints/canonicalmodel/completeoriginaltargettransport.Full10xgoalactive.
+Errors: unused copied helper/import warnings only;no scientificexecution yet.
