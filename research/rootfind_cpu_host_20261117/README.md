@@ -429,3 +429,26 @@ done
 
 Retain the draft gate: actual PMU counters, GPU correctness and
 end-to-end `rf256_decompose` throughput on equal input streams.
+
+
+### Final code revision: verified after rejecting ADC intrinsic
+
+[GitHub Actions run 44201297759](https://github.com/isogeny-labs/crypto/actions/runs/44201297759)
+rebuilt and checked the **final retained code** (sparse P-256 reduction
+and x86-64 `u256_sbb`, with original `u256_adc` restored). All C++
+rootfinder correctness tests passed (`ALL PASS`), including
+32,768 before/after multiply pairs and 32,768 limb-operation pairs.
+
+| Final code, GCC -O2 on Ubuntu 24.04 runner | Before ns/op | After ns/op | Speedup |
+|---|---:|---:|---:|
+| P-256 Montgomery multiplication | 34.804 | 30.191 | **1.153x** |
+| Four-limb subtraction with borrow | 3.461 | 2.737 | **1.265x** |
+| Four-limb addition (unchanged control) | 3.044 | 2.996 | 1.016x noise |
+
+The first CI run above had different absolute timings and speedups
+because it was a different transient runner; **use this final table**
+for the retained commit's actual-header results. The local
+`perf_event_open` task-clock results are the only collected Linux
+performance counters; CI hardware counters remain unavailable
+(`perf_event_paranoid=4`). Neither microbenchmark represents the
+whole root-finding algorithm or establishes GPU speedups.
