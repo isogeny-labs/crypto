@@ -1826,3 +1826,10 @@ What was done: derivedtwistedfixedpointtracesidentify pi=P(sigma) byrank1cycloto
 Decisions made: wholeprimeorderpremiseunchanged impliesLagrangeredundancy of[ell]C, notnewassumption. Nonzero/publicsourcebindingretained. Fullcharacter/Bezoutcostcounted. Mathematicalproofnotformal/independentreviewed, allassertions [pcc:unverified].
 Open threads: pushfreeze then once-only120CPU invocation andcomparecompletecosts.
 Errors: none in compile, no science yet; MilneLEC25.1/AV10.23primarytext read.
+
+## Traced Frobenius action certificate qualified
+
+What was done: freeze7c3ce5a0231 once-onlyexit0;12orientations/12wronglambda/2040nativeplacecontrols,12certificates/84mutations,24costcalls replay/phases/repeats pass. Proof andBezoutwitnesses retained. Assertions [pcc:unverified].
+Decisions made: pi=P(sigma) fromtwistedtraces+tracepairing; no unqualifiedCM/actionassumption added, fixedwholeorderpremise unchanged. p601verifierbase1.787-1.926old/new,completecandidatebase1.226-1.325x andell8.637-10.344xsourcecost. No fullgain.
+Open threads: sparsewitnessconstruction/zerowork elimination withsamecertificatepredicate, thenchangedproducer; independentproofreview/formalization.
+Errors: none,no rerun/S3/cloud.
