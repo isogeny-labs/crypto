@@ -857,3 +857,17 @@ A new relation-generation mechanism still needs a complete cost case; the broad 
 
 ### Errors
 The previous compact phrase about closing a supported candidate was ambiguous; replaced it with an explicit rejection based on the table.
+
+## Incremental sparse pencil baseline prepared
+
+### What was done
+Replaced repeated elimination in isolated copies of the binomial and C4 pencil with general sparse incremental elimination. All row generation and checks remain. A separate counter-disabled gate compares every accepted prefix with the original solver. Compiled successfully; not executed.
+
+### Decisions made
+Use all eight retained models and exactly the previous 32 public workloads. Compare against retained original vectors rather than rerun unchanged benchmarks. Require the entire base-field vector unchanged, all available determining-prefix fields equal, and exact repetition. This strengthens controls; it is engineering, not mathematical priority.
+
+### Open threads
+Freeze and push, execute once, then use the strengthened pencil for the next mathematical lead. The broader tenfold genus-2+ objective remains active.
+
+### Errors
+None. Previous goal turn classified as progress from its completed falsifier and stronger solver reference.
