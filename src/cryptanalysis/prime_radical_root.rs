@@ -266,7 +266,7 @@ impl<R: Ring> Cube<R> {
 
 /// Per-prime context: one-time precomputation (non-residues, 3-Sylow generators, constants).
 pub struct RadicalRootCtx {
-    pub f: Fp,
+    pub(crate) f: Fp,
     inv2: u64,
     inv3: u64,
     inv4: u64,
