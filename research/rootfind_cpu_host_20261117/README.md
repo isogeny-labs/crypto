@@ -196,3 +196,67 @@ reproduction produced **1.297×** for P-256 host inversion
 (24,669 → 19,597 ns), with identical public-input correctness checks.
 Compiler sensitivity reinforces that the measurements are indicative,
 not deployment-level numbers.
+
+
+## Follow-up: eliminate identity multiplies in the root-finding oracle (2026-11-17)
+
+Root-finding itself uses two additional Montgomery batch-inversion loops
+in `gpu/rootfind/rootfind.cuh`, separate from `fp64_batch_inv`:
+
+* `rf_decompose_thread<F,T,CHUNK>`: seed the prefix accumulator from
+  `d[0]`, start the prefix at 1, stop the unwind at 1, and assign
+  `d[0]=inv_acc`. Saves **3 field multiplications per full thread chunk**
+  for every supported `CHUNK` (8, 16, 32, 64). Preserves the inverse of
+  each nonzero (or one-substituted) denominator exactly.
+* `rf_pair_run`: seed `pre[0]=d[0]`, omit the final unused unwind
+  multiplication, and skip the unreachable `bi==ai` branch for `k>=1`.
+  Saves **2 field multiplications per nonempty pair-table run**, with
+  unchanged denominator-zero fallback. `m>=1` follows from the
+  existing `b0>=n` early return.
+
+All changes operate on field elements in the same Montgomery form and
+require no change to relation ordering or lookup tables. They affect the
+host and GPU compilations, **but the performance evidence below is CPU
+only**; verify GPU occupancy and end-to-end oracle throughput before
+adopting a device speedup claim.
+
+### Local paired measurements (isolated reproduction, not PMU counters)
+
+AMD EPYC 9V74 VM, CPU 0 pinned, C++17 `-O2`, deterministic public
+8192-row input corpus, median of nine timing passes inside each
+process, **15 independent processes**. Every process checked exact
+bitwise agreement over all 8192 rows, `pair` lengths 1..16, and
+`oracle` chunk sizes 16/32. The `oracle` core omits table lookups,
+point arithmetic and relation output; the `pair` core omits its
+point-coordinate computation. These are not full-oracle measurements.
+
+| Isolated core | Old median ns/op | New median ns/op | Median of 15 paired speedups | Paired speedup range |
+|---|---:|---:|---:|---:|
+| Oracle CHUNK=16 | 253.01 | 244.06 | 1.019x | 0.915-1.105x |
+| Oracle CHUNK=32 | 389.31 | 379.55 | 1.035x | 0.973-1.650x |
+| Pair m=16 | 258.36 | 247.87 | 1.040x | 0.985-1.236x |
+| Pair m=1 | 124.38 | 119.15 | 1.033x | 0.993-1.225x |
+
+Some individual runs regress, and the wide ranges make **any single-run
+speedup unreliable**. The median paired gains are small (~2-4%).
+An on-repository benchmark `make -C gpu/rootfind bench-batch-core`
+now compiles with the real `fp64.cuh` and performs paired bitwise
+verification before measuring these particular inversion loops.
+
+### Actual repository test and perf status
+
+GitHub Actions [rootfind host perf validation run 44180765115](https://github.com/isogeny-labs/crypto/actions/runs/44180765115)
+on the post-loop-change revision successfully installed
+`perf version 7.0.14`, compiled `test_cpu.cpp` against the real
+headers, and printed `ALL PASS`. The hosted VM set
+`kernel.perf_event_paranoid=4`, and the PMU probe failed; the
+workflow explicitly reported `PMU unavailable` instead of
+fabricating counter values. The local Debian 13 container also denies
+software task-clock and hardware cycles/instructions via
+`perf_event_open` (`EACCES`) and cannot resolve the package mirrors.
+
+The newly added `bench-batch-core` target and extended workflow were
+committed **after** that passing run and must pass their own CI build
+before the PR can be treated as fully verified. Even with a passing
+unit suite, GPU tests and full `rf64_decompose` benchmarking remain
+required; the PR must stay draft until those gates are satisfied.
