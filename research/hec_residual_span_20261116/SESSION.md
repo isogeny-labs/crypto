@@ -1742,3 +1742,480 @@ What was done: freezee278e13933c once-onlyexit0;8calls/4originaltargets complete
 Decisions made: close THISgenericfullFBtransportbackend as10xcandidate, notallquotients/algorithms. UniformfullFBsmoothstate count231881/411491 identicalonboth endpoints is a deduction, notexecuted enumeration; no automaticyieldbenefit.
 Open threads: successor changedproducer/linearalgebra mechanism and completecostcase, originalgoalopen; independentverification/publicationartifacts remain.
 Errors: none,no rerun/S3/cloud.
+
+## Source phase-floor audit frozen
+
+What was done: newbranch research/hec-source-phases-20261117 after usermerge4552; compiled exactsourcearm0copy withsnapshot-only exclusivephases on12fixedtargets/24calls.
+Decisions made: require alloldcountervectors identical andphase sums exact; deriveconditional verificationfloor before newsolvermechanism. KBstructuredmatrix tradeoff isleadonly, not cost evidence. Assertions [pcc:unverified].
+Open threads: pushfreeze then single120CPU invocation, selectsuccessor fromphase costs.
+Errors: none in compile; ownT7093lease confirmed.
+
+## Source phase audit completed and successor selected
+
+What was done: freeze83dfd55822d once-onlyexit0;24calls,alloldvectors/exclusivephases/repeats exact. Verification32.8-71.0percentbasefield; freeeverythingelse ceiling1.409-3.053x. Basefieldlinearphasezero. Assertions [pcc:unverified].
+Decisions made: solver-onlycannotreach10xbasefieldonpanel; investigate checkedprincipalrelations+linearwitness scalarcertificate, notverificationomission. Nativefinalcheck remains externalcontrol until new soundness/costgate.
+Open threads: originalcurve-bound certificate and mutationrejection, then fullcertificatecost andproducer improvements. Goalunchanged.
+Errors: none,no rerun/S3/cloud.
+
+## Curve-bound relation certificate frozen
+
+What was done: compiled sourcearm0packetproducer, Gaussian rowwitness, separate verifier checks public/source/pencil polynomialidentities andorbit/actionbinding;12positive/84mutation predictions.
+Decisions made: wholeprimeorder fixed-instance premise explicit; nativeaction andsourcebindingchecked, nativefinalscalarcontrol retained; no cost/signedverification claim. Firstprototype checkedscalarfolding, notpureoperatorringproof. Assertions [pcc:unverified].
+Open threads: pushfreeze then single120CPU invocation; independent serialization/replay and costgate remain.
+Errors: unusedimport removed beforefreeze, no science yet.
+
+## Curve-bound relation certificate gate completed
+
+What was done: freezeb712a22d7b0 once-onlyexit0;12originalcertificates accepted,84target/source/action/row/witness/k/supportmutations rejected; rows6-67, fullpacketsretained. Assertions [pcc:unverified].
+Decisions made: separateverifier notindependentlysigned/sharednativearithmetic; wholeprimefixedinstancepremise explicit. No speedclaim, action/generatorchecks maydominate.
+Open threads: fullcertificateconstruction/verifier costs and standalone replay; nativefinalcontrolretained.
+Errors: none,no rerun/S3/cloud.
+
+## Complete first certificate cost gate frozen
+
+What was done: compiled12originaltargets/24calls withunchangedqualified verifier checks, countedwitnessconstruction, externalnativecontrol separated, exclusiveverifierphases.
+Decisions made: candidatecost explicitly producer-nativecontrol+fullverifier; no checkomission/freecertificate. Producerbasevectors mustmatcholdsourceexact, repeats/sums exact. Assertions [pcc:unverified].
+Open threads: pushfreeze then single120CPU costinvocation.
+Errors: none in compile, no science yet.
+
+## First certificate cost rejected
+
+What was done: freeze18d7f02a248 once-onlyexit0;24calls certificates/replay/phases/repeats pass. Derivedcandidate losesbothmoduli allcases; p601base10.164-11.362x,ell28.502-42.298xsource. Exampleverifier149250=10296binding+142anchors+138812relations. Assertions [pcc:unverified].
+Decisions made: no freeverifier claim; both orbitlookup and nativeactionbinding needchange, solverwitnessalone insufficient. Retain soundnessprototype andnegativecosts.
+Open threads: orbitindex verifier and independentlyqualifiedFrobenius/Bezoutaction proof withfullcost; changedproducer stillrequired.
+Errors: none,no rerun/S3/cloud.
+
+## Indexed verified orbit lookup frozen
+
+What was done: compiled countedcompleteorbitindex, ambiguouskeysinvalid, unchangedcurve/action/polynomial/witness checks;12positive/84mutationagreement withreference before24costcalls.
+Decisions made: includeindexbuild andallbindingcosts; compareoldcertificate/source separately, no componenttofullgain promotion. All assertions [pcc:unverified].
+Open threads: pushfreeze then once-only120CPU invocation; actionproof remainsseparate.
+Errors: none in compile, no science yet; ownT7093scope retained.
+
+## Indexed verifier instrumentation failure and prospective amendment
+
+What was done: freeze0bb73a644a4 exits101 phasecounterunderflow afterfirsttargettworepeats; partialraw/exit preserved.
+Decisions made: no claim of12targetpass; newindexed-certificate-v2 resets phase before uncountedqualification. No mathematicalverifier/inputcriterion change. Assertions [pcc:unverified].
+Open threads: compile/freeze newversion then once-only gate.
+Errors: stalephaseLAST frompreviousinterval; retained, not overwritten.
+
+## Indexed orbit verifier qualified and measured
+
+What was done: freezef0f7c529ce4 once-onlyexit0;12certificates/84mutations agreebothverifiers,24calls replay/phases/repeats exact. p601verifierbase7.554-7.986x,ell14.099-14.249x reduction versusoldverifier, butfullcandidate stillbase1.912-1.997x andell8.615-10.308xsourcecost. Assertions [pcc:unverified].
+Decisions made: scopedverifiedlookup improvement, no fullgain; nativebinding unchangeddominates, densewitness cost remains. Failedv1retained.
+Open threads: soundFrobenius/Bezout actionproof anddegree/root principalcertificate equivalence, completecost andchangedproducer.
+Errors: onlypreviousv1instrumentationfailure, correctedprospectively; no overwrite/S3/cloud.
+
+## Degree/root principal certificate frozen
+
+What was done: compiled cacheanchorvalidity plus disjointdistinctresidualroot certificate; algebraicproof andoverlapcounterexample recorded. Nativeaction/binding/index/witness retained.
+Decisions made: scoped equivalence onproducerdisjointdomain, not unrestricted multiplicities; onepositive/fournegativelemma controls plus12cert/84mutationagreement and24costcalls. Assertions [pcc:unverified].
+Open threads: pushfreeze then once-only120CPU invocation.
+Errors: none in compile, no science yet.
+
+## Degree/root principal certificate qualified
+
+What was done: freeze201de1a202e once-onlyexit0;12certificates/84mutations agree, polynomiallemma1positive4negative includingoverlap,24costcalls replay/phases/repeats exact. p601verifierbase1.118-1.128old/new,ellunchanged. Assertions [pcc:unverified].
+Decisions made: retain guardedsmallverificationgain, no fullpipelinegain; nativebindingunchanged, actionproof/producer remain.
+Open threads: soundFrobeniusaction qualification and originalsource producer mechanism, full10xgoalunchanged.
+Errors: none,no rerun/S3/cloud.
+
+## Frobenius/Bezout action certificate frozen
+
+What was done: derivedtwistedfixedpointtracesidentify pi=P(sigma) byrank1cyclotomicTatemodule/tracepairing; compiled internalcharacter/Bezout verifier replacingnativeactioncheck. Fourorientations/curve andallFBnativecontrols scheduled.
+Decisions made: wholeprimeorderpremiseunchanged impliesLagrangeredundancy of[ell]C, notnewassumption. Nonzero/publicsourcebindingretained. Fullcharacter/Bezoutcostcounted. Mathematicalproofnotformal/independentreviewed, allassertions [pcc:unverified].
+Open threads: pushfreeze then once-only120CPU invocation andcomparecompletecosts.
+Errors: none in compile, no science yet; MilneLEC25.1/AV10.23primarytext read.
+
+## Traced Frobenius action certificate qualified
+
+What was done: freeze7c3ce5a0231 once-onlyexit0;12orientations/12wronglambda/2040nativeplacecontrols,12certificates/84mutations,24costcalls replay/phases/repeats pass. Proof andBezoutwitnesses retained. Assertions [pcc:unverified].
+Decisions made: pi=P(sigma) fromtwistedtraces+tracepairing; no unqualifiedCM/actionassumption added, fixedwholeorderpremise unchanged. p601verifierbase1.787-1.926old/new,completecandidatebase1.226-1.325x andell8.637-10.344xsourcecost. No fullgain.
+Open threads: sparsewitnessconstruction/zerowork elimination withsamecertificatepredicate, thenchangedproducer; independentproofreview/formalization.
+Errors: none,no rerun/S3/cloud.
+
+## Sparse certificate witness gate frozen
+
+What was done: compiled orderednonzero Gaussian rows/witness propagation, samepivotorder/finaldensepacket; verifierzero/unit terms skipped afterrangechecks. Fullpacketreplay andbaseverifierexactness required.
+Decisions made: no geometry/action/premise changes,12accept84mutation24costcontrols retained; onlysubgroupconstruction/checking changes. Assertions [pcc:unverified].
+Open threads: pushfreeze then once-only120CPU invocation.
+Errors: none in compile, no science yet.
+
+## Sparse proof witnesses qualified
+
+What was done: freeze47bb75c8634 once-onlyexit0; fullpackets sameasdense,12cert/84mutation/action/geometrycontrols and24costcalls replay/phases/repeats pass. Subgroupcandidatecost p6014.039-5.737x lowerthanpreviousdense, still1.803-2.138xsource. Baseunchanged. Assertions [pcc:unverified].
+Decisions made: exactcertificatepreserved, no fullgain. Nextlazycore primitivecertificate integration musthandle residualmultiplicities/anchorintersection, nottrustlabels/discardrows.
+Open threads: lazyproducer primitivepacket/witness withexactfallback/fullcost againstbothsourcearms; whole10xgoalunchanged.
+Errors: none,no rerun/S3/cloud.
+
+## Lazy producer certificate frozen
+
+What was done: recorded original lazy primitives; explicit action-folded rows and sparse witness, exact multiplicity fallback; compiled with overflow checks.
+Decisions made: Git custody while S3 unavailable; same 12 targets and counters, 84 mutation gate, once-only 120 CPU seconds after push. Assertions [pcc:unverified].
+Open threads: qualify certificates, then register full-cost measurement separately.
+Errors: duplicate helper name corrected before freeze; no scientific execution yet.
+
+## Lazy producer certificates qualified
+
+What was done: freeze4a6bab348ec executed once, exit0;12 certificates/84 mutations each verifier, original producer vectors/native diagnostic traces exact. Three repeated-root relations used exact fallback;12 total attempts.
+Decisions made: qualification only, no certificate cost or complete speedup claim. Assertions [pcc:unverified]. Git custody replaces unavailable S3.
+Open threads: freeze complete-cost gate against both retained source arms; independent review/publication artifacts; original genus2+10x objective.
+Errors: none in execution; no retry/S3/cloud.
+
+## Complete lazy certificate cost frozen
+
+What was done: compiled complete producer/construction/verification cost harness, explicit native-control delta, prior packet/counter replay, two repeats and both retained arms.
+Decisions made: prospective descriptive gate, all 12 original targets; no mixed-modulus aggregation, Git freeze before once-only120CPU invocation. Sources are prior lazy/sparse/Frobenius protocols/results/derivation. Assertions [pcc:unverified].
+Open threads: execute after push, interpret complete costs and choose successor.
+Errors: none in compile; no science yet.
+
+## Complete lazy certificate cost screened
+
+What was done: freezedbce54bbdd0 once-onlyexit0;24 calls/12 targets full packet and producer vector replay,84 mutations each verifier, exact phases/repeats. Atp601 fullcandidate/arm0base1.932-3.797, subgroup4.876-6.872. Assertions [pcc:unverified].
+Decisions made: reject current complete implementation for10x; free-certificate producer floor exceeds0.1arm0 everywhere, so certificate-only successor insufficient.
+Open threads: mathematical relation-generation/incidence mechanism reducing producer scan/setup, reuse checked primitives; prospective proof/cost case before next experiment; originalgenus2+objective unchanged.
+Errors: none; all negative results retained,no retry/S3/cloud.
+
+## Orbit incidence norm frozen
+
+What was done: derived explicit quadratic norm over X5-r and generic non-descent of pencil tau for g2/3/4 binomial models. Compiled coefficient/product checks including denominator basepoints.
+Decisions made: no scalar orbit parameter substitution; test identity and basepoint hazards before cost prototype. Assertions [pcc:unverified].
+Sources checked (KB): revision9b2119e8fbac482b98b50521c0d604bb, refreshed2026-11-17T06:15:25Z; source:91b6bbe9fb73267bbeb5d7c97f493b26 crypto:docs/ecbench/README.md and source:fdff62973a741275cdbf8ec3b5ff069d crypto:docs/ic/LEAD_LADDER_METHODOLOGY_20261010.md; stale for current local measurements, no novelty claim. Sage resultant primary definition read, links in derivation.
+Open threads: once-only120CPU algebra screen after Git freeze push; shared-incidence cost case still needed.
+Errors: no compile errors, no scientific execution yet.
+
+## Orbit incidence algebra qualified
+
+What was done: freeze f71d88998c3 executed onceexit0;181408 scalar identities,65210 coefficient products pass;920 basepoint zero products,61660 five-distinct products (not independent orbit counts). Assertions [pcc:unverified].
+Decisions made: reject single rational pencil parameter perorbit; generic degree2g+1 obstruction for binomial models g2/3/4. Retain exact norm with basepoint factor removal as possible shared-incidence interface.
+Open threads: complete product/gcd/update/rootlift cost case versus incremental explicit batch-inversion buckets before new performance prototype; independently review derivation; full10x scope unchanged.
+Errors: none; no retry/S3/cloud.
+
+## Orbit incidence constructor screen frozen
+
+What was done: built three-kernel exact component comparison, original12targets/all successful lazy reps/16anchors, norm/direct products/explicit batched parameters and exactrepeats.
+Decisions made: before a gcd collector measure implemented construction alone; no universal norm lower bound, no total-speed claim. Assertions [pcc:unverified]. Sources: previous orbit-incidence derivation/KB receipt and batched/inverse.rs.
+Open threads: push freeze, one120CPU invocation, assess construction hurdle and subsequent incidence mechanism.
+Errors: none in compile, no scientific execution yet.
+
+## Orbit constructor cost screened
+
+What was done: freezec02d12d4c28 once-onlyexit0;72 kernel calls/12 targets exact products/parameter roots/repeats. Norm construction4.611-4.731x explicitREDC; directproduct1.265-1.284x. Assertions [pcc:unverified].
+Decisions made: measured norm constructor not admitted for a gcd collector; not a universal lowerbound. Next standardVieta specialization x3=t²+u1-x1-x2 removes residual polynomial divisions while requiring full trace/certificate equality.
+Open threads: prospectively freeze Vieta producer equivalence/cold-cost gate; extend residualcoefficient extraction to g3/4 separately; original10xgoal unchanged.
+Errors: no execution errors; no retry/S3/cloud.
+
+## Vieta residual producer frozen
+
+What was done: compiled isolated coefficient-root producer; diagnostic old quotient and native group checks, original fulltrace/packet replay gates, unchanged subgroup arithmetic and full certificate costs.
+Decisions made: standardVieta identity x3=t²+u1-x1-x2, notnovelty; original12g2targets/24measuredcalls, Gitfreeze before one120CPU invocation. Assertions [pcc:unverified].
+Open threads: execute after push, compare producer and complete costs against both retained arms and oldcompletecandidate.
+Errors: traceprefix escaping corrected before freeze; no science yet.
+
+## Vieta producer qualified
+
+What was done: freeze0a15e66fd7a once-onlyexit0;24calls/12targets full traces/packets/native quotient/group/subgroup replay,84mutations each verifier, phase/repeat checks pass. Producerbase5.1-10.6percent fewerREDC, completebase2.9-7.2percent fewer, subgroup unchanged. Assertions [pcc:unverified].
+Decisions made: retain exact local extraction; full10x gatefails. Derived unexecuted g3/4 residualleadingcoefficient recurrence in GENERALIZATION.md, noimplicit performance coverage.
+Open threads: qualify g3/4 truncated exactquotients and residualsplit costs; change dominant certificate construction/setup/collection toward original10xobjective.
+Errors: none in run,no retry/S3/cloud.
+
+## Three-genus quotient gate frozen
+
+What was done: built g2/3/4 truncated coefficient recurrence vs exact division plus same residual split oracle; deterministic32anchor algebra fixtures, original principal identity/brute roots/native split-group diagnostics.
+Decisions made: fixed g4fixture is algebra-only, no subgroup order/target solve inference; two measured repeats, all nonsplits retained, Gitfreeze before once-only120CPU invocation. Assertions [pcc:unverified]. Sources: vieta GENERALIZATION and KB source:91b6bbe9fb73267bbeb5d7c97f493b26 crypto:docs/ecbench/README.md, revision9b2119e8fbac482b98b50521c0d604bb.
+Open threads: run after push, inspect multiplicity and component costs; full originalgenus2+10xgoal unchanged.
+Errors: signed degree comparison compile error fixed before freeze; nonzero-x base rule declared before execution to avoid fixed-orbit base.
+
+## Three-genus truncated quotient qualified
+
+What was done: freeze3fe6d38b1b9 once-onlyexit0;1680exactquotient/principalidentity/bruteoracle cases, allsplit nativegroup checks and repeatedcostvectors pass. g3 split75/nonsplit700,repeated2;g4 split28/nonsplit644,repeated3; knownroot overlaps allgenera. Component extract+oracle REDC reductions86.16/55.45/22.58percent(g2/3/4). Assertions [pcc:unverified].
+Decisions made: retain exact recurrence for qualified binomial fixtures; nofullpipeline/neworiginalg4target coverage. G4cubicoracle and g2certificate construction remain bottlenecks.
+Open threads: screen prior residual/LP reuse before new nonsplit mechanism; complete originaltarget collector/setup/certificate changes for10x, independentreview/publicationartifacts.
+Errors: none in execution,no retry/S3/cloud.
+
+## Indexed packet builder frozen
+
+What was done: residual/LP prior-art screen found prior classical span identity and zero useful g2 subgroup rank gain; no new nonsplit shortcut assumed. Built one signed orbit index per packet, same action/rows/sparsewitness and bytepacket gate; originalproducer/verifier allvectors mustreplay.
+Decisions made: engineering preparation for useful mathematical baseline, fullcost charged;12targets/24calls exactrepeats, Gitfreeze before once-only120CPU. Assertions [pcc:unverified]. Sources checked(KB): revision9b2119e8fbac482b98b50521c0d604bb, source:4548c0e85d47f9299ddc900c047c266d crypto:docs/ic/ECDLP_RESEARCH_TECHNIQUES.md;source:ac5467325172604dcf4e5a9a4117e449 crypto:research/notes/index-calculus/RESEARCH_GLV_INDEX_CALCULUS.md; priorv2/cyclotomic results read locally, no novelty claim.
+Open threads: run after push, derive completecost and remainingfloor; originalgenus2+10x unchanged.
+Errors: no compileerrors,no scientific executionyet.
+
+## Indexed packet complete gate qualified
+
+What was done: freeze4c71783dc31 once-onlyexit0;24calls/12targets bytepackets/fulltraces/allproducer-verifier-controlvectors replay,84mutations each verifier, phases/repeats pass. p601complete old/new2.185-2.467base,4.733-6.729subgroup. Assertions [pcc:unverified].
+Decisions made: retainengineering index; mixed vs retainedcontrols (p601arm0base0.811-1.501,subgroup0.868-1.106), no10x. Priornonsplitspan identity/ranknegative alreadycovers naive reuse.
+Open threads: mathematical mechanism reducing jointcollection/proof work from correctedbaseline, require usefulsubgrouprank/coldcost; genus3/4fullcoverage,independentreview/publication artifacts.
+Errors: none in execution,no retry/S3/cloud.
+
+## Witness-supported packet frozen
+
+What was done: retainedraw supportaudit2..16nonzeroof7..35rows; derived exactrestricted w^TA=eT,w^Tb=k underzero-weight removal. Built terminalpacket compression retainingallreps, fullproducer/construction charged and replayed.
+Decisions made: same12targets/24calls, bothverifiers84mutation gate, prunedpackets retained; nofieldarithmetic discountfor collection/construction, vector costsunpriced. Assertions [pcc:unverified]. Sourceschecked(KB): source:4548c0e85d47f9299ddc900c047c266d crypto:docs/ic/ECDLP_RESEARCH_TECHNIQUES.md,revision9b2119e8fbac482b98b50521c0d604bb, sparsecombination replay; localindexed builder/verifier read.
+Open threads: pushfreeze then one120CPU invocation, comparecomplete costs tobothcontrols, original10xgoalunchanged.
+Errors: none in compile,no scienceyet.
+
+## Witness-supported packet qualified
+
+What was done: freeze34645397fe6 once-onlyexit0;24completecalls/12targets fullprepruningpacket andproducer/constructionvectors replay, bothverifiers84mutations pass, native/phase/repeat controls unchanged. P601completebase7.1-10.1percent fewerREDC, subgroupunchanged. Assertions [pcc:unverified].
+Decisions made: retain soundzero-weight rowremoval, charge fullproofgeneration; nofuturewitness leakage asonline selection. Full10xgatefails,mixed vs sourcecontrols.
+Open threads: public-data onlineproductive-relation mechanism reducing proofgeneration/collection together; originalgenus2+goal, independentreview/publication artifacts.
+Errors: none in execution,no retry/S3/cloud.
+
+## Triangular witness frozen
+
+What was done: derived exact discoverylabel+primitiveprovenance invariant; built one-unknownpoint triangular substitution then2variable constraints, composite original-row witness, fullmatrix witnessidentity check charged.
+Decisions made: same producer/rows/scalars, witnessmaychange and bothverifiers84mutations mustpass;24completecalls original12targets, comparison to supportedpacket/bothcontrols. Assertions [pcc:unverified]. Sources core/ring/sparse/KB exactcombination receipt inprotocol; standard elimination no noveltyclaim.
+Open threads: pushfreeze then once-only120CPU invocation, inspect fullcost/constructiveness; originalgenus2+10xgoal unchanged.
+Errors: onlyunusedimportwarnings, no scientificexecutionyet.
+
+## Triangular primitive provenance qualified
+
+What was done: freezea0763f01207 once-onlyexit0;24calls/12targets exactrows/scalars/traces/controlvectors, explicit originalmatrix witnessidentity, native/phase/repeat and84mutation gates pass. P601subgroupconstruction708-998REDC vs2768-4476, complete subgroupold/new2.057-2.486; baseunchanged. Assertions [pcc:unverified].
+Decisions made: retainstructuredelimination/provenance, notnovelty/full10x; witnessrebuild aftercollection notyetformalringonlinepropagation. CRTzero-divisor provenance cannotbeassumedfree.
+Open threads: reduce basefieldcollection/scan/setup with fullproofcost; originalgenus2+10xgoal, genus3/4fullpipeline and independentreview/publicationartifacts.
+Errors: noexecutionfailure,no retry/S3/cloud.
+
+## Exhaustive action-component certificate frozen
+
+What was done: retainedtraceaudit scans=anchors onall12runs rulesout repeatedanchorcache gain onpanel; alltraceaction hypotheses unique. Derived principaldivisor Phi5(sigma)=0 and complete4root disjunction of exactcontradiction orsamekscalar certificates, compiled branchproof gate.
+Decisions made: no trueaction supplied tobranchselection; actualcharacterreference diagnostic only; algebraqualification notfullverifier/cost. Original12targets/48proofs, Gitfreeze beforeonce-only120CPU. Assertions [pcc:unverified]. Sourceschecked KB queries inprotocol, no directsupportingpaperhit; selfcontainedproof standard, no noveltyclaim.
+Open threads: execute afterpush, establishconstructivebranchcoverage; separatelyneed independentbinding/mutation/fullcostgate. Genus4S9 notPhi9 caveat recorded.
+Errors: onlyunusedwarnings,noscientificexecutionyet.
+
+## Exhaustive eigenvalue cover qualified
+
+What was done: freezee14406ead25 once-onlyexit0;12covers/48exactmatrix proofs,36excluded+12scalar branches,actualactionconsistent,rootproductPhi5 exact,48weightmutations rejected. Principal/native diagnostics pass. Assertions [pcc:unverified].
+Decisions made: constructive finitecaseproof canavoid knowing actualaction inprinciple; no productionverifier/costclaim yet. WholeJprime/Dnonzero and exhaustivecoverage critical.
+Open threads: separatelybound coverpacket/verifier withmissing/duplicateroot/binding/geometry mutations and fullcoldcosts versus triangular andbothsourcearms; genus3/4scope andindependentreview.
+Errors: none in execution,no retry/S3/cloud.
+
+## Bound eigen-cover verifier frozen
+
+What was done: built externallybound Context+coverpacket, separate weightedrow verifier checking complete roots/principalgeometry/sourcebinding/allbranchwitnesses; no character/action module imported.18mutations/target declared.
+Decisions made: original12targets/216rejections, qualificationonly no performancecostclaim, unchangedwholeprimeJpremise. Assertions [pcc:unverified]. Sources eigen-cover THEORY/results andexactgeometry proof, no newmechanism assumed.
+Open threads: pushfreeze thenonce-only120CPU invocation; nextfullcoldcost allfourbranches vs triangular/bothcontrols.
+Errors: onlyunusedwarnings,no scientificexecutionyet.
+
+## Bound eigen-cover verifier qualified
+
+What was done: freeze01f132ab44e once-onlyexit0;12boundpackets accepted,216mutations rejected, noactioncharacterorproducerGaussian calls in verifier. Assertions [pcc:unverified].
+Decisions made: proceed to fullcostscreen, no performanceclaim fromqualification.
+Open threads: price all4proofs/rootgeneration/geometry/binding andproducer onoriginaltargets.
+Errors: none,no retry/S3/cloud.
+
+## Complete eigen-cover cost frozen
+
+What was done: compiled unchanged216mutation-qualified coverpacket/verifier fullcost harness; chargeall4proofs/rootgeneration/selfchecks/geometry/binding andproducer.
+Decisions made:24calls/12targets exactpacket/producer-control replay,repeats,permoduluscomparisons versus triangular/botharms; Gitfreeze beforeone120CPU invocation. Assertions [pcc:unverified].
+Open threads: execute afterpush, compareavoidedcharactersum with additionalproof costs.
+Errors: onlyunusedwarnings,noscienceyet.
+
+## Complete eigen-cover cost screened
+
+What was done: freeze211c0536b61 once-onlyexit0;24completecalls/12targets bytepackets/producer-controlvectors/repeats pass. Atp601basecandidate/triangular0.856-0.985, subgroup35.026-70.910. All4denseproof/selfchecks/verifier charged. Assertions [pcc:unverified].
+Decisions made: reject firstdensecover implementation foracceleration; retainmathematicalcover and216mutation-qualified verifier. Nextneed sparse triangular contradictionprovenance and supportverification, notfreeomission.
+Open threads: prospectivesparse4component proof gate/fullcost; originalgenus2+10x,independentreview/publicationartifacts andgenus3/4extensions.
+Errors: noexecutionerrors; negativeoutcome retained,no retry/S3/cloud.
+
+## Sparse eigen-cover frozen
+
+What was done: sparsefullcolumn rows+witnesses withsamepivots/contradiction, exactzero/unit arithmetic, precomputedbranchpowers andzero-weight skip afterallgeometry/membership/ranges. Bothold/newverifiers216mutation gate, exactfullpackets expected.
+Decisions made: controlledengineering step before triangularcontradiction specialization;24completecalls/12targets/all4branches charged, permoduluscontrols, Gitfreeze beforeone120CPU invocation. Assertions [pcc:unverified].
+Open threads: executeafterpush, assess remainingcost versus densecover/triangular/botharms.
+Errors: onlyunusedwarnings,no scientificexecutionyet.
+
+## Sparse exact eigen-cover qualified
+
+What was done: freeze33e4355a9cd once-onlyexit0;24calls/12targets byteexactfullpackets/all4witnesses/producer-controlvectors/repeats pass; bothverifiers216mutations rejected. P601dense/sparse subgroup5.655-8.680, baseunchanged. Assertions [pcc:unverified].
+Decisions made: retainexactpacketcontrol, still6.194-8.180x subgrouptriangular baseline so10xgatefails. Nextstructural2variablebranchproof mustreturncontradiction provenance notpanic.
+Open threads: frozen triangularfourcomponent proof/cost gate; originalgenus2+10xgoal, independentreview/publicationartifacts/genus3/4coverage.
+Errors: none in execution,no retry/S3/cloud.
+
+## Triangular all-component cover frozen
+
+What was done: built perroot pointdefinition provenance, reduced2variableconstraints, exactscalar/contradiction proofcomposition. Keepold/newboundverifiers216mutations, samepacketexceptweights/rootstatuses/scalars exact.
+Decisions made: all4roots/proofs/selfchecks charged,24completecalls/12targets,repeats,newpacketraw retained, no nontriangular/unresolvedpanic usedasexclusion. Assertions [pcc:unverified].
+Open threads: pushfreeze thenone120CPU invocation, compareallcompletecosts to sparse/densecover/triangular/botharms.
+Errors: onlyunusedwarnings,noscienceyet.
+
+## Triangular all-component cover qualified
+
+What was done: freezeea843b8170e once-onlyexit0;24calls/12targets exactpacketexceptweights, bothverifiers216mutations, scalar/contradiction originalsparsewitnesses/native/phase/repeats pass. P601complete subgroupold/new3.328-3.865vs sparsecover;1.861-2.176x single-actiontriangular;0.738-0.979x retainedarm0. Baseunchanged. Assertions [pcc:unverified].
+Decisions made: retain finitecover alternative, no10x/fullgainclaim. All4branches charged; basecollection/setup/geometry remains needed mechanism.
+Open threads: basefieldcollection/proofsharedwork withCRTprovenance obligations; originalgenus2+goal, independentreview/publicationartifacts/genus3/4coverage.
+Errors: no executionfailure,no retry/S3/cloud.
+
+## Cover verifier phase gate frozen
+
+What was done: sixexclusive countertaps binding/rootcover/orbitindex/anchors/geometry/branchwitnesses, allwholevectors mustreplay triangularcover exactly, observerresets beforequalification andmeasuredverify.
+Decisions made: descriptiveinstrumentation noalgorithmchange;24calls/12targets/both216mutation gates/exactrepeats, sumphasevectors=verifier,Gitfreeze beforeone120CPU. Assertions [pcc:unverified].
+Open threads: executeafterpush, useactualphasecosts toselect materialproofsuccessor.
+Errors: onlyunusedwarnings,no scientificexecutionyet.
+
+## Cover verifier phase replay qualified
+
+What was done: freezec99762b59f7 once-onlyexit0;24calls/12targets allwholevectors replay, sixexclusivephases sumexactly/verifier, repeats/both216mutations pass. P601anchor1058-2838REDC,geometry1472-2176,binding370-1340; branchbasezero. Assertions [pcc:unverified].
+Decisions made: unchangedanchorverifier >0.1arm0base on3of4p601targets, so10xrequireschangedanchorproof/collection, notonlysubgroupproof. No universalbound.
+Open threads: exact divisor-class anchorcertificates/cancellation/sharedsupport costcase; originalgenus2+10x andreview/publicationcoverage.
+Errors: summarynil lookup forabsentzero-phase/modulus correctedtozero;rawunaffected,partialrawcommitdda9be93083 retained,no scientificretry/S3/cloud.
+
+## Polynomial anchor certificate frozen
+
+What was done: derived norm/congruence addition certificate, compatible sharedsupport from multiplicity identity; cancellation/identity nativefallback. Built192originalchainsteps+synthetic controls, native/build/verify componentcounts separate.
+Decisions made: knownvalidinputs explicit; no verification-only gain credited asfullcold. Gitfreeze beforeone120CPU invocation. Assertions [pcc:unverified]. SourcesKB receipt inprotocol; AMSoriginal403, universityStollnotes fallback; no noveltyclaim.
+Open threads: executeafterpush, assess certificateverification and actualconstructioncost, then decide fullpipeline admission.
+Errors: orchestration syntax rejected beforeexecution, retriedtoolcode only; no scientificrunyet.
+
+### Pre-execution source receipt correction
+
+What was done: Stoll fallbackPDF also returned502; protocol corrected to say neitherexternalPDF read, useexactlocalCantorimplementation.
+Decisions made: preserve failedretrieval scope explicitly, sourcefreeze amendment before scientificexecution.
+Open threads: once-onlygate aftercorrectedfreeze push.
+Errors: previousprospective text assumed fallbackretrievalsuccess; corrected,hasesupdated,noscienceexecuted.
+
+## Polynomial anchor certificates qualified
+
+What was done: freezed77d601fbc3 once-onlyexit0;192originalsteps, sharedsupport/cancellation/identity controls,1156mutations, exactnativeoutputs/costrepeats pass.7fallbacksincluding6synthetic+1original,3compatiblesharedsupport controls. Verify2.737-3.018xlowerbaseREDC than nativeadd+validity. Assertions [pcc:unverified].
+Decisions made: retainproofcomponent; constructioncharged separately, build+verify/single-native ratio notcoldpipeline comparison sinceoldproduceralsobuildsanchors. Needexactintegrationwithproducer-emittedcerts.
+Open threads: completeoriginaltarget collector/verifier certificateemission gate withfallbacks/sourcebinding/principalgeometry charged, original10xscope andreview/genus3/4coverage.
+Errors: externalPDF403/502gapexplicit,no scientificfailure/retry/S3/cloud.
+
+## Collector-emitted anchor cover frozen
+
+What was done: integrated polynomialcertificatebuild intoeachlazyanchorcomposition, retainedexactnativefallback; boundcovercarriescerts, verifierchecksallanchoridentities byinduction fromvalidexpectedsource/target. Added96anchor-specificmutations, common216eachverifierretained.
+Decisions made: allproducerproof-emission overheadcharged, no freecertconstruction;24completecalls/12targets/exactrepeats, subgroup/controlreplay andgeometry/root/scalarpacketfields exact. Assertions [pcc:unverified].
+Open threads: pushfreeze thenone120CPU invocation, comparecompletecost witholdcover/single-action/botharms.
+Errors: onlyunusedwarnings,no scientificexecutionyet.
+
+## Emitted-anchor gate formatting failure retained
+
+What was done: freezefa7db31e05a once-onlyexit101 beforefirstresultrow; debugnormalizerremovedspacebeforeclosingbrace, valuesprintedmatchfirsttarget.
+Decisions made: preservefailure/raw, prospectivev2onlycomparisonformatfix, no scientificresultclaim.
+Open threads: freezev2correctedjoin andexecutenewgate.
+Errors: k4709} vs k4709 } comparison, no measuredrows;no S3/cloud.
+
+## Emitted-anchor v2 frozen
+
+What was done: newv2source/binary fixesonlyclosingbrace debugspace; v1rawfailure remainsimmutable, noalgorithm/verifier/gate change.
+Decisions made: original12targets/24calls andallmutation/cost gates unchanged; pushnewfreeze beforeonce-only120CPU invocation. Assertions [pcc:unverified].
+Open threads: runv2afterpush andinterpretcompletecost.
+Errors: originalformatfailureexplicit, no v2scientificexecutionyet.
+
+## Collector-emitted anchor cover v2 qualified
+
+What was done: freeze511d29299e7 once-onlyexit0;24calls/12targets packetgeometry/root/branch/scalar andsubgroup/controlvectors/repeats pass.216commonmutations eachverifier+96anchor mutations newverifier rejected. Fullbasecost5.8-9.8percent fewer vsoldcover, subgroupunchanged; allcertificateemission/fallback overheadcharged. Assertions [pcc:unverified].
+Decisions made: retainactualcoldgain, no10x/novelty claim. V1formatfailure preserved;v2prospectivecomparisononlyfix. Anchoridentity nowboundbyinduction, nofreeconstruction.
+Open threads: remainingprincipalgeometry/collection/setup/newrelation mechanism withcompletecost; originalgenus2+10x,independentreview/publication/genus3/4coverage.
+Errors: v1debugspacecomparison failure correctedprospectively,no otherexecutionerror/S3/cloud.
+
+## Root/anchor complete pipeline frozen
+
+What was done: integrate previouslyqualified distinct-degree/root principalidentity with exactrepeated/overlap fallback, native-recompute/boundcommon216+anchor96 mutations, allproducer/constructionvectors exact gate. Synthetic overlap/repeated controls retained.
+Decisions made: no relation/setup change, verifyacceptedpointcurve membership via finalphasecheck, allgeometryfallback costsincluded; original12targets/24calls/repeats,Gitfreeze beforeone120CPU. Assertions [pcc:unverified].
+Open threads: executeafterpush, reportcoldgain andremaininggap.
+Errors: onlyunusedwarning,noscienceyet.
+
+## Degree/root emitted-anchor pipeline qualified
+
+What was done: freezea21453fe317 once-onlyexit0;24calls/12targets allproducer/construction/controlvectors replay,packetfields/native/repeat gates,216common eachverifier+96anchor mutations pass.3exactfallbackrows retained. Completebase0.6-6.0percent fewer, p6013.9-6.0percent fewer; subgroupunchanged. Assertions [pcc:unverified].
+Decisions made: retaincompletecoldreduction; mixedsourcecomparison/10xgatefails, verificationoptimizationsalone notmathematicalbreakthrough.
+Open threads: newcollection/setup/relation mechanism withactualcostcase andpriornegative/rankscreens, originalgenus2+10x/review/publication/genus3/4coverage.
+Errors: none,no retry/S3/cloud.
+
+## Public-core anchor-step gate frozen
+
+What was done: derived publicD=sC anchorT+aC withconstantsa/s, implementedcollector/rowbuilder/bothverifiers consistently. OriginalD,T/scalarunchanged, diagnosticnativeprimitivegroupchecks andsource1exactREDC controls declared.
+Decisions made: unchanged16anchors/1..3seedbudget,24calls/12targets/allproof/sourcebindingcost charged, source17streamallowedchangebutfailuresretained. Assertions [pcc:unverified]. SourcesKB source:91b6bbe9fb73267bbeb5d7c97f493b26 andsource:18b3900e10b174cccc5479567bfc0b84 backgroundonly; localpublicnormalization priorrecordsscreened,no noveltyclaim.
+Open threads: pushfreeze thenone120CPU invocation, examinecompletecost andstopping ratherthanassumeanchorcostbenefit.
+Errors: onlyunusedwarning,no scienceyet.
+
+## Public-core anchor step qualified, mixed cost
+
+What was done: freeze03c6c0bd4d9 once-onlyexit0;24calls/12originaltargets originalkD=T/diagnosticnativeprimitive/fulltraces/mutation/repeat gates pass,source1exactcompleteREDCcontrol. Source17p601base16.9/7.9percent fewer;subgroupmixed, p101case0base regresses. Assertions [pcc:unverified].
+Decisions made: retainnormalizationasalternative, no posthocD/C oraclechoice oruniformgainclaim; cheapstep doesnotpredictproductiveclosure,10xgatefails.
+Open threads: mathematical productive-relation/scheduling mechanism withpubliccostdecision andindependenttargets, originalgenus2+goal/review/publication/genus3/4coverage.
+Errors: noneinrun,no retry/S3/cloud.
+
+## Anchor work-queue closure frozen
+
+What was done: checkedprior singleanchorambiguity applieswithoutsourceequation, currentpublicnormalizationbreaksthatobstruction. Builtpersistentperanchor buckets/cursor, ingestonlyneworbits, closecurrentanchorbeforeadvance, sameprincipal/formalconsensus/nativeproofs.
+Decisions made: original12targets/24calls, same16anchors/3seeds, allattempts/batches/inversions/proofs charged, diagnosticnativefulltrace+mutation/repeat gates. Assertions [pcc:unverified]. Sources anchor-rank results/protocol andKB source:91b6bbe9fb73267bbeb5d7c97f493b26 backgroundonly,no noveltyclaim.
+Open threads: pushfreeze thenone120CPU invocation, inspectstalls/anchorcount/proofcost beforegainclaims.
+Errors: onlyunusedwarning,noscienceyet.
+
+## Persistent anchor closure qualified, costregressions retained
+
+What was done: freeze1a62fd27829 once-onlyexit0;24calls/12originaltargets native/diagnostictrace/control/repeat/mutation gatespass. Onep251targetcompletesoneanchor. P601source1costgrows (base13218->14490,7936->11668;subgroup4044->8496,3626->7656); source17basewins butsubgroupgrowth. Assertions [pcc:unverified].
+Decisions made: eagerclosure notuniformgain,10xgatefails. Definitionsaddunknown+equation; p60140orbits42rows leaves4constraints. Nextpublicclosure-constraintpriorityrule mustchargeclassification, notfuturewitnessoracle.
+Open threads: prospectiveconstraint-first scheduling/costcase versus bothstreams; originalgenus2+10x andindependentreview/publication/genus3/4coverage.
+Errors: noneinrun,no retry/S3/cloud.
+
+## Fixed-window constraint priority frozen
+
+What was done: built fixed8candidate windows sortedknown-residualfirst/publicTorder, exactVieta results cached, allspeculativeclassification charged. No rank/knownanswer/futurewitness input, persistentqueue/source/geometryproof unchanged.
+Decisions made: original12targets/24calls, same16anchors/3seeds, fullclassification/attempt/proofcost, diagnostictrace inclclassificationcount/native/mutation/repeat gates; Gitfreeze beforeone120CPU. Assertions [pcc:unverified].
+Open threads: executeafterpush, compareagainst eagerclosure andpreclosure notjustweakbaseline; originalgenus2+goal unchanged.
+Errors: onlyunusedwarning,no scienceyet.
+
+## Fixed-window constraint priority qualified, mixed outcome
+
+What was done: freeze8e5b7ecac59 once-onlyexit0;24calls/12originaltargets native/diagnosticclassificationtrace/control/repeat/mutation gatespass. Knownresidualpriorityreducessomeorbits/rows; p601source17case0 base11788->11050, subgroup5808->4746. Source1base regresses slightly, subgroupunchanged fromeager. Assertions [pcc:unverified].
+Decisions made: no uniformgain/10xclaim, comparepreclosureaswell; knownresidual notindependentrank guarantee. Allclassificationcost andregressions retained, no posthocwindowtuning/oraclechoice.
+Open threads: materiallynewcollection/rank mechanism withpubliccostcase+independenttargets; originalgenus2+10x andreview/publication/genus3/4coverage.
+Errors: none,no retry/S3/cloud.
+
+## Same-orbit residual-pair opportunity gate frozen
+
+What was done: priorweightedLP/self-orbitharvest screened; derivequadraticrecognition P(1+q)^2=qS^2 andunit1±Z^e grounding, buildoriginal12target/16anchor/signedcoreorbit opportunitygate withfulloracle/nativeidentity comparison.
+Decisions made: no minimumyieldassertion, allzero-triggercells retained; notfullsolver/costclaim ornovelrankprinciple. SourcesKB source:b3c90d39a347ef661ccf10680a742186 crypto:research/notes/index-calculus/RESEARCH_HYPERELLIPTIC_IC_RHO.md,revision9b2119e8fbac482b98b50521c0d604bb andlocalgain-graph/self-orbit results. Assertions [pcc:unverified].
+Open threads: pushfreeze thenone120CPU invocation, no-trigger wouldrejectstandalone bootstrapcoverage.
+Errors: usize/u64 phasecast compilefix beforefreeze,no scientificexecutionyet.
+
+## Same-orbit residual recognition qualified, bootstrapcoverage rejected
+
+What was done: freezeed408645ff9 once-onlyexit0;1894trials/12originalcells exactrecognizer/fullquadraticoracle sets agree,40candidate groundingrows nativeprincipal/group/unitchecks pass.2zero-triggercells p251sm17case1,p601sm17case0 retained. Assertions [pcc:unverified].
+Decisions made: rejectstandaloneuniformbootstrapwithin16anchors, no40rows=rank/solve inference. Retainquadraticrecognizer/standardunitgrounding identity, no novelty/performanceclaim.
+Open threads: materiallydifferent useful-rank/collectionconstruction orcostjustifiedhybridwithnegativefallbacks/independenttargets; originalgenus2+10x/review/publication/genus3/4coverage.
+Errors: noneinrun,no retry/S3/cloud.
+
+## Paid orbit-pair bootstrap prefix frozen
+
+What was done: coldprefixvalidation/publicroot/batchedinverses/point-addanchor scans untilfirstgroundingor16cap, diagnosticprincipal/nativechecks separate. No fulloracle/action/expectedscalar inprefix, original12targets/24repeats.
+Decisions made: compareoptimisticprefix to10percent retainedcompletecontrols, no fullsolve/gain inference orunavoidablefreshfallbackdoublecount. Gitfreeze beforeone120CPU. Assertions [pcc:unverified]. Sources priororbit-pair algebra/gain-graph/nativebatchcost.
+Open threads: executeafterpush, testwhetherany10xhybridretainingthisprefixhascostroom.
+Errors: onlyunusedwarning,noscienceyet.
+
+## Paid orbit-pair prefix qualified, 10xcostcase rejected
+
+What was done: freeze16c4cd22c5e once-onlyexit0;24prefixcalls/12targets repeat/nativeprincipal gates pass,10firstgroundings/2none.9of12have10P>fullarm0baseB, alsoarm1; e.g4496vs5280complete. Assertions [pcc:unverified].
+Decisions made: rejectuniform10xhybridretainingthisexactprefix beforecompletion/proofcost; remaining3prefixesnotfullwins. No universalbound orfreshfallbackdoublecount.
+Open threads: materiallydifferentbootstrap/relationmechanism withpubliccostcase, originalgenus2+10x/review/publication/genus3/4coverage.
+Errors: none,no retry/S3/cloud.
+
+## Public target-decomposition seed frozen
+
+What was done: buildtargetuquadratic factorization seedwhen2distinctneworbits, exactT=P+Q definitionrow/labels andbothverifiers; chargedordinaryseedfallback otherwise. Dedicatedtargetrowmutations pluscommon216/anchor96 gates.
+Decisions made: original12targets/24calls/same16anchors3seeds, no split-subsetselection;allfactor/proof/sourcebinding/failedattempt costs charged,diagnosticgroup/traces/finalscalar/repeats. Assertions [pcc:unverified]. Sources localindependentseed experiment screened;KB source:91b6bbe9fb73267bbeb5d7c97f493b26 background/no noveltyclaim.
+Open threads: pushfreeze thenone120CPU invocation, measureapplicability+fullcost notassumefactorizationyield advantage.
+Errors: Ruby sourceediting range syntax correctedbeforefiles/execution,unusedwarningonly,noscienceyet.
+
+## Target-decomposition seed qualified on successor PR4582
+
+What was done: PR4561mergedexternallywhilepreparing, newbranchresearch/hec-target-seed-20261117 rebasedonecommit ontoactualfetchedmain;freeze6c3d8f24028 pushedbeforeonce-onlyexit0.24calls/12originaltargets native/scalar/trace/repeat/common216+anchor96+targetrow12 mutations pass.3eligiblecells, mixedcosts (p251base5692->4238,p601source17base15208->13824/subgroup4810->3730;otherp601regresses). Assertions [pcc:unverified].
+Decisions made: retaincorrectbootstrapalternative, allineligiblequery/fallbackcosts included,no uniform10xclaim. No mergebythissession. OriginalPRclosedbyexternalmerge, successor containsnewtestonly.
+Open threads: mathematical useful-rank/cost mechanism+independenttargets, originalgenus2+10x/review/publication/genus3/4coverage.
+Errors: origin/main trackingrefwasstale;rebasedontoverifiedFETCH_HEADmain ratherthanassumetrackingupdated. No scientificfailure/retry/S3/cloud.
+
+## Homogeneous complete-component witness gate frozen
+
+What was done: compiled overflow-checked Rust gate, homogeneous T-kD row-span queries for all48 branches on original12 targets; n5/7/9 module scope controls and annihilator/projection proof. Successor branch rebased onto fetched main after external PR4582 merge.
+Decisions made: Git replaces unavailable S3 custody; source/protocol/native/binary hashes pushed before one120CPU invocation; unresolved branches retained. Existing own T-7093 reservation confirmed by CLI, check allow, attachment returned own-scope conflict. No merge or auto-merge.
+Open threads: execute once after checkpoint push; retain complete raw output and qualify evidence. No cost or genus3/4 curve conclusion from module controls.
+Errors: attach service rejected existing own reservation; CLI confirmed task already claimed. Build only unused-function warnings.
+
+## Homogeneous all-component existence gate passed
+
+What was done: pushed freeze33b96ad90bb, verified INPUT hashes, once-only exit0;48/48 homogeneous matrix witnesses on12 originaltargets,0 unresolved,48 weightmutations rejected;3 finite-module projection/scope controls pass. Raw weights/stderr/exit and outputhashes retained in Git.
+Decisions made: stronger all-component format supports proposed rank-independent theorem under explicit annihilator/membership/splitting assumptions; existing prime-order genus2 certificate unchanged. No construction/verification cost or genus3/4 curve conclusion. [pcc:unverified].
+Open threads: packet-bound homogeneous verifier then full counted construction/verification; independent validation and broader speedup objective remain.
+Errors: none in scientific invocation; no rerun/S3/cloud/merge.
