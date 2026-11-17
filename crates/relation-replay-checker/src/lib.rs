@@ -1,5 +1,6 @@
 //! Separate wire/schema/order/arithmetic implementation. No producer dependency.
 //! Exact ideal equality and Buchberger witnesses, with no basis construction.
+pub mod identities;
 use serde::{Deserialize, Serialize};
 use std::{
     cmp::Ordering,

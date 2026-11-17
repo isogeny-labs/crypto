@@ -8,6 +8,7 @@ fn existing_output_is_refused_before_a_solver_call_and_left_unchanged() {
     for binary in [
         env!("CARGO_BIN_EXE_aps-partition-bridge"),
         env!("CARGO_BIN_EXE_quartic"),
+        env!("CARGO_BIN_EXE_encoding-compare"),
     ] {
         let result = Command::new(binary)
             .args([
@@ -32,6 +33,7 @@ fn missing_source_pins_cannot_start_the_fixed_panel() {
     for binary in [
         env!("CARGO_BIN_EXE_aps-partition-bridge"),
         env!("CARGO_BIN_EXE_quartic"),
+        env!("CARGO_BIN_EXE_encoding-compare"),
     ] {
         let result = Command::new(binary).arg("structural").output().unwrap();
         assert!(!result.status.success());

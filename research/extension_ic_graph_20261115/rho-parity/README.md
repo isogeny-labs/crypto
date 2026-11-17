@@ -12,6 +12,12 @@ PCC-20261117-817df2 remains unverified. [pcc:unverified]
 [Rust recomputation](analyze.rs) · [Summary](validation/summary-1.json) ·
 [Report](report.pdf) · [Session](SESSION.md)
 
+Canonical integration record PCC-20261117-372680 reissues the three unchanged
+development records after main advanced. [Integration receipt](integration.json)
+and the exact [original suffix](development-ledger-fork.jsonl) retain both
+histories; none of the original hash links or scientific bytes are rewritten.
+All producer standing remains unverified. [pcc:unverified]
+
 ## Exact construction
 
 Use the existing monic genus3 Nagao quotient
