@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 730" width="880" height="730" font-family="system-ui, -apple-system, Segoe UI, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">rootfind-subtract on the GPU, m = 2 and m = 3: solve wall time per arm</title>
+<desc id="d">Median complete-solve wall time of the CPU arm, the GPU arm with a worker per run, and the GPU arm on a daemon worker, per curve and base size, log scale; all arms report the same counted S.</desc>
+<style>.bg{fill:#fcfcfb}.c1{fill:#8f8e89}.c2{fill:#86b6ee}.c3{fill:#2a78d6}.c4{fill:#c3c2b7}.p{fill:#0b0b0b}.q{fill:#52514e}.g{stroke:#e4e3df}@media (prefers-color-scheme: dark){.bg{fill:#1a1a19}.c1{fill:#8f8e89}.c2{fill:#1f5ea8}.c3{fill:#3987e5}.c4{fill:#52514e}.p{fill:#f0efec}.q{fill:#c3c2b7}.g{stroke:#383835}}</style>
+<rect class="bg" width="880" height="730"/>
+<text class="p" x="16" y="24" font-size="15" font-weight="600">rootfind-subtract in complete IC solves: m = 3 above 32 bits and m = 2</text>
+<text class="q" x="16" y="42" font-size="12">median solve wall, log scale; A100 pod; every arm reports identical relations, logarithm and counted S</text>
+<rect class="c1" x="16" y="54" width="12" height="12" rx="2"/><text class="p" x="34" y="64" font-size="12">CPU, 1 thread</text>
+<rect class="c4" x="206" y="54" width="12" height="12" rx="2"/><text class="p" x="224" y="64" font-size="12">CPU, all threads</text>
+<rect class="c2" x="396" y="54" width="12" height="12" rx="2"/><text class="p" x="414" y="64" font-size="12">GPU, host-built table</text>
+<rect class="c3" x="586" y="54" width="12" height="12" rx="2"/><text class="p" x="604" y="64" font-size="12">GPU, daemon</text>
+<line class="g" x1="230.0" x2="230.0" y1="86" y2="700" stroke-width="1"/>
+<text class="q" x="230.0" y="716" font-size="11" text-anchor="middle">0.1 s</text>
+<line class="g" x1="393.3" x2="393.3" y1="86" y2="700" stroke-width="1"/>
+<text class="q" x="393.3" y="716" font-size="11" text-anchor="middle">1 s</text>
+<line class="g" x1="556.7" x2="556.7" y1="86" y2="700" stroke-width="1"/>
+<text class="q" x="556.7" y="716" font-size="11" text-anchor="middle">10 s</text>
+<line class="g" x1="720.0" x2="720.0" y1="86" y2="700" stroke-width="1"/>
+<text class="q" x="720.0" y="716" font-size="11" text-anchor="middle">100 s</text>
+<text class="p" x="220" y="107.0" font-size="12" text-anchor="end">m = 3, log2 r = 33.4, |F_x| = 2048</text>
+<text class="q" x="220" y="122.0" font-size="11" text-anchor="end">S = 96.6 (133× rho)</text>
+<g><title>cpu: 2.745 s</title><rect class="c1" x="230" y="92" width="235.0" height="10" rx="2"/></g>
+<text class="q" x="471.0" y="100.5" font-size="11">2.74 s</text>
+<g><title>mt: 2.751 s</title><rect class="c4" x="230" y="104" width="235.1" height="10" rx="2"/></g>
+<text class="p" x="471.1" y="112.5" font-size="11">2.75 s (1.0× CPU)</text>
+<g><title>gpuh: 3.196 s</title><rect class="c2" x="230" y="116" width="245.8" height="10" rx="2"/></g>
+<text class="p" x="481.8" y="124.5" font-size="11">3.2 s (0.9× CPU)</text>
+<g><title>gpud: 2.558 s</title><rect class="c3" x="230" y="128" width="230.0" height="10" rx="2"/></g>
+<text class="p" x="466.0" y="136.5" font-size="11">2.56 s (1.1× CPU)</text>
+<text class="p" x="220" y="169.0" font-size="12" text-anchor="end">m = 3, log2 r = 33.4, |F_x| = 4096</text>
+<text class="q" x="220" y="184.0" font-size="11" text-anchor="end">S = 167.9 (230× rho)</text>
+<g><title>cpu: 8.662 s</title><rect class="c1" x="230" y="154" width="316.5" height="10" rx="2"/></g>
+<text class="q" x="552.5" y="162.5" font-size="11">8.66 s</text>
+<g><title>mt: 11.561 s</title><rect class="c4" x="230" y="166" width="337.0" height="10" rx="2"/></g>
+<text class="p" x="573.0" y="174.5" font-size="11">11.6 s (0.7× CPU)</text>
+<g><title>gpud: 8.556 s</title><rect class="c3" x="230" y="178" width="315.6" height="10" rx="2"/></g>
+<text class="p" x="551.6" y="186.5" font-size="11">8.56 s (1.0× CPU)</text>
+<text class="p" x="220" y="219.0" font-size="12" text-anchor="end">m = 3, log2 r = 35.2, |F_x| = 2048</text>
+<text class="q" x="220" y="234.0" font-size="11" text-anchor="end">S = 145.2 (152× rho)</text>
+<g><title>cpu: 4.218 s</title><rect class="c1" x="230" y="204" width="265.4" height="10" rx="2"/></g>
+<text class="q" x="501.4" y="212.5" font-size="11">4.22 s</text>
+<g><title>mt: 3.415 s</title><rect class="c4" x="230" y="216" width="250.5" height="10" rx="2"/></g>
+<text class="p" x="486.5" y="224.5" font-size="11">3.41 s (1.2× CPU)</text>
+<g><title>gpuh: 3.524 s</title><rect class="c2" x="230" y="228" width="252.7" height="10" rx="2"/></g>
+<text class="p" x="488.7" y="236.5" font-size="11">3.52 s (1.2× CPU)</text>
+<g><title>gpud: 2.813 s</title><rect class="c3" x="230" y="240" width="236.7" height="10" rx="2"/></g>
+<text class="p" x="472.7" y="248.5" font-size="11">2.81 s (1.5× CPU)</text>
+<text class="p" x="220" y="281.0" font-size="12" text-anchor="end">m = 3, log2 r = 35.2, |F_x| = 4096</text>
+<text class="q" x="220" y="296.0" font-size="11" text-anchor="end">S = 123.8 (129× rho)</text>
+<g><title>cpu: 15.461 s</title><rect class="c1" x="230" y="266" width="357.6" height="10" rx="2"/></g>
+<text class="q" x="593.6" y="274.5" font-size="11">15.5 s</text>
+<g><title>mt: 17.582 s</title><rect class="c4" x="230" y="278" width="366.7" height="10" rx="2"/></g>
+<text class="p" x="602.7" y="286.5" font-size="11">17.6 s (0.9× CPU)</text>
+<g><title>gpud: 15.988 s</title><rect class="c3" x="230" y="290" width="360.0" height="10" rx="2"/></g>
+<text class="p" x="596.0" y="298.5" font-size="11">16 s (1.0× CPU)</text>
+<text class="p" x="220" y="331.0" font-size="12" text-anchor="end">m = 3, log2 r = 37.4, |F_x| = 2048</text>
+<text class="q" x="220" y="346.0" font-size="11" text-anchor="end">S = 287.5 (188× rho)</text>
+<g><title>cpu: 10.455 s</title><rect class="c1" x="230" y="316" width="329.8" height="10" rx="2"/></g>
+<text class="q" x="565.8" y="324.5" font-size="11">10.5 s</text>
+<g><title>mt: 4.490 s</title><rect class="c4" x="230" y="328" width="269.9" height="10" rx="2"/></g>
+<text class="p" x="505.9" y="336.5" font-size="11">4.49 s (2.3× CPU)</text>
+<g><title>gpuh: 3.706 s</title><rect class="c2" x="230" y="340" width="256.3" height="10" rx="2"/></g>
+<text class="p" x="492.3" y="348.5" font-size="11">3.71 s (2.8× CPU)</text>
+<g><title>gpud: 2.915 s</title><rect class="c3" x="230" y="352" width="239.2" height="10" rx="2"/></g>
+<text class="p" x="475.2" y="360.5" font-size="11">2.91 s (3.6× CPU)</text>
+<text class="p" x="220" y="393.0" font-size="12" text-anchor="end">m = 3, log2 r = 37.4, |F_x| = 4096</text>
+<text class="q" x="220" y="408.0" font-size="11" text-anchor="end">S = 163.2 (107× rho)</text>
+<g><title>cpu: 25.316 s</title><rect class="c1" x="230" y="378" width="392.6" height="10" rx="2"/></g>
+<text class="q" x="628.6" y="386.5" font-size="11">25.3 s</text>
+<g><title>mt: 19.466 s</title><rect class="c4" x="230" y="390" width="373.9" height="10" rx="2"/></g>
+<text class="p" x="609.9" y="398.5" font-size="11">19.5 s (1.3× CPU)</text>
+<g><title>gpud: 17.252 s</title><rect class="c3" x="230" y="402" width="365.4" height="10" rx="2"/></g>
+<text class="p" x="601.4" y="410.5" font-size="11">17.3 s (1.5× CPU)</text>
+<text class="p" x="220" y="443.0" font-size="12" text-anchor="end">m = 3, log2 r = 39.3, |F_x| = 2048</text>
+<text class="q" x="220" y="458.0" font-size="11" text-anchor="end">S = 567.3 (521× rho)</text>
+<g><title>cpu: 32.639 s</title><rect class="c1" x="230" y="428" width="410.6" height="10" rx="2"/></g>
+<text class="q" x="646.6" y="436.5" font-size="11">32.6 s</text>
+<g><title>mt: 7.741 s</title><rect class="c4" x="230" y="440" width="308.5" height="10" rx="2"/></g>
+<text class="p" x="544.5" y="448.5" font-size="11">7.74 s (4.2× CPU)</text>
+<g><title>gpuh: 3.991 s</title><rect class="c2" x="230" y="452" width="261.5" height="10" rx="2"/></g>
+<text class="p" x="497.5" y="460.5" font-size="11">3.99 s (8.2× CPU)</text>
+<g><title>gpud: 2.929 s</title><rect class="c3" x="230" y="464" width="239.6" height="10" rx="2"/></g>
+<text class="p" x="475.6" y="472.5" font-size="11">2.93 s (11.1× CPU)</text>
+<text class="p" x="220" y="505.0" font-size="12" text-anchor="end">m = 3, log2 r = 39.3, |F_x| = 4096</text>
+<text class="q" x="220" y="520.0" font-size="11" text-anchor="end">S = 298.2 (274× rho)</text>
+<g><title>cpu: 48.025 s</title><rect class="c1" x="230" y="490" width="438.0" height="10" rx="2"/></g>
+<text class="q" x="674.0" y="498.5" font-size="11">48 s</text>
+<g><title>mt: 21.252 s</title><rect class="c4" x="230" y="502" width="380.1" height="10" rx="2"/></g>
+<text class="p" x="616.1" y="510.5" font-size="11">21.3 s (2.3× CPU)</text>
+<g><title>gpud: 17.647 s</title><rect class="c3" x="230" y="514" width="367.0" height="10" rx="2"/></g>
+<text class="p" x="603.0" y="522.5" font-size="11">17.6 s (2.7× CPU)</text>
+<text class="p" x="220" y="555.0" font-size="12" text-anchor="end">m = 2, log2 r = 27.5, |F_x| = 4096</text>
+<text class="q" x="220" y="570.0" font-size="11" text-anchor="end">S = 6028.3 (8468× rho)</text>
+<g><title>cpu: 3.068 s</title><rect class="c1" x="230" y="540" width="242.9" height="10" rx="2"/></g>
+<text class="q" x="478.9" y="548.5" font-size="11">3.07 s</text>
+<g><title>mt: 0.623 s</title><rect class="c4" x="230" y="552" width="129.8" height="10" rx="2"/></g>
+<text class="p" x="365.8" y="560.5" font-size="11">0.623 s (4.9× CPU)</text>
+<g><title>gpud: 0.153 s</title><rect class="c3" x="230" y="564" width="30.2" height="10" rx="2"/></g>
+<text class="p" x="266.2" y="572.5" font-size="11">0.153 s (20.0× CPU)</text>
+<text class="p" x="220" y="605.0" font-size="12" text-anchor="end">m = 2, log2 r = 30.0, |F_x| = 4096</text>
+<text class="q" x="220" y="620.0" font-size="11" text-anchor="end">S = 13432.8 (10858× rho)</text>
+<g><title>cpu: 14.441 s</title><rect class="c1" x="230" y="590" width="352.7" height="10" rx="2"/></g>
+<text class="q" x="588.7" y="598.5" font-size="11">14.4 s</text>
+<g><title>mt: 2.878 s</title><rect class="c4" x="230" y="602" width="238.3" height="10" rx="2"/></g>
+<text class="p" x="474.3" y="610.5" font-size="11">2.88 s (5.0× CPU)</text>
+<g><title>gpud: 0.202 s</title><rect class="c3" x="230" y="614" width="49.9" height="10" rx="2"/></g>
+<text class="p" x="285.9" y="622.5" font-size="11">0.202 s (71.5× CPU)</text>
+<text class="p" x="220" y="655.0" font-size="12" text-anchor="end">m = 2, log2 r = 31.3, |F_x| = 4096</text>
+<text class="q" x="220" y="670.0" font-size="11" text-anchor="end">S = 25111.5 (22784× rho)</text>
+<g><title>cpu: 39.898 s</title><rect class="c1" x="230" y="640" width="424.8" height="10" rx="2"/></g>
+<text class="q" x="660.8" y="648.5" font-size="11">39.9 s</text>
+<g><title>mt: 7.809 s</title><rect class="c4" x="230" y="652" width="309.1" height="10" rx="2"/></g>
+<text class="p" x="545.1" y="660.5" font-size="11">7.81 s (5.1× CPU)</text>
+<g><title>gpud: 0.323 s</title><rect class="c3" x="230" y="664" width="83.1" height="10" rx="2"/></g>
+<text class="p" x="319.1" y="672.5" font-size="11">0.323 s (123.6× CPU)</text>
+</svg>

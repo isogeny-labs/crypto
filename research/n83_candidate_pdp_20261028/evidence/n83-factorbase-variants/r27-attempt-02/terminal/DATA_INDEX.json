@@ -1,0 +1,60 @@
+{
+  "schema": "n83.factor-base-terminal-data-index/v1",
+  "files": [
+    {
+      "path": "FORMAT.json",
+      "bytes": 1352,
+      "sha256": "729ec3191158c4f858444985f31299e768053515cedd73e06dedb384c112df8c",
+      "role": "file_format_descriptor"
+    },
+    {
+      "path": "container.log",
+      "bytes": 1,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "role": "bounded_container_logs"
+    },
+    {
+      "path": "events-api.json",
+      "bytes": 119,
+      "sha256": "7a779468a2dde976a9b896541df1e4ef805e813093bd5edb40ef1a6eea588edf",
+      "role": "raw_kubernetes_events_query"
+    },
+    {
+      "path": "job-api.json",
+      "bytes": 10534,
+      "sha256": "f93fb58f38145c3cda4ad221d6ef31102be9b1003cbd523de868d31a8d2d2f00",
+      "role": "raw_kubernetes_job"
+    },
+    {
+      "path": "observed-at.txt",
+      "bytes": 21,
+      "sha256": "8c1a23efd0d675ff089b56a788c43b43140a19840c97b7ddaef2eab20f3a3974",
+      "role": "collection_timestamp"
+    },
+    {
+      "path": "pod-api.json",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "raw_kubernetes_pod_query"
+    },
+    {
+      "path": "results-listing.json",
+      "bytes": 3716,
+      "sha256": "89cef77ae686429557f1fd346555f895c45dfbfc56ef1fdf1abb0fd5e6793e0a",
+      "role": "isolab_s3_results_listing"
+    },
+    {
+      "path": "status-tool.json",
+      "bytes": 3,
+      "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "role": "isolab_status_response"
+    },
+    {
+      "path": "terminal-receipt.json",
+      "bytes": 1192,
+      "sha256": "20d5e974999dcec5bd74d8a62b9529babecb98e12419d93b1a50363cce4475ec",
+      "role": "normalized_terminal_record"
+    }
+  ],
+  "index_hash_rule": "DATA_INDEX.json is not self-hashed; manifest.sha256 covers the index and all other files"
+}

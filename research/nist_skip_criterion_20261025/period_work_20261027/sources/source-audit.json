@@ -1,0 +1,60 @@
+{
+  "kind": "recorded-ecpp-work-source-audit/v1",
+  "original_archive_sha256": "0387e7d180e570d0cf1ff957ed281a46711fb20d50ae0b0669a01a3464d9160f",
+  "files": [
+    {
+      "path": "sources/ecpp.c",
+      "sha256": "16766d2b73a5424b4252d0d75ba5a4346fae1d908ecc04eb7bca8bf1930071e2",
+      "bytes": 8572
+    },
+    {
+      "path": "sources/findd.c",
+      "sha256": "4700f5ba3fee7688478a3120807f5044e881f6ab1ddd9297a8fa7532cece5ae8",
+      "bytes": 7729
+    },
+    {
+      "path": "sources/ecppio.c",
+      "sha256": "d5a6f774c114c4523f23fb9edbb22a5e74e6ca142acabd9c8e0909c9eff0bb19",
+      "bytes": 1717
+    },
+    {
+      "path": "sources/lfactor.c",
+      "sha256": "1c12f226fb28eb7814debed5d745b3d7a3fbf0e6ca541830c339358193f3faa5",
+      "bytes": 1329
+    }
+  ],
+  "sites": [
+    [
+      "ecpp.c",
+      115,
+      161,
+      "Explicit chain/routing prints; final chain level may omit the End-of-depth message"
+    ],
+    [
+      "ecpp.c",
+      232,
+      249,
+      "Each findm starts rank0 and prints only a norm-eligible returned discriminant"
+    ],
+    [
+      "findd.c",
+      18,
+      88,
+      "Catalog rank advances through silent genus/norm failures; retry/exhaustion can censor inferred records"
+    ],
+    [
+      "ecppio.c",
+      25,
+      96,
+      "One catalog record per line; D follows the factor list"
+    ],
+    [
+      "lfactor.c",
+      47,
+      57,
+      "Factor records are prints, not unique factors or operation counts"
+    ]
+  ],
+  "source_is_historical_caller": false,
+  "analysis_of_existing_results": true
+}

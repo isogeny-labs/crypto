@@ -1,0 +1,15 @@
+/var/tmp/pencil-remainder-trace-20261031-v1/Trace.lean:25:7: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  b * quotient es + run b es (cancel b r e)
+in the target expression
+  r = b * (term e + quotient es) + run b es (cancel b r e)
+
+case cons
+K : Type u_1
+inst✝ : Field K
+b : K[X]
+e : ℕ × K
+es : List (ℕ × K)
+ih : ∀ (r : K[X]), r = b * quotient es + run b es r
+r : K[X]
+h : cancel b r e = b * quotient es + run b es (cancel b r e)
+⊢ r = b * (term e + quotient es) + run b es (cancel b r e)

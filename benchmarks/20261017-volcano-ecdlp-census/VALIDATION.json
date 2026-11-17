@@ -1,0 +1,114 @@
+{
+  "schema": "validation-gate/v1",
+  "replay_certificate": {
+    "path": "replay-certificate.json",
+    "sha256": "be9ab9cb0ba12eebc551ad700edf717faade1883c65faa07003dcc1efb185bd7"
+  },
+  "validator_report": {
+    "path": "validator-report.json",
+    "sha256": "ef0f1ac12fa8118d2b94e14c94a1554b9d27f57bb7ea5b2914f870bd7d64b50e"
+  },
+  "rho_reference": {
+    "kind": "negation",
+    "protocol": "PLAN s1 / ANALYSIS_PLAN s9 name rho-neg (rho.negation) as the matched rho in every session, paired with ic on the same (workload, target, round). It is the strongest available on every V1 and V2 vertex and on the 15 non-crater V3 vertices (no j = 0 or 1728). On the V3 j = 0 crater the strongest available is the automorphism fold rho-cubic (rho.cubic, order-6 automorphism group), measured in the same sessions as the positive control; since erratum A3 the report compares IC with rho-cubic there (results.json ic_vs_rho_cubic_crater: 84.9x / 92.8x / 131.1x at 0 / 0.1 / 1 GAE).",
+    "unit": "S (ecbench normalised group operations: total_gae over the session floor), every unpriced native operation priced at 0 / 0.1 / 1 GAE on both arms",
+    "binary_or_process": "ecbench sha256 ac4bc5b26f858a4d8a374208297157840af25fb1dc25ea1c19dd41360735fb35 (runs/progress.jsonl header); every arm, references included, in the same sessions",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "order_holds_across_band": true,
+    "note": "gae_band: V1 pooled mean priced S of ic and rho-neg (the main population). gae_band_by_volcano: V1, V2, V3 (ic and rho-neg, isogenous families pooled) and V3crater (ic, rho-cubic and rho-neg on the D + N crater pairs). Rho is ahead at every price on every volcano, level and the crater.",
+    "gae_band": {
+      "0": {
+        "ic": 46.688314936919689,
+        "rho": 1.1006423075175533
+      },
+      "0.1": {
+        "ic": 55.619971934142512,
+        "rho": 1.1993955629103119
+      },
+      "1": {
+        "ic": 136.00488490914088,
+        "rho": 2.0881748614450988
+      }
+    },
+    "gae_band_by_volcano": {
+      "V1|0": {
+        "ic": 46.688314936919689,
+        "rho_neg": 1.1006423075175533,
+        "ratio": 42.419153450700051,
+        "n": 18000
+      },
+      "V1|0.1": {
+        "ic": 55.619971934142512,
+        "rho_neg": 1.1993955629103119,
+        "ratio": 46.373334748030622,
+        "n": 18000
+      },
+      "V1|1": {
+        "ic": 136.00488490914088,
+        "rho_neg": 2.0881748614450988,
+        "ratio": 65.130984679616432,
+        "n": 18000
+      },
+      "V2|0": {
+        "ic": 76.027065280319277,
+        "rho_neg": 1.2356763244423508,
+        "ratio": 61.526682818520122,
+        "n": 17920
+      },
+      "V2|0.1": {
+        "ic": 89.962462686971975,
+        "rho_neg": 1.3445156617046323,
+        "ratio": 66.910684084493198,
+        "n": 17920
+      },
+      "V2|1": {
+        "ic": 215.38103934685239,
+        "rho_neg": 2.3240696970650028,
+        "ratio": 92.67408788077681,
+        "n": 17920
+      },
+      "V3|0": {
+        "ic": 68.450657039601424,
+        "rho_neg": 1.163843227842877,
+        "ratio": 58.814327739373596,
+        "n": 10160
+      },
+      "V3|0.1": {
+        "ic": 81.329483631270861,
+        "rho_neg": 1.2704669384934366,
+        "ratio": 64.015427058427946,
+        "n": 10160
+      },
+      "V3|1": {
+        "ic": 197.23892295629446,
+        "rho_neg": 2.2300803343485285,
+        "ratio": 88.444761347090079,
+        "n": 10160
+      },
+      "V3crater|0": {
+        "ic": 57.437867047569043,
+        "rho_cubic": 0.67683674760077728,
+        "rho_neg": 1.1716362327307417,
+        "ic_over_cubic": 84.862217146412931,
+        "n": 2000
+      },
+      "V3crater|0.1": {
+        "ic": 68.156666637030284,
+        "rho_cubic": 0.73476658739846756,
+        "rho_neg": 1.279046021041423,
+        "ic_over_cubic": 92.759616190969481,
+        "n": 2000
+      },
+      "V3crater|1": {
+        "ic": 164.62586294218133,
+        "rho_cubic": 1.2561351455776868,
+        "rho_neg": 2.2457341158376112,
+        "ic_over_cubic": 131.05744514971849,
+        "n": 2000
+      }
+    }
+  }
+}

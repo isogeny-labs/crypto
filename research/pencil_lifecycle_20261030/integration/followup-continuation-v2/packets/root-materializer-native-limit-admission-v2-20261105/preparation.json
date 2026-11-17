@@ -1,0 +1,52 @@
+{
+  "schema": "root-library-materialization-admission/v3",
+  "revision": "29861c9a55f9ae5a33e1e09b3866aa397fbde605",
+  "repository": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105",
+  "workspace": "/var/tmp/pencil-root-materialize-t1716-20261105",
+  "output": "/home/ec2-user/pencil-validation-receipts/t1716-materializer-20261105/worker",
+  "unit": "pencil-root-materialize-t1716-20261105.service",
+  "published_github_commit": "8609dfee303905cfec867814bb58e43def6fb4fd",
+  "reviewed": true,
+  "lease": {
+    "task_id": "a6b3cc50-594a-471c-9d6b-acb66b45766a",
+    "attempt_id": "d0b8cc9b-8ec2-4363-b455-1bb94a15e18c",
+    "lease_id": "d83751fa-b216-4ed3-bd25-cf141392b011",
+    "fencing_epoch": 1
+  },
+  "absolute_deadline": "2026-11-06T04:00:00+00:00",
+  "campaign_remaining_worker_seconds": 42300,
+  "historical_source_manifest": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pencil-root-adapter-positive-control/source-materialization.json",
+  "concat_addendum": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pencil-root-adapter-positive-control/concat-include-addendum.json",
+  "candidate": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-durable-validation-20261105/v2-draft/candidate-pencil.rs",
+  "registry_archives": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pencil-root-adapter-positive-control/registry-archives.json",
+  "tool_manifest": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pencil-root-adapter-positive-control/root-check-tool-inputs.json",
+  "cache_source": "/home/ec2-user/crypto-pencil-signed-graph-20261029/target/release",
+  "input_files": {
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pencil-root-adapter-positive-control/source-materialization.json": "d9f17186258b3629a1483db1ac2c48a84d11a0bbbef49f8db395cd229b33f811",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pencil-root-adapter-positive-control/concat-include-addendum.json": "431b90daa2e0b9c68bff4291da485e7a0ee0c4bcc3b96cf5e82e3902168c5cfe",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-durable-validation-20261105/v2-draft/candidate-pencil.rs": "555a5c62339a927579599d46c7e94265e52497dc56bacf0b13bb53c2dcd133c4",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pencil-root-adapter-positive-control/registry-archives.json": "87f9efd55a5f5aaf6cfac4b0aaee8d06313723f88b5014b11fe6a6eba92640a3",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pencil-root-adapter-positive-control/root-check-tool-inputs.json": "dc136ba9d740efd9ebed49fec9e2fe461156ab2e94aaba5b5a4c6595fd147dbd",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-materializer-v2-review-20261105/result.json": "f18b26e1b37b2a496b46fb1232f0cb82116c2bd9819b51163ea7b236ae8591c1",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/materializer-mapping-review-20261105/result.json": "d08608ef1b7acd8ee8bbf57e1908c1b958252ce52e1eb5e7953a08077ab529c7",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-materializer-native-limit-admission-v2-20261105/materialize.py": "4e01f95cde6fe851a656819133ff22cf0b65d20e39fe9227ee6bce24ba557b71",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-materializer-native-limit-admission-v2-20261105/materialize_safety.py": "2d506f0e676ff1db54036adc061680dd7f911b809b4519630fc02ff1606f9507",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-materializer-native-limits-review-20261105/result.json": "52716f81dc0f4ffa22437daf91c7fdab1e493df4ff823367c853de0f9169411f"
+  },
+  "limits": {
+    "outer_seconds": 900,
+    "inner_seconds": 880,
+    "cpu": 2,
+    "memory_bytes": 4294967296,
+    "swap": 0,
+    "tasks": 512,
+    "attempts": 1,
+    "automatic_retry": false
+  },
+  "source_review_commit": "7362ee80f42dffe99089520d8dc6809293152d30",
+  "source_review_scope": "independent native22-line gate review published; reviewed=true refers only to source; concrete command/config review and root release remain required",
+  "status": "source_review_published_command_review_pending",
+  "approval_required": false,
+  "launch_disabled": true,
+  "coordinator_release_required": true
+}

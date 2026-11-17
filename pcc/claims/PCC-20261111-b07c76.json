@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-11T22:29:30Z",
+ "id": "PCC-20261111-b07c76",
+ "kind": "statement",
+ "producer": {
+  "commit": "882b6446d358b316bf670f49f52a6ba06fe76edd",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/successor-preflight-01.txt",
+    "sha256": "3d60511c4fbecc823001d0ba748e1986ee5bf92260bc79a480695b4e561def23"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/successor-preflight-source-01.rs",
+    "sha256": "76afb71ce17e624d233e8c57fff63e6aeea0c24e6becaa77b98cf530a0915564"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/successor-preflight/src/seven-reference.rs",
+    "sha256": "bb640465bfe9406e5b5e275b5127c73417b48cec5a90006d2f2bb87f72f40ae9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/CT24_PREFLIGHT.md",
+    "sha256": "881d2f1e8d3a05737b9beb70274c49426fcd481b971eb79b528be265ae863390"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "CT24 preflight01 passes unique nondual elliptic7 directions from actual E1prime(26,58),E2prime(69,50): kernels[99,94,75,1]/[53,19,40,1], targets(59,27)j47/(23,7)j89, actual Frobenius5/6 versus previous-dual2/4 by exact kernel equality. Existing exact Kohel/global dual-x certificates and all109/113 point bijections/dual7/two-hop49/scalar/recovery controls pass,inverse49=89/30. Actual transported2-roots give unchanged HLP raw[45,0,29,0,84,0,13],square leading rho35,monic C2[19,0,10,0,22,0,1],constant-root25,smoothness/coefficient descent/productL/order12317 pass. No new full Jacobian map or its global/source/cost acceptance inferred. Unsigned fixed-field correctness evidence; cold build elapsed is not a benchmark."
+}

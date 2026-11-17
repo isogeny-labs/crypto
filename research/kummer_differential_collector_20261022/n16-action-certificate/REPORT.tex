@@ -1,0 +1,78 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.72in]{geometry}
+\usepackage{graphicx,booktabs,amsmath}
+\usepackage[T1]{fontenc}
+\title{N16: Kummer Action Certificate Gate}
+\author{Exact matrix checks and finite exceptional replay}
+\date{25 October 2026}
+\begin{document}
+\maketitle
+\noindent Exact modular arithmetic on 21 frozen models checked 105 recorded
+rational 2-torsion action matrices. Every matrix is invertible and squares
+to a nonzero scalar identity. All 210 within-model pairs commute
+projectively, and each five-matrix product is scalar identity. All 21
+general-conversion determinants and 84 theta inverse constants are nonzero.
+These identities hold on the full four-dimensional coordinate space.
+
+\begin{center}\small
+\begin{tabular}{lr}
+\toprule
+Finite exceptional replay quantity & Result\\
+\midrule
+Checked class instances & 5,494\\
+Checked action comparisons & 27,470\\
+Action mismatches or missing final coordinates & 0\\
+Direct source zero / extended nonzero degree-two outputs & 5,599\\
+Direct source / extended chart matches & 21,595\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent For $u=x^2+a_1x+a_0$ and $v=b_1x+b_0$, the constant coefficient
+of $v^2=f\bmod u$ gives $b_0^2=a_0b_1^2+R_0$. Write
+$x^n\bmod u=C_n+L_nx$. Since $C_{n+1}=-a_0L_n$ and $f(0)=0$,
+\[
+ R_0/a_0=-\sum_{n\ge2}f_nL_{n-1}
+\]
+is a polynomial even at $a_0=0$. Every generic projection numerator
+$a_0T_i-b_0^2$ therefore has the direct continuation
+$T_i-b_1^2-R_0/a_0$. This cancels the common factor that caused the
+source's 5,599 zero vectors; it does not use a torsion action to set its
+expected value. More strongly, the four coordinates equal the recorded
+conversion matrix $C$ applied to
+$(1,-a_1,-a_0,a_0a_1+b_1^2+R_0/a_0)^T$ in the direct $C_2$ basis. Its first entry is 1 and
+the exactly checked $\det C_2$ is nonzero on every frozen model, so the
+continued chart is nonzero for every degree-two polynomial input, including
+$a_0=0$. The degree-one candidate chart $C_1(0,1,x,x^2)^T$ is likewise
+nonzero for every $x$. These are all-state chart statements, not an
+all-state geometric translation theorem.
+
+\noindent The source $C_1$ is also an alternate degree-two basis:
+with $\sigma=1+\lambda+\mu+\nu$ and $q_3=a_0a_1+b_1^2+R_0/a_0$,
+$C_2(1,-a_1,-a_0,q_3)^T=C_1(1,-a_1,a_0,q_3+\sigma a_0)^T$.
+Thus N15's $C_1$ inverse correctly recovers $a_0$. The earlier claim
+that the two matrices were identical is retracted; a subsequent exact
+matrix audit verifies the basis change on all 21 models.
+
+\noindent The degree-one candidate chart is the fixed conversion of
+$(0,1,x,x^2)$. Native Jacobian addition built each translated class for
+the finite check. Its geometric interpretation and the generic identity
+$K(D+T_r)\sim M_rK(D)$ are not certified for every divisor. For
+$U=u(r)\ne0$, the remaining proof can use $c=-v(r)/U$,
+$L=v+cu$, $u'=(f-L^2)/(u(x-r))$, and $v'=-L\bmod u'$; clear powers of
+$U$ and reduce cross-products modulo both coefficients of $v^2-f\bmod u$.
+The later generic and exceptional packets now provide these algebraic
+action certificates for the declared charts. A source-independent geometric
+embedding proof and a new signed collector remain absent. No cohort or rho
+comparison was run in this N16 packet; its rho ratio remains null.
+
+\newpage
+\begin{center}
+\includegraphics[width=\linewidth]{research/kummer_differential_collector_20261022/n16-action-certificate/chart-graph.png}\\
+\small Source zero vectors resolved by the direct chart, by frozen model.
+\end{center}
+\noindent Exact scalars and finite rows are in
+\texttt{results/summary.json} and \texttt{results/exceptional.csv}.
+\texttt{SHA256SUMS} binds code, inputs and rendered packet. The all-state
+geometric action identity and complete cold collector cost remain open.
+\end{document}

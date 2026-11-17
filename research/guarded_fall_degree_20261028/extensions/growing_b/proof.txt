@@ -1,0 +1,268 @@
+Growing-cardinality extension of the inverse-guarded model
+Date: 2026-10-28
+
+Status and scope
+----------------
+This note contains mathematical derivations, not new experiments or a Lean
+formalization. It uses the already proved B=3 theorem in
+../../proofs/universal_five_symmetric_audit.txt. No literature-priority or novelty
+claim is made. The important parameter B is the CARDINALITY of the abscissa
+set and the degree of its explicit membership polynomial. It is not an
+extension degree, a binary coordinate count, or the factor-base bit length.
+
+Primary context: Semaev's summation-polynomial construction, IACR ePrint
+2004/031; Huang--Kosters--Yeo's last-fall-degree/Weil-descent framework,
+arXiv:1505.02532. The polynomial closure below is the same ordinary-ring
+closure already fixed in this project. The finite-field function-algebra
+first-fall definition is a different convention when truncation is active.
+
+Setting
+-------
+Let k=F_p, p>3, and E:y^2=x^3+a*x+b be nonsingular. Let S consist of B
+distinct abscissas of affine k-rational points; both signs above every
+abscissa are allowed. Let R be an affine rational target with abscissa r.
+Put g(X)=product_(s in S)(X-s). Use the explicit six-input system in
+k[x,y,z,u,v]:
+
+ F_S={g(x),g(y),g(z),f1=S3(x,y,u),f2=S3(u,z,r),h=v*(x-y)-1}.
+
+Every algebraic-closure solution is rational: membership fixes x,y,z to S,
+the guard forces x!=y, and the first S3 quadratic has roots given by the
+rational abscissas of sums/differences of rational lifts of x and y. The
+guard then also fixes v rationally. Thus unsatisfiability over k is also
+absence of algebraic-closure zeros and makes (F_S) the unit ideal.
+
+Total degree is ordinary polynomial degree. V(F,D) contains eligible inputs
+and is closed under linear combinations and multiplication whenever the
+ordinary product degree stays at most D. No implicit field/Boolean reduction
+is used. The first-fall convention is the homogeneous-top syzygy module
+modulo the Koszul syzygy submodule, with the usual degree shifts for unequal
+input degrees.
+
+Results
+-------
+For every B>=2:
+  d_ff(F_S)=B+1.
+
+For every UNSATISFIABLE instance and B>=3:
+  max(5,B+1) <= d_F(F_S) <= 3B-4.
+
+Consequently B=3 gives the already proved exact pair (4,5). B=2 has the
+previous exact pair (3,4). The constant ceiling five cannot extend to all
+growing B in this presentation: B>=5 forces d_F>=6. The latter is stronger
+than merely excluding degree-B inputs below degree B, but its linear scale
+still depends essentially on the degree-B membership encoding.
+
+1. A regular core of leading forms
+----------------------------------
+The leading forms of the three non-membership inputs are
+
+ H=v*(x-y),
+ A=x^2*y^2+u^2*(x-y)^2-2*u*x*y*(x+y),
+ C=u^2*z^2.
+
+They form a regular sequence. Here is an elementary verification.
+
+H is nonzero. Its two prime factors v and x-y divide neither A: A is
+independent of v, and A(x,x,u)=x^3*(x-4*u) is not zero. Hence gcd(H,A)=1,
+and A is a non-zero-divisor modulo (H).
+
+The variable z is a non-zero-divisor modulo (H,A), since neither generator
+depends on z. The variable u is also a non-zero-divisor. To prove this,
+suppose u*f=alpha*H+beta*A. Reduce modulo u. Since A at u=0 is x^2*y^2,
+and gcd(H,x^2*y^2)=1, there is a polynomial t independent of u with
+  alpha_0=-t*x^2*y^2, beta_0=t*H.
+Replace alpha by alpha+t*A and beta by beta-t*H. This changes neither the
+represented polynomial nor its value, and both new coefficients are
+divisible by u. Divide the identity by u to get f in (H,A).
+
+Therefore u^2*z^2 is a non-zero-divisor modulo (H,A), proving the claim.
+
+In particular every syzygy of H,A,C is Koszul. One can see this directly:
+if a0*H+b0*A+c0*C=0, reduction modulo (H,A) gives c0 in (H,A). Write
+c0=c1*H+c2*A; substituting reduces the remaining equation to a syzygy of
+the coprime pair H,A. That syzygy is a multiple of (A,-H), so the original
+one is a sum of the three pairwise Koszul syzygies. For homogeneous data,
+all these expressions can be chosen homogeneous in the shifted degrees.
+
+2. Exact first fall B+1
+----------------------
+Below internal degree B, no membership top x^B,y^B,z^B is present. Any top
+syzygy comes from the regular core and is therefore Koszul.
+
+At internal degree B, coefficients of membership tops are constants. A
+syzygy would put
+  c1*x^B+c2*y^B+c3*z^B
+in (H,A,C). Evaluate at the three coordinate-axis points
+  (x,y,z,u,v)=(1,0,0,0,0), (0,1,0,0,0), (0,0,1,0,0).
+Every core top vanishes at these points, so c1=c2=c3=0. The remaining
+syzygy is again a core Koszul syzygy. This also covers B=2,3, when the
+quartic core inputs are not yet eligible at degree B.
+
+At degree B+1, define
+  Q_top=(x^B-y^B)/(x-y).
+There is a top syzygy
+  v*x^B-v*y^B-Q_top*H=0.
+It is not Koszul: a Koszul syzygy with a membership component first occurs
+at degree min(B+2,B+4,2B), which is strictly greater than B+1 for B>=2.
+Any degree-(B+1) core Koszul combination has zero membership components,
+whereas the displayed syzygy has membership components v,-v,0.
+
+Thus the first non-Koszul internal degree is exactly B+1. The full
+inhomogeneous identity is
+  v*(g(x)-g(y))-Q*h=Q,
+  Q=(g(x)-g(y))/(x-y),
+so the witness lifts to a nonzero polynomial of degree B-1.
+
+3. The core has no hidden degree falls
+--------------------------------------
+Let K=(h,f1,f2). Its top ideal equals (H,A,C). A self-contained argument
+is useful because this fact is essential to the lower bound below.
+
+For f in K, choose a representation f=sum_i a_i*f_i whose maximum product
+degree D is minimal, where here f_i are h,f1,f2. If D>deg f, the top
+coefficient vector is a homogeneous syzygy of H,A,C. By section 1 it is a
+homogeneous sum of Koszul syzygies. Subtract the corresponding FULL
+inhomogeneous Koszul identities from the coefficient vector (a_i). The
+represented polynomial f does not change, while all degree-D products
+cancel. This contradicts minimality of D.
+
+Hence every f in K has a representation whose products have degree at most
+deg f, and its leading form lies in (H,A,C). The reverse inclusion for top
+ideals is immediate from the core inputs.
+
+The ideal K is proper. Over an algebraic closure, choose an affine U with
+x(U)!=r. Choose P avoiding O,U and the finite set of solutions of 2P=U.
+Then Qp=U-P is affine and x(P)!=x(Qp); otherwise Qp=P or Qp=-P, contrary
+to the choice of P or U being affine. The third point T=R-U is affine.
+These points give a common zero of f1,f2 and h, with
+v=(x(P)-x(Qp))^(-1). Such a choice exists because the algebraic-closure
+elliptic curve is infinite and multiplication by two has finite fibres.
+
+4. A degree-B closed separating space: d_F>=B+1
+------------------------------------------------
+Set
+  W=(K intersect polynomials of degree <=B)+span_k{g(x),g(y),g(z)}.
+It contains every input eligible in V(F_S,B).
+
+If w=i+c1*g(x)+c2*g(y)+c3*g(z) has degree less than B, then its degree-B
+part shows c1*x^B+c2*y^B+c3*z^B lies in the top ideal of K. Section 3 and
+the three coordinate-axis points force all ci=0. Thus every member of W
+of degree less than B belongs to K.
+
+This makes W closed under every permitted multiplication at degree B:
+a nonconstant multiplier forces the original row degree below B, and its
+product stays in K and degree <=B. Constant multiplication is covered by
+linearity. Also 1 is not in W, since its membership would force all ci=0
+and then 1 in the proper ideal K.
+
+Consequently 1 is not in V(F_S,B). On an unsatisfiable instance, last fall
+equals the least degree deriving 1, so d_F>=B+1. No implication from
+first-fall degree to last-fall degree was assumed.
+
+5. The degree-four obstruction extends to every B>=3
+---------------------------------------------------
+The earlier universal B=3 lower proof extends without change. Set
+  I0=(g(x),g(y),g(z),h),
+  W4=(I0 intersect degree<=4)+span_k{f1,f2}.
+If a member of W4 has degree <=3, evaluate its u^2 coefficient on distinct
+first-pair roots and a third root, leaving u as a formal indeterminate.
+Restrict all these choices to ANY three-element subset T of S. The exact
+same affine-coefficient argument from the B=3 proof forces both Semaev
+coefficients to vanish: variation in z first kills the f2 coefficient;
+swapping x,y removes the inverse-coordinate coefficient; the genuinely
+quadratic squared-difference function on three missing roots kills the f1
+coefficient in characteristic greater than three.
+
+Thus low rows of W4 lie in I0, W4 is closed at degree four, and 1 is
+excluded because I0 has common zeros. This contains every eligible input,
+including when B>4 and the membership inputs are not yet eligible. Hence
+1 not in V(F_S,4), and an unsatisfiable instance has d_F>=5.
+
+6. Exact triple-projector partition of unity
+--------------------------------------------
+For each three-element subset T of S put
+  g_T(X)=product_(t in T)(X-t),
+  q_T(X)=g(X)/g_T(X),
+  e_T=q_T(x)*q_T(y)*q_T(z),
+  kappa_T=product_(t in T)q_T(t).
+The denominator kappa_T is nonzero because S has distinct elements.
+Then the following is an EXACT POLYNOMIAL identity:
+  sum_(|T|=3) e_T/kappa_T = 1.
+
+Proof: call the left side P. It has degree <=B-3 in each of x,y,z and is
+symmetric. On any triple of distinct elements of S, exactly the summand
+indexed by that triple's set is nonzero, and its value is one. Multiply
+P-1 by the Vandermonde
+  Delta(x,y,z)=(x-y)*(x-z)*(y-z).
+The result has degree at most B-1 in EACH variable. It vanishes on the
+whole grid S^3: on distinct triples P-1=0, and on repeated triples Delta=0.
+Tensor Lagrange interpolation makes such a polynomial identically zero.
+The polynomial ring is a domain and Delta is nonzero, so P-1=0.
+
+This argument includes repeated variable values and does not divide by
+Delta. It only uses Delta to establish a polynomial identity.
+
+7. Lifting the proved B=3 refutation: d_F<=3B-4
+------------------------------------------------
+For each T, replace g by g_T to form the local six-input system F_T.
+It is unsatisfiable: every local solution would also solve F_S. The proved
+B=3 theorem gives a degree-five derivation of 1 from F_T.
+
+Multiply EVERY polynomial in that derivation by e_T. The final polynomial
+is e_T. Its intermediate degrees are at most
+  deg(e_T)+5 = 3*(B-3)+5 = 3B-4.
+
+All localized initial inputs are available from F_S within that ceiling:
+  e_T*g_T(x) = q_T(y)*q_T(z)*g(x), degree 3B-6,
+and similarly for y,z;
+  e_T*f1, e_T*f2 have degree at most 3B-5;
+  e_T*h has degree 3B-7.
+The same ceiling also includes every required global input. Each local
+linear-combination step lifts by linearity, and every local permitted
+multiplication lifts with the degree bound above. Therefore
+  e_T belongs to V(F_S,3B-4).
+
+Sum e_T/kappa_T using section 6. This derives 1 within degree 3B-4, and
+hence proves d_F(F_S)<=3B-4 for every B>=3.
+
+The construction uses binomial(B,3) local derivations. It is a linear
+degree bound in cardinality, not an efficient algorithm in log B.
+
+8. Existence as B grows and the resulting scale
+----------------------------------------------
+The lower bound is nonvacuous for unbounded B. The factor base has at most
+2B rational points, so all its ordered three-sums occupy at most 8B^3
+points of E(k). If
+  #E(k) > 8B^3+1,
+there is an affine rational target outside the full sum set; it is also
+unsatisfiable for the guarded system. There are enough rational abscissas
+to choose S, since at most two affine points have any given abscissa.
+
+Hasse's inequality gives #E(k)>=p+1-2*sqrt(p), so sufficiently large primes
+satisfy this condition for every fixed B (for B>=2, p>=16B^3 suffices).
+Thus one obtains actual unsatisfiable families with unbounded B and
+  B+1 <= d_F <= 3B-4.
+
+The scale is therefore Theta(B) in this explicit degree-B membership
+presentation. This DOES NOT establish a linear lower bound in the number
+of Boolean/Weil-descent variables in a fixed-degree encoding. If B=2^ell,
+the large membership degree is already exponential in ell. That difference
+is precisely why the original n/ell experiment cannot be substituted for
+the model treated here.
+
+Remaining gap
+-------------
+The exact last fall for general B>=4 is unresolved between the bounds above.
+No constant ceiling can hold as B grows in this presentation. No assertion
+is made here about characteristic two, where both the S3 formula and the
+degree-five resultant step need separate treatment.
+
+One part nevertheless transfers without change: the triple-projector
+partition and proof-lifting principle are characteristic-independent. For
+an analogous explicit-membership system in any characteristic, if every
+three-abscissa restriction has a uniform refutation ceiling c (at least
+the maximum degree of its local inputs), the same argument gives a global
+ceiling 3*(B-3)+c. This is conditional on the separate local theorem and
+on retaining the same ordinary-degree encoding; it is not an unconditional
+characteristic-two result or a Weil-descent transfer.

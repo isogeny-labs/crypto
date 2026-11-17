@@ -1,0 +1,18 @@
+{
+  "schema": "n83.full-d18-m4-l0-positive-host/v1",
+  "source_commit": "dc5600493668544691a5884f5dcd474192a4d921",
+  "binary_sha256": "c155f955b6bf3c8aafe003a154ca1804f6053b3e8296c198adfa347b12a5ad16",
+  "host": "Darwin 25.6.0 arm64, macOS 26.6, Apple M4 Pro",
+  "physical_memory_bytes": 51539607552,
+  "isolation": "L0_shared_host_no_hard_cgroup",
+  "cpu_limit_enforced": false,
+  "internal_process_wall_cap_seconds": 300,
+  "independent_outer_cap_seconds": 310,
+  "start_utc": "2026-10-25T15:18:27Z",
+  "end_utc": "2026-10-25T15:23:29Z",
+  "supervisor": "/usr/bin/time -l /opt/homebrew/bin/gtimeout -s TERM -k 5 310",
+  "supervisor_exit_code": 1,
+  "supervisor_exit_interpretation": "time -l could not read kern.clockrate inside the sandbox; the worker's durable 300-second cap receipt is authoritative for censoring",
+  "peak_rss_bytes": null,
+  "selected_best_total_runtime": null
+}

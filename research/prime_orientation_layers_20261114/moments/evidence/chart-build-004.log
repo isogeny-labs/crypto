@@ -1,0 +1,38 @@
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+../evidence/chart-draft-004.lean.txt:254:55: error: unsolved goals
+a u i x y : ℕ
+M : ℕ → ℕ
+hx : x < 2 ^ a
+hy : y < 2 ^ a
+hi : i < u
+hu : u ≤ a
+hc : x.testBit i = y.testBit i
+ht : poleQ i ∈ image (node a) univ
+hd : delta x y ∈ image (node a) univ
+m : Nodes a
+left✝¹ : m ∈ univ
+hm✝ : node a m = poleQ i
+s : Nodes a
+left✝ : s ∈ univ
+hs : node a s = delta x y
+hsm : s ≠ m
+R : ℚ[X] := Polynomial.map LocalIntegral.integralRing.subtype (restPolynomial a m s)
+U : ℚ[X] := R * chartUnit a u i x y M
+q : ℚ := ↑↑(LocalIntegral.rhoUnit a m) * ↑(LocalIntegral.chartRatio a m s)
+hw : WeightedPolynomial U
+hr0 : eval 0 R = 1
+hu0 : eval 0 (chartUnit a u i x y M) = 1
+hU0 : U.coeff 0 = 1
+hb : chart a (pole i) (base (grid a) (delta x y)) = C q * X * R
+hm :
+  chart a (pole i) (completed (grid a) u x y M) =
+    chart a (pole i) (base (grid a) (delta x y)) * chart a (pole i) (correction u x y M)
+⊢ C ↑↑(LocalIntegral.rhoUnit a m) * C ↑(LocalIntegral.chartRatio a m s) * X * R *
+        C (eval (poleQ i) (correction u x y M)) *
+      chartUnit a u i x y M =
+    X * R * chartUnit a u i x y M * C (q * eval (poleQ i) (correction u x y M))

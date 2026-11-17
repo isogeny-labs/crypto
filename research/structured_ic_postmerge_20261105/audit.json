@@ -1,0 +1,368 @@
+{
+  "schema": "structured-ic-postmerge-audit/v1",
+  "standing": "producer_assertion",
+  "scope": "Existing public known-answer fixture controls and source/evidence custody only; no scientific-state promotion",
+  "revisions": {
+    "crypto": "2d33e9c068c0f2b3226893017c8ea48548cc0749",
+    "cryptanalysis": "12d419499d1f2ba4a8380da58f139f0d0db11912",
+    "crypto-autoresearcher": "b9c6c32a70d273a22355019b59ed897d6ad733eb"
+  },
+  "host": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "machine": "x86_64"
+  },
+  "prior_claims": [
+    "PCC-20261104-458dda",
+    "PCC-20261104-f011a3"
+  ],
+  "flow": {
+    "planned": 4,
+    "attempted": 4,
+    "completed": 4,
+    "excluded_by_rule": []
+  },
+  "tests": [
+    {
+      "standing": "producer_assertion",
+      "name": "crypto-cli",
+      "cwd": "/workspace/crypto-integration",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--test",
+        "structured_cli"
+      ],
+      "started_at": "2026-11-05T06:48:18.025218+00:00",
+      "completed_at": "2026-11-05T06:49:16.371408+00:00",
+      "exit_code": 0,
+      "raw": "crypto-cli.txt.gz",
+      "raw_sha256": "a0c4e4a0da5dca230dd2f6afaed0d88cb7e11dc89d11de614f82ee918cc59186",
+      "compression": "gzip",
+      "raw_sha256_is_uncompressed": true,
+      "test_summaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 30.63s"
+      ]
+    },
+    {
+      "standing": "producer_assertion",
+      "name": "bindings-cli",
+      "cwd": "/workspace/cryptanalysis",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "bindings/rust/hashed-ecdl-tensor/Cargo.toml",
+        "--test",
+        "structured_cli"
+      ],
+      "started_at": "2026-11-05T06:48:18.025216+00:00",
+      "completed_at": "2026-11-05T06:49:12.772103+00:00",
+      "exit_code": 0,
+      "raw": "bindings-cli.txt.gz",
+      "raw_sha256": "4f1ea5903f8cf67a93e3decf5030bd291fd3326be7cc0acbf10dc222c1c995f1",
+      "compression": "gzip",
+      "raw_sha256_is_uncompressed": true,
+      "test_summaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 31.56s"
+      ]
+    },
+    {
+      "standing": "producer_assertion",
+      "name": "suite-cli",
+      "cwd": "/workspace/cryptanalysis",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--test",
+        "structured_cli"
+      ],
+      "started_at": "2026-11-05T06:49:12.839820+00:00",
+      "completed_at": "2026-11-05T06:49:52.466881+00:00",
+      "exit_code": 0,
+      "raw": "suite-cli.txt.gz",
+      "raw_sha256": "600b6fefb08d1175b6350a631f9b8cdbde99304ad505a5734135ef40052896a2",
+      "compression": "gzip",
+      "raw_sha256_is_uncompressed": true,
+      "test_summaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 21.67s"
+      ]
+    },
+    {
+      "standing": "producer_assertion",
+      "name": "suite-library",
+      "cwd": "/workspace/cryptanalysis",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--lib"
+      ],
+      "started_at": "2026-11-05T06:49:52.546493+00:00",
+      "completed_at": "2026-11-05T06:52:46.204990+00:00",
+      "exit_code": 0,
+      "raw": "suite-library.txt.gz",
+      "raw_sha256": "4b92a63f72727f437693652cbf6d1d456ba7601ed316ad62b06b19bbe8602f4e",
+      "compression": "gzip",
+      "raw_sha256_is_uncompressed": true,
+      "test_summaries": [
+        "test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 167.00s"
+      ]
+    }
+  ],
+  "claim": "PCC-20261105-e660a7",
+  "independent_execution_attestation": false,
+  "controls": {
+    "bindings-cli": {
+      "standing": "producer_assertion",
+      "name": "bindings-cli",
+      "cwd": "/workspace/cryptanalysis",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "bindings/rust/hashed-ecdl-tensor/Cargo.toml",
+        "--test",
+        "structured_cli"
+      ],
+      "started_at": "2026-11-05T06:48:18.025216+00:00",
+      "completed_at": "2026-11-05T06:49:12.772103+00:00",
+      "exit_code": 0,
+      "raw": "bindings-cli.txt.gz",
+      "raw_sha256": "4f1ea5903f8cf67a93e3decf5030bd291fd3326be7cc0acbf10dc222c1c995f1",
+      "compression": "gzip",
+      "raw_sha256_is_uncompressed": true,
+      "test_summaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 31.56s"
+      ]
+    },
+    "ca-ledger": {
+      "standing": "producer_assertion",
+      "name": "ca-ledger",
+      "cwd": "/workspace/cryptanalysis",
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "ledger",
+        "verify",
+        "--base",
+        "e3d07ed87a8bed34c2a1f9bac0bfa21081ba81d5"
+      ],
+      "started_at": "2026-11-05T06:51:48.457333+00:00",
+      "completed_at": "2026-11-05T06:51:48.552665+00:00",
+      "exit_code": 0,
+      "raw": "ca-ledger.txt.gz",
+      "raw_sha256": "9f01bae651e641eef4b50473b7991d1400296a4014d4043b23addcfc2de24b85",
+      "compression": "gzip",
+      "raw_sha256_is_uncompressed": true
+    },
+    "ca-standing": {
+      "standing": "producer_assertion",
+      "name": "ca-standing",
+      "cwd": "/workspace/cryptanalysis",
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "standing",
+        "PCC-20261104-f011a3",
+        "--json"
+      ],
+      "started_at": "2026-11-05T06:52:27.640132+00:00",
+      "completed_at": "2026-11-05T06:52:27.768357+00:00",
+      "exit_code": 2,
+      "raw": "ca-standing.txt.gz",
+      "raw_sha256": "d62728ce7d674acb8152eb68eace26c8bf7cb481f719eeabc1a9f3b6ae09eddf",
+      "compression": "gzip",
+      "raw_sha256_is_uncompressed": true,
+      "expected_exit_code": 2
+    },
+    "crypto-cli": {
+      "standing": "producer_assertion",
+      "name": "crypto-cli",
+      "cwd": "/workspace/crypto-integration",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--test",
+        "structured_cli"
+      ],
+      "started_at": "2026-11-05T06:48:18.025218+00:00",
+      "completed_at": "2026-11-05T06:49:16.371408+00:00",
+      "exit_code": 0,
+      "raw": "crypto-cli.txt.gz",
+      "raw_sha256": "a0c4e4a0da5dca230dd2f6afaed0d88cb7e11dc89d11de614f82ee918cc59186",
+      "compression": "gzip",
+      "raw_sha256_is_uncompressed": true,
+      "test_summaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 30.63s"
+      ]
+    },
+    "crypto-ledger": {
+      "standing": "producer_assertion",
+      "name": "crypto-ledger",
+      "cwd": "/workspace/crypto-integration",
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "ledger",
+        "verify",
+        "--base",
+        "eab6ed334715504767bee9b7c60f1ba72b789182"
+      ],
+      "started_at": "2026-11-05T06:51:48.274163+00:00",
+      "completed_at": "2026-11-05T06:51:48.403755+00:00",
+      "exit_code": 0,
+      "raw": "crypto-ledger.txt.gz",
+      "raw_sha256": "4b8b8bdb1f9ff1c7992486f3e2286b4baeefec74edee50c8d32cf806dc65eb99",
+      "compression": "gzip",
+      "raw_sha256_is_uncompressed": true
+    },
+    "crypto-standing": {
+      "standing": "producer_assertion",
+      "name": "crypto-standing",
+      "cwd": "/workspace/crypto-integration",
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "standing",
+        "PCC-20261104-458dda",
+        "--json"
+      ],
+      "started_at": "2026-11-05T06:52:27.483715+00:00",
+      "completed_at": "2026-11-05T06:52:27.600531+00:00",
+      "exit_code": 2,
+      "raw": "crypto-standing.txt.gz",
+      "raw_sha256": "2d72ec92bb18277605d7e7a94f4f24f2465de843d67098a8be00c29ef638465e",
+      "compression": "gzip",
+      "raw_sha256_is_uncompressed": true,
+      "expected_exit_code": 2
+    },
+    "crypto-tensor-clippy": {
+      "standing": "producer_assertion",
+      "name": "crypto-tensor-clippy",
+      "cwd": "/workspace/crypto-integration",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "started_at": "2026-11-05T06:49:16.508377+00:00",
+      "completed_at": "2026-11-05T06:49:20.854862+00:00",
+      "exit_code": 0,
+      "raw": "crypto-tensor-clippy.txt.gz",
+      "raw_sha256": "dc1412df0f1e99b3c9c4ca0b9352a0e85215596738014cb33bf443655e5b812c",
+      "compression": "gzip",
+      "raw_sha256_is_uncompressed": true
+    },
+    "custody": {
+      "standing": "producer_assertion",
+      "name": "custody",
+      "cwd": "/workspace/crypto-integration",
+      "command": [
+        "python3",
+        "research/structured_ic_postmerge_20261105/verify_custody.py"
+      ],
+      "started_at": "2026-11-05T06:51:47.485410+00:00",
+      "completed_at": "2026-11-05T06:51:48.232394+00:00",
+      "exit_code": 0,
+      "raw": "custody.txt.gz",
+      "raw_sha256": "fc39348e545dd099891a6f4b1eda2c7209e195a9986858121c94dab2cded0b64",
+      "compression": "gzip",
+      "raw_sha256_is_uncompressed": true
+    },
+    "genus2-lock": {
+      "standing": "producer_assertion",
+      "name": "genus2-lock",
+      "cwd": "/workspace/cryptanalysis",
+      "command": [
+        "cargo",
+        "metadata",
+        "--locked",
+        "--format-version",
+        "1",
+        "--manifest-path",
+        "tools/binary-genus2-cover/Cargo.toml"
+      ],
+      "started_at": "2026-11-05T06:52:27.816295+00:00",
+      "completed_at": "2026-11-05T06:52:28.042589+00:00",
+      "exit_code": 0,
+      "raw": "genus2-lock.txt.gz",
+      "raw_sha256": "e09080e2dac00a601614b0b9cedcc1db8ff208f462fc27d0661abc13f417d9fb",
+      "compression": "gzip",
+      "raw_sha256_is_uncompressed": true
+    },
+    "suite-cli": {
+      "standing": "producer_assertion",
+      "name": "suite-cli",
+      "cwd": "/workspace/cryptanalysis",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--test",
+        "structured_cli"
+      ],
+      "started_at": "2026-11-05T06:49:12.839820+00:00",
+      "completed_at": "2026-11-05T06:49:52.466881+00:00",
+      "exit_code": 0,
+      "raw": "suite-cli.txt.gz",
+      "raw_sha256": "600b6fefb08d1175b6350a631f9b8cdbde99304ad505a5734135ef40052896a2",
+      "compression": "gzip",
+      "raw_sha256_is_uncompressed": true,
+      "test_summaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 21.67s"
+      ]
+    },
+    "suite-library": {
+      "standing": "producer_assertion",
+      "name": "suite-library",
+      "cwd": "/workspace/cryptanalysis",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--lib"
+      ],
+      "started_at": "2026-11-05T06:49:52.546493+00:00",
+      "completed_at": "2026-11-05T06:52:46.204990+00:00",
+      "exit_code": 0,
+      "raw": "suite-library.txt.gz",
+      "raw_sha256": "4b92a63f72727f437693652cbf6d1d456ba7601ed316ad62b06b19bbe8602f4e",
+      "compression": "gzip",
+      "raw_sha256_is_uncompressed": true,
+      "test_summaries": [
+        "test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 167.00s"
+      ]
+    }
+  }
+}

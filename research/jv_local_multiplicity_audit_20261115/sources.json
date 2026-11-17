@@ -1,0 +1,388 @@
+{
+  "schema": "jv-local-source-plan/v1",
+  "created": "2026-11-15T14:19:35.171122+00:00",
+  "formal": {
+    "project": "research/jv_local_multiplicity_audit_20261115/lean",
+    "theorem": "JVLocalMultiplicityAudit.jv_local_multiplicity_certificate",
+    "statement": "theorem jv_local_multiplicity_certificate : Module.length A A = 8 ∧ IsLocalRing A ∧ originIdeal.IsMaximal ∧ Nonempty (A ⧸ originIdeal ≃+* F) ∧ (∀ p : PrimeSpectrum A, p = originPoint) ∧ IsOpen ({originPoint} : Set (PrimeSpectrum A)) ∧ Nat.card (PrimeSpectrum A) = 1 ∧ Function.Bijective (algebraMap A OriginLocalization) ∧ Module.length OriginLocalization OriginLocalization = 8 ∧ IsLocalRing OriginLocalization ∧ Nonempty (ActualLocalizedResidue ≃+* F) ∧ h ^ 3 ≠ 0 ∧ h ^ 4 = 0 ∧ ¬ IsReduced A ∧ Subsingleton FirstChart ∧ Module.length FirstChart FirstChart = 0 ∧ ¬ IsLocalRing FirstChart ∧ Subsingleton FirstOpen ∧ Module.length FirstOpen FirstOpen = 0 ∧ ¬ IsLocalRing FirstOpen ∧ secondF0 (69 : F) 75 1 = 0 ∧ secondF1 (69 : F) 75 1 = 0 ∧ secondF2 (69 : F) 75 1 = 0 ∧ Nontrivial SecondChart ∧ Nontrivial SecondOpen ∧ Module.length A A ≠ Nat.card (ConeSolutions F) ∧ ∀ (L : Type) [Field L] [CharP L 101], Nat.card (ConeSolutions L) = 1",
+    "decl_sha256": "59b1c8ec79f8518956b08bef41ee9fa233ab2de63bae53f7dc0e2fc356dcf850",
+    "scope": "Literal first Joux–Vitse homogeneous F101 source ideal and actual quotient A. Actual self-module length8, derived locality, maximal origin kernel and quotient residue F101; actual unique isolated prime. Actual canonical Localization.AtPrime(originIdeal) coefficient map bijective, actual own self-module length8/locality and canonical residue field isomorphic F101. Actual h³neq0/h⁴zero/nonreducedness. Actual h=1 quotient and principal-open localization at h subsingleton/selflength0/notlocal. Source second literal triple has actual F101 root(69,75,1); actual h=1 quotient and principal-open evaluation homomorphisms to F101 prove nontriviality, with no uniqueness/wholecurve/order/scalar/decomposition claim. Actual cone pointcard1 over every characteristic101 field is an explicitly credited cardinality corollary of prior all-field zero characterization; actual ring length differs. No supplied locality/length/isolation/residue/evaluation correctness premise. Six new modules,18frozen local dependency modules/0copies;33old formal/configuration pins and61old formal/artifactpins checked before/after every numbered build. Classical actual ideal-tail flag adapted from credited prior power-basis length argument, without assuming actual JV is monogenic. Ordinary homogeneous affine cone is not Diem product(P1)^n multihomogeneous setup; qualified n!d^n with multiplicities is unrefuted. Scheme.Spec/localRing/cycle comparison, general multihomogeneous intersection/isolated components/positive-dimensional/projective cycles and Rojas C refinement remainopen. Historical native GB sizes6/1/2 do not directly certify multiplicity8; no new solver/native experiment. Defaultlimits/standardfoundations/noholes/customaxioms/nativeproofeval/flags/waivers/frozenedits/cryptoPython/spend/upload. No novelty/physicalhost/compiler/backend/runtime/signedstanding/canonicalpromotion/full14 claim.",
+    "sources": [
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/CanonicalPieces.lean",
+        "bytes": 3989,
+        "sha256": "4d43f6ad60e25982f57184aaf3743f7a932fb2df0e30e19765db043e6aa32b56"
+      },
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/GradedBasis.lean",
+        "bytes": 4758,
+        "sha256": "452b39f6ada2f9440a0b5f5227d23e06b4ea7c66b20eb87fd1cbbfd0a8c8fbc3"
+      },
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/GradedCertificate.lean",
+        "bytes": 1401,
+        "sha256": "0df13f8f45cb4a5e3da6917bb009a37082c9e6f75158ed03e21b9bd7e92ad4f6"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/CubicDual.lean",
+        "bytes": 3956,
+        "sha256": "98eed2dc8c32352381e1b546dd59866f4102c20f8be0cf897f9e3493f38bc274"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/DualBasis.lean",
+        "bytes": 3137,
+        "sha256": "9da34ce7da5810aed405ce5d79e7a3a4e10c33509c047fe259a39419b35dfe7a"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/QuotientBasis.lean",
+        "bytes": 9044,
+        "sha256": "fce18061d53ae6d02800947e9602a0312f82e0058c7488919f00e9fd27c32666"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/SharpCutoff.lean",
+        "bytes": 2430,
+        "sha256": "735ab1b0f042c5dec927b36a60417d090c5024a75285a9a960f7c5cfc50e5648"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/ActualIdeal.lean",
+        "bytes": 2914,
+        "sha256": "6f71f8014dee9a161b4a85efdacc7200611463f675c2d25893247f04c37c74c5"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/CubicNormalForms.lean",
+        "bytes": 4508,
+        "sha256": "c4fddf97dfcee2b00c4b1113282f57c83fca4d7eefbd89506912af036ae24615"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/LiteralQuadratics.lean",
+        "bytes": 2125,
+        "sha256": "51196e6a76de350be0ece641393f58240beff5eff9903e6d31bca85f75893ecb"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/MacaulayCertificate.lean",
+        "bytes": 4097,
+        "sha256": "b3c3f41025759c5c212cd858d7f43fc21da223b3287b133301b9d86cc160f5aa"
+      },
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/lakefile.toml",
+        "bytes": 286,
+        "sha256": "9bd69ed91399c89671fb786dac49e4c7be64635cc7e211a34bf244e96d1158c7"
+      },
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3692,
+        "sha256": "7aaef10cdce5986ff39f1dc481e8b3eb58bf476d4e73dff7f7117178d6559c20"
+      },
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/lakefile.toml",
+        "bytes": 284,
+        "sha256": "56ba6962a29ea7af7943e194fdc07e807dd30b945f007f365668c4046721ab85"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/lake-manifest.json",
+        "bytes": 3831,
+        "sha256": "21f977f9eb39b2d00119a8a77dd8e2f2a9d4287ca1b8498e0e7eb1e92628dfdd"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/lakefile.toml",
+        "bytes": 367,
+        "sha256": "f18793a72f079915913fa45693b8eabe5a0e33c7c04ad51353ddcc1726517fc0"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/lake-manifest.json",
+        "bytes": 3557,
+        "sha256": "21b41c4e076c955374b730d6cc0a6c09033563089eab25dd0989b5084ff43c91"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/Bivariate.lean",
+        "bytes": 5748,
+        "sha256": "9a88d8e710b0681b31574c3d5094c123046da9bd14ddedb5724ae02a2399276e"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/Solutions.lean",
+        "bytes": 2996,
+        "sha256": "2ea90976a4f54837acb810ef91f7d25b099c05debf311bfae1eaa43ee09fcd38"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/Thickening.lean",
+        "bytes": 3021,
+        "sha256": "05cdaa45ad42e17ec286d390c91fb1f1a53f93f7155ca32b979b8e2f3f8abfac"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/LocalLengthCertificate.lean",
+        "bytes": 1497,
+        "sha256": "8fce3febd13be9cc84409e0f3b634a65061a88fc817d3e9babb85a914c5574b1"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/PowerBasisLength.lean",
+        "bytes": 5142,
+        "sha256": "c44d00a3f7098707c541bb8577eceef3f4d9d923fb4b1efe577121fe47db7f1b"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/ResidueDegreeControl.lean",
+        "bytes": 924,
+        "sha256": "3a4725e219e694124003ada1c55f71f39cb41cbda83dc03ab0748b0c5443bdaa"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/TruncatedLocal.lean",
+        "bytes": 4184,
+        "sha256": "ea8166ea9807e75e168ae6dd1b7e4d687232950f73057f0ecd3156c6853e7bdb"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/lakefile.toml",
+        "bytes": 342,
+        "sha256": "0f21c3133e3fdc0eb5ec0133f4563f7a3efa9dc5297ae89b7f6817ae08036164"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3423,
+        "sha256": "2fdad587ea840838497a8629ecae4b91a3c634e467be281ec21e3068e283d670"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/lakefile.toml",
+        "bytes": 366,
+        "sha256": "9833ac9c49c342d6153d0cab3c3613aa29007d4e928c39e4e0b463df95f0f065"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3244,
+        "sha256": "24ef2554ad6ad3a76d566d53e4022fdfc6cf0600e07371448d626eea6ebd6169"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVCharts.lean",
+        "bytes": 5395,
+        "sha256": "140f704e7ac69e3abde29b250de59bb8b3144369c6481e143f9898e1980fa563"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVConePoints.lean",
+        "bytes": 1491,
+        "sha256": "62e32c10dcae8da22000b925f98aa59cc3dee2704c5687e83ab0370181f05709"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVLocalCertificate.lean",
+        "bytes": 2053,
+        "sha256": "944c2f9cfa15172ea016fde42ccada8350c26777a5727ec26164fd92fbba1789"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVLocalization.lean",
+        "bytes": 3767,
+        "sha256": "83d29f444c93257cba26620369146ad5b52dfceba4cca121d739ec7a7fb62652"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVOrigin.lean",
+        "bytes": 6372,
+        "sha256": "ad8f1a5eea6636d44e054ea87590c71abca9a5317f9e09199aaea6c29346d13d"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVTailFlags.lean",
+        "bytes": 4396,
+        "sha256": "fb620161b8992489cdc2bef096caa70511ace58cf7dc5faf6bfcbe3012d82a71"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/lakefile.toml",
+        "bytes": 457,
+        "sha256": "e4af3e1d76959877c22b43466098993996b44e04d7eb971df4439951a71b3b93"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/lake-manifest.json",
+        "bytes": 4959,
+        "sha256": "aafc7b4aa1f7ac945cd926288bc9024a2126acb8fce8a858de00aaf74081a352"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "ActualIdeal",
+    "Bivariate",
+    "CanonicalPieces",
+    "CubicDual",
+    "CubicNormalForms",
+    "DualBasis",
+    "GradedBasis",
+    "GradedCertificate",
+    "JVCharts",
+    "JVConePoints",
+    "JVLocalCertificate",
+    "JVLocalization",
+    "JVOrigin",
+    "JVTailFlags",
+    "LiteralQuadratics",
+    "LocalLengthCertificate",
+    "MacaulayCertificate",
+    "PowerBasisLength",
+    "QuotientBasis",
+    "ResidueDegreeControl",
+    "SharpCutoff",
+    "Solutions",
+    "Thickening",
+    "TruncatedLocal"
+  ],
+  "artifacts": [
+    {
+      "path": "research/jv_local_multiplicity_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 32736,
+      "sha256": "e4c90dad86e7c414a9c059fdb0ecfc16bc130bb506dd4bc2dc4352e2793fc87f"
+    },
+    {
+      "path": "research/jv_local_multiplicity_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "ea80f38ef24af5935c9ad3151a62dbad18495dd1c0a4aa332b40a5301b9bd4ae"
+    },
+    {
+      "path": "research/jv_local_multiplicity_audit_20261115/evidence/attempts.json",
+      "bytes": 231,
+      "sha256": "e44b2f357d646810c507d6e7576ac8ce22825bbad7a711ae96297dc42f0df8f3"
+    },
+    {
+      "path": "research/jv_local_multiplicity_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 2346,
+      "sha256": "063903f2e03528a7a17e27454a44e55be8697cf1d622f9ad422caca5b893914e"
+    },
+    {
+      "path": "research/jv_local_multiplicity_audit_20261115/evidence/gate.json",
+      "bytes": 9244,
+      "sha256": "6d5068689c154070a6a6f4610ceeac408bdd7476cce4e4ca6ea9691f9c79158a"
+    },
+    {
+      "path": "research/jv_local_multiplicity_audit_20261115/evidence/source-review.json",
+      "bytes": 6062,
+      "sha256": "2b1e01a0f87fd5fd5d09f7cf6cc217309c55844e4ad5d9b62e79f924442bc6a0"
+    },
+    {
+      "path": "research/jv_local_multiplicity_audit_20261115/evidence/binding-check.json",
+      "bytes": 4542,
+      "sha256": "9288fcae63e3a50d87d983208af2eb6091e1c1e7c05b18c45ce378a1fd571b7f"
+    },
+    {
+      "path": "research/jv_local_multiplicity_audit_20261115/proof-map.json",
+      "bytes": 8230,
+      "sha256": "ac932d6c3dda402a414931549a62378818f8a50b0c62130fa1b79b00f461440a"
+    },
+    {
+      "path": "research/jv_local_multiplicity_audit_20261115/render_report.py",
+      "bytes": 8031,
+      "sha256": "b4ca339c90cad33d3ee8c7f899facd60b2e22311f614056ea4b38da29525ced5"
+    },
+    {
+      "path": "research/jv_local_multiplicity_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/jv_local_multiplicity_audit_20261115/export_binding_input.py",
+      "bytes": 1743,
+      "sha256": "99769d6a466f78a11909d5c45534d1f4408215460e9e498dee6f76be84302ab2"
+    },
+    {
+      "path": "research/jv_local_multiplicity_audit_20261115/PROTOCOL.md",
+      "bytes": 9959,
+      "sha256": "32686ec0cf9f40c9174dafd6690bc12fe9d50973c2b248925458d8acd336c579"
+    },
+    {
+      "path": "research/jv_local_multiplicity_audit_20261115/reports/jv-local.svg",
+      "bytes": 1427,
+      "sha256": "4c9b54ac943199aa5d4685a2b5dc8886bb1fcefb625ea5d9668c247561baaf93"
+    },
+    {
+      "path": "research/jv_local_multiplicity_audit_20261115/reports/layout.json",
+      "bytes": 290,
+      "sha256": "278af6cd10742ddaa408e880519ff75fcf6a05e43cdaf896780076e621875ec0"
+    },
+    {
+      "path": "research/jv_local_multiplicity_audit_20261115/reports/report.pdf",
+      "bytes": 48087,
+      "sha256": "0840f97a2d02f4973b08ca644919eb32ca522e994752e3507aa35f103943de5f"
+    },
+    {
+      "path": "research/jv_graded_hilbert_audit_20261114/sources.json",
+      "bytes": 10905,
+      "sha256": "a3e23e697d95c6ccbcac7a576819846d347040318a95356483e15e1d7355102f"
+    },
+    {
+      "path": "research/local_algebra_length_audit_20261114/sources.json",
+      "bytes": 9341,
+      "sha256": "8b8ddb04bab0173adfabb0b3424e27af31735e93bcb32ac6b54ec16fbd04c669"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 73,
+    "fresh_project_modules": 6,
+    "credited_dependency_modules": 18,
+    "credited_prior_gate_declarations": [
+      26,
+      28
+    ],
+    "copied_modules": 0,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "new_source_warnings": 0,
+    "inherited_legacy_advisories_per_build": 12,
+    "inherited_auditor_String_mk_deprecation": 1,
+    "all33dependency_formal_configs_pinned": true,
+    "all61predecessor_pins_checked_each_state": true,
+    "actual_self_module_length8": true,
+    "derived_actual_locality_origin_residue_F101": true,
+    "actual_unique_isolated_prime": true,
+    "actual_canonical_origin_localization_equivalence_and_self_length8": true,
+    "actual_canonical_localized_residue_F101": true,
+    "actual_h3_nonzero_h4_zero_nonreduced": true,
+    "actual_first_chart_and_open_zero_length0_notlocal": true,
+    "actual_second_literal_source_root_and_chart_open_nontrivial": true,
+    "known_all_field_zero_characterization_credited": true,
+    "actual_length_neq_distinct_point_count": true,
+    "qualified_Diem_bound_refuted": false,
+    "ordinary_cone_is_Diem_product_projective_instance": false,
+    "Scheme_localRing_cycle_comparison": false,
+    "general_intersection_or_positive_dimensional_components": false,
+    "source_second_unique_root_proved": false,
+    "whole_curve_order_scalar_decomposition": false,
+    "solver_directly_reports_multiplicity8": false,
+    "new_native_experiment": false,
+    "new_physical_host_or_implementation_independence": false,
+    "concrete_compiler_or_backend_refinement": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

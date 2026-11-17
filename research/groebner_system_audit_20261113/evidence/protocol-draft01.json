@@ -1,0 +1,1022 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "groebner-source-systems-20261113",
+  "version": 1,
+  "created": "2026-11-13",
+  "repository": "crypto",
+  "study_dir": "research/groebner_system_audit_20261113",
+  "authors": [
+    "Codex; approved original fourteen-item audit"
+  ],
+  "links": {
+    "source_session": "Approved all14, item9; zero-paid local checkpoint",
+    "spec": "Eight fixed source/control systems, each twice; two native calibration calls.",
+    "note": "First native trials for these fixtures. Known Lean/source answers are unblinded; no heldout or performance inference."
+  },
+  "question": "Compute exact GBs, finite staircases, rational zeros and initial-ideal Hilbert prefixes for the actual Edwards counterexample and the two original Joux-Vitse F101^3 toy descents, including literal homogenization.",
+  "claims": [
+    {
+      "id": "G1",
+      "class": "exact_computation",
+      "text": "Bounded exact outputs for eight registered fixtures, native source reconstruction, independent native Buchberger/remainder/S-pair checks and deterministic repeats.",
+      "decided_by": [
+        "fixed-fixtures"
+      ]
+    },
+    {
+      "id": "G2",
+      "class": "theorem",
+      "text": "The Edwards actual input/descent/nonregularity and length-two algebra are decided by the separate frozen Lean55 project/PCC-bc105f.",
+      "decided_by": []
+    },
+    {
+      "id": "G3",
+      "class": "out_of_scope",
+      "text": "No generic/n>=3 FGHR refutation, complete JV internal-degree bound, solver/compiler refinement, timing or independent-host assertion.",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "controls",
+      "role": "control_positive",
+      "description": "Native exact dual-number length2 versus simple length1 and correct GB/remainder control.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "e7797bf83d60d82533a96a0d5619671cf11a9439",
+        "build": [
+          [
+            "g++",
+            "-O2",
+            "-std=c++20",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "research/groebner_system_audit_20261113/native/analyze.cpp",
+            "-o",
+            "/workspace/scratch/groebner-system-native/analyze"
+          ]
+        ],
+        "binary_sha256": "4421041e6740b9852e5fa3d65379b01f6299c721dd48734755b1e722afd6b5d1",
+        "threads": 1,
+        "flags": {
+          "assertions": "enabled",
+          "mode": "bounded exact native checker"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "component": "controls",
+        "argv": [
+          "--controls"
+        ]
+      }
+    },
+    {
+      "id": "negative",
+      "role": "control_negative",
+      "description": "Same native path detects one wrong constant in an otherwise valid GB.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "e7797bf83d60d82533a96a0d5619671cf11a9439",
+        "build": [
+          [
+            "g++",
+            "-O2",
+            "-std=c++20",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "research/groebner_system_audit_20261113/native/analyze.cpp",
+            "-o",
+            "/workspace/scratch/groebner-system-native/analyze"
+          ]
+        ],
+        "binary_sha256": "4421041e6740b9852e5fa3d65379b01f6299c721dd48734755b1e722afd6b5d1",
+        "threads": 1,
+        "flags": {
+          "assertions": "enabled",
+          "mode": "bounded exact native checker"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "component": "negative",
+        "argv": [
+          "--negative"
+        ]
+      }
+    },
+    {
+      "id": "control",
+      "role": "reference",
+      "description": "Exact source/control system control",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "research/solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": 1,
+          "genericity": 0,
+          "verbosity": 2,
+          "print_gb": 2,
+          "source_provenance": "evidence/build-provenance.json"
+        },
+        "env": {
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "component": "control",
+        "input": "inputs/control.ms"
+      }
+    },
+    {
+      "id": "control-aa",
+      "role": "control_aa",
+      "description": "Identical repeat of control",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "research/solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": 1,
+          "genericity": 0,
+          "verbosity": 2,
+          "print_gb": 2,
+          "source_provenance": "evidence/build-provenance.json"
+        },
+        "env": {
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "component": "control",
+        "input": "inputs/control.ms"
+      },
+      "same_instrument_as": "control"
+    },
+    {
+      "id": "edwards-affine",
+      "role": "reference",
+      "description": "Exact source/control system edwards-affine",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "research/solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": 1,
+          "genericity": 0,
+          "verbosity": 2,
+          "print_gb": 2,
+          "source_provenance": "evidence/build-provenance.json"
+        },
+        "env": {
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "component": "edwards-affine",
+        "input": "inputs/edwards-affine.ms"
+      }
+    },
+    {
+      "id": "edwards-affine-aa",
+      "role": "control_aa",
+      "description": "Identical repeat of edwards-affine",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "research/solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": 1,
+          "genericity": 0,
+          "verbosity": 2,
+          "print_gb": 2,
+          "source_provenance": "evidence/build-provenance.json"
+        },
+        "env": {
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "component": "edwards-affine",
+        "input": "inputs/edwards-affine.ms"
+      },
+      "same_instrument_as": "edwards-affine"
+    },
+    {
+      "id": "edwards-top",
+      "role": "reference",
+      "description": "Exact source/control system edwards-top",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "research/solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": 1,
+          "genericity": 0,
+          "verbosity": 2,
+          "print_gb": 2,
+          "source_provenance": "evidence/build-provenance.json"
+        },
+        "env": {
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "component": "edwards-top",
+        "input": "inputs/edwards-top.ms"
+      }
+    },
+    {
+      "id": "edwards-top-aa",
+      "role": "control_aa",
+      "description": "Identical repeat of edwards-top",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "research/solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": 1,
+          "genericity": 0,
+          "verbosity": 2,
+          "print_gb": 2,
+          "source_provenance": "evidence/build-provenance.json"
+        },
+        "env": {
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "component": "edwards-top",
+        "input": "inputs/edwards-top.ms"
+      },
+      "same_instrument_as": "edwards-top"
+    },
+    {
+      "id": "edwards-homogeneous",
+      "role": "reference",
+      "description": "Exact source/control system edwards-homogeneous",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "research/solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": 1,
+          "genericity": 0,
+          "verbosity": 2,
+          "print_gb": 2,
+          "source_provenance": "evidence/build-provenance.json"
+        },
+        "env": {
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "component": "edwards-homogeneous",
+        "input": "inputs/edwards-homogeneous.ms"
+      }
+    },
+    {
+      "id": "edwards-homogeneous-aa",
+      "role": "control_aa",
+      "description": "Identical repeat of edwards-homogeneous",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "research/solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": 1,
+          "genericity": 0,
+          "verbosity": 2,
+          "print_gb": 2,
+          "source_provenance": "evidence/build-provenance.json"
+        },
+        "env": {
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "component": "edwards-homogeneous",
+        "input": "inputs/edwards-homogeneous.ms"
+      },
+      "same_instrument_as": "edwards-homogeneous"
+    },
+    {
+      "id": "jv-empty-affine",
+      "role": "reference",
+      "description": "Exact source/control system jv-empty-affine",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "research/solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": 1,
+          "genericity": 0,
+          "verbosity": 2,
+          "print_gb": 2,
+          "source_provenance": "evidence/build-provenance.json"
+        },
+        "env": {
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "component": "jv-empty-affine",
+        "input": "inputs/jv-empty-affine.ms"
+      }
+    },
+    {
+      "id": "jv-empty-affine-aa",
+      "role": "control_aa",
+      "description": "Identical repeat of jv-empty-affine",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "research/solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": 1,
+          "genericity": 0,
+          "verbosity": 2,
+          "print_gb": 2,
+          "source_provenance": "evidence/build-provenance.json"
+        },
+        "env": {
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "component": "jv-empty-affine",
+        "input": "inputs/jv-empty-affine.ms"
+      },
+      "same_instrument_as": "jv-empty-affine"
+    },
+    {
+      "id": "jv-empty-homogeneous",
+      "role": "reference",
+      "description": "Exact source/control system jv-empty-homogeneous",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "research/solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": 1,
+          "genericity": 0,
+          "verbosity": 2,
+          "print_gb": 2,
+          "source_provenance": "evidence/build-provenance.json"
+        },
+        "env": {
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "component": "jv-empty-homogeneous",
+        "input": "inputs/jv-empty-homogeneous.ms"
+      }
+    },
+    {
+      "id": "jv-empty-homogeneous-aa",
+      "role": "control_aa",
+      "description": "Identical repeat of jv-empty-homogeneous",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "research/solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": 1,
+          "genericity": 0,
+          "verbosity": 2,
+          "print_gb": 2,
+          "source_provenance": "evidence/build-provenance.json"
+        },
+        "env": {
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "component": "jv-empty-homogeneous",
+        "input": "inputs/jv-empty-homogeneous.ms"
+      },
+      "same_instrument_as": "jv-empty-homogeneous"
+    },
+    {
+      "id": "jv-split-affine",
+      "role": "reference",
+      "description": "Exact source/control system jv-split-affine",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "research/solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": 1,
+          "genericity": 0,
+          "verbosity": 2,
+          "print_gb": 2,
+          "source_provenance": "evidence/build-provenance.json"
+        },
+        "env": {
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "component": "jv-split-affine",
+        "input": "inputs/jv-split-affine.ms"
+      }
+    },
+    {
+      "id": "jv-split-affine-aa",
+      "role": "control_aa",
+      "description": "Identical repeat of jv-split-affine",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "research/solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": 1,
+          "genericity": 0,
+          "verbosity": 2,
+          "print_gb": 2,
+          "source_provenance": "evidence/build-provenance.json"
+        },
+        "env": {
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "component": "jv-split-affine",
+        "input": "inputs/jv-split-affine.ms"
+      },
+      "same_instrument_as": "jv-split-affine"
+    },
+    {
+      "id": "jv-split-homogeneous",
+      "role": "reference",
+      "description": "Exact source/control system jv-split-homogeneous",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "research/solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": 1,
+          "genericity": 0,
+          "verbosity": 2,
+          "print_gb": 2,
+          "source_provenance": "evidence/build-provenance.json"
+        },
+        "env": {
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "component": "jv-split-homogeneous",
+        "input": "inputs/jv-split-homogeneous.ms"
+      }
+    },
+    {
+      "id": "jv-split-homogeneous-aa",
+      "role": "control_aa",
+      "description": "Identical repeat of jv-split-homogeneous",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "research/solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": 1,
+          "genericity": 0,
+          "verbosity": 2,
+          "print_gb": 2,
+          "source_provenance": "evidence/build-provenance.json"
+        },
+        "env": {
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "component": "jv-split-homogeneous",
+        "input": "inputs/jv-split-homogeneous.ms"
+      },
+      "same_instrument_as": "jv-split-homogeneous"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "aa-control",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "controls",
+      "expected_detection": "Native length2/support1 versus simple length1; actual solver x\u00b2,y\u00b2 must have finite length4/support1.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "negative",
+      "null_population": {
+        "description": "Same native reduction path with y-1 changed to y-2, keeping x\u00b2.",
+        "generator": "Frozen native calibration constructs both exact lists and requires original input remainder nonzero against the wrong basis.",
+        "n": 1,
+        "why_n": "Exact deliberate detector control, no statistical inference.",
+        "matched_on": [
+          "field",
+          "variables",
+          "degree",
+          "reduction code",
+          "all other coefficients"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [],
+    "factors": [
+      {
+        "name": "arm_label",
+        "treatment": "fixed",
+        "value": "Reference versus A/A output path only",
+        "how": "Identical binary/flags/input/stop rule within each pair."
+      },
+      {
+        "name": "fixture",
+        "treatment": "fixed",
+        "value": "Eight literal source/control systems; two native synthetic calibration components.",
+        "how": "One registered fixed batch, specified by each arm component before data."
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "Native checker for calibration; original msolve LA1 for solver arms.",
+        "how": "Exact per-arm identities. The absolute fixture record makes no cross-instrument causal comparison; A/A pairs keep the same instrument."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Same shared local host",
+        "how": "Provenance retained; scientific clocks invalid."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "Unblinded exact checker",
+        "how": "Known source/Lean answers stated in advance; no fitted test."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "fixed-fixtures",
+        "arms": [
+          "controls",
+          "negative",
+          "control",
+          "control-aa",
+          "edwards-affine",
+          "edwards-affine-aa",
+          "edwards-top",
+          "edwards-top-aa",
+          "edwards-homogeneous",
+          "edwards-homogeneous-aa",
+          "jv-empty-affine",
+          "jv-empty-affine-aa",
+          "jv-empty-homogeneous",
+          "jv-empty-homogeneous-aa",
+          "jv-split-affine",
+          "jv-split-affine-aa",
+          "jv-split-homogeneous",
+          "jv-split-homogeneous-aa"
+        ],
+        "differs_in": [
+          "fixture",
+          "instrument"
+        ],
+        "design": "absolute",
+        "threshold": "Every fixed raw output is retained; exact correctness and source discrepancies are reported separately. No cross-instrument causal ranking."
+      },
+      {
+        "id": "aa-control",
+        "arms": [
+          "control",
+          "control-aa"
+        ],
+        "differs_in": [
+          "arm_label"
+        ],
+        "design": "aa",
+        "threshold": "Exact GB output bytes match; independent native canonical GBs match for both."
+      },
+      {
+        "id": "aa-edwards-affine",
+        "arms": [
+          "edwards-affine",
+          "edwards-affine-aa"
+        ],
+        "differs_in": [
+          "arm_label"
+        ],
+        "design": "aa",
+        "threshold": "Exact GB output bytes match; independent native canonical GBs match for both."
+      },
+      {
+        "id": "aa-edwards-top",
+        "arms": [
+          "edwards-top",
+          "edwards-top-aa"
+        ],
+        "differs_in": [
+          "arm_label"
+        ],
+        "design": "aa",
+        "threshold": "Exact GB output bytes match; independent native canonical GBs match for both."
+      },
+      {
+        "id": "aa-edwards-homogeneous",
+        "arms": [
+          "edwards-homogeneous",
+          "edwards-homogeneous-aa"
+        ],
+        "differs_in": [
+          "arm_label"
+        ],
+        "design": "aa",
+        "threshold": "Exact GB output bytes match; independent native canonical GBs match for both."
+      },
+      {
+        "id": "aa-jv-empty-affine",
+        "arms": [
+          "jv-empty-affine",
+          "jv-empty-affine-aa"
+        ],
+        "differs_in": [
+          "arm_label"
+        ],
+        "design": "aa",
+        "threshold": "Exact GB output bytes match; independent native canonical GBs match for both."
+      },
+      {
+        "id": "aa-jv-empty-homogeneous",
+        "arms": [
+          "jv-empty-homogeneous",
+          "jv-empty-homogeneous-aa"
+        ],
+        "differs_in": [
+          "arm_label"
+        ],
+        "design": "aa",
+        "threshold": "Exact GB output bytes match; independent native canonical GBs match for both."
+      },
+      {
+        "id": "aa-jv-split-affine",
+        "arms": [
+          "jv-split-affine",
+          "jv-split-affine-aa"
+        ],
+        "differs_in": [
+          "arm_label"
+        ],
+        "design": "aa",
+        "threshold": "Exact GB output bytes match; independent native canonical GBs match for both."
+      },
+      {
+        "id": "aa-jv-split-homogeneous",
+        "arms": [
+          "jv-split-homogeneous",
+          "jv-split-homogeneous-aa"
+        ],
+        "differs_in": [
+          "arm_label"
+        ],
+        "design": "aa",
+        "threshold": "Exact GB output bytes match; independent native canonical GBs match for both."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "No randomness. Full fixed order and deterministic repeats."
+    },
+    "instance_sampling": {
+      "rule": "One registered batch; arm component selects the declared literal fixture/calibration, not a random method comparison.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Known-answer exact mathematics; no subjective selection."
+    },
+    "arm_order_reason": "No scientific clock, timing or statistical inference; every listed call executes once."
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exactly18calls: two native calibrations and16solver calls; no sampled-population inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 10,
+      "threads": 1,
+      "estimated_total_seconds": 170,
+      "measured_on": "Hard budget caps, not measured time estimates. Exact computation only; every scientific clock invalid."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "call_complete",
+        "name": "Fixed native call completed",
+        "unit": "Boolean",
+        "kind": "exact",
+        "definition": "Child exit0; independent frozen analysis is a separate validity gate.",
+        "source": "runs/main/*.exit",
+        "aggregation": "per_row",
+        "resolution": "integer",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "basis_degree",
+        "name": "Returned GB maximal degree",
+        "unit": "degree",
+        "kind": "exact",
+        "definition": "Native parser computes the maximum degree of returned GB polynomials; separate from F4 selected-pair rounds and an unaudited internal maximum.",
+        "source": "analysis/analysis.jsonl",
+        "aggregation": "per_row",
+        "resolution": "integer",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [],
+    "record": [
+      "all raw outputs/exits/argv",
+      "source/binary/library pins",
+      "native independent GB and algebra counts",
+      "UTC provenance times only"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Execute both native calibration calls and every one of16solver calls once; preserve failures/timeouts and do not rerun.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Native calibration5s each; solver10s each; frozen native analysis120s. Driver600s cap.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Changed frozen input/binary/protocol/analysis pin, missing output, failed positive/negative/source/GB/remainder/S-pair/A/A gate invalidates an exact accepted result; all evidence is still retained.",
+    "A source-prediction discrepancy is an outcome, not an excuse to delete or rerun it. Only finite checked scope may be reported."
+  ],
+  "decision_rule": {
+    "text": "Accept bounded exact outputs only if all frozen integrity/control/source gates pass; report every source discrepancy separately.",
+    "comparison_ids": [
+      "fixed-fixtures"
+    ],
+    "threshold": "Zero integrity discrepancies. Source predictions are separate observations.",
+    "statistic": "Exact canonical GB/initial monomial ideal/finite staircase/rational zero counts",
+    "interval": "none; fixed fixtures",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact per-system integer quantities",
+    "verdict_vocabulary": [
+      "bounded_checks_pass",
+      "discrepancy",
+      "not_validated"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "analyze.sh",
+      "sha256": "848d60fce2d7cb5759a3b75a5525441b47b5c1acae6e9309b0cada414aa55372"
+    },
+    "inputs": [
+      "inputs/*.ms",
+      "runs/main/*"
+    ],
+    "outputs": [
+      "analysis/analysis.jsonl",
+      "analysis/analysis.stderr",
+      "analysis/analysis.exit"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [],
+    "report_dir": "reports/main"
+  },
+  "inadmissible": [
+    "No performance or security inference.",
+    "A finite special input does not refute generic hypotheses.",
+    "Returned basis degree or selected-pair degree does not certify the full internal maximum in JVAssumption2.",
+    "No independent-host/compiled-refinement assertion."
+  ],
+  "literature": [
+    {
+      "ref": "FGHR2014 printed603\u2013604/Definition5/\u00a74.1.1/Hypothesis3; exact PDF/source review in prior Edwards study.",
+      "provenance": "retrieved",
+      "claim": "Use the literal a/d Edwards source formula and actual highest homogeneous components."
+    },
+    {
+      "ref": "Joux\u2013Vitse author DLFq5.pdf SHA6f3268a0ef8c50b51a79f8b64deff0c60374228a827bea73d4e590284cb68377 pp7/9\u201310.",
+      "provenance": "retrieved",
+      "claim": "Use both exact original F101\u00b3 toy systems and literal quadratic homogenization; distinguish the stated computation-degree assumption."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": false
+  },
+  "extensions": {
+    "original_item": 9,
+    "population_id": "groebner-source-fixed-batch",
+    "source_checkpoint": "e7797bf83d60d82533a96a0d5619671cf11a9439",
+    "input_manifest": {
+      "path": "inputs.sha256",
+      "sha256": "bcd786be2706bb4ed09258a10129294ed081d1685b7529ed140a80999b789e21"
+    },
+    "native_binary_sha256": "4421041e6740b9852e5fa3d65379b01f6299c721dd48734755b1e722afd6b5d1",
+    "new_planned_calls": 18,
+    "solver_calls": 16,
+    "solver_fixture_count": 8,
+    "known_in_sample": true,
+    "scientific_clock_valid": false,
+    "checkpoint_exception": "Previously approved zero-paid local checkpoint; no agent paid compute/storage uploads.",
+    "observed_internal_f4_degree_complete": false,
+    "hilbert_scope": "Exact initial monomial ideal degrees0..12; no stabilization extrapolation."
+  }
+}

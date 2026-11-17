@@ -1,0 +1,97 @@
+{
+  "required": "L2",
+  "executions": 1680,
+  "invalid_outcomes": [],
+  "below_l2": [
+    {
+      "seq": 1295,
+      "arm": "rho-neg-v2",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: solve too short to admit wall time: solve 861.9 µs is under the 1.0 ms minimum",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 121
+          }
+        },
+        "foreign_busy_ticks": 1,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794086917182,
+          "loadavg": [
+            0.95068359375,
+            0.45654296875,
+            0.18017578125
+          ],
+          "psi_cpu_some_avg10": 0.08,
+          "psi_cpu_some_total_us": 25909138,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 7374,
+              "idle": 9049,
+              "steal": 5
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794086917184,
+          "loadavg": [
+            0.95068359375,
+            0.45654296875,
+            0.18017578125
+          ],
+          "psi_cpu_some_avg10": 0.08,
+          "psi_cpu_some_total_us": 25909138,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 7375,
+              "idle": 9049,
+              "steal": 5
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    }
+  ],
+  "grades": [
+    {
+      "level": "L1",
+      "count": 1
+    },
+    {
+      "level": "L2",
+      "count": 1679
+    }
+  ],
+  "accepted": false
+}

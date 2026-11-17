@@ -1,0 +1,280 @@
+module
+public import OrientationRank
+import all OrientationAnchor
+import all OrientationValuation
+import all OrientationContent
+import all OrientationProduct
+import all OrientationResidue
+import all OrientationDiagonal
+import all OrientationJet
+import all OrientationLeading
+import all OrientationRefinement
+public section
+noncomputable section
+namespace OrientationMoment
+open Polynomial Finset OrientationAnchor OrientationResidue OrientationDiagonal OrientationJet OrientationLeading OrientationRefinement
+
+def rowResidue (u x : ℕ) : ℕ := x % 2^u
+def rowQuotient (u x : ℕ) : ℕ := x / 2^u
+
+theorem row_split (u x : ℕ) : (x:ℚ) = (rowResidue u x:ℚ)+(2:ℚ)^u*(rowQuotient u x:ℚ) := by
+  dsimp [rowResidue,rowQuotient]
+  exact_mod_cast (Nat.mod_add_div x (2^u)).symm
+
+theorem row_mod (u x : ℕ) : x % 2^u = rowResidue u x % 2^u := by
+  simp [rowResidue]
+
+theorem row_bound (u x : ℕ) : rowResidue u x < 2^u := Nat.mod_lt _ (by positivity)
+
+theorem row_source_bound (a u x : ℕ) (hu : u ≤ a) : rowResidue u x < 2^a :=
+  lt_of_lt_of_le (row_bound u x) (Nat.pow_le_pow_right (by decide) hu)
+
+theorem row_crossing (u i x y : ℕ) (hi : i < u) (hc : x.testBit i = y.testBit i) :
+    (rowResidue u x).testBit i = y.testBit i :=
+  (matching_bits u x (rowResidue u x) i hi (row_mod u x)).symm.trans hc
+
+def slope (u r y : ℕ) (q : ℚ) : ℚ := (2:ℚ)^u/(q-delta r y)
+
+theorem power_integral (u : ℕ) : VBound (u:ℤ) ((2:ℚ)^u) := by
+  right
+  rw [two_power_valuation]
+
+theorem anchor_slope_even (u x y j : ℕ) (hj : j ∈ mask u x y) :
+    VBound 1 (slope u (rowResidue u x) y ((2:ℚ)^j)) := by
+  have hmask := masks_stable u u x (rowResidue u x) y le_rfl (row_mod u x)
+  have hp := selected_denominator_le u (rowResidue u x) y j (hmask ▸ hj)
+  have hb := vbound_div (power_integral u) (r:=((2:ℚ)^j-delta (rowResidue u x) y))
+  have hju : j < u := mem_range.mp (mem_filter.mp hj).1
+  exact hb.mono (by omega)
+
+theorem pole_slope_even (u i x y : ℕ) (hi : i < u) (hc : x.testBit i = y.testBit i) :
+    VBound 1 (slope u (rowResidue u x) y (poleQ i)) := by
+  have hp := crossing_denominator_le (rowResidue u x) y i (row_crossing u i x y hi hc)
+  have hb := vbound_div (power_integral u) (r:=poleQ i-delta (rowResidue u x) y)
+  exact hb.mono (by omega)
+
+/-- Actual row-coordinate denominator identity, with the actual nonzero prototype. -/
+theorem denominator_inverse (u x y : ℕ) (q : ℚ)
+    (hd : q-delta (rowResidue u x) y ≠ 0) :
+    (q-delta (rowResidue u x) y)/(q-delta x y) =
+      (1+slope u (rowResidue u x) y q*(rowQuotient u x:ℚ))⁻¹ := by
+  have hs := row_split u x
+  have he : 1+slope u (rowResidue u x) y q*(rowQuotient u x:ℚ) =
+      (q-delta x y)/(q-delta (rowResidue u x) y) := by
+    unfold slope delta
+    have hdn : q-((y:ℚ)-(rowResidue u x:ℚ)) ≠ 0 := hd
+    field_simp [hdn]
+    nlinarith [hs]
+  rw [he,inv_div]
+
+def reciprocalProduct (u i x y : ℕ) (m : ℕ → ℕ) : ℚ :=
+  (1+slope u (rowResidue u x) y (poleQ i)*(rowQuotient u x:ℚ))⁻¹ *
+  ∏ j ∈ mask u x y,
+    ((1+slope u (rowResidue u x) y ((2:ℚ)^j)*(rowQuotient u x:ℚ))⁻¹)^m j
+
+theorem comparison_reciprocal (u i x y : ℕ) (m : ℕ → ℕ)
+    (hi : i < u) (hc : x.testBit i = y.testBit i) :
+    comparisonRatio u i x (rowResidue u x) y m = reciprocalProduct u i x y m := by
+  have hmask := masks_stable u u x (rowResidue u x) y le_rfl (row_mod u x)
+  have hb := denominator_inverse u x y (poleQ i)
+    (sub_ne_zero.mpr (Ne.symm (crossing_displacement_ne_pole (rowResidue u x) y i
+      (row_crossing u i x y hi hc))))
+  have hp : correctionRatio u x (rowResidue u x) y m =
+      ∏ j ∈ mask u x y,
+        ((1+slope u (rowResidue u x) y ((2:ℚ)^j)*(rowQuotient u x:ℚ))⁻¹)^m j := by
+    unfold correctionRatio
+    apply prod_congr rfl
+    intro j hj
+    rw [denominator_inverse u x y ((2:ℚ)^j)
+      (denominator_ne_zero u (rowResidue u x) y j (hmask ▸ hj))]
+  simp only [comparisonRatio,hb,hp,reciprocalProduct]
+
+/-- The actual normalized completed first jet is the actual reciprocal family. -/
+theorem actual_reciprocal_family (a u i x y : ℕ) (m : ℕ → ℕ)
+    (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u ≤ a)
+    (hc : x.testBit i = y.testBit i) :
+    firstJet a u i x y m/diagonalJet a u i m =
+      (firstJet a u i (rowResidue u x) y m/diagonalJet a u i m)*reciprocalProduct u i x y m := by
+  rw [actual_jet_comparison a u u i x (rowResidue u x) y m hx (row_source_bound a u x hu)
+    hy hi le_rfl hu (row_mod u x) hc,comparison_reciprocal u i x y m hi hc]
+
+
+/-- Coefficient degree itself is the actual two-adic weight. -/
+def WeightedPolynomial (P : ℚ[X]) : Prop := ∀ n : ℕ,VBound (n:ℤ) (P.coeff n)
+
+theorem WeightedPolynomial.one : WeightedPolynomial (1:ℚ[X]) := by
+  intro n
+  by_cases hn : n=0
+  · subst n; simp [VBound]
+  · simp [coeff_one,hn,VBound]
+
+theorem WeightedPolynomial.mul {P Q : ℚ[X]} (hP : WeightedPolynomial P)
+    (hQ : WeightedPolynomial Q) : WeightedPolynomial (P*Q) := by
+  intro n
+  rw [coeff_mul]
+  apply VBound.sum
+  intro ij hij
+  have hs := mem_antidiagonal.mp hij
+  simpa only [← Nat.cast_add,hs] using (hP ij.1).mul (hQ ij.2)
+
+theorem WeightedPolynomial.pow {P : ℚ[X]} (hP : WeightedPolynomial P) (n : ℕ) :
+    WeightedPolynomial (P^n) := by
+  induction n with
+  | zero => simpa using WeightedPolynomial.one
+  | succ n ih => simpa only [pow_succ] using ih.mul hP
+
+theorem WeightedPolynomial.prod {ι : Type*} (S : Finset ι) (P : ι → ℚ[X])
+    (hP : ∀ j ∈ S,WeightedPolynomial (P j)) : WeightedPolynomial (∏ j ∈ S,P j) := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simpa using WeightedPolynomial.one
+  | @insert j S hj ih =>
+    rw [prod_insert hj]
+    exact (hP j (mem_insert_self _ _)).mul
+      (ih (by intro z hz; exact hP z (mem_insert_of_mem hz)))
+
+theorem weighted_linear {e : ℚ} (he : VBound 1 e) : WeightedPolynomial (1+C e*X) := by
+  intro n
+  by_cases h0 : n=0
+  · subst n; simp [VBound]
+  by_cases h1 : n=1
+  · subst n
+    have hh : (1+C e*X:ℚ[X]).coeff 1=e := by
+      simp only [Polynomial.coeff_add,Polynomial.coeff_one,Polynomial.coeff_C_mul,Polynomial.coeff_X]
+      norm_num
+    rw [hh]
+    exact he
+  · simp [coeff_add,coeff_one,coeff_C_mul,coeff_X,h0,Ne.symm h1,VBound]
+
+def denominatorPolynomial (u i x y : ℕ) (m : ℕ → ℕ) : ℚ[X] :=
+  (1+C (slope u (rowResidue u x) y (poleQ i))*X)*
+    ∏ j ∈ mask u x y, (1+C (slope u (rowResidue u x) y ((2:ℚ)^j))*X)^m j
+
+theorem actual_denominator_weighted (u i x y : ℕ) (m : ℕ → ℕ)
+    (hi : i < u) (hc : x.testBit i = y.testBit i) :
+    WeightedPolynomial (denominatorPolynomial u i x y m) := by
+  apply (weighted_linear (pole_slope_even u i x y hi hc)).mul
+  apply WeightedPolynomial.prod
+  intro j hj
+  exact (weighted_linear (anchor_slope_even u x y j hj)).pow (m j)
+
+theorem actual_denominator_constant (u i x y : ℕ) (m : ℕ → ℕ) :
+    (denominatorPolynomial u i x y m).coeff 0 = 1 := by
+  rw [coeff_zero_eq_eval_zero]
+  simp only [denominatorPolynomial,eval_mul,eval_prod,eval_pow,eval_add,eval_one,eval_C,eval_X,
+    mul_zero,add_zero,one_pow,prod_const_one,mul_one]
+
+theorem actual_denominator_reciprocal (u i x y : ℕ) (m : ℕ → ℕ) :
+    reciprocalProduct u i x y m =
+      ((denominatorPolynomial u i x y m).eval (rowQuotient u x:ℚ))⁻¹ := by
+  simp only [denominatorPolynomial,reciprocalProduct,eval_mul,eval_prod,eval_pow,eval_add,
+    eval_one,eval_C,eval_X,mul_inv_rev,← Finset.prod_inv_distrib,← inv_pow]
+  ring
+
+/-- The coefficient recurrence is constructed by the existing power-series API. -/
+def inverseSeries (P : ℚ[X]) : PowerSeries ℚ := PowerSeries.invOfUnit P.toPowerSeries 1
+
+theorem weighted_inverse_coefficients (P : ℚ[X]) (hP : WeightedPolynomial P) :
+    ∀ n : ℕ,VBound (n:ℤ) (PowerSeries.coeff n (inverseSeries P)) := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | h n ih =>
+    rw [inverseSeries,PowerSeries.coeff_invOfUnit]
+    by_cases hn : n=0
+    · subst n; simp [VBound]
+    rw [ite_eq_right hn]
+    simp only [inv_one,Units.val_one,neg_one_mul]
+    apply VBound.neg
+    apply VBound.sum
+    intro ij hij
+    split_ifs with hj
+    · rw [Polynomial.coeff_coe]
+      change VBound (n:ℤ) (P.coeff ij.1*PowerSeries.coeff ij.2 (inverseSeries P))
+      have hs := mem_antidiagonal.mp hij
+      simpa only [← Nat.cast_add,hs] using (hP ij.1).mul (ih ij.2 hj)
+    · exact VBound.zero _
+
+theorem inverse_series_identity (P : ℚ[X]) (h0 : P.coeff 0=1) :
+    P.toPowerSeries*inverseSeries P = 1 := by
+  exact PowerSeries.mul_invOfUnit _ _ (by simpa using h0)
+
+
+theorem WeightedPolynomial.sub {P Q : ℚ[X]} (hP : WeightedPolynomial P)
+    (hQ : WeightedPolynomial Q) : WeightedPolynomial (P-Q) := by
+  intro n
+  simpa only [coeff_sub,sub_eq_add_neg] using (hP n).add (hQ n).neg
+
+def inverseTrunc (P : ℚ[X]) (k : ℕ) : ℚ[X] := PowerSeries.trunc k (inverseSeries P)
+
+theorem inverse_trunc_weighted (P : ℚ[X]) (hP : WeightedPolynomial P) (k : ℕ) :
+    WeightedPolynomial (inverseTrunc P k) := by
+  intro n
+  rw [inverseTrunc,PowerSeries.coeff_trunc]
+  split_ifs
+  · exact weighted_inverse_coefficients P hP n
+  · exact VBound.zero _
+
+theorem inverse_trunc_low (P : ℚ[X]) (h0 : P.coeff 0=1) (k n : ℕ) (hn : n < k) :
+    (P*inverseTrunc P k-1).coeff n = 0 := by
+  have he : (P*inverseTrunc P k).coeff n =
+      PowerSeries.coeff n (P.toPowerSeries*inverseSeries P) := by
+    rw [Polynomial.coeff_mul,PowerSeries.coeff_mul]
+    apply sum_congr rfl
+    intro ij hij
+    have hs := mem_antidiagonal.mp hij
+    have hj : ij.2 < k := by omega
+    simp only [inverseTrunc,PowerSeries.coeff_trunc,hj,ite_true,Polynomial.coeff_coe]
+  rw [coeff_sub,he,inverse_series_identity P h0]
+  simp only [PowerSeries.coeff_one,Polynomial.coeff_one,sub_self]
+
+theorem integral_power {z : ℚ} (hz : VBound 0 z) (n : ℕ) : VBound 0 (z^n) := by
+  induction n with
+  | zero => simp [VBound]
+  | succ n ih => simpa only [pow_succ,add_zero] using ih.mul hz
+
+/-- Evaluating a derived weighted tail at an actual integer retains its cutoff. -/
+theorem eval_tail_bound (P : ℚ[X]) (hP : WeightedPolynomial P) (k : ℕ)
+    (hz : ∀ n < k,P.coeff n=0) (z : ℤ) : VBound (k:ℤ) (P.eval (z:ℚ)) := by
+  rw [eval_eq_sum,Polynomial.sum_def]
+  apply VBound.sum
+  intro n _
+  by_cases hn : n < k
+  · rw [hz n hn,zero_mul]
+    exact VBound.zero _
+  · have hc := (hP n).mono (show (k:ℤ) ≤ n by omega)
+    simpa only [add_zero] using hc.mul (integral_power (OrientationRank.integer_integral z) n)
+
+theorem denominator_eval_one (P : ℚ[X]) (hP : WeightedPolynomial P)
+    (h0 : P.coeff 0=1) (z : ℤ) : OneModTwo (P.eval (z:ℚ)) := by
+  have hh := eval_tail_bound (P-1) (hP.sub WeightedPolynomial.one) 1
+    (by intro n hn; have hn0 : n=0 := by omega; subst n; simp [h0]) z
+  simpa only [eval_sub,eval_one] using hh
+
+theorem one_mod_two_ne_zero {q : ℚ} (h : OneModTwo q) : q ≠ 0 := by
+  intro hz
+  rw [hz] at h
+  norm_num [OneModTwo,VBound,padicValRat.neg] at h
+
+theorem one_mod_two_valuation {q : ℚ} (h : OneModTwo q) : padicValRat 2 q=0 := by
+  have hh : VBound 1 (1-q) := by simpa only [neg_sub] using h.neg
+  simpa only [sub_sub_cancel] using one_sub_valuation hh
+
+/-- Actual constructed inverse truncation, not an assumed good approximation. -/
+theorem inverse_trunc_error (P : ℚ[X]) (hP : WeightedPolynomial P)
+    (h0 : P.coeff 0=1) (k : ℕ) (z : ℤ) :
+    VBound (k:ℤ) ((P.eval (z:ℚ))⁻¹-(inverseTrunc P k).eval (z:ℚ)) := by
+  have he := eval_tail_bound (P*inverseTrunc P k-1)
+    ((hP.mul (inverse_trunc_weighted P hP k)).sub WeightedPolynomial.one)
+    k (inverse_trunc_low P h0 k) z
+  have hunit := denominator_eval_one P hP h0 z
+  have hne := one_mod_two_ne_zero hunit
+  have hv := one_mod_two_valuation hunit
+  have hh := vbound_div he (r:=P.eval (z:ℚ))
+  rw [hv,sub_zero] at hh
+  have hr : -((P*inverseTrunc P k-1).eval (z:ℚ)/P.eval (z:ℚ)) =
+      (P.eval (z:ℚ))⁻¹-(inverseTrunc P k).eval (z:ℚ) := by
+    simp only [eval_sub,eval_mul,eval_one]
+    field_simp [hne]
+  rwa [hr] at hh.neg
+
+end OrientationMoment

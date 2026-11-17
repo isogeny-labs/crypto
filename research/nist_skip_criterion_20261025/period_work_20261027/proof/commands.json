@@ -1,0 +1,109 @@
+{
+  "kind": "exact-proof-development-commands/v1",
+  "proof_source_workdir": "research/nist_skip_criterion_20261025/period_work_20261027/lean",
+  "attempts": [
+    {
+      "id": "001",
+      "argv": [
+        "/workspace/nist-profile-lean-tools/lean-4.34.1-linux/bin/lean",
+        "-o",
+        "/workspace/nist-profile-lean-build-001/WorkLimits.olean",
+        "WorkLimits.lean"
+      ],
+      "ulimit_v_KiB": 4194304,
+      "timeout_seconds": 120,
+      "status": 1
+    },
+    {
+      "id": "002",
+      "argv": [
+        "/workspace/nist-profile-lean-tools/lean-4.34.1-linux/bin/lean",
+        "-j1",
+        "-o",
+        "/workspace/nist-profile-lean-build-002/WorkLimits.olean",
+        "WorkLimits.lean"
+      ],
+      "ulimit_v_KiB": 4194304,
+      "timeout_seconds": 120,
+      "status": 1
+    },
+    {
+      "id": "003",
+      "argv": [
+        "/workspace/nist-profile-lean-tools/lean-4.34.1-linux/bin/lean",
+        "--threads=1",
+        "--memory=1024",
+        "-o",
+        "/workspace/nist-profile-lean-build-003/WorkLimits.olean",
+        "WorkLimits.lean"
+      ],
+      "ulimit_v_KiB": null,
+      "timeout_seconds": 120,
+      "status": 1
+    },
+    {
+      "id": "004",
+      "argv": [
+        "/workspace/nist-profile-lean-tools/lean-4.34.1-linux/bin/lean",
+        "--threads=1",
+        "--memory=1024",
+        "-o",
+        "/workspace/nist-profile-lean-build-004/WorkLimits.olean",
+        "WorkLimits.lean"
+      ],
+      "ulimit_v_KiB": null,
+      "timeout_seconds": 120,
+      "status": 0,
+      "audit_argv": [
+        "/workspace/nist-profile-lean-tools/lean-4.34.1-linux/bin/lean",
+        "--threads=1",
+        "--memory=1024",
+        "--run",
+        "tools/lean/AuditAxioms.lean",
+        "--",
+        "WorkLimits"
+      ],
+      "audit_status": 1
+    },
+    {
+      "id": "005",
+      "argv": [
+        "/workspace/nist-profile-lean-tools/lean-4.34.1-linux/bin/lean",
+        "--threads=1",
+        "--memory=1024",
+        "-o",
+        "/workspace/nist-profile-lean-build-005/WorkLimits.olean",
+        "WorkLimits.lean"
+      ],
+      "ulimit_v_KiB": null,
+      "timeout_seconds": 120,
+      "status": 0,
+      "audit_argv": [
+        "/workspace/nist-profile-lean-tools/lean-4.34.1-linux/bin/lean",
+        "--threads=1",
+        "--memory=4096",
+        "--run",
+        "/workspace/crypto-pr/tools/lean/AuditAxioms.lean",
+        "--",
+        "WorkLimits"
+      ],
+      "audit_status": 1
+    },
+    {
+      "id": "006",
+      "argv": [
+        "/workspace/nist-profile-lean-tools/lean-4.34.1-linux/bin/lean",
+        "--threads=1",
+        "--memory=4096",
+        "--run",
+        "tools/lean/AuditAxioms.lean",
+        "--",
+        "WorkLimits"
+      ],
+      "workdir": "repository root",
+      "command_local_PATH_prefix": "/workspace/nist-profile-lean-tools/lean-4.34.1-linux/bin",
+      "LEAN_PATH": "/workspace/nist-profile-lean-build-005",
+      "status": 0
+    }
+  ]
+}

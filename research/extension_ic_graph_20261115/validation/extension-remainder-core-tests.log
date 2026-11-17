@@ -1,0 +1,29 @@
+   Compiling crypto v0.1.0 (/workspace/crypto)
+warning: function `decode` is never used
+  --> examples/../research/extension_ic_graph_20261115/extension_remainder.rs:22:8
+   |
+22 | pub fn decode(a: &[[u64; 2]]) -> Poly {
+   |        ^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `into_certificate` is never used
+   --> examples/../research/extension_ic_graph_20261115/extension_remainder.rs:135:12
+    |
+131 | impl Verified {
+    | ------------- method in this implementation
+...
+135 |     pub fn into_certificate(self) -> Certificate {
+    |            ^^^^^^^^^^^^^^^^
+
+warning: `crypto` (example "jv_sieve_extension_remainders" test) generated 2 warnings
+    Finished `release` profile [optimized] target(s) in 3.40s
+     Running unittests examples/jv_sieve_extension_remainders.rs (target/release/build/crypto/189a610b1a5442eb/out/jv_sieve_extension_remainders-189a610b1a5442eb)
+
+running 3 tests
+test remainder::tests::corrupted_norm_ordinate_support_and_tail_are_refused ... ok
+test remainder::tests::denominator_inverse_detects_non_coprimality ... ok
+test remainder::tests::exact_principal_remainder_agrees_with_cantor_group_law ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

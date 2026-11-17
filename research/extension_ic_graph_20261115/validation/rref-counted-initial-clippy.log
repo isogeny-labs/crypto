@@ -1,0 +1,27 @@
+    Checking crypto v0.1.0 (/workspace/crypto)
+error: unused import: `File`
+ --> examples/jv_relation_counter_replay.rs:9:10
+  |
+9 |     fs::{File, OpenOptions},
+  |          ^^^^
+  |
+  = note: `-D unused-imports` implied by `-D warnings`
+  = help: to override `-D warnings` add `#[allow(unused_imports)]`
+
+error[E0277]: `?` couldn't convert the error: `crypto_lib::cryptanalysis::bitops::NoPrice: std::error::Error` is not satisfied
+  --> examples/jv_relation_counter_replay.rs:90:120
+   |
+21 | fn main() -> Result<(), Box<dyn std::error::Error>> {
+   |              -------------------------------------- required `crypto_lib::cryptanalysis::bitops::NoPrice: std::error::Error` because of this
+...
+90 |         "observed_primitives":work::prims_json(&tally),"observed_primitive_subtotal_bitops":work::price(&tally,&widths)?.to_string(),
+   |                                                                                             ---------------------------^ the trait `std::error::Error` is not implemented for `crypto_lib::cryptanalysis::bitops::NoPrice`
+   |                                                                                             |
+   |                                                                                             this has type `Result<_, crypto_lib::cryptanalysis::bitops::NoPrice>`
+   |
+   = note: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait
+   = note: required for `std::boxed::Box<dyn std::error::Error>` to implement `std::convert::From<crypto_lib::cryptanalysis::bitops::NoPrice>`
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `crypto` (example "jv_relation_counter_replay") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

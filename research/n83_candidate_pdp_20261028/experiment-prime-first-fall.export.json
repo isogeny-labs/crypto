@@ -1,0 +1,648 @@
+{
+  "analysis": {
+    "script": {
+      "path": "src/bin/prime_first_fall.rs",
+      "kind": "analysis",
+      "bytes": 19978,
+      "sha256": "9560b4f74772d14704e8b5efba9baac969f0dd51d69d8657b674df287cc417e9"
+    },
+    "outputs": [
+      {
+        "path": "evidence/prime-first-fall/summary.json",
+        "kind": "summary",
+        "bytes": 4230,
+        "sha256": "f81be9e6771ce656442e92a32f9b8b585f76d5fe2df65bd7fdf858aff57cb5d5"
+      }
+    ],
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "id": "original",
+      "role": "baseline",
+      "commit": "30cad456257df5250058717f0b5ae8f385cf30fd",
+      "binary_sha256": "30b300c0de4c047cdc9e6ce1a5d0999ab7e329ed21d11d3eb0f297ed95904853",
+      "image_digest": null
+    },
+    {
+      "id": "baseline",
+      "role": "baseline",
+      "commit": "30cad456257df5250058717f0b5ae8f385cf30fd",
+      "binary_sha256": "30b300c0de4c047cdc9e6ce1a5d0999ab7e329ed21d11d3eb0f297ed95904853",
+      "image_digest": null
+    },
+    {
+      "id": "spike40",
+      "role": "candidate",
+      "commit": "30cad456257df5250058717f0b5ae8f385cf30fd",
+      "binary_sha256": "30b300c0de4c047cdc9e6ce1a5d0999ab7e329ed21d11d3eb0f297ed95904853",
+      "image_digest": null
+    }
+  ],
+  "backend": "local",
+  "created": "2026-10-30T05:30:36Z",
+  "export_id": "N83-PRIME-FIRST-FALL-20261030-R1",
+  "files": [
+    {
+      "path": "evidence/prime-first-fall/README.md",
+      "kind": "raw",
+      "bytes": 601,
+      "sha256": "62fd6583b9266c989cc93585b25df3c968f856af48eba35a2a8fb6cecab1825d"
+    },
+    {
+      "path": "evidence/prime-first-fall/baseline-prime-m2-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 30223,
+      "sha256": "89735ee225c53dccb23e1f2722c4bc84948f75e9dc1f6c02ec7f7530e014f655"
+    },
+    {
+      "path": "evidence/prime-first-fall/baseline-prime-m2-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 30864,
+      "sha256": "213657a9e0773a0697183cceb7f3097d63b61d97e0806a53e88e12a4b0ac3729"
+    },
+    {
+      "path": "evidence/prime-first-fall/controls.json",
+      "kind": "raw",
+      "bytes": 39884,
+      "sha256": "2232f6bbe189eecc59ae8598dddf9692eed663fa148c446393ffa662171fb895"
+    },
+    {
+      "path": "evidence/prime-first-fall/controls.log",
+      "kind": "raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/prime-first-fall/host.txt",
+      "kind": "raw",
+      "bytes": 3504,
+      "sha256": "958527093e13ef3f4054aeb182138e67a0d058e5645e2d94bda3f1e1d9e3b77a"
+    },
+    {
+      "path": "evidence/prime-first-fall/original-prime-m2-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 29684,
+      "sha256": "ed7dc8f59a519d3e9b5bd84af50c749ac057b4201a9a5491e493e1bbf902698a"
+    },
+    {
+      "path": "evidence/prime-first-fall/original-prime-m2-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 30279,
+      "sha256": "516f435a1cca7cab2a84235d286a23bb353ed970f0369c9f8a36e0c3ec3b366c"
+    },
+    {
+      "path": "evidence/prime-first-fall/primality.json",
+      "kind": "raw",
+      "bytes": 811,
+      "sha256": "b2d36b46d4ff8600a6dd248817a093f04e1adabe2294916c99f11cc4595790e4"
+    },
+    {
+      "path": "evidence/prime-first-fall/producer.log",
+      "kind": "raw",
+      "bytes": 214,
+      "sha256": "a6941dd0af749b1bcae5f49b00ef45f453816b7d241d801057dcd7e5f1cf8cc0"
+    },
+    {
+      "path": "evidence/prime-first-fall/raw-manifest.sha256",
+      "kind": "raw",
+      "bytes": 7517,
+      "sha256": "901c602199fdd6009d782ab51438ca1f48d68c641308ad45861f3bca8bf5402d"
+    },
+    {
+      "path": "evidence/prime-first-fall/replay.log",
+      "kind": "raw",
+      "bytes": 208,
+      "sha256": "ee3c892f7cc52be024a02c577703c7bd2271b03761232a9366b9e180b318d722"
+    },
+    {
+      "path": "evidence/prime-first-fall/spike40-prime-m2-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 30239,
+      "sha256": "2713f699ccd1416fd4502e0762394f92bd1892484d1f77dbd26923f4d49a3ab0"
+    },
+    {
+      "path": "evidence/prime-first-fall/spike40-prime-m2-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 30880,
+      "sha256": "b51582f513fbf499cc2ce84d1bb71fd2152264a2fb287b7e1de43b65fdffa361"
+    },
+    {
+      "path": "evidence/prime-first-fall/status.json",
+      "kind": "raw",
+      "bytes": 97,
+      "sha256": "7d9fa5419d615a8483a95bfcddd38b4eade143efb1ff97a6411148b0bf843908"
+    },
+    {
+      "path": "evidence/prime-first-fall/summary.json",
+      "kind": "raw",
+      "bytes": 4230,
+      "sha256": "f81be9e6771ce656442e92a32f9b8b585f76d5fe2df65bd7fdf858aff57cb5d5"
+    },
+    {
+      "path": "evidence/prime-first-fall/terminal.json",
+      "kind": "raw",
+      "bytes": 203,
+      "sha256": "df4eb05706a4f46ff047752dfda4ab3365b378d6001b413f664d591a818a9b41"
+    },
+    {
+      "path": "validation-prime-first-fall/restored/raw-download-check.log",
+      "kind": "log",
+      "bytes": 75,
+      "sha256": "103b164dd1e8910a03b2bb26bd748639623dd5ea29e83a6750a2b25229952afa"
+    },
+    {
+      "path": "validation-prime-first-fall/restored/restored-after.log",
+      "kind": "log",
+      "bytes": 3115,
+      "sha256": "6176fd6210870209c9bbf9aa5a631926e38fa575a0785bcd002de72fba88012f"
+    },
+    {
+      "path": "validation-prime-first-fall/restored/restored-before.log",
+      "kind": "log",
+      "bytes": 3115,
+      "sha256": "6176fd6210870209c9bbf9aa5a631926e38fa575a0785bcd002de72fba88012f"
+    },
+    {
+      "path": "validation-prime-first-fall/restored/restored-replay.log",
+      "kind": "log",
+      "bytes": 208,
+      "sha256": "ee3c892f7cc52be024a02c577703c7bd2271b03761232a9366b9e180b318d722"
+    },
+    {
+      "path": "validation-prime-first-fall/restored/restored-status.json",
+      "kind": "receipt",
+      "bytes": 28,
+      "sha256": "a318776e7df22505ce0db17ef58334749e032b61c055c4ecd418b10bfa2b08fd"
+    },
+    {
+      "path": "prime-first-fall-archives/runs.tar.xz",
+      "kind": "raw",
+      "bytes": 1306276,
+      "sha256": "a4d2cb49aed497674fd5f2797c70486d86057f28d2e89eeb4d9842418edb90ab"
+    },
+    {
+      "path": "evidence/prime-first-fall-publication.json",
+      "kind": "receipt",
+      "bytes": 1186,
+      "sha256": "b6ed0352782736e9f829851c8b096f212c5b3659b99c8759288facbdb6c81a95"
+    },
+    {
+      "path": "evidence/prime-first-fall-storage.json",
+      "kind": "receipt",
+      "bytes": 855,
+      "sha256": "42d807fe44f3edf046afb2ade85bdadf489bbd7d626de84cfce90a701b3e7576"
+    },
+    {
+      "path": "protocol-prime-first-fall.json",
+      "kind": "protocol",
+      "bytes": 18804,
+      "sha256": "f852b9566aee3e31db931ceb398bea6b7d598ffedef46c5612fdb00a1b823f6e"
+    },
+    {
+      "path": "PRIME_FIRST_FALL_DESIGN.md",
+      "kind": "other",
+      "bytes": 7339,
+      "sha256": "2a878df654bc92c0e42ef8d80a8a4582808816d140f0915c2f684496bf9f5516"
+    },
+    {
+      "path": "PRIME_FIRST_FALL_FORMAT.json",
+      "kind": "other",
+      "bytes": 4731,
+      "sha256": "1cd1788489c44def12a15282d30e52a0b9ad081f77cd27a86acd55e7de7cf6e7"
+    },
+    {
+      "path": "src/prime_first_fall_donor.rs",
+      "kind": "other",
+      "bytes": 18695,
+      "sha256": "f88e89504dfe6cdcff2691c4ad6bdd7fc2b046fdd776ed9f0757c0954848ae9d"
+    }
+  ],
+  "flow": {
+    "planned": 6,
+    "attempted": 6,
+    "completed": 6,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "host": {
+    "class_id": "existing-spot-L0",
+    "path": "evidence/prime-first-fall/host.txt",
+    "sha256": "958527093e13ef3f4054aeb182138e67a0d058e5645e2d94bda3f1e1d9e3b77a",
+    "summary": {
+      "cpu_model": "Intel(R) Xeon(R) 6975P-C",
+      "hypervisor": "KVM",
+      "isolation_tier_max": "L0",
+      "kernel": "Linux ip-172-31-26-169.us-east-2.compute.internal 6.18.54-121.166.amzn2023.x86_64 #2 SMP PREEMPT_DYNAMIC Tue Oct  6 23:11:34 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+      "logical_cpus": 32,
+      "memory_bytes": null,
+      "spot": true
+    }
+  },
+  "notes": [
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "All six unchanged prime m2 identities are retained. Original/baseline natural inputs repeat;not independent samples or an elite-base ranking."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Highest-form FFD and actual strict filtered falls have separate certificates. A zero functional would be inconclusive for the affine test. Global upper and exact LFD remain unknown."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Witnesses use exact sparse tensor factors;no coefficient is sampled or discarded. Full expansion follows the committed format."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Existing-host L0 fallback: CLI EKS role assumption denied and MCP inventory timed out. No new EKS job submitted,no IAM/capacity change,no performance/CRIU claim."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "All previous datasets, original-top regularity values and actual point/source/target bindings remain unchanged. Full three-family m2-9 goal remains active."
+    }
+  ],
+  "producer": {
+    "runtime": "codex",
+    "role": "producer",
+    "model": null,
+    "session": "n83-prime-first-fall-20261030-r1"
+  },
+  "protocol": {
+    "path": "protocol-prime-first-fall.json",
+    "protocol_id": "N83-PRIME-FIRST-FALL-20261030",
+    "version": 1,
+    "sha256": "5c10dc03ea5f1447ed50430d297c691bbc008316dff21a9c6d7c3240c13f291f"
+  },
+  "reviews_dir": "reviews",
+  "runs": [
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/prime-first-fall/summary.json",
+          "kind": "summary",
+          "bytes": 4230,
+          "sha256": "f81be9e6771ce656442e92a32f9b8b585f76d5fe2df65bd7fdf858aff57cb5d5"
+        },
+        {
+          "path": "evidence/prime-first-fall/original-prime-m2-planted/certificate.json",
+          "kind": "other",
+          "bytes": 30279,
+          "sha256": "516f435a1cca7cab2a84235d286a23bb353ed970f0369c9f8a36e0c3ec3b366c"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/a4/a4d2cb49aed497674fd5f2797c70486d86057f28d2e89eeb4d9842418edb90ab",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 17,
+          "first_strict_filtered_fall_degree": 17,
+          "last_fall_lower_bound": 17
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m2-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native source/primality/rank/factor/coefficient/certificate replay. Strict LFD lower requires nonzero functional;no global upper/exact;independent review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/prime-first-fall/summary.json",
+          "kind": "summary",
+          "bytes": 4230,
+          "sha256": "f81be9e6771ce656442e92a32f9b8b585f76d5fe2df65bd7fdf858aff57cb5d5"
+        },
+        {
+          "path": "evidence/prime-first-fall/original-prime-m2-natural/certificate.json",
+          "kind": "other",
+          "bytes": 29684,
+          "sha256": "ed7dc8f59a519d3e9b5bd84af50c749ac057b4201a9a5491e493e1bbf902698a"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/a4/a4d2cb49aed497674fd5f2797c70486d86057f28d2e89eeb4d9842418edb90ab",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 17,
+          "first_strict_filtered_fall_degree": 17,
+          "last_fall_lower_bound": 17
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m2-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native source/primality/rank/factor/coefficient/certificate replay. Strict LFD lower requires nonzero functional;no global upper/exact;independent review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/prime-first-fall/summary.json",
+          "kind": "summary",
+          "bytes": 4230,
+          "sha256": "f81be9e6771ce656442e92a32f9b8b585f76d5fe2df65bd7fdf858aff57cb5d5"
+        },
+        {
+          "path": "evidence/prime-first-fall/baseline-prime-m2-planted/certificate.json",
+          "kind": "other",
+          "bytes": 30864,
+          "sha256": "213657a9e0773a0697183cceb7f3097d63b61d97e0806a53e88e12a4b0ac3729"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/a4/a4d2cb49aed497674fd5f2797c70486d86057f28d2e89eeb4d9842418edb90ab",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 17,
+          "first_strict_filtered_fall_degree": 17,
+          "last_fall_lower_bound": 17
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m2-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native source/primality/rank/factor/coefficient/certificate replay. Strict LFD lower requires nonzero functional;no global upper/exact;independent review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/prime-first-fall/summary.json",
+          "kind": "summary",
+          "bytes": 4230,
+          "sha256": "f81be9e6771ce656442e92a32f9b8b585f76d5fe2df65bd7fdf858aff57cb5d5"
+        },
+        {
+          "path": "evidence/prime-first-fall/baseline-prime-m2-natural/certificate.json",
+          "kind": "other",
+          "bytes": 30223,
+          "sha256": "89735ee225c53dccb23e1f2722c4bc84948f75e9dc1f6c02ec7f7530e014f655"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/a4/a4d2cb49aed497674fd5f2797c70486d86057f28d2e89eeb4d9842418edb90ab",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 17,
+          "first_strict_filtered_fall_degree": 17,
+          "last_fall_lower_bound": 17
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m2-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native source/primality/rank/factor/coefficient/certificate replay. Strict LFD lower requires nonzero functional;no global upper/exact;independent review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/prime-first-fall/summary.json",
+          "kind": "summary",
+          "bytes": 4230,
+          "sha256": "f81be9e6771ce656442e92a32f9b8b585f76d5fe2df65bd7fdf858aff57cb5d5"
+        },
+        {
+          "path": "evidence/prime-first-fall/spike40-prime-m2-planted/certificate.json",
+          "kind": "other",
+          "bytes": 30880,
+          "sha256": "b51582f513fbf499cc2ce84d1bb71fd2152264a2fb287b7e1de43b65fdffa361"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/a4/a4d2cb49aed497674fd5f2797c70486d86057f28d2e89eeb4d9842418edb90ab",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 17,
+          "first_strict_filtered_fall_degree": 17,
+          "last_fall_lower_bound": 17
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m2-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native source/primality/rank/factor/coefficient/certificate replay. Strict LFD lower requires nonzero functional;no global upper/exact;independent review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/prime-first-fall/summary.json",
+          "kind": "summary",
+          "bytes": 4230,
+          "sha256": "f81be9e6771ce656442e92a32f9b8b585f76d5fe2df65bd7fdf858aff57cb5d5"
+        },
+        {
+          "path": "evidence/prime-first-fall/spike40-prime-m2-natural/certificate.json",
+          "kind": "other",
+          "bytes": 30239,
+          "sha256": "2713f699ccd1416fd4502e0762394f92bd1892484d1f77dbd26923f4d49a3ab0"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/a4/a4d2cb49aed497674fd5f2797c70486d86057f28d2e89eeb4d9842418edb90ab",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_degree": 17,
+          "first_strict_filtered_fall_degree": 17,
+          "last_fall_lower_bound": 17
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m2-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native source/primality/rank/factor/coefficient/certificate replay. Strict LFD lower requires nonzero functional;no global upper/exact;independent review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "repo": "crypto",
+    "commit": "30cad456257df5250058717f0b5ae8f385cf30fd",
+    "dirty": false
+  }
+}

@@ -1,0 +1,4 @@
+pdp generate /tmp/n83-candidate-inputs/spike32 /tmp/n83-candidate-bases/r32/data research/n83_candidate_pdp_20261028/evidence/pdp/baseline spike32
+top single /tmp/n83-candidate-inputs/spike32 /tmp/n83-candidate-top/spike32-parent/certificates
+top single-replay /tmp/n83-candidate-inputs/spike32 /tmp/n83-candidate-top/spike32-parent/certificates
+fall runner: serial 48 cases, 60s timeout and 8GiB address-space limit; each output uploaded and fresh-process replayed

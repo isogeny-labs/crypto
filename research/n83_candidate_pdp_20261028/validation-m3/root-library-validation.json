@@ -1,0 +1,91 @@
+{
+  "schema": "n83.root-library-validation/v1",
+  "head": "cc063967c673e8bca317bfddf4cea1c35f7f76a1",
+  "full_suite_original": {
+    "passed": 5131,
+    "failed": 12,
+    "ignored": 123,
+    "elapsed": "698.89s",
+    "exit_code": 101
+  },
+  "targeted_rechecks": [
+    {
+      "test": "cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar",
+      "exit_code": 0,
+      "log": "library-targeted/01.log",
+      "sha256": "f426ec27a1454ccbe41f2028298b2d32247eef4b378e321cea355a4c048f7a99"
+    },
+    {
+      "test": "cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures",
+      "exit_code": 0,
+      "log": "library-targeted/02.log",
+      "sha256": "6d5786e900df21a27cbfc7644a77d9ad95633ec03e1241406a30c55c7e8a189f"
+    },
+    {
+      "test": "cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic",
+      "exit_code": 0,
+      "log": "library-targeted/03.log",
+      "sha256": "af6250cf86136e3709a67c559b5c58f5cee1aa027d2730a88c5a9aac859863e0"
+    },
+    {
+      "test": "cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver",
+      "exit_code": 0,
+      "log": "library-targeted/04.log",
+      "sha256": "3e14106d9f65891ef3b1ccf59e80c31d8143640a1a933f01eb4ce803f102c800"
+    },
+    {
+      "test": "cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed",
+      "exit_code": 0,
+      "log": "library-targeted/05.log",
+      "sha256": "0ef76e6b00e33e9f21420fff33cc1854d79fe7d598158c9fdba47c20d1e3e01b"
+    },
+    {
+      "test": "cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means",
+      "exit_code": 0,
+      "log": "library-targeted/06.log",
+      "sha256": "abda719cded0f180419b2d0dfc0a0d5ad920d4deebdc2208ab15c3b18fcaa4b8"
+    },
+    {
+      "test": "cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload",
+      "exit_code": 0,
+      "log": "library-targeted/07.log",
+      "sha256": "a498ccfa125626662d818c558a9fc9f9b1bd9b1f147e960fe55bd0244baa6f12"
+    },
+    {
+      "test": "cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible",
+      "exit_code": 0,
+      "log": "library-targeted/08.log",
+      "sha256": "fffd7d0c3fa0635c93473816a957ab46ddb2c082b56f09e024864ab8b556ecf2"
+    },
+    {
+      "test": "cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples",
+      "exit_code": 0,
+      "log": "library-targeted/09.log",
+      "sha256": "d21388d229bd3d07768fe952bd5774cd93b9506869ebdc899b420f686ce41e1f"
+    },
+    {
+      "test": "cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band",
+      "exit_code": 0,
+      "log": "library-targeted/10.log",
+      "sha256": "cf9c63152d055db8f07f36c0e5311e08c59edec8ba817d0a830742cdefde6941"
+    },
+    {
+      "test": "cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files",
+      "exit_code": 0,
+      "log": "library-targeted/11.log",
+      "sha256": "1fa715f5da039f4d458ccdbe47373e91498db5c5a8f39844e99905dcda14b63b"
+    },
+    {
+      "test": "cryptanalysis::ic_framework::planner::tests::every_cited_file_exists",
+      "exit_code": 0,
+      "log": "library-targeted/12.log",
+      "sha256": "6b83ea3d0f9b8e8c95b8596858eaa14752d78b2dc5a61ca0a54b083b8074b28d"
+    }
+  ],
+  "restored_tracked_inputs": 33,
+  "all_prior_failures_resolved": true,
+  "validation_scope": "One full release-library run followed by exact failed-test rechecks after tracked fixture restoration; not a second full-suite run",
+  "source_changes": false,
+  "production_reruns": false,
+  "additional_restoration_receipt": "additional-runtime-input.json"
+}

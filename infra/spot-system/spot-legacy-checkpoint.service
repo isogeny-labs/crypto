@@ -1,0 +1,12 @@
+[Unit]
+Description=Local leave-running backups of explicitly registered legacy experiments
+After=network-online.target
+[Service]
+Type=oneshot
+User=root
+UMask=0077
+ExecStart=/usr/bin/python3 /opt/spot-criu/criu_local.py snapshot --root /var/lib/spot-criu-managed --criu /opt/spot-criu/criu
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+TimeoutStartSec=0

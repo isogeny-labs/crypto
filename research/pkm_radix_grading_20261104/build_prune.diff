@@ -1,0 +1,377 @@
+diff --git a/src/cryptanalysis/mod.rs b/src/cryptanalysis/mod.rs
+index 7467b30642..a3bcade58d 100644
+--- a/src/cryptanalysis/mod.rs
++++ b/src/cryptanalysis/mod.rs
+@@ -96,20 +96,11 @@ pub mod aes;
+ pub mod ai_schoof;
+ pub mod algebra_cache;
+ pub mod aps_single_relation;
+-pub mod aut_folded_rho;
+-pub mod auto_attack;
+-pub mod avalanche;
+-pub mod b_seed_profile;
+-pub mod b_weak_class_battery;
+-pub mod bielliptic_quartic;
+-pub mod biext_k2;
+ pub mod binary_field_basis;
+ pub mod binary_isogeny;
+-pub mod binary_root_trace;
+ pub mod binary_semaev;
+ pub mod binary_semaev_chain_sat;
+ pub mod binary_semaev_s4;
+-pub mod binary_small_x;
+ pub mod binary_torsion_walk;
+ pub mod binary_velu;
+ pub mod bitop_tally;
+@@ -119,71 +110,38 @@ pub mod boolean;
+ pub mod boomerang;
+ pub mod bsgs_fast;
+ pub mod canonical_lift;
+-pub mod certicom131_symlp;
+-pub mod certicom_dlp;
+-pub mod certicom_dlp_cli;
+ pub mod cga_hnc;
+ pub mod chain_pivot_rules;
+ pub mod chain_trace;
+ pub mod challenge_ladder;
+-pub mod cheon_attack;
+-pub mod cheon_counted;
+-pub mod cipher_registry;
+-pub mod class_number_estimate;
+-pub mod closure_checkpoint;
+-pub mod cm_canonical_lift;
+-pub mod coleman_integration;
+-pub mod coordinate_descent;
+-pub mod coordinate_quotients;
+ pub mod coordinate_search;
+ pub mod cover_catalog;
+ pub mod crossbred;
+ pub mod curve_catalog;
+-pub mod curve_construction;
+ pub mod curve_id;
+ pub mod curve_traits;
+ pub mod cyclotomic_factor_base;
+ pub mod d4_weighted_s5;
+-pub mod degree_reduction;
+-pub mod degree_reduction_anf;
+ pub mod delta_method;
+-pub mod descent_algebraic;
+ pub mod descent_expansion;
+ pub mod descent_lowgamma;
+-pub mod descent_treewidth;
+-pub mod diem_descent;
+-pub mod diem_quartic;
+ pub mod ec_index_calculus;
+ pub mod ec_index_calculus_curves;
+ pub mod ec_index_calculus_j0;
+ pub mod ec_trapdoor;
+ pub mod ecbench;
+ pub mod ecbench_large_prime;
+-pub mod ecc2k130_guard;
+-#[cfg(unix)]
+-pub mod ecc2k130_merge;
+-pub mod ecc2k130_pyjson;
+-pub mod ecc2k130_status;
+-pub mod ecdlp_challenges;
+ pub mod ecdlp_nist;
+ pub mod ecdlp_variants;
+ pub mod ecdsa_audit;
+-pub mod ecm;
+-pub mod eds_mov;
+-pub mod eds_net;
+-pub mod eds_residue;
+-pub mod eds_tate;
+ pub mod endo_rho;
+ pub mod ext_curve;
+ pub mod f4_fp;
+ pub mod f4_fp_tower;
+ pub mod f4_tower_generic;
+-pub mod f6_wide_geometry;
+-pub mod fes_gpu;
+ pub mod ffd_harness;
+ pub mod fghr_full;
+ pub mod fghr_line;
+-pub mod fght_snfs;
+ pub mod fp_backend;
+ pub mod fp_backend_ifma;
+ pub(crate) mod fx_hash;
+@@ -194,24 +152,13 @@ pub mod gaudry_quartic_d4;
+ pub mod genus2_fp;
+ pub mod gf2_elim;
+ pub mod gf3m;
+-pub mod ghs_class_coverage;
+ pub mod ghs_descent;
+ pub mod ghs_full_attack;
+-pub mod ghs_generalized;
+-pub mod ghs_ic;
+-pub mod ghs_quadratic;
+-pub mod ghs_screen;
+-pub mod ghs_smooth;
+-pub mod ghs_transport;
+ pub mod gls_fp2;
+-pub mod glv_gaudry;
+ pub mod glv_invariant_base;
+ pub mod glv_invariant_experiments;
+-pub mod gpu_rootfind;
+-pub mod groebner_cache;
+ pub mod groebner_f4;
+ pub mod group_op_count;
+-pub mod hash_attacks;
+ pub mod hashed_ecdl;
+ /// Toy index calculus with tensor-contraction relation finding
+ /// (`crates/ecdl-tensor-ic`, Rust port of the Go `ecdltensor` prototype).
+@@ -220,55 +167,35 @@ pub mod dreg_forecast;
+ pub mod hilbert_class_poly;
+ pub mod hky_fp_tower;
+ pub mod hnp_ecdsa;
+-pub mod hwcost;
+ pub mod hyperelliptic_ic_bench;
+ pub mod hyperelliptic_index_calculus;
+ pub mod hyperelliptic_word;
+ pub mod ic_boundary;
+-pub mod ic_corpus;
+ pub mod ic_descent_degrees;
+ pub mod ic_engine;
+ pub mod ic_framework;
+ pub mod ic_measurement;
+-pub mod ic_oracle_pricing;
+-pub mod ic_progress;
+-pub mod ic_run;
+ pub mod ic_wide;
+ pub mod identity_certificate;
+ pub mod inherited_f4;
+ pub mod invalid_curve_attack;
+ pub mod isogeny_class_search;
+-pub mod isogeny_degree_search;
+ pub mod isogeny_eval;
+ pub mod isogeny_walk;
+ pub mod j0_twists;
+-pub mod jacobian_transfer;
+-pub mod joux_vitse;
+-pub mod joux_vitse_edwards;
+ pub mod jv_bitops;
+ pub mod jv_cover;
+-pub mod jv_isogeny_walk;
+-pub mod jv_quartic;
+-pub mod jv_quintic;
+-pub mod jv_quintic_edwards;
+-pub mod jv_rho_strong;
+-pub mod jv_sieve;
+ pub mod klein_v4;
+-pub mod koblitz_bench;
+ pub mod koblitz_factor_base_search;
+ pub mod koblitz_fast;
+ pub mod koblitz_fast_arith;
+ pub mod koblitz_greedy_base;
+ pub mod koblitz_greedy_sampled;
+ pub mod koblitz_groebner;
+-pub mod koblitz_ic_leads;
+ pub mod koblitz_index_calculus;
+ pub mod koblitz_isogeny_cost;
+ pub mod koblitz_large_prime;
+-pub mod koblitz_pdp_phase_a;
+ pub mod koblitz_relation_solver;
+-pub mod koblitz_rotated_chain;
+-pub mod koblitz_sixsum_extract;
+ pub mod koblitz_sparse_la;
+ pub mod koblitz_strong_rho;
+ pub mod koblitz_sym_s4;
+@@ -276,57 +203,28 @@ pub mod koblitz_symmetrised;
+ pub mod koblitz_wide;
+ pub mod large_prime_filter;
+ pub mod lattice;
+-pub mod legacy_curve_attacks;
+-pub mod line_oracle;
+-pub mod line_s4_oracle;
+-pub mod lopsided_thin_product;
+ pub mod macaulay_profile;
+ pub mod macaulay_tails;
+ pub mod matmul_exponent;
+ pub mod matrix_f5_f2;
+-pub mod mazur_tate_sigma;
+-pub mod md5_chosen_prefix;
+ pub mod md5_differential;
+-pub mod md5_hashclash_ffi;
+ pub mod ml_dsa_fault;
+ pub mod ml_dsa_leakage;
+ pub mod ml_kem_pco;
+-pub mod ml_rho_walks;
+ pub mod mlwe;
+ pub mod modular_polynomial;
+ pub mod mov_attack;
+ pub mod mq_fes;
+ pub mod mq_monica;
+-pub mod multi_key_hnp;
+-pub mod native_signed_mitm;
+-pub mod nist_seed_provenance;
+-pub mod nonanom_formal_log;
+-pub mod orbit_homology;
+-pub mod orbit_pair_table;
+-pub mod p192_cm_norm_sieve;
+-pub mod p192_cm_relation_search;
+-pub mod p192_interval_bsgs;
+-pub mod p192_native;
+-pub mod p192_singular_recovery;
+-pub mod p224_hypotheses;
+ pub mod p256_attacks;
+-pub mod p256_backdoor_map;
+-pub mod p256_bitbox_factor_base;
+-pub mod p256_dickson_factor_base;
+ pub mod p256_isogeny_campaign;
+ pub mod p256_isogeny_cover;
+ pub mod p256_isogeny_task;
+ pub mod p256_isogeny_walk;
+ pub mod p256_structural;
+-pub mod p256_trapdoor_round2;
+-pub mod p256_trapdoor_round3;
+-pub mod partial_enlargement;
+-pub mod pc_degree_avg;
+ pub mod pc_degree_harness;
+-pub mod pdp_split;
+ pub mod petit_quisquater;
+ pub mod pkm_criterion;
+-pub mod plane_quartic_pic;
+ pub mod pohlig_hellman;
+ pub mod pollard_collab;
+ pub mod pollard_rho;
+@@ -338,73 +236,31 @@ pub mod pq_groebner_f2;
+ pub mod pq_sparse_la;
+ pub mod pq_wiedemann;
+ pub mod pq_xl;
+-pub mod prepared_control_archive;
+-pub mod prepared_sat_control;
+-pub mod preprocessing_rho;
+ pub mod prime_fast;
+-pub mod prime_field_smt;
+ pub mod prime_orbit_index_calculus;
+-pub mod prime_root_trace;
+-pub mod prime_small_x;
+-pub mod q_curve;
+-pub mod quantum_estimator;
+ pub mod quartic_folds;
+-pub mod quasi_subfield;
+-pub mod recursive_descent;
+-pub mod relation_yield_pruning;
+ pub mod research_bench;
+ pub mod residual_walk;
+ pub mod sat;
+ pub mod sbox;
+-pub mod secg_small_x;
+-pub mod secg_standards;
+-pub mod sect113r1_audit;
+-pub mod seed_grind_trapdoor;
+ pub mod semaev_corpus;
+ pub mod semaev_decomp;
+-pub mod semaev_higher;
+-pub mod semaev_leading_form;
+-pub mod semaev_prime_poly;
+-pub mod semaev_s3_cost;
+ pub mod semaev_sat;
+-pub mod sha1_differential;
+-pub mod shor;
+ pub mod sig_fp_tower;
+-pub mod signal_ratchet;
+ pub mod signature_corpus;
+-pub mod six_class_rho;
+-pub mod smith_elliptic_walk;
+-pub mod smith_kernel_coverage;
+-pub mod smith_prop24;
+-pub mod smt_oracle;
+-pub mod solinas_correlations;
+ pub mod sparse_macaulay;
+ pub mod statistical;
+ pub mod subfield_fp3;
+ pub mod symmetrized_semaev;
+ pub mod three_leads;
+ pub mod three_leads_followup;
+-pub mod tls12_kdf;
+-pub mod tls13_kdf;
+-pub mod twist24_rep;
+-pub mod twist24_shortfall;
+-pub mod two_rank_null;
+ pub mod two_sylow_search;
+-pub mod visual_demos;
+ pub mod visualize;
+-pub mod volcano;
+ pub mod wdsat_oracle;
+ pub mod weil_charts;
+ pub mod wide_gf2m;
+-pub mod wide_groebner;
+-pub mod wide_sixsum;
+ pub mod zero_dim_la;
+ 
+-pub use aut_folded_rho::{
+-    apply_aut, aut_folded_rho_dlp, canonical_form, AutElt, FoldedRhoOptions, FoldedRhoSolution,
+-    J0CurveAut,
+-};
+-pub use avalanche::{bit_independence_score, full_avalanche, sac_score, AvalancheReport};
+ pub use bleichenbacher::{
+     bias_magnitude, bleichenbacher_direct, signature_to_sample, BleichenbacherPeak,
+     BleichenbacherSample,
+@@ -442,11 +298,6 @@ pub use j0_twists::{
+     enumerate_twists, factorise_small, format_twist_table, max_prime_factor, naive_point_count,
+     primitive_root, twist_coefficients, TwistInfo,
+ };
+-pub use koblitz_bench::{
+-    bench_instance, ffd_summary, format_ffd_table, format_oracle_table, format_system_table,
+-    max_m_within_budget, n_vars_for, profile_system, subspace_ladder, sweep_ffd, sweep_systems,
+-    FfdSummary, InstanceBench, OracleRun, SystemProfile,
+-};
+ pub use koblitz_groebner::{
+     build_decomposition_system, first_fall_degree, macaulay_profile, matrix_f4_f2,
+     matrix_f4_f2_counted, solve_boolean_system, solve_boolean_system_filtered, sym_semaev_s3,
+@@ -486,25 +337,11 @@ pub use koblitz_sparse_la::{
+     SparseSolveReport, SpmvBackend, SpmvOptions, Wide, WideModulus, WordWidth, U128, U192, U256,
+ };
+ pub use lattice::{bkz_reduce, lll_reduce};
+-pub use legacy_curve_attacks::{
+-    bounded_bsgs_binary, bounded_bsgs_prime, legacy_curve_attack_report,
+-    run_legacy_curve_attack_demos, BoundedDlpSolution, LegacyCurveAttackDemo,
+-};
+-pub use multi_key_hnp::{build_transcript, multi_key_hnp_recover_master, ChildKeySignature};
+ pub use pollard_rho::{
+     pollard_rho_dlp, pollard_rho_dlp_zp, pollard_rho_dlp_zp_multi, pollard_rho_dp_dlp_zp,
+     pollard_rho_dp_dlp_zp_multi, DpRhoOptions, RhoOptions, RhoSolution,
+ };
+-pub use preprocessing_rho::{
+-    build_preprocessing_table, expected_online_cost, online_solve, preprocessing_rho_dlp,
+-    PreprocessingOptions, PreprocessingTable,
+-};
+ pub use sbox::{Sbox, SboxReport};
+-pub use sha1_differential::{
+-    estimate_differential, find_near_collision, round_function_truth_table, sha1, sha1_avalanche,
+-    sha1_compress, DifferentialEstimate, NearCollision,
+-};
+-pub use shor::{shor_factor, shor_order_find};
+ pub use signature_corpus::{
+     CorpusAnalyzer, CorpusReport, Finding, ReportRow, Severity, SignatureRecord,
+ };
+diff --git a/src/lib.rs b/src/lib.rs
+index 0de6e7e3f6..1595a14bbb 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -19,24 +19,16 @@
+ 
+ pub mod asymmetric;
+ pub mod binary_ecc;
+-pub mod bls12_381;
+-pub mod build_provenance;
+ pub mod cryptanalysis;
+-pub mod cryptopals;
+ pub mod ct_bignum;
+ pub mod ecc;
+ pub mod ecc_safety;
+-pub mod encoding;
+ pub mod hash;
+ pub mod isogeny;
+ pub mod kdf;
+-pub mod keys;
+-pub mod ml_dataset;
+ pub mod pqc;
+ pub mod prime_hyperelliptic;
+ pub mod store;
+ pub mod symmetric;
+-pub mod tls13;
+ pub mod utils;
+ pub mod visualize;
+-pub mod zk;

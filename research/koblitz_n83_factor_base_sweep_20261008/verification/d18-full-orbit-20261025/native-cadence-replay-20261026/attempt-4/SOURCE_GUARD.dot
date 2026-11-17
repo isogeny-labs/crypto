@@ -1,0 +1,10 @@
+digraph source_guard {
+  graph [rankdir=LR, fontname="Helvetica", label="N83 D18 attempt 4: startup guard", labelloc=t];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fillcolor="#e8f2ff"];
+  a [label="Fresh D18 S3 GET\nSHA-256 and provider checks pass", fillcolor="#e4f4e8"];
+  b [label="Local launch gate\nload 9.40 <= 24; swapouts stable", fillcolor="#e4f4e8"];
+  c [label="Positive worker startup\ncompile-time CARGO_MANIFEST_DIR\npoints to dirty original checkout", fillcolor="#ffe8de"];
+  d [label="Exit 1 at 1.05 s\nno result JSON", fillcolor="#ffe8de"];
+  e [label="Natural arm held\nno cold-runtime selection", fillcolor="#eeeeee"];
+  a -> b -> c -> d -> e;
+}

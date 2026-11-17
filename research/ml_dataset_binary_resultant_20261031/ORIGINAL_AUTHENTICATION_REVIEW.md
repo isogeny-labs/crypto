@@ -1,0 +1,7 @@
+# Independent source review of shared original authentication
+
+Reviewed binary-original-auth-extraction.patch SHA2562164cf67a6d1f3a3d14ab7aa406ca6850c1c26998d430311fcda7f632b36a285 against source99d97d and factor_bases.rs generation/replay code. No build or test was performed.
+
+The v2 fix is needed: generated units contain coordinates arrays, with lifts nested in each coordinate. The prior Koblitz top-level lifts check rejects this valid shape. Proposed helper retains255 outer units,255 total coordinate candidates and2 lifts per coordinate. Full recipe expansion is separately bounded before replay: sampled candidate_limit, subspace2^dimension, and Frobenius-union2^dimension*(n/k). factor_bases::build independently checks k against the actual coefficient field before coordinate-unit expansion, so unverified public k cannot enable a larger successful replay. Legacy size4 expansion is255.
+
+Original public/config/policy/seed validation and mathematical curve/factor-base replay remain; exact four signed points/two x codes and negation pairs remain mandatory. Koblitz still requires actual b=1, while the extracted ordinary-binary profile is private and has no runtime caller. Explicit-legacy causal exporter controls depend on this fix. Source inspection found no concrete blocker. Natural policy-domain fixtures and new helper boundary tests are drafted, not executed; actual unmodified two-code domain admission remains a validation gate.

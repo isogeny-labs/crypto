@@ -1,0 +1,903 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "PENCIL-SYMBOLIC-P186379-TARGET0-GATE-20261030",
+  "version": 1,
+  "created": "2026-10-30",
+  "repository": "crypto",
+  "study_dir": "research/pencil_large_prime_20261029",
+  "authors": [
+    "T-826 protocol drafting lane"
+  ],
+  "links": {
+    "spec_manifest": "../../prepared_specs/manifest.json",
+    "timing_contract": "../../TIMING_CONTRACT.json",
+    "analysis": "../../native_price/README.md",
+    "status": "Frozen prospective p186379 target0 finite-count gate; root must commit before affected observations. Exact frozen-body coverage and live operational admission are separate additive records. Original full-cohort and timing obligations remain incomplete."
+  },
+  "question": "On the one prescribed public synthetic p186379 target0 workload, obtain all18 arm executions and independently verify all15 measured source/count observations before any remaining-cohort admission. This prospective gate is designed with prior p739 results known; no clock qualification or cohort completion is claimed.",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Every accepted synthetic result satisfies the original source-curve equation and archived known answer; failures, caps and missing outcomes remain visible.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C4",
+      "text": "Deployed-key recovery, cryptographic security impact, asymptotic advantage, universal mathematical correctness and complete CPU/infrastructure pricing are outside this public synthetic study.",
+      "class": "out_of_scope",
+      "decided_by": []
+    },
+    {
+      "id": "C5",
+      "text": "After independent source-bound coverage review, report exact finite algorithm GAE prices on all36 declared cells, separately algorithm-only and calibration-inclusive; incomplete pairs retain null prices and incomplete cohorts retain null ratio-of-sums.",
+      "class": "comparative",
+      "decided_by": [
+        "C-method"
+      ],
+      "if_supported": "Descriptive complete-denominator ratios under the named finite model, with both losses and gains retained.",
+      "if_not_supported": "Raw counts and missing/capped/invalid outcomes remain visible; unadmitted prices are null."
+    },
+    {
+      "id": "C6",
+      "text": "Cold and online clock qualification is deferred and remains an unmet original objective. This finite-count continuation makes no qualifying clock comparison; retained intervals are diagnostic.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "pencil",
+      "role": "candidate",
+      "description": "Signed symbolic point-driven pencil collector, cold per-call construction/transfer charged. Actual prepared arm label is pencil.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+        "image_digest": "sha256:e82333a5e77a03270335589848783e1d0cf55e42c7c2f5f35732ee8ba54523fd",
+        "flags": {
+          "RUSTFLAGS": "-C target-cpu=x86-64",
+          "CARGO_BUILD_JOBS": "2"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.three_leads_genus2_pencil_symbolic_v2",
+        "small_denominator": 8,
+        "matrix_coefficient_cap": 25000000
+      },
+      "same_instrument_as": "rho"
+    },
+    {
+      "id": "rho",
+      "role": "reference",
+      "description": "Matched source-negation rho with pinned DefaultHasher collision-table policy v1, same Rust1.99.1 instrument as candidate/control. Preserves walk RNG; table layout/runtime can differ from historical RandomState baseline.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+        "image_digest": "sha256:e82333a5e77a03270335589848783e1d0cf55e42c7c2f5f35732ee8ba54523fd",
+        "flags": {
+          "RUSTFLAGS": "-C target-cpu=x86-64",
+          "CARGO_BUILD_JOBS": "2"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.three_leads_negation_v1",
+        "trial_cap": "resolved exact archived per-workload value"
+      }
+    },
+    {
+      "id": "rho_AA",
+      "role": "control_aa",
+      "description": "Identical resolved rho method and algorithm seed, separate scheduled execution.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+        "image_digest": "sha256:e82333a5e77a03270335589848783e1d0cf55e42c7c2f5f35732ee8ba54523fd",
+        "flags": {
+          "RUSTFLAGS": "-C target-cpu=x86-64",
+          "CARGO_BUILD_JOBS": "2"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.three_leads_negation_v1",
+        "trial_cap": "same as rho"
+      },
+      "same_instrument_as": "rho"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Every fixed public fixture contains a known synthetic answer checked in child and independently by parent/source audit; a wrong answer invalidates the execution. These checks exercise the same method path; no fourth arm is introduced."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No detection or enrichment/null-population claim. Deterministic rejection fixtures for altered identity, wrong equation, cap, missing phases and missing partners validate the analysis separately before freeze; they are not timed cohort samples."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "method",
+        "levels": [
+          "ic.three_leads_genus2_pencil_symbolic_v2",
+          "rho.three_leads_negation_v1"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "workload",
+        "treatment": "fixed",
+        "how": "21 models x60 exact archived targets; all arms share workload SHA and original source equation.",
+        "value": "550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339"
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "One immutable source commit, lockfile, flags, binary and image for all arms; unresolved hashes block freezing."
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "how": "Single method thread; pin physical-core placement and SMT sibling exclusion before execution.",
+        "value": 1
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Record instance ID/type, CPU model/microcode, SMT, affinity, NUMA, kernel, hypervisor, governor/frequency, steal, PSI, co-tenants and isolation blockers. Reject timed rows below L2; no cross-host timing pooling after recovery."
+      },
+      {
+        "name": "placement",
+        "treatment": "fixed",
+        "how": "Dedicated qualified L2 c8a.2xlarge Spot placement; no heterogeneous fallback.",
+        "value": "c8a.2xlarge"
+      },
+      {
+        "name": "memory_environment",
+        "treatment": "fixed",
+        "how": "8GiB execution cap, same allocator preparation/environment for every arm; record actual RSS, allocator, ASLR and resolved environment. No memory-cap increase.",
+        "value": 8
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "Use existing prepared spec shuffle rule and seed2026101801; freeze emitted plan bytes before data. Interleave all three arms in each workload/round."
+      },
+      {
+        "name": "algorithm_stream",
+        "treatment": "crossed",
+        "how": "Five predetermined measured streams per workload shared exactly across all three arms; index0 preserves archived seed; indices1..4 are new streams, not repeat measurements of index0."
+      },
+      {
+        "name": "warmup",
+        "treatment": "fixed",
+        "how": "One warmup execution per arm/workload; retain records but exclude from ratios.",
+        "value": 1
+      },
+      {
+        "name": "preemption",
+        "treatment": "measured",
+        "how": "Retain checkpoint, interruption and restore records; resumed execution clocks invalid. Restart only under frozen infrastructure retry limit, never restart a scientific cap."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Unblinded deterministic native exporter; no hand-selected workloads, thresholds or best stream. External reviewer receives all rows and reasons."
+      },
+      {
+        "name": "rho_hash_policy",
+        "treatment": "fixed",
+        "how": "DefaultHasher with BuildHasherDefault, policy version1, Rust1.99.1. Replaces randomized table hashing before data; records hash policy and all observed hash/equality events. This is an instrument amendment, not an unmodified historical baseline.",
+        "value": 1
+      },
+      {
+        "name": "finite_operation_model",
+        "treatment": "fixed",
+        "how": "pencil-algorithm-cost/atomic-scalar-disjoint-v1; source-bound nine-category independent coverage required.36cells, symmetric scalar inverse normalization, disjoint primitive registry, separate algorithm/calibration/resource boundaries.",
+        "value": "eb5348c894516e9ba163740861dd1f0e58865c08a930500662e6b060f7a571d8"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-method",
+        "arms": [
+          "pencil",
+          "rho"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "rho_AA",
+          "rho"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": true,
+    "transfer_obligations": [
+      {
+        "mapping": "source elliptic curve to mapped genus-2 Jacobian",
+        "requirement": "Verify domain/model/transfer identity on frozen fixtures; verify accepted geometric relations and returned synthetic answer on original source curve. Charge candidate setup and transfer inside method call; do not infer universal transfer theorem from finite checks."
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "randomized",
+    "arm_order_reason": "Prepared measurement.order=shuffle, with interleaved workload/round scheduling; plan bytes frozen before observations.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "Prepared spec measurement.seed=2026101801 and algorithm_seed_round=measured_index. Native ecbench plan resolves per-workload archived seed at measured index0 and predetermined streams1..4. Exact decimal algorithm_seed, absolute round and sequence retained; all three arms must match within pair."
+    },
+    "instance_sampling": {
+      "rule": "Use only exact prescribed gate-p186379-target0.json and its pinned18-slot plan; no resampling, replacement, alternative seed or denominator.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Known deterministic fixtures and method structures already observed; report unblinded descriptive measurements, not out-of-sample discovery or significance.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 5,
+    "warmups": 1,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": false,
+      "note": "Fixed complete cohort for descriptive reproducibility, not a powered hypothesis test. Five streams characterize observed range only. The [0.90,1.10] rule is operational admission, not a confidence interval; alpha is schema-required and unused. No significance or power claim."
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 10800,
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "measured_on": "Unmeasured scheduling ceiling, not expected completion or call cost: additive active worker budget10800 seconds shared by upper gate, remaining workloads, controls, warmups, replay, retries and recovery. Absolute expiry05:05:50Z can stop earlier. Retained p739 timing observations are known but do not estimate larger-target completion."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "finite_algorithm_gae",
+        "name": "Finite algorithm cost including calibration, with separate components",
+        "unit": "GAE",
+        "kind": "derived",
+        "definition": "Declared M/S/I and disjoint native-event model on36cells. Algorithm setup/transfer/target/elimination/verification and metadata-copy primitives included; calibration preparation+addition shown separately and once in explicit combined cost. Map and geometry diagnostic totals are not double counted. Reporting/allocator/RSS/clocks/infrastructure remain separate units. Independent source-bound coverage is required; no complete CPU-cost claim.",
+        "source": "native_price analyzer/aggregate outputs bound to complete records, plans and independent coverage review",
+        "aggregation": "sum",
+        "resolution": "Exact checked rational numerator/denominator per cell; ratio of complete matched price sums, never mean of ratios or survivor-only cohort",
+        "uncertainty": "none_exact",
+        "formula": "For each fixed cell: price=(M+wS*S+wI*I)/U+wL*L, U=M_source_add+wS*S_source_add+wI*I_source_add. M/S/I/L are disjoint normalized primitive totals. Combined price=algorithm price+calibration price. Cohort ratio=sum(candidate prices)/sum(reference prices), only over the complete prescribed matched denominator."
+      }
+    ],
+    "secondary": [
+      {
+        "id": "cold_call",
+        "name": "Full method call",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "Actual observed method-call boundary starts before methods::solve and ends after nested instrumentation closes and methods::complete returns. The earlier immediate-return description is not used. Raw diagnostic only; wall_valid false. Includes report completion; not full process cost.",
+        "source": "records.jsonl time.method_call_wall_ns",
+        "aggregation": "paired_ratio",
+        "resolution": "integer nanoseconds; effective accuracy assessed by L2 and A/A",
+        "uncertainty": "range"
+      },
+      {
+        "id": "online",
+        "name": "Online window",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "Retain actual method-specific online window as diagnostic only. Generic rho exposes rho_solve/recovery_check; candidate exposes five target phases. Do not fabricate common five-phase rho data or qualify ratios.",
+        "source": "records.jsonl online.wall_ns",
+        "aggregation": "paired_ratio",
+        "resolution": "integer nanoseconds; effective accuracy assessed by L2 and A/A",
+        "uncertainty": "range"
+      },
+      {
+        "id": "online_phases",
+        "name": "Five online phases",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "Retain actual native phase keys and clocks per arm, including generic rho_solve/recovery_check and candidate five target phases; diagnostic only, never sum overlapping clocks into method cost.",
+        "source": "records.jsonl online.phases_ns",
+        "aggregation": "per_row",
+        "resolution": "integer nanoseconds; effective accuracy assessed by L2 and A/A",
+        "uncertainty": "range"
+      },
+      {
+        "id": "parent_audit",
+        "name": "Parent mathematical audit",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "Parent source multiplication and equality comparison only; no inherited child isolation, diagnostic only and never added to child clocks.",
+        "source": "records.jsonl time.parent_audit_verification_ns",
+        "aggregation": "per_row",
+        "resolution": "integer nanoseconds; effective accuracy assessed by L2 and A/A",
+        "uncertainty": "range"
+      },
+      {
+        "id": "process",
+        "name": "Child process envelope",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "Spawn to reap; overlaps method call and includes preparation; diagnostic, never summed with method-call time.",
+        "source": "records.jsonl time.process_wall_ns",
+        "aggregation": "per_row",
+        "resolution": "integer nanoseconds; effective accuracy assessed by L2 and A/A",
+        "uncertainty": "range"
+      },
+      {
+        "id": "rss",
+        "name": "Child maximum resident set",
+        "unit": "KiB",
+        "kind": "counted",
+        "definition": "Per-child process high-water RSS including preparation; not allocated bytes or additive across phases.",
+        "source": "records.jsonl time.max_rss_kib",
+        "aggregation": "per_row",
+        "resolution": "exact recorded integer or explicit null",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "native_counts",
+        "name": "Raw finite primitive observations and admission status",
+        "unit": "events",
+        "kind": "counted",
+        "definition": "Retain complete raw field/scalar/collection/primality/phase observations including rejected work and explicit missing fields. Independently reviewed finite mapping gates derived prices; allocation/RSS/reporting/infrastructure are separate resources without invented GAE weights.",
+        "source": "records.jsonl cost and native/detail blocks",
+        "aggregation": "per_row",
+        "resolution": "exact recorded integer or explicit null",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "randomized",
+    "clock": "monotonic",
+    "counters": [
+      "field M/S/I, field adds/bits, atomic scalar events",
+      "disjoint collection/map primitives, hash/RNG atomics",
+      "base and scalar-domain outer/constructor primality",
+      "setup and candidate semantic counts, nonoverlapping engine geometry segments",
+      "calibration preparation/addition and metadata copy observations"
+    ],
+    "record": [
+      "cpu_model",
+      "microcode",
+      "kernel_release",
+      "hypervisor",
+      "instance_id",
+      "instance_type",
+      "frequency_governor",
+      "SMT",
+      "NUMA",
+      "affinity",
+      "binary_sha256",
+      "image_digest",
+      "source_commit",
+      "plan_sha256",
+      "env_class_id",
+      "isolation.level",
+      "isolation.blockers",
+      "steal_ticks",
+      "psi",
+      "foreign_busy_ticks",
+      "threads",
+      "attempts",
+      "resumes",
+      "wall_valid"
+    ],
+    "timed_primary_justification": "No timed primary. Finite counted costs alone decide this continuation. Retain existing isolated placement and raw timers; wall_valid false for all exported continuation rows. Source boundary mismatch, method-specific phase differences and short control calls remain unresolved timing blockers."
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab",
+    "placement": {
+      "instance_type": "c8a.2xlarge",
+      "spot": true,
+      "threads": 1,
+      "memory_limit_bytes": 8589934592,
+      "isolation": "dedicated L2; pin physical core and exclude its SMT sibling",
+      "admission_status": "Exact uppergate v2request and conditional R900 operational source review bound. Scientific source consumers reviewed; root commits/finalizes frozen protocol before submission and reconciles prior owners. No launch performed by draft.",
+      "recovery_contract": "Preserve existing CRIU+EBS computation contract,300-second checkpoint request,max_restores1; every computation and fresh epoch consumes the same new budget. Restored clocks invalid; no clock qualification even for uninterrupted rows in this continuation.",
+      "checkpoint_grace_note": "Checkpoint interval300s; no request field sets120s checkpoint grace. Conditional operational guard reserve900s covers four185s kube calls+60s fresh termination grace with100s ordinary local/control slack; not a universal host-failure bound.",
+      "epoch": "Actual controller computation and fresh epochs retained separately; no duplicate target counting or clock qualification."
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "One exact workload, three arms, five measured streams and one warmup:18base executions,15measured,3warmups,5candidate-reference pairs. All15 measured source/count observations independently replay. Replay is charged separately and never counted as extra coverage."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "Shared continuation budget10800activeworker seconds and absolute expiry2026-10-30T05:05:50Z; stop at earlier. One active payload;25million coefficients,8GiB,3600seconds per execution capped by remaining budget/guard. All computation/fresh/control/warmup/replay/retry/recovery costs count; no first-gate reset/refund. Infrastructure retry at most2 attempts,computation restore at most1, only remaining allowance."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Any wrong answer, geometric violation, scientific cap/exhaustion, missing/incomplete gate, unsupported counted category or failed independent non-wall replay blocks later cohort admission. Preserve outcomes; no automatic scientific retry or seed/method replacement."
+    },
+    {
+      "kind": "preregistered_sequential",
+      "preregistered": true,
+      "rule": "This gate alone authorizes no remaining-cohort launch. After complete mathematical/count replay and independent review, a separately frozen prospective full1260 disjoint contract may admit remaining1200, within the same unchanged remaining resource allowance. Clock failure remains outside finite admission and leaves original timing objective incomplete."
+    }
+  ],
+  "invalidation_rules": [
+    "Any missing/duplicate/mismatched plan row, workload, seed, method, arm, round or artifact identity blocks affected pairing.",
+    "Unverified, exhausted, capped, wrong-answer or absent records retain status and null ratios, not substituted values.",
+    "Clock below L2, restored/interrupted execution, nonpositive timer, isolation blockers or unmatched instrumentation blocks timed admission.",
+    "Cold and online admission independent: exactly5 eligible A/A pairs each, identical resolved rho methods, every rho_AA/rho within inclusive[0.90,1.10] by integer cross-products. A missing round or one failure invalidates that metric for the workload.",
+    "Online additionally requires exact phase sum and explicit error:null; absence is unknown.",
+    "Do not pool only successful workloads as if the complete1-target upper gate. Report every exclusion and the fixed denominator.",
+    "Known prior p739 data cannot be labelled prospective or filed before its observations.",
+    "Wrong enrollment, cross-plan overlap, rewritten session/record/sequence identity or changed scientific slot invalidates reuse.",
+    "No qualified clocks in this continuation; the original timing requirement remains incomplete."
+  ],
+  "decision_rule": {
+    "text": "Neutral finite-count reporting only after exact enrollment, per-plan protocol lineage, source/binary/mapping coverage and mathematical/non-wall replay admission. Report all36 exact ratios of complete matched sums, algorithm-only and calibration-inclusive, with separate calibration costs. Do not admit old or new clock ratios. No significance, superiority or general mathematical theorem verdict. Failure and missing rows remain visible; any unadmitted pair nulls the complete affected scope.",
+    "comparison_ids": [
+      "C-method"
+    ],
+    "threshold": "Exact known-answer equality, full declared finite-category coverage and exact integer source/non-wall replay; no numeric cost threshold selects admission. Historical [0.90,1.10] clock A/A rule remains a future timing requirement and is not applied to relax counted admission.",
+    "statistic": "All36 exact ratios of complete matched price sums across5measured pairs, each stream one pair. Complete denominator required. Separate algorithm-only, calibration-only and combined prices; no superiority test or qualified clock ratio.",
+    "interval": "Observed five-stream range only; tolerance is operational, not CI.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact dimensionless candidate/rho finite-model price ratio; no qualified clock effect size.",
+    "verdict_vocabulary": [
+      "qualified_observation",
+      "incomplete",
+      "capped",
+      "invalid_measurement",
+      "unknown"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/pencil_large_prime_20261029/native_price/src/bin/analyze_cohort.rs",
+      "sha256": "3fdeed22637da8b6d1864590a8ba2a26665fc503d3acfb6d78aa436483f44623"
+    },
+    "inputs": [
+      "Exact gate-p186379-target0.json and pinned prepared plan",
+      "New immutable18-row session and explicit attempts/restore history",
+      "Frozen upper-gate protocol and same source/binary/image identities",
+      "Independent finite-category coverage binding and all15 measured source/count replay",
+      "Actual shared continuation resource/guard/attempt observations",
+      "Pinned reviewed native upper-gate analyzer and canonical exporter"
+    ],
+    "outputs": [
+      "18planned-row flow including missing/capped/invalid outcomes",
+      "Five measured paired observations and all36 finite cells with exact fractions or null",
+      "Independent replay of all15 measured source/count observations",
+      "experiment.export/v1 with wall_valid:false and independent experiment.review/v1",
+      "Neutral PDF/SVG/JSON/CSV and separately recorded resources",
+      "Gate admission status; no full1260 completion claim"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "18slot gate outcome/verification matrix",
+      "36finite-model cells with exact five-pair denominator or explicit null",
+      "Raw unqualified clocks and separately charged replay/attempt/resource observations"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Submitting before the frozen protocol is committed, or treating schema validity as empirical qualification.",
+    "Replacing unresolved identity with a guessed commit/image or reusing historical timing as current data.",
+    "Changing frozen cohort, cap, small_denominator8, seeds, order, threshold or analysis after observations without dated amendment.",
+    "Presenting incomplete counts as full cost ratios; suppressing losses, failed AA, caps or missing workload outcomes.",
+    "Treating five new algorithm streams as identical-seed timing repeats, or [0.90,1.10] as a CI.",
+    "Re-running capped scientific outcomes under infrastructure retry authority.",
+    "Claiming CRIU recovery or L2 from successful pod status alone."
+  ],
+  "literature": [
+    {
+      "ref": "research/pencil_large_prime_20261029/README.md",
+      "provenance": "internal",
+      "claim": "Signed symbolic graph and residual constraint retention; tests do not constitute full formal implementation proof.",
+      "verified_by": "Protocol drafting lane read source study artifacts2026-10-29"
+    },
+    {
+      "ref": "research/pencil_markowitz_20261022/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "Preserve prior small then upper gate,25m coefficient/8GiB/3600s boundary and no extension on capped upper outcome.",
+      "verified_by": "Parent-supplied frozen gate contract; original artifact inventoried earlier"
+    },
+    {
+      "ref": "https://cacr.uwaterloo.ca/techreports/2004/corr2004-29.pdf",
+      "provenance": "internal",
+      "claim": "Prior study cites double-large-prime forest method; no genus2 pencil complexity theorem imported.",
+      "verified_by": "Previously retrieved by source study; no new literature retrieval in draft lane"
+    },
+    {
+      "ref": "research/pencil_large_prime_20261029/validation/accounting/COST_BOUNDARY.md",
+      "provenance": "internal",
+      "claim": "Finite semantic algorithm price with separate measured resources; original36cell grid, disjoint observations and calibration scope.",
+      "verified_by": "Read source boundary, primitive registry, analyzer and aggregate mappings at543a54b4b; this is not a completed independent coverage review."
+    }
+  ],
+  "amendments": [
+    {
+      "id": "A-prospective-upper-gate-20261030",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "Prospective gate protocol affects only new p186379 target0 observations. Prior p739 observations are known design context, remain under their original protocol and are not enrolled or requalified here.",
+      "changes": [
+        "Use the exact existing p186379target0 spec/plan,18base rows/15measured/3warmups/5pairs.",
+        "Retain original36-cell finite counted model and unchanged scientific instrument.",
+        "Gate and replay share continuation10800activeworker-second cap and05:05:50Z expiry with any later cohort; no budget reset.",
+        "All clocks diagnostic; old timing requirement remains incomplete.",
+        "Require independent gate review before any later cohort execution; failure stops extension."
+      ],
+      "supersedes_fields": [
+        "question",
+        "sample_size.instances",
+        "stopping_rules",
+        "extensions.analysis_scope"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "009499bc14e0ff3355a2373e621f73f0d5f1755b1cafb4f9d7e3e07d9cc2d091",
+    "commit": "848f495fa7031f0d0b5ac0d811ec07aa29fed9e7",
+    "frozen_at": "2026-10-30T02:34:36Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "draft_only": false,
+    "analysis_scope": {
+      "kind": "gate-p186379-target0/v1",
+      "expected_workloads": 1,
+      "expected_executions": 18,
+      "expected_measured_pairs": 5,
+      "prepared_plan_sha256": "481d795e6208cfb3ca648c463de2d7b232adfb7d28bebc341afa4f58e119dfcf",
+      "charged_separately_from_full_cohort": true
+    },
+    "finite_cost_model": {
+      "policy": "pencil-algorithm-cost/atomic-scalar-disjoint-v1",
+      "mapping_sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+      "square_per_multiply": [
+        0,
+        0.5,
+        1
+      ],
+      "inversion_per_multiply": [
+        1,
+        10,
+        100,
+        1000
+      ],
+      "native_GAE_per_event": [
+        0,
+        0.1,
+        1
+      ],
+      "cells": 36,
+      "independent_coverage_review": null,
+      "qualified_ratios_available": false,
+      "analyzer_binaries_sha256": {
+        "analyze_pair": "a239de86526e9c37de451e8cc0218c5a2a09bf260d9f4606312f3726361b32d1",
+        "analyze_cohort": "e086ebeb7f261983af647284307a768e522b1f5921eabfb0146706f7eede360d"
+      }
+    },
+    "instrument_build": {
+      "source_commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+      "workflow_commit": "7d7f5495c5b85ae426efdbcb721b6faf72c1be14",
+      "workflow_run": 40938439022,
+      "status": "completed_verified_binary_and_plan_parity_image_bound",
+      "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+      "image_digest": "sha256:e82333a5e77a03270335589848783e1d0cf55e42c7c2f5f35732ee8ba54523fd",
+      "artifact_id": 12926168934,
+      "receipt": "../../validation/instrument_build_40938439022/receipt.json",
+      "receipt_sha256": "59fd9e0e1f4573d9492bcca710b5351cd0175f788b197a7c82939e177ab1a1a1",
+      "note": "Static ecbench and exact archive/plan parity verified; runtime image and controller receipts bound. This is preparation evidence, not executed empirical qualification.",
+      "binary_path": "/home/ec2-user/pencil-build-40938439022/ecbench",
+      "binary_bytes": 76970952,
+      "build_info": {
+        "source_repository": "https://github.com/aburan28/crypto",
+        "source_revision": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+        "ecbench_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+        "built_at": "2026-10-29T19:31:18Z",
+        "architecture": "linux/amd64",
+        "target": "x86_64-unknown-linux-musl",
+        "default_features": false,
+        "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1",
+        "rustflags": "-C target-cpu=x86-64"
+      },
+      "evidence_sha256": {
+        "build-info.json": "17b5602dd978e0484677b4b9e27b8323ceb60b01ae5bbdcf9728e578d0d352c5",
+        "archive-parity.json": "a78b31214c136f82d5dc4ed6454b59df7abea471a7d1d5d8d970f763a70016d3",
+        "prepared-plan-parity.json": "06bce13aa3c5ed866238173ed5edd64365a92f589371df2b17b7653af6f877d6",
+        "elf-headers.txt": "611d9351cc4b69fd0bb2758b5b16a23cbeb0432ab9ba66c0eeadf30ef2199c2a"
+      },
+      "archive_targets_matched": 1260,
+      "prepared_plans_exactly_equal": 9,
+      "solver_executions_performed": 0
+    },
+    "baseline_scope": "rho/rho_AA use identical pinned DefaultHasher instrumentation. Historical RandomState and earlier peeling/Markowitz results are context only. No new fourth baseline arm or experimental work is authorized here.",
+    "computation_epoch": {
+      "contract": "isolab.eks.resumable/v1",
+      "checkpoint": {
+        "policy": "criu",
+        "interval_seconds": 300,
+        "grace_seconds": 120,
+        "restore_validation": "criu_selfcheck",
+        "after_restore": {
+          "wall_time": "invalid",
+          "counted_units": "valid"
+        }
+      },
+      "max_restores": 1,
+      "clock_valid": false,
+      "purpose": "Durable computation and independent replay; never contributes to primary or secondary timed comparison, even without restore. Native controller starts distinct fresh benchmark epoch described by execution."
+    },
+    "whole_run_resource_accounting": "Retain every computation, warmup, gate, benchmark, control, replay, checkpoint, restore and infrastructure attempt and its resource/time cost in export flow. Separate algorithm method-call metric from whole study cost; no erasure of computation/control or first-gate costs. Never sum overlapping child/process/phase clocks.",
+    "resource_authorization": {
+      "path": "resource_authorization_20261030.json",
+      "sha256": "fef73c695ec6b3783268db8d52ad1f00b0bd1b612d8aed412ca44854e705ccb1"
+    },
+    "continuation_envelope": {
+      "cumulative_active_worker_seconds": 10800,
+      "absolute_deadline_utc": "2026-10-30T05:05:50Z",
+      "max_active_payloads": 1,
+      "coefficients_per_execution": 25000000,
+      "memory_bytes": 8589934592,
+      "seconds_per_execution": 3600,
+      "first_gate_budget_reset": false,
+      "guard_and_admission_receipt": null,
+      "operational_guard": {
+        "status": "accepted_conditional_resource_guard_only",
+        "outer_deadline_utc": "2026-10-30T05:05:50Z",
+        "internal_deadline_utc": "2026-10-30T03:28:20Z",
+        "preparation_lower_bound_utc": "2026-10-30T02:05:50Z",
+        "reserve_seconds": 900,
+        "required_inequality": "2*G-C0+R<=D",
+        "basis": "Existing controller request deadline alone does not strictly enforce outer expiry: relative Pod deadlines, scheduling delay and synchronous replay/CRIU need conservative earlier internal guard or reviewed equivalent. Bind actual reviewed requests and retain incomplete denominator if earlier guard truncates work.",
+        "budget_proof": "One active payload plus a proven absolute expiry within the authorized three-hour window can bound additive active seconds only if computation/fresh/replay transitions do not overlap. Reconcile actual owners and retain all attempts; no assumed non-overlap.",
+        "guard": {
+          "path": "/home/ec2-user/pencil-continuation-20261030/operational-guard-v2.json",
+          "sha256": "fe0b90ac62db652ee4469cff469e84e11d1569a083d7ffbb31ff4e62546a41f0"
+        },
+        "independent_review": {
+          "path": "operational-source-review-v2.json",
+          "sha256": "2631f7d60b0b79e311f748eeeb940dd9e0b41007d71d003f66811a2580ab8b92"
+        },
+        "conditions": "Normal Kubernetes/OS execution, four185-second network calls+60s grace and100s local/control slack; cross-request terminal reconciliation. No universal failure theorem."
+      }
+    },
+    "known_data": {
+      "gate_protocol_canonical_sha256": "cf8f76eadc42ff487644ea13b3392af1fd31c94e4629eecd6ad7b9a18820badb",
+      "raw_records_sha256": "9ccc07c9b55b9180af36c3b910891803dde7f4249742881a7322f748bfdb73f7",
+      "observations_known_at_design": true,
+      "first_gate_clock_status": "rejected_retained",
+      "old_finite_observations_not_new_data": true,
+      "reuse_admission": "not applicable: known p739 data are context only and not enrolled in uppergate"
+    },
+    "upper_gate": {
+      "spec": "../../prepared_specs/gate-p186379-target0.json",
+      "spec_sha256": "d4ec180d5a2cf65617a5821b565ec0d4952435a77669da65ca77852d2723c32c",
+      "workloads": 1,
+      "base_executions": 18,
+      "measured": 15,
+      "warmups": 3,
+      "pairs": 5,
+      "enrolled_in_cohort": false,
+      "shares_continuation_budget": true,
+      "requires_independent_nonwall_replay": true,
+      "consumer_route": "gate-p186379-target0/v1",
+      "execution_request": {
+        "path": "/home/ec2-user/pencil-continuation-20261030/upper-gate-request-v2.json",
+        "sha256": "19929f222a46d13f02fa50738e31ef7c86e3a0854c4f2041a58f9f6c05c46e28"
+      }
+    },
+    "timing_status": {
+      "original_requirement": "unfulfilled",
+      "this_continuation_clock_qualification": false,
+      "export_wall_valid": false,
+      "unchanged_threshold_ns": 1000000,
+      "blockers": [
+        "Grading uses solve_wall_ns while old cold definition selected method_call_wall_ns",
+        "Actual method_call endpoint includes instrumentation close and methods::complete",
+        "Every prior rho/rho_AA solve and broader method-call interval is under1ms",
+        "Generic rho phase schema differs from five candidate target phases"
+      ],
+      "prospective_repair": "Requires separate source/metric/phase design and fixed repeated-call block only if independently approved. No adaptive repetition, padding, lower threshold, or claim that blocks are individual-call latency."
+    },
+    "pending_bindings": [
+      "Commit frozen protocol before affected data",
+      "External coverage review bound to exact frozen canonical body",
+      "Final live owner reconciliation and resource admission before submission"
+    ],
+    "evidence_bindings": {
+      "path": "evidence-bindings.json",
+      "sha256": "45eec35b572cea9733c17bd2fe6f75db4b4b54318ff1cea2c3216d89f4a1314e"
+    },
+    "scientific_admission": false,
+    "launch_authorized": false,
+    "completion": {
+      "finite_gate": "pending18rows and15measured independent replays",
+      "full_cohort": "not decided by this gate",
+      "timing": "pending separate admitted design and measurements",
+      "overall": "incomplete"
+    },
+    "parent_research_scope": {
+      "targets": 1260,
+      "finite_continuation_draft": "protocol.json",
+      "later_cohort_execution_authorized": false,
+      "upper_gate_rows_reused_in_cohort": false
+    },
+    "analysis_support_sha256": {
+      "native_price/Cargo.lock": "d7d2479f3a9c691991bb13c7d8398602df198a94b3b73ef136c901d1285e1957",
+      "native_price/Cargo.toml": "85dbb703cd29656e9916ae7aaa299790f1967ba8d4b931e1c6b19f031374b077",
+      "native_price/src/aggregate.rs": "8240aa54f6fa37eead6c63180e9dbf4b28752a7ba8df1433a337568a005b4b62",
+      "native_price/src/analyzer.rs": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+      "native_price/src/bin/analyze_cohort.rs": "3fdeed22637da8b6d1864590a8ba2a26665fc503d3acfb6d78aa436483f44623",
+      "native_price/src/bin/analyze_pair.rs": "1ff553390e3584017edde1d27e15f1b6d3a6f1a2ec9d196899582530d964bac1",
+      "native_price/src/disjoint.rs": "04a8a0b9acb9c70c4c01a4e8f00a947cb234c62a700b1185ccf96f4336575e89",
+      "native_price/src/importer.rs": "db05f1bda12bfbdeaff4806f3d3ac968e165c05d06b28e8dd73bb9868963633d",
+      "native_price/src/lib.rs": "8709765fa9f15e9c6b441a3fc2c6da1e49f86b52ec8178fd27376ab75b16842e",
+      "paired_export/Cargo.lock": "310199aab018093643475dac1a38e5e1ddf88d261c560c82c006ae06eb08676f",
+      "paired_export/Cargo.toml": "0a198bb240dee5fe2900d3e6323951e75a246459161c16046a6ed857c464e67f",
+      "paired_export/src/lib.rs": "d8ef61a5db60874e3c9de2539c0f1201d75a2589c410687d3509b147b06288fe",
+      "paired_export/src/main.rs": "638a3fc180f24ae7e2494d28cb4544f2e70564b16a3e65d38b33ca51f05560e6",
+      "paired_export/src/plan.rs": "fb8f3dd4fbcc42119d2f3f435b32eadaf6a7beb3fd7f2abcc13c67dd8fba2720"
+    },
+    "analysis_build": {
+      "status": "committed_source_and_binary_verified_analysis_only",
+      "source_commit": "848f495fa7031f0d0b5ac0d811ec07aa29fed9e7",
+      "receipt": "../../native_price/validation/disjoint-analysis-software-20261030/postcommit-analysis-build-receipt.json",
+      "receipt_sha256": "e298afa19500793dbcc6339f210efc67f3724f5b0e7917fefa375f71353eaf21",
+      "binaries": {
+        "analyze_pair": {
+          "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_price/target/release/analyze_pair",
+          "sha256": "a239de86526e9c37de451e8cc0218c5a2a09bf260d9f4606312f3726361b32d1"
+        },
+        "analyze_cohort": {
+          "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_price/target/release/analyze_cohort",
+          "sha256": "e086ebeb7f261983af647284307a768e522b1f5921eabfb0146706f7eede360d"
+        }
+      },
+      "experiment_executions": 0
+    },
+    "canonical_packaging": {
+      "status": "source_reviewed_native_packaging_not_scientific_qualification",
+      "language": "Rust",
+      "adapter": "research/pencil_large_prime_20261029/native_canonical_export",
+      "adapter_sha256": "73f834a1bd97a5b4bb8209dc99f16289ab651508bdd0943c5d97dd32104277cd",
+      "binary_sha256": "8ab4f52027cfac920fe05224a9cb7d1193eaf3b1bd7fbd4deb81f9c98901dbd2",
+      "canonical_tool": "research/pencil_large_prime_20261029/native_canonical_export/tools/experiment_protocol.reference.txt",
+      "canonical_tool_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+      "canonical_reference_execution": false,
+      "export_schema": "research/pencil_large_prime_20261029/native_canonical_export/schemas/experiment-export.v1.json",
+      "receipt": "../../native_canonical_export/validation/disjoint-enrollment/receipt.json",
+      "receipt_sha256": "41ae6742beef9c42bf0fea8a5209383ece952b52e9e3a98bc58803f2769b63af",
+      "explicit_execution_history_required": true,
+      "wall_valid": false,
+      "experiment_executions": 0
+    },
+    "finite_category_applicability_review": {
+      "path": "finite-category-applicability-review.json",
+      "sha256": "49eea655a79aa9e055e3ea547d920a669010a5d2616d22a2e292e18e9cda6020"
+    },
+    "scoped_prepared_validation": {
+      "path": "upper-gate-prepared-receipt.json",
+      "sha256": "a02f83518a76caa290aa78dbe4fba1aa4728eb85d97b519c46610f514b740d17"
+    },
+    "scientific_design_review": {
+      "status": "reviewed_finite_count_gate_only",
+      "reviewer": "/root/four_lead_state",
+      "timing_requirement": "unfulfilled_separate_track",
+      "no_experiment_launched": true
+    }
+  }
+}

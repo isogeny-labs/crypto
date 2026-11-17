@@ -1,0 +1,8 @@
+digraph Transport {
+ graph [rankdir=LR,bgcolor="transparent",nodesep=.35,ranksep=.25];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4ff",fontname="Helvetica",fontsize=11];
+ a [label="Actual absolute factors\nk=max(0,p-w)\nright degree <= p"];
+ b [label="Derived integral coefficients\nodd denominator + finite formula\nconstructed mod 2^p map"];
+ c [label="Exact crossing factorization\narbitrary characteristic 2^p ring\nany evaluation element"];
+ a -> b; b -> c;
+}

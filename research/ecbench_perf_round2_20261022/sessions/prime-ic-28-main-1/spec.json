@@ -1,0 +1,55 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "round 2 2026-10-22: prime index calculus, old vs new binary",
+ "description": "Old vs new binary, same spec: counted outcomes must be identical; wall time compared. Not a cross-method claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 28,
+    "seed": 59297
+   }
+  ],
+  "targets_per_curve": 2,
+  "target_seed": 20261002
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "ic-mitm",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=512",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "ic-batch",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=512",
+     "oracle": "mitm-prime-batch:m=2"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 1,
+  "isolation_required": "L2",
+  "timeout_seconds": 300
+ }
+}

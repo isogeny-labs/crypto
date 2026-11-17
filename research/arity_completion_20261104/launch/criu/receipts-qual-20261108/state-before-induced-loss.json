@@ -1,0 +1,73 @@
+{
+  "schema": "isolab.eks.recovery-state/v1",
+  "request": {
+    "schema": "isolab.eks.resumable/v1",
+    "run_name": "arity-criu-qual-20261108",
+    "deadline_unix_seconds": 1794137441,
+    "build": {
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:fd4a039bd778b7a7796e59a1b3918a54327d35b5e813722c11733b074ea2480b",
+      "source_revision": "4fa25efc0e2392b2e02e4c84253059ebc7c67e02",
+      "ecbench_sha256": "e3632febbc2bf340a0f86f01b03543c8e34466b84b249f3d3d015c245483f90b"
+    },
+    "runtime_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:fd4a039bd778b7a7796e59a1b3918a54327d35b5e813722c11733b074ea2480b",
+    "instance_type": "c8a.2xlarge",
+    "checkpoint_interval_seconds": 120,
+    "max_restores": 10,
+    "memory": "8Gi",
+    "command": {
+      "argv": [
+        "/opt/study/launch/job-criu-qual.sh"
+      ],
+      "outputs": "/work/compute/out",
+      "threads": 2,
+      "binaries": {
+        "/opt/study/launch/job-lib.sh": "f03e57cfb02ca045daaf514896f2204992fbbded02dbc986292504371e6650af",
+        "/opt/study/resume/prime/cells/ctl-m3-n15-kummer.jsonl": "dc26d5e5836525090ca20c764686b6cbd8d47574523cc8c943462deeb7cb0b9e",
+        "/usr/local/bin/pkm_tower_pilot": "5b6d8c9c91f36f471e16251db5aa41de836805cf1a9553355622cc7adac78a0b"
+      },
+      "pvc_gib": 16
+    }
+  },
+  "request_sha256": "e45cf2fde5d217750faec543a7fb72c34aef1f369a8ec553c71ba154e07de7b8",
+  "owner_build": "isolab-recovery-controller:7e66066d-b03d-4aaf-847f-1808a1798d3b",
+  "phase": "running",
+  "attempt": 0,
+  "restores": 0,
+  "next_generation": 2,
+  "checkpoint_generation": null,
+  "current_pod_uid": "8f0260dc-d30f-4114-bdd7-93f88c868d9b",
+  "current_instance": "i-037cca11b696d6f76",
+  "original_node_runtime": {
+    "architecture": "amd64",
+    "containerRuntimeVersion": "containerd://2.3.5+unknown",
+    "kernelVersion": "6.18.54-121.166.amzn2023.x86_64",
+    "osImage": "Amazon Linux 2023.12.20261012"
+  },
+  "terminated_instances": [],
+  "generations": [
+    {
+      "number": 1,
+      "request_sha256": "e45cf2fde5d217750faec543a7fb72c34aef1f369a8ec553c71ba154e07de7b8",
+      "snapshot_name": "arity-criu-qual-20261108-g1",
+      "snapshot_id": "snap-021337dec55394824",
+      "archive_key": "recovery/runs/arity-criu-qual-20261108/generations/g1/checkpoint.tar",
+      "archive_version": "4acVyZVKiAQ6Bft50IMOJVkg2aV2YhbF",
+      "archive_sha256": "3c189982e284b1dbfcb910a0dd753948fbc48dd058dfd05e8016de49d0f81a24",
+      "manifest_sha256": "0d8a8182355b50bc8f2f57f321e04d400baa0544cac3b2747e2e6e7481be82a6",
+      "archive_bytes": 1152716800,
+      "source_instance": "i-037cca11b696d6f76",
+      "source_pod_uid": "8f0260dc-d30f-4114-bdd7-93f88c868d9b",
+      "committed_unix_seconds": 1794116690,
+      "snapshot_ready": true,
+      "encrypted": true,
+      "readback_verified": true
+    }
+  ],
+  "last_checkpoint_at": 1794116690,
+  "selected_generation": null,
+  "failure": null,
+  "benchmark_job": null,
+  "benchmark_uid": null,
+  "benchmark_manifest": null,
+  "benchmark_create_attempted": false
+}

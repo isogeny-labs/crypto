@@ -1,0 +1,120 @@
+name: Iso Lab source checkpoint
+on:
+  workflow_dispatch:
+    inputs:
+      source_revision:
+        description: Full immutable source SHA; data is archived, never executed here
+        required: true
+        type: string
+      spec_path:
+        description: Frozen ECBench spec JSON at the source revision
+        required: true
+        type: string
+      protocol_path:
+        description: Frozen experiment protocol JSON at the source revision
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  checkpoint:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Validate immutable source and input paths
+        env:
+          SOURCE_REVISION: ${{ inputs.source_revision }}
+          SPEC_PATH: ${{ inputs.spec_path }}
+          PROTOCOL_PATH: ${{ inputs.protocol_path }}
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_REVISION" =~ ^[a-f0-9]{40}$ ]]
+          for relative in "$SPEC_PATH" "$PROTOCOL_PATH"; do
+            [[ "$relative" =~ ^[a-zA-Z0-9_./-]+\.json$ && "$relative" != /* && "/$relative/" != *'/../'* ]]
+          done
+      - name: Check out trusted workflow tooling
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          path: control
+          persist-credentials: false
+          sparse-checkout: |
+            scripts
+            taskq/deploy/eks-karpenter
+      - name: Check out the immutable source as data
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ inputs.source_revision }}
+          path: source
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /Cargo.toml
+            /Cargo.lock
+            /src/
+            /crates/
+            /isogeny_algos/
+            /scripts/
+            /tools/artifacts/
+            /tools/factor-base/
+            /tools/volcano-cli/
+            /taskq/deploy/eks-karpenter/
+            /.github/workflows/
+            /.artifacts/
+            /docs/curves/registry.json
+            /docs/curves/standards/parameters.json
+            /docs/ic/boundary_targets.json
+            /docs/ic/calibration.json
+            /research/pencil_large_prime_20261029/
+            /research/five_leads_e2e_20261019/native/
+            /${{ inputs.spec_path }}
+            /${{ inputs.protocol_path }}
+      - name: Mark the revision fetched by checkout as published
+        env:
+          SOURCE_REVISION: ${{ inputs.source_revision }}
+        run: |
+          set -euo pipefail
+          test "$(git -C source rev-parse HEAD)" = "$SOURCE_REVISION"
+          # A detached shallow checkout has no remote-tracking branch. The
+          # trusted checkout just fetched this exact public revision; record
+          # that provenance so checkpoint.sh need not bundle absent history.
+          git -C source update-ref refs/remotes/origin/checkpoint-source "$SOURCE_REVISION"
+      - name: Obtain existing temporary uploader identity
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708
+        with:
+          role-to-assume: ${{ vars.ISOLAB_TRIGGER_ROLE_ARN }}
+          role-session-name: checkpoint-${{ github.run_id }}
+          aws-region: us-east-2
+      - name: Upload checkpoint and verify readback
+        env:
+          SOURCE_REVISION: ${{ inputs.source_revision }}
+          SPEC_PATH: ${{ inputs.spec_path }}
+          PROTOCOL_PATH: ${{ inputs.protocol_path }}
+          AWS_REGION: us-east-2
+        run: |
+          set -euo pipefail
+          if ! command -v aws >/dev/null; then
+            curl --fail --silent --show-error --location https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o "$RUNNER_TEMP/aws.zip"
+            unzip -q "$RUNNER_TEMP/aws.zip" -d "$RUNNER_TEMP/aws-install"
+            sudo "$RUNNER_TEMP/aws-install/aws/install"
+          fi
+          bash control/taskq/deploy/eks-karpenter/checkpoint-source \
+            "$GITHUB_WORKSPACE/source" "$SOURCE_REVISION" "$SPEC_PATH" "$PROTOCOL_PATH" "$RUNNER_TEMP/source-checkpoint"
+      - name: Retain non-secret checkpoint receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: source-checkpoint-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/source-checkpoint/checkpoint.json
+            ${{ runner.temp }}/source-checkpoint/caller-account-check.txt
+            ${{ runner.temp }}/source-checkpoint/upload.txt
+            ${{ runner.temp }}/source-checkpoint/gate.txt
+            ${{ runner.temp }}/source-checkpoint/payload.sha256
+            ${{ runner.temp }}/source-checkpoint/source-check.txt
+            ${{ runner.temp }}/source-checkpoint/payload-readback.txt
+          if-no-files-found: warn

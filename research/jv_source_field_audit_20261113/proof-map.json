@@ -1,0 +1,58 @@
+{
+  "namespace": "JVSourceFieldAudit",
+  "project": "research/jv_source_field_audit_20261113/lean",
+  "proofs": [
+    {
+      "claim": "actual irreducible cubic and extension cardinality",
+      "declarations": [
+        "modulus_irreducible",
+        "field_cardinality"
+      ],
+      "file": "SourceField.lean"
+    },
+    {
+      "claim": "actual basis coordinates and uniqueness",
+      "declarations": [
+        "coordinate_representation",
+        "representation_zero_iff"
+      ],
+      "file": "SourceField.lean"
+    },
+    {
+      "claim": "actual nonsingular curve and nonzero target outside base x",
+      "declarations": [
+        "curve_nonsingular",
+        "target_nonzero",
+        "target_x_not_base"
+      ],
+      "file": "ActualCurve.lean"
+    },
+    {
+      "claim": "literal source S3 and actual coordinate descent",
+      "declarations": [
+        "source_coefficient_identities",
+        "source_polynomial_identity",
+        "coefficient_decomposition",
+        "actual_descent"
+      ],
+      "file": "SourceDescent.lean"
+    },
+    {
+      "claim": "no base-field S3 zero",
+      "declarations": [
+        "source_S3_has_no_base_solution"
+      ],
+      "file": "SourceDescent.lean"
+    },
+    {
+      "claim": "actual signed group decomposition obstruction",
+      "declarations": [
+        "actual_target_not_decomposable",
+        "literal_jv_source_field_certificate"
+      ],
+      "file": "ActualDecomposition.lean"
+    }
+  ],
+  "status": "whole-project gate PASS59/0/0; independently signed standing not established",
+  "hypotheses": "Literal source field/parameters; InFactorBase includes both signs of actual affine points with embedded base-field x. No source prime-order assumption or generic regularity hypothesis."
+}

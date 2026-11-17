@@ -1,0 +1,74 @@
+name: ECC2K-130 PDP difficulty outcome replay
+
+on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
+    paths:
+      - "research/notes/ecc2k130/pdp_difficulty_features_20261001/**"
+      - ".github/workflows/ecc2k130-pdp-difficulty-outcome.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  replay:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-pdp-difficulty-outcome.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-pdp-difficulty-outcome.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/pdp_difficulty_features_20261001
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Independently replay frozen source, inputs and every public-point observation
+        run: |
+          python3 -B research/notes/ecc2k130/pdp_difficulty_features_20261001/verify.py \
+            --evidence research/notes/ecc2k130/pdp_difficulty_features_20261001/evidence_run_20261001_source3a8c4699 \
+            --out /tmp/ecc2k130-pdp-difficulty-replay.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('research/notes/ecc2k130/pdp_difficulty_features_20261001/evidence_run_20261001_source3a8c4699')
+          expected = json.loads((root / 'VERIFY.json').read_bytes())
+          replay = json.loads(Path('/tmp/ecc2k130-pdp-difficulty-replay.json').read_bytes())
+          for key in ('status', 'decision', 'evidence_result_sha256', 'config_sha256',
+                      'manifest_sha256', 'verified_training_rows', 'verified_evaluation_rows',
+                      'checker_sha256'):
+              assert replay[key] == expected[key], key
+          PY
+      # Moved here from ecc2k130-pdp-difficulty-protocol.yml. SOURCE_LOCK.json and
+      # SOURCE_CHECK.json pin that workflow's exact bytes, so it must stay as it was
+      # sealed; editing it makes verify.py and source_preflight.py fail.
+      - name: Recompute the scored diagnostic without importing the producer
+        # Independent of the replay above: a failing verify.py must not hide the
+        # score check in the same run (they were separate jobs before the move).
+        if: ${{ !cancelled() }}
+        run: |
+          python3 research/notes/ecc2k130/pdp_difficulty_features_20261001/check_score.py \
+            --choice research/notes/ecc2k130/pdp_difficulty_features_20261001/TRAIN_CHOICE.json \
+            --outcome research/notes/ecc2k130/pdp_difficulty_features_20261001/OUTCOME.json

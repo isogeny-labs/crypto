@@ -1,0 +1,43 @@
+warning: fields `output`, `max_records`, `max_bytes`, and `started` are never read
+   --> /home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/src/relation_stream.rs:156:5
+    |
+155 | pub struct Trace<'a> {
+    |            ----- fields in this struct
+156 |     output: &'a mut dyn Write,
+    |     ^^^^^^
+157 |     identity: Identity,
+158 |     max_records: u64,
+    |     ^^^^^^^^^^^
+159 |     max_bytes: usize,
+    |     ^^^^^^^^^
+...
+162 |     started: bool,
+    |     ^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `emit` and `write_event` are never used
+   --> /home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/src/relation_stream.rs:211:19
+    |
+166 | impl<'a> Trace<'a> {
+    | ------------------ methods in this implementation
+...
+211 |     pub(crate) fn emit(&mut self, event: Event) -> Result<(), Error> {
+    |                   ^^^^
+...
+221 |     fn write_event(&mut self, event: Event) -> Result<(), Error> {
+    |        ^^^^^^^^^^^
+
+warning: struct `Buffer` is never constructed
+   --> /home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/src/relation_stream.rs:268:8
+    |
+268 | struct Buffer {
+    |        ^^^^^^
+
+warning: `pencil-symbolic-graph` (lib) generated 3 warnings
+   Compiling pencil-target-stream-offline v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/target-stream)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.80s
+     Running unittests src/lib.rs (/var/tmp/pencil-target-stream-offline-20261102/target/debug/deps/pencil_target_stream_offline-58d6b1edf0df630d)
+     Running unittests src/main.rs (/var/tmp/pencil-target-stream-offline-20261102/target/debug/deps/pencil_target_stream_offline-7319fc0a204389cb)
+     Running tests/cli.rs (/var/tmp/pencil-target-stream-offline-20261102/target/debug/deps/cli-7e2880cad6bf8488)
+   Doc-tests pencil_target_stream_offline

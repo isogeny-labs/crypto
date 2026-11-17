@@ -1,0 +1,24 @@
+{
+  "schema": "rho-worker-latest-repair-validation-v1",
+  "date_utc": "2026-10-18",
+  "rho_branch_commit": "e8b73328df39deb9bb807db5aeb85f3359940827",
+  "temporary_repair_commit": "b11d1948a9af825f9306214b150b2d67904c6205",
+  "command": "CARGO_TARGET_DIR=/Volumes/SSD990/llm/tmp/rho-worker-profile-20261017/target cargo test --offline --release --lib cryptanalysis::pollard_collab -- --nocapture",
+  "sandbox_first_attempt": {
+    "compiled": true,
+    "passed": 35,
+    "failed": 9,
+    "failure_category": "loopback_socket_permission_denied"
+  },
+  "loopback_enabled_retry": {
+    "status": "pass",
+    "passed": 44,
+    "failed": 0,
+    "ignored": 0,
+    "filtered_out": 4453,
+    "log": "rebased-latest-rho-44.log",
+    "log_sha256": "3b1f9faf117a23a886a9a4317806e9b9ff7857ed9da1df559d97aa0f833118d7"
+  },
+  "temporary_merge_removed": true,
+  "complete_release_library_suite": null
+}

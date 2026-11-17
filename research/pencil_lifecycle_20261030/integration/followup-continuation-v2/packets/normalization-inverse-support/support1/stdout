@@ -1,0 +1,40 @@
+/var/tmp/pencil-normalization-inverse-support-20261031-v1/Support.lean:14:48: warning: This simp argument is unused:
+  Prod.fst
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [backward, forward, Prod.snd]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-normalization-inverse-support-20261031-v1/Support.lean:14:57: warning: This simp argument is unused:
+  Prod.snd
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [backward, forward, Prod.fst]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-normalization-inverse-support-20261031-v1/Support.lean:14:82: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/var/tmp/pencil-normalization-inverse-support-20261031-v1/Support.lean:18:48: warning: This simp argument is unused:
+  Prod.fst
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [backward, forward, Prod.snd]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-normalization-inverse-support-20261031-v1/Support.lean:18:57: warning: This simp argument is unused:
+  Prod.snd
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [backward, forward, Prod.fst]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-normalization-inverse-support-20261031-v1/Support.lean:18:82: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/var/tmp/pencil-normalization-inverse-support-20261031-v1/Support.lean:43:66: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+a b : K
+P : K × K
+⊢ -P.2 / a ^ 3 = -(P.2 / a ^ 3)

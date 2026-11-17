@@ -1,0 +1,89 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "inc",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.9119923404917765,
+        2.0934177738612663,
+        3.7262466741866773
+      ],
+      "charged_sum": 177216.0,
+      "native_sum": 168157,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 7670.3125
+      }
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "rho-neg",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        0.8837203221906651,
+        0.9656556069922445,
+        1.7030731702064592
+      ],
+      "charged_sum": 81909.0,
+      "native_sum": 75943,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "tw2l-x20-j16-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.8853541752658705,
+        2.067713940392575,
+        3.7089518265329198
+      ],
+      "charged_sum": 174747.0,
+      "native_sum": 169023,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 10521.1875
+      }
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "rho-neg",
+      "verdict": "rho-neg < inc"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "tw2l-x20-j16-n2",
+      "verdict": "tw2l-x20-j16-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "rho-neg",
+      "b": "tw2l-x20-j16-n2",
+      "verdict": "rho-neg < tw2l-x20-j16-n2"
+    }
+  ]
+}

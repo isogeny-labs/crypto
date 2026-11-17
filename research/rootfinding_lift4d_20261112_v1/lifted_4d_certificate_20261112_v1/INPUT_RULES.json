@@ -1,0 +1,89 @@
+{
+  "schema": "lift4d-certificate-inputs/v1",
+  "training_post_result": true,
+  "fields": [
+    "P-192",
+    "P-224",
+    "P-256",
+    "P-384",
+    "P-521"
+  ],
+  "prior_public_input": "research/dual_ladder_20261109_v3/planted_inputs.json",
+  "block": "h0=public_h-offset; field-order offsets [0,1,3,5,7]; assert0<=h0,h0+7<p; u=0..7; midpointpivot3",
+  "arms": [
+    "all",
+    "seven",
+    "four"
+  ],
+  "order": [
+    [
+      "all",
+      "seven",
+      "four"
+    ],
+    [
+      "four",
+      "seven",
+      "all"
+    ],
+    [
+      "seven",
+      "all",
+      "four"
+    ]
+  ],
+  "seed": "direct4D dual basis; weights max(1,[3M,9M\u00b2,3M\u00b2,M\u00b3]);16basis/pair vectors; centre gamma/delta before7featurelift",
+  "controls": {
+    "primes": [
+      5,
+      7,
+      11,
+      13,
+      17
+    ],
+    "M": 2,
+    "H": 2,
+    "coefficients": [
+      [
+        1,
+        2,
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        0,
+        1,
+        1,
+        0,
+        1,
+        0
+      ]
+    ],
+    "direct_states": 405,
+    "seed_corruptions": 15
+  },
+  "caps": {
+    "worker_seconds": 90,
+    "memory_mb": 4096,
+    "cores": 1,
+    "native_nodes_per_fiber": 100000,
+    "blocks": 5,
+    "u_perblock": 8,
+    "candidate_u_perarm": 1960
+  },
+  "optional_reciprocal_tested": false,
+  "cache_implemented": false,
+  "output": "all conditional ordered residual tuples plusk, never original global root closure",
+  "prediction": "four paid median lower than seven on same complete root union; otherwise reject cost prediction",
+  "prior_blocks_changed": true,
+  "planted_offsets": {
+    "P-192": 0,
+    "P-224": 1,
+    "P-256": 3,
+    "P-384": 5,
+    "P-521": 7
+  },
+  "selection": "Fixed before any timing of this variant; previously exposed positive targets, new shifted training blocks; no holdout/hardness claim"
+}

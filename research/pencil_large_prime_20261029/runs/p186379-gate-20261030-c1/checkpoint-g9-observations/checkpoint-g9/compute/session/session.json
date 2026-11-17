@@ -1,0 +1,57 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1hf8b5deac05ae",
+  "label": "CRIU computation only: all timing invalid for benchmark admission",
+  "spec_id": "ECS1h9829e6cf8e43",
+  "spec_sha256": "9829e6cf8e438cb5b2ce0b15788cf6cb875de4451cb7e2db93a6c0feecb1c5a3",
+  "env_class_id": "ECBENV3h1523f9fe2982",
+  "host_sha256": "a6f443a2f75dc2f346224a0463ac44eb58ed456f0bdf4198b8e7907fbbf2e2ca",
+  "plan_sha256": "f74ebbc6419891f6f80dd99dff14e988b5e9cc4c5c06d663d8be2277335e29eb",
+  "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+  "git_commit": "7d7f5495c5b85ae426efdbcb721b6faf72c1be14",
+  "git_dirty": null,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/work/compute/session.lock",
+    "wait_for_lock": false,
+    "allow_busy": false,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "b9646383c915cec5449a77a2fa646343869f9145c66931e016c8ced5f4a9161f",
+  "child_env": {
+    "HOME": "/work/compute",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/usr/local/bin:/usr/bin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1793339034317,
+  "finished_unix_ms": null,
+  "status": "running",
+  "executions_planned": 18,
+  "records_written": 4,
+  "records_sha256": null,
+  "status_counts": {
+    "timeout": 1,
+    "verified": 3
+  },
+  "last_seq": 3
+}

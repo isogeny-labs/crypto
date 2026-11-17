@@ -1,0 +1,247 @@
+{
+  "main": "MillerLevelCompatibilityAudit.miller_level_compatibility_certificate",
+  "binding": "6a6628b9f2c6a3727ac4069803840c6f68da4702658b03d1f34ac7595f00e8cf",
+  "custom_imports": {
+    "AllMiller": "research/binary_miller_audit_20261115/lean/AllMiller.lean",
+    "BasechangeCertificate": "research/binary_miller_audit_20261115/lean/BasechangeCertificate.lean",
+    "BasechangeControls": "research/binary_miller_audit_20261115/lean/BasechangeControls.lean",
+    "BasechangeField": "research/binary_miller_audit_20261115/lean/BasechangeField.lean",
+    "BasechangeFunctions": "research/binary_miller_audit_20261115/lean/BasechangeFunctions.lean",
+    "BasechangeInfinity": "research/binary_miller_audit_20261115/lean/BasechangeInfinity.lean",
+    "BasechangeMiller": "research/binary_miller_audit_20261115/lean/BasechangeMiller.lean",
+    "BasechangeNorm": "research/binary_miller_audit_20261115/lean/BasechangeNorm.lean",
+    "BasechangePoints": "research/binary_miller_audit_20261115/lean/BasechangePoints.lean",
+    "BinaryCertificate": "research/binary_miller_audit_20261115/lean/BinaryCertificate.lean",
+    "BinarySchedule": "research/binary_miller_audit_20261115/lean/BinarySchedule.lean",
+    "BinaryState": "research/binary_miller_audit_20261115/lean/BinaryState.lean",
+    "CancellationDivisors": "research/binary_miller_audit_20261115/lean/CancellationDivisors.lean",
+    "CancellationFunctions": "research/binary_miller_audit_20261115/lean/CancellationFunctions.lean",
+    "CancellationValues": "research/binary_miller_audit_20261115/lean/CancellationValues.lean",
+    "ChartAdicValuation": "research/binary_miller_audit_20261115/lean/ChartAdicValuation.lean",
+    "ChartAlgebra": "research/binary_miller_audit_20261115/lean/ChartAlgebra.lean",
+    "ChartCertificate": "research/binary_miller_audit_20261115/lean/ChartCertificate.lean",
+    "ChartFractionField": "research/binary_miller_audit_20261115/lean/ChartFractionField.lean",
+    "ChartLocalization": "research/binary_miller_audit_20261115/lean/ChartLocalization.lean",
+    "ConstantDivisors": "research/binary_miller_audit_20261115/lean/ConstantDivisors.lean",
+    "ConstantKernel": "research/binary_miller_audit_20261115/lean/ConstantKernel.lean",
+    "DVRIdentification": "research/binary_miller_audit_20261115/lean/DVRIdentification.lean",
+    "DiscreteValuation": "research/binary_miller_audit_20261115/lean/DiscreteValuation.lean",
+    "DivisorDegree": "research/binary_miller_audit_20261115/lean/DivisorDegree.lean",
+    "DivisorEvaluation": "research/binary_miller_audit_20261115/lean/DivisorEvaluation.lean",
+    "EvaluationCertificate": "research/binary_miller_audit_20261115/lean/EvaluationCertificate.lean",
+    "EvaluationConstants": "research/binary_miller_audit_20261115/lean/EvaluationConstants.lean",
+    "EvaluationControls": "research/binary_miller_audit_20261115/lean/EvaluationControls.lean",
+    "EvaluationFormulas": "research/binary_miller_audit_20261115/lean/EvaluationFormulas.lean",
+    "FieldValuation": "research/binary_miller_audit_20261115/lean/FieldValuation.lean",
+    "FiniteControls": "research/binary_miller_audit_20261115/lean/FiniteControls.lean",
+    "FiniteDVR": "research/binary_miller_audit_20261115/lean/FiniteDVR.lean",
+    "FiniteFractionField": "research/binary_miller_audit_20261115/lean/FiniteFractionField.lean",
+    "FinitePointCertificate": "research/binary_miller_audit_20261115/lean/FinitePointCertificate.lean",
+    "FiniteRegular": "research/binary_miller_audit_20261115/lean/FiniteRegular.lean",
+    "FiniteValuation": "research/binary_miller_audit_20261115/lean/FiniteValuation.lean",
+    "FiniteZeros": "research/binary_miller_audit_20261115/lean/FiniteZeros.lean",
+    "FunctionDivisor": "research/binary_miller_audit_20261115/lean/FunctionDivisor.lean",
+    "FunctionDivisorCertificate": "research/binary_miller_audit_20261115/lean/FunctionDivisorCertificate.lean",
+    "FunctionEvaluation": "research/binary_miller_audit_20261115/lean/FunctionEvaluation.lean",
+    "GeometricCancellation": "research/binary_miller_audit_20261115/lean/GeometricCancellation.lean",
+    "GeometricCertificate": "research/binary_miller_audit_20261115/lean/GeometricCertificate.lean",
+    "GeometricControls": "research/binary_miller_audit_20261115/lean/GeometricControls.lean",
+    "GeometricDegree": "research/binary_miller_audit_20261115/lean/GeometricDegree.lean",
+    "GeometricFibers": "research/binary_miller_audit_20261115/lean/GeometricFibers.lean",
+    "GeometricMiller": "research/binary_miller_audit_20261115/lean/GeometricMiller.lean",
+    "GuardControls": "research/binary_miller_audit_20261115/lean/GuardControls.lean",
+    "GuardedBinary": "research/binary_miller_audit_20261115/lean/GuardedBinary.lean",
+    "GuardedStep": "research/binary_miller_audit_20261115/lean/GuardedStep.lean",
+    "InfinityEvaluation": "research/binary_miller_audit_20261115/lean/InfinityEvaluation.lean",
+    "InfinityMonic": "research/binary_miller_audit_20261115/lean/InfinityMonic.lean",
+    "LineEvaluation": "research/binary_miller_audit_20261115/lean/LineEvaluation.lean",
+    "LineIdeals": "research/binary_miller_audit_20261115/lean/LineIdeals.lean",
+    "LineMultiplicity": "research/binary_miller_audit_20261115/lean/LineMultiplicity.lean",
+    "LocalComparison": "research/binary_miller_audit_20261115/lean/LocalComparison.lean",
+    "LocalNegation": "research/binary_miller_audit_20261115/lean/LocalNegation.lean",
+    "LocalOrderAlgebra": "research/binary_miller_audit_20261115/lean/LocalOrderAlgebra.lean",
+    "LocalOriginEvaluation": "research/binary_miller_audit_20261115/lean/LocalOriginEvaluation.lean",
+    "MillerFunctions": "research/binary_miller_audit_20261115/lean/MillerFunctions.lean",
+    "MillerStep": "research/binary_miller_audit_20261115/lean/MillerStep.lean",
+    "NegationCertificate": "research/binary_miller_audit_20261115/lean/NegationCertificate.lean",
+    "NegationControls": "research/binary_miller_audit_20261115/lean/NegationControls.lean",
+    "NegationCoordinate": "research/binary_miller_audit_20261115/lean/NegationCoordinate.lean",
+    "NegationDivisor": "research/binary_miller_audit_20261115/lean/NegationDivisor.lean",
+    "NegationField": "research/binary_miller_audit_20261115/lean/NegationField.lean",
+    "NegationNorm": "research/binary_miller_audit_20261115/lean/NegationNorm.lean",
+    "NegationValuation": "research/binary_miller_audit_20261115/lean/NegationValuation.lean",
+    "NormDegree": "research/binary_miller_audit_20261115/lean/NormDegree.lean",
+    "NormEvaluation": "research/binary_miller_audit_20261115/lean/NormEvaluation.lean",
+    "Normalization": "research/binary_miller_audit_20261115/lean/Normalization.lean",
+    "NormalizedUniqueness": "research/binary_miller_audit_20261115/lean/NormalizedUniqueness.lean",
+    "NumericalTrace": "research/binary_miller_audit_20261115/lean/NumericalTrace.lean",
+    "OrderBounds": "research/binary_miller_audit_20261115/lean/OrderBounds.lean",
+    "OriginEvaluation": "research/binary_miller_audit_20261115/lean/OriginEvaluation.lean",
+    "PointDivisor": "research/binary_miller_audit_20261115/lean/PointDivisor.lean",
+    "PointLocalization": "research/binary_miller_audit_20261115/lean/PointLocalization.lean",
+    "PointResidue": "research/binary_miller_audit_20261115/lean/PointResidue.lean",
+    "PolynomialValues": "research/binary_miller_audit_20261115/lean/PolynomialValues.lean",
+    "RationalControls": "research/binary_miller_audit_20261115/lean/RationalControls.lean",
+    "RecursionCertificate": "research/binary_miller_audit_20261115/lean/RecursionCertificate.lean",
+    "RecursionControls": "research/binary_miller_audit_20261115/lean/RecursionControls.lean",
+    "ResidueNormalization": "research/binary_miller_audit_20261115/lean/ResidueNormalization.lean",
+    "SplitPolynomialDivisors": "research/binary_miller_audit_20261115/lean/SplitPolynomialDivisors.lean",
+    "TraceControls": "research/binary_miller_audit_20261115/lean/TraceControls.lean",
+    "UnitEvaluation": "research/binary_miller_audit_20261115/lean/UnitEvaluation.lean",
+    "ValuationCertificate": "research/binary_miller_audit_20261115/lean/ValuationCertificate.lean",
+    "LevelNumerical": "research/miller_level_compatibility_audit_20261115/lean/LevelNumerical.lean",
+    "LevelControls": "research/miller_level_compatibility_audit_20261115/lean/LevelControls.lean",
+    "LevelFunctions": "research/miller_level_compatibility_audit_20261115/lean/LevelFunctions.lean",
+    "LevelCertificate": "research/miller_level_compatibility_audit_20261115/lean/LevelCertificate.lean",
+    "LevelGeometry": "research/miller_level_compatibility_audit_20261115/lean/LevelGeometry.lean",
+    "LevelValues": "research/miller_level_compatibility_audit_20261115/lean/LevelValues.lean"
+  },
+  "claims": [
+    {
+      "declaration": "MillerLevelCompatibilityAudit.miller_multiple",
+      "conclusion": "Actual nP=0 gives chosen f_(a*n)=f_n^a."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.miller_unit_divisible",
+      "conclusion": "Actual chosen field-unit level power for n|N."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.divisibleDomain",
+      "conclusion": "Actual higher final unit/principal-support domain derived from lower one."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.value_divisible",
+      "conclusion": "Actual final divisor-evaluation value power, no supplied commutation premise."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.exponent_product",
+      "conclusion": "Exact natural quotient product under positive n,N and n|N|M."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.final_exponent_compatibility",
+      "conclusion": "Actual chosen function/evaluation core of source Exercise26.3.8."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.two_point_order",
+      "conclusion": "Actual positive point(4,0) order2."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.point23_nonsingular",
+      "conclusion": "Actual negative support point(2,3) nonsingular."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.base_not_two_torsion",
+      "conclusion": "Actual source torsion guard fails in negative control."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.field_card_five",
+      "conclusion": "Actual finitefield cardinality5, not an arithmetic model."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.negative_function_power_failure",
+      "conclusion": "Actual f4neqf2² distinguished by actual orders0vs−2."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.geometric_difference_image",
+      "conclusion": "Actual singleton differences are actual point-map images."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.geometric_final_domain_away",
+      "conclusion": "Actual mapped function/divisor full geometric final domain from actual point noncollisions."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.positive_value_two",
+      "conclusion": "Actual proper positive value2."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.positive_value_four",
+      "conclusion": "Actual proper positive value4."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.negative_value_two",
+      "conclusion": "Actual proper negative value1."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.negative_value_four",
+      "conclusion": "Actual proper negative value3."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.positive_final_compatibility",
+      "conclusion": "Actual positive finalpowers4=4."
+    },
+    {
+      "declaration": "MillerLevelCompatibilityAudit.negative_final_failure",
+      "conclusion": "Actual deleted-torsion finalpowers1neq3."
+    }
+  ],
+  "prior_reused_claims": [
+    "PCC-20261115-16a863",
+    "PCC-20261115-1a1570",
+    "PCC-20261115-b11451",
+    "PCC-20261115-9eb5c1",
+    "PCC-20261115-421c18",
+    "PCC-20261115-c81d29",
+    "PCC-20261115-529612",
+    "PCC-20261115-bb5771",
+    "PCC-20261115-6a306d"
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 55,
+    "fresh_audit_modules": 6,
+    "credited_frozen_dependency_modules": 87,
+    "credited_predecessor_gate_declarations": 679,
+    "copied_modules": 0,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "all90dependency_source_configurations_pinned": true,
+    "predecessor107pins_checked_before_and_after_every_build": true,
+    "actual_allfield_torsion_function_power": true,
+    "actual_final_unit_higher_domain_derived": true,
+    "actual_final_divisor_value_power": true,
+    "actual_final_exponent_compatibility_core": true,
+    "actual_F5_curve_points_cardinality_order_and_degreezero": true,
+    "actual_F5_allfour_full_geometric_final_domains": true,
+    "actual_positive_values2_4_final4_agrees_nontrivial": true,
+    "actual_negative_values1_3_final1_neq3": true,
+    "actual_negative_function_power_order0_neqminus2": true,
+    "actual_hypotheses": "EveryFieldK/actualDecidableEqK/WΔneq0/nP=0 for chosenfunctionlevelpower. Actual lower principal-support disjointness derives higher final local-unit domain. Positive n,N and n|N|M for finalexponents; no assumption of evaluation commutation/correctness or canonical Tate. ActualF5 n2/N4/M4/fieldcard5/degree0/fullactualAC finaldomains for controls.",
+    "source_qualified_torsion_domain_refuted": false,
+    "source_implicit_first_argument_torsion_domain_omitted_claim": false,
+    "canonical_Tate_pairing_or_representative_independence": false,
+    "full_scheme_or_divisor_basechange_or_descent": false,
+    "reciprocity_translation": false,
+    "concrete_native_numeric_backend_or_runtime": false,
+    "source_original_Miller_paper_read": false,
+    "full_original14_completion": false,
+    "new_physicalhost_or_implementation_independence": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

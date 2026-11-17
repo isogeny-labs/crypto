@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-05T08:49:28Z",
+ "id": "PCC-20261105-d6264e",
+ "kind": "theorem",
+ "producer": {
+  "commit": "4721f00f0d3c8a1848910a9cf82d8659c22bb30a",
+  "model": "",
+  "session": "pkm-pr3452-main-20261105"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "b2297c0feec801e6f0bf4c72b1e46584f3959f88d1152aeeff4fe3230b98b2cd",
+   "kind": "lean",
+   "project": "research/prime_ecdlp_three_leads_20261029/lean",
+   "theorem": "ThreeLeads.PKMScalarCertificates.target_ambiguity"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact Lean contract only; native Rust parsing/arithmetic/cardinality and polynomial/complete-cost bridges are not proved. Statement fidelity is a reviewer obligation.",
+ "statement": "Over a field K with finitely many columns and arbitrary rows, if Mz=rhs, Mh=0 and h[target]=1, then z+h also satisfies the retained equations and its target coordinate differs from z[target]. This concerns linear equations, not multiple curve logarithms."
+}

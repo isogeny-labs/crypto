@@ -1,0 +1,69 @@
+{
+  "schema": "research.independent-component-review/v1",
+  "verdict": "no blocking discrepancy at scalar field cycle/anchor scope",
+  "producer_main": 10,
+  "producer_controls": 8,
+  "reviewer_controls": 8,
+  "readbacks": 26,
+  "manifest_entries": 33,
+  "manifest_mismatches": [],
+  "bindings": {
+    "Cycles.lean": {
+      "producer": "658db13dc4acfbf17c14021c8622baa1eda72b5762bb873e82b9f4318f296023",
+      "review_copy": "658db13dc4acfbf17c14021c8622baa1eda72b5762bb873e82b9f4318f296023"
+    },
+    "Controls.lean": {
+      "producer": "6706c2297bbcdb8e6a36daf640f429f6f6c51e16610f81ada55cd594c38daa34",
+      "review_copy": "6706c2297bbcdb8e6a36daf640f429f6f6c51e16610f81ada55cd594c38daa34"
+    },
+    "Readback.lean": {
+      "producer": "5c5f59b2abbd150588920a49b674297e56e450f7aa805fd67550cf1b70d348a9",
+      "review_copy": "5c5f59b2abbd150588920a49b674297e56e450f7aa805fd67550cf1b70d348a9"
+    }
+  },
+  "native_sources": {
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/src/cryptanalysis/three_leads.rs": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-target-rank-review/pruned.rs": "149d55205b5edd872610350a2ddb7bf872d248f0e46f131b0091d618d33c6e5e"
+  },
+  "checks": {
+    "main1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "reviewer1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "reviewer2": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "reviewer3": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "reviewer_readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "scientific_execution": false,
+  "producer_modified": false,
+  "prepublication_review": true,
+  "precommitted_plan": false
+}

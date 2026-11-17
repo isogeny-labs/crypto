@@ -1,0 +1,96 @@
+{
+  "schema": "theorem-audit-verification/v1",
+  "recorded_at": "2026-11-10T05:31:12.297925+00:00",
+  "source_commit": "12cb97aeba09c023db0a17429ace0c4cd0ccc32b",
+  "source_plan_sha256": "424d47893f3d418eb17eed829f139f6a4c453872fac597734a63f1a97db79829",
+  "source_bytes_equal_commit": true,
+  "formal": {
+    "project": "research/theorem_census_20261109/lean",
+    "theorem": "FrobeniusPointDescentAudit.frobenius_descent_audit_certificate",
+    "statement": "theorem frobenius_descent_audit_certificate : (∀ (A B : Type*) [Field A] [Fintype A] [Field B] [Algebra A B] [DecidableEq A] [DecidableEq B] (W : WeierstrassCurve.Affine A) (P : (W.baseChange B).Point),pointFrobenius W P=P ↔ ∃ Q : W.Point,WeierstrassCurve.Affine.Point.map (W'",
+    "decl_sha256": "978f48648c886f0a9eb719918191d6476229a3aeceba9e2c5a9d105d22965236",
+    "sources": [
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusPointDescent.lean",
+        "bytes": 6808,
+        "sha256": "772180baf24ea48b16ba3cae5c2039e2cf21d925ed1e7f1370b906711d60dc72"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/TorsionBoundaries.lean",
+        "bytes": 11120,
+        "sha256": "8cce3dc81692549da50df802c41178c9ef908bb39cbf065f4d82cb8323afff47"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RationalCounterexample.lean",
+        "bytes": 1477,
+        "sha256": "780be0d45d23fc0198e8bc5a77003cd473d4cdc1cf7d14c5fa9abe1cf5190eb1"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/StructuralAudit.lean",
+        "bytes": 4216,
+        "sha256": "fa6f8c3383b7b1ec9249155287c1e9bb4602c4b747aeea390d2684affa474e86"
+      }
+    ],
+    "gate": {
+      "path": "evidence/frobenius-point-descent-gate.log",
+      "declarations": 479,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Every finite field F, every extension L/F, every general Weierstrass model: actual q-Frobenius fixes a nonsingular curve point iff it lies in the actual base-change image of a base-field point; actual torsion is preserved, and all actual r-torsion rational iff Frobeniusidentity there. Actual nonsingular F7curve y²=x³+3x+2has9points and nonfixed geometric3-torsion although3|q−1and9|#E, directly negating full3torsion fixedness. This refutes removal of the BKexclusion, not the qualified theorem/corpus node. Actual q^kiterate/extension identification, torsion rank/determinant and Weil necessity remain open."
+  },
+  "proof_packet": {
+    "id": "PCC-20261110-f1abe2",
+    "local_verdict": {
+      "claim_id": "PCC-20261110-f1abe2",
+      "claim_sha256": "529a62635266244895e594c1d4059f8bdabc55f2cd51ab2ab132e558b099b385",
+      "commit": "12cb97aeba09c023db0a17429ace0c4cd0ccc32b",
+      "proofs": [
+        {
+          "kind": "lean",
+          "notes": [
+            "lean: proof gate PASS for research/theorem_census_20261109/lean (FrobeniusPointDescent.lean)"
+          ],
+          "reasons": [],
+          "verdict": "pass"
+        }
+      ],
+      "reasons": [],
+      "schema": "pcc.verdict/v1",
+      "verdict": "pass",
+      "verified_at": "2026-11-10T05:30:15Z",
+      "verifier_host": "762f5fc120c9"
+    },
+    "standing": {
+      "claim_id": "PCC-20261110-f1abe2",
+      "claim_sha256": "529a62635266244895e594c1d4059f8bdabc55f2cd51ab2ab132e558b099b385",
+      "standing": "unverified",
+      "verdicts": []
+    }
+  },
+  "report": {
+    "path": "reports/proof-20261110-frobenius-descent/report.pdf",
+    "bytes": 62241,
+    "sha256": "f351ba3c369681c30f070ff9ecad51655b64f9fc5fb493a10907812181ace036",
+    "pages": 2,
+    "all_pages_visually_inspected": true,
+    "diagram_inspected": true
+  },
+  "scope": "Every finite field F, every extension L/F, every general Weierstrass model: actual q-Frobenius fixes a nonsingular curve point iff it lies in the actual base-change image of a base-field point; actual torsion is preserved, and all actual r-torsion rational iff Frobeniusidentity there. Actual nonsingular F7curve y²=x³+3x+2has9points and nonfixed geometric3-torsion although3|q−1and9|#E, directly negating full3torsion fixedness. This refutes removal of the BKexclusion, not the qualified theorem/corpus node. Actual q^kiterate/extension identification, torsion rank/determinant and Weil necessity remain open.",
+  "paid_compute": 0,
+  "commands": [
+    "timeout 180s lake env lean -o .lake/build/lib/lean/FrobeniusPointDescent.olean FrobeniusPointDescent.lean",
+    "tools/lean/proof-gate.sh --out research/theorem_census_20261109/evidence/frobenius-point-descent-gate research/theorem_census_20261109/lean",
+    "python3 tools/pcc/pcc.py verify PCC-20261110-f1abe2 --json"
+  ]
+}

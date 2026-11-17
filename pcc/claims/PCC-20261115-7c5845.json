@@ -1,0 +1,21 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T06:53:13Z",
+ "id": "PCC-20261115-7c5845",
+ "kind": "measurement",
+ "producer": {
+  "commit": "9e95f83262997336c1785ced4170b1edf8bd0d21",
+  "model": "",
+  "session": "genus3-cold-audit-20261115"
+ },
+ "proofs": [
+  {
+   "kind": "recompute",
+   "path": "research/genus3_cover_cold_target_20261115/reports/native-check.json",
+   "sha256": "863a80b7eb93b4c073da0cf136ec0f0677b420499acfea057202cfdf0bd1b541"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/genus3_cover_cold_target_20261115",
+ "statement": "The frozen historical Python audit reports mean cold times 0.05663239334374559 s for its cover implementation and 0.07878538950000369 s for its negation-aware BSGS implementation across 64 separately set-up targets. Native local replay recomputes these recorded summaries; historical execution, isolation, native timings and counted Pollard-rho admission are not established."
+}

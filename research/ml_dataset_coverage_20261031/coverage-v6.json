@@ -1,0 +1,427 @@
+{
+  "binary47_independent_archive_audit_sha256": "2388cbcf23206e3b8cb6aeb182d3921f0aa23e79ea1ec3af6fdfc9a3647e5af3",
+  "binary47_independent_s3_readback_sample_sha256": "ad9727021591f9e1e4bdb6ae4458d4c70a00af2838c7f83d45759cd3655b88f2",
+  "claim_scope": "retained local synthetic receipt coverage, not completion of the default plan",
+  "interpretation": [
+    "Counts are campaign receipts, not unique curve or key identities across campaigns.",
+    "The 64 prime twists were read from restricted archive manifests after exact archive hash checks; their Git checkpoints alone omit cell_spec.",
+    "Absent family-method intersections are coverage gaps, not evidence that a method is mathematically unsupported.",
+    "Native partial, timeout, and budget-exhausted outcomes remain retained rather than promoted to solutions.",
+    "The four prime61 receipts add two bounded root timeouts and two verified enumeration artifacts across both twists; none recovered a scalar.",
+    "The sixteen Koblitz47 m=4 receipts retain eight F6 pair-domain and eight bounded enumeration artifacts across both twists; none independently recovered a scalar. F6 here is a pair-domain method, not a Groebner F6 implementation.",
+    "The four ordinary-binary n47 m=4 receipts retain two F6 pair domains and two bounded enumeration traces across both twists; the twisted enumeration timeout is censored. None independently recovered a scalar, and scoped PMU observations are not whole-worker instruction labels.",
+    "The 26 Koblitz n23 enumeration receipts span m=3..15 on both twists with one fixed public core per twist. The four m=3,4 cells completed their fixed factor-base search without decomposition; the 22 m=5..15 cells are timeout-censored. No cell independently recovered a scalar, and no whole-worker instruction-to-solve label was verified."
+  ],
+  "inventory_sha256": "9116924ef25155d57cb3f32cfbaf4d7600182f9fb3397efd2a8f76be9c341967",
+  "koblitz23_arity_independent_archive_audit_sha256": "f8db20fcba3106b02d3aff4faa51a804d33a836c2bbb10a0d690cd8829c7842f",
+  "koblitz23_arity_independent_s3_readback_sample_sha256": "9cef5a0a59519e39641f42f14dda6c734e33a857fc04e2dc7d2aaab0b9e0c397",
+  "koblitz47_independent_archive_audit_sha256": "cd4ee54578506b965f933d2b22e903eba03d9f7c102915ff15b46792b926d609",
+  "koblitz47_independent_s3_readback_sample_sha256": "bcb9127615cf7cfe4fa53936342c530bf50115b3206344f1adf675fc6422eebd",
+  "observed": {
+    "arities": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "campaigns": [
+      {
+        "method_receipts": {
+          "bsgs": 64
+        },
+        "name": "ml_dataset_local_campaign_20261031",
+        "receipts": 64,
+        "twist_not_explicit_in_checkpoint_receipts": 64
+      },
+      {
+        "method_receipts": {
+          "bsgs": 8,
+          "root": 8
+        },
+        "name": "ml_dataset_koblitz_root_bsgs_20261031",
+        "receipts": 16,
+        "twist_not_explicit_in_checkpoint_receipts": 0
+      },
+      {
+        "method_receipts": {
+          "bsgs": 2,
+          "f6": 2
+        },
+        "name": "ml_dataset_koblitz_m4_f6_bsgs_mnt_20261031",
+        "receipts": 4,
+        "twist_not_explicit_in_checkpoint_receipts": 0
+      },
+      {
+        "method_receipts": {
+          "bsgs": 8,
+          "root": 8
+        },
+        "name": "ml_dataset_binary_root_bsgs_20261031",
+        "receipts": 16,
+        "twist_not_explicit_in_checkpoint_receipts": 0
+      },
+      {
+        "method_receipts": {
+          "bsgs": 8,
+          "double-large-prime": 8,
+          "f4": 8,
+          "f5": 8,
+          "sat": 8,
+          "weil": 8
+        },
+        "name": "ml_dataset_binary_methods_20261031",
+        "receipts": 48,
+        "twist_not_explicit_in_checkpoint_receipts": 0
+      },
+      {
+        "method_receipts": {
+          "enumerate": 2,
+          "root": 2
+        },
+        "name": "ml_dataset_prime61_root_enum_20261031",
+        "receipts": 4,
+        "specific_prime_modulus": "2305843009213693951",
+        "twist_not_explicit_in_checkpoint_receipts": 0
+      },
+      {
+        "method_receipts": {
+          "enumerate": 8,
+          "f6": 8
+        },
+        "name": "ml_dataset_koblitz47_m4_f6_enum_20261031",
+        "receipts": 16,
+        "twist_not_explicit_in_checkpoint_receipts": 0
+      },
+      {
+        "method_receipts": {
+          "enumerate": 2,
+          "f6": 2
+        },
+        "name": "ml_dataset_binary47_m4_f6_enum_20261031",
+        "receipts": 4,
+        "twist_not_explicit_in_checkpoint_receipts": 0
+      },
+      {
+        "method_receipts": {
+          "enumerate": 26
+        },
+        "name": "ml_dataset_koblitz23_m3_15_enum_20261031",
+        "receipts": 26,
+        "twist_not_explicit_in_checkpoint_receipts": 0
+      }
+    ],
+    "explicit_twists_by_family": {
+      "binary": [
+        false,
+        true
+      ],
+      "koblitz": [
+        false,
+        true
+      ],
+      "prime": [
+        false,
+        true
+      ]
+    },
+    "families": [
+      "binary",
+      "koblitz",
+      "prime"
+    ],
+    "family_method_grid": [
+      {
+        "family": "koblitz",
+        "method": "enumerate",
+        "observed_receipts": 34
+      },
+      {
+        "family": "koblitz",
+        "method": "bsgs",
+        "observed_receipts": 10
+      },
+      {
+        "family": "koblitz",
+        "method": "sat",
+        "observed_receipts": 0
+      },
+      {
+        "family": "koblitz",
+        "method": "weil",
+        "observed_receipts": 0
+      },
+      {
+        "family": "koblitz",
+        "method": "f4",
+        "observed_receipts": 0
+      },
+      {
+        "family": "koblitz",
+        "method": "f5",
+        "observed_receipts": 0
+      },
+      {
+        "family": "koblitz",
+        "method": "f6",
+        "observed_receipts": 10
+      },
+      {
+        "family": "koblitz",
+        "method": "root",
+        "observed_receipts": 8
+      },
+      {
+        "family": "koblitz",
+        "method": "pkm",
+        "observed_receipts": 0
+      },
+      {
+        "family": "koblitz",
+        "method": "double-large-prime",
+        "observed_receipts": 0
+      },
+      {
+        "family": "binary",
+        "method": "enumerate",
+        "observed_receipts": 2
+      },
+      {
+        "family": "binary",
+        "method": "bsgs",
+        "observed_receipts": 16
+      },
+      {
+        "family": "binary",
+        "method": "sat",
+        "observed_receipts": 8
+      },
+      {
+        "family": "binary",
+        "method": "weil",
+        "observed_receipts": 8
+      },
+      {
+        "family": "binary",
+        "method": "f4",
+        "observed_receipts": 8
+      },
+      {
+        "family": "binary",
+        "method": "f5",
+        "observed_receipts": 8
+      },
+      {
+        "family": "binary",
+        "method": "f6",
+        "observed_receipts": 2
+      },
+      {
+        "family": "binary",
+        "method": "root",
+        "observed_receipts": 8
+      },
+      {
+        "family": "binary",
+        "method": "pkm",
+        "observed_receipts": 0
+      },
+      {
+        "family": "binary",
+        "method": "double-large-prime",
+        "observed_receipts": 8
+      },
+      {
+        "family": "prime",
+        "method": "enumerate",
+        "observed_receipts": 2
+      },
+      {
+        "family": "prime",
+        "method": "bsgs",
+        "observed_receipts": 64
+      },
+      {
+        "family": "prime",
+        "method": "sat",
+        "observed_receipts": 0
+      },
+      {
+        "family": "prime",
+        "method": "weil",
+        "observed_receipts": 0
+      },
+      {
+        "family": "prime",
+        "method": "f4",
+        "observed_receipts": 0
+      },
+      {
+        "family": "prime",
+        "method": "f5",
+        "observed_receipts": 0
+      },
+      {
+        "family": "prime",
+        "method": "f6",
+        "observed_receipts": 0
+      },
+      {
+        "family": "prime",
+        "method": "root",
+        "observed_receipts": 2
+      },
+      {
+        "family": "prime",
+        "method": "pkm",
+        "observed_receipts": 0
+      },
+      {
+        "family": "prime",
+        "method": "double-large-prime",
+        "observed_receipts": 0
+      }
+    ],
+    "field_sizes": [
+      23,
+      47,
+      61
+    ],
+    "independently_solved_ecdlp_cells": 93,
+    "methods": [
+      "bsgs",
+      "double-large-prime",
+      "enumerate",
+      "f4",
+      "f5",
+      "f6",
+      "root",
+      "sat",
+      "weil"
+    ],
+    "native_status_counts_where_retained": {
+      "budget_exhausted": 7,
+      "partial": 22,
+      "timeout": 29,
+      "verified": 40
+    },
+    "prime_twists_replayed_from_verified_restricted_archives": 64,
+    "retained_receipts": 198,
+    "twist_not_explicit_in_checkpoint_receipts": 64
+  },
+  "prime61_independent_archive_audit_sha256": "97d72b8827fd79e1a82ba545f4aed9513e4860606bd8cbca3c2f7a224de6053e",
+  "prime61_independent_s3_readback_sample_sha256": "b0a166d24ae74adbd1d4b6f9a489aed03a2fa44db17eebd835cfecb48cd7dcad",
+  "prime_twist_archive_audit_sha256": "0f0e3e9f76b8ae14e6d0743183c0f9e05a0a74dde89fb8c02be3b69c8074f682",
+  "prior_coverage_sha256": "9a5f2630d8e9d1d5369caab5959fee892b43e1ae53d9fdfd93bb231b47d1be20",
+  "requested": {
+    "arities": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "curve_seeds_per_axis": 16,
+    "default_method_cells": 165150720,
+    "families": [
+      "koblitz",
+      "binary",
+      "prime"
+    ],
+    "field_sizes": [
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61
+    ],
+    "generators_per_curve": 8,
+    "keys_per_generator": 64,
+    "methods": [
+      "enumerate",
+      "bsgs",
+      "sat",
+      "weil",
+      "f4",
+      "f5",
+      "f6",
+      "root",
+      "pkm",
+      "double-large-prime"
+    ],
+    "specific_prime_modulus": "2^61-1",
+    "twists": [
+      false,
+      true
+    ]
+  },
+  "schema": "ml-dataset.requested-versus-observed-coverage/v6",
+  "unobserved_axes": {
+    "arities": [],
+    "field_sizes": [
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60
+    ],
+    "methods": [
+      "pkm"
+    ],
+    "n_47_to_61": "n=47 has sixteen Koblitz and four ordinary-binary retained cells; n=61 prime has four; n=48..60 have none",
+    "specific_prime_modulus_2^61-1": "four retained cells"
+  }
+}

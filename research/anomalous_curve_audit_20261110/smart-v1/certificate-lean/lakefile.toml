@@ -1,0 +1,11 @@
+name = "smart_concrete_certificate"
+version = "0.1.0"
+defaultTargets = ["SmartCertificateAudit"]
+
+[[require]]
+name = "smart_known_answer"
+path = "../lean"
+
+[[lean_lib]]
+name = "SmartCertificateAudit"
+roots = ["SmartLargeLift1Q", "SmartLargeRecovery", "SmartLargeLift3Q", "SmartLargeLift3G", "SmartLargeLift2G", "SmartLargeLift2Q", "SmartLargeLift0Q", "SmartLargeLift0G", "SmartLargeLift1G", "SmartSpecification", "SmartCertificate"]

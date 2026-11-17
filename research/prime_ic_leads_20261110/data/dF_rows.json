@@ -1,0 +1,13 @@
+{
+  "source_note": "Recorded lower-median last fall degrees d_F of the PKM Kummer towers at P1 = 15*2^27+1, copied from research/pkm_falldegree_unblock_20261107/RESULTS.md Table 1, RESULTS_T12_BRACKET.md and RESULTS_STAGE_C.md Tables 1-2. 'ge' marks a censored lower bound. N = m*t tower unknowns (free chain unknowns excluded).",
+  "ladders": [
+    {"name": "m = 2, t = 1..14 (stage A + t12 bracket)", "m": 2,
+     "points": [[1,3,false],[2,4,false],[3,4,false],[4,4,false],[5,4,false],[6,5,false],[7,5,false],[8,5,false],[9,5,false],[10,6,false],[11,6,false],[12,6,false],[13,6,true],[14,6,true]],
+     "x": "t"},
+    {"name": "t = 2, m = 2..6 (stage C)", "t": 2,
+     "points": [[2,4,false],[3,5,false],[4,6,false],[5,6,false],[6,7,true]], "x": "m"},
+    {"name": "t = 3, m = 2..6 (stage C)", "t": 3,
+     "points": [[2,4,false],[3,6,false],[4,7,false],[5,8,true],[6,8,true]], "x": "m"}
+  ],
+  "cstep": "d_F = 4 + floor((t-2)/4) for m = 2 (Amendment 6)"
+}

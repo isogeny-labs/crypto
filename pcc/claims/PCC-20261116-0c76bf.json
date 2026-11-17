@@ -1,0 +1,128 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T23:22:17Z",
+ "id": "PCC-20261116-0c76bf",
+ "kind": "statement",
+ "producer": {
+  "commit": "efa830fc60e64eeddcad5d19454c0c9acf5c3931",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/PROTOCOL.md",
+    "sha256": "2e8490420e1bdb6c418bf6b2893c917e78ee912de22aa937b2bfd04f2d354bb7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/BUILD_MANIFEST.json",
+    "sha256": "29293feeaa3dae7384bf2b98354f26c208506203a7242d15de8cbef31ef6fa4c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/SOURCES.sha256",
+    "sha256": "3c298fc04730411fa62d5113ada7d983f95c0485224306e2e505a3b2834de6e6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/SOURCE_QUALIFICATION.json",
+    "sha256": "f5177175e1f978a9849e8b794f296ee315ac78069aa3f4dad8cf9e846758268c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/QUALIFIER_PRE_CALL.json",
+    "sha256": "c524bc58f2fdaf42d4fea988c3f0d6e85f8ff609328f4dd8afcb52f1178f39bc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/qualifier-v1.sh",
+    "sha256": "b7e0e8d7649c3336b05ac17c821e59a029caaf55878bf8fc1b239edfeebfe9a7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/source-v1-delta.tar.xz",
+    "sha256": "f0735ae1100e76b91587221b0e662a2ad5ba30c99552c1cd00c5e49694d76ae8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/native-v1.tar.xz",
+    "sha256": "5332de1c3b6981ab664cc6e71b1c162996ac7ef812a572a382af5382b27896ad"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/NATIVE_ARCHIVE.json",
+    "sha256": "587963272adbb808ebaa90b164ac308af5fb71ac88ca46fad476d00e653610dd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/native-v1.control.log",
+    "sha256": "5b10181db89b21f0c0b8fee5e68b126548111ff65e981d261eb20553c552f0cf"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/development/source-attempt-01.tar.xz",
+    "sha256": "f4d1ce6e322bcd6ca93d99e041007201ecd6773bf8bcec50642e5c49f8e59cad"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/development/native-test-01.log",
+    "sha256": "6b6c74e50207a68fd61282033834c58189f53221be0f000c54262169fe113676"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/development/clippy-01.log",
+    "sha256": "775b16c2b5639c7be0fe62df43a2ca2448ef1e41496bd2ab32674072b7aa7f1f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/development/fmt-final.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/development/build-final.log",
+    "sha256": "b33160878cf67c7efe19ccad39263840f8820e41111c2599e14ce797a2a5280a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/development/qualifier-final.log",
+    "sha256": "bbb18726f32486a15e48f9c3c977edfd7df717916977f8300cb824c691694378"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Branch-local affine coefficient and trail lifetime controls v1",
+ "statement": "Unsigned Rust branch-local affine bridge retains every original constraint, derives conditional rows only after independent BigUint specialization and immutable prior coefficient checks, and drops each generation before Undo. Disabled fork matches old worklist answers/full decisions/counters on33 declared systems. On28 fixed curve inputs enabled returns13 checked/replayed roots and15 cumulative-modeled-reservation caps; baseline returns15roots/13Unsupported. All13 retained enabled curve roots have unchanged node counts, so no curve branch or cost gain is established. Synthetic conditional-root control changes3to2nodes; rollback contradiction/root and eight trace/root mutations,seven caps,four malformed requests and five bounded original/conditional truth domains are retained. Composite98inputs,five archive round-trips,35 compiled bindings and exact28 copied public requests match; native binary/pre-call/qualifier frozen. No huge original-base solver call, completeness/absence, full cold/live-memory, speed/exponent, prime-field, signed execution or formal correctness result."
+}

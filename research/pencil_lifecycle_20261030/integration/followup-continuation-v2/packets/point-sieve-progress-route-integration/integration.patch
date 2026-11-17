@@ -1,0 +1,30 @@
+--- a/src/cryptanalysis/ecbench/pencil_progress_native.rs
++++ b/src/cryptanalysis/ecbench/pencil_progress_native.rs
+@@ -859,9 +859,25 @@
+     let v = &d.v[..d.degree];
+     let (q0, _) = complement(d, 0, h, p);
+     let mut exceptional = TrackedSet::new();
++    // Candidate preconditions: degree <= 2, canonical active coefficients,
++    // 0 < p <= 2^63. Inactive array tails are deliberately ignored.
++    let u0 = u[0];
++    let u1 = u.get(1).copied().unwrap_or(0);
++    let u2 = u.get(2).copied().unwrap_or(0);
++    let v0 = v.first().copied().unwrap_or(0);
++    let v1 = v.get(1).copied().unwrap_or(0);
++    meter::collection(u.len() + v.len(), 0, 0, 0);
++    let mut u_value = u0;
++    let mut u_delta = add(u1, u2, p);
++    let u_delta2 = add(u2, u2, p);
++    let mut v_value = v0;
+     for x in 0..p {
+-        let ux = peval(u, x, p);
+-        let vx = peval(v, x, p);
++        let ux = u_value;
++        let vx = v_value;
++        // Advance before either continue; branch bodies retain old ux/vx.
++        u_value = add(u_value, u_delta, p);
++        u_delta = add(u_delta, u_delta2, p);
++        v_value = add(v_value, v1, p);
+         meter::collection(0, 0, 0, 1);
+         if ux == 0 {
+             // q_lambda = q_0 + 2 lambda v + lambda^2 u.  At a root

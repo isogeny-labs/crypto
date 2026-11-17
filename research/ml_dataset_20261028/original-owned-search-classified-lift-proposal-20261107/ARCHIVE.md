@@ -1,0 +1,1 @@
+Complete immutable packet including omitted full source references, scratch and binaries is in S3_RECEIPT.json. Verify archive SHA-256 and byte count, extract, then run sha256sum -c SHA256SUMS at archive root. Original nested manifests describe full archived packets. This Git copy is a review subset; assembled worker compilation is not claimed.

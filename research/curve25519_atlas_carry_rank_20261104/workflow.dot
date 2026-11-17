@@ -1,0 +1,13 @@
+digraph study {
+  graph [rankdir=TB, bgcolor="white", label="Atlas / carry / rank: development and pending comparisons", labelloc=t, fontsize=16];
+  node [shape=box, style="rounded,filled", fillcolor="#e8f0fa", fontname="Helvetica", fontsize=11];
+  input [label="RFC Curve25519 arithmetic fixture\nSmall-prime finite supports for experiments"];
+  atlas [label="1: source / identical transported support\ntarget-native / mixed / random; equal N"];
+  enc [label="2: identical signed relation queries\ndirect mod versus schoolbook carries"];
+  rank [label="3: generic training rank per probe\nfreeze winner before disjoint holdout"];
+  tests [label="Native functional checks\nFull-query SMT checks unresolved", fillcolor="#fff1d6"];
+  remote [label="PENDING: checkpoint + pinned image + EKS\nmatched solvers, all costs, raw results", fillcolor="#eeeeee"];
+  review [label="PENDING: runner/replay integration\nindependent verification; no promotion yet", fillcolor="#eeeeee"];
+  input -> atlas; atlas -> enc; atlas -> rank; enc -> tests; rank -> tests;
+  tests -> remote [style=dashed]; remote -> review [style=dashed];
+}

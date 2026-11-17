@@ -1,0 +1,60 @@
+{
+  "schema": "three-leads.dashboard-date-merge/v1",
+  "tested_revision": "72fe858c095f72fa3b2155576bf48756b4115a2e",
+  "previous_pr_head": "88ee1ec506133143e3d50edbbdaee825cd61eea5",
+  "merged_main": "cb2ec6873f30b683f7885b53c410d69965f02c20",
+  "copilot_request": "https://github.com/aburan28/crypto/pull/2229#issuecomment-6272567962",
+  "fallback_notice": "https://github.com/aburan28/crypto/pull/2229#issuecomment-6272646002",
+  "conductor_scope_check": "allow",
+  "resolution": "Generated dashboard metadata rebuilt from the auto-merged timeline and HTML. No ours/theirs selection of evidence was used.",
+  "timeline_changes": [
+    {
+      "path": "/series/0/points/11/date",
+      "before": "2026-10-14",
+      "after": "2026-10-15"
+    }
+  ],
+  "three_leads_panel_sha256": "23ee9d71ab77e9a5673fd8c15aa8edad06da22ad4c1cd0f798b932b3c01f8084",
+  "three_leads_panel_unchanged": true,
+  "historical_ledger_unchanged": true,
+  "progress_timeline_sha256": "40669c4cc17d240a7f163ffecf8817c26a201bc59a4b5e5853da36f743cf5921",
+  "rust_source_tests_build_files_changed": false,
+  "validation": {
+    "library": {
+      "command": "cargo test --release --lib",
+      "exit_code": 0,
+      "passed": 4414,
+      "failed": 0,
+      "ignored": 118,
+      "log": "library-tests.log.gz"
+    },
+    "site": {
+      "command": "python3 -m unittest discover -s scripts/site -p 'test_build.py'",
+      "exit_code": 0,
+      "passed": 49,
+      "log": "site-tests.log"
+    },
+    "browser": {
+      "command": "node tools/check_ic_dashboard_browser.mjs",
+      "exit_code": 0,
+      "widths": [
+        1280,
+        390,
+        320
+      ],
+      "log": "browser-pass.json"
+    },
+    "generation": {
+      "command": "node tools/render_ic_dashboard.mjs --check; python3 scripts/site/panel_index.py --check",
+      "exit_code": 0,
+      "panels": 306,
+      "log": "generation-check.log"
+    },
+    "initial_generation_attempt": {
+      "status": "missing_sparse_inputs",
+      "log": "initial-sparse-render-failure.log",
+      "remedy": "20 unchanged pinned inputs were materialized; all source pins then passed."
+    }
+  },
+  "limits": "Local validation does not substitute for applicable GitHub CI. The inherited failures documented in prior receipts are not represented as fixed by this date-only merge."
+}

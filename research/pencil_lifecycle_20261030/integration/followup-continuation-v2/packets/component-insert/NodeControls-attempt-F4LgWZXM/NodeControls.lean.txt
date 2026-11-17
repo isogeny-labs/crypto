@@ -1,0 +1,12 @@
+import NodeForest
+set_option autoImplicit false
+namespace NodeControls
+open ComponentMap UnionSize
+def owner : Fin 3 → Fin 3 := fun i => if i.val < 2 then 0 else 2
+theorem old_pair_retained : (fiber (extendMap owner) (0 : Fin 3).castSucc).card=2 := by decide
+theorem old_singleton_retained : (fiber (extendMap owner) (2 : Fin 3).castSucc).card=1 := by decide
+theorem inserted_singleton : (fiber (extendMap owner) (Fin.last 3)).card=1 := by decide
+theorem empty_insertion : (fiber (extendMap (id : Fin 0 → Fin 0)) (Fin.last 0)).card=1 := by decide
+theorem new_owner_distinct : extendMap owner (Fin.last 3) ≠ extendMap owner (0 : Fin 3).castSucc := by decide
+theorem inserted_size_one : (sizeAt (insertSizes (initialSizes 0)) (Fin.last 0)).toNat=1 := by rw [insert_size_new];rfl
+end NodeControls

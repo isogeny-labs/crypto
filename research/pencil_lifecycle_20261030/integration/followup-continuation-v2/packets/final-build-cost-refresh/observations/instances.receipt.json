@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "timeout",
+    "-k",
+    "2s",
+    "30s",
+    "aws",
+    "ec2",
+    "describe-instances",
+    "--query",
+    "Reservations[].Instances[].{Id:InstanceId,Type:InstanceType,AZ:Placement.AvailabilityZone,Block:BlockDeviceMappings,SpotRequest:SpotInstanceRequestId,State:State.Name}",
+    "--region",
+    "us-east-2",
+    "--cli-connect-timeout",
+    "5",
+    "--cli-read-timeout",
+    "15",
+    "--output",
+    "json"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T22:29:31.866798+00:00",
+  "observed_utc": "2026-11-03T22:29:37.590765+00:00",
+  "elapsed_seconds": 5.7239826600125525,
+  "stdout_sha256": "ff4867fd5d6e3f9f65ab90a6769c807fbdafc00da20dacda297f37d199d8217f",
+  "stdout_bytes": 2644,
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_bytes": 0
+}

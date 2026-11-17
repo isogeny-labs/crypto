@@ -1,0 +1,216 @@
+{
+  "schema": "runtime.readonly-preflight/v1",
+  "observed_unix": 1793730189.0296094,
+  "binding_sha256": "8a9c10a1480afaf54e80ced33540a9a65c3d880f780abc2bde8e46d115dde586",
+  "admitted": false,
+  "tools": {
+    "containerd": {
+      "path": "/usr/bin/containerd",
+      "sha256": "b11f594e9aaaade860167f7ee0a2335f3ce9b85bd1564c9b1264478d4ca230cf",
+      "matches": true
+    },
+    "docker": {
+      "path": "/usr/bin/docker",
+      "sha256": "2f5efd2249ead2acf57956ab04b4f4714b4820e157b72caaf8f4dc669a23ecfa",
+      "matches": true
+    },
+    "dockerd": {
+      "path": "/usr/bin/dockerd",
+      "sha256": "705216ae50f901c6b5081d4207ec4a9b719a8bc8d1884e6104c0f63426333447",
+      "matches": true
+    },
+    "losetup": {
+      "path": "/usr/sbin/losetup",
+      "sha256": "10a18739802172bc253402e61e3a72124fb84ac70f591cf78507222bd9d0e08f",
+      "matches": true
+    },
+    "mkfs.ext4": {
+      "path": "/usr/sbin/mkfs.ext4",
+      "sha256": "ec9c162a0b4d163f1c2ca16c32f8f7efc72d8ffecf516c93da08036972822b60",
+      "matches": true
+    },
+    "mount": {
+      "path": "/usr/bin/mount",
+      "sha256": "345ef5f06c4e2969b0c3779b99235bf5b2b9ff4b5b489b910131c3843639044e",
+      "matches": true
+    },
+    "python": {
+      "path": "/usr/bin/python3",
+      "sha256": "173454ac7873250cadc42e1ad959cef8ed2cc3736a5d8f7ab67726c87876ae5a",
+      "matches": true
+    },
+    "runc": {
+      "path": "/usr/sbin/runc",
+      "sha256": "003e4d72cda1d7fd039aecd77153e1d32ae3022600475727280b893e20940efb",
+      "matches": true
+    },
+    "systemctl": {
+      "path": "/usr/bin/systemctl",
+      "sha256": "df2d21b19e473ebbee59ae33f62c73d512dafc35a3dc117ac33e33f0af2d4052",
+      "matches": true
+    },
+    "systemd-run": {
+      "path": "/usr/bin/systemd-run",
+      "sha256": "50891e8ea80865c3fda1d5ab2fa60cd3d1cb832641023b386e56558bd9fe7177",
+      "matches": true
+    },
+    "umount": {
+      "path": "/usr/bin/umount",
+      "sha256": "7629958499892e545028f151179ab1a001e7004bc494d166cf9d469378c795a6",
+      "matches": true
+    }
+  },
+  "context": [
+    {
+      "path": "Dockerfile",
+      "mode": "0o644",
+      "matches": true,
+      "sha256": "5d86b44b9f087a430969c40882db60127d4fcfdb5934bb87cc4d2398dbcec21b",
+      "bytes": 386
+    },
+    {
+      "path": "mountpoints",
+      "mode": "0o755",
+      "matches": true
+    },
+    {
+      "path": "mountpoints/exec-gate",
+      "mode": "0o644",
+      "matches": true,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "mountpoints/fixtures.marker",
+      "mode": "0o644",
+      "matches": true,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "runtime",
+      "mode": "0o755",
+      "matches": true
+    },
+    {
+      "path": "runtime/BUILD.json",
+      "mode": "0o644",
+      "matches": true,
+      "sha256": "db071b491a7e36eb28814a2e3655c6f41bcf80bbed238bfd077e974c564b9411",
+      "bytes": 1843
+    },
+    {
+      "path": "runtime/SHA256SUMS",
+      "mode": "0o644",
+      "matches": true,
+      "sha256": "73aea963ea3b3d9b0c6301059d8d1edd8f95178fc99ca97d823bc4abb6fa2cf0",
+      "bytes": 984
+    },
+    {
+      "path": "runtime/criu",
+      "mode": "0o755",
+      "matches": true,
+      "sha256": "8dbd38dfe73ac1cbdf7d060e91b8e6bc85a07897c3e880e4df62a545aafc59b5",
+      "bytes": 5961984
+    },
+    {
+      "path": "runtime/isolab-criu-progress",
+      "mode": "0o755",
+      "matches": true,
+      "sha256": "65509d5a2ed54622b36212efc6ddf2505f4d7dacde40ac640a9a9e5e6faf0273",
+      "bytes": 745344
+    },
+    {
+      "path": "runtime/isolab-eks-recovery",
+      "mode": "0o755",
+      "matches": true,
+      "sha256": "b0403250273d2e06e58b18a745f221f2c8d9881979afbe027fdb5f8c237628a6",
+      "bytes": 2080560
+    },
+    {
+      "path": "runtime/lib",
+      "mode": "0o755",
+      "matches": true
+    },
+    {
+      "path": "runtime/lib/libacl.so.1",
+      "mode": "0o755",
+      "matches": true,
+      "sha256": "b8b1fffe46d1c492dff6a1333912f4870486f67f597f1d2a5d9e7b9d7b1428a3",
+      "bytes": 44896
+    },
+    {
+      "path": "runtime/lib/libnet.so.1",
+      "mode": "0o755",
+      "matches": true,
+      "sha256": "74c0580296a54d5cb5805e652a298b6abe1c0df5fb641ad7a1b13e88600ae017",
+      "bytes": 102864
+    },
+    {
+      "path": "runtime/lib/libnl-3.so.200",
+      "mode": "0o755",
+      "matches": true,
+      "sha256": "1e99f9a2c676973018e36ed388a122f07725454ff51c4b5240fe31f1c4446d3b",
+      "bytes": 146984
+    },
+    {
+      "path": "runtime/lib/libpcre2-8.so.0",
+      "mode": "0o755",
+      "matches": true,
+      "sha256": "afa839e9d27f48e99c863f580b49f1cf7ce09326281ce87adbae01d437f45449",
+      "bytes": 645128
+    },
+    {
+      "path": "runtime/lib/libprotobuf-c.so.1",
+      "mode": "0o755",
+      "matches": true,
+      "sha256": "3d97bc482d2a690a16af7a8242f39e8922381bd11e5bbbed2e9dd93f0e6b8e84",
+      "bytes": 41224
+    },
+    {
+      "path": "runtime/lib/libselinux.so.1",
+      "mode": "0o755",
+      "matches": true,
+      "sha256": "505558aba88e41a3451b0d852e45101f90b839e6593f8f38a533c4f81a72ec93",
+      "bytes": 176840
+    },
+    {
+      "path": "runtime/lib/libuuid.so.1",
+      "mode": "0o755",
+      "matches": true,
+      "sha256": "e9acd621feef25a5f1b8d019f46640702d2294ae6dc38e619bb5d609cc045149",
+      "bytes": 32400
+    },
+    {
+      "path": "runtime/tar",
+      "mode": "0o755",
+      "matches": true,
+      "sha256": "14682ed51217f135dd99e557d734951eb061963298f1f12a43a8963d2bcecad7",
+      "bytes": 527696
+    }
+  ],
+  "runtime_launched": false,
+  "base_archive": {
+    "path": "/var/tmp/pencil-base-inspection-44wf3otl/base.tar",
+    "bytes": 549662208,
+    "sha256": "43a645ed7b810e1ef4f5ec473c61694dffeb8a69511ec2e44409fd192a494a2c",
+    "matches": true
+  },
+  "existing_private_state": [
+    "/var/tmp/pencil-private-integration-preview.png",
+    "/var/tmp/pencil-private-integration-final.png"
+  ],
+  "unit_readback": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "exact_owner_state": {
+    "old_root": "/var/tmp/pencil-private-2d885f49-d570-4a8b-990e-7ea14ee9ea80",
+    "corrected_root": "/var/tmp/ppr-2d885f49-d570-4a8b-990e-7ea14ee9ea80",
+    "old_root_exists": false,
+    "corrected_root_exists": false
+  },
+  "other_corrected_state_directories": [],
+  "original_prefix_matches_are_not_all_state_directories": true
+}

@@ -1,0 +1,20 @@
+digraph point_hash_leads {
+  graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.25", ranksep="0.35", fontname="DejaVu Sans", label="Point-table follow-ons: proposed paths, no measurements", labelloc=t, fontsize=16];
+  node [shape=box, style="rounded,filled", fillcolor="#edf2f7", color="#52677d", fontname="DejaVu Sans", fontsize=12, margin="0.15,0.10"];
+  edge [color="#52677d", arrowsize=0.65, fontname="DejaVu Sans", fontsize=10];
+  inputs [label="Certified curve + validated G,Q\nKeep slot and curve identities"];
+  targets [label="Existing: independent targets\nShared public doubling chains"];
+  trusted [label="L1: sealed subgroup provenance\nPublic input still checked", style="rounded,filled,dashed", fillcolor="#e5f3ff"];
+  walks [label="L5: independent anchors +\ntwo-dimensional adding walks", style="rounded,filled,dashed", fillcolor="#fff1da"];
+  table [label="Prepared exact point tables\nL2: batch complement denominators", style="rounded,filled,dashed", fillcolor="#e5f3ff"];
+  replay [label="Full equality + membership\n+ group-sum replay"];
+  collector [label="L3: slot-tagged graph / weighted forest\nTry further cycles before discarding trial", style="rounded,filled,dashed", fillcolor="#e5f3ff"];
+  choice [label="L4: bounded alternative witnesses\nCharge every extra candidate", style="rounded,filled,dashed", fillcolor="#fff1da"];
+  v1 [label="Stage A/B: retain N+1 rows\nExisting strict v1 certificate"];
+  v2 [label="Stage C: early stop requires v2\nSeparate soundness + negative controls", style="rounded,filled,dashed", fillcolor="#ffe6e6"];
+  scalar [label="Cancellation + nonzero combined v\nVerify scalar against Q"];
+  inputs -> targets; inputs -> trusted;
+  targets -> table; trusted -> table; inputs -> walks; walks -> table;
+  table -> replay; replay -> collector; collector -> choice [style=dashed]; choice -> table [style=dashed, label="bounded feedback"];
+  collector -> v1; collector -> v2 [style=dashed]; v1 -> scalar; v2 -> scalar [style=dashed];
+}

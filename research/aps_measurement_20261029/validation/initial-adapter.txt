@@ -1,0 +1,9 @@
+Development validation, base d188c5a6775dff07129084ab2f3f7ae39547c9fc plus task sources.
+Command: cargo test --release --locked --lib ecbench::aps
+Rust stable 1.99; release opt-level=3, codegen-units=256; no experiment run.
+Actual result: 8 passed; 1 failed; 0 ignored; 5512 filtered out; exit101.
+Failure: callback-rejection test selected a base with no coordinate sets, so
+its visitor was never invoked and unwrap_err correctly failed on Ok(empty).
+The rejection assertion is retained; use the existing checked positive fixture.
+This source boundary precedes late-witness enforcement and final additions.
+All original dependency/build output remains local, not published.

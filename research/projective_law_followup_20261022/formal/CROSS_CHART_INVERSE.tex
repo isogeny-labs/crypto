@@ -1,0 +1,47 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.82in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{array}
+\title{Cross-chart identification for the weighted-Proj genus-2 model}
+\author{Formal proof packet}
+\date{27 October 2026}
+\begin{document}
+\maketitle
+\noindent This is a formal-proof packet, not a new target experiment or cost comparison. The editable diagram and machine-readable gate table are \texttt{cross-chart-inverse.svg} and \texttt{cross-chart-inverse.csv} beside this PDF.
+
+\section*{Scope and checked theorem}
+For every field $K$ and coefficients $a_3,a_2,a_1,a_0\in K$, the existing weight-$(1,3,1)$ sextic model has two basic-open charts. In \texttt{WeightedProjCrossInjective.lean}, the theorem \texttt{cross} identifies affine- and infinity-chart points in the separately glued scheme whenever their images in the actual weighted $\operatorname{Proj}$ coincide. The theorem \texttt{gluedToProj\_isIso} then proves that the canonical glued-to-$\operatorname{Proj}$ morphism is a scheme isomorphism. Neither statement requires smoothness or squarefreeness.
+
+\begin{center}
+\setlength{\fboxsep}{8pt}
+\fbox{\begin{minipage}{0.84\linewidth}\centering
+\textbf{Checked proof dependency}\par\vspace{5pt}
+Basic-open chart isomorphisms $\longrightarrow$ opposite-open preimages\par\vspace{4pt}
+$\longrightarrow$ cross-chart point equality $\longrightarrow$ global scheme isomorphism\par\vspace{9pt}
+\textbf{Still open}\par\vspace{4pt}
+global divisor/Pic$^0$ equation\qquad compiled Rust semantics
+\end{minipage}}
+\end{center}
+
+\section*{Verification and limits}
+The direct compile of \texttt{WeightedProjCrossInjective.lean} exited zero with Lean 4.34.1 and Mathlib \texttt{d13f23b}. The Markdown companion gives the exact command. Both theorem axiom audits listed only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; neither listed \texttt{sorryAx}. Source SHA-256:\par\smallskip\noindent{\small\texttt{d59ee7093bca3842cada43b055590331b11393f378106776a00ee9b6ddc28f8b}}.
+
+\begin{center}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.54\linewidth}ll}
+\hline
+Formal gate & Status & Scope \\
+\hline
+Opposite-open preimages & checked & arbitrary field/coefficient \\
+Cross-chart point identification & checked & arbitrary field/coefficient \\
+Glued-to-Proj scheme isomorphism & checked & arbitrary field/coefficient \\
+Global divisor/Pic$^0$ class equation & open & genus-2 law \\
+Compiled Rust exceptional branches & open & runtime law \\
+\hline
+\end{tabular}
+\end{center}
+
+The theorem does not alter any frozen 1,260-target row, operation counter, matched-rho control, or cost ratio. The measured comparison remains in the four-follow-up report. The class equation and source-semantics bridge remain independent obligations before treating the complete inversion-free law as proved end to end.
+\end{document}

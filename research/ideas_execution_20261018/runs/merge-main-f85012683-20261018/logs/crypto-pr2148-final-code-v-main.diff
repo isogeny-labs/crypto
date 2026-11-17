@@ -1,0 +1,232 @@
+diff --git a/src/cryptanalysis/ecbench/methods.rs b/src/cryptanalysis/ecbench/methods.rs
+index d950790e04..3b35bd18ec 100644
+--- a/src/cryptanalysis/ecbench/methods.rs
++++ b/src/cryptanalysis/ecbench/methods.rs
+@@ -2842,8 +2842,11 @@ pub fn dump_factor_base(
+     if let Instance::Wide(_) = &inst {
+         return Err("no factor-base plug-in runs on a wide (n > 62) curve yet".into());
+     }
+-    if let Instance::Fp4(_) = &inst {
+-        return Err("no factor-base plug-in runs on E(F_p⁴); ic.k4_gaudry builds its own".into());
++    if matches!(
++        &inst,
++        Instance::Fp4(_) | Instance::Fp4Torsion(_) | Instance::F2m4(_)
++    ) {
++        return Err("extension-field IC methods build their own factor bases; no standalone dump plug-in is available".into());
+     }
+     if let Instance::Fp4Torsion(_) | Instance::F2m4(_) = &inst {
+         return Err("factor-base dumps cover prime and binary curves".into());
+diff --git a/src/cryptanalysis/ecbench/workload.rs b/src/cryptanalysis/ecbench/workload.rs
+index 69036ebbda..456b41bea7 100644
+--- a/src/cryptanalysis/ecbench/workload.rs
++++ b/src/cryptanalysis/ecbench/workload.rs
+@@ -420,6 +420,16 @@ impl CurveSpec {
+             CurveSpec::Fp4Translation { p, seed } => {
+                 format!("quartic_folds::generate_translation_instance({p}, {seed}, 16)")
+             }
++            CurveSpec::Fp4Torsion {
++                p,
++                seed,
++                max_cofactor,
++            } => format!("find_d4_curve({p}, {seed}, {max_cofactor})"),
++            CurveSpec::F2m4Torsion {
++                m,
++                seed,
++                max_cofactor,
++            } => format!("find_bin_curve({m}, {seed}, {max_cofactor})"),
+         }
+     }
+ }
+@@ -761,7 +771,7 @@ impl Instance {
+         let model = model_hash(curve);
+         let mut scratch = GroupOps::default();
+         if let Instance::Fp4(_) = self {
+-            // Planted targets only on E(F_{p⁴}): no public-target law yet.
++            // Translation fixtures still lack a public-target law.
+             return None;
+         }
+         if let Instance::Wide(i) = self {
+@@ -1153,6 +1163,86 @@ impl Workload {
+ mod tests {
+     use super::*;
+ 
++    #[test]
++    fn extension_variants_have_distinct_constructors_and_subgroup_arithmetic() {
++        for spec in [
++            CurveSpec::Fp4Torsion {
++                p: 13,
++                seed: 1,
++                max_cofactor: 16,
++            },
++            CurveSpec::F2m4Torsion {
++                m: 4,
++                seed: 1,
++                max_cofactor: 16,
++            },
++            CurveSpec::Fp4Translation { p: 13, seed: 1 },
++        ] {
++            let encoded = serde_json::to_string(&spec).unwrap();
++            assert_eq!(serde_json::from_str::<CurveSpec>(&encoded).unwrap(), spec);
++            let inst = spec.build().unwrap();
++            let facts = inst.facts(&spec);
++            assert_eq!(inst.r(), facts.r);
++            assert_eq!(inst.mul_generator_hex(1).unwrap(), facts.generator);
++            assert!(inst.mul_generator_hex(0).is_none());
++            assert!(inst.mul_generator_hex(inst.r()).is_none());
++            assert!(inst.mul_generator_hex(2).is_some());
++            let target = inst.hash_to_subgroup(&facts, 1, 0);
++            if matches!(&inst, Instance::Fp4(_)) {
++                assert!(
++                    target.is_none(),
++                    "translation public-target law is unavailable"
++                );
++            } else {
++                let (target, counter) = target.expect("torsion public-target law from main");
++                assert_eq!(
++                    inst.hash_to_subgroup(&facts, 1, 0),
++                    Some((target.clone(), counter))
++                );
++                let x = u64::from_str_radix(target[0].trim_start_matches("0x"), 16).unwrap();
++                let y = u64::from_str_radix(target[1].trim_start_matches("0x"), 16).unwrap();
++                let mut scratch = GroupOps::default();
++                match &inst {
++                    Instance::Fp4Torsion(i) => {
++                        let c = &i.inst.curve;
++                        let point = Pt4 {
++                            x: unpack_e4(i.p(), x),
++                            y: unpack_e4(i.p(), y),
++                            inf: false,
++                        };
++                        assert!(c.on_curve(&point));
++                        assert!(CountedGroup::mul(c, &mut scratch, point, i.r).inf);
++                    }
++                    Instance::F2m4(i) => {
++                        let c = &i.curve;
++                        let point = crate::cryptanalysis::gaudry_quartic_bin::PtB {
++                            x: c.f.unpack(x),
++                            y: c.f.unpack(y),
++                            inf: false,
++                        };
++                        assert!(c.on_curve(&point));
++                        assert!(CountedGroup::mul(c, &mut scratch, point, i.r).inf);
++                    }
++                    _ => unreachable!(),
++                }
++            }
++        }
++        assert!(CurveSpec::Fp4Torsion {
++            p: 9,
++            seed: 1,
++            max_cofactor: 16
++        }
++        .build()
++        .is_err());
++        assert!(CurveSpec::F2m4Torsion {
++            m: 3,
++            seed: 1,
++            max_cofactor: 16
++        }
++        .build()
++        .is_err());
++    }
++
+     fn public_fixture() -> CurveSpec {
+         CurveSpec::PrimePublicFixture {
+             p: 343073,
+diff --git a/src/cryptanalysis/gaudry_quartic.rs b/src/cryptanalysis/gaudry_quartic.rs
+index 824ef733ff..b850d9321b 100644
+--- a/src/cryptanalysis/gaudry_quartic.rs
++++ b/src/cryptanalysis/gaudry_quartic.rs
+@@ -2945,6 +2945,40 @@ mod tests {
+     use super::*;
+     use rand::SeedableRng;
+ 
++    #[test]
++    fn both_echelon_pivot_policies_preserve_the_exact_small_row_space() {
++        fn span(rows: &[Vec<u16>], p: u16) -> std::collections::BTreeSet<Vec<u16>> {
++            let width = rows.first().map_or(0, Vec::len);
++            let mut result = std::collections::BTreeSet::new();
++            for mut code in 0..u64::from(p).pow(rows.len() as u32) {
++                let mut sum = vec![0; width];
++                for row in rows {
++                    let coefficient = (code % u64::from(p)) as u16;
++                    code /= u64::from(p);
++                    for (out, value) in sum.iter_mut().zip(row) {
++                        *out = (*out + coefficient * value) % p;
++                    }
++                }
++                result.insert(sum);
++            }
++            result
++        }
++        let rows = vec![
++            vec![1, 1, 1, 1],
++            vec![1, 0, 0, 1],
++            vec![0, 1, 1, 0],
++            vec![0, 0, 0, 0],
++        ];
++        let expected = span(&rows, 3);
++        for sparsest in [false, true] {
++            let mut work = 0;
++            let echelon = echelon_by_lead_with(rows.clone(), 3, &mut work, false, sparsest);
++            assert_eq!(span(&echelon.rows, 3), expected);
++            assert_eq!(echelon.zero_rows, 2);
++            assert!(work > 0);
++        }
++    }
++
+     #[test]
+     fn u16_kernels_match_the_reference_routines() {
+         use super::super::gaudry_cubic::{charpoly_mod_p, eigenvectors_mod_p};
+diff --git a/src/cryptanalysis/jacobian_transfer/mod.rs b/src/cryptanalysis/jacobian_transfer/mod.rs
+index 313ecd064a..fb008b0611 100644
+--- a/src/cryptanalysis/jacobian_transfer/mod.rs
++++ b/src/cryptanalysis/jacobian_transfer/mod.rs
+@@ -1180,18 +1180,36 @@ mod tests {
+             );
+         }
+         // c2pnb304w1's 288-bit subgroup does not fit in a 256-bit Jacobian;
+-        // its best route is the n = 4 descent over GF(2^76). Priced with the
+-        // measured Jacobian operation counts (#1983) it costs 2^160.259
+-        // against matched rho's 2^160.226, so it is no longer below rho.
+-        let r = screen(
+-            &by_name("c2pnb304w1"),
+-            &CostModel::default(),
+-            DEFAULT_FACTOR_BUDGET,
+-        );
++        // its best route is the n = 4, genus-8 descent over GF(2^76).
++        // The earlier 10*g^2 Jacobian price put that route 2.001 bits below
++        // rho. The measured Cantor price (2620.9, rather than 640, at g=8)
++        // moves it 0.033 bits above rho without changing its exact geometry.
++        let model = CostModel::default();
++        let r = screen(&by_name("c2pnb304w1"), &model, DEFAULT_FACTOR_BUDGET);
++        let best = &r.routes[r.best_route.unwrap()];
+         assert_eq!(r.verdict, RouteClass::Boundary);
+-        assert_eq!(
+-            r.routes[r.best_route.unwrap()].invariants["base_degree"],
+-            76
++        assert_eq!(best.invariants["base_degree"], 76);
++        assert_eq!(best.destination.genus, "8");
++        assert!(best.cost.ratio_log2 < 0.0);
++        assert!(best.cost.exponent_ratio_log2 > 0.0);
++
++        // Preserve the historical model's conclusion as an explicit control:
++        // do not recover it by weakening the measured production price.
++        let mut legacy = model.clone();
++        legacy.jacobian_group_op_mults_measured = model
++            .jacobian_group_op_mults_measured
++            .iter()
++            .map(|&(g, _)| (g, 10.0 * f64::from(g).powi(2)))
++            .collect();
++        legacy.jacobian_group_op_extrapolation_exponent = 2.0;
++        let old = screen(&by_name("c2pnb304w1"), &legacy, DEFAULT_FACTOR_BUDGET);
++        let old_best = &old.routes[old.best_route.unwrap()];
++        assert_eq!(old.verdict, RouteClass::FormulaMarginal);
++        assert_eq!(old_best.invariants, best.invariants);
++        assert_eq!(old_best.destination, best.destination);
++        let measured_price_delta = (2620.9_f64 / 640.0).log2();
++        assert!(
++            (old_best.cost.ratio_log2 - best.cost.ratio_log2 - measured_price_delta).abs() < 0.003
+         );
+         // A registry curve where (8) fails: b in F_2, Tr(a) = 1, N = 18.
+         let r = screen(

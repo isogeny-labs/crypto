@@ -1,0 +1,36 @@
+{
+ "created_at": "2026-11-08T00:07:32Z",
+ "id": "PCC-20261108-befc50",
+ "kind": "statement",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round52-p192/verification.json",
+    "sha256": "623a916182a7ec30bdacbdda2afde104f88ccfee01be6cb190eac4fdb7f77b75"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round52-p192/elimination-verification.json",
+    "sha256": "313ab2bab32f72f115ea93b068750baecc0f96d2616ca27923d3eda7dbb84e83"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round52-p192/report.md",
+    "sha256": "c6046c86d53bc4ab30306088213ff88e39b993e9cc84802000efb0b91a5673cb"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Written projection derivation, exact finite controls, no P192 elimination or general quotient evaluation",
+ "statement": "Round52 constructs a quartic base-field presentation of the rational graph subgroup from G,Q, checks P-192 witnesses and all toy addition pairs, and supplies an independently checked toy projected coordinate algebra."
+}

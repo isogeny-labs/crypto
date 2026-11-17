@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/crypto/wt/codex-rootfind-inline-page-index-20261116/research/rootfind_k13_l0_independent_audit_20261116/audit.py", line 258, in <module>
+    print(json.dumps(audit(args.records), indent=2, sort_keys=True))
+                     ~~~~~^^^^^^^^^^^^^^
+  File "/Volumes/SSD990-2/crypto/wt/codex-rootfind-inline-page-index-20261116/research/rootfind_k13_l0_independent_audit_20261116/audit.py", line 187, in audit
+    validate_record(row, modulus, generator)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/SSD990-2/crypto/wt/codex-rootfind-inline-page-index-20261116/research/rootfind_k13_l0_independent_audit_20261116/audit.py", line 163, in validate_record
+    raise ValueError("factor-base points digest mismatch")
+ValueError: factor-base points digest mismatch

@@ -1,0 +1,113 @@
+{
+  "schema": "runtime.assembler.independent-source-review/v1",
+  "reviewer": "/root/assembler_independent_review_v2",
+  "author_of_original": false,
+  "reviewed_commit": "ea7499c8315be99c9bf8b4fe05aadce5b7dbd5a6",
+  "observed_head": "9c6d9c61c52bdbfb42b79148aef694d4bebdafdc",
+  "decision": "source_review_with_unresolved_admission_obligations",
+  "execution_allowance_approved": false,
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "admission_obligation",
+      "location": "assemble.py:105-110,60",
+      "finding": "Synchronous context checks have only a pre-entry deadline check; final check may finish after deadline or pending signal and still return success. No hard whole-process deadline is enforced.",
+      "resolution_required": "Reject final success after expiry or interruption, and retain external whole-process containment as unresolved."
+    },
+    {
+      "id": "R2",
+      "severity": "admission_obligation",
+      "location": "assemble.py:83-90,121-124",
+      "finding": "Client termination and tag readback do not prove Docker daemon build termination.",
+      "resolution_required": "Operator-owned containment, reconciliation and finite accounting of unresolved daemon work before bounded admission."
+    },
+    {
+      "id": "R3",
+      "severity": "scope_limit",
+      "finding": "Owner marker prevents repeat use of one owner; new-owner duplicates and lost/deleted markers require external reconciliation."
+    },
+    {
+      "id": "R4",
+      "severity": "scope_limit",
+      "finding": "Pinned reviewer fields are structural assertions, not authentication. Trusted reviewer provenance is an external obligation."
+    },
+    {
+      "id": "R5",
+      "severity": "scope_limit",
+      "finding": "Output polling detects overflow but is not a hard storage quota; daemon CPU/RAM are not enforced here."
+    }
+  ],
+  "files": [
+    {
+      "path": "runtime-replacement-assembler/assemble.py",
+      "sha256": "bd878d153ba497ceea6906f286488c7a473dc3f1e859c67606b89187a1259131",
+      "bytes": 10817
+    },
+    {
+      "path": "runtime-replacement-assembler/test_assemble.py",
+      "sha256": "476aa74240399b15ac15e5e8edc65b86cd7b2a5f7288aaad48f8bde99c019bbf",
+      "bytes": 6349
+    },
+    {
+      "path": "runtime-replacement-assembler/binding.draft.json",
+      "sha256": "f63c41525d067f07a2f2bc24e4f672b16128f6ce701f8a03680099ece29bff87",
+      "bytes": 2574
+    },
+    {
+      "path": "runtime-replacement-assembler/PLAN.md",
+      "sha256": "9f1052bf072c164db86595bf251779d11c1a45b6cd289dab7a442ba5de39002e",
+      "bytes": 1505
+    },
+    {
+      "path": "runtime-replacement-assembler/REPORT.md",
+      "sha256": "508ebc8f8acd680c9329207bc6a919e1f532a215b699103e1537a1992a9f6bd0",
+      "bytes": 2807
+    },
+    {
+      "path": "runtime-replacement-contract/check_inputs.py",
+      "sha256": "d8cc99889a09d3d657ede65b94327ef498c0684cd0620c9e9c1fb7d71fed0b38",
+      "bytes": 4769
+    },
+    {
+      "path": "runtime-replacement-contract/contract.json",
+      "sha256": "648f78937c49d45b8d33d6460b438b23857956e364485d980c74d27488a1271b",
+      "bytes": 1581
+    },
+    {
+      "path": "runtime-driver-controls/check.py",
+      "sha256": "31b0868464a2f1d4641f988d96d831b74baa5b358549f2cc3a3ba8b0ecb8cf4a",
+      "bytes": 3525
+    },
+    {
+      "path": "runtime-driver-controls/summary.json",
+      "sha256": "a0fb492dc75902391e907ef9d1c9cc2b3c53fe2e0cfc68230b18de91a0739c46",
+      "bytes": 4648
+    },
+    {
+      "path": "runtime-driver-controls/PLAN.md",
+      "sha256": "9ccf821bfa9477fec9095aec8e093a2c51f4adc1b16d2fd99ab6ec4cca80dc82",
+      "bytes": 1449
+    },
+    {
+      "path": "runtime-driver-controls/REPORT.md",
+      "sha256": "91175301057bffe923aaf4c6379a9ee54e1e64f23176f1c92abf201ac3a6c8bd",
+      "bytes": 2442
+    },
+    {
+      "path": "runtime-mountpoint-proposal/Dockerfile.runtime.proposed",
+      "sha256": "5d86b44b9f087a430969c40882db60127d4fcfdb5934bb87cc4d2398dbcec21b",
+      "bytes": 386
+    }
+  ],
+  "fresh_checks": {
+    "mocked_unit_tests": 14,
+    "passed": 14,
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -v test_assemble.py"
+  },
+  "recorded_controls_inspected": 8,
+  "recorded_controls_replayed": false,
+  "docker_calls": 0,
+  "sudo_calls": 0,
+  "scientific_execution": false,
+  "independence_boundary": "Independent review applies only to original assembler. This reviewer subsequently authored v2; v2 requires a different reviewer."
+}

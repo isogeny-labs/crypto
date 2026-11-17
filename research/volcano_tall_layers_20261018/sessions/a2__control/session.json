@@ -1,0 +1,52 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h40737d08523f",
+  "label": "2-volcano, D = -3, depth 20, m = 0, p = 104602353229057: positive control on the floor curves, 8 targets per curve",
+  "spec_id": "ECS1h14a518fabc9a",
+  "spec_sha256": "14a518fabc9a50abefc7adcaef698e7b6dad1ee5bcded5a9e0a72cd4475bdf0a",
+  "env_class_id": "ECBENV2he30515f1eabb",
+  "host_sha256": "96320774b3faa85b6cb08e297d7b0f3394d2d4c7e162fdcce46ed99ec8b77d12",
+  "plan_sha256": "056c257d1213f906b160c6bed8254eac20bfca7259ddd9fea2cf0259cf85e6bc",
+  "binary_sha256": "47407f2b47fd5c73553a47c4b57ab1e0a165ca8dfa286965bf1f218ee9d41005",
+  "git_commit": "7552f346056b47528c06ec427c52fea81ec3d62d",
+  "git_dirty": true,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/home/user/crypto/research/volcano_tall_layers_20261018/.locks/a2__control",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1792357022466,
+  "finished_unix_ms": 1792357339264,
+  "status": "complete",
+  "executions_planned": 128,
+  "records_written": 128,
+  "records_sha256": "0822e2fb2ab411a7d051dbb69b64eff46fd1faeac7b63f392285d1abef95e782",
+  "status_counts": {
+    "verified": 128
+  }
+}

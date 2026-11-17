@@ -1,0 +1,15 @@
+# Normalization validity from sliced input guards
+
+T-1189; 2026-10-31. Producer proof and source trace; independent source-fidelity review pending.
+
+A coefficient prefix through degree d whose coefficient at d is one has exact natural degree d and is monic. A prefix of length d has polynomial degree strictly less than d, including the empty prefix at d=0. Combined with d<=2 and residual divisibility, these facts establish all four Mumford validity conditions. The UInt64 composition derives the stored-output validity and preserved degree directly from the top-word-one guard; separate input degree metadata and a bundled input-validity premise are no longer required by that theorem.
+
+Six main declarations and eight controls are exposed for separate axiom readback. Controls cover degrees zero, one and two, empty ordinate, missing top coefficient, inconsistent degree metadata, a nonmonic top coefficient, and the ordinate prefix bound. Canonical coefficient/parameter words, prime 1<p<2^31, nonzero scale and residual divisibility remain explicit assumptions of the stored-word theorem.
+
+Source trace: Jacobian.valid checks degree<=2 and u[degree]==1, then checks an empty remainder of f-v^2 modulo the sliced u. Divisor.up includes coefficients through degree; Divisor.vp takes only coefficients below degree. This supplies the shape of the proved guards. The logical connection between the native remainder algorithm and polynomial divisibility is still unproved here. Jacobian.valid does not itself check canonical coefficient words or unused array tails.
+
+For non-infinite tau outputs, the source asserts every stored u/v word is below p and checks Jacobian.valid. The infinity branch returns the fixed identity. The model gate checks source validity for its sampled d inputs, but the add-result passed to map_divisor has no immediate validity assertion at that call. Source-level construction/invariant proofs remain necessary to cover that path. Scholten.new asserts p>13, p mod4=3 and constructor primality; the inspected constructor does not assert p<2^31. Field.validate contains that bound, but this model-gate caller does not invoke it explicitly. The proof retains the bound; this trace does not certify the fixture data or all callers.
+
+Source excerpts are exact-line/hash-bound to three_leads.rs, alongside the corrected named model-gate extraction. Prior sourcePoly_coefficient and stored_valid supply the composition. Pinned Mathlib degree lemmas provide coefficient/degree equivalences. No new compiled dependencies, native remainder proof, compiled-Rust equivalence, geometric class theorem or scientific execution is claimed.
+
+All four native checks passed with unchanged input bindings. All 14 named axiom readbacks use only propext, Classical.choice and Quot.sound; results are in status.json. Existing compiled upstream dependencies retain their trust boundary. Any nonfatal deprecation warnings are kept in the receipts.

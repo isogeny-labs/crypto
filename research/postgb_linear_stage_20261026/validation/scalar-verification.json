@@ -1,0 +1,812 @@
+{
+ "schema": "postgb-la-scalar-verification/v1",
+ "verifier": "research/postgb_linear_stage_20261026/validation/verify_scalars.py",
+ "independent_arithmetic": true,
+ "snapshot_commit": "e9bf8737a38fa4446acec23812eaaf085d8426a6",
+ "dump_commit": "ca7dc711fae61199b47826035a72d89d1dce12fd",
+ "inputs": {
+  "research/postgb_linear_stage_20261026/validation/scalar-dump/instances-sparse.jsonl": "fdeec87b64ca7ff19b31d4cc38ab4fd5aa67aa731c5a376ebf5806a1e6913242",
+  "research/postgb_linear_stage_20261026/validation/scalar-dump/dlp-sparse.json": "18e2963e6fb72dec67ea09bd17197f3194ffc20a23dc724dcfe2e52cac5f8625",
+  "research/postgb_linear_stage_20261026/validation/scalar-dump/instances-fast.jsonl": "7a14981c718db9df5251e50180597638a224aa77f7c5c3fcd84db227a5fa47eb",
+  "research/postgb_linear_stage_20261026/validation/scalar-dump/dlp-fast.json": "75c5c4cc85ae9d1ebcc2e1234768597a3336d25b808819898e52eac4ea89283b"
+ },
+ "instances": [
+  {
+   "p": 53,
+   "seed": 1,
+   "lin": "sparse",
+   "l": 5541095869,
+   "d": 5433602569,
+   "dd": 5433602569,
+   "w_nonresidue_euler": true,
+   "w_no_root_exhaustive": true,
+   "s_noncube_euler": true,
+   "s_no_root_exhaustive": true,
+   "curve_nonsingular": true,
+   "G_on_curve": true,
+   "Q_on_curve": true,
+   "l_prime_miller_rabin": true,
+   "l_prime_trial_division": true,
+   "G_not_O": true,
+   "lG_is_O": true,
+   "ddG_eq_Q": true,
+   "dd_eq_d": true,
+   "d_in_range": true,
+   "negative_controls_all_false": true,
+   "negative_controls": {
+    "dd_plus_1_times_G_eq_Q": false,
+    "perturbed_G_on_curve": false,
+    "composite_3l_prime": false,
+    "residue_4_passes_nonresidue_test": false,
+    "cube_s_noncube": false,
+    "l_minus_1_times_G_is_O": false
+   },
+   "self_tests_all_true": true,
+   "self_tests": {
+    "mul_assoc": true,
+    "distrib": true,
+    "inverse": true,
+    "frobenius_order": true,
+    "scalar_linearity": true,
+    "l_minus_1_is_neg": true,
+    "results_on_curve": true
+   },
+   "extra_4l_in_hasse_interval": true,
+   "extra_4l_kills_3_random_points": true,
+   "verified": true,
+   "gating_checks": [
+    "w_nonresidue_euler",
+    "w_no_root_exhaustive",
+    "s_noncube_euler",
+    "s_no_root_exhaustive",
+    "curve_nonsingular",
+    "G_on_curve",
+    "Q_on_curve",
+    "l_prime_miller_rabin",
+    "l_prime_trial_division",
+    "G_not_O",
+    "lG_is_O",
+    "ddG_eq_Q",
+    "dd_eq_d",
+    "d_in_range",
+    "negative_controls_all_false",
+    "self_tests_all_true"
+   ],
+   "lin_label_matches_arm": true
+  },
+  {
+   "p": 53,
+   "seed": 2,
+   "lin": "sparse",
+   "l": 5541066061,
+   "d": 750649568,
+   "dd": 750649568,
+   "w_nonresidue_euler": true,
+   "w_no_root_exhaustive": true,
+   "s_noncube_euler": true,
+   "s_no_root_exhaustive": true,
+   "curve_nonsingular": true,
+   "G_on_curve": true,
+   "Q_on_curve": true,
+   "l_prime_miller_rabin": true,
+   "l_prime_trial_division": true,
+   "G_not_O": true,
+   "lG_is_O": true,
+   "ddG_eq_Q": true,
+   "dd_eq_d": true,
+   "d_in_range": true,
+   "negative_controls_all_false": true,
+   "negative_controls": {
+    "dd_plus_1_times_G_eq_Q": false,
+    "perturbed_G_on_curve": false,
+    "composite_3l_prime": false,
+    "residue_4_passes_nonresidue_test": false,
+    "cube_s_noncube": false,
+    "l_minus_1_times_G_is_O": false
+   },
+   "self_tests_all_true": true,
+   "self_tests": {
+    "mul_assoc": true,
+    "distrib": true,
+    "inverse": true,
+    "frobenius_order": true,
+    "scalar_linearity": true,
+    "l_minus_1_is_neg": true,
+    "results_on_curve": true
+   },
+   "extra_4l_in_hasse_interval": true,
+   "extra_4l_kills_3_random_points": true,
+   "verified": true,
+   "gating_checks": [
+    "w_nonresidue_euler",
+    "w_no_root_exhaustive",
+    "s_noncube_euler",
+    "s_no_root_exhaustive",
+    "curve_nonsingular",
+    "G_on_curve",
+    "Q_on_curve",
+    "l_prime_miller_rabin",
+    "l_prime_trial_division",
+    "G_not_O",
+    "lG_is_O",
+    "ddG_eq_Q",
+    "dd_eq_d",
+    "d_in_range",
+    "negative_controls_all_false",
+    "self_tests_all_true"
+   ],
+   "lin_label_matches_arm": true
+  },
+  {
+   "p": 101,
+   "seed": 1,
+   "lin": "sparse",
+   "l": 265379898941,
+   "d": 93549171483,
+   "dd": 93549171483,
+   "w_nonresidue_euler": true,
+   "w_no_root_exhaustive": true,
+   "s_noncube_euler": true,
+   "s_no_root_exhaustive": true,
+   "curve_nonsingular": true,
+   "G_on_curve": true,
+   "Q_on_curve": true,
+   "l_prime_miller_rabin": true,
+   "l_prime_trial_division": true,
+   "G_not_O": true,
+   "lG_is_O": true,
+   "ddG_eq_Q": true,
+   "dd_eq_d": true,
+   "d_in_range": true,
+   "negative_controls_all_false": true,
+   "negative_controls": {
+    "dd_plus_1_times_G_eq_Q": false,
+    "perturbed_G_on_curve": false,
+    "composite_3l_prime": false,
+    "residue_4_passes_nonresidue_test": false,
+    "cube_s_noncube": false,
+    "l_minus_1_times_G_is_O": false
+   },
+   "self_tests_all_true": true,
+   "self_tests": {
+    "mul_assoc": true,
+    "distrib": true,
+    "inverse": true,
+    "frobenius_order": true,
+    "scalar_linearity": true,
+    "l_minus_1_is_neg": true,
+    "results_on_curve": true
+   },
+   "extra_4l_in_hasse_interval": true,
+   "extra_4l_kills_3_random_points": true,
+   "verified": true,
+   "gating_checks": [
+    "w_nonresidue_euler",
+    "w_no_root_exhaustive",
+    "s_noncube_euler",
+    "s_no_root_exhaustive",
+    "curve_nonsingular",
+    "G_on_curve",
+    "Q_on_curve",
+    "l_prime_miller_rabin",
+    "l_prime_trial_division",
+    "G_not_O",
+    "lG_is_O",
+    "ddG_eq_Q",
+    "dd_eq_d",
+    "d_in_range",
+    "negative_controls_all_false",
+    "self_tests_all_true"
+   ],
+   "lin_label_matches_arm": true
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "lin": "sparse",
+   "l": 265380442529,
+   "d": 154451384320,
+   "dd": 154451384320,
+   "w_nonresidue_euler": true,
+   "w_no_root_exhaustive": true,
+   "s_noncube_euler": true,
+   "s_no_root_exhaustive": true,
+   "curve_nonsingular": true,
+   "G_on_curve": true,
+   "Q_on_curve": true,
+   "l_prime_miller_rabin": true,
+   "l_prime_trial_division": true,
+   "G_not_O": true,
+   "lG_is_O": true,
+   "ddG_eq_Q": true,
+   "dd_eq_d": true,
+   "d_in_range": true,
+   "negative_controls_all_false": true,
+   "negative_controls": {
+    "dd_plus_1_times_G_eq_Q": false,
+    "perturbed_G_on_curve": false,
+    "composite_3l_prime": false,
+    "residue_4_passes_nonresidue_test": false,
+    "cube_s_noncube": false,
+    "l_minus_1_times_G_is_O": false
+   },
+   "self_tests_all_true": true,
+   "self_tests": {
+    "mul_assoc": true,
+    "distrib": true,
+    "inverse": true,
+    "frobenius_order": true,
+    "scalar_linearity": true,
+    "l_minus_1_is_neg": true,
+    "results_on_curve": true
+   },
+   "extra_4l_in_hasse_interval": true,
+   "extra_4l_kills_3_random_points": true,
+   "verified": true,
+   "gating_checks": [
+    "w_nonresidue_euler",
+    "w_no_root_exhaustive",
+    "s_noncube_euler",
+    "s_no_root_exhaustive",
+    "curve_nonsingular",
+    "G_on_curve",
+    "Q_on_curve",
+    "l_prime_miller_rabin",
+    "l_prime_trial_division",
+    "G_not_O",
+    "lG_is_O",
+    "ddG_eq_Q",
+    "dd_eq_d",
+    "d_in_range",
+    "negative_controls_all_false",
+    "self_tests_all_true"
+   ],
+   "lin_label_matches_arm": true
+  },
+  {
+   "p": 53,
+   "seed": 1,
+   "lin": "fast",
+   "l": 5541095869,
+   "d": 5433602569,
+   "dd": 5433602569,
+   "w_nonresidue_euler": true,
+   "w_no_root_exhaustive": true,
+   "s_noncube_euler": true,
+   "s_no_root_exhaustive": true,
+   "curve_nonsingular": true,
+   "G_on_curve": true,
+   "Q_on_curve": true,
+   "l_prime_miller_rabin": true,
+   "l_prime_trial_division": true,
+   "G_not_O": true,
+   "lG_is_O": true,
+   "ddG_eq_Q": true,
+   "dd_eq_d": true,
+   "d_in_range": true,
+   "negative_controls_all_false": true,
+   "negative_controls": {
+    "dd_plus_1_times_G_eq_Q": false,
+    "perturbed_G_on_curve": false,
+    "composite_3l_prime": false,
+    "residue_4_passes_nonresidue_test": false,
+    "cube_s_noncube": false,
+    "l_minus_1_times_G_is_O": false
+   },
+   "self_tests_all_true": true,
+   "self_tests": {
+    "mul_assoc": true,
+    "distrib": true,
+    "inverse": true,
+    "frobenius_order": true,
+    "scalar_linearity": true,
+    "l_minus_1_is_neg": true,
+    "results_on_curve": true
+   },
+   "extra_4l_in_hasse_interval": true,
+   "extra_4l_kills_3_random_points": true,
+   "verified": true,
+   "gating_checks": [
+    "w_nonresidue_euler",
+    "w_no_root_exhaustive",
+    "s_noncube_euler",
+    "s_no_root_exhaustive",
+    "curve_nonsingular",
+    "G_on_curve",
+    "Q_on_curve",
+    "l_prime_miller_rabin",
+    "l_prime_trial_division",
+    "G_not_O",
+    "lG_is_O",
+    "ddG_eq_Q",
+    "dd_eq_d",
+    "d_in_range",
+    "negative_controls_all_false",
+    "self_tests_all_true"
+   ],
+   "lin_label_matches_arm": true
+  },
+  {
+   "p": 53,
+   "seed": 2,
+   "lin": "fast",
+   "l": 5541066061,
+   "d": 750649568,
+   "dd": 750649568,
+   "w_nonresidue_euler": true,
+   "w_no_root_exhaustive": true,
+   "s_noncube_euler": true,
+   "s_no_root_exhaustive": true,
+   "curve_nonsingular": true,
+   "G_on_curve": true,
+   "Q_on_curve": true,
+   "l_prime_miller_rabin": true,
+   "l_prime_trial_division": true,
+   "G_not_O": true,
+   "lG_is_O": true,
+   "ddG_eq_Q": true,
+   "dd_eq_d": true,
+   "d_in_range": true,
+   "negative_controls_all_false": true,
+   "negative_controls": {
+    "dd_plus_1_times_G_eq_Q": false,
+    "perturbed_G_on_curve": false,
+    "composite_3l_prime": false,
+    "residue_4_passes_nonresidue_test": false,
+    "cube_s_noncube": false,
+    "l_minus_1_times_G_is_O": false
+   },
+   "self_tests_all_true": true,
+   "self_tests": {
+    "mul_assoc": true,
+    "distrib": true,
+    "inverse": true,
+    "frobenius_order": true,
+    "scalar_linearity": true,
+    "l_minus_1_is_neg": true,
+    "results_on_curve": true
+   },
+   "extra_4l_in_hasse_interval": true,
+   "extra_4l_kills_3_random_points": true,
+   "verified": true,
+   "gating_checks": [
+    "w_nonresidue_euler",
+    "w_no_root_exhaustive",
+    "s_noncube_euler",
+    "s_no_root_exhaustive",
+    "curve_nonsingular",
+    "G_on_curve",
+    "Q_on_curve",
+    "l_prime_miller_rabin",
+    "l_prime_trial_division",
+    "G_not_O",
+    "lG_is_O",
+    "ddG_eq_Q",
+    "dd_eq_d",
+    "d_in_range",
+    "negative_controls_all_false",
+    "self_tests_all_true"
+   ],
+   "lin_label_matches_arm": true
+  },
+  {
+   "p": 101,
+   "seed": 1,
+   "lin": "fast",
+   "l": 265379898941,
+   "d": 93549171483,
+   "dd": 93549171483,
+   "w_nonresidue_euler": true,
+   "w_no_root_exhaustive": true,
+   "s_noncube_euler": true,
+   "s_no_root_exhaustive": true,
+   "curve_nonsingular": true,
+   "G_on_curve": true,
+   "Q_on_curve": true,
+   "l_prime_miller_rabin": true,
+   "l_prime_trial_division": true,
+   "G_not_O": true,
+   "lG_is_O": true,
+   "ddG_eq_Q": true,
+   "dd_eq_d": true,
+   "d_in_range": true,
+   "negative_controls_all_false": true,
+   "negative_controls": {
+    "dd_plus_1_times_G_eq_Q": false,
+    "perturbed_G_on_curve": false,
+    "composite_3l_prime": false,
+    "residue_4_passes_nonresidue_test": false,
+    "cube_s_noncube": false,
+    "l_minus_1_times_G_is_O": false
+   },
+   "self_tests_all_true": true,
+   "self_tests": {
+    "mul_assoc": true,
+    "distrib": true,
+    "inverse": true,
+    "frobenius_order": true,
+    "scalar_linearity": true,
+    "l_minus_1_is_neg": true,
+    "results_on_curve": true
+   },
+   "extra_4l_in_hasse_interval": true,
+   "extra_4l_kills_3_random_points": true,
+   "verified": true,
+   "gating_checks": [
+    "w_nonresidue_euler",
+    "w_no_root_exhaustive",
+    "s_noncube_euler",
+    "s_no_root_exhaustive",
+    "curve_nonsingular",
+    "G_on_curve",
+    "Q_on_curve",
+    "l_prime_miller_rabin",
+    "l_prime_trial_division",
+    "G_not_O",
+    "lG_is_O",
+    "ddG_eq_Q",
+    "dd_eq_d",
+    "d_in_range",
+    "negative_controls_all_false",
+    "self_tests_all_true"
+   ],
+   "lin_label_matches_arm": true
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "lin": "fast",
+   "l": 265380442529,
+   "d": 154451384320,
+   "dd": 154451384320,
+   "w_nonresidue_euler": true,
+   "w_no_root_exhaustive": true,
+   "s_noncube_euler": true,
+   "s_no_root_exhaustive": true,
+   "curve_nonsingular": true,
+   "G_on_curve": true,
+   "Q_on_curve": true,
+   "l_prime_miller_rabin": true,
+   "l_prime_trial_division": true,
+   "G_not_O": true,
+   "lG_is_O": true,
+   "ddG_eq_Q": true,
+   "dd_eq_d": true,
+   "d_in_range": true,
+   "negative_controls_all_false": true,
+   "negative_controls": {
+    "dd_plus_1_times_G_eq_Q": false,
+    "perturbed_G_on_curve": false,
+    "composite_3l_prime": false,
+    "residue_4_passes_nonresidue_test": false,
+    "cube_s_noncube": false,
+    "l_minus_1_times_G_is_O": false
+   },
+   "self_tests_all_true": true,
+   "self_tests": {
+    "mul_assoc": true,
+    "distrib": true,
+    "inverse": true,
+    "frobenius_order": true,
+    "scalar_linearity": true,
+    "l_minus_1_is_neg": true,
+    "results_on_curve": true
+   },
+   "extra_4l_in_hasse_interval": true,
+   "extra_4l_kills_3_random_points": true,
+   "verified": true,
+   "gating_checks": [
+    "w_nonresidue_euler",
+    "w_no_root_exhaustive",
+    "s_noncube_euler",
+    "s_no_root_exhaustive",
+    "curve_nonsingular",
+    "G_on_curve",
+    "Q_on_curve",
+    "l_prime_miller_rabin",
+    "l_prime_trial_division",
+    "G_not_O",
+    "lG_is_O",
+    "ddG_eq_Q",
+    "dd_eq_d",
+    "d_in_range",
+    "negative_controls_all_false",
+    "self_tests_all_true"
+   ],
+   "lin_label_matches_arm": true
+  }
+ ],
+ "ties": [
+  {
+   "check": "sparse: one dump per recorded (p, seed), 4 in all",
+   "ok": true,
+   "keys": [
+    [
+     53,
+     1
+    ],
+    [
+     53,
+     2
+    ],
+    [
+     101,
+     1
+    ],
+    [
+     101,
+     2
+    ]
+   ]
+  },
+  {
+   "check": "sparse (53, 1): dlp-sparse.json row = R2-D1 row (all non-timing fields)",
+   "fields_compared": 54,
+   "differing": {},
+   "dump_l_eq_row_l": true,
+   "row_correct": true,
+   "row_solved": true,
+   "ok": true
+  },
+  {
+   "check": "sparse (53, 2): dlp-sparse.json row = R2-D1 row (all non-timing fields)",
+   "fields_compared": 54,
+   "differing": {},
+   "dump_l_eq_row_l": true,
+   "row_correct": true,
+   "row_solved": true,
+   "ok": true
+  },
+  {
+   "check": "sparse (101, 1): dlp-sparse.json row = R2-D1 row (all non-timing fields)",
+   "fields_compared": 54,
+   "differing": {},
+   "dump_l_eq_row_l": true,
+   "row_correct": true,
+   "row_solved": true,
+   "ok": true
+  },
+  {
+   "check": "sparse (101, 2): dlp-sparse.json row = R2-D1 row (all non-timing fields)",
+   "fields_compared": 54,
+   "differing": {},
+   "dump_l_eq_row_l": true,
+   "row_correct": true,
+   "row_solved": true,
+   "ok": true
+  },
+  {
+   "check": "fast: one dump per recorded (p, seed), 4 in all",
+   "ok": true,
+   "keys": [
+    [
+     53,
+     1
+    ],
+    [
+     53,
+     2
+    ],
+    [
+     101,
+     1
+    ],
+    [
+     101,
+     2
+    ]
+   ]
+  },
+  {
+   "check": "fast (53, 1): dlp-fast.json row = R2-D2 row (all non-timing fields)",
+   "fields_compared": 54,
+   "differing": {},
+   "dump_l_eq_row_l": true,
+   "row_correct": true,
+   "row_solved": true,
+   "ok": true
+  },
+  {
+   "check": "fast (53, 2): dlp-fast.json row = R2-D2 row (all non-timing fields)",
+   "fields_compared": 54,
+   "differing": {},
+   "dump_l_eq_row_l": true,
+   "row_correct": true,
+   "row_solved": true,
+   "ok": true
+  },
+  {
+   "check": "fast (101, 1): dlp-fast.json row = R2-D2 row (all non-timing fields)",
+   "fields_compared": 54,
+   "differing": {},
+   "dump_l_eq_row_l": true,
+   "row_correct": true,
+   "row_solved": true,
+   "ok": true
+  },
+  {
+   "check": "fast (101, 2): dlp-fast.json row = R2-D2 row (all non-timing fields)",
+   "fields_compared": 54,
+   "differing": {},
+   "dump_l_eq_row_l": true,
+   "row_correct": true,
+   "row_solved": true,
+   "ok": true
+  },
+  {
+   "check": "(53, 1): dumped instance identical across JV_LIN arms",
+   "ok": true,
+   "fields": {
+    "p": true,
+    "seed": true,
+    "w": true,
+    "s": true,
+    "a2": true,
+    "a4": true,
+    "l": true,
+    "g": true,
+    "q": true,
+    "d": true,
+    "dd": true
+   }
+  },
+  {
+   "check": "(53, 2): dumped instance identical across JV_LIN arms",
+   "ok": true,
+   "fields": {
+    "p": true,
+    "seed": true,
+    "w": true,
+    "s": true,
+    "a2": true,
+    "a4": true,
+    "l": true,
+    "g": true,
+    "q": true,
+    "d": true,
+    "dd": true
+   }
+  },
+  {
+   "check": "(101, 1): dumped instance identical across JV_LIN arms",
+   "ok": true,
+   "fields": {
+    "p": true,
+    "seed": true,
+    "w": true,
+    "s": true,
+    "a2": true,
+    "a4": true,
+    "l": true,
+    "g": true,
+    "q": true,
+    "d": true,
+    "dd": true
+   }
+  },
+  {
+   "check": "(101, 2): dumped instance identical across JV_LIN arms",
+   "ok": true,
+   "fields": {
+    "p": true,
+    "seed": true,
+    "w": true,
+    "s": true,
+    "a2": true,
+    "a4": true,
+    "l": true,
+    "g": true,
+    "q": true,
+    "d": true,
+    "dd": true
+   }
+  }
+ ],
+ "own_runs": [
+  {
+   "name": "dump_fast_p53-101_s1",
+   "argv": [
+    "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned/jv_cover_dump",
+    "--exp",
+    "dlp",
+    "--rho-runs",
+    "4",
+    "--check-every",
+    "64",
+    "--sizes",
+    "53,101",
+    "--seeds",
+    "1",
+    "--json",
+    "research/postgb_linear_stage_20261026/validation/replay/out/dump_fast_p53-101_s1.json"
+   ],
+   "env": {
+    "JV_LIN": "fast",
+    "JV_DUMP_INSTANCE": "research/postgb_linear_stage_20261026/validation/replay/out/dump_fast_p53-101_s1.instances.jsonl"
+   },
+   "binary_sha256": "b2b8ab340fb6ab5dfca09552226b2005a1495e3ed1045d4bbe3250f15a8b3300",
+   "exit_code": 0,
+   "checks": [
+    {
+     "key": [
+      53,
+      1
+     ],
+     "instance_line_byte_identical_to_producer_dump": true
+    },
+    {
+     "key": [
+      101,
+      1
+     ],
+     "instance_line_byte_identical_to_producer_dump": true
+    },
+    {
+     "key": [
+      53,
+      1
+     ],
+     "row_equals_R2_row_non_timing_fields": true,
+     "fields_compared": 54,
+     "differing": {}
+    },
+    {
+     "key": [
+      101,
+      1
+     ],
+     "row_equals_R2_row_non_timing_fields": true,
+     "fields_compared": 54,
+     "differing": {}
+    }
+   ],
+   "ok": true
+  },
+  {
+   "name": "dump_sparse_p101_s2",
+   "argv": [
+    "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned/jv_cover_dump",
+    "--exp",
+    "dlp",
+    "--rho-runs",
+    "4",
+    "--check-every",
+    "64",
+    "--sizes",
+    "101",
+    "--seeds",
+    "1",
+    "--first-seed",
+    "2",
+    "--json",
+    "research/postgb_linear_stage_20261026/validation/replay/out/dump_sparse_p101_s2.json"
+   ],
+   "env": {
+    "JV_LIN": "sparse",
+    "JV_DUMP_INSTANCE": "research/postgb_linear_stage_20261026/validation/replay/out/dump_sparse_p101_s2.instances.jsonl"
+   },
+   "binary_sha256": "b2b8ab340fb6ab5dfca09552226b2005a1495e3ed1045d4bbe3250f15a8b3300",
+   "exit_code": 0,
+   "checks": [
+    {
+     "key": [
+      101,
+      2
+     ],
+     "instance_line_byte_identical_to_producer_dump": true
+    },
+    {
+     "key": [
+      101,
+      2
+     ],
+     "row_equals_R2_row_non_timing_fields": true,
+     "fields_compared": 54,
+     "differing": {}
+    }
+   ],
+   "ok": true
+  }
+ ],
+ "all_verified": true
+}

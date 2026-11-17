@@ -1,0 +1,30 @@
+Traceback (most recent call last):
+  File "/Volumes/SSD990/crypto/worktrees/n83-crossfamily-cancel-20261017/research/n83_crossfamily_cancel_20261017/aggregate.py", line 194, in <module>
+    main()
+    ~~~~^^
+  File "/Volumes/SSD990/crypto/worktrees/n83-crossfamily-cancel-20261017/research/n83_crossfamily_cancel_20261017/aggregate.py", line 177, in main
+    strata.append(bind_stratum(
+                  ~~~~~~~~~~~~^
+        stratum, getattr(args, f'stratum{stratum}_results').resolve(),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        getattr(args, f'stratum{stratum}_zip').resolve(),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        getattr(args, f'stratum{stratum}_provider_sha256'), args.run_id,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        args.run_attempt, args.head_sha, args.reuse_local_replay))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/SSD990/crypto/worktrees/n83-crossfamily-cancel-20261017/research/n83_crossfamily_cancel_20261017/aggregate.py", line 67, in bind_stratum
+    process = subprocess.run(command, cwd=ROOT, capture_output=True,
+                             text=True, check=False)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 556, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 1219, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 2122, in _communicate
+    ready = selector.select(timeout)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/selectors.py", line 314, in select
+    r, w, _ = self._select(self._readers, self._writers, [], timeout)
+              ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: select() takes 1 positional argument but 5 were given

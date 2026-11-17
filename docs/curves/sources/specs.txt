@@ -1,0 +1,39 @@
+# Specifications for examples/curve_id_generated.rs, one per line.
+# Native cofactor/generator fixture source: research/ecbench_known_log_targets_20261021/fixtures.json
+# Reproduce these additions with examples/known_log_targets.rs (fixtures, register).
+# Regenerate docs/curves/sources/generated.json with the command in docs/curves/README.md.
+# The Round-5 matched-rho evaluation ladder (seed 0xE7A1 = 59297) and its calibration (0xCA11B = 827675):
+prime:12:59297 prime:14:59297 prime:16:59297 prime:18:59297 prime:20:59297 prime:22:59297 prime:24:59297 prime:26:59297
+prime:22:827675 prime:24:827675 prime:26:827675
+char2:13:59297:8 char2:15:59297:8 char2:17:59297:8 char2:19:59297:8 char2:21:59297:8 char2:23:59297:8 char2:25:59297:8 char2:27:59297:8
+char2:13:827675:8 char2:15:827675:8 char2:17:827675:8 char2:19:827675:8 char2:21:827675:8 char2:23:827675:8 char2:25:827675:8 char2:27:827675:8
+# The framework's W13/W15/W17 bench curves (seed = first rho seed XOR 0x52484F00):
+char2:13:20260922:8 char2:13:20260923:8 char2:13:20260924:8 char2:15:20260922:8 char2:15:20260923:8 char2:15:20260924:8 char2:17:20260922:8
+# Subfield curves of RESEARCH_KOBLITZ_INDEX_CALCULUS.md:
+subfield:2:6:0:2 subfield:2:10:0:2 subfield:2:14:0:2 subfield:2:18:2:1
+# The bench roster:
+roster:8 roster:10 roster:12 roster:14 roster:16 roster:18 roster:20
+# Every Koblitz curve the repository names below degree 64, as KoblitzCurve::new builds it:
+koblitz:0:7 koblitz:0:9 koblitz:0:11 koblitz:0:13 koblitz:0:15 koblitz:0:17 koblitz:0:19 koblitz:0:23 koblitz:0:31 koblitz:0:37 koblitz:0:39 koblitz:0:41 koblitz:0:53 koblitz:0:61 koblitz:1:7 koblitz:1:9 koblitz:1:11 koblitz:1:13 koblitz:1:15 koblitz:1:17 koblitz:1:19 koblitz:1:21 koblitz:1:23 koblitz:1:29 koblitz:1:31 koblitz:1:43 koblitz:1:45 koblitz:1:47 koblitz:1:59
+
+# Native seed/source manifest: docs/curves/sources/iso1_population_20261009.json
+
+# Native seed/source manifest: docs/curves/sources/ecbench-ten-questions.json
+# conductor_gap crater/floor: ell=263, t=241, floor seed=59297; examples/ecbench_leads.rs register
+
+# Native seed/source manifest: docs/curves/sources/iso1_two_branch_20261009.json
+# Native CM source search (seed 1, certified orders and floor models):
+# research/full_volcano_classes_20261017/evidence/construction.jsonl
+# research/full_volcano_classes_20261017/evidence/*-floor-plan.json
+# The frontier campaign pilot (research/ic_frontier_campaign_20261015/pilot, session pP20):
+prime:20:20261015
+
+# Weighted Weil-restriction native construction manifest (all p with both seeds):
+# docs/curves/sources/weil-weighted-20261019.json
+# generate_instance3(p, seed), p=31,61,127,241,499,1009; seed=20261019,936451
+# The ic-size-sweep ladder (taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026, seed 0xE7A1 = 59297) at the sizes the matched-rho ladder above does not hold:
+prime:28:59297 prime:32:59297
+# PKM tower ecbench round (research/pkm_tower_ecbench_20261011): prime-order curves with 2^t | p - 1 for t = 5..8:
+prime:9:17 prime:11:20 prime:13:35 prime:15:115
+# Ic-lead-queue studies B1 (research/ic_lead_queue_20261114/B_sweep_followups/B1): fresh 20-bit curves drawn by seed:
+prime:20:211747386521066 prime:20:145169970934094

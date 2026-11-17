@@ -1,0 +1,49 @@
+PencilWordRefinement.literal5_mul_reduce (p a : UInt64) (hp : 0 < p.toNat) (hb : p.toNat < 2 ^ 31)
+  (ha : a.toNat < p.toNat) : 5 * a % p = 5 % p * a % p
+PencilWordRefinement.dbl_payload_decode (p : UInt64) [Fact (Nat.Prime p.toNat)] (hfive : 5 ≤ p.toNat)
+  (hb : p.toNat < 2 ^ 31) (a0 a1 a2 a3 : UInt64) (a : PencilWordRefinement.WordD1) (h0 : a0.toNat < p.toNat)
+  (h1 : a1.toNat < p.toNat) (h2 : a2.toNat < p.toNat) (h3 : a3.toNat < p.toNat)
+  (ha : PencilWordRefinement.WordD1.canonical p a) :
+  have c := PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a;
+  have d := PencilWordRefinement.WordD1.decode p a;
+  have f := WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat) d.x d.y d.z d.w;
+  PencilWordRefinement.WeightedWord.canonical p c ∧
+    ↑c.q.toNat = f.q ∧ ↑c.r.toNat = f.r ∧ ↑c.s.toNat = f.s ∧ ↑c.t.toNat = f.t ∧ ↑c.z.toNat = f.z ∧ ↑c.w.toNat = f.w
+PencilWordRefinement.dbl_normalized_valid (p : UInt64) [Fact (Nat.Prime p.toNat)] (hfive : 5 ≤ p.toNat)
+  (hb : p.toNat < 2 ^ 31) (a0 a1 a2 a3 : UInt64) (a : PencilWordRefinement.WordD1) (h0 : a0.toNat < p.toNat)
+  (h1 : a1.toNat < p.toNat) (h2 : a2.toNat < p.toNat) (h3 : a3.toNat < p.toNat)
+  (ha : PencilWordRefinement.WordD1.canonical p a) (hz : (PencilWordRefinement.WordD1.decode p a).z ≠ 0)
+  (hw : (PencilWordRefinement.WordD1.decode p a).w ≠ 0) (htwo : 2 ≠ 0)
+  (hy : (PencilWordRefinement.WordD1.decode p a).y ≠ 0)
+  (hpoint :
+    WeightedDoubling.value (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+        ((PencilWordRefinement.WordD1.decode p a).x / (PencilWordRefinement.WordD1.decode p a).z ^ 2) =
+      ((PencilWordRefinement.WordD1.decode p a).y /
+          ((PencilWordRefinement.WordD1.decode p a).z ^ 5 * (PencilWordRefinement.WordD1.decode p a).w)) ^
+        2) :
+  have c := PencilWordRefinement.dblWordPayload p a0 a1 a2 a3 a;
+  have q := ↑c.q.toNat;
+  have r := ↑c.r.toNat;
+  have s := ↑c.s.toNat;
+  have t := ↑c.t.toNat;
+  have z := ↑c.z.toNat;
+  have w := ↑c.w.toNat;
+  PencilWordRefinement.WeightedWord.canonical p c ∧
+    z ≠ 0 ∧
+      w ≠ 0 ∧
+        Polynomial.X ^ 2 + Polynomial.C (q / z ^ 2) * Polynomial.X + Polynomial.C (r / z ^ 4) ∣
+          WeightedDoubling.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat -
+            (Polynomial.C (s / (z ^ 3 * w)) * Polynomial.X + Polynomial.C (t / (z ^ 5 * w))) ^ 2
+PencilWordRefinement.zero_y_word_inverse (p x z w : UInt64) :
+  PencilWordRefinement.wordGuard p { x := x, y := 0, z := z, w := w } { x := x, y := 0, z := z, w := w } =
+    PencilWordRefinement.Add11Branch.inverse
+PencilWordRefinement.self_word_doubling (p : UInt64) [Fact (Nat.Prime p.toNat)] (hfive : 5 ≤ p.toNat)
+  (hb : p.toNat < 2 ^ 31) (a : PencilWordRefinement.WordD1) (ha : PencilWordRefinement.WordD1.canonical p a)
+  (hz : (PencilWordRefinement.WordD1.decode p a).z ≠ 0) (hw : (PencilWordRefinement.WordD1.decode p a).w ≠ 0)
+  (htwo : 2 ≠ 0) (hy : (PencilWordRefinement.WordD1.decode p a).y ≠ 0) :
+  PencilWordRefinement.wordGuard p a a = PencilWordRefinement.Add11Branch.doubling
+'PencilWordRefinement.literal5_mul_reduce' depends on axioms: [propext, Quot.sound]
+'PencilWordRefinement.dbl_payload_decode' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PencilWordRefinement.dbl_normalized_valid' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PencilWordRefinement.zero_y_word_inverse' depends on axioms: [propext, Quot.sound]
+'PencilWordRefinement.self_word_doubling' depends on axioms: [propext, Classical.choice, Quot.sound]

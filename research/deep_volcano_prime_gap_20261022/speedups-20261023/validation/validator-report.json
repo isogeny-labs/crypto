@@ -1,0 +1,452 @@
+{
+  "schema": "validation-gate/validator/v1",
+  "status": "pass",
+  "independent": true,
+  "study": "research/deep_volcano_prime_gap_20261022/speedups-20261023",
+  "snapshot": {
+    "evidence_commit": "049a0ac05c9b7c1c15ba15149cb64e2d342bfc0c",
+    "head_at_validation": "b67532210fad6a107ea2528bfde88788814b8778",
+    "code_under_test_commit": "d81da47d52064b2d4b83d4d10629d46442617738",
+    "note": "All 37 raw_data files are tracked, and each working-tree file equals its blob at HEAD b67532210 (git show HEAD:<path> | sha256sum). The merge b67532210 changes neither the evidence directory nor src/cryptanalysis/ic_boundary.rs, src/cryptanalysis/ecbench/ or src/cryptanalysis/prime_fast.rs relative to d81da47d5."
+  },
+  "sessions": {
+    "rho-lanes/session": "ECBS1h45f937d2f95a",
+    "rerun-sharded/sessions/spec-shard0": "ECBS1h14d98bf2a3ec",
+    "rerun-sharded/sessions/spec-shard1": "ECBS1h846ee50776a9",
+    "rerun-sharded/sessions/spec-shard2": "ECBS1hd4816b5f840b",
+    "rerun-sharded/sessions/spec-aa": "ECBS1h0246a995e87e",
+    "rerun-sharded/sessions/spec-bsgs": "ECBS1hd719e0366969",
+    "../run/sessions/spec (before)": "ECBS1h41a98e7c2141",
+    "../run/sessions/spec-aa (before)": "ECBS1h4034bfcbccc4",
+    "../run/sessions/spec-bsgs (before)": "ECBS1h658495a369ec"
+  },
+  "raw_data": [
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/MANIFEST.sha256",
+      "sha256": "afedc1ebbfafc44762cb4773be5a9e1d6458cdc85b1f7ad0013f002a8c8502de"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/summary.json",
+      "sha256": "351ce46b8cbb2f047803fcf6e9f7626c52293e243e5546110293fc64b56d95d1"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/summarize.sh",
+      "sha256": "d3e8147870c166e571cb87f7d3941c85616bd48b63a739e6b5fa39d76536dce9"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/timing.sh",
+      "sha256": "2daceb079c4c695b144d30b9d98345424948b9f86a2c7342269d5caff11084ff"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/timing-plan.jsonl",
+      "sha256": "a5fd77915a78e025834e84fbc1bda93e965c7e4e37eda8c3d7bd0f1d8cea906c"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/timing-construct.jsonl",
+      "sha256": "fbd1c9884db1a70ea6eaba1592d528fab41793db90348df7d79f37c41e7971c9"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rho-lanes/spec.json",
+      "sha256": "0acfc01c06d05703537c0dd8fec856445877fda606ceb61a974a3ddfbb98ff7c"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rho-lanes/session/spec.json",
+      "sha256": "0acfc01c06d05703537c0dd8fec856445877fda606ceb61a974a3ddfbb98ff7c"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rho-lanes/session/records.jsonl.gz",
+      "sha256": "d176a685a3e59395017ffbb434ec794fa69115b7128f0de3bea8cb38aa3bcfd3"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rho-lanes/session/plan.json.gz",
+      "sha256": "51aec8aba4d51b0aad1ff8a8a97ed63af62718960d010ac7cf616372881f2244"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rho-lanes/session/session.json",
+      "sha256": "e207938780fac785015cbfa6b0ee9d76932aa53b85048a78b55d72b11b8b602a"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rho-lanes/session/host.json",
+      "sha256": "4570f2eefc280eb88d348eb0bd95805995ed12b7216c188a740551f28341a4d3"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rho-lanes/session/comparisons/rho-neg__rho-neg-lanes.json",
+      "sha256": "dd56435d79e9e55d163f539b93f5ce73a2c966119f9fb7839458484f412c206e"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rho-lanes/band.json",
+      "sha256": "5da44a77828855d4aee3922c60392cee1cc451da849baae527952efb16a63097"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rho-lanes/session.audit.json",
+      "sha256": "3f43180eb41a921dca8d188e303d7f544a87e23aa0b698668d8fa9fc83d45131"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rho-lanes/external_ca.sh",
+      "sha256": "cfeb4e338a826e9cc41b2aca432af2a56ccdf2ca9c8a5a42f55668aa45c30a3d"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rho-lanes/external_ca.inputs.tsv",
+      "sha256": "5ed41c165429042fe7a5636daa86a2a33dc94f933b63064ec0c24f5f1b399369"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rho-lanes/external_ca.jsonl",
+      "sha256": "34956539e10a2d6075fda49c0d5156f5e7d61f4819bc12cef5cc4dcdcd67b06a"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/compare.sh",
+      "sha256": "b6924f43676922b5177e6564138ac9acdfeb1615fb6f28b27e1bc5142ff50d88"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/compare.sha256",
+      "sha256": "7b7209b266ce2a365b68729511d9c0bc69cda750aaf26e3de0562169274c70f6"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-shard0/records.jsonl.gz",
+      "sha256": "029483efa1b2d8da56a5586005e21714aae9d31fe7f3942b21d49ec5db68add8"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-shard1/records.jsonl.gz",
+      "sha256": "b2c8397876b22cbd4d91af66356d4b3e96d3bd947b06cdb7a140827a13279319"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-shard2/records.jsonl.gz",
+      "sha256": "f0255136371523e646d92924c64ec0a9679b80a601ad78df58d5816cbe18119e"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-aa/records.jsonl.gz",
+      "sha256": "8c19d98c5dad1b8447f2391e225c37d71814f31d611a50366468aabcbd633c07"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-bsgs/records.jsonl.gz",
+      "sha256": "46973c5859c2738e7dd8e7049ef48d7b31c7143f9b6efafccfa293b1e0257e01"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-shard0/session.json",
+      "sha256": "12dd5ed111d569b988eadcd19a95bba2646d7e67045227fe1c2f897808c2c7ad"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-shard1/session.json",
+      "sha256": "084bed497ca71f23d9b6cf7aea416af341ae4560794bca6cecf417ab40909628"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-shard2/session.json",
+      "sha256": "fe7a493cefc6025509eb354ebe25131e5c49eec76783fa15a9f8dda6c011951b"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-aa/session.json",
+      "sha256": "19443f242a642e1275047a6b6196db6315062dacb7b3c7419dd92b36b2a76aba"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-bsgs/session.json",
+      "sha256": "5d100f4972523a74037df934b28ce3466fe7ee4b928a07c044db1a7ae5bce957"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/run/sessions/spec/records.jsonl.gz",
+      "sha256": "05a114e284c24f2ac8eeb908e6cd0c6ab1f0897d6580d9c3e189a79f86c463e7"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/run/sessions/spec-aa/records.jsonl.gz",
+      "sha256": "8269808a781f399afbdf864d33eec6bac7130b054534d5642897db940db9f3f1"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/run/sessions/spec-bsgs/records.jsonl.gz",
+      "sha256": "d3aac12107fa95be697eff2409e8dbffb8dc512428e5e25c8876d047848f9e90"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/run/sessions/spec/session.json",
+      "sha256": "17d7eab3149703abd5f3d11ee50018623a71d946900da72a338c31aad6b8fb2f"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/run/sessions/spec-aa/session.json",
+      "sha256": "57165fd1cad98dfa34b5b405d16f76480783045703ae1ad0d81a78ca75bf05f4"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/run/sessions/spec-bsgs/session.json",
+      "sha256": "030f6904f176467fb0472b02544cfc5f993b303364b9a771306e60b4c2f9f0a6"
+    },
+    {
+      "path": "../../research/deep_volcano_prime_gap_20261022/run/sessions/MANIFEST.sha256",
+      "sha256": "916313173bef876c113ea28e11a2446c3f96263672770a539ea7b6b74bb24c9e"
+    }
+  ],
+  "raw_data_note": "Paths are relative to benchmarks/20261023-volcano-gap-speedups/; drop the leading ../../ for the repository path. records.jsonl and plan.json are committed gzipped; MANIFEST.sha256 pins the uncompressed bytes (sha256sum -c: 12/12 OK), gunzip of every .gz equals both the manifest and session.json records_sha256 / plan_sha256. The original run/sessions/*/records.jsonl are no longer on disk uncompressed; their .gz hash to the values the 2026-10-22 validator pinned and gunzip to each session.json records_sha256.",
+  "headline": [
+    {
+      "name": "rho lanes/serial median ns per GAE (ratio of the two medians below)",
+      "claimed": 0.40643540303599734,
+      "recomputed": 0.40643540303599734,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "rho-neg (serial) median solve_wall_ns/total_gae, ns",
+      "claimed": 293.862446685379,
+      "recomputed": 293.86244668537898,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "rho-neg-lanes median solve_wall_ns/total_gae, ns",
+      "claimed": 119.4361019557163,
+      "recomputed": 119.4361019557163,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "rho-neg median solve ms",
+      "claimed": 362.088438,
+      "recomputed": 362.088438,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "rho-neg-lanes median solve ms",
+      "claimed": 154.595293,
+      "recomputed": 154.595293,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "rho-neg mean S (cost.s)",
+      "claimed": 0.9303300895824488,
+      "recomputed": 0.93033008958244878,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "rho-neg-lanes mean S (cost.s)",
+      "claimed": 0.9538025695307257,
+      "recomputed": 0.95380256953072573,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "rho-neg runs (non-warmup)",
+      "claimed": 576,
+      "recomputed": 576,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "rho-neg verified",
+      "claimed": 576,
+      "recomputed": 576,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "rho-neg-lanes runs (non-warmup)",
+      "claimed": 576,
+      "recomputed": 576,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "rho-neg-lanes verified",
+      "claimed": 576,
+      "recomputed": 576,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "ecbench compare ops ratio lanes/serial (sum S_b / sum S_a over 576 (workload, round) pairs)",
+      "claimed": 1.0252302706438448,
+      "recomputed": 1.0252302706438443,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "ecbench compare ops pairs",
+      "claimed": 576,
+      "recomputed": 576,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "ecbench compare wall median ratio lanes/serial (interpolated median of 576 per-pair ratios)",
+      "claimed": 0.41931135653769125,
+      "recomputed": 0.41931135653769125,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "external ca median seconds/ops*1e9, ns per op",
+      "claimed": 45.43872041472215,
+      "recomputed": 45.438720414722148,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "external ca median solve ms",
+      "claimed": 58.426,
+      "recomputed": 58.426000000000002,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "external ca mean ops/sqrt(r), r = 1883199430181",
+      "claimed": 0.9763254783434467,
+      "recomputed": 0.97632547834344674,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "external ca runs",
+      "claimed": 576,
+      "recomputed": 576,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "external ca correct (x == planted)",
+      "claimed": 576,
+      "recomputed": 576,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "ecbench plan, main spec, 1 CPU: before, s (median of 3)",
+      "claimed": 96.644090596,
+      "recomputed": 96.644090595999998,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "ecbench plan, main spec, 1 CPU: after, s (median of 3)",
+      "claimed": 0.308205664,
+      "recomputed": 0.30820566399999999,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "ecbench plan speed-up",
+      "claimed": 313.5701315210093,
+      "recomputed": 313.57013152100927,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "N-isogeny kernel and Velu set-up, 1 CPU: before, s (median of 7, logged to 1 ms)",
+      "claimed": 0.154,
+      "recomputed": 0.154,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "N-isogeny kernel and Velu set-up, 1 CPU: after, s (median of 7)",
+      "claimed": 0.047,
+      "recomputed": 0.047,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "N-isogeny kernel speed-up",
+      "claimed": 3.276595744680851,
+      "recomputed": 3.2765957446808511,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "N-isogeny map one point, 1 CPU: before, s",
+      "claimed": 0.0186,
+      "recomputed": 0.018599999999999998,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "N-isogeny map one point, 1 CPU: after, s",
+      "claimed": 0.0188,
+      "recomputed": 0.018800000000000001,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "N-isogeny map one point, 4 CPUs: before, s",
+      "claimed": 0.0186,
+      "recomputed": 0.018599999999999998,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "N-isogeny map one point, 4 CPUs: after, s",
+      "claimed": 0.0063,
+      "recomputed": 0.0063,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "volcano-gap construct whole, 4 CPUs: before, s",
+      "claimed": 0.884893836,
+      "recomputed": 0.884893836,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "volcano-gap construct whole, 4 CPUs: after, s",
+      "claimed": 0.282309114,
+      "recomputed": 0.282309114,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "volcano-gap construct whole, 4 CPUs: speed-up",
+      "claimed": 3.134485541263822,
+      "recomputed": 3.134485541263822,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "measurement sessions span before (max finished - min started over run/sessions/{spec,spec-aa,spec-bsgs}), s",
+      "claimed": 2119.831,
+      "recomputed": 2119.831,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "measurement sessions span after (rerun-sharded/sessions/*), s",
+      "claimed": 733.946,
+      "recomputed": 733.946,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "measurement sessions span ratio",
+      "claimed": 2.888265621721489,
+      "recomputed": 2.888265621721489,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "rerun-sharded records identical to the original (17-field key)",
+      "claimed": 6840,
+      "recomputed": 6840,
+      "rel_tol": 1E-9
+    }
+  ],
+  "headline_note": "Medians follow summarize.sh: the lower middle of the sorted values for an even count (576 -> element 288 of 1..576), the middle for odd counts; the ecbench compare wall median interpolates (Rust quantile). With interpolated medians (mean of the two middle values): serial 293.8687 and lanes 119.4456 ns/GAE (ratio 0.40646), external 45.4414 ns/op and 58.442 ms; the differences are <= 3e-4 relative and immaterial. Every recomputed value is the same double as the claim except the ops ratio (relative 4.3e-16, summation order: compare.rs sums in BTreeMap order, awk in hash order), well inside rel_tol 1e-9. Timing medians are of the producer-logged values; construct_s and eval_s_per_point come from volcano-gap log lines rounded to 1 ms / 0.1 ms, so their resolution is a few percent.",
+  "derived_checks": {
+    "lanes_minus_serial_mean_S_measured": 0.023472,
+    "lanes_minus_serial_mean_S_predicted": 0.023132,
+    "prediction": "(lanes - 1) x 2^dp_bits / sqrt(r) = 31 x 1024 / 1372297.6: walks in flight when the collision is found (parallel collision search overhead); inside the compare interval (ratio [1.0213, 1.0295] = delta S [0.0198, 0.0274])",
+    "lane_round_invariant": "steps + look_ahead_additions == 32 x lane_rounds on 768/768 lanes records (incl. warmups): every round charges all 32 additions, including the final round after the recovering lane",
+    "gae_ledger_identity": "total_gae == setup_additions + setup_doublings + start_additions + walk_operations + verification_operations, and walk_operations == steps + look_ahead_additions + cycle_escape_doublings, on 1152/1152 measured records (both arms)",
+    "band_5a": {
+      "weights": [
+        0,
+        0.1,
+        1
+      ],
+      "serial": [
+        0.93033008958244878,
+        1.0233321233845598,
+        1.8603504276035718
+      ],
+      "lanes": [
+        0.95380256953072573,
+        1.0491506945082305,
+        1.9072838193057622
+      ],
+      "ratio_lanes_over_serial": [
+        1.0252302706438441,
+        1.0252299038930572,
+        1.0252282532397126
+      ],
+      "per_curve": "band.json rows reproduced to <= 3.9e-16 relative (96 rows); ranks: rho-neg < rho-neg-lanes on 48/48 curves at every weight"
+    },
+    "wall_isolation_sensitivity": "L2-L2 pairs only (306): median wall ratio 0.4179; L2-only medians 292.06 / 118.72 ns/GAE",
+    "validator_retiming": "not evidence: 5 curves x 4 targets x 2 rounds with the b67532210 binary (7bbab033...) on 2026-10-23T03:34Z: 294.6 / 116.7 ns/GAE, median wall ratio 0.415 over 40 pairs; all 80 counted costs equal the session records with the same algorithm seeds. ecbench plan re-run: old 100.36 s, new 0.295 s, output sha ac5a7b2e... both; volcano-gap construct re-run: kernel 0.143-0.144 s -> 0.042-0.043 s, isogeny digest d39a3965... both."
+  },
+  "method": "jq/awk/bc over the committed raw files",
+  "method_detail": "jq flattens records.jsonl (decompressed from the committed .gz, hash-checked), external_ca.jsonl, timing-*.jsonl and session.json to TSV; awk (mawk 1.3.4) computes medians (sort -g), means, paired ratios, ledger identities and the 5a band; GNU bc 1.07.1 with its own affine EC arithmetic (self-tested on F_97) checks [planted]G == target, both on the curve and [r]G = O for all 192 rho-lanes workload targets, with a negative control ([planted+1]G != target, 192/192). No producer script (summarize.sh, compare.sh, plot.py) or producer output was used to compute any recomputed value; ecbench verify (producer harness) was used only for replays.",
+  "validator": "validator subagent (independent of the producer)",
+  "date": "2026-10-23T03:38:48Z",
+  "notes": [
+    "Snapshot: the evidence is committed in 049a0ac05 and unchanged in HEAD b67532210 (merge of main); the code under test (ic_boundary.rs, ecbench/, prime_fast.rs) is byte-identical between d81da47d5 and b67532210. The first part of this validation (rho-lanes replay-all, 02:01Z) ran before 049a0ac05 existed, on working-tree files whose hashes equal the committed blobs, so it binds to the commit. This report is void for any later file that hashes differently.",
+    "Replays (producer harness, validator-chosen N): rho-lanes --replay-all with the d81da47d5 build (04fde7fe...): 1152/1152 measured runs identical (counts, phases, counters, field_ops, recovered), all 12 integrity checks true; again --replay 50 with the b67532210 build (7bbab033...): 50/50. Each rerun-sharded session --replay 50 with 7bbab033...: 50/50 x 5, 0 problems. Neither binary is the one that recorded the sessions (rho-lanes d9a6ca93..., rerun 4652d200..., both from a dirty bec9df9e8 tree and not preserved), so the replays show that the committed code reproduces every counted result; they say nothing about wall time.",
+    "Scalars: rho-lanes 1536/1536 records (1152 measured + 384 warmup) verified, matches_target, matches_planted, recovered == workload.planted, deterministic; rerun-sharded 6840/6840 likewise. Independent GNU bc check (own affine EC code): on all 192 rho-lanes workload targets G and the target are on the curve, [r]G = O and [planted]G = target; negative control [planted+1]G != target 192/192. External: 576/576 rows status ok, alg rho, threads 1, x == planted, seeds 1,2,3 for each of 192 workloads; external_ca.inputs.tsv equals byte for byte the distinct (workload, curve, target, planted) rows of all 1536 session records.",
+    "Rerun identity (re-derived, compare.sh not run): the 6840 original records (gunzip of run/sessions/{spec,spec-aa,spec-bsgs}/records.jsonl.gz) and the 6840 rerun records are identical as multisets under a 17-field key (arm, method_id, method_sha256, workload_id, workload_sha256, target_index, planted, round, warmup, algorithm_seed, status, recovered, total_gae, cost.s, sorted counters, phases, field_ops); per arm 4560 rho-neg, 1520 rho-neg-aa, 760 bsgs-neg on both sides; compare.sh's own 8-field key reproduces both digests in compare.sha256 (7bedc5cc...). spec-aa and spec-bsgs plans have the original plan_sha256.",
+    "Code review, rho_walk_lanes against TunedWalker::walk: set-up, draws, jump table and stride are copied verbatim; per lane the start canonicalisation, the look-ahead rule (flipped && tried < jumps && not identity && index(y) == j), identity loss, the window cycle detection with escape from the minimum-key member by doubling and abandonment on a repeated escape point, the push to the window, then the DP test before the cap test (len > walk_cap) are in the same order with the same state (recent, last_escape, len, j0, tried). Starts [k]T are handed out in order by next_walk under the same loop guard (walk_ops < max_steps && walks < max_steps). Difference 1: the per-step budget test of TunedWalker::walk becomes a per-round test, so a run can overshoot max_steps by < 32 additions; they are charged, and no run came near the budget (64 x floor). Difference 2 (intended): DPs reach the table in a different order, so collisions differ per seed.",
+    "Charging: PrimeCurve::native_lane_walk_adder adds 1 to ops.adds for every request before computing, so every addition of every round is in total_gae, including those after the recovering lane; the steps counter is topped up to match. Checked on every record: steps + look_ahead_additions == 32 x lane_rounds (768/768 lanes records) and total_gae == setup + start + walk + verification operations (1152/1152, both arms). Exceptional lanes (equal abscissae) leave the batch and are charged their own inversion. No path found by which the lanes method reports fewer GAE than the group operations it performed.",
+    "Predicted negative case: lanes must cost more GAE than serial, by about (lanes - 1) x 2^dp_bits / sqrt(r) = 0.02313 in S (in-flight walks when the collision lands). Measured +0.02347, ratio 1.0252 [1.0213, 1.0295]; the band ranks serial cheaper on 48/48 curves at w = 0, 0.1, 1. Consistent with an honest ledger and the same walk law; tested at one lane count only.",
+    "Unit test: cargo test --release --lib lane_rho (test binary rebuilt from d81da47d5 sources): lane_rho_recovers_replays_and_batches_its_inversions ok (24 seeds, 20-bit roster curve; 16 lanes recover, replay and close the ledger; 1 lane equals rho_walk_with in gae, recovered and every counter). It does not test multi-lane walks against the serial walk from the same starts.",
+    "Discrepancy (README section 3 and run report run-20261023T0121Z): 'median wall ratio 0.4193 [0.4173, 0.4214], over 306 admitted pairs' is wrong about the pairs. The comparison's required level is L0 with 0 pairs below it, so the median and interval are over all 576 pairs; 306 is the quality block's L2 count. Over the 306 L2-L2 pairs the median is 0.4179.",
+    "Discrepancy (README section 3): 'Both arms run the same walk, so the band does not rank them' contradicts rho-lanes/band.json, whose ranks say rho-neg < rho-neg-lanes on 48/48 curves (order holds at every weight, ratio 1.0252 at w = 0, 0.1, 1).",
+    "Defect, minor (diagnostic only): the rho_walk_lanes doc says its field tally includes the conversions to and from Montgomery form. The to-Montgomery conversions are tallied as 2 muls each, but the from-Montgomery reductions (2 per lane output, about 2 per GAE) go to GroupOps.montgomery_reductions, which neither rho_walk_lanes' counters nor the ecbench record export (field_ops carries muls, sqrs, invs only). The recorded lanes field tally therefore omits them. GAE is unaffected. The batch inversion is charged 3k + 1 muls (3(k - 1) needed), a slight over-count.",
+    "Counter semantics: walks_capped is 132 (lanes) vs 216 (serial) over 576 runs. Capped walks last walk_cap = 20544 steps, about half a run's 41k rounds, so they are often still in flight when the lanes collision lands and are never counted as capped. Their steps are charged; the counter is not comparable across arms.",
+    "Attribution: the serial arm adds through PrimeCurve::add (CountedFp, one inversion per addition); the lanes arm through FastPrimeCurve in Montgomery form with one batch inversion per round. The 2.46x per-GAE speed-up is the two changes together; no arm isolates the batching (the adder's batched=false path is not an ecbench method).",
+    "Wall-time provenance: the session's wall times come from binary d9a6ca93... built from a dirty bec9df9e8 tree, not preserved. The validator's re-timing with the committed code (b67532210 build; 40 pairs, not evidence) gives 294.6 / 116.7 ns/GAE and a median wall ratio 0.415, consistent. Isolation was L1/L2 (no L0 required, no in-session A/A, contention observed on all 1152 runs, p95 foreign busy 5.7%); every one of the 576 pairs has lanes faster (max ratio 0.973), so the direction is not noise.",
+    "External ca fairness: the same host is established only by file times (external_ca.jsonl written 01:30:04-01:30:44Z, after the session ended at 01:29:02Z) and the binary path on this machine; the script pins with taskset -c 2 and every output reports threads 1, but no affinity, load or quiet check was recorded, so 'alone on the host' (run report) is not established. The ca binary's sha256 is not in the evidence (now 12e69faf..., built 2026-10-22T08:57Z, Release -O3, CA_NATIVE OFF, repo clean at 1aa48b5). ca's timer covers the whole solve call (membership check, set-up, walk), as solve_wall_ns does.",
+    "External ca ops vs GAE: ca counts 1 per batched walk addition (ops += W per round, retries included), 1 per escape step and doubling, and prices each a*G + b*H (table set-up and walk restarts) at double-and-add counts (popcount + bitlength - 1 per scalar, + 1), although it computes them with fixed-base tables; it charges no verification. The convention matches GAE (additions + doublings), but about 93k of its mean 1.34M ops (about 7 percent: 512 multipliers + 256 starts x about 121) are formula-priced (an estimate from the source, not measured), which biases its ns/op low and its ops/sqrt(r) high. Its walk also differs: 256 walks, 512 multipliers, dp_bits 7, against 32 lanes, 16 jumps, dp_bits 10. The per-solve gap (154.6 / 58.4 = 2.65x) does not depend on the op count; the per-op gap (2.63x) is approximate.",
+    "Sessions span: 2119.831 s before vs 733.946 s after (2.89x) is the wall-clock span of the measurement phase. Total solve time rose from 2738.2 s to 2987.8 s (5 sessions on 4 vCPUs, unpinned, --cpus none). The gain comes from running the 4560-run main spec as 3 shards in parallel (the before span is the one 2005 s session) plus the ~115 s planning delay of the old spec session (started_unix_ms is taken after planning). It is a throughput and scheduling gain, not faster computation.",
+    "Construct: the whole volcano-gap construct on 1 CPU went 0.8979 s -> 0.7206 s (1.25x; timing-construct.jsonl, stage construct, wall_ns), which summary.json does not report. The 3.13x whole-construct row is on 4 CPUs and includes the map's threading; the kernel set-up alone is 3.28x on 1 CPU (counted multiplications 43.9M -> 8.5M).",
+    "Timing provenance: the before binaries (ecbench-old 295f13d6..., volcano-gap-old df2d7a01...) and after binaries exist only in the session scratchpad (/tmp); their hashes in the jsonl rows match those files, but their builds from the commits the README names were not reproduced (no rebuild, disk). The timing rows carry no timestamps or load records; ABAB interleaving and pinning were checked in timing.sh only. Validator spot re-runs of the same binaries: plan 100.36 s vs 0.295 s, identical output; kernel 0.143-0.144 s vs 0.042-0.043 s, identical isogeny digest.",
+    "Framing: may be claimed: on this host, class (p 52-bit, r about 2^40.8, A = 2) and configuration, rho.negation_lanes solves in 0.419x the paired median wall time of rho.negation (2.38x faster per solve, 2.46x per counted operation), with the same walk law and 2.5% more counted GAE. Not claimable: any counted-cost (GAE) improvement, any IC improvement or IC leaderboard progress (this speeds up the rho comparator, not the index-calculus baseline), or rho.negation_lanes as the GAE rho reference (rho.negation stays cheaper in GAE on 48/48 curves). For wall-clock comparisons against rho, the strongest rho at hand is now ca (2.6x faster than the lanes), so a wall-clock IC-vs-rho distance quoted against ecbench's rho would overstate IC's standing. The sessions-span and 4-CPU construct rows are parallelism, not less work.",
+    "Scope: one 4-vCPU KVM VM (Intel Xeon @ 2.10 GHz), 48 curve models of one class, 4 shared planted scalars, lanes = 32. Nothing here transfers to other sizes, lane counts or hosts without measurement. A passed report means the receipts are admissible evidence; it does not support an ECDLP claim or authorize promotion."
+  ]
+}

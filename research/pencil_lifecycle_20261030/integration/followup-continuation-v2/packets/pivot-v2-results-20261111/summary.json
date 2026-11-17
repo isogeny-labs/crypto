@@ -1,0 +1,64 @@
+{
+  "schema": "research.terminal-result/v1",
+  "attempt": "pivot-operational-v2-20261111",
+  "caller_exit_code": 1,
+  "status": "failed",
+  "native_pre_status": "passed",
+  "native_post_status": "passed",
+  "dependency_files": 16736,
+  "dependency_bytes": 3111892318,
+  "pre_post_hash_maps_equal": true,
+  "compiler_invocations": 3,
+  "command_results": [
+    {
+      "module": "EliminationField",
+      "exit": 0,
+      "expected_exit": 0,
+      "reaped": true,
+      "remaining_group": [],
+      "elapsed_seconds": 31.929459221020807
+    },
+    {
+      "module": "PivotSwap",
+      "exit": 0,
+      "expected_exit": 0,
+      "reaped": true,
+      "remaining_group": [],
+      "elapsed_seconds": 18.019910486007575
+    },
+    {
+      "module": "Controls",
+      "exit": 1,
+      "expected_exit": 0,
+      "reaped": true,
+      "remaining_group": [],
+      "elapsed_seconds": 24.385996471042745
+    }
+  ],
+  "unattempted_modules": [
+    "Readback",
+    "ExpectedFailure"
+  ],
+  "all_phase_owners_terminal": true,
+  "failure": "Controls.lean:16:61 failed to synthesize Decidable (swapRows M 1 2 0 = M 0)",
+  "elapsed_seconds": {
+    "native_pre": 48.510982003994286,
+    "native_compiler_phase": 74.79445491998922,
+    "native_post": 41.57603019400267,
+    "outer_completion": 165.85813155799406,
+    "caller": 165.9826697029639
+  },
+  "attempt_charge_seconds": 2400,
+  "campaign_charged_seconds": 10980,
+  "campaign_remaining_seconds": 118620,
+  "deadline_utc": "2026-11-11T12:00:00Z",
+  "raw_files": 56,
+  "compiled_artifacts": {
+    "EliminationField.olean": "f5f98dc6e28104d422f5538d9314d6ad5301066afd9f1b66a2c5929c5af92d15",
+    "PivotSwap.olean": "c8eb0407e51b7407a492f2a9ed7ae21aaf55c059434fb61337c93126c2152efe"
+  },
+  "readback_complete": false,
+  "independent_kernel_recheck_complete": false,
+  "dollar_cost": null,
+  "scientific_cost_ratio": null
+}

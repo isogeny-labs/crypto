@@ -1,0 +1,164 @@
+import MixedCancellation
+set_option autoImplicit false
+namespace MixedGeneric
+open Polynomial MixedCancellation
+variable {K : Type*} [Field K]
+noncomputable def curve (a0 a1 a2 a3 : K) : K[X] := X^5+C a3*X^3+C a2*X^2+C a1*X+C a0
+noncomputable def interp (q r s t m : K) : K[X] := ordinate s t+C m*MixedCancellation.support q r
+
+theorem disjoint_product_dvd (x q r : K) (hk : x^2+q*x+r ≠ 0) (P : K[X])
+ (hl : (X-C x) ∣ P) (hu : MixedCancellation.support q r ∣ P) : (X-C x)*MixedCancellation.support q r ∣ P := by
+ obtain ⟨a,ha⟩ := hl
+ obtain ⟨b,hb⟩ := hu
+ have hid : MixedCancellation.support q r-(X-C x)*(X+C (q+x))=C (x^2+q*x+r) := by
+  simp only [MixedCancellation.support,C_add,C_mul,C_pow]; ring
+ have hbez : C ((x^2+q*x+r)⁻¹)*(MixedCancellation.support q r-(X-C x)*(X+C (q+x)))=1 := by
+  rw [hid,←C_mul,inv_mul_cancel₀ hk,C_1]
+ refine ⟨C ((x^2+q*x+r)⁻¹)*(a-(X+C (q+x))*b),?_⟩
+ calc
+  P = (C ((x^2+q*x+r)⁻¹)*(MixedCancellation.support q r-(X-C x)*(X+C (q+x))))*P := by rw [hbez,one_mul]
+  _ = (X-C x)*MixedCancellation.support q r*(C ((x^2+q*x+r)⁻¹)*(a-(X+C (q+x))*b)) := by
+   calc
+    _ = C ((x^2+q*x+r)⁻¹)*(MixedCancellation.support q r*P-(X-C x)*(X+C (q+x))*P) := by ring
+    _ = C ((x^2+q*x+r)⁻¹)*(MixedCancellation.support q r*((X-C x)*a)-(X-C x)*(X+C (q+x))*(MixedCancellation.support q r*b)) := by
+      rw [show MixedCancellation.support q r*P=MixedCancellation.support q r*((X-C x)*a) by rw [ha],
+          show (X-C x)*(X+C (q+x))*P=(X-C x)*(X+C (q+x))*(MixedCancellation.support q r*b) by rw [hb]]
+    _ = _ := by ring
+
+theorem interpolation_divides (f : K[X]) (x y q r s t : K)
+ (hk : x^2+q*x+r ≠ 0)
+ (hp : (X-C x) ∣ f-(C y)^2)
+ (hu : MixedCancellation.support q r ∣ f-(ordinate s t)^2) :
+ (X-C x)*MixedCancellation.support q r ∣ f-(interp q r s t ((y-(s*x+t))/(x^2+q*x+r)))^2 := by
+ let m := (y-(s*x+t))/(x^2+q*x+r)
+ have hm : m*(x^2+q*x+r)+(s*x+t)=y := by
+  dsimp [m]; rw [div_mul_cancel₀ _ hk]; ring
+ have hid : interp q r s t m-C y = (X-C x)*(C m*(X+C x)+C (s+m*q)) := by
+  have hy : y=m*(x^2+q*x+r)+(s*x+t) := hm.symm
+  rw [hy]
+  simp only [interp,MixedCancellation.support,ordinate,C_add,C_sub,C_mul,C_pow]
+  ring
+ have hd1 : (X-C x) ∣ (interp q r s t m)^2-(C y)^2 := by
+  refine ⟨(C m*(X+C x)+C (s+m*q))*(interp q r s t m+C y),?_⟩
+  calc
+   _ = (interp q r s t m-C y)*(interp q r s t m+C y) := by ring
+   _ = _ := by rw [hid]; ring
+ have hd2 : MixedCancellation.support q r ∣ (interp q r s t m)^2-(ordinate s t)^2 := by
+  refine ⟨C m*(interp q r s t m+ordinate s t),?_⟩
+  dsimp [interp]; ring
+ apply disjoint_product_dvd x q r hk
+ · convert dvd_sub hp hd1 using 1 <;> ring
+ · convert dvd_sub hu hd2 using 1 <;> ring
+
+def oq (x q m : K) : K := x-q-m^2
+def orr (a3 x q r s m : K) : K := a3+q^2-r-m*(2*s+m*q)+x*oq x q m
+
+theorem residual_degree (a0 a1 a2 a3 x q r s t m : K) :
+ (curve a0 a1 a2 a3-(interp q r s t m)^2-
+  (X-C x)*MixedCancellation.support q r*MixedCancellation.support (oq x q m) (orr a3 x q r s m)).natDegree ≤ 2 := by
+ have hid : curve a0 a1 a2 a3-(interp q r s t m)^2-
+  (X-C x)*MixedCancellation.support q r*MixedCancellation.support (oq x q m) (orr a3 x q r s m) =
+  C (a2-(s+m*q)^2-2*m*(t+m*r)-((q-x)*orr a3 x q r s m+(r-q*x)*oq x q m-r*x))*X^2+
+  C (a1-2*(s+m*q)*(t+m*r)-((r-q*x)*orr a3 x q r s m-r*x*oq x q m))*X+
+  C (a0-(t+m*r)^2+r*x*orr a3 x q r s m) := by
+  simp only [curve,interp,MixedCancellation.support,ordinate,oq,orr,C_add,C_sub,C_mul,C_pow,C_neg,map_ofNat]
+  ring
+ rw [hid]
+ exact natDegree_quadratic_le
+
+theorem reduction_identity (a0 a1 a2 a3 x y q r s t : K)
+ (hk : x^2+q*x+r ≠ 0)
+ (hp : (X-C x) ∣ curve a0 a1 a2 a3-(C y)^2)
+ (hu : MixedCancellation.support q r ∣ curve a0 a1 a2 a3-(ordinate s t)^2) :
+ let m := (y-(s*x+t))/(x^2+q*x+r)
+ curve a0 a1 a2 a3-(interp q r s t m)^2 =
+  (X-C x)*MixedCancellation.support q r*MixedCancellation.support (oq x q m) (orr a3 x q r s m) := by
+ let m := (y-(s*x+t))/(x^2+q*x+r)
+ have hd := interpolation_divides (curve a0 a1 a2 a3) x y q r s t hk hp hu
+ have hres := dvd_sub hd (dvd_mul_right ((X-C x)*MixedCancellation.support q r) (MixedCancellation.support (oq x q m) (orr a3 x q r s m)))
+ have hu2 : (MixedCancellation.support q r).natDegree=2 := by
+  simpa [MixedCancellation.support] using (natDegree_quadratic (R:=K) (a:=(1:K)) (b:=q) (c:=r) one_ne_zero)
+ have hu0 : MixedCancellation.support q r ≠ 0 := by
+  intro hz; rw [hz] at hu2; simp at hu2
+ have hd3 : ((X-C x)*MixedCancellation.support q r).natDegree=3 := by
+  rw [natDegree_mul (X_sub_C_ne_zero x) hu0,natDegree_X_sub_C,hu2]
+ have hr2 := residual_degree a0 a1 a2 a3 x q r s t m
+ have hz := eq_zero_of_dvd_of_natDegree_lt hres (by rw [hd3]; dsimp [m] at hr2 ⊢; omega)
+ exact sub_eq_zero.mp hz
+
+theorem affine_generic_valid (a0 a1 a2 a3 x y q r s t : K)
+ (hk : x^2+q*x+r ≠ 0)
+ (hp : (X-C x) ∣ curve a0 a1 a2 a3-(C y)^2)
+ (hu : MixedCancellation.support q r ∣ curve a0 a1 a2 a3-(ordinate s t)^2) :
+ let m := (y-(s*x+t))/(x^2+q*x+r)
+ let q' := oq x q m
+ let r' := orr a3 x q r s m
+ MixedCancellation.support q' r' ∣ curve a0 a1 a2 a3-
+  (ordinate (m*q'-(s+m*q)) (m*r'-(t+m*r)))^2 := by
+ dsimp
+ let m := (y-(s*x+t))/(x^2+q*x+r)
+ let v' := ordinate (m*oq x q m-(s+m*q)) (m*orr a3 x q r s m-(t+m*r))
+ have hid := reduction_identity a0 a1 a2 a3 x y q r s t hk hp hu
+ have hsum : interp q r s t m+v' = C m*MixedCancellation.support (oq x q m) (orr a3 x q r s m) := by
+  dsimp [interp,v',ordinate,MixedCancellation.support]
+  simp only [C_add,C_sub,C_mul]
+  ring
+ refine ⟨(X-C x)*MixedCancellation.support q r+(interp q r s t m-v')*C m,?_⟩
+ change curve a0 a1 a2 a3-v'^2=_
+ calc
+  _ = (curve a0 a1 a2 a3-(interp q r s t m)^2)+(interp q r s t m-v')*(interp q r s t m+v') := by ring
+  _ = _ := by rw [hid,hsum]; ring
+
+def genericK (a : WeightedAdd11.Input K) (b : D2 K) : K :=
+ ((b.q*((b.z*b.z)*(a.x*(a.z*a.z)))+(a.x*a.x)*((b.z*b.z)*(b.z*b.z)))+
+ b.r*((a.z*a.z)*(a.z*a.z)))*a.w
+def genericA (a : WeightedAdd11.Input K) (b : D2 K) : K :=
+ a.y*rawW3 b-rawY3 a b*a.w
+
+def outputWith (k aa : K) (a : WeightedAdd11.Input K) (b : D2 K) (a3 : K) : D2 K :=
+ let z2 := b.z*b.z
+ let z4 := z2*z2
+ let bb := b.s*(k*a.z)+aa*b.q
+ let cc := b.t*(k*a.z)+aa*b.r
+ let ll := k*(a.z*b.w)
+ let mm := k*(b.z*b.w)
+ let ll2 := ll*ll
+ let ll4 := ll2*ll2
+ let mm2 := mm*mm
+ let q3 := (a.x*mm2-b.q*ll2)-aa*aa
+ let r3 := ((a3*z4-b.r+b.q*b.q)*ll4-aa*((bb+b.s*(k*a.z))*ll2))+q3*(a.x*mm2)
+ ⟨q3,r3,aa*q3-bb*ll2,aa*r3-cc*ll4,k*(b.z*(a.z*b.w)),1⟩
+def output (a : WeightedAdd11.Input K) (b : D2 K) (a3 : K) := outputWith (genericK a b) (genericA a b) a b a3
+
+theorem genericK_same (a : WeightedAdd11.Input K) (b : D2 K) : genericK a b=rawK a b := by
+ unfold genericK rawK; ring
+
+theorem normalized_with (k aa : K) (a : WeightedAdd11.Input K) (b : D2 K) (a3 : K)
+ (hk : k ≠ 0) (haz : a.z ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0) :
+ let c := outputWith k aa a b a3
+ let m := aa/(k*(b.z*(a.z*b.w)))
+ c.z ≠ 0 ∧ c.w ≠ 0 ∧
+ nq c=oq (WeightedAdd11.nx a) (nq b) m ∧
+ nr c=orr a3 (WeightedAdd11.nx a) (nq b) (nr b) (ns b) m ∧
+ ns c=m*oq (WeightedAdd11.nx a) (nq b) m-(ns b+m*nq b) ∧
+ nt c=m*orr a3 (WeightedAdd11.nx a) (nq b) (nr b) (ns b) m-(nt b+m*nr b) := by
+ refine ⟨mul_ne_zero hk (mul_ne_zero hbz (mul_ne_zero haz hbw)),one_ne_zero,?_,?_,?_,?_⟩
+ all_goals
+  dsimp [outputWith,nq,nr,ns,nt,oq,orr,WeightedAdd11.nx]
+  field_simp
+  <;> ring
+
+theorem slope_decode (a : WeightedAdd11.Input K) (b : D2 K)
+ (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0)
+ (hk : genericK a b ≠ 0) :
+ genericA a b/(genericK a b*(b.z*(a.z*b.w))) =
+ (WeightedAdd11.ny a-(ns b*WeightedAdd11.nx a+nt b))/
+ ((WeightedAdd11.nx a)^2+nq b*WeightedAdd11.nx a+nr b) := by
+ obtain ⟨hK,hL,hR,_,_⟩ := scales a b haz haw hbz hbw
+ have hg : genericK a b=a.z^4*b.z^4*a.w*((WeightedAdd11.nx a)^2+nq b*WeightedAdd11.nx a+nr b) := by rw [genericK_same,hK]
+ unfold genericA
+ rw [hL,hR,hg]
+ field_simp
+ <;> ring
+
+end MixedGeneric

@@ -1,0 +1,13 @@
+[Unit]
+Description=Checkpoint and export authorized legacy experiments
+After=network-online.target
+[Service]
+Type=oneshot
+User=root
+UMask=0077
+ExecStart=/usr/bin/python3 /opt/spot-criu/criu_local.py snapshot --root /var/lib/spot-criu-managed --criu /opt/spot-criu/criu
+ExecStart=/usr/bin/python3 /opt/spot-criu/criu_export.py --root /var/lib/spot-criu-managed --staging /var/lib/spot-criu-export --authorization /var/lib/spot-criu-managed/export-authorization.json
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+TimeoutStartSec=0

@@ -1,0 +1,22 @@
+/var/tmp/pencil-mixed-positive-distinct-20261031-v1/PositiveDistinct.lean:41:47: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+a0 a1 a2 a3 : K
+a : WeightedAdd11.Input K
+ha : validPoint (MixedGeneric.curve a0 a1 a2 a3) a
+x : K := WeightedAdd11.nx a
+y : K := WeightedAdd11.ny a
+hid :
+  MixedGeneric.curve a0 a1 a2 a3 - C y ^ 2 =
+    (X - C x) *
+        (X ^ 4 + C x * X ^ 3 + C (x ^ 2 + a3) * X ^ 2 + C (x ^ 3 + a3 * x + a2) * X +
+          C (x ^ 4 + a3 * x ^ 2 + a2 * x + a1)) +
+      C (WeightedDoubling.value a0 a1 a2 a3 x - y ^ 2)
+hd : X - C x ∣ C (WeightedDoubling.value a0 a1 a2 a3 x - y ^ 2)
+⊢ (C (WeightedDoubling.value a0 a1 a2 a3 x) - C y ^ 2).natDegree = 0
+/var/tmp/pencil-mixed-positive-distinct-20261031-v1/PositiveDistinct.lean:43:2: error: Type mismatch: After simplification, term
+  congrArg (fun P => P.coeff 0) hz
+ has type
+  WeightedDoubling.value a0 a1 a2 a3 x - (C y ^ 2).coeff 0 = 0
+but is expected to have type
+  WeightedDoubling.value a0 a1 a2 a3 x - y ^ 2 = 0

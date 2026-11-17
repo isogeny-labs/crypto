@@ -1,0 +1,286 @@
+{
+  "card_id": "CARD-postgb-la-20261026-R2-L1",
+  "card_path": "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L1.yaml",
+  "card_sha256": "3e259a6e3c31d18e703ce4d6c672673584193f638a011b423afce7c463812e81",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import subprocess,sys; out=subprocess.run(['git','status','--porcelain','--untracked-files=all','--',':(exclude)research/postgb_linear_stage_20261026/cards'],capture_output=True,text=True).stdout; sys.exit(1 if out.strip() else 0)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.47,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "git-clean",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.47,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import os,sys; sys.exit(1 if os.path.exists('research/postgb_linear_stage_20261026/runs/R2-L1.json') else 0)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.017,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "output-absent",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.017,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/postgb_linear_stage_20261026/runs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "mkdir-runs",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "df",
+        "-h",
+        "/"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-record",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "4b909a61f8ddf3b050fb99d04add725776238528eb2dd7b3b18ac8d3ae9a7ce1",
+      "stdout_tail": [
+        "Filesystem      Size  Used Avail Use% Mounted on",
+        "/dev/vda        252G   37G  2.8G  93% /"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "lscpu"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.01,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "lscpu-record",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.01,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "35aff9c9dd67ea379067ea6d72263b3e9c6305b94cf02227c955888621eeca93",
+      "stdout_tail": [
+        "NUMA node0 CPU(s):                       0-3",
+        "Vulnerability Gather data sampling:      Not affected",
+        "Vulnerability Ghostwrite:                Not affected",
+        "Vulnerability Indirect target selection: Mitigation; Aligned branch/return thunks",
+        "Vulnerability Itlb multihit:             Not affected",
+        "Vulnerability L1tf:                      Not affected",
+        "Vulnerability Mds:                       Not affected",
+        "Vulnerability Meltdown:                  Not affected",
+        "Vulnerability Mmio stale data:           Vulnerable: Clear CPU buffers attempted, no microcode; SMT Host state unknown",
+        "Vulnerability Old microcode:             Not affected",
+        "Vulnerability Reg file data sampling:    Not affected",
+        "Vulnerability Retbleed:                  Mitigation; Enhanced IBRS",
+        "Vulnerability Spec rstack overflow:      Not affected",
+        "Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl",
+        "Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization",
+        "Vulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI Vulnerable",
+        "Vulnerability Srbds:                     Not affected",
+        "Vulnerability Tsa:                       Not affected",
+        "Vulnerability Tsx async abort:           Vulnerable: Clear CPU buffers attempted, no microcode; SMT Host state unknown",
+        "Vulnerability Vmscape:                   Not affected"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.034,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-run",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.034,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import re, sys, time\nstart = time.time()\nheld = 0\nwhile True:\n    value = float(re.search(r'some avg10=([0-9.]+)', open('/proc/pressure/cpu').read()).group(1))\n    if value <= 1.0:\n        held += 1\n    else:\n        held = 0\n    if held >= 6:\n        sys.exit(0)\n    if time.time() - start >= 1800:\n        sys.exit(1)\n    time.sleep(5)\n"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 55.034,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "quiet-before-run",
+      "index": 7,
+      "outputs": {},
+      "seconds": 55.034,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/examples/postgb_la_bench",
+        "--families",
+        "jv-nagao,gaudry-s4,gaudry-d4",
+        "--per",
+        "8",
+        "--reps",
+        "7",
+        "--json",
+        "research/postgb_linear_stage_20261026/runs/R2-L1.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1134.085,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run",
+      "index": 8,
+      "outputs": {
+        "research/postgb_linear_stage_20261026/runs/R2-L1.json": "8ad1e7dade6ba91161412b4d6473a191816b9f7dc86c15d3b2babfef533cb69a"
+      },
+      "seconds": 1134.085,
+      "stderr_sha256": "23ef006bf4f97ba90fe6fe9f9b286f3fa6a2f1748aca36fff5c3b04ea500c8e1",
+      "stderr_tail": [
+        "gaudry-d4 p97-4                  \u03b4=  512 f4=     71.8ms dense=32434.812 sparse=35316.291 fast=33216.071 sols=0 agree=true planted=None fast-gave-up:minimal polynomial short of delta",
+        "gaudry-d4 p97-5                  \u03b4=  512 f4=     56.9ms dense= 1718.021 sparse=  274.564 fast=   13.122 sols=0 agree=true planted=None",
+        "gaudry-d4 p97-6                  \u03b4=  512 f4=     50.5ms dense= 1725.721 sparse=  275.211 fast=   12.790 sols=0 agree=true planted=None",
+        "gaudry-d4 p97-7                  \u03b4=  512 f4=     61.7ms dense= 1712.705 sparse=  278.331 fast=   13.550 sols=0 agree=true planted=None",
+        "gaudry-d4 p1033-0                \u03b4=  512 f4=     61.8ms dense= 1784.261 sparse=  303.163 fast=   16.275 sols=0 agree=true planted=None",
+        "gaudry-d4 p1033-1                \u03b4=  512 f4=     63.2ms dense= 1789.480 sparse=  299.139 fast=   16.458 sols=0 agree=true planted=None",
+        "gaudry-d4 p1033-2                \u03b4=  512 f4=     53.0ms dense= 2117.649 sparse=  328.026 fast=   16.632 sols=1 agree=true planted=None",
+        "gaudry-d4 p1033-3                \u03b4=  512 f4=     56.1ms dense= 1800.411 sparse=  296.290 fast=   16.581 sols=0 agree=true planted=None",
+        "gaudry-d4 p1033-4                \u03b4=  512 f4=     57.7ms dense= 2054.105 sparse=  312.959 fast=   16.501 sols=1 agree=true planted=None",
+        "gaudry-d4 p1033-5                \u03b4=  512 f4=     65.3ms dense= 2128.492 sparse=  312.843 fast=   16.431 sols=1 agree=true planted=None",
+        "gaudry-d4 p1033-6                \u03b4=  512 f4=     59.4ms dense= 2967.853 sparse=  345.680 fast=   16.501 sols=4 agree=true planted=None",
+        "gaudry-d4 p1033-7                \u03b4=  512 f4=     67.2ms dense= 1803.875 sparse=  298.968 fast=   16.501 sols=0 agree=true planted=None",
+        "gaudry-d4 p4093-0                \u03b4=  512 f4=     62.0ms dense= 1846.795 sparse=  328.883 fast=   16.911 sols=0 agree=true planted=None",
+        "gaudry-d4 p4093-1                \u03b4=  512 f4=     65.3ms dense= 1880.534 sparse=  321.129 fast=   16.698 sols=0 agree=true planted=None",
+        "gaudry-d4 p4093-2                \u03b4=  512 f4=     69.4ms dense= 1789.086 sparse=  326.061 fast=   16.559 sols=0 agree=true planted=None",
+        "gaudry-d4 p4093-3                \u03b4=  512 f4=     53.7ms dense= 1934.759 sparse=  328.321 fast=   16.588 sols=0 agree=true planted=None",
+        "gaudry-d4 p4093-4                \u03b4=  512 f4=     67.6ms dense= 2505.360 sparse=  354.675 fast=   17.342 sols=2 agree=true planted=None",
+        "gaudry-d4 p4093-5                \u03b4=  512 f4=     68.0ms dense= 1921.690 sparse=  324.558 fast=   16.891 sols=0 agree=true planted=None",
+        "gaudry-d4 p4093-6                \u03b4=  512 f4=     57.0ms dense= 4816.852 sparse=  354.647 fast=   16.778 sols=2 agree=true planted=None",
+        "gaudry-d4 p4093-7                \u03b4=  512 f4=     55.9ms dense= 2804.157 sparse=  361.530 fast=   16.869 sols=3 agree=true planted=None"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 8,
+  "commit": "e370e78ba36c6b038514bc8ced50eb3d8b01df6b",
+  "dirty_after": [
+    "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L1.disk-start.stdout",
+    "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L1.lscpu.stdout",
+    "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L1.run.stderr",
+    "research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L1.run.stdout",
+    "research/postgb_linear_stage_20261026/runs/R2-L1.json"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

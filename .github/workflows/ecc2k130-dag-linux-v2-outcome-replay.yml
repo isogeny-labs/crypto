@@ -1,0 +1,55 @@
+name: ECC2K-130 DAG Linux v2 first-outcome successor replay
+on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
+    paths:
+      - 'research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_outcome_replay_20260929/**'
+      - 'research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928/**'
+      - '.github/workflows/ecc2k130-dag-linux-v2-outcome-replay.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  archive-only-replay:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-dag-linux-v2-outcome-replay.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-dag-linux-v2-outcome-replay.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928 research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_outcome_replay_20260929
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile versioned verifier
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 -m py_compile research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_outcome_replay_20260929/{gate,corrected_replay}.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only dag_linux_v2_outcome_replay_20260929 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
+      - name: Bind first-run ZIP and replay all semantics without rerunning children
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_outcome_replay_20260929/gate.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only dag_linux_v2_outcome_replay_20260929 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"

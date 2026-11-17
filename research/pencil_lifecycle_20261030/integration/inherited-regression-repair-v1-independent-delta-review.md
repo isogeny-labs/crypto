@@ -1,0 +1,14 @@
+# Independent review of exact inherited repair v1 delta
+
+Reviewed immutable private patch SHA256 `b426169949dfddb008f6e5ad48d034387d4d8b8bfc11392f3684383eb7bedf65` against the earlier inherited-regression-fixes-independent-review.md. Source reading only; no edits to shared source, builds, tests, solver calls, or cloud operations. Parent-reported check/Clippy outcomes were not independently reproduced or used as the basis for this review.
+
+No concrete defect found in this exact scoped delta.
+
+- The legacy wrapper now admits 4..=6; the shared checked path admits 2..=9. The documentation correctly distinguishes the adapter range from the wider underlying encoder. Other admission conditions, limits, field replay, and group checks are unchanged.
+- The new admission fixture reaches the real wrapper and shared implementation. At n=7 the minimum admitted circuit bound, m=2, is196 variables; max_variables=1 therefore exits ChainedS3Encoding::build through VariableCap before circuit/solver construction. Domain clause counting precedes that gate and uses a bounded finite-domain preflight without constructing a solver. Assertions distinguish admitted 2..9 from legacy4..6, retain zero solver_calls, and reject0,1,10,15. This is an admission regression fixture, not mathematical validation of successful decompositions across the wider range.
+- BudgetedS3Backend::head now handles only successful Some metadata without a digest by calling existing get_body into a sink with the exact same expected object and scope. The assignment of the expected digest occurs after the fallible call succeeds. Errors propagate before assignment. None remains None, and already-present metadata (including the existing403+GET path) avoids duplicate fallback. The existing GET verifier preserves byte bounds, hashing, timeout, budget charging, and durable successful attempt completion. Store::push is untouched; no evidence guard was weakened.
+- The storage assertion changes from a late round-trip string to the actual earlier mismatched-size-or-digest error. The corrupt-byte preservation assertion remains. This reflects fail-closed early detection and does not permit replacement or acceptance of corrupt content.
+
+The patch contains only the two implementation repairs, the bounded admission fixture, the stale-comment correction, and the storage assertion. It does not modify T965 restore.rs or the separately owned PR2986 boundary repair. The storage assertion remains subject to its separate T907 ownership authorization before applying that hunk, as reported by the parent; this review grants no reservation or execution permission.
+
+Unverified here: compilation, execution of the added fixture, and native S3 request behavior. In particular the native fallback has no new executed network test in this review. Those limits do not change the source-level conclusion above. No performance result, scientific result, or campaign admission follows from this patch review.

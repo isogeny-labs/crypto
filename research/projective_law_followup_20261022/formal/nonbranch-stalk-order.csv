@@ -1,0 +1,13 @@
+item,status,scope,source,source_sha256,dependency_or_gate
+pointPreEval_equation,checked,affine quintic point evaluation,WeightedProjNonbranchZeroOrder.lean,3aca729afb11cdbf3992dc3db727b8d531922ecf381c423bc6bb6b2d6c3d3910,curve equation y squared equals f of a
+pointIdeal_maximal,checked,evaluation kernel at rational point,WeightedProjNonbranchZeroOrder.lean,3aca729afb11cdbf3992dc3db727b8d531922ecf381c423bc6bb6b2d6c3d3910,pointEval_surjective
+pointProjStalkIso,checked,actual weighted-Proj stalk at rational point,WeightedProjNonbranchZeroOrder.lean,3aca729afb11cdbf3992dc3db727b8d531922ecf381c423bc6bb6b2d6c3d3910,Z basic-open isomorphism and open-immersion stalk maps
+pointY_unit,checked,pulled-back affine y at rational nonbranch point,WeightedProjNonbranchZeroOrder.lean,3aca729afb11cdbf3992dc3db727b8d531922ecf381c423bc6bb6b2d6c3d3910,y nonzero in residue field
+point_norm_order,conditional,actual weighted-Proj stalk at rational nonbranch point,WeightedProjNonbranchZeroOrder.lean,3aca729afb11cdbf3992dc3db727b8d531922ecf381c423bc6bb6b2d6c3d3910,requires IsDomain and DVR instances plus unit and norm-factor hypotheses
+affine_quintic_domain,open,arbitrary odd-degree quintic affine quotient,,,prove irreducibility of y squared minus quintic without rational simple root
+nonbranch_maximal_principal,open,local maximal ideal at rational nonbranch point,,,show x minus a generates after y plus point value becomes a unit
+nonbranch_local_dvr,open,actual weighted-Proj stalk at rational nonbranch point,,,derive from affine domain and principal maximal ideal
+source_norm_transport,open,proof-side common 2+2 numerator in actual stalk,,,map source numerator and norm factorization into the point stalk
+global_principal_divisor,open,all finite points and infinity,,,sum all local orders and prove complete divisor identity
+Pic0_class_transport,open,global Jacobian divisor class,,,derive class equation from principal divisor
+compiled_Rust_semantics,open,all runtime law branches,,,establish compiled implementation corresponds to proof-side hypotheses

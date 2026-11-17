@@ -3483,3 +3483,6 @@ does not establish a mathematical obstruction or a security theorem. [pcc:unveri
 
 
 
+
+
+- [Chained transfers: canonical trust and store gate omission](chained-current-main-trust-gate-omission.md) (open, 2026-11-17). [pcc:unverified]

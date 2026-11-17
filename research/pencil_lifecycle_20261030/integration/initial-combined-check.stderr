@@ -1,0 +1,42 @@
+    Checking crypto v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> src/cryptanalysis/ecbench/diagnostic_runtime.rs:139:14
+    |
+139 |             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| x.checked_add(1))
+    |              ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+139 -             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| x.checked_add(1))
+139 +             .try_update(Ordering::Relaxed, Ordering::Relaxed, |x| x.checked_add(1))
+    |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> src/cryptanalysis/ecbench/pencil.rs:79:18
+   |
+79 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| x.checked_add(1))
+   |                  ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+79 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| x.checked_add(1))
+79 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |x| x.checked_add(1))
+   |
+
+warning: struct `Noop` is never constructed
+  --> src/cryptanalysis/ecbench/pencil_progress_sink.rs:87:12
+   |
+87 | pub struct Noop;
+   |            ^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `solve_one` is never used
+    --> src/cryptanalysis/ecbench/pencil_progress_native.rs:1192:8
+     |
+1192 | pub fn solve_one(
+     |        ^^^^^^^^^
+
+warning: `crypto` (lib) generated 4 warnings (run `cargo fix --lib -p crypto` to apply 2 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 17s

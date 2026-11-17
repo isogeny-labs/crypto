@@ -1,0 +1,29 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage{booktabs}
+\begin{document}
+\section*{Common 2+2 returned-ordinate congruence}
+\texttt{projective-law-common22-residual/v1}. Lean proves the cleared
+identity $C^5N + SC^2X + T = U[-C^4X + C^3(-Cq_1-A) + C^2Q]$ over a
+commutative ring. Source-derived integer polynomials meet five obligations
+connecting the Rust return tuple to the theorem's ordinate definitions.
+Changing the sign of the $s$ term on either side is rejected.
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Obligation & Monomials & Equal\\
+\midrule
+r\_has\_C\_squared\_factor & 1369 & yes\\
+qdelta\_matches\_source & 81 & yes\\
+rdelta\_matches\_source & 1384 & yes\\
+s\_matches\_lean & 1577 & yes\\
+t\_matches\_lean & 11350 & yes\\
+\bottomrule
+\end{tabular}
+\end{center}
+\noindent The term-level CSV retains every expanded integer coefficient. This
+cleared polynomial statement does not establish weighted normalization, the
+residual support's curve equation, the principal-divisor step, exceptional
+branches, or a cost change.
+\end{document}

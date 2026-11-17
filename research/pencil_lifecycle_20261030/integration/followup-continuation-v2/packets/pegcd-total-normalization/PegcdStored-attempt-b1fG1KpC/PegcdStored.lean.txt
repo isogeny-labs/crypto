@@ -1,0 +1,53 @@
+import PegcdTotal
+set_option autoImplicit false
+namespace Pegcd
+open Polynomial ScaleTrim MonicRemainder MonicTermination MonicZeroTest NativeDivision PencilWordRefinement
+inductive StoredTrace (p : UInt64) [Fact p.toNat.Prime] : List UInt64 → List UInt64 → State (ZMod p.toNat) → State (ZMod p.toNat) → List UInt64 → Prop
+ | stop (a z) : StoredTrace p a [] z z a
+ | next (a b z last q r out g) : b.getLast? = some last →
+   NonmonicDivision.divide p last b a a.length = some (q,r) →
+   StoredTrace p b r (step z q (wordsPoly p r)) out g → StoredTrace p a b z out g
+
+theorem stored_fuel (p : UInt64) [Fact p.toNat.Prime]
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31) (fuel : Nat)
+ (a b : List UInt64) (z : State (ZMod p.toNat))
+ (ha : Canon p a) (hna : Normal a) (hc : Canon p b) (hn : Normal b)
+ (h0 : z.r0 = wordsPoly p a) (h1 : z.r1 = wordsPoly p b)
+ (hl : b.length < fuel) :
+ ∃ out g, StoredTrace p a b z out g ∧ Trace z out ∧ out.r1 = 0 ∧
+ Canon p g ∧ Normal g ∧ out.r0 = wordsPoly p g := by
+ induction fuel generalizing a b z with
+ | zero => omega
+ | succ fuel ih =>
+   by_cases he : b = []
+   · subst b
+     exact ⟨z,a,StoredTrace.stop a z,Trace.refl z,(by simpa [wordsPoly,listPoly] using h1),ha,hna,h0⟩
+   · let last := b.getLast he
+     have hm : b.getLast? = some last := List.getLast?_eq_some_getLast he
+     have hlast : last.toNat < p.toNat := hc _ (List.getLast_mem he)
+     have hne : last ≠ 0 := by
+       intro hz
+       exact hn (by simpa [hz] using hm)
+     obtain ⟨q,r,hd,hcr,hnr,heq,hshort⟩ :=
+       NonmonicDivision.divide_total p last b a hp hb hlast hne hc ha hm a.length le_rfl
+     have hlt : r.length < b.length := by
+       rcases hshort with hh | hh
+       · subst r; simpa using List.length_pos_iff.mpr he
+       · exact hh
+     have hbound : r.length < fuel := by omega
+     obtain ⟨out,g,hword,htrace,hend,hcg,hng,hg⟩ := ih b r (step z q (wordsPoly p r)) hc hn hcr hnr
+       (by simpa [step] using h1) rfl hbound
+     have hnonzero : z.r1 ≠ 0 := by
+       rw [h1]
+       exact fun hz => he ((zero_iff_empty p b hc hn).mp hz)
+     refine ⟨out,g,StoredTrace.next a b z last q r out g hm hd hword,?_,hend,hcg,hng,hg⟩
+     exact Trace.next z q (wordsPoly p r) out hnonzero (by simpa [h0,h1] using heq) htrace
+
+theorem stored_total (p : UInt64) [Fact p.toNat.Prime]
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31) (a b : List UInt64)
+ (ha : Canon p a) (hna : Normal a) (hc : Canon p b) (hn : Normal b) :
+ ∃ out g, StoredTrace p a b (initial (wordsPoly p a) (wordsPoly p b)) out g ∧
+ Trace (initial (wordsPoly p a) (wordsPoly p b)) out ∧ out.r1 = 0 ∧
+ Canon p g ∧ Normal g ∧ out.r0 = wordsPoly p g :=
+ stored_fuel p hp hb (b.length+1) a b _ ha hna hc hn rfl rfl (by omega)
+end Pegcd

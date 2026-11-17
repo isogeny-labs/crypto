@@ -1,0 +1,146 @@
+{
+  "schema": "pencil-unknown-runtime-independent-source-review/v1",
+  "created_utc": "2026-10-30T05:36:22Z",
+  "review_kind": "independent_read_only_source_and_validation_review",
+  "review_scope": "Narrow frozen-protocol admission exception for the exact resource-bounded p186379 target0 characterization gate when runtime is explicitly unknown.",
+  "repository_worktree": "/home/ec2-user/crypto-pencil-signed-graph-20261029",
+  "git_head_context": "9ab05b985d13489ffc55338934a2f7cb858a2b04",
+  "source_commit_status": "reviewed files were uncommitted; file hashes are authoritative",
+  "reviewer_independent_of_implementation": true,
+  "reviewed_sources": [
+    {
+      "path": "research/pencil_large_prime_20261029/native_canonical_export/src/protocol_lint.rs",
+      "sha256": "acf731fd71387496a2f2d4605c1bc87a76abbc8f4fdadf44f4e87cd5d81d7613"
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/native_canonical_export/src/lib.rs",
+      "sha256": "67bd9a11ede14a4e9addfe8855fa85234810fa8a5ff9a6a13b9fec12be7b5e53"
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/native_canonical_export/tests/unit_contracts/mod.rs",
+      "sha256": "2aece5a99abafc1ae1fdc1956b2e42f6b194b56e613274edfe46daeb969a3620"
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/native_canonical_export/tests/unit_contracts/unknown_runtime.rs",
+      "sha256": "2a3081078f2b189120ae43783f77d48abeecb7c4ecaa33f39002d6951dff0f9c"
+    }
+  ],
+  "reviewed_fixture_bindings": [
+    {
+      "path": "research/pencil_large_prime_20261029/native_canonical_export/fixtures/unknown-runtime-gate/protocol.json",
+      "sha256": "9780db72036f40f9ea27137e0b526a0d388b6cd265c130ccb0b70c5767882e11"
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/native_canonical_export/fixtures/unknown-runtime-gate/request.json",
+      "sha256": "e49b94e02639a57b5af1b71b6b0a415a852190156a4beef9583e88d205866c0d"
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/native_canonical_export/fixtures/unknown-runtime-gate/resource_authorization.json",
+      "sha256": "5ea8e080af4b28572f3ff1d074e9e261ef8ad3c24a53a6e7d06d1b37b0316d25"
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/native_canonical_export/fixtures/unknown-runtime-gate/review.json",
+      "sha256": "a865795463c9f24c6f553c6534692c64a1f89e2135a47c4674b56e586dc0d7f0"
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/native_canonical_export/fixtures/unknown-runtime-gate/spec.json",
+      "sha256": "d4ec180d5a2cf65617a5821b565ec0d4952435a77669da65ca77852d2723c32c"
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/native_canonical_export/fixtures/unknown-runtime-gate/terminal-state.json",
+      "sha256": "d3985784784f82244779f0db72bb7e996a7947f571e11fa23701bd856d9580be"
+    }
+  ],
+  "validation": {
+    "build_receipt": {
+      "path": "research/pencil_large_prime_20261029/native_canonical_export/validation/unknown-runtime-gate/build-receipt.json",
+      "sha256": "2880aa1f81c859941caab3de9cdba82725e5ddb48b4f5dc48d17ab463ccda4a5"
+    },
+    "source_manifest": {
+      "path": "research/pencil_large_prime_20261029/native_canonical_export/validation/unknown-runtime-gate/source-files.sha256",
+      "sha256": "b7f7724efb54e7ae9b5613efd30614d89d55a1f21931e7297d1af7e4b64d086b"
+    },
+    "release_library_tests": {
+      "path": "research/pencil_large_prime_20261029/native_canonical_export/validation/unknown-runtime-gate/release-lib-tests.log",
+      "sha256": "41368304046684f0c8cbedb37b5830d30e75b883b46e3a0263179fb8b9c88af9",
+      "passed": 59,
+      "failed": 0,
+      "ignored": 0
+    },
+    "clippy": {
+      "path": "research/pencil_large_prime_20261029/native_canonical_export/validation/unknown-runtime-gate/clippy.log",
+      "sha256": "b03766b32a1e902cc9a355c64e48508d44489362e09f5981b7fc7679500f7adf",
+      "passed": true,
+      "all_targets": true
+    },
+    "rustfmt": {
+      "path": "research/pencil_large_prime_20261029/native_canonical_export/validation/unknown-runtime-gate/fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    "git_diff_check_passed": true,
+    "release_binary": {
+      "path_at_review": "/tmp/pencil-unknown-runtime-target/release/pencil-native-canonical-export",
+      "sha256": "b904a0da30851284da6301d4c97117cf427d6e3d32ea0ff242d90a928367bf7e",
+      "bytes": 7673312
+    },
+    "adapter_sha256": "5d14e1a9ea20e56c016cf80a12c85ac37d6b4653a6caf53530da69f9a78bc4e3"
+  },
+  "reviewed_properties": {
+    "default_frozen_protocol_with_null_runtime_estimate_rejected": true,
+    "opt_in_schema_exact": "pencil-bounded-unknown-runtime-gate/v1",
+    "runtime_estimate_status": "unknown",
+    "resource_caps_are_not_runtime_estimates": true,
+    "exact_gate_geometry": {
+      "workloads": 1,
+      "arms": 3,
+      "warmup_executions": 3,
+      "measured_executions": 15,
+      "total_executions": 18,
+      "measured_pairs": 5,
+      "finite_cost_cells": 36
+    },
+    "primary_statistic_exact_finite_algorithm_gae_only": true,
+    "all_clocks_unqualified_and_diagnostic": true,
+    "official_and_extension_bindings_cross_checked": true,
+    "full_arm_instrument_role_pairing_flags_environment_and_parameters_checked": true,
+    "known_b1_failure_identity_counts_and_terminal_hash_checked": true,
+    "single_prospective_replacement_and_prior_rows_excluded": true,
+    "resource_authorization_remains_non_scientific_non_cohort_non_timing_non_launch": true,
+    "retry_checkpoint_restore_and_single_payload_caps_checked": true,
+    "gate_replay_review_and_separate_cohort_barrier_checked": true,
+    "scientific_admission_false": true,
+    "launch_authorized_false": true
+  },
+  "finding_count": 0,
+  "findings": [],
+  "verdict": "no_remaining_concrete_defect_in_scoped_source_admission",
+  "freeze_suitability": "suitable for validating a corrected protocol that exactly matches the reviewed opt-in and all of its bound attachments",
+  "superseded_review_for_freeze_suitability": {
+    "reason": "The earlier review assessed the draft design before the frozen validator exposed the absent-estimate blocker and before the narrow source exception existed. It remains historical design evidence but is not the current freeze-suitability decision.",
+    "json": {
+      "path": "research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/pencil-six-hour-design-review.json",
+      "sha256": "d072e42a479f1a4c6a249f70ce4ecf446852c131197a5c5ba4a8d0da1b325e05"
+    },
+    "markdown": {
+      "path": "research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/pencil-six-hour-design-review.md",
+      "sha256": "b08a49317d73ad89a3bb87c4db3eb11392a3e846ab90264b94b50c0c39afa28a"
+    },
+    "frozen_attempt_failure": {
+      "exit_path": "research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/frozen-attempt-validation.exit",
+      "exit_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "stderr_path": "research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/frozen-attempt-validation.stderr",
+      "stderr_sha256": "33099d694cc4511f5452f18b7428a804b0b8f6962c23987bfbbb7484fbaa8e86",
+      "observed_error": "frozen protocol preflight estimate absent"
+    }
+  },
+  "limits": [
+    "This review does not provide or infer a runtime estimate.",
+    "This review does not qualify wall time or any other clock.",
+    "This review does not admit a full cohort or reuse the prior b1 rows as prospective observations.",
+    "This review does not authorize launch or establish live infrastructure reconciliation.",
+    "This review does not execute, replay, or evaluate a scientific workload.",
+    "A final protocol is covered only if it and every bound attachment exactly satisfy the reviewed validator; later changed source or bindings require another review."
+  ],
+  "scientific_executions": 0
+}

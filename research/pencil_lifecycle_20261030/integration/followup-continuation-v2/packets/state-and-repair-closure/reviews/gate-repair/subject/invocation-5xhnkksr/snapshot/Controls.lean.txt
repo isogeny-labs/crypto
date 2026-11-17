@@ -1,0 +1,29 @@
+import Find
+open GraphFind SignedGraphAlgebra
+namespace FindControls
+abbrev F := ZMod 17
+def s : State F 3 :=
+ ⟨fun i=>if i=0 then 0 else if i=1 then 0 else 1,
+ fun i=>if i=0 then ident else if i=1 then ⟨-1,2,3⟩ else ⟨-1,5,4⟩⟩
+def rank (i : Fin 3) : Nat := i.val
+def vals (i : Fin 3) : F := if i=0 then 7 else if i=1 then 1 else 12
+def q1 : Potential F := compose (s.pot 1) ident
+def t1 : State F 3 := compress s 1 0 q1
+def q2 : Potential F := compose (t1.pot 2) q1
+def t2 : State F 3 := compress t1 2 0 q2
+
+theorem depth_two_run : Run s 2 t2 0 q2 := by
+ apply Run.step s t1 2 0 q1 (by decide)
+ change Run s 1 t1 0 q1
+ apply Run.step s s 1 0 ident (by decide)
+ exact Run.root s 0 (by decide)
+theorem initial_forest : Forest s rank := by unfold Forest s rank; decide
+theorem initial_values : Represents s vals 2 := by unfold Represents s vals eval ident; decide
+theorem compressed_parent : t2.parent 2=0 ∧ t2.parent 1=0 := by decide
+theorem compressed_value : eval q2 7 2=12 := by decide
+theorem all_values_preserved : Represents t2 vals 2 :=
+ (run_preserves s t2 2 0 q2 depth_two_run rank vals 2 initial_forest initial_values).2.1
+theorem root_fixed : t2.parent 0=0 := by decide
+def bad : State F 3 := ⟨s.parent,fun _=>ident⟩
+theorem potential_reset_wrong : ¬Represents bad vals 2 := by unfold Represents bad s vals eval ident; decide
+end FindControls

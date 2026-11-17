@@ -1,0 +1,161 @@
+warning: unused import: `self`
+ --> producer/continuation.rs:3:59
+  |
+3 | use super::{sparse::{Owner,Charge,Polynomial},scheduler::{self,search},check};
+  |                                                           ^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `variables` is never used
+ --> producer/harness.rs:9:20
+  |
+9 | impl CheckedMap{fn variables(&self)->u32{self.0.variables}}
+  | ---------------    ^^^^^^^^^
+  | |
+  | method in this implementation
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `Bound` is never constructed
+ --> producer/signed_lift.rs:6:8
+  |
+6 | struct Bound<'a,T:VerificationAdmission>{owner:&'a mut T,deadline:Instant,expired:bool,stop:Option<Error>}
+  |        ^^^^^
+
+warning: method `time` is never used
+ --> producer/signed_lift.rs:7:46
+  |
+7 | impl<T:VerificationAdmission> Bound<'_,T>{fn time(&mut self)->Result<(),Error>{if Instant::now()>=self.deadline{self.expired=true;Err...
+  | -----------------------------------------    ^^^^
+  | |
+  | method in this implementation
+
+warning: function `verify_candidate` is never used
+  --> producer/signed_lift.rs:17:8
+   |
+17 | pub fn verify_candidate(map:&CheckedMap,model:&[bool],signed_domain:&[(u64,u64)],target:Option<(u64,u64)>,progress:&mut Progress,dea...
+   |        ^^^^^^^^^^^^^^^^
+
+warning: variants `Splitting` and `Excluded` are never constructed
+ --> producer/continuation.rs:7:90
+  |
+7 | #[derive(Debug,Clone,Copy,PartialEq,Eq)]pub enum Status{Building,Ready,Running,Candidate,Splitting,Excluded,Refuted}
+  |                                                  ------ variants in this enum            ^^^^^^^^^ ^^^^^^^^
+  |
+  = note: `Status` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: struct `CandidateCall` is never constructed
+  --> producer/continuation.rs:29:12
+   |
+29 | pub struct CandidateCall<V>{pub value:Option<V>,pub result:Result<(),Failure>}
+   |            ^^^^^^^^^^^^^
+
+warning: methods `candidate`, `exclude`, and `with_candidate_owner` are never used
+  --> producer/continuation.rs:33:9
+   |
+31 | impl<'a,T:Owner> Session<'a,T>{
+   | ------------------------------ methods in this implementation
+32 |  pub fn new(n:u32,g:&'a [Polynomial],limits:Limits,deadline:Instant,owner:&'a mut T)->Self{Self{owner,original:g,n,limits,deadline,a...
+33 |  pub fn candidate(&self)->Option<&[bool]>{if self.attempt.failure.is_some()||self.attempt.outcome!=Outcome::CandidateRetained{return...
+   |         ^^^^^^^^^
+...
+42 |  pub fn exclude(&mut self,record:u64)->Result<(),Failure>{
+   |         ^^^^^^^
+...
+52 |  pub fn with_candidate_owner<V>(&mut self,f:impl FnOnce(&[bool],Instant,&mut T)->V)->CandidateCall<V>{
+   |         ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `candidate` is never used
+  --> producer/continuation.rs:66:4
+   |
+66 | fn candidate(p:&Partition)->Option<&[bool]>{let a=p.search.as_ref()?;let n=a.nodes.get(a.witness_node?)?;if a.result.is_err()||a.ver...
+   |    ^^^^^^^^^
+
+warning: function `exclude` is never used
+  --> producer/continuation.rs:99:4
+   |
+99 | fn exclude<T:Owner>(n:u32,a:&mut Attempt,record:u64,m:&mut Meter<T>)->Result<(),Failure>{
+   |    ^^^^^^^
+
+warning: function `audit` is never used
+   --> producer/continuation.rs:122:8
+    |
+122 | pub fn audit(n:u32,g:&[Polynomial],a:&Attempt,limits:Limits,deadline:Instant,owner:&mut impl Owner)->CoverageAudit{
+    |        ^^^^^
+
+warning: struct `RecordView` is never constructed
+ --> producer/exclusions.rs:5:12
+  |
+5 | pub struct RecordView<'a>{pub partition:usize,pub record:u64,pub model:&'a [bool],pub callback_result:Option<Result<(),continuation::...
+  |            ^^^^^^^^^^
+
+warning: trait `Records` is never used
+ --> producer/exclusions.rs:9:11
+  |
+9 | pub trait Records{fn len(&self)->usize;fn get(&self,index:usize)->Option<RecordView<'_>>;}
+  |           ^^^^^^^
+
+warning: struct `Limits` is never constructed
+  --> producer/exclusions.rs:11:33
+   |
+11 | #[derive(Clone,Copy)]pub struct Limits{pub records:usize,pub work:u64,pub bytes:u64,pub coverage:continuation::Limits}
+   |                                 ^^^^^^
+
+warning: struct `Bound` is never constructed
+  --> producer/exclusions.rs:14:8
+   |
+14 | struct Bound<'a,T:Owner+VerificationAdmission>{owner:&'a mut T,limits:Limits,deadline:Instant,charge:Charge,failure:Option<Failure>}
+   |        ^^^^^
+
+warning: methods `time`, `pay`, `scan`, and `alloc` are never used
+  --> producer/exclusions.rs:16:5
+   |
+15 | impl<T:Owner+VerificationAdmission> Bound<'_,T>{
+   | ----------------------------------------------- methods in this implementation
+16 |  fn time(&mut self)->Result<(),Failure>{if let Some(e)=self.failure{return Err(e)}if Instant::now()>=self.deadline{return Err(Failur...
+   |     ^^^^
+17 |  fn pay(&mut self,w:u64,b:u64)->Result<(),Failure>{let r=(||{self.time()?;let q=Charge{work:self.charge.work.checked_add(w).ok_or(Fa...
+   |     ^^^
+18 |  fn scan(&mut self,n:usize)->Result<(),Failure>{self.pay(u64::try_from(n).map_err(|_|Failure::Overflow)?.checked_add(1).ok_or(Failur...
+   |     ^^^^
+19 |  fn alloc<V>(&mut self,v:&mut Vec<V>,n:usize)->Result<(),Failure>{let b=n.checked_mul(size_of::<V>()).and_then(|n|n.checked_add(64))...
+   |     ^^^^^
+
+warning: function `verify` is never used
+  --> producer/exclusions.rs:27:8
+   |
+27 | pub fn verify(n:u32,g:&[Polynomial],map:&CheckedMap,domain:&[(u64,u64)],target:Option<(u64,u64)>,attempt:&continuation::Attempt,reco...
+   |        ^^^^^^
+
+warning: variants `AcceptedSignedRelation`, `ConditionalBooleanCoverage`, and `RetainedModelExclusionsReplayed` are never constructed
+  --> producer/harness.rs:53:2
+   |
+51 | #[derive(Debug,Clone,Copy)]pub enum Status{
+   |                                     ------ variants in this enum
+52 |  Incomplete,
+53 |  AcceptedSignedRelation,
+   |  ^^^^^^^^^^^^^^^^^^^^^^
+54 |  ConditionalBooleanCoverage,
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+57 |  RetainedModelExclusionsReplayed,
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `Status` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: methods `map_ack`, `pattern`, `deadline`, and `binding_sha256` are never used
+  --> producer/encoding.test.rs:12:9
+   |
+11 | impl EncodingSource<'_>{
+   | ----------------------- methods in this implementation
+12 |  pub fn map_ack(&self)->Option<&capture::CommittedEventPosition>{self.identity.map_ack}
+   |         ^^^^^^^
+13 |  pub fn pattern(&self)->Option<u32>{self.identity.pattern}
+   |         ^^^^^^^
+14 |  pub fn deadline(&self)->Instant{self.deadline}
+   |         ^^^^^^^^
+15 |  pub fn binding_sha256(&self)->&[u8;32]{self.identity.binding_sha256}
+   |         ^^^^^^^^^^^^^^
+
+warning: 19 warnings emitted
+

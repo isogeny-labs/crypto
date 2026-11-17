@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/workspace/scratch/ct103_mirror_accepted_CI_capture_ranks_root_01.py", line 21, in <module>
+    p=Path(path);body=p.read_bytes();assert json.loads(body)['original_exit']==0;(e/(label+'.json')).write_bytes(body)
+                      ^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1019, in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/scratch/ct89-original-fixed-IC-CI-acceptance-01-publication-01/receipt.json'

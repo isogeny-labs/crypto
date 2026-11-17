@@ -1,0 +1,2983 @@
+{
+  "analysis": {
+    "script": {
+      "path": "src/bin/prime_terminal.rs",
+      "kind": "analysis",
+      "bytes": 20136,
+      "sha256": "06699994e24d8d5df43399165cd164a9d22ebf5c6885ce59c0d26e8a355c570f"
+    },
+    "outputs": [
+      {
+        "path": "evidence/prime-terminal/summary.json",
+        "kind": "summary",
+        "bytes": 30431,
+        "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+      }
+    ],
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "id": "original",
+      "role": "baseline",
+      "commit": "1ec2f68e9a2956dfc55c4e35354e9ce7c0fcaeab",
+      "binary_sha256": "db78c87e524c61f2b35d6f6fcad6bee62480cf0ed68ca31cd481fbb1e6a3fd64",
+      "image_digest": null
+    },
+    {
+      "id": "baseline",
+      "role": "baseline",
+      "commit": "1ec2f68e9a2956dfc55c4e35354e9ce7c0fcaeab",
+      "binary_sha256": "db78c87e524c61f2b35d6f6fcad6bee62480cf0ed68ca31cd481fbb1e6a3fd64",
+      "image_digest": null
+    },
+    {
+      "id": "spike40",
+      "role": "candidate",
+      "commit": "1ec2f68e9a2956dfc55c4e35354e9ce7c0fcaeab",
+      "binary_sha256": "db78c87e524c61f2b35d6f6fcad6bee62480cf0ed68ca31cd481fbb1e6a3fd64",
+      "image_digest": null
+    }
+  ],
+  "backend": "local",
+  "created": "2026-10-30T06:32:46Z",
+  "export_id": "N83-PRIME-TERMINAL-20261030-R3",
+  "files": [
+    {
+      "path": "evidence/prime-terminal/README.md",
+      "kind": "raw",
+      "bytes": 590,
+      "sha256": "08dd959edb401b3f8c89b18072a7fafe4bd0276e45b083051182d3f8ce59dd6d"
+    },
+    {
+      "path": "evidence/prime-terminal/baseline-prime-m3-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 5145,
+      "sha256": "9c636c99d274e931257250c75c5ddf370e84eff99f7f5c3e1d8a7fbb510a0051"
+    },
+    {
+      "path": "evidence/prime-terminal/baseline-prime-m3-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 6120,
+      "sha256": "582c3c400f462e97a2ee9e9a9c93ca39e211dafcb9ebda7a4acc3decf473d92a"
+    },
+    {
+      "path": "evidence/prime-terminal/baseline-prime-m4-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 5456,
+      "sha256": "9df1d6835c281a3ac6b0e2025eadca0b0a248334f54bc190020c3dc6418d91f3"
+    },
+    {
+      "path": "evidence/prime-terminal/baseline-prime-m4-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 6762,
+      "sha256": "fd3eefa40d1687a80538e52cd4e81a04da8d2830666a070149ef1daca81f0cc9"
+    },
+    {
+      "path": "evidence/prime-terminal/baseline-prime-m5-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 5762,
+      "sha256": "57387fc16133afdf18ff2732eb1cc1721751a73320620cd99adafb03816961eb"
+    },
+    {
+      "path": "evidence/prime-terminal/baseline-prime-m5-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 7399,
+      "sha256": "bfff49874538c4ce83eb3b2b571816c08676c58a36fc0e20f618b78ca155ac8f"
+    },
+    {
+      "path": "evidence/prime-terminal/baseline-prime-m6-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 6062,
+      "sha256": "67a81c90098b89c5b0ac1e082a93dd58cf683c3c9dd4df7fcf9f0588da2afa1d"
+    },
+    {
+      "path": "evidence/prime-terminal/baseline-prime-m6-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 8033,
+      "sha256": "01b9529f909e1ce441e907ca190cb91a77ce523bfe26f057b6c503db8bca1741"
+    },
+    {
+      "path": "evidence/prime-terminal/baseline-prime-m7-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 6367,
+      "sha256": "6f36daa5284ff864cb0dc914f531d629d69782aa18b193fcf8e70cfdaf93ffa3"
+    },
+    {
+      "path": "evidence/prime-terminal/baseline-prime-m7-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 8665,
+      "sha256": "f6480eb71964db7155e9cd64564a43bbdb470169b00f305227464fb8b82cc16e"
+    },
+    {
+      "path": "evidence/prime-terminal/baseline-prime-m8-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 6676,
+      "sha256": "e97dfbf48787603764f1107e0a010f2cab66003f9ff83aed7a383ef3bd7fa111"
+    },
+    {
+      "path": "evidence/prime-terminal/baseline-prime-m8-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 9308,
+      "sha256": "d6f7a61203cf2ea3a4745b767d8850321c454cb78a3bedb246f7ed3a2a4aab6f"
+    },
+    {
+      "path": "evidence/prime-terminal/baseline-prime-m9-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 6978,
+      "sha256": "3de9c716c1afb0c63abd8e09542ee9286f841e16d270ed4a7847d7f98ada26a8"
+    },
+    {
+      "path": "evidence/prime-terminal/baseline-prime-m9-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 9939,
+      "sha256": "a0d53e067b24bccdfa5ea7a5a6352f63b0eec034ad311be24a6818dc1913f439"
+    },
+    {
+      "path": "evidence/prime-terminal/controls.json",
+      "kind": "raw",
+      "bytes": 134,
+      "sha256": "2bd44c17f996c1a9d913e4f6394cea32d75d6fad305c19186da616b51b0b1961"
+    },
+    {
+      "path": "evidence/prime-terminal/controls.log",
+      "kind": "raw",
+      "bytes": 134,
+      "sha256": "2bd44c17f996c1a9d913e4f6394cea32d75d6fad305c19186da616b51b0b1961"
+    },
+    {
+      "path": "evidence/prime-terminal/host.txt",
+      "kind": "raw",
+      "bytes": 3504,
+      "sha256": "958527093e13ef3f4054aeb182138e67a0d058e5645e2d94bda3f1e1d9e3b77a"
+    },
+    {
+      "path": "evidence/prime-terminal/original-prime-m3-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 4612,
+      "sha256": "748ff5ca1f088881d16ffcc951944227e3e1a280232287504b1c3d72dadaba6c"
+    },
+    {
+      "path": "evidence/prime-terminal/original-prime-m3-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 5532,
+      "sha256": "80d283db5ebf002fb1a46a967685ad4f953dbce98ff7666919d020271def9bf8"
+    },
+    {
+      "path": "evidence/prime-terminal/original-prime-m4-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 4917,
+      "sha256": "d1746e3e1793645ecdea416d3f35040333011133ade31c225cef31382fe1751f"
+    },
+    {
+      "path": "evidence/prime-terminal/original-prime-m4-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 6177,
+      "sha256": "bccbcf376c14dbdf0aceba415c654a021b1f56b1149ab1cc1f6cff8141b6171b"
+    },
+    {
+      "path": "evidence/prime-terminal/original-prime-m5-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 5221,
+      "sha256": "189d24872d9c0d0f29e39d74781bf7bf7cadf020c5f9d1e737e55e6dc4de107d"
+    },
+    {
+      "path": "evidence/prime-terminal/original-prime-m5-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 6808,
+      "sha256": "f15d5a20a8a67c8286e0f81fc51e811da6ab89d467b68c4ba2c15c07a2f6f5eb"
+    },
+    {
+      "path": "evidence/prime-terminal/original-prime-m6-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 5527,
+      "sha256": "42f051cb797a726d6b523a55bc5eda46ce363367d56401d6055308df15483bac"
+    },
+    {
+      "path": "evidence/prime-terminal/original-prime-m6-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 7446,
+      "sha256": "fe10b8f930fb96aaa71991b0be19387eb7f875c53dbf5f8db8a193ddc667832f"
+    },
+    {
+      "path": "evidence/prime-terminal/original-prime-m7-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 5828,
+      "sha256": "851c95d62a036ac055e36cf44451de11af5105eda4de4afb5cf674cb67575f49"
+    },
+    {
+      "path": "evidence/prime-terminal/original-prime-m7-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 8082,
+      "sha256": "73becb0f40c03345f179de4a9e9684cfadaee95fcbf1e9e3afe915f1e922128a"
+    },
+    {
+      "path": "evidence/prime-terminal/original-prime-m8-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 6143,
+      "sha256": "549952cafc1d922ec1a23ac98028f3dc79fee1fc7890f49a8fdc9e3cedd3c07f"
+    },
+    {
+      "path": "evidence/prime-terminal/original-prime-m8-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 8724,
+      "sha256": "ad773140c1bf58762bbd764739f8410977279a533bbd1c60135d19d458b92122"
+    },
+    {
+      "path": "evidence/prime-terminal/original-prime-m9-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 6443,
+      "sha256": "f497eed2af28e91c3929e33ca6f5b99091585c10ade77c85d3f23521ea339704"
+    },
+    {
+      "path": "evidence/prime-terminal/original-prime-m9-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 9359,
+      "sha256": "1c4a34a3081777d5ec09af3c294518d9c86fdab28ccdfe5198b9b46f93f98fd8"
+    },
+    {
+      "path": "evidence/prime-terminal/primality.json",
+      "kind": "raw",
+      "bytes": 811,
+      "sha256": "b2d36b46d4ff8600a6dd248817a093f04e1adabe2294916c99f11cc4595790e4"
+    },
+    {
+      "path": "evidence/prime-terminal/producer.log",
+      "kind": "raw",
+      "bytes": 1498,
+      "sha256": "09e1c1da10054f89541ec0a3837d8ae5d4a79eaaae01b556e241c9893d459721"
+    },
+    {
+      "path": "evidence/prime-terminal/raw-manifest.sha256",
+      "kind": "raw",
+      "bytes": 29735,
+      "sha256": "0113e48b898383f3bd85aa920a029b44a01ef1a0f3c1cd24c8cc54224c112cfe"
+    },
+    {
+      "path": "evidence/prime-terminal/replay.log",
+      "kind": "raw",
+      "bytes": 1456,
+      "sha256": "03562cab08bcb0184e172615183a94987cc2f934756ca5a3876b62e8a675235d"
+    },
+    {
+      "path": "evidence/prime-terminal/spike40-prime-m3-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 5147,
+      "sha256": "8d47eab915d09c904649e01c09587bf08dac4fd7da32aae89fa35580d1a50d9e"
+    },
+    {
+      "path": "evidence/prime-terminal/spike40-prime-m3-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 6122,
+      "sha256": "ea3e28a3595bd97604e7ccb880c3d79c862a437373a6fe49aaf3933f7316e61d"
+    },
+    {
+      "path": "evidence/prime-terminal/spike40-prime-m4-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 5458,
+      "sha256": "a0862e6db5e0e95ad18e8e3ceb244f214814d7e41fae6b49d98d2d2ab162e404"
+    },
+    {
+      "path": "evidence/prime-terminal/spike40-prime-m4-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 6764,
+      "sha256": "e70059f745328dac83b857c3f3ecf74a61f214b31d349a1471276f8038937997"
+    },
+    {
+      "path": "evidence/prime-terminal/spike40-prime-m5-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 5764,
+      "sha256": "0826566e6e8ac0974642a9222aac83f66a449c0c99a8c3a0d90bff96b3b8e45c"
+    },
+    {
+      "path": "evidence/prime-terminal/spike40-prime-m5-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 7401,
+      "sha256": "35e0c2f1d6991e5ea44c37c8c9034bb2c88188a416fee68253575580d695d873"
+    },
+    {
+      "path": "evidence/prime-terminal/spike40-prime-m6-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 6064,
+      "sha256": "0fca784ccb1bb52e86faffcd68897e8f15cfaa8790be2fa2256ea8d9adf86b0b"
+    },
+    {
+      "path": "evidence/prime-terminal/spike40-prime-m6-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 8035,
+      "sha256": "0a3cae95beac318d74e2fd81dfb480b211d0501a55ff5cce62c5a75885a622e7"
+    },
+    {
+      "path": "evidence/prime-terminal/spike40-prime-m7-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 6369,
+      "sha256": "06470d50bcfe165d2b6ca4a24355152f3f9937d6dd86daac350b23795eb540eb"
+    },
+    {
+      "path": "evidence/prime-terminal/spike40-prime-m7-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 8667,
+      "sha256": "fa98067e85325fc361386f9c3f214b48e9d33226ea4854662dab26970c425d83"
+    },
+    {
+      "path": "evidence/prime-terminal/spike40-prime-m8-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 6678,
+      "sha256": "7ebedd65103158e91d6544916da022c6f6c0be0dc869337abe7892f0a969f0df"
+    },
+    {
+      "path": "evidence/prime-terminal/spike40-prime-m8-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 9310,
+      "sha256": "77f2f984aa34bb008fd900add6a501725f36bddbc54fffcc8b8866b8a32804ee"
+    },
+    {
+      "path": "evidence/prime-terminal/spike40-prime-m9-natural/certificate.json",
+      "kind": "raw",
+      "bytes": 6980,
+      "sha256": "4a0619d445d88bd75ee759532da0fa2544fb96ab5ff5cad8f0bf7ffdbdb0c62a"
+    },
+    {
+      "path": "evidence/prime-terminal/spike40-prime-m9-planted/certificate.json",
+      "kind": "raw",
+      "bytes": 9941,
+      "sha256": "1ebe90f61204212584be0daeaeb3d49578f61cf337ae2aff3f7180014aec9939"
+    },
+    {
+      "path": "evidence/prime-terminal/status.json",
+      "kind": "raw",
+      "bytes": 97,
+      "sha256": "7d9fa5419d615a8483a95bfcddd38b4eade143efb1ff97a6411148b0bf843908"
+    },
+    {
+      "path": "evidence/prime-terminal/summary.json",
+      "kind": "raw",
+      "bytes": 30431,
+      "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+    },
+    {
+      "path": "evidence/prime-terminal/terminal.json",
+      "kind": "raw",
+      "bytes": 201,
+      "sha256": "b96146f24e10ea6763ea7096e2afe44bbd2b632599f65b7fc1886923e412fbbd"
+    },
+    {
+      "path": "validation-prime-terminal/restored/raw-download-check.log",
+      "kind": "log",
+      "bytes": 36,
+      "sha256": "bc377ee1fe283cd68e401f836f0ca951b705667715cdb6c8d1c663b40063ab2f"
+    },
+    {
+      "path": "validation-prime-terminal/restored/restored-after.log",
+      "kind": "log",
+      "bytes": 13057,
+      "sha256": "2d4cca79dfaa3fb4a994c0e8c7193e4f2f96c238505112c29945d6f62cc29b03"
+    },
+    {
+      "path": "validation-prime-terminal/restored/restored-before.log",
+      "kind": "log",
+      "bytes": 13057,
+      "sha256": "2d4cca79dfaa3fb4a994c0e8c7193e4f2f96c238505112c29945d6f62cc29b03"
+    },
+    {
+      "path": "validation-prime-terminal/restored/restored-replay.log",
+      "kind": "log",
+      "bytes": 1456,
+      "sha256": "03562cab08bcb0184e172615183a94987cc2f934756ca5a3876b62e8a675235d"
+    },
+    {
+      "path": "validation-prime-terminal/restored/restored-status.json",
+      "kind": "receipt",
+      "bytes": 23,
+      "sha256": "c5cb95ba9eaf91aac5b92a06ea417f5b63cb7574f49e7d4ed508935de65f05c1"
+    },
+    {
+      "path": "prime-terminal-archives/runs.tar.gz",
+      "kind": "raw",
+      "bytes": 12959786,
+      "sha256": "6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a"
+    },
+    {
+      "path": "evidence/prime-terminal-publication.json",
+      "kind": "receipt",
+      "bytes": 1066,
+      "sha256": "3b439e95741851c44107c8786b85874bc05b0726f4951ddc8d0c2f7564e30567"
+    },
+    {
+      "path": "evidence/prime-terminal-storage.json",
+      "kind": "receipt",
+      "bytes": 1962,
+      "sha256": "bb80c098cbb4d1be1faa9ca49a8fec932822b01ae130388b057ff9e173e9cc5a"
+    },
+    {
+      "path": "protocol-prime-terminal-r3.json",
+      "kind": "protocol",
+      "bytes": 39331,
+      "sha256": "3ed4897ed3eef878019b72bf218828b9ef66db184d23bf3b108fc81f675e052c"
+    },
+    {
+      "path": "PRIME_TERMINAL_DESIGN.md",
+      "kind": "other",
+      "bytes": 4446,
+      "sha256": "578e360e2eb5109e32047f2824309b8f078d308f925abd00699727664bcba846"
+    },
+    {
+      "path": "PRIME_TERMINAL_FORMAT.json",
+      "kind": "other",
+      "bytes": 2054,
+      "sha256": "151db3a9ec61634be5a5916157245a44babcdbfcebfe7c547ba77e13b5c2c343"
+    },
+    {
+      "path": "src/prime_terminal_math.rs",
+      "kind": "other",
+      "bytes": 4672,
+      "sha256": "b1dc368a8b4fb07aeeb04cc1d4e7467fb916141f5c6b791ba9c95fdae70dc691"
+    }
+  ],
+  "flow": {
+    "planned": 42,
+    "attempted": 42,
+    "completed": 42,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "host": {
+    "class_id": "existing-spot-L0",
+    "path": "evidence/prime-terminal/host.txt",
+    "sha256": "958527093e13ef3f4054aeb182138e67a0d058e5645e2d94bda3f1e1d9e3b77a",
+    "summary": {
+      "cpu_model": null,
+      "hypervisor": null,
+      "isolation_tier_max": "L0",
+      "kernel": "Linux ip-172-31-26-169.us-east-2.compute.internal 6.18.54-121.166.amzn2023.x86_64 #2 SMP PREEMPT_DYNAMIC Tue Oct  6 23:11:34 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux\nArchitecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  32\nOn-line CPU(s) list:                     0-31\nVendor ID:                               GenuineIntel\nModel name:                              Intel(R) Xeon(R) 6975P-C\nCPU family:                              6\nModel:                                   173\nThread(s) per core:                      2\nCore(s) per socket:                      16\nSocket(s):                               1\nStepping:                                1\nBogoMIPS:                                5400.00\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq monitor ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch cpuid_fault ssbd ibrs ibpb stibp ibrs_enhanced fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx_vnni avx512_bf16 wbnoinvd ida arat avx512vbmi umip pku ospke waitpkg avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg tme avx512_vpopcntdq rdpid bus_lock_detect cldemote movdiri movdir64b md_clear serialize amx_bf16 avx512_fp16 amx_tile amx_int8 flush_l1d arch_capabilities\nHypervisor vendor:                       KVM\nVirtualization type:                     full\nL1d cache:                               768 KiB (16 instances)\nL1i cache:                               1 MiB (16 instances)\nL2 cache:                                32 MiB (16 instances)\nL3 cache:                                480 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-31\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS Not affected; BHI BHI_DIS_S\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Not affected",
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "spot": true
+    }
+  },
+  "notes": [
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "All42 retained prime m3\u20139 identities;no new target or base;not independent statistical samples."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Certified highest-form FFD upper bound only. Affine consequence has bounded derivation degree but strict lower-space nonmembership is not checked;no new LFD bound."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "R1 and R2 EKS Jobs failed before native production;retained permissions and source403 errors. R3 existing-host fallback uses unchanged pinned binary;fresh and S3-restored replay;no timing or CRIU claim."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Full three-family m2\u20139 and elite-base objectives remain active;all older results preserved."
+    }
+  ],
+  "producer": {
+    "runtime": "codex",
+    "role": "producer",
+    "model": null,
+    "session": "n83-prime-terminal-20261030-r3"
+  },
+  "protocol": {
+    "path": "protocol-prime-terminal-r3.json",
+    "protocol_id": "N83-PRIME-TERMINAL-20261030",
+    "version": 3,
+    "sha256": "e197dbafacbee40a41a695ffcbf472c35951686d36af58899f58f7acb9b7d143"
+  },
+  "reviews_dir": "reviews",
+  "runs": [
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/original-prime-m3-planted/certificate.json",
+          "kind": "other",
+          "bytes": 5532,
+          "sha256": "80d283db5ebf002fb1a46a967685ad4f953dbce98ff7666919d020271def9bf8"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/original-prime-m3-natural/certificate.json",
+          "kind": "other",
+          "bytes": 4612,
+          "sha256": "748ff5ca1f088881d16ffcc951944227e3e1a280232287504b1c3d72dadaba6c"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/original-prime-m4-planted/certificate.json",
+          "kind": "other",
+          "bytes": 6177,
+          "sha256": "bccbcf376c14dbdf0aceba415c654a021b1f56b1149ab1cc1f6cff8141b6171b"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m4-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/original-prime-m4-natural/certificate.json",
+          "kind": "other",
+          "bytes": 4917,
+          "sha256": "d1746e3e1793645ecdea416d3f35040333011133ade31c225cef31382fe1751f"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m4-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/original-prime-m5-planted/certificate.json",
+          "kind": "other",
+          "bytes": 6808,
+          "sha256": "f15d5a20a8a67c8286e0f81fc51e811da6ab89d467b68c4ba2c15c07a2f6f5eb"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m5-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/original-prime-m5-natural/certificate.json",
+          "kind": "other",
+          "bytes": 5221,
+          "sha256": "189d24872d9c0d0f29e39d74781bf7bf7cadf020c5f9d1e737e55e6dc4de107d"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m5-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/original-prime-m6-planted/certificate.json",
+          "kind": "other",
+          "bytes": 7446,
+          "sha256": "fe10b8f930fb96aaa71991b0be19387eb7f875c53dbf5f8db8a193ddc667832f"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m6-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/original-prime-m6-natural/certificate.json",
+          "kind": "other",
+          "bytes": 5527,
+          "sha256": "42f051cb797a726d6b523a55bc5eda46ce363367d56401d6055308df15483bac"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m6-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/original-prime-m7-planted/certificate.json",
+          "kind": "other",
+          "bytes": 8082,
+          "sha256": "73becb0f40c03345f179de4a9e9684cfadaee95fcbf1e9e3afe915f1e922128a"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m7-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/original-prime-m7-natural/certificate.json",
+          "kind": "other",
+          "bytes": 5828,
+          "sha256": "851c95d62a036ac055e36cf44451de11af5105eda4de4afb5cf674cb67575f49"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m7-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/original-prime-m8-planted/certificate.json",
+          "kind": "other",
+          "bytes": 8724,
+          "sha256": "ad773140c1bf58762bbd764739f8410977279a533bbd1c60135d19d458b92122"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m8-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/original-prime-m8-natural/certificate.json",
+          "kind": "other",
+          "bytes": 6143,
+          "sha256": "549952cafc1d922ec1a23ac98028f3dc79fee1fc7890f49a8fdc9e3cedd3c07f"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m8-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/original-prime-m9-planted/certificate.json",
+          "kind": "other",
+          "bytes": 9359,
+          "sha256": "1c4a34a3081777d5ec09af3c294518d9c86fdab28ccdfe5198b9b46f93f98fd8"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m9-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/original-prime-m9-natural/certificate.json",
+          "kind": "other",
+          "bytes": 6443,
+          "sha256": "f497eed2af28e91c3929e33ca6f5b99091585c10ade77c85d3f23521ea339704"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m9-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/baseline-prime-m3-planted/certificate.json",
+          "kind": "other",
+          "bytes": 6120,
+          "sha256": "582c3c400f462e97a2ee9e9a9c93ca39e211dafcb9ebda7a4acc3decf473d92a"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/baseline-prime-m3-natural/certificate.json",
+          "kind": "other",
+          "bytes": 5145,
+          "sha256": "9c636c99d274e931257250c75c5ddf370e84eff99f7f5c3e1d8a7fbb510a0051"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/baseline-prime-m4-planted/certificate.json",
+          "kind": "other",
+          "bytes": 6762,
+          "sha256": "fd3eefa40d1687a80538e52cd4e81a04da8d2830666a070149ef1daca81f0cc9"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m4-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/baseline-prime-m4-natural/certificate.json",
+          "kind": "other",
+          "bytes": 5456,
+          "sha256": "9df1d6835c281a3ac6b0e2025eadca0b0a248334f54bc190020c3dc6418d91f3"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m4-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/baseline-prime-m5-planted/certificate.json",
+          "kind": "other",
+          "bytes": 7399,
+          "sha256": "bfff49874538c4ce83eb3b2b571816c08676c58a36fc0e20f618b78ca155ac8f"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m5-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/baseline-prime-m5-natural/certificate.json",
+          "kind": "other",
+          "bytes": 5762,
+          "sha256": "57387fc16133afdf18ff2732eb1cc1721751a73320620cd99adafb03816961eb"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m5-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/baseline-prime-m6-planted/certificate.json",
+          "kind": "other",
+          "bytes": 8033,
+          "sha256": "01b9529f909e1ce441e907ca190cb91a77ce523bfe26f057b6c503db8bca1741"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m6-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/baseline-prime-m6-natural/certificate.json",
+          "kind": "other",
+          "bytes": 6062,
+          "sha256": "67a81c90098b89c5b0ac1e082a93dd58cf683c3c9dd4df7fcf9f0588da2afa1d"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m6-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/baseline-prime-m7-planted/certificate.json",
+          "kind": "other",
+          "bytes": 8665,
+          "sha256": "f6480eb71964db7155e9cd64564a43bbdb470169b00f305227464fb8b82cc16e"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m7-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/baseline-prime-m7-natural/certificate.json",
+          "kind": "other",
+          "bytes": 6367,
+          "sha256": "6f36daa5284ff864cb0dc914f531d629d69782aa18b193fcf8e70cfdaf93ffa3"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m7-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/baseline-prime-m8-planted/certificate.json",
+          "kind": "other",
+          "bytes": 9308,
+          "sha256": "d6f7a61203cf2ea3a4745b767d8850321c454cb78a3bedb246f7ed3a2a4aab6f"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m8-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/baseline-prime-m8-natural/certificate.json",
+          "kind": "other",
+          "bytes": 6676,
+          "sha256": "e97dfbf48787603764f1107e0a010f2cab66003f9ff83aed7a383ef3bd7fa111"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m8-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/baseline-prime-m9-planted/certificate.json",
+          "kind": "other",
+          "bytes": 9939,
+          "sha256": "a0d53e067b24bccdfa5ea7a5a6352f63b0eec034ad311be24a6818dc1913f439"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m9-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/baseline-prime-m9-natural/certificate.json",
+          "kind": "other",
+          "bytes": 6978,
+          "sha256": "3de9c716c1afb0c63abd8e09542ee9286f841e16d270ed4a7847d7f98ada26a8"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m9-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/spike40-prime-m3-planted/certificate.json",
+          "kind": "other",
+          "bytes": 6122,
+          "sha256": "ea3e28a3595bd97604e7ccb880c3d79c862a437373a6fe49aaf3933f7316e61d"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/spike40-prime-m3-natural/certificate.json",
+          "kind": "other",
+          "bytes": 5147,
+          "sha256": "8d47eab915d09c904649e01c09587bf08dac4fd7da32aae89fa35580d1a50d9e"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/spike40-prime-m4-planted/certificate.json",
+          "kind": "other",
+          "bytes": 6764,
+          "sha256": "e70059f745328dac83b857c3f3ecf74a61f214b31d349a1471276f8038937997"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m4-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/spike40-prime-m4-natural/certificate.json",
+          "kind": "other",
+          "bytes": 5458,
+          "sha256": "a0862e6db5e0e95ad18e8e3ceb244f214814d7e41fae6b49d98d2d2ab162e404"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m4-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/spike40-prime-m5-planted/certificate.json",
+          "kind": "other",
+          "bytes": 7401,
+          "sha256": "35e0c2f1d6991e5ea44c37c8c9034bb2c88188a416fee68253575580d695d873"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m5-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/spike40-prime-m5-natural/certificate.json",
+          "kind": "other",
+          "bytes": 5764,
+          "sha256": "0826566e6e8ac0974642a9222aac83f66a449c0c99a8c3a0d90bff96b3b8e45c"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m5-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/spike40-prime-m6-planted/certificate.json",
+          "kind": "other",
+          "bytes": 8035,
+          "sha256": "0a3cae95beac318d74e2fd81dfb480b211d0501a55ff5cce62c5a75885a622e7"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m6-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/spike40-prime-m6-natural/certificate.json",
+          "kind": "other",
+          "bytes": 6064,
+          "sha256": "0fca784ccb1bb52e86faffcd68897e8f15cfaa8790be2fa2256ea8d9adf86b0b"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m6-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/spike40-prime-m7-planted/certificate.json",
+          "kind": "other",
+          "bytes": 8667,
+          "sha256": "fa98067e85325fc361386f9c3f214b48e9d33226ea4854662dab26970c425d83"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m7-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/spike40-prime-m7-natural/certificate.json",
+          "kind": "other",
+          "bytes": 6369,
+          "sha256": "06470d50bcfe165d2b6ca4a24355152f3f9937d6dd86daac350b23795eb540eb"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m7-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/spike40-prime-m8-planted/certificate.json",
+          "kind": "other",
+          "bytes": 9310,
+          "sha256": "77f2f984aa34bb008fd900add6a501725f36bddbc54fffcc8b8866b8a32804ee"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m8-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/spike40-prime-m8-natural/certificate.json",
+          "kind": "other",
+          "bytes": 6678,
+          "sha256": "7ebedd65103158e91d6544916da022c6f6c0be0dc869337abe7892f0a969f0df"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m8-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/spike40-prime-m9-planted/certificate.json",
+          "kind": "other",
+          "bytes": 9941,
+          "sha256": "1ebe90f61204212584be0daeaeb3d49578f61cf337ae2aff3f7180014aec9939"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m9-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/prime-terminal/summary.json",
+          "kind": "summary",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "path": "evidence/prime-terminal/spike40-prime-m9-natural/certificate.json",
+          "kind": "other",
+          "bytes": 6980,
+          "sha256": "4a0619d445d88bd75ee759532da0fa2544fb96ab5ff5cad8f0bf7ffdbdb0c62a"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "first_fall_upper_bound": 17,
+          "affine_derivation_degree_upper_bound": 17,
+          "affine_consequence_degree": 16
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m9-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh and S3-restored native complete-source,primality,annihilator,circuit and certificate replay;written projection argument;independent review pending;no strict LFD claim"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "repo": "crypto",
+    "commit": "1ec2f68e9a2956dfc55c4e35354e9ce7c0fcaeab",
+    "dirty": false
+  }
+}

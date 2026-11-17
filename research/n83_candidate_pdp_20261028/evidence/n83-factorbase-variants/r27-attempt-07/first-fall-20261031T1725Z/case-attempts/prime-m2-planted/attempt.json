@@ -1,0 +1,36 @@
+{
+  "certificate_sha256": "1ce9336342714d33cce1eba8304ca8b5ee2b0704545d4fb45d8b9b2c5d64968b",
+  "closure_rank": null,
+  "command": [
+    "timeout",
+    "--kill-after=5s",
+    "60s",
+    "prlimit",
+    "--as=8589934592",
+    "--",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+    "run",
+    "/tmp/n83-candidate-fall/spike27/cases/prime-m2-planted/input",
+    "/tmp/n83-candidate-fall/spike27/cases/prime-m2-planted/result"
+  ],
+  "elapsed_seconds": 0.865,
+  "family": "prime",
+  "first_fall_degree": null,
+  "first_fall_lower_bound": 5,
+  "id": "prime-m2-planted",
+  "input_sha256": "a180122cfd692e097892e73364b9061f58d8471c92d002431e18e39184527b99",
+  "last_fall_degree": null,
+  "m": 2,
+  "replay": {
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "{\"input\":\"prime-m2-planted\",\"kind\":\"explicit polynomial witness or coefficient-minor replay; not independent research review\",\"verified\":true}\n",
+    "verified": true
+  },
+  "returncode": 0,
+  "status": "completed",
+  "stderr": "",
+  "stdout": "{\"first_fall_degree\":null,\"first_fall_lower_bound\":5,\"id\":\"prime-m2-planted\",\"status\":\"certified_no_fall_through_degree_4\"}\n",
+  "system_sha256": "6a13a7e4c8dd35c298921ce4c0594717995680b1d10f3bec73e6a18c3bf21c47",
+  "target_kind": "planted"
+}

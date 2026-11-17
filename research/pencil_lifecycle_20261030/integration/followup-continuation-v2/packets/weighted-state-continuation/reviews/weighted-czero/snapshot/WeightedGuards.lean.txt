@@ -1,0 +1,26 @@
+import WeightedPoint
+set_option autoImplicit false
+namespace WeightedCZero
+open CZeroInterpolation
+variable {K : Type*} [Field K]
+theorem b_guard (q1 r1 s1 t1 q2 r2 s2 t2 z1 w1 z2 w2 : K)
+ (hz1:z1≠0) (hz2:z2≠0) :
+ let ca:=cross (weight q1 r1 s1 t1 z1 w1) (weight q2 r2 s2 t2 z2 w2)
+ let cb:=cross (weight q2 r2 s2 t2 z2 w2) (weight q1 r1 s1 t1 z1 w1)
+ bnum ca.q ca.r cb.q cb.r≠0 ↔ bnum q1 r1 q2 r2≠0 := by
+ dsimp only
+ rw [cross_weight,cross_weight]
+ simp only [weight,mul_comm z2 z1]
+ rw [b_scale]
+ simp [mul_ne_zero hz1 hz2]
+theorem c_guard (q1 r1 s1 t1 q2 r2 s2 t2 z1 w1 z2 w2 : K)
+ (hz1:z1≠0) (hw1:w1≠0) (hz2:z2≠0) (hw2:w2≠0) :
+ let ca:=cross (weight q1 r1 s1 t1 z1 w1) (weight q2 r2 s2 t2 z2 w2)
+ let cb:=cross (weight q2 r2 s2 t2 z2 w2) (weight q1 r1 s1 t1 z1 w1)
+ cnum ca.q ca.r ca.s ca.t cb.q cb.r cb.s cb.t=0 ↔ cnum q1 r1 s1 t1 q2 r2 s2 t2=0 := by
+ dsimp only
+ rw [cross_weight,cross_weight]
+ simp only [weight,mul_comm z2 z1,mul_comm w2 w1]
+ rw [c_scale]
+ simp [mul_ne_zero hz1 hz2,mul_ne_zero hw1 hw2]
+end WeightedCZero

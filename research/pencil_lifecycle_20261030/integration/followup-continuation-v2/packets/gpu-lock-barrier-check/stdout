@@ -1,0 +1,46 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "control": "no_child_close_reacquire",
+      "first": {
+        "acquired": true,
+        "errno": null,
+        "errno_name": null
+      },
+      "second": {
+        "acquired": true,
+        "errno": null,
+        "errno_name": null
+      }
+    },
+    {
+      "control": "child_holds_inherited_descriptor_parent_closed",
+      "child_pid": 2082601,
+      "fd_cloexec": true,
+      "attempt": {
+        "acquired": false,
+        "errno": 11,
+        "errno_name": "EAGAIN",
+        "message": "[Errno 11] Resource temporarily unavailable"
+      }
+    },
+    {
+      "control": "child_closed_and_reaped",
+      "child_exit_code": 0,
+      "attempt": {
+        "acquired": true,
+        "errno": null,
+        "errno_name": null
+      }
+    }
+  ],
+  "scope": "deterministic flock mechanism; original test cause unproved",
+  "uname": [
+    "Linux",
+    "ip-172-31-26-169.us-east-2.compute.internal",
+    "6.18.54-121.166.amzn2023.x86_64",
+    "#2 SMP PREEMPT_DYNAMIC Tue Oct  6 23:11:34 UTC 2026",
+    "x86_64"
+  ]
+}

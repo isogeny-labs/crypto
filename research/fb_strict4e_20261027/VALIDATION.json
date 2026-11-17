@@ -1,0 +1,37 @@
+{
+  "schema": "validation-gate/v1",
+  "note": "strict4e vs prefix binary-subspace, Koblitz a=0 n=13,19,23, l=3,4; geometric-mean ic/rho ratios over the 24 strict arms (rho normalised to 1); the strict-vs-prefix ORDER does NOT hold across the band",
+  "replay_certificate": {
+    "path": "replay-certificate.json",
+    "sha256": "e2775f1db3611bf3641e464f260e65b11aeac8413a650acd74562d6bd662aa4c"
+  },
+  "validator_report": {
+    "path": "validator-report.json",
+    "sha256": "2f686fda332610d2bd03b4a9c7b4c2a40e5dbadc4ab231d81c1a4dd810c98ad1"
+  },
+  "rho_reference": {
+    "kind": "negation_frobenius",
+    "protocol": "rho.signed_frobenius_strong (single-target strong signed-Frobenius rho), same session and binary, 8 public targets per curve",
+    "unit": "counted group operations (GAE), S = GAE/sqrt(r)",
+    "binary_or_process": "target/release/ecbench (sha256 fed0320849927ee0c27df1147c4a2bba4ae6b0c4d6cc06d3b4b7e9e9e3a10186), same session as the IC arms",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "gae_band": {
+      "0": {
+        "ic": 17.7831,
+        "rho": 1.0
+      },
+      "0.1": {
+        "ic": 92.8184,
+        "rho": 1.0
+      },
+      "1": {
+        "ic": 529.921,
+        "rho": 1.0
+      }
+    },
+    "order_holds_across_band": false
+  }
+}

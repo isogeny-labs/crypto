@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Infrastructure bootstrap only. This does not enable process restore in CRI.
+set -euo pipefail
+cd "$(dirname "$0")"
+: "${KUBECONFIG:?Set KUBECONFIG for the intended Iso Lab cluster}"
+export AWS_REGION=us-east-2 AWS_DEFAULT_REGION=us-east-2 AWS_PAGER=''
+[[ $(aws sts get-caller-identity --query Account --output text) == 104186811093 ]] || {
+  echo 'Expected Iso Lab AWS account 104186811093' >&2; exit 1;
+}
+scratch=$(mktemp -d)
+trap 'rm -rf "$scratch"' EXIT
+aws eks describe-cluster --name isolab > "$scratch/cluster.json"
+kubectl config view --minify -o json > "$scratch/context.json"
+[[ $(jq -r '.cluster.endpoint' "$scratch/cluster.json") == \
+   $(jq -r '.clusters[0].cluster.server' "$scratch/context.json") ]] || {
+  echo 'KUBECONFIG does not select the intended Iso Lab cluster' >&2; exit 1;
+}
+aws eks describe-addon --cluster-name isolab --addon-name aws-ebs-csi-driver \
+  > "$scratch/ebs.json"
+jq -e '.addon.status=="ACTIVE" and (.addon.health.issues|length)==0' "$scratch/ebs.json" >/dev/null
+if aws eks describe-addon --cluster-name isolab --addon-name snapshot-controller \
+  > "$scratch/addon.json" 2> "$scratch/error"; then
+  jq -e '.addon.status=="ACTIVE" and (.addon.health.issues|length)==0' "$scratch/addon.json" >/dev/null || {
+    echo 'Existing snapshot controller is not healthy/active; inspect its current operation' >&2; exit 1;
+  }
+elif grep -q ResourceNotFoundException "$scratch/error"; then
+  aws eks create-addon --cluster-name isolab --addon-name snapshot-controller \
+    --addon-version v8.6.0-eksbuild.10 --tags project=isolab,managed-by=codex \
+    > "$scratch/create.json"
+  aws eks wait addon-active --cluster-name isolab --addon-name snapshot-controller
+else
+  cat "$scratch/error" >&2; exit 1
+fi
+kubectl apply -f snapshot-class.yaml
+kubectl get volumesnapshotclass isolab-ebs-checkpoints
+echo 'CSI snapshots installed. CRIU recovery and benchmark re-admission are separate gates.'

@@ -1,0 +1,85 @@
+CARD SWB-RECOMPUTE-17  (frozen before dispatch; experiment-director style; mechanical tier)
+GOAL  Recompute, from raw records committed in this repository, the headline numbers of the benchmark directories listed below (these directories have NO row in benchmarks/README.md; ROW n is a pseudo-id O<n>; use row_no = 1000+n in the output; the HEADLINE is the first sentence of the directory README; the numbers there are what you recompute), and check the identical-output claims. COMPUTE AND COPY ONLY. You do not judge, classify, explain or repair anything.
+REPO  /home/user/crypto (cwd). Read everything; write ONLY under research/validation_sweep_20261019/B-benchmarks/scripts/recompute/ and research/validation_sweep_20261019/B-benchmarks/recompute/.
+TOOLS  python3 -I (isolated mode) for every computation; grep/ls/zcat/xz -dc/tar -tf/sed for reading. FORBIDDEN: cargo/rustc builds or tests, running any benchmark or ecbench/crypto binary, network access, editing or deleting any file outside the two write dirs, git commands other than read-only (git log/show/ls-files).
+PER ROW (do these in order; at most 25 tool calls per row, then record status cannot_define for what is left):
+ 1. Open the row's study directories (listed per row) and read the README/PROTOCOL/REPORT only as needed to find which raw files hold per-run records.
+ 2. From the row's HEADLINE copy up to 10 numeric claims, preferring ratios, speedups, quotients, medians, intervals and counts (verbatim string each).
+ 3. For each, find the raw per-run/per-pair records in the repo that the number is computed from. Write ONE script per row at scripts/recompute/<row_no>.py (python3 -I, reads only committed files, prints the computed values with the field names used). Run it. If the aggregation (median vs mean, paired vs pooled, which rounds are excluded) is not stated in the study, try the study's stated rule; if still undefined record status cannot_define and say which choice is missing. Never pick the aggregation that happens to match.
+ 4. status per claim: match (relative difference <= 1% or equal at the precision the row prints), mismatch (state both numbers), no_raw_in_repo (the records are not in the repo), cannot_define, partial.
+ 5. If the HEADLINE or MEASURED text claims identical/bit-identical/equal outputs, counters, answers, digests or checksums between arms: find the corresponding fields in the raw records of both arms and report n_compared, n_equal, n_differ, files. If the raw records contain no such field, status no_raw_in_repo.
+ 6. Copy verbatim (path:line) every sentence in the row's study files that points to data outside the repo (drive.google.com, /Volumes, SSD, /Users, s3://, gs://, store:<name>, Modal volume, 'not committed', 'scratch'). For each store:<name> check store/index.json lists it (yes/no).
+ 7. Copy verbatim from the study files: (a) the A/A or null-control result lines (path:line), (b) the isolation tier or isolation statement (path:line), (c) whether PROTOCOL/spec is committed in git before the first raw record (run `git log --diff-filter=A --format=%H%x20%cI -- <protocol path>` and `git log --diff-filter=A --format=%H%x20%cI -- <first raw file>` and print both dates; if either is empty say so).
+OUTPUT  Write research/validation_sweep_20261019/B-benchmarks/recompute/SWB-RECOMPUTE-17.jsonl, one JSON object per row: {"row_no":int,"slug":str,"claims":[{"claimed":str,"computed":str,"definition":str,"files":[str],"status":str}],"identical":{"claimed":bool,"n_compared":int|null,"n_equal":int|null,"n_differ":int|null,"files":[str],"status":str},"offrepo_refs":[str],"aa_lines":[str],"isolation_lines":[str],"protocol_git_date":str,"first_raw_git_date":str,"script":str,"notes":str}. notes holds only facts you saw, never opinions. Then reply with the file path and one line per row: row_no, number of match/mismatch/no_raw/cannot_define claims.
+STOP_WHEN  a row's study directory does not exist; a file you must read is unreadable; you are about to write outside the two write dirs. Report the stop verbatim and continue with the next row.
+ROWS
+
+--- ROW 1011 | 2026-10-11 | 20261011-pdp-ps2-scalar-group-law
+MEASURED: [Source study](../../research/pdp_oracle_speedup_20261011/ps2_scalar/README.md) and [run report](../../research/pdp_oracle_speedup_20261011/reports/run-20261011T2255Z/report.pdf) remain the source of truth. These browsing copies were added during integration on 2026-10-12. The PDFs and SVGs are byte
+HEADLINE: 29.8–40.8 ns per own pair; group-scalar/baseline per-pair ratios 0.0668–0.1225; 400 corpus root sets agree; library promotion and Gray update remain partial
+HOST (as reported): Host and scope: 4-vCPU Intel Xeon 2.80 GHz, shared Linux container; CPU 3 pinned; 6/125 timed runs marked contended, retained with sensitivity table; no certified isolation level. The integration adds no measurement or independent replay.
+STUDY DIRS: research/pdp_oracle_speedup_20261011/ps2_scalar/README.md; research/pdp_oracle_speedup_20261011/reports/run-20261011T2255Z/report.pdf
+RAW CANDIDATES (largest first): benchmarks/20261011-pdp-ps2-scalar-group-law/copies.json, research/pdp_oracle_speedup_20261011/ps2_scalar/raw/counts.jsonl, research/pdp_oracle_speedup_20261011/ps2_scalar/raw/iso.jsonl, research/pdp_oracle_speedup_20261011/ps2_scalar/raw/programs.jsonl, research/pdp_oracle_speedup_20261011/ps2_scalar/raw/refused_starts.log, research/pdp_oracle_speedup_20261011/ps2_scalar/raw/times.jsonl
+
+--- ROW 1012 | 2026-10-11 | 20261011-pdp-ps1-algebra-gates
+MEASURED: [Source study](../../research/pdp_oracle_speedup_20261011/ps1_algebra/README.md) and [run report](../../research/pdp_oracle_speedup_20261011/reports/run-20261011T2217Z/report.pdf) remain the source of truth. These browsing copies were added during integration on 2026-10-12. The PDFs and SVGs are byt
+HEADLINE: 7410–14608 fused ternary-logic issues per group-law task; derived baseline 70695–190275 (9.5–13.0×); program-model accounting, no wall-time measurement
+HOST (as reported): Host and scope: Gate-count program model; Linux host manifest in PS0; identity-certificate requirement remains blocked. The integration adds no measurement or independent replay.
+STUDY DIRS: research/pdp_oracle_speedup_20261011/ps1_algebra/README.md; research/pdp_oracle_speedup_20261011/reports/run-20261011T2217Z/report.pdf
+RAW CANDIDATES (largest first): benchmarks/20261011-pdp-ps1-algebra-gates/copies.json, research/pdp_oracle_speedup_20261011/ps1_algebra/raw/agree.jsonl, research/pdp_oracle_speedup_20261011/ps1_algebra/raw/bscheck.jsonl, research/pdp_oracle_speedup_20261011/ps1_algebra/raw/degrees.jsonl, research/pdp_oracle_speedup_20261011/ps1_algebra/raw/gates.jsonl, research/pdp_oracle_speedup_20261011/ps1_algebra/raw/sample.jsonl
+
+--- ROW 1013 | 2026-10-11 | 20261011-pdp-ps0-baseline
+MEASURED: [Source study](../../research/pdp_oracle_speedup_20261011/baseline_v1/README.md) and [run report](../../research/pdp_oracle_speedup_20261011/reports/run-20261011T2107Z/report.pdf) remain the source of truth. These browsing copies were added during integration on 2026-10-12. The PDFs and SVGs are byt
+HEADLINE: Baseline medians 337.7 / 375.4 / 393.3 / 421.4 / 452.3 ns per pair; largest A/A spread 8.81%; accounting result
+HOST (as reported): Host and scope: 4-vCPU Intel Xeon 2.80 GHz, shared Linux container; CPU 3 pinned; 0/50 timed runs marked contended; no certified isolation level. The integration adds no measurement or independent replay.
+STUDY DIRS: research/pdp_oracle_speedup_20261011/baseline_v1/README.md; research/pdp_oracle_speedup_20261011/reports/run-20261011T2107Z/report.pdf
+RAW CANDIDATES (largest first): benchmarks/20261011-pdp-ps0-baseline/copies.json, research/pdp_oracle_speedup_20261011/baseline_v1/callgrind/cg_l8.out, research/pdp_oracle_speedup_20261011/baseline_v1/callgrind/cg_l9.out, research/pdp_oracle_speedup_20261011/baseline_v1/raw/brute_l8.log, research/pdp_oracle_speedup_20261011/baseline_v1/raw/iso.jsonl, research/pdp_oracle_speedup_20261011/baseline_v1/raw/run_ps0_main.log
+
+--- ROW 1014 | 2026-10-11 | 20261011-lit2026-w8-summation-models
+MEASURED: [Source study](../../research/lit2026_w8_summation_models_20261011/README.md) and [run report](../../research/lit2026_w8_summation_models_20261011/reports/run-20261011T2017Z/report.pdf) remain the source of truth. These browsing copies were added during integration on 2026-10-12. The PDFs and SVGs a
+HEADLINE: Convolution splitting: 1.21–2.07× more word operations despite lower degree; Frobenius auxiliaries: 57–701× more MatrixF4 word operations; model diagnostics, no IC/rho claim
+HOST (as reported): Host and scope: Shared Apple M4 Pro; L0; counted word operations retained as reported. The integration adds no measurement or independent replay.
+STUDY DIRS: research/lit2026_w8_summation_models_20261011/README.md; research/lit2026_w8_summation_models_20261011/reports/run-20261011T2017Z/report.pdf
+RAW CANDIDATES (largest first): benchmarks/20261011-lit2026-w8-summation-models/copies.json, research/lit2026_w8_summation_models_20261011/identity-certificates/eg-resultant-s4.json, research/lit2026_w8_summation_models_20261011/reports/run-20261011T2017Z/raw/cert.json, research/lit2026_w8_summation_models_20261011/reports/run-20261011T2017Z/raw/frob-inherited.json, research/lit2026_w8_summation_models_20261011/reports/run-20261011T2017Z/raw/frob.json, research/lit2026_w8_summation_models_20261011/reports/run-20261011T2017Z/raw/lucas-l34.json
+
+--- ROW 1015 | 2026-10-11 | 20261011-lit2026-w8-quotient-s3
+MEASURED: [Source study](../../research/lit2026_w8_summation_models_20261011/README.md) and [run report](../../research/lit2026_w8_summation_models_20261011/reports/run-20261011T2131Z/report.pdf) remain the source of truth. These browsing copies were added during integration on 2026-10-12. The PDFs and SVGs a
+HEADLINE: Original/candidate F4 word-operation ratios 1.340–1.642; identical root digests; five interleaved rounds; decomposition stage
+HOST (as reported): Host and scope: Shared Apple M4 Pro; L0; load 100–340. The integration adds no measurement or independent replay.
+STUDY DIRS: research/lit2026_w8_summation_models_20261011/README.md; research/lit2026_w8_summation_models_20261011/reports/run-20261011T2131Z/report.pdf
+RAW CANDIDATES (largest first): benchmarks/20261011-lit2026-w8-quotient-s3/copies.json, research/lit2026_w8_summation_models_20261011/identity-certificates/eg-resultant-s4.json, research/lit2026_w8_summation_models_20261011/reports/run-20261011T2017Z/raw/cert.json, research/lit2026_w8_summation_models_20261011/reports/run-20261011T2017Z/raw/frob-inherited.json, research/lit2026_w8_summation_models_20261011/reports/run-20261011T2017Z/raw/frob.json, research/lit2026_w8_summation_models_20261011/reports/run-20261011T2017Z/raw/lucas.json
+
+--- ROW 1016 | 2026-10-11 | 20261011-lit2026-w5-gate-first-lane-roots
+MEASURED: [Source study](../../research/lit2026_w5_lane_batched_f4_20261011/README.md) and [run report](../../research/lit2026_w5_lane_batched_f4_20261011/reports/run-20261011T2225Z/report.pdf) remain the source of truth. These browsing copies were added during integration on 2026-10-12. The PDFs and SVGs are
+HEADLINE: Gate-first original/candidate word-XOR ratios 1.5675–1.7788; lane roots cost 2.6–4.0× sequential control in the three batch cells (negative)
+HOST (as reported): Host and scope: Shared Apple M4 Pro, 14 cores; L0, unpinned; load 82.5–388.1. The integration adds no measurement or independent replay.
+STUDY DIRS: research/lit2026_w5_lane_batched_f4_20261011/README.md; research/lit2026_w5_lane_batched_f4_20261011/reports/run-20261011T2225Z/report.pdf
+RAW CANDIDATES (largest first): benchmarks/20261011-lit2026-w5-gate-first-lane-roots/copies.json, research/lit2026_w5_lane_batched_f4_20261011/reports/run-20261011T2225Z/raw/diag-lanes-echelon.jsonl, research/lit2026_w5_lane_batched_f4_20261011/reports/run-20261011T2225Z/raw/diag-lanes-rref.jsonl, research/lit2026_w5_lane_batched_f4_20261011/reports/run-20261011T2225Z/raw/r1-K1_17-lanes.jsonl, research/lit2026_w5_lane_batched_f4_20261011/reports/run-20261011T2225Z/raw/r2-K1_17-lanes.jsonl, research/lit2026_w5_lane_batched_f4_20261011/reports/run-20261011T2225Z/raw/r3-K1_17-lanes.jsonl
+
+--- ROW 1017 | 2026-10-11 | 20261011-lit2026-w4-early-abort
+MEASURED: [Source study](../../research/lit2026_w4_early_abort_20261011/README.md) and [run report](../../research/lit2026_w4_early_abort_20261011/reports/run-20261011T2025Z/report.pdf) remain the source of truth. These browsing copies were added during integration on 2026-10-12. The PDFs and SVGs are byte-id
+HEADLINE: Mode 1 original/candidate word-XOR ratios 1.00083–1.00378 (no-change); mode 2 0.99714–0.99928 (negative); switches remain off
+HOST (as reported): Host and scope: Shared Apple M4 Pro; L0, unpinned; load 63.6–110.9. The integration adds no measurement or independent replay.
+STUDY DIRS: research/lit2026_w4_early_abort_20261011/README.md; research/lit2026_w4_early_abort_20261011/reports/run-20261011T2025Z/report.pdf
+RAW CANDIDATES (largest first): benchmarks/20261011-lit2026-w4-early-abort/copies.json, research/lit2026_w4_early_abort_20261011/reports/run-20261011T2025Z/raw/trace_k0n23_dim8_mode1.jsonl, research/lit2026_w4_early_abort_20261011/reports/run-20261011T2025Z/raw/trace_k0n23_dim8_mode2.jsonl, research/lit2026_w4_early_abort_20261011/reports/run-20261011T2025Z/raw/trace_k1n17_dim6_mode0.jsonl, research/lit2026_w4_early_abort_20261011/reports/run-20261011T2025Z/raw/trace_k1n17_dim6_mode1.jsonl, research/lit2026_w4_early_abort_20261011/reports/run-20261011T2025Z/raw/trace_k1n17_dim6_mode2.jsonl
+
+--- ROW 1018 | 2026-10-11 | 20261011-koblitz-m3-2357z
+MEASURED: [Source study](../../research/koblitz-isogeny) and [run/result record](../../research/koblitz-isogeny/reports/run-20261011T2357Z/report.pdf) remain the source of truth. The PDF and SVG files below are byte-identical browsing copies added during integration on 2026-10-12. PNGs render the correspondin
+HEADLINE: 128/128 verified cells; 20,661 relations/256,000 probes; median 16.6 ms/call; work ICC 0.228 [0.032,0.403]
+HOST (as reported): Host and isolation: 4-vCPU shared x86_64 cloud container, no core isolation; wall-clock values indicative only. Original host/isolation wording and measurement qualifications are preserved in the copied PDFs and [verbatim source report](SOURCE_REPORT.md).
+STUDY DIRS: research/koblitz-isogeny; research/koblitz-isogeny/reports/run-20261011T2357Z/report.pdf
+RAW CANDIDATES (largest first): benchmarks/20261011-koblitz-m3-2357z/copies.json
+
+--- ROW 1019 | 2026-10-11 | 20261011-koblitz-m3-2150z
+MEASURED: [Source study](../../research/koblitz-isogeny) and [run/result record](../../research/koblitz-isogeny/reports/run-20261011T2150Z/report.pdf) remain the source of truth. The PDF and SVG files below are byte-identical browsing copies added during integration on 2026-10-12. PNGs render the correspondin
+HEADLINE: Geometric n=17/19 e3 9.702 / 123.595 ms versus PinX3 0.052 / 0.154 ms per call; n=31 full solves 33.5 / 45.9 s
+HOST (as reported): Host and isolation: 4-vCPU shared x86_64 cloud container, no core isolation; wall-clock values indicative only. Original host/isolation wording and measurement qualifications are preserved in the copied PDFs and [verbatim source report](SOURCE_REPORT.md).
+STUDY DIRS: research/koblitz-isogeny; research/koblitz-isogeny/reports/run-20261011T2150Z/report.pdf
+RAW CANDIDATES (largest first): benchmarks/20261011-koblitz-m3-2150z/copies.json
+
+--- ROW 1020 | 2026-10-11 | 20261011-koblitz-m3-1955z
+MEASURED: [Source study](../../research/koblitz-isogeny) and [run/result record](../../research/koblitz-isogeny/reports/run-20261011T1955Z/report.pdf) remain the source of truth. The PDF and SVG files below are byte-identical browsing copies added during integration on 2026-10-12. PNGs render the correspondin
+HEADLINE: n=17 per-call e3 0.000116 / 0.00141 / 0.0216 s at l=3/4/5; symmetric l=5 timed out (>300 s for four probes)
+HOST (as reported): Host and isolation: 4-vCPU shared x86_64 cloud container, no core isolation; wall-clock values indicative only. Original host/isolation wording and measurement qualifications are preserved in the copied PDFs and [verbatim source report](SOURCE_REPORT.md).
+STUDY DIRS: research/koblitz-isogeny; research/koblitz-isogeny/reports/run-20261011T1955Z/report.pdf
+RAW CANDIDATES (largest first): benchmarks/20261011-koblitz-m3-1955z/copies.json

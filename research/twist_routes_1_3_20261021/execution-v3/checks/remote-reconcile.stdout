@@ -1,0 +1,425 @@
+Merge made by the 'ort' strategy.
+ benchmarks/20261016-n83-finegrid/.artifacts.json   |      7 +
+ benchmarks/20261016-n83-finegrid/.gitignore        |      4 +
+ benchmarks/20261016-n83-finegrid/observations.png  |    Bin 82622 -> 0 bytes
+ benchmarks/20261016-n83-finegrid/report.pdf        |    946 -
+ .../.artifacts.json                                |     37 +
+ .../20261017-isogeny-volcano-cost-v2/.gitignore    |     34 +
+ .../heterogeneity.png                              |    Bin 72921 -> 0 bytes
+ .../hypotheses_forest.png                          |    Bin 92508 -> 0 bytes
+ .../per_class_yield.png                            |    Bin 105862 -> 0 bytes
+ .../20261017-isogeny-volcano-cost-v2/report.pdf    |   5274 -
+ .../volcano-l2-s1001.png                           |    Bin 474956 -> 0 bytes
+ .../volcano-l2-s1002.png                           |    Bin 476303 -> 0 bytes
+ .../volcano-l2-s1003.png                           |    Bin 480409 -> 0 bytes
+ .../volcano-l2-s1004.png                           |    Bin 475300 -> 0 bytes
+ .../volcano-l2-s1005.png                           |    Bin 477019 -> 0 bytes
+ .../volcano-l2-s1006.png                           |    Bin 475417 -> 0 bytes
+ .../volcano-l2-s1007.png                           |    Bin 479635 -> 0 bytes
+ .../volcano-l2-s1008.png                           |    Bin 475978 -> 0 bytes
+ .../volcano-l2-s1009.png                           |    Bin 475330 -> 0 bytes
+ .../volcano-l2-s1010.png                           |    Bin 474369 -> 0 bytes
+ .../volcano-l2-s1011.png                           |    Bin 475927 -> 0 bytes
+ .../volcano-l2-s1012.png                           |    Bin 475179 -> 0 bytes
+ .../volcano-l2-s1013.png                           |    Bin 476881 -> 0 bytes
+ .../volcano-l2-s1014.png                           |    Bin 475703 -> 0 bytes
+ .../volcano-l3-s1001.png                           |    Bin 511204 -> 0 bytes
+ .../volcano-l3-s1002.png                           |    Bin 505669 -> 0 bytes
+ .../volcano-l3-s1003.png                           |    Bin 498001 -> 0 bytes
+ .../volcano-l3-s1004.png                           |    Bin 502426 -> 0 bytes
+ .../volcano-l3-s1005.png                           |    Bin 497515 -> 0 bytes
+ .../volcano-l3-s1006.png                           |    Bin 498663 -> 0 bytes
+ .../volcano-l3-s1007.png                           |    Bin 497280 -> 0 bytes
+ .../volcano-l3-s1008.png                           |    Bin 496166 -> 0 bytes
+ .../volcano-l3-s1009.png                           |    Bin 498113 -> 0 bytes
+ .../volcano-l3-s1010.png                           |    Bin 517937 -> 0 bytes
+ .../volcano-l3-s1011.png                           |    Bin 497033 -> 0 bytes
+ .../volcano-l3-s1012.png                           |    Bin 496907 -> 0 bytes
+ .../volcano-l3-s1013.png                           |    Bin 509892 -> 0 bytes
+ .../volcano-l3-s1014.png                           |    Bin 509020 -> 0 bytes
+ .../20261017-volcano-ecdlp-census/.artifacts.json  |     14 +
+ .../20261017-volcano-ecdlp-census/.gitignore       |     11 +
+ .../fig1_forest_level_effect.png                   |    Bin 217284 -> 0 bytes
+ .../fig2_volcano_V1.png                            |    Bin 1560576 -> 0 bytes
+ .../fig2_volcano_V2.png                            |    Bin 1440150 -> 0 bytes
+ .../fig2_volcano_V3.png                            |    Bin 453770 -> 0 bytes
+ .../fig3_ic_over_rho.png                           |    Bin 81144 -> 0 bytes
+ .../fig4_curve_vs_control.png                      |    Bin 530386 -> 0 bytes
+ .../fig5_transport_vs_solve.png                    |    Bin 83199 -> 0 bytes
+ .../fig6_cv_precision.png                          |    Bin 140516 -> 0 bytes
+ .../replay-receipts/.artifacts.json                |     10 +
+ .../replay-receipts/.gitignore                     |      7 +
+ .../replay-receipts/V1-S-L4-c0.replay-all.json.xz  |    Bin 84572 -> 0 bytes
+ .../replay-receipts/V2-N-L3-c0.replay-all.json.xz  |    Bin 107452 -> 0 bytes
+ .../replay-receipts/V2-S-L3-c0.replay-all.json.xz  |    Bin 115608 -> 0 bytes
+ .../V2-ctl-L2-c0.replay-all.json.xz                |    Bin 76452 -> 0 bytes
+ .../V3-ctl-L0-c0.replay-all.json.xz                |    Bin 132556 -> 0 bytes
+ .../20261017-volcano-ecdlp-census/report.pdf       |   4914 -
+ .../.artifacts.json                                |      6 +
+ .../.gitignore                                     |      3 +
+ .../report.pdf                                     |    Bin 88033 -> 0 bytes
+ .../20261018-jv-cover-sparse-fglm/.artifacts.json  |      8 +
+ .../20261018-jv-cover-sparse-fglm/.gitignore       |      5 +
+ .../20261018-jv-cover-sparse-fglm/REPORT.pdf       |   1423 -
+ benchmarks/20261018-jv-cover-sparse-fglm/ccov.png  |    Bin 83286 -> 0 bytes
+ .../20261018-jv-cover-sparse-fglm/run-report.pdf   |   1200 -
+ .../20261021-eccp131-exact-probe/.artifacts.json   |      6 +
+ benchmarks/20261021-eccp131-exact-probe/.gitignore |      3 +
+ .../20261021-eccp131-exact-probe/run_report.pdf    |    Bin 88608 -> 0 bytes
+ .../20261022-arm64-f4-defaults/.artifacts.json     |      7 +
+ benchmarks/20261022-arm64-f4-defaults/.gitignore   |      4 +
+ .../20261022-arm64-f4-defaults/fig_arm64.png       |    Bin 215078 -> 0 bytes
+ benchmarks/20261022-arm64-f4-defaults/report.pdf   |   3501 -
+ .../20261025-twist-block-encoding/.artifacts.json  |      8 +
+ .../20261025-twist-block-encoding/.gitignore       |      5 +
+ .../20261025-twist-block-encoding/COUNTS.png       |    Bin 125917 -> 0 bytes
+ .../20261025-twist-block-encoding/INSTRUCTIONS.png |    Bin 117974 -> 0 bytes
+ .../20261025-twist-block-encoding/RESULTS.pdf      |    Bin 139768 -> 0 bytes
+ .../isobench/sessions/bmss-127/.artifacts.json     |      7 +
+ .../docs/isobench/sessions/bmss-127/.gitignore     |      4 +
+ .../isobench/sessions/bmss-127/isolation.jsonl     |     80 -
+ .../docs/isobench/sessions/bmss-127/records.jsonl  |     80 -
+ .../isobench/sessions/codomain-127/.artifacts.json |      6 +
+ .../docs/isobench/sessions/codomain-127/.gitignore |      3 +
+ .../isobench/sessions/codomain-127/isolation.jsonl |     48 -
+ .../sessions/path-ordinary/.artifacts.json         |      7 +
+ .../isobench/sessions/path-ordinary/.gitignore     |      4 +
+ .../sessions/path-ordinary/isolation.jsonl         |    120 -
+ .../isobench/sessions/path-ordinary/records.jsonl  |    120 -
+ .../sessions/path-supersingular/.artifacts.json    |      7 +
+ .../sessions/path-supersingular/.gitignore         |      4 +
+ .../sessions/path-supersingular/isolation.jsonl    |     72 -
+ .../sessions/path-supersingular/records.jsonl      |     72 -
+ .../sessions/phi-hecke-127/.artifacts.json         |      6 +
+ .../isobench/sessions/phi-hecke-127/.gitignore     |      3 +
+ .../isobench/sessions/phi-hecke-127/records.jsonl  |      4 -
+ .../docs/isobench/sessions/sea/.artifacts.json     |      6 +
+ .../docs/isobench/sessions/sea/.gitignore          |      3 +
+ .../docs/isobench/sessions/sea/records.jsonl       |     24 -
+ .../.artifacts.json                                |      8 +
+ .../cover_transfer_assessment_20261013/.gitignore  |      5 +
+ .../cover_transfer_assessment_20261013.pdf         |    Bin 162763 -> 0 bytes
+ .../typed_correspondence.png                       |    Bin 148416 -> 0 bytes
+ .../typed_transfer_context.png                     |    Bin 116174 -> 0 bytes
+ .../reports/run-20261016T2329Z/.artifacts.json     |      7 +
+ .../reports/run-20261016T2329Z/.gitignore          |      4 +
+ .../reports/run-20261016T2329Z/observations.png    |    Bin 82622 -> 0 bytes
+ .../reports/run-20261016T2329Z/report.pdf          |    946 -
+ .../.artifacts.json                                |      7 +
+ .../nist_basepoint_provenance_20261017/.gitignore  |      4 +
+ .../coverage.png                                   |    Bin 181388 -> 0 bytes
+ .../out/.artifacts.json                            |      6 +
+ .../out/.gitignore                                 |      3 +
+ .../out/b163_brute.out.gz                          |    Bin 182063 -> 0 bytes
+ .../nist_basepoint_provenance_20261017/report.pdf  |   1122 -
+ .../lattice_ecdlp_routes_20261023/.artifacts.json  |      7 +
+ .../lattice_ecdlp_routes_20261023/.gitignore       |      4 +
+ .../lattice_ecdlp_routes_20261023/REPORT.pdf       |   4354 -
+ .../lattice_ecdlp_routes_20261023/exponents.png    |    Bin 207756 -> 0 bytes
+ research/twist_routes_1_3_20261021/.artifacts.json |      6 +
+ research/twist_routes_1_3_20261021/.gitignore      |      3 +
+ research/twist_routes_1_3_20261021/EXPERIMENTS.pdf |    Bin 98973 -> 0 bytes
+ .../execution-v1/checks/.artifacts.json            |      9 +
+ .../execution-v1/checks/.gitignore                 |      6 +
+ .../execution-v1/checks/twist-root-tests-5.stdout  |   4722 -
+ .../execution-v1/checks/twist-root-tests-6.stdout  |   4625 -
+ .../execution-v1/checks/twist-root-tests-7.stdout  |   4612 -
+ .../execution-v1/checks/twist-root-tests-8.stdout  |   4616 -
+ .../execution-v1/logs/.artifacts.json              |      7 +
+ .../execution-v1/logs/.gitignore                   |      4 +
+ .../execution-v1/logs/E15-audit-v1.stdout          |  10262 -
+ .../logs/ecbench-20261022T0012Z.stderr             |   1921 -
+ .../runs/ecbench-20261022T0012Z/.artifacts.json    |      6 +
+ .../runs/ecbench-20261022T0012Z/.gitignore         |      3 +
+ .../runs/ecbench-20261022T0012Z/records.jsonl      |   1920 -
+ .../runs/solver-20261021T2320Z/.artifacts.json     |     11 +
+ .../runs/solver-20261021T2320Z/.gitignore          |      8 +
+ .../solver-20261021T2320Z/E08-solver-panel.json    | 196262 ----------
+ .../solver-20261021T2320Z/cases.tar.xz.part-aa     |    Bin 50331648 -> 0 bytes
+ .../solver-20261021T2320Z/cases.tar.xz.part-ab     |    Bin 50331648 -> 0 bytes
+ .../solver-20261021T2320Z/cases.tar.xz.part-ac     |    Bin 50331648 -> 0 bytes
+ .../solver-20261021T2320Z/cases.tar.xz.part-ad     |    Bin 50331648 -> 0 bytes
+ .../solver-20261021T2320Z/cases.tar.xz.part-ae     |    Bin 33542356 -> 0 bytes
+ .../runs/solver-20261021T2349Z-v2/.artifacts.json  |      9 +
+ .../runs/solver-20261021T2349Z-v2/.gitignore       |      6 +
+ .../solver-20261021T2349Z-v2/E08-solver-panel.json | 257040 --------------
+ .../solver-20261021T2349Z-v2/cases.tar.xz.part-aa  |    Bin 50331648 -> 0 bytes
+ .../solver-20261021T2349Z-v2/cases.tar.xz.part-ab  |    Bin 50331648 -> 0 bytes
+ .../solver-20261021T2349Z-v2/cases.tar.xz.part-ac  |    Bin 47757400 -> 0 bytes
+ .../runs/solver-20261022T0004Z-v3/.artifacts.json  |      9 +
+ .../runs/solver-20261022T0004Z-v3/.gitignore       |      6 +
+ .../solver-20261022T0004Z-v3/E08-solver-panel.json | 265955 --------------
+ .../solver-20261022T0004Z-v3/cases.tar.xz.part-aa  |    Bin 50331648 -> 0 bytes
+ .../solver-20261022T0004Z-v3/cases.tar.xz.part-ab  |    Bin 50331648 -> 0 bytes
+ .../solver-20261022T0004Z-v3/cases.tar.xz.part-ac  |    Bin 19027480 -> 0 bytes
+ .../runs/trace-20261021T2256Z/.artifacts.json      |      6 +
+ .../runs/trace-20261021T2256Z/.gitignore           |      3 +
+ .../runs/trace-20261021T2256Z/E02-E04-bases.json   | 334675 ------------------
+ .../execution-v2/.artifacts.json                   |      6 +
+ .../execution-v2/.gitignore                        |      3 +
+ .../execution-v2/RAW_MEMBERS_FINAL.json            | 180417 ----------
+ .../assessment-20261023-v1/.artifacts.json         |      6 +
+ .../execution-v2/assessment-20261023-v1/.gitignore |      3 +
+ .../assessment-20261023-v1/RAW_MEMBERS.json        |  72477 ----
+ .../assessment-20261023-v2/.artifacts.json         |      6 +
+ .../execution-v2/assessment-20261023-v2/.gitignore |      3 +
+ .../assessment-20261023-v2/RAW_MEMBERS.json        | 179042 ----------
+ .../assessment-20261023-v3/.artifacts.json         |      6 +
+ .../execution-v2/assessment-20261023-v3/.gitignore |      3 +
+ .../assessment-20261023-v3/RAW_MEMBERS.json        | 179042 ----------
+ .../execution-v2/block-20261025/.artifacts.json    |      7 +
+ .../execution-v2/block-20261025/.gitignore         |      4 +
+ .../execution-v2/block-20261025/ARCHIVE_FILES.nul  |    Bin 1280475 -> 0 bytes
+ .../execution-v2/block-20261025/RAW_MEMBERS.json   |  76481 ----
+ .../block-checks-20261025/.artifacts.json          |      7 +
+ .../execution-v2/block-checks-20261025/.gitignore  |      4 +
+ .../packing-attempt-v1/.artifacts.json             |      6 +
+ .../packing-attempt-v1/.gitignore                  |      3 +
+ .../packing-attempt-v1/ARCHIVE_FILES.nul           |    Bin 1280475 -> 0 bytes
+ .../block-checks-20261025/root-lib.stdout          |   4625 -
+ .../block-checks-20261025/whitespace-v1.stdout     |   1516 -
+ .../checks/final-20261023/.artifacts.json          |      6 +
+ .../execution-v2/checks/final-20261023/.gitignore  |      3 +
+ .../checks/final-20261023/root-tests.stdout        |   4627 -
+ .../checks/integration-20261023/.artifacts.json    |      6 +
+ .../checks/integration-20261023/.gitignore         |      3 +
+ .../checks/integration-20261023/merge.stdout       |   6227 -
+ .../publication-20261025-checks/.artifacts.json    |      6 +
+ .../publication-20261025-checks/.gitignore         |      3 +
+ .../publication-20261025-checks/root-tests.stdout  |   4625 -
+ .../.artifacts.json                                |      7 +
+ .../publication-20261025-setec-checks/.gitignore   |      4 +
+ .../library-network.stdout                         |   4626 -
+ .../library.stdout                                 |   4684 -
+ .../execution-v2/runs/.artifacts.json              |      6 +
+ .../execution-v2/runs/.gitignore                   |      3 +
+ .../runs/block-panel-20261025-v2.transport.stdout  |   1263 -
+ .../runs/block-panel-20261025-v2/.artifacts.json   |      7 +
+ .../runs/block-panel-20261025-v2/.gitignore        |      4 +
+ .../runs/block-panel-20261025-v2/PANEL.json        |  34478 --
+ .../runs/block-panel-20261025-v2/SUMMARY.json      |  34486 --
+ .../proposals-20261022/.artifacts.json             |      6 +
+ .../proposals-20261022/.gitignore                  |      3 +
+ .../proposals-20261022/REPORT.pdf                  |    Bin 145980 -> 0 bytes
+ .../proposals-20261022/checks/.artifacts.json      |      6 +
+ .../proposals-20261022/checks/.gitignore           |      3 +
+ .../proposals-20261022/checks/root-lib.stdout      |   4671 -
+ .../reports/.artifacts.json                        |      6 +
+ .../twist_routes_1_3_20261021/reports/.gitignore   |      3 +
+ .../reports/EXECUTION_RESULTS.pdf                  |    Bin 93404 -> 0 bytes
+ .../reports/block-20261025/.artifacts.json         |      8 +
+ .../reports/block-20261025/.gitignore              |      5 +
+ .../reports/block-20261025/COUNTS.png              |    Bin 125917 -> 0 bytes
+ .../reports/block-20261025/INSTRUCTIONS.png        |    Bin 117974 -> 0 bytes
+ .../reports/block-20261025/RESULTS.pdf             |    Bin 139768 -> 0 bytes
+ .../publication-20261025-setec/.artifacts.json     |      6 +
+ .../reports/publication-20261025-setec/.gitignore  |      3 +
+ .../reports/publication-20261025-setec/REPORT.pdf  |    Bin 109604 -> 0 bytes
+ 216 files changed, 570 insertions(+), 1904197 deletions(-)
+ create mode 100644 benchmarks/20261016-n83-finegrid/.artifacts.json
+ create mode 100644 benchmarks/20261016-n83-finegrid/.gitignore
+ delete mode 100644 benchmarks/20261016-n83-finegrid/observations.png
+ delete mode 100644 benchmarks/20261016-n83-finegrid/report.pdf
+ create mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/.artifacts.json
+ create mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/.gitignore
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/heterogeneity.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/hypotheses_forest.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/per_class_yield.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/report.pdf
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l2-s1001.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l2-s1002.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l2-s1003.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l2-s1004.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l2-s1005.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l2-s1006.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l2-s1007.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l2-s1008.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l2-s1009.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l2-s1010.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l2-s1011.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l2-s1012.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l2-s1013.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l2-s1014.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l3-s1001.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l3-s1002.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l3-s1003.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l3-s1004.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l3-s1005.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l3-s1006.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l3-s1007.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l3-s1008.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l3-s1009.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l3-s1010.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l3-s1011.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l3-s1012.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l3-s1013.png
+ delete mode 100644 benchmarks/20261017-isogeny-volcano-cost-v2/volcano-l3-s1014.png
+ create mode 100644 benchmarks/20261017-volcano-ecdlp-census/.artifacts.json
+ create mode 100644 benchmarks/20261017-volcano-ecdlp-census/.gitignore
+ delete mode 100644 benchmarks/20261017-volcano-ecdlp-census/fig1_forest_level_effect.png
+ delete mode 100644 benchmarks/20261017-volcano-ecdlp-census/fig2_volcano_V1.png
+ delete mode 100644 benchmarks/20261017-volcano-ecdlp-census/fig2_volcano_V2.png
+ delete mode 100644 benchmarks/20261017-volcano-ecdlp-census/fig2_volcano_V3.png
+ delete mode 100644 benchmarks/20261017-volcano-ecdlp-census/fig3_ic_over_rho.png
+ delete mode 100644 benchmarks/20261017-volcano-ecdlp-census/fig4_curve_vs_control.png
+ delete mode 100644 benchmarks/20261017-volcano-ecdlp-census/fig5_transport_vs_solve.png
+ delete mode 100644 benchmarks/20261017-volcano-ecdlp-census/fig6_cv_precision.png
+ create mode 100644 benchmarks/20261017-volcano-ecdlp-census/replay-receipts/.artifacts.json
+ create mode 100644 benchmarks/20261017-volcano-ecdlp-census/replay-receipts/.gitignore
+ delete mode 100644 benchmarks/20261017-volcano-ecdlp-census/replay-receipts/V1-S-L4-c0.replay-all.json.xz
+ delete mode 100644 benchmarks/20261017-volcano-ecdlp-census/replay-receipts/V2-N-L3-c0.replay-all.json.xz
+ delete mode 100644 benchmarks/20261017-volcano-ecdlp-census/replay-receipts/V2-S-L3-c0.replay-all.json.xz
+ delete mode 100644 benchmarks/20261017-volcano-ecdlp-census/replay-receipts/V2-ctl-L2-c0.replay-all.json.xz
+ delete mode 100644 benchmarks/20261017-volcano-ecdlp-census/replay-receipts/V3-ctl-L0-c0.replay-all.json.xz
+ delete mode 100644 benchmarks/20261017-volcano-ecdlp-census/report.pdf
+ create mode 100644 benchmarks/20261018-jv-cover-cost-breakdown-leads/.artifacts.json
+ create mode 100644 benchmarks/20261018-jv-cover-cost-breakdown-leads/.gitignore
+ delete mode 100644 benchmarks/20261018-jv-cover-cost-breakdown-leads/report.pdf
+ create mode 100644 benchmarks/20261018-jv-cover-sparse-fglm/.artifacts.json
+ create mode 100644 benchmarks/20261018-jv-cover-sparse-fglm/.gitignore
+ delete mode 100644 benchmarks/20261018-jv-cover-sparse-fglm/REPORT.pdf
+ delete mode 100644 benchmarks/20261018-jv-cover-sparse-fglm/ccov.png
+ delete mode 100644 benchmarks/20261018-jv-cover-sparse-fglm/run-report.pdf
+ create mode 100644 benchmarks/20261021-eccp131-exact-probe/.artifacts.json
+ create mode 100644 benchmarks/20261021-eccp131-exact-probe/.gitignore
+ delete mode 100644 benchmarks/20261021-eccp131-exact-probe/run_report.pdf
+ create mode 100644 benchmarks/20261022-arm64-f4-defaults/.artifacts.json
+ create mode 100644 benchmarks/20261022-arm64-f4-defaults/.gitignore
+ delete mode 100644 benchmarks/20261022-arm64-f4-defaults/fig_arm64.png
+ delete mode 100644 benchmarks/20261022-arm64-f4-defaults/report.pdf
+ create mode 100644 benchmarks/20261025-twist-block-encoding/.artifacts.json
+ create mode 100644 benchmarks/20261025-twist-block-encoding/.gitignore
+ delete mode 100644 benchmarks/20261025-twist-block-encoding/COUNTS.png
+ delete mode 100644 benchmarks/20261025-twist-block-encoding/INSTRUCTIONS.png
+ delete mode 100644 benchmarks/20261025-twist-block-encoding/RESULTS.pdf
+ create mode 100644 isogeny_algos/docs/isobench/sessions/bmss-127/.artifacts.json
+ create mode 100644 isogeny_algos/docs/isobench/sessions/bmss-127/.gitignore
+ delete mode 100644 isogeny_algos/docs/isobench/sessions/bmss-127/isolation.jsonl
+ delete mode 100644 isogeny_algos/docs/isobench/sessions/bmss-127/records.jsonl
+ create mode 100644 isogeny_algos/docs/isobench/sessions/codomain-127/.artifacts.json
+ create mode 100644 isogeny_algos/docs/isobench/sessions/codomain-127/.gitignore
+ delete mode 100644 isogeny_algos/docs/isobench/sessions/codomain-127/isolation.jsonl
+ create mode 100644 isogeny_algos/docs/isobench/sessions/path-ordinary/.artifacts.json
+ create mode 100644 isogeny_algos/docs/isobench/sessions/path-ordinary/.gitignore
+ delete mode 100644 isogeny_algos/docs/isobench/sessions/path-ordinary/isolation.jsonl
+ delete mode 100644 isogeny_algos/docs/isobench/sessions/path-ordinary/records.jsonl
+ create mode 100644 isogeny_algos/docs/isobench/sessions/path-supersingular/.artifacts.json
+ create mode 100644 isogeny_algos/docs/isobench/sessions/path-supersingular/.gitignore
+ delete mode 100644 isogeny_algos/docs/isobench/sessions/path-supersingular/isolation.jsonl
+ delete mode 100644 isogeny_algos/docs/isobench/sessions/path-supersingular/records.jsonl
+ create mode 100644 isogeny_algos/docs/isobench/sessions/phi-hecke-127/.artifacts.json
+ create mode 100644 isogeny_algos/docs/isobench/sessions/phi-hecke-127/.gitignore
+ delete mode 100644 isogeny_algos/docs/isobench/sessions/phi-hecke-127/records.jsonl
+ create mode 100644 isogeny_algos/docs/isobench/sessions/sea/.artifacts.json
+ create mode 100644 isogeny_algos/docs/isobench/sessions/sea/.gitignore
+ delete mode 100644 isogeny_algos/docs/isobench/sessions/sea/records.jsonl
+ create mode 100644 research/cover_transfer_assessment_20261013/.artifacts.json
+ create mode 100644 research/cover_transfer_assessment_20261013/.gitignore
+ delete mode 100644 research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf
+ delete mode 100644 research/cover_transfer_assessment_20261013/typed_correspondence.png
+ delete mode 100644 research/cover_transfer_assessment_20261013/typed_transfer_context.png
+ create mode 100644 research/n83_e2e_finegrid_20261016/reports/run-20261016T2329Z/.artifacts.json
+ create mode 100644 research/n83_e2e_finegrid_20261016/reports/run-20261016T2329Z/.gitignore
+ delete mode 100644 research/n83_e2e_finegrid_20261016/reports/run-20261016T2329Z/observations.png
+ delete mode 100644 research/n83_e2e_finegrid_20261016/reports/run-20261016T2329Z/report.pdf
+ create mode 100644 research/nist_basepoint_provenance_20261017/.artifacts.json
+ create mode 100644 research/nist_basepoint_provenance_20261017/.gitignore
+ delete mode 100644 research/nist_basepoint_provenance_20261017/coverage.png
+ create mode 100644 research/nist_basepoint_provenance_20261017/out/.artifacts.json
+ create mode 100644 research/nist_basepoint_provenance_20261017/out/.gitignore
+ delete mode 100644 research/nist_basepoint_provenance_20261017/out/b163_brute.out.gz
+ delete mode 100644 research/nist_basepoint_provenance_20261017/report.pdf
+ create mode 100644 research/notes/ecdlp-general/lattice_ecdlp_routes_20261023/.artifacts.json
+ create mode 100644 research/notes/ecdlp-general/lattice_ecdlp_routes_20261023/.gitignore
+ delete mode 100644 research/notes/ecdlp-general/lattice_ecdlp_routes_20261023/REPORT.pdf
+ delete mode 100644 research/notes/ecdlp-general/lattice_ecdlp_routes_20261023/exponents.png
+ create mode 100644 research/twist_routes_1_3_20261021/.artifacts.json
+ delete mode 100644 research/twist_routes_1_3_20261021/EXPERIMENTS.pdf
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v1/checks/.artifacts.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v1/checks/.gitignore
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/checks/twist-root-tests-5.stdout
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/checks/twist-root-tests-6.stdout
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/checks/twist-root-tests-7.stdout
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/checks/twist-root-tests-8.stdout
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v1/logs/.artifacts.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v1/logs/.gitignore
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/logs/E15-audit-v1.stdout
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/logs/ecbench-20261022T0012Z.stderr
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/ecbench-20261022T0012Z/.artifacts.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/ecbench-20261022T0012Z/.gitignore
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/ecbench-20261022T0012Z/records.jsonl
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261021T2320Z/.artifacts.json
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261021T2320Z/E08-solver-panel.json
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261021T2320Z/cases.tar.xz.part-aa
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261021T2320Z/cases.tar.xz.part-ab
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261021T2320Z/cases.tar.xz.part-ac
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261021T2320Z/cases.tar.xz.part-ad
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261021T2320Z/cases.tar.xz.part-ae
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261021T2349Z-v2/.artifacts.json
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261021T2349Z-v2/E08-solver-panel.json
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261021T2349Z-v2/cases.tar.xz.part-aa
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261021T2349Z-v2/cases.tar.xz.part-ab
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261021T2349Z-v2/cases.tar.xz.part-ac
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261022T0004Z-v3/.artifacts.json
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261022T0004Z-v3/E08-solver-panel.json
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261022T0004Z-v3/cases.tar.xz.part-aa
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261022T0004Z-v3/cases.tar.xz.part-ab
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261022T0004Z-v3/cases.tar.xz.part-ac
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/trace-20261021T2256Z/.artifacts.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/trace-20261021T2256Z/.gitignore
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v1/runs/trace-20261021T2256Z/E02-E04-bases.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/.artifacts.json
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v2/RAW_MEMBERS_FINAL.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/assessment-20261023-v1/.artifacts.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/assessment-20261023-v1/.gitignore
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v2/assessment-20261023-v1/RAW_MEMBERS.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/assessment-20261023-v2/.artifacts.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/assessment-20261023-v2/.gitignore
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v2/assessment-20261023-v2/RAW_MEMBERS.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/assessment-20261023-v3/.artifacts.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/assessment-20261023-v3/.gitignore
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v2/assessment-20261023-v3/RAW_MEMBERS.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/block-20261025/.artifacts.json
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v2/block-20261025/ARCHIVE_FILES.nul
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v2/block-20261025/RAW_MEMBERS.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/block-checks-20261025/.artifacts.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/block-checks-20261025/.gitignore
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/block-checks-20261025/packing-attempt-v1/.artifacts.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/block-checks-20261025/packing-attempt-v1/.gitignore
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v2/block-checks-20261025/packing-attempt-v1/ARCHIVE_FILES.nul
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v2/block-checks-20261025/root-lib.stdout
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v2/block-checks-20261025/whitespace-v1.stdout
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/checks/final-20261023/.artifacts.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/checks/final-20261023/.gitignore
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v2/checks/final-20261023/root-tests.stdout
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/checks/integration-20261023/.artifacts.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/checks/integration-20261023/.gitignore
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v2/checks/integration-20261023/merge.stdout
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/publication-20261025-checks/.artifacts.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/publication-20261025-checks/.gitignore
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v2/publication-20261025-checks/root-tests.stdout
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/publication-20261025-setec-checks/.artifacts.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/publication-20261025-setec-checks/.gitignore
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v2/publication-20261025-setec-checks/library-network.stdout
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v2/publication-20261025-setec-checks/library.stdout
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/runs/.artifacts.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/runs/.gitignore
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v2/runs/block-panel-20261025-v2.transport.stdout
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/runs/block-panel-20261025-v2/.artifacts.json
+ create mode 100644 research/twist_routes_1_3_20261021/execution-v2/runs/block-panel-20261025-v2/.gitignore
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v2/runs/block-panel-20261025-v2/PANEL.json
+ delete mode 100644 research/twist_routes_1_3_20261021/execution-v2/runs/block-panel-20261025-v2/SUMMARY.json
+ create mode 100644 research/twist_routes_1_3_20261021/proposals-20261022/.artifacts.json
+ create mode 100644 research/twist_routes_1_3_20261021/proposals-20261022/.gitignore
+ delete mode 100644 research/twist_routes_1_3_20261021/proposals-20261022/REPORT.pdf
+ create mode 100644 research/twist_routes_1_3_20261021/proposals-20261022/checks/.artifacts.json
+ create mode 100644 research/twist_routes_1_3_20261021/proposals-20261022/checks/.gitignore
+ delete mode 100644 research/twist_routes_1_3_20261021/proposals-20261022/checks/root-lib.stdout
+ create mode 100644 research/twist_routes_1_3_20261021/reports/.artifacts.json
+ delete mode 100644 research/twist_routes_1_3_20261021/reports/EXECUTION_RESULTS.pdf
+ create mode 100644 research/twist_routes_1_3_20261021/reports/block-20261025/.artifacts.json
+ delete mode 100644 research/twist_routes_1_3_20261021/reports/block-20261025/COUNTS.png
+ delete mode 100644 research/twist_routes_1_3_20261021/reports/block-20261025/INSTRUCTIONS.png
+ delete mode 100644 research/twist_routes_1_3_20261021/reports/block-20261025/RESULTS.pdf
+ create mode 100644 research/twist_routes_1_3_20261021/reports/publication-20261025-setec/.artifacts.json
+ delete mode 100644 research/twist_routes_1_3_20261021/reports/publication-20261025-setec/REPORT.pdf

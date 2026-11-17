@@ -1,0 +1,1 @@
+Interrupted source draft. No manifest or completed validation existed at migration. Five authored tests have not been run. No active worker dispatch or CLI schema is added. This packet is preserved for continuation, not accepted as a validated factory.

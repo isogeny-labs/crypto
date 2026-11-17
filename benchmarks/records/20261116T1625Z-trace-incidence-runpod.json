@@ -1,0 +1,111 @@
+{
+  "schema": "bench.record/v1",
+  "id": "20261116T1625Z-trace-incidence-runpod",
+  "slug": "trace-incidence-runpod",
+  "problem": "ecdlp:prime-random-labelled-pools-trace-incidence",
+  "repo": "crypto",
+  "created_utc": "2026-11-16T16:25:49.000Z",
+  "closed_utc": "2026-11-16T16:39:33Z",
+  "status": "measured",
+  "commit": "c0176f942c03a549a98cb680b816e864b8820333",
+  "commit_dirty": false,
+  "branch": "lane/trace-incidence",
+  "host": {
+    "cpu": "AMD EPYC 9575F 64-Core Processor",
+    "cpus_online": 128,
+    "hostname": "wg53vkdhjsv6lk",
+    "platform": "Runpod digest-pinned Debian trixie amd64",
+    "isolation": "shared host; no L2; measured processes pinned to one CPU",
+    "requested_vcpus": 8,
+    "requested_memory_gb": 16,
+    "measurement_threads": 1
+  },
+  "entries": [
+    "benchmarks/20261116-trace-incidence-runpod"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/trace_incidence_20261116/runpod/job-v2.sh"
+      ],
+      "cwd": "/workspace/source",
+      "exit": 0,
+      "recording_scope": "Retrospective administrative transcription from sealed worker source/exit receipts; native job not launched through Python benchrec."
+    }
+  ],
+  "raw": [
+    {
+      "path": "research/trace_incidence_20261116/runpod/attempt-2/results.tar.gz",
+      "sha256": "0b27d27910807fc9e5b047e4f64999ba71d603178537c78ac7b7f1cb06be81fa",
+      "bytes": 3298986,
+      "s3_uri": "s3://setec-astronomy-artifacts/store/runpod/trace-incidence/c0176f942c03a549a98cb680b816e864b8820333/43907109841/results.tar.gz",
+      "uploaded": true
+    }
+  ],
+  "metrics": [
+    {
+      "name": "paper_pullback_given_datum_cpu",
+      "value": 0.00006878125,
+      "unit": "cpu_s",
+      "better": "lower",
+      "baseline": null,
+      "reference": null,
+      "reference_kind": null,
+      "n": 5,
+      "spread": null,
+      "note": "[pcc:unverified] One fixed F83 degree10 polynomial; 32 calls/row; datum validation charged; descriptive median."
+    },
+    {
+      "name": "complete_translation_d256_generic_trace_cpu",
+      "value": 0.00299,
+      "unit": "cpu_s",
+      "better": "lower",
+      "baseline": null,
+      "reference": null,
+      "reference_kind": null,
+      "n": 10,
+      "spread": null,
+      "note": "[pcc:unverified] Two fixed fields and five rounds; complete calls with handling, independent support audit separate."
+    },
+    {
+      "name": "b128_pullback_bounded_target_wall",
+      "value": 0.5712196744279936,
+      "unit": "wall_s",
+      "better": "lower",
+      "baseline": null,
+      "reference": null,
+      "reference_kind": null,
+      "n": 60,
+      "spread": null,
+      "note": "[pcc:unverified] 12 distinct targets repeated five rounds; prior attempts/setup/recovery included; shared host."
+    },
+    {
+      "name": "b128_pairs_bounded_target_wall",
+      "value": 0.007882576435804367,
+      "unit": "wall_s",
+      "better": "lower",
+      "baseline": null,
+      "reference": null,
+      "reference_kind": null,
+      "n": 60,
+      "spread": null,
+      "note": "[pcc:unverified] Algorithm-level frozen batched-pair control; fresh generation and public verification included."
+    }
+  ],
+  "reports": {
+    "pdf": "benchmarks/20261116-trace-incidence-runpod/RUNPOD_REPORT.pdf",
+    "svg": [
+      "benchmarks/20261116-trace-incidence-runpod/root-and-translation.svg",
+      "benchmarks/20261116-trace-incidence-runpod/translation-scaling-native.svg",
+      "benchmarks/20261116-trace-incidence-runpod/complete-target-costs.svg"
+    ],
+    "png": [
+      "benchmarks/20261116-trace-incidence-runpod/root-and-translation.png",
+      "benchmarks/20261116-trace-incidence-runpod/translation-scaling-native.png",
+      "benchmarks/20261116-trace-incidence-runpod/complete-target-costs.png"
+    ]
+  },
+  "validation": null,
+  "summary": "[pcc:unverified] Descriptive shared-host Runpod data: full6066-row matrix, fixed root/translation controls and growing labelled pools with all misses/recovery charged. No L2, canonical-schema admission, signed replay or leaderboard promotion."
+}

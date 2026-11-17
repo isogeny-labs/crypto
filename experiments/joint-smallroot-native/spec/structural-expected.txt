@@ -1,0 +1,11 @@
+SEALED BEFORE FIRST STRUCTURAL INVOCATION: 2026-10-26
+Only fixed codec, rational, exponent order, facet membership and constant-pivot fixtures.
+1. rational -6/-8 canonicalizes to numerator 3, denominator 4; 1/3+1/6=1/2.
+2. tuple (0,1,0,0,0,0,0) codec roundtrip unchanged; negative exponent rejected.
+3. weights (1000,50,50,50,50,100,100): p > z1^19; p > z1^20 (equal weight, lex); z1^2 > h1 (equal weight, lex); h1 > z1 (weight).
+4. polynomial comparator: -p < 0, -p < -1, p-1 < p+1, -p+2 < -p+3; stripped leading coefficient of 2*p^2*z1+3*p*z1+z2 is 2*p^2 (first highest-order term, no coefficient sum).
+5. rational triangle conv((0,0),(2,0),(0,2)): integer points in lex order (0,0),(0,1),(0,2),(1,0),(1,1),(2,0); (1,2) excluded; affine line conv((0,0),(2,0)): (0,0),(1,0),(2,0).
+6. constant-pivot [[p,1],[1,0]]: column0 first constant pivot row1; swap; column1 pivot1; final identity. [[p,p^2],[2*p,2*p^2]] unchanged: no constant pivots (unlike fraction-field RREF).
+7. refresh fixture [[1,1,p],[0,p,1],[0,p+1,1]]: pivot col0 row0; col1 skipped; col2 row1 normalized; elimination makes remaining col1=1, but no revisit of skipped col1; final [[1,1-p^2,0],[0,p,1],[0,1,0]].
+8. Singular Wp order fixture only (no ideals): lead(p+z1^20)=p, lead(z1^2+h1)=z1^2; codec 2/3*p*z1-5/7 has terms 2/3:(1,1,0,0,0,0,0) then -5/7:(0,0,0,0,0,0,0).
+No ideal, closure, interpolation, bound, sign-tree, calibration or extraction fixture is authorized.

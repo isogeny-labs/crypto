@@ -1,0 +1,61 @@
+   Compiling torus-s4-tree v0.1.0 (/workspace/isogeny-labs/crypto/tools/torus-s4-tree)
+    Finished `release` profile [optimized] target(s) in 10.59s
+     Running unittests src/lib.rs (tools/torus-s4-tree/target/release/build/torus-s4-tree/2dd17c3f5aa5ec83/out/torus_s4_tree-2dd17c3f5aa5ec83)
+
+running 22 tests
+test identity::tests::field_arithmetic_agrees_with_u128_reference ... ok
+test identity::tests::committed_schoenhage_certificate_still_checks ... ok
+test identity::tests::degree_bound_is_checked_syntactically_not_trusted ... ok
+test identity::tests::canonical_bytes_are_sorted_and_round_trip ... ok
+test identity::tests::tampering_with_the_digest_is_detected ... ok
+test identity::tests::swapping_the_statement_under_a_sealed_id_is_malformed ... ok
+test identity::tests::points_depend_on_the_id_so_the_author_cannot_pre_pick_them ... ok
+test native_sha256::tests::sha224_empty ... ok
+test native_sha256::tests::sha256_abc ... ok
+test identity::tests::the_identity_without_its_error_term_is_false_and_cannot_be_issued ... ok
+test native_sha256::tests::sha224_abc ... ok
+test native_sha256::tests::sha256_block_boundary_55 ... ok
+test native_sha256::tests::sha256_empty ... ok
+test native_sha256::tests::sha256_hello_world ... ok
+test native_sha256::tests::sha256_fips180_112byte ... ok
+test native_sha256::tests::sha256_fips180_56byte ... ok
+test native_sha256::tests::sha256_two_blocks_64 ... ok
+test identity::tests::schoenhage_identity_certifies_and_checks ... ok
+test native_sha256::tests::streaming_million_a ... ok
+test native_sha256::tests::sha_extensions_agree_with_the_portable_rounds ... ok
+test native_sha256::tests::streaming_matches_one_shot_at_every_split ... ok
+test native_sha256::tests::sha256_million_a ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src/main.rs (tools/torus-s4-tree/target/release/build/torus-s4-tree/efc2679dd13af29d/out/torus_s4_tree-efc2679dd13af29d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/identity.rs (tools/torus-s4-tree/target/release/build/torus-s4-tree/44d2e295fa5883a6/out/identity-44d2e295fa5883a6)
+
+running 2 tests
+test both_genus_two_elliptic_map_identities_are_exact ... ok
+test exact_integer_coefficients_match_and_mutant_fails ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/tree.rs (tools/torus-s4-tree/target/release/build/torus-s4-tree/ffc37e598a1a3341/out/tree-ffc37e598a1a3341)
+
+running 5 tests
+test actual_prime_target_has_eight_checked_raw_sections ... ok
+test semaev_y_formula_covers_all_group_pairs_and_identity ... ok
+test actual_four_point_system_and_mutation ... ok
+test branch_norm_arithmetic_and_shifted_constructions ... ok
+test identity_intermediate_and_multiple_arities ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+   Doc-tests torus_s4_tree
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,129 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "exhaustive, prime curve p36: plan, 1.41 N0, residual collector B = 2-32",
+  "description": "research/ic_planner_exhaustive_20261026/PROTOCOL.md",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 68719476731,
+        "a": 68719476728,
+        "b": 33,
+        "group_order": 68719022539,
+        "r": 68719022539,
+        "gx": 2,
+        "gy": 51741851039
+      }
+    ],
+    "targets_per_curve": 16,
+    "target_seed": 20261105
+  },
+  "arms": [
+    {
+      "name": "rho",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2048",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "walk"
+        }
+      },
+      "name": "plan",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2888",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "walk"
+        }
+      },
+      "name": "m141",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "residual"
+        }
+      },
+      "name": "res2",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=4",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "residual"
+        }
+      },
+      "name": "res4",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=8",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "residual"
+        }
+      },
+      "name": "res8",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=16",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "residual"
+        }
+      },
+      "name": "res16",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "residual"
+        }
+      },
+      "name": "res32",
+      "role": "baseline"
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 20261106,
+    "isolation_required": "L2",
+    "timeout_seconds": 1800
+  }
+}

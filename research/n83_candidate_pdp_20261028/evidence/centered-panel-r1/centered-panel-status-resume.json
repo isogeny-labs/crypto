@@ -1,0 +1,38 @@
+{
+  "observed_at": "2026-10-30T21:30:36.878Z",
+  "job": {
+    "created_at": "2026-10-30T21:21:00Z",
+    "job_name": "n83-centered-panel-20261030-r1",
+    "state": "active",
+    "status": {
+      "active": 1,
+      "ready": 0,
+      "startTime": "2026-10-30T21:21:00Z",
+      "terminating": 0,
+      "uncountedTerminatedPods": {}
+    },
+    "uid": "9eefa95f-ad54-4cab-b836-432e8a987f37"
+  },
+  "pods": [
+    {
+      "name": "n83-centered-panel-20261030-r1-8tckv",
+      "node": null,
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-30T21:21:00Z",
+            "message": "0/5 nodes are available: 1 node(s) didn't match pod anti-affinity rules, 2 node(s) didn't match Pod's node affinity/selector, 2 node(s) had untolerated taint(s). no new claims to deallocate, preemption: 0/5 nodes are available: 1 No preemption victims found for incoming pod, 4 Preemption is not helpful for scheduling.",
+            "observedGeneration": 1,
+            "reason": "Unschedulable",
+            "status": "False",
+            "type": "PodScheduled"
+          }
+        ],
+        "phase": "Pending",
+        "qosClass": "Guaranteed"
+      },
+      "uid": "3da4f513-d1e8-46e1-b417-1db290f04bac"
+    }
+  ]
+}

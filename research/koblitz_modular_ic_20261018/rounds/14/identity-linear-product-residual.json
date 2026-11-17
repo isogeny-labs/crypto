@@ -1,0 +1,216 @@
+{
+  "id": "IDC1haee65cd782bbce9b",
+  "independence": "native issuer plus128 extra checks;source-bound universal Lean theorem",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound14.lean",
+    "sha256": "fb2eb88db9c24bbede2191f9f0682f9fb380e3f9c6475a4213b4af480ea00df7"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 202610210101,
+  "statement": {
+    "degree_bound": 2,
+    "lhs": {
+      "args": [
+        {
+          "args": "h",
+          "op": "var"
+        },
+        {
+          "args": [
+            {
+              "args": "out",
+              "op": "var"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": "w",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        }
+      ],
+      "op": "mul"
+    },
+    "name": "linear-product-residual",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "h",
+                          "op": "var"
+                        },
+                        {
+                          "args": "out",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": -1,
+                          "op": "const"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "a",
+                              "op": "var"
+                            },
+                            {
+                              "args": "b",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "a",
+                          "op": "var"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": -1,
+                              "op": "const"
+                            },
+                            {
+                              "args": "A",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "add"
+                    },
+                    {
+                      "args": "b",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": "A",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "b",
+                      "op": "var"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": -1,
+                          "op": "const"
+                        },
+                        {
+                          "args": "B",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "A",
+                  "op": "var"
+                },
+                {
+                  "args": "B",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "h",
+                      "op": "var"
+                    },
+                    {
+                      "args": "w",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "KoblitzRound14.linear_product_residual",
+    "variables": [
+      "h",
+      "out",
+      "a",
+      "b",
+      "A",
+      "B",
+      "w"
+    ]
+  },
+  "value_digest": "c09d2688cfbfc7bfda45473a6d4a3835bc843f98f3b5269c11d61786b18e724a"
+}

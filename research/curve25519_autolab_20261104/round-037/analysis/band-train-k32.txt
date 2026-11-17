@@ -1,0 +1,13 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | inc | 16/16 | 1.773 | 2.000 | 4.041 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | rho-neg | 16/16 | 1.031 | 1.133 | 2.046 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | tw2l-x20-j16-n2 | 16/16 | 1.707 | 1.876 | 3.395 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp32-tm109914-36f5bc82 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp32-tm109914-36f5bc82 | inc vs tw2l-x20-j16-n2 | tw2l-x20-j16-n2 < inc |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs tw2l-x20-j16-n2 | rho-neg < tw2l-x20-j16-n2 |

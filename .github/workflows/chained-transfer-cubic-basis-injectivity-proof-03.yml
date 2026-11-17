@@ -1,0 +1,123 @@
+name: Cubic basis injectivity original dual gates03
+on:
+  pull_request:
+    paths:
+      - 'research/chained_jacobian_transfers_20261110/lean/CubicBasisInjectivity22303.lean'
+      - 'research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/**'
+      - '.github/workflows/chained-transfer-cubic-basis-injectivity-proof-03.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-dual-proof-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SOURCE_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - name: Initialize complete partial proof custody
+        run: |
+          mkdir "$RUNNER_TEMP/cubic-basis-injectivity-proof-custody"
+          date -u +%FT%TZ > "$RUNNER_TEMP/cubic-basis-injectivity-proof-custody/start.txt"
+          printf '%s\n' '${{ github.workflow_sha }}' > "$RUNNER_TEMP/cubic-basis-injectivity-proof-custody/workflow-revision.txt"
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          path: crypto
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/lean/
+            /research/chained_jacobian_transfers_20261110/lean/CubicBasisInjectivity22303.lean
+            /research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean
+            /.github/workflows/chained-transfer-cubic-basis-injectivity-proof-03.yml
+      - name: Checkout unchanged original Consumer proof tools
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          repository: isogeny-labs/cryptanalysis
+          ref: 5e80c96125b7afda24c02821efc22395d2738cb3
+          persist-credentials: false
+          path: original-consumer
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/lean/
+            /experiments/chained-transfer-lp-presentation-01/historical-01/original-source/common.rs
+      - name: Retain the actual executing workflow
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
+          path: actual-workflow
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/workflows/chained-transfer-cubic-basis-injectivity-proof-03.yml
+      - name: Install original static proof toolchains
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/cubic-basis-injectivity-proof-custody"
+          curl -fsSL --connect-timeout 15 --max-time 120 https://raw.githubusercontent.com/leanprover/elan/v4.2.4/elan-init.sh -o "$out/actual-elan-init.sh"
+          sh "$out/actual-elan-init.sh" -y --no-modify-path --default-toolchain leanprover/lean4:v4.35.0
+          "$HOME/.elan/bin/elan" toolchain install leanprover/lean4:v4.34.1
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Check exact source and both original gate bytes
+        working-directory: crypto
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/cubic-basis-injectivity-proof-custody"
+          test "$(git rev-parse HEAD)" = "$SOURCE_REVISION"
+          test -z "$(git status --porcelain --untracked-files=all)"
+          source=research/chained_jacobian_transfers_20261110/lean/CubicBasisInjectivity22303.lean
+          cmp "$source" research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean
+          printf '%s  %s\n' 9bd383b7e9d3ad241fa92e24d3b853cdba7011bf36d0cbe66fec89a7999e5ead "$source" | sha256sum --check
+          echo '2fe88bb302db587bbb6ede217fc646cf8fa35f9b9a2980e4a15dae273b8df6eb  tools/lean/proof-gate.sh' | sha256sum --check
+          echo 'b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929  tools/lean/AuditAxioms.lean' | sha256sum --check
+          echo 'a64f4010f3713653786e56ef7762b3e879720e2706ca78f979a0fefe2d53a7e2  ../original-consumer/tools/lean/proof-gate.sh' | sha256sum --check
+          echo 'f97280b48f1846d13e7ed96d9691753811551864162086fb25e9fe05438aa7dc  ../original-consumer/tools/lean/AuditAxioms.lean' | sha256sum --check
+          echo '832fd28810909194875a9438e164ec1b45dcefbaa83257b4e3fad3095ef865d6  ../original-consumer/experiments/chained-transfer-lp-presentation-01/historical-01/original-source/common.rs' | sha256sum --check
+          git rev-parse HEAD > "$out/actual-source-head.txt"
+          cp "$source" "$out/entire-actual-source.lean"
+          cp ../actual-workflow/.github/workflows/chained-transfer-cubic-basis-injectivity-proof-03.yml "$out/entire-actual-workflow.yml"
+          cp -r tools/lean "$out/entire-original-Root-tools"
+          cp -r ../original-consumer/tools/lean "$out/entire-original-Consumer-tools"
+          mkdir ../original-consumer/proof-source
+          cp "$source" ../original-consumer/proof-source/CubicBasisInjectivity22303.lean
+          cp ../original-consumer/experiments/chained-transfer-lp-presentation-01/historical-01/original-source/common.rs "$out/entire-original-common.rs"
+          sha256sum "$source" ../original-consumer/proof-source/CubicBasisInjectivity22303.lean > "$out/whole-source-equality.sha256"
+      - name: Run both unchanged original gates with one compiler worker
+        working-directory: crypto
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/cubic-basis-injectivity-proof-custody"
+          mkdir "$out/proof-bin"
+          cat > "$out/proof-bin/lean" <<'EOF'
+          #!/usr/bin/env sh
+          exec "$HOME/.elan/bin/lean" -j 1 "$@"
+          EOF
+          chmod +x "$out/proof-bin/lean"
+          export PATH="$out/proof-bin:$PATH"
+          for label in Root435 Consumer434; do
+            gate=tools/lean/proof-gate.sh
+            target=research/chained_jacobian_transfers_20261110/lean/CubicBasisInjectivity22303.lean
+            toolchain=leanprover/lean4:v4.35.0
+            if [[ $label == Consumer434 ]]; then
+              gate=../original-consumer/tools/lean/proof-gate.sh
+              target=proof-source/CubicBasisInjectivity22303.lean
+              toolchain=leanprover/lean4:v4.34.1
+            fi
+            set +e
+            ELAN_TOOLCHAIN=$toolchain timeout 120 bash "$gate" --out "$out/$label" "$target" > "$out/entire-$label-caller.txt" 2>&1
+            code=$?
+            set -e
+            printf '%s\n' "$code" > "$out/$label.exit"
+            cat "$out/entire-$label-caller.txt"
+            test "$code" -eq 0 || exit "$code"
+          done
+          cmp research/chained_jacobian_transfers_20261110/lean/CubicBasisInjectivity22303.lean ../original-consumer/proof-source/CubicBasisInjectivity22303.lean
+          test -z "$(git status --porcelain --untracked-files=all)"
+      - name: Retain every complete and partial proof outcome
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cubic-basis-injectivity-original-gates-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/cubic-basis-injectivity-proof-custody
+          if-no-files-found: error

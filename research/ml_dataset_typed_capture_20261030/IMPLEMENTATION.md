@@ -1,0 +1,11 @@
+# Typed capture implementation handoff
+
+2026-10-30, root T888 delegation. Implemented only additive capture.rs types/API and authored eight focused controls; no Cargo run or runtime dispatch activation. Existing event/payload interfaces remain unchanged. Scoped design committed before runtime edits as e87949bc6076.
+
+API: TypedEventBuffer::requested_bytes(event_cap), try_new(event_cap, admitted_requested_bytes), and CaptureEmitter::event_typed(TypedEventKind::WidePrimeDynamic, &payload, &mut buffer). Parent must reserve the returned cap+128 tariff in its actual ledger once; this helper merely checks the supplied admission. Parent owns EventSink wiring and chooses Bound only. Capture owns top-level kind and nests payload, so nested kinds cannot impersonate emitter payload notifications.
+
+Two passes enforce min(buffer logical cap, emitter event cap), including newline. Counting does not allocate output. Aggregate/event-count checks precede second-pass writing, whose writer never grows beyond preallocated capacity or logical cap. Different counted/written lengths reject before commit; a growing serializer cannot bypass the second limit. Custom Serialize code remains trusted caller code rather than a memory/time sandbox. Existing commit_event preserves exact hash chaining and sticky write/head failures. Existing head/map/payload allocations stay within the established outer capture/supervisor boundary.
+
+Authored tests cover storage exact/one-less, byte/hash identity over two events, buffer pointer reuse, event/newline exact/one-less, aggregate exact/one-less, event-count limit, nested reserved-kind protection, changed serialization length, serialization failure, second-pass growth refusal, actual event-file write failure and head failure after bytes were written. Tests are unrun; parent runs serialized focused/full library validation. rustfmt completed; no benchmark or scientific result is asserted.
+
+Git windows coordinated with dynamic_adapter_core. No solvers/adapter-child files were edited by this lane. Scoped handoff substitutes for shared session-log changes. Remaining work: parent wiring and validation, then original-chain adapter gates; dataset corpus and nonlinear extraction remain unfinished. No budget/deadline or cloud changes.

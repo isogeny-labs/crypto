@@ -1,0 +1,38 @@
+[
+  {
+    "source": "companion-zero-delete/paired_delete.py",
+    "target": "root_move.py",
+    "substitutions": [
+      [
+        "from selection_delete import Selection",
+        "from selection_delete import Selection\nfrom root_binding import RootSelection"
+      ],
+      [
+        "type(selection) is not Selection",
+        "type(selection) not in (Selection,RootSelection)"
+      ]
+    ]
+  },
+  {
+    "source": "companion-selected-reuse/driver_reuse.py",
+    "target": "driver_root.py",
+    "substitutions": [
+      [
+        "from paired_delete import move",
+        "from root_move import move\nfrom root_binding import RootBinding"
+      ],
+      [
+        "def solve_or_witness(source, rhs, metric, inverse_metric):",
+        "def solve_or_witness(source, rhs, metric, inverse_metric, root_binding=None):"
+      ],
+      [
+        "        trace.append(dict(kind='compression', dimension=size,",
+        "        if root_binding is not None:\n            if type(root_binding) is not RootBinding:\n                raise ValueError('constructor-bound root proposal required')\n            root_binding.prepare(source,reduced)\n            trace.append(root_binding.trace)\n        trace.append(dict(kind='compression', dimension=size,"
+      ],
+      [
+        "        selection=select(source,d,di,view)",
+        "        if root_binding is None:\n            selection=select(source,d,di,view)\n        else:\n            selection=root_binding.choose(source,d,di,view)\n            root_binding=None"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,1386 @@
+--- a/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/pruned.rs
++++ b/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/pruned.rs
+@@ -321,7 +321,43 @@
+     }
+ }
+ 
++// Opt-in diagnostics. None avoids event construction; arithmetic routines are unchanged.
++fn observe_driver(observer: &mut Option<&mut dyn FnMut(Value) -> Result<(), String>>,
++    event: impl FnOnce() -> Value) -> Result<(), String> {
++    if let Some(callback) = observer.as_mut() { callback(event())?; }
++    Ok(())
++}
++fn begin_driver(observer: &mut Option<&mut dyn FnMut(Value) -> Result<(), String>>,
++    calls: &mut u64, operation: &'static str, event: impl FnOnce() -> Value) -> Result<(), String> {
++    if observer.is_some() {
++        *calls = calls.checked_add(1).ok_or("driver call sequence overflow")?;
++        let call = *calls;
++        observe_driver(observer, || json!({"kind":"driver_begin", "operation":operation,
++            "call":call, "input":event()}))?;
++    }
++    Ok(())
++}
++fn end_advance(observer: &mut Option<&mut dyn FnMut(Value) -> Result<(), String>>,
++    call: u64, step: &Advance) -> Result<(), String> {
++    observe_driver(observer, || json!({"kind":"driver_end", "operation":"advance", "call":call,
++        "next":step.next, "choice":step.choice, "roots":step.roots,
++        "evaluated":step.evaluated, "selected":step.selected,
++        "used_fallback":step.used_fallback, "fallback_validity_checks":step.fallback_validity_checks,
++        "transition_checks":step.transition_checks, "validation_failed":step.validation_failed}))
++}
++
+ pub fn run(output_dir: &str) {
++    run_internal(output_dir, None).expect("disabled driver observation cannot fail");
++}
++/// One native header/terminal per target. Route each target to a fresh Trace adapter.
++/// Callback failure stops this invocation; an incomplete prefix is not a solved target.
++pub fn run_observed(output_dir: &str,
++    observer: &mut dyn FnMut(Value) -> Result<(), String>) -> Result<(), String> {
++    run_internal(output_dir, Some(observer))
++}
++fn run_internal(output_dir: &str,
++    mut observer: Option<&mut dyn FnMut(Value) -> Result<(), String>>) -> Result<(), String> {
++
+     let theta_rows =
+         fs::read_to_string("research/kummer_theta_20261022/results/theta-models.jsonl").unwrap();
+     let mut theta = BTreeMap::new();
+@@ -445,9 +481,19 @@
+             let mut recovered = None;
+             let mut status = "candidate_cap";
+             let cap = 100 * p + 10000;
++            let mut observed_calls = 0u64;
++            observe_driver(&mut observer, || json!({"kind":"header", "schema":"kummer-driver-events/v1",
++                "workload_id":v["workload_id"], "target_index":v["target_index"], "bits":bits,
++                "p":p, "r":r, "g":g, "q":q, "initial_pair":[k,kp], "initial_labels":[a,b],
++                "algorithm_seed":v["algorithm_seed"], "candidate_cap":cap,
++                "transition_validation_enabled":validate_transitions}))?;
+             while attempts < cap {
+                 let Some(general) = signed::general_coords(k, t, p) else {
+                     general_skips += 1;
++                    observe_driver(&mut observer, || json!({"kind":"driver_gate", "status":"nonordinary_chart",
++                        "labels":[a,b], "pair":[k,kp]}))?;
++                    begin_driver(&mut observer, &mut observed_calls, "advance", || json!({
++                        "site":"general_skip", "labels":[a,b], "pair":[k,kp], "attempts_before":attempts}))?;
+                     let step = advance(
+                         k,
+                         kp,
+@@ -465,6 +511,7 @@
+                         b,
+                         validate_transitions,
+                     );
++                    end_advance(&mut observer, observed_calls, &step)?;
+                     repairs += step.roots.iter().filter(|x| x.is_some()).count() as u64;
+                     attempts += 1;
+                     if step.used_fallback {
+@@ -495,16 +542,24 @@
+                     b = rng.next() % r;
+                     let d = j.add(j.mul(g, a), j.mul(q, b));
+                     let dplus = j.add(d, g);
++                    observe_driver(&mut observer, || json!({"kind":"driver_restart", "status":"labels_selected",
++                        "labels":[a,b], "divisor":d, "plus":dplus, "attempts":attempts}))?;
+                     let Some(kk) = walk::project_any(d, &j, t, acts, p) else {
+                         status = "restart_projection_fail";
++                        observe_driver(&mut observer, || json!({"kind":"driver_restart", "status":"projection_failed",
++                            "labels":[a,b], "attempts":attempts}))?;
+                         break;
+                     };
+                     let Some(kpp) = walk::project_any(dplus, &j, t, acts, p) else {
+                         status = "restart_projection_fail";
++                        observe_driver(&mut observer, || json!({"kind":"driver_restart", "status":"projection_failed",
++                            "labels":[a,b], "attempts":attempts}))?;
+                         break;
+                     };
+                     k = kk;
+                     kp = kpp;
++                    observe_driver(&mut observer, || json!({"kind":"driver_restart", "status":"projected",
++                        "labels":[a,b], "pair":[k,kp], "attempts":attempts}))?;
+                     continue;
+                 }
+                 let a0 = general[2];
+@@ -514,18 +569,29 @@
+                     let x0 = j.f.mul(j.f.sub(root, a1), p.div_ceil(2));
+                     let x1 = j.f.mul(j.f.sub(j.f.neg(root), a1), p.div_ceil(2));
+                     if x0 != x1 {
++                        begin_driver(&mut observer, &mut observed_calls, "lift", || json!({
++                            "labels":[a,b], "pair":[k,kp], "split_x":[x0,x1]}))?;
+                         let (signed_d, rec_status, _tested) =
+                             signed::lift(g, k, kp, kg, t, acts, &j, p);
++                        observe_driver(&mut observer, || json!({"kind":"driver_end", "operation":"lift",
++                            "call":observed_calls, "divisor":signed_d, "status":rec_status, "tested":_tested,
++                            "labels":[a,b]}))?;
+                         if let Some(d) = signed_d {
+                             recovery_ok += 1;
+-                            if !relation_seen.insert(d.min(j.neg(d))) {
++                            let canonical = d.min(j.neg(d));
++                            if !relation_seen.insert(canonical) {
+                                 // Preserve one relation per signed divisor, as in baseline.
++                                observe_driver(&mut observer, || json!({"kind":"driver_duplicate",
++                                    "divisor":d, "canonical":canonical, "labels":[a,b]}))?;
+                             } else {
+                                 let y0 = j.f.add(d.v[0], j.f.mul(d.v[1], x0));
+                                 let y1 = j.f.add(d.v[0], j.f.mul(d.v[1], x1));
+                                 let n0 = *nodes.entry(x0).or_insert_with(|| graph.node());
+                                 let n1 = *nodes.entry(x1).or_insert_with(|| graph.node());
+                                 splits += 1;
++                                observe_driver(&mut observer, || json!({"kind":"driver_relation",
++                                    "divisor":d, "canonical":canonical, "labels":[a,b], "nodes":[n0,n1], "x":[x0,x1], "y":[y0,y1],
++                                    "signs":[if y0<=p/2 {1} else {-1}, if y1<=p/2 {1} else {-1}]}))?;
+                                 recovered = graph.edge(
+                                     n0,
+                                     if y0 <= p / 2 { 1 } else { -1 },
+@@ -534,6 +600,8 @@
+                                     a,
+                                     b,
+                                 );
++                                observe_driver(&mut observer, || json!({"kind":"driver_graph_result",
++                                    "recovered":recovered, "graph_operations":graph.operations, "graph_cycles":graph.cycles}))?;
+                                 if let Some(ans) = recovered {
+                                     if j.mul(g, ans) == q && ans == v["planted"].as_u64().unwrap() {
+                                         status = "verified";
+@@ -549,8 +617,16 @@
+                                 status = "recover_D_zero";
+                             }
+                         }
++                    } else {
++                        observe_driver(&mut observer, || json!({"kind":"driver_gate", "status":"repeated_root",
++                            "labels":[a,b], "split_x":[x0,x1]}))?;
+                     }
++                } else {
++                    observe_driver(&mut observer, || json!({"kind":"driver_gate", "status":"nonsplit",
++                        "labels":[a,b], "discriminant":disc}))?;
+                 }
++                begin_driver(&mut observer, &mut observed_calls, "advance", || json!({
++                    "site":"ordinary", "labels":[a,b], "pair":[k,kp], "attempts_before":attempts}))?;
+                 let step = advance(
+                     k,
+                     kp,
+@@ -568,6 +644,7 @@
+                     b,
+                     validate_transitions,
+                 );
++                end_advance(&mut observer, observed_calls, &step)?;
+                 repairs += step.roots.iter().filter(|x| x.is_some()).count() as u64;
+                 attempts += 1;
+                 if step.used_fallback {
+@@ -589,6 +666,13 @@
+                 k = nk;
+                 kp = nkp;
+             }
++            observe_driver(&mut observer, || json!({"kind":"terminal", "attempts":attempts,
++                "driver_calls":observed_calls, "status":status, "recovered":recovered,
++                "labels":[a,b], "pair":[k,kp], "splits":splits, "recovery_ok":recovery_ok,
++                "recovery_fail":recovery_fail, "general_skips":general_skips, "restarts":restarts,
++                "repairs":repairs, "fallback_steps":fallback_steps, "fallback_failures":fallback_failures,
++                "fallback_checks":fallback_checks, "transition_checks":transition_checks,
++                "graph_operations":graph.operations, "graph_cycles":graph.cycles}))?;
+             if status == "verified" {
+                 solved += 1;
+             }
+@@ -602,6 +686,7 @@
+         }
+     }
+     println!("completed={completed} solved={solved}");
++    Ok(())
+ }
+ fn main() {
+     run("research/kummer_differential_collector_20261022/n19-labelled-fallback/results/collector");
+@@ -850,3 +935,7 @@
+  }
+  json!({"schema":"native-signed-duplicate-adapter/v1","p":p,"r":r,"planted":k,"public_known_answer":true,"alternate_labels_deliberately_planted":true,"new_trajectory_executed":false,"input_validation_field":input_validation,"controls":out,"all_pass":true})
+ }
++
++#[cfg(test)]
++#[path = "driver-controls.rs"]
++mod driver_controls;
+--- a/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/check.rs
++++ b/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/check.rs
+@@ -1,2 +1,6 @@
+ mod graph;mod pruned;mod duplicate;
+ fn main(){let v:serde_json::Value=serde_json::from_str(include_str!("../fixture.json")).unwrap();println!("{}",pruned::duplicate_fixture(&v));}
++
++#[cfg(test)]
++#[path = "pruned-original.rs"]
++mod original;
+--- a/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/Cargo.toml
++++ b/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/Cargo.toml
+@@ -10,3 +10,6 @@
+ [[bin]]
+ name="equivalence"
+ path="src/check.rs"
++
++[dev-dependencies]
++pencil-symbolic-graph={path="../../../../../pencil_large_prime_20261029",features=["reporting"]}
+--- a/research/pencil_large_prime_20261029/src/relation_stream.rs
++++ b/research/pencil_large_prime_20261029/src/relation_stream.rs
+@@ -449,7 +449,7 @@
+ /// sequence, flushing and poisoned-prefix semantics; performs no field work.
+ /// This validates event coverage, not geometry, scalar correctness or ranks.
+ #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+-pub enum NativeProtocol { SignedCollector, KummerLabels }
++pub enum NativeProtocol { SignedCollector, KummerLabels, KummerDriver }
+ 
+ pub struct NativeEvents<'a, 'w> {
+     trace: &'a mut Trace<'w>,
+@@ -462,6 +462,11 @@
+     pending: Option<u64>,
+     recovered: Option<u64>,
+     nodes: u64,
++    driver_calls: u64,
++    driver_pending: Option<&'static str>,
++    driver_lift: Option<(serde_json::Value, serde_json::Value)>,
++    driver_input_labels: Option<serde_json::Value>,
++    driver_graph_pending: bool,
+     first: std::collections::BTreeMap<String, u64>,
+ }
+ impl<'a, 'w> NativeEvents<'a, 'w> {
+@@ -472,10 +477,11 @@
+         let schema = match protocol {
+             NativeProtocol::SignedCollector => "signed-collector-events/v1",
+             NativeProtocol::KummerLabels => "kummer-label-events/v1",
++            NativeProtocol::KummerDriver => "kummer-driver-events/v1",
+         };
+         if expected_header["schema"] != schema { return Err(Error::State); }
+         Ok(Self { trace, expected_header, protocol, started:false, terminal:false,
+-            failed:false, attempts:0, pending:None, recovered:None, nodes:1,
++            failed:false, attempts:0, pending:None, recovered:None, nodes:1, driver_calls:0, driver_pending:None, driver_lift:None, driver_input_labels:None, driver_graph_pending:false,
+             first:std::collections::BTreeMap::new() })
+     }
+     pub fn observe(&mut self, value: serde_json::Value) -> Result<(), Error> {
+@@ -513,6 +519,9 @@
+             self.started=true; return Ok(());
+         }
+         if kind=="header" { return Err(Error::State); }
++        if self.protocol == NativeProtocol::KummerDriver {
++            return self.accept_driver(value);
++        }
+         if kind=="terminal" {
+             if self.pending.is_some() || Self::number(&value,"attempts")? != self.attempts
+                 || Self::scalar(&value,"recovered")? != self.recovered { return Err(Error::State); }
+@@ -584,6 +593,98 @@
+         }
+         self.trace.emit(Event::Observed(value))
+     }
++    fn driver_labels(&self, value: &serde_json::Value) -> Result<(), Error> {
++        let r=Self::number(&self.expected_header,"r")?;
++        let labels=value.as_array().ok_or(Error::State)?;
++        if r<3 || labels.len()!=2 || labels.iter().any(|v| v.as_u64().is_none_or(|x| x>=r)) {
++            return Err(Error::State);
++        }
++        Ok(())
++    }
++    fn accept_driver(&mut self, value: serde_json::Value) -> Result<(), Error> {
++        let kind=value["kind"].as_str().ok_or(Error::State)?;
++        if kind=="terminal" {
++            if self.pending.is_some() || self.driver_graph_pending || self.driver_lift.is_some()
++                || Self::number(&value,"attempts")?!=self.attempts
++                || Self::number(&value,"driver_calls")?!=self.driver_calls
++                || Self::scalar(&value,"recovered")?!=self.recovered { return Err(Error::State); }
++            self.trace.emit(Event::ObservedTerminal(value))?;
++            self.terminal=true;return Ok(());
++        }
++        match kind {
++            "driver_begin" => {
++                if self.pending.is_some() || self.driver_graph_pending || self.driver_lift.is_some() || self.recovered.is_some() {
++                    return Err(Error::State);
++                }
++                let operation=match value["operation"].as_str() {
++                    Some("advance")=>"advance",Some("lift")=>"lift",_=>return Err(Error::State),
++                };
++                let call=Self::number(&value,"call")?;
++                if self.driver_calls.checked_add(1)!=Some(call) { return Err(Error::State); }
++                self.driver_labels(&value["input"]["labels"])?;
++                self.driver_calls=call;self.pending=Some(call);self.driver_pending=Some(operation);
++                self.driver_input_labels=Some(value["input"]["labels"].clone());
++                self.driver_lift=None;
++            }
++            "driver_end" => {
++                if self.pending!=Some(Self::number(&value,"call")?)
++                    || self.driver_pending!=value["operation"].as_str() { return Err(Error::State); }
++                match self.driver_pending {
++                    Some("advance")=>{
++                        if Self::number(&value,"choice")? > 1 { return Err(Error::State); }
++                        for field in ["used_fallback","validation_failed"] {
++                            if !value[field].is_boolean() { return Err(Error::State); }
++                        }
++                        self.attempts=self.attempts.checked_add(1).ok_or(Error::State)?;
++                    }
++                    Some("lift")=>{
++                        self.driver_labels(&value["labels"])?;
++                        if self.driver_input_labels.as_ref()!=Some(&value["labels"])
++                            || !value["status"].is_string() || value["tested"].as_u64().is_none() {
++                            return Err(Error::State);
++                        }
++                        if !value["divisor"].is_null() {
++                            if !value["divisor"].is_object() { return Err(Error::State); }
++                            self.driver_lift=Some((value["divisor"].clone(),value["labels"].clone()));
++                        }
++                    }
++                    _=>return Err(Error::State),
++                }
++                self.pending=None;self.driver_pending=None;self.driver_input_labels=None;
++            }
++            "driver_relation"|"driver_duplicate" => {
++                if self.pending.is_some() || self.driver_graph_pending { return Err(Error::State); }
++                let (divisor,labels)=self.driver_lift.take().ok_or(Error::State)?;
++                if value["divisor"]!=divisor || value["labels"]!=labels
++                    || !value["canonical"].is_object() { return Err(Error::State); }
++                let key=serde_json::to_string(&value["canonical"]).map_err(|_|Error::State)?;
++                if kind=="driver_duplicate" {
++                    if !self.first.contains_key(&key) { return Err(Error::State); }
++                } else {
++                    if self.first.insert(key,self.driver_calls).is_some() { return Err(Error::State); }
++                    let nodes=value["nodes"].as_array().ok_or(Error::State)?;
++                    let signs=value["signs"].as_array().ok_or(Error::State)?;
++                    if nodes.len()!=2 || nodes.iter().any(|n| n.as_u64().is_none())
++                        || signs.len()!=2 || signs.iter().any(|x| !matches!(x.as_i64(),Some(-1)|Some(1))) {
++                        return Err(Error::State);
++                    }
++                    self.driver_graph_pending=true;
++                }
++            }
++            "driver_graph_result" => {
++                if !self.driver_graph_pending || self.pending.is_some() { return Err(Error::State); }
++                self.recovered=Self::scalar(&value,"recovered")?;self.driver_graph_pending=false;
++            }
++            "driver_gate"|"driver_restart" => {
++                if self.pending.is_some() || self.driver_graph_pending || self.driver_lift.is_some() || self.recovered.is_some()
++                    || !value["status"].is_string() { return Err(Error::State); }
++                self.driver_labels(&value["labels"])?;self.driver_lift=None;
++            }
++            _=>return Err(Error::State),
++        }
++        self.trace.emit(Event::Observed(value))
++    }
++
+ }
+ 
+ #[cfg(test)]
+@@ -685,3 +786,42 @@
+  }
+ 
+ }
++
++#[cfg(test)]
++mod kummer_driver_protocol_controls {
++    use super::*;
++    use serde_json::json;
++    fn header()->serde_json::Value { json!({"kind":"header","schema":"kummer-driver-events/v1","r":7}) }
++    fn identity()->Identity { Identity {source_revision:"a".repeat(40),source_sha256:"b".repeat(64),workload_id:"synthetic-protocol".into(),run_id:"fixed".into()} }
++    fn begin()->serde_json::Value { json!({"kind":"driver_begin","operation":"lift","call":1,"input":{"labels":[0,1]}}) }
++    fn end()->serde_json::Value { json!({"kind":"driver_end","operation":"lift","call":1,"divisor":{"degree":2,"u":[1,0,1],"v":[0,0]},"labels":[0,1],"status":"fixture","tested":1}) }
++    #[test]
++    fn missing_call_result_rejected() {
++        let mut bytes=vec![];let mut trace=Trace::new(&mut bytes,identity(),20,10000).unwrap();
++        {let mut adapter=NativeEvents::new(&mut trace,NativeProtocol::KummerDriver,header()).unwrap();
++        adapter.observe(header()).unwrap();adapter.observe(begin()).unwrap();
++        assert_eq!(adapter.observe(json!({"kind":"terminal","attempts":0,"driver_calls":1,"recovered":null})),Err(Error::State));}
++        assert!(!trace.complete());
++    }
++    #[test]
++    fn changed_call_number_rejected() {
++        let mut bytes=vec![];let mut trace=Trace::new(&mut bytes,identity(),20,10000).unwrap();
++        let mut adapter=NativeEvents::new(&mut trace,NativeProtocol::KummerDriver,header()).unwrap();
++        adapter.observe(header()).unwrap();adapter.observe(begin()).unwrap();
++        let mut event=end();event["call"]=json!(2);assert_eq!(adapter.observe(event),Err(Error::State));
++    }
++    #[test]
++    fn changed_signed_labels_rejected() {
++        let mut bytes=vec![];let mut trace=Trace::new(&mut bytes,identity(),20,10000).unwrap();
++        let mut adapter=NativeEvents::new(&mut trace,NativeProtocol::KummerDriver,header()).unwrap();
++        adapter.observe(header()).unwrap();adapter.observe(begin()).unwrap();
++        let mut event=end();event["labels"]=json!([1,0]);assert_eq!(adapter.observe(event),Err(Error::State));
++    }
++    #[test]
++    fn missing_lift_disposition_rejected() {
++        let mut bytes=vec![];let mut trace=Trace::new(&mut bytes,identity(),20,10000).unwrap();
++        let mut adapter=NativeEvents::new(&mut trace,NativeProtocol::KummerDriver,header()).unwrap();
++        adapter.observe(header()).unwrap();adapter.observe(begin()).unwrap();adapter.observe(end()).unwrap();
++        assert_eq!(adapter.observe(json!({"kind":"terminal","attempts":0,"driver_calls":1,"recovered":null})),Err(Error::State));
++    }
++}
+--- /dev/null
++++ b/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/driver-controls.rs
+@@ -0,0 +1,128 @@
++//! Prospective tests only. Run serially with the exact retained p739 fixture staged.
++use super::*;
++use pencil_symbolic_graph::relation_stream::{Identity, NativeEvents, NativeProtocol, Trace};
++use std::cell::Cell;
++use std::io::{self, Write};
++
++struct FaultWriter<'a> { bytes: Vec<u8>, fail: &'a Cell<bool> }
++impl Write for FaultWriter<'_> {
++    fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
++        if self.fail.get() { return Err(io::Error::other("fixed driver callback fault")); }
++        self.bytes.extend_from_slice(bytes); Ok(bytes.len())
++    }
++    fn flush(&mut self) -> io::Result<()> { Ok(()) }
++}
++fn identity(fixture: &Value, name: &str) -> Identity {
++    Identity { source_revision:env!("KUMMER_DRIVER_REVISION").into(),
++        source_sha256:env!("KUMMER_DRIVER_SOURCE_SHA256").into(),
++        workload_id:fixture["target"]["workload_id"].as_str().unwrap().into(),run_id:name.into() }
++}
++fn expected_header(fixture: &Value) -> Value {
++    let v=&fixture["target"];let cases=v["cases"].as_array().unwrap();
++    let p=v["p"].as_u64().unwrap();
++    json!({"kind":"header","schema":"kummer-driver-events/v1", "workload_id":v["workload_id"],
++        "target_index":v["target_index"],"bits":16,"p":p,"r":v["r"],
++        "g":cases[1]["coordinate_witness"]["jacobian_expected"],
++        "q":cases[2]["coordinate_witness"]["jacobian_expected"],
++        "initial_pair":[cases[2]["coordinate_witness"]["k_expected"],cases[3]["coordinate_witness"]["k_expected"]],
++        "initial_labels":[0,1],"algorithm_seed":v["algorithm_seed"],"candidate_cap":100*p+10000,
++        "transition_validation_enabled":false})
++}
++fn target_row(directory: &std::path::Path) -> Value {
++    let text=fs::read_to_string(directory.join("collector-16.jsonl")).unwrap();
++    assert_eq!(text.lines().count(),1);
++    serde_json::from_str(text.lines().next().unwrap()).unwrap()
++}
++#[test]
++fn actual_driver_original_disabled_observed_and_fixed_faults() {
++    // Envelope and exact fixture staging are external protocol inputs; no environment mutations here.
++    assert_eq!(std::env::var("KUMMER_TARGET_CAP").as_deref(),Ok("1"));
++    assert_eq!(std::env::var("KUMMER_START_INDEX").as_deref(),Ok("0"));
++    assert_ne!(std::env::var("KUMMER_VALIDATE_TRANSITIONS").as_deref(),Ok("1"));
++    let fixture:Value=serde_json::from_str(include_str!("../fixture.json")).unwrap();
++    assert_eq!(fixture["target"]["p"],739);assert_eq!(fixture["target"]["r"],34147);
++    let out=std::path::PathBuf::from(std::env::var("KUMMER_DRIVER_CONTROL_OUTPUT").unwrap());
++    fs::create_dir(&out).unwrap();
++    crate::original::run(out.join("original").to_str().unwrap());
++    run(out.join("disabled").to_str().unwrap());
++    let expected=target_row(&out.join("original"));
++    assert_eq!(expected,target_row(&out.join("disabled")));
++    let fail=Cell::new(false);let mut writer=FaultWriter{bytes:vec![],fail:&fail};let mut events=vec![];
++    {
++        let mut trace=Trace::new(&mut writer,identity(&fixture,"observed"),1_000_000,64*1024*1024).unwrap();
++        {
++            let mut adapter=NativeEvents::new(&mut trace,NativeProtocol::KummerDriver,expected_header(&fixture)).unwrap();
++            run_observed(out.join("observed").to_str().unwrap(),&mut |event| {
++                adapter.observe(event.clone()).map_err(|e|e.to_string())?;events.push(event);Ok(())
++            }).unwrap();
++        }
++        assert!(trace.complete());
++    }
++    assert_eq!(expected,target_row(&out.join("observed")));
++    fs::write(out.join("observed.jsonl"),&writer.bytes).unwrap();
++    // Eight predeclared callback joints. Missing native branch coverage fails; no seed search.
++    let joints=[("header",""),("driver_begin","advance"),("driver_end","advance"),
++        ("driver_begin","lift"),("driver_end","lift"),("driver_relation",""),
++        ("driver_duplicate",""),("terminal","")];
++    let mut fault_rows=vec![];
++    for (index,(kind,op)) in joints.into_iter().enumerate() {
++        let position=events.iter().position(|v|v["kind"]==kind&&(op.is_empty()||v["operation"]==op))
++            .expect("fixed native fixture did not cover required callback joint");
++        let fail=Cell::new(false);let mut writer=FaultWriter{bytes:vec![],fail:&fail};let mut seen=0;
++        let mut trace=Trace::new(&mut writer,identity(&fixture,&format!("fault-{index}")),1_000_000,64*1024*1024).unwrap();
++        let result={
++            let mut adapter=NativeEvents::new(&mut trace,NativeProtocol::KummerDriver,expected_header(&fixture)).unwrap();
++            run_observed(out.join(format!("fault-{index}")).to_str().unwrap(),&mut |event| {
++                if seen==position { fail.set(true); } seen+=1;
++                adapter.observe(event).map_err(|e|e.to_string())
++            })
++        };
++        assert!(result.is_err());assert!(!trace.complete());assert!(trace.failure().is_some());
++        assert_eq!(seen,position+1);drop(trace);
++        fs::write(out.join(format!("fault-{index}.jsonl")),&writer.bytes).unwrap();
++        fault_rows.push(json!({"kind":kind,"operation":op,"position":position,"passed":true}));
++    }
++    fs::write(out.join("result.json"),serde_json::to_vec_pretty(&json!({
++        "schema":"kummer-driver-software-qualification/v1","original_disabled_observed_equal":true,
++        "complete_original_row":expected,"faults":fault_rows,"native_runs":11,
++        "timing_comparison":null,"exceptional_branch_coverage":"separate native probe required"})).unwrap()).unwrap();
++}
++
++#[test]
++fn actual_forced_fallback_and_zero_vector_lift_are_recorded() {
++    let fixture:Value=serde_json::from_str(include_str!("../fixture.json")).unwrap();
++    let v=&fixture["target"];let t=&fixture["theta"]["selected"]["constants"];
++    let p=v["p"].as_u64().unwrap();let r=v["r"].as_u64().unwrap();
++    let f=signed::curve_coeff(t,p);let j=Jacobian{f:Field::new(p,1,0),polynomial:f[..6].to_vec()};
++    let cases=v["cases"].as_array().unwrap();
++    let g:Divisor=serde_json::from_value(cases[1]["coordinate_witness"]["jacobian_expected"].clone()).unwrap();
++    let q:Divisor=serde_json::from_value(cases[2]["coordinate_witness"]["jacobian_expected"].clone()).unwrap();
++    let kg=parse_vec4(&cases[1]["coordinate_witness"]["k_expected"]);
++    let k=parse_vec4(&cases[2]["coordinate_witness"]["k_expected"]);
++    let kp=parse_vec4(&cases[3]["coordinate_witness"]["k_expected"]);
++    let constants=["A","B","C","D"].map(|key|t[key].as_u64().unwrap());
++    let mut out=vec![];let mut trace=Trace::new(&mut out,identity(&fixture,"forced-native"),32,1024*1024).unwrap();
++    {
++        let mut adapter=NativeEvents::new(&mut trace,NativeProtocol::KummerDriver,expected_header(&fixture)).unwrap();
++        adapter.observe(expected_header(&fixture)).unwrap();
++        let mut sink=|event|adapter.observe(event).map_err(|e|e.to_string());
++        let mut observer:Option<&mut dyn FnMut(Value)->Result<(),String>>=Some(&mut sink);
++        let mut calls=0;
++        begin_driver(&mut observer,&mut calls,"advance",||json!({"labels":[0,1],"pair":[k,kp],"forced_zero_difference":true})).unwrap();
++        let step=advance(k,kp,kg,[0;4],constants,&[],&j,t,p,r,g,q,0,1,true);
++        end_advance(&mut observer,calls,&step).unwrap();
++        assert!(step.used_fallback);assert!(!step.validation_failed);
++        let (next,plus)=step.next.expect("actual fallback must reconstruct the fixture");
++        let d=j.add(j.mul(g,step.choice%r),j.mul(q,2%r));
++        assert!(walk::same_k(next,walk::project_any(d,&j,t,&[],p).unwrap(),p));
++        assert!(walk::same_k(plus,walk::project_any(j.add(d,g),&j,t,&[],p).unwrap(),p));
++        begin_driver(&mut observer,&mut calls,"lift",||json!({"labels":[0,1],"pair":[[0;4],[0;4]]})).unwrap();
++        let (divisor,status,tested)=signed::lift(g,[0;4],[0;4],kg,t,&[],&j,p);
++        assert!(divisor.is_none());assert_eq!(status,"zero_projective_vector");assert_eq!(tested,0);
++        observe_driver(&mut observer,||json!({"kind":"driver_end","operation":"lift","call":calls,
++            "divisor":divisor,"status":status,"tested":tested,"labels":[0,1]})).unwrap();
++        observe_driver(&mut observer,||json!({"kind":"terminal","attempts":1,"driver_calls":calls,
++            "status":"fixture_complete","recovered":null})).unwrap();
++    }
++    assert!(trace.complete());
++}
+--- /dev/null
++++ b/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/pruned-original.rs
+@@ -0,0 +1,852 @@
++#![allow(dead_code)]
++use five_leads_study::three_leads::{Divisor, Field, Jacobian, Ring, Rng, SignedGraph};
++use serde_json::{Value, json};
++use std::{
++    collections::{BTreeMap, HashMap, HashSet},
++    fs,
++};
++fn parse_vec4(v: &Value) -> [u64; 4] {
++    std::array::from_fn(|i| v[i].as_u64().unwrap())
++}
++fn parse_matrix(v: &Value) -> [[u64; 4]; 4] {
++    std::array::from_fn(|i| parse_vec4(&v[i]))
++}
++fn sub_mod(x: u64, y: u64, p: u64) -> u64 {
++    (x + p - y) % p
++}
++fn mul_mod(x: u64, y: u64, p: u64) -> u64 {
++    x * y % p
++}
++fn inv_mod(x: u64, p: u64) -> u64 {
++    let mut base = x;
++    let mut exp = p - 2;
++    let mut z = 1;
++    while exp > 0 {
++        if exp & 1 != 0 {
++            z = mul_mod(z, base, p);
++        }
++        base = mul_mod(base, base, p);
++        exp >>= 1;
++    }
++    z
++}
++
++mod walk {
++    include!(concat!(
++        env!("CARGO_MANIFEST_DIR"),
++        "/src/walk_impl_uncached.rs"
++    ));
++    type Pair = ([u64; 4], [u64; 4]);
++    type StepResult = (Option<Pair>, u64, [Option<u64>; 3], [bool;3], [bool;3]);
++    pub fn step(
++        k: [u64; 4],
++        kp: [u64; 4],
++        kg: [u64; 4],
++        k0: [u64; 4],
++        t: [u64; 4],
++        acts: &[(u64, [[u64; 4]; 4])],
++        p: u64,
++    ) -> StepResult {
++        let choice = branch(k, p);
++        // Proposed arm: only the selected double is evaluated.
++        // None in the unused repair slot means not evaluated, not repair failure.
++        if choice == 0 {
++            let (kd, r0) = xadd_repaired(k, k, k0, t, acts, p);
++            let (km, r1) = xadd_repaired(k, kp, kg, t, acts, p);
++            (kd.zip(km), choice, [r0, r1, None], [true,true,false], [true,true,false])
++        } else {
++            let (km, r1) = xadd_repaired(k, kp, kg, t, acts, p);
++            let (kpp, r2) = xadd_repaired(kp, kp, k0, t, acts, p);
++            (km.zip(kpp), choice, [None, r1, r2], [false,true,true], [false,true,true])
++        }
++    }
++
++    pub fn repair_probe(x:[u64;4],y:[u64;4],diff:[u64;4],t:[u64;4],acts:&[(u64,[[u64;4];4])],p:u64)->(Option<[u64;4]>,Option<[u64;4]>,Option<u64>){
++       let plain=xadd(x,y,diff,t,p);let(repaired,root)=xadd_repaired(x,y,diff,t,acts,p);(plain,repaired,root)
++    }
++    pub fn project_divisor(d: Divisor, t: &serde_json::Value, p: u64) -> Option<[u64; 4]> {
++        project(d, t, p)
++    }
++    pub fn project_any(
++        d: Divisor,
++        j: &Jacobian,
++        t: &serde_json::Value,
++        _acts: &[(u64, [[u64; 4]; 4])],
++        p: u64,
++    ) -> Option<[u64; 4]> {
++        // CCS §6.3 and §7.4 give the classical Kummer vector q followed by
++        // the invertible C1 fast-theta map. This handles degree 0/1/2,
++        // including the a0=0 zero-numerator locus of the older generic law.
++        let q = match d.degree {
++            0 => [0, 0, 0, 1],
++            1 => {
++                let x = sub(0, d.u[0], p);
++                [0, 1, x, mul(x, x, p)]
++            }
++            2 => {
++                let (a0, a1, b1) = (d.u[0], d.u[1], d.v[1]);
++                let f = &j.polynomial;
++                let z = sub(mul(a1, a1, p), a0, p);
++                let xi4 = sub(
++                    add(
++                        add(mul(b1, b1, p), mul(z, sub(mul(f[5], a1, p), 0, p), p), p),
++                        mul(a1, sub(f[3], mul(f[4], a1, p), p), p),
++                        p,
++                    ),
++                    f[2],
++                    p,
++                );
++                [1, sub(0, a1, p), a0, xi4]
++            }
++            _ => return None,
++        };
++        let (l, mu, nu) = (
++            t["lambda"].as_u64().unwrap(),
++            t["mu"].as_u64().unwrap(),
++            t["nu"].as_u64().unwrap(),
++        );
++        let m0 = [
++            mul(mu, add(l, nu, p), p),
++            mul(mul(nu, l, p), add(1, mu, p), p),
++            mul(nu, add(l, mu, p), p),
++            mul(mul(mu, l, p), add(1, nu, p), p),
++        ];
++        let m1 = [
++            sub(0, mu, p),
++            sub(0, mul(nu, l, p), p),
++            sub(0, nu, p),
++            sub(0, mul(mu, l, p), p),
++        ];
++        let m2 = [add(mu, 1, p), add(l, nu, p), add(nu, 1, p), add(l, mu, p)];
++        let scale = ["a", "b", "c", "d"].map(|key| t[key].as_u64().unwrap());
++        let out = std::array::from_fn(|i| {
++            let row = [m0[i], m1[i], m2[i], p - 1];
++            mul(
++                scale[i],
++                (0..4).fold(0, |v, k| add(v, mul(row[k], q[k], p), p)),
++                p,
++            )
++        });
++        (out != [0; 4]).then_some(out)
++    }
++    pub fn same_k(x: [u64; 4], y: [u64; 4], p: u64) -> bool {
++        same(x, y, p)
++    }
++}
++mod signed {
++    include!(concat!(
++        env!("CARGO_MANIFEST_DIR"),
++        "/src/recover_boundary_impl.rs"
++    ));
++    pub fn curve_coeff(t: &Value, p: u64) -> Vec<u64> {
++        curve(t, p)
++    }
++    pub fn general_coords(k: [u64; 4], t: &Value, p: u64) -> Option<[u64; 4]> {
++        general(k, t, p)
++    }
++    #[allow(clippy::too_many_arguments)] // The unchanged N11 Recover wrapper.
++
++
++    pub fn delta_lift(anchor:Divisor,kq:[u64;4],kplus:[u64;4],t:&Value,j:&Jacobian,p:u64)->(Option<Divisor>,&'static str,usize){
++      if kq==[0;4]||kplus==[0;4]{return(None,"delta_zero_vector",0);}
++      let Some(q)=general(kq,t,p)else{return(None,"delta_nonordinary_chart",0);};let f=curve(t,p);
++      let(a0,a1)=(q[2],s(0,q[1],p));let z=s(m(a1,a1,p),a0,p);let b1sq=a(s(s(q[3],m(z,s(m(f[5],a1,p),m(f[6],z,p),p),p),p),m(a1,s(f[3],m(f[4],a1,p),p),p),p),f[2],p);
++      let Some(root)=j.f.sqrt(b1sq)else{return(None,"delta_nonsquare",0);};
++      let mut power=[1,0];let mut rem=[0,0];for &coeff in &f{rem[0]=a(rem[0],m(coeff,power[0],p),p);rem[1]=a(rem[1],m(coeff,power[1],p),p);power=[s(0,m(a0,power[1],p),p),s(power[0],m(a1,power[1],p),p)];}
++      let mut candidates=Vec::new();for b1 in[root,j.f.neg(root)]{let b0s=if b1!=0{vec![m(a(rem[1],m(a1,b1sq,p),p),inv(m(2,b1,p),p),p)]}else{match j.f.sqrt(rem[0]){Some(b0)=>vec![b0,j.f.neg(b0)],None=>vec![]}};
++        for b0 in b0s{let d=Divisor{degree:2,u:[a0,a1,1],v:[b0,b1]};if !candidates.contains(&d){candidates.push(d);}}}
++      let tested=candidates.len();assert!(tested<=4);let mut matches=Vec::new();
++      for d in candidates{if !j.valid(d){continue;}let Some(kd)=super::walk::project_any(d,j,t,&[],p)else{continue;};if !super::walk::same_k(kd,kq,p){continue;}let sum=j.add(anchor,d);let Some(ks)=super::walk::project_any(sum,j,t,&[],p)else{continue;};if super::walk::same_k(ks,kplus,p){matches.push(d);}}
++      match matches.len(){1=>(Some(matches[0]),"delta_unique_signed_lift",tested),0=>(None,"delta_no_signed_lift",tested),_=>(None,"delta_ambiguous_signed_lift",tested)}
++    }
++    pub fn boundary_lift(anchor:Divisor,kq:[u64;4],kplus:[u64;4],t:&Value,j:&Jacobian,p:u64)->(Option<Divisor>,&'static str,usize){
++      if kq==[0;4]||kplus==[0;4]{return(None,"zero_projective_vector",0);}
++      let Some(q)=general_homogeneous(kq,t,p)else{return(None,"singular_coordinate_map",0);};
++      if q[0]!=0{return(None,"not_boundary_chart",0);}
++      if q[1]==0{
++        if q[2]!=0||q[3]==0{return(None,"invalid_boundary_chart",0);}
++        let Some(ka)=super::walk::project_any(anchor,j,t,&[],p)else{return(None,"anchor_projection_failure",0);};
++        return if super::walk::same_k(ka,kplus,p){(Some(Divisor::O),"identity_recovered",1)}else{(None,"identity_neighbour_mismatch",1)};
++      }
++      if m(q[1],q[3],p)!=m(q[2],q[2],p){return(None,"invalid_degree1_conic",0);}
++      let x=m(q[2],inv(q[1],p),p);let value=j.polynomial.iter().rev().fold(0,|z,&c|j.f.add(j.f.mul(z,x),c));
++      let Some(y)=j.f.sqrt(value)else{return(None,"degree1_nonsquare",0);};
++      let mut matches=Vec::new();let mut tested=0;
++      for yy in [y,j.f.neg(y)]{
++        let candidate=Divisor{degree:1,u:[j.f.neg(x),1,0],v:[yy,0]};if matches.contains(&candidate){continue;}tested+=1;
++        if !j.valid(candidate){continue;}let Some(kc)=super::walk::project_any(candidate,j,t,&[],p)else{continue;};
++        if !super::walk::same_k(kc,kq,p){continue;}let sum=j.add(anchor,candidate);let Some(ks)=super::walk::project_any(sum,j,t,&[],p)else{continue;};
++        if super::walk::same_k(ks,kplus,p){matches.push(candidate);}
++      }
++      match matches.len(){1=>(Some(matches[0]),"degree1_unique_signed_lift",tested),0=>(None,"degree1_no_signed_lift",tested),_=>(None,"degree1_ambiguous_signed_lift",tested)}
++    }
++    pub fn lift(
++        anchor: Divisor,
++        kq: [u64; 4],
++        kplus: [u64; 4],
++        kp: [u64; 4],
++        t: &Value,
++        acts: &[(u64, [[u64; 4]; 4])],
++        j: &Jacobian,
++        p: u64,
++    ) -> (Option<Divisor>, &'static str, usize) {
++        let constants = ["A", "B", "C", "D"].map(|z| t[z].as_u64().unwrap());
++        let (km, _) = xadd_repaired(kq, kp, kplus, constants, acts, p);
++        let (q, plus, minus) = (
++            general(kq, t, p),
++            general(kplus, t, p),
++            km.and_then(|x| general(x, t, p)),
++        );
++        if let (Some(q), Some(plus), Some(minus)) = (q, plus, minus) {
++            let f = curve(t, p);
++            let (mut out, mut status) = recover(anchor, q, plus, minus, &f, p);
++            let mut tested = 0;
++            if out.is_none() && status == "D_zero" {
++                let (candidate, n) = exceptional_lift(anchor, q, plus, &f, j, p);
++                out = candidate;
++                tested = n;
++                if out.is_some() {
++                    status = "enumerated_exception_lift";
++                }
++            }
++            if out.is_none() && status == "Delta_zero" {
++                return delta_lift(anchor,kq,kplus,t,j,p);
++            }
++            (out, status, tested)
++        } else {
++            boundary_lift(anchor,kq,kplus,t,j,p)
++        }
++    }
++}
++
++struct Advance {
++    next: Option<([u64; 4], [u64; 4])>,
++    choice: u64,
++    roots: [Option<u64>; 3],
++    evaluated: [bool;3],
++    selected: [bool;3],
++    used_fallback: bool,
++    fallback_validity_checks: u64,
++    transition_checks: u64,
++    validation_failed: bool,
++}
++
++#[allow(clippy::too_many_arguments)]
++fn signed_fallback(
++    j: &Jacobian,
++    t: &Value,
++    acts: &[(u64, [[u64; 4]; 4])],
++    p: u64,
++    r: u64,
++    g: Divisor,
++    q: Divisor,
++    a: u64,
++    b: u64,
++    choice: u64,
++) -> Option<([u64; 4], [u64; 4])> {
++    let aa = (2 * a + choice) % r;
++    let bb = (2 * b) % r;
++    let d = j.add(j.mul(g, aa), j.mul(q, bb));
++    let dplus = j.add(d, g);
++    let d_valid = j.valid(d);
++    let plus_valid = j.valid(dplus);
++    if !d_valid || !plus_valid {
++        return None;
++    }
++    walk::project_any(d, j, t, acts, p).zip(walk::project_any(dplus, j, t, acts, p))
++}
++
++#[allow(clippy::too_many_arguments)]
++fn advance(
++    k: [u64; 4],
++    kp: [u64; 4],
++    kg: [u64; 4],
++    k0: [u64; 4],
++    constants: [u64; 4],
++    acts: &[(u64, [[u64; 4]; 4])],
++    j: &Jacobian,
++    t: &Value,
++    p: u64,
++    r: u64,
++    g: Divisor,
++    q: Divisor,
++    a: u64,
++    b: u64,
++    validate_transition: bool,
++) -> Advance {
++    let (next, choice, roots, evaluated, selected) = walk::step(k, kp, kg, k0, constants, acts, p);
++    if let Some((nk, nkp)) = next {
++        if validate_transition {
++            let aa = (2 * a + choice) % r;
++            let bb = (2 * b) % r;
++            let d = j.add(j.mul(g, aa), j.mul(q, bb));
++            let dplus = j.add(d, g);
++            let expected =
++                walk::project_any(d, j, t, acts, p).zip(walk::project_any(dplus, j, t, acts, p));
++            let valid = j.valid(d)
++                && j.valid(dplus)
++                && expected
++                    .is_some_and(|(e, ep)| walk::same_k(nk, e, p) && walk::same_k(nkp, ep, p));
++            return Advance {
++                next: valid.then_some((nk, nkp)),
++                choice,
++                roots, evaluated, selected,
++                used_fallback: false,
++                fallback_validity_checks: 0,
++                transition_checks: 2,
++                validation_failed: !valid,
++            };
++        }
++        return Advance {
++            next,
++            choice,
++            roots, evaluated, selected,
++            used_fallback: false,
++            fallback_validity_checks: 0,
++            transition_checks: 0,
++            validation_failed: false,
++        };
++    }
++    // The labels determine the signed successor without a discrete-log
++    // oracle. Arithmetic here is native Jacobian arithmetic and is charged.
++    let next = signed_fallback(j, t, acts, p, r, g, q, a, b, choice);
++    Advance {
++        next,
++        choice,
++        roots, evaluated, selected,
++        used_fallback: true,
++        fallback_validity_checks: 2,
++        transition_checks: 0,
++        validation_failed: false,
++    }
++}
++
++pub fn run(output_dir: &str) {
++    let theta_rows =
++        fs::read_to_string("research/kummer_theta_20261022/results/theta-models.jsonl").unwrap();
++    let mut theta = BTreeMap::new();
++    let mut normal = BTreeMap::new();
++    for line in theta_rows.lines() {
++        let v: Value = serde_json::from_str(line).unwrap();
++        let p = v["p"].as_u64().unwrap();
++        theta.insert(p, v["selected"]["constants"].clone());
++        normal.insert(
++            p,
++            (
++                v["selected"]["r0"].as_u64().unwrap(),
++                v["selected"]["delta"].as_u64().unwrap(),
++            ),
++        );
++    }
++    let model_rows =
++        fs::read_to_string("research/kummer_coordinates_20261022/results/generic-models.jsonl")
++            .unwrap();
++    let mut actions = BTreeMap::new();
++    for line in model_rows.lines() {
++        let v: Value = serde_json::from_str(line).unwrap();
++        let p = v["p"].as_u64().unwrap();
++        let (r0, delta) = normal[&p];
++        let acts: Vec<_> = v["torsion_actions"]
++            .as_array()
++            .unwrap()
++            .iter()
++            .map(|z| {
++                (
++                    mul_mod(
++                        sub_mod(z["root"].as_u64().unwrap(), r0, p),
++                        inv_mod(delta, p),
++                        p,
++                    ),
++                    parse_matrix(&z["action"]["matrix"]),
++                )
++            })
++            .collect();
++        actions.insert(p, acts);
++    }
++    let max_targets = std::env::var("KUMMER_TARGET_CAP")
++        .ok()
++        .and_then(|x| x.parse::<usize>().ok())
++        .unwrap_or(1260);
++    let start_index = std::env::var("KUMMER_START_INDEX")
++        .ok()
++        .and_then(|x| x.parse::<usize>().ok())
++        .unwrap_or(0);
++    let mut completed = 0;
++    let mut solved = 0;
++    let mut seen_targets = 0;
++    let validate_transitions =
++        std::env::var("KUMMER_VALIDATE_TRANSITIONS").ok().as_deref() == Some("1");
++    for bits in [16, 20, 24, 28, 32, 36, 40] {
++        let input = fs::read_to_string(format!(
++            "research/kummer_coordinates_20261022/results/target-gate-{bits}.jsonl"
++        ))
++        .unwrap();
++        let mut out = String::new();
++        for line in input.lines() {
++            let global_index = seen_targets;
++            seen_targets += 1;
++            if global_index < start_index {
++                continue;
++            }
++            if completed == max_targets {
++                break;
++            }
++            let v: Value = serde_json::from_str(line).unwrap();
++            let p = v["p"].as_u64().unwrap();
++            let r = v["r"].as_u64().unwrap();
++            walk::reset_ops();
++            signed::reset_ops();
++            let t = &theta[&p];
++            let acts = &actions[&p];
++            let f = signed::curve_coeff(t, p);
++            let j = Jacobian {
++                f: Field::new(p, 1, 0),
++                polynomial: f[..6].to_vec(),
++            };
++            let cases = v["cases"].as_array().unwrap();
++            let g: Divisor =
++                serde_json::from_value(cases[1]["coordinate_witness"]["jacobian_expected"].clone())
++                    .unwrap();
++            let q: Divisor =
++                serde_json::from_value(cases[2]["coordinate_witness"]["jacobian_expected"].clone())
++                    .unwrap();
++            let kg = parse_vec4(&cases[1]["coordinate_witness"]["k_expected"]);
++            let mut k = parse_vec4(&cases[2]["coordinate_witness"]["k_expected"]);
++            let mut kp = parse_vec4(&cases[3]["coordinate_witness"]["k_expected"]);
++            let k0 = ["a", "b", "c", "d"].map(|key| t[key].as_u64().unwrap());
++            let consts = ["A", "B", "C", "D"].map(|key| t[key].as_u64().unwrap());
++            let ring = Ring::new(r);
++            let mut graph = SignedGraph::new(ring.clone());
++            let mut nodes = HashMap::new();
++            let mut relation_seen = HashSet::new();
++            let mut walk_seen = HashSet::new();
++            let mut rng = Rng(v["algorithm_seed"]
++                .as_str()
++                .unwrap()
++                .parse::<u64>()
++                .unwrap()
++                ^ 0x6b756d6d6572);
++            let (mut a, mut b) = (0u64, 1u64);
++            let (
++                mut attempts,
++                mut splits,
++                mut recovery_ok,
++                mut recovery_fail,
++                mut repairs,
++                mut restarts,
++                mut general_skips,
++                mut fallback_steps,
++                mut fallback_failures,
++                mut fallback_checks,
++                mut transition_checks,
++            ) = (
++                0u64, 0u64, 0u64, 0u64, 0u64, 0u64, 0u64, 0u64, 0u64, 0u64, 0u64,
++            );
++            let mut recovered = None;
++            let mut status = "candidate_cap";
++            let cap = 100 * p + 10000;
++            while attempts < cap {
++                let Some(general) = signed::general_coords(k, t, p) else {
++                    general_skips += 1;
++                    let step = advance(
++                        k,
++                        kp,
++                        kg,
++                        k0,
++                        consts,
++                        acts,
++                        &j,
++                        t,
++                        p,
++                        r,
++                        g,
++                        q,
++                        a,
++                        b,
++                        validate_transitions,
++                    );
++                    repairs += step.roots.iter().filter(|x| x.is_some()).count() as u64;
++                    attempts += 1;
++                    if step.used_fallback {
++                        fallback_steps += 1;
++                        fallback_checks += step.fallback_validity_checks;
++                    }
++                    transition_checks += step.transition_checks;
++                    let Some((nk, nkp)) = step.next else {
++                        if step.validation_failed {
++                            status = "transition_mismatch";
++                        } else {
++                            fallback_failures += 1;
++                            status = "fallback_projection_fail";
++                        }
++                        break;
++                    };
++                    a = (2 * a + step.choice) % r;
++                    b = 2 * b % r;
++                    k = nk;
++                    kp = nkp;
++                    continue;
++                };
++                let key = (general[1], general[2], general[3]);
++                if !walk_seen.insert(key) {
++                    restarts += 1;
++                    walk_seen.clear();
++                    a = rng.next() % r;
++                    b = rng.next() % r;
++                    let d = j.add(j.mul(g, a), j.mul(q, b));
++                    let dplus = j.add(d, g);
++                    let Some(kk) = walk::project_any(d, &j, t, acts, p) else {
++                        status = "restart_projection_fail";
++                        break;
++                    };
++                    let Some(kpp) = walk::project_any(dplus, &j, t, acts, p) else {
++                        status = "restart_projection_fail";
++                        break;
++                    };
++                    k = kk;
++                    kp = kpp;
++                    continue;
++                }
++                let a0 = general[2];
++                let a1 = sub_mod(0, general[1], p);
++                let disc = j.f.sub(j.f.sq(a1), j.f.mul(4, a0));
++                if let Some(root) = j.f.sqrt(disc) {
++                    let x0 = j.f.mul(j.f.sub(root, a1), p.div_ceil(2));
++                    let x1 = j.f.mul(j.f.sub(j.f.neg(root), a1), p.div_ceil(2));
++                    if x0 != x1 {
++                        let (signed_d, rec_status, _tested) =
++                            signed::lift(g, k, kp, kg, t, acts, &j, p);
++                        if let Some(d) = signed_d {
++                            recovery_ok += 1;
++                            if !relation_seen.insert(d.min(j.neg(d))) {
++                                // Preserve one relation per signed divisor, as in baseline.
++                            } else {
++                                let y0 = j.f.add(d.v[0], j.f.mul(d.v[1], x0));
++                                let y1 = j.f.add(d.v[0], j.f.mul(d.v[1], x1));
++                                let n0 = *nodes.entry(x0).or_insert_with(|| graph.node());
++                                let n1 = *nodes.entry(x1).or_insert_with(|| graph.node());
++                                splits += 1;
++                                recovered = graph.edge(
++                                    n0,
++                                    if y0 <= p / 2 { 1 } else { -1 },
++                                    n1,
++                                    if y1 <= p / 2 { 1 } else { -1 },
++                                    a,
++                                    b,
++                                );
++                                if let Some(ans) = recovered {
++                                    if j.mul(g, ans) == q && ans == v["planted"].as_u64().unwrap() {
++                                        status = "verified";
++                                    } else {
++                                        status = "wrong_scalar";
++                                    }
++                                    break;
++                                }
++                            }
++                        } else {
++                            recovery_fail += 1;
++                            if rec_status == "D_zero" {
++                                status = "recover_D_zero";
++                            }
++                        }
++                    }
++                }
++                let step = advance(
++                    k,
++                    kp,
++                    kg,
++                    k0,
++                    consts,
++                    acts,
++                    &j,
++                    t,
++                    p,
++                    r,
++                    g,
++                    q,
++                    a,
++                    b,
++                    validate_transitions,
++                );
++                repairs += step.roots.iter().filter(|x| x.is_some()).count() as u64;
++                attempts += 1;
++                if step.used_fallback {
++                    fallback_steps += 1;
++                    fallback_checks += step.fallback_validity_checks;
++                }
++                transition_checks += step.transition_checks;
++                let Some((nk, nkp)) = step.next else {
++                    if step.validation_failed {
++                        status = "transition_mismatch";
++                    } else {
++                        fallback_failures += 1;
++                        status = "fallback_projection_fail";
++                    }
++                    break;
++                };
++                a = (2 * a + step.choice) % r;
++                b = 2 * b % r;
++                k = nk;
++                kp = nkp;
++            }
++            if status == "verified" {
++                solved += 1;
++            }
++            completed += 1;
++            out.push_str(&format!("{}\n",json!({"schema":"kummer-labelled-fallback/v1","bits":bits,"p":p,"r":r,"target_index":v["target_index"],"workload_id":v["workload_id"],"planted":v["planted"],"source_scalar_verified":v["source_scalar_verified"],"status":status,"recovered":recovered,"source_verified":status=="verified","attempts":attempts,"split_relations":splits,"recover_success":recovery_ok,"recover_fail":recovery_fail,"general_conversion_skips":general_skips,"xadd_repairs":repairs,"walk_restarts":restarts,"fallback_steps":fallback_steps,"fallback_failures":fallback_failures,"fallback_validity_checks":fallback_checks,"transition_checks":transition_checks,"transition_validation_enabled":validate_transitions,"graph_cycles":graph.cycles,"graph_operations":graph.operations,"walk_ops":walk::read_ops(),"recover_ops":signed::read_ops(),"field_counts":j.f.counts()})));
++        }
++        fs::create_dir_all(output_dir).unwrap();
++        fs::write(format!("{output_dir}/collector-{bits}.jsonl"), out).unwrap();
++        if completed == max_targets {
++            break;
++        }
++    }
++    println!("completed={completed} solved={solved}");
++}
++fn main() {
++    run("research/kummer_differential_collector_20261022/n19-labelled-fallback/results/collector");
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    fn c2_oracle(d: Divisor, t: &Value, f: &[u64], p: u64) -> [u64; 4] {
++        assert_eq!(d.degree, 2);
++        let mm = |x: u64, y: u64| x * y % p;
++        let aa = |x: u64, y: u64| (x + y) % p;
++        let ss = |x: u64, y: u64| (x + p - y) % p;
++        let (a0, a1, b1) = (d.u[0], d.u[1], d.v[1]);
++        let (l, mu, nu) = (
++            t["lambda"].as_u64().unwrap(),
++            t["mu"].as_u64().unwrap(),
++            t["nu"].as_u64().unwrap(),
++        );
++        let mut c = 1;
++        let mut lin = 0;
++        let mut prev_lin = 0;
++        let mut rem0_over_a0 = 0;
++        for (n, &coef) in f.iter().enumerate() {
++            if n >= 2 {
++                rem0_over_a0 = ss(rem0_over_a0, mm(coef, prev_lin));
++            }
++            let nc = ss(0, mm(a0, lin));
++            let nl = ss(c, mm(a1, lin));
++            prev_lin = lin;
++            (c, lin) = (nc, nl);
++        }
++        let terms = [
++            mm(ss(mu, a0), aa(aa(l, a1), nu)),
++            mm(ss(mm(nu, l), a0), aa(aa(1, a1), mu)),
++            mm(ss(nu, a0), aa(aa(l, a1), mu)),
++            mm(ss(mm(mu, l), a0), aa(aa(1, a1), nu)),
++        ];
++        let scale = ["a", "b", "c", "d"].map(|key| t[key].as_u64().unwrap());
++        std::array::from_fn(|i| mm(scale[i], ss(ss(terms[i], mm(b1, b1)), rem0_over_a0)))
++    }
++
++    #[test]
++    fn all_models_force_zero_xadd_and_reconstruct_signed_successor() {
++        std::env::set_current_dir(std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../.."))
++            .unwrap();
++        let theta_rows =
++            fs::read_to_string("research/kummer_theta_20261022/results/theta-models.jsonl")
++                .unwrap();
++        let theta: BTreeMap<u64, Value> = theta_rows
++            .lines()
++            .map(|line| {
++                let v: Value = serde_json::from_str(line).unwrap();
++                (v["p"].as_u64().unwrap(), v["selected"]["constants"].clone())
++            })
++            .collect();
++        let mut seen = HashSet::new();
++        for bits in [16, 20, 24, 28, 32, 36, 40] {
++            let input = fs::read_to_string(format!(
++                "research/kummer_coordinates_20261022/results/target-gate-{bits}.jsonl"
++            ))
++            .unwrap();
++            for line in input.lines() {
++                let v: Value = serde_json::from_str(line).unwrap();
++                let p = v["p"].as_u64().unwrap();
++                if !seen.insert(p) {
++                    continue;
++                }
++                let t = &theta[&p];
++                let f = signed::curve_coeff(t, p);
++                let j = Jacobian {
++                    f: Field::new(p, 1, 0),
++                    polynomial: f[..6].to_vec(),
++                };
++                let cases = v["cases"].as_array().unwrap();
++                let g: Divisor = serde_json::from_value(
++                    cases[1]["coordinate_witness"]["jacobian_expected"].clone(),
++                )
++                .unwrap();
++                let q: Divisor = serde_json::from_value(
++                    cases[2]["coordinate_witness"]["jacobian_expected"].clone(),
++                )
++                .unwrap();
++                let kg = parse_vec4(&cases[1]["coordinate_witness"]["k_expected"]);
++                let k = parse_vec4(&cases[2]["coordinate_witness"]["k_expected"]);
++                let kp = parse_vec4(&cases[3]["coordinate_witness"]["k_expected"]);
++                let constants = ["A", "B", "C", "D"].map(|key| t[key].as_u64().unwrap());
++                let r = v["r"].as_u64().unwrap();
++                // A zero difference forces the cleared xADD vector to zero
++                // in both doubling calls, hence at least one chosen output.
++                let forced = advance(
++                    k,
++                    kp,
++                    kg,
++                    [0; 4],
++                    constants,
++                    &[],
++                    &j,
++                    t,
++                    p,
++                    r,
++                    g,
++                    q,
++                    0,
++                    1,
++                    true,
++                );
++                assert!(forced.used_fallback, "p={p}");
++                let (out, out_plus) = forced.next.expect("signed fallback projection");
++                let aa = forced.choice % r;
++                let bb = 2 % r;
++                let d = j.add(j.mul(g, aa), j.mul(q, bb));
++                let dplus = j.add(d, g);
++                let independent_d = if forced.choice == 0 {
++                    j.add(q, q)
++                } else {
++                    j.add(j.add(q, q), g)
++                };
++                assert_eq!(d, independent_d, "signed label invariant p={p}");
++                assert!(j.valid(d) && j.valid(dplus));
++                if d.degree == 2 {
++                    assert!(walk::same_k(out, c2_oracle(d, t, &f, p), p));
++                }
++                if dplus.degree == 2 {
++                    assert!(walk::same_k(out_plus, c2_oracle(dplus, t, &f, p), p));
++                }
++                assert!(walk::same_k(
++                    walk::project_any(g, &j, t, &[], p).unwrap(),
++                    kg,
++                    p
++                ));
++                assert!(walk::same_k(
++                    walk::project_any(q, &j, t, &[], p).unwrap(),
++                    k,
++                    p
++                ));
++                assert!(walk::same_k(
++                    walk::project_any(j.add(q, g), &j, t, &[], p).unwrap(),
++                    kp,
++                    p
++                ));
++                let k0 = ["a", "b", "c", "d"].map(|key| t[key].as_u64().unwrap());
++                let (mut regular_k, mut regular_kp) = (k, kp);
++                let (mut label_a, mut label_b) = (0, 1);
++                for _ in 0..3 {
++                    let step = advance(
++                        regular_k,
++                        regular_kp,
++                        kg,
++                        k0,
++                        constants,
++                        &[],
++                        &j,
++                        t,
++                        p,
++                        r,
++                        g,
++                        q,
++                        label_a,
++                        label_b,
++                        true,
++                    );
++                    assert!(!step.validation_failed, "regular transition p={p}");
++                    assert_eq!(
++                        step.transition_checks,
++                        if step.used_fallback { 0 } else { 2 }
++                    );
++                    (regular_k, regular_kp) = step.next.expect("validated regular pair");
++                    label_a = (2 * label_a + step.choice) % r;
++                    label_b = 2 * label_b % r;
++                }
++                assert!(j.f.counts().jac_adds > 0);
++                assert!(walk::project_any(Divisor::O, &j, t, &[], p).is_some());
++                let zero_numerator = Divisor {
++                    degree: 2,
++                    u: [0, p - 1, 1],
++                    v: [0, 0],
++                };
++                assert!(j.valid(zero_numerator));
++                assert!(walk::project_divisor(zero_numerator, t, p).is_none());
++                let repaired = walk::project_any(zero_numerator, &j, t, &[], p).unwrap();
++                assert!(walk::same_k(
++                    repaired,
++                    c2_oracle(zero_numerator, t, &f, p),
++                    p
++                ));
++                for x in [
++                    0,
++                    1,
++                    t["lambda"].as_u64().unwrap(),
++                    t["mu"].as_u64().unwrap(),
++                    t["nu"].as_u64().unwrap(),
++                ] {
++                    let branch = Divisor {
++                        degree: 1,
++                        u: [sub_mod(0, x, p), 1, 0],
++                        v: [0, 0],
++                    };
++                    assert!(j.valid(branch));
++                    assert!(walk::project_any(branch, &j, t, &[], p).is_some());
++                }
++            }
++        }
++        assert_eq!(seen.len(), 21);
++    }
++}
++
++pub fn original_gstep_fixture(input:&Value)->Value{
++ let v=&input["target"];let th=&input["theta"]["selected"];let t=&th["constants"];let p=v["p"].as_u64().unwrap();let r=v["r"].as_u64().unwrap();assert!((2..=(1u64<<63)).contains(&r));let r0=th["r0"].as_u64().unwrap();let delta=th["delta"].as_u64().unwrap();let acts:Vec<_>=input["model"]["torsion_actions"].as_array().unwrap().iter().map(|z|(mul_mod(sub_mod(z["root"].as_u64().unwrap(),r0,p),inv_mod(delta,p),p),parse_matrix(&z["action"]["matrix"]))).collect();let f=signed::curve_coeff(t,p);let j=Jacobian{f:Field::new(p,1,0),polynomial:f[..6].to_vec()};let cases=v["cases"].as_array().unwrap();let g:Divisor=serde_json::from_value(cases[1]["coordinate_witness"]["jacobian_expected"].clone()).unwrap();let q:Divisor=serde_json::from_value(cases[2]["coordinate_witness"]["jacobian_expected"].clone()).unwrap();assert!(j.valid(g)&&j.valid(q));assert_ne!(j.add(g,g),Divisor::O);assert_eq!(j.mul(g,r),Divisor::O);assert_eq!(j.mul(q,r),Divisor::O);
++ let before=j.f.counts();walk::reset_ops();signed::reset_ops();let qg=j.add(q,g);let(mut k,mut kp)=(walk::project_any(q,&j,t,&acts,p).unwrap(),walk::project_any(qg,&j,t,&acts,p).unwrap());let kg=walk::project_any(g,&j,t,&acts,p).unwrap();let k0=walk::project_any(Divisor::O,&j,t,&acts,p).unwrap();let initialization=json!({"field":j.f.counts()-before,"walk":walk::read_ops(),"signed":signed::read_ops()});let constants=["A","B","C","D"].map(|z|t[z].as_u64().unwrap());let(mut a,mut b)=(0,1);let mut rows=vec![];let mut adapter=crate::graph::Adapter::new(r);
++ for index in 0..3{
++  assert!(a<r&&b<r);walk::reset_ops();signed::reset_ops();let before=j.f.counts();let step=advance(k,kp,kg,k0,constants,&acts,&j,t,p,r,g,q,a,b,false);let transition=json!({"field":j.f.counts()-before,"walk":walk::read_ops(),"signed":signed::read_ops()});a=(2*a+step.choice)%r;b=2*b%r;
++  let Some((nk,nkp))=step.next else{rows.push(json!({"index":index,"status":"step_failed","choice":step.choice,"labels":[a,b],"transition":transition,"fallback":step.used_fallback,"pass":false}));break;};
++  // No expected signed point is computed until after recovery consumes propagated pair.
++  walk::reset_ops();signed::reset_ops();let before=j.f.counts();let(recovered,status,tested)=signed::lift(g,nk,nkp,kg,t,&acts,&j,p);let recovery=json!({"field":j.f.counts()-before,"walk":walk::read_ops(),"signed":signed::read_ops()});
++  let graph_row=adapter.consume(&j,recovered,a,b);let terminal=graph_row["answer"].as_u64();
++  walk::reset_ops();signed::reset_ops();let before=j.f.counts();let expected=j.add(j.mul(g,a),j.mul(q,b));let ep=j.add(expected,g);let expected_pair=[expected,ep].map(|d|walk::project_any(d,&j,t,&acts,p).unwrap());let corners=[walk::same_k(nk,expected_pair[0],p),walk::same_k(nkp,expected_pair[1],p)];let signed_ok=recovered==Some(expected);let verification=json!({"field":j.f.counts()-before,"walk":walk::read_ops(),"signed":signed::read_ops()});
++  rows.push(json!({"index":index,"status":"checked","choice":step.choice,"labels":[a,b],"pair":[nk,nkp],"roots":step.roots,"evaluated":step.evaluated,"selected":step.selected,"fallback":step.used_fallback,"fallback_checks":step.fallback_validity_checks,"internal_transition_checks":step.transition_checks,"corner_matches":corners,"recovered":recovered,"expected":expected,"recovery_status":status,"recovery_tested":tested,"signed_ok":signed_ok,"pass":corners.iter().all(|&x|x)&&signed_ok,"graph":graph_row,"counts":{"transition":transition,"recovery":recovery,"verification":verification}}));k=nk;kp=nkp;if let Some(ans)=terminal{assert_eq!(j.mul(g,ans),q);assert_eq!(Some(ans),v["planted"].as_u64());break;}
++ }
++ json!({"p":p,"r":r,"workload_id":v["workload_id"],"initialization":initialization,"rows":rows})
++}
++pub fn duplicate_fixture(input:&Value)->Value{
++ let v=&input["target"];let t=&input["theta"]["selected"]["constants"];let p=v["p"].as_u64().unwrap();let r=v["r"].as_u64().unwrap();let k=v["planted"].as_u64().unwrap();assert_eq!((p,r,k),(739,34147,31124));let f=signed::curve_coeff(t,p);let j=Jacobian{f:Field::new(p,1,0),polynomial:f[..6].to_vec()};let cases=v["cases"].as_array().unwrap();let g:Divisor=serde_json::from_value(cases[1]["coordinate_witness"]["jacobian_expected"].clone()).unwrap();let q:Divisor=serde_json::from_value(cases[2]["coordinate_witness"]["jacobian_expected"].clone()).unwrap();let d:Divisor=serde_json::from_value(input["retained_divisor"].clone()).unwrap();let(a,b)=(2u64,8u64);let before=j.f.counts();assert!(j.valid(d));assert_eq!(j.mul(g,k),q);assert_eq!(j.add(j.mul(g,a),j.mul(q,b)),d);let input_validation=j.f.counts()-before;
++ let alt_a=(a+k)%r;let alt_b=(b+r-1)%r;let mut out=vec![];
++ for name in["informative_same","informative_opposite","redundant_same","redundant_opposite","invalid_zero_target","invalid_wrong_candidate","noncanonical","changed_target"]{
++  let actual_q=if name=="changed_target"{j.mul(g,2)}else{q};let before=j.f.counts();let mut labels=crate::duplicate::Labels::new(&j,g,actual_q,r);let initialization=j.f.counts()-before;let mut graph=crate::graph::Adapter::new(r);
++  let first=labels.ingest(d,a,b);assert_eq!(first["emit_graph_edge"],true);
++  // Crucial: normalized labels belong ONLY to the table's canonical key.
++  // First graph edge receives the original signed divisor and original labels.
++  let edge=graph.consume(&j,Some(d),a,b);assert_eq!(edge["status"],"inserted");let before_graph=graph.snapshot();
++  let(dd,aa,bb,expected)=match name{
++   "informative_same"=>(d,alt_a,alt_b,"candidate_verified"),
++   "informative_opposite"=>(j.neg(d),(r-alt_a)%r,(r-alt_b)%r,"candidate_verified"),
++   "redundant_same"=>(d,a,b,"redundant"),
++   "redundant_opposite"=>(j.neg(d),r-a,r-b,"redundant"),
++   "invalid_zero_target"=>(d,a+1,b,"invariant_error"),
++   "invalid_wrong_candidate"=>(d,(alt_a+1)%r,alt_b,"candidate_rejected"),
++   "noncanonical"=>(d,r,b,"noncanonical_label"),
++   _=>(d,alt_a,alt_b,"candidate_rejected")};
++  let before=j.f.counts();let valid_label=aa<r&&bb<r&&j.add(j.mul(g,aa),j.mul(actual_q,bb))==dd;let label_reference=j.f.counts()-before;
++  let second=labels.ingest(dd,aa,bb);assert_eq!(second["status"],expected);assert_eq!(second["emit_graph_edge"],false);let after_graph=graph.snapshot();assert_eq!(before_graph,after_graph);assert_eq!(after_graph["equations"],1);assert_eq!(after_graph["cycles"],0);
++  if expected=="candidate_verified"{assert_eq!(second["answer"],k);assert!(valid_label)}else{assert!(second["answer"].is_null())}
++  if name.starts_with("redundant"){assert!(valid_label)}
++  out.push(json!({"name":name,"first":first,"first_graph_edge":edge,"second_input":{"divisor":dd,"a":aa,"b":bb},"second":second,"label_valid":valid_label,"before_graph":before_graph,"after_graph":after_graph,"initialization_field":initialization,"label_reference_field":label_reference,"pass":true}));
++ }
++ json!({"schema":"native-signed-duplicate-adapter/v1","p":p,"r":r,"planted":k,"public_known_answer":true,"alternate_labels_deliberately_planted":true,"new_trajectory_executed":false,"input_validation_field":input_validation,"controls":out,"all_pass":true})
++}

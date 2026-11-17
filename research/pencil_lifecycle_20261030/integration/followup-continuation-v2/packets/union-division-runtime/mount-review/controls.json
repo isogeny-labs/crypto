@@ -1,0 +1,589 @@
+{
+  "schema": "independent.pure-parser-controls/v1",
+  "cases": [
+    {
+      "case": "permutation-0",
+      "input_type": "bytes",
+      "expected_acceptance": true,
+      "accepted": true,
+      "input_sha256": "405bf7de821c0b1185c5686204cfa3a9a678b45d6e1d3a0382dfa546a06f3438",
+      "result": {
+        "schema": "software.exact-mount-diff/v1",
+        "changes": [
+          {
+            "kind": "added",
+            "path": "/fixtures"
+          },
+          {
+            "kind": "added",
+            "path": "/qualification"
+          },
+          {
+            "kind": "added",
+            "path": "/qualification/exec-gate"
+          }
+        ],
+        "writer_attribution": null,
+        "no_writes_claim": false
+      }
+    },
+    {
+      "case": "permutation-1",
+      "input_type": "bytes",
+      "expected_acceptance": true,
+      "accepted": true,
+      "input_sha256": "7dc8614e14303fc9c1ef98b2da635b19ecd26c6119746a19dd4914e0ca2ce140",
+      "result": {
+        "schema": "software.exact-mount-diff/v1",
+        "changes": [
+          {
+            "kind": "added",
+            "path": "/fixtures"
+          },
+          {
+            "kind": "added",
+            "path": "/qualification"
+          },
+          {
+            "kind": "added",
+            "path": "/qualification/exec-gate"
+          }
+        ],
+        "writer_attribution": null,
+        "no_writes_claim": false
+      }
+    },
+    {
+      "case": "permutation-2",
+      "input_type": "bytes",
+      "expected_acceptance": true,
+      "accepted": true,
+      "input_sha256": "fb1e10af914b4e11b49e0f0c8c53fd77416f3ce2f6a9a36cfaebb215acba5729",
+      "result": {
+        "schema": "software.exact-mount-diff/v1",
+        "changes": [
+          {
+            "kind": "added",
+            "path": "/fixtures"
+          },
+          {
+            "kind": "added",
+            "path": "/qualification"
+          },
+          {
+            "kind": "added",
+            "path": "/qualification/exec-gate"
+          }
+        ],
+        "writer_attribution": null,
+        "no_writes_claim": false
+      }
+    },
+    {
+      "case": "permutation-3",
+      "input_type": "bytes",
+      "expected_acceptance": true,
+      "accepted": true,
+      "input_sha256": "0f6371185b0230f9ffdaee67123ce88b48e6b3844b3aeecdf36302254936853d",
+      "result": {
+        "schema": "software.exact-mount-diff/v1",
+        "changes": [
+          {
+            "kind": "added",
+            "path": "/fixtures"
+          },
+          {
+            "kind": "added",
+            "path": "/qualification"
+          },
+          {
+            "kind": "added",
+            "path": "/qualification/exec-gate"
+          }
+        ],
+        "writer_attribution": null,
+        "no_writes_claim": false
+      }
+    },
+    {
+      "case": "permutation-4",
+      "input_type": "bytes",
+      "expected_acceptance": true,
+      "accepted": true,
+      "input_sha256": "eeaa86874a70f0aef36885ecbb0016b9936edf760b21060fff0b3dbaf3aa6e8f",
+      "result": {
+        "schema": "software.exact-mount-diff/v1",
+        "changes": [
+          {
+            "kind": "added",
+            "path": "/fixtures"
+          },
+          {
+            "kind": "added",
+            "path": "/qualification"
+          },
+          {
+            "kind": "added",
+            "path": "/qualification/exec-gate"
+          }
+        ],
+        "writer_attribution": null,
+        "no_writes_claim": false
+      }
+    },
+    {
+      "case": "permutation-5",
+      "input_type": "bytes",
+      "expected_acceptance": true,
+      "accepted": true,
+      "input_sha256": "f988e2403c2ef391145578e2a11ecc7969d3adaff0bd50206c053938389ee25b",
+      "result": {
+        "schema": "software.exact-mount-diff/v1",
+        "changes": [
+          {
+            "kind": "added",
+            "path": "/fixtures"
+          },
+          {
+            "kind": "added",
+            "path": "/qualification"
+          },
+          {
+            "kind": "added",
+            "path": "/qualification/exec-gate"
+          }
+        ],
+        "writer_attribution": null,
+        "no_writes_claim": false
+      }
+    },
+    {
+      "case": "retained-v5-diff",
+      "input_type": "bytes",
+      "expected_acceptance": true,
+      "accepted": true,
+      "input_sha256": "0f6371185b0230f9ffdaee67123ce88b48e6b3844b3aeecdf36302254936853d",
+      "result": {
+        "schema": "software.exact-mount-diff/v1",
+        "changes": [
+          {
+            "kind": "added",
+            "path": "/fixtures"
+          },
+          {
+            "kind": "added",
+            "path": "/qualification"
+          },
+          {
+            "kind": "added",
+            "path": "/qualification/exec-gate"
+          }
+        ],
+        "writer_attribution": null,
+        "no_writes_claim": false
+      }
+    },
+    {
+      "case": "str-type",
+      "input_type": "str",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "c2d892e9134e2446bb57279936f6be923f594b2b63db55eb4b60e1e0235f1471",
+      "result": {
+        "exception": "ValueError",
+        "message": "bytes/cap"
+      }
+    },
+    {
+      "case": "bytearray-type",
+      "input_type": "bytearray",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "9d1c7a138ac84b648050f8a266adfae88e229dd6f4e430f25495c6d81b3d90c1",
+      "result": {
+        "exception": "ValueError",
+        "message": "bytes/cap"
+      }
+    },
+    {
+      "case": "memoryview-type",
+      "input_type": "memoryview",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "161533ffec11b2a4f8e6bc590d8706bc2213ae592cba71a52a8631ca5efce1b2",
+      "result": {
+        "exception": "ValueError",
+        "message": "bytes/cap"
+      }
+    },
+    {
+      "case": "bytes-subclass",
+      "input_type": "BytesSubclass",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "17d7984d17a8381d7ff2139011d65c7a51dadeb34123146eb1860b922d6ea73a",
+      "result": {
+        "exception": "ValueError",
+        "message": "bytes/cap"
+      }
+    },
+    {
+      "case": "null-type",
+      "input_type": "NoneType",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "dc937b59892604f5a86ac96936cd7ff09e25f18ae6b758e8014a24c7fa039e91",
+      "result": {
+        "exception": "ValueError",
+        "message": "bytes/cap"
+      }
+    },
+    {
+      "case": "integer-type",
+      "input_type": "int",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+      "result": {
+        "exception": "ValueError",
+        "message": "bytes/cap"
+      }
+    },
+    {
+      "case": "empty",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {
+        "exception": "ValueError",
+        "message": "final newline"
+      }
+    },
+    {
+      "case": "partial",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "ee705b6e1269a3ea3e97376044221457b88fbc74f626b3ad267fea6c1dc63bb1",
+      "result": {
+        "exception": "ValueError",
+        "message": "three unique changes required"
+      }
+    },
+    {
+      "case": "duplicate",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "f2856254acbf1539a84b3da9d49082b1a3488510a403ac70f6999fc04baf2f64",
+      "result": {
+        "exception": "ValueError",
+        "message": "three unique changes required"
+      }
+    },
+    {
+      "case": "missing-newline",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "e8eafd1ef65def0509441e64fab44b1bdd2920b14844846e2b7bfa33bc86ae2c",
+      "result": {
+        "exception": "ValueError",
+        "message": "final newline"
+      }
+    },
+    {
+      "case": "double-newline",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "f3a3d4b7fe62289526b56677baf801a8262a06fcb7f8258505cc6fe814822d2d",
+      "result": {
+        "exception": "ValueError",
+        "message": "final newline"
+      }
+    },
+    {
+      "case": "leading-newline",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "242d80a5993d7431c99da8c3f131ce0c70f0f292247e966654b3c1bf09120bee",
+      "result": {
+        "exception": "ValueError",
+        "message": "three unique changes required"
+      }
+    },
+    {
+      "case": "CRLF",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "52b1d5ccf9ffe9c31d201fc7a42bcd38b82e0d49d747af814a3f026e85f07541",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    },
+    {
+      "case": "CR-only",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "a19bfec339b415b534c22321ade738b9a20ac11849572a13fec01b8ae78550d5",
+      "result": {
+        "exception": "ValueError",
+        "message": "final newline"
+      }
+    },
+    {
+      "case": "unicode-lookalike",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "2befa634ca175ba5cfa24cc65f5aa1de821438c45e7b14933e614a8f4b6e2b7c",
+      "result": {
+        "exception": "ValueError",
+        "message": "ASCII"
+      }
+    },
+    {
+      "case": "invalid-utf8",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "583921ea8eb061d2786e871ae2e78bb7e6fe4d54ef531771d63f937348a6d4c4",
+      "result": {
+        "exception": "ValueError",
+        "message": "ASCII"
+      }
+    },
+    {
+      "case": "NUL",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "5d879e18c5d476a490c2c6b90f49505f77408803404cbf3e555dbe04ed0ba382",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    },
+    {
+      "case": "tab-separator",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "a54a5d8d5bdd33de46e050dd17ee9627d4d827a98b57572c4d0a67eb0b15c65d",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    },
+    {
+      "case": "double-space",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "2ecec6f9cf8d195a4c6f92a78a30e9daccce5b6b6f4d9e9bfb5bc922c84fad3f",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    },
+    {
+      "case": "trailing-space",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "db0ab12657bbad511036bd8df5c0f2d8181fae83dc7db301620355f325c91256",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    },
+    {
+      "case": "leading-space",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "8a5970654c4f16f44684dd6e062f91594834ed5cf5b70a72d118b89780dfba84",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    },
+    {
+      "case": "lowercase-operation",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "a036a2a53d81d7ad66cb773ceeedc2504471409ca7f04f5e3635e29ee5233434",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    },
+    {
+      "case": "dot-component",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "cc33d3ad6b000c9685e557e6c6645286c774b439a4762e32fb3799d5d2fba581",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    },
+    {
+      "case": "parent-component",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "7e1ebc070ef2bc417021c941b72c7d1d1edbf0ec34cf07b4466b3cb5ab8a709f",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    },
+    {
+      "case": "double-slash",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "d6206643ed274b98b854357103eff5bf3d8c9ba0b0f6c826708c615230f7728e",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    },
+    {
+      "case": "trailing-slash",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "2da91735bb3ed46f5dc1ec2789858a0527f4289317438f6bb50ebcbae42d1ec8",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    },
+    {
+      "case": "prefix-lookalike",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "deded7a47cae22e5802e9cbffe809c2ffd9bfd802248f60c0407d8d3521f572c",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    },
+    {
+      "case": "extra-child",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "316a1e67e3cbff268e2b9d4d8440f2fe7797e7290426aa92417e96ab08609762",
+      "result": {
+        "exception": "ValueError",
+        "message": "three unique changes required"
+      }
+    },
+    {
+      "case": "oversized-1025",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "c6d8e9905300876046729949cc95c2385221270d389176f7234fe7ac00c4e430",
+      "result": {
+        "exception": "ValueError",
+        "message": "bytes/cap"
+      }
+    },
+    {
+      "case": "oversized-1024-malformed",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7",
+      "result": {
+        "exception": "ValueError",
+        "message": "final newline"
+      }
+    },
+    {
+      "case": "C-line-0",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "3c0e7bf87aa4b3540136064ccfed72144d7b4fc2f5ebd3d6c47859d2ee1a43d1",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    },
+    {
+      "case": "C-line-1",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "8c00bdf4ce971afea86cb29f407efc5bbe6cc32ed08854eb89c9c4151485d61b",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    },
+    {
+      "case": "C-line-2",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "4c0dfa0e7e0729cb69f3d2928a405cd36780633959ba77d7f80497d1765dd090",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    },
+    {
+      "case": "D-line-0",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "440bc3646992abb5cfbb024f4392ee898187eddee6a08ede82c45a29311ee338",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    },
+    {
+      "case": "D-line-1",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "ab68434d950eaf84d12d48ffd9244067ab63601ee980285d9b62fe8e0ea5ab10",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    },
+    {
+      "case": "D-line-2",
+      "input_type": "bytes",
+      "expected_acceptance": false,
+      "accepted": false,
+      "input_sha256": "a4050195e692b4fcfa6145ad6ea5fb72302ea152f0f0416e4963a554c1f332ea",
+      "result": {
+        "exception": "ValueError",
+        "message": "unexpected change"
+      }
+    }
+  ],
+  "count": 43,
+  "accepted": 7,
+  "rejected": 36,
+  "all_expected": true,
+  "docker_invoked": false,
+  "runtime_execution": false
+}

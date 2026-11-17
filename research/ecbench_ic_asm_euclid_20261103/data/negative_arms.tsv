@@ -1,0 +1,4 @@
+variant	ir_32bit_default_or_arm	note
+guard pre-sized from max_trials (candidate c1)	670870239	32-bit default arm better, but 20-bit ic.pipeline solves worse: 13173241 (seq 1), 9931323 (seq 2); dropped
+mitm-prime-blocked, candidate c1	549760567	same GAE and logarithm; existing arm, measured for reference
+mitm-prime-batch + targets=walk-prime-fast, candidate c1	971936861	same GAE and logarithm; more instructions; not used

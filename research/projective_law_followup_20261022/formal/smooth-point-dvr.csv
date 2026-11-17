@@ -1,0 +1,9 @@
+id,status,statement,assumptions,evidence,limitation
+derivative_match,checked,explicit derivativeAt equals evaluated quintic derivative,field K,WeightedProjSmoothPointDVR.derivativeAt_eq_quintic_derivative,no geometric smoothness predicate
+jacobian_iff,checked,2y or derivativeAt nonzero iff one affine partial nonzero,field K,WeightedProjSmoothPointDVR.pointwise_jacobian_iff,pointwise differential equivalence only
+local_dvr,checked,affine rational-point localization is DVR,field K; point equation; separable quintic; Jacobian disjunction,WeightedProjSmoothPointDVR.point_local_dvr,no global divisor claim
+projective_dvr,checked,actual weighted-Proj rational-point stalk is DVR,field K; point equation; separable quintic; Jacobian disjunction,WeightedProjSmoothPointDVR.projective_point_dvr,no global divisor claim
+projective_dvr_jacobian,checked,actual point stalk DVR from nonzero affine partial,field K; point equation; separable quintic; one partial nonzero,WeightedProjSmoothPointDVR.projective_point_dvr_of_jacobian,one-way implication
+scheme_smooth_equivalence,open,identify condition with scheme-theoretic Smooth predicate,requires separate formal geometric bridge,,not proved
+global_pic0,open,global principal-divisor and Pic0 class transport,global multiplicities,,not proved
+compiled_semantics,open,connect proof formula to compiled Rust law,code-to-proof relation,,not proved
