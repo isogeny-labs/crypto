@@ -2324,3 +2324,10 @@ What was done: pushedfreeze28fad65adee, hashespass, onceexit0;3profiles roots/mu
 Decisions made: countsnotcoordinates/quotientclasses; rationalnonselfquotient implicationconditionalEndFp=O, no nonhyperelliptic/geometry/speedclaim. Degree659³ andtorsionfield costsmustbeadmitted beforeconstruction. [pcc:unverified].
 Open threads: boundedrepresentativekernel/torsionfield/quotientconstructioncost thennonhyperellipticity/ICevaluation, independentreview andoriginalgenus2+10xgoal.
 Errors: none,no retry/S3/cloud/merge.
+
+## Exceptional659 abstract kernel/pointfield gate frozen
+
+What was done: compileall1316 mixedline symplectic subspaces withrank/isotropy/Frobenius/sigmanonstability anddistinctslope checks; exactFrobeigenorders anddivisorinversion pointorbitcounts scheduled. PrimaryLubiczRobert rationalTheorem1.1/Miliointroduction distinguishkernel equations fromgeometricpoints; inputconstructionnotfree.
+Decisions made: abstractnormalizedeigenbasis only, notactualMumfordpoints/geometrickernelideal; noextensionfield/quotient/speedclaim. Gateexactordernothardcoded, Gitfreeze beforeone120CPU.
+Open threads: deriveactualpointfield/representation requirements anddecideboundedquotientconstructionroute; full10xscopeunchanged.
+Errors: none, unusedhelperwarning; ownT7093confirmed/checkallow/attachownconflict. No scientificexecutionyet/S3/cloud/merge.
