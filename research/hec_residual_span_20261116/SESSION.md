@@ -2156,3 +2156,10 @@ What was done: built fixed8candidate windows sortedknown-residualfirst/publicTor
 Decisions made: original12targets/24calls, same16anchors/3seeds, fullclassification/attempt/proofcost, diagnostictrace inclclassificationcount/native/mutation/repeat gates; Gitfreeze beforeone120CPU. Assertions [pcc:unverified].
 Open threads: executeafterpush, compareagainst eagerclosure andpreclosure notjustweakbaseline; originalgenus2+goal unchanged.
 Errors: onlyunusedwarning,no scienceyet.
+
+## Fixed-window constraint priority qualified, mixed outcome
+
+What was done: freeze8e5b7ecac59 once-onlyexit0;24calls/12originaltargets native/diagnosticclassificationtrace/control/repeat/mutation gatespass. Knownresidualpriorityreducessomeorbits/rows; p601source17case0 base11788->11050, subgroup5808->4746. Source1base regresses slightly, subgroupunchanged fromeager. Assertions [pcc:unverified].
+Decisions made: no uniformgain/10xclaim, comparepreclosureaswell; knownresidual notindependentrank guarantee. Allclassificationcost andregressions retained, no posthocwindowtuning/oraclechoice.
+Open threads: materiallynewcollection/rank mechanism withpubliccostcase+independenttargets; originalgenus2+10x andreview/publication/genus3/4coverage.
+Errors: none,no retry/S3/cloud.
