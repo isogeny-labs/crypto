@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Add ECDB research sweeps and model-ready feature/dataset layer (Codex, started 2026-11-17, branch codex/ecdb-research-sweeps, PR #4566)
+- [x] Add ECDB research sweeps and model-ready feature/dataset layer (Codex, started 2026-11-17, branch codex/ecdb-research-sweeps, PR #4566)
 
 - [x] Freeze and audit #4556 exact-source public B8 RR9 result with native JSON receipt (automation, started 2026-11-17, branch research/prime31-barycentric-evidence-20261117, PR #4558)
 
