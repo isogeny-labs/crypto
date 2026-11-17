@@ -2163,3 +2163,10 @@ What was done: freeze8e5b7ecac59 once-onlyexit0;24calls/12originaltargets native
 Decisions made: no uniformgain/10xclaim, comparepreclosureaswell; knownresidual notindependentrank guarantee. Allclassificationcost andregressions retained, no posthocwindowtuning/oraclechoice.
 Open threads: materiallynewcollection/rank mechanism withpubliccostcase+independenttargets; originalgenus2+10x andreview/publication/genus3/4coverage.
 Errors: none,no retry/S3/cloud.
+
+## Same-orbit residual-pair opportunity gate frozen
+
+What was done: priorweightedLP/self-orbitharvest screened; derivequadraticrecognition P(1+q)^2=qS^2 andunit1±Z^e grounding, buildoriginal12target/16anchor/signedcoreorbit opportunitygate withfulloracle/nativeidentity comparison.
+Decisions made: no minimumyieldassertion, allzero-triggercells retained; notfullsolver/costclaim ornovelrankprinciple. SourcesKB source:b3c90d39a347ef661ccf10680a742186 crypto:research/notes/index-calculus/RESEARCH_HYPERELLIPTIC_IC_RHO.md,revision9b2119e8fbac482b98b50521c0d604bb andlocalgain-graph/self-orbit results. Assertions [pcc:unverified].
+Open threads: pushfreeze thenone120CPU invocation, no-trigger wouldrejectstandalone bootstrapcoverage.
+Errors: usize/u64 phasecast compilefix beforefreeze,no scientificexecutionyet.
