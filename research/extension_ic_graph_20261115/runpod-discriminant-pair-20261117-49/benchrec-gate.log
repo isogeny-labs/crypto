@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "/workspace/crypto/tools/benchrec.py", line 1702, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/workspace/crypto/tools/benchrec.py", line 1691, in main
+    return a.fn(a, root, cfg)
+           ^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto/tools/benchrec.py", line 999, in cmd_gate
+    return cmd_check(ns, root, cfg)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto/tools/benchrec.py", line 953, in cmd_check
+    problems += record_errors(root, cfg, rec, name, require_closed=True,
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto/tools/benchrec.py", line 845, in record_errors
+    if rec.get("validation") and not stored_ok(rec["validation"], "validation file"):
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto/tools/benchrec.py", line 830, in stored_ok
+    if (root / p).is_file():
+        ~~~~~^~~
+TypeError: unsupported operand type(s) for /: 'PosixPath' and 'dict'

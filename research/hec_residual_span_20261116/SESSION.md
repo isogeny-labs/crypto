@@ -717,3 +717,972 @@ Exclusivepfieldphaseattributionandnewrelation-generationmechanismsremainthenexts
 
 ### Errors
 ExternalmergeracedPRupdate: gh edit targeted4518justbeforeitsmergedstatewasobserved. CorrectedbysuccessorPR; no code/result loss.
+
+## Exclusive C4 phase attribution frozen
+
+### What was done
+Copied72callC4studywithonlyexclusivephaselabels/output; nativearithmeticunchanged, separateenabledcounterwrapperpreservestotals. Warningfreebuild. Protocolrequiresoriginalbyte-identicalCONTROL,all16phasesums,phaserepeatsandpriorcorrectnessgates. Noexecutionyet.
+
+### Decisions made
+Previousgoalturnclassifiedprogress(actualstronggroupsolvesandcertificatereplays). Attributeimprovedpencilcostbeforeselectingnewmath; conditionalAmdahlboundsnotuniversalalgorithmicbarriers. Gitcustodycontinues.
+
+### Open threads
+Executeonce,quantifyscan/anchor/setup/residualshares,thennewgeneratorcandidateagainstthisbaseline.
+
+### Errors
+None.
+
+## C4 exclusive phases matched original and changed diagnosis
+
+### What was done
+Atade52b8357cphaseinstrumentexits0,all72calls,CONTROLbyte-identical,1164phasevectorrepeatsand16componentsums exact. Pencilscan30.652–44.618%ofpREDC;eigenvalue18.788–25.314%;verification9.519–13.757%. Conditionaldelete-scan ceiling1.442–1.806. Localobservations. [pcc:unverified]
+
+### Decisions made
+Correctearlierinference: base-fielddifferencebetweenwalksandpencildoesnotmeanpencilcostispredominantlyscanning. Needaddressalgebraicsetup/verificationaswell. InvestigateGaussianFrobeniusnorm/eigenspacetraceorientationnext, no newmathclaimbeforeproof/uniquenesscostgate.
+
+### Open threads
+RecordphasePRsuccessor(parent4523mergedexternallyatc0f639385eechead565181f737f). Develop/checkGaussianroutewithsamepublicNmetadataandallambiguitiesretained.
+
+### Errors
+None. No arithmetic changes or timingmeasurements.
+
+## Gaussian C4 reconstruction candidate prepared
+
+### What was done
+DerivedorientedtwistedtraceviaFpcharacters; enumeratedGaussian normcircle/line intersections underexplicitHdet(unit*p²determinant)hypothesis. Candidatecoretakesonlycurve,N,ell,i; no source/F/lambda. QualificationrequiresfullretainedWeilnormandallcatalogueactionchecks,bothorientations,exactrepeats. Compiled;notexecuted.
+
+### Decisions made
+RetainHdetgeneralproofgap; actualnormfactor/trace/groupcertificatescanqualifyselectedmodelswithoutclaiminggeneraltheorem. Unique-candidategateprecedesanysolverintegration. Componentalonecannotgive10x. PrimaryParkJeongLim2002section3Example2and4.1readinauthorfulltext; automorphism/GLVclassical, nopriorityclaim. IACRPDFfetchunavailable/403.
+
+### Open threads
+Freeze/push/run6orientations×2reps; retainambiguities/failure. Independentlyauditdeterminantlemmaandoperatororientationbeforegeneralpromotion.
+
+### Errors
+None. KBrevisionchangedto9b2119e8fbac482b98b50521c0d604bbduringsearch; newGaussian/eigenspacequeriesproducednoload-bearingexactlead, notabsenceproof.
+
+## Gaussian C4 gate passed all selected orientations
+
+### What was done
+Atf887eea349donce-onlygateexits0,threecurves×twoorientations×tworepetitions; onecandidateeach, fullnormpolynomials/C1/catalogueactions/scalars/repeatsmatch. DerivedG1: p101(-583,9817),p149(1937,21473),p197(3421,37525); corepREDC1318/1944/2568. Ratiosversusoldeigenphase20.435–37.352dependingfield/source. Local observations only. [pcc:unverified]
+
+### Decisions made
+Recordsetupcomponentresult,notintegrated10xgain. No source/F/lambda passedtocore; allordinary/twistedcounts included. RetainHdetgeneralproofgapandoutsidecorequalificationcosts. UpdateopenPR4527scope; no merge.
+
+### Open threads
+IndependentGaussianarithmeticaudit,determinantlemma,thenintegratedcoldsolvecomparisonwithallsourcevalidation/finalchecksretained. Generalgenus2+10xobjectiveactive.
+
+### Errors
+None; allambiguity/certificategatespasswithoutretry.
+
+## Independent Gaussian replay passed; integration prepared
+
+### What was done
+Atfe0851492abstandalonereplayerexits0withall6orientations/all24rawrecords; genericFp²twistedcountandbruteGaussianlineenumerationmatch. No producer/nativeimports. Startedisolatedintegrationcopywithonlyeigenvalueblockreplaced; sourcevalidation andallfinalchecks retained. Localobservations. [pcc:unverified]
+
+### Decisions made
+Selected3modelsalreadyhavefullnorm/actioncertificates, so integrateunderthoseexplicitpreconditions; unrestrictedHdettheoremstillopen. Same72calls/seeds/bounds/streams; exactoutcomeprefixgateagainstc4-solves. No newhiddeninputorqualificationcostsilentlyremoved.
+
+### Open threads
+Freeze/build/push integrationandrunonce; measureallcountedcoldcosts. Separatelyauditgeneralordinarydeterminantlemma.
+
+### Errors
+None. Previousgoalturnclassifiedprogress(newalgebraicprimitiveandexclusivecostdiagnosis).
+
+## Integrated Gaussian C4 solves passed identical prefixes
+
+### What was done
+At1cfe3eee443once-onlyrunexits0with72calls,all12workloadsallarmscomplete,scalars/repeats/prefixespass. Rustsummaryconfirmsall144outcome-prefixrecordsmatchold,all16countersetupdeltasconstantbymodel/source/modulus. Oldpencil/newpencilpREDC1.217–1.326;newfolded/newpencil2.641–6.067. Localobservations. [pcc:unverified]
+
+### Decisions made
+Retainlargeeigencomponentgainasmodestintegratedgain; no10xtotalclaim. No sourcevalidationorfinalcheckremoved. Qualifiedgenus4scopeandgeneralHdetgapremainexplicit. Nextauditgenus2C4scopebeforeextendingroute.
+
+### Open threads
+GeneralHdetreview; genus2C4geometric-splittingobstruction; choosebroadrelation-generationmechanismwithremainingcostscontrolled. Goalactive.
+
+### Errors
+None; no runtimefailureorretry.
+
+## Genus2C4geometric scope obstruction recorded
+
+### What was done
+Derivedexplicitreciprocalinvolutiontau(x,y)=(u²/x,u³y/x³),u4=b,forall smoothgenus2y²=x5+a*x3+b*x. Exactsubstitution,tau²andtwofixedpointscountgivegenus1quotientbyRiemannHurwitz. ReadprimaryShaskaVoelkleinmath/0107142andCardonaQuermath/0203165; klassicalscope, notnewpriority. [pcc:unverified]
+
+### Decisions made
+Do notsubstitutegenus2C4familyforgeneralabsolutelysimplegenus2coverage. GeometricquotientdoesnotimplyFpdescentorDLPspeedup. Retaincurrentgenus4gainandturnbroadersearchtowardmechanismsusableonprime-ordergenus2/3controls.
+
+### Open threads
+GeneralGaussianHdetproofaudit; relationgenerationmechanismwithcostcaseforbroadgenus2+10xobjective.
+
+### Errors
+OriginalrisatprimaryPDFredirectinaccessible; recoveredoriginalsarxiv. KBexactscopequeryunhelpful,nopriorityorabsenceclaim.
+
+## One-orbit core walk prepared after prior-art collision
+
+### What was done
+KBknown-log+sparserowleadcollidedwithexistingRESEARCH_HYPERELLIPTIC_IC_RHO(source:b3c90d39a347ef661ccf10680a742186),metadata/context/relatedread. PrimaryGTTDweightedgraphsectionread. Preparedrank1orbit-historywalkinstead; genericSparseFullincrementalLP-first/nonzero-onlycontrolandOnline exactprefixgate,oldfoldedwalk/bestpencilcontrols. Fixed5prime-orderg2/3models,20freshworkloads/160calls. Noexecutionyet.
+
+### Decisions made
+Do notmarketknown-logwalkasnew. One-orbitstepdiversityvsunknown-historyrankhasanexplicitcostcasebutmixing/rankarrivalunknown; usefreshfalsifierandstrongsparsecontrol. Allsource-normalizationinfo retainedincoreset; genus3filteredpartialschargeallrejections. Previousgoalturnprogress(integratedGaussianchecks).
+
+### Open threads
+Freeze/push/runonce; classifyfullvectors/trialexcess/pencilcomparison. Genuinebroader10xgoalactive.
+
+### Errors
+Pre-freezecopyhadrelative source.rs path; fixedtoretainednormalized/source.rsbeforebuild. No scientificrun/retry. OldConductorleaseexpired; newtaskT7038claimed. KBrevision9b2119e8fbac482b98b50521c0d604bbrefresh06:15predatesnewwork,lexicalonly. Prioradjacentproposal:b2948c1f2af904530de97fdb05ec1589notameasurement.
+
+## One-orbit core route completed and failed tenfold cost gate
+
+### What was done
+At07a6025bf46once-onlyrunexits0;160calls/20freshworkloadsallsolve,420prefixrank/kchecksOnlinevsSparseFullmatch,allrepeats/reductionidentities/scalars pass. g2p601oldfold/candidateellREDC35.713–56.331butpencil/candidatepREDC0.629–0.729;allg3casesalso losepencilpREDC. GeneralSparseFullmatchesorimprovesOnlinearithmeticonallcases. Localobservations. [pcc:unverified]
+
+### Decisions made
+Closeone-orbithistoryasasupported10xrouteonpanel,notabroadimpossibilityclaim. Do notattributecombinedgenerator+incrementalLAgainsolelytogenerator. RetainSparseFullasstrongbaseline; futurepencilLAcomparisonsneedincrementalsparsecontrol. Generalmathematicalgoalactive.
+
+### Open threads
+Integrateincrementalsparsepencilasbaselineengineeringifneeded,thennewrelation-generationleadwithg2+costcase. C4determinantlemma/generalproofgapremainseparate.
+
+### Errors
+No runtimefailures/censoring/retries;9g3p421smoothrowsfilter-rejectedandcharged. Historicalknown-logwalkcollisionpreventedfalsepriorityclaim.
+
+## Orbit-core result wording clarified
+
+### What was done
+Rewrote the derived result report in plain prose and explicitly rejected the route as a tenfold candidate on the registered panel. Raw evidence and frozen producer are unchanged.
+
+### Decisions made
+The general sparse reference prevents attributing avoided zero work or repeated elimination to new mathematics. Preserve the distinction between a component reduction and the stronger pencil comparison.
+
+### Open threads
+A new relation-generation mechanism still needs a complete cost case; the broad objective is active. Generic incremental pencil elimination is a baseline improvement to evaluate separately.
+
+### Errors
+The previous compact phrase about closing a supported candidate was ambiguous; replaced it with an explicit rejection based on the table.
+
+## Incremental sparse pencil baseline prepared
+
+### What was done
+Replaced repeated elimination in isolated copies of the binomial and C4 pencil with general sparse incremental elimination. All row generation and checks remain. A separate counter-disabled gate compares every accepted prefix with the original solver. Compiled successfully; not executed.
+
+### Decisions made
+Use all eight retained models and exactly the previous 32 public workloads. Compare against retained original vectors rather than rerun unchanged benchmarks. Require the entire base-field vector unchanged, all available determining-prefix fields equal, and exact repetition. This strengthens controls; it is engineering, not mathematical priority.
+
+### Open threads
+Freeze and push, execute once, then use the strengthened pencil for the next mathematical lead. The broader tenfold genus-2+ objective remains active.
+
+### Errors
+None. Previous goal turn classified as progress from its completed falsifier and stronger solver reference.
+
+## Incremental pencil baseline completed
+
+### What was done
+At `f5d84e08de0`, 64 calls on 32 workloads across all eight models completed. Old/new solvers agreed at 998 accepted prefixes. All 128 raw record comparisons, scalar checks and repeats pass; every base-field counter is identical. Subgroup inversions improve 2.8–31.7x; REDC improves unevenly and regresses on some small genus-2 cases. Local observations only. [pcc:unverified]
+
+### Decisions made
+Retain both pivot strategies as controls rather than claim uniform dominance. This is solver engineering and does not provide the mathematical tenfold objective. Next screen Kummer projective arithmetic and model prerequisites before prototyping a base-field reduction.
+
+### Open threads
+A mechanism that changes base-field work is still required. Kummer model/field-of-definition requirements and ordinary/prime-order input compatibility need review. Gaussian determinant proof remains separate.
+
+### Errors
+No runtime failures, censoring or retries. The strengthened solver does not uniformly reduce REDC; regressions are retained.
+
+## Kummer route screened without changing the target model
+
+### What was done
+Read primary Müller, Gaudry, Chung–Costello–Smith and Corte-Real Santos–Flynn papers and relevant KB metadata/context. Derived the homogeneous splitting predicate Delta=K2²-4K1K3, including sign/lift/exception obligations. Recorded the rational-node and irreducible-quintic Frobenius-module obstruction to a direct split fast-theta port on the odd-prime-order genus-2 controls. No new experiment ran. [pcc:unverified]
+
+### Decisions made
+Do not borrow split-model operation counts or silently extend to Fp5. Generic Fp Kummer arithmetic remains eligible, but needs a counted differential-addition and signed-recovery circuit before a full solve prototype. Keep general curve scope and final-check/setup costs.
+
+### Open threads
+Concrete generic Kummer circuit cost case; if competitive, freeze original-group/exception/sign controls and then a complete solve comparison. Genus-3/4 and broad tenfold mathematical objective remain open. Gaussian determinant proof is separate.
+
+### Errors
+ePrint and author mirror fetches failed; recovered the Gaudry publisher PDF. Sparse checkout has no src/crates tree, so the limited filename search is not evidence of repository-wide absence. No scientific retry or model substitution.
+
+## Generic Kummer source and symbolic specialization frozen
+
+### What was done
+Recovered Flynn's generic biquadratic expressions and coordinate identity from the primary Oxford archive. The earlier public NN_isogenies source was checked at bdc57f671cea175b512b95d792256440f977242e and found to supply fast-model arithmetic instead. Compiled a Rust-only mathematical expression specialization generator; no scientific execution yet.
+
+### Decisions made
+Freeze stage 1 before symbolic specialization; stage 2 arithmetic primitive gets its own freeze. Preserve source hash/URL, integer tensor output and symmetry/degree gates. No theta model or field change. Previous goal turn is progress from the stronger baseline and model gate.
+
+### Open threads
+Run symbolic preparation once, then implement all-chart generic differential arithmetic and signed recovery cost gate. General tenfold objective remains active.
+
+### Errors
+No formula or runtime failure. Previous task lease expired; claimed T7044 for this distinct kernel gate. KB revision9b2119e8fbac482b98b50521c0d604bb is ready but predates new files. Relevant metadata/context receipts are in SOURCES.md.
+
+## Generic Kummer primitive compiled and frozen
+
+### What was done
+Stage-1 specialization at 6cb42b18896 passed: 16 forms, 238 terms, exact degree and symmetry checks. Compiled an Fp fixed-source quadratic circuit, all-chart differential addition, projective split/root decoder, and charged signed recovery. Stage-2 scientific execution has not started.
+
+### Decisions made
+Use 3168 checked steps including explicit identity/theta/doubled-point controls and exact repeats. Native reference and sign recovery use add_place for degree-one sources. Report setup, kernel prefix and full collector primitive separately; nested kernel is not an additive phase. No full DLP or tenfold claim.
+
+### Open threads
+Execute once, retain every failure or cost regression, then decide whether this implementation has a credible complete collector cost case. Broader genus-3/4 and mathematical objective stay open.
+
+### Errors
+Pre-freeze review caught a zero-cost native identity case that could have no modulus entry; output now represents missing counts as zero. Removed one unused import. No scientific retry. Original Oxford expressions are transformed into attributed mathematical coefficient tensors, not vendored as a program.
+
+## Generic Kummer primitive gate completed
+
+### What was done
+Once-only execution at e3e877638c0 exited 0: 3168 exact checked steps, 1556 signed recoveries, 52 non-first charts; repeats and all 9504 primitive/36 setup records validate. Retained raw data and Rust-derived summaries. [pcc:unverified]
+
+### Decisions made
+Reject this unchanged circuit as the tenfold route: full REDC regresses in every chain group, and even a free-rest kernel bound is at most 4.547. Any nonnegative weighting of the recorded counter components yields at most 3.306, conditional on that incomplete counter model. Do not promote component or optimistic bounds to full runtime. Keep broader genus-2/3/4 objective active. Git custody replaces unavailable S3; no S3 polling.
+
+### Open threads
+A substantially cheaper generic circuit needs a fresh cost case before a full collector experiment. Existing incremental pencil baseline and Gaussian determinant proof obligations remain separate. PR stays open for review, unmerged by this agent.
+
+### Errors
+No execution or exception failure. Cost gate failed; no producer retry or favorable-input substitution. Counter summaries are derived after the frozen run, not a new scientific execution.
+
+## Oriented rational recovery derived
+
+### What was done
+Derived degree-one-source recovery from the two neighboring u polynomials by exact CRT coefficient comparison. Proved that translation by a nonzero Q does not descend from a single sign-quotient coordinate in an odd-prime-order subgroup. Read primary recovery framework and KB sign-resolution overlap. No scientific execution.
+
+### Decisions made
+Keep rational recovery as an untested classical component, with s=0/shared-support/degree-drop fallbacks required. Do not spend a full performance campaign on recovery alone: the retained kernel optimistic bound already falls short of tenfold. Differential orientation does not remove relation sign obligations or unknown source logs.
+
+### Open threads
+A cheaper kernel or mathematically justified higher-yield relation mechanism is needed before another full collector run. Broader genus2/3/4 objective remains active.
+
+### Errors
+Conductor reports this scope held by our own live T7044 lease; no competing scope was taken. No source failure or producer retry. Algebraic derivation is not advertised as replay validation.
+
+## Point-source symbolic sparsity measured
+
+### What was done
+Frozen Rust specialization at4ff60ed3fe3 exited0, retaining all16 exact integer-polynomial forms with6–8 terms each. Derived shared-factor identities B11=U² and B12=U*V+2*(r5+c)*K1² with explicit coefficient expansion. No field benchmark or full-solve run.
+
+### Decisions made
+This supplies a concrete smaller-circuit lead, not tenfold evidence. Complete the other entries/all charts and an exact identity/cost gate before arithmetic execution. Keep original sources/unknown-log accounting and genus2+ objective.
+
+### Open threads
+Complete factored differential circuit and stronger relation-yield mechanism; signed recovery exceptions remain separate. No mathematical breakthrough is claimed.
+
+### Errors
+No symbolic execution failure or retry. No S3 access. Current task remains the same own live lease.
+
+## Full first-chart factorization checked
+
+### What was done
+At frozen3ae4ff9195b the exact coordinate transform and inverse passed all4 first-chart integer-polynomial identities. Derived a complete shared-intermediate schedule and explicit upper-cost ledger, retaining source normalization and exceptional-chart obligations.
+
+### Decisions made
+The straightforward schedule uses23 products/squares plus10 generic reconstruction products before specializations, so it supplies no tenfold cost case. This is an upper schedule, not a mathematical lower bound. Retain the circuit without launching an unjustified full collector run.
+
+### Open threads
+Cheaper all-cost arithmetic or a justified independent-relation-yield mechanism is required; broad genus2/3/4 objective remains active.
+
+### Errors
+No execution failure/retry. No field or wall benchmark performed. Own T7044 lease held throughout edits.
+
+## Written circuit directly qualified and ledger corrected
+
+### What was done
+Frozen09e26f0ee7e direct multivariate expansion passed all4 written identities against original tensors. Derived a19-product shared schedule. Corrected the prior reconstruction count from10 to7: one lead product and two for each remaining output. Retained all raw check records.
+
+### Decisions made
+No performance or tenfold claim from this symbolic check. Candidate general first-chart schedule totals26 products/squares before oracle/recovery/setup; it is an upper schedule, not a lower bound. Full scope stays active and no full collector is admitted by this estimate alone.
+
+### Open threads
+Assess broader relation-yield mechanisms or a stronger complete cost case rather than accumulating unmeasured local optimizations. Genus3/4 obligations remain.
+
+### Errors
+Prior prose overcounted reconstruction by3 products; corrected explicitly. Scientific records are unaffected. No producer retries, S3 access or cloud spend.
+
+## Factored arithmetic gate executed
+
+### What was done
+Frozen7ee004a87fa once-only gate passes3168steps/1556signedrecoveries/52nonfirstcharts and all repeats.6336retained native or degree-two-source records exactly match; all9504records and36setups validate. Point-source kernel REDC falls1.298–1.714 versus old Kummer; full primitive improvement only1.029–1.210. [pcc:unverified]
+
+### Decisions made
+Full primitive remains more REDC than native on every group. Even a free-rest optimistic REDC bound reaches only5.903. Close this unchanged factored circuit as a tenfold candidate, retaining measured component improvement. Seek different yield/cost mechanism rather than an unjustified full collector run. General goal stays active.
+
+### Open threads
+Useful independent-relation yield mechanism, genus3/4 coverage and Gaussian determinant proof remain separate. No completion claim.
+
+### Errors
+No arithmetic/counter failure or retry. No S3 polling/cloud spend. Generic fallback setup and all exception cases retained.
+
+## Higher-dimensional section yield screened
+
+### What was done
+Derived exact2parameter residual-degree and rational-point line-incidence construction. Proved pair-visit identity and carried known single-anchor scaling ambiguity into the larger family. Read primary sieve method and KB overlap before attributing the route.
+
+### Decisions made
+Do not implement naive all-pairs merely to gain q²parameters: conditional split-yield model predicts2–3times more visits per full split relation for g2–4, before parameter cost. This is a heuristic screen, not universal impossibility. A candidate must avoid pair generation or justify structured useful-rank concentration. No science producer executed.
+
+### Open threads
+Find an admissible incidence filter or a different useful-rank mechanism with a complete cost case. General mathematical10xgoal stays active.
+
+### Errors
+Initial source-path guess orbit-core/binomial.rs did not exist; inspected actual incremental/pencil sources. No failed or hidden runtime attempt. Git custody, no S3 polling.
+
+## Streaming completed-bucket gate measured
+
+### What was done
+Frozen3aef9b6acc0 once-only run completes all32workloads/64calls, with1017independent prefix checks and128repeated modulus records. Same source/target scalar results verify. Implemented fixed16point batches and emitted exhausted residual buckets before anchor scan completion.
+
+### Decisions made
+Close this fixed scheduling candidate as tenfold route: base-field REDC ratio at best1.1423 and subgroup ratios mixed, including0.6333regression. No adaptive batch tuning/fullwall/novelty claim. Preserve classical method and full setup/finalchecks. Goal remains active.
+
+### Open threads
+A stronger independent-relation mechanism or complete-cost construction is needed; neither higher-dimensional all-pairs nor stream scheduling supplies it.
+
+### Errors
+No runtime/gate failure or retry. No S3 polling, cloud spending or old-baseline rerun.
+
+## Balanced determinant proof supplied
+
+### What was done
+Read Weinstein Theorem3.3.2 and conventions. Supplied a paper-level proof of Hdet using Gaussian p-divisible idempotents,2+2Lie signature, determinant/cokernel length and Gaussian ideal norm. The proof does not require ordinarity. It invokes standard compatible etale/crystalline weight-one realizations explicitly; no experiment substitutes for these foundations. [pcc:unverified]
+
+### Decisions made
+Keep the new proof note separate from frozen historical reports/sources. No new timing, unique-candidate guarantee, formal certification or tenfold claim. This strengthens a specialgenus4setup construction; it does not silently narrow the general objective.
+
+### Open threads
+Independent review of realization conventions and full reconstruction theorem; a broad useful-relation/cost mechanism remains necessary for10xgenus2+.
+
+### Errors
+Browser502onprimarynotes; curl retrieval succeeded and full theorem/convention text read. No scientific run or S3 polling.
+
+## Orbit-sharing rank screen derived
+
+### What was done
+Derived exact binomial pencil parameter equivariance between transformed anchors and proved scalar-copy rows collapse after the already qualified factor-base contraction. Proved a sigma-stable full residual system would force zero anchor projection when lambda!=1.
+
+### Decisions made
+Do not credit orbit-size savings by scanning representatives of a noninvariant target pencil or count copied folded rows as rank. Explicit orbit-wise arithmetic sharing and genuinely independent anchor relations remain eligible, subject to complete cost case. Mathematical10xgoal remains active.
+
+### Open threads
+A same-anchor filter or an actual shared evaluation DAG must replace the unsupported orbit-saving premise. Genus2/3/4 objective unchanged.
+
+### Errors
+No runtime/gate failure or scientific rerun. No S3 or paidresources. Own T7044 lease held.
+
+## Genus3 Gaussian extension qualified after explicit field amendment
+
+### What was done
+Derived unbalanced determinant d=p*eta,normeta=p and degree3reciprocity. Original92bd5d0ea64 gate fails because fixedpoint ywasrestrictedtoFp2. Frozen diagnostic identifies error; prospectively amended74cbe3a5458 uses valid square-value exponent criterion. All6fixedsmoothmodels/12orientations pass, with unique candidates/fullnormmatches and exactrepeats. Both failure and success retained. [pcc:unverified]
+
+### Decisions made
+Qualify coefficient reconstruction only; no scalar-action, simplicity, performance or10xclaim. Existing binomialg3controls are not this C4family and must not be substituted. Preserve original failedsource/output and explicit amendment. Generalgoal active.
+
+### Open threads
+Independent determinant/convention review and scalar-action/cost qualification on an appropriate unchanged target family; broadgenus2+mechanism remains open.
+
+### Errors
+Standalonev1incorrectlysearchedyonlyinFp2; y^(p²)=-y shows nonzerofixedpointslieoutsideFp2. Corrected onlyinnewfrozenv2withfailurepreserved. Initialcompilewarning resolved beforefreeze usingRust2021. No S3/cloud.
+
+## Direct cyclotomic action screened on original targets
+
+### What was done
+Frozen7d6eba7cb3e compares direct5th/7throot action to charactercertificate on5originalg2/g3models,2sources,2repetitions,2arms. All40calls/80modulusrecords qualify exactFB,z,lambda and sourceaction/repeats. Fullsetup/sourcevalidation counted. [pcc:unverified]
+
+### Decisions made
+Rejectthisreplacementonpanel: baseREDCcandidatecost3.3–4.2xg2or6.4–7.4xg3, despite lowerellfieldarithmetic. No arbitrarymodulusweights/largefieldcrossover/fullsolve/noveltyclaim. Broadgoalactive; usefulrelationmechanismstillneeded.
+
+### Open threads
+No unjustifiednewlargefieldcampaign. A construction with credible completecostcase or usefulrankadvantage isneeded.
+
+### Errors
+No runtime/gatefailureorretry. Existingownleaseclaimrenewalattemptreturnedbudgetexhaustedwhiletheliveleasecontinued; no competingclaim taken. NoS3/cloud.
+
+## Short-residual geometry constrained across retained genera
+
+### What was done
+Derived genus2degree2Riemann–Roch dichotomy and generalized the useful-row obstruction using hyperelliptic-pair removal plus reduced Mumford uniqueness for degrees<=g. Applied it to the proposed genus2singular-plane-quartic projection pencil. Read finite-characteristic StacksRiemann–Roch and classical reduced-divisor source; recorded KBscope.
+
+### Decisions made
+Do not treat a lowdegreefixed-anchor family as a new source of independent rows when it only varies cancelling pairs. Newanchors,degree>gresiduals,qualifiedtransport oractualsharedarithmetic remain eligible. No universalruntime/novelty/10xclaim. Goalactive.
+
+### Open threads
+A mechanism satisfying those concrete admission conditions is needed; no implication that nonhyperellipticgenus3results covergenus2.
+
+### Errors
+No execution/failure/retry. Priorleaseexpired; newdistinctT7050claimed for geometric screen. NoS3/cloud.
+
+## Restricted small-prime producer measured with censoring
+
+### What was done
+Frozen aec41463d93 executes classical shortened sieve with quadraticremainder factoring andLP-first genericSparse.20of32workloads complete(g2all12,g3all8),g4all12incomplete at128anchors.64calls,561prefixchecks,128exact repeatedmodulusrecords; allreturnedscalarsverify. Allfailedcostsretained. [pcc:unverified]
+
+### Decisions made
+Rejectthisfixedcutasfullpanel10xroute. Basefieldcompletedratios g2 0.542–1.084,g3 0.719–0.967; censoredg4countsnotreportedasspeedups. No budgetextension/adaptivecut/sourcechange. Added conditionalroot-incidence costmodel withoutpromotingit to usefullranktheorem. Broadgoalactive.
+
+### Open threads
+A genuinelybettercompletecost/rankmechanism isrequired; classicalLPproducer nowhas actualcostevidence ratherthanfullscanfilterdiagnostics.
+
+### Errors
+No runtime/assertionfailure;24incompletecalls areexplicit scientificoutcomes, notinfrastructurefailures. NoS3/cloud/oldbaselinererun.
+
+## Deterministic incidence criterion derived from restricted failure
+
+### What was done
+Inspected all12unresolvedg4terminalrecords:0–8rows over128anchors, verifiednone by independentprefixsolver. Derived exact k*A<=I for n=g+1,k=g-1 and scanratebound F/rho<=kappa*n/k, with explicit signedpointfraction and concentrationdefinition. Separated deterministicidentity,uniformmarginal expectationbound and strongerindependenceheuristic.
+
+### Decisions made
+No assumptionthat terminalgraphcoverage/rankcausewasmeasured: fullmatrix/rejectedcandidate support isnotretained. A concentration-only10xscanclaim requireskappa>=10/3,5,6 in g2/3/4; thisisnotaglobalalgorithm bound. Newcandidate muststateconcentration or independentrank/matrixadvantage andchargepilotcosts. Broadgoalactive.
+
+### Open threads
+No demonstrated mechanismyetmeets theseconditions. Existingfailure isclosedwithoutretuneorbudgetextension.
+
+### Errors
+No scientificrun orS3access. Do not infer entire128anchorpanelincidence from oldbaselinewhichstopsatfirstsolution.
+
+## Fresh fixed-core oracle incidence bound measured
+
+### What was done
+Frozen e6655cd3dd1 retains5785exactgroup-verified genus2residual supports on6freshworkloads,16anchors each. All204possiblecore sizes analyzed with topincidencedegreeupperbound and sumdegrees=3M. Maxbounds perworkload3.377–3.665,allbelow10. [pcc:unverified]
+
+### Decisions made
+Reject10xfromfixedorbitcoreconcentrationalone onthesecompletepanels,evenfreeoracle; donotpromoteboundstoattainableperformance orotheranchorlaws. Source/targetscalaroutsideprobe;fullselection/setup/factor/LAcostnotclaimedfree. Newcandidate requiresdifferentmechanism. Broadgoalactive.
+
+### Open threads
+Adaptiveperanchorcores,otheranchorlaws,qualifiedtransport or independentrank/matrixadvantage needexplicitconstructivecostcase. Existingrawsupportenablesfuturepostanalysiswithoutproducer rerun.
+
+### Errors
+Retainedoldfileslackedroot supports, so no incidenceinferredfromranktotals. ReleasedownexpiredgeometrictaskandclaimedT7051; no competingagentworktouched. No scientificfailure/retry,S3/cloud.
+
+## Adaptive incidence escape tested without producer rerun
+
+### What was done
+Frozen965d0513a49 postanalysis retains3264anchor/orbitblocks, deduplicatesrowcoverage and computesexactbestblockvisitdensity. Freechangingcores/anchor-skipping maxima5.184–6.340 across6workloads; fixedcoreexactmax3.063–3.597. No statisticalrootassumptions ornewdata. [pcc:unverified]
+
+### Decisions made
+Close10xacceptedrow-per-visit claim fromselectingexistinganchor/orbitblocks onthesecompletepanels,evenfreeoracle. ReferenceisALL16fullscanrowdensity,notcompletingruntime; independentrank,costs,newanchorlawsnotbounded. Fullgoalremainsactive.
+
+### Open threads
+Mustchangeanchorlaw,arithmeticsharing,qualifiedgeometry orweightedrank/matrixcost,notmerelypickbetterexistingcores. Noonstrongerconstructionyet.
+
+### Errors
+No failedanalysis/producerretry/S3/cloud. Olddataused onlyforitsdeclaredscope.
+
+## One-orbit useful target rank qualified across all cores
+
+### What was done
+Frozenaf2da5d2845 postanalysis reconstructssignedweightedrows/publicnormalization fromretainedsupports. All204coresresolve6originaltargets within16anchors;17001prefixcomparisons betweenSparse/referenceagreeandallreturnedscalarsmultiplyback. Core0resolvesatanchors3–9 acrossworkloads. Atp601allcoresidentifykwithoutfullrank. [pcc:unverified]
+
+### Decisions made
+Positivegenus2structuralresult,notperformance/novelty/generalranktheorem. Anyproduceronnewtargetsneedsprospectivefullcostcase; cannotcreditgenericvsdenseeliminationorfreecorelearning. Existingincidenceboundstillrejects10xrowyieldalone. Broadgoalactive.
+
+### Open threads
+Constructiveconstantcore/weightedLPcompressionwithfreshfullcostqualificationornewgeometry;g3/g4andbreakthroughproofremainopen.
+
+### Errors
+No analysisassertionfailure,scientificproducerretry,S3/cloud. Fullrankisnotrequiredfortargetuniqueness; preservedcounterexamples.
+
+## Affine LP path compression qualified and counted
+
+### What was done
+Implementedweightedunion-find withaffine(core,k,constant)potentials,unbalancedcomponentgrounding,pathcompression and2variablelabelsolver. Frozen ca06f28e1c2 agrees inrank/kwithSparse/nativeFast at17001prefixes across204cores.24core0LAstagecalls repeat exactly. EllREDC gains1.392–1.657 versusgeneralSparse; inversionsidentical. [pcc:unverified]
+
+### Decisions made
+Retainasclassicalengineeringcomponentgain,notmathbreakthrough/fullruntime/10x. Nofullcollectorcampaignsolelyfromthisstage. Excludedproducer/setup/factor/verifycostsexplicit. g3/g4remainunqualifiedandgoalactive.
+
+### Open threads
+Fullcostcaseandnewusefulgeometryrequired; nofaircomparisonagainstdense-onlybaseline. Potentialproductionintegrationneedsfreshinputs/protocol.
+
+### Errors
+No failedgate/retry/S3/cloud. Previousonlinekernelhadpivotchainsbutnotgraphpathcompression; no falseassertionthatthiswasalreadymeasured.
+
+## Fresh complete one-core affine cost comparison closes route
+
+### What was done
+Frozenfdd4b4799e7 fullcoldcountercomparison on12freshgenus2workloads completes48calls/96records;307candidateprefixesmatchreference,allscalarsverifyandrepeatsmatch. Core0restrictedproducer+affineDSUagainstfullscanSparsewithallsetup/anchor/factor/verificationcharges. [pcc:unverified]
+
+### Decisions made
+Rejectunchangedcombinationas10xroute: baseREDCratios0.528–1.094,10regressions/2smallwins;ell1.042–6.108doesnotmaketotalgain. No arbitraryfieldweights/wall/CPU ornewmathclaim. Allcasescompletebutobjectiveunachieved/active;g3/g4notcoveredbythiscosttest.
+
+### Open threads
+Neednewproducer/setupgeometryorstrongcompletecostmechanism,notfurtherposthoccoretuning. AffineLPcomponentremainsqualifiedindependently.
+
+### Errors
+Postsummaryinitiallycomparedrepetitionidentifieritself; correctedcomparisonofoutcome/countfieldswithoutproducer retry. Initialunusedrankmethodwarning suppressedlocallybeforerun. NoS3/cloud.
+
+## Affine promotion bootstrap window independently checked
+
+### What was done
+Frozenb99946ccdd1 exposesfirstgroundedLPaffineexpressionson6core0streams.177originalJacobianidentitychecksand416prefixchecks pass.5of6streams have5–26explicitnonzerotargettermexpressionsbeforekuniqueness; p601/source1hasnonebeforek. Allcontrolsretained. [pcc:unverified]
+
+### Decisions made
+Validbootstrapopportunity,notindependentrow/costgain. Exactgenus2threepointinterpolationleavesquadraticresidualandatmost2newLPs; nextboundedgatecouldtestnewlabelrankwithoutsequentialanchors. Triggerdoesnotcoverfullpanel; no allgenus10xclaim. Diagnosticallvertexscansnotfreeproductionevents.
+
+### Open threads
+Prospectiveinterpolation/rankgateandcompleteadaptiveproducercostcase;homogeneousharvestingorcorelabelsubstitutionnotexcluded. g3/g4needseparateconstructionandgoalactive.
+
+### Errors
+No scientificfailure/retry/S3/cloud. Explicitnonzerotargettermisnotassumedindependentbecausecorelabelconstraints cancancelit.
+
+## Promotion interpolation adds independent rows and resolves eligible branches
+
+### What was done
+Frozen660b41e29aa pauses5eligiblecore0streamsatthefirstpre-kpromotion,triesall40prescribedthree-pointsigninterpolantsperbranch.200trials/93splitrows,exactH/groupchecksandDSU/Sparse/nativeFastrank/kagreementpass. All5recoverkafter5–38trialswithoutmoreoriginalanchorrows. Sixthp601/source1no-triggercasepreserved. [pcc:unverified]
+
+### Decisions made
+Positivealgebraicbootstrapqualification,notcoldcost/heldout/generalrank/novelty/10x. Everyfailedattemptandafter-ktrialretained. Aproductionmethodneedsallbootstrap/discovery/interpolation/factor/LA/setupchargesandexplicitnocoveragecase. Broadgoalactive,g3/g4separate.
+
+### Open threads
+Exactsharedsign-interpolationcircuitcouldreduceinversioncost;itsalgebra/setup/gatesmustbefrozenbeforemeasurement. Nounboundedcampaignadmittedfromrankonly.
+
+### Errors
+No failedgate/retry,S3/cloud. Newrankgainsdonotbythemselvesimplynetcostbenefitoverremaininganchorwork.
+
+## Shared-sign interpolation qualified against prepared control
+
+### What was done
+Frozen d2b202a942c primitivegatepasses20calls/800outputs; independentinterpolationcomparisonREDC1.556–2.212/inv120to1. Addedstrongpreparedcontrolat5e42753968d,also20calls/800outputs,withbotharmsoneinverseandidenticalbasispreparation. IsolatedsigncorrectionREDCgain1.138–1.300. All10retainedcandidatevectorsbyte-identical. [pcc:unverified]
+
+### Decisions made
+Reportstrongcontrolprimary,not120xinversionasatenfoldalgorithm. Allpreparation/rootattemptscountedbutcoldsetup/bootstrap/discovery/LA/finalverifyremainoutsideprimitive. No coldadaptivecampaignadmittedfromthisgainalone. Broadgoalactive,g3/g4open.
+
+### Open threads
+Needcompletecompetitiveadaptiveconstructionornewgeometry; modestcircuitgaincannotreplacecostcase. Originalnocoveragecontrolpreserved.
+
+### Errors
+Pre-freezeliteralnewlineescapecompilefailurefixed; postanalysisRubyeditserializationfailed,recoveredwithoutproducerrun. Bothscientificgatespassonce.NoS3/cloud.
+
+## Optimistic unchanged-bootstrap floor measured
+
+### What was done
+Frozen2fb868459c1 truncatesone-corecoldproducerimmediatelyafterfirsttarget-bearingrow,beforeLA/finalcheck.24prefixcalls/48recordsrepeat,allfirstrowsverifyoriginalgroup,allprefixcomponents<=retainedfullcandidate. Matchedsame-targetfullscanB/Pceilings2.800–8.311,all12below10. [pcc:unverified]
+
+### Decisions made
+No fulladaptivecampaignadmittedfrompost-promotiongainswhilekeepingthisprefix: nonnegativesubsequentbaseREDCcannotreach10evenfree. Boundisconditionalonexactprefix/counter,notCPU/wall/newalgorithms. Needalteredbootstrap/preparationorstrongcompletecostcase. Broadgoalactive,g3/g4remainopen.
+
+### Open threads
+Newinitialrelation/preparationgeometry;source-reusemustbecharged/labeledandnotfreecoldwork. Do notpromotecomponentgainstobreakthrough.
+
+### Errors
+No failedgate/retry/S3/cloud. Reusedimmutablecompletingbaselineandmatchedseed,notoldtargetcounts.
+
+## Deferred eigenvalue learned from relation consistency
+
+### What was done
+Frozen c5cfa225c8c tests4unknown-actionhypotheseson12full/one-corestreamswithoutcharacterinputtoinference.7338prefixcheckswithoppositeFBpivotordersagree. Allstreamsreject3wrongrootsandinfertrueorientedlambda+k;postqualificationgroupchecks pass. One-coreuses1–8extrarowsversusknownlambda. DerivedR=Fell[Z]/Phi5LPunit argumentandCRTlabelzero-divisorobligations. [pcc:unverified]
+
+### Decisions made
+Positivealternativebootstraplogic,notcost/novelty/10x. Hypotheticalmapsnotadmitteduntilgeometricqualification. Fourparallelsolvesmaycostmore;sharedringimplementationandfreshfullcostcaserequired. g3/g4remainopen,goalactive.
+
+### Open threads
+Implement/cost-qualifyR-DSUandcorrectCRT-awarelabelsolverorfindabetterinitialconstruction. CanonicalFB/source/finalcheckcostsremain.
+
+### Errors
+No scientificgatefailure/retry,S3/cloud. Wronghypothesisprovisionalkisnotadmittedassolutionbeforeconsistencyandgroupqualification.
+
+## Cyclotomic shared LP/CRT state qualified
+
+### What was done
+ImplementedR=Fell[Z]/Phi5affineweightedDSUandCRT-aware2variablelabelsolver. Frozen25bea240859 passessyntheticzerodivisor/partialinconsistency/unbalancedcyclecontrolsandall416prefixesof6corestreamsagainst4Sparse+reverseDensefieldreferences. Inferredlambda/kandallprefixsurvivorsmatchpriorinference;originalgroupchecks pass. [pcc:unverified]
+
+### Decisions made
+Representation/correctnessqualification,notcost/novelty/10x. No zerodivisorpivotrejectedwithoutconsistencyproof. Actualrootsonlyreferenceinput,notRengine. Fullcostgateandfreshfullsolvesneeded;g3/g4unqualified,broadgoalactive.
+
+### Open threads
+MeasureR/CRTcostagainsteagerknown-actionand4fieldreferences;retainedsource/FB/finalcheckcostsmustnotdisappear. Potentialpolynomialarithmeticoverheadmayrejectroute.
+
+### Errors
+No build/runtime/gatefailureorretry,S3/cloud. Matchedall416oldprefixrecordswithoutproducerrun.
+
+## Cyclotomic preparation and elimination cost measured
+
+### What was done
+Frozeneafc7d8ae1d compares eagercharacter+known-actionaffineagainstgeometry-only+R/CRT on6retainedstreams,24calls/48records. Source/rowassembly/linear/finalscalarcostscharged;producerexcluded. Allaction/kchecksandrepeatsagree. BaseREDCgain1.058–1.251;ellREDCregresses5of6. [pcc:unverified]
+
+### Decisions made
+Closeunchangedringstage/fixedcollector as10xroute: commonnonnegativeweightedtwo-REDCstagebound<=891/712(<1.252) andcommonproducer+extra1–8rowscannotimprovethatbound. Conditionalcounterproof,notfullCPU/wall/fullsolve. Neednewconstruction/costcase;goalactive,g3/g4open.
+
+### Open threads
+Changedkernel/bootstrap/producerorgenuinegeometry;correctnessandlogicalsetupdeferralalonearenotcostbreakthrough.
+
+### Errors
+No build/scientificfailureorretry/S3/cloud. No hiddenfreeproducerworkorweightedmoduluscancellation.
+
+## Rational genus-three isogeny screen derived
+
+What was done: read Smith's original sections 1/3 and Milne polarization background; wrote isogeny-screen/DERIVATION.md. Derived conditional exhaustion of rational (2,2,2) kernels for irreducible x7+c with rational seventh roots of unity. Explicit Gaussian periods A,B satisfy AB=2 and are Rosati adjoints, so the only two rational maximal isotropic kernels give polarized self-isogenies.
+
+Decisions made: do not build Smith transport on these binomial controls without first checking the irreducibility hypothesis and exact F2 module. This is a restricted obstruction, not a global impossibility or performance result. Git custody retained; no S3 access.
+
+Open threads: prospectively frozen Rust qualification on both retained genus-three models; broader genus2+ tenfold objective remains unresolved.
+
+Errors: stale T-7062 retry budget exhausted; released own old task, created and successfully claimed T-7071 via CLI. Connector principal still reports own CLI reservation as a conflict. No scientific producer was executed.
+
+## Rational kernel gate frozen
+
+What was done: prepared std-only Rust exhaustive subspace enumeration and fixed-model Kummer checks; release compilation succeeds. Source/protocol/binary SHA256 retained in isogeny-screen/INPUT.sha256.
+Decisions made: push checkpoint before once-only gate; exact subspace counts and model eligibility required, with no fixture substitution.
+Open threads: execute frozen checker, retain output and assess the conditional obstruction on both original models.
+Errors: own task already claimed; no competing holder or scientific execution.
+
+## Rational kernel gate completed
+
+What was done: single invocation at pushed 923c5f6c85c exits0; 1395 subspaces,135 isotropic,2 invariant, both exactly the proposed Gaussian-period kernels. Models (113,3),(421,2) have nonseventh-power residues49,370 and no branch roots. All frozen hashes pass; raw/exit/outputhashes/results retained.
+Decisions made: rational polarized degree-eight escape closed on both original genus-three controls subject to the written standard-theory proof; no transport implementation justified on this route.
+Open threads: different-degree rational kernel/quotient and explicit map/cost case, or another relation mechanism addressing original genus2+ targets; tenfold objective unresolved.
+Errors: none during the gate. No S3, cloud, producer retry or runtime claim.
+
+## Four-point harvesting gate frozen
+
+What was done: derived cubic-through-four-points residual degree<=2 and six-cross-term sign identity. Prepared/compiled gate on unchanged five promotion inputs, ten core triples/eight signs each, with full polynomial/group and three-solver checks. Input/native/import/binary hashes retained.
+Decisions made: structural gate before pricing the new sign family; 400 attempts and sixth no-trigger input retained. No square normalization omission, skipped cost claim or fixture substitution.
+Open threads: execute frozen gate once, compare useful rank to retained three-point gate, then qualify shared circuit only if useful.
+Errors: none; compiled without scientific execution.
+
+## Four-point harvesting gate completed
+
+What was done: at654f7ac52e1 all400trials/181splitgrouprelations pass with three-solver prefix agreement; all5eligible target scalars reconstruct. First-k attempts5/7/28/8/48 versus retained three-point9/18/25/5/38. Split181/400 versus93/200; sixth no-trigger preserved. Raw/exit/hashes retained.
+Decisions made: family qualifies exact rows but more signs are not a speed result. Two attempt improvements and three regressions prevent promoting a yield claim. Shared cross-term arithmetic remains unqualified and full costs remain required.
+Open threads: strong prepared six-cross-term comparison before cold full-cost work; original genus2+tenfold objective remains open.
+Errors: none; no retry/S3/cloud or target substitution.
+
+## Four-point shared arithmetic frozen
+
+What was done: compiled prepared-reference/shared-six-cross-term driver, all5unchanged panels,20alternating repeated calls/1600signedoutputs. Monic normalization and all80factorattempts charged percall; all source/native/import/input/binary hashes frozen.
+Decisions made: isolate residual arithmetic after equal shared preparation; preserve degree drops and prior mixed rank outcomes. Push before scientific execution.
+Open threads: once-only counter gate and split-total comparison with prior four-point qualification; full objective unresolved.
+Errors: none; own T7071lease retained, no scientific execution yet.
+
+## Four-point shared circuit completed
+
+What was done: frozen d27d2d03141 exits0;20calls/1600outputs exact arm equality,polynomial checks,exact repeated vectors. All split totals23/27/45/45/41 match prior independent gate. Base REDC reference/shared1.136-1.299;poly divisions80to10,products1960to1200, additions increase. Inversions80or81 unchanged.
+Decisions made: component gain only; no cold/full/tenfold claim. High normalization inversions identify a batch-normalization follow-up requiring equal strong controls.
+Open threads: qualify batch normalization before considering cold four-point collection; preserve three-point mixed rank outcomes and uncovered stream. Genus2+tenfold objective open.
+Errors: none; no scientific retry/S3/cloud.
+
+## Four-point batch normalization frozen
+
+What was done: compiled equal batch normalization for prepared reference and shared circuit, all80residuals perburst, ordinary-monic root cross-check outside counters. Same20calls/1600outputs and fixed panels; hashes frozen.
+Decisions made: charge batching in both arms and compare retained three-point split/REDC with explicit structural-only boundary; freeze/push before run.
+Open threads: execute once, inspect inversion/counter tradeoff and panel yield per work before full-cost qualification.
+Errors: none; own existing T7071task remains claimed.
+
+## Batch normalization qualification completed
+
+What was done: one invocation at a41ba58e57b exits0,20calls/1600outputs exact across arms and ordinary-monic roots; repeated vectors/polynomial checks pass. Inversions80-81to2; shared REDC increases to7582/7842/7746/7746/16264. Split totals unchanged; every fixed-panel split/REDC lower than retained three-point shared circuit. Raw/summary/hashes retained.
+Decisions made: no arbitrary pricing of inversions versus REDC, no tenfold/full-runtime claim. Full-burst four-point variant not justified as replacement on these panels; retain useful-rank/early-stop limits.
+Open threads: different mechanism with original genus2+target fidelity and complete cost case; tenfold goal unresolved. Keep exact circuits available without advancing unchanged combination to expensive full-cost trials.
+Errors: none; no retry/S3/cloud.
+
+## Mixed-orbit harvesting frozen
+
+What was done: derived new two-promoted+one-core family with orbit support multiplicities different from retained one-promoted+two-core. Compiled200trial gate on same5triggerpoints with signed affine labels and three solvers; native/import/input/binary freeze.
+Decisions made: quotient scalar-copy triples by fixing singleton, no duplicate orbit-rank accounting. Structural useful-rank qualification before shared arithmetic/cost. Push before run.
+Open threads: once-only gate and comparison with original40trial family; complete genus2+objective open.
+Errors: none; T7071claimed, no science run yet.
+
+## Mixed-orbit harvesting qualified with incomplete arm
+
+What was done: frozen3338194d4da exits0,200trials/99splitgrouprelations,allpromoted orbit labels/polynomials/three-solver prefixes pass. Firstk6/9/27/7/undetermined versus old9/18/25/5/38;4of5eligible complete, sixth no-trigger kept. p601source17adds23rank without pinningk. Raw/exit/hashes/results retained.
+Decisions made: no speed ratio for incomplete arm or promotion from larger point pool/split count/rank. Different orbit multiplicities give valid new rows but standalone replacement not justified.
+Open threads: a combined adaptive-label pool needs new useful-rank/cost case before cold campaign; broader original genus2+tenfold objective remains open.
+Errors: no runtime/assertion errors; incomplete identification is scientific outcome, not retried. No S3/cloud.
+
+## Self-orbit harvesting frozen
+
+What was done: derived exhaustive two-shape quotient for triples of a5cycle; eight signed trials per promoted orbit. Prepared40trial gate on same5fixtures, original no-trigger kept, exact affine label/group/polynomial/three-solver checks. Compiled, hashes frozen.
+Decisions made: test compact target-bearing family before building combined pool; no8vs40speed inference, scalar-copy triples excluded.
+Open threads: execute once and assess useful rank/target completion; full genus2+tenfold objective open.
+Errors: none; no execution before pushed freeze.
+
+## Self-orbit eight-trial gate completed
+
+What was done: cdbea1ba123 single invocation exits0,40trials/24splitgrouprelations,alllabel/polynomial/three-solver checks. Addedrank2/2/3/3/4;onlyp251source17completesat8,versusold5. Other4undetermined, sixth no-trigger retained. Raw/exit/hashes/results preserved.
+Decisions made:60%split fraction not useful-target improvement. Exhausted same-orbit triple representatives without scalar-copy inflation; standalone circuit optimization not justified. Avoid further minor fixture variations without new useful-rank/cost mechanism.
+Open threads: mathematically different mechanism for original genus2+10xobjective; combined adaptive pool not justified by hit counts alone.
+Errors: none; incomplete cases scientific outcomes, no retries/S3/cloud.
+
+## Direct-target interpolation screened against existing arithmetic
+
+What was done: checked current add_place/reduce and prior section-sieve notes; direct target-Mumford plus rational-point interpolation is exactly existing CRT/Cantor path, including irreducible u. Derived generic residual degree max(2g+1-n,n-2), minimumg atn=g+1,g+2; standard Riemann-Roch gives residual>=g for independent prescribed zero conditions with actual pole degree>2g-2. Primary Handbook theorem4.106 and Stoll notes read. Added section-sieve/INTERPOLATION-BUDGET.md.
+Decisions made: no experiment on a relabelled bootstrap. Higher-degree interpolation alone does not lower generic residual degree; a useful new mechanism must escape independent constraints, improve target rank or reduce complete arithmetic cost. Explicit degree-drop/dependent/special-divisor exceptions retained.
+Open threads: find and cost a target-log-independent dependency finder or other mechanism; original genus2+tenfold goal remains unresolved.
+Errors: initial proposed bootstrap collides with current implementation, corrected before any scientific execution. No S3/cloud or fixture campaign.
+
+## Adaptive-label peeling oracle frozen
+
+What was done: derived two-known-root collision leaves linear residual and affine newpoint. Prepared optimistic retained-support closure across all6original16anchor panels, public source-normalized core only. Compiled exact affine original-group and Sparse/nativeFast prefix checker; hashes frozen.
+Decisions made: free-support reachability falsifier before building adaptive bucketproducer; repeat to fixedpoint, all unresolved outcomes retained. No rank/cost inference from positive closure.
+Open threads: execute once; if closure stalls, new supports or multiunknown elimination needed; if succeeds, actual adaptiveproducer costs stillrequired. Original genus2+10xgoalopen.
+Errors: none, no scientificexecution before pushedfreeze.
+
+## Adaptive peeling oracle completed with stopping set
+
+What was done: frozen d6b9b8ad004 single invocation exits0,3781Sparse/nativeFast prefixes and allaffine/groupchecks pass. Fivepanels identifyk/reachallcolumns; p601source1stallsinitially with1/68known,0admitted outof2004rows. Retained raw/exit/hashes/results and induction stopping-set explanation.
+Decisions made: no unchanged peeling-only producer; free complete support oracle already stalls. Order/revisiting cannot rescue same rows/rule. New supports or multiunknown initialization needed; existingLPwork notnew/free and unchangedbootstrapfloor remainsbinding.
+Open threads: mathematical mechanism coupling components/geometry without previous bootstrap cost, original genus2+10xgoal unresolved.
+Errors: no assertion/runtime errors; oneundetermined arm scientific outcome retained. No retry/S3/cloud.
+
+## Symbolic seed preparation repaired
+
+What was done: compiled all67symbolic seed cases, prefix Sparse/constraint agreement and terminal nativeFast checks; source/native/input/binary hashes retained.
+Decisions made: no supplied seed log; complete support discovery only is free. Corrected protocol/hash checkpoint required before once-only execution.
+Open threads: execute corrected freeze and retain allseed outcomes; original10xgoal unresolved.
+Errors: system-volume temp space exhausted during heredoc, leaving empty protocol in6fb94fb2f91; caught before science. Wrote complete protocol with apply_patch and retained correction explicitly. SSD still has free space; no unrelated cleanup.
+
+## Symbolic seed inactivation completed
+
+What was done: correctedbedc21855ef single invocation exits0;66of67seeds reach68columns/admit2004rows/rank2constraints/recoverk104551. Seed44stalls2labels0rows,retained. All132264constraint-vs-originalSparse prefixes,67terminalnativeFast,andoriginalgrouplabel/scalarchecks pass.
+Decisions made: symbolic seed is unknownvariable, notfreeDLP; positive finite reachability justifies actual sparseproducer qualification with prospectivelyfixedseed. No oraclecost or novelty/10xclaim.
+Open threads: implement actual parameterbucketing/residualdivision/closure with allscansandfailurescharged; originalgenus2+goalopen.
+Errors: no scientificfailure/retry; earlierdiskpreparationerrorpreserved. NoS3/cloud.
+
+## Actual sparse inactivation producer frozen
+
+What was done: compiled no-support-file sparse bucketing/linear-residual producer on6originaltargets,fixedseed1,all16anchors generated. Exact rows/labels/originalSparse-vs-constraints and terminalnativeFast checks; hashes frozen.
+Decisions made: structural gate before nativecost; scans only orbit-member pool, duplicates/discovery and exclusions explicit. Pointvisits nottotalcost.
+Open threads: execute once and retain stalls; prospective fresh coldcost ifqualified.
+Errors: coordination500onchecks/renewal while ownT7071lease stillvaliduntil02:38PST; no competingholder. No science before pushedfreeze.
+
+## Actual sparse inactivation producer completed
+
+What was done:60e22f8e941single invocation exits0;all6originalworkloads complete withfixedseed1 and noROOTSaccess. Pointvisits55/25/90/120/385/165,rows6/5/11/10/24/12. Exact originalgroup rows/labels,constraint-vs-Sparse prefixes,terminalnativeFast,scalars pass. Includes formerlystalledp601source1withoutpromotiontrigger.
+Decisions made: genuineproduction qualification,not10xmeasurement;all16anchors generated plusFB/actionsetup andsymbolicwork remaincharged in futurecoldcomparison.
+Open threads: fresh-target coldnativecounter comparison against strongfullscanSparse with equalpublicsourceinformation andfailure-retention; originalgenus2+10xgoalopen.
+Errors: no scientificerrors/retries/S3/cloud; coordination500whileownleasevalidnoted inprotocol.
+
+## Fresh sparse inactivation cold gate frozen
+
+What was done:12fresh targetsseed2026112900,source1/17,48alternatingcoldcalls; botharms receive/verifypublicD=smC. Strong fullscanSparse removesdiagnosticpolynomialreconstruction fromcount; candidate removesdiagnosticreferences/groupchecks, allalgorithmicworkandfinalverify retained. Bothdiagnosticgates precedemeasurement. Buildpasses,hashesfrozen.
+Decisions made: sourcepromise explicit andequal; controlalsoretainsderivedsmoothsourceequation. Fixedseed1and16anchors, stallsretained,no arbitrarycounterweights.
+Open threads: execute once andevaluatecompletions/fullcounts,notpointvisitgain.
+Errors: noneinbuild, nosciencebeforepushedfreeze.
+
+## Fresh sparse inactivation cold gate completed
+
+What was done:7d8f6edb2d4single invocation exits0;48calls exactrepeats,12freshworkloads. Reference12/12candidate11/12; p601source1case1stalls bothrepeats,counts censored. CompletedbaseREDCratios0.670-1.087(10regressions,1smallwin),ell1.039-6.002. Bothdiagnosticgates/finalscalarchecks pass; raw/summary/hashesretained.
+Decisions made: unchangedcandidatefails10xcase; original6fixtureproduction success notfreshcostclaim. Equalexplicitpublicsourcenormalization,allsetup/16candidateanchors/labels/constraints/finalchecks charged; no arbitrarymodulusweighting.
+Open threads: newcomplete-costmechanism; eageranchorsengineeringnotdemonstrated10x. Originalgenus2+goalopen,genus3/4unqualified.
+Errors: no runtimeassertionfailures,retries,S3/cloud; oneincomplete scientificarmretained.
+
+## Lazy orbit deferred-action producer frozen
+
+What was done: compiled18inputgate combining dynamicorbitdiscovery,ringlabels,CRTconstraints,lazyanchors; producer takes nofullFB/character/action/rootrecords. Allgeneratedrowsgroupchecked,driverindependentlyevaluateslabels atreferenceaction. Hashesfrozen.
+Decisions made: sourceCpromise explicit; structuralintegrationgateonly, priorcoldfailuresretained. No nonunitdivisionforpointlabels,existingCRT handlesconstraints.
+Open threads: execute once, retainallstalls; coldcost remainsrequired.
+Errors: unusedimportedringmethods warnings suppressedlocally; rebuildclean. NewT7080leaseclaimedviaCLI afterreleasingoldtask;connectorreportsownreservationasduplicate.
+
+## Lazy cyclotomic producer qualified
+
+What was done:f3cb6e18a1esingle invocation exits0;17of18complete,223originalgrouplabelchecks andfinalaction/scalarverificationpass. Producer receivesnoFB/character/eigenvalue/supportrecords; lazydiscoveryandringconstraintslearn action. Original6complete,fresh11of12; samep601source1case1stalls2orbits0rows4survivors.
+Decisions made: removed eagerfullFB/actionprecomputation fromproducer,notpricedasfreegain. SourceCpromiseexplicit; classicalintegration,fullcostnext. Priornegativegates preserved.
+Open threads: coldcountercomparison withalllazy/ring/CRT/finalcosts; fixedseedstallneedsprospectivechargedfallback; originalgenus2+goalopen.
+Errors: noscientificerrors/retries,S3/cloud; incompletearmretained.
+
+## Lazy cyclotomic cold fallback gate frozen
+
+What was done:compiled12freshseed2026113000targetcomparison48calls,strongnormalizedfullscancontrol. Candidatefixed3seedorbitfallback,allrestartdiscovery/setup/CRT/anchor/finalcostscharged. Separateknownstallfallbackqualification,notpooled. Diagnosticgatesandexacttracerepeatsrequired; hashesfrozen.
+Decisions made: nopublicaction/FBtocandidate,equalCsourcepromiseverifiedbotharms,allfailuresretained. Noarbitrarycounterweights/10xclaim.
+Open threads: executesinglefrozengateandpricecompletepipeline.
+Errors: none, nosciencebeforepushedcheckpoint.
+
+## Lazy cyclotomic cold gate completed
+
+What was done:55e07dcb164single invocation exits0,48calls exactvectors/traces,12of12freshbotharmscomplete,allgroup/scalarchecks. Candidatefreshrestarts0; separateknownstall succeedsseed2at193385,counterdisabled. BaseREDCratios0.503-0.928allregress;ell0.471-8.274with4smallfieldregressions. Raw/summary/hashesretained.
+Decisions made: unchangedimplementationfails10xcostcase; subgroupgainandcoverage notwholewin. Extraactionscalarmulcharged; anyeliminationrequiresproofandnewvalidationcontract,notposthoc omission.
+Open threads: mathematicallycertifiedverification/normalizationmechanism, fullgenus2+goalopen.
+Errors: none,no scientificretry/S3/cloud; fallbackcoverage andcoldcostseparate.
+
+## Conditional action survival and target consensus frozen
+
+What was done:derived whole-prime-Jacobian trueaction survival from principaldivisorPhi5(sigma)=0andinductiveconditionalpointlabels. Consensuskcanbeacceptedwithoutuniqueaction undercertifiedhypotheses; finaltargetcheckretained. CopiedCRTmodule common_kaccessor,8syntheticscenariosand4independentfieldrefs,buildpasses; hashesfrozen.
+Decisions made: proofconditional/unformalized,wholeorderreceiptsverifiedincurrentfiles; nochangeoldproducer/runtimecontractorcost. Syntheticgatebeforeintegration.
+Open threads: execute once; then prospectivevalidationcontract/producerintegration/fullcostrequired.
+Errors: oldT7080leaseexpired, newT7083claimed; connectorownlease mismatchretained,no scientificexecutionyet.
+
+## Target consensus synthetic gate completed
+
+What was done:ccc05211dabone invocation exits0;8scenarios19prefixes76independentfieldcomponentsagree. Constanttargetwith4actionsaccepted;varyingtarget/freezero-pivot/emptysurvivorscorrectlyblocked. Proofdocumentswholeprimegroup trueactionsurvival andconsistentCRT assumptions. Raw/exit/hashesretained.
+Decisions made: currentproducercontracts/costsunchanged; integrationrequirescertifiedmodelguard,retainedfinaltargetcheck,strict-vs-consensuscoldqualification. No synthetic10x/proof-formalizationclaim.
+Open threads: integrateconsensusunderprospectivevalidationcontractandmeasurecompletecost; originalgenus2+goalopen.
+Errors: none,no scientificretry/S3/cloud.
+
+## Certified consensus producer comparison frozen
+
+What was done:compiled strict-vs-consensus modes,same12oldcoldinputs,48alternatingcalls; exactmodel/order/nonzero-sourceguard andretainedfinaltargetcheck. Strict48modulusvectorsmustreplayolddata beforebaselinecounterreuse. Diagnosticgates,labelchecks,tracerepeatsandmulti-actionstoppingrecorded. Hashesfrozen.
+Decisions made: explicitchangedvalidationcontract justifiedbyconditionalproof,notposthocolddataomission; base/ellseparate,noCPU/10xclaim.
+Open threads: executesinglematchedgateandpricefullconsensuspipeline.
+Errors: none, nosciencebeforepushedfreeze.
+
+## Consensus producer costs and sparse-bootstrap bound completed
+
+What was done:6967ac38dacsingle invocation exits0;48calls exactrepeats,strict48modulusvectorsreplayolddata,all12bothmodescomplete,alllabels/finalscalarsverify. No multiactionstopobserved. Base strict/consensus1.230-1.590; strongcontrol/consensus0.795-1.264(2wins),ellunchanged. Derived exact first-admission unionbound A sum binom(Mj,g)#C/(N-1),currentg2<=8640#C/(N-1),fixedbudgetprobabilitydecays.
+Decisions made: proof-backedvalidationoptimizationqualifiedbutnot10x; nofurtherfixed-small-poolcampaign withoutscaledrank/costcase. Forfixedanchors/restarts,necessarypoolscalesq^(1-1/g),notgeneralsolverlowerbound.
+Open threads: multivariablesymbolicinactivation/component-awareproduction withscalingandcost; originalgenus2+goalunresolved.
+Errors: none,no scientificretry/S3/cloud.
+
+## Sparse dependency operator and target certificate frozen
+
+What was done:literature-first scaling screen distinguishes firsthit fromgrowth; meanfieldbalance matchesclassicalexponent,notnovelattack. Implemented unittriangularDAG forward/transposeSchur, exactRHScorrection,originalrowbasis/offsetreplay,densecomparison,adjoints,andtargetrowspacewitness verification. Compiled18panels onretained6streams; hashesfrozen.
+Decisions made: avoiddense-labelseed-widthfactorbeforelargerpoolprototype; witnessgenerationdense referenceonly,no productioncost/10xclaim. KnownfieldoperatornotringKrylovqualification.
+Open threads: executeonce; efficienttargetwitnesssolver/fullscaledproducerremainrequired.
+Errors: none,nosciencebeforepushedfreeze.
+
+## Sparse dependency operator and target witness completed
+
+What was done:f030dee3d7aone invocation exits0;18panels252basiscolumns54adjoints,RHSandoriginalequationreplaypass. OriginalSparse/SchurSparse/nativeFasttargetsagree; all18targetwitnessesverifyusingmatrixfreetransposeandgroupchecks. p601intermediatepanelterms7811/7978versusdensenonzeros13444/10904,smallpanelsnotuniformsaving.
+Decisions made: operatorcorrectnessandwitnessverificationonly,densewitnessfinderreference,nofree-supportproduceror10xclaim. Growthheuristicrecoversclassicalexponent,notbreakthrough; futurebackendmustavoidreintroducingdenseSchur.
+Open threads: efficientrectangular/rank-deficienttargetwitnessfinder andscaledproducer,costedoriginalgenus2+targets; goalopen.
+Errors: none,no scientificretry/S3/cloud.
+
+## Callback-only Krylov target witness frozen
+
+What was done:readoriginalWiedemannsectionsII/III; implemented3attemptdiagonallypreconditionedrecurrencefinder,S/STcallbacksonly,exacttargetwitnessverification,linearvectorstorage. Same18retainedpanels plus5negative/rankdeficient/isotropicsynthetics; oldoperatorchecksretained. Compiled/hashfreeze.
+Decisions made: boundedfailureisunknown,neverinconsistency; no matrix/referenceanswerfinderinput,no seedretuning; allcallback/rejectioncountsretained,no10xclaim.
+Open threads: executeonceandretainallsolverfailures; cost/integrationremain.
+Errors: none, nosciencebeforepushedfreeze.
+
+## Callback-only Krylov witness qualified
+
+What was done:5ff034f1672single invocation exits0;all18retainedpanels verifiedfirstattempt,witness/target/originaloperatorcheckspass. Stdoutbyteidenticalpreviousoperatorgate. 5synthetics:2impossible referencecasesunknownafter3attempts,3solvableincludingrankdeficient/isotropic verifiedfirstattempt. ActualS/STcalls7-205each; nofullmatrixfinderinput.
+Decisions made: efficientstorage/correctnessbackendonly,callbackcountsnotfield/CPUgain; unknownnotinfeasibility. Comparewithincrementalsparseatmatchedprefixbeforeperformanceclaim,scaledproducer/CRTstillrequired.
+Open threads: matchedsolvercostandproductionintegration; originalgenus2+10xgoalopen.
+Errors: none,no scientificretry/S3/cloud.
+
+## Matched solver-prefix cost frozen
+
+What was done:compiled18panelsfirst-completingoriginalSparseprefixes,72alternatingcalls. KrylovpaysDAGrebuild/RHS/allattempts/witness,targetverifyboth. Exactrepeat/countidentity,oldoperatorchecksrequired; hashesfrozen.
+Decisions made: optimisticprefixselectionfreeboth,notonlineproduction; knownfieldsolverstageonly,no10x/CPUclaim. Unknownsretainedcensored.
+Open threads: executeonceandcomparesubgroupworkbeforebackendintegration.
+Errors: none,nosciencebeforepushedfreeze.
+
+## Matched-prefix Krylov cost completed
+
+What was done:ccc5d0e1fc6one invocation exits0;18panels72calls144modulusrecords complete/exactrepeat/allchecks. SubgroupKrylov3.691-63.372xmoreREDC,all18regress; basevectorsidentical18of18. Prefix4-66rows,optimisticstoporaclechargedgraph/solver/finalverify. Raw/summary/hashesretained.
+Decisions made: notdefaultbackend,no10xclaimfromlowerstorage. Biggercrossoverneedsnewcostcase. Auditedsourcegeometricrootsearchlinear; power-map/canonicalorbitreplacementnext,controlmustoptimizeequally.
+Open threads: qualifycanonicalgeometricrootreplacementandcompletecost,notanotherunpricedbackendcampaign; originalgenus2+goalopen.
+Errors: none,no scientificretry/S3/cloud.
+
+## Canonical geometric root optimization frozen
+
+What was done:compiled standardpower-map primitiveorder/canonicalmin helper;fullsetupcopyreusesalreadycomputedgeneratorpower. Preparedexhaustiveallprimes<=1000orders4/5/7/9,isolatedrootand8fullsetupold/newgates, exactFB/root/charcountrepeats. Source/native/import/binaryhashesfrozen.
+Decisions made: preservealloldhelpers,controlmustgetoptimizationtoo; noasymptoticdeterministictrialguaranteeor10x/DLPclaim. G4setuponly.
+Open threads: executeonce,evaluateisolatedversusfullsetupbeforepipelineintegration.
+Errors: none,nosciencebeforepushedfreeze; ownleaseT7083renewed.
+
+## Canonical root optimization qualified
+
+What was done:477fdad9193single invocation exits0;175prime/orderpairs exactcanonicalroots,100countedcalls exactrepeats,all8fullFB/root/charoutputsidentical. IsolatedrootREDCgain2.269-225.350,fullsetup1.004-2.018. Powermap1-10trialsobserved,notgeneralbound.
+Decisions made: standardengineeringcomponentgain,not10xIC. Preserveoldhelpers,newpipelinecontrolandcandidatebothoptimize. G4setuponly.
+Open threads: matchedcompletepipelinewithcommonrootimprovement,subgroupvector/traceinvariance; goalopen.
+Errors: none,no scientificretry/S3/cloud.
+
+## Root-optimized common pipeline frozen
+
+What was done:compiled48callmatchon12fixedinputs; fullscancontrolusesgeneratorreuse,consensuscandidateusespowermap,samecanonicalroot. Priorfieldtraces/subgroupvectorsmustreplay; diagnosticgates/sourcepromise/finaltargetchecksretained. Hashesfrozen.
+Decisions made: botharmsoptimize,noisolatedrootgainpromotion; nofreshinput/validationcontractchange,notKrylovdefault.
+Open threads: executeonceandpricecompletepipeline; original10xgoalopen.
+Errors: none,nosciencebeforepushedfreeze.
+
+## Common root optimization fullpipeline qualified
+
+What was done:1a1fea83255single invocation exits0;48callsexactrepeats,all12FIXEDtargetscomplete.96metadatarecord/48subgroupvectorsreplaypriorcontrolandconsensus. Bothcanonicalrootsoptimized; basecontrol/candidaterange0.779-1.268(2wins),ellunchanged0.471-8.274. Knownstall diagnosticseed2successretained.
+Decisions made: keepcommonengineeringfix,nofull10xclaim orrootstagegainpromotion. Preserveoldsourcesandallnegativegates; broadgenus2+goalopen.
+Open threads: mathematicallydifferentcomplete-costmechanism beyondunchangedlazy/consensusproducer; genus3/4fullqualificationstillmissing.
+Errors: copiedrawsummaryprintslegacyfresh_targets=12; thesearefixedoldinputs,correctedexplicitlyinRESULTSwithoutoverwritingraw. No scientificretry/S3/cloud.
+
+## Frobenius small-prime admission screen frozen
+
+What was done:literature-first Smith/Costaetalgraphscreen on5originalg2/g3models. CompiledcheckedintegerFrobeniusmatrix/norm/charpoly/order/pointcount/powerbasisindex plus75smallprimefinitealgebra/factordegree/dimensionchecks. Scalarandramifiedflagsretained. Hashesfrozen.
+Decisions made: rankdeficiencyonlyadmission,nokernel/nonhyperelliptic/speedclaim; goodprimesnotdeclaredselfloops,dimensionpassnotisotropy. Genus4outsidecyclotomicmodelpremise.
+Open threads: executeonceandinspectactualcandidateprimesbeforekernelcode.
+Errors: oldT7083retrybudgetexpired,newT7088claimed; no sciencebeforepushedfreeze.
+
+## Frobenius small-prime screen completed
+
+What was done:1604877628bexits0,75smallprime/5integerchecks pass. Indexdegeneraciesg2p251l19,g2p601l5admittednecessaryonly;g3p113l13excludedbyevenfactordegrees. Bothg3models only2,7,11,23,29,37,43passdimtest; ram7Frobeniusalgebrafullrank6. No scalarflag.
+Decisions made: no quotient/speedclaim; boundedgenus3normwitness exhaustionnext,genus2kernelpossibilitiesseparate.
+Open threads: explicitpolarizedselfisogenywitnessesandkernelcounts,notjustunpolarizedclass. Fullgoalopen.
+Errors: none,no scientificretry/S3/cloud.
+
+## Norm-witness finite gate frozen
+
+What was done: recovered edit claim T7093 after outage; retained conditional genus3 norm witnesses and genus2 Hermitian count derivation, all pcc:unverified. Compiled standalone checked Rust witness checker; no scientific execution yet.
+Decisions made: test exact integer norms, modular rank3, distinct kernels against unchanged frozen screen; expected50 model/kernel combinations. Producer checks are not independent verification. Git custody, no S3.
+Open threads: push freeze then once-only bounded invocation; ramified genus2 l5 and quotient costs remain open.
+Errors: MCP attach reports own-scope conflict; existing task card confirms own active lease. Shared docs/session-logs absent in sparse checkout; retained scoped SESSION as prior stages. KB revision9b2119e8fbac482b98b50521c0d604bb older than this work; primary Milne/Smith background checked, no novelty claim.
+
+## Norm-witness finite gate completed
+
+What was done: pushed freezee630f68ba91 then single invocation exits0;14admissions,50 norm/rank/distinctness checks pass as producer self-checks [pcc:unverified]. Counts per model2,1,2,2,8,2,8. Raw stdout/stderr/exit retained.
+Decisions made: bounded conditional self-isogeny argument supported by finite algebra checks; not independent Frobenius/polarization verification or a measured gain.
+Open threads: genus2p601l5 nilpotent polarization and p251l19 quotient classification; independent review of bounded genus3 obstruction.
+Errors: none in execution; no rerun/S3/cloud.
+
+## Ramified genus2 l5 gate frozen
+
+What was done: compiled actual p601c7 conditional Frobenius, rank1 nilpotent prediction; exhaustive806planes and all15625alternating forms.
+Decisions made: predict6stable Lagrangians for every nondegenerate sigma-invariant form; no arbitrary pairing selection. Mathematical proof via R=im(pi+1), allstable Lagrangians containR. Assertions [pcc:unverified].
+Open threads: push freeze then once-only120CPU invocation; polarized quotient classification remains separate.
+Errors: copied unused helper warnings only; no scientific execution.
+
+## Ramified genus2 l5 gate completed
+
+What was done: freeze2bc699d39dc single invocation exits0, input hashes match;806planes,56stable,20compatible nondegenerate forms, each156Lagrangians and6stable containing rank1 image; (pi+1)^2=0. All producer assertions [pcc:unverified].
+Decisions made: sixkernel admission supported without choosing arbitrary pairing; one proposed cyclotomic sqrt5 self-loop, remaining5need quotient classification and lost orbit compression costs.
+Open threads: polarized quotient classes/maps and complete-cost case; p251l19 independent count and genus3 independent review.
+Errors: none, no rerun/S3/cloud.
+
+## Ramified five orbit/order gate frozen
+
+What was done: compiled separate followup preserving old l5assertions, sigma permutation, rho²5 and125/625stabilizer/conductor predictions.
+Decisions made: expect orbit1+5, at mostone nonself quotient class fromfivekernels; localorder index5would distinguishsource. All assertions [pcc:unverified], quotient equations not computed.
+Open threads: pushfreeze and once-only120CPU invocation, then exactorder/automorphism costcase.
+Errors: copiedunusedhelpers warnings; no scientific execution. KB source5f3331ba699891737b6895c6d423edbc ellipticanalogy notproof; primary Brooks-Jetchev-Wesolowski sections1and6checked.
+
+## Ramified five quotient orbit/order gate completed
+
+What was done: freeze67f0120c9e7 once-only exits0;120orbit/order rows match orbit1+5, fixedrho kernel, ring625/125 and conductor625/25. Oldgate assertions preserved. Producer self-checks [pcc:unverified].
+Decisions made: conditional exactlytwo polarized quotient classes (self plus one index5order class); five nonfixed kernels notfiveindependent endpoints. Transported order5auto absent; price lostcompression before mapcampaign.
+Open threads: one quotientmodel/map and concretecomplete-cost mechanism; p251l19 separate classification; independentreview.
+Errors: stdout mixes inherited summary and orbit records; explicit dualschema in RUN, raw retained unchanged. No retry/S3/cloud.
+
+## Rational twist kernel prerequisite frozen
+
+What was done: read general Kummer oddisogeny construction Corte-RealSantos/Flynn section5; source pi acts-1on admitted kernels, twist makes generatorsrational. Compiled deterministic first32projection by2531 on auxiliary twist, order5/125span/sixkernel orbit checks.
+Decisions made: auxiliarytwist onlyconstructiondevice, originaltargetunchanged; generalKummer route avoids assuming rational2torsion. Assertions [pcc:unverified].
+Open threads: pushfreeze then single invocation, explicit quotient/map and completecostcase remain.
+Errors: none in compile; no science yet.
+
+## Explicit rational twist kernel constructed
+
+What was done: freeze65977dbff83 single invocation exits0; d7twist523points, S=(u329,1;v108),deltaS=(149,39,1;234,12),R=(0,1;594); allorder5,125span, six25kernels orbit1+5. Producer assertions [pcc:unverified].
+Decisions made: H=<R,S> concrete nonfixedkernel; detwist uunchanged,v/sqrt7, originalKummerkernelrational. No targetsubstitution/map/speedclaim.
+Open threads: generalKummer invariantquintics/quotient recovery, independentisotropy and fullcostcase.
+Errors: none, no retry/S3/cloud.
+
+## General Kummer quintic gate frozen
+
+What was done: implemented all56indexmultisets/120permutations, binomialbiquadratic forms and fourquarticrelation reduction; predicts12+12spaces/intersection4,67sampletranslations andallpairkernel/negationseparation.
+Decisions made: no conjectural12index shortcut; exceptionalidentity/kernel cases included, no silentdiscard. Producer assertions [pcc:unverified].
+Open threads: pushfreeze, once-only bounded invocation then quotientnormalization ifchecks pass.
+Errors: none in compile; no science yet.
+
+## General Kummer quintic finite gate completed
+
+What was done: freeze02eb85bf333 single invocation exits0; spaces12+12 combinedrank20 intersection4; fourquinticvectors retained;67samples sourcequartic/nonzeromap,134translationchecks and2211kernel/negationseparation pairs pass. Producer assertions [pcc:unverified].
+Decisions made: mapcandidate finitequalification, not exhaustive morphism proof; no exceptionalpoints dropped.
+Open threads: imagequartic interpolation/exactsubstitution then quotientcurve/targetrecovery and fullcost.
+Errors: none, no rerun/S3/cloud.
+
+## Imagequartic exact composition gate frozen
+
+What was done: compiled fixedmap interpolation from128x4catalogue sumimages,35quarticcoefficients; exactdegree20composition/sourcequarticdivision and originfirstpartials checks.
+Decisions made: require nullity1,>=70distinctimages, zeroexactremainder; no substitution of finitevanishing for polynomialidentity. Assertions [pcc:unverified].
+Open threads: pushfreeze then single120CPU invocation, generalmodelnormalization remains.
+Errors: none in compile; no science yet.
+
+## Imagequartic exact identity completed
+
+What was done: freeze098b55cbb19 single invocation exit0;480distinctimages, quarticnullity1; degree20composition1577terms reducesexactlyzero modulo sourcequartic. Originimage[1,284,243,459] singular. Producer assertions [pcc:unverified].
+Decisions made: retainexplicitquartic/map and exactidentity; no automaticglobalbasepoint/degree25/Jacobianlift/twistclaim.
+Open threads: reconstructgenus2curve fromquartic then map/lift/targetqualification andcost.
+Errors: none, no rerun/S3/cloud.
