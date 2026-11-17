@@ -421,7 +421,9 @@ pub fn find_roots_fp_fast(coeffs: &[FieldElement], p: &BigUint) -> Vec<FieldElem
         return Vec::new();
     }
     // Monic copy for the polynomial arithmetic.
-    let lead_inv = f[deg].inv().expect("nonzero lead is invertible mod p");
+    let lead_inv = f[deg]
+        .inv_vartime()
+        .expect("nonzero lead is invertible mod p");
     let monic: Vec<FieldElement> = f.iter().map(|c| c.mul(&lead_inv)).collect();
 
     // X^p mod f(X) by repeated squaring.
@@ -454,14 +456,14 @@ pub fn find_roots_fp_fast(coeffs: &[FieldElement], p: &BigUint) -> Vec<FieldElem
             let qb = h[1].clone();
             let qc = h[0].clone();
             if qa.is_zero() {
-                if let Some(inv) = qb.inv() {
+                if let Some(inv) = qb.inv_vartime() {
                     factors.push(vec![qc.neg().mul(&inv), qb]);
                 }
             } else {
                 let four = FieldElement::new(BigUint::from(4u32), p.clone());
                 let disc = qb.mul(&qb).sub(&four.mul(&qa).mul(&qc));
                 if let Some(root) = sqrt_mod_p(&disc.value, p) {
-                    let two_inv = qa.add(&qa).inv().expect("2a invertible");
+                    let two_inv = qa.add(&qa).inv_vartime().expect("2a invertible");
                     let s = FieldElement::new(root, p.clone());
                     let r1 = qb.neg().add(&s).mul(&two_inv);
                     let r2 = qb.neg().sub(&s).mul(&two_inv);
@@ -519,7 +521,7 @@ pub fn find_roots_fp_fast(coeffs: &[FieldElement], p: &BigUint) -> Vec<FieldElem
     for lin in factors {
         if lin.len() == 2 && !lin[1].is_zero() {
             // root = −c0 / c1
-            if let Some(inv) = lin[1].inv() {
+            if let Some(inv) = lin[1].inv_vartime() {
                 roots.push(lin[0].neg().mul(&inv));
             }
         } else if lin.len() == 2 {
@@ -533,9 +535,16 @@ pub fn find_roots_fp_fast(coeffs: &[FieldElement], p: &BigUint) -> Vec<FieldElem
 /// Polynomial remainder `a mod modulus` over `F_p` (any nonzero lead).
 fn poly_rem(a: &[FieldElement], modulus: &[FieldElement], p: &BigUint) -> Vec<FieldElement> {
     let m_deg = modulus.len() - 1;
-    let lead_inv = match modulus[m_deg].inv() {
-        Some(v) => v,
-        None => return a.to_vec(),
+    // The moduli here are monic (see `poly_mul_mod`/`poly_pow_x_mod`), so the
+    // leading inverse is 1; testing for it avoids an inversion per reduction,
+    // and `X^p mod f` performs one reduction per bit of p.
+    let lead_inv = if modulus[m_deg].value.is_one() {
+        FieldElement::one(p.clone())
+    } else {
+        match modulus[m_deg].inv_vartime() {
+            Some(v) => v,
+            None => return a.to_vec(),
+        }
     };
     let mut r = a.to_vec();
     loop {
@@ -649,7 +658,7 @@ fn poly_gcd(a: &[FieldElement], b: &[FieldElement], p: &BigUint) -> Vec<FieldEle
     if a.is_empty() {
         return vec![FieldElement::zero(p.clone())];
     }
-    if let Some(inv) = a[a.len() - 1].inv() {
+    if let Some(inv) = a[a.len() - 1].inv_vartime() {
         for coeff in a.iter_mut() {
             *coeff = coeff.mul(&inv);
         }
@@ -660,7 +669,7 @@ fn poly_gcd(a: &[FieldElement], b: &[FieldElement], p: &BigUint) -> Vec<FieldEle
 /// Exact quotient `a / b` for polynomials with `b | a`.
 fn poly_div_exact(a: &[FieldElement], b: &[FieldElement], p: &BigUint) -> Vec<FieldElement> {
     let b_deg = b.len() - 1;
-    let lead_inv = b[b_deg].inv().expect("divisor lead is invertible");
+    let lead_inv = b[b_deg].inv_vartime().expect("divisor lead is invertible");
     let mut r = a.to_vec();
     let mut quotient = vec![FieldElement::zero(p.clone()); a.len().saturating_sub(b_deg)];
     while r.len() > b_deg && !(r.len() == 1 && r[0].is_zero()) {
