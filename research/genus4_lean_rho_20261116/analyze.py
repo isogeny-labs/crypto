@@ -210,6 +210,7 @@ open(os.path.join(HERE, "tables.md"), "w").write("\n".join(L) + "\n")
 
 import matplotlib
 matplotlib.use("Agg")
+matplotlib.rcParams["svg.fonttype"] = "none"  # keep figures under the 64 KB artifact threshold
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
@@ -228,7 +229,7 @@ for reading, ax in zip(["Q3", "Q4"], axs):
     ax.legend()
 fig.tight_layout()
 fig.savefig(os.path.join(HERE, "figure.svg"))
-fig.savefig(os.path.join(HERE, "figure.png"), dpi=150)
+fig.savefig(os.path.join(HERE, "figure.png"), dpi=90)
 with PdfPages(os.path.join(HERE, "REPORT.pdf")) as pdf:
     pdf.savefig(fig)
     for src in ["RESULTS.md", "tables.md"]:

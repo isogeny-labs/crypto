@@ -132,13 +132,13 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T1756Z-genus4-scale",
+  "latest_record": "20261116T2201Z-genus4-lean-rho",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 12,
     "invalid": 4,
-    "measured": 209,
-    "open": 2
+    "measured": 210,
+    "open": 1
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -25996,6 +25996,32 @@
     },
     {
       "better": "lower",
+      "first": -0.364,
+      "latest": -0.364,
+      "latest_derived": {},
+      "metric": "slope_log_ratio_q3_w1",
+      "points": [
+        {
+          "commit": "586146fabc0f",
+          "date": "2026-11-17",
+          "derived": {},
+          "n": 2,
+          "record": "20261116T2201Z-genus4-lean-rho",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            -0.975,
+            0.294
+          ],
+          "summary": "Genus 4 arm w vs lean rho (B negation+Brent, Q plain no window), p=8209 (18 targets) and 16411 (9): cheapest rho at w=1 is Q. Q3: w=0.1 below (0.210, 0.163); w=1 above (2.075 [1.675,2.657], 1.612 [1.180,2.409]); slope -0.364 [-0.975,0.294]. Negation walks at 1.40-1.83x theory steps. p=32771 dropped (declared). [pcc:unverified]",
+          "value": -0.364
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 515.8755048849767,
       "latest": 515.8755048849767,
       "latest_derived": {
@@ -32377,6 +32403,58 @@
     },
     {
       "better": "lower",
+      "first": 0.163,
+      "latest": 0.163,
+      "latest_derived": {},
+      "metric": "w_over_cheapest_rho_q3_w01_p16411",
+      "points": [
+        {
+          "commit": "586146fabc0f",
+          "date": "2026-11-17",
+          "derived": {},
+          "n": 9,
+          "record": "20261116T2201Z-genus4-lean-rho",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.119,
+            0.243
+          ],
+          "summary": "Genus 4 arm w vs lean rho (B negation+Brent, Q plain no window), p=8209 (18 targets) and 16411 (9): cheapest rho at w=1 is Q. Q3: w=0.1 below (0.210, 0.163); w=1 above (2.075 [1.675,2.657], 1.612 [1.180,2.409]); slope -0.364 [-0.975,0.294]. Negation walks at 1.40-1.83x theory steps. p=32771 dropped (declared). [pcc:unverified]",
+          "value": 0.163
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.21,
+      "latest": 0.21,
+      "latest_derived": {},
+      "metric": "w_over_cheapest_rho_q3_w01_p8209",
+      "points": [
+        {
+          "commit": "586146fabc0f",
+          "date": "2026-11-17",
+          "derived": {},
+          "n": 18,
+          "record": "20261116T2201Z-genus4-lean-rho",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.169,
+            0.268
+          ],
+          "summary": "Genus 4 arm w vs lean rho (B negation+Brent, Q plain no window), p=8209 (18 targets) and 16411 (9): cheapest rho at w=1 is Q. Q3: w=0.1 below (0.210, 0.163); w=1 above (2.075 [1.675,2.657], 1.612 [1.180,2.409]); slope -0.364 [-0.975,0.294]. Negation walks at 1.40-1.83x theory steps. p=32771 dropped (declared). [pcc:unverified]",
+          "value": 0.21
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 0.115,
       "latest": 0.115,
       "latest_derived": {},
@@ -32422,6 +32500,32 @@
           ],
           "summary": "Genus 4, p=8209 (3 new curves) and p=16411 (3 curves): under the frozen rho references arm w is below rho at w=0,0.1,1 in Q3 (0.149, 0.115 at w=1), but against window-free plain rho (P0f) w=1 is at parity (1.05 [0.68,2.01], 1.15 [0.77,2.25]); below at w<=0.1. Negation rho needs 1.42x theory steps at p=16411 (P4 failed). Measurement launchers search.sh/resume.sh ran outside benchrec (deviation); the recorded command is the analysis. [pcc:unverified]",
           "value": 1.153
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.612,
+      "latest": 1.612,
+      "latest_derived": {},
+      "metric": "w_over_cheapest_rho_q3_w1_p16411",
+      "points": [
+        {
+          "commit": "586146fabc0f",
+          "date": "2026-11-17",
+          "derived": {},
+          "n": 9,
+          "record": "20261116T2201Z-genus4-lean-rho",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.18,
+            2.409
+          ],
+          "summary": "Genus 4 arm w vs lean rho (B negation+Brent, Q plain no window), p=8209 (18 targets) and 16411 (9): cheapest rho at w=1 is Q. Q3: w=0.1 below (0.210, 0.163); w=1 above (2.075 [1.675,2.657], 1.612 [1.180,2.409]); slope -0.364 [-0.975,0.294]. Negation walks at 1.40-1.83x theory steps. p=32771 dropped (declared). [pcc:unverified]",
+          "value": 1.612
         }
       ],
       "problem": "prime-field-chained-transfer-no-advantage",
@@ -32507,6 +32611,32 @@
     },
     {
       "better": "lower",
+      "first": 2.075,
+      "latest": 2.075,
+      "latest_derived": {},
+      "metric": "w_over_cheapest_rho_q3_w1_p8209",
+      "points": [
+        {
+          "commit": "586146fabc0f",
+          "date": "2026-11-17",
+          "derived": {},
+          "n": 18,
+          "record": "20261116T2201Z-genus4-lean-rho",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.675,
+            2.657
+          ],
+          "summary": "Genus 4 arm w vs lean rho (B negation+Brent, Q plain no window), p=8209 (18 targets) and 16411 (9): cheapest rho at w=1 is Q. Q3: w=0.1 below (0.210, 0.163); w=1 above (2.075 [1.675,2.657], 1.612 [1.180,2.409]); slope -0.364 [-0.975,0.294]. Negation walks at 1.40-1.83x theory steps. p=32771 dropped (declared). [pcc:unverified]",
+          "value": 2.075
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 0.142,
       "latest": 0.142,
       "latest_derived": {},
@@ -32526,6 +32656,32 @@
           ],
           "summary": "Genus 4 p=8209, 9 targets: negation rho is the cheapest rho (plain 1.30-1.35x). IC arm w vs cheapest rho at w=1: Q1 mults-only 0.469 [0.341,0.709]; Q2 IC adds priced 1.367 [0.995,2.068]; Q3 all emitted ops 0.142; Qcal 0.008. Below at w=0, 0.1 in every reading. [pcc:unverified]",
           "value": 0.142
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.403,
+      "latest": 0.403,
+      "latest_derived": {},
+      "metric": "w_over_cheapest_rho_q4_w1_p16411",
+      "points": [
+        {
+          "commit": "586146fabc0f",
+          "date": "2026-11-17",
+          "derived": {},
+          "n": 9,
+          "record": "20261116T2201Z-genus4-lean-rho",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.295,
+            0.602
+          ],
+          "summary": "Genus 4 arm w vs lean rho (B negation+Brent, Q plain no window), p=8209 (18 targets) and 16411 (9): cheapest rho at w=1 is Q. Q3: w=0.1 below (0.210, 0.163); w=1 above (2.075 [1.675,2.657], 1.612 [1.180,2.409]); slope -0.364 [-0.975,0.294]. Negation walks at 1.40-1.83x theory steps. p=32771 dropped (declared). [pcc:unverified]",
+          "value": 0.403
         }
       ],
       "problem": "prime-field-chained-transfer-no-advantage",
