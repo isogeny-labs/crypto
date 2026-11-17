@@ -4210,7 +4210,7 @@ fn build_inherited_macaulay_with_layout(
                 )
             };
             if let Some(matrix) = matrix {
-                F4_LAYOUT_HITS.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                f4_layout_count(true);
                 return Some((layout.columns.clone(), matrix));
             }
             F4_LAYOUTS.with(|layouts| {
@@ -4602,7 +4602,7 @@ fn build_macaulay_with_multiplier_mask(
                 multiplier_mask,
                 &layout,
             ) {
-                F4_LAYOUT_HITS.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                f4_layout_count(true);
                 return Some(BuiltMacaulay {
                     columns: layout.columns.clone(),
                     matrix,
@@ -4647,7 +4647,7 @@ fn build_macaulay_flat_with_multiplier_mask(
             if let Some(matrix) =
                 pack_polynomials_flat_fused(polys, n_vars, degree, multiplier_mask, &layout)
             {
-                F4_LAYOUT_HITS.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                f4_layout_count(true);
                 return Some(BuiltMacaulay {
                     columns: layout.columns.clone(),
                     matrix,
@@ -4671,7 +4671,400 @@ fn build_macaulay_flat_with_multiplier_mask(
     )
 }
 
-fn build_macaulay_packed<P: Default>(
+// ── Sort-free parity row generation (KIC_M4RI_OLD=1 restores the old path) ──
+//
+// A cold Macaulay build used to materialise every product `t · f` as a
+// vector of masks, sort it to cancel even multiplicities, insert every
+// surviving monomial in a hash set to find the columns, then look each one
+// up again in a column index to pack the row.  Over `F_2` with at most a few
+// thousand monomials of degree ≤ D in n ≤ 64 variables, each monomial has a
+// direct slot (its colex rank within its degree), so: toggle the product's
+// slots in a parity bitset (an even multiplicity cancels by itself), read
+// the odd slots back in product order, mark new columns in a seen bitset,
+// sort only the distinct columns, and scatter each row's slots through a
+// slot→column table.  The rows, columns, row order, caps and the `bitop/v1`
+// tally charged are exactly the old path's; only the host work changes.
+
+/// Highest degree the slot map serves; beyond it the old builder runs.
+const PARITY_MAX_DEGREE: usize = 6;
+/// Largest slot space (monomials of degree ≤ D in n variables) served.
+const PARITY_MAX_SLOTS: u64 = 1 << 20;
+
+thread_local! {
+    static PARITY_ROWS_OVERRIDE: std::cell::Cell<Option<bool>> =
+        const { std::cell::Cell::new(None) };
+    static PARITY_SCRATCH: std::cell::RefCell<ParityScratch> =
+        std::cell::RefCell::new(ParityScratch::default());
+}
+
+/// Whether cold Macaulay builds use the sort-free parity generator:
+/// yes unless `KIC_M4RI_OLD=1` (read once) or a test override says no.
+fn parity_rows_enabled() -> bool {
+    if let Some(on) = PARITY_ROWS_OVERRIDE.with(std::cell::Cell::get) {
+        return on;
+    }
+    static OLD: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    !*OLD.get_or_init(|| std::env::var("KIC_M4RI_OLD").as_deref() == Ok("1"))
+}
+
+/// Per-thread override of [`parity_rows_enabled`] for same-process
+/// comparisons (`None` restores the environment's choice).
+#[cfg(test)]
+fn set_parity_rows_thread(on: Option<bool>) {
+    PARITY_ROWS_OVERRIDE.with(|c| c.set(on));
+}
+
+#[derive(Default)]
+struct ParityScratch {
+    /// One bit a slot; all zero between products.
+    parity: Vec<u64>,
+    /// One bit a slot; all zero between builds.
+    seen: Vec<u64>,
+    /// Slot → column, written for the live slots of the current build only.
+    slot_col: Vec<u32>,
+    /// The current product's slots, in term order.
+    ids: Vec<u32>,
+}
+
+/// Rows of a cold build in slot form: row `r` is
+/// `slots[row_ends[r-1]..row_ends[r]]`, its odd monomials in the order the
+/// old builder's sort put them (irrelevant to the packed bits).
+struct ParityRows {
+    slots: Vec<u32>,
+    row_ends: Vec<usize>,
+    /// Distinct columns as `(mask, slot)`, unsorted.
+    columns: Vec<(Mask, u32)>,
+}
+
+enum ParityOutcome {
+    /// The row cap was exceeded (the old builder's `None`).
+    TooManyRows,
+    Rows(ParityRows),
+}
+
+/// Packing of slot rows into a matrix representation.
+trait ParityPack: Sized {
+    fn pack_slot_rows(words: usize, slot_col: &[u32], rows: &ParityRows) -> Self;
+}
+
+impl ParityPack for Vec<Vec<u64>> {
+    fn pack_slot_rows(words: usize, slot_col: &[u32], rows: &ParityRows) -> Self {
+        let mut start = 0usize;
+        rows.row_ends
+            .iter()
+            .map(|&end| {
+                let mut row = vec![0u64; words];
+                for &slot in &rows.slots[start..end] {
+                    let column = slot_col[slot as usize] as usize;
+                    row[column / 64] |= 1u64 << (column % 64);
+                }
+                start = end;
+                row
+            })
+            .collect()
+    }
+}
+
+impl ParityPack for FlatF2Matrix {
+    fn pack_slot_rows(words: usize, slot_col: &[u32], rows: &ParityRows) -> Self {
+        let mut data = vec![0u64; rows.row_ends.len() * words];
+        let mut start = 0usize;
+        for (index, &end) in rows.row_ends.iter().enumerate() {
+            let row = &mut data[index * words..(index + 1) * words];
+            for &slot in &rows.slots[start..end] {
+                let column = slot_col[slot as usize] as usize;
+                row[column / 64] |= 1u64 << (column % 64);
+            }
+            start = end;
+        }
+        FlatF2Matrix {
+            data,
+            rows: rows.row_ends.len(),
+            words,
+        }
+    }
+}
+
+/// Colex slot table for monomials of degree ≤ `degree` in `n_vars`
+/// variables, or `None` when the shape is outside the served range.
+struct SlotMap {
+    /// `C(bit, j)` at `bit * 8 + j`: a flat table whose length covers
+    /// every `trailing_zeros` result, so the lookup needs no bounds check.
+    choose: [u32; (MASK_BITS + 1) * 8],
+    offsets: [u32; PARITY_MAX_DEGREE + 2],
+    total: usize,
+}
+
+impl SlotMap {
+    fn new(n_vars: usize, degree: u32) -> Option<Self> {
+        let degree = degree as usize;
+        if n_vars > MASK_BITS || degree > PARITY_MAX_DEGREE {
+            return None;
+        }
+        let mut wide = [[0u64; PARITY_MAX_DEGREE + 1]; MASK_BITS + 1];
+        for n in 0..=n_vars {
+            wide[n][0] = 1;
+            for k in 1..=PARITY_MAX_DEGREE.min(n) {
+                wide[n][k] = wide[n - 1][k - 1] + wide[n - 1][k];
+            }
+        }
+        let mut total = 0u64;
+        let mut offsets = [0u32; PARITY_MAX_DEGREE + 2];
+        for d in 0..=degree {
+            offsets[d] = u32::try_from(total).ok()?;
+            total += wide[n_vars][d];
+            if total > PARITY_MAX_SLOTS {
+                return None;
+            }
+        }
+        let mut choose = [0u32; (MASK_BITS + 1) * 8];
+        for n in 0..=n_vars {
+            for k in 0..=PARITY_MAX_DEGREE {
+                // entries past the slot range are never read for masks of
+                // degree ≤ `degree` below `n_vars`
+                choose[n * 8 + k] = u32::try_from(wide[n][k].min(u64::from(u32::MAX))).unwrap();
+            }
+        }
+        Some(SlotMap {
+            choose,
+            offsets,
+            total: total as usize,
+        })
+    }
+
+    /// The slot of `mask` (degree ≤ the map's degree, bits below `n_vars`).
+    #[inline]
+    fn slot(&self, mask: Mask) -> u32 {
+        let mut rank = self.offsets[mask.count_ones() as usize];
+        let mut bits = mask;
+        let mut j = 1usize;
+        while bits != 0 {
+            let bit = bits.trailing_zeros() as usize;
+            rank += self.choose[(bit << 3) | (j & 7)];
+            bits &= bits - 1;
+            j += 1;
+        }
+        rank
+    }
+}
+
+/// The rows [`macaulay_rows_monos_with_mask`] produces, in slot form, with
+/// the same `bitop/v1` charges (its products' ORs, sort and parity scan,
+/// the kept copy) and the same row cap.  `scratch.seen` holds the columns'
+/// bits on return; the caller clears them.
+fn parity_rows_with_mask(
+    polys: &[F2BoolPoly],
+    n_vars: usize,
+    degree: u32,
+    multiplier_mask: Mask,
+    criterion: Option<&F5Criterion>,
+    map: &SlotMap,
+    scratch: &mut ParityScratch,
+) -> ParityOutcome {
+    let row_cap = max_f4_rows();
+    let words = map.total.div_ceil(64);
+    if scratch.parity.len() < words {
+        scratch.parity.resize(words, 0);
+        scratch.seen.resize(words, 0);
+    }
+    if scratch.slot_col.len() < map.total {
+        scratch.slot_col.resize(map.total, 0);
+    }
+    let ParityScratch {
+        parity, seen, ids, ..
+    } = scratch;
+    let mut out = ParityRows {
+        slots: Vec::new(),
+        row_ends: Vec::new(),
+        columns: Vec::new(),
+    };
+    let mut full_count = 0usize;
+    let mut schedules: Vec<Option<std::rc::Rc<[Mask]>>> = vec![None; degree as usize + 1];
+    // as in `visit_macaulay_rows_counted`
+    let mut tally = bitop_tally::Pending::default();
+    for (i, p) in polys.iter().enumerate() {
+        tally.word_ops += p.terms.len() as u64;
+        let pdeg = p
+            .terms
+            .iter()
+            .map(|t| t.mask.count_ones())
+            .max()
+            .unwrap_or(0);
+        if pdeg > degree {
+            continue;
+        }
+        let gap = (degree - pdeg) as usize;
+        let multipliers = schedules[gap].get_or_insert_with(|| {
+            if multiplier_mask == all_variable_mask(n_vars) {
+                monomials_up_to_mask(multiplier_mask, gap as u32).into()
+            } else {
+                cached_monomials_up_to_mask(multiplier_mask, gap as u32)
+            }
+        });
+        let charge = 2 * p.terms.len() as u64 + bitop_tally::sort_cost(p.terms.len());
+        for &mult in multipliers.iter() {
+            let pruned = criterion.is_some_and(|c| c.prunes(i, mult));
+            tally.hash_probes += u64::from(criterion.is_some());
+            if pruned {
+                continue;
+            }
+            tally.word_ops += charge;
+            ids.clear();
+            ids.extend(p.terms.iter().map(|t| {
+                let s = map.slot(t.mask | mult);
+                parity[(s / 64) as usize] ^= 1u64 << (s % 64);
+                s
+            }));
+            let start = out.slots.len();
+            for (&s, t) in ids.iter().zip(p.terms.iter()) {
+                let (w, b) = ((s / 64) as usize, 1u64 << (s % 64));
+                if parity[w] & b != 0 {
+                    parity[w] &= !b;
+                    out.slots.push(s);
+                    if seen[w] & b == 0 {
+                        seen[w] |= b;
+                        out.columns.push((t.mask | mult, s));
+                    }
+                }
+            }
+            let kept = out.slots.len() - start;
+            if kept != 0 {
+                full_count += 1;
+                tally.word_ops += kept as u64;
+                out.row_ends.push(out.slots.len());
+            }
+            if full_count > row_cap {
+                for &(_, s) in &out.columns {
+                    seen[(s / 64) as usize] &= !(1u64 << (s % 64));
+                }
+                return ParityOutcome::TooManyRows;
+            }
+        }
+    }
+    ParityOutcome::Rows(out)
+}
+
+/// The cold-layout half of [`build_macaulay_packed`] on the parity
+/// generator.  `None` inside `Some` is the old builder's `None` (a cap);
+/// an outer `None` asks the caller to run the old builder.
+#[allow(clippy::too_many_arguments)]
+fn build_macaulay_packed_parity<P: Default + ParityPack>(
+    polys: &[F2BoolPoly],
+    n_vars: usize,
+    degree: u32,
+    multiplier_mask: Mask,
+    reuse_layout: bool,
+    f5: Option<&F5Criterion>,
+    rows_pruned: u64,
+    criterion_word_ops: u64,
+    layout_key: (Mask, u32, bool),
+    subprofile: bool,
+) -> Option<Option<BuiltMacaulay<P>>> {
+    let map = SlotMap::new(n_vars, degree)?;
+    let support = polys
+        .iter()
+        .flat_map(|p| p.terms.iter())
+        .fold(multiplier_mask, |acc, t| acc | t.mask);
+    if support & !all_variable_mask(n_vars) != 0 {
+        return None;
+    }
+    let finish = |columns: Vec<Mask>, matrix: P| BuiltMacaulay {
+        columns,
+        matrix,
+        rows_pruned,
+        criterion_word_ops,
+    };
+    let mut fresh = None;
+    PARITY_SCRATCH.with(|cell| {
+        let mut guard = cell.try_borrow_mut().ok();
+        let scratch: &mut ParityScratch = match guard.as_deref_mut() {
+            Some(scratch) => scratch,
+            None => fresh.get_or_insert_with(ParityScratch::default),
+        };
+        let rows_started = subprofile.then(std::time::Instant::now);
+        let mut rows = match parity_rows_with_mask(
+            polys,
+            n_vars,
+            degree,
+            multiplier_mask,
+            f5,
+            &map,
+            scratch,
+        ) {
+            ParityOutcome::TooManyRows => return Some(None),
+            ParityOutcome::Rows(rows) => rows,
+        };
+        if let Some(started) = rows_started {
+            F4_BUILD_ROWS_NS.fetch_add(
+                started.elapsed().as_nanos() as u64,
+                std::sync::atomic::Ordering::Relaxed,
+            );
+        }
+        let clear_seen = |scratch: &mut ParityScratch, rows: &ParityRows| {
+            for &(_, s) in &rows.columns {
+                scratch.seen[(s / 64) as usize] &= !(1u64 << (s % 64));
+            }
+        };
+        if rows.row_ends.is_empty() {
+            clear_seen(scratch, &rows);
+            return Some(Some(finish(Vec::new(), P::default())));
+        }
+        let pack_started = subprofile.then(std::time::Instant::now);
+        if reuse_layout {
+            f4_layout_count(false);
+        }
+        clear_seen(scratch, &rows);
+        // `macaulay_columns`'s charges and cap
+        let nonzeros = rows.slots.len();
+        if rows.row_ends.len() <= 1 {
+            bitop_tally::word_ops(2 * nonzeros as u64 + bitop_tally::sort_cost(nonzeros));
+        } else {
+            bitop_tally::hash_probes(nonzeros as u64);
+        }
+        if rows.columns.len() > max_f4_cols() {
+            return Some(None);
+        }
+        let mut columns = std::mem::take(&mut rows.columns);
+        bitop_tally::word_ops(columns.len() as u64 + bitop_tally::sort_cost(columns.len()));
+        columns
+            .sort_unstable_by_key(|&(m, _)| std::cmp::Reverse(mono_key(F2BoolMono::from_mask(m))));
+        for (column, &(_, s)) in columns.iter().enumerate() {
+            scratch.slot_col[s as usize] = column as u32;
+        }
+        let cols: Vec<Mask> = columns.iter().map(|&(m, _)| m).collect();
+        let layout = std::rc::Rc::new(F4ColumnLayout::new(cols));
+        // `pack_rows_with_layout`'s charges (no verification on a cold build)
+        let words = layout.columns.len().div_ceil(64);
+        {
+            let mut tally = bitop_tally::Pending::default();
+            tally.word_ops += (rows.row_ends.len() * words + nonzeros) as u64;
+            tally.lookup(layout.index.hashed(), nonzeros as u64);
+        }
+        let matrix = P::pack_slot_rows(words, &scratch.slot_col, &rows);
+        if reuse_layout {
+            F4_LAYOUTS.with(|layouts| {
+                let mut layouts = layouts.borrow_mut();
+                let retained_columns: usize =
+                    layouts.values().map(|layout| layout.columns.len()).sum();
+                if layouts.len() >= 128
+                    || retained_columns.saturating_add(layout.columns.len()) > 200_000
+                {
+                    layouts.clear();
+                }
+                layouts.insert(layout_key, layout.clone());
+            });
+        }
+        if let Some(started) = pack_started {
+            F4_BUILD_PACK_NS.fetch_add(
+                started.elapsed().as_nanos() as u64,
+                std::sync::atomic::Ordering::Relaxed,
+            );
+        }
+        Some(Some(finish(layout.columns.clone(), matrix)))
+    })
+}
+
+fn build_macaulay_packed<P: Default + ParityPack>(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
@@ -4694,6 +5087,23 @@ fn build_macaulay_packed<P: Default>(
         .as_ref()
         .map(|c| (c.pruned_count(), c.word_ops()))
         .unwrap_or((0, 0));
+    let parity_key = (multiplier_mask, degree, criterion == RowCriterion::F5);
+    if parity_rows_enabled() && (!reuse_layout || cached_f4_layout(parity_key).is_none()) {
+        if let Some(built) = build_macaulay_packed_parity(
+            polys,
+            n_vars,
+            degree,
+            multiplier_mask,
+            reuse_layout,
+            f5.as_ref(),
+            rows_pruned,
+            criterion_word_ops,
+            parity_key,
+            subprofile,
+        ) {
+            return built;
+        }
+    }
     let rows_monos =
         macaulay_rows_monos_with_mask(polys, n_vars, degree, multiplier_mask, f5.as_ref())?;
     if let Some(started) = rows_started {
@@ -4718,7 +5128,7 @@ fn build_macaulay_packed<P: Default>(
         let cached = cached_f4_layout(layout_key);
         if let Some(layout) = cached {
             if let Some(matrix) = pack(&rows_monos, &layout, true) {
-                F4_LAYOUT_HITS.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                f4_layout_count(true);
                 if let Some(started) = pack_started {
                     F4_BUILD_PACK_NS.fetch_add(
                         started.elapsed().as_nanos() as u64,
@@ -4728,7 +5138,7 @@ fn build_macaulay_packed<P: Default>(
                 return Some(finish(layout.columns.clone(), matrix));
             }
         }
-        F4_LAYOUT_MISSES.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        f4_layout_count(false);
     }
 
     let cols: Vec<Mask> = macaulay_columns(&rows_monos)?;
@@ -4766,6 +5176,37 @@ pub static F4_WORD_OPS_TOTAL: std::sync::atomic::AtomicU64 = std::sync::atomic::
 
 static F4_LAYOUT_HITS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
 static F4_LAYOUT_MISSES: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+#[cfg(test)]
+thread_local! {
+    /// This thread's layout hits and misses since its last
+    /// [`f4_layout_stats_reset`]: the process-wide counters are shared by
+    /// tests running in parallel, so tests compare these instead.
+    static F4_LAYOUT_THREAD_STATS: std::cell::Cell<(u64, u64)> =
+        const { std::cell::Cell::new((0, 0)) };
+}
+
+/// Counts one layout-cache hit (`true`) or miss (`false`).
+#[inline]
+fn f4_layout_count(hit: bool) {
+    let counter = if hit {
+        &F4_LAYOUT_HITS
+    } else {
+        &F4_LAYOUT_MISSES
+    };
+    counter.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    #[cfg(test)]
+    F4_LAYOUT_THREAD_STATS.with(|c| {
+        let (h, m) = c.get();
+        c.set(if hit { (h + 1, m) } else { (h, m + 1) });
+    });
+}
+
+/// [`f4_layout_stats`] of the calling thread only (tests).
+#[cfg(test)]
+fn f4_layout_stats_thread() -> (u64, u64) {
+    F4_LAYOUT_THREAD_STATS.with(|c| c.get())
+}
 static F4_DIRECT_FUSED_PACK: std::sync::atomic::AtomicBool =
     std::sync::atomic::AtomicBool::new(false);
 static F4_SUPPORT_LOCAL_STREAM: std::sync::atomic::AtomicBool =
@@ -4982,6 +5423,8 @@ pub fn f4_layout_stats_reset() {
     use std::sync::atomic::Ordering::Relaxed;
     F4_LAYOUT_HITS.store(0, Relaxed);
     F4_LAYOUT_MISSES.store(0, Relaxed);
+    #[cfg(test)]
+    F4_LAYOUT_THREAD_STATS.with(|c| c.set((0, 0)));
     F4_LAYOUTS.with(|layouts| layouts.borrow_mut().clear());
 }
 
@@ -8721,6 +9164,75 @@ mod tests {
         assert!(
             pack_polynomials_nested_fused::<true>(&polys, n_vars, degree, mask, &extra).is_none()
         );
+    }
+
+    #[test]
+    fn parity_rows_match_sorted_rows_and_tally() {
+        // Cold Macaulay builds on the sort-free parity generator equal the
+        // materialise-sort-hash builder: columns, rows, pruning, layout
+        // misses and every `bitop/v1` charge (KIC_M4RI_OLD control).
+        let mut state = 0x9E37_79B9_7F4A_7C15u64;
+        let mut next = move || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state
+        };
+        for case in 0..60u64 {
+            let n_vars = [4usize, 6, 9, 12, 17, 32, 40][case as usize % 7];
+            let degree = 2 + (case % 3) as u32;
+            let polys: Vec<F2BoolPoly> = (0..2 + case as usize % 5)
+                .map(|_| {
+                    let terms = 1 + (next() % 9) as usize;
+                    let monos = (0..terms)
+                        .map(|_| {
+                            let mut mask: Mask = 0;
+                            for _ in 0..(next() % 3) {
+                                mask |= (1 as Mask) << (next() % n_vars as u64);
+                            }
+                            F2BoolMono::from_mask(mask)
+                        })
+                        .collect();
+                    F2BoolPoly::from_monos(monos, n_vars)
+                })
+                .collect();
+            let full = all_variable_mask(n_vars);
+            let mask = if case % 4 == 3 { full & !1 } else { full };
+            for criterion in [RowCriterion::None, RowCriterion::F5] {
+                for reuse in [false, true] {
+                    let run = |on: bool| {
+                        set_parity_rows_thread(Some(on));
+                        f4_layout_stats_reset();
+                        let before = bitop_tally::snapshot();
+                        let nested = build_macaulay_with_multiplier_mask(
+                            &polys, n_vars, degree, mask, reuse, criterion,
+                        )
+                        .map(|b| (b.columns, b.matrix, b.rows_pruned, b.criterion_word_ops));
+                        // this thread's counts: the process-wide ones are
+                        // shared with tests running in parallel
+                        let stats = f4_layout_stats_thread();
+                        f4_layout_stats_reset();
+                        let flat = build_macaulay_flat_with_multiplier_mask(
+                            &polys, n_vars, degree, mask, reuse, criterion,
+                        )
+                        .map(|b| (b.columns, b.matrix.data, b.matrix.rows, b.matrix.words));
+                        let tally = bitop_tally::snapshot().since(before);
+                        set_parity_rows_thread(None);
+                        f4_layout_stats_reset();
+                        (nested, stats, flat, tally.word_ops, tally.hash_probes)
+                    };
+                    // warm the per-thread multiplier-schedule cache, whose
+                    // first fill is charged once per thread, not per build
+                    run(false);
+                    let old = run(false);
+                    let new = run(true);
+                    assert_eq!(old.0, new.0, "case {case} nested");
+                    assert_eq!(old.1, new.1, "case {case} layout stats");
+                    assert_eq!(old.2, new.2, "case {case} flat");
+                    assert_eq!((old.3, old.4), (new.3, new.4), "case {case} tally");
+                }
+            }
+        }
     }
 
     #[test]
