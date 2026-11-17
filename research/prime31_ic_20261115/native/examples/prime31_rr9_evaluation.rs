@@ -1174,6 +1174,7 @@ fn run() -> Value {
     let mut ar = Arithmetic::default();
     check_curve(PRIME31, &mut ar).expect("prime31 curve certificate");
     let b8_fibre_audit = rr9_b8_linear_fibre_audit(&mut ar);
+    let b8_exceptional_audit = rr9_b8_exceptional_fibre_audit(&mut ar);
     let b1 = first_rational_points(&mut ar);
     let b2 = Base::build(PRIME31, 6, &mut ar).expect("real Dickson31 depth-six base");
     assert_eq!(b2.points.len(), 31);
@@ -1183,7 +1184,8 @@ fn run() -> Value {
         "schema":"prime31.rr9.evaluation.v1", "p":PRIME31.p, "n":PRIME31.n,
         "curve":PRIME31, "method":"L(9O) evaluation determinant on nine distinct affine points",
         "positive_count":64, "negative_count":64,
-        "panels":[first,dickson], "b8_signed_fibres":b8_fibre_audit, "source_only_pcc":"unverified",
+        "panels":[first,dickson], "b8_signed_fibres":b8_fibre_audit,
+        "b8_exceptional_x_signed_fibres":b8_exceptional_audit, "source_only_pcc":"unverified",
         "nonenumerative_factor_extraction":false,
         "complete_unknown_target_ecdlp_recoveries":0,
         "matched_optimized_rho":false
