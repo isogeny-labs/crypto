@@ -1329,3 +1329,10 @@ What was done: single invocation at pushed 923c5f6c85c exits0; 1395 subspaces,13
 Decisions made: rational polarized degree-eight escape closed on both original genus-three controls subject to the written standard-theory proof; no transport implementation justified on this route.
 Open threads: different-degree rational kernel/quotient and explicit map/cost case, or another relation mechanism addressing original genus2+ targets; tenfold objective unresolved.
 Errors: none during the gate. No S3, cloud, producer retry or runtime claim.
+
+## Four-point harvesting gate frozen
+
+What was done: derived cubic-through-four-points residual degree<=2 and six-cross-term sign identity. Prepared/compiled gate on unchanged five promotion inputs, ten core triples/eight signs each, with full polynomial/group and three-solver checks. Input/native/import/binary hashes retained.
+Decisions made: structural gate before pricing the new sign family; 400 attempts and sixth no-trigger input retained. No square normalization omission, skipped cost claim or fixture substitution.
+Open threads: execute frozen gate once, compare useful rank to retained three-point gate, then qualify shared circuit only if useful.
+Errors: none; compiled without scientific execution.
