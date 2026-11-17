@@ -1981,3 +1981,10 @@ What was done: retainedtraceaudit scans=anchors onall12runs rulesout repeatedanc
 Decisions made: no trueaction supplied tobranchselection; actualcharacterreference diagnostic only; algebraqualification notfullverifier/cost. Original12targets/48proofs, Gitfreeze beforeonce-only120CPU. Assertions [pcc:unverified]. Sourceschecked KB queries inprotocol, no directsupportingpaperhit; selfcontainedproof standard, no noveltyclaim.
 Open threads: execute afterpush, establishconstructivebranchcoverage; separatelyneed independentbinding/mutation/fullcostgate. Genus4S9 notPhi9 caveat recorded.
 Errors: onlyunusedwarnings,noscientificexecutionyet.
+
+## Exhaustive eigenvalue cover qualified
+
+What was done: freezee14406ead25 once-onlyexit0;12covers/48exactmatrix proofs,36excluded+12scalar branches,actualactionconsistent,rootproductPhi5 exact,48weightmutations rejected. Principal/native diagnostics pass. Assertions [pcc:unverified].
+Decisions made: constructive finitecaseproof canavoid knowing actualaction inprinciple; no productionverifier/costclaim yet. WholeJprime/Dnonzero and exhaustivecoverage critical.
+Open threads: separatelybound coverpacket/verifier withmissing/duplicateroot/binding/geometry mutations and fullcoldcosts versus triangular andbothsourcearms; genus3/4scope andindependentreview.
+Errors: none in execution,no retry/S3/cloud.
