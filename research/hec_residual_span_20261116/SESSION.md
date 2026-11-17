@@ -2058,3 +2058,10 @@ What was done: freezec99762b59f7 once-onlyexit0;24calls/12targets allwholevector
 Decisions made: unchangedanchorverifier >0.1arm0base on3of4p601targets, so10xrequireschangedanchorproof/collection, notonlysubgroupproof. No universalbound.
 Open threads: exact divisor-class anchorcertificates/cancellation/sharedsupport costcase; originalgenus2+10x andreview/publicationcoverage.
 Errors: summarynil lookup forabsentzero-phase/modulus correctedtozero;rawunaffected,partialrawcommitdda9be93083 retained,no scientificretry/S3/cloud.
+
+## Polynomial anchor certificate frozen
+
+What was done: derived norm/congruence addition certificate, compatible sharedsupport from multiplicity identity; cancellation/identity nativefallback. Built192originalchainsteps+synthetic controls, native/build/verify componentcounts separate.
+Decisions made: knownvalidinputs explicit; no verification-only gain credited asfullcold. Gitfreeze beforeone120CPU invocation. Assertions [pcc:unverified]. SourcesKB receipt inprotocol; AMSoriginal403, universityStollnotes fallback; no noveltyclaim.
+Open threads: executeafterpush, assess certificateverification and actualconstructioncost, then decide fullpipeline admission.
+Errors: orchestration syntax rejected beforeexecution, retriedtoolcode only; no scientificrunyet.
