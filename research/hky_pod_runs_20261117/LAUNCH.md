@@ -102,3 +102,30 @@ Checks and predictions written before the sweep's new cells:
 ## 20:21 UTC
 
 - Depth 14 c = 6: 2 h 34 min in, peak RSS 19.8 GB. (6,3) D = 8: 2 h 52 min in, peak RSS 109.4 GB, host load average 126 to 195. No new closure line.
+## Note, 2026-11-17 (later the same day): the Python glue was removed
+
+Nothing above is rewritten; the hashes in the table are those of the files as
+pushed, which are this directory at commit `833a35d21e`.
+
+- `tools/optlevel` is now a Rust crate. The job scripts call a prebuilt binary
+  pushed as `/workspace/in/optlevel` (`cargo build --release --manifest-path
+  tools/optlevel/Cargo.toml`; one x86-64 binary runs on any pod, because its
+  calibration kernels select their instruction set at run time) instead of
+  `python3 tools/optlevel/optlevel.py`. `optlevel.tar.gz` is still needed by the
+  GPU jobs for `tools/profile.sh` and `kernels/gpu_calib.cu`.
+- The inline `python3` JSON summaries in `msweep_job.sh`, `cpu_job.sh`,
+  `gpu_job2.sh` and `gpu_job3.sh` are now `jq` filters or `optlevel summary`.
+  The pods need `jq` (`cpu_job.sh` installs it with its other packages).
+- `job.py` (SHA-256 `82899a74…`, five lines: run one shell script and pass its
+  exit code through) is deleted from the tree. It existed only because the
+  control server inside `pod.py` accepts jobs whose first word is `python3`.
+  Until `pod.py` is replaced, the same launch is
+  `pod.py run NAME JOB -- python3 -c 'import os,sys; os.execv("/bin/bash", ["bash", "/workspace/code/" + sys.argv[1], *sys.argv[2:]])' cpu_job.sh`:
+  that one `exec` is the only Python left in a job, and it is `pod.py`'s
+  requirement, not the job's.
+- `pod.py` is unchanged apart from a note on its second line: it is a copy of
+  the lfd-summation-systems launcher and is to be replaced, not extended.
+- No pod was started, changed or contacted for this edit. The edited scripts
+  were checked with `bash -n` and their `jq` filters against the committed
+  result files (`results/b_m7-T2.jsonl` reproduces the summary lines in
+  `results/b_msweep.log`); they have not run on a pod.

@@ -9,9 +9,17 @@
  * charges those bytes to DRAM only when the working set exceeds the
  * last-level cache.
  *
- * The same source is built twice by tools/optlevel/optlevel.py:
- *   optk         -O3 -march=native                 (SIMD ceiling)
- *   optk_scalar  -O3 -march=native -fno-tree-vectorize -fno-tree-slp-vectorize
+ * Since 2026-11-17 the calibration kernels are the Rust ones in ../src/kernels.rs.
+ * This file is kept as the reference they were ported from and as an optional
+ * second opinion: `optlevel calibrate --c-kernels` builds it with the system C
+ * compiler (as c-native, c-w512, c-scalar) and takes the best of both.  Unlike
+ * the Rust kernels it reads the clock after every pass, which costs the short
+ * in-cache passes up to a third of their rate (research/optlevel_rs_20261117).
+ *
+ * The same source is built three times by `optlevel calibrate --c-kernels`:
+ *   c-native     -O3 -march=native -ffp-contract=fast   (SIMD ceiling)
+ *   c-w512       the same plus -mprefer-vector-width=512
+ *   c-scalar     the same plus -fno-tree-vectorize -fno-tree-slp-vectorize
  * so the scalar/SIMD ratio of a class is measured, not assumed.
  *
  * Every kernel folds its result into a checksum the caller can compare
