@@ -2940,3 +2940,10 @@ What was done: afterlatefinisherregression screenedSmith0806.2995primarytractabl
 Decisions made: classifyallkernelsnotjusttractable, keepabstractlabels/rationalgroupschemeversusrationalpointsdistinction. Positiveadmissionnotrationaltrigonalmap/nonhypermodel/speed; g4Jacobianobligationexplicit. One600CPUprocessafterGitfreeze.
 Open threads: executeadmissionall11, thenonlyeligibleactualsourcekernelsmeritexplicitlowdegreequotient/reconstructionproof;full10xgoalactiveunachieved.
 Errors: prefreezeborrowtypesinPoly::gcd/BTreeSetnestedreferencefixedatcompile, no scientificexecutionyet. No S3/cloud/merge.
+
+## Original mixed-term two-kernel census qualifies with three genus3 tractable admissions
+
+What was done: freezeed08d38beb7 hashespass/exit0;15/135/2295allLagrangiansand15/105/945pairkernels/exactmodule/action/knowncycle/polynomialpatterncontrols pass. Originalg3p61/211/401allfactor1+6and1stablepairkernel. g2p101/1009oneeach;g4p31eleven(5pair/6other);other5modelszero. Allabstractspans/zerosretained.
+Decisions made: positivekerneladmissionnotrationaltrigonalmap/quotient/nonhyp/transport/speed. Source-specificlow2routepromisingforg3, notallgenus2+claim. NextderiveFpPlueckerpair-identificationconstraintsusingh=X^(p³)modirreduciblesextic/quadricdecomposability;all3rationalityoutcomesmustremain.
+Open threads: construct/verifyrationaldegree3mapsfororiginalg3kernels, thenexplicitquotient/descent/mapsifeligible;g2/g4/full10xgoalunachieved/independentreviewopen.
+Errors: no scientificfailure; prefreezeborrowfixalreadyrecorded. No S3/cloud/merge/unchangedrerun.
