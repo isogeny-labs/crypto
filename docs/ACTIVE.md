@@ -15,6 +15,8 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [ ] Audit actual prime31 B31 eight-leaf coverage against matched random and first-x bases; reuse original Rust 4A oracle and pre-registered 256-Q corpus (automation, started 2026-11-17, branch automation/prime31-b31-coverage-null-control-20261117)
+
 - [x] Dickson31 8A relation-index full 31-column modular solve and 1024 blinded prime31 targets; scoped generic-equivalent complete-control benchmark (automation, started 2026-11-17, branch automation/prime31-dickson31-complete-1024-20261117, PR #4623)
 
 - [x] Benchmark Montgomery batch-inverted 4A complement checks for Dickson31 eight-sum IC relation controls, same 98 public targets (automation, started 2026-11-17, branch automation/prime31-dickson31-batched-complement-20261117, PR #4618)
