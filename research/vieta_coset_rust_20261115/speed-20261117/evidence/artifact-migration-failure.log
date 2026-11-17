@@ -1,0 +1,21 @@
+migrate	Upload changed data and replay remote bytes	﻿2026-11-17T06:23:38.1430880Z ##[group]Run set -euo pipefail
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:38.1431128Z [36;1mset -euo pipefail[0m
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:38.1431365Z [36;1mtest -n "$AWS_ACCESS_KEY_ID" && test -n "$AWS_SECRET_ACCESS_KEY"[0m
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:38.1431610Z [36;1mcd candidate[0m
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:38.1431788Z [36;1mbase=$(git merge-base "$BASE_SHA" HEAD)[0m
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:38.1432071Z [36;1mpython3 ../trusted/tools/artifacts/artifacts.py migrate "$base" HEAD[0m
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:38.1432335Z [36;1mgit diff --cached --check[0m
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:38.1480376Z shell: /usr/bin/bash -e {0}
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:38.1480553Z env:
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:38.1480840Z   AWS_ACCESS_KEY_ID: ***
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:38.1481074Z   AWS_SECRET_ACCESS_KEY: ***
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:38.1481246Z   AWS_REGION: us-west-2
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:38.1481441Z   BASE_SHA: c5cbb67b19fe39864da7f8c9b29726696ba01580
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:38.1481663Z ##[endgroup]
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:42.1926927Z artifacts: head-object store/sha256/90/90e9bf388fe1473183e90c23fadbacc017c7c0fff9566b59c843ce29accd8007: aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 answers 403 for an absent key without s3:ListBucket)
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:42.1930003Z artifacts: head-object store/sha256/49/4905fd120f08ea426f18e156ea1fe04f74925de1262600be7112b771945e51f0: aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 answers 403 for an absent key without s3:ListBucket)
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:42.2085873Z artifacts: head-object store/sha256/cd/cd41ba02cdcc8f132665944c317ae9a9b7e75bdbc4e578af622cb62cdbfd4063: aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 answers 403 for an absent key without s3:ListBucket)
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:42.2096377Z artifacts: head-object store/sha256/3e/3e0af1257d61ceed712b82e9ba432ecb9033c874b93c339e5b91bc8784ddd591: aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 answers 403 for an absent key without s3:ListBucket)
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:43.1301295Z artifacts: head-object store/sha256/90/90e9bf388fe1473183e90c23fadbacc017c7c0fff9566b59c843ce29accd8007: aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 answers 403 for an absent key without s3:ListBucket)
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:43.1304206Z artifacts: head-object store/sha256/cd/cd41ba02cdcc8f132665944c317ae9a9b7e75bdbc4e578af622cb62cdbfd4063: aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 answers 403 for an absent key without s3:ListBucket)
+migrate	Upload changed data and replay remote bytes	2026-11-17T06:23:43.1458126Z ##[error]Process completed with exit code 2.
