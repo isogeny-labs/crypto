@@ -1,0 +1,9 @@
+The previous rank-based study found two certified cubics that lower observed F4 degree5to4 on development n3/4/6. This follow-up adds direct construction and a frozen repeated comparison that prices the removed rank scout, unused candidate work and complete checking. PR4349 is merged; this branch starts from integrated main.
+
+Four routes:dynamic rank selection, direct selection after constructing all candidates, direct construction from the first four equations, and the previous fastest fully checked frontier constructor. The first three must produce identical augmented bytes. All routes retain native membership checks, fresh Singular identity checks, complete original-input3CAS basis equality, and the frontier's separate full replay. No completed basis or witness enters selection.
+
+[Protocol](research/relation_degree_trace_20261115/direct-syzygy-20261117/PROTOCOL.md):fixed p2147483647,n3/4/6,seed7;7A/A pairs,24 position-balanced blocks plus fixed25th block, joint100000-draw percentile bootstrap. Work/full-paid scopes separate; all A/A rejections and failed attempts remain. No15x promise or new timing result yet.
+
+Qualification:53 scoped capture and16 library release tests, strictlint/build, one originaln3four-route correctness panel, independent frontier-wire replay, corrupted-cost and corrupted-wire refusal. Earlier7/21 numerical admission remains unchanged; explicit25 adapter uses the same odd median/resampling core. Initial compile/calculator/monitor setup failures are retained and all predate native timing.
+
+Complete source/config/provenance and qualification/program archives are included. LocalCPU0/L0/checkpoint waiver/zero cloud spend. Fresh and original reserved seeds unused. Benchmark helper tools removed by currentmain are not restored; record/audit is Rust and the existing monitor/dependency are frozen outside the tree. Results remain unsigned; CI/review pending.
