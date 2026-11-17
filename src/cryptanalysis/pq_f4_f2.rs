@@ -2663,7 +2663,9 @@ pub fn solutions_from_linear_part(
         }
         pivots.push((v, mask, c));
     }
-    let pinned = pivots.iter().fold(0 as Mask, |acc, p| acc | ((1 as Mask) << p.0));
+    let pinned = pivots
+        .iter()
+        .fold(0 as Mask, |acc, p| acc | ((1 as Mask) << p.0));
     let free: Vec<usize> = (0..n_vars).filter(|&v| (pinned >> v) & 1 == 0).collect();
     if free.len() > max_free {
         return None;
@@ -2718,7 +2720,8 @@ mod tests {
         let mut rng = StdRng::seed_from_u64(29);
         for case in 0..40 {
             let n = 8 + case % 7;
-            let planted = (case % 3 != 0).then(|| mask_from64(rng.gen::<u64>() & ((1u64 << n) - 1)));
+            let planted =
+                (case % 3 != 0).then(|| mask_from64(rng.gen::<u64>() & ((1u64 << n) - 1)));
             let m = n + 2 + case % 4;
             let eqs: Vec<F2BoolPoly> = (0..m)
                 .map(|_| {

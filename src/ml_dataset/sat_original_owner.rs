@@ -971,7 +971,7 @@ pub(in crate::ml_dataset::solvers) mod worker;
 #[path = "original_boolean_rows.rs"]
 pub(in crate::ml_dataset::solvers) mod boolean_rows;
 
-#[path="original_boolean_search.rs"]
+#[path = "original_boolean_search.rs"]
 pub(in crate::ml_dataset::solvers) mod boolean_search;
 
 #[path = "affine_row_central.rs"]
@@ -982,8 +982,8 @@ pub(in crate::ml_dataset::solvers) mod affine_rows;
 #[path = "affine_boolean_row_worker.rs"]
 pub(in crate::ml_dataset::solvers) mod affine_worker;
 
-#[path="sat_search_worker.rs"]
+#[path = "sat_search_worker.rs"]
 pub(in crate::ml_dataset::solvers) mod search_worker;
 
-#[path="owned_boolean_search_worker.rs"]
+#[path = "owned_boolean_search_worker.rs"]
 pub(in crate::ml_dataset::solvers) mod owned_search_worker;

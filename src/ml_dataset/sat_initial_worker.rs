@@ -23,7 +23,10 @@ pub(in crate::ml_dataset::solvers) fn eligibility(c: &CaseConfig) -> Eligibility
     }
     // V1 requests retain their frozen historical unsupported disposition.
     // Activation must be explicit in original plan/protocol bytes before entry.
-    if c.channels.as_ref().is_some_and(|r| r.schema != "crypto.ml-dataset.channel-requests/v2") {
+    if c.channels
+        .as_ref()
+        .is_some_and(|r| r.schema != "crypto.ml-dataset.channel-requests/v2")
+    {
         return Eligibility::Unsupported;
     }
     if c.solver == "sat" && profile(&c.family, c.n, c.m) {
@@ -336,8 +339,17 @@ impl Custody {
     /// The checkpoint is the sole terminal capture receipt; parent result.json
     /// finalization retains its existing root-owned metadata scope.
     #[cfg(test)]
-    pub(in crate::ml_dataset::solvers) fn original_ledger_for_control(&self) -> Option<(u64,u64,u64,Option<Stop>)> {
-        self.budget.as_ref().map(|b|(b.native_work_limit,b.checking_work,b.adapter_bytes,b.stopped))
+    pub(in crate::ml_dataset::solvers) fn original_ledger_for_control(
+        &self,
+    ) -> Option<(u64, u64, u64, Option<Stop>)> {
+        self.budget.as_ref().map(|b| {
+            (
+                b.native_work_limit,
+                b.checking_work,
+                b.adapter_bytes,
+                b.stopped,
+            )
+        })
     }
     pub(in crate::ml_dataset::solvers) fn outcome(&mut self) -> Option<Value> {
         if !self.report_admitted || self.report_taken {
@@ -441,7 +453,10 @@ mod shared_receipt_tests {
             assert!(empty.artifacts.is_empty() && stored.is_empty());
             assert!(residual.sat_report_unavailable());
             assert!(residual.sat.is_some());
-            assert_eq!(before, std::fs::read(f.root.join("live/committed.json")).unwrap());
+            assert_eq!(
+                before,
+                std::fs::read(f.root.join("live/committed.json")).unwrap()
+            );
         }
     }
     #[test]

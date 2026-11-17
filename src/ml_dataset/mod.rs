@@ -3280,9 +3280,9 @@ fn verify_cell_with_replay_session(
             || manifest.outcome["status"] != "unsupported"
             || manifest.outcome["solver_completed"] != false
             || manifest.outcome["full_span_search"] != false)
-        {
-            return Err("unsupported affine request carries an execution claim".into());
-        }
+    {
+        return Err("unsupported affine request carries an execution claim".into());
+    }
 
     if affine_present {
         affine_replay_caller::with_current(|session| {

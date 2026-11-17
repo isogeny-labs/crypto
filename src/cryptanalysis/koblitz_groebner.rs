@@ -11373,8 +11373,7 @@ mod tests {
                         "trial {trial} {split_rule:?} {policy:?}: the splitting tree differs"
                     );
                     assert_eq!(
-                        got,
-                        brute,
+                        got, brute,
                         "trial {trial} {split_rule:?} {policy:?}: roots are not the variety"
                     );
                 }
@@ -13724,8 +13723,8 @@ mod eliminated_s4_tests {
     use super::*;
     use crate::cryptanalysis::binary_semaev::binary_semaev_s4;
     use crate::cryptanalysis::koblitz_bench::random_subspace_basis;
-    use crate::cryptanalysis::pq_groebner_f2::mask_from64;
     use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+    use crate::cryptanalysis::pq_groebner_f2::mask_from64;
     use rand::rngs::StdRng;
     use rand::SeedableRng;
 
@@ -13775,11 +13774,9 @@ mod eliminated_s4_tests {
                 })
                 .collect();
             let want = word(&binary_semaev_s4(&pt[0], &pt[1], &pt[2], &pt[3], &b, &irr));
-            let got = sys
-                .equations
-                .iter()
-                .enumerate()
-                .fold(0u64, |acc, (j, p)| acc | (p.eval(mask_from64(a)) as u64) << j);
+            let got = sys.equations.iter().enumerate().fold(0u64, |acc, (j, p)| {
+                acc | (p.eval(mask_from64(a)) as u64) << j
+            });
             assert_eq!(got, want, "n={n} ell={ell} twists={twists:?} a={a:#x}");
             zeros += (want == 0) as usize;
         }
@@ -13803,8 +13800,8 @@ mod eliminated_s4_tests {
 mod target_free_tests {
     use super::*;
     use crate::cryptanalysis::koblitz_bench::{random_subspace_basis, S3LinkRoots};
-    use crate::cryptanalysis::pq_groebner_f2::mask_from64;
     use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+    use crate::cryptanalysis::pq_groebner_f2::mask_from64;
     use rand::rngs::StdRng;
     use rand::SeedableRng;
 

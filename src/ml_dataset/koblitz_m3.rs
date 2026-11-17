@@ -1171,7 +1171,7 @@ mod admission_tests {
             protocol["freeze"] = json!({"status":"frozen", "protocol_sha256":dataset::digest(&body), "filed_before_affected_data":true, "frozen_at":"2026-10-30T00:00:00Z"});
             let bytes = serde_json::to_vec(&protocol).unwrap();
             let plan = dataset::DatasetPlan {
-                                channels: None,
+                channels: None,
                 factor_base_policies: vec![],
                 schema: "crypto.ml-dataset.plan/v1".into(),
                 field_sizes: vec![23],
@@ -1316,7 +1316,7 @@ mod mathematical_tests {
 
     fn config(n: u32, twist: bool, size: usize) -> CaseConfig {
         CaseConfig {
-                        channels: None,
+            channels: None,
             factor_base_policy: None,
             family: "koblitz".into(),
             n,
@@ -1420,7 +1420,7 @@ mod construction_tests {
 
     pub(super) fn fixture() -> MathInput {
         let config = CaseConfig {
-                        channels: None,
+            channels: None,
             factor_base_policy: None,
             family: "koblitz".into(),
             n: 23,
@@ -1819,7 +1819,7 @@ mod input_verification_tests {
         for n in [23, 31, 47, 53, 61] {
             for twist in [false, true] {
                 let config = CaseConfig {
-                                        channels: None,
+                    channels: None,
                     factor_base_policy: None,
                     family: "koblitz".into(),
                     n,
@@ -2031,7 +2031,7 @@ mod signed_prefix_tests {
         for n in [23, 31, 47, 53, 61] {
             for twist in [false, true] {
                 let cfg = CaseConfig {
-                                        channels: None,
+                    channels: None,
                     factor_base_policy: None,
                     family: "koblitz".into(),
                     n,
@@ -5280,10 +5280,9 @@ fn decode_boundary_record(
                 MatrixBoundaryStage::MainCandidate {
                     generator,
                     multiplier,
+                } if (generator >= equations || multiplier > 7) => {
+                    return Err("native main candidate mismatch".into());
                 }
-                    if (generator >= equations || multiplier > 7) => {
-                        return Err("native main candidate mismatch".into());
-                    }
                 _ => {}
             }
             reserved
@@ -12184,25 +12183,25 @@ pub(super) fn verify_worker_cell(
             false,
         )?
         .is_some()
+    {
+        let bytes = read_bounded(dir, "partial-koblitz-m3-input.raw", INPUT_BYTE_CAP)?;
+        // Truncated raw encoding remains raw custody, not a malformed
+        // canonical assertion. Only a full strict mathematical replay
+        // supplies a digest for subsequent terminal/group binding.
+        if verify_original_input(
+            &bytes,
+            &original,
+            &binding,
+            &public.sha256,
+            &factor.sha256,
+            limits,
+        )
+        .is_ok()
         {
-            let bytes = read_bounded(dir, "partial-koblitz-m3-input.raw", INPUT_BYTE_CAP)?;
-            // Truncated raw encoding remains raw custody, not a malformed
-            // canonical assertion. Only a full strict mathematical replay
-            // supplies a digest for subsequent terminal/group binding.
-            if verify_original_input(
-                &bytes,
-                &original,
-                &binding,
-                &public.sha256,
-                &factor.sha256,
-                limits,
-            )
-            .is_ok()
-            {
-                input_sha = Some(crate::ml_dataset::digest(&bytes));
-                raw_input_verified = true;
-            }
+            input_sha = Some(crate::ml_dataset::digest(&bytes));
+            raw_input_verified = true;
         }
+    }
     let native = if canonical(KOBLITZ_SLOTS[1]) {
         let bytes = read_bounded(dir, KOBLITZ_SLOTS[1].0, 4096 * 2048)?;
         Some(verify_native_capture(

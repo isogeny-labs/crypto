@@ -343,7 +343,16 @@ pub(super) fn verify_input(
     bytes: &[u8],
     admission: &mut impl OriginalAdmission,
 ) -> Result<(), Failure> {
-    verify_input_owned(original_config,original_public,original_factor_base,binding,limits,bytes,admission).map(|_|())
+    verify_input_owned(
+        original_config,
+        original_public,
+        original_factor_base,
+        binding,
+        limits,
+        bytes,
+        admission,
+    )
+    .map(|_| ())
 }
 
 pub(super) fn verify_input_owned(

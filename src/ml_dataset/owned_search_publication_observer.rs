@@ -51,7 +51,9 @@ pub(in crate::ml_dataset::solvers) fn install(observer: Observer) -> Result<Guar
             return Err("publication test observer already installed on this thread");
         }
         slot.set(Some(observer));
-        Ok(Guard { _same_thread: PhantomData })
+        Ok(Guard {
+            _same_thread: PhantomData,
+        })
     })
 }
 pub(super) fn notify(boundary: Boundary<'_>) {

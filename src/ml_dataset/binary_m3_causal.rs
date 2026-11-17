@@ -446,7 +446,7 @@ mod tests {
     use super::*;
     fn ordinary_original() -> MathInput {
         let config = CaseConfig {
-                        channels: None,
+            channels: None,
             family: "binary".into(),
             n: 23,
             m: 3,
@@ -472,7 +472,7 @@ mod tests {
     #[test]
     fn foreign_family_and_non_m3_reject_before_hooks_or_callbacks() {
         let mut config = CaseConfig {
-                        channels: None,
+            channels: None,
             family: "binary".into(),
             n: 23,
             m: 3,

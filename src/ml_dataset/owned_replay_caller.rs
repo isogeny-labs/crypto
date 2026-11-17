@@ -3,19 +3,41 @@ use super::*;
 use std::io::{Read, Write};
 use std::time::{Duration, Instant};
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum ReplayMode { Terminal, Historical }
+enum ReplayMode {
+    Terminal,
+    Historical,
+}
 impl ReplayMode {
     fn parse(mode: &str) -> Option<Self> {
-        match mode { "original_owned_search_rows_v1" => Some(Self::Terminal), "original_owned_search_historical_rows_v1" => Some(Self::Historical), _ => None }
+        match mode {
+            "original_owned_search_rows_v1" => Some(Self::Terminal),
+            "original_owned_search_historical_rows_v1" => Some(Self::Historical),
+            _ => None,
+        }
     }
     fn projection_matches(self, value: &Value) -> bool {
         match self {
-            Self::Terminal => value["schema"]=="crypto.ml-dataset.owned-search-restricted-rows/v1" && value["status"]=="verified_selected_rows",
-            Self::Historical => value["schema"]=="crypto.ml-dataset.owned-search-historical-rows/v1" && value["status"]=="verified_rows_from_prior_checkpoint" && value["producer_attempt_complete"]==false && value["report_capture_join_verified"]==false,
+            Self::Terminal => {
+                value["schema"] == "crypto.ml-dataset.owned-search-restricted-rows/v1"
+                    && value["status"] == "verified_selected_rows"
+            }
+            Self::Historical => {
+                value["schema"] == "crypto.ml-dataset.owned-search-historical-rows/v1"
+                    && value["status"] == "verified_rows_from_prior_checkpoint"
+                    && value["producer_attempt_complete"] == false
+                    && value["report_capture_join_verified"] == false
+            }
         }
     }
     fn accepts(self, verdict: solvers::OwnedReplayVerdict) -> bool {
-        matches!((self, verdict), (Self::Terminal, solvers::OwnedReplayVerdict::CheckedScope) | (Self::Historical, solvers::OwnedReplayVerdict::HistoricalCheckedScope))
+        matches!(
+            (self, verdict),
+            (Self::Terminal, solvers::OwnedReplayVerdict::CheckedScope)
+                | (
+                    Self::Historical,
+                    solvers::OwnedReplayVerdict::HistoricalCheckedScope
+                )
+        )
     }
 }
 const POLICY_CAP: u64 = 4096;
@@ -110,7 +132,7 @@ struct Slot {
     index: u64,
     consumed: bool,
     visits: u8,
-    projections:u8,
+    projections: u8,
     failed: bool,
     custody: Option<solvers::OwnedReplayCustody>,
 }
@@ -125,7 +147,9 @@ pub(super) struct Session {
     caller: CallerAdmission,
 }
 impl Session {
-    pub(super) fn historical(&self)->bool {ReplayMode::parse(&self.policy.mode)==Some(ReplayMode::Historical)}
+    pub(super) fn historical(&self) -> bool {
+        ReplayMode::parse(&self.policy.mode) == Some(ReplayMode::Historical)
+    }
     pub(super) fn from_policy(root: &Path, path: &Path, receipt: &Path) -> Result<Self, String> {
         let started = Instant::now();
         // Fixed <=4097-byte bootstrap, charged in CALLER_SETUP_WORK/FIXED_OWNER. Never producer allowance.
@@ -235,7 +259,7 @@ impl Session {
                 index,
                 consumed: false,
                 visits: 0,
-                projections:0,
+                projections: 0,
                 failed: false,
                 custody: None,
             });
@@ -263,7 +287,8 @@ impl Session {
         Ok(session)
     }
     pub(super) fn verify(&mut self, dir: &Path, manifest: &CellManifest) -> Result<(), String> {
-        let mode = ReplayMode::parse(&self.policy.mode).ok_or("invalid retained owned replay mode")?;
+        let mode =
+            ReplayMode::parse(&self.policy.mode).ok_or("invalid retained owned replay mode")?;
         let slot = self
             .slots
             .iter_mut()
@@ -324,9 +349,10 @@ impl Session {
                 slot.failed = false;
                 Ok(())
             }
-            solvers::OwnedReplayVerdict::CheckedScope | solvers::OwnedReplayVerdict::HistoricalCheckedScope => {
-                Err("owned-search replay verdict differs from authorized mode; custody retained".into())
-            }
+            solvers::OwnedReplayVerdict::CheckedScope
+            | solvers::OwnedReplayVerdict::HistoricalCheckedScope => Err(
+                "owned-search replay verdict differs from authorized mode; custody retained".into(),
+            ),
             solvers::OwnedReplayVerdict::Incomplete => {
                 Err("owned-search replay incomplete; custody retained".into())
             }
@@ -338,13 +364,30 @@ impl Session {
             }
         }
     }
-    pub(super) fn project(&mut self,dir:&Path,manifest:&CellManifest)->Result<Value,String>{
-        self.verify(dir,manifest)?;
-        let slot=self.slots.iter_mut().find(|s|s.index==manifest.cell_index).ok_or("search restricted projection slot missing")?;
-        slot.failed=true;
-        let value=slot.custody.as_mut().ok_or("search restricted projection owner missing")?.project_identity()?;
-        if !ReplayMode::parse(&self.policy.mode).ok_or("invalid retained owned replay mode")?.projection_matches(&value){return Err("owned projection differs from authorized replay mode; custody retained".into())}
-        slot.projections+=1;slot.failed=false;Ok(value)
+    pub(super) fn project(&mut self, dir: &Path, manifest: &CellManifest) -> Result<Value, String> {
+        self.verify(dir, manifest)?;
+        let slot = self
+            .slots
+            .iter_mut()
+            .find(|s| s.index == manifest.cell_index)
+            .ok_or("search restricted projection slot missing")?;
+        slot.failed = true;
+        let value = slot
+            .custody
+            .as_mut()
+            .ok_or("search restricted projection owner missing")?
+            .project_identity()?;
+        if !ReplayMode::parse(&self.policy.mode)
+            .ok_or("invalid retained owned replay mode")?
+            .projection_matches(&value)
+        {
+            return Err(
+                "owned projection differs from authorized replay mode; custody retained".into(),
+            );
+        }
+        slot.projections += 1;
+        slot.failed = false;
+        Ok(value)
     }
     pub(super) fn write_receipt(&mut self, path: &Path, success: bool) -> Result<(), String> {
         if self.report_taken {
@@ -426,7 +469,11 @@ pub(super) fn invoke(
     args: &DatasetArgs,
     body: impl FnOnce() -> Result<(), String>,
 ) -> Result<(), String> {
-    if args.owned_replay_policy.is_some() && (args.sat_replay_policy.is_some()||args.affine_replay_policy.is_some()||args.search_replay_policy.is_some()) {
+    if args.owned_replay_policy.is_some()
+        && (args.sat_replay_policy.is_some()
+            || args.affine_replay_policy.is_some()
+            || args.search_replay_policy.is_some())
+    {
         return Err("simultaneous search and initial/affine replay policies are ambiguous".into());
     }
     if ENTERED.with(|c| c.replace(true)) {
@@ -442,10 +489,14 @@ pub(super) fn invoke(
             start_name.push(".started.json");
             let start_path = PathBuf::from(start_name);
             if receipt.exists() || start_path.exists() {
-                return Err("existing owned-search replay invocation; reconcile instead of retry".into());
+                return Err(
+                    "existing owned-search replay invocation; reconcile instead of retry".into(),
+                );
             }
             let session = Session::from_policy(&root, policy, receipt)?;
-            if ReplayMode::parse(&session.policy.mode)==Some(ReplayMode::Historical) && matches!(&args.command,DatasetCommand::Generate(_)) {
+            if ReplayMode::parse(&session.policy.mode) == Some(ReplayMode::Historical)
+                && matches!(&args.command, DatasetCommand::Generate(_))
+            {
                 return Err("historical replay policy cannot authorize generation".into());
             }
             let start = json!({"schema":"crypto.ml-dataset.owned-replay-start/v1","mode":session.policy.mode,"policy_sha256":session.policy_sha256,"run_sha256":session.policy.run_sha256});
@@ -484,7 +535,11 @@ pub(super) fn authorize_generation(plan: &DatasetPlan, binding: &Value) -> Resul
     }
     // Match storage::write_json through an admitted bounded writer.
     with_current(|s| {
-        if s.as_ref().is_some_and(|s|ReplayMode::parse(&s.policy.mode)==Some(ReplayMode::Historical)){return Err("historical replay policy cannot authorize generation".into())}
+        if s.as_ref()
+            .is_some_and(|s| ReplayMode::parse(&s.policy.mode) == Some(ReplayMode::Historical))
+        {
+            return Err("historical replay policy cannot authorize generation".into());
+        }
         let s = s.ok_or("explicit owned-search replay policy required before generation")?;
         s.caller.reserve_read()?;
         struct Bounded(Vec<u8>);
@@ -523,7 +578,9 @@ pub(super) fn authorize_cell_dispatch(index: u64, config: &CaseConfig) -> Result
     }
     with_current(|s| {
         let s = s.ok_or("explicit owned-search replay policy required before cell dispatch")?;
-        if ReplayMode::parse(&s.policy.mode)!=Some(ReplayMode::Terminal){return Err("historical replay policy cannot authorize cell dispatch".into())}
+        if ReplayMode::parse(&s.policy.mode) != Some(ReplayMode::Terminal) {
+            return Err("historical replay policy cannot authorize cell dispatch".into());
+        }
         if Instant::now() >= s.deadline
             || !s
                 .slots
@@ -535,8 +592,6 @@ pub(super) fn authorize_cell_dispatch(index: u64, config: &CaseConfig) -> Result
         Ok(())
     })
 }
-
-
 
 #[cfg(test)]
 mod tests {
@@ -577,9 +632,12 @@ mod tests {
         }
         fn args(&self) -> DatasetArgs {
             DatasetArgs {
-                search_replay_policy:None,search_replay_receipt:None,
-                affine_replay_policy:None,affine_replay_receipt:None,
-                sat_replay_policy:None,sat_replay_receipt:None,
+                search_replay_policy: None,
+                search_replay_receipt: None,
+                affine_replay_policy: None,
+                affine_replay_receipt: None,
+                sat_replay_policy: None,
+                sat_replay_receipt: None,
                 owned_replay_policy: Some(self.policy.clone()),
                 owned_replay_receipt: Some(self.receipt.clone()),
                 command: DatasetCommand::Verify {
@@ -709,40 +767,70 @@ mod tests {
         );
     }
     fn retained_fixture_manifest() -> CellManifest {
-        CellManifest { schema:"crypto.ml-dataset.cell/v1".into(), plan_sha256:digest(b"{}\n"), cell_index:0, config:serde_json::from_value(json!({
-            "family":"koblitz","n":23,"m":3,"twist":false,"curve_seed":1,
-            "generator_index":0,"key_index":0,"seed":1,"factor_base_size":4,
-            "degree_bound":4,"work_limit":100,"solver":"f4"
-        })).unwrap(),outcome:json!({}),artifacts:vec![] }
+        CellManifest {
+            schema: "crypto.ml-dataset.cell/v1".into(),
+            plan_sha256: digest(b"{}\n"),
+            cell_index: 0,
+            config: serde_json::from_value(json!({
+                "family":"koblitz","n":23,"m":3,"twist":false,"curve_seed":1,
+                "generator_index":0,"key_index":0,"seed":1,"factor_base_size":4,
+                "degree_bound":4,"work_limit":100,"solver":"f4"
+            }))
+            .unwrap(),
+            outcome: json!({}),
+            artifacts: vec![],
+        }
     }
     #[test]
     fn failed_run_binding_is_sticky_after_file_is_repaired() {
-        let f=Fixture::new();let mut owner=Session::from_policy(&f.root,&f.policy,&f.receipt).unwrap();
-        let manifest=retained_fixture_manifest();
-        fs::write(f.root.join("run.json"),b"changed").unwrap();
-        assert!(owner.verify(&f.root,&manifest).unwrap_err().contains("differs from authorized run"));
-        let charged=owner.caller.work;
+        let f = Fixture::new();
+        let mut owner = Session::from_policy(&f.root, &f.policy, &f.receipt).unwrap();
+        let manifest = retained_fixture_manifest();
+        fs::write(f.root.join("run.json"), b"changed").unwrap();
+        assert!(owner
+            .verify(&f.root, &manifest)
+            .unwrap_err()
+            .contains("differs from authorized run"));
+        let charged = owner.caller.work;
         assert!(owner.slots[0].consumed && owner.slots[0].failed);
-        fs::write(f.root.join("run.json"),b"{}\n").unwrap();
-        assert!(owner.verify(&f.root,&manifest).unwrap_err().contains("previously failed"));
-        assert_eq!(owner.caller.work,charged);assert_eq!(owner.slots[0].visits,1);
+        fs::write(f.root.join("run.json"), b"{}\n").unwrap();
+        assert!(owner
+            .verify(&f.root, &manifest)
+            .unwrap_err()
+            .contains("previously failed"));
+        assert_eq!(owner.caller.work, charged);
+        assert_eq!(owner.slots[0].visits, 1);
     }
     #[test]
     fn expired_owner_cannot_restart_after_deadline_failure() {
-        let f=Fixture::new();let mut owner=Session::from_policy(&f.root,&f.policy,&f.receipt).unwrap();
-        let manifest=retained_fixture_manifest();owner.deadline=Instant::now();
-        assert!(owner.verify(&f.root,&manifest).unwrap_err().contains("deadline exhausted"));
+        let f = Fixture::new();
+        let mut owner = Session::from_policy(&f.root, &f.policy, &f.receipt).unwrap();
+        let manifest = retained_fixture_manifest();
+        owner.deadline = Instant::now();
+        assert!(owner
+            .verify(&f.root, &manifest)
+            .unwrap_err()
+            .contains("deadline exhausted"));
         assert!(owner.slots[0].consumed && owner.slots[0].failed);
         assert!(owner.slots[0].custody.is_none());
-        assert!(owner.verify(&f.root,&manifest).unwrap_err().contains("previously failed"));
+        assert!(owner
+            .verify(&f.root, &manifest)
+            .unwrap_err()
+            .contains("previously failed"));
     }
     #[test]
     fn overlapping_replay_policy_refuses_before_receipt_or_body() {
-        let f=Fixture::new();
+        let f = Fixture::new();
         for other in 0..3 {
-            let mut a=f.args();
-            match other {0=>a.sat_replay_policy=Some(f.policy.clone()),1=>a.affine_replay_policy=Some(f.policy.clone()),_=>a.search_replay_policy=Some(f.policy.clone())}
-            assert!(invoke(&a,||panic!("ambiguous replay executed")).unwrap_err().contains("ambiguous"));
+            let mut a = f.args();
+            match other {
+                0 => a.sat_replay_policy = Some(f.policy.clone()),
+                1 => a.affine_replay_policy = Some(f.policy.clone()),
+                _ => a.search_replay_policy = Some(f.policy.clone()),
+            }
+            assert!(invoke(&a, || panic!("ambiguous replay executed"))
+                .unwrap_err()
+                .contains("ambiguous"));
             assert!(!f.receipt.exists());
         }
     }

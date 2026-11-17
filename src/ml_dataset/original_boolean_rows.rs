@@ -238,23 +238,34 @@ mod tests {
             let after;
             {
                 let attempt = owner.produce_boolean_row(0, caps());
-                assert_eq!(attempt.failure(), Some(Failure::Expansion(equations::Failure::Unknown(equations::Unknown::Cap))));
+                assert_eq!(
+                    attempt.failure(),
+                    Some(Failure::Expansion(equations::Failure::Unknown(
+                        equations::Unknown::Cap
+                    )))
+                );
                 assert_eq!(attempt.first_stop(), Some(Stop::NativeFailure));
                 assert_eq!(attempt.original as *const _, original);
                 assert_eq!(attempt.deadline, deadline);
                 assert!(attempt.certificate().is_none());
-                let State::Expanded(expansion) = &attempt.state else { panic!("actual raw expansion prefix required") };
+                let State::Expanded(expansion) = &attempt.state else {
+                    panic!("actual raw expansion prefix required")
+                };
                 assert_eq!(expansion.source() as *const _, map);
                 assert_eq!(expansion.equations().len(), 97);
                 assert_eq!(expansion.charged().work, 3_994_150);
                 assert_eq!(expansion.charged().bytes, 1_514_872);
                 let (partial, scratch, stage, row, literal) = expansion.retained();
                 assert_eq!((stage, row, literal), (equations::Stage::Domain, 5, 13));
-                assert!(!partial.is_empty()); assert!(!scratch.is_empty());
+                assert!(!partial.is_empty());
+                assert!(!scratch.is_empty());
                 after = attempt.charged();
                 assert!(after.0 > before.0 && after.1 > before.1);
             }
-            assert_eq!((owner.budget.checking_work, owner.budget.adapter_bytes), after);
+            assert_eq!(
+                (owner.budget.checking_work, owner.budget.adapter_bytes),
+                after
+            );
             let retry = owner.produce_boolean_row(0, caps());
             assert_eq!(retry.failure(), Some(Failure::Admission(Stop::Phase)));
             assert_eq!(retry.first_stop(), Some(Stop::NativeFailure));
@@ -496,8 +507,17 @@ mod owned_tests {
     use super::tests::caps;
     use super::*;
     use crate::ml_dataset::solvers;
-    fn genuine_owned(twist: bool, refuse_wire: bool) -> OwnedAttempt { genuine_owned_fixture(twist,refuse_wire).0 }
-    fn genuine_owned_fixture(twist: bool, refuse_wire: bool) -> (OwnedAttempt,Fixture,Vec<crate::ml_dataset::types::Artifact>) {
+    fn genuine_owned(twist: bool, refuse_wire: bool) -> OwnedAttempt {
+        genuine_owned_fixture(twist, refuse_wire).0
+    }
+    fn genuine_owned_fixture(
+        twist: bool,
+        refuse_wire: bool,
+    ) -> (
+        OwnedAttempt,
+        Fixture,
+        Vec<crate::ml_dataset::types::Artifact>,
+    ) {
         let f = Fixture::with_ordinary_runtime_shape(23, twist, "sat");
         execution::create(&f.root).unwrap();
         let mut registry = Vec::new();
@@ -554,134 +574,293 @@ mod owned_tests {
         assert_eq!(result.deadline, deadline);
         assert!(result.original.map_ack.is_some());
         assert!(!result.original.map_bytes.is_empty());
-        for (path,role) in crate::ml_dataset::CAPTURE_CONTEXT.into_iter().chain([(execution::PATH,execution::ROLE)]) {
-            let(sha256,bytes)=crate::store::hash_file(&f.root.join(path)).unwrap();
-            registry.push(crate::ml_dataset::types::Artifact{path:path.into(),role:role.into(),encoding:"json".into(),sha256,bytes});
+        for (path, role) in crate::ml_dataset::CAPTURE_CONTEXT
+            .into_iter()
+            .chain([(execution::PATH, execution::ROLE)])
+        {
+            let (sha256, bytes) = crate::store::hash_file(&f.root.join(path)).unwrap();
+            registry.push(crate::ml_dataset::types::Artifact {
+                path: path.into(),
+                role: role.into(),
+                encoding: "json".into(),
+                sha256,
+                bytes,
+            });
         }
         // The token and generated case drop; retain Fixture for filesystem followups.
-        (result,f,registry)
+        (result, f, registry)
     }
     #[test]
     fn raw_n23_owned_expansion_cap_retains_map_ledger_and_blocks_publication() {
         let (mut owner, fixture, mut registry) = genuine_owned_fixture(false, false);
         assert!(fixture.root.join("public.json").is_file());
-        assert_eq!(owner.failure(), Some(Failure::Expansion(equations::Failure::Unknown(equations::Unknown::Cap))));
+        assert_eq!(
+            owner.failure(),
+            Some(Failure::Expansion(equations::Failure::Unknown(
+                equations::Unknown::Cap
+            )))
+        );
         assert_eq!(owner.first_stop(), Some(Stop::NativeFailure));
         assert!(owner.certificate().is_none());
-        let OwnedState::Expanded(expansion) = &owner.state else { panic!("actual owned raw expansion prefix required") };
+        let OwnedState::Expanded(expansion) = &owner.state else {
+            panic!("actual owned raw expansion prefix required")
+        };
         assert_eq!(expansion.equations().len(), 97);
         assert_eq!(expansion.charged().work, 3_994_150);
         assert_eq!(expansion.charged().bytes, 1_514_872);
         assert_eq!(expansion.source().variables(), 115);
         let charges = owner.charged();
         let deadline = owner.deadline;
-        let acknowledgement = owner.original.map_ack.clone().expect("actual map receipt required");
+        let acknowledgement = owner
+            .original
+            .map_ack
+            .clone()
+            .expect("actual map receipt required");
         let map_pointer = owner.original.map_bytes.as_ptr();
         assert!(!owner.original.map_bytes.is_empty());
         let head = std::fs::read(fixture.root.join("live/committed.json")).unwrap();
         assert!(owner.outcome().is_none());
         let owner = owner.publish();
         assert_eq!(owner.charged(), charges);
-        assert!(!owner.publication.attempted); assert!(!owner.publication.committed);
+        assert!(!owner.publication.attempted);
+        assert!(!owner.publication.committed);
         let output = solvers::WorkerSolveOutput::from_original_boolean_rows(owner);
         let mut retained = solvers::WorkerResidualCustody::default();
         let registry_count = registry.len();
-        assert!(crate::ml_dataset::finish_retained_worker_output(&fixture.root, &mut registry, output, Ok(()), &mut retained).is_err());
+        assert!(crate::ml_dataset::finish_retained_worker_output(
+            &fixture.root,
+            &mut registry,
+            output,
+            Ok(()),
+            &mut retained
+        )
+        .is_err());
         let kept = retained.boolean_rows.as_ref().unwrap();
-        assert_eq!(kept.charged(), charges); assert_eq!(kept.deadline, deadline);
+        assert_eq!(kept.charged(), charges);
+        assert_eq!(kept.deadline, deadline);
         assert_eq!(kept.first_stop(), Some(Stop::NativeFailure));
         assert_eq!(kept.original.map_ack.as_ref(), Some(&acknowledgement));
         assert_eq!(kept.original.map_bytes.as_ptr(), map_pointer);
         assert!(matches!(kept.state, OwnedState::Expanded(_)));
         assert!(retained.boolean_rows_report_unavailable());
         assert_eq!(registry.len(), registry_count);
-        assert_eq!(head, std::fs::read(fixture.root.join("live/committed.json")).unwrap());
+        assert_eq!(
+            head,
+            std::fs::read(fixture.root.join("live/committed.json")).unwrap()
+        );
     }
-
-
-
-
-
-
-
 }
 
-#[path="boolean_row_receipt.rs"]
+#[path = "boolean_row_receipt.rs"]
 pub(in crate::ml_dataset::solvers) mod receipt;
 #[derive(Default)]
 struct Publication {
-    attempted:bool,metadata:Option<receipt::Metadata>,bytes:Vec<u8>,
-    ack:Option<capture::CommittedEventPosition>,committed:bool,report_taken:bool,
-    path:Option<String>,capture_error:Option<capture::CaptureError>,
+    attempted: bool,
+    metadata: Option<receipt::Metadata>,
+    bytes: Vec<u8>,
+    ack: Option<capture::CommittedEventPosition>,
+    committed: bool,
+    report_taken: bool,
+    path: Option<String>,
+    capture_error: Option<capture::CaptureError>,
 }
-struct ReceiptWriter<'a>{bytes:&'a mut Vec<u8>,cap:usize}
-impl std::io::Write for ReceiptWriter<'_>{
-    fn write(&mut self,b:&[u8])->std::io::Result<usize>{
-        if self.bytes.len().checked_add(b.len()).filter(|n|*n<=self.cap).is_none(){return Err(std::io::ErrorKind::InvalidData.into())}
-        self.bytes.extend_from_slice(b);Ok(b.len())
+struct ReceiptWriter<'a> {
+    bytes: &'a mut Vec<u8>,
+    cap: usize,
+}
+impl std::io::Write for ReceiptWriter<'_> {
+    fn write(&mut self, b: &[u8]) -> std::io::Result<usize> {
+        if self
+            .bytes
+            .len()
+            .checked_add(b.len())
+            .filter(|n| *n <= self.cap)
+            .is_none()
+        {
+            return Err(std::io::ErrorKind::InvalidData.into());
+        }
+        self.bytes.extend_from_slice(b);
+        Ok(b.len())
     }
-    fn flush(&mut self)->std::io::Result<()>{Ok(())}
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
 }
 impl OwnedAttempt {
-    pub(in crate::ml_dataset::solvers) fn publish(mut self)->Self {
-        if self.failure.is_some(){return self}
-        if let Err(stop)=self.publish_inner(){self.stop(Failure::Publication(stop),stop)}
+    pub(in crate::ml_dataset::solvers) fn publish(mut self) -> Self {
+        if self.failure.is_some() {
+            return self;
+        }
+        if let Err(stop) = self.publish_inner() {
+            self.stop(Failure::Publication(stop), stop)
+        }
         self
     }
-    fn publish_inner(&mut self)->Result<(),Stop>{
-        if self.publication.attempted{return Err(Stop::Phase)}
-        self.publication.attempted=true;
-        let OwnedState::Certified(certificate)=&self.state else{return Err(Stop::Phase)};
-        if certificate.failure().is_some()||certificate.audit().is_none_or(|a|a.result.is_err())||!self.original.map_published{return Err(Stop::Phase)}
-        let raw=certificate.raw().ok_or(Stop::Phase)?;
+    fn publish_inner(&mut self) -> Result<(), Stop> {
+        if self.publication.attempted {
+            return Err(Stop::Phase);
+        }
+        self.publication.attempted = true;
+        let OwnedState::Certified(certificate) = &self.state else {
+            return Err(Stop::Phase);
+        };
+        if certificate.failure().is_some()
+            || certificate.audit().is_none_or(|a| a.result.is_err())
+            || !self.original.map_published
+        {
+            return Err(Stop::Phase);
+        }
+        let raw = certificate.raw().ok_or(Stop::Phase)?;
         // Pay the actual-wire scan/hash before inspecting its canonical alphabet.
-        self.original.budget.reserve_checking((raw.len() as u64).checked_add(self.original.map_bytes.len() as u64).and_then(|n|n.checked_mul(16)).ok_or(Stop::Overflow)?,65536,Instant::now())?;
-        let cap=receipt::cap(raw).ok_or(Stop::Serialization)?;
-        if cap>self.original.capture_limits.max_payload_bytes{return Err(Stop::Bytes)}
-        let cap_usize=usize::try_from(cap).map_err(|_|Stop::Overflow)?;
-        let before=self.sink.committed_event_position();
-        if self.original.map_ack.as_ref()!=Some(&before){return Err(Stop::Observer)}
-        let storage=super::super::quote_parent_storage_length(cap,false,&self.original.capture_limits)?;
-        let report=super::super::quote_parent_storage_length(receipt::REPORT_CAP,true,&self.original.capture_limits)?;
-        let encoding=cap.checked_mul(16).ok_or(Stop::Overflow)?;
-        self.original.budget.reserve_checking(storage.work.checked_add(report.work).and_then(|w|w.checked_add(encoding)).and_then(|w|w.checked_add(16*receipt::REPORT_CAP)).ok_or(Stop::Overflow)?,storage.bytes.checked_add(report.bytes).and_then(|b|b.checked_add(cap)).and_then(|b|b.checked_add(262144)).ok_or(Stop::Overflow)?,Instant::now())?;
-        self.original.budget.reserve_trace(storage.trace.checked_add(report.trace).ok_or(Stop::Overflow)?,Instant::now())?;
+        self.original.budget.reserve_checking(
+            (raw.len() as u64)
+                .checked_add(self.original.map_bytes.len() as u64)
+                .and_then(|n| n.checked_mul(16))
+                .ok_or(Stop::Overflow)?,
+            65536,
+            Instant::now(),
+        )?;
+        let cap = receipt::cap(raw).ok_or(Stop::Serialization)?;
+        if cap > self.original.capture_limits.max_payload_bytes {
+            return Err(Stop::Bytes);
+        }
+        let cap_usize = usize::try_from(cap).map_err(|_| Stop::Overflow)?;
+        let before = self.sink.committed_event_position();
+        if self.original.map_ack.as_ref() != Some(&before) {
+            return Err(Stop::Observer);
+        }
+        let storage =
+            super::super::quote_parent_storage_length(cap, false, &self.original.capture_limits)?;
+        let report = super::super::quote_parent_storage_length(
+            receipt::REPORT_CAP,
+            true,
+            &self.original.capture_limits,
+        )?;
+        let encoding = cap.checked_mul(16).ok_or(Stop::Overflow)?;
+        self.original.budget.reserve_checking(
+            storage
+                .work
+                .checked_add(report.work)
+                .and_then(|w| w.checked_add(encoding))
+                .and_then(|w| w.checked_add(16 * receipt::REPORT_CAP))
+                .ok_or(Stop::Overflow)?,
+            storage
+                .bytes
+                .checked_add(report.bytes)
+                .and_then(|b| b.checked_add(cap))
+                .and_then(|b| b.checked_add(262144))
+                .ok_or(Stop::Overflow)?,
+            Instant::now(),
+        )?;
+        self.original.budget.reserve_trace(
+            storage
+                .trace
+                .checked_add(report.trace)
+                .ok_or(Stop::Overflow)?,
+            Instant::now(),
+        )?;
         // No paid operation remains outside this bound before the snapshot is encoded.
-        self.publication.bytes.try_reserve_exact(cap_usize).map_err(|_|Stop::Allocation)?;
-        let mut map_event=[0;32];hex::decode_to_slice(&before.last_event_sha256,&mut map_event).map_err(|_|Stop::Serialization)?;
-        let row=u64::try_from(self.selected_row).map_err(|_|Stop::Overflow)?;
-        self.publication.path=Some(receipt::path(self.original.pattern.ok_or(Stop::Phase)?,row));
-        let b=&self.original.budget;
-        if let Some(stop)=b.stopped{return Err(stop)}
-        self.publication.metadata=Some(receipt::Metadata{
-            original_binding:self.original.binding,launch_sha256:self.original.launch_sha256,
-            pattern:self.original.pattern.unwrap(),row,window:0,
-            variables:certificate.rows().source().variables(),generators:certificate.rows().source().equations().len() as u64,
-            map_sha256:Sha256::digest(&self.original.map_bytes).into(),map_bytes:self.original.map_bytes.len() as u64,
-            map_sequence:before.event_count,map_event_sha256:map_event,
-            wire_sha256:Sha256::digest(raw).into(),wire_bytes:raw.len() as u64,
-            limits:[b.native_work_limit,b.memory_limit,b.trace_limit,b.addition_limit],
-            totals:[b.native.work,b.native.bytes,b.checking_work,b.checking_performed_work,b.adapter_bytes,b.trace_bytes,b.additions],
-            phase:b.phase as u8,phase_native:[b.phase_native.work,b.phase_native.bytes],phase_limits:[b.phase_limits.work,b.phase_limits.bytes],
-            first_stop:b.stopped,solver_completed:false,full_span_search:false,scalar_recovered:false,
+        self.publication
+            .bytes
+            .try_reserve_exact(cap_usize)
+            .map_err(|_| Stop::Allocation)?;
+        let mut map_event = [0; 32];
+        hex::decode_to_slice(&before.last_event_sha256, &mut map_event)
+            .map_err(|_| Stop::Serialization)?;
+        let row = u64::try_from(self.selected_row).map_err(|_| Stop::Overflow)?;
+        self.publication.path = Some(receipt::path(
+            self.original.pattern.ok_or(Stop::Phase)?,
+            row,
+        ));
+        let b = &self.original.budget;
+        if let Some(stop) = b.stopped {
+            return Err(stop);
+        }
+        self.publication.metadata = Some(receipt::Metadata {
+            original_binding: self.original.binding,
+            launch_sha256: self.original.launch_sha256,
+            pattern: self.original.pattern.unwrap(),
+            row,
+            window: 0,
+            variables: certificate.rows().source().variables(),
+            generators: certificate.rows().source().equations().len() as u64,
+            map_sha256: Sha256::digest(&self.original.map_bytes).into(),
+            map_bytes: self.original.map_bytes.len() as u64,
+            map_sequence: before.event_count,
+            map_event_sha256: map_event,
+            wire_sha256: Sha256::digest(raw).into(),
+            wire_bytes: raw.len() as u64,
+            limits: [
+                b.native_work_limit,
+                b.memory_limit,
+                b.trace_limit,
+                b.addition_limit,
+            ],
+            totals: [
+                b.native.work,
+                b.native.bytes,
+                b.checking_work,
+                b.checking_performed_work,
+                b.adapter_bytes,
+                b.trace_bytes,
+                b.additions,
+            ],
+            phase: b.phase as u8,
+            phase_native: [b.phase_native.work, b.phase_native.bytes],
+            phase_limits: [b.phase_limits.work, b.phase_limits.bytes],
+            first_stop: b.stopped,
+            solver_completed: false,
+            full_span_search: false,
+            scalar_recovered: false,
         });
-        let wire=receipt::Wire{schema:receipt::SCHEMA,metadata:self.publication.metadata.as_ref().unwrap(),wire:std::str::from_utf8(raw).map_err(|_|Stop::Serialization)?};
-        serde_json::to_writer(ReceiptWriter{bytes:&mut self.publication.bytes,cap:cap_usize},&wire).map_err(|_|Stop::Serialization)?;
+        let wire = receipt::Wire {
+            schema: receipt::SCHEMA,
+            metadata: self.publication.metadata.as_ref().unwrap(),
+            wire: std::str::from_utf8(raw).map_err(|_| Stop::Serialization)?,
+        };
+        serde_json::to_writer(
+            ReceiptWriter {
+                bytes: &mut self.publication.bytes,
+                cap: cap_usize,
+            },
+            &wire,
+        )
+        .map_err(|_| Stop::Serialization)?;
         self.original.budget.check(Instant::now())?;
-        let result=self.sink.payload_borrowed(self.publication.path.as_ref().unwrap(),receipt::ROLE,"json",&self.publication.bytes);
-        if let Err(error)=result{self.publication.capture_error=Some(error);return Err(Stop::Observer)}
-        let after=self.sink.committed_event_position();
-        let exact=after.event_count==before.event_count.checked_add(1).ok_or(Stop::Overflow)?&&after.binding_sha256==before.binding_sha256&&after.byte_end>before.byte_end;
-        self.publication.ack=Some(after);
-        if !exact{return Err(Stop::Observer)}
+        let result = self.sink.payload_borrowed(
+            self.publication.path.as_ref().unwrap(),
+            receipt::ROLE,
+            "json",
+            &self.publication.bytes,
+        );
+        if let Err(error) = result {
+            self.publication.capture_error = Some(error);
+            return Err(Stop::Observer);
+        }
+        let after = self.sink.committed_event_position();
+        let exact = after.event_count == before.event_count.checked_add(1).ok_or(Stop::Overflow)?
+            && after.binding_sha256 == before.binding_sha256
+            && after.byte_end > before.byte_end;
+        self.publication.ack = Some(after);
+        if !exact {
+            return Err(Stop::Observer);
+        }
         self.original.budget.check(Instant::now())?;
-        self.publication.committed=true;Ok(())
+        self.publication.committed = true;
+        Ok(())
     }
-    pub(in crate::ml_dataset::solvers) fn outcome(&mut self)->Option<Value>{
-        if !self.publication.committed||self.failure.is_some()||self.publication.report_taken{return None}
-        if let Err(stop)=self.original.budget.check(Instant::now()){self.stop(Failure::Publication(stop),stop);return None}
-        self.publication.report_taken=true;
-        let ack=self.publication.ack.as_ref()?;
-        Some(serde_json::json!({"adapter_id":"original-unit-boolean-row-v1","strategy":"original-unit-boolean-row-v1","status":"partial","finite_row_receipt_committed":true,"solver_completed":false,"scalar_recovered_without_witness":false,"ecdlp_pipeline_completed":false,"full_span_search":false,"pattern":self.original.pattern,"row":self.selected_row,"receipt_sequence":ack.event_count,"receipt_sha256":ack.last_event_sha256}))
+    pub(in crate::ml_dataset::solvers) fn outcome(&mut self) -> Option<Value> {
+        if !self.publication.committed || self.failure.is_some() || self.publication.report_taken {
+            return None;
+        }
+        if let Err(stop) = self.original.budget.check(Instant::now()) {
+            self.stop(Failure::Publication(stop), stop);
+            return None;
+        }
+        self.publication.report_taken = true;
+        let ack = self.publication.ack.as_ref()?;
+        Some(
+            serde_json::json!({"adapter_id":"original-unit-boolean-row-v1","strategy":"original-unit-boolean-row-v1","status":"partial","finite_row_receipt_committed":true,"solver_completed":false,"scalar_recovered_without_witness":false,"ecdlp_pipeline_completed":false,"full_span_search":false,"pattern":self.original.pattern,"row":self.selected_row,"receipt_sequence":ack.event_count,"receipt_sha256":ack.last_event_sha256}),
+        )
     }
 }

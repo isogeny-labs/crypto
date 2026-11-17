@@ -236,7 +236,10 @@ fn draw_instance(
         let span = span_words(&basis);
         let base = factor_base(curve, &span);
         let target = if planted {
-            let mut xs: Vec<u64> = base.iter().filter_map(|p| pt_words(p).map(|w| w.0)).collect();
+            let mut xs: Vec<u64> = base
+                .iter()
+                .filter_map(|p| pt_words(p).map(|w| w.0))
+                .collect();
             xs.sort_unstable();
             xs.dedup();
             if xs.len() < plant_k {
@@ -285,7 +288,11 @@ fn draw_instance(
 }
 
 /// (ordered total, ordered with pairwise distinct abscissas, factor-base size).
-fn count_truth(curve: &BinaryCurve, base: &[BinaryPoint], target: &BinaryPoint) -> (u64, u64, usize) {
+fn count_truth(
+    curve: &BinaryCurve,
+    base: &[BinaryPoint],
+    target: &BinaryPoint,
+) -> (u64, u64, usize) {
     let have: HashSet<(u64, u64)> = base.iter().filter_map(pt_words).collect();
     let (mut total, mut distinct) = (0u64, 0u64);
     for p in base {
@@ -453,7 +460,10 @@ fn count_truth4(curve: &BinaryCurve, base0: &[BinaryPoint], target: &BinaryPoint
         .enumerate()
         .filter_map(|(i, p)| pt_words(p).map(|w| (w, i)))
         .collect();
-    let negs: Vec<usize> = base0.iter().map(|p| index[&pt_words(&point_neg(p)).unwrap()]).collect();
+    let negs: Vec<usize> = base0
+        .iter()
+        .map(|p| index[&pt_words(&point_neg(p)).unwrap()])
+        .collect();
     let (mut total, mut nopair) = (0u64, 0u64);
     for (i1, p1) in base0.iter().enumerate() {
         let r1 = point_add(curve, target, &point_neg(p1));
@@ -861,17 +871,27 @@ fn assess(
         let mut acc = BinaryPoint::Infinity;
         for (i, &x) in xs.iter().enumerate() {
             let off = 3 * ell + i * mu;
-            let y = (0..mu).filter(|&j| bits[off + j]).fold(0u64, |a, j| a | 1 << j);
+            let y = (0..mu)
+                .filter(|&j| bits[off + j])
+                .fold(0u64, |a, j| a | 1 << j);
             let p = BinaryPoint::Affine {
                 x: elem(x, m),
                 y: elem(y, m),
             };
             if !curve.is_on_curve(&p) {
-                return Assess { ok: false, xs, class: "" };
+                return Assess {
+                    ok: false,
+                    xs,
+                    class: "",
+                };
             }
             acc = point_add(curve, &acc, &p);
         }
-        return Assess { ok: acc == *target, xs, class: "" };
+        return Assess {
+            ok: acc == *target,
+            xs,
+            class: "",
+        };
     }
     if arm == "norm4" {
         return assess_norm4(curve, target, bits, xs, ell);
@@ -901,7 +921,11 @@ fn assess_norm4(
     let m = curve.m;
     let mu = m as usize;
     let gf = gf_of(curve);
-    let field = |off: usize| (0..mu).filter(|&j| bits[off + j]).fold(0u64, |a, j| a | 1 << j);
+    let field = |off: usize| {
+        (0..mu)
+            .filter(|&j| bits[off + j])
+            .fold(0u64, |a, j| a | 1 << j)
+    };
     let (c2, c1, c0) = (field(4 * ell), field(4 * ell + mu), field(4 * ell + 2 * mu));
     let (xr, yr) = pt_words(target).expect("affine target");
     let a = word(&curve.a);
@@ -917,7 +941,11 @@ fn assess_norm4(
         gf.sq(cm) ^ c1sq,
     ];
     if n[..] != e[1..] {
-        return Assess { ok: false, xs, class: "not_a_root" };
+        return Assess {
+            ok: false,
+            xs,
+            class: "not_a_root",
+        };
     }
     if xs.iter().all(|&x| x != c1) {
         let mut acc = BinaryPoint::Infinity;
@@ -929,17 +957,37 @@ fn assess_norm4(
                 y: elem(y, m),
             };
             if !curve.is_on_curve(&p) {
-                return Assess { ok: false, xs, class: "generic_fail" };
+                return Assess {
+                    ok: false,
+                    xs,
+                    class: "generic_fail",
+                };
             }
             acc = point_add(curve, &acc, &p);
         }
         let ok = acc == *target;
-        return Assess { ok, xs, class: if ok { "generic" } else { "generic_fail" } };
+        return Assess {
+            ok,
+            xs,
+            class: if ok { "generic" } else { "generic_fail" },
+        };
     }
     match sign_search(curve, &xs, target) {
-        Some(true) => Assess { ok: true, xs, class: "degenerate_rational" },
-        Some(false) => Assess { ok: false, xs, class: "degenerate_fail" },
-        None => Assess { ok: false, xs, class: "degenerate_nonrational" },
+        Some(true) => Assess {
+            ok: true,
+            xs,
+            class: "degenerate_rational",
+        },
+        Some(false) => Assess {
+            ok: false,
+            xs,
+            class: "degenerate_fail",
+        },
+        None => Assess {
+            ok: false,
+            xs,
+            class: "degenerate_nonrational",
+        },
     }
 }
 
@@ -970,9 +1018,14 @@ fn arm_extra(
         "norm4" => {
             let mut classes: std::collections::BTreeMap<&str, u64> = Default::default();
             for b in sols {
-                *classes.entry(assess(arm, curve, basis, target, b).class).or_default() += 1;
+                *classes
+                    .entry(assess(arm, curve, basis, target, b).class)
+                    .or_default() += 1;
             }
-            out.insert("n_generic".into(), json!(classes.get("generic").copied().unwrap_or(0)));
+            out.insert(
+                "n_generic".into(),
+                json!(classes.get("generic").copied().unwrap_or(0)),
+            );
             out.insert(
                 "n_degenerate".into(),
                 json!(classes
@@ -1065,7 +1118,11 @@ fn write_cnf(path: &std::path::Path, enc: &Encoding) {
         }
         let mut s = String::from("x");
         for (i, &v) in vars.iter().enumerate() {
-            let l = if i == 0 && !rhs { -(v as i64) } else { v as i64 };
+            let l = if i == 0 && !rhs {
+                -(v as i64)
+            } else {
+                v as i64
+            };
             s.push_str(&format!(" {l}"));
         }
         s.push_str(" 0");
@@ -1085,7 +1142,11 @@ fn write_json(path: &std::path::Path, polys: &[F2BoolPoly], n_vars: usize) {
         .map(|p| {
             p.terms
                 .iter()
-                .map(|t| (0..n_vars).filter(|&k| t.mask & bit(k as u32) != 0).collect())
+                .map(|t| {
+                    (0..n_vars)
+                        .filter(|&k| t.mask & bit(k as u32) != 0)
+                        .collect()
+                })
                 .collect()
         })
         .collect();
@@ -1520,7 +1581,10 @@ fn main() {
             .collect()
     };
     let out_dir = std::path::PathBuf::from(get("--out").expect("--out DIR is required"));
-    let ms: Vec<u32> = list("--m", "7,9,11,13").iter().map(|s| s.parse().expect("--m")).collect();
+    let ms: Vec<u32> = list("--m", "7,9,11,13")
+        .iter()
+        .map(|s| s.parse().expect("--m"))
+        .collect();
     let offs: Vec<i64> = list("--ell-offset", "0")
         .iter()
         .map(|s| s.parse().expect("--ell-offset"))
@@ -1539,7 +1603,8 @@ fn main() {
     // so a cell can be resumed or split across processes with identical instances.
     let first_draw: u32 = num("--first-draw", "0").parse().expect("--first-draw");
     let budget_s: f64 = num("--budget-s", "600").parse().expect("--budget-s");
-    let sat_conflicts: Option<u64> = get("--sat-conflicts").map(|s| s.parse().expect("--sat-conflicts"));
+    let sat_conflicts: Option<u64> =
+        get("--sat-conflicts").map(|s| s.parse().expect("--sat-conflicts"));
     let arms = list("--arms", "incidence,norm");
     let solvers = list("--solvers", "f4,sat");
     let seed: u64 = num("--seed", "20261115").parse().expect("--seed");
@@ -1567,7 +1632,10 @@ fn main() {
         );
     }
     for solver in &solvers {
-        assert!(["f4", "sat", "xl"].contains(&solver.as_str()), "unknown solver {solver}");
+        assert!(
+            ["f4", "sat", "xl"].contains(&solver.as_str()),
+            "unknown solver {solver}"
+        );
     }
     let budget = Duration::from_secs_f64(budget_s);
 
@@ -1705,8 +1773,10 @@ fn main() {
                     write_json(&cells.join(format!("{name}.json")), &polys, n_vars);
                     let enc = encode(&polys, n_vars);
                     write_cnf(&cells.join(format!("{name}.cnf")), &enc);
-                    let verify = |bits: &[bool]| decode_ok(arm, &curve, &dr.basis, &dr.target, bits);
-                    let extra = |sols: &[Vec<bool>]| arm_extra(arm, &curve, &dr.basis, &dr.target, sols);
+                    let verify =
+                        |bits: &[bool]| decode_ok(arm, &curve, &dr.basis, &dr.target, bits);
+                    let extra =
+                        |sols: &[Vec<bool>]| arm_extra(arm, &curve, &dr.basis, &dr.target, sols);
                     if check && n_vars <= 27 {
                         let roots = brute_roots(&polys, n_vars);
                         info["check_brute_solutions"] = json!(roots.len());
@@ -1714,7 +1784,8 @@ fn main() {
                             let all: Vec<Vec<bool>> =
                                 roots.iter().map(|&s| mask_bits(s, n_vars)).collect();
                             let ex = extra(&all);
-                            info["check_brute_distinct_x_triples"] = ex["n_distinct_x_triples_all"].clone();
+                            info["check_brute_distinct_x_triples"] =
+                                ex["n_distinct_x_triples_all"].clone();
                         }
                         eprintln!(
                             "{name} check: brute {} truth_for_arm {} ({tfield})",

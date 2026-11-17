@@ -2269,10 +2269,7 @@ fn verify_live_committed_prefix_owned_inner(
             OwnedReplayReply::Payload(verified)
                 if verified.path == payload.path
                     && verified.sha256 == payload.sha256
-                    && verified.bytes == payload.bytes =>
-            {
-                
-            }
+                    && verified.bytes == payload.bytes => {}
             _ => return Err("missing or mismatched bounded payload proof".into()),
         }
     }

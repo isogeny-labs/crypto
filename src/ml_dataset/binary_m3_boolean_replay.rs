@@ -255,12 +255,20 @@ pub(super) fn verify_optional(
     let check_bytes = checked_read(dir, check_root, 49152)?;
     let check: Value = serde_json::from_slice(&check_bytes).map_err(|e| e.to_string())?;
     let version2 = check["schema"] == "crypto.ml-dataset.binary-m3-boolean-check/v2";
-    let requested_config:CaseConfig=serde_json::from_slice(config_bytes).map_err(|e|e.to_string())?;
-    if let Some(channels)=requested_config.channels.as_ref() {
-        let Some(crate::ml_dataset::types::BooleanRequest::Produce{row_index})=channels.boolean_consequence.as_ref() else {
+    let requested_config: CaseConfig =
+        serde_json::from_slice(config_bytes).map_err(|e| e.to_string())?;
+    if let Some(channels) = requested_config.channels.as_ref() {
+        let Some(crate::ml_dataset::types::BooleanRequest::Produce { row_index }) =
+            channels.boolean_consequence.as_ref()
+        else {
             return Err("Boolean receipt was not requested by frozen channel config".into());
         };
-        if !version2 || check["requested_row_index"] != *row_index || !check["supplied_proof_suffix_hex"].as_str().is_some_and(str::is_empty) {
+        if !version2
+            || check["requested_row_index"] != *row_index
+            || !check["supplied_proof_suffix_hex"]
+                .as_str()
+                .is_some_and(str::is_empty)
+        {
             return Err("Boolean receipt differs from frozen production request".into());
         }
     }
@@ -601,31 +609,60 @@ pub(super) fn verify_optional(
                     "Boolean saved equality/degree claim differs from independent checker".into(),
                 );
             }
-            if let Some(slot)=projection {
-                let final_custody_work=artifacts.iter().try_fold(0u64,|sum,a|sum.checked_add(a.bytes))
-                    .and_then(|bytes|bytes.checked_mul(16)).and_then(|work|work.checked_add(2_097_152))
+            if let Some(slot) = projection {
+                let final_custody_work = artifacts
+                    .iter()
+                    .try_fold(0u64, |sum, a| sum.checked_add(a.bytes))
+                    .and_then(|bytes| bytes.checked_mul(16))
+                    .and_then(|work| work.checked_add(2_097_152))
                     .ok_or("Boolean final custody quote overflow")?;
-                if let Err(reason)=reserve_projection_output(admission,final_custody_work) {
-                    return Ok(Assessment::Unknown{reason});
+                if let Err(reason) = reserve_projection_output(admission, final_custody_work) {
+                    return Ok(Assessment::Unknown { reason });
                 }
-                let config:CaseConfig=serde_json::from_slice(config_bytes).map_err(|e|e.to_string())?;
-                let feature=if d.target.is_some() {
-                    Some(PublicEquations::from_admitted(&admitted_math,&config,&evidence.coordinate_anfs)?)
-                } else {None};
-                let record=RestrictedEquationRecord {
-                    schema:"crypto.ml-dataset.boolean-equation-record/v1",
-                    status:if d.target.is_some(){EquationStatus::VerifiedNonzero}else{EquationStatus::VerifiedZero},
-                    assessment:expected.clone(),
-                    target:Some(polynomial_terms(coefficients(target)?)),
-                    receipt:Some(check.clone()), native_operation_witness:false,producer_execution_verified:false,
+                let config: CaseConfig =
+                    serde_json::from_slice(config_bytes).map_err(|e| e.to_string())?;
+                let feature = if d.target.is_some() {
+                    Some(PublicEquations::from_admitted(
+                        &admitted_math,
+                        &config,
+                        &evidence.coordinate_anfs,
+                    )?)
+                } else {
+                    None
+                };
+                let record = RestrictedEquationRecord {
+                    schema: "crypto.ml-dataset.boolean-equation-record/v1",
+                    status: if d.target.is_some() {
+                        EquationStatus::VerifiedNonzero
+                    } else {
+                        EquationStatus::VerifiedZero
+                    },
+                    assessment: expected.clone(),
+                    target: Some(polynomial_terms(coefficients(target)?)),
+                    receipt: Some(check.clone()),
+                    native_operation_witness: false,
+                    producer_execution_verified: false,
                 };
                 // Bound both retained output objects before granting the private seal.
-                bounded_projection_json(&feature,32_768)?;
-                bounded_projection_json(&record,65_536)?;
-                if admission.check_deadline().is_err(){return Ok(Assessment::Unknown{reason:Unknown::ReplayDeadline});}
-                storage::verify_manifest(dir,artifacts)?;
-                if admission.check_deadline().is_err(){return Ok(Assessment::Unknown{reason:Unknown::ReplayDeadline});}
-                *slot=Some(Projection{feature,record,deadline:admission.deadline,needs_final_custody:true});
+                bounded_projection_json(&feature, 32_768)?;
+                bounded_projection_json(&record, 65_536)?;
+                if admission.check_deadline().is_err() {
+                    return Ok(Assessment::Unknown {
+                        reason: Unknown::ReplayDeadline,
+                    });
+                }
+                storage::verify_manifest(dir, artifacts)?;
+                if admission.check_deadline().is_err() {
+                    return Ok(Assessment::Unknown {
+                        reason: Unknown::ReplayDeadline,
+                    });
+                }
+                *slot = Some(Projection {
+                    feature,
+                    record,
+                    deadline: admission.deadline,
+                    needs_final_custody: true,
+                });
             }
             Ok(Assessment::Identity {
                 target_degree: d.target,
@@ -793,116 +830,236 @@ fn verify_capture_and_stability(
     Ok(true)
 }
 
-
 // Distinct typed exhaustion reasons; no deadline reset or changed allowance.
-fn reserve_projection_output(admission:&mut ReplayAdmission,work:u64)->Result<(),Unknown>{
-    admission.reserve(Quote{work,bytes:1_048_576}).map_err(|_|Unknown::ReplayBudget)?;
-    admission.check_deadline().map_err(|_|Unknown::ReplayDeadline)
+fn reserve_projection_output(admission: &mut ReplayAdmission, work: u64) -> Result<(), Unknown> {
+    admission
+        .reserve(Quote {
+            work,
+            bytes: 1_048_576,
+        })
+        .map_err(|_| Unknown::ReplayBudget)?;
+    admission
+        .check_deadline()
+        .map_err(|_| Unknown::ReplayDeadline)
 }
 
 // Only this module can construct a public-bearing seal. No Deserialize, Clone,
 // public fields or JSON-boolean admission API is provided.
 pub(in crate::ml_dataset) struct Projection {
-    feature:Option<PublicEquations>, record:RestrictedEquationRecord,deadline:Instant,needs_final_custody:bool,
+    feature: Option<PublicEquations>,
+    record: RestrictedEquationRecord,
+    deadline: Instant,
+    needs_final_custody: bool,
 }
 #[derive(serde::Serialize)]
 struct PublicEquations {
-    schema:&'static str, task:&'static str, static_inputs:Value,
-    ring:Ring, selectors:Vec<Selector>, source_equations:Vec<Vec<Vec<u32>>>,
+    schema: &'static str,
+    task: &'static str,
+    static_inputs: Value,
+    ring: Ring,
+    selectors: Vec<Selector>,
+    source_equations: Vec<Vec<Vec<u32>>>,
 }
 #[derive(serde::Serialize)]
-struct Ring { characteristic:u8, quotient:&'static str, variables:u32, variable_order:Vec<u32> }
+struct Ring {
+    characteristic: u8,
+    quotient: &'static str,
+    variables: u32,
+    variable_order: Vec<u32>,
+}
 #[derive(serde::Serialize)]
-struct Selector { variable:u32,summand:u32,codes:[String;2] }
+struct Selector {
+    variable: u32,
+    summand: u32,
+    codes: [String; 2],
+}
 #[derive(serde::Serialize)]
-#[serde(rename_all="snake_case")]
-enum EquationStatus { VerifiedNonzero,VerifiedZero,Unknown,Rejected }
+#[serde(rename_all = "snake_case")]
+enum EquationStatus {
+    VerifiedNonzero,
+    VerifiedZero,
+    Unknown,
+    Rejected,
+}
 #[derive(serde::Serialize)]
 struct RestrictedEquationRecord {
-    schema:&'static str,status:EquationStatus,assessment:Value,
-    target:Option<Vec<Vec<u32>>>,receipt:Option<Value>,
-    native_operation_witness:bool,producer_execution_verified:bool,
+    schema: &'static str,
+    status: EquationStatus,
+    assessment: Value,
+    target: Option<Vec<Vec<u32>>>,
+    receipt: Option<Value>,
+    native_operation_witness: bool,
+    producer_execution_verified: bool,
 }
-fn polynomial_terms(bits:u8)->Vec<Vec<u32>> {
-    [0u8,1,3,7,5,2,6,4].into_iter().filter(|m|bits&(1<<m)!=0)
-        .map(|m|(0..3).filter(|i|m&(1<<i)!=0).collect()).collect()
+fn polynomial_terms(bits: u8) -> Vec<Vec<u32>> {
+    [0u8, 1, 3, 7, 5, 2, 6, 4]
+        .into_iter()
+        .filter(|m| bits & (1 << m) != 0)
+        .map(|m| (0..3).filter(|i| m & (1 << i) != 0).collect())
+        .collect()
 }
 impl PublicEquations {
-    fn from_admitted(math:&MathInput,config:&CaseConfig,equations:&[u8])->Result<Self,String>{
-        if equations.len()!=config.n as usize || equations.len()>61 {return Err("Boolean public coordinate count".into());}
-        let mut initial=crate::ml_dataset::solvers::koblitz_m3::ordinary_causal_projection::static_inputs(math,config.twist);
-        if let Some(policy)=&config.factor_base_policy {
-            initial["source_factor_base_policy"]=crate::ml_dataset::export::policy_projection(
-                &serde_json::to_value(policy).map_err(|e|e.to_string())?)?;
+    fn from_admitted(
+        math: &MathInput,
+        config: &CaseConfig,
+        equations: &[u8],
+    ) -> Result<Self, String> {
+        if equations.len() != config.n as usize || equations.len() > 61 {
+            return Err("Boolean public coordinate count".into());
         }
-        Ok(Self {schema:"crypto.ml-dataset.boolean-equations/v1",task:"binary-polynomial-consequence/v1",
-            static_inputs:initial,ring:Ring{characteristic:2,quotient:"v_i^2+v_i",variables:3,variable_order:vec![0,1,2]},
-            selectors:(0..3).map(|i|Selector{variable:i,summand:i,codes:math.codes.map(|x|x.to_string())}).collect(),
-            source_equations:equations.iter().map(|&p|polynomial_terms(p)).collect()})
+        let mut initial =
+            crate::ml_dataset::solvers::koblitz_m3::ordinary_causal_projection::static_inputs(
+                math,
+                config.twist,
+            );
+        if let Some(policy) = &config.factor_base_policy {
+            initial["source_factor_base_policy"] = crate::ml_dataset::export::policy_projection(
+                &serde_json::to_value(policy).map_err(|e| e.to_string())?,
+            )?;
+        }
+        Ok(Self {
+            schema: "crypto.ml-dataset.boolean-equations/v1",
+            task: "binary-polynomial-consequence/v1",
+            static_inputs: initial,
+            ring: Ring {
+                characteristic: 2,
+                quotient: "v_i^2+v_i",
+                variables: 3,
+                variable_order: vec![0, 1, 2],
+            },
+            selectors: (0..3)
+                .map(|i| Selector {
+                    variable: i,
+                    summand: i,
+                    codes: math.codes.map(|x| x.to_string()),
+                })
+                .collect(),
+            source_equations: equations.iter().map(|&p| polynomial_terms(p)).collect(),
+        })
     }
 }
-fn bounded_projection_json<T:serde::Serialize>(value:&T,cap:usize)->Result<Value,String>{
-    struct Writer{bytes:Vec<u8>,cap:usize}
-    impl std::io::Write for Writer {
-        fn write(&mut self,b:&[u8])->std::io::Result<usize>{
-            if b.len()>self.cap.saturating_sub(self.bytes.len()){return Err(std::io::Error::other("projection byte cap"));}
-            self.bytes.extend_from_slice(b);Ok(b.len())
-        }
-        fn flush(&mut self)->std::io::Result<()>{Ok(())}
+fn bounded_projection_json<T: serde::Serialize>(value: &T, cap: usize) -> Result<Value, String> {
+    struct Writer {
+        bytes: Vec<u8>,
+        cap: usize,
     }
-    let mut writer=Writer{bytes:Vec::new(),cap};
-    writer.bytes.try_reserve_exact(cap).map_err(|e|e.to_string())?;
-    serde_json::to_writer(&mut writer,value).map_err(|e|e.to_string())?;
-    serde_json::from_slice(&writer.bytes).map_err(|e|e.to_string())
+    impl std::io::Write for Writer {
+        fn write(&mut self, b: &[u8]) -> std::io::Result<usize> {
+            if b.len() > self.cap.saturating_sub(self.bytes.len()) {
+                return Err(std::io::Error::other("projection byte cap"));
+            }
+            self.bytes.extend_from_slice(b);
+            Ok(b.len())
+        }
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+    let mut writer = Writer {
+        bytes: Vec::new(),
+        cap,
+    };
+    writer
+        .bytes
+        .try_reserve_exact(cap)
+        .map_err(|e| e.to_string())?;
+    serde_json::to_writer(&mut writer, value).map_err(|e| e.to_string())?;
+    serde_json::from_slice(&writer.bytes).map_err(|e| e.to_string())
 }
 impl Projection {
-    pub(super) fn restricted(assessment:&Assessment,deadline:Instant)->Result<Self,String>{
-        let status=if matches!(assessment,Assessment::Rejected{..}){EquationStatus::Rejected}else{EquationStatus::Unknown};
-        Ok(Self{feature:None,deadline,needs_final_custody:false,record:RestrictedEquationRecord{
-            schema:"crypto.ml-dataset.boolean-equation-record/v1",status,
-            assessment:serde_json::to_value(assessment).map_err(|e|e.to_string())?,target:None,receipt:None,
-            native_operation_witness:false,producer_execution_verified:false}})
+    pub(super) fn restricted(assessment: &Assessment, deadline: Instant) -> Result<Self, String> {
+        let status = if matches!(assessment, Assessment::Rejected { .. }) {
+            EquationStatus::Rejected
+        } else {
+            EquationStatus::Unknown
+        };
+        Ok(Self {
+            feature: None,
+            deadline,
+            needs_final_custody: false,
+            record: RestrictedEquationRecord {
+                schema: "crypto.ml-dataset.boolean-equation-record/v1",
+                status,
+                assessment: serde_json::to_value(assessment).map_err(|e| e.to_string())?,
+                target: None,
+                receipt: None,
+                native_operation_witness: false,
+                producer_execution_verified: false,
+            },
+        })
     }
-    pub(in crate::ml_dataset) fn finish_admission(&mut self,dir:&std::path::Path,artifacts:&[Artifact])->Result<(),String>{
+    pub(in crate::ml_dataset) fn finish_admission(
+        &mut self,
+        dir: &std::path::Path,
+        artifacts: &[Artifact],
+    ) -> Result<(), String> {
         if self.needs_final_custody {
-            if Instant::now()<self.deadline {storage::verify_manifest(dir,artifacts)?;}
-            if Instant::now()>=self.deadline {
-                self.feature=None;self.record.status=EquationStatus::Unknown;
-                self.record.assessment=serde_json::json!({"status":"unknown","reason":"final_custody_deadline"});
-                self.record.target=None;self.record.receipt=None;
+            if Instant::now() < self.deadline {
+                storage::verify_manifest(dir, artifacts)?;
             }
-            self.needs_final_custody=false;
+            if Instant::now() >= self.deadline {
+                self.feature = None;
+                self.record.status = EquationStatus::Unknown;
+                self.record.assessment =
+                    serde_json::json!({"status":"unknown","reason":"final_custody_deadline"});
+                self.record.target = None;
+                self.record.receipt = None;
+            }
+            self.needs_final_custody = false;
         }
         Ok(())
     }
-    pub(in crate::ml_dataset) fn unknown_rows()->Result<(Option<Value>,Value),String>{
-        let record=RestrictedEquationRecord{schema:"crypto.ml-dataset.boolean-equation-record/v1",
-            status:EquationStatus::Unknown,assessment:serde_json::json!({"status":"unknown","reason":"original_source_or_optional_check_not_reached"}),
-            target:None,receipt:None,native_operation_witness:false,producer_execution_verified:false};
-        Ok((None,bounded_projection_json(&record,4096)?))
+    pub(in crate::ml_dataset) fn unknown_rows() -> Result<(Option<Value>, Value), String> {
+        let record = RestrictedEquationRecord {
+            schema: "crypto.ml-dataset.boolean-equation-record/v1",
+            status: EquationStatus::Unknown,
+            assessment: serde_json::json!({"status":"unknown","reason":"original_source_or_optional_check_not_reached"}),
+            target: None,
+            receipt: None,
+            native_operation_witness: false,
+            producer_execution_verified: false,
+        };
+        Ok((None, bounded_projection_json(&record, 4096)?))
     }
-    pub(in crate::ml_dataset) fn into_rows(self)->Result<(Option<Value>,Value),String>{
+    pub(in crate::ml_dataset) fn into_rows(self) -> Result<(Option<Value>, Value), String> {
         self.into_rows_with_clock(Instant::now)
     }
     // Production uses the original monotonic clock; the private hook lets the
     // test cross the exact final encoding boundary without sleeps or renewal.
-    fn into_rows_with_clock(self,mut now:impl FnMut()->Instant)->Result<(Option<Value>,Value),String>{
-        if self.needs_final_custody {return Err("Boolean final cell custody not completed".into());}
+    fn into_rows_with_clock(
+        self,
+        mut now: impl FnMut() -> Instant,
+    ) -> Result<(Option<Value>, Value), String> {
+        if self.needs_final_custody {
+            return Err("Boolean final cell custody not completed".into());
+        }
         // Prebuild the terminal censoring record within the existing prepaid
         // terminal/output allowance. No encoding/allocation follows the final
         // deadline decision on the exhausted path.
-        let unknown=RestrictedEquationRecord{schema:"crypto.ml-dataset.boolean-equation-record/v1",
-            status:EquationStatus::Unknown,
-            assessment:serde_json::json!({"status":"unknown","reason":"projection_deadline"}),
-            target:None,receipt:None,native_operation_witness:false,producer_execution_verified:false};
-        let expired_rows=(None,bounded_projection_json(&unknown,4096)?);
-        if now()>=self.deadline {return Ok(expired_rows);}
-        let feature=self.feature.as_ref().map(|v|bounded_projection_json(v,32_768)).transpose()?;
-        let record=bounded_projection_json(&self.record,65_536)?;
-        if now()>=self.deadline {return Ok(expired_rows);}
-        Ok((feature,record))
+        let unknown = RestrictedEquationRecord {
+            schema: "crypto.ml-dataset.boolean-equation-record/v1",
+            status: EquationStatus::Unknown,
+            assessment: serde_json::json!({"status":"unknown","reason":"projection_deadline"}),
+            target: None,
+            receipt: None,
+            native_operation_witness: false,
+            producer_execution_verified: false,
+        };
+        let expired_rows = (None, bounded_projection_json(&unknown, 4096)?);
+        if now() >= self.deadline {
+            return Ok(expired_rows);
+        }
+        let feature = self
+            .feature
+            .as_ref()
+            .map(|v| bounded_projection_json(v, 32_768))
+            .transpose()?;
+        let record = bounded_projection_json(&self.record, 65_536)?;
+        if now() >= self.deadline {
+            return Ok(expired_rows);
+        }
+        Ok((feature, record))
     }
-
 }
 
 #[cfg(test)]
@@ -910,70 +1067,176 @@ mod tests {
     use super::*;
     #[test]
     fn source_feature_ignores_solver_row_proof_and_retains_equation_order() {
-        let config:CaseConfig=serde_json::from_value(serde_json::json!({"family":"binary","n":23,"m":3,"twist":false,
+        let config: CaseConfig = serde_json::from_value(
+            serde_json::json!({"family":"binary","n":23,"m":3,"twist":false,
             "curve_seed":7,"generator_index":1,"key_index":1,"seed":42,"factor_base_size":4,
-            "degree_bound":3,"work_limit":16384,"solver":"f4"})).unwrap();
-        let case=crate::ml_dataset::curves::generate(&config).unwrap();
-        let math=crate::ml_dataset::solvers::binary_m3_original::authenticate(
-            crate::ml_dataset::solvers::binary_m3_original::Profile::OrdinaryBinary,&config,&case).unwrap();
-        let mut equations=vec![0u8;23];equations[0]=3;equations[1]=5;
-        let baseline=bounded_projection_json(&PublicEquations::from_admitted(&math,&config,&equations).unwrap(),32768).unwrap();
-        let mut changed=config.clone();changed.solver="f5".into();changed.work_limit=65536;changed.degree_bound=6;
-        changed.channels=Some(crate::ml_dataset::types::ChannelRequests{owned_boolean_search:None,sat_search:None,schema:"crypto.ml-dataset.channel-requests/v1".into(),
-            boolean_consequence:Some(crate::ml_dataset::types::BooleanRequest::Produce{row_index:7}),sat_initial:None,affine_boolean_row:None});
-        let same=bounded_projection_json(&PublicEquations::from_admitted(&math,&changed,&equations).unwrap(),32768).unwrap();
-        assert_eq!(baseline,same);
-        assert_eq!(baseline["source_equations"][22],serde_json::json!([]));
-        equations.swap(0,1);
-        assert_ne!(baseline,bounded_projection_json(&PublicEquations::from_admitted(&math,&config,&equations).unwrap(),32768).unwrap());
-        let text=serde_json::to_string(&baseline).unwrap();
-        for private in ["wire_hex","row_index","watermark","checking_reserved_work","producer","outcome"] {assert!(!text.contains(private));}
+            "degree_bound":3,"work_limit":16384,"solver":"f4"}),
+        )
+        .unwrap();
+        let case = crate::ml_dataset::curves::generate(&config).unwrap();
+        let math = crate::ml_dataset::solvers::binary_m3_original::authenticate(
+            crate::ml_dataset::solvers::binary_m3_original::Profile::OrdinaryBinary,
+            &config,
+            &case,
+        )
+        .unwrap();
+        let mut equations = vec![0u8; 23];
+        equations[0] = 3;
+        equations[1] = 5;
+        let baseline = bounded_projection_json(
+            &PublicEquations::from_admitted(&math, &config, &equations).unwrap(),
+            32768,
+        )
+        .unwrap();
+        let mut changed = config.clone();
+        changed.solver = "f5".into();
+        changed.work_limit = 65536;
+        changed.degree_bound = 6;
+        changed.channels = Some(crate::ml_dataset::types::ChannelRequests {
+            owned_boolean_search: None,
+            sat_search: None,
+            schema: "crypto.ml-dataset.channel-requests/v1".into(),
+            boolean_consequence: Some(crate::ml_dataset::types::BooleanRequest::Produce {
+                row_index: 7,
+            }),
+            sat_initial: None,
+            affine_boolean_row: None,
+        });
+        let same = bounded_projection_json(
+            &PublicEquations::from_admitted(&math, &changed, &equations).unwrap(),
+            32768,
+        )
+        .unwrap();
+        assert_eq!(baseline, same);
+        assert_eq!(baseline["source_equations"][22], serde_json::json!([]));
+        equations.swap(0, 1);
+        assert_ne!(
+            baseline,
+            bounded_projection_json(
+                &PublicEquations::from_admitted(&math, &config, &equations).unwrap(),
+                32768
+            )
+            .unwrap()
+        );
+        let text = serde_json::to_string(&baseline).unwrap();
+        for private in [
+            "wire_hex",
+            "row_index",
+            "watermark",
+            "checking_reserved_work",
+            "producer",
+            "outcome",
+        ] {
+            assert!(!text.contains(private));
+        }
         // Restricted proof/row/capture mutations are outside the feature constructor's input type.
-        let mut record=RestrictedEquationRecord{schema:"crypto.ml-dataset.boolean-equation-record/v1",status:EquationStatus::VerifiedNonzero,
-            assessment:serde_json::json!({}),target:Some(vec![vec![0]]),receipt:Some(serde_json::json!({"wire_hex":"aa","row_index":0})),
-            native_operation_witness:false,producer_execution_verified:false};
-        let feature=PublicEquations::from_admitted(&math,&config,&vec![0u8;23]).unwrap();
-        let before=bounded_projection_json(&feature,32768).unwrap();
-        record.receipt=Some(serde_json::json!({"wire_hex":"bbbb","row_index":7,"watermark":99}));
-        record.target=Some(vec![vec![1,2]]);
-        assert_eq!(before,bounded_projection_json(&feature,32768).unwrap());
-        assert!(bounded_projection_json(&record,8).is_err());
+        let mut record = RestrictedEquationRecord {
+            schema: "crypto.ml-dataset.boolean-equation-record/v1",
+            status: EquationStatus::VerifiedNonzero,
+            assessment: serde_json::json!({}),
+            target: Some(vec![vec![0]]),
+            receipt: Some(serde_json::json!({"wire_hex":"aa","row_index":0})),
+            native_operation_witness: false,
+            producer_execution_verified: false,
+        };
+        let feature = PublicEquations::from_admitted(&math, &config, &vec![0u8; 23]).unwrap();
+        let before = bounded_projection_json(&feature, 32768).unwrap();
+        record.receipt = Some(serde_json::json!({"wire_hex":"bbbb","row_index":7,"watermark":99}));
+        record.target = Some(vec![vec![1, 2]]);
+        assert_eq!(before, bounded_projection_json(&feature, 32768).unwrap());
+        assert!(bounded_projection_json(&record, 8).is_err());
     }
     #[test]
     fn final_encoding_boundary_censors_previously_eligible_public_and_target_rows() {
-        let start=Instant::now();let deadline=start+std::time::Duration::from_secs(1);
+        let start = Instant::now();
+        let deadline = start + std::time::Duration::from_secs(1);
         // Synthetic encoding control, not a substitute for real identity admission.
-        let make=||Projection{deadline,needs_final_custody:false,
-            feature:Some(PublicEquations{schema:"crypto.ml-dataset.boolean-equations/v1",task:"binary-polynomial-consequence/v1",
-                static_inputs:serde_json::json!({"family":"binary","n":23}),
-                ring:Ring{characteristic:2,quotient:"v_i^2+v_i",variables:3,variable_order:vec![0,1,2]},
-                selectors:vec![],source_equations:vec![vec![vec![0]]]}),
-            record:RestrictedEquationRecord{schema:"crypto.ml-dataset.boolean-equation-record/v1",status:EquationStatus::VerifiedNonzero,
-                assessment:serde_json::json!({"kind":"equal"}),target:Some(vec![vec![0]]),
-                receipt:Some(serde_json::json!({"wire_hex":"00"})),native_operation_witness:false,producer_execution_verified:false}};
-        let (feature,record)=make().into_rows_with_clock(||start).unwrap();
-        assert!(feature.is_some());assert_eq!(record["status"],"verified_nonzero");
-        let mut calls=0;
-        let (feature,record)=make().into_rows_with_clock(||{calls+=1;if calls==1 {start}else{deadline}}).unwrap();
-        assert_eq!(calls,2,"control must reach the post-encoding boundary");
-        assert!(feature.is_none());assert_eq!(record["status"],"unknown");
-        assert_eq!(record["assessment"]["reason"],"projection_deadline");
-        assert!(record["target"].is_null());assert!(record["receipt"].is_null());
+        let make = || Projection {
+            deadline,
+            needs_final_custody: false,
+            feature: Some(PublicEquations {
+                schema: "crypto.ml-dataset.boolean-equations/v1",
+                task: "binary-polynomial-consequence/v1",
+                static_inputs: serde_json::json!({"family":"binary","n":23}),
+                ring: Ring {
+                    characteristic: 2,
+                    quotient: "v_i^2+v_i",
+                    variables: 3,
+                    variable_order: vec![0, 1, 2],
+                },
+                selectors: vec![],
+                source_equations: vec![vec![vec![0]]],
+            }),
+            record: RestrictedEquationRecord {
+                schema: "crypto.ml-dataset.boolean-equation-record/v1",
+                status: EquationStatus::VerifiedNonzero,
+                assessment: serde_json::json!({"kind":"equal"}),
+                target: Some(vec![vec![0]]),
+                receipt: Some(serde_json::json!({"wire_hex":"00"})),
+                native_operation_witness: false,
+                producer_execution_verified: false,
+            },
+        };
+        let (feature, record) = make().into_rows_with_clock(|| start).unwrap();
+        assert!(feature.is_some());
+        assert_eq!(record["status"], "verified_nonzero");
+        let mut calls = 0;
+        let (feature, record) = make()
+            .into_rows_with_clock(|| {
+                calls += 1;
+                if calls == 1 {
+                    start
+                } else {
+                    deadline
+                }
+            })
+            .unwrap();
+        assert_eq!(calls, 2, "control must reach the post-encoding boundary");
+        assert!(feature.is_none());
+        assert_eq!(record["status"], "unknown");
+        assert_eq!(record["assessment"]["reason"], "projection_deadline");
+        assert!(record["target"].is_null());
+        assert!(record["receipt"].is_null());
     }
     #[test]
     fn projection_resource_and_deadline_refusals_are_distinct() {
-        let mut expired=ReplayAdmission{deadline:Instant::now(),work:0,bytes:0};
-        assert!(matches!(reserve_projection_output(&mut expired,1),Err(Unknown::ReplayDeadline)));
-        assert_eq!(expired.work,1);assert_eq!(expired.bytes,1_048_576);
-        let mut exhausted=ReplayAdmission{deadline:Instant::now()+std::time::Duration::from_secs(1),work:64*1024*1024,bytes:0};
-        assert!(matches!(reserve_projection_output(&mut exhausted,1),Err(Unknown::ReplayBudget)));
+        let mut expired = ReplayAdmission {
+            deadline: Instant::now(),
+            work: 0,
+            bytes: 0,
+        };
+        assert!(matches!(
+            reserve_projection_output(&mut expired, 1),
+            Err(Unknown::ReplayDeadline)
+        ));
+        assert_eq!(expired.work, 1);
+        assert_eq!(expired.bytes, 1_048_576);
+        let mut exhausted = ReplayAdmission {
+            deadline: Instant::now() + std::time::Duration::from_secs(1),
+            work: 64 * 1024 * 1024,
+            bytes: 0,
+        };
+        assert!(matches!(
+            reserve_projection_output(&mut exhausted, 1),
+            Err(Unknown::ReplayBudget)
+        ));
     }
     #[test]
     fn unknown_and_expired_seals_never_release_public_features() {
-        let (feature,record)=Projection::unknown_rows().unwrap();assert!(feature.is_none());
-        assert_eq!(record["status"],"unknown");assert!(record["target"].is_null());
-        let seal=Projection::restricted(&Assessment::Unknown{reason:Unknown::ReplayBudget},Instant::now()).unwrap();
-        let (feature,record)=seal.into_rows().unwrap();assert!(feature.is_none());assert!(record["receipt"].is_null());
+        let (feature, record) = Projection::unknown_rows().unwrap();
+        assert!(feature.is_none());
+        assert_eq!(record["status"], "unknown");
+        assert!(record["target"].is_null());
+        let seal = Projection::restricted(
+            &Assessment::Unknown {
+                reason: Unknown::ReplayBudget,
+            },
+            Instant::now(),
+        )
+        .unwrap();
+        let (feature, record) = seal.into_rows().unwrap();
+        assert!(feature.is_none());
+        assert!(record["receipt"].is_null());
     }
     #[test]
     fn first_stop_is_sticky_but_partial_failure_is_allowed() {
