@@ -2,6 +2,7 @@
 #
 #   make test            CPU verification of the shared headers (no GPU, no nvcc)
 #   make bench-host-inv  public-input host Fp64 inversion + batch benchmark
+#   make bench-mul256   compare old versus native-128 host P-256 MAC
 #   make bench-host-inv256  P-256 sparse-exponent host inverse + batch benchmark
 #   make lib             librootfind_oracle.a, emulation backend only
 #                        (what gpu/rootfind/rs/build.rs builds for the gpu-rootfind cargo crate)
@@ -78,6 +79,13 @@ bench_batch_core: bench_batch_core.cpp fp64.cuh
 
 bench-batch-core: bench_batch_core
 	./bench_batch_core
+
+# Compare original versus native-128 host P-256 Montgomery MAC.
+bench_mul256: bench_mul256.cpp fp256x64.cuh fp64.cuh
+	$(CXX) $(CXXFLAGS) -o $@ bench_mul256.cpp
+
+bench-mul256: bench_mul256
+	./bench_mul256
 
 # --- emulation-only static library (no CUDA toolchain required) -------
 rootfind_api_emul.o: rootfind_api.cpp $(HDRS)
