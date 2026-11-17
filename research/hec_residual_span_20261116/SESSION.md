@@ -899,3 +899,17 @@ Concrete generic Kummer circuit cost case; if competitive, freeze original-group
 
 ### Errors
 ePrint and author mirror fetches failed; recovered the Gaudry publisher PDF. Sparse checkout has no src/crates tree, so the limited filename search is not evidence of repository-wide absence. No scientific retry or model substitution.
+
+## Generic Kummer source and symbolic specialization frozen
+
+### What was done
+Recovered Flynn's generic biquadratic expressions and coordinate identity from the primary Oxford archive. The earlier public NN_isogenies source was checked at bdc57f671cea175b512b95d792256440f977242e and found to supply fast-model arithmetic instead. Compiled a Rust-only mathematical expression specialization generator; no scientific execution yet.
+
+### Decisions made
+Freeze stage 1 before symbolic specialization; stage 2 arithmetic primitive gets its own freeze. Preserve source hash/URL, integer tensor output and symmetry/degree gates. No theta model or field change. Previous goal turn is progress from the stronger baseline and model gate.
+
+### Open threads
+Run symbolic preparation once, then implement all-chart generic differential arithmetic and signed recovery cost gate. General tenfold objective remains active.
+
+### Errors
+No formula or runtime failure. Previous task lease expired; claimed T7044 for this distinct kernel gate. KB revision9b2119e8fbac482b98b50521c0d604bb is ready but predates new files. Relevant metadata/context receipts are in SOURCES.md.
