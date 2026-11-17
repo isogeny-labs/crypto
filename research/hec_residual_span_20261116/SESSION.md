@@ -2989,3 +2989,10 @@ What was done: compiled native exhaustive rho/sigma reconstruction on both origi
 Decisions made: restricted nonsingular-projection open only, no global normalization or transport claim; Git freeze precedes sole600CPU execution.
 Open threads: run gate and retain coverage; canonical model and complete transport still required.
 Errors: Smith source-code page unreachable (403/timeout), Magma absent; unused copied helper warnings only. No scientific execution yet.
+
+## Rational Smith chart reconstruction qualifies beyond split fibres
+
+What was done: freeze44693a66ca8 hashes pass/exit0. Exhausted6900rho/420900rho-sigma candidates over115eligible parameters, exact unique b for109quartic roots,97nonsplit/12split;109inverse/congruence/mutationchecksand88rationalsourceincidencespass.
+Decisions made: retainedallpointcoordinates, nofullcurvepointcount orsupersetclaim;newstricteropenloses4oldsplitpoints. Thisfinitebijectionisnotglobalnormalization/Jacobiantransport/speed.
+Open threads: functionfieldinverseandexceptionalplaces, canonicaladjoints/smoothnonhypermodel, completedivisortransport;full10xgenus2+goalactiveunachieved.
+Errors: no scientificfailure, unusedhelperwarningsonly;S3notqueried/no merge.

@@ -58,3 +58,7 @@ Six normalized maps now have exact norm and affine-equation checks under Git cus
 ### Extension transport boundary
 
 `SMITH-TWIST-TRANSPORT.md` derives that the four nonsquare Smith maps carry the original odd-order subgroup into Frobenius's minus eigenspace over Fp². The ordinary rational trace kills these images; Frobenius-polynomial projection cannot turn them into nonzero Fp-rational images. An extension solver could preserve k but needs a dedicated anti-invariant relation and complete cost case. Generic quartic cost with Q=p² supplies no exponent improvement against the original genus-three heuristic. This is a conditional mathematical deduction, not a measured speedup or a universal exclusion.
+
+### Exhaustive rational Smith chart reconstruction
+
+Freeze `44693a66ca8` qualifies both original F61 maps on a restricted nonsingular-projection chart. Native enumeration exhausts 420,900 rho/sigma pairs: 109 quartic roots have unique full b-polynomial reconstructions, including 97 nonsplit-fibre points; inverse/mutation checks and 88 rational source incidences pass. The restricted open differs from the previous split-only gate and loses four old split points. These are finite chart checks, not global normalization, complete divisor transport or speed evidence. Raw points and limitations: `native-smith-chart/RESULTS.md` under the research directory.
