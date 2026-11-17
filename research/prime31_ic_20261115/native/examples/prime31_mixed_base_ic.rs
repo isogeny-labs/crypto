@@ -314,8 +314,9 @@ fn solve_public_q(q: Point, case: usize) -> Value {
         total_probes += probes as u64;
         if let Some((left, right)) = witness {
             // Genuine original-curve replay; no use of the caller's known k.
-            let lhs = ar.add(PRIME31, replay(&mut ar, &apt, &left),
-                replay(&mut ar, &bpt, &right));
+            let a_sum = replay(&mut ar, &apt, &left);
+            let b_sum = replay(&mut ar, &bpt, &right);
+            let lhs = ar.add(PRIME31, a_sum, b_sum);
             assert_eq!(lhs, residual);
             let row = signed_row(&left, &right, &aidx, &bidx, nvars, label_a, label_b);
             let independent = rank.insert(row.clone());
@@ -426,7 +427,8 @@ mod tests {
         assert_eq!(ai.len(), B);
         assert_eq!(bi.len(), B);
         let tokens = signed_points(&ar, &first);
-        assert_eq!(replay(&mut ar, &tokens, &signature([0, 1, 2, 3])),
-            ar.add(PRIME31, tokens[2], tokens[3]));
+        let observed = replay(&mut ar, &tokens, &signature([0, 1, 2, 3]));
+        let expected = ar.add(PRIME31, tokens[2], tokens[3]);
+        assert_eq!(observed, expected);
     }
 }
