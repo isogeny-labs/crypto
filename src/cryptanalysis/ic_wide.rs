@@ -775,6 +775,7 @@ pub fn run_f2m4<S: NarrowRhoScalar>(
             forecaster: t.forecaster.clone(),
             forecast_unavailable: t.forecast_unavailable.clone(),
             pricing_qualification: None,
+            ..Default::default()
         }
     });
     let total_gae = fb_phase.gae + prep_cost.gae + rel.gae + la.gae + ver.gae;
