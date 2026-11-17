@@ -1053,3 +1053,17 @@ Independent review of realization conventions and full reconstruction theorem; a
 
 ### Errors
 Browser502onprimarynotes; curl retrieval succeeded and full theorem/convention text read. No scientific run or S3 polling.
+
+## Orbit-sharing rank screen derived
+
+### What was done
+Derived exact binomial pencil parameter equivariance between transformed anchors and proved scalar-copy rows collapse after the already qualified factor-base contraction. Proved a sigma-stable full residual system would force zero anchor projection when lambda!=1.
+
+### Decisions made
+Do not credit orbit-size savings by scanning representatives of a noninvariant target pencil or count copied folded rows as rank. Explicit orbit-wise arithmetic sharing and genuinely independent anchor relations remain eligible, subject to complete cost case. Mathematical10xgoal remains active.
+
+### Open threads
+A same-anchor filter or an actual shared evaluation DAG must replace the unsupported orbit-saving premise. Genus2/3/4 objective unchanged.
+
+### Errors
+No runtime/gate failure or scientific rerun. No S3 or paidresources. Own T7044 lease held.
