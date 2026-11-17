@@ -395,3 +395,17 @@ Qualifygraphsemantics/actualindependentlabelarrival; broadobjectiveopen. Needcom
 
 ### Errors
 Initialreadrootnativepathabsentinsparsecheckout; usedretainedcountednativecopy. No scientificrunyet.
+
+## Weighted graph rank gate passes, real false-cycle controls observed
+
+### What was done
+At pushed0beced90ca2,1528weightedgraph/denseLPprefixrankchecksand3parallel-edgenegativecontrols passEXIT0. Naivecycleformulafails26actualprefixes. Filteredcompletiong2/g3bothcuts6/6;g4small2=5/6,small4=6/6. Original18recoveries/31008bucketchecks/892relationspass. Rawhashesverify;postrunRustsummaryretained.
+
+### Decisions made
+Retainonefilteredg4misswithoutbudgetextension. Leftnullitynotindependentlabelrank (example86vs3). No performance/newpriorityclaimfromgraphstats. ExistingexactLPbaseline/primarypriorartretainauthority. Chargedonlineproductioncollectorwouldneednewprotocolandcompletecostcase.
+
+### Open threads
+PR4498externallymerged2026-11-17T04:26:30Z at164dc1799e20decf5d0e26632bc8941a61bf0bf6;createonlygraphsuccessorfrommerge. Broad10xgoalopen,especiallyg2.
+
+### Errors
+No scientificrankfailures/retries;filteredmissisretainedincompleteasregistered. Rootnativepathsparseabsent;usedfrozenretainedcopy.
