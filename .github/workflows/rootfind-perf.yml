@@ -48,7 +48,7 @@ jobs:
 
       - name: Build and verify shared rootfinder headers
         run: |
-          make -C gpu/rootfind test bench_host_inv bench_host_inv256
+          make -C gpu/rootfind test bench_host_inv bench_host_inv256 bench-batch-core
 
       - name: Record before and after perf counters when accessible
         shell: bash
@@ -81,6 +81,12 @@ jobs:
                 -- taskset -c "$cpu" "gpu/rootfind/$bin" "--perf-$arm"
               cat "$RUNNER_TEMP/rootfind-perf/${name}.txt"
             done
+          done
+          # Inversion-core arms are in addition to the field-inversion arms.
+          for arm in oracle16-before oracle16-after oracle32-before oracle32-after \
+                     pair16-before pair16-after pair1-before pair1-after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/batch-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_batch_core "--perf-$arm"
           done
           echo "Hardware PMU measurements saved as the rootfind-perf artifact." >> "$GITHUB_STEP_SUMMARY"
 
