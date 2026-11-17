@@ -1637,3 +1637,10 @@ What was done: compiled separate followup preserving old l5assertions, sigma per
 Decisions made: expect orbit1+5, at mostone nonself quotient class fromfivekernels; localorder index5would distinguishsource. All assertions [pcc:unverified], quotient equations not computed.
 Open threads: pushfreeze and once-only120CPU invocation, then exactorder/automorphism costcase.
 Errors: copiedunusedhelpers warnings; no scientific execution. KB source5f3331ba699891737b6895c6d423edbc ellipticanalogy notproof; primary Brooks-Jetchev-Wesolowski sections1and6checked.
+
+## Ramified five quotient orbit/order gate completed
+
+What was done: freeze67f0120c9e7 once-only exits0;120orbit/order rows match orbit1+5, fixedrho kernel, ring625/125 and conductor625/25. Oldgate assertions preserved. Producer self-checks [pcc:unverified].
+Decisions made: conditional exactlytwo polarized quotient classes (self plus one index5order class); five nonfixed kernels notfiveindependent endpoints. Transported order5auto absent; price lostcompression before mapcampaign.
+Open threads: one quotientmodel/map and concretecomplete-cost mechanism; p251l19 separate classification; independentreview.
+Errors: stdout mixes inherited summary and orbit records; explicit dualschema in RUN, raw retained unchanged. No retry/S3/cloud.
