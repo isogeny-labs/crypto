@@ -9,6 +9,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--receipt-name", default="maps-main-validation.json")
 parser.add_argument("--run", action="append", dest="runs")
+parser.add_argument("--base", default="MERGE_HEAD")
 args = parser.parse_args()
 assert Path(args.receipt_name).name == args.receipt_name
 
@@ -16,7 +17,7 @@ root = Path.cwd()
 spec = importlib.util.spec_from_file_location("pcc_api", root / "tools/pcc/pcc.py")
 pcc = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(pcc)
-base = subprocess.check_output(["git", "rev-parse", "MERGE_HEAD"], text=True).strip()
+base = subprocess.check_output(["git", "rev-parse", args.base], text=True).strip()
 base_text = subprocess.check_output(["git", "show", f"{base}:pcc/ledger.jsonl"], text=True)
 base_entries = pcc.read_ledger_text(base_text)
 head_entries = pcc.read_ledger(root / "pcc/ledger.jsonl")
