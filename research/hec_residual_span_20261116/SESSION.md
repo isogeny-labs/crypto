@@ -2415,3 +2415,10 @@ What was done: freeze32bf5d34104hashpass; absolutesimplicityauxrank6exit0, quoti
 Decisions made: nooverallpass, preservefailure. Sourceorder7automorphism forcesweight4zero(proposedlemma), soJundefinedratherthanprecisionissue. Prospectivelydomainawarev2computesRindependentlywithSigma140, Joptional/undefined; nochangingquotientcriteria.
 Open threads: v2sourceR+exactreload/isometrycomparison, thenreal421-adicbridge/cost; fullgoalunchanged.
 Errors: unnecessarysourceJdenominatorassumptionfailed; no overwrite/retry/S3/cloud/merge.
+
+## Domain-awareJ/Rcontinuationv2 frozen
+
+What was done: compileexplicitundefinedJflagwhenScontains0, RindependentlydefinedbySigma140; exactball/flagcomparator skipsundefinedsourceJ, allsourceR/quotient/precision/isometrygates retained. Priorabsoluterankreused, noRust rerun.
+Decisions made: sourceJhasno valuebecauseofdomain, notforcedzero. New4onceprocesses120CPUeachafterGitfreeze, oldfailureimmutable; nofinitefieldcriterionrelaxed.
+Open threads: successfulportablemodularscalarchecks thenexact421-adic/algebraiccertificateandconstructioncost; fullgoalunchanged.
+Errors: inheritedCindentationwarning, no compilefailure/S3/cloud/merge.
