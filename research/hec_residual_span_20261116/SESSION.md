@@ -1067,3 +1067,17 @@ A same-anchor filter or an actual shared evaluation DAG must replace the unsuppo
 
 ### Errors
 No runtime/gate failure or scientific rerun. No S3 or paidresources. Own T7044 lease held.
+
+## Genus3 Gaussian extension qualified after explicit field amendment
+
+### What was done
+Derived unbalanced determinant d=p*eta,normeta=p and degree3reciprocity. Original92bd5d0ea64 gate fails because fixedpoint ywasrestrictedtoFp2. Frozen diagnostic identifies error; prospectively amended74cbe3a5458 uses valid square-value exponent criterion. All6fixedsmoothmodels/12orientations pass, with unique candidates/fullnormmatches and exactrepeats. Both failure and success retained. [pcc:unverified]
+
+### Decisions made
+Qualify coefficient reconstruction only; no scalar-action, simplicity, performance or10xclaim. Existing binomialg3controls are not this C4family and must not be substituted. Preserve original failedsource/output and explicit amendment. Generalgoal active.
+
+### Open threads
+Independent determinant/convention review and scalar-action/cost qualification on an appropriate unchanged target family; broadgenus2+mechanism remains open.
+
+### Errors
+Standalonev1incorrectlysearchedyonlyinFp2; y^(p²)=-y shows nonzerofixedpointslieoutsideFp2. Corrected onlyinnewfrozenv2withfailurepreserved. Initialcompilewarning resolved beforefreeze usingRust2021. No S3/cloud.
