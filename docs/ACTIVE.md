@@ -15,7 +15,7 @@ Achieve a measured 2–6× speedup in the Rust Vieta evaluator over Euclid/Newto
 
 ## Active items (top = next)
 
-- [ ] Chase measured 2–6× Vieta speedup over Euclid/Newton (codex, started 2026-11-17, branch lane/vieta-speedup-20261117; in progress).
+- [ ] Chase measured 2–6× Vieta speedup over Euclid/Newton (codex, started 2026-11-17, branch lane/vieta-speedup-20261117, PR #4535; in progress).
 - [ ] Profile the unchanged Rust baseline and identify dominant costs (same task/branch).
 - [ ] Implement the highest-impact optimization and verify exact relations against schoolbook/lookup (same task/branch).
 - [ ] Validate canonical seed/export fixtures and freeze the corrected comparison before data (same task/branch).
