@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Assemble P-192 quartic relation collection and OpenSSL cross-check pipeline (Codex, started 2026-11-17, branch lane/nist-relation-pipeline, PR #4529; in progress)
+- [ ] P-192 relation pipeline: functional replay complete; independent signed verification and admitted costs pending (Codex, started 2026-11-17, branch lane/nist-relation-pipeline, PR #4529; in progress)
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 
@@ -24,3 +24,5 @@ _(none pinned — set one with `/goal <text>`)_
 - [x] Track every task first in docs/ACTIVE.md and a draft PR; roll /goal out to isogeny-labs repos (claude, started 2026-11-17, branch track-first-active, PR #4499)
 
 ## Blocked / questions for the owner
+
+- P-192 #4529: separate OpenSSL checks pass, but the producer cannot issue its own independent signed verdict. EKS cost admission also requires current daily/monthly balance and capacity readback; this runtime has no AWS CLI/EKS MCP. The standing allowance exists; no increased allowance is requested. See RELATION_PIPELINE.md for the completed local replay and excluded costs.
