@@ -52,3 +52,11 @@ Protocol: RR9_DETERMINANT_PROTOCOL_20261116.md, extension B, committed before co
 4. **Alternative direct algebraic lead.** Evaluate Hermite-jet-aware *coefficient elimination* of f=prod_i(T-x_i) to avoid carrying eight point variables. At B4/B8 retain solution-set equivalence; high-degree determinant reduction, loss of orientations or unexpected positive-dimensional fibres is an explicit stop condition. Do not assume the compact 9x9 determinant yields cheap elimination.
 
 Result classification: **mathematical lemma and Rust predicate improvement, pending source-exact CI**; **0** new complete unknown-scalar logarithms, **0** new strong-rho timing ratios, and **no** demonstrated non-generic breakthrough. Preserve PCC status [pcc:unverified].
+
+## Numerical stop/go budget from measured 2026-11-16 cold controls
+
+The prior source-exact producer 24-Q panel reported 74.433895 ms total for composed APS and 79.833260 ms for unfolded rho32. Per target those are approximately 3.1014 ms and 3.3264 ms respectively, with paired uncertainty crossing parity. These are **not** full externally optimized generic-rho benchmarks.
+
+An ordinary rank-32 factor-base IC approach with 31 unknown base logs and one target log needs **at least 32 independent rows** if it demands full-column-rank reconstruction; in that *specific accounting protocol*, a 3.3264 ms cold target budget leaves at most 103.95 microseconds per successful relation even assuming zero setup, zero failed queries, and free modular linear algebra. Beating the observed APS time instead gives at most 96.92 microseconds. If the natural-relation rate were 22/24 (historical Dickson31 pilot, high sampling uncertainty), then 32 successes would take roughly 35 attempts; the oracle+walk budget would be ~95 microseconds/attempt versus rho32 and ~89 microseconds/attempt versus APS. These are **necessary engineering feasibility checks under the stated 32-row full-rank design**, not generic lower bounds on all algorithms.
+
+Require timed rootfinding plus saturation/verification at B4/B8 before promoting an S9 coefficient extraction. Multi-target amortization can use a separate ledger, but must never be compared to a cold single-log rho result without charging the shared cost.
