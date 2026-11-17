@@ -243,18 +243,25 @@ This audit is deliberately narrow:
 The exact replay commands are:
 
 ```sh
-cargo check --example curve25519_ic_artifact
-cargo test --lib curve25519_ic::tests -- --nocapture
-cargo run --quiet --example curve25519_ic_artifact -- \
+cargo build --release --example curve25519_ic_artifact
+cargo test --release --lib curve25519_ic::tests -- --nocapture
+cargo run --release --quiet --example curve25519_ic_artifact -- \
   replay research/curve25519_index_calculus_20261102/montgomery-translation.identity.json
 tools/lean/proof-gate.sh research/curve25519_index_calculus_20261102/lean
 ```
 
-The original focused result was 6 passed, 0 failed; certificate replay accepted
-with 32 original and 32 extra points. The synchronized revision adds one
-cross-backend test; its exact current-base result is recorded in the session
-log and PR validation. The initial monolithic test link took 4m46s in the
-original cloud environment. Build time is environment context, not an
+The original focused result was 6 passed, 0 failed. On the feature merged with
+repair head `dc955125b1`, all seven optimized artifact tests pass and the
+certificate accepts 32 original plus 32 extra points with reported
+`false_accept_log2 = -3802.562399953846`.
+
+A complete `cargo test --release --lib` pass on preceding repair head
+`f437c1e21b` finished with 7,428 passed, 73 failed, and 142 ignored in 2,451.88
+seconds. All seven artifact tests passed; none of the failures was in
+`curve25519_ic`. The next repair fixed 12 APS parser failures and its 14 APS
+tests pass. Remaining failures record unrelated fixture, registry, pricing,
+and frozen-configuration drift. The artifact is validated, but this is not an
+all-green repository-suite claim. Build time is environment context, not an
 algorithm measurement.
 
 # Current research frontier
@@ -269,11 +276,10 @@ current discriminating work is tracked in repository problem records:
 3. test target-conditioned section coefficients under a frozen cold-search
    budget without relabelling a bounded search as a general solver.
 
-See
-[`curve25519-torus-four-point-decomposition.md`](../../problems/curve25519-torus-four-point-decomposition.md),
-[`curve25519-singular-isolated-runner.md`](../../problems/curve25519-singular-isolated-runner.md),
-and
-[`curve25519-section-coefficient-selection.md`](../../problems/curve25519-section-coefficient-selection.md).
+See the tracked problems for
+[four-point torus decomposition](../../problems/curve25519-torus-four-point-decomposition.md),
+the [isolated actual-field runner](../../problems/curve25519-singular-isolated-runner.md),
+and [section-coefficient selection](../../problems/curve25519-section-coefficient-selection.md).
 This artifact supplies the independent model oracle those lanes can reuse; it
 does not claim to resolve them.
 
@@ -309,10 +315,3 @@ does not claim to resolve them.
   [`curve25519_ic_baseline_20261102`](../curve25519_ic_baseline_20261102/README.md),
   and
   [`curve25519_algebraic_ladder_20261102`](../curve25519_algebraic_ladder_20261102/README.md).
-
-`ecdb` was not exposed in the original environment, so standard parameters
-were taken from RFC 7748 and new values were labelled as native derivations.
-The artifact mechanism diagram was updated on 2026-11-17 to distinguish the
-independent certificate from the canonical backend and the later miniature
-measurements. No canonical leaderboard or mechanism edge is promoted by this
-study.
