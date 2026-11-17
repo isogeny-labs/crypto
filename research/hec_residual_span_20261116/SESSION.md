@@ -1988,3 +1988,10 @@ What was done: freezee14406ead25 once-onlyexit0;12covers/48exactmatrix proofs,36
 Decisions made: constructive finitecaseproof canavoid knowing actualaction inprinciple; no productionverifier/costclaim yet. WholeJprime/Dnonzero and exhaustivecoverage critical.
 Open threads: separatelybound coverpacket/verifier withmissing/duplicateroot/binding/geometry mutations and fullcoldcosts versus triangular andbothsourcearms; genus3/4scope andindependentreview.
 Errors: none in execution,no retry/S3/cloud.
+
+## Bound eigen-cover verifier frozen
+
+What was done: built externallybound Context+coverpacket, separate weightedrow verifier checking complete roots/principalgeometry/sourcebinding/allbranchwitnesses; no character/action module imported.18mutations/target declared.
+Decisions made: original12targets/216rejections, qualificationonly no performancecostclaim, unchangedwholeprimeJpremise. Assertions [pcc:unverified]. Sources eigen-cover THEORY/results andexactgeometry proof, no newmechanism assumed.
+Open threads: pushfreeze thenonce-only120CPU invocation; nextfullcoldcost allfourbranches vs triangular/bothcontrols.
+Errors: onlyunusedwarnings,no scientificexecutionyet.
