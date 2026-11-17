@@ -3003,3 +3003,10 @@ What was done: derived coefficient X through nondegenerate quartic trace pairing
 Decisions made: generic proof distinct from finite implementation evidence; no novelty/speed/globalnormalizationclaim;Gitfreeze precedes600CPU sole invocation.
 Open threads: execute gate; canonical adjoints and complete target transport remain.
 Errors: unused copied helper/import compile warnings only;no scientificexecution yet.
+
+## Native Smith trace inverse qualifies
+
+What was done: freeze8a056b49bd3 hashespass/exit0;115nonsingulartrace systems,109fullcongruencesandexactpreviousbmatches,4syntheticcontrolrootsallpass. CubicGprimeinverseandS=-u/2 checks pass;no sigma search.
+Decisions made: genericrationalinverseargumentseparatefromfinitechecks;no novelty/runtime/10xclaim. Canonicalnormalization/exceptionalplaces/completeJacobiantransportstillrequired.
+Open threads: canonicaladjoints/smoothmodel andcompleteoriginaltargettransport;full10xgenus2+goalactiveunachieved,independentreviewopen.
+Errors: no scientificfailure;unusedhelperwarningsonly.Gitcustody/noS3/no merge.

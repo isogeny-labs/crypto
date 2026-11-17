@@ -62,3 +62,7 @@ Six normalized maps now have exact norm and affine-equation checks under Git cus
 ### Exhaustive rational Smith chart reconstruction
 
 Freeze `44693a66ca8` qualifies both original F61 maps on a restricted nonsingular-projection chart. Native enumeration exhausts 420,900 rho/sigma pairs: 109 quartic roots have unique full b-polynomial reconstructions, including 97 nonsplit-fibre points; inverse/mutation checks and 88 rational source incidences pass. The restricted open differs from the previous split-only gate and loses four old split points. These are finite chart checks, not global normalization, complete divisor transport or speed evidence. Raw points and limitations: `native-smith-chart/RESULTS.md` under the research directory.
+
+### Rational trace-pairing inverse
+
+`native-smith-trace/DERIVATION.md` derives inverse expressions over F61(t,rho) through cubic traces and a four-dimensional nondegenerate quartic trace pairing. Under freeze `8a056b49bd3`, the native implementation passes 115 trace systems, reproduces all 109 frozen chart b-polynomials without sigma search, and passes four synthetic sign-orbit controls. The generic argument is not independently reviewed. Smooth canonical normalization, exceptional places and complete target transport remain open; no speedup is claimed.
