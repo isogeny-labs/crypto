@@ -2,6 +2,7 @@
 
 Status: **planned and unmeasured**. This directory defines a progression and
 its gates; it contains no benchmark outcome and establishes no ECDLP speedup.
+[pcc:unverified]
 
 The panel starts with a deliberately broad 20-bit calibration phase, then moves
 through nominal 30-, 60-, and 80-bit subgroup sizes. “Bits” always means
@@ -74,4 +75,4 @@ to examine the next scale. It does **not** mean index calculus is faster than
 rho. A speedup statement requires the separate claim gate: verified cold
 end-to-end solves, complete phase costs, matched strongest applicable rho,
 paired uncertainty below one at every required amortization weight, controls,
-and independent replay. See `PROTOCOL.md`.
+and independent replay. See `PROTOCOL.md`. [pcc:unverified]

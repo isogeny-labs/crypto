@@ -13,6 +13,7 @@ header-includes: |
 
 **Evidence state:** planned and unmeasured. This report selects curves and gates;
 it does not report an experiment, an attack, or an ECDLP speedup.
+[pcc:unverified]
 
 ## Decision
 
@@ -27,9 +28,9 @@ cell.
 The exact identities, parameters, and current execution states are frozen in
 [`panel.json`](panel.json). Promotion is a scientific-readiness decision. The
 separate end-to-end claim gate in [`PROTOCOL.md`](PROTOCOL.md) is required for
-any speedup statement.
+any speedup statement. [pcc:unverified]
 
-![Four phased panels separated by admission, correctness, rank, replay, and resource gates. The speedup-claim gate is a separate branch.](phased-panel.svg)
+![Four phased panels separated by admission, correctness, rank, replay, and resource gates. The speedup-claim gate is a separate branch. [pcc:unverified]](phased-panel.svg)
 
 ## What “representative” means here
 
@@ -59,7 +60,7 @@ The selected traits are:
 
 No small curve is a secure deployment recommendation. The 79-bit challenge
 curves are historical public exercises, not present-day security targets and
-not evidence that this study’s methods solve them faster.
+not evidence that this study’s methods solve them faster. [pcc:unverified]
 
 ## Selected cells
 
@@ -88,7 +89,7 @@ The two external anchors use the exact Certicom parameters mirrored at pinned
 `isogeny-labs/ecc-challenges` commit
 `efd49aa0a802cda679748533ec5bc5e44ab9ea71`, blob
 `a82dc0ee00a6d25bbfc09f260a4e5430a2a52f9e` [7]. They deliberately have no
-local ICV1 or EC1 yet.
+local ICV1 or EC1 yet. [pcc:unverified]
 
 ### Trait cautions
 
@@ -118,7 +119,7 @@ low-cofactor general-binary cell. No registered low-cofactor Koblitz curve falls
 inside the 27–33-bit subgroup window; the degree-37 Koblitz curve
 `icv1-f2m37-tm534059-32aad96b` is therefore retained as a clearly
 labeled high-cofactor stress cell rather than misrepresented as a standard-curve
-analogue.
+analogue. [pcc:unverified]
 
 ### Phase 3: current implementation boundary
 
@@ -178,6 +179,7 @@ costs, at least 32 public targets below 64 bits and 8 above, paired uncertainty
 whose upper bound is below 1 at weights `0`, `0.1`, and `1`, controls,
 independent replay, and current repository `gate`, `size`, and `artifacts`
 checks [11]. A relation-yield improvement alone is not sufficient.
+[pcc:unverified]
 
 ## Alternatives rejected
 

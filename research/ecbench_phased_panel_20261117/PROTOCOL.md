@@ -16,10 +16,11 @@ This protocol has two distinct decisions:
    to test at the next scale.
 2. **Speedup claim:** complete cold end-to-end solve time is lower than the
    strongest applicable rho reference under every required amortization weight.
+   [pcc:unverified]
 
 The first decision never implies the second. Relation yield, projections,
 operation counts, warm runs, shared preprocessing, and extrapolations cannot by
-themselves establish an end-to-end speedup.
+themselves establish an end-to-end speedup. [pcc:unverified]
 
 ## 2. Size, panel, and target model
 
@@ -45,7 +46,7 @@ All items must pass before a phase consumes benchmark resources:
 
 - Every mandatory local curve has one pinned ICV1 slug, EC1 representation,
   curve UID, field polynomial or prime, model, subgroup, cofactor, generator,
-  and proved order/subgroup status.
+  and proved order/subgroup status. [pcc:unverified]
 - An external anchor has been imported into the local registry and traits
   catalogue with the same data before it becomes runnable. A public name alone
   is enough to plan a blocked cell, never enough to run it.
@@ -80,13 +81,13 @@ contract. For each `(curve, candidate, episode, look)`:
    factor-base contract, or fails direct group verification, record the exact
    failure and immediately prune the candidate for correctness.
 3. For a verified relation, increment `verified_relations`. Hash its canonical
-   sparse row so duplicates remain visible.
+   sparse row so duplicates remain visible. [pcc:unverified]
 4. Reduce the row modulo `r` against the episode’s incremental basis. Increment
    `independent_rows` only when rank grows. Record rank, duplicate count,
    factor-base coverage, row weight, and collection/verification/reduction cost.
 5. At every frozen look, emit cumulative and blockwise values for:
 
-   - verified relation yield `verified_relations / attempted`;
+   - verified relation yield `verified_relations / attempted`; [pcc:unverified]
    - independent-rank yield `independent_rows / attempted`;
    - rank novelty `independent_rows / verified_relations`;
    - full-rank episode success;
@@ -113,6 +114,7 @@ standalone promotion metric.
   target rank and trial budget. A default operational guard rejects a yield more
   than 2× below the preregistered model/incumbent, but the exact minimum is frozen
   before probes and may only be changed under a new candidate ID.
+  [pcc:unverified]
 - Structural impossibility, invalid relation, inconsistent replay, or solver
   wrong answer prunes immediately. Otherwise pruning requires the conservative
   v1 statistical decision. Ambiguous evidence survives rather than being
@@ -127,6 +129,7 @@ to keep each mandatory family cell interpretable.
 For every retained candidate and reference workload:
 
 - ecbench verifies the reported discrete logarithm by `[d]P = Q`;
+  [pcc:unverified]
 - every relation used by the solver has passed direct group verification;
 - all cold setup, factor-base construction, relation collection, filtering,
   matrix build, linear algebra, individual logarithm, verification, teardown,
@@ -190,9 +193,10 @@ new ID; it does not inherit the failed candidate’s evidence.
 ## 9. Separate speedup-claim gate G6
 
 Passing G5 says only “continue the scaling study.” A speedup statement requires,
-on the same current-head artifacts:
+on the same current-head artifacts: [pcc:unverified]
 
 - verified end-to-end solves for candidate and strongest applicable rho;
+  [pcc:unverified]
 - complete cold one-target costs and all required public targets;
 - paired candidate/rho uncertainty whose upper confidence bound is below 1 at
   every required amortization weight;
@@ -202,7 +206,7 @@ on the same current-head artifacts:
 - the repository’s current `gate`, `size`, and `artifacts` checks.
 
 Results may be family- and range-specific. A win on a 20-bit analogue does not
-establish a 60- or 80-bit asymptotic or practical speedup.
+establish a 60- or 80-bit asymptotic or practical speedup. [pcc:unverified]
 
 ## 10. Phase-specific admission notes
 
