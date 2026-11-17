@@ -75,3 +75,10 @@ Checks and predictions written before the sweep's new cells:
   `results/b_*.jsonl`. `msweep-m6` (`gzyyvzfhwssxi2`) was terminated as a duplicate of the m = 6 run on `msweep-a`.
 - `msweep-m8` `sweep2` finished: (8,3) closed without 1 at D = 7 (3,947,416 columns, 184 s and 181 s); D = 8 has
   13,962,982 columns, over the 12M cap. `sweep3` started 17:02 with `"8" "3" 20000000` (depth 3 and 4, cap 20M).
+
+## 17:31 UTC
+
+- `msweep-m8` (`t4rz3s0otppli2`) terminated (GET 404): (8,3) D = 8 at 13.96M columns was not going to finish in its budget.
+- `msweep-a`: job `sweep` stopped with TERM during the second target of (6,3) D = 8 (the first hit the 2,400 s
+  budget); `sweep6` runs (6,3) on one target with an 18,000 s budget and a 1,200,000-column cap. The cap also
+  limits the depth-4 cell the driver emits afterwards.
