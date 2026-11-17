@@ -2212,3 +2212,10 @@ What was done: compiled overflow-checked Rust gate, homogeneous T-kD row-span qu
 Decisions made: Git replaces unavailable S3 custody; source/protocol/native/binary hashes pushed before one120CPU invocation; unresolved branches retained. Existing own T-7093 reservation confirmed by CLI, check allow, attachment returned own-scope conflict. No merge or auto-merge.
 Open threads: execute once after checkpoint push; retain complete raw output and qualify evidence. No cost or genus3/4 curve conclusion from module controls.
 Errors: attach service rejected existing own reservation; CLI confirmed task already claimed. Build only unused-function warnings.
+
+## Homogeneous all-component existence gate passed
+
+What was done: pushed freeze33b96ad90bb, verified INPUT hashes, once-only exit0;48/48 homogeneous matrix witnesses on12 originaltargets,0 unresolved,48 weightmutations rejected;3 finite-module projection/scope controls pass. Raw weights/stderr/exit and outputhashes retained in Git.
+Decisions made: stronger all-component format supports proposed rank-independent theorem under explicit annihilator/membership/splitting assumptions; existing prime-order genus2 certificate unchanged. No construction/verification cost or genus3/4 curve conclusion. [pcc:unverified].
+Open threads: packet-bound homogeneous verifier then full counted construction/verification; independent validation and broader speedup objective remain.
+Errors: none in scientific invocation; no rerun/S3/cloud/merge.
