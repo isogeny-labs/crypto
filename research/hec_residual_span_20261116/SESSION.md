@@ -521,3 +521,17 @@ Needactualstrongnewmechanismandseparategenus4order4qualificationwithnewproofs. B
 
 ### Errors
 No scientificfailures/retries. No target/field/budgetselectionafteroutcomes;compileunusedfieldwarningsretained.
+
+## Order-four genus-four proof/certificate screen frozen
+
+### What was done
+Derived sigma(-x,iy) Mumford action and separate finite-field/whole-order/scalar-projection/simplicity obligations. Read Howe–Zhu primary Proposition3/Lemma4. Implemented exact extension counts d1..4, integer reciprocal factor screen for ordinary Weil polynomials, and sufficient finite modular root-of-unity power-collision witnesses. Six fixed models at p13/17/29, all classifications retained; no target solves.
+
+### Decisions made
+No pi=P(sigma) import from binomial family. Absolute certificate conditional on all finite modular witnesses; missing witness stays uncertified. Group/source qualification is a separate flag. Compile/freeze/push before once-only run, no simplicity-count success quota or model replacement.
+
+### Open threads
+Execute fixed screen, inspect actual ordinary/simple/group-qualified coverage before any solver or speed claim. Broadgoalopen.
+
+### Errors
+Previously referenced Rust1.99 stable binaries became unavailable; adapted to Homebrew Rust1.93.1 and recorded version before measurement. No old timing comparison or scientific rerun. Build assertions not executed yet.
