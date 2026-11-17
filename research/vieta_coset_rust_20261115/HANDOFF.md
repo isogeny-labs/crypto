@@ -2,6 +2,13 @@
 
 ## Results publication tracking — PR4525
 
+Latest concrete artifact blocker: at head5ac77b08ee, official migration failed
+S3 HeadObject403 (job/log/ambiguity retained in speed/evidence/artifact-migration-
+blocker.json and artifact-migration-failure.log). No object presence/absence or
+local S3 availability is established. Nine original policy blobs remain.
+Do not repack/rename committed evidence or weaken policy; operator/store access
+repair is required before the official bot can migrate them. Draft stays blocked.
+
 New bounded publication follow-up is confirmed enabled: first10:20:13UTC,
 then4hour intervals, maximum3occurrences. Exact service receipt is
 `speed-20261117/evidence/followup-schedule.json`; inherited environment details

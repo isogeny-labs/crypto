@@ -23,3 +23,5 @@ account billing lock. The exact check annotations are pinned in
 CI did not execute them. No spending or bypass was attempted.
 
 Publication/record blocker: official censored-close aborted on unchanged main historical record20261105T0828Z-icb-large-prime-n53-s1-archive command1 lacking a successful integer exit. Our1301 raw pointers/6 native count metrics are registered, but the record stays open; no historical exclusion or bypass was added. See evidence/record-close-blocker.json.
+
+Official artifact migration failed S3 HeadObject403 at head5ac77b08ee. Nine policy files remain pending; object absence versus access denial is undetermined. Git-only compression/repacking of committed logs is prohibited, so no storage workaround or local S3 operation was attempted. Evidence/artifact-migration-blocker.json retains the actual job and failure.
