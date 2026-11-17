@@ -2044,3 +2044,10 @@ What was done: freezeea843b8170e once-onlyexit0;24calls/12targets exactpacketexc
 Decisions made: retain finitecover alternative, no10x/fullgainclaim. All4branches charged; basecollection/setup/geometry remains needed mechanism.
 Open threads: basefieldcollection/proofsharedwork withCRTprovenance obligations; originalgenus2+goal, independentreview/publicationartifacts/genus3/4coverage.
 Errors: no executionfailure,no retry/S3/cloud.
+
+## Cover verifier phase gate frozen
+
+What was done: sixexclusive countertaps binding/rootcover/orbitindex/anchors/geometry/branchwitnesses, allwholevectors mustreplay triangularcover exactly, observerresets beforequalification andmeasuredverify.
+Decisions made: descriptiveinstrumentation noalgorithmchange;24calls/12targets/both216mutation gates/exactrepeats, sumphasevectors=verifier,Gitfreeze beforeone120CPU. Assertions [pcc:unverified].
+Open threads: executeafterpush, useactualphasecosts toselect materialproofsuccessor.
+Errors: onlyunusedwarnings,no scientificexecutionyet.
