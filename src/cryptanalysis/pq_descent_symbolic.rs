@@ -642,9 +642,9 @@ fn s4_symbolic_poly_affine(
     offset: u64,
 ) -> FieldBoolPoly {
     let np = b1.len() as u32;
-    let x1 = FieldBoolPoly::linear(0, b1);
-    let x2 = FieldBoolPoly::linear(np, b2);
-    let x3 = FieldBoolPoly::linear(2 * np, b3);
+    let x1 = affine_form(0, b1, offset);
+    let x2 = affine_form(np, b2, offset);
+    let x3 = affine_form(2 * np, b3, offset);
     let x4 = x_r.counted_clone();
     let bconst = FieldBoolPoly::constant(b);
     let s3_in_x3 = |p: &FieldBoolPoly, q: &FieldBoolPoly| {
