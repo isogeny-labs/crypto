@@ -11,10 +11,16 @@ follow-ups here; history belongs in the session log, not in this file.
 
 ## Current goal
 
-_(none pinned — set one with `/goal <text>`)_
+Measure the baseline performance of the root-finding decomposition (`rootfind-mitm` / `rootfind-pairs` and descendants) and establish a plan to chase a 100x speed-up (owner, 2026-11-17, `/goal`).
 
 ## Active items (top = next)
 
+- [ ] Root-finding 100x: baseline and plan (claude, started 2026-11-17, branch claude/rootfind-baseline-100x, stacked on #4607)
+  - [ ] Survey what the repository already measured and ruled out for root finding (research/rootfind_*, ecbench_rootfind*, docs/perf)
+  - [ ] Local baseline: per-phase time and counted operations for rootfind-mitm (prime and binary), with an A/A noise floor
+  - [ ] Profile where the time goes (table build, batched additions, probes, memory)
+  - [ ] Roofline: how far the current kernel is from the host's limits
+  - [ ] Plan: ranked levers with predicted factors, cheapest falsifying test each, and what a 100x requires
 - [ ] Repair the 28 examples/tests/bins on main broken by lossy merges (syntax, struct drift, lost library APIs) (claude, started 2026-11-17, branch claude/fastest-grobner-base-algorithm-u74ipw; in progress)
 - [x] Fix the `wide-vars` build (u64 vs `Mask` in f4_trace, pq_f4_f2, koblitz_groebner) and clear `clippy-maintained.sh` -D warnings (claude, 2026-11-17, branch claude/wide-vars-clippy-cleanup, PR #4607, stacked on #4589; done, awaiting review)
 - [x] Clean up main CI breakages and add an ecbench CI check (claude, started 2026-11-17, branch claude/fastest-grobner-base-algorithm-u74ipw, PR #4569 merged; ecbench-smoke check passing; remaining main blockers need the owner: AWS key, pcc claim_type, hec-multi record, rho currency)
