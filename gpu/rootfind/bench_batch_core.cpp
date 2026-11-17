@@ -128,8 +128,10 @@ int main(int argc,char **argv) {
         double t[2]={};
         for (int j=0;j<2;j++) {
             if (argc>1 && std::string(argv[1])!=std::string("--perf-")+names[k]+"-"+arms[j]) continue;
-            const auto &fn = (k==0?(j==0?b16:a16):k==1?(j==0?b32:a32):k==2?(j==0?bp16:ap16):(j==0?bp1:ap1));
-            t[j]=median_ns(fn,iterations);
+            t[j] = k==0 ? (j==0 ? median_ns(b16,iterations) : median_ns(a16,iterations))
+                 : k==1 ? (j==0 ? median_ns(b32,iterations) : median_ns(a32,iterations))
+                 : k==2 ? (j==0 ? median_ns(bp16,iterations) : median_ns(ap16,iterations))
+                        : (j==0 ? median_ns(bp1,iterations) : median_ns(ap1,iterations));
             std::printf("%s %s: %.2f ns/op\n",names[k],arms[j],t[j]);
         }
         if (t[0]>0 && t[1]>0) std::printf("%s speedup %.4fx\n",names[k],t[0]/t[1]);
