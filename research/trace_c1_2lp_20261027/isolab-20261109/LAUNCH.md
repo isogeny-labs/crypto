@@ -53,3 +53,7 @@ The Iso Lab route is blocked: CodeBuild queue limit 0, artifact-store keys inval
 | isolation | A RunPod pod cannot reach L2. The specs still say L2, so the wall-time comparison is **not admitted**. The counted-operation (GAE) comparison, the headline statistic of `ecbench compare`, does not depend on isolation |
 | ceiling | USD 5, failures included |
 | resume checkpoint | S3 upload is unavailable; this pushed commit is the checkpoint |
+
+### RunPod outcome (2026-11-17T15:31Z)
+
+All four specs ran on pod `Z0jehpw47bv0s5` (d2 9 s, d3 9 s, d4 10 s, d5 15 s). Every session passed `ecbench verify --dir` with 0 problems. The d2 standard arms failed deterministically ("projected small factor base has no columns"). The pod was deleted. Results are in [`../runpod-20261117/README.md`](../runpod-20261117/README.md).
