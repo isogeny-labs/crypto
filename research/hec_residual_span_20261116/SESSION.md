@@ -1883,3 +1883,10 @@ Decisions made: no scalar orbit parameter substitution; test identity and basepo
 Sources checked (KB): revision9b2119e8fbac482b98b50521c0d604bb, refreshed2026-11-17T06:15:25Z; source:91b6bbe9fb73267bbeb5d7c97f493b26 crypto:docs/ecbench/README.md and source:fdff62973a741275cdbf8ec3b5ff069d crypto:docs/ic/LEAD_LADDER_METHODOLOGY_20261010.md; stale for current local measurements, no novelty claim. Sage resultant primary definition read, links in derivation.
 Open threads: once-only120CPU algebra screen after Git freeze push; shared-incidence cost case still needed.
 Errors: no compile errors, no scientific execution yet.
+
+## Orbit incidence algebra qualified
+
+What was done: freeze f71d88998c3 executed onceexit0;181408 scalar identities,65210 coefficient products pass;920 basepoint zero products,61660 five-distinct products (not independent orbit counts). Assertions [pcc:unverified].
+Decisions made: reject single rational pencil parameter perorbit; generic degree2g+1 obstruction for binomial models g2/3/4. Retain exact norm with basepoint factor removal as possible shared-incidence interface.
+Open threads: complete product/gcd/update/rootlift cost case versus incremental explicit batch-inversion buckets before new performance prototype; independently review derivation; full10x scope unchanged.
+Errors: none; no retry/S3/cloud.
