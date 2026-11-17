@@ -1,0 +1,91 @@
+{
+  "schema": "prime31.shared_bsgs_1024q.independent_affine_readback.v1",
+  "checked_utc_date": "2026-11-17",
+  "run_id": 44031618724,
+  "source_sha": "df661dee03446583f232998c95eb326f4dab5ae1",
+  "artifact_id": 14305472259,
+  "artifact_zip_sha256": "dcf190695bfd9b939f5316b180f01db2beb20c243beed3f312923b33b4326cb2",
+  "curve": {
+    "p": 2147483647,
+    "n": 2147446831,
+    "a": 847514846,
+    "b": 2087444724,
+    "g": [
+      625037715,
+      2100627251
+    ]
+  },
+  "independent_verifier": "Independent original-curve affine add/double and unreduced scalar multiplication plus row-mod-n replay; NOT signed PCC; not an ECDLP solver",
+  "replayed": {
+    "curve_generator_order_n": true,
+    "independent_public_q_scalars": 1024,
+    "IC_answers": 1024,
+    "IC_basis_logs": 61,
+    "IC_setup_rows": 61,
+    "IC_target_rows": 1024,
+    "BSGS_m46341": 1024,
+    "BSGS_m262144": 1024,
+    "BSGS_m1048576": 1024,
+    "native_rho_unfolded": 1024,
+    "native_rho_folded": 1024,
+    "rho_AA": 64
+  },
+  "same_runner_ns": {
+    "ic_setup": 1315438328,
+    "ic_online": 906035433,
+    "ic_full": 2221473761,
+    "rho_unfolded_full": 2246126471,
+    "rho_folded_full": 4360294154,
+    "bsgs": [
+      {
+        "m": 46341,
+        "baby_entries": 46340,
+        "setup": 2878276,
+        "online": 985152533,
+        "full": 988030809,
+        "rss_after_setup_kib": 12288,
+        "hash_capacity": 57344,
+        "ratio_bsgs_over_ic": 0.44476366380993687,
+        "target_bootstrap_95_over_IC": [
+          0.4260720672895966,
+          0.4637935116468706
+        ]
+      },
+      {
+        "m": 262144,
+        "baby_entries": 262143,
+        "setup": 22911989,
+        "online": 193298591,
+        "full": 216210580,
+        "rss_after_setup_kib": 27504,
+        "hash_capacity": 458752,
+        "ratio_bsgs_over_ic": 0.09732754165085095,
+        "target_bootstrap_95_over_IC": [
+          0.0937766157177403,
+          0.10094489484925522
+        ]
+      },
+      {
+        "m": 1048576,
+        "baby_entries": 1048575,
+        "setup": 103839846,
+        "online": 66273588,
+        "full": 170113434,
+        "rss_after_setup_kib": 67924,
+        "hash_capacity": 1835008,
+        "ratio_bsgs_over_ic": 0.07657683695684218,
+        "target_bootstrap_95_over_IC": [
+          0.0745315668646988,
+          0.07863799626017122
+        ]
+      }
+    ]
+  },
+  "resampling": "20000 paired target resamples of same 1024 Q with fixed setup, deterministic seed 20261117; between-run hardware variability not accounted for",
+  "limitations": [
+    "Producer-level exact-source CI, independently reimplemented arithmetic in separate local Python auditor only; no signed PCC",
+    "Process RSS after sequential setup is not isolated per-arm peak",
+    "Single hardware-run batch and serial arm order; cannot infer general portability",
+    "Classical Shanks BSGS is generic, no non-generic ECDLP result"
+  ]
+}

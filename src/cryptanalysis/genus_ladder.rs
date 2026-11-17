@@ -51,8 +51,8 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
 use super::chained_transfer::ic_control::{
-    addm, build_rows, combine, mulmod, peel, split_order, subm, wiedemann, Dsu, Nat, Rel, Row,
-    REL_FB,
+    addm, build_rows, combine, mulmod, pa, peel, pm, ppow, ps, split_order, subm, wiedemann,
+    wiedemann_coord, CubicOracle, Dsu, Nat, Rel, Row, REL_FB,
 };
 use super::ic_boundary::{
     invmod, pivot_inversion_steps, rho_reference_walk, CountedGroup, GroupOps, RhoWalk,
@@ -1251,6 +1251,10 @@ pub struct IcResult {
     pub core_rows: usize,
     pub core_cols: usize,
     pub attempts: u32,
+    /// [`IcExt::coord_square`] solves that returned nothing and fell back.
+    pub la_fallbacks: u32,
+    /// Candidates the Ferrari test left undecided (baseline test run).
+    pub ferrari_undecided: u64,
     pub wall_ns: u64,
 }
 
@@ -1271,9 +1275,134 @@ pub fn restart_sqrt(r: u64) -> u64 {
     (((r as f64).sqrt() / 2.0) as u64).clamp(16, RESTART)
 }
 
+/// Ferrari splitting test for a monic quartic `u = x⁴ + c₃x³ + c₂x² + c₁x + c₀`
+/// whose discriminant is already known to be a non-zero square (the parity
+/// prefilter passed).  For such a squarefree quartic Frobenius is the
+/// identity, a (2,2) or a (3,1) permutation of the roots.
+///
+/// * The resolvent cubic `R(z) = z³ − c₂z² + (c₁c₃ − 4c₀)z − (c₁² + c₀c₃² − 4c₀c₂)`
+///   has the roots `x₁x₂ + x₃x₄`, `x₁x₃ + x₂x₄`, `x₁x₄ + x₂x₃`; (3,1) permutes
+///   them cyclically, the identity and (2,2) fix them.  `disc R = disc u`, so
+///   the Cardano–Lucas cubic test decides (3,1) (not split) without any
+///   polynomial exponentiation.
+/// * Otherwise one root `θ` of `R` gives `b₁, b₂` (roots of `z² − θz + c₀`) and
+///   `a₁ = (c₁ − c₃b₁)/(b₂ − b₁)`, `a₂ = c₃ − a₁` with
+///   `u = (x² + a₁x + b₁)(x² + a₂x + b₂)` when the pairing is rational.  For
+///   the identity every `θ` gives a square `θ² − 4c₀`; for (2,2) a non-square
+///   proves "not split", and a square leaves the two quadratic discriminants
+///   to decide.
+///
+/// Returns `Some(None)` (not split), `Some(Some(roots))` (split, the four
+/// roots) or `None` (undecided: the caller runs the baseline test).  Every
+/// native operation is counted in `n`.
+pub(crate) fn ferrari_split(
+    co: &CubicOracle,
+    p: u64,
+    u: &[u64],
+    n: &mut Nat,
+) -> Option<Option<Vec<u64>>> {
+    if u.len() != 5 || u[4] != 1 {
+        return None;
+    }
+    let (c0, c1, c2, c3) = (u[0], u[1], u[2], u[3]);
+    let four_c0 = pm(p, 4, c0, n);
+    let r2 = ps(p, 0, c2, n);
+    let r1 = ps(p, pm(p, c1, c3, n), four_c0, n);
+    let t = pa(
+        p,
+        pm(p, c1, c1, n),
+        ps(p, pm(p, c0, pm(p, c3, c3, n), n), pm(p, four_c0, c2, n), n),
+        n,
+    );
+    let r0 = ps(p, 0, t, n);
+    let res: Vec<u64> = vec![r0, r1, r2, 1];
+    let (splits, info) = co.split_cubic(&res, n)?;
+    if !splits {
+        return Some(None); // (3,1)
+    }
+    let roots = match info {
+        Some((tt, pp)) => co.cubic_roots(&res, tt, pp, n),
+        None => None,
+    }
+    .or_else(|| co.split_cubic_roots_det(&res, n))?;
+    let theta = roots[0];
+    let d = ps(p, pm(p, theta, theta, n), four_c0, n);
+    if d == 0 {
+        return None;
+    }
+    if ppow(p, d, (p - 1) / 2, n) != 1 {
+        return Some(None); // (2,2): this pairing is not rational
+    }
+    let s = co.sqrt(d, n);
+    let inv2 = p.div_ceil(2);
+    let b1 = pm(p, pa(p, theta, s, n), inv2, n);
+    let b2 = pm(p, ps(p, theta, s, n), inv2, n);
+    if b1 == b2 {
+        return None;
+    }
+    let den = ps(p, b2, b1, n);
+    let a1 = pm(p, ps(p, c1, pm(p, c3, b1, n), n), ppow(p, den, p - 2, n), n);
+    let a2 = ps(p, c3, a1, n);
+    if pa(p, pm(p, a1, a2, n), pa(p, b1, b2, n), n) != c2 {
+        return None;
+    }
+    let mut out = Vec::with_capacity(4);
+    for (a, b) in [(a1, b1), (a2, b2)] {
+        let dq = ps(p, pm(p, a, a, n), pm(p, 4, b, n), n);
+        if dq == 0 {
+            return None;
+        }
+        if ppow(p, dq, (p - 1) / 2, n) != 1 {
+            return Some(None); // an irreducible quadratic factor
+        }
+        let sq = co.sqrt(dq, n);
+        let na = ps(p, 0, a, n);
+        out.push(pm(p, pa(p, na, sq, n), inv2, n));
+        out.push(pm(p, ps(p, na, sq, n), inv2, n));
+    }
+    out.sort_unstable();
+    Some(Some(out))
+}
+
+/// Optional speed-ups ported from the genus-3 positive control
+/// (`research/ic_positive_control_{la,capped}_20261116`).  The default is
+/// the frozen instrument, count for count.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct IcExt {
+    /// Coordinate Wiedemann on a random square row subset
+    /// (`ic_control::wiedemann_coord`): only the target's coordinate, no
+    /// `AᵀDA`, no reconstruction.  A failed certificate falls back, in the
+    /// same attempt and counted, to the baseline [`wiedemann`].  Ignored
+    /// when [`IcParams::sge`] is set.
+    pub coord_square: bool,
+    /// Unit-T walk: starts `a G + T`, jumps `α G`; the unknown is
+    /// `h · log T` (column −1) and the segment between restarts is capped at
+    /// `max(64, ⌊√r / 16⌋)` so a segment never runs into its rho cycle.
+    pub unit_t: bool,
+    /// Ferrari splitting test for quartics ([`ferrari_split`]) after the
+    /// parity prefilter, at genus 4; undecided cases fall back to the
+    /// baseline test.  Needs [`IcParams::prefilter`].
+    pub ferrari: bool,
+    /// Structured Gaussian elimination ([`sge_reduce`], with the
+    /// [`SgeParams`] of [`IcParams::sge`]) on the peeled core, then the
+    /// coordinate Wiedemann on a random square row subset of the *reduced*
+    /// matrix, the target column mapped through the renumbering.  A failed
+    /// certificate falls back, in the same attempt and counted, to the
+    /// baseline [`wiedemann`] on the same reduced matrix (the merge is not
+    /// repeated).  Needs [`IcParams::sge`]; without it this flag does nothing.
+    /// Merged rows carry non-unit entries, which [`ic_control`]'s `mat_vec`
+    /// charges one multiplication each per product (a `±1` entry is free).
+    pub sge_coord: bool,
+}
+
 /// Run one index-calculus arm on an instance.  The structure is
 /// `ic_control::run_ic_with`, with the genus a variable.
 pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
+    run_ic_ext(inst, prm, IcExt::default())
+}
+
+/// [`run_ic`] with the speed-ups of [`IcExt`].
+pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
     let start = std::time::Instant::now();
     let curve = &inst.curve;
     let (p, r, h) = (inst.p, inst.r, inst.h);
@@ -1330,12 +1459,23 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
     let mut jumps: Vec<(JDiv, u64, u64)> = Vec::new();
     for _ in 0..16 {
         let a = rng.gen_range(1..short);
+        if ext.unit_t {
+            jumps.push((curve.mul(&mut ops, inst.g, a), a, 0));
+            continue;
+        }
         let b = rng.gen_range(1..short);
         let ag = curve.mul(&mut ops, inst.g, a);
         let bt = curve.mul(&mut ops, inst.target, b);
         jumps.push((curve.add(&mut ops, ag, bt), a, b));
     }
     res.setup_ops = ops.adds + ops.doubles;
+    // Cardano–Lucas constants for the Ferrari test, charged to the relation phase.
+    let cubic = (ext.ferrari && g == 4 && p > 3).then(|| CubicOracle::new(p, &mut res.rel));
+    let restart = if ext.unit_t {
+        prm.restart.min((((r as f64).sqrt() / 16.0) as u64).max(64))
+    } else {
+        prm.restart
+    };
 
     let mut rels: Vec<Rel> = Vec::new();
     let mut vid: HashMap<u32, u32> = HashMap::new();
@@ -1353,7 +1493,14 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
                 res.exhausted = true;
                 break 'outer;
             }
-            if since_restart >= prm.restart.max(1) {
+            if since_restart >= restart.max(1) && ext.unit_t {
+                let a = rng.gen_range(1..r);
+                let ag = curve.mul(&mut ops, inst.g, a);
+                cur = curve.add(&mut ops, ag, inst.target);
+                ca = a;
+                cb = 1;
+                since_restart = 0;
+            } else if since_restart >= restart.max(1) {
                 let a = rng.gen_range(1..r);
                 let b = rng.gen_range(1..r);
                 let ag = curve.mul(&mut ops, inst.g, a);
@@ -1386,12 +1533,26 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
                 // Two factors of a quadratic with square discriminant.
                 decided = g == 2;
             }
-            if !decided && !splits_completely(p, &u, &mut res.rel) {
+            let mut fer_roots = None;
+            if let (Some(co), true) = (cubic.as_ref(), prm.prefilter && g == 4) {
+                match ferrari_split(co, p, &u, &mut res.rel) {
+                    Some(None) => continue,
+                    Some(Some(r)) => fer_roots = Some(r),
+                    None => res.ferrari_undecided += 1,
+                }
+            }
+            if fer_roots.is_none() && !decided && !splits_completely(p, &u, &mut res.rel) {
                 continue;
             }
             res.splits += 1;
-            let Some(roots) = roots_of(p, &u, &mut rng, &mut res.rel) else {
-                continue;
+            let roots = match fer_roots {
+                Some(r) => r,
+                None => {
+                    let Some(r) = roots_of(p, &u, &mut rng, &mut res.rel) else {
+                        continue;
+                    };
+                    r
+                }
             };
             let vc = curve.v_coeffs(&cur);
             let mut rel = Rel {
@@ -1429,9 +1590,15 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
             if rel.nfb == 0 && lps.is_empty() {
                 continue;
             }
-            res.rel.mul += 2;
             rel.rhs = mulmod(h % r, ca, r);
-            rel.tcoef = subm(0, mulmod(h % r, cb, r), r);
+            if ext.unit_t {
+                debug_assert_eq!(cb, 1);
+                res.rel.mul += 1;
+                rel.tcoef = r - 1; // unknown h·log T
+            } else {
+                res.rel.mul += 2;
+                rel.tcoef = subm(0, mulmod(h % r, cb, r), r);
+            }
             if prm.verify_relations {
                 let mut sum = JDiv::IDENTITY;
                 for &(x, y) in &places {
@@ -1489,40 +1656,99 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
         }
         let mut w_nat = Nat::default();
         let dense = res.attempts > 1;
-        let sol = match prm.sge {
-            None => wiedemann(&core, cc, r, &mut rng, dense, &mut w_nat).map(|x| x[ct as usize]),
-            Some(sp) => {
-                let mut s_nat = Nat::default();
-                let (red, rcc, rct, st) = sge_reduce(&core, cc, ct, r, sp, &mut s_nat);
-                res.la_sge.merge(s_nat);
-                res.la.merge(s_nat);
-                res.sge = st;
-                // The merged system is solved with a copy of the stream; the
-                // stream itself advances as the unmerged solve would, so a
-                // failed attempt resumes the relation phase identically.
-                let mut wrng = rng.clone();
-                skip_wiedemann_draws(&mut rng, core.len(), cc, r, dense);
-                wiedemann(&red, rcc, r, &mut wrng, dense, &mut w_nat).map(|x| x[rct as usize])
-            }
+        // UnitT solves for h·log T: one inversion of h and one product.
+        let h_inv = if ext.unit_t {
+            w_nat.mul += pivot_inversion_steps(r) + 1;
+            let Some(inverse) = invmod(h % r, r) else {
+                // Unit-T cannot recover log T when the cofactor is not a unit.
+                res.la_wied.merge(w_nat);
+                res.la.merge(w_nat);
+                res.exhausted = true;
+                break 'outer;
+            };
+            inverse
+        } else {
+            1
         };
-        res.la_wied.merge(w_nat);
-        res.la.merge(w_nat);
-        if let Some(t) = sol {
+        let to_log = |t: u64| if ext.unit_t { mulmod(t, h_inv, r) } else { t };
+        // The certificate: [t]G = T by the counted multiplication (its group
+        // operations are verify_ops) and by an independent one whose field
+        // work is taken back out of the tally.
+        // (Assigned, not accumulated, exactly as the frozen instrument does.)
+        let certify = |t: u64, ops: &mut GroupOps, verify_ops: &mut u64| -> bool {
             let v0 = ops.adds + ops.doubles;
-            let chk = curve.mul(&mut ops, inst.g, t);
-            res.verify_ops = ops.adds + ops.doubles - v0;
+            let chk = curve.mul(ops, inst.g, t);
+            *verify_ops = ops.adds + ops.doubles - v0;
             let (cm, ci) = (curve.fmul(), curve.finv());
             let ok = chk == inst.target && curve.mul_rtl(inst.g, t) == inst.target;
-            // The second, independent multiplication is a certificate, not
-            // solver work: take it back out of the field tally.
             curve.k.mul.set(cm);
             curve.k.inv.set(ci);
-            if ok {
-                res.recovered = Some(t);
-                res.certified = true;
-                solved = true;
-                continue;
+            ok
+        };
+        let mut answer = None;
+        // The reduced core of `sge_coord`, kept for the certified fallback.
+        let mut reduced: Option<(Vec<Row>, usize, u32)> = None;
+        if let (true, Some(sp)) = (ext.sge_coord, prm.sge) {
+            let mut s_nat = Nat::default();
+            let (red, rcc, rct, st) = sge_reduce(&core, cc, ct, r, sp, &mut s_nat);
+            res.la_sge.merge(s_nat);
+            res.la.merge(s_nat);
+            res.sge = st;
+            let t = wiedemann_coord(&red, rcc, rct as usize, r, &mut rng, true, &mut w_nat);
+            match t.map(to_log) {
+                Some(t) if certify(t, &mut ops, &mut res.verify_ops) => answer = Some(t),
+                _ => res.la_fallbacks += 1,
             }
+            reduced = Some((red, rcc, rct));
+        } else if ext.coord_square && prm.sge.is_none() {
+            let t = wiedemann_coord(&core, cc, ct as usize, r, &mut rng, true, &mut w_nat);
+            match t.map(to_log) {
+                Some(t) if certify(t, &mut ops, &mut res.verify_ops) => answer = Some(t),
+                _ => res.la_fallbacks += 1,
+            }
+        }
+        if answer.is_none() {
+            let sol = match prm.sge {
+                _ if reduced.is_some() => {
+                    let (red, rcc, rct) = reduced.as_ref().expect("checked");
+                    wiedemann(red, *rcc, r, &mut rng, true, &mut w_nat).map(|x| x[*rct as usize])
+                }
+                None => wiedemann(
+                    &core,
+                    cc,
+                    r,
+                    &mut rng,
+                    dense || ext.coord_square,
+                    &mut w_nat,
+                )
+                .map(|x| x[ct as usize]),
+                Some(sp) => {
+                    let mut s_nat = Nat::default();
+                    let (red, rcc, rct, st) = sge_reduce(&core, cc, ct, r, sp, &mut s_nat);
+                    res.la_sge.merge(s_nat);
+                    res.la.merge(s_nat);
+                    res.sge = st;
+                    // The merged system is solved with a copy of the stream; the
+                    // stream itself advances as the unmerged solve would, so a
+                    // failed attempt resumes the relation phase identically.
+                    let mut wrng = rng.clone();
+                    skip_wiedemann_draws(&mut rng, core.len(), cc, r, dense);
+                    wiedemann(&red, rcc, r, &mut wrng, dense, &mut w_nat).map(|x| x[rct as usize])
+                }
+            };
+            if let Some(t) = sol.map(to_log) {
+                if certify(t, &mut ops, &mut res.verify_ops) {
+                    answer = Some(t);
+                }
+            }
+        }
+        res.la_wied.merge(w_nat);
+        res.la.merge(w_nat);
+        if let Some(t) = answer {
+            res.recovered = Some(t);
+            res.certified = true;
+            solved = true;
+            continue;
         }
         next_check = rels.len() as u64 + (nunk as u64 / 20).max(16);
     }
@@ -1899,6 +2125,9 @@ pub struct RhoOut {
     pub cantor_inv: u64,
     /// Canonicalisations (the walk's per-step native work).
     pub native: u64,
+    /// The walk's other counted native work (`RhoResult::work_native`: the
+    /// short-cycle window's and Brent's compares), summed.  Not in `native`.
+    pub compares: u64,
     pub steps: u64,
     pub wall_ns: u64,
 }
@@ -1912,6 +2141,13 @@ impl RhoOut {
 /// Negation-map rho on the order-`r` subgroup (`rho_reference_walk`,
 /// `RhoWalk::negation()`), certified by an independent `[k]G`.
 pub fn run_rho(inst: &Instance, seed: u64) -> RhoOut {
+    run_rho_walk(inst, seed, RhoWalk::negation())
+}
+
+/// [`run_rho`] with the walk chosen (`RhoWalk::plain()` for the walk on
+/// points).  `native` is the walk's canonicalisations, floored at one per
+/// step, as in [`run_rho`].
+pub fn run_rho_walk(inst: &Instance, seed: u64, walk: RhoWalk) -> RhoOut {
     let (fm0, fi0) = (inst.curve.fmul(), inst.curve.finv());
     let max_steps = (60.0 * (inst.r as f64).sqrt()) as u64 + 10_000;
     let rr = rho_reference_walk(
@@ -1921,7 +2157,7 @@ pub fn run_rho(inst: &Instance, seed: u64) -> RhoOut {
         inst.r,
         seed,
         max_steps,
-        RhoWalk::negation(),
+        walk,
     );
     let (cm, ci) = (inst.curve.fmul() - fm0, inst.curve.finv() - fi0);
     let certified = rr
@@ -1943,6 +2179,7 @@ pub fn run_rho(inst: &Instance, seed: u64) -> RhoOut {
             .copied()
             .unwrap_or(0)
             .max(rr.steps),
+        compares: rr.work_native.values().sum(),
         steps: rr.steps,
         wall_ns: rr.wall_ns,
     }
@@ -1950,8 +2187,275 @@ pub fn run_rho(inst: &Instance, seed: u64) -> RhoOut {
 
 #[cfg(test)]
 mod tests {
+
+    /// The default extension is the frozen instrument: every count equal.
+    #[test]
+    fn ext_default_is_run_ic_count_for_count() {
+        for (p, g) in [(131u64, 3u32), (131, 4), (257, 3)] {
+            let inst = first_instance(p, g);
+            let prm = IcParams {
+                arm: Arm::DoubleLp,
+                nb: fb_size_2lp(p, g, 2.0),
+                seed: 5,
+                max_trials: 5_000_000,
+                restart: restart_sqrt(inst.r),
+                prefilter: true,
+                verify_relations: false,
+                sge: None,
+            };
+            let a = run_ic(&inst, prm);
+            let b = run_ic_ext(&inst, prm, IcExt::default());
+            assert_eq!(
+                (
+                    a.trials,
+                    a.relations,
+                    a.group_ops(),
+                    a.rel,
+                    a.la,
+                    a.verify_ops,
+                    a.recovered
+                ),
+                (
+                    b.trials,
+                    b.relations,
+                    b.group_ops(),
+                    b.rel,
+                    b.la,
+                    b.verify_ops,
+                    b.recovered
+                )
+            );
+        }
+    }
+
+    /// Coordinate Wiedemann and the unit-T walk certify at genus 3 and 4, alone
+    /// and together, and the coordinate solve spends fewer LA multiplications.
+    #[test]
+    fn ext_arms_certify_at_genus_3_and_4() {
+        for (p, g) in [(131u64, 3u32), (131, 4), (257, 4)] {
+            let inst = first_instance(p, g);
+            let prm = IcParams {
+                arm: Arm::DoubleLp,
+                nb: fb_size_2lp(p, g, 2.0),
+                seed: 9,
+                max_trials: 5_000_000,
+                restart: restart_sqrt(inst.r),
+                prefilter: true,
+                verify_relations: true,
+                sge: None,
+            };
+            let base = run_ic(&inst, prm);
+            for ext in [
+                IcExt {
+                    coord_square: true,
+                    unit_t: false,
+                    ferrari: false,
+                    sge_coord: false,
+                },
+                IcExt {
+                    coord_square: false,
+                    unit_t: true,
+                    ferrari: false,
+                    sge_coord: false,
+                },
+                IcExt {
+                    coord_square: true,
+                    unit_t: true,
+                    ferrari: false,
+                    sge_coord: false,
+                },
+            ] {
+                let x = run_ic_ext(&inst, prm, ext);
+                assert!(x.certified, "p={p} g={g} {ext:?}");
+                assert_eq!(x.bad_relations, 0);
+                assert_eq!(x.recovered.unwrap() % inst.r, inst.t_secret % inst.r);
+                if ext
+                    == (IcExt {
+                        coord_square: true,
+                        unit_t: false,
+                        ferrari: false,
+                        sge_coord: false,
+                    })
+                {
+                    assert_eq!(x.relations, base.relations);
+                    if x.la_fallbacks == 0 {
+                        assert!(x.la_wied.mul < base.la_wied.mul, "p={p} g={g}");
+                    }
+                }
+            }
+        }
+    }
     use super::*;
     use crate::cryptanalysis::chained_transfer::hyper64::H64Curve;
+
+    /// Every monic quartic with a non-zero square discriminant over small
+    /// primes (both residue classes of p mod 3, with and without a
+    /// single-exponent cube root): a decided Ferrari answer equals brute
+    /// force, roots included, and most candidates are decided.
+    #[test]
+    fn ferrari_matches_brute_force_on_every_square_disc_quartic() {
+        let mut rates = Vec::new();
+        for p in [5u64, 7, 11, 13, 17, 19, 23] {
+            let mut chi = vec![-1i8; p as usize];
+            chi[0] = 0;
+            for y in 1..=(p - 1) / 2 {
+                chi[(y * y % p) as usize] = 1;
+            }
+            let mut n = Nat::default();
+            let co = CubicOracle::new(p, &mut n);
+            let (mut decided, mut total) = (0u64, 0u64);
+            for c0 in 0..p {
+                for c1 in 0..p {
+                    for c2 in 0..p {
+                        for c3 in 0..p {
+                            let u = vec![c0, c1, c2, c3, 1];
+                            if disc_character(p, &u, &chi, &mut n) != 1 {
+                                continue;
+                            }
+                            total += 1;
+                            let truth: Vec<u64> = (0..p)
+                                .filter(|&x| {
+                                    (((((x + c3) % p * x + c2) % p) * x + c1) % p * x + c0) % p == 0
+                                })
+                                .collect();
+                            match ferrari_split(&co, p, &u, &mut n) {
+                                None => {}
+                                Some(None) => {
+                                    decided += 1;
+                                    assert_ne!(truth.len(), 4, "p={p} u={u:?} split but rejected");
+                                }
+                                Some(Some(r)) => {
+                                    decided += 1;
+                                    assert_eq!(r, truth, "p={p} u={u:?}");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            eprintln!("ferrari p={p}: decided {decided} of {total}");
+            rates.push((p, decided, total));
+        }
+        // Correctness is asserted above for every prime; the fast path must
+        // decide most candidates once p is not tiny (degenerate quartics, with
+        // P' = 0 or b1 = b2, fall back to the exact baseline by design).
+        for (p, decided, total) in rates {
+            assert!(
+                p < 11 || decided * 2 >= total,
+                "p={p}: decided only {decided} of {total}"
+            );
+        }
+    }
+
+    /// `sge_coord` (merge, then the coordinate solve on a square subset of the
+    /// reduced matrix) certifies at genus 3 and 4, reproduces the relation
+    /// phase of arm w, and where the merge shrank the matrix and neither run
+    /// fell back it spends fewer LA multiplications than arm w.
+    #[test]
+    fn sge_coord_certifies_and_cuts_la() {
+        let w = IcExt {
+            coord_square: true,
+            unit_t: true,
+            ferrari: false,
+            sge_coord: false,
+        };
+        let s = IcExt {
+            sge_coord: true,
+            ..w
+        };
+        let mut shrank = 0;
+        for (p, g) in [(131u64, 3u32), (257, 3), (131, 4), (257, 4)] {
+            let inst = first_instance(p, g);
+            for sp in [
+                SgeParams {
+                    w_max: 4,
+                    fill_max: 1.5,
+                },
+                SgeParams {
+                    w_max: 8,
+                    fill_max: 3.0,
+                },
+            ] {
+                let mut prm = prm(p, g, Arm::DoubleLp, true, None);
+                prm.verify_relations = true;
+                prm.restart = restart_sqrt(inst.r);
+                let a = run_ic_ext(&inst, prm, w);
+                prm.sge = Some(sp);
+                let b = run_ic_ext(&inst, prm, s);
+                let tag = format!("p={p} g={g} {sp:?}");
+                assert!(b.certified && b.bad_relations == 0, "{tag}");
+                assert_eq!(b.recovered.unwrap() % inst.r, inst.t_secret % inst.r);
+                assert_eq!(
+                    b.la.mul,
+                    b.la_graph.mul + b.la_peel.mul + b.la_sge.mul + b.la_wied.mul
+                );
+                if b.attempts == a.attempts && b.relations == a.relations {
+                    assert_eq!((b.sge.rows_in, b.sge.cols_in), (b.core_rows, b.core_cols));
+                    eprintln!(
+                        "sge_coord {tag}: cols {}->{} nnz {}->{} generic {}->{} fb {}/{} \
+                         la_wied mul {} add {} (w: {} {}) la mul {} (w {})",
+                        b.sge.cols_in,
+                        b.sge.cols_out,
+                        b.sge.nnz_in,
+                        b.sge.nnz_out,
+                        b.sge.generic_in,
+                        b.sge.generic_out,
+                        b.la_fallbacks,
+                        a.la_fallbacks,
+                        b.la_wied.mul,
+                        b.la_wied.add,
+                        a.la_wied.mul,
+                        a.la_wied.add,
+                        b.la.mul,
+                        a.la.mul
+                    );
+                    if b.sge.cols_out * 10 <= b.sge.cols_in * 8
+                        && b.la_fallbacks == 0
+                        && a.la_fallbacks == 0
+                    {
+                        shrank += 1;
+                        assert!(b.la_wied.mul < a.la_wied.mul, "{tag}");
+                    }
+                }
+            }
+        }
+        eprintln!("sge_coord: matrices shrunk by 20% or more in {shrank} runs");
+    }
+
+    /// The Ferrari arm certifies at genus 4 and spends fewer relation-phase
+    /// multiplications per trial than the same arm without it.
+    #[test]
+    fn ferrari_arm_certifies_and_cuts_relation_work() {
+        for p in [131u64, 257] {
+            let inst = first_instance(p, 4);
+            let prm = IcParams {
+                arm: Arm::DoubleLp,
+                nb: fb_size_2lp(p, 4, 2.0),
+                seed: 9,
+                max_trials: 5_000_000,
+                restart: restart_sqrt(inst.r),
+                prefilter: true,
+                verify_relations: true,
+                sge: None,
+            };
+            let base = IcExt {
+                coord_square: true,
+                unit_t: true,
+                ferrari: false,
+                sge_coord: false,
+            };
+            let fer = IcExt {
+                ferrari: true,
+                ..base
+            };
+            let a = run_ic_ext(&inst, prm, base);
+            let b = run_ic_ext(&inst, prm, fer);
+            assert!(b.certified && b.bad_relations == 0, "p={p}");
+            assert_eq!(b.recovered.unwrap() % inst.r, inst.t_secret % inst.r);
+            let per = |x: &IcResult| x.rel.mul as f64 / x.trials as f64;
+            assert!(per(&b) < per(&a), "p={p}: {} vs {}", per(&b), per(&a));
+        }
+    }
 
     fn first_instance(p: u64, g: u32) -> Instance {
         for cs in 1..400u64 {

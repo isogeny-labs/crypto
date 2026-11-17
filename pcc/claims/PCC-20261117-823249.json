@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T06:37:37Z",
+ "id": "PCC-20261117-823249",
+ "kind": "measurement",
+ "producer": {
+  "commit": "c5cbb67b19fe39864da7f8c9b29726696ba01580",
+  "model": "Codex",
+  "session": "root-recurrence-20261117"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/recurrence_20261117/results/a1-summary.json",
+    "sha256": "10abaf096b71eb20fba4419d15ce6c2310ad85c07d72bcb4764b0ebb86cdcff6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/recurrence_20261117/translation.cpp",
+    "sha256": "41b82db5f265f49071badc9f6f458507afa6410742155a45b772c9aeeb10f920"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/recurrence_20261117/preinverse.cpp",
+    "sha256": "4ff4fb9786bca27aed5af35beec92680e69c32f1043ab705db24ec8b7d0a7634"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/recurrence_20261117",
+ "statement": "Local recurrence run a1 completed1512 rows with252 warmups and1260 measured rows; every output support/root check passes. At degree256 preinverted FLINT recurrence gives median paired complete wall ratio1.1691 versus prior trace and11.4801 versus dense across40 fixture-round units. Small F83 root example shows no trace gain; external FLINT and existing pullback remain cheaper. Producer-only shared-local measurements; no rho or Pareto optimality conclusion."
+}

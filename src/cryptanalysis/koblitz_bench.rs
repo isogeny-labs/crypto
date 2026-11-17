@@ -2481,6 +2481,7 @@ mod tests {
             }
         }
         assert!(two > 0 && one > 0 && none > 0, "{two} {one} {none}");
+    }
     /// The Artin–Schreier chain walk counts exactly what the scan counts.
     #[test]
     fn fast_chained_count_matches_the_reference() {

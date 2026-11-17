@@ -774,6 +774,337 @@ pub mod wide {
         out.truncate(n);
         Ok((out, draws))
     }
+
+    // -----------------------------------------------------------------------
+    // `Psi = psi_* . phi` into `Pic^0(C)` at wide primes, with the 64-bit
+    // `plane_quartic_pic64`. Ported from `smith_canonical::Transfer`; the
+    // differences: no point enumeration anywhere (base points come from sampled
+    // rational image points, the pool of points of `H` is sampled), and a split
+    // point is accepted when its `e_class` is defined, not when it belongs to a
+    // pre-enumerated list.
+
+    use crate::cryptanalysis::plane_quartic_pic64 as pq;
+    use std::cell::RefCell;
+    use std::collections::HashMap;
+
+    fn nullspace_fp(rows: &[Vec<u64>], n: usize, p: u64) -> Vec<Vec<u64>> {
+        let mut m: Vec<Vec<u64>> = rows
+            .iter()
+            .map(|r| r.iter().map(|&x| x % p).collect())
+            .collect();
+        let mut piv: Vec<usize> = Vec::new();
+        let mut r = 0;
+        for c in 0..n {
+            let Some(k) = (r..m.len()).find(|&k| m[k][c] != 0) else {
+                continue;
+            };
+            m.swap(r, k);
+            let iv = sp::inv_mod(m[r][c], p);
+            for x in m[r].iter_mut() {
+                *x = mm(*x, iv, p);
+            }
+            for k in 0..m.len() {
+                if k != r && m[k][c] != 0 {
+                    let f = m[k][c];
+                    for cc in 0..n {
+                        let t = mm(f, m[r][cc], p);
+                        m[k][cc] = sb(m[k][cc], t, p);
+                    }
+                }
+            }
+            piv.push(c);
+            r += 1;
+            if r == m.len() {
+                break;
+            }
+        }
+        let free: Vec<usize> = (0..n).filter(|c| !piv.contains(c)).collect();
+        free.iter()
+            .map(|&fc| {
+                let mut v = vec![0u64; n];
+                v[fc] = 1;
+                for (i, &pc) in piv.iter().enumerate() {
+                    v[pc] = sb(0, m[i][fc], p);
+                }
+                v
+            })
+            .collect()
+    }
+
+    fn mon_vals(k: &F2, mons: &[(u8, u8, u8)], h: &[Fp2; 3]) -> Vec<Fp2> {
+        mons.iter()
+            .map(|&(a, b, c)| {
+                let mut v = k.c(1);
+                for _ in 0..a {
+                    v = k.mul(v, h[0]);
+                }
+                for _ in 0..b {
+                    v = k.mul(v, h[1]);
+                }
+                for _ in 0..c {
+                    v = k.mul(v, h[2]);
+                }
+                v
+            })
+            .collect()
+    }
+
+    fn det3(k: &F2, a: &[Fp2; 3], b: &[Fp2; 3], c: &[Fp2; 3]) -> Fp2 {
+        let m = |x: Fp2, y: Fp2, z: Fp2, w: Fp2| k.sub(k.mul(x, y), k.mul(z, w));
+        k.add(
+            k.sub(
+                k.mul(a[0], m(b[1], c[2], b[2], c[1])),
+                k.mul(a[1], m(b[0], c[2], b[2], c[0])),
+            ),
+            k.mul(a[2], m(b[0], c[1], b[1], c[0])),
+        )
+    }
+
+    fn rational(h: &[Fp2; 3]) -> bool {
+        h.iter().all(|z| z.b == 0)
+    }
+
+    /// The affine points of a reduced class `d` of `J_H` when `u` splits
+    /// into distinct linear factors over `F_p`: `(x, v(x))` for the roots `x`
+    /// of `u`. Polylog in `p` (factoring, not `smith_canonical::proots`, which
+    /// scans `0..p`). `None` if `u` has a repeated or nonlinear factor.
+    pub fn split64(d: &sc::Mumford, p: u64) -> Option<Vec<(u64, u64)>> {
+        let du = pdeg(&d.u);
+        if du <= 0 {
+            return Some(Vec::new());
+        }
+        let seed =
+            d.u.iter()
+                .fold(0x9E37_79B9_7F4A_7C15u64, |h, &c| h.rotate_left(13) ^ c);
+        let mut rng = sp::SplitMix64(seed);
+        let fs = sp::factor_squarefree(&d.u, p, &mut rng)?;
+        if fs.len() as isize != du || fs.iter().any(|f| pdeg(f) != 1) {
+            return None;
+        }
+        let mut out: Vec<(u64, u64)> = fs
+            .iter()
+            .map(|f| {
+                // monic linear factor x + c: root -c
+                let x = (p - f[0] % p) % p;
+                let mut y = 0u64;
+                for &c in d.v.iter().rev() {
+                    y = ad(mm(y, x, p), c, p);
+                }
+                (x, y)
+            })
+            .collect();
+        out.sort();
+        Some(out)
+    }
+
+    /// The transfer `J_H -> Pic^0(C)` at a wide prime.
+    pub struct Transfer64<'a> {
+        pub w: &'a WideChain,
+        pub quartic: [u64; 15],
+        pub c: pq::PlaneQuartic,
+        bases: Vec<pq::Pt>,
+        std2: Vec<(u8, u8, u8)>,
+        cache: RefCell<HashMap<(u64, u64), Result<pq::PicClass, String>>>,
+    }
+
+    impl<'a> Transfer64<'a> {
+        /// `rational_images`: rational points of `C` (normalized), e.g. from
+        /// [`sample_images`]; the first is the base point `P0`, up to seven
+        /// more serve as auxiliary bases.
+        pub fn new(
+            w: &'a WideChain,
+            quartic: [u64; 15],
+            rational_images: &[[Fp2; 3]],
+        ) -> Result<Transfer64<'a>, String> {
+            let p = w.tr.p;
+            let mut bases: Vec<pq::Pt> = Vec::new();
+            for h in rational_images.iter().filter(|h| rational(h)) {
+                let pt = [h[0].a, h[1].a, h[2].a];
+                if !bases.contains(&pt) {
+                    bases.push(pt);
+                }
+                if bases.len() == 8 {
+                    break;
+                }
+            }
+            let p0 = *bases.first().ok_or("no rational point of C supplied")?;
+            let c = pq::PlaneQuartic::new(p, quartic, p0).map_err(|e| format!("C: {e:?}"))?;
+            let bases: Vec<pq::Pt> = bases.iter().map(|&b| c.normalize_point(b)).collect();
+            let std2 = c.std_monomials(2);
+            Ok(Transfer64 {
+                w,
+                quartic,
+                c,
+                bases,
+                std2,
+                cache: RefCell::new(HashMap::new()),
+            })
+        }
+
+        /// `[Q1 + Q2 + 2 P0 - K]` for two distinct rational points or a
+        /// conjugate pair of `C`.
+        pub fn pair_class(&self, q1: [Fp2; 3], q2: [Fp2; 3]) -> Result<pq::PicClass, String> {
+            let p = self.w.tr.p;
+            let k = F2::new(p);
+            let n1 = sc::normalize_fp2(&k, q1).ok_or("zero point")?;
+            let n2 = sc::normalize_fp2(&k, q2).ok_or("zero point")?;
+            if !k.is_zero(quartic_eval_fp2(&self.quartic, n1, p))
+                || !k.is_zero(quartic_eval_fp2(&self.quartic, n2, p))
+            {
+                return Err("point not on C".into());
+            }
+            let rat = rational(&n1) && rational(&n2);
+            if !rat && n2 != n1.map(|z| k.conj(z)) {
+                return Err("the pair is neither rational nor conjugate".into());
+            }
+            if n1 == n2 {
+                return Err("double point: not supported".into());
+            }
+            let v1 = mon_vals(&k, &self.std2, &n1);
+            let v2 = mon_vals(&k, &self.std2, &n2);
+            for (bi, base) in self.bases.iter().enumerate() {
+                let bf = [k.c(base[0]), k.c(base[1]), k.c(base[2])];
+                if k.is_zero(det3(&k, &n1, &n2, &bf)) {
+                    continue;
+                }
+                let mut rows: Vec<Vec<u64>> = if rat {
+                    vec![
+                        v1.iter().map(|z| z.a).collect(),
+                        v2.iter().map(|z| z.a).collect(),
+                    ]
+                } else {
+                    vec![
+                        v1.iter().map(|z| z.a).collect(),
+                        v1.iter().map(|z| z.b).collect(),
+                    ]
+                };
+                rows.push(mon_vals(&k, &self.std2, &bf).iter().map(|z| z.a).collect());
+                let ns = nullspace_fp(&rows, 6, p);
+                if ns.len() != 3 {
+                    continue;
+                }
+                let cls = self.c.class_from_conics(ns);
+                return Ok(if bi == 0 {
+                    cls
+                } else {
+                    self.c.sub(&cls, &self.c.point_class(*base))
+                });
+            }
+            Err("no usable auxiliary base point".into())
+        }
+
+        /// `[E(P) + 2 P0 - K]` for an affine point `P = (x, y)` of `H` over `U`.
+        pub fn e_class(&self, x: u64, y: u64) -> Result<pq::PicClass, String> {
+            if let Some(r) = self.cache.borrow().get(&(x, y)) {
+                return r.clone();
+            }
+            let r = (|| {
+                let ip = self.w.tr.image_points(x, y)?;
+                let h1 = self.w.cm.psi_xpoint(&ip.points[0])?;
+                let h2 = self.w.cm.psi_xpoint(&ip.points[1])?;
+                self.pair_class(h1, h2)
+            })();
+            self.cache.borrow_mut().insert((x, y), r.clone());
+            r
+        }
+
+        pub fn point_sum(
+            &self,
+            plus: &[(u64, u64)],
+            minus: &[(u64, u64)],
+        ) -> Result<pq::PicClass, String> {
+            if plus.len() != minus.len() {
+                return Err("point_sum needs a divisor of degree 0".into());
+            }
+            let mut acc = self.c.zero();
+            for &(x, y) in plus {
+                acc = self.c.add(&acc, &self.e_class(x, y)?);
+            }
+            for &(x, y) in minus {
+                acc = self.c.sub(&acc, &self.e_class(x, y)?);
+            }
+            Ok(acc)
+        }
+
+        /// A pool of `n` sampled affine points of `H` on which `e_class` is
+        /// defined (no enumeration).
+        pub fn sample_pool(&self, n: usize, rng: &mut sp::SplitMix64) -> Vec<(u64, u64)> {
+            let p = self.w.tr.p;
+            let mut out = Vec::new();
+            let mut tries = 0;
+            while out.len() < n && tries < 100_000 {
+                tries += 1;
+                let x = rng.below(p);
+                let mut fx = 0u64;
+                for &c in self.w.tr.f.iter().rev() {
+                    fx = ad(mm(fx, x, p), c, p);
+                }
+                let Some(y) = sp::sqrt_mod(fx, p) else {
+                    continue;
+                };
+                if y != 0 && self.e_class(x, y).is_ok() && !out.contains(&(x, y)) {
+                    out.push((x, y));
+                }
+            }
+            out
+        }
+
+        /// `Psi(D)` for a class `D` of `J_H(F_p)` (`deg F = 7`): write
+        /// `D + S1 = R1 + R2 + R3 - 3 inf` and `S2 = R'1 + R'2 + R'3 - 3 inf`
+        /// with `S1, S2` random sums of pool points and every `R` an affine
+        /// point on which `e_class` is defined, so
+        /// `D = sum R - sum R' + S2 - S1`.
+        pub fn transfer_divisor(
+            &self,
+            jac: &sc::HJac,
+            d: &sc::Mumford,
+            pool: &[(u64, u64)],
+            rng: &mut sp::SplitMix64,
+        ) -> Result<pq::PicClass, String> {
+            if pool.len() < 8 {
+                return Err("pool too small".into());
+            }
+            let p = self.w.tr.p;
+            let ok = |r: &[(u64, u64)]| {
+                r.len() == 3 && r.iter().all(|&(x, y)| self.e_class(x, y).is_ok())
+            };
+            let rand_sum = |rng: &mut sp::SplitMix64| {
+                let mut plus = Vec::new();
+                let mut minus = Vec::new();
+                let mut m = jac.zero();
+                for _ in 0..2 {
+                    let a = pool[rng.below(pool.len() as u64) as usize];
+                    let b = pool[rng.below(pool.len() as u64) as usize];
+                    m = jac.add(&m, &jac.point(a.0, a.1));
+                    m = jac.add(&m, &jac.point(b.0, (p - b.1) % p));
+                    plus.push(a);
+                    minus.push(b);
+                }
+                (m, plus, minus)
+            };
+            let find = |base: &sc::Mumford, rng: &mut sp::SplitMix64| {
+                for _ in 0..20_000 {
+                    let (m, plus, minus) = rand_sum(rng);
+                    let s = jac.add(base, &m);
+                    if let Some(r) = split64(&s, p) {
+                        if ok(&r) {
+                            return Some((r, plus, minus));
+                        }
+                    }
+                }
+                None
+            };
+            let (r1, p1, m1) = find(d, rng).ok_or("no split representative of D + S1")?;
+            let (r2, p2, m2) = find(&jac.zero(), rng).ok_or("no split representative of S2")?;
+            let mut plus = r1;
+            plus.extend(p2);
+            plus.extend(m1);
+            let mut minus = r2;
+            minus.extend(m2);
+            minus.extend(p1);
+            self.point_sum(&plus, &minus)
+        }
+    }
 }
 
 #[cfg(test)]
@@ -992,6 +1323,96 @@ mod tests {
             let rhs = wide::quartic_eval_fp2(&q, ax.map(|v| k.c(v)), p);
             assert_eq!(lhs, rhs);
         }
+    }
+
+    /// The 64-bit transfer (sampled pool, on-the-fly usability) gives the
+    /// same class of `Pic^0(C)` as the u32 original, on the same trigonal map,
+    /// canonical map and base point, at a toy prime.
+    #[test]
+    fn transfer64_matches_u32_transfer_at_toy_prime() {
+        let p = 1009u64;
+        let (b, _) = find_prime_e(p).expect("prime-order a=-3 curve");
+        let a = p - 3;
+        let chain = Chain::build(p, a, b, 400, true).expect("toy chain");
+        let e = chain.ecc();
+        let r = chain.e_prime_subgroup;
+        let gp = (0..p)
+            .find_map(|x| {
+                let rhs = ((x as u128).pow(3) + a as u128 * x as u128 + b as u128) % p as u128;
+                super::sp::sqrt_mod(rhs as u64, p).and_then(|y| {
+                    let pt = Some((x, y));
+                    (e.order(&pt, r) == r).then_some(pt)
+                })
+            })
+            .unwrap();
+        let d = pullback(&chain.jac, chain.gamma, &gp).unwrap();
+        let mut rng = super::sp::SplitMix64(41);
+        let orig = chain
+            .transfer
+            .transfer_divisor(&chain.jac, &d, &chain.pts_over_u, &mut rng)
+            .unwrap();
+
+        let w = wide::WideChain {
+            tr: chain.transfer.cm.tr.clone(),
+            cm: chain.transfer.cm.clone(),
+        };
+        let p0 = chain.transfer.c.base_point();
+        let k = crate::cryptanalysis::smith_trigonal::F2::new(p);
+        let p0h = [k.c(p0[0] as u64), k.c(p0[1] as u64), k.c(p0[2] as u64)];
+        let quartic: [u64; 15] = chain.quartic.map(|x| x as u64);
+        let t64 = wide::Transfer64::new(&w, quartic, &[p0h]).unwrap();
+        let mut rng2 = super::sp::SplitMix64(43);
+        let pool = t64.sample_pool(40, &mut rng2);
+        assert!(pool.len() >= 8);
+        let w64 = t64
+            .transfer_divisor(&chain.jac, &d, &pool, &mut rng2)
+            .unwrap();
+        assert_eq!(
+            orig.key().0.map(|x| x as u64),
+            w64.key().0,
+            "same class of Pic^0(C)"
+        );
+        // and the 64-bit class is a homomorphic image: [k] Psi(D) = Psi([k]D)
+        let kk = 77u128;
+        let dk = chain.jac.mul(&d, kk);
+        let w64k = t64
+            .transfer_divisor(&chain.jac, &dk, &pool, &mut rng2)
+            .unwrap();
+        assert!(t64.c.eq(&t64.c.mul_scalar(&w64, kk), &w64k));
+    }
+
+    /// `wide::split64` (factoring) agrees with `HJac::split` (scan of
+    /// `F_p`) on random reduced classes at a toy prime.
+    #[test]
+    fn split64_matches_hjac_split_at_toy_prime() {
+        let p = 1009u64;
+        let (b, _) = find_prime_e(p).expect("curve");
+        let chain = Chain::build(p, p - 3, b, 400, true).expect("toy chain");
+        let jac = &chain.jac;
+        let pts = &chain.pts_over_u;
+        let mut rng = super::sp::SplitMix64(17);
+        let (mut agree, mut split) = (0, 0);
+        for _ in 0..400 {
+            let mut d = jac.zero();
+            for _ in 0..3 {
+                let a = pts[rng.below(pts.len() as u64) as usize];
+                d = jac.add(&d, &jac.point(a.0, a.1));
+            }
+            let mut ref_split = jac.split(&d);
+            if let Some(r) = ref_split.as_mut() {
+                r.sort();
+                // HJac::split does not reject repeated roots; split64 does.
+                let mut dd = r.clone();
+                dd.dedup_by_key(|q| q.0);
+                if dd.len() != r.len() {
+                    continue;
+                }
+                split += 1;
+            }
+            assert_eq!(wide::split64(&d, p), ref_split, "class {:?}", d.u);
+            agree += 1;
+        }
+        assert!(agree > 300 && split > 50, "agree {agree}, split {split}");
     }
 
     #[test]
