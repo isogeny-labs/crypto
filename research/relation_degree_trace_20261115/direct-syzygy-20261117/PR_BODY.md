@@ -11,3 +11,5 @@ At n=6, descriptive median extra preprocessing falls from3.138161ms for rank to0
 Validation:53 scoped capture and16 library release tests, strictlint/build, oldn3four-route correctness calibration, corrupted-cost/wire refusals, raw statistical/identity/basis/wire replay, archive extraction replay and visually inspected SVG/PNG/PDF. All setup/compiler/calculator failures are retained before data. No whole-root suite or signed independent validation verdict.
 
 Next unmeasured hypothesis: an independently implemented exact Rust identity checker to reduce the measured external-check phase while preserving every obligation. LocalCPU0/L0/checkpoint waiver/zero cloud; fresh and reserved seeds unused. Old helper tools removed by currentmain are not restored. CI/review pending; this PR does not authorize a merge.
+
+[Pin scope](research/relation_degree_trace_20261115/direct-syzygy-20261117/PIN_SCOPE.md): executable/config/source/monitor pins were checked; comprehensive shared-library attestation was not captured. This limits execution standing and does not change the retained all-case rejection.
