@@ -227,3 +227,17 @@ Needdistinctrelation-generation/anchor-reuse mechanism or evidence-supportedcost
 
 ### Errors
 No runtime errors/retries. Generator reversechecknewlineissuefixedbeforefreeze; no arithmeticchanges. Localbuildunusedfieldwarnings retained.
+
+## Phase attribution frozen
+
+### What was done
+Preparednew108solveattribution experiment. Reusesexactcountednative modules, newcounterkeepsstageandtotalvectors. Runtimecopiesonlytaggedstagecalls; generatorreversecheckrecoversoriginalcores. Requireeverytotalmatchearlierrawvectors andsumstagesexactly, besidesallpriorgates.
+
+### Decisions made
+Measurefactorbase/action/walk-or-anchor/oracle-or-sieve/rows/LA/verify attribution, nochangedalgorithm/timing/retryoffailedwallrun. Anyderivedfloorlimitedtotheunchangedstageandcounter; nothardware/unconditionallowerbound.
+
+### Open threads
+Runonceafterpushedfreeze, thenselectmechanismusingactualdominantwork.
+
+### Errors
+Generatorheredocsyntaxcaughtbeforebuild/run, fixedbeforefreeze. Buildunusedfieldwarningsretained, no arithmeticchanges.
