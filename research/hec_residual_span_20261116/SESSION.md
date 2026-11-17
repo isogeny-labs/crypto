@@ -1574,3 +1574,10 @@ What was done:477fdad9193single invocation exits0;175prime/orderpairs exactcanon
 Decisions made: standardengineeringcomponentgain,not10xIC. Preserveoldhelpers,newpipelinecontrolandcandidatebothoptimize. G4setuponly.
 Open threads: matchedcompletepipelinewithcommonrootimprovement,subgroupvector/traceinvariance; goalopen.
 Errors: none,no scientificretry/S3/cloud.
+
+## Root-optimized common pipeline frozen
+
+What was done:compiled48callmatchon12fixedinputs; fullscancontrolusesgeneratorreuse,consensuscandidateusespowermap,samecanonicalroot. Priorfieldtraces/subgroupvectorsmustreplay; diagnosticgates/sourcepromise/finaltargetchecksretained. Hashesfrozen.
+Decisions made: botharmsoptimize,noisolatedrootgainpromotion; nofreshinput/validationcontractchange,notKrylovdefault.
+Open threads: executeonceandpricecompletepipeline; original10xgoalopen.
+Errors: none,nosciencebeforepushedfreeze.
