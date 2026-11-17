@@ -2639,3 +2639,10 @@ What was done: compiled matchedvalidation extraction and2LP/Fast/Dense/Hybrid fr
 Decisions made: countspermodulus, allcontrol/regression/failure recordsretained; no weightedruntime/novelty/10xclaim. Same m/seeds/budget, no tuning. One600CPUprocess after Gitfreeze, independentqualification remainsseparate.
 Open threads: execute, inspect all176outcomes, comparestrongest controls beforeclaiminganycomponent/fullcostgain.
 Errors: pre-freeze metadata matching strengthened to exactfieldprefix; inherited unusedreportfields warning only. Ownscope check allows, attach existingreservation. No S3/cloud/merge.
+
+## Original-family complete2LPcounts qualify, base-field bottleneck explicit
+
+What was done: freeze144459efdc2 hashes pass, one run exit0;176calls complete, allnativeverified, matchedvalidation/all16vectors/repeats/metadata replay pass. Percontrol132comparisons and44perfield envelopes retained. Best-control base ratiosg2.992-1.291,g3.508-.893,g4.539-.842; subgroup ratiosg22.962-6.860,g32.046-3.938,g41.125-2.299.
+Decisions made: everyfixture subgroupimproves, allg3/4baseworkregresses; no field-envelope10x or mixedfield/wall claim. Keep2LPand Fast/Dense/Hybrid allascontrols, not an unconditionalreplacement. p4001Dense matters; weakFastonlyratio notheadline.
+Open threads: general-curve RRpencil2LPproducer with exact principal/source binding and genuinebasecostcase, and sharedgenericfastfactorbase ifused; previousbinomialrestricted/streaming failures stillscreened. Knownclassicalbaseline notbreakthrough; full10xgoal active/unachieved.
+Errors: none in scientificrun; inheritedunusedreportfield warning only. No S3/cloud/merge.
