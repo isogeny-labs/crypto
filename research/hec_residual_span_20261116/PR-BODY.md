@@ -78,3 +78,7 @@ Freeze `f1a3d00562f` resolves both F61 degree10 models at infinity by exact nati
 ### Native smooth canonical quartics on the original F61 source
 
 Freeze `727541cc8d3` constructs both canonical quartic models. Residue-field checks certify11ordinary finite nodes per model, leaving3canonical sections after all adjoint conditions. Exact degree2/3/4 relation kernels are0/0/1. Native Jacobian ideals are unit on all six projective patches, certifying geometric smoothness. Both quartics have66rational points, matching H, and all55+54retained chart images are injective. Equations and sections: `native-smith-canonical/MODELS.json`; details: `RESULTS.md`. The known Smith construction is not a novelty/speed claim; complete original source/target divisor transport and matched costs remain open. The two maps share one kernel.
+
+### Original public source/target class transport
+
+Freeze `83151284040` qualifies native Smith class transport for both original fixture cases on both F61 models. Degree2point images and public moving divisors produce degree6image ideals reduced with canonical Pic64. All4pairs preserve original scalar relations, retain nonzero source order124459 and agree across different auxiliaries; zero/negation/additive/invalid controls pass. Original coordinates and class keys: `native-smith-transport/TRANSPORT.json`. Scalars are verification-driver inputs only; no quartic DLP solve or speedup is claimed. Bounded movement and incomplete counter coverage are explicit in RESULTS.md.

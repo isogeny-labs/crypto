@@ -3059,3 +3059,10 @@ What was done: compiled degree2sourcepoint-image quadratic in6dimensional residu
 Decisions made: expectedscalaronlydriver, noDLPsolverinvocation, bounded512movingsearchnotuniversalguarantee. Piccountersnotcompletecost.Gitfreeze precedes sole600CPUrun.
 Open threads: executequalification;fullmatchedcostandquarticDLPimplementationnext ifqualified.Full10xgenus2+goalactive.
 Errors: unused copied module/helper warnings only;no scientificexecution yet.
+
+## Original Smith public class transport qualifies
+
+What was done: freeze83151284040 hashespass/exit0;raw e7d293a338b retained.4originalmap-fixturepairs preservek/nonzeroorderell124459/alternateauxkeys;zero/negation/additive/invalidcontrols pass. Case0degree1 handledbymovingdivisors;extensionimagealgebrasnotpointlists. StructuredTRANSPORT.jsonretained.
+Decisions made: knownscalaronlyverificationdriver,notquarticDLPsolve;512movingboundnotuniversal;Piccountersnotcompletecost.Twomodelsonekernel.
+Open threads: genuinequarticIContransportedtargets/originalHfinalcheck,complete matchedcostcase;full10xgenus2+goalactiveunachieved/independentreviewopen.
+Errors: postrunRubyreceiptparser usedsplit_whitespace;rawalreadycommitted,packagingcorrectedtosplitwithoutscientificrerun.Unusedcopiedmodule/helperwarnings.Gitcustody/noS3/no merge.
