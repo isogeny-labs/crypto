@@ -1315,3 +1315,10 @@ Decisions made: do not build Smith transport on these binomial controls without 
 Open threads: prospectively frozen Rust qualification on both retained genus-three models; broader genus2+ tenfold objective remains unresolved.
 
 Errors: stale T-7062 retry budget exhausted; released own old task, created and successfully claimed T-7071 via CLI. Connector principal still reports own CLI reservation as a conflict. No scientific producer was executed.
+
+## Rational kernel gate frozen
+
+What was done: prepared std-only Rust exhaustive subspace enumeration and fixed-model Kummer checks; release compilation succeeds. Source/protocol/binary SHA256 retained in isogeny-screen/INPUT.sha256.
+Decisions made: push checkpoint before once-only gate; exact subspace counts and model eligibility required, with no fixture substitution.
+Open threads: execute frozen checker, retain output and assess the conditional obstruction on both original models.
+Errors: own task already claimed; no competing holder or scientific execution.
