@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Prove and encode the exact B8 RR9 random-residual success/cost gate on original prime31; audit adjacent B31 and active solver lanes without duplication (automation, started 2026-11-17, branch automation/prime31-rr9-b8-cost-gate-20261117)
+- [x] Prove and encode the exact B8 RR9 random-residual success/cost gate on original prime31; audit adjacent B31 and active solver lanes without duplication (automation, started 2026-11-17, branch automation/prime31-rr9-b8-cost-gate-20261117, PR #4612; Rust 40/40+1/1 PASS, pending PCC)
 
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
