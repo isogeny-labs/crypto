@@ -2604,3 +2604,10 @@ What was done: freeze597fa1ad5c3 hashes pass, deterministic analyzer exit0. All1
 Decisions made: original10xreference unchanged; stronger comparator report separate. Common-set statement is acrosspanel, not allfourphases mandatoryineverycase. Reject isolated-phase prototyping absent joint cost construction; earlier lazy/streaming/restricted results screened and not rerun.
 Open threads: concrete joint source/setup/producer/verification construction or distinct geometric route with fulltarget/rank/cost evidence; entiregenus2+goal active/unachieved. No new speed measurement or universal impossibility assertion.
 Errors: none in post-analysis; no S3/cloud/merge.
+
+## Initial-native versus binomial applicability audit frozen
+
+What was done: inspected tracked initial PLAN/S2results/instance source via gitshow, extracted11unique initial instances covering55fastseeds with benchmark blob receipt. Compiled exact all-z coefficient invariance audit against same(g,p,c)binomial controls; source snapshots immutable.
+Decisions made: recent 'original' terminology refers only to later frozen binomial panels, not initialnative mixed-term models; explicit correction required in PR. Do not extend special-family shortverification/quotient/phase claims to native11without admitted transport. One deterministic applicability invocation after Gitfreeze, no benchmark rerun.
+Open threads: execute audit and publish prominent scope map; next fullscope construction must address original families or explicitly delimit special-class result without claiming fullgoal.
+Errors: initial files absent from sparse checkout; authoritative tracked blobs read with gitshow, no checkout expansion needed. Compile passes, no S3/cloud/merge.
