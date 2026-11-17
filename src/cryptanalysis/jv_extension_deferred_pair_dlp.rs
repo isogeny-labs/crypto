@@ -1,5 +1,9 @@
 //! Screened two-quadratic IC with bounded deferred-edge activation and sparse rank.
 //! Declared successor prototype; older grounded collectors and wire remain intact.
+#[path = "jv_nagao_unit.rs"]
+mod nagao_unit;
+#[path = "jv_nagao_unit_elimination.rs"]
+mod nagao_unit_elimination;
 use super::deferred_pair_graph as deferred;
 use super::homogeneous_quotient::{ExtraCounts, Quotient};
 use super::quadratic_pair_relation::{self as pair, Certificate, SplitOptions, SplitReport};
@@ -395,6 +399,53 @@ pub fn run_extension_deferred_pair_dlp_on(
         options.collection.collection,
         options.collection.max_screen_refusals,
         options.max_deferred_edges,
+        DescentBackend::Original,
+    )
+}
+/// Same collection and protected affine solve, with an audited five-variable
+/// Nagao backend. Every residual attempt is retained, including empty/capped.
+pub fn run_extension_unit_deferred_pair_dlp_on(
+    spec: &Spec,
+    seed: u64,
+    options: DeferredPairDlpOptions,
+) -> Result<(Value, Option<u64>), String> {
+    if !(1..=1_000_000).contains(&options.collection.max_screen_refusals)
+        || options.collection.collection.max_descent_residuals > 8192
+    {
+        return Err("bounded unit descent/refusal history required".into());
+    }
+    run_quadratic_pair(
+        spec,
+        seed,
+        options.collection.collection,
+        options.collection.max_screen_refusals,
+        options.max_deferred_edges,
+        DescentBackend::UnitFive,
+    )
+}
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum DescentBackend {
+    Original,
+    AdaptedSix,
+    UnitFive,
+}
+
+/// Matched root-materialization adapter control, retaining six coordinates.
+pub fn run_extension_adapted_deferred_pair_dlp_on(
+    spec: &Spec,
+    seed: u64,
+    options: DeferredPairDlpOptions,
+) -> Result<(Value, Option<u64>), String> {
+    if !(1..=1_000_000).contains(&options.collection.max_screen_refusals) {
+        return Err("bounded discriminant refusal history required".into());
+    }
+    run_quadratic_pair(
+        spec,
+        seed,
+        options.collection.collection,
+        options.collection.max_screen_refusals,
+        options.max_deferred_edges,
+        DescentBackend::AdaptedSix,
     )
 }
 fn run_quadratic_pair(
@@ -403,6 +454,7 @@ fn run_quadratic_pair(
     options: QuadraticPairDlpOptions,
     screen_cap: usize,
     max_deferred_edges: usize,
+    backend: DescentBackend,
 ) -> Result<(Value, Option<u64>), String> {
     let max_screen_refusals = Some(screen_cap);
     options.sparse_rank.validate()?;
@@ -673,6 +725,7 @@ fn run_quadratic_pair(
     let jac = ctx.jac();
     let by_x: HashMap<_, _> = base.iter().enumerate().map(|(i, b)| (b.x, i)).collect();
     let mut descents = Vec::new();
+    let mut nagao_attempts = Vec::new();
     let mut affine_rows = Vec::new();
     let mut projected_rows = Vec::new();
     let mut affine = CountedRelationSystem::new(spec.l, 2);
@@ -699,8 +752,36 @@ fn run_quadratic_pair(
         let opts = cover::opts_for_mode(24, 600.0, cover::StopMode::Staircase(64));
         for i in 0..options.max_descent_residuals {
             let mut rng = StdRng::seed_from_u64(seed ^ i.wrapping_mul(0x9E37_79B9_7F4A_7C15));
-            let (decompositions, cost) =
-                cover::nagao_decompose(&ctx, &base, &by_x, &residual, &opts, &mut rng);
+            let (decompositions, cost) = if backend != DescentBackend::Original {
+                let attempt = nagao_unit::decompose(
+                    &ctx,
+                    &base,
+                    &by_x,
+                    &residual,
+                    &opts,
+                    &mut rng,
+                    backend == DescentBackend::UnitFive,
+                );
+                let (rows, cost, audit) = match attempt {
+                    Ok(value) => value,
+                    Err(error) => {
+                        let mut v = residual.v.clone();
+                        v.resize(3, cover::E2::ZERO);
+                        let input = cover::weil_forms(&ctx.f.f, &ctx.cov.hx, &residual.u, &v)
+                            .polys(&ctx.reim, spec.p);
+                        nagao_attempts.push(json!({"residual_index":i,"u":remainder::encode(&residual.u),"v":remainder::encode(&residual.v),"original":input,"refusal":error}));
+                        residuals += 1;
+                        refusal = Some(error);
+                        break;
+                    }
+                };
+                if backend == DescentBackend::UnitFive {
+                    nagao_attempts.push(json!({"residual_index":i,"u":remainder::encode(&residual.u),"v":remainder::encode(&residual.v),"audit":audit}));
+                }
+                (rows, cost)
+            } else {
+                cover::nagao_decompose(&ctx, &base, &by_x, &residual, &opts, &mut rng)
+            };
             residuals += 1;
             timeouts += u64::from(cost.timed_out);
             incomplete += u64::from(cost.incomplete);
@@ -764,7 +845,7 @@ fn run_quadratic_pair(
     if let Some(cap) = max_screen_refusals {
         collection["discriminant_screen"] = json!({"method":"euclidean-discriminant-character","max_refusals":cap,"calls":screen_calls,"refusals":screen_refusals});
     }
-    let report = json!({"schema":"cover.deferred-pair.dlp/v1","p":spec.p,"l":spec.l,"seed":seed,"options":options,"max_deferred_edges":max_deferred_edges,"max_screen_refusals":screen_cap,
+    let mut report = json!({"schema":"cover.deferred-pair.dlp/v1","p":spec.p,"l":spec.l,"seed":seed,"options":options,"max_deferred_edges":max_deferred_edges,"max_screen_refusals":screen_cap,
         "collection":collection,"collection_rank_ready":ready,"initial_basis":initial_basis,"final_extra_counts":basis.as_ref().map(|q|&q.counts),
         "descents":descents,"affine_rows":affine_rows,"projected_rows":projected_rows,"descent_residuals":residuals,"descent_stream_advances":advances,
         "descent_timeouts":timeouts,"descent_incomplete":incomplete,"invalid_descents":invalid,"last_rank":affine.rank(),"solver_modular_muls":affine.ops(),
@@ -772,6 +853,14 @@ fn run_quadratic_pair(
         "rank_scope":"kernel-scale and protected-target coordinates only; full-base homogeneous rank is in collection",
         "solver_product_scope":"two-column affine RREF only; collection/kernel/projection work recorded separately",
         "complete_cost":false,"total_bitops":null,"comparative_eligibility":false,"known_uncounted":["native containers/control/normalization/scans","PRNG internals","fixed-factor and Euclidean internals","hashing/serialization"]});
+    if backend != DescentBackend::Original {
+        report["nagao_backend"] = json!(if backend == DescentBackend::UnitFive {
+            "exact-unit-five"
+        } else {
+            "adapted-six"
+        });
+        report["nagao_attempts"] = json!(nagao_attempts);
+    }
     Ok((report, scalar))
 }
 

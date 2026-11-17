@@ -63,7 +63,10 @@ pub use extension_quadratic_pair_dlp::{
 pub mod deferred_pair_graph;
 #[path = "jv_extension_deferred_pair_dlp.rs"]
 mod extension_deferred_pair_dlp;
-pub use extension_deferred_pair_dlp::{run_extension_deferred_pair_dlp_on, DeferredPairDlpOptions};
+pub use extension_deferred_pair_dlp::{
+    run_extension_adapted_deferred_pair_dlp_on, run_extension_deferred_pair_dlp_on,
+    run_extension_unit_deferred_pair_dlp_on, DeferredPairDlpOptions,
+};
 
 #[path = "jv_homogeneous_quotient.rs"]
 mod homogeneous_quotient;
