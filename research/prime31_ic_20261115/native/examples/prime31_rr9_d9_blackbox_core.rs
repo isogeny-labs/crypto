@@ -219,6 +219,57 @@ pub fn run(case: usize) -> Value {
     let (seq, nnz, matvec_muls) = moments(&rows, cols, seed, 2 * cols);
     let moment_elapsed_ns = start.elapsed().as_nanos().to_string();
     let (certified, complexity, last) = full_rank_certified(&seq, cols);
+    // This second-stage witness is a direct Bézout identity, not just a BM
+    // degree assertion. The extension was registered after the first rank run.
+    let mut explicit_unit_witness: Option<Vec<u64>> = None;
+    let mut identity_replayed = false;
+    let mut witness_nonzeros = 0usize;
+    let mut inverse_gram_applications = 0usize;
+    if certified {
+        let (l2, coefficients) = berlekamp_massey(&seq);
+        assert_eq!(l2, cols, "BM linear complexity changed on replay");
+        assert_eq!(coefficients[cols], last);
+        // If A has characteristic polynomial
+        // t^N+c1 t^(N-1)+...+cN, then:
+        // A^(-1)=-(A^(N-1)+c1 A^(N-2)+...+c_(N-1) I)/cN.
+        let mut x = vec![0u64; cols];
+        x[0] = 1; // constant monomial e0
+        let mut next = vec![0u64; cols];
+        let mut random = seed;
+        let diagonal: Vec<u64> = (0..rows.len())
+            .map(|_| random_nonzero(&mut random)).collect();
+        for j in 1..cols {
+            gram_apply(&rows, &diagonal, &x, &mut next);
+            next[0] = add(next[0], coefficients[j]);
+            mem::swap(&mut x, &mut next);
+            inverse_gram_applications += 1;
+        }
+        let minus_inverse = sub(0, pow(last, P - 2));
+        for value in &mut x { *value = mul(*value, minus_inverse); }
+
+        // w = D M x. Full independent check M^T w = e0.
+        let mut w = Vec::with_capacity(rows.len());
+        for (row, &d) in rows.iter().zip(&diagonal) {
+            let mut inner = 0;
+            for &(column, coefficient) in row {
+                inner = add(inner, mul(coefficient, x[column]));
+            }
+            w.push(mul(d, inner));
+        }
+        let mut recombined = vec![0u64; cols];
+        for (row, &weight) in rows.iter().zip(&w) {
+            for &(column, coefficient) in row {
+                recombined[column] =
+                    add(recombined[column], mul(weight, coefficient));
+            }
+        }
+        assert_eq!(recombined[0], 1, "D9 unit witness has wrong constant");
+        assert!(recombined[1..].iter().all(|&x| x == 0),
+                "D9 unit witness polynomial identity failed replay");
+        witness_nonzeros = w.iter().filter(|&&x| x != 0).count();
+        identity_replayed = true;
+        explicit_unit_witness = Some(w);
+    }
     json!({
         "schema": "prime31.rr9.d9-blackbox-negative.v1",
         "p": P, "n": PRIME31.n, "a": PRIME31.a, "b": PRIME31.b,
@@ -230,6 +281,11 @@ pub fn run(case: usize) -> Value {
         "operator_field_multiplications": matvec_muls.to_string(),
         "scalar_bm_linear_complexity": complexity,
         "scalar_bm_last_coefficient": last,
+        "unit_bezout_identity_replayed": identity_replayed,
+        "unit_bezout_witness_nonzeros": witness_nonzeros,
+        "inverse_gram_applications": inverse_gram_applications,
+        "unit_bezout_row_order": "quadrics i=0..7, then monomials(7) affine degree ascending, as native Rust Macaulay source",
+        "unit_bezout_coefficients": explicit_unit_witness,
         "one_sided_full_rank_certified": certified,
         "absence_over_algebraic_closure_only_if_certified": certified,
         "inconclusive_if_not_certified": !certified,
