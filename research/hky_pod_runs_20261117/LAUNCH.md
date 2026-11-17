@@ -82,3 +82,10 @@ Checks and predictions written before the sweep's new cells:
 - `msweep-a`: job `sweep` stopped with TERM during the second target of (6,3) D = 8 (the first hit the 2,400 s
   budget); `sweep6` runs (6,3) on one target with an 18,000 s budget and a 1,200,000-column cap. The cap also
   limits the depth-4 cell the driver emits afterwards.
+
+## 17:56 UTC
+
+- PR #4568 merged at 17:48 with the records up to 17:35; later records go in a follow-up PR.
+- `msweep-m9` (`kb81a8op5pd0ah`) terminated (GET 404) after target 1 closed D = 8 without 1; its D = 9 closure was not waited for.
+- Depth 13 finished (both targets, exit 0); depth 14 started 17:46 UTC on the same pod.
+- Still running: `hky2-cpu-t14` (depth 14) and `msweep-a` (`sweep6`, (6,3) D = 8, 18,000 s budget).
