@@ -199,3 +199,17 @@ Countcompletecost acrossPencil/Folded/Expanded withprospectivecostdefinition. Sh
 
 ### Errors
 Frozennoisegatesfail; retainedallrawandnegativequalification insteadofrerunning. No experimental sourcechanges.
+
+## Deterministic field-vector gate frozen
+
+### What was done
+Copied nativecrate inside scopedresearch tree withtaggedcounterinsertionsonly. Reversecheckrecoversalloriginalsrcfilesbyte-for-byte. Count p/ell separately across18workloads3arms2repeats=108solves; fixedprimitivevectorincludesrawpolynomialproducts andinverseEuclideansteps plusnestedgroup/LAfieldwork. No original implementation edits.
+
+### Decisions made
+Fullfieldvector is a diagnostic, notcompleteinstructioncount: nestedcolumns overlap, memory/bookkeeping/RNG/Fpinitializationintegerworknotfullycounted. No arbitraryweights/singlecountertenfoldclaim. Freezeallsource/imports/native/binary, require repeatidentity/REDCidentity/allanswers beforeinterpretation. Previouswallfailurepreserved.
+
+### Open threads
+Executeonceafterpushedcheckpoint, inspectwhichwork changes; broadobjectiveopen.
+
+### Errors
+Generator initial reversecheck caught one extra newline in libdeclaration removal; fixedbeforefreeze, every originalfile nowrecovered exactly. No scientificrunyet.
