@@ -194,7 +194,7 @@ impl SystemSolver for F4F2 {
     }
 
     fn describe(&self) -> String {
-        "F4 over F_2[v]/(v²−v): normal strategy, dense exact-LCM Gebauer–Möller selection on bounded domains, field pairs, bitmap/hash symbolic sets, adaptive leading-block tables, tiled bit-packed elimination, reduced basis"
+        "F4 over F_2[v]/(v²−v): normal strategy, dense exact-LCM Gebauer–Möller selection on bounded domains, field pairs, bitmap/hash symbolic sets, Faugère–Lachartre reducer/free-column split with full-width fallback, tiled bit-packed elimination, reduced basis"
             .into()
     }
 
@@ -249,6 +249,10 @@ impl SystemSolver for F4F2 {
             ("full_m4ri_matrices", st.full_m4ri_matrices),
             ("full_m4ri_blocks", st.full_m4ri_blocks),
             ("full_m4ri_table_word_xors", st.full_m4ri_table_word_xors),
+            ("fl_matrices", st.fl_matrices),
+            ("fl_reducer_rows", st.fl_reducer_rows),
+            ("fl_pair_rows", st.fl_pair_rows),
+            ("fl_free_cols", st.fl_free_cols),
             ("build_ns", st.build_ns),
             ("eliminate_ns", st.eliminate_ns),
             ("f4_wall_ns", st.wall_ns),
@@ -303,6 +307,7 @@ impl SystemSolver for F4F2 {
             solving_degree: Some(st.solving_degree),
             timed_out: st.timed_out,
             extra,
+            ..Default::default()
         };
         let verdict = if st.timed_out || st.oversize {
             SolverVerdict::BudgetExceeded
@@ -661,6 +666,7 @@ impl SystemSolver for HybridF4 {
             solving_degree: None,
             timed_out: st.exhausted,
             extra,
+            ..Default::default()
         };
         let verdict = if st.exhausted {
             SolverVerdict::BudgetExceeded
@@ -781,6 +787,7 @@ impl SystemSolver for CrossbredF2 {
             solving_degree: None,
             timed_out: matches!(verdict, SolverVerdict::BudgetExceeded),
             extra,
+            ..Default::default()
         };
         (verdict, cost)
     }
@@ -1104,6 +1111,7 @@ fn fes_finish(
         solving_degree: None,
         timed_out: false,
         extra,
+        ..Default::default()
     };
     (verdict, cost)
 }
@@ -1510,6 +1518,7 @@ impl SystemSolver for FesWide {
             solving_degree: None,
             timed_out: false,
             extra,
+            ..Default::default()
         };
         if points.is_empty() {
             (SolverVerdict::Unsatisfiable, cost)
@@ -1566,6 +1575,7 @@ impl SystemSolver for BuchbergerF2 {
             solving_degree: Some(st.solving_degree),
             timed_out: st.timed_out,
             extra,
+            ..Default::default()
         };
         let done = |mut cost: SolverCost, word_ops: u64| {
             cost.extra.insert("bitop_word_ops".into(), word_ops);
@@ -1650,6 +1660,7 @@ impl SystemSolver for XlF2 {
                 ("bitop_word_ops".to_string(), word_ops),
                 ("bitop_complete".to_string(), 1),
             ]),
+            ..Default::default()
         };
         if solutions.is_empty() {
             (SolverVerdict::Unsatisfiable, cost)
@@ -1807,6 +1818,7 @@ impl SystemSolver for SatCdcl {
             solving_degree: None,
             timed_out: matches!(verdict, SolveResult::Unknown),
             extra,
+            ..Default::default()
         };
         match verdict {
             SolveResult::Sat => (SolverVerdict::Solved(vec![enc.model_assignment()]), cost),
@@ -1920,6 +1932,7 @@ fn solve_primo(
                     solving_degree: None,
                     timed_out,
                     extra,
+                    ..Default::default()
                 },
             );
         }
@@ -1969,6 +1982,7 @@ fn solve_primo(
             solving_degree: None,
             timed_out: false,
             extra,
+            ..Default::default()
         },
     )
 }
@@ -2090,6 +2104,7 @@ impl SystemSolver for Exhaustive {
                 ("bitop_word_ops".to_string(), word_ops),
                 ("bitop_complete".to_string(), 1),
             ]),
+            ..Default::default()
         };
         if solutions.is_empty() {
             (SolverVerdict::Unsatisfiable, cost)

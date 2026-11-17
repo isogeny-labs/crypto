@@ -1497,6 +1497,8 @@ fn s4_free(paths: &[String]) {
             twisted.join("; ")
         }
     );
+}
+
 /// Outcome of one `dreg_closure --fix` record: the closure refutes at ≤ 4,
 /// does not (degree 4 saturated without `1`), or is unmeasured (empty or cut).
 fn fix_outcome(path: &str) -> &'static str {

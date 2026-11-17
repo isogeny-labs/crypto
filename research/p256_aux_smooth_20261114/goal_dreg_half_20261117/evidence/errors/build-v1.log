@@ -1,0 +1,73 @@
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp: In function ‘std::pair<std::map<std::__cxx11::basic_string<char>, unsigned int>, __gmp_expr<__mpz_struct [1], __mpz_struct [1]> > leading(const Poly&, const Variables&)’:
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:19:85: error: use of deleted function ‘std::pair<_T1, _T2>& std::pair<_T1, _T2>::operator=(const std::pair<_T1, _T2>&) [with _T1 = const std::map<std::__cxx11::basic_string<char>, unsigned int>; _T2 = __gmp_expr<__mpz_struct [1], __mpz_struct [1]>]’
+   19 |     for(const auto& term:p.terms) if(lex_less(result.first,term.first,vars)) result=term;
+      |                                                                                     ^~~~
+In file included from /usr/include/c++/14/utility:69,
+                 from /usr/include/gmpxx.h:39,
+                 from research/p256_aux_smooth_20261114/goal_dreg_half_20261117/../aux_base.cpp:3,
+                 from research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:3:
+/usr/include/c++/14/bits/stl_pair.h:587:13: note: declared here
+  587 |       pair& operator=(const pair&) = delete;
+      |             ^~~~~~~~
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:19:85: note: use ‘-fdiagnostics-all-candidates’ to display considered candidates
+   19 |     for(const auto& term:p.terms) if(lex_less(result.first,term.first,vars)) result=term;
+      |                                                                                     ^~~~
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp: In function ‘std::vector<Poly> tower_polynomials(const Base&, Variables&)’:
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:80:5: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   80 |     for(unsigned i=0;i<b.depth;++i) vars.push_back("X"+num(i)); vars.push_back("H");
+      |     ^~~
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:80:65: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   80 |     for(unsigned i=0;i<b.depth;++i) vars.push_back("X"+num(i)); vars.push_back("H");
+      |                                                                 ^~~~
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp: At global scope:
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:116:58: error: ‘function’ in namespace ‘std’ does not name a template type
+  116 | void expect_rejection(const std::string& name,const std::function<void()>& test,std::vector<std::string>& controls) {
+      |                                                          ^~~~~~~~
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:4:1: note: ‘std::function’ is defined in header ‘<functional>’; this is probably fixable by adding ‘#include <functional>’
+    3 | #include "../aux_base.cpp"
+  +++ |+#include <functional>
+    4 | #undef main
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:116:66: error: expected ‘,’ or ‘...’ before ‘<’ token
+  116 | void expect_rejection(const std::string& name,const std::function<void()>& test,std::vector<std::string>& controls) {
+      |                                                                  ^
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp: In function ‘void expect_rejection(const std::string&, int)’:
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:117:32: error: ‘test’ was not declared in this scope
+  117 |     bool rejected=false; try { test(); } catch(const std::exception&) { rejected=true; }
+      |                                ^~~~
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:118:62: error: ‘controls’ was not declared in this scope
+  118 |     require(rejected,"corrupt certificate accepted: "+name); controls.push_back(jquote(name));
+      |                                                              ^~~~~~~~
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp: In function ‘std::string fixture_certificate(unsigned int, std::vector<std::__cxx11::basic_string<char> >&)’:
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:123:58: error: cannot convert ‘fixture_certificate(unsigned int, std::vector<std::__cxx11::basic_string<char> >&)::<lambda()>’ to ‘int’
+  123 |     expect_rejection("wrong-regularity-depth"+num(depth),[&]{certify_tower(generators,vars,depth);},controls);
+      |                                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                          |
+      |                                                          fixture_certificate(unsigned int, std::vector<std::__cxx11::basic_string<char> >&)::<lambda()>
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:116:47: note:   initializing argument 2 of ‘void expect_rejection(const std::string&, int)’
+  116 | void expect_rejection(const std::string& name,const std::function<void()>& test,std::vector<std::string>& controls) {
+      |                                               ^~~~~~~~~~~~~~~~~~~
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:125:56: error: cannot convert ‘fixture_certificate(unsigned int, std::vector<std::__cxx11::basic_string<char> >&)::<lambda()>’ to ‘int’
+  125 |     expect_rejection("nonhomogeneous-depth"+num(depth),[&]{certify_tower(corrupt,vars,depth+1);},controls);
+      |                                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                        |
+      |                                                        fixture_certificate(unsigned int, std::vector<std::__cxx11::basic_string<char> >&)::<lambda()>
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:116:47: note:   initializing argument 2 of ‘void expect_rejection(const std::string&, int)’
+  116 | void expect_rejection(const std::string& name,const std::function<void()>& test,std::vector<std::string>& controls) {
+      |                                               ^~~~~~~~~~~~~~~~~~~
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:128:69: error: cannot convert ‘fixture_certificate(unsigned int, std::vector<std::__cxx11::basic_string<char> >&)::<lambda()>’ to ‘int’
+  128 |         expect_rejection("repeated-leading-square-depth"+num(depth),[&]{certify_tower(corrupt,vars,depth+1);},controls);
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     fixture_certificate(unsigned int, std::vector<std::__cxx11::basic_string<char> >&)::<lambda()>
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:116:47: note:   initializing argument 2 of ‘void expect_rejection(const std::string&, int)’
+  116 | void expect_rejection(const std::string& name,const std::function<void()>& test,std::vector<std::string>& controls) {
+      |                                               ^~~~~~~~~~~~~~~~~~~
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:131:52: error: cannot convert ‘fixture_certificate(unsigned int, std::vector<std::__cxx11::basic_string<char> >&)::<lambda()>’ to ‘int’
+  131 |     expect_rejection("zero-delta-depth"+num(depth),[&]{Variables v; tower_polynomials(bad_base,v);},controls);
+      |                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                    |
+      |                                                    fixture_certificate(unsigned int, std::vector<std::__cxx11::basic_string<char> >&)::<lambda()>
+research/p256_aux_smooth_20261114/goal_dreg_half_20261117/membership_certificate.cpp:116:47: note:   initializing argument 2 of ‘void expect_rejection(const std::string&, int)’
+  116 | void expect_rejection(const std::string& name,const std::function<void()>& test,std::vector<std::string>& controls) {
+      |                                               ^~~~~~~~~~~~~~~~~~~
+cc1plus: all warnings being treated as errors

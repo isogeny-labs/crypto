@@ -2042,9 +2042,78 @@ pub struct SolverStats {
     pub degree_of_regularity_forecast: Option<crate::cryptanalysis::dreg_forecast::Forecast>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub forecast_unavailable: Option<String>,
+    /// Measured degree-fall observables of the solve (diagnostic, never priced
+    /// into `S`, outside the replay comparison, never a stopping rule). A
+    /// **degree fall** at working degree `d` is a step producing a fresh
+    /// generator of degree `< d`, the constant `1`, or a realized Hilbert value
+    /// below the semi-regular prediction. `first_fall_degree` is the smallest
+    /// such `d` over the run, `last_fall_degree` the largest, and
+    /// `degree_of_regularity_observed` the first degree the realized Hilbert
+    /// series goes non-positive (distinct from the advisory forecast above).
+    /// Present only for polynomial-system solves; absent on sparse-LA, generic
+    /// or table families and on records written before the fields existed.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first_fall_degree: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_fall_degree: Option<u32>,
+    /// The total (sum over solver calls) solving degree.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub solving_degree_sum: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub degree_of_regularity_observed: Option<u32>,
+    /// Per-working-degree history of the richest solver call, for the trace
+    /// drawing (relations/steps against degree, coloured by fall intensity).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub degree_trace: Vec<crate::cryptanalysis::ic_framework::stages::DegreeStep>,
+    /// Which cost story this block carries, so a reader never mistakes an
+    /// absent degree for a measured one: `polynomial-system` (Gröbner /
+    /// Macaulay / Semaev — the degree fields are measured), `sat`, `sparse-la`
+    /// (block-Wiedemann / Markowitz mod r), `generic-transfer`, or
+    /// `table-enumeration`. The degree fields are populated only for
+    /// `polynomial-system`; elsewhere they are absent by construction, not
+    /// missing data.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub degree_story: Option<String>,
+    /// Relation-phase figures for the sparse-linear-algebra and table families
+    /// that have no polynomial-system degree (`degree_story` says which): the
+    /// relations collected and the shape and rank of the relation matrix, which
+    /// is solved modulo the group order (block Wiedemann / Markowitz), not by a
+    /// Gröbner basis. The degree fields above are absent for these families by
+    /// construction, not missing data.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub relations: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub relation_matrix_rows: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub relation_matrix_columns: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub relation_matrix_rank: Option<u64>,
 }
 
 impl SolverStats {
+    /// A solver block for a sparse-linear-algebra or table family: no
+    /// polynomial-system degree (the degree fields stay `None`), only the
+    /// relation-phase figures, tagged with its `degree_story`.
+    pub fn relation_block(
+        name: &str,
+        story: &str,
+        relations: Option<u64>,
+        rows: Option<u64>,
+        columns: Option<u64>,
+        rank: Option<u64>,
+    ) -> Self {
+        SolverStats {
+            name: name.to_string(),
+            op_unit: "relations".to_string(),
+            degree_story: Some(story.to_string()),
+            relations,
+            relation_matrix_rows: rows,
+            relation_matrix_columns: columns,
+            relation_matrix_rank: rank,
+            ..Default::default()
+        }
+    }
+
     /// Attach the run's degree-of-regularity forecast, pricing its hope
     /// band against the generic floor `√(π r / 2A)` of this curve.
     pub fn with_forecast(
@@ -2106,6 +2175,17 @@ impl SolverStats {
             sat_restarts: if sat { get(&["restarts"]) } else { None },
             sat_learnt_clauses: if sat { get(&["learnt_clauses"]) } else { None },
             extra: x.clone(),
+            first_fall_degree: solver.first_fall_degree,
+            last_fall_degree: solver.last_fall_degree,
+            solving_degree_sum: (solver.solving_degree_sum > 0)
+                .then_some(solver.solving_degree_sum),
+            degree_of_regularity_observed: solver.degree_of_regularity_observed,
+            degree_trace: solver.degree_trace.clone(),
+            degree_story: Some(if sat { "sat" } else { "polynomial-system" }.to_string()),
+            relations: None,
+            relation_matrix_rows: None,
+            relation_matrix_columns: None,
+            relation_matrix_rank: None,
             degree_of_regularity_forecast: None,
             forecast_unavailable: None,
         }
@@ -5295,7 +5375,16 @@ fn solve_hyper_ic(
         detail,
         online: None,
         online_error: None,
-        solver: None,
+        // Markowitz sparse elimination mod r, not a polynomial-system solve:
+        // no degree story, only the relation matrix's column count.
+        solver: Some(SolverStats::relation_block(
+            "markowitz-sparse",
+            "sparse-la",
+            None,
+            None,
+            Some(columns),
+            None,
+        )),
         // HCurve does not tally the field work inside a Cantor step.
         field_ops: None,
     })
@@ -8186,7 +8275,16 @@ fn solve_koblitz_descent(
         detail: koblitz_filter_detail(koblitz_descent::detail_of(&out, &p), top_layout),
         online,
         online_error,
-        solver: None,
+        // Sparse logs mod r (block Wiedemann), not a polynomial-system solve:
+        // no degree story, only the relation-phase figures.
+        solver: Some(SolverStats::relation_block(
+            "block-wiedemann",
+            "sparse-la",
+            Some(c.relations_accepted as u64),
+            None,
+            Some(c.columns as u64),
+            c.sparse.as_ref().map(|r| r.core_dimension as u64),
+        )),
         field_ops: None,
     })
 }

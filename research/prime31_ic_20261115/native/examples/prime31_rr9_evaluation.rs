@@ -359,6 +359,81 @@ fn rr9_poly_pow_mod(
     Ok(acc)
 }
 
+/// Polynomial quotient/remainder over the *original* prime field.
+//// All inputs are ascending order; zero polynomial has representation [0].
+/// No elliptic point enumeration or discrete-log arithmetic.
+fn rr9_poly_trim(mut v: Vec<u64>) -> Vec<u64> {
+    while v.len() > 1 && v.last() == Some(&0) { v.pop(); }
+    v
+}
+fn rr9_poly_div_rem(numerator: &[u64], denominator: &[u64])
+    -> Result<(Vec<u64>, Vec<u64>), String>
+{
+    if numerator.is_empty() || denominator.is_empty()
+        || numerator.iter().chain(denominator.iter()).any(|&z| z >= P)
+    {
+        return Err("empty or noncanonical polynomial".into());
+    }
+    let mut n = rr9_poly_trim(numerator.to_vec());
+    let d = rr9_poly_trim(denominator.to_vec());
+    if d == [0] { return Err("division by zero polynomial".into()); }
+    let inv_lc = fp_pow(*d.last().unwrap(), P - 2);
+    let mut q = vec![0u64; n.len().saturating_sub(d.len()) + 1];
+    while n != [0] && n.len() >= d.len() {
+        let offset = n.len() - d.len();
+        let c = fp_mul(*n.last().unwrap(), inv_lc);
+        q[offset] = c;
+        for (j, &dj) in d.iter().enumerate() {
+            n[offset+j] = fp_sub(n[offset+j], fp_mul(c, dj));
+        }
+        n = rr9_poly_trim(n);
+    }
+    Ok((rr9_poly_trim(q), n))
+}
+
+/// Make gcd monic to identify *distinct* factors, including multiplicities.
+fn rr9_poly_gcd_monic(left: &[u64], right: &[u64]) -> Result<Vec<u64>, String> {
+    if left.is_empty() || right.is_empty() {
+        return Err("empty polynomial in gcd".into());
+    }
+    let mut a = rr9_poly_trim(left.to_vec());
+    let mut b = rr9_poly_trim(right.to_vec());
+    while b != [0] {
+        let (_, rem) = rr9_poly_div_rem(&a, &b)?;
+        a = b;
+        b = rem;
+    }
+    if a == [0] { return Err("gcd(0,0) undefined".into()); }
+    let inv_lc = fp_pow(*a.last().unwrap(), P-2);
+    Ok(a.iter().map(|&z| fp_mul(z, inv_lc)).collect())
+}
+
+/// Characteristic p>8, monic degree-eight M and squarefree H:
+/// M | H^8 iff rad(M)=M/gcd(M,M') divides H.
+/// This membership oracle is exact for all eight-root multiplicity partitions.
+/// It DOES NOT recover M or the seven signed-chart coefficients from public R.
+fn rr9_radical_support(m: &[u64], h: &[u64]) -> Result<(bool, usize), String> {
+    if m.len() != 9 || m[8] != 1 || h.len() < 2 || h.last() != Some(&1)
+        || m.iter().chain(h.iter()).any(|&z| z >= P)
+    {
+        return Err("expected canonical monic degree-eight M and squarefree monic H".into());
+    }
+    let hd: Vec<u64> = (1..h.len())
+        .map(|i| fp_mul(h[i], i as u64 % P)).collect();
+    if rr9_poly_gcd_monic(h, &hd)? != [1] {
+        return Err("factor-base x polynomial H is not squarefree".into());
+    }
+    let md: Vec<u64> = (1..m.len())
+        .map(|i| fp_mul(m[i], i as u64)).collect();
+    let gcd = rr9_poly_gcd_monic(m, &md)?;
+    let (rad, remainder) = rr9_poly_div_rem(m, &gcd)?;
+    if remainder != [0] || rad.last() != Some(&1) || rad.len() < 2 {
+        return Err("invalid monic squarefree radical of degree-eight M".into());
+    }
+    let (_, h_rem) = rr9_poly_div_rem(h, &rad)?;
+    Ok((h_rem == [0], rad.len()-1))
+}
+
 /// Public coefficient-only support test (NOT a coefficient extractor).
 ///
 /// Input F=U+yV is already supplied, as are public R and H_B. The test
@@ -576,6 +651,10 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
             .expect("direct signed monic eight-factor");
         assert!(rr9_poly_pow_mod(&h, 8, &chart_factor)
             .expect("direct M divides public H^8").iter().all(|&z| z == 0));
+        let (radical_supported, radical_degree) = rr9_radical_support(&chart_factor, &h)
+            .expect("independent radical support on distinct-leaf prime31 M");
+        assert!(radical_supported, "radical gate rejected valid public signed support");
+        assert_eq!(radical_degree, 8, "distinct leaf x-coordinates must be squarefree");
         let chart_coeff = rr9_from_signed_chart(&chart_a, &chart_v, r).unwrap();
         let normalized_norm = rr9_norm(&chart_coeff);
         let mut quotient = [0u64; 9];
@@ -596,6 +675,9 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
         assert_ne!(altered_factor, chart_factor, "altered F has unchanged norm factor");
         assert!(rr9_poly_pow_mod(&h, 8, &altered_factor)
             .unwrap().iter().any(|&z| z != 0));
+        assert!(!rr9_radical_support(&altered_factor, &h)
+            .expect("independent radical mutated coefficient negative").0,
+            "radical oracle accepted a target-preserving unsupported M");
         assert!(!rr9_public_norm_support(&changed_coeff, r, &h)
             .expect("same-target altered F support test"),
             "altered F unexpectedly has eight factor-base x roots");
@@ -676,6 +758,10 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
             .expect("direct repeated-point chart factor");
         assert!(rr9_poly_pow_mod(&h, 8, &chart_factor)
             .unwrap().iter().all(|&z| z == 0));
+        let (radical_supported, radical_degree) = rr9_radical_support(&chart_factor, &h)
+            .expect("independent repeated-point radical membership");
+        assert!(radical_supported, "radical oracle missed repeated valid leaf support");
+        assert_eq!(radical_degree, if multiplicity == 8 { 1 } else { 2 });
         let norm = rr9_norm(&rr9_from_signed_chart(&chart_a, &chart_v, true_r).unwrap());
         let rx = true_r.unwrap().0;
         let mut quotient = [0u64; 9];
@@ -695,6 +781,8 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
             .expect("confluent changed monic factor");
         assert_ne!(altered_factor, chart_factor);
         assert!(rr9_poly_pow_mod(&h, 8, &altered_factor).unwrap().iter().any(|&z| z != 0));
+        assert!(!rr9_radical_support(&altered_factor, &h)
+            .expect("repeated altered coefficient radical negative").0);
         assert!(!rr9_public_norm_support(&changed_coeff, true_r, &h)
             .expect("altered repeated support check"));
         higher_controls.push(json!({
@@ -740,9 +828,524 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
     })
 }
 
+
+/// Exact affine linear solve for a GIVEN B8 sign vector and public residual.
+/// This deliberately enumerates signed supports: it is a correctness oracle,
+/// not a nonenumerative relation extraction algorithm or an ECDLP solver.
+fn rr9_b8_signed_linear_solve(
+    base: &[(u64, u64); 8], signs: u8, residual: Point,
+) -> Result<Option<([u64; 4], [u64; 4])>, String> {
+    let (r, s) = residual.ok_or("B8 solver excludes infinity residual")?;
+    let mut rows = [[0u64; 8]; 8];
+    for (i, &(x, y)) in base.iter().enumerate() {
+        let signed_y = if ((signs >> i) & 1) == 1 { fp_sub(0, y) } else { y };
+        let powers = [1, x, fp_mul(x, x), fp_mul(fp_mul(x, x), x)];
+        if x == r {
+            // The ordinary split product is 0=0 at x=r. Its actual
+            // quotient root condition is the pair of *linear* branches
+            // M(r)=V(r)[(3r^2+a)V(r)-2sA(r)]=0.
+            // The selected signed leaf fixes WHICH branch is correct:
+            // R: F(R)=2s V(r)=0; -R: F'(-R)=0 (confluent jet).
+            if s == 0 { return Err("rational two-torsion invalid for this prime-order curve".into()); }
+            if signed_y == s {
+                for j in 0..3 { rows[i][4+j] = powers[j]; }
+                rows[i][7] = fp_sub(0, powers[3]);
+            } else if signed_y == fp_sub(0, s) {
+                let d = fp_add(fp_mul(3, fp_mul(r, r)), PRIME31.a);
+                let two_s = fp_mul(2, s);
+                for j in 0..4 { rows[i][j] = fp_mul(two_s, powers[j]); }
+                for j in 0..3 { rows[i][4+j] = fp_sub(0, fp_mul(d, powers[j])); }
+                rows[i][7] = fp_mul(d, powers[3]);
+            } else {
+                return Err("factor-base point off the residual x-fibre".into());
+            }
+            continue;
+        }
+        let t = fp_sub(x, r);
+        let w = fp_add(s, signed_y);
+        for j in 0..4 { rows[i][j] = fp_mul(t, powers[j]); }
+        for j in 0..3 { rows[i][4+j] = fp_mul(w, powers[j]); }
+        // Fixed V_3=1 contributes w*x^3 to the left-hand side.
+        rows[i][7] = fp_sub(0, fp_mul(w, powers[3]));
+    }
+    let mut pivots = [usize::MAX; 7];
+    let mut rank = 0usize;
+    for col in 0..7 {
+        let Some(piv) = (rank..8).find(|&i| rows[i][col] != 0) else {
+            continue;
+        };
+        rows.swap(rank, piv);
+        let inv = fp_pow(rows[rank][col], P-2);
+        for j in col..8 { rows[rank][j] = fp_mul(rows[rank][j], inv); }
+        for i in 0..8 {
+            if i == rank { continue; }
+            let factor = rows[i][col];
+            for j in col..8 {
+                rows[i][j] = fp_sub(rows[i][j], fp_mul(factor, rows[rank][j]));
+            }
+        }
+        pivots[rank] = col;
+        rank += 1;
+    }
+    if (rank..8).any(|i| rows[i][7] != 0) { return Ok(None); }
+    if rank != 7 {
+        return Err(format!("B8 signed chart has a consistent rank-{rank} positive-dimensional fibre"));
+    }
+    let mut result = [0u64; 7];
+    for i in 0..7 { result[pivots[i]] = rows[i][7]; }
+    Ok(Some((
+        [result[0], result[1], result[2], result[3]],
+        [result[4], result[5], result[6], 1],
+    )))
+}
+
+/// For x != r, -(x-r)M(x)=L_+(x)*L_-(x).
+/// For x = r, use the true quotient-root identity
+/// M(r)=V(r)[(3r²+a)V(r)-2sA(r)], not the tautological 0=0.
+fn rr9_b8_factor_identity_at(
+    a: &[u64; 4], v: &[u64; 4], residual: Point, q: (u64, u64),
+) -> Result<(u64, u64), String> {
+    let (r, s) = residual.ok_or("B8 factor identity needs affine residual")?;
+    let (x, y) = q;
+    let x2 = fp_mul(x, x);
+    let x3 = fp_mul(x2, x);
+    let eval = |coeff: &[u64; 4]| {
+        fp_add(fp_add(coeff[0], fp_mul(coeff[1], x)),
+            fp_add(fp_mul(coeff[2], x2), fp_mul(coeff[3], x3)))
+    };
+    let av = eval(a);
+    let vv = eval(v);
+    let t = fp_sub(x, r);
+    let l_plus = fp_add(fp_mul(t, av), fp_mul(fp_add(s, y), vv));
+    let l_minus = fp_add(fp_mul(t, av), fp_mul(fp_sub(s, y), vv));
+    let m = rr9_signed_chart_monic_factor(a, v, residual)?;
+    let mval = m.iter().rev().fold(0u64, |z, &c| fp_add(fp_mul(z, x), c));
+    if x == r {
+        let d = fp_add(fp_mul(3, fp_mul(r, r)), PRIME31.a);
+        return Ok((mval, fp_mul(vv, fp_sub(fp_mul(d, vv), fp_mul(fp_mul(2,s), av)))));
+    }
+    Ok((fp_sub(0, fp_mul(t, mval)), fp_mul(l_plus, l_minus)))
+}
+
+/// Exhaustive B8 signed-fibre equivalence test. All 256 masks enter only as
+/// a TEST oracle; no target scalar or basis discrete logs enter the solver.
+fn rr9_b8_linear_fibre_audit(ar: &mut Arithmetic) -> Value {
+    let first = first_rational_points(ar);
+    let base: [(u64, u64); 8] = first[..8].try_into().unwrap();
+    let mut h = vec![1u64];
+    for &(x, _) in &base {
+        h = rr9_poly_mul(&h, &[fp_sub(0, x), 1]);
+    }
+    assert_eq!(h.len(), 9);
+    let mut supports: HashMap<Point, Vec<u8>> = HashMap::new();
+    let mut sums = [None; 256];
+    for mask in 0u16..256 {
+        let leaves: [Point; 8] = std::array::from_fn(|i| {
+            if ((mask >> i) & 1) == 1 { neg(Some(base[i])) } else { Some(base[i]) }
+        });
+        let sum = group_sum(ar, &leaves);
+        sums[mask as usize] = sum;
+        supports.entry(sum).or_default().push(mask as u8);
+    }
+    let collisions = 256usize - supports.len();
+    let mut checked_residuals = HashSet::new();
+    let mut excluded_infinity = 0usize;
+    let mut excluded_same_x = 0usize;
+    let mut positive_systems = 0usize;
+    let mut recovered_masks = 0usize;
+    let mut exact_fibres = 0usize;
+    let mut factor_checks = 0usize;
+    for mask in 0usize..256 {
+        let target = sums[mask];
+        if target.is_none() {
+            excluded_infinity += 1;
+            continue;
+        }
+        let r = target.unwrap().0;
+        if base.iter().any(|&(x, _)| x == r) {
+            excluded_same_x += 1;
+            continue;
+        }
+        if !checked_residuals.insert(target) { continue; }
+        let expected = &supports[&target];
+        let mut found = Vec::new();
+        for candidate in 0u16..256 {
+            positive_systems += 1;
+            if let Some((a,v)) = rr9_b8_signed_linear_solve(&base, candidate as u8, target)
+                .expect("all 8x7 linear fibres must be determinate") {
+                let f = rr9_from_signed_chart(&a, &v, target).unwrap();
+                let signed: [Point; 8] = std::array::from_fn(|i| {
+                    if ((candidate >> i) & 1) == 1 { neg(Some(base[i])) } else { Some(base[i]) }
+                });
+                assert_eq!(rr9_function_at(&f, neg(target)).unwrap(), 0);
+                for &q in &signed { assert_eq!(rr9_function_at(&f, q).unwrap(), 0); }
+                let m = rr9_signed_chart_monic_factor(&a, &v, target).unwrap();
+                assert_eq!(m.as_slice(), h.as_slice(), "linear solution does not have M=H_B");
+                assert!(rr9_radical_support(&m, &h).unwrap().0);
+                assert_eq!(group_sum(ar, &signed), target, "false-positive chart solution");
+                found.push(candidate as u8);
+                recovered_masks += 1;
+            }
+        }
+        assert_eq!(found, *expected, "signed linear fibre differs from original-curve group sums");
+        exact_fibres += 1;
+        if factor_checks == 0 {
+            // Independent algebraic polynomial-factor identity, *not* a solver.
+            // Test all 256 arbitrary canonical A,V coefficients and eight base x.
+            for j in 0u64..256 {
+                let a = [j, j+1, j*j+17, j*3+7];
+                let v = [j*11+3, j*j+2, j+9, 1];
+                for &q in &base {
+                    let (left,right) = rr9_b8_factor_identity_at(&a,&v,target,q).unwrap();
+                    assert_eq!(left,right,"B8 split-quadric identity fails");
+                    factor_checks += 1;
+                }
+            }
+        }
+    }
+    let mut negative_systems = 0usize;
+    let mut excluded_negative_offsets = 0usize;
+    let mut verified_negative_targets = 0usize;
+    for &initial_mask in &[0x00usize, 0x35, 0x96, 0xff] {
+        let mut target = sums[initial_mask];
+        let mut found_negative = false;
+        for _attempt in 1..=64 {
+            target = ar.add(PRIME31, target, Some(PRIME31.g));
+            let suitable = target.map(|(x,_)| !base.iter().any(|&(bx,_)| bx==x))
+                .unwrap_or(false);
+            if suitable && !supports.contains_key(&target) {
+                found_negative = true;
+                break;
+            }
+            excluded_negative_offsets += 1;
+        }
+        assert!(found_negative, "64 deterministic G offsets failed to find B8 negative");
+        for mask in 0u16..256 {
+            negative_systems += 1;
+            assert!(rr9_b8_signed_linear_solve(&base, mask as u8, target)
+                .expect("negative linear chart must be determinate").is_none(),
+                "negative public residual admits a false signed fibre");
+        }
+        verified_negative_targets += 1;
+    }
+    assert!(exact_fibres >= 1);
+    assert!(positive_systems >= 256);
+    assert_eq!(negative_systems, 4 * 256);
+    assert_eq!(factor_checks, 256 * 8);
+    json!({
+        "factor_base":"first_eight_rational_x_prime31",
+        "formal_sign_masks":256, "distinct_original_curve_sums":supports.len(),
+        "sum_collisions":collisions, "admissible_unique_public_residuals":exact_fibres,
+        "skipped_masks_with_infinity_R":excluded_infinity,
+        "skipped_masks_with_base_x_equal_residual_x":excluded_same_x,
+        "positive_affine_linear_systems":positive_systems,
+        "recovered_signed_masks":recovered_masks,
+        "exact_signed_fibres":exact_fibres,
+        "independent_split_quadric_identity_checks":factor_checks,
+        "negative_affine_linear_systems":negative_systems,
+        "negative_public_residuals":verified_negative_targets,
+        "negative_offsets_skipped":excluded_negative_offsets,
+        "algorithm_enumerates_all_256_sign_masks":true,
+        "complete_unknown_Q_discrete_log_solves":0,
+        "nonenumerative_extraction_demonstrated":false,
+        "pcc":"unverified"
+    })
+}
+
+//// Exact exceptional-x B8 controls, with construction outside the coefficient solver.
+/// Choose six independent affine leaves, derive a seventh by the original
+/// curve group law so seven sum to O (R leaf) or 2R (-R leaf).
+/// Reject repeated x, infinity and any target-x collision before testing.
+fn rr9_b8_exceptional_fixture(
+    ar: &mut Arithmetic, residual: Point, minus_residual_leaf: bool,
+) -> [(u64,u64); 8] {
+    let (r, _) = residual.expect("fixture requires affine R");
+    let first = first_rational_points(ar);
+    let required_seven_sum = if minus_residual_leaf {
+        ar.add(PRIME31, residual, residual)
+    } else { None };
+    for shift in 0..=first.len()-6 {
+        let mut leaves: [Point; 8] = [None; 8];
+        for i in 0..6 { leaves[i] = Some(first[shift+i]); }
+        if leaves[..6].iter().any(|q| q.unwrap().0 == r) { continue; }
+        let mut six_sum: Point = None;
+        for &q in &leaves[..6] { six_sum = ar.add(PRIME31, six_sum, q); }
+        let seventh = ar.add(PRIME31, required_seven_sum, neg(six_sum));
+        let Some((x7,_)) = seventh else { continue; };
+        if x7 == r || leaves[..6].iter().any(|q| q.unwrap().0 == x7) { continue; }
+        leaves[6] = seventh;
+        leaves[7] = if minus_residual_leaf { neg(residual) } else { residual };
+        let basis: [(u64,u64);8] = leaves.map(|q| q.expect("finite fixture"));
+        assert_eq!(group_sum(ar, &leaves), residual);
+        assert_eq!(basis.iter().map(|p| p.0).collect::<HashSet<_>>().len(), 8);
+        return basis;
+    }
+    panic!("could not build a deterministic distinct-x exceptional fixture");
+}
+
+fn rr9_b8_exceptional_fibre_audit(ar: &mut Arithmetic) -> Value {
+    let residual = Some(PRIME31.g);
+    let mut panels = Vec::new();
+    for &minus_residual_leaf in &[false, true] {
+        let base = rr9_b8_exceptional_fixture(ar, residual, minus_residual_leaf);
+        let mut h = vec![1u64];
+        for &(x,_) in &base { h = rr9_poly_mul(&h, &[fp_sub(0,x),1]); }
+        let mut expected = Vec::<u8>::new();
+        let mut sums = Vec::new();
+        for mask in 0u16..256 {
+            let leaves: [Point;8] = std::array::from_fn(|i|
+                if (mask >> i) & 1 == 1 { neg(Some(base[i])) } else { Some(base[i]) });
+            let sum = group_sum(ar,&leaves);
+            if sum == residual { expected.push(mask as u8); }
+            sums.push(sum);
+        }
+        assert!(expected.contains(&0), "fixture does not construct its planted positive");
+        let mut found = Vec::<u8>::new();
+        let mut tangent_checks = 0usize;
+        let mut exceptional_product_checks = 0usize;
+        for mask in 0u16..256 {
+            if let Some((a,v)) = rr9_b8_signed_linear_solve(&base,mask as u8,residual)
+                .expect("exceptional B8 has determinate signed chart") {
+                let f = rr9_from_signed_chart(&a,&v,residual).unwrap();
+                let m = rr9_signed_chart_monic_factor(&a,&v,residual).unwrap();
+                assert_eq!(m.as_slice(),h.as_slice(), "exceptional signed solution M!=H");
+                assert_eq!(rr9_function_at(&f,neg(residual)).unwrap(),0);
+                let leaves: [Point;8] = std::array::from_fn(|i|
+                    if (mask >> i) & 1 == 1 { neg(Some(base[i])) } else { Some(base[i]) });
+                for &q in &leaves { assert_eq!(rr9_function_at(&f,q).unwrap(),0); }
+                if leaves[7] == neg(residual) {
+                    let jet = evaluation_tangent_jet(neg(residual)).unwrap();
+                    let deriv = (0..9).fold(0u64, |acc,i|
+                        fp_add(acc, fp_mul(jet[i],f[i])));
+                    assert_eq!(deriv,0, "confluent -R tangent missing");
+                    tangent_checks += 1;
+                }
+                assert!(rr9_radical_support(&m,&h).unwrap().0);
+                assert_eq!(group_sum(ar,&leaves),residual);
+                found.push(mask as u8);
+            }
+        }
+        assert_eq!(found,expected,"exceptional signed fibres differ from group sums");
+        // This negative target must share x with a factor-base point yet have
+        // no signed eight-leaf support. Verify absence by the independent EC oracle.
+        let mut negative = None;
+        for &q in &base[..7] {
+            for candidate in [Some(q),neg(Some(q))] {
+                if !sums.contains(&candidate) { negative = Some(candidate); break; }
+            }
+            if negative.is_some() { break; }
+        }
+        let neg_target = negative.expect("no absent exceptional-x signed residual");
+        let mut negative_systems = 0usize;
+        for mask in 0u16..256 {
+            negative_systems += 1;
+            assert!(rr9_b8_signed_linear_solve(&base,mask as u8,neg_target)
+                .expect("negative exceptional-x fibre determinate").is_none(),
+                "false exceptional-x B8 support");
+        }
+        // Test the actual exceptional quotient identity independently of
+        // the signed solver on deterministic arbitrary A,V coefficients.
+        for j in 0u64..128 {
+            let a = [j, j+1, j*j+17, j*3+7];
+            let v = [j*11+3, j*j+2, j+9, 1];
+            let (l,r) = rr9_b8_factor_identity_at(&a,&v,residual,base[7]).unwrap();
+            assert_eq!(l,r,"exceptional M(r) factor identity failed");
+            exceptional_product_checks += 1;
+        }
+        panels.push(json!({
+            "minus_residual_leaf":minus_residual_leaf,
+            "eight_distinct_x":true,
+            "residual_is_generator":true,
+            "positive_original_curve_sign_masks":expected.len(),
+            "recovered_signed_masks":found.len(),
+            "exact_signed_fibre_set":true,
+            "tangent_derivative_checks":tangent_checks,
+            "same_x_outside_support_negative_targets":1,
+            "negative_systems":negative_systems,
+            "exceptional_polynomial_factor_checks":exceptional_product_checks
+        }));
+    }
+    json!({"panels":panels,"exceptional_branch_count":2,
+        "nonenumerative_extraction":false,"unknown_ecdlp_logs":0,
+        "pcc":"unverified"})
+}
+
+
+/// Reconstruct the ninth zero of an RR9 function from seven *given* signed
+/// affine points S_i and a public affine residual R.  This is NOT relation
+/// extraction: the divisor identity proves T=R-sum(S_i), a generic group
+/// subtraction, although this implementation obtains T algebraically.
+///
+/// Hermite jet comparison is essential if T shares an x-coordinate with a
+/// supplied zero: F(T)=0 alone is insufficient to distinguish T from -T.
+fn rr9_complete_seven_signed_leaves(
+    ar: &mut Arithmetic, leaves: &[Point; 7], residual: Point,
+) -> Result<Point, String> {
+    residual.ok_or("seven-anchor completion excludes R=O")?;
+    if leaves.iter().any(|q| q.is_none()) {
+        return Err("seven-anchor completion excludes supplied infinity".into());
+    }
+    let divisor: [Point; 8] = std::array::from_fn(|i| {
+        if i < 7 { leaves[i] } else { neg(residual) }
+    });
+    // Existing L(9O) kernel uses true higher-order jets for repeated points.
+    let coeff = rr9_leaves_kernel(&divisor)?;
+    let norm = rr9_norm(&coeff);
+    if norm[9] == 0 {
+        // Ninth zero is at O, where the affine norm factor is unavailable.
+        return Ok(None);
+    }
+    let mut known_x = vec![1u64];
+    for q in leaves.iter().copied().chain(std::iter::once(residual)) {
+        let (x, _) = q.ok_or("infinite point in divisor x factors")?;
+        known_x = rr9_poly_mul(&known_x, &[fp_sub(0, x), 1]);
+    }
+    let (quotient, remainder) = rr9_poly_div_rem(&norm, &known_x)?;
+    if remainder != [0] || quotient.len() != 2 || quotient[1] != norm[9] {
+        return Err("RR9 norm does not leave an exact linear ninth-zero factor".into());
+    }
+    let x = fp_mul(fp_sub(0, quotient[0]), fp_pow(quotient[1], P - 2));
+    let rhs = ar.rhs(PRIME31, x);
+    let y = ar.sqrt(rhs, P)
+        .ok_or("ninth norm x-coordinate has no rational curve lift")?;
+    if y == 0 { return Err("prime-order prime31 has no affine rational 2-torsion".into()); }
+    let positive = Some((x, y));
+    let negative = neg(positive);
+    // Test for ONE ADDITIONAL local zero beyond the eight already imposed.
+    // This also disambiguates the exceptional x(T)=x(R) tangent-jet branch.
+    let has_extra = |q: Point| -> Result<bool, String> {
+        let order = divisor.iter().filter(|&&given| given == q).count();
+        let row = evaluation_higher_jet(q, order)?;
+        let value = (0..9).fold(0u64, |acc, i| fp_add(acc, fp_mul(row[i], coeff[i])));
+        Ok(value == 0)
+    };
+    match (has_extra(positive)?, has_extra(negative)?) {
+        (true, false) => Ok(positive),
+        (false, true) => Ok(negative),
+        (false, false) => Err(format!("RR9 ninth norm root at x={x} has no signed extra zero")),
+        (true, true) => Err(format!("RR9 ninth norm root at x={x} has ambiguous extra zeros")),
+    }
+}
+
+/// Full exact B8 sign-mask and original-curve B31 audit of seven-leaf
+/// interpolation. The original group sum is the INDEPENDENT test oracle;
+/// only seven signed leaves and public R are passed to the algebraic routine.
+fn rr9_seven_anchor_completion_audit(ar: &mut Arithmetic) -> Value {
+    let first = first_rational_points(ar);
+    let b8: [(u64,u64);8] = first[..8].try_into().unwrap();
+    let mut b8_checked = 0usize;
+    let mut b8_infinity = 0usize;
+    let mut exceptional_r_x = 0usize;
+    let mut computation_ns = 0u128;
+    for mask in 0u16..256 {
+        let signed: [Point; 8] = std::array::from_fn(|i| {
+            if (mask >> i) & 1 == 1 { neg(Some(b8[i])) } else { Some(b8[i]) }
+        });
+        let residual = group_sum(ar, &signed);
+        if residual.is_none() {
+            b8_infinity += 1;
+            continue;
+        }
+        let seven: [Point; 7] = std::array::from_fn(|i| signed[i]);
+        let started = Instant::now();
+        let completion = rr9_complete_seven_signed_leaves(ar, &seven, residual)
+            .expect("B8 RR9 algebraic completion should have one exact signed ninth zero");
+        computation_ns += started.elapsed().as_nanos();
+        assert_eq!(completion, signed[7], "B8 algebraic ninth zero differs from original EC sum");
+        if residual.unwrap().0 == signed[7].unwrap().0 { exceptional_r_x += 1; }
+        b8_checked += 1;
+    }
+    assert!(b8_checked >= 250, "unexpected number of infinity B8 residuals");
+    let residual = Some(PRIME31.g);
+    let mut exceptional_fixtures = 0usize;
+    for &minus in &[false, true] {
+        let points = rr9_b8_exceptional_fixture(ar, residual, minus);
+        let seven: [Point; 7] = std::array::from_fn(|i| Some(points[i]));
+        let completed = rr9_complete_seven_signed_leaves(ar, &seven, residual)
+            .expect("exceptional seven-anchor Hermite completion");
+        assert_eq!(completed, Some(points[7]), "R/-R exceptional completion chooses wrong tangent sign");
+        exceptional_fixtures += 1;
+    }
+    let mut negative_off_base = 0usize;
+    let mut negative_trials = 0usize;
+    for &mask in &[0u8, 0x35, 0x96, 0xff] {
+        let signed: [Point;8] = std::array::from_fn(|i|
+            if (mask >> i) & 1 == 1 { neg(Some(b8[i])) } else { Some(b8[i]) });
+        let seven: [Point;7] = std::array::from_fn(|i| signed[i]);
+        let mut target = group_sum(ar, &signed);
+        let seven_sum = seven.iter().copied().fold(None, |acc,q| ar.add(PRIME31, acc, q));
+        for _ in 0..64 {
+            target = ar.add(PRIME31,target,Some(PRIME31.g));
+            negative_trials += 1;
+            if target.is_none() { continue; }
+            let expected = ar.add(PRIME31, target, neg(seven_sum));
+            let Some((ex,_)) = expected else { continue; };
+            if b8.iter().any(|&(x,_)| x == ex) { continue; }
+            let completed = rr9_complete_seven_signed_leaves(ar, &seven, target)
+                .expect("negative off-base algebraic completion");
+            assert_eq!(completed, expected, "nonfactor-base completion must match generic subtraction");
+            assert!(!b8.iter().any(|&(x,_)| x == completed.unwrap().0),
+                "off-base negative was accepted as a factor-base leaf");
+            negative_off_base += 1;
+            break;
+        }
+    }
+    assert_eq!(negative_off_base, 4, "not all B8 off-base negative controls completed");
+    let dickson = Base::build(PRIME31, 6, ar).unwrap();
+    assert_eq!(dickson.points.len(),31);
+    let mut b31_checked = 0usize;
+    let mut draws = 0usize;
+    for (index, base) in [&first, &dickson.points].into_iter().enumerate() {
+        let mut seed = SEED ^ (index as u64) ^ 0x5345_5645_4e5f_414e;
+        let mut panel_checked = 0usize;
+        while panel_checked < 32 {
+            draws += 1;
+            assert!(draws < 2000, "B31 seven-anchor completion trial cap exceeded");
+            let mut choices: Vec<usize> = (0..31).collect();
+            let signed: [Point;8] = std::array::from_fn(|i| {
+                let j = i + (splitmix64(&mut seed) as usize % (31-i));
+                choices.swap(i,j);
+                let q = Some(base[choices[i]]);
+                if splitmix64(&mut seed)&1==1 {neg(q)} else {q}
+            });
+            let residual = group_sum(ar,&signed);
+            if residual.is_none() { continue; }
+            let seven: [Point;7] = std::array::from_fn(|i| signed[i]);
+            let started = Instant::now();
+            let completion = rr9_complete_seven_signed_leaves(ar,&seven,residual)
+                .expect("B31 given seven signed leaves complete to eighth");
+            computation_ns += started.elapsed().as_nanos();
+            assert_eq!(completion,signed[7], "B31 target-conditioned ninth norm root mismatches EC sum");
+            panel_checked += 1;
+            b31_checked += 1;
+        }
+    }
+    json!({
+        "schema":"prime31.rr9.seven_anchor_completion.v1",
+        "p":PRIME31.p,"n":PRIME31.n,
+        "b8_sign_masks_total":256,
+        "b8_positive_checked":b8_checked,"b8_infinity_residuals":b8_infinity,
+        "b8_residual_x_equals_withheld_x":exceptional_r_x,
+        "explicit_R_and_minus_R_jet_fixtures":exceptional_fixtures,
+        "negative_off_base_completed":negative_off_base,
+        "negative_target_offsets_tried":negative_trials,
+        "b31_given_support_completions":b31_checked,
+        "b31_raw_draws":draws,
+        "interpolation_wall_ns_diagnostic_only":computation_ns.to_string(),
+        "seven_signed_leaf_points_supplied":true,
+        "generic_group_subtraction_equivalence_proved":true,
+        "public_only_relation_extraction":false,
+        "complete_unknown_target_ecdlp_recoveries":0,
+        "pcc":"unverified"
+    })
+}
+
 fn run() -> Value {
     let mut ar = Arithmetic::default();
     check_curve(PRIME31, &mut ar).expect("prime31 curve certificate");
+    let seven_anchor_audit = rr9_seven_anchor_completion_audit(&mut ar);
+    let b8_fibre_audit = rr9_b8_linear_fibre_audit(&mut ar);
+    let b8_exceptional_audit = rr9_b8_exceptional_fibre_audit(&mut ar);
     let b1 = first_rational_points(&mut ar);
     let b2 = Base::build(PRIME31, 6, &mut ar).expect("real Dickson31 depth-six base");
     assert_eq!(b2.points.len(), 31);
@@ -752,7 +1355,9 @@ fn run() -> Value {
         "schema":"prime31.rr9.evaluation.v1", "p":PRIME31.p, "n":PRIME31.n,
         "curve":PRIME31, "method":"L(9O) evaluation determinant on nine distinct affine points",
         "positive_count":64, "negative_count":64,
-        "panels":[first,dickson], "source_only_pcc":"unverified",
+        "panels":[first,dickson], "b8_signed_fibres":b8_fibre_audit,
+        "b8_exceptional_x_signed_fibres":b8_exceptional_audit,
+        "seven_anchor_completion":seven_anchor_audit, "source_only_pcc":"unverified",
         "nonenumerative_factor_extraction":false,
         "complete_unknown_target_ecdlp_recoveries":0,
         "matched_optimized_rho":false
@@ -801,6 +1406,57 @@ mod tests {
         assert!(rr9_poly_rem_monic(vec![2], &[1, 2]).is_err());
     }
     #[test]
+    fn rr9_radical_support_partitions_and_negative_controls() {
+        // Eight x-roots, with repetitions, deliberately selected from the
+        // original F_p. This tests the exact polynomial iff theorem independent
+        // of the coefficient interpolation and original-curve group arithmetic.
+        let roots = [7u64, 11, 19, 23, 29, 31, 37, 41];
+        let mut h = vec![1u64];
+        for &x in &roots {
+            h = rr9_poly_mul(&h, &[fp_sub(0, x), 1]);
+        }
+        for (mults, expected_degree) in [
+            (&[8usize][..], 1usize),
+            (&[4usize, 4][..], 2usize),
+            (&[5usize, 2, 1][..], 3usize),
+            (&[1usize, 1, 1, 1, 1, 1, 1, 1][..], 8usize),
+        ] {
+            let mut m = vec![1u64];
+            for (i, &count) in mults.iter().enumerate() {
+                for _ in 0..count {
+                    m = rr9_poly_mul(&m, &[fp_sub(0, roots[i]), 1]);
+                }
+            }
+            assert_eq!(m.len(), 9);
+            let (fast, degree) = rr9_radical_support(&m, &h).unwrap();
+            assert!(fast);
+            assert_eq!(degree, expected_degree);
+            assert!(rr9_poly_pow_mod(&h, 8, &m).unwrap().iter().all(|&z| z == 0));
+            if expected_degree == 8 {
+                // The discriminant-nonzero stratum has no H^8 power gate:
+                // membership reduces directly to eight remainder equations H mod M.
+                assert!(rr9_poly_rem_monic(h.clone(), &m).unwrap().iter().all(|&z| z == 0));
+            }
+            let mut h_omit = vec![1u64];
+            for &x in roots.iter().skip(1) {
+                h_omit = rr9_poly_mul(&h_omit, &[fp_sub(0, x), 1]);
+            }
+            assert!(!rr9_radical_support(&m, &h_omit).unwrap().0);
+            assert!(rr9_poly_pow_mod(&h_omit, 8, &m).unwrap().iter().any(|&z| z != 0));
+        }
+        // M contains eight roots but its degree/order and canonicality are
+        // checked independently of the x-factor-base polynomial.
+        assert!(rr9_radical_support(&[1, 1], &h).is_err());
+        let mut malformed = [0u64; 9];
+        malformed[0] = P;
+        malformed[8] = 1;
+        assert!(rr9_radical_support(&malformed, &h).is_err());
+        let double_root_h = rr9_poly_mul(
+            &[fp_sub(0, 7), 1], &[fp_sub(0, 7), 1]);
+        assert!(rr9_radical_support(&malformed.map(|z| if z == P { 0 } else { z }), &double_root_h).is_err());
+        assert!(rr9_poly_div_rem(&[1], &[0]).is_err());
+    }
+    #[test]
     fn rr9_public_support_rejects_infinity_and_invalid_coefficients() {
         let zero = [0u64; 9];
         let h = [1u64, 1];
@@ -814,6 +1470,43 @@ mod tests {
         let mut bad = zero;
         bad[0] = P;
         assert!(rr9_public_norm_support(&bad, Some(PRIME31.g), &h).is_err());
+    }
+    #[test]
+    fn rr9_seven_anchor_generic_equivalence_on_actual_prime31() {
+        let mut ar = Arithmetic::default();
+        check_curve(PRIME31,&mut ar).unwrap();
+        let report = rr9_seven_anchor_completion_audit(&mut ar);
+        assert_eq!(report["b8_sign_masks_total"],256);
+        assert!(report["b8_positive_checked"].as_u64().unwrap()>=250);
+        assert_eq!(report["explicit_R_and_minus_R_jet_fixtures"],2);
+        assert_eq!(report["negative_off_base_completed"],4);
+        assert_eq!(report["b31_given_support_completions"],64);
+        assert_eq!(report["public_only_relation_extraction"],false);
+        assert_eq!(report["complete_unknown_target_ecdlp_recoveries"],0);
+    }
+    #[test]
+    fn rr9_b8_exceptional_x_jet_fibre_equivalence() {
+        let mut ar = Arithmetic::default();
+        check_curve(PRIME31,&mut ar).unwrap();
+        let report = rr9_b8_exceptional_fibre_audit(&mut ar);
+        assert_eq!(report["exceptional_branch_count"],2);
+        for panel in report["panels"].as_array().unwrap() {
+            assert_eq!(panel["exact_signed_fibre_set"],true);
+            assert_eq!(panel["negative_systems"],256);
+            assert_eq!(panel["exceptional_polynomial_factor_checks"],128);
+        }
+        assert!(report["panels"][1]["tangent_derivative_checks"].as_u64().unwrap()>=1);
+    }
+    #[test]
+    fn rr9_b8_full_signed_fibre_equivalence() {
+        let mut ar = Arithmetic::default();
+        check_curve(PRIME31, &mut ar).unwrap();
+        let report = rr9_b8_linear_fibre_audit(&mut ar);
+        assert_eq!(report["formal_sign_masks"], 256);
+        assert_eq!(report["negative_affine_linear_systems"], 1024);
+        assert_eq!(report["independent_split_quadric_identity_checks"], 2048);
+        assert_eq!(report["algorithm_enumerates_all_256_sign_masks"], true);
+        assert_eq!(report["nonenumerative_extraction_demonstrated"], false);
     }
     #[test]
     fn rr9_original_prime31_bases_and_duplicate_control() {

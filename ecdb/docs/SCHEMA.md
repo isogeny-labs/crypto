@@ -673,12 +673,38 @@ deleted. A second run writes nothing.
   and pass counts, the geometric mean of the online speedup and of the cold
   ratio, and mean S per phase.
 
-### Class groups of imaginary quadratic orders (`0013`)
+### Class groups of imaginary quadratic orders (`0014`)
 
 | Table | What it holds |
 |:--|:--|
 | `order_class_group` | one row per discriminant D = f² d_K of an order O (End(E) of an ordinary curve): h(D), Cl(O) as invariant factors n₁ \| n₂ \| … (ascending, `{}` when trivial), d_K, f, h(d_K), [O_K* : O*], the 2-rank, the independent identities that held (`cross_checks`) and the status. Join on `endomorphism_ring.discriminant` |
 | `order_ell_class` | per (D, ℓ) with ℓ prime to f and split or ramified in O: the splitting, the form (ℓ, b, c) of a prime above ℓ, the order of its class in Cl(O) (the crater size of the ℓ-volcano of a curve with End(E) = O) and its `cross_checks` |
+
+### Research sweeps and model-ready features (`0016`)
+
+- `research_sweep` and `research_sweep_cell` content-bind saved cohort
+  filters, already-defined factor-base selectors, measurement controls and
+  required feature keys. `research_sweep_member` freezes selected curves with
+  provenance. A sweep remains a plan, never a result.
+- `factor_base_artifact` links an existing FB1/FBS1/archive identity to one or
+  more content-addressed `artifact` rows. `artifact.storage_uri` is the S3 or
+  HTTPS object reference; object bytes and remote verification stay outside
+  Postgres.
+- `feature_definition` versions semantic contracts. `feature_observation`
+  stores a typed value or explicit missing reason on exactly one curve, field,
+  subgroup, factor base, FBM1 configuration or sweep cell, with context,
+  fact status and provenance. A database trigger enforces the definition's
+  subject scope, JSON type and non-nullability even for direct writer inserts.
+- `ml_dataset`, `ml_dataset_feature` and `ml_dataset_member` pin sample grain,
+  selection SQL, exact feature versions/roles, split policy, frozen sample
+  membership and an optional materialized artifact.
+- `v_curve_ml_features`, `v_factor_base_ml_features` and
+  `v_factor_base_measurement_ml_features` expose one stable row at each model
+  grain. `curve_document` layers the curve row, factor-base objects,
+  observations and sweep/dataset memberships onto the normalized document.
+
+The checked-in manifests and workflow are documented in
+[`RESEARCH_SWEEPS.md`](RESEARCH_SWEEPS.md).
 
 ## 4. Coverage of the brief
 

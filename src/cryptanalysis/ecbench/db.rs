@@ -307,7 +307,7 @@ fn run_rows(out: &mut String, r: &Record) {
     if let Some(sv) = &r.solver {
         let _ = writeln!(
             out,
-            "INSERT INTO run_solver VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (record_id) DO NOTHING;",
+            "INSERT INTO run_solver VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (record_id) DO NOTHING;",
             ts(&r.record_id),
             ts(&sv.name),
             sv.calls,
@@ -329,6 +329,12 @@ fn run_rows(out: &mut String, r: &Record) {
             i(sv.sat_conflicts),
             i(sv.sat_decisions),
             i(sv.sat_propagations),
+            i(sv.first_fall_degree),
+            i(sv.last_fall_degree),
+            i(sv.solving_degree_sum),
+            i(sv.degree_of_regularity_observed),
+            t(sv.degree_story.as_deref()),
+            json_text(&sv.degree_trace),
             json_text(&sv.extra),
         );
     }
