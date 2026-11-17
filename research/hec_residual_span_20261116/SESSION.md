@@ -1567,3 +1567,10 @@ What was done:compiled standardpower-map primitiveorder/canonicalmin helper;full
 Decisions made: preservealloldhelpers,controlmustgetoptimizationtoo; noasymptoticdeterministictrialguaranteeor10x/DLPclaim. G4setuponly.
 Open threads: executeonce,evaluateisolatedversusfullsetupbeforepipelineintegration.
 Errors: none,nosciencebeforepushedfreeze; ownleaseT7083renewed.
+
+## Canonical root optimization qualified
+
+What was done:477fdad9193single invocation exits0;175prime/orderpairs exactcanonicalroots,100countedcalls exactrepeats,all8fullFB/root/charoutputsidentical. IsolatedrootREDCgain2.269-225.350,fullsetup1.004-2.018. Powermap1-10trialsobserved,notgeneralbound.
+Decisions made: standardengineeringcomponentgain,not10xIC. Preserveoldhelpers,newpipelinecontrolandcandidatebothoptimize. G4setuponly.
+Open threads: matchedcompletepipelinewithcommonrootimprovement,subgroupvector/traceinvariance; goalopen.
+Errors: none,no scientificretry/S3/cloud.
