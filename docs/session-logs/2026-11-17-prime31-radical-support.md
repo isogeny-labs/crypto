@@ -24,3 +24,19 @@
 ### Errors (what went wrong, how it was handled)
 - No local cargo/rustc or direct GitHub network in the container runtime. Used the authenticated GitHub connector to inspect and commit Rust source; existing pinned GitHub Actions supplies compilation and execution.
 - Research-KB/Conductor tools not exposed; fallback to checked GitHub sources documented; no novelty inference from unavailable search.
+
+## 2026-11-17T08:29Z — exact-source Rust checks successful
+
+### What was done (commands, files, features)
+- [Actions #44046676997](https://github.com/isogeny-labs/crypto/actions/runs/44046676997) completed with conclusion `success` on exact Rust source `02e76e640aaf7407280de86ce81ba5f60a115347`, job `133913970897`. Read job logs: pinned original Rust 1.100 ran **40/40 library** and **6/6 RR9 example tests**. The example's 128 distinct prime31 positive/negative determinant records passed; 70 radical-support positives and 70 corresponding negatives were exercised in unchanged on-curve panel assertions (including repeated F). Source-specific CI, [pcc:unverified].
+- Retrieved uploaded raw artifact id `14312111559` (13,662 bytes) and committed CI evidence/outcome to `RR9_RADICAL_SUPPORT_RESULT_20261117.md` (`81daf8a`). No new full ECDLP benchmark or signed independent verdict.
+
+### Decisions made (and why)
+- The exact radical characterization and source-specific test gate are complete at producer-validation scope. The coefficient extractor and fully charged batch speed comparison are separate open research objectives.
+
+### Open threads (unfinished, pick up next time)
+- B8 public-only coefficient root solving and B31 repeated-root branches, with exhaustive independent solution-fibre validation. Independent signed PCC still required for verified standing.
+- Retarget stacked #4541 to main after #4539 merges; only then consider enabling auto-merge.
+
+### Errors (what went wrong, how it was handled)
+- No Rust build/test or original-curve numerical failure in exact-source CI. No local cargo; source-specific Actions supplied compiler and runner.
