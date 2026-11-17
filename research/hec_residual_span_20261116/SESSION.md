@@ -2282,3 +2282,10 @@ What was done: compiled snapshot-only attribution of unchanged singletonproducer
 Decisions made: grantentiresplitfree tobound sqrt-onlysuccessor, notjustTSsetup; implementation-specific10REST>B comparedseparatelyall3controls. SameopenPR4587, Gitfreeze beforeone120CPU; no scientificexecutionyet.
 Open threads: executeanddeterminewhether query/anchor remainder alone exhausts10xbudget; fullgoal unchanged.
 Errors: no compileerror, unusedhelperwarning. OwnT7093lease confirmed/checkallow, attachownconflict. NoS3/cloud/merge.
+
+## Free split still exceeds singleton10xbudget
+
+What was done: pushedfreeze4e47f661bd8, hashcheckspass, onceexit0;24calls prior16vectors exact, sumsplit+rest exactallindices, repeatedphasevectors/native/rowchecks. All36 comparisons10REST>B. P601split14446/14514/17716/18288, remainder3540/3284/5114/5168.
+Decisions made: sqrt-onlyoptimizationcannotdeliveruniform10x withthisexactremainder, evenentiresplitfree; no cachedbenefit/wholewall/generalimpossibility claim. Needcombinedquery/anchor/relationredesign. Assertions [pcc:unverified].
+Open threads: materiallynewusefulrelationarrival reducingpaidquery/anchorwork, independentvalidation/fullgenus3/4 andoriginal10xgoalactive.
+Errors: none,no retry/S3/cloud/merge.
