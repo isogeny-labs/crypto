@@ -2870,3 +2870,10 @@ What was done: addedchargedpublicD/Tsplits andsignedrows sumFB=1/sumFB-k=0, noex
 Decisions made: classicalstrongbaseline/source-normalizationnotnovelty, countallnewworkandnonsplit/pendingcases. One600CPUrun afterGitfreeze,512anchorbudgetunchanged, beforetryingselectivelowdimfinisher.
 Open threads: execute/measure againststaticforest;full10xgoalactiveunachieved/independentreviewpending.
 Errors: inheritedunusedsource/helperwarningsonly;no scientificexecutionbeforefreeze. No S3/cloud/merge.
+
+## Public source target constraints qualify with small mixed effects
+
+What was done: freeze55e9cec705d hashespass/exit0;22audit+44freshcalls/nativeanswers/publicdecompositionreconstruction/allnorm-principalchecks/prefixFastagreementpass.24splitinserted/20nonsplitinputs/0pending, repeatednewauditReports/vectors/lookups exact.16offsubgroupfinalrejections/6unavailable. Static/newbaseg2.997-1.050,g3.993-1.070,g4.9974-.9992;subgroupg2.973-1.045,g3.986-1.205,g4.998-1.095.
+Decisions made: retainpublicnormalizationarmwithallcosts/nonavailablecases, notuniformreplacement/hiddenlargegain. Mostfinalanchorsunchanged;rho1finisherstillneedsnewindependentgeometricconstraint andpricedquotient/tags/interpolation.
+Open threads: constructchargedgrounded-onlyindependentrelationinrho1window, comparebothnormalization/staticforestcontrols;10xgoalactiveunachieved/independentreviewopen.
+Errors: no scientificfailure; inheritedunusedhelper/importwarnings. No S3/cloud/merge/unchangedrerun.
