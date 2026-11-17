@@ -36,3 +36,13 @@ This tests **membership of supplied coefficients F**, not how to find them from 
 ## Next real extraction gate
 
 Eliminate the seven remaining projective coefficient degrees of freedom after the linear condition `F(-R)=0`, **without enumerating signed supports**. The `H_B^8 mod M_F=0` condition gives eight explicit polynomial remainders in the coefficients; verify exact fibre equality at B4/B8 against independently enumerated *test only* solutions, including signed collisions and infinity branches. Instrument F4/FGLM, root isolation, saturation, rank, memory and all failed calls. Only after success attempt complete hidden-Q logs on B31 and frozen same-host cold comparisons with shared BSGS and tuned rho. No performance inference from a membership check alone.
+
+## Extension B — signed public-residual seven-coordinate chart (frozen before implementation)
+
+For a nonidentity public `R=(r,s)`, the condition `F(-R)=0` is exactly `U(r)-sV(r)=0`. Polynomial division gives a **unique** `A` of degree at most three satisfying `U(X)-sV(X)=(X-r)A(X)`. Hence
+
+`F(X,Y)=(X-r)A(X)+(Y+s)V(X)`,
+
+with eight coefficients `A_0..A_3,V_0..V_3`. All relevant eight-leaf nonidentity solutions have `V_3!=0`; set `V_3=1` projectively, leaving precisely **seven** affine unknowns. This chart makes the signed orientation condition automatic, and the nonenumerative extraction target is the eight remainder equations in these seven variables.
+
+**New source-exact falsifier, no timed performance claim:** reconstruct `F` from this chart for all 64 already planted nonzero-R coefficients and all six repeated-point certificates; assert equality up to the unique `V_3` scaling, and that reconstructed `F(-R)=0`. The changed-support `F'=F+(X-r)` must also remain on this signed chart, so a negative test cannot pass by merely violating `F(-R)=0`. Reject `R=O` and `V_3=0`; require test assertions for both. No generic ECDLP enumeration, new solver or speedup claim.
