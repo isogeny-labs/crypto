@@ -2506,3 +2506,10 @@ What was done: freezefcf616e7976 hashes passed, one invocation exit0. All288152o
 Decisions made: transported-same-base extra group collisions are not a speed mechanism, by all-length bijection proof. Do not build quotient maps to test this invariant. Coordinate-solving complexity and genuinely different paid bases remain open; no speed or whole-Jacobian/subgroup claim.
 Open threads: explicit cheaper decomposition circuit or paid nonuniform/new-rank construction capable of changing full costs; genus-three reduction certificate and genus-four mechanism remain required. Goal active, unachieved.
 Errors: none in frozen run; shared arithmetic not independent review. No S3/cloud/merge.
+
+## Proper-subgroup projected pair census frozen
+
+What was done: checked prior qualified holdout tuples, found nontrivial h in five retained g2/3/4 cases. Compiled exact projected-multiset and deduplicated-set convolution diagnostic, with exhaustive cyclic membership labels and native projection/group controls.
+Decisions made: do not extrapolate ambient pair uniqueness through noninjective projection. All five cases retained; no performance threshold. Diagnostic exhaustive logs not production inputs or cheap solver evidence; duplicate/zero images explicitly separated. One120CPU run after Git freeze/push.
+Open threads: inspect projection collision/coverage outcomes, then require paid construction/rank/cost before promoting any effect toward10x.
+Errors: none in compilation; conflict check allows, attach reports existing own reservation as before. No S3/cloud/merge.
