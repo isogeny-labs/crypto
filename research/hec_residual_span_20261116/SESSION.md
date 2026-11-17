@@ -157,3 +157,17 @@ Extract standard-input runtime and freeze equivalence/cold-comparison protocol. 
 
 ### Errors
 Release debug stripping warns missingLLVMlibrary; executable completed, warning retained, no timing claim. Disable strip explicitly on next build. No reruns or anchor-budget changes.
+
+## Pencil production extraction frozen
+
+### What was done
+Extracted classical pencil core with publicC,D,T,ell inputs only. Fresh action certificate/maps, incremental anchors, full point scan then increasingt buckets, exact residual reconstruction, prefix LA and final source verification. Driver requires exact first determining anchor/t/rowcount/scalar match with previously retained exhaustive gate for all18cases.
+
+### Decisions made
+Freeze/push before execution; no reference data enters runtime core. Diagnostic group/allparameter checks replaced by previously qualified equivalence plus exact residual and final checks; input contract explicit. No timing claim. Strip disabled in build.
+
+### Open threads
+Run extraction correctness, then freeze complete cold comparison against currentFolded/Expanded.
+
+### Errors
+No scientific runtime executed yet.
