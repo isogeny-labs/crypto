@@ -11,9 +11,11 @@ follow-ups here; history belongs in the session log, not in this file.
 
 ## Current goal
 
-_(none pinned — set one with `/goal <text>`)_
+Establish an exponent-reducing relation-collection method for ordinary prime-field elliptic curves, with complete charged costs, a frozen matched baseline, and independent scaling validation.
 
 ## Active items (top = next)
+
+- [ ] Pin prime-field relation-collection exponent goal and contract (Codex, started 2026-11-17, branch codex/aps-prime-field-exponent-goal-20261117; in progress)
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 
