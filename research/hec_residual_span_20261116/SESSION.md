@@ -1560,3 +1560,10 @@ What was done:ccc5d0e1fc6one invocation exits0;18panels72calls144modulusrecords 
 Decisions made: notdefaultbackend,no10xclaimfromlowerstorage. Biggercrossoverneedsnewcostcase. Auditedsourcegeometricrootsearchlinear; power-map/canonicalorbitreplacementnext,controlmustoptimizeequally.
 Open threads: qualifycanonicalgeometricrootreplacementandcompletecost,notanotherunpricedbackendcampaign; originalgenus2+goalopen.
 Errors: none,no scientificretry/S3/cloud.
+
+## Canonical geometric root optimization frozen
+
+What was done:compiled standardpower-map primitiveorder/canonicalmin helper;fullsetupcopyreusesalreadycomputedgeneratorpower. Preparedexhaustiveallprimes<=1000orders4/5/7/9,isolatedrootand8fullsetupold/newgates, exactFB/root/charcountrepeats. Source/native/import/binaryhashesfrozen.
+Decisions made: preservealloldhelpers,controlmustgetoptimizationtoo; noasymptoticdeterministictrialguaranteeor10x/DLPclaim. G4setuponly.
+Open threads: executeonce,evaluateisolatedversusfullsetupbeforepipelineintegration.
+Errors: none,nosciencebeforepushedfreeze; ownleaseT7083renewed.
