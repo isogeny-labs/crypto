@@ -44,6 +44,16 @@ pub use sparse_collection_rank::Options as SparseCollectionRankOptions;
 #[path = "jv_quadratic_pair_graph.rs"]
 pub mod quadratic_pair_graph;
 
+/// Checked principal sources with at most two irreducible quadratic classes.
+#[path = "jv_quadratic_pair_relation.rs"]
+pub mod quadratic_pair_relation;
+
+#[path = "jv_extension_quadratic_pair_dlp.rs"]
+mod extension_quadratic_pair_dlp;
+pub use extension_quadratic_pair_dlp::{
+    run_extension_quadratic_pair_dlp_on, QuadraticPairDlpOptions,
+};
+
 #[path = "jv_homogeneous_quotient.rs"]
 mod homogeneous_quotient;
 
@@ -171,6 +181,18 @@ impl TwoLargePrimeSieve {
             shared,
             (self.setup.m - 2) as u8,
         )
+    }
+
+    /// Degree-nine norms with at least five small roots, selected from the
+    /// existing complete counter table. All remaining factors need admission.
+    pub fn sieve_line_quadratic_pairs(
+        &self,
+        ring: &FpRing,
+        line: &Line,
+        ctr: &mut Counters,
+        shared: Option<&SharedB>,
+    ) -> (Vec<u64>, SieveCost) {
+        extension_quadratic_pair_dlp::sieve_line_quadratic_pairs(ring, self, line, ctr, shared)
     }
 
     fn split(&self, full: &SieveRel, id: u64, modulus: u64) -> Option<PartialRelation> {

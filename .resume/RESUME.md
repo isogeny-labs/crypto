@@ -88161,3 +88161,20 @@ Read author-linked 2005Feb15Gaudry–Thériault–Thomé preprint §§2.3/3.1/3.
 CIae2artifacts sizecheck nowPASS then35base-equal workflow-pull wiring errors; sibling CI_AFTER_RASTER.md preservesoldpinnedCI_BLOCKERS. Otherbase metrics/store/sharedparity/legacygateissuesremain, no all-green/merge bypass. Source core48publication and remote verification next. Goalactive; primary complete-count/freshgrowing/signed admission notmet. Finaltest/Clippy assets in local-final-build-assets; earlierintermediatehashes explicitlypre-final. No Python science.
 
 Published core48:5071f3a88de321db68eee687f586425753557ed0, remote feature+immutablemeasure/grounded-pair-graph48-core-source verifiedequal; PR4508regularopen/auto-mergeon, title/body final46/47+core48scope, connectorconfirmscore/controls/NEXT/PDF. CInewheadinprogress/BLOCKED, noallgreen. Nextcommand/work: readgrounded-pair-graph48/NEXT.md and implementboundedquarticsplitter/checkedtwo-remainderprincipalcertificate. No48measurement/allocation; goalactive.
+
+## Active continuation: two-quadratic graph IC48 source/protocol freeze
+
+2026-11-17: PR4508merged. New branch feat/extension-ic-quadratic-pair-collector,
+tracking-only331f11edef, PR4537(draft tracking; mark ready on source publication).
+New Rust pair principal/splitter, grounded collector and separate complete source/
+graph/enumeration/RNG/rank/affine qualifier implemented.17admission/36worker/
+143qualifier serialized controls, optimized native builds/Clippy and transport pass.
+PCC92f18d/fe6376UNVERIFIED. One inspected native source/report PDF and43074B150dpi
+preview. Main c5cbb67b19metadata reconciliation preserves every journal block and
+unchanged1361entry ledger; audit validation/pair48/shared-reconciliation.json.
+Next verify/freeze pair48-source/build/report manifests, publish immutable source
+and regular PR, then new three-arm Runpod trial from Amendment43/pair plan.
+No48pod/call yet; all owned runners through47deleted. Lifetime6000seconds,4CPU8GiB,
+≤0.40USDh, live detached guardian before sole dispatch. AllscienceRust, no local
+natural-yield/performance measurement. Old46/47/core48proof subjects unchanged.
+Goal ACTIVE; complete native/fresh/scaling/signed rho admission remains open.
