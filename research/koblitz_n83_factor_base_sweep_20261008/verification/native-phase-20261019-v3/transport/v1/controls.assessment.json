@@ -1,0 +1,60 @@
+{
+  "schema": "n83.director-assessment/v1",
+  "card_id": "CARD-n83-native-phase-20261019-controls",
+  "commit": "fc7d1a63f75add58b9eb619cad93c730d5b047c0",
+  "relay_verbatim": null,
+  "relay_status": "unverified_transport_limitation",
+  "relay_reason": "Exact executor returned JSON was not forwarded into assessor context. No relay text was reconstructed and native card-check was not run. Root reports holding actual full returned JSON; that is not this assessor mechanical verification.",
+  "outcome": "stopped",
+  "stopped_at_step": "n83-fixed-witness-control",
+  "card_invoked_as_specified_from_receipt": true,
+  "all_controls_completed": false,
+  "receipt_commands": [
+    {
+      "index": 1,
+      "id": "traced-small-field-positive-controls",
+      "exit_code": 0,
+      "timed_out": false,
+      "succeeded": true,
+      "seconds": 0.696222353
+    },
+    {
+      "index": 2,
+      "id": "check-positive-trace",
+      "exit_code": 0,
+      "timed_out": false,
+      "succeeded": true,
+      "seconds": 0.027217087
+    },
+    {
+      "index": 3,
+      "id": "n83-fixed-witness-control",
+      "exit_code": 1,
+      "timed_out": false,
+      "succeeded": false,
+      "seconds": 180.783776832
+    }
+  ],
+  "output_digests_checked": "All six command stdout/stderr hashes and four extant declared witness output hashes match receipt; declared audit.json absent as recorded null.",
+  "witness_outer": {
+    "cleanup_verified": true,
+    "exit_code": 137,
+    "outer_wall_ms": 180537.788512,
+    "schema": "n83.native-outer/v1",
+    "stderr_blake3": "1bb5af76a324fb271037086f7ba8d49be5f7fc9b20e785f3e0b8aa2a54c0cd0a",
+    "stdout_blake3": "af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262",
+    "wall_censored": true
+  },
+  "fixed_units_installed_elapsed_ms_L0": 113.114676,
+  "reasons": [
+    "Commands 1 and 2 succeeded in declared order; exact small-field test passed and trace checker reported PASS_TRACED_SMALL_FIELD_POSITIVE_BRANCHES.",
+    "Command 3 supervisor returned exit 1 after 180.783776832 seconds, without outer card timeout; inner worker was wall-censored and exited 137.",
+    "Witness stdout is empty; runner stderr records EOF while parsing a value. Declared audit.json was not created; cleanup_verified is true.",
+    "Receipt records one attempt per command and stopped at command 3. Failure evidence was preserved; no rerun or altered experiment was performed by assessor.",
+    "Current HEAD equals pinned fc7d1a63f75add58b9eb619cad93c730d5b047c0. git status --porcelain has no tracked changes; this alone cannot prove absence of arbitrary untracked writes.",
+    "Retained K2048 and K4096 cards remain unlaunched per coordinator; assessment confers no permission to dispatch them."
+  ],
+  "recommendation": "escalate",
+  "recommendation_scope": "Coordinator must retain failed control, resolve relay transport independently, and decide any separately preregistered action. No rerun is recommended to change this result.",
+  "interpretation": "not_assessed"
+}

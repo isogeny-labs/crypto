@@ -1,0 +1,424 @@
+{
+  "card_id": "CARD-BLINDSPOT-04-20",
+  "card_path": "research/blindspots_20261018/04-presentation-search/card-20.yaml",
+  "card_sha256": "f0cd278cd62db069bfd0863bb0ecad808e3f87f0e3ea79e9ed6712829e6ce89a",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-04/card-20"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-04/card-20/b04",
+        "examples/blindspots_04_presentation_search.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 7.947,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 7.947,
+      "stderr_sha256": "4dc0b77782bbda8e469851e351f2200cb2fb287e66c887fe3570f9a0c9e520c1",
+      "stderr_tail": [
+        "138 |     low: u64,",
+        "    |     ^^^",
+        "    |",
+        "    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default",
+        "",
+        "warning: fields `rss_kb` and `seed_rows` are never read",
+        "    --> examples/blindspots_04_presentation_search.rs:2656:5",
+        "     |",
+        "2647 | struct DegreeResult {",
+        "     |        ------------ fields in this struct",
+        "...",
+        "2656 |     rss_kb: u64,",
+        "     |     ^^^^^^",
+        "2657 |     seed_rows: usize,",
+        "     |     ^^^^^^^^^",
+        "     |",
+        "     = note: `DegreeResult` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis",
+        "",
+        "warning: 2 warnings emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-04/card-20/b04",
+        "plan",
+        "--n",
+        "17",
+        "--l",
+        "4",
+        "--m",
+        "3",
+        "--build"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.074,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "plan-cell1",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.074,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "15d722726007f5e755f6e8e98997434e13c26cad4c97006dd3a2280f3d8ab977",
+      "stdout_tail": [
+        "plan n=17 l=4 m=3",
+        "arm  a N= 12  d2: 79 cols 3.90e2 B  d3: 299 cols 5.59e3 B  d4: 794 cols 3.94e4 B  d5: 1586 cols 1.57e5 B  d6: 2510 cols 3.94e5 B",
+        "arm  c N= 12  d2: 79 cols 3.90e2 B  d3: 299 cols 5.59e3 B  d4: 794 cols 3.94e4 B  d5: 1586 cols 1.57e5 B  d6: 2510 cols 3.94e5 B",
+        "arm d0 N= 12  d2: 79 cols 3.90e2 B  d3: 299 cols 5.59e3 B  d4: 794 cols 3.94e4 B  d5: 1586 cols 1.57e5 B  d6: 2510 cols 3.94e5 B",
+        "arm  d N= 10  d2: 56 cols 1.96e2 B  d3: 176 cols 1.94e3 B  d4: 386 cols 9.31e3 B  d5: 638 cols 2.54e4 B  d6: 848 cols 4.49e4 B",
+        "arm  e N= 29  d2: 436 cols 1.19e4 B  d3: 4090 cols 1.05e6 B  d4: 27841 cols 4.84e7 B  d5: 146596 cols 1.34e9 B  d6: 621616 cols 2.42e10 B",
+        "arm  b N= 98  d2: 4852 cols 1.47e6 B  d3: 156948 cols 1.54e9 B  d4: 3769228 cols 8.88e11 B  d5: 71680092 cols 3.21e14 B  d6: 1124298484 cols 7.90e16 B",
+        "built arm e: N=29 eliminated 1 -> N=28 eqs 34 columns d3 3683 d4 24158 reduced-basis bound d3 8.48e5 B d4 3.65e7 B  (0.0s)",
+        "built arm b: N=98 eliminated 17 -> N=81 eqs 102 columns d3 88642 d4 1752382 reduced-basis bound d3 4.91e8 B d4 1.92e11 B  (0.0s)"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-04/card-20/b04",
+        "plan",
+        "--n",
+        "19",
+        "--l",
+        "4",
+        "--m",
+        "3",
+        "--build"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.504,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "plan-cell2",
+      "index": 4,
+      "outputs": {},
+      "seconds": 1.504,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "c207bfb059e53b325f291389732d4ac0a42a4accfd34b982b73ee61745b1e70c",
+      "stdout_tail": [
+        "plan n=19 l=4 m=3",
+        "arm  a N= 12  d2: 79 cols 3.90e2 B  d3: 299 cols 5.59e3 B  d4: 794 cols 3.94e4 B  d5: 1586 cols 1.57e5 B  d6: 2510 cols 3.94e5 B",
+        "arm  c N= 12  d2: 79 cols 3.90e2 B  d3: 299 cols 5.59e3 B  d4: 794 cols 3.94e4 B  d5: 1586 cols 1.57e5 B  d6: 2510 cols 3.94e5 B",
+        "arm d0 N= 12  d2: 79 cols 3.90e2 B  d3: 299 cols 5.59e3 B  d4: 794 cols 3.94e4 B  d5: 1586 cols 1.57e5 B  d6: 2510 cols 3.94e5 B",
+        "arm  d N= 10  d2: 56 cols 1.96e2 B  d3: 176 cols 1.94e3 B  d4: 386 cols 9.31e3 B  d5: 638 cols 2.54e4 B  d6: 848 cols 4.49e4 B",
+        "arm  e N= 31  d2: 497 cols 1.54e4 B  d3: 4992 cols 1.56e6 B  d4: 36457 cols 8.31e7 B  d5: 206368 cols 2.66e9 B  d6: 942649 cols 5.55e10 B",
+        "arm  b N=108  d2: 5887 cols 2.17e6 B  d3: 210043 cols 2.76e9 B  d4: 5569138 cols 1.94e12 B  d5: 117038314 cols 8.56e14 B  d6: 2030592502 cols 2.58e17 B",
+        "built arm e: N=31 eliminated 1 -> N=30 eqs 38 columns d3 4526 d4 31931 reduced-basis bound d3 1.28e6 B d4 6.37e7 B  (0.0s)",
+        "built arm b: N=108 eliminated 19 -> N=89 eqs 114 columns d3 117570 d4 2559196 reduced-basis bound d3 8.64e8 B d4 4.09e11 B  (0.0s)"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-04/card-20/b04",
+        "plan",
+        "--n",
+        "13",
+        "--l",
+        "3",
+        "--m",
+        "4",
+        "--build"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.058,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "plan-cell3",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.058,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "4897959a18d4fb5de7882e70b5c64c8d64bda2ae9a1b0b9f32f950441fdb9037",
+      "stdout_tail": [
+        "plan n=13 l=3 m=4",
+        "arm  a N= 12  d2: 79 cols 3.90e2 B  d3: 299 cols 5.59e3 B  d4: 794 cols 3.94e4 B  d5: 1586 cols 1.57e5 B  d6: 2510 cols 3.94e5 B",
+        "arm  c N= 12  d2: 79 cols 3.90e2 B  d3: 299 cols 5.59e3 B  d4: 794 cols 3.94e4 B  d5: 1586 cols 1.57e5 B  d6: 2510 cols 3.94e5 B",
+        "arm d0 N= 12  d2: 79 cols 3.90e2 B  d3: 299 cols 5.59e3 B  d4: 794 cols 3.94e4 B  d5: 1586 cols 1.57e5 B  d6: 2510 cols 3.94e5 B",
+        "arm  d N=  9  d2: 46 cols 1.32e2 B  d3: 130 cols 1.06e3 B  d4: 256 cols 4.10e3 B  d5: 382 cols 9.12e3 B  d6: 466 cols 1.36e4 B",
+        "arm  e N= 38  d2: 742 cols 3.44e4 B  d3: 9178 cols 5.26e6 B  d4: 82993 cols 4.30e8 B  d5: 584935 cols 2.14e10 B  d6: 3345616 cols 7.00e11 B",
+        "arm  b N=104  d2: 5461 cols 1.86e6 B  d3: 187565 cols 2.20e9 B  d4: 4785691 cols 1.43e12 B  d5: 96748211 cols 5.85e14 B  d6: 1614129791 cols 1.63e17 B",
+        "built arm e: N=38 eliminated 1 -> N=37 eqs 39 columns d3 8474 d4 74519 reduced-basis bound d3 4.49e6 B d4 3.47e8 B  (0.0s)",
+        "built arm b: N=104 eliminated 13 -> N=91 eqs 104 columns d3 125672 d4 2798342 reduced-basis bound d3 9.87e8 B d4 4.89e11 B  (0.0s)"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-04/card-20/b04",
+        "plan",
+        "--n",
+        "15",
+        "--l",
+        "3",
+        "--m",
+        "4",
+        "--build"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.052,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "plan-cell4",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.052,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "9bdd36ed260463cb800ec11c424470b8b550a14496dff94964f1839536a7b05c",
+      "stdout_tail": [
+        "plan n=15 l=3 m=4",
+        "arm  a N= 12  d2: 79 cols 3.90e2 B  d3: 299 cols 5.59e3 B  d4: 794 cols 3.94e4 B  d5: 1586 cols 1.57e5 B  d6: 2510 cols 3.94e5 B",
+        "arm  c N= 12  d2: 79 cols 3.90e2 B  d3: 299 cols 5.59e3 B  d4: 794 cols 3.94e4 B  d5: 1586 cols 1.57e5 B  d6: 2510 cols 3.94e5 B",
+        "arm d0 N= 12  d2: 79 cols 3.90e2 B  d3: 299 cols 5.59e3 B  d4: 794 cols 3.94e4 B  d5: 1586 cols 1.57e5 B  d6: 2510 cols 3.94e5 B",
+        "arm  d N=  9  d2: 46 cols 1.32e2 B  d3: 130 cols 1.06e3 B  d4: 256 cols 4.10e3 B  d5: 382 cols 9.12e3 B  d6: 466 cols 1.36e4 B",
+        "arm  e N= 42  d2: 904 cols 5.11e4 B  d3: 12384 cols 9.59e6 B  d4: 124314 cols 9.66e8 B  d5: 974982 cols 5.94e10 B  d6: 6220768 cols 2.42e12 B",
+        "arm  b N=118  d2: 7022 cols 3.08e6 B  d3: 273938 cols 4.69e9 B  d4: 7947773 cols 3.95e12 B  d5: 182911211 cols 2.09e15 B  d6: 3478055960 cols 7.56e17 B",
+        "built arm e: N=42 eliminated 1 -> N=41 eqs 45 columns d3 11522 d4 112792 reduced-basis bound d3 8.30e6 B d4 7.95e8 B  (0.0s)",
+        "built arm b: N=118 eliminated 15 -> N=103 eqs 120 columns d3 182208 d4 4603483 reduced-basis bound d3 2.07e9 B d4 1.32e12 B  (0.0s)"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-04/card-20/b04",
+        "plan",
+        "--n",
+        "17",
+        "--l",
+        "4",
+        "--m",
+        "4",
+        "--build"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.1,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "plan-cell5",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.1,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0773452e74a3a61ae41525a1d9e3bf81c470d005ced616b4fba24fb8ceaf15a9",
+      "stdout_tail": [
+        "plan n=17 l=4 m=4",
+        "arm  a N= 16  d2: 137 cols 1.17e3 B  d3: 697 cols 3.04e4 B  d4: 2517 cols 3.96e5 B  d5: 6885 cols 2.96e6 B  d6: 14893 cols 1.39e7 B",
+        "arm  c N= 16  d2: 137 cols 1.17e3 B  d3: 697 cols 3.04e4 B  d4: 2517 cols 3.96e5 B  d5: 6885 cols 2.96e6 B  d6: 14893 cols 1.39e7 B",
+        "arm d0 N= 16  d2: 137 cols 1.17e3 B  d3: 697 cols 3.04e4 B  d4: 2517 cols 3.96e5 B  d5: 6885 cols 2.96e6 B  d6: 14893 cols 1.39e7 B",
+        "arm  d N= 13  d2: 92 cols 5.29e2 B  d3: 378 cols 8.93e3 B  d4: 1093 cols 7.47e4 B  d5: 2380 cols 3.54e5 B  d6: 4096 cols 1.05e6 B",
+        "arm  e N= 50  d2: 1276 cols 1.02e5 B  d3: 20876 cols 2.72e7 B  d4: 251176 cols 3.94e9 B  d5: 2369936 cols 3.51e11 B  d6: 18260636 cols 2.08e13 B",
+        "arm  b N=136  d2: 9317 cols 5.43e6 B  d3: 419357 cols 1.10e10 B  d4: 14053187 cols 1.23e13 B  d5: 373986299 cols 8.74e15 B  d6: 8232525911 cols 4.24e18 B",
+        "built arm e: N=50 eliminated 1 -> N=49 eqs 51 columns d3 19650 d4 231526 reduced-basis bound d3 2.41e7 B d4 3.35e9 B  (0.0s)",
+        "built arm b: N=136 eliminated 17 -> N=119 eqs 136 columns d3 280960 d4 8221711 reduced-basis bound d3 4.93e9 B d4 4.22e12 B  (0.0s)"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-04/card-20/b04",
+        "summarize",
+        "research/blindspots_20261018/04-presentation-search/raw",
+        "--tsv",
+        "research/blindspots_20261018/04-presentation-search/raw/summary.tsv"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "summarize",
+      "index": 8,
+      "outputs": {
+        "research/blindspots_20261018/04-presentation-search/raw/summary.tsv": "b2b9573f0a2f7e56389625fc834699f754d4e2cc56f782b761c04d1e0b1b6c52"
+      },
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "041f1384d034ffed4bb615ae71a5c8630703df0e51bd352a868a2de7e4da1762",
+      "stdout_tail": [
+        "  planted           e: complete+sound+planted-in 2/2  measured 2  D: 4 4",
+        "cell n=17 l=4 m=4",
+        "  arm           a draw 0 D: >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached]",
+        "  arm          d0 draw 0 D: 10 10 10 10 10 10 10 10",
+        "  arm           d draw 0 D: 10 10 10 10 10 10 10 10",
+        "  arm           c draw 0 D: >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached]",
+        "  planted           a: complete+sound+planted-in 4/4  measured 0  D: .[not-reached] .[not-reached] .[not-reached] .[not-reached]",
+        "  planted          d0: complete+sound+planted-in 4/4  measured 4  D: 10 10 10 10",
+        "  planted           d: complete+sound+planted-in 4/4  measured 4  D: 10 10 10 10",
+        "  planted           c: complete+sound+planted-in 4/4  measured 0  D: .[not-reached] .[not-reached] .[not-reached] .[not-reached]",
+        "",
+        "# frozen rule: an arm LOWERS D on a cell if all 8 random targets of the arm are measured exactly and of the incumbent measured (exactly, or by the certified lower bound D >= last saturated degree + 1), median(arm) <= median(a) - 1 and max(arm) <= max(a) - 1, and every random and planted run of the arm on the cell is complete, sound and contains its planted decomposition",
+        "A/A control (a on draw 1 against a on draw 0): lowers on 0 of 3 measured cells",
+        "arm  b (candidate): lowers D on 0 of 5 cells, raises on 0, unmeasured cells 5, gated cells 0; also lowers D below arm e on 0 cells; reading MIXED-OR-SAME",
+        "arm  c (candidate): lowers D on 0 of 5 cells, raises on 0, unmeasured cells 1, gated cells 4; also lowers D below arm e on 0 cells; reading MIXED-OR-SAME",
+        "arm  d (candidate): lowers D on 5 of 5 cells, raises on 0, unmeasured cells 0, gated cells 5; also lowers D below arm e on 0 cells; reading LOWER",
+        "arm d0 (diagnostic): lowers D on 5 of 5 cells, raises on 0, unmeasured cells 0, gated cells 5; also lowers D below arm e on 0 cells; reading LOWER",
+        "arm  e (reference): lowers D on 3 of 5 cells, raises on 0, unmeasured cells 2, gated cells 3; also lowers D below arm e on 0 cells; reading MIXED-OR-SAME",
+        "VERDICT BY THE FROZEN RULE: INCONCLUSIVE (the A/A control does not satisfy: at least 4 measured cells and at most 1 passing)",
+        "wrote research/blindspots_20261018/04-presentation-search/raw/summary.tsv"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-04/card-20/b04"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 9,
+  "commit": "cf0c75cf755d1eb55335619b42248d25a3af7f8e",
+  "dirty_after": [
+    "research/blindspots_20261018/04-presentation-search/raw/card-20-build.stderr.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-20-build.stdout.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-20-plan-cell1.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-20-plan-cell1.txt",
+    "research/blindspots_20261018/04-presentation-search/raw/card-20-plan-cell2.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-20-plan-cell2.txt",
+    "research/blindspots_20261018/04-presentation-search/raw/card-20-plan-cell3.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-20-plan-cell3.txt",
+    "research/blindspots_20261018/04-presentation-search/raw/card-20-plan-cell4.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-20-plan-cell4.txt",
+    "research/blindspots_20261018/04-presentation-search/raw/card-20-plan-cell5.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-20-plan-cell5.txt",
+    "research/blindspots_20261018/04-presentation-search/raw/card-20-summarize.log",
+    "research/blindspots_20261018/04-presentation-search/raw/summary.tsv",
+    "research/blindspots_20261018/04-presentation-search/raw/summary.txt",
+    "xamples/blindspots_10_kernel_search.rs"
+  ],
+  "dirty_before": [
+    "xamples/blindspots_10_kernel_search.rs"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

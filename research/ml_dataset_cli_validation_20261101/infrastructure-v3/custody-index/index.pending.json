@@ -1,0 +1,105 @@
+{
+  "schema": "crypto.ml-dataset.custody-index/v1",
+  "status": "draft-awaiting-full-raw-readback",
+  "original_fixture": "/var/tmp/ml-dataset-cli46-032469-v3-20261101",
+  "derived_export_sha256": "4aee068ce1aa909ef96ca851cf2d8ba7e7ff90bd5a2c1115cd10c5e3d70d2822",
+  "source_commit": "0324692bc77758a5b69b4b972504b8cf2e00e957",
+  "protocol_commit": "143a6d02c9dd421fa64ed28047a8db46b358c091",
+  "evidence_commit": "c192f305d56940d277a2176a970ae993724cca7e",
+  "software_cases": 46,
+  "phase_observations": 92,
+  "original_execution": "FAIL/no_retry; derived export separately validated",
+  "entries": [
+    {
+      "role": "retained_binary",
+      "receipt": {
+        "schema": "crypto.ml-dataset.evidence-archive-readback/v1",
+        "uri": "s3://setec-astronomy-artifacts/ml-dataset/20261101/checkpoints/prime-cli-build-032469/d400a71c127c2db1e583d6f0683c0170c84056471fcbf2944ba4f78fbf49c645/checkpoint.tar.gz",
+        "sha256": "d400a71c127c2db1e583d6f0683c0170c84056471fcbf2944ba4f78fbf49c645",
+        "bytes": 16811388,
+        "verified_at": "2026-11-01T06:01:30Z",
+        "conditional_put": true,
+        "etag_bound_fresh_get": true,
+        "head_and_get_length_checked": true,
+        "archive_bytes_equal": true,
+        "archive_hash_checked": true,
+        "contained_hashes_checked": true,
+        "scientific_dataset_generated": false,
+        "new_cloud_job": false
+      },
+      "archive_payload_restore_mapping": {
+        "cli-build-032469-v2": "/home/ec2-user/ml-dataset-resume-20261029/cli-build-032469-v2"
+      }
+    },
+    {
+      "role": "source_library_validation",
+      "receipt": {
+        "schema": "crypto.ml-dataset.evidence-archive-readback/v1",
+        "uri": "s3://setec-astronomy-artifacts/ml-dataset/20261101/validation/prime-full-library-032469/0708a76179e25eba02b22c69d800605b20db3485e674a3635e825803c441e836/checkpoint.tar.gz",
+        "sha256": "0708a76179e25eba02b22c69d800605b20db3485e674a3635e825803c441e836",
+        "bytes": 174108,
+        "verified_at": "2026-11-01T05:51:17Z",
+        "conditional_put": true,
+        "etag_bound_fresh_get": true,
+        "head_and_get_length_checked": true,
+        "archive_bytes_equal": true,
+        "archive_hash_checked": true,
+        "contained_hashes_checked": true,
+        "scientific_dataset_generated": false,
+        "new_cloud_job": false
+      },
+      "archive_payload_restore_mapping": {}
+    },
+    {
+      "role": "frozen_protocol",
+      "receipt": {
+        "schema": "crypto.ml-dataset.evidence-archive-readback/v1",
+        "uri": "s3://setec-astronomy-artifacts/ml-dataset/20261101/checkpoints/cli46-v3-frozen/f237b51a347d48c5319c05175b19d1971dd12d7cfff19b225e41a67d56b20c35/checkpoint.tar.gz",
+        "sha256": "f237b51a347d48c5319c05175b19d1971dd12d7cfff19b225e41a67d56b20c35",
+        "bytes": 71535,
+        "verified_at": "2026-11-01T06:25:33Z",
+        "conditional_put": true,
+        "etag_bound_fresh_get": true,
+        "head_and_get_length_checked": true,
+        "archive_bytes_equal": true,
+        "archive_hash_checked": true,
+        "contained_hashes_checked": true,
+        "scientific_dataset_generated": false,
+        "new_cloud_job": false
+      },
+      "archive_payload_restore_mapping": {}
+    },
+    {
+      "role": "derived_export_and_report",
+      "receipt": {
+        "schema": "crypto.ml-dataset.evidence-archive-readback/v1",
+        "uri": "s3://setec-astronomy-artifacts/ml-dataset/20261101/checkpoints/cli46-v3-derived/87f55ba4c05f018db74894ec8e2e8a07f29d148b3b950ca0d139061c7404f2fe/checkpoint.tar.gz",
+        "sha256": "87f55ba4c05f018db74894ec8e2e8a07f29d148b3b950ca0d139061c7404f2fe",
+        "bytes": 258599,
+        "verified_at": "2026-11-01T06:36:56Z",
+        "conditional_put": true,
+        "etag_bound_fresh_get": true,
+        "head_and_get_length_checked": true,
+        "archive_bytes_equal": true,
+        "archive_hash_checked": true,
+        "contained_hashes_checked": true,
+        "scientific_dataset_generated": false,
+        "new_cloud_job": false
+      },
+      "archive_payload_restore_mapping": {
+        "derived-export": "/home/ec2-user/ml-dataset-resume-20261029/cli46-v3-derived-export",
+        "report": "/home/ec2-user/ml-dataset-resume-20261029/cli46-v3-terminal-report"
+      }
+    }
+  ],
+  "raw_fixture_pending_packet": "/home/ec2-user/ml-dataset-resume-20261029/nov1-cli46-v3-terminal-checkpoint",
+  "raw_fixture_restore_mapping": {
+    "fixture": "/var/tmp/ml-dataset-cli46-032469-v3-20261101"
+  },
+  "restore_requirements": [
+    "Reconcile existing destination and process ownership first; do not overwrite a populated fixture.",
+    "Verify archive SHA256 and every SHA256SUMS entry before using restored data.",
+    "Preserve original evidence bytes and paths; derived export absolute references point into the original fixture and derived package.",
+    "Restoring custody does not authorize rerunning a terminal attempt or extending budget."
+  ]
+}

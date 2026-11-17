@@ -1,0 +1,22 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T06:58:38Z",
+ "id": "PCC-20261116-0db11a",
+ "kind": "theorem",
+ "producer": {
+  "commit": "e398666199bdf5f1987ee7f5b7f796cb85a29092",
+  "model": "",
+  "session": "prime-field-transfer-goal-round-04"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "35334a6c25e27fcd0ef10f424170be456e2c192ca1841dd70c3ff581685b941e",
+   "kind": "lean",
+   "project": "research/prime_field_transfer_goal_20261116/lean",
+   "theorem": "WeberResiduesV2.auxiliary_irreducible"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Literal Weber polynomial/quotient/residue endpoint only; CM, oriented specialization, LLL, Smart and full scalar transfer remain outside formalization.",
+ "statement": "theorem auxiliary_irreducible : Irreducible (X ^ 3 + 3 * X + 5 : Polynomial (ZMod 7))"
+}

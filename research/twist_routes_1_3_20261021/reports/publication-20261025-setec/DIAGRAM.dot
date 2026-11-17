@@ -1,0 +1,11 @@
+digraph publication {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.18", ranksep="0.25", fontname="Helvetica", label="Corrected publication, 2026-10-25\nOne fixed archive; transport and replay only", labelloc=t, fontsize=15];
+  node [shape=box, style="rounded,filled", fillcolor="#edf4f8", color="#346a89", fontname="Helvetica", fontsize=12, margin="0.13,0.09"];
+  edge [color="#346a89", arrowsize=0.7];
+  archive [label="Prepared archive\n38,156,064 bytes; original SHA-256"];
+  upload [label="setec-astronomy-artifacts\nConditional create + S3 checksum: verified"];
+  download [label="Native index + fresh remote download\nArchive bytes and SHA-256: verified"];
+  members [label="35,979 archived + 104 loose files\nAll 36,083 original file hashes: verified"];
+  replay [label="Unchanged downloaded E30 CAS input\n270 checks + native Rust gate: accepted"];
+  archive -> upload -> download -> members -> replay;
+}

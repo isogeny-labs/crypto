@@ -1,0 +1,49 @@
+{
+  "schema": "pencil-protocol-amendment-validation/v1",
+  "canonical_validation": {
+    "exit_code": 0,
+    "stdout": "OK: experiment.protocol/v1 research/pencil_large_prime_20261029/protocol_draft/accounting_amendment_20261029/protocol.json (0 finding(s))\n",
+    "checker_path": "/home/ec2-user/crypto-autoresearcher-fall-degree-submission-20261029/tools/experiment_protocol.py",
+    "checker_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+    "schema_path": "/home/ec2-user/crypto-autoresearcher-fall-degree-submission-20261029/schemas/experiment-protocol.v1.json",
+    "schema_sha256": "a9b948f2be323f862b98301eb7a5aa147ecc29db35041737f0aa3dfd03ad2443",
+    "command": [
+      "uv",
+      "run",
+      "--no-project",
+      "--with",
+      "jsonschema>=4",
+      "python",
+      "/home/ec2-user/crypto-autoresearcher-fall-degree-submission-20261029/tools/experiment_protocol.py",
+      "validate",
+      "research/pencil_large_prime_20261029/protocol_draft/accounting_amendment_20261029/protocol.json"
+    ]
+  },
+  "protocol_sha256_integrity_only": "c2effaf1e39fcbdcb37439706dba129b049ca2aaa41b81a284b86a6de8190ecf",
+  "preservation_checks": {
+    "sample_size": true,
+    "randomization": true,
+    "controls": true,
+    "execution": true,
+    "stopping_rules": true,
+    "invalidation_rules": true,
+    "prepared_manifest_unchanged": true,
+    "freeze_remains_draft": true,
+    "all_instrument_hashes_pending": true,
+    "no_qualified_results": true
+  },
+  "expected_pending_bindings": {
+    "binary_sha256": null,
+    "image_digest": null,
+    "immutable_build_receipt_sha256": null,
+    "new_binary_plan_parity_receipt": null,
+    "independent_coverage_review": null,
+    "cumulative_authorized_budget": null,
+    "original_absolute_deadline": null,
+    "cap_provenance": "Current unfrozen prepared specs25m retained unchanged; older Markowitz p739 gate10m differs. Root archaeology found T789 preserves historical caps and no explicit signed-symbolic25m smallgate authorization. This conflicts with old10m smallgate and requires explicit resolution before freeze; prepared specs are not authorization.",
+    "launch_authorization": null,
+    "execution_time_envelope": "Original smallgate3600s was one external gate-command boundary; existing draft3600s per expanded arm/execution is materially different. Existing draft value retained for review only, not inferred authorization. Root must bind the approved whole-gate/cohort envelope before freeze."
+  },
+  "initial_schema_or_semantic_defect": "Derived finite_algorithm_gae metric initially lacked formula; corrected before final validation. Raw first finding retained.",
+  "freeze_or_authorization_performed": false
+}

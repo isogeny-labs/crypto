@@ -1,0 +1,3 @@
+# Cost clarification for the preserved derivation
+
+The phrase "without ... an O(r) inverse table" in DERIVATION.md describes removal of the preceding aggregate module's full inverse table, but is too broad as asymptotic language for the full-root path. The precise statement is: a prefix through order d allocates d+1 inverse coefficients; full root initialization requests d=m, where m is approximately r/4, so that inverse array and the full root state are still Theta(r) in that path. Only a bounded-order prefix avoids storage proportional to r. The code and recorded tests are unchanged. The original derivation is retained at its attested hash; this clarification governs cost interpretation.

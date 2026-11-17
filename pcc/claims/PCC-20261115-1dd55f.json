@@ -1,0 +1,64 @@
+{
+ "created_at": "2026-11-15T21:21:33Z",
+ "id": "PCC-20261115-1dd55f",
+ "kind": "statement",
+ "producer": {
+  "commit": "f7fc9d687d490c174608d8bf8d54b54439167cc4",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_fast_20261115/README.md",
+    "sha256": "602fc462f0319e0e16378c61ec29ab211c69997a0a5210ec6d3d93c3138f44a4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_fast_20261115/report.pdf",
+    "sha256": "ec3154cf849c33e108fad6f72e9f725f16447d0a8bb8ed8c076aceaf277fbfa8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_fast_20261115/export.json",
+    "sha256": "fa0e4d656be5551646c0a4b7dbd7a6db764ee531bd77d5c9a4c28afc024c8d3e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_fast_20261115/grid-audit.json",
+    "sha256": "3d77abe0b53fdbdf9593af5e68785ed2e45922537b9446669733298c284b50a6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_fast_20261115/independent-audit.json",
+    "sha256": "d2e5fc5ad5063a73857c643a5f623b0f0d37e232c168a7dd29e034397347cc81"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_fast_20261115/checks/final-delivery.json",
+    "sha256": "773b47085625d64cb65b9c15b06aa44f99650d1e9fedff621e45d625432a8e47"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_fast_20261115/checks/final-root-check.txt",
+    "sha256": "75481ad874598bb92b8d920b37c9b8b8016959a6f9a94cf5e2906195ee0ee9be"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Finite fixed-input implementation comparison and producer cross-arithmetic checks only; unsigned evidence, no native-time/cycles/external-best/population/scaling claim.",
+ "statement": "The optimized trace-zero backend retains exact65-case old/new outcomes and witness order;29 focused checks and the final production library check pass. Separate schoolbook arithmetic checks all65 truths,416 previous and60 new saved relations, and rejects tampered-point/false-refutation fixtures. A frozen90-row cold-process comparison records25.03%/54.46% fewer simulated instructions on n131 planted/uniform and35.15%/53.80% on n83; two cancellation cells remain inconclusive. Canonical export and511-member deterministic archive checks pass; both2-page PDFs were inspected."
+}

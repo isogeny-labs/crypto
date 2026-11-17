@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "kind": "aes-square-captured-acceptance",
+  "checked_at_utc": "2026-10-23T18:39:14.665445+00:00",
+  "source_parent_commit": "78cc0c8242530d3b07aad0f9928dd3b08dc3e272",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/aes-square-20261023T183914Z-580bcc72",
+  "generated_command": "crypto cryptanalysis aes-attack --technique square --square-sets 3 --export-pairs-file FILE --export-verification-file FILE",
+  "objects": {
+    "training": {
+      "name": "evidence/aes-square/aes-square-20261023T183914Z-580bcc72/training.json",
+      "key": "ic/v1/acceptance/aes-square-20261023T183914Z-580bcc72/sha256/26/26a7923dc44f8f0140b05ddf1fa0a99fa51e68d0ff25f4bb67c845c7a001e7a1",
+      "sha256": "26a7923dc44f8f0140b05ddf1fa0a99fa51e68d0ff25f4bb67c845c7a001e7a1",
+      "bytes": 94605,
+      "head_size_matches": true
+    },
+    "heldout": {
+      "name": "evidence/aes-square/aes-square-20261023T183914Z-580bcc72/heldout.json",
+      "key": "ic/v1/acceptance/aes-square-20261023T183914Z-580bcc72/sha256/a8/a8c113c38fa0419190eb0cc4c2532109638bdc6fb37c7ba7c039005bab9981a5",
+      "sha256": "a8c113c38fa0419190eb0cc4c2532109638bdc6fb37c7ba7c039005bab9981a5",
+      "bytes": 31629,
+      "head_size_matches": true
+    }
+  },
+  "checks": {
+    "fresh_cache_name_and_digest_import": {
+      "status": "verified",
+      "candidate_key_hex": "914f6da1c78305bb2957ee104d826cfa",
+      "lambda_sets": 3,
+      "training_matches": 768,
+      "verification_matches": 256
+    },
+    "without_heldout_status": "candidate",
+    "negative_cases": {
+      "wrong_round": {
+        "rejected": true,
+        "error": "error: AES corpus schema, model, technique, or round count differs"
+      },
+      "missing_pair": {
+        "rejected": true,
+        "error": "error: Square recovery needs 1..=6 complete lambda sets and <=100000 verification pairs"
+      },
+      "duplicate_plaintext": {
+        "rejected": true,
+        "error": "error: Square training plaintexts must be distinct"
+      },
+      "tampered_ciphertext": {
+        "rejected": true,
+        "error": "error: Square corpus has no last-round key candidate at byte 0"
+      },
+      "reused_training_as_verification": {
+        "rejected": true,
+        "error": "error: verification plaintexts must be distinct from training and each other"
+      }
+    },
+    "final_release_corpus_format": "aes-square-corpus/v1",
+    "same_export_path_rejected_before_create": true
+  },
+  "cleanup": {
+    "training": {
+      "delete_exit": 0,
+      "head_after_delete_404": true
+    },
+    "heldout": {
+      "delete_exit": 0,
+      "head_after_delete_404": true
+    }
+  },
+  "source_sha256": {
+    "src/main.rs": "a6f5048881a717f3de1a311e9eca0a9409a5367ebc289c11522809bcfe642e17",
+    "src/cli_aes_observed.rs": "f56e03fbd2764645cd30585740185be236967631d205258ec27005d189b54dff",
+    "src/cryptanalysis/aes/square.rs": "005e5eee42eb54b5df4445a8666f5bf8e0a58cb50f7dd896ad52586b05913c49"
+  },
+  "validation": {
+    "release_crypto_binary_tests": "24 passed, 0 failed",
+    "focused_aes_observed_tests": "7 passed, 0 failed",
+    "release_crypto_build": "passed",
+    "rustfmt_touched_files": "passed",
+    "git_diff_check": "passed",
+    "json_parse_check": "passed",
+    "release_library_tests": "4489 passed, 0 failed, 119 ignored"
+  }
+}

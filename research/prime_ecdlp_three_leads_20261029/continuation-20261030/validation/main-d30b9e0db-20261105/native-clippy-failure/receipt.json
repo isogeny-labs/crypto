@@ -1,0 +1,90 @@
+{
+  "schema": "pkm.integrated-clippy-failure/v1",
+  "recorded_utc": "2026-11-05T09:28:51.047208+00:00",
+  "tested_source_merge": "bbf241b7e501be105c1878a4e05fc9fc89c3c877",
+  "example_phase_receipt": "../examples-pass-20261105T0908Z/receipt.json",
+  "example_tests_passed": 26,
+  "clippy_exit": 101,
+  "supervisor_exit": 101,
+  "finished": "2026-11-05T09:10:42Z",
+  "errors": [
+    "unused solve_one_with_trace at research/pencil_large_prime_20261029/src/native_solver.rs:1351",
+    "bool_comparison at src/ml_dataset/custody.rs:713"
+  ],
+  "inherited_main": "d30b9e0db7ec00c55330effef5f64532f97cd160",
+  "unchanged_main_compile_input_objects": {
+    "src": "b044c4974fe2dbbf2a4da2280de1b9e96b063bb0",
+    "crates": "cb0a697e787d418fbeb448a606102b46630528b4",
+    "Cargo.toml": "4863d96e15c3fe919e4b744f2a246d55fc1b8104",
+    "Cargo.lock": "426a5848aa26aecc9325b763b496c4761f413455",
+    "isogeny_algos": "8b57bb4a80eac0e2ec1f254fbf82a01aeb2a4baa",
+    "research/pencil_large_prime_20261029": "adfb8daf1615549a49ecbd00e3d90a3989c41438",
+    "tools/factor-base": "7ddafa821c968783132462b62f2e051c508e7172",
+    "tools/volcano-cli": "52b1c64049002561f3ff55b149c300cdb4656f34"
+  },
+  "not_reached_phases": [
+    "rustfmt",
+    "cli-build",
+    "cli-gate",
+    "backlog-build",
+    "backlog-validate",
+    "library-build",
+    "library-test"
+  ],
+  "library_test_attempted": false,
+  "new_library_declared_count": null,
+  "no_full_suite_pass": true,
+  "no_lint_exception_or_waiver": true,
+  "captures": {
+    "clippy.log": {
+      "raw_bytes": 1243,
+      "raw_sha256": "63b36a8aeae46f701a2f3dbf1582d8bb42478d21452b574ce6b7d49250f6adf6",
+      "stored_bytes": 1243,
+      "stored_sha256": "63b36a8aeae46f701a2f3dbf1582d8bb42478d21452b574ce6b7d49250f6adf6",
+      "raw_is_exact_prefix": true
+    },
+    "clippy.started": {
+      "raw_bytes": 21,
+      "raw_sha256": "80945cc2b42092b377ecdba4856bede5826304c9b8f5ede4a47b45b961d72253",
+      "stored_bytes": 21,
+      "stored_sha256": "80945cc2b42092b377ecdba4856bede5826304c9b8f5ede4a47b45b961d72253",
+      "raw_is_exact_prefix": true
+    },
+    "clippy.exit": {
+      "raw_bytes": 4,
+      "raw_sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "stored_bytes": 4,
+      "stored_sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "raw_is_exact_prefix": true
+    },
+    "clippy.finished": {
+      "raw_bytes": 21,
+      "raw_sha256": "9eec5f2001505d2fb4720ed19aa9e18b713e5457f6049d206345e085c5145eeb",
+      "stored_bytes": 21,
+      "stored_sha256": "9eec5f2001505d2fb4720ed19aa9e18b713e5457f6049d206345e085c5145eeb",
+      "raw_is_exact_prefix": true
+    },
+    "supervisor.log": {
+      "raw_bytes": 37,
+      "raw_sha256": "26cb7316f38cfc959679309655608c1f926f56b7761dfc66c26aafe3ffc4873b",
+      "stored_bytes": 37,
+      "stored_sha256": "26cb7316f38cfc959679309655608c1f926f56b7761dfc66c26aafe3ffc4873b",
+      "raw_is_exact_prefix": true
+    },
+    "supervisor.exit": {
+      "raw_bytes": 4,
+      "raw_sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "stored_bytes": 4,
+      "stored_sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "raw_is_exact_prefix": true
+    },
+    "supervisor.finished": {
+      "raw_bytes": 21,
+      "raw_sha256": "9eec5f2001505d2fb4720ed19aa9e18b713e5457f6049d206345e085c5145eeb",
+      "stored_bytes": 21,
+      "stored_sha256": "9eec5f2001505d2fb4720ed19aa9e18b713e5457f6049d206345e085c5145eeb",
+      "raw_is_exact_prefix": true
+    }
+  },
+  "pcc_standing": "unverified producer observation"
+}

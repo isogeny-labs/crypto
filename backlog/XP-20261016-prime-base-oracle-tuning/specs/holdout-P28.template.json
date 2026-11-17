@@ -1,0 +1,101 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "XP-20261016-prime-base-oracle-tuning Stage H (holdout), 28-bit fresh prime-order curve",
+  "description": "Holdout panel of the frozen PROTOCOL.md (section 4.4): the frontier incumbent, the train-selected base size and exact oracle, the size-only change, a strided-base control at the selected size, matched rho and A/A arms, on a fresh curve and fresh public targets. Public synthetic curve and targets; no security claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 20261018202
+      }
+    ],
+    "targets_per_curve": 48,
+    "target_seed": 20261018211,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "inc",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=407",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "26479085"
+        }
+      }
+    },
+    {
+      "name": "sel",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "@SEL_FB@",
+          "oracle": "@SEL_ORACLE@",
+          "max_trials": "26479085"
+        }
+      }
+    },
+    {
+      "name": "size",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "@SIZE_FB@",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "26479085"
+        }
+      }
+    },
+    {
+      "name": "stride",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "@STRIDE_FB@",
+          "oracle": "@SEL_ORACLE@",
+          "max_trials": "26479085"
+        }
+      }
+    },
+    {
+      "name": "inc-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=407",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "26479085"
+        }
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261018221,
+    "isolation_required": "L0",
+    "timeout_seconds": 1800
+  }
+}

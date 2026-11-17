@@ -1,0 +1,5 @@
+make: Entering directory '/workspace/crypto-native-smallroot/experiments/joint-smallroot-native'
+g++ -Isrc -I/workspace/skeleton_sage-runtime/include -std=c++17 -O2 -g -Wall -Wextra -Wpedantic -Werror src/main.cpp -L/workspace/skeleton_sage-runtime/lib -Wl,-rpath,/workspace/skeleton_sage-runtime/lib -lgmpxx -lgmp -lcrypto -pthread -o /workspace/native-smallroot-build/native-smallroot
+g++ -Isrc -I/workspace/skeleton_sage-runtime/include -std=c++17 -O2 -g -Wall -Wextra -Wpedantic -Werror tests/structural.cpp -L/workspace/skeleton_sage-runtime/lib -Wl,-rpath,/workspace/skeleton_sage-runtime/lib -lgmpxx -lgmp -lcrypto -pthread -o /workspace/native-smallroot-build/structural
+g++ -Isrc -I/workspace/skeleton_sage-runtime/include -std=c++17 -O2 -g -Wall -Wextra -Wpedantic -Werror src/cdd_helper.cpp -L/workspace/skeleton_sage-runtime/lib -Wl,-rpath,/workspace/skeleton_sage-runtime/lib -lcddgmp -lgmpxx -lgmp -o /workspace/native-smallroot-build/cdd-helper
+make: Leaving directory '/workspace/crypto-native-smallroot/experiments/joint-smallroot-native'

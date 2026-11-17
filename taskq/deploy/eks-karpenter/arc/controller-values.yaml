@@ -1,0 +1,12 @@
+replicaCount: 1
+nodeSelector:
+  isolab.dev/role: system
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    memory: 512Mi
+flags:
+  logLevel: info
+  logFormat: json

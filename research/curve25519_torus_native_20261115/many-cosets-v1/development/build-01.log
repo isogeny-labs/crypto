@@ -1,0 +1,5 @@
+mul_div_cancel_left₀.{u_1} {M₀ : Type u_1} [CommMonoidWithZero M₀] [Div M₀] [MulDivCancelClass M₀] (b : M₀) {a : M₀}
+  (ha : a ≠ 0) : a * b / a = b
+mul_div_cancel₀.{u_3} {G₀ : Type u_3} [CommGroupWithZero G₀] {b : G₀} (a : G₀) (hb : b ≠ 0) : b * (a / b) = a
+div_eq_one_iff_eq.{u_3} {G₀ : Type u_3} [GroupWithZero G₀] {a b : G₀} (hb : b ≠ 0) : a / b = 1 ↔ a = b
+Odd.neg_pow.{u_2} {α : Type u_2} [Monoid α] [HasDistribNeg α] {n : ℕ} : Odd n → ∀ (a : α), (-a) ^ n = -a ^ n

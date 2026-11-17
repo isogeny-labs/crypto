@@ -1,0 +1,120 @@
+{
+  "schema": "crypto.rust-lint-historical-source-repair/v1",
+  "status": "pass_for_scoped_software_maintenance",
+  "pre_repair_head": "eaedaf1c132ed1f1ff101edd10c75369ab5e2dfe",
+  "current_source_changes": [
+    "pinned formatter on bounded export example",
+    "boxed oracle affine y ownership plus software clone/roundtrip test"
+  ],
+  "library_source_changes": false,
+  "clippy": {
+    "command": "RUSTUP_TOOLCHAIN=1.98 bash scripts/clippy-maintained.sh",
+    "toolchain": "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "exit": 0,
+    "lint_exemptions_added": false,
+    "scope": "Exact maintained-target CI lint command. Traits data changed during this code-lint run; fresh-data correctness is separately validated below."
+  },
+  "format": {
+    "toolchain": "Rust 1.98.1 / rustfmt 1.9.0-stable",
+    "checked_campaign_paths": 6,
+    "changed_paths": 2,
+    "exit": 0
+  },
+  "provenance_tests": {
+    "passed": 9,
+    "failed": 0,
+    "exit": 0,
+    "historical_source_depends_on_current_live_example": false,
+    "negative_controls": [
+      "snapshot bytes changed",
+      "predecessor binding bytes changed",
+      "manifest bytes changed",
+      "redirect to live source path",
+      "wrong source commit",
+      "wrong source blob",
+      "wrong predecessor digest",
+      "wrong manifest digest",
+      "historical raw source path replaced with physical snapshot path"
+    ]
+  },
+  "release_traits_module": {
+    "command": "cargo +stable test --release --locked --lib curve_traits",
+    "toolchain": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "passed": 36,
+    "failed": 0,
+    "ignored": 0,
+    "filtered_out": 4463,
+    "exit": 0,
+    "traits_sha256": "6b3d5bc69a6d4f321455762bce671ee1f5d949582f38ac325c3a88a193f78922",
+    "stdout_archive": "logs/rust-repair-curve-traits-tests.log.gz",
+    "stdout_uncompressed_sha256": "01ebfda04a17009d9f8362ec30431e66b6df8f7056b2ace2323953b6d9fcebf7"
+  },
+  "release_examples": {
+    "command": "cargo +stable test --release --locked --example ideas_bounded_memory_export --example ideas_oracle_components --example ideas_oracle_factorial_summary",
+    "toolchain": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "targets": {
+      "ideas_bounded_memory_export": {
+        "passed": 0,
+        "failed": 0
+      },
+      "ideas_oracle_components": {
+        "passed": 4,
+        "failed": 0
+      },
+      "ideas_oracle_factorial_summary": {
+        "passed": 0,
+        "failed": 0
+      }
+    },
+    "exit": 0,
+    "stdout_archive": "logs/rust-repair-example-tests.log.gz",
+    "stdout_uncompressed_sha256": "c39f0cb6aa8f56bd20fc077e116995c3a3cb6e8926c4132b4876ffd51140a12d"
+  },
+  "historical_preservation": {
+    "compared": 930,
+    "unchanged": 929,
+    "differences": [
+      {
+        "path": "research/ideas_execution_20261018/oracle_integration/README.md",
+        "sha256": "71c8198778b3d02ac33a607e033ec6a364ee0c9b5e2afc09b9b3a1e8cb35ffc7",
+        "current_sha256": "6a7d859bdb4030d6608e6c593451d7ff9959584dffd2b50656907eed78184ed5"
+      }
+    ],
+    "scope": "All pre-existing tracked campaign files; the only changed file is the separately authorized living README erratum and temporal qualification, not a frozen protocol/raw/binding/receipt."
+  },
+  "source_snapshots": {
+    "count": 6,
+    "suffix": ".rs.source",
+    "all_byte_equal_declared_git_commits": true,
+    "source_proof": "rust-repair-source-preservation.json"
+  },
+  "source_and_data_sha256": {
+    "examples/ideas_bounded_memory_export.rs": "b18c8bb96c51d82670037ae69975f77378947faf25da752312179c0985ea828b",
+    "examples/ideas_oracle_components.rs": "feb7a4cb3515c5eade5edcd094b72bdaab7f7c34edd7ce6284057de46e060643",
+    "scripts/test_curve_names_archived_labels.py": "47a5b4a38dd40c838ac31176185e7a40c1d071be01399d2a6e54500912e11009",
+    "research/ideas_execution_20261018/oracle_integration/historical-label-binding.json": "3e2c19a3bd0e08d65fd001d01f9588b552c2391723230d6ca9176dd7702e2074",
+    "research/ideas_execution_20261018/oracle_integration/historical-label-binding-v2.json": "2a8ac374385e641ae7bc2786d08bb208eda9f5d13a46f499556148d3bc180089",
+    "research/ideas_execution_20261018/oracle_integration/PROTOCOL.md": "799dfb71a8aa125c699415c52a31076923d9d2a2ae752af06e014b0ebcdc7530",
+    "research/ideas_execution_20261018/oracle_integration/raw-evidence-20261018.tar.gz": "59bb5ed51227aa373740c6f87abffeae1eb707d3129510e8c2124e070fdc967c",
+    "docs/curves/traits.json": "6b3d5bc69a6d4f321455762bce671ee1f5d949582f38ac325c3a88a193f78922"
+  },
+  "independent_read_only_review": "independent-repair-review.json",
+  "new_full_library_suite_run": false,
+  "new_scientific_trials": 0,
+  "new_performance_measurements": 0,
+  "new_cloud_actions": 0,
+  "prior_full_suite_reinterpreted_for_new_source_or_data": false,
+  "commits_or_pushes_by_this_agent": false,
+  "coordinator_owned_gates": [
+    "full native trait freshness receipt",
+    "generated indexes and mirror validation",
+    "commit/publication",
+    "applicable actual-head CI"
+  ],
+  "original_20_item_campaign_completion": "unchanged; all original items remain partial",
+  "raw_stdout_archival": {
+    "manifest": "stdout-log-archives.json",
+    "decompressed_bytes_verified": true,
+    "reason": "New raw stdout EOF whitespace is preserved exactly in deterministic gzip; it is an archive-format issue and does not change actual test results."
+  }
+}

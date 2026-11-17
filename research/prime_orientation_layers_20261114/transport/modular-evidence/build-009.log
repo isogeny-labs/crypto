@@ -1,0 +1,89 @@
+'OrientationRationalSize.Bits.add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.grid_natAbs_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_chart_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_anchor_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_derivative_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_diagonal_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_absolute_left_coefficient_bits' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.cleared_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.integer_bivariate_clearing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.Rep.geometric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.geometric_denominator_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actualDenomRep' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actualDenomRep_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actual_geometric_denominator_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.numerator_divisible' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.quotientResidue_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.reduceCleared_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.bivariate_coefficient_modular' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_denominator_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.actual_geometric_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.rowNumeratorRep' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.approximationRep_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.absoluteRightRep_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_absolute_right_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+../modular-evidence/draft-009.lean.txt:821:8: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  (↑?a).den
+in the target expression
+  (↑2 ^ n - ↑t).den = 1
+
+n : ℕ
+t : ℤ
+h : 2 ^ n - ↑t = ↑2 ^ n - ↑t
+⊢ (↑2 ^ n - ↑t).den = 1
+../modular-evidence/draft-009.lean.txt:828:8: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  (2 ^ ?n).den
+in the target expression
+  1 * (1 ^ (a + 1) * 1) = 1
+
+a : ℕ
+t z : ℤ
+hz : z ∈ Ico (-2 ^ a) (2 ^ a)
+hs : ↑z ∈ grid a
+h : (↑t - ↑z).den = 1
+⊢ 1 * (1 ^ (a + 1) * 1) = 1
+../modular-evidence/draft-009.lean.txt:833:30: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  (2 ^ ?n).den
+in the target expression
+  1 * (1 ^ (a + 1) * 1) * (2 ^ j - d)⁻¹.den = (2 ^ j - d)⁻¹.den
+
+a j : ℕ
+t : ℤ
+d : ℚ
+⊢ 1 * (1 ^ (a + 1) * 1) * (2 ^ j - d)⁻¹.den = (2 ^ j - d)⁻¹.den
+../modular-evidence/draft-009.lean.txt:889:76: error: unsolved goals
+case h
+a u i x y : ℕ
+t : ℤ
+m : ℕ → ℕ
+hi : i ≤ a
+hu : u ≤ a
+hy : y < 2 ^ a
+ht : ↑t ∈ grid a
+⊢ ?m.26
+
+a u i x y : ℕ
+t : ℤ
+m : ℕ → ℕ
+hi : i ≤ a
+hu : u ≤ a
+hy : y < 2 ^ a
+ht : ↑t ∈ grid a
+h : ?m.26
+⊢ (rowNumeratorRep a u i x y t m).den ≤ 2 ^ rowNumeratorSize a u i x y m
+../modular-evidence/draft-009.lean.txt:890:8: error: unexpected token 'λ'; expected command
+'OrientationCommonDenominator.chartRootRep_den_one' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.absoluteRightRep_bound' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

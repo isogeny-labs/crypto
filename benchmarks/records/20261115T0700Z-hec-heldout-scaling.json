@@ -1,0 +1,338 @@
+{
+  "branch": "research/hec-principal-relations-20261114",
+  "closed_utc": "2026-11-15T07:31:47+00:00",
+  "commands": [
+    {
+      "argv": [
+        "sh",
+        "-c",
+        "/Users/adamburan/pq-work/hec-followup-target/release/heldout_bench --select research/hec_anchor_relations_20261114/heldout-run > research/hec_anchor_relations_20261114/heldout-evidence/selection.txt"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T07:02:08+00:00",
+      "wall_s": 69.495
+    },
+    {
+      "argv": [
+        "/usr/bin/time",
+        "-p",
+        "/Users/adamburan/pq-work/hec-followup-target/release/heldout_bench",
+        "--gate",
+        "research/hec_anchor_relations_20261114/heldout-run"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T07:05:32Z",
+      "wall_s": 45.1
+    },
+    {
+      "argv": [
+        "/usr/bin/time",
+        "-p",
+        "/Users/adamburan/pq-work/hec-followup-target/release/heldout_bench",
+        "--measure",
+        "research/hec_anchor_relations_20261114/heldout-run"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T07:07:27Z",
+      "wall_s": 46.77
+    }
+  ],
+  "commit": "2404e34dca6529ff2b9267f16942974b0e777671",
+  "commit_dirty": false,
+  "created_utc": "2026-11-15T07:00:24+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261114-hec-anchor-forest"
+  ],
+  "host": {
+    "cpu": "arm",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "isolation": "unstated",
+    "platform": "macOS-27.2-arm64-arm-64bit-Mach-O"
+  },
+  "id": "20261115T0700Z-hec-heldout-scaling",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g2_p1009_f0_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.000513416
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g2_p1009_f1_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.000485209
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g2_p4001_f0_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.001748625
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g2_p4001_f1_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.001595959
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g2_p16381_f0_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.0076395
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g2_p16381_f1_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.006959875
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g2_p65537_f0_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.043092959
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g2_p65537_f1_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.03513875
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g3_p127_f0_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.000261625
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g3_p127_f1_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.000269708
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g3_p503_f0_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.001168
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g3_p503_f1_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.001351375
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g3_p1009_f0_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.00343875
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g3_p1009_f1_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.0025535
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g4_p31_f0_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.000556917
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g4_p31_f1_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.000430583
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g4_p61_f0_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.000402834
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g4_p61_f1_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.000465834
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g4_p127_f0_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.000817209
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "g4_p127_f1_compact_cold_s",
+      "note": "Native measured cold totals, five independent one-target cases; primary paired-ratio screen is in native summary. L0 producer assertions [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.000897834
+    }
+  ],
+  "problem": "hec:g234-math10x",
+  "raw": [
+    {
+      "bytes": 781017,
+      "path": "research/hec_anchor_relations_20261114/HELDOUT-RAW.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7d/7dede0f0ff49824e6dbe1fce10be0d65a82042e0bbf8e4dc2b5651c483a6603d",
+      "sha256": "7dede0f0ff49824e6dbe1fce10be0d65a82042e0bbf8e4dc2b5651c483a6603d",
+      "uploaded": false
+    },
+    {
+      "bytes": 124603,
+      "path": "research/hec_anchor_relations_20261114/heldout-evidence/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ae/aef557c0bec954217e57abdc7f485f1207e4dae4e2fc4dd0e75d7e363f435643",
+      "sha256": "aef557c0bec954217e57abdc7f485f1207e4dae4e2fc4dd0e75d7e363f435643",
+      "uploaded": false
+    },
+    {
+      "bytes": 274,
+      "path": "research/hec_anchor_relations_20261114/heldout-evidence/binary.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/24/246e8ead1f00d32cbc6256ac3db653525d2ef9c2401ce3a7eb327d5963a361ff",
+      "sha256": "246e8ead1f00d32cbc6256ac3db653525d2ef9c2401ce3a7eb327d5963a361ff",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261114-hec-anchor-forest/HELDOUT-REPORT.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261114-hec-anchor-forest/heldout.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "hec-heldout-scaling",
+  "status": "measured",
+  "summary": "Twenty held-out fixtures,100group gates,1500timed cells completed; local checks pass. Paired median ratios vs fastest of12controls0.94..3.17; no10x. A/A max3.09. Rust/native jq scientific path. [pcc:unverified].",
+  "validation": null
+}

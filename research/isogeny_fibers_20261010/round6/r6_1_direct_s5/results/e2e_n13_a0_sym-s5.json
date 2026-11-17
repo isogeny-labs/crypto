@@ -1,0 +1,435 @@
+{
+  "a": 0,
+  "arm_wall_s": 600.0,
+  "experiment": "R6.1 end-to-end through ic_framework::run_pipeline (the ic bench pipeline)",
+  "h": 4,
+  "instance": "icv1-f2m13-t181-515ee569",
+  "max_trials": 20000,
+  "n": 13,
+  "node_budget": 4096,
+  "planted": 1571,
+  "r": 2003,
+  "rho_floor_S_derived": 0.8862269254527579,
+  "rows": [
+    {
+      "S": 761420.3752857324,
+      "arm": "sym-s5",
+      "call_outcomes": {
+        "budget": 15,
+        "found": 9
+      },
+      "columns": 8,
+      "ell": 5,
+      "exhausted": false,
+      "extra": {
+        "interpolation": {
+          "sym": {
+            "field_mults": 246465,
+            "samples": 15,
+            "wall_s": 0.00214105,
+            "word_xors": 117993
+          },
+          "wall_s_contended": 0.128903211,
+          "x": {
+            "field_mults": 13911440,
+            "samples": 53,
+            "wall_s": 0.118558819,
+            "word_xors": 20713140
+          }
+        },
+        "precompute": {
+          "build_s_contended": 30.075278634,
+          "complete": true,
+          "products": 118
+        }
+      },
+      "full_report": {
+        "decomposition": {
+          "cost": {
+            "gae": 34077264.379472,
+            "group_ops": {
+              "adds": 426,
+              "doubles": 443,
+              "scalar_mults": 48
+            },
+            "native": {
+              "canonicalisations": 0,
+              "direct_relations_skipped": 0,
+              "frobfold_mismatches": 0,
+              "inversions": 0,
+              "lift_failures": 0,
+              "lookups": 0,
+              "relations": 9,
+              "repeated_targets_skipped": 0,
+              "s4_hits": 0,
+              "s4_pairs": 0,
+              "solver_budget_exceeded": 15,
+              "solver_calls": 24,
+              "solver_ops": 14790102037,
+              "sqrt_solves": 0,
+              "target_guard_probes": 24,
+              "trials": 24,
+              "unliftable_systems": 0
+            },
+            "wall_ns": 27848725754
+          },
+          "description": "direct r6-sym-s5 S5, node budget 4096",
+          "gae_before_solver": 869.286224,
+          "hit_rate": 0.375,
+          "name": "r6-sym-s5",
+          "relations_found": 9,
+          "setup": {
+            "gae": 0.0,
+            "group_ops": {
+              "adds": 0,
+              "doubles": 0,
+              "scalar_mults": 0
+            },
+            "native": {},
+            "wall_ns": 522
+          },
+          "solver": {
+            "budget_exceeded": 15,
+            "calls": 24,
+            "degree_over_bound": null,
+            "extra": {},
+            "gae": 34076395.093248,
+            "name": "direct S5, inherited-f4 (cap 3)",
+            "ns_per_op": 0.2561248512,
+            "op_unit": "word XORs (elimination, specialisation and linear elimination only)",
+            "ops": 14790102037,
+            "peak_bytes": 0,
+            "priced_by": "pinned",
+            "semi_regular_degree": 9,
+            "solving_degree_max": 0,
+            "solving_degree_mean": null,
+            "wall_ns": 25758942563
+          },
+          "summands": 4,
+          "system": {
+            "degrees": [
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5
+            ],
+            "n_equations": 13,
+            "n_vars": 17,
+            "semi_regular_degree": 9
+          },
+          "targets_tried": 24
+        },
+        "exhausted": false,
+        "factor_base": {
+          "abscissae": 17,
+          "columns": 8,
+          "cost": {
+            "gae": 2.2291830000000004,
+            "group_ops": {
+              "adds": 0,
+              "doubles": 0,
+              "scalar_mults": 0
+            },
+            "native": {
+              "abscissae_scanned": 0,
+              "as_solves": 0,
+              "cofactor_multiplications": 17,
+              "derived_counts": 1,
+              "frobenius_coordinate_squarings": 416,
+              "frobenius_maps": 33
+            },
+            "wall_ns": 629454
+          },
+          "description": "F_u random V",
+          "name": "r6-fixed-subspace",
+          "points_per_column": 4.125,
+          "signed_points": 33
+        },
+        "group_order": 8012,
+        "instance": "icv1-f2m13-t181-515ee569",
+        "label": "r6-fixed-subspace + r6-sym-s5[m=4] + — + random",
+        "linear_algebra": {
+          "cost": {
+            "gae": 3.0090900000000005,
+            "group_ops": {
+              "adds": 0,
+              "doubles": 0,
+              "scalar_mults": 0
+            },
+            "native": {
+              "columns": 9,
+              "pinned_by_repeated_row": 0,
+              "rank": 9,
+              "repeated_column_rows": 0,
+              "row_ops": 178,
+              "rows": 9,
+              "single_column_rows": 0,
+              "two_column_rows": 2
+            },
+            "wall_ns": 39393
+          },
+          "dependent": 0,
+          "name": "incremental-gauss",
+          "rank": 9,
+          "rows": 9,
+          "work": 178,
+          "work_unit": "row_ops"
+        },
+        "log2_r": 10.967946705812707,
+        "r": 2003,
+        "recovered": 1571,
+        "rho_s": null,
+        "s": 761420.3752857324,
+        "s_over_rho": null,
+        "spec": {
+          "factor_base": "r6-fixed-subspace",
+          "factor_base_params": {},
+          "linalg": "",
+          "max_trials": 20000,
+          "oracle": "r6-sym-s5",
+          "oracle_params": {
+            "m": "4"
+          },
+          "seed": 123212651130,
+          "solver": null,
+          "solver_budget_seconds": 0,
+          "solver_params": {},
+          "targets": "Random"
+        },
+        "total_gae": 34077283.617745005,
+        "verified": true,
+        "verify": {
+          "gae": 14.0,
+          "group_ops": {
+            "adds": 4,
+            "doubles": 10,
+            "scalar_mults": 1
+          },
+          "native": {},
+          "wall_ns": 1731
+        },
+        "wall_seconds": 27.848810475
+      },
+      "hit_rate": 0.375,
+      "instance": "icv1-f2m13-t181-515ee569",
+      "label": "r6-fixed-subspace + r6-sym-s5[m=4] + — + random",
+      "m": 4,
+      "per_call": [
+        {
+          "build_ms_contended": 88.943502,
+          "outcome": "found",
+          "reductions": 3889,
+          "splits": 1962,
+          "wall_ms_contended": 1082.466355,
+          "word_xors": 466573259
+        },
+        {
+          "build_ms_contended": 85.071724,
+          "outcome": "found",
+          "reductions": 11,
+          "splits": 10,
+          "wall_ms_contended": 1285.850787,
+          "word_xors": 1315466221
+        },
+        {
+          "build_ms_contended": 92.667367,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 2075,
+          "wall_ms_contended": 1144.870418,
+          "word_xors": 492407910
+        },
+        {
+          "build_ms_contended": 82.850669,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 2067,
+          "wall_ms_contended": 1227.671557,
+          "word_xors": 553381045
+        },
+        {
+          "build_ms_contended": 83.707405,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 2092,
+          "wall_ms_contended": 1164.752453,
+          "word_xors": 519890992
+        },
+        {
+          "build_ms_contended": 86.148999,
+          "outcome": "found",
+          "reductions": 1181,
+          "splits": 606,
+          "wall_ms_contended": 470.570876,
+          "word_xors": 279577310
+        },
+        {
+          "build_ms_contended": 95.341307,
+          "outcome": "found",
+          "reductions": 145,
+          "splits": 80,
+          "wall_ms_contended": 1269.729165,
+          "word_xors": 1312380323
+        },
+        {
+          "build_ms_contended": 86.45853,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 2075,
+          "wall_ms_contended": 1258.143995,
+          "word_xors": 551921098
+        },
+        {
+          "build_ms_contended": 85.649597,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 2068,
+          "wall_ms_contended": 1075.450372,
+          "word_xors": 490123005
+        },
+        {
+          "build_ms_contended": 74.653242,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 2061,
+          "wall_ms_contended": 1189.605379,
+          "word_xors": 520497848
+        },
+        {
+          "build_ms_contended": 92.739607,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 2073,
+          "wall_ms_contended": 1082.015116,
+          "word_xors": 446930187
+        },
+        {
+          "build_ms_contended": 69.945582,
+          "outcome": "found",
+          "reductions": 1220,
+          "splits": 622,
+          "wall_ms_contended": 626.541644,
+          "word_xors": 445491331
+        },
+        {
+          "build_ms_contended": 67.096363,
+          "outcome": "found",
+          "reductions": 195,
+          "splits": 103,
+          "wall_ms_contended": 1324.692639,
+          "word_xors": 1311369873
+        },
+        {
+          "build_ms_contended": 90.357462,
+          "outcome": "found",
+          "reductions": 1345,
+          "splits": 680,
+          "wall_ms_contended": 472.729946,
+          "word_xors": 312649481
+        },
+        {
+          "build_ms_contended": 98.587562,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 2072,
+          "wall_ms_contended": 1040.676253,
+          "word_xors": 488978557
+        },
+        {
+          "build_ms_contended": 78.554297,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 2050,
+          "wall_ms_contended": 1212.626222,
+          "word_xors": 444967945
+        },
+        {
+          "build_ms_contended": 72.779441,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 2089,
+          "wall_ms_contended": 1107.758333,
+          "word_xors": 490917625
+        },
+        {
+          "build_ms_contended": 94.342185,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 2087,
+          "wall_ms_contended": 1095.132777,
+          "word_xors": 491276664
+        },
+        {
+          "build_ms_contended": 89.761235,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 2093,
+          "wall_ms_contended": 1113.206376,
+          "word_xors": 551587542
+        },
+        {
+          "build_ms_contended": 83.529046,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 2061,
+          "wall_ms_contended": 1171.653228,
+          "word_xors": 523972525
+        },
+        {
+          "build_ms_contended": 100.999311,
+          "outcome": "found",
+          "reductions": 346,
+          "splits": 180,
+          "wall_ms_contended": 1262.140701,
+          "word_xors": 1310568552
+        },
+        {
+          "build_ms_contended": 122.241466,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 2059,
+          "wall_ms_contended": 1160.377017,
+          "word_xors": 539365335
+        },
+        {
+          "build_ms_contended": 81.680469,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 2048,
+          "wall_ms_contended": 1079.391918,
+          "word_xors": 487855121
+        },
+        {
+          "build_ms_contended": 85.070913,
+          "outcome": "found",
+          "reductions": 2903,
+          "splits": 1479,
+          "wall_ms_contended": 840.889036,
+          "word_xors": 441952288
+        }
+      ],
+      "r": 2003,
+      "reductions_total": 72675,
+      "relations_found": 9,
+      "solver_budget_exceeded": 15,
+      "solver_calls": 24,
+      "solver_ops": 14790102037,
+      "targets_tried": 24,
+      "total_gae": 34077283.617745005,
+      "verified": true,
+      "wall_s_contended": 27.848810475,
+      "wall_truncated": false
+    }
+  ],
+  "seed": 123212651130,
+  "v_seed": 370935120
+}

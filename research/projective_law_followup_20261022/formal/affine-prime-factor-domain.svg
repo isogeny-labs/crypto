@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="470" viewBox="0 0 1100 470" role="img" aria-labelledby="title desc">
+  <title id="title">Prime-factor sufficient condition for the actual quintic domain</title>
+  <desc id="desc">The factor witness is explicit. It implies four checked domain theorems. Deriving that witness from separability and proving the local DVR remain open.</desc>
+  <style>
+    text { font-family: DejaVu Sans, Arial, sans-serif; fill:#182436; }
+    .title { font-size:22px; font-weight:700; }
+    .small { font-size:13px; fill:#536075; }
+    .label { font-size:16px; font-weight:600; }
+    .detail { font-size:12px; }
+    .checked { fill:#e8f3ff; stroke:#2372b8; stroke-width:2; }
+    .assumed { fill:#fff1d8; stroke:#a66b0a; stroke-width:2; }
+    .open { fill:#f1f3f6; stroke:#788596; stroke-width:2; }
+    .line { fill:none; stroke:#596579; stroke-width:2; }
+    .dashed { fill:none; stroke:#788596; stroke-width:2; stroke-dasharray:7 5; }
+    .tip { fill:#596579; }
+  </style>
+  <rect width="1100" height="470" fill="white"/>
+  <text x="30" y="38" class="title">Actual affine and projective domain: checked sufficient condition</text>
+  <text x="30" y="61" class="small">Lean 4.34.1 · source SHA-256 4ead48655a0379aaac0107324236231aa122b32ed1efb1911409865a455d05da · no measurements</text>
+
+  <rect x="35" y="98" width="310" height="72" rx="8" class="open"/>
+  <text x="55" y="124" class="label">Separable monic quintic</text><text x="55" y="147" class="detail">factor extraction in Lean is open</text>
+  <rect x="395" y="98" width="310" height="72" rx="8" class="assumed"/>
+  <text x="415" y="124" class="label">Explicit prime-factor witness</text><text x="415" y="147" class="detail">f = t·u; Prime t; t does not divide u</text>
+  <rect x="755" y="98" width="310" height="72" rx="8" class="checked"/>
+  <text x="775" y="124" class="label">Outer equation irreducible</text><text x="775" y="147" class="detail">Eisenstein for Y² − f(X)</text>
+  <path d="M345 134 H395" class="dashed"/><path d="M705 134 H755" class="line"/>
+  <path d="M395 134 L385 129 L385 139 Z M755 134 L745 129 L745 139 Z" class="tip"/>
+
+  <rect x="35" y="234" width="310" height="72" rx="8" class="checked"/>
+  <text x="55" y="260" class="label">Affine coordinate ring domain</text><text x="55" y="283" class="detail">K[x,y] / (y² − f(x))</text>
+  <rect x="395" y="234" width="310" height="72" rx="8" class="checked"/>
+  <text x="415" y="260" class="label">Rational-point localization domain</text><text x="415" y="283" class="detail">evaluation-kernel localization</text>
+  <rect x="755" y="234" width="310" height="72" rx="8" class="checked"/>
+  <text x="775" y="260" class="label">Actual weighted-Proj stalk domain</text><text x="775" y="283" class="detail">via checked stalk ring equivalence</text>
+  <path d="M910 170 V202 H190 V234" class="line"/><path d="M345 270 H395" class="line"/><path d="M705 270 H755" class="line"/>
+  <path d="M190 234 L185 224 L195 224 Z M395 270 L385 265 L385 275 Z M755 270 L745 265 L745 275 Z" class="tip"/>
+
+  <rect x="35" y="368" width="310" height="62" rx="8" class="open"/>
+  <text x="55" y="394" class="label">Principal nonbranch ideal</text><text x="55" y="415" class="detail">show generator x − a</text>
+  <rect x="395" y="368" width="310" height="62" rx="8" class="open"/>
+  <text x="415" y="394" class="label">Actual nonbranch DVR</text><text x="415" y="415" class="detail">needs principal ideal + domain</text>
+  <rect x="755" y="368" width="310" height="62" rx="8" class="open"/>
+  <text x="775" y="394" class="label">Norm, Pic0, runtime transport</text><text x="775" y="415" class="detail">separate later proof gates</text>
+  <path d="M345 399 H395" class="line"/><path d="M705 399 H755" class="line"/><path d="M910 306 V348 H550 V368" class="line"/>
+  <path d="M395 399 L385 394 L385 404 Z M755 399 L745 394 L745 404 Z M550 368 L545 358 L555 358 Z" class="tip"/>
+  <text x="35" y="457" class="small">Blue: checked under the displayed factor witness · amber: explicit assumption · gray: open · dashed: unproved implication</text>
+</svg>

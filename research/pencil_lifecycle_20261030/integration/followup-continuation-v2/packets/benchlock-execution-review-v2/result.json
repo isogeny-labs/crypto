@@ -1,0 +1,95 @@
+{
+  "schema": "software.fixed-controls-review/v1",
+  "status": "retained_execution_verified",
+  "native_rerun": false,
+  "independent_of_patch_and_execution": true,
+  "binding_checks": {
+    "/home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/rustc": true,
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/target/release/deps/liblibc-56ab79ec8afd5c44.rlib": true,
+    "/var/tmp/pencil-benchlock-controls-20261031-v2/helper.rs": true,
+    "/var/tmp/pencil-benchlock-controls-20261031-v2/benchlock.rs": true,
+    "/var/tmp/pencil-benchlock-controls-20261031-v2/manifest.json": true,
+    "binary": true,
+    "admission": true,
+    "review": true
+  },
+  "producer_manifest_entries": 6,
+  "raw_receipt_hashes": {
+    "/var/tmp/pencil-benchlock-controls-execution-20261031-v2/admission.json": "16516bcde371b4bf3e3d052cb20203efb2fd190ac06eda193e2795b9616407aa",
+    "/var/tmp/pencil-benchlock-controls-execution-20261031-v2/compile.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/var/tmp/pencil-benchlock-controls-execution-20261031-v2/compile.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/var/tmp/pencil-benchlock-controls-execution-20261031-v2/helper": "6645ee449d9b51bd30fd7f65f52053556cd2a78f4a57e21567aaa72c1533afeb",
+    "/var/tmp/pencil-benchlock-controls-execution-20261031-v2/compile.receipt.json": "7b1c9d0dccf3916a74dc0daf50d5f9d9dc2c2e1db9106c806380b86017caca65",
+    "/var/tmp/pencil-benchlock-controls-execution-20261031-v2/binary-binding.json": "47f80c70d91dedff339a4cf487e9016751345e50eb1074bbd35085bf71558ba7",
+    "/var/tmp/pencil-benchlock-controls-execution-20261031-v2/run.stdout": "08fd6833aab9b37e2563dd78ed09e5ff8f2c526180171f200093bb02e33b8627",
+    "/var/tmp/pencil-benchlock-controls-execution-20261031-v2/run.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/var/tmp/pencil-benchlock-controls-execution-20261031-v2/run.receipt.json": "8b51ab1d2ee0d74341ca748ea132492ec3422a6917e26e1c93207821b0f5407b"
+  },
+  "marker_counts": {
+    "C1 PASS": 1,
+    "C2 PASS": 1,
+    "C3 PASS": 1,
+    "C4 PASS": 1,
+    "C5 PASS": 1,
+    "C6 PASS": 1,
+    "ALL_SIX_CONTROLS_PASS": 1
+  },
+  "ordered_controls": [
+    "C1 PASS",
+    "C2 PASS",
+    "C3 PASS",
+    "C4 PASS",
+    "C6 PASS",
+    "C5 PASS"
+  ],
+  "probes": [
+    [
+      false,
+      11
+    ],
+    [
+      true,
+      0
+    ],
+    [
+      false,
+      11
+    ],
+    [
+      true,
+      0
+    ],
+    [
+      true,
+      0
+    ],
+    [
+      false,
+      11
+    ],
+    [
+      true,
+      0
+    ],
+    [
+      true,
+      0
+    ],
+    [
+      true,
+      0
+    ]
+  ],
+  "child_ready_count": 4,
+  "child_zero_reap_count": 4,
+  "compile_exit": 0,
+  "run_exit": 0,
+  "scientific_cost_ratio": null,
+  "limits": [
+    "standalone extracted primitive",
+    "no wait=true",
+    "no injected non-WouldBlock runtime error",
+    "child release method plus close rather than full field destruction",
+    "original GPU failure cause not established"
+  ]
+}

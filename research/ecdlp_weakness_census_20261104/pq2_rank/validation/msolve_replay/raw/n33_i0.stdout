@@ -1,0 +1,78 @@
+
+--------------- INPUT DATA ---------------
+#variables                      34
+#equations                      67
+#invalid equations               0
+field characteristic             2
+homogeneous input?               0
+signature-based computation      0
+monomial order                 DRL
+basis hash table resetting     OFF
+linear algebra option            2
+initial hash table size     131072 (2^17)
+max pair selection             ALL
+reduce gb                        1
+#threads                         1
+info level                       2
+generate pbm files               0
+------------------------------------------
+
+Legend for f4 information
+--------------------------------------------------------
+deg       current degree of pairs selected in this round
+sel       number of pairs selected in this round
+pairs     total number of pairs in pair list
+mat       matrix dimensions (# rows x # columns)
+density   density of the matrix
+new data  # new elements for basis in this round
+          # zero reductions during linear algebra
+time(rd)  time of the current f4 round in seconds given
+          for real and cpu time
+--------------------------------------------------------
+
+deg     sel   pairs        mat          density            new data         time(rd) in sec (real|cpu)
+------------------------------------------------------------------------------------------------------
+  2      27      54      33 x 324        49.59%       27 new       0 zero         0.00 | 0.00         
+  2       2     308      68 x 432        15.85%        1 new       1 zero         0.00 | 0.00         
+  3     323     323    2254 x 6442        1.10%      306 new      17 zero         0.13 | 0.13         
+  3     499    2314    3660 x 7501        2.96%      499 new       0 zero         0.51 | 0.51         
+  4   11401   11401   58779 x 66201       1.14%     5115 new    6286 zero       263.47 | 261.37       
+  4   13299   71704   63713 x 62175       2.00%     4180 new    9119 zero       413.11 | 409.22       
+  4    4092  161476   44489 x 47432       3.11%     2772 new    1602 zero       224.02 | 222.02       
+  4    4356  217708   59746 x 59932       2.28%     2772 new    1587 zero       245.33 | 243.24       
+  4   44286   94984  103403 x 59231       1.87%     1769 new   44176 zero       746.71 | 740.38       
+  2     555    9634    1163 x 612         2.11%        0 new     555 zero         0.01 | 0.00         
+  3    6752    9079   11805 x 5057        6.08%        0 new    6752 zero         1.50 | 1.48         
+  4    2327    2327   10123 x 7800        4.63%        0 new    2327 zero         1.02 | 1.01         
+------------------------------------------------------------------------------------------------------
+reduce final basis       37 x 41          8.04%       37 new       0 zeroDimension of quotient: 4
+------------------------------------------------------------------------------------
+msolve overall time        1895.88 sec (elapsed) / 1879.44 sec (cpu)
+------------------------------------------------------------------------------------
+         0.01 | 0.01         
+------------------------------------------------------------------------------------------------------
+
+---------------- TIMINGS ---------------
+overall(elapsed)     1895.83 sec
+overall(cpu)         1879.39 sec
+select                 20.49 sec   1.1%
+symbolic prep.         23.50 sec   1.2%
+update                425.60 sec  22.4%
+convert                 0.51 sec   0.0%
+linear algebra       1425.65 sec  75.2%
+reduce gb               0.00 sec   0.0%
+-----------------------------------------
+
+---------- COMPUTATIONAL DATA -----------
+size of basis                    37
+#terms in basis                 112
+#pairs reduced                87919
+#GM criterion             153168359
+#redundant elements           17471
+#rows reduced                179763
+#zero reductions              72422
+max. matrix data             103403 x 59231 (1.871%)
+max. symbolic hash table size  2^17
+max. basis hash table size     2^24
+-----------------------------------------
+

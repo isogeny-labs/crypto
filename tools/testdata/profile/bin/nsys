@@ -1,0 +1,21 @@
+#!/bin/bash
+# Test double for tools/test_profile.sh: prints output in the format of nsys
+# (columns and report names as of Nsight 2025.x / driver 580) so the parsers in
+# tools/profile.sh can be checked without a GPU.  Every value is invented: it is
+# not a measurement of any GPU or kernel.
+if [ "$1" = --version ]; then echo "NVIDIA Nsight Systems version 2025.5.1.121-255436664817v0"; exit 0; fi
+if [ "$1" = profile ] && [ "$2" = --help ]; then echo "  --gpu-metrics-devices="; exit 0; fi
+if [ "$1" = profile ]; then o=""; for a in "$@"; do case $a in -o) n=1;; *) [ -n "$n" ] && { o=$a; n=""; };; esac; done; echo rep > "$o.nsys-rep"; echo "Generated: $o.nsys-rep"; exit 0; fi
+if [ "$1" = stats ]; then r=""; p=""; prev=""; for a in "$@"; do [ "$prev" = -r ] && r=$a; [ "$prev" = -o ] && p=$a; prev=$a; done
+  f="${p}_$r.csv"
+  case $r in
+    cuda_gpu_kern_sum) printf '%s\n' '"Time (%)","Total Time (ns)","Instances","Avg (ns)","Med (ns)","Min (ns)","Max (ns)","StdDev (ns)","Name"' '"96.1","4800000","4","1200000.0","1199000.0","1180000","1230000","20000.1","eccWalkKernel<32, true>(unsigned int*, const unsigned int*, int)"' '"3.9","195000","4","48750.0","48700.0","48000","49500","600.0","reduceDistinguished(unsigned int*, int)"' > "$f";;
+    cuda_api_sum) printf '%s\n' '"Time (%)","Total Time (ns)","Num Calls","Avg (ns)","Med (ns)","Min (ns)","Max (ns)","StdDev (ns)","Name"' '"80.0","5200000","5","1040000.0","1100000.0","900","1300000","1.0","cudaDeviceSynchronize"' '"20.0","1300000","8","162500.0","5000.0","4000","1250000","1.0","cudaLaunchKernel"' > "$f";;
+    cuda_gpu_mem_time_sum) printf '%s\n' '"Time (%)","Total Time (ns)","Count","Avg (ns)","Med (ns)","Min (ns)","Max (ns)","StdDev (ns)","Operation"' '"100.0","90000","2","45000.0","45000.0","40000","50000","1.0","[CUDA memcpy Device-to-Host]"' > "$f";;
+    cuda_gpu_trace) printf '%s\n' '"Start (ns)","Duration (ns)","CorrId","GrdX","GrdY","GrdZ","BlkX","BlkY","BlkZ","Reg/Trd","StcSMem (MB)","DymSMem (MB)","Bytes (MB)","Throughput (MBps)","SrcMemKd","DstMemKd","Device","Ctx","Strm","Name"' \
+      '"1000000","1200000","1","1088","1","1","256","1","1","128","0","0","","","","","NVIDIA RTX PRO 6000 (0)","1","7","eccWalkKernel<32, true>(unsigned int*, const unsigned int*, int)"' \
+      '"2250000","48000","2","64","1","1","256","1","1","32","0","0","","","","","NVIDIA RTX PRO 6000 (0)","1","7","reduceDistinguished(unsigned int*, int)"' \
+      '"2400000","1200000","3","1088","1","1","256","1","1","128","0","0","","","","","NVIDIA RTX PRO 6000 (0)","1","7","eccWalkKernel<32, true>(unsigned int*, const unsigned int*, int)"' \
+      '"3700000","40000","4","","","","","","","","","","0.5","12500","Device","Pageable","NVIDIA RTX PRO 6000 (0)","1","7","[CUDA memcpy Device-to-Host]"' > "$f";;
+    *) exit 1;;
+  esac; exit 0; fi

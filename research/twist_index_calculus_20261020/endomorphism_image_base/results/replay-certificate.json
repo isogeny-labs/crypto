@@ -1,0 +1,23 @@
+{
+  "schema": "twist-image-archive-replay/v1",
+  "recorded_utc": "2026-10-23T23:06:56Z",
+  "status": "pass",
+  "archive_sha256": "1e0a2139c9a32571a9476e4b9579f73da91e93e4a8cc7c2143d2bf4536c36038",
+  "archive_bytes": 28241048,
+  "archive_extract_repack_equal": true,
+  "native_binary_sha256": "2c83189133b699ed24ec345600078c808beee4ee8390c7f44d7eb903476e6adc",
+  "cold_assembly": {
+    "status": "pass",
+    "whole_rounds": 105,
+    "nontiming_records": 630,
+    "missing": []
+  },
+  "csvs_byte_identical": [
+    "full-stream.csv",
+    "cold-costs.csv",
+    "paired-cold-costs.csv",
+    "rank-traces.csv"
+  ],
+  "verification": "Native reconstruction from fresh archive extraction: exact signed sets, folded rows, ranks, recovered points, all deterministic cold traces and exact phase sums",
+  "claim_scope": "Fixture replay and archive integrity only; no full GAE/rho VALIDATION gate asserted"
+}

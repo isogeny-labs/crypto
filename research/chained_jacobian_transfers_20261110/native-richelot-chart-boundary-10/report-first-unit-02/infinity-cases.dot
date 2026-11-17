@@ -1,0 +1,12 @@
+digraph infinities {
+rankdir=TB; bgcolor="transparent";
+node [shape=box,style="rounded,filled",fillcolor="#edf2f8",fontname="DejaVu Sans",fontsize=14,color="#284b63"];
+edge [fontname="DejaVu Sans",fontsize=12,color="#284b63"];
+a [label="Input finite points (a,+b), (a,-b)"];
+b [label="Output infinities, ratios +1,-1"];
+a -> b [label="u=1/(x-a), v=y*u^3/b"];
+c [label="Input rational infinity, ratio t
+when t^2 equals the leading coefficient"];
+d [label="Output finite point (0,t/b)"];
+c -> d [label="same chart, completed at u=0"];
+}

@@ -1,0 +1,68 @@
+{
+  "recorded_at": "2026-10-18T12:47:20.976840+00:00",
+  "checks": [
+    {
+      "name": "leaderboard-freshness",
+      "argv": [
+        "python3",
+        "scripts/build_ic_leaderboard.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "leaderboard-freshness.stdout",
+      "stderr": "leaderboard-freshness.stderr"
+    },
+    {
+      "name": "leaderboard-path-controls",
+      "argv": [
+        "python3",
+        "scripts/test_check_ic_leaderboard_paths.py"
+      ],
+      "exit": 0,
+      "stdout": "leaderboard-path-controls.stdout",
+      "stderr": "leaderboard-path-controls.stderr"
+    },
+    {
+      "name": "leaderboard-input-coverage",
+      "argv": [
+        "python3",
+        "scripts/check_ic_leaderboard_paths.py"
+      ],
+      "exit": 0,
+      "stdout": "leaderboard-input-coverage.stdout",
+      "stderr": "leaderboard-input-coverage.stderr"
+    },
+    {
+      "name": "browser-freshness",
+      "argv": [
+        "python3",
+        "scripts/build_lab_browser.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "browser-freshness.stdout",
+      "stderr": "browser-freshness.stderr"
+    },
+    {
+      "name": "curve-identity-selftest",
+      "argv": [
+        "python3",
+        "scripts/curve_id.py",
+        "selftest"
+      ],
+      "exit": 0,
+      "stdout": "curve-identity-selftest.stdout",
+      "stderr": "curve-identity-selftest.stderr"
+    },
+    {
+      "name": "curve-name-lint",
+      "argv": [
+        "python3",
+        "scripts/check_curve_names.py"
+      ],
+      "exit": 0,
+      "stdout": "curve-name-lint.stdout",
+      "stderr": "curve-name-lint.stderr"
+    }
+  ]
+}

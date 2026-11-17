@@ -1,0 +1,85 @@
+import Init.Grind.Module.Basic
+
+/-! Finite symplectic covariance and a rational-point comparison theorem.
+The actual torsion bases, curves, group schemes, quotient morphisms and
+identification of rational points remain explicit written/native bridges.
+In particular, the inverse-scalar hypothesis is about the rational domain;
+no cancellation of point multiplication on geometric groups is assumed. -/
+set_option autoImplicit false
+namespace PartialFrobenius
+open Lean.Grind
+
+abbrev V4 := Fin 4 × Fin 4
+def frobenius4 (v : V4) : V4 := (3*v.2,v.1+v.2)
+def opposite4 (v : V4) : V4 := (3*v.1,3*v.2)
+def omega (v w : V4) : Fin 4 := v.1*w.2+3*v.2*w.1
+def partialAction (p : V4 × V4) : V4 × V4 := (frobenius4 p.1,p.2)
+def productForm (p q : V4 × V4) : Fin 4 := omega p.1 q.1+omega p.2 q.2
+def iterate {A : Type} (f : A → A) : Nat → A → A
+  | 0,a => a
+  | n+1,a => f (iterate f n a)
+
+theorem frobenius_preserves_form : ∀ a b c d : Fin 4,
+    omega (frobenius4 (a,b)) (frobenius4 (c,d))=omega (a,b) (c,d) := by decide
+
+theorem partial_preserves_product_form (p q : V4 × V4) :
+    productForm (partialAction p) (partialAction q)=productForm p q := by
+  rcases p with ⟨⟨a,b⟩,p2⟩
+  rcases q with ⟨⟨c,d⟩,q2⟩
+  change omega (frobenius4 (a,b)) (frobenius4 (c,d))+omega p2 q2 =
+    omega (a,b) (c,d)+omega p2 q2
+  rw [frobenius_preserves_form a b c d]
+
+theorem finite_sign_orbit :
+    (∀ a b : Fin 4, iterate frobenius4 3 (a,b)=opposite4 (a,b)) ∧
+    (∀ a b : Fin 4, iterate frobenius4 6 (a,b)=(a,b)) ∧
+    (∀ k : Fin 2,
+      (∃ a b : Fin 4, iterate frobenius4 (k.val+1) (a,b)≠(a,b)) ∧
+      (∃ a b : Fin 4, iterate frobenius4 (k.val+1) (a,b)≠opposite4 (a,b))) := by decide
+
+theorem public_moduli_and_norms :
+    (6103 : Nat)%109=108 ∧ (6103 : Nat)%113=1 ∧
+    (6214 : Nat)%109=1 ∧ (6214 : Nat)%113=112 ∧
+    (2826 : Nat)%109=101 ∧ (2826 : Nat)%113=1 ∧
+    (4973 : Nat)%109=68 ∧ (4973 : Nat)%113=1 ∧
+    (2826*4973 : Nat)%12317=1 ∧
+    (4860 : Nat)%109=101^2%109 ∧ (4860 : Nat)%113=1 ∧
+    (10510 : Nat)%109=46 ∧ (10510 : Nat)%113=1 ∧
+    (4860*10510 : Nat)%12317=1 ∧ (101 : Nat)%113≠1 ∧
+    (101^2 : Nat)%113≠1 := by decide
+
+theorem public_inverse_halves_quarters {M : Type} [IntModule M]
+    (killed : ∀ x : M, (12317 : Int) • x=0) :
+    (∀ x : M, (6159 : Int) • ((2 : Int) • x)=x) ∧
+    (∀ x : M, (9238 : Int) • ((4 : Int) • x)=x) := by
+  constructor
+  · intro x
+    have h := killed x
+    grind
+  · intro x
+    have h := killed x
+    grind
+
+/-- Once the factor morphism fixes the rational norm image, the normalized
+transfer is exactly the existing direct norm/pull bridge on that domain.
+Actual quotient identities and the rational inverse are exposed inputs. -/
+theorem rational_bridge_agreement {J E T : Type} [IntModule T]
+    (n r : Int) (norm : J → E) (pull : E → T) (phi : E → E)
+    (transfer : J → T)
+    (fixed : ∀ x, phi (norm x)=norm x)
+    (cleared : ∀ x, n • transfer x=pull (phi (norm x)))
+    (inverse : ∀ y : T, r • (n • y)=y) :
+    ∀ x, transfer x=r • pull (norm x) := by
+  intro x
+  calc
+    transfer x = r • (n • transfer x) := (inverse _).symm
+    _ = r • pull (phi (norm x)) := by rw [cleared]
+    _ = r • pull (norm x) := by rw [fixed]
+
+end PartialFrobenius
+#print axioms PartialFrobenius.frobenius_preserves_form
+#print axioms PartialFrobenius.partial_preserves_product_form
+#print axioms PartialFrobenius.finite_sign_orbit
+#print axioms PartialFrobenius.public_moduli_and_norms
+#print axioms PartialFrobenius.public_inverse_halves_quarters
+#print axioms PartialFrobenius.rational_bridge_agreement

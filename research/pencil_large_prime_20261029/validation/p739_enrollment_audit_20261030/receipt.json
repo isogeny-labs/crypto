@@ -1,0 +1,39 @@
+{
+  "schema": "p739-enrollment-audit-validation/v1",
+  "tests": {
+    "passed": 7,
+    "failed": 0,
+    "cases": [
+      "u64max and original sequence mapping",
+      "missing execution",
+      "duplicate execution",
+      "adjacent seed mutation above2^53",
+      "wrong full workload",
+      "wrong resolved arm",
+      "invalid float seed"
+    ]
+  },
+  "clippy_warnings_denied": true,
+  "mapped_workloads": 60,
+  "mapped_executions": 1080,
+  "resolved_arms": 3,
+  "missing": 0,
+  "duplicates": 0,
+  "extra_subset": 0,
+  "seed_mismatches": 0,
+  "sequence_positions_different": 900,
+  "fresh_plan_equal": true,
+  "outputs": {
+    "audit_sha256": "def56f34e31a2d6774b1daecd3cdc23c57a9d104c169fe87609763a18e7f33f0",
+    "pdf_sha256": "0955bf86f101759f1e71d758a4a019f18d5a592e5f732ebd739852db5c7ffdca",
+    "svg_sha256": "c46abf57c704074f2fa88d867cdbf7a3c24b6e9141e326f9dbc8178c0dc7c026"
+  },
+  "pdf_visual_inspection": {
+    "pages": 1,
+    "clipped_labels": false
+  },
+  "new_solver_executions": 0,
+  "new_plan_generation": 0,
+  "new_measurements": 0,
+  "general_admission_or_remaining_cohort_launch_authorized": false
+}

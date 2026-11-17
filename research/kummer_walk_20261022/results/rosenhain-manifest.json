@@ -1,0 +1,28 @@
+{
+  "schema": "kummer-rosenhain-manifest/v1",
+  "run_id": "ROSENHAIN-SETUP-20261022",
+  "protocol": "research/kummer_walk_20261022/ROSENHAIN_PROTOCOL.md",
+  "input": "research/four_followups_20261021/results/kummer-model-gate.jsonl",
+  "input_sha256": "280b06474489bd78cba9a1fedd548aac9ac529a843f60156060d692851432680",
+  "input_commit": "342617c3bf9e9e38631227d2ef41aab309cad035",
+  "producer": "research/kummer_walk_20261022/src/bin/rosenhain.rs",
+  "validator": "research/kummer_walk_20261022/src/bin/validate_rosenhain.rs",
+  "commands": [
+    "TMPDIR=/var/tmp cargo build --release --locked --bins --manifest-path research/kummer_walk_20261022/Cargo.toml",
+    "research/kummer_walk_20261022/target/release/rosenhain",
+    "research/kummer_walk_20261022/target/release/validate_rosenhain",
+    "rerun producer and cmp with /var/tmp/rosenhain-first.jsonl"
+  ],
+  "models_requested": 21,
+  "models_completed": 21,
+  "exact_coefficient_checks_passed": 21,
+  "square_pairs_per_model": 10,
+  "ordered_pairs_per_model": 20,
+  "fast_kummer_coordinates_verified": false,
+  "collector_targets_completed": 0,
+  "collector_targets_requested": 1260,
+  "candidate_over_rho": null,
+  "raw": "results/rosenhain-models.jsonl",
+  "summary": "results/rosenhain-summary.json",
+  "digests": "ROSENHAIN_SHA256SUMS"
+}

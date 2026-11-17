@@ -1,0 +1,50 @@
+F2 := GF(2);
+P<U> := PolynomialRing(F2);
+L<z> := ext<F2 | U^24+U^16+U^15+U^14+U^13+U^10+U^9+U^7+U^5+U^3+1>;
+K := FiniteField(2,12); Embed(K,L);
+E := EllipticCurve([K|1,K!(L!(1+z^2+z^3+z^4+z^6+z^7+z^8+z^10+z^14+z^18+z^20+z^22)),0,0,K!(L!(z+z^3+z^4+z^10+z^12+z^15+z^19+z^20))]);
+G := E![K!(L!(1+z+z^3+z^4+z^10+z^12+z^15+z^19+z^20)),K!(L!(1+z+z^5+z^6+z^7+z^8+z^10+z^11+z^17+z^22+z^23)),1];
+Q := E![K!(L!(1+z+z^2+z^4+z^8+z^10+z^11+z^18+z^21+z^23)),K!(L!(z+z^2+z^3+z^4+z^5+z^7+z^8+z^10+z^11+z^14+z^16+z^17+z^18+z^19+z^21+z^22+z^23)),1];
+r := 2111;
+assert #E eq 4222 and Order(G) eq r and Q eq 7*G;
+
+function Step(st)
+    pt := st[1]; aa := st[2]; bb := st[3];
+    if pt eq E!0 then
+        h := 0;
+    else
+        bits := Eltseq(K!(pt[1]/pt[3]));
+        h := (&+[Integers()!bits[i]*2^(i-1) : i in [1..#bits]]) mod 3;
+    end if;
+    if h eq 0 then return <pt+G,(aa+1) mod r,bb>; end if;
+    if h eq 1 then return <pt+Q,aa,(bb+1) mod r>; end if;
+    return <2*pt,(2*aa) mod r,(2*bb) mod r>;
+end function;
+
+function Solve(seed)
+    aa := (37*seed+11) mod r; bb := (101*seed+5) mod r;
+    st := <aa*G+bb*Q,aa,bb>;
+    tortoise := Step(st); hare := Step(Step(st)); calls := 3;
+    while tortoise[1] ne hare[1] do
+        tortoise := Step(tortoise);
+        hare := Step(Step(hare));
+        calls +:= 3;
+        assert calls lt 50*r;
+    end while;
+    den := (hare[3]-tortoise[3]) mod r;
+    if den eq 0 then return false,calls,0; end if;
+    ans := Integers()!((Integers(r)!(tortoise[2]-hare[2]))/(Integers(r)!den));
+    assert ans*G eq Q and ans eq 7;
+    return true,calls,ans;
+end function;
+
+tic := Cputime(); calls := []; solved := 0; singular := 0;
+for seed in [0..99] do
+    ok,n,ans := Solve(seed);
+    if ok then Append(~calls,n); solved +:= 1; else singular +:= 1; end if;
+end for;
+Sort(~calls);
+print "RHO_SOLVED", solved, "SINGULAR", singular;
+print "RHO_STEP_CALLS_MEDIAN", calls[(#calls+1) div 2];
+print "RHO_STEP_CALLS_TOTAL", &+calls;
+print "RHO_CPU_SECONDS", Cputime(tic);

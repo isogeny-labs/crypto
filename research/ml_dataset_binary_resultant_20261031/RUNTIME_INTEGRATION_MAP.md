@@ -1,0 +1,32 @@
+# Ordinary-binary runtime integration map
+
+Source inspected: 99d97d849e35793e2f88406836deb9754204676b, 2026-10-31. This is the next implementation contract after the pure resultant component; no runtime activation, test execution, or scientific measurement is asserted here. The existing DESIGN.md remains the mathematical/domain specification.
+
+## Existing interfaces and exact gaps
+
+`solvers::VerifiedWorkerOriginal` borrows config/public/factor-base/root/binding and stores original byte hashes and lengths. `solve_with_verified_worker_original` validates pointer and disk/attempt identity before dispatch. The ordinary-binary entry must consume this existing token; constructing a new token from producer output, caller-provided metadata or an outcome adapter ID is prohibited. The original policy replay now includes `curves::verify_factor_base_config`, so a mathematically valid factor base from a different recipe cannot be substituted.
+
+`binary_m3_resultant::build` and `verify` are currently compiled only as a test module. They operate on the supplied original polynomial quotient and nonzero actual b. They do not authenticate irreducibility, subgroup order, twist or the original execution context. The next adapter must perform those checks before either function. The module's small-degree tests do not enlarge runtime eligibility: the requested runtime range remains every n in 23..31 and 47..61, actual ordinary-binary family, m=3, F4/F5, degree 1..6, four signed points with exactly two x coordinates.
+
+`koblitz_m3::original_math` provides a concrete checklist but cannot be called for this new profile: it deliberately rejects non-Koblitz family and b!=1. Its verified group, affine target, bounded candidate replay, distinct sorted sign-pair checks and original basis normalization should be extracted into a private shared helper with explicit profile requirements. Keep the existing Koblitz b=1 predicate at its caller. Do not broaden it by removing the predicate globally. The new caller admits actual nonzero b and retains actual a for both twists and signed-group replay.
+
+`koblitz_m3::Budget` already implements cumulative work, bytes, trace, additions, first-stop and absolute-deadline semantics. Its phase transition is Setup -> Construction -> Constructed -> Matrix -> MatrixComplete -> Extraction -> Complete. Pure resultant admission is incremental (`reserve(Quote)`), whereas native matrix observation is cumulative (`observe(Reservation)`). A bridge must checked-add pure construction quotes to its own cumulative construction total and then observe that total exactly once. Independent determinant verification is checking work, not matrix work. It must debit the same original remaining allowance; it cannot instantiate a second full-limit budget. No global tariff reduction or ceiling increase is part of this integration.
+
+The pure builder's `Failure` values are not interchangeable with `Stop`: preserve Input/Mismatch as rejected mathematical evidence, Admission as original resource refusal with its actual first cause, Deadline as the original deadline, Allocation as allocation failure, and TallyActive as unsupported simultaneous instrumentation. Do not map all failures to completed-empty equations or zero native work. A refusal after reservation retains that charge.
+
+## Shared infrastructure and distinct artifact identities
+
+Reuse the existing bounded F4/F5 matrix engine with the builder's three-variable, n-coordinate equations. Keep equation construction identified as finite-selector resultant interpolation and retain its eight values plus canonical ANFs in restricted artifacts. This path is distinct from symbolic Koblitz S4 and from a chained-S3 system with free intermediate field variables.
+
+Do not copy the entire Koblitz worker implementation or relabel its existing receipts. Extract only parameter-independent ledger and signed-group helpers under unchanged Koblitz regression controls. Introduce a closed typed profile discriminator with distinct ordinary-binary artifact paths, roles, schemas, event origin and adapter identity. The existing private `AdmittedKoblitzNative` exact-wire interface is specialized to a closed schema; an ordinary-binary payload must not be admitted through it by changing a string. Add a separately bounded concrete event interface or a reviewed closed enum whose maximum wire bounds cover every new variant.
+
+WorkerStoredReceipts original-input adoption, actual root writes, capture finalization and parent delivery accounting remain required. Central replay must detect the new reserved path/role namespace independently of outcome strategy, as `verify_worker_cell` currently does for Koblitz. Rehashing a transplanted Koblitz artifact or changing adapter_id must not make it an ordinary-binary artifact. Original config, field, a, b, target, exact signed domain, policy recipe, seed binding, original limits and capture binding all remain part of admission/replay.
+
+## Ordered delivery and falsification controls
+
+1. Extract shared original-math authentication and ledger plumbing with byte-identical existing Koblitz canonical output on retained controls. Keep ordinary dispatch disabled.
+2. Add a typed ordinary construction artifact and its independent determinant/ANF replay, original-ledger bridge and partial/refusal representation. Add altered-b, basis, target, code ordering and recipe controls, including same signed points under different recipes.
+3. Connect actual F4/F5 matrix invocation and independent signed-group replay. Preserve infinity-prefix behavior; a resultant zero alone is only an algebraic candidate. Exercise nonconstant equations, b!=1 and b=1, both twists, positive and negative fixed domains, every phase refusal and actual original root-storage failures.
+4. Integrate trusted worker dispatch and unconditional central reserved-namespace replay, then actual source-bound CLI generation, verify, publication/restore and export. Update capabilities only for the exact registered route. Check every requested degree with fixed inputs rather than replacing failed natural cells.
+
+The full portfolio remains all three families, both twists, all 24 requested field sizes, m=2..15, all retained policies and requested solver/cost/trace axes. This map supplies the next ordinary-binary runtime increment; generalized chained-S3/m4..15, expanded selector domains, matrix/construction ML projections and scientific production remain separate required work.

@@ -1,0 +1,28 @@
+[
+  {
+    "id": "C121-exact-quadratic-prefix-oracle",
+    "status": "specified_unexecuted",
+    "budget": "90s4GiB1core",
+    "protocol": "allcoefficientsm1through5;literalroot/multiplicitysets;separatebitmatrixsolver;a0/a!=0/emptyfibers;fielddegreebound"
+  },
+  {
+    "id": "C121-exact-quadratic-prefix-circuit",
+    "status": "depends_on_oracle",
+    "scope": "fullprefixsupportforquadraticfactor;allleadingdegreeguards+recoverycharged;cubicstillneedscondition"
+  },
+  {
+    "id": "C121-actual-combined-formulation",
+    "status": "depends_on_profile",
+    "rule": "replace14weakquadraticresidueswithprovedstrongerfullprefixcondition;retainfactorization/cubic/otherstrata;nonewidenticalSATretry"
+  },
+  {
+    "id": "prime-interval-and-odd-domain-proof",
+    "status": "independentstream",
+    "rule": "separatesignedinteger/discriminant/carrysemantics;noGF2prefixprooftransfer"
+  },
+  {
+    "id": "matched-genuine-F4-F5-F6",
+    "status": "independentengineeringstream",
+    "rule": "20hardallrootscompleteinstances,allrequestedfields/curves,repetitionsandmemory"
+  }
+]

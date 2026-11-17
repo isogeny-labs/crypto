@@ -1,0 +1,60 @@
+✖ [2060/2061] Building NormGroupBridge (2.3s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/NormGroupBridge.lean -o /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean/NormGroupBridge.olean -i /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean/NormGroupBridge.ilean -c /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/ir/NormGroupBridge.c --setup /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/ir/NormGroupBridge.setup.json --json
+error: NormGroupBridge.lean:80:34: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  Module.finrank ?R (?ι → ?R)
+in the target expression
+  Module.finrank K ((i : ι) → W.CoordinateRing ⧸ I i) = Fintype.card ι
+
+K : Type u_1
+inst✝¹ : Field K
+W : WeierstrassCurve.Affine K
+ι : Type u_2
+inst✝ : Fintype ι
+x y : ι → K
+hp : ∀ (i : ι), W.Nonsingular (x i) (y i)
+hx : Function.Injective x
+I : ι → Ideal W.CoordinateRing := fun i => CoordinateRing.XYIdeal W (x i) (C (y i))
+hc : Pairwise (Function.onFun IsCoprime I)
+e : (W.CoordinateRing ⧸ ⨅ i, I i) ≃ₐ[K] (i : ι) → W.CoordinateRing ⧸ I i :=
+  let __src := Ideal.quotientInfRingEquivPiQuotient I hc;
+  { toEquiv := __src.toEquiv, map_mul' := ⋯, map_add' := ⋯, commutes' := ⋯ }
+⊢ Module.finrank K ((i : ι) → W.CoordinateRing ⧸ I i) = Fintype.card ι
+error: NormGroupBridge.lean:100:38: Type mismatch: After simplification, term
+  hc
+ has type
+  Pairwise (Function.onFun IsCoprime I)
+but is expected to have type
+  Set.univ.Pairwise (Function.onFun IsCoprime I)
+error: NormGroupBridge.lean:104:10: Unknown constant `Ideal.span_singleton_le_iff_mem.mpr`
+warning: NormGroupBridge.lean:109:2: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+warning: NormGroupBridge.lean:111:2: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+warning: NormGroupBridge.lean:113:2: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+info: NormGroupBridge.lean:120:0: 'NormGroupBridge.quotientFinite' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: NormGroupBridge.lean:121:0: 'NormGroupBridge.idealsEqualOfDimension' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: NormGroupBridge.lean:122:0: 'NormGroupBridge.pointIdealsCoprime' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: NormGroupBridge.lean:123:0: 'NormGroupBridge.pointQuotientDimension' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+info: NormGroupBridge.lean:124:0: 'NormGroupBridge.principalPointProduct' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- NormGroupBridge
+error: build failed

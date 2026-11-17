@@ -1,0 +1,32 @@
+name: Profile tool
+on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
+    paths:
+      - 'tools/profile.sh'
+      - 'tools/test_profile.sh'
+      - 'tools/testdata/profile/**'
+      - '.github/workflows/profile-tool.yml'
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|profile-tool.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|profile-tool.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install jq, gawk, valgrind and perf
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq jq gawk valgrind linux-tools-common linux-tools-generic
+          # GitHub's runners set perf_event_paranoid=4; 2 lets a user sample
+          # its own processes (as rho-formal.yml does).
+          sudo sysctl -w kernel.perf_event_paranoid=2
+      - name: Parsers, graphs, refusal paths and CPU profiling
+        run: tools/test_profile.sh

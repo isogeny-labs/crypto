@@ -1,0 +1,19 @@
+# Prospective independent solve4 suffix review — T1441
+
+Prepared 2026-11-03 before reading the new producer proof or receipts. Coordinator requested review of the source-linked suffix-row elimination first rung and its UInt64 correspondence. Exact published producer revision, theorem names, modules, toolchain and closure hashes must be recorded in a freeze supplement before any replay. Until then this plan authorizes preparation only.
+
+Independence: reviewer authored the earlier ordinary-fiber review, not this producer proof or native solve4. Prior context includes ordinary-fiber conditional normalization, the native C1 row layout and the outstanding general solve4 bridge. Reviewer has seen coordinator's description that the field proof passed and UInt64 correspondence was checking. Thus this is non-author source-fidelity review, not a blind derivation or independent algorithm. No new producer source or reports were read before this plan.
+
+Prior: elementary full-row subtraction preserves a linear equation when both input equations hold. A suffix-only implementation additionally needs a prefix invariant; arithmetic over machine words needs canonical values and no unaccounted overflow. A theorem about one row operation will not alone establish pivot selection, row swaps, normalization, loop induction or returned solve4 correctness.
+
+Statement-level derivation, before producer access: write augmented residual R(row,x)=sum(a_j*x_j)-b. Full subtraction row'=row-factor*pivot gives R(row',x)=R(row,x)-factor*R(pivot,x). If the implementation updates only columns j>=k, equality to this full subtraction requires factor*pivot_j=0 for j<k (zero pivot prefix is sufficient). This derives the load-bearing joint to inspect; it does not pre-approve the unknown actual theorem statement.
+
+Owned joints and prospective attacks:
+- Suffix semantics: compare native start/end indices, RHS inclusion, retained prefix, factor capture and pivot aliasing to elaborated definitions. Seek a concrete counterexample if zero-prefix assumptions are removed: pivot prefix 1, factor 1 leaves a nonzero omitted subtraction.
+- Field semantics: inspect hypotheses and quantifiers, including zero factor and singular pivot; do not infer invertibility from a subtraction lemma. Where normalization appears, test the zero-denominator boundary.
+- Word correspondence: bind exact native modular add/sub/mul and operand bounds. Inspect wraparound versus mathematical product and subtraction branches. Use a small noncanonical or overflow boundary only if applicable to the actual statement; distinguish inability to apply a theorem from a counterexample.
+- Evidence: rebuild exact named modules in isolated copied local source closure, audit named declarations and axioms, preserve dependency binary trust boundary. A known-false theorem must fail; a concrete nearby positive case must pass.
+
+Prospective execution ceiling: ONE software validation attempt, at most 300 seconds total (TERM at 295 seconds, KILL reserve 5 seconds), RLIMIT_AS 8 GiB, Lean heap 3584 MiB, stack 16 MiB, one Lean worker. Exact call inventory and bounded child cleanup go in frozen supplement. No implicit retry; preserve failure and seek prospective correction if infrastructure prevents checks. No compiler/toolchain installation, native cohort, Docker, cloud or scientific runs. Frozen producer inputs must be published before replay. Reports/rendering and artifact transport are separate packaging, with their commands and limits retained.
+
+Deliverables: source and verifier closure hashes, exact logs and axiom readbacks, controls, per-claim machine/fidelity/outcome verdicts, attestation of actual reads, PDF and SVG, JSON, official artifact upload/readback and scoped local commit coordinated with shared index. Parent owns publication; no push here. No scientific status transition.

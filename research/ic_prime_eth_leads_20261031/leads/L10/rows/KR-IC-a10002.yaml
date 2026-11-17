@@ -1,0 +1,31 @@
+# DRAFT (L10). Provisional id. Receipt: none in Lean; this is a reading of the D.1 statement (label: derived from text, plan for formal check).
+id: KR-IC-a10002
+area: index-calculus
+kind: known_negative
+title: D.1 gives no discount for linear or low-rank vertices and has no q-ary (prime-digit) form
+claim: >-
+  As stated, Theorem D.1 (openai/math ETH paper, Appendix D) bounds the contraction by
+  (s+L)^{O(1)} 2^{O(s/sqrt(log s))} where the exponent depends only on the number s of one-bit edges;
+  vertex tensors are black boxes evaluated from their descriptions in time (s+L)^b 2^{A s^{9/10}}, so a
+  vertex that is F_p-linear or low rank earns no reduction in the exponent. Edges are bits and the
+  proof is 2-adic (valuations, F_{2^e} residue field, l0 = 1-z, l1 = z); the paper treats no q-ary
+  edge alphabet and supplies no p-adic analogue. Thus Fourier-gadget or ring-linear structure
+  (leads L1, L2) can help a solver, not the D.1 bound, and a p-ary digit network is outside D.1 as stated.
+  Also: D.1's recursion is inert below s ~ 2^{2^85} edges (admission u0 >= lambda^{4/5}); below it
+  the algorithm is brute force 2^s (derived by prior-session audit).
+status: reported
+setting: {field: prime, model: boolean_tensor_network}
+sources:
+  - ref: KN-LIT-caa51d
+    locator: "App. D, Thm D.1 statement (eth.txt l. 3018-3029); vertices as immutable descriptions (l. 3595-3600); cost depends on s only (l. 3612-3632); 2-adic machinery (l. 3295-3311)"
+    verification_state: secondary_source   # line numbers quoted from LEADS.md s1; eth.txt no longer on disk, so not re-checked in L10
+forecloses:
+  - linear vertices cheaper in tensor contraction
+  - q-ary tensor network under D.1
+  - p-ary digit network inherits D.1 exponent
+  - Fourier gadget lowers the D.1 exponent
+internal:
+  - {ref: LEAD-EXO-hashed-factor-base-tensor-ecdl, relation: extends, note: "ternary 3-adic packet variant built internally did not improve the exponent (crypto research/prime_tensor_variants_20261030)"}
+dominated_by: null
+added: '2026-10-31'
+superseded_by: null

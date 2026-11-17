@@ -1,0 +1,84 @@
+research/p256_aux_smooth_20261114/aux_base.cpp: In function ‘Base build(unsigned int)’:
+research/p256_aux_smooth_20261114/aux_base.cpp:305:34: error: invalid initialization of reference of type ‘const Object&’ {aka ‘const std::map<std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> >&’} from expression of type ‘<brace-enclosed initializer list>’
+  305 |         b.trials.push_back(object({{"domain",quoted("coset")},{"index",num(i)},{"status",quoted(status)}}));
+      |                            ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+research/p256_aux_smooth_20261114/aux_base.cpp:70:34: note: in passing argument 1 of ‘std::string object(const Object&)’
+   70 | std::string object(const Object& v) {
+      |                    ~~~~~~~~~~~~~~^
+research/p256_aux_smooth_20261114/aux_base.cpp:334:41: error: no matching function for call to ‘std::map<std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> >::map(<brace-enclosed initializer list>)’
+  334 |       {"signed_points",num(rows.size())}};
+      |                                         ^
+In file included from /usr/include/c++/14/map:63,
+                 from research/p256_aux_smooth_20261114/aux_base.cpp:15:
+/usr/include/c++/14/bits/stl_map.h:302:9: note: candidate: ‘template<class _InputIterator> std::map<_Key, _Tp, _Compare, _Alloc>::map(_InputIterator, _InputIterator, const _Compare&, const allocator_type&) [with _Key = std::__cxx11::basic_string<char>; _Tp = std::__cxx11::basic_string<char>; _Compare = std::less<std::__cxx11::basic_string<char> >; _Alloc = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >]’
+  302 |         map(_InputIterator __first, _InputIterator __last,
+      |         ^~~
+/usr/include/c++/14/bits/stl_map.h:302:9: note:   candidate expects 4 arguments, 10 provided
+/usr/include/c++/14/bits/stl_map.h:285:9: note: candidate: ‘template<class _InputIterator> std::map<_Key, _Tp, _Compare, _Alloc>::map(_InputIterator, _InputIterator) [with _Key = std::__cxx11::basic_string<char>; _Tp = std::__cxx11::basic_string<char>; _Compare = std::less<std::__cxx11::basic_string<char> >; _Alloc = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >]’
+  285 |         map(_InputIterator __first, _InputIterator __last)
+      |         ^~~
+/usr/include/c++/14/bits/stl_map.h:285:9: note:   candidate expects 2 arguments, 10 provided
+/usr/include/c++/14/bits/stl_map.h:268:9: note: candidate: ‘template<class _InputIterator> std::map<_Key, _Tp, _Compare, _Alloc>::map(_InputIterator, _InputIterator, const allocator_type&) [with _Key = std::__cxx11::basic_string<char>; _Tp = std::__cxx11::basic_string<char>; _Compare = std::less<std::__cxx11::basic_string<char> >; _Alloc = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >]’
+  268 |         map(_InputIterator __first, _InputIterator __last,
+      |         ^~~
+/usr/include/c++/14/bits/stl_map.h:268:9: note:   candidate expects 3 arguments, 10 provided
+/usr/include/c++/14/bits/stl_map.h:262:7: note: candidate: ‘std::map<_Key, _Tp, _Compare, _Alloc>::map(std::initializer_list<std::pair<const _Key, _Tp> >, const allocator_type&) [with _Key = std::__cxx11::basic_string<char>; _Tp = std::__cxx11::basic_string<char>; _Compare = std::less<std::__cxx11::basic_string<char> >; _Alloc = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >; allocator_type = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >]’
+  262 |       map(initializer_list<value_type> __l, const allocator_type& __a)
+      |       ^~~
+/usr/include/c++/14/bits/stl_map.h:262:7: note:   candidate expects 2 arguments, 10 provided
+/usr/include/c++/14/bits/stl_map.h:256:7: note: candidate: ‘std::map<_Key, _Tp, _Compare, _Alloc>::map(std::map<_Key, _Tp, _Compare, _Alloc>&&, std::__type_identity_t<_Alloc>&) [with _Key = std::__cxx11::basic_string<char>; _Tp = std::__cxx11::basic_string<char>; _Compare = std::less<std::__cxx11::basic_string<char> >; _Alloc = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >; std::__type_identity_t<_Alloc> = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >]’
+  256 |       map(map&& __m, const __type_identity_t<allocator_type>& __a)
+      |       ^~~
+/usr/include/c++/14/bits/stl_map.h:256:7: note:   candidate expects 2 arguments, 10 provided
+/usr/include/c++/14/bits/stl_map.h:252:7: note: candidate: ‘std::map<_Key, _Tp, _Compare, _Alloc>::map(const std::map<_Key, _Tp, _Compare, _Alloc>&, std::__type_identity_t<_Alloc>&) [with _Key = std::__cxx11::basic_string<char>; _Tp = std::__cxx11::basic_string<char>; _Compare = std::less<std::__cxx11::basic_string<char> >; _Alloc = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >; std::__type_identity_t<_Alloc> = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >]’
+  252 |       map(const map& __m, const __type_identity_t<allocator_type>& __a)
+      |       ^~~
+/usr/include/c++/14/bits/stl_map.h:252:7: note:   candidate expects 2 arguments, 10 provided
+/usr/include/c++/14/bits/stl_map.h:248:7: note: candidate: ‘std::map<_Key, _Tp, _Compare, _Alloc>::map(const allocator_type&) [with _Key = std::__cxx11::basic_string<char>; _Tp = std::__cxx11::basic_string<char>; _Compare = std::less<std::__cxx11::basic_string<char> >; _Alloc = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >; allocator_type = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >]’
+  248 |       map(const allocator_type& __a)
+      |       ^~~
+/usr/include/c++/14/bits/stl_map.h:248:7: note:   candidate expects 1 argument, 10 provided
+/usr/include/c++/14/bits/stl_map.h:240:7: note: candidate: ‘std::map<_Key, _Tp, _Compare, _Alloc>::map(std::initializer_list<std::pair<const _Key, _Tp> >, const _Compare&, const allocator_type&) [with _Key = std::__cxx11::basic_string<char>; _Tp = std::__cxx11::basic_string<char>; _Compare = std::less<std::__cxx11::basic_string<char> >; _Alloc = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >; allocator_type = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >]’
+  240 |       map(initializer_list<value_type> __l,
+      |       ^~~
+/usr/include/c++/14/bits/stl_map.h:240:7: note:   candidate expects 3 arguments, 10 provided
+/usr/include/c++/14/bits/stl_map.h:227:7: note: candidate: ‘std::map<_Key, _Tp, _Compare, _Alloc>::map(std::map<_Key, _Tp, _Compare, _Alloc>&&) [with _Key = std::__cxx11::basic_string<char>; _Tp = std::__cxx11::basic_string<char>; _Compare = std::less<std::__cxx11::basic_string<char> >; _Alloc = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >]’
+  227 |       map(map&&) = default;
+      |       ^~~
+/usr/include/c++/14/bits/stl_map.h:227:7: note:   candidate expects 1 argument, 10 provided
+/usr/include/c++/14/bits/stl_map.h:219:7: note: candidate: ‘std::map<_Key, _Tp, _Compare, _Alloc>::map(const std::map<_Key, _Tp, _Compare, _Alloc>&) [with _Key = std::__cxx11::basic_string<char>; _Tp = std::__cxx11::basic_string<char>; _Compare = std::less<std::__cxx11::basic_string<char> >; _Alloc = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >]’
+  219 |       map(const map&) = default;
+      |       ^~~
+/usr/include/c++/14/bits/stl_map.h:219:7: note:   candidate expects 1 argument, 10 provided
+/usr/include/c++/14/bits/stl_map.h:206:7: note: candidate: ‘std::map<_Key, _Tp, _Compare, _Alloc>::map(const _Compare&, const allocator_type&) [with _Key = std::__cxx11::basic_string<char>; _Tp = std::__cxx11::basic_string<char>; _Compare = std::less<std::__cxx11::basic_string<char> >; _Alloc = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >; allocator_type = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >]’
+  206 |       map(const _Compare& __comp,
+      |       ^~~
+/usr/include/c++/14/bits/stl_map.h:206:7: note:   candidate expects 2 arguments, 10 provided
+/usr/include/c++/14/bits/stl_map.h:197:7: note: candidate: ‘std::map<_Key, _Tp, _Compare, _Alloc>::map() [with _Key = std::__cxx11::basic_string<char>; _Tp = std::__cxx11::basic_string<char>; _Compare = std::less<std::__cxx11::basic_string<char> >; _Alloc = std::allocator<std::pair<const std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >]’
+  197 |       map() = default;
+      |       ^~~
+/usr/include/c++/14/bits/stl_map.h:197:7: note:   candidate expects 0 arguments, 10 provided
+research/p256_aux_smooth_20261114/aux_base.cpp:343:25: error: invalid initialization of reference of type ‘const Object&’ {aka ‘const std::map<std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> >&’} from expression of type ‘<brace-enclosed initializer list>’
+  343 |     b.certificate=object({{"auxiliary_icv1",quoted("ICV1:fp-"+P.get_str()+":0:"+Z(P+1).get_str()+":1728:unk:unk:r:"+aux_hash.substr(0,12))},
+      |                   ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  344 |       {"auxiliary_model",model(AUX)},{"auxiliary_slug",quoted("icv1-fp256-t0-"+aux_hash.substr(0,8))},
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  345 |       {"auxiliary_order",dec(P+1)},{"auxiliary_order_basis",quoted("j1728-character-pairing-p=3mod4")},
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  346 |       {"chain",array(steps)},{"coset",point_json(b.coset)},{"depth",num(depth)},
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  347 |       {"dump_sha256",quoted(hash(b.dump+"\n"))},{"factor_base_id",quoted(b.fb_id)},
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  348 |       {"group_order_is_asserted_smooth","false"},{"identity_preimage",b.identity},
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  349 |       {"kernel",point_json(b.kernel)},{"kernel96",point_json(b.kernel96)},
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  350 |       {"odd_cofactor",dec(odd)},{"p",dec(P)},{"schema",quoted("p256.aligned_auxiliary_certificate/v1")},
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  351 |       {"seed",quoted(SEED)},{"smooth_subgroup_order",dec(two96)},{"terminal",point_json(b.terminal)},
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  352 |       {"trials",array(b.trials)},{"verification_standing",quoted("producer-unverified")}});
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+research/p256_aux_smooth_20261114/aux_base.cpp:70:34: note: in passing argument 1 of ‘std::string object(const Object&)’
+   70 | std::string object(const Object& v) {
+      |                    ~~~~~~~~~~~~~~^

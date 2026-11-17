@@ -1,0 +1,512 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "inc",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        23.19347702595614,
+        25.381019933588185,
+        45.06890610227664
+      ],
+      "charged_sum": 8598572.0,
+      "native_sum": 8109929,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "ksum3-n176",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        156.45330286344506,
+        156.7601644125072,
+        159.5219183540665
+      ],
+      "charged_sum": 58002299.0,
+      "native_sum": 1137635,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "ksum3-n246",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        426.5287328166824,
+        427.0769337107555,
+        432.01074175741337
+      ],
+      "charged_sum": 158127995.0,
+      "native_sum": 2032358,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "ksum4-n19",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        9.044630431004528,
+        10.523049337414733,
+        23.828819495106565
+      ],
+      "charged_sum": 3353137.0,
+      "native_sum": 5480977,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "ksum4-n26",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        8.303106235036347,
+        8.81882628318485,
+        13.460306716521362
+      ],
+      "charged_sum": 3078230.0,
+      "native_sum": 1911941,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "ksum4-n37",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        25.185542247209174,
+        25.37037047148609,
+        27.033824489978276
+      ],
+      "charged_sum": 9337095.0,
+      "native_sum": 685218,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "ksum4-n52",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        97.86289764900148,
+        97.95870234746307,
+        98.82094463361732
+      ],
+      "charged_sum": 36280941.0,
+      "native_sum": 355179,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "ksum4-n74",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        408.9917086444955,
+        409.0921350061283,
+        409.99597226082216
+      ],
+      "charged_sum": 151626453.0,
+      "native_sum": 372313,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "mitmbatch-n512",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        23.19347702595614,
+        25.381019933588185,
+        45.06890610227664
+      ],
+      "charged_sum": 8598572.0,
+      "native_sum": 8109929,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "mitmblocked-n512",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        23.19347702595614,
+        25.381019933588185,
+        45.06890610227664
+      ],
+      "charged_sum": 8598572.0,
+      "native_sum": 8109929,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "rho-neg",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.134802538448937,
+        1.2466009859513727,
+        2.252787013473292
+      ],
+      "charged_sum": 420708.0,
+      "native_sum": 414473,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "inc",
+      "b": "ksum3-n176",
+      "verdict": "inc < ksum3-n176"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "inc",
+      "b": "ksum3-n246",
+      "verdict": "inc < ksum3-n246"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "inc",
+      "b": "ksum4-n19",
+      "verdict": "ksum4-n19 < inc"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "inc",
+      "b": "ksum4-n26",
+      "verdict": "ksum4-n26 < inc"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "inc",
+      "b": "ksum4-n37",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "inc",
+      "b": "ksum4-n52",
+      "verdict": "inc < ksum4-n52"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "inc",
+      "b": "ksum4-n74",
+      "verdict": "inc < ksum4-n74"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "inc",
+      "b": "mitmbatch-n512",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "inc",
+      "b": "mitmblocked-n512",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "inc",
+      "b": "rho-neg",
+      "verdict": "rho-neg < inc"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum3-n176",
+      "b": "ksum3-n246",
+      "verdict": "ksum3-n176 < ksum3-n246"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum3-n176",
+      "b": "ksum4-n19",
+      "verdict": "ksum4-n19 < ksum3-n176"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum3-n176",
+      "b": "ksum4-n26",
+      "verdict": "ksum4-n26 < ksum3-n176"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum3-n176",
+      "b": "ksum4-n37",
+      "verdict": "ksum4-n37 < ksum3-n176"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum3-n176",
+      "b": "ksum4-n52",
+      "verdict": "ksum4-n52 < ksum3-n176"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum3-n176",
+      "b": "ksum4-n74",
+      "verdict": "ksum3-n176 < ksum4-n74"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum3-n176",
+      "b": "mitmbatch-n512",
+      "verdict": "mitmbatch-n512 < ksum3-n176"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum3-n176",
+      "b": "mitmblocked-n512",
+      "verdict": "mitmblocked-n512 < ksum3-n176"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum3-n176",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum3-n176"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum3-n246",
+      "b": "ksum4-n19",
+      "verdict": "ksum4-n19 < ksum3-n246"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum3-n246",
+      "b": "ksum4-n26",
+      "verdict": "ksum4-n26 < ksum3-n246"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum3-n246",
+      "b": "ksum4-n37",
+      "verdict": "ksum4-n37 < ksum3-n246"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum3-n246",
+      "b": "ksum4-n52",
+      "verdict": "ksum4-n52 < ksum3-n246"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum3-n246",
+      "b": "ksum4-n74",
+      "verdict": "ksum4-n74 < ksum3-n246"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum3-n246",
+      "b": "mitmbatch-n512",
+      "verdict": "mitmbatch-n512 < ksum3-n246"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum3-n246",
+      "b": "mitmblocked-n512",
+      "verdict": "mitmblocked-n512 < ksum3-n246"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum3-n246",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum3-n246"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n19",
+      "b": "ksum4-n26",
+      "verdict": "ksum4-n26 < ksum4-n19"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n19",
+      "b": "ksum4-n37",
+      "verdict": "ksum4-n19 < ksum4-n37"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n19",
+      "b": "ksum4-n52",
+      "verdict": "ksum4-n19 < ksum4-n52"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n19",
+      "b": "ksum4-n74",
+      "verdict": "ksum4-n19 < ksum4-n74"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n19",
+      "b": "mitmbatch-n512",
+      "verdict": "ksum4-n19 < mitmbatch-n512"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n19",
+      "b": "mitmblocked-n512",
+      "verdict": "ksum4-n19 < mitmblocked-n512"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n19",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum4-n19"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n26",
+      "b": "ksum4-n37",
+      "verdict": "ksum4-n26 < ksum4-n37"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n26",
+      "b": "ksum4-n52",
+      "verdict": "ksum4-n26 < ksum4-n52"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n26",
+      "b": "ksum4-n74",
+      "verdict": "ksum4-n26 < ksum4-n74"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n26",
+      "b": "mitmbatch-n512",
+      "verdict": "ksum4-n26 < mitmbatch-n512"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n26",
+      "b": "mitmblocked-n512",
+      "verdict": "ksum4-n26 < mitmblocked-n512"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n26",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum4-n26"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n37",
+      "b": "ksum4-n52",
+      "verdict": "ksum4-n37 < ksum4-n52"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n37",
+      "b": "ksum4-n74",
+      "verdict": "ksum4-n37 < ksum4-n74"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n37",
+      "b": "mitmbatch-n512",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n37",
+      "b": "mitmblocked-n512",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n37",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum4-n37"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n52",
+      "b": "ksum4-n74",
+      "verdict": "ksum4-n52 < ksum4-n74"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n52",
+      "b": "mitmbatch-n512",
+      "verdict": "mitmbatch-n512 < ksum4-n52"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n52",
+      "b": "mitmblocked-n512",
+      "verdict": "mitmblocked-n512 < ksum4-n52"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n52",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum4-n52"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n74",
+      "b": "mitmbatch-n512",
+      "verdict": "mitmbatch-n512 < ksum4-n74"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n74",
+      "b": "mitmblocked-n512",
+      "verdict": "mitmblocked-n512 < ksum4-n74"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "ksum4-n74",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum4-n74"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "mitmbatch-n512",
+      "b": "mitmblocked-n512",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "mitmbatch-n512",
+      "b": "rho-neg",
+      "verdict": "rho-neg < mitmbatch-n512"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "mitmblocked-n512",
+      "b": "rho-neg",
+      "verdict": "rho-neg < mitmblocked-n512"
+    }
+  ]
+}

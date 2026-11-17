@@ -1,0 +1,20 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\begin{document}
+\section*{R90 rank-32 transport: bound-61 prefix and dimension failure}
+The single frozen attempt checked forward column 1 at its first
+pole-clearing power 61. Its full R50 module product and corrupted-coordinate
+control passed. Forward column 2 failed when Singular converted a
+32-component vector with a trailing zero to a 31-by-1 matrix. The driver
+rejected the attempt; the reverse direction was not reached.
+
+\begin{center}\includegraphics[width=\textwidth]{diagram.pdf}\end{center}
+
+Source revision: \texttt{156f7cbe80488153878fb2a96f711df18faedcf2}.
+The one-thread native run used seed 90, a 4 GiB virtual-memory cap and a
+1200-second cap. All 18 raw archive members passed a fresh readback hash
+check. A new frozen source must use an explicitly sized 32-by-1 matrix
+for every extracted power vector. See \texttt{CM.md} and
+\texttt{results.json} for the scoped evidence.
+\end{document}

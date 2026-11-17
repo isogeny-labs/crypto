@@ -1,0 +1,53 @@
+ELF Header:
+  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 
+  Class:                             ELF64
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              EXEC (Executable file)
+  Machine:                           Advanced Micro Devices X86-64
+  Version:                           0x1
+  Entry point address:               0x40166a
+  Start of program headers:          64 (bytes into file)
+  Start of section headers:          50952 (bytes into file)
+  Flags:                             0x0
+  Size of this header:               64 (bytes)
+  Size of program headers:           56 (bytes)
+  Number of program headers:         8
+  Size of section headers:           64 (bytes)
+  Number of section headers:         19
+  Section header string table index: 18
+
+Program Headers:
+  Type           Offset             VirtAddr           PhysAddr
+                 FileSiz            MemSiz              Flags  Align
+  LOAD           0x0000000000000000 0x0000000000400000 0x0000000000400000
+                 0x0000000000000230 0x0000000000000230  R      0x1000
+  LOAD           0x0000000000001000 0x0000000000401000 0x0000000000401000
+                 0x000000000000687d 0x000000000000687d  R E    0x1000
+  LOAD           0x0000000000008000 0x0000000000408000 0x0000000000408000
+                 0x0000000000001898 0x0000000000001898  R      0x1000
+  LOAD           0x0000000000009fc8 0x000000000040afc8 0x000000000040afc8
+                 0x0000000000000250 0x0000000000000d08  RW     0x1000
+  NOTE           0x0000000000000200 0x0000000000400200 0x0000000000400200
+                 0x0000000000000030 0x0000000000000030  R      0x8
+  GNU_PROPERTY   0x0000000000000200 0x0000000000400200 0x0000000000400200
+                 0x0000000000000030 0x0000000000000030  R      0x8
+  GNU_STACK      0x0000000000000000 0x0000000000000000 0x0000000000000000
+                 0x0000000000000000 0x0000000000000000  RW     0x10
+  GNU_RELRO      0x0000000000009fc8 0x000000000040afc8 0x000000000040afc8
+                 0x0000000000000038 0x0000000000000038  R      0x1
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     .note.gnu.property 
+   01     .init .text .fini 
+   02     .rodata .eh_frame 
+   03     .init_array .fini_array .data.rel.ro .got .got.plt .data .bss 
+   04     .note.gnu.property 
+   05     .note.gnu.property 
+   06     
+   07     .init_array .fini_array .data.rel.ro .got .got.plt 
+
+There is no dynamic section in this file.

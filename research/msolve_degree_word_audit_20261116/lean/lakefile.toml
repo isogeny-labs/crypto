@@ -1,0 +1,11 @@
+name = "msolve_degree_word_audit"
+version = "0.1.0"
+defaultTargets = ["MsolveDegreeWordAudit"]
+
+[[require]]
+name = "theorem_refutations"
+path = "../../theorem_census_20261109/lean"
+
+[[lean_lib]]
+name = "MsolveDegreeWordAudit"
+roots = ["DegreeImports", "DegreeWords", "DegreeFamily", "F4Boundary", "NativeWitness", "DegreeCertificate"]

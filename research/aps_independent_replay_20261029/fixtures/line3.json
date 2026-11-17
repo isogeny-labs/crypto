@@ -1,0 +1,284 @@
+{
+  "schema": "aps.single-relation.correctness/v1",
+  "fixture": "toy101",
+  "arm": "line3",
+  "labels": "guaranteed",
+  "subset_size": 2,
+  "seed": 20261026,
+  "attempt_cap": 32,
+  "solver_budget_ms_per_attempt": 10000,
+  "first_informative": true,
+  "curve_icv1": "ICV1:fp-101:-5:107:36:unk:unk:r:9ced75c2406a",
+  "curve_model": {
+    "a": "59",
+    "b": "6",
+    "field": "fp-101",
+    "form": "y^2=x^3+a*x+b",
+    "p": "101",
+    "v": "1"
+  },
+  "generator": [
+    78,
+    4
+  ],
+  "target": [
+    28,
+    28
+  ],
+  "expected_public_logarithm": 37,
+  "status": "verified",
+  "attempts": [
+    {
+      "base": {
+        "parts": [
+          [
+            76,
+            67
+          ],
+          [
+            44,
+            28
+          ],
+          [
+            31,
+            20
+          ]
+        ],
+        "points": {
+          "20": {
+            "x": 20,
+            "y": 55,
+            "u": 38,
+            "v": 1
+          },
+          "28": {
+            "x": 28,
+            "y": 73,
+            "u": 33,
+            "v": 1
+          },
+          "31": {
+            "x": 31,
+            "y": 35,
+            "u": 2,
+            "v": 1
+          },
+          "44": {
+            "x": 44,
+            "y": 44,
+            "u": 95,
+            "v": 1
+          },
+          "67": {
+            "x": 67,
+            "y": 45,
+            "u": 52,
+            "v": 1
+          },
+          "76": {
+            "x": 76,
+            "y": 50,
+            "u": 45,
+            "v": 106
+          }
+        },
+        "draws": 6
+      },
+      "algebra": {
+        "complete": true,
+        "stopped_early": false,
+        "coordinate_sets": [],
+        "solver_calls": 1,
+        "solving_degree": 4,
+        "max_rows": 14,
+        "max_columns": 20,
+        "f4_field_multiplications": 4146,
+        "timed_out": false,
+        "roots": {
+          "equation_roots_visited": 0,
+          "candidates_rejected": 0,
+          "domain_evaluations": 0,
+          "factored_univariates": 0,
+          "root_field_multiplications": 0,
+          "full_field_branches": 0
+        }
+      },
+      "recovery": null
+    },
+    {
+      "base": {
+        "parts": [
+          [
+            57,
+            5
+          ],
+          [
+            40,
+            94
+          ],
+          [
+            53,
+            6
+          ]
+        ],
+        "points": {
+          "5": {
+            "x": 5,
+            "y": 27,
+            "u": 65,
+            "v": 106
+          },
+          "6": {
+            "x": 6,
+            "y": 77,
+            "u": 32,
+            "v": 106
+          },
+          "40": {
+            "x": 40,
+            "y": 3,
+            "u": 4,
+            "v": 1
+          },
+          "53": {
+            "x": 53,
+            "y": 45,
+            "u": 66,
+            "v": 1
+          },
+          "57": {
+            "x": 57,
+            "y": 55,
+            "u": 57,
+            "v": 106
+          },
+          "94": {
+            "x": 94,
+            "y": 82,
+            "u": 2,
+            "v": 106
+          }
+        },
+        "draws": 6
+      },
+      "algebra": {
+        "complete": true,
+        "stopped_early": false,
+        "coordinate_sets": [],
+        "solver_calls": 1,
+        "solving_degree": 4,
+        "max_rows": 14,
+        "max_columns": 20,
+        "f4_field_multiplications": 4138,
+        "timed_out": false,
+        "roots": {
+          "equation_roots_visited": 0,
+          "candidates_rejected": 0,
+          "domain_evaluations": 0,
+          "factored_univariates": 0,
+          "root_field_multiplications": 0,
+          "full_field_branches": 0
+        }
+      },
+      "recovery": null
+    },
+    {
+      "base": {
+        "parts": [
+          [
+            84,
+            89
+          ],
+          [
+            77,
+            97
+          ],
+          [
+            83,
+            55
+          ]
+        ],
+        "points": {
+          "55": {
+            "x": 55,
+            "y": 59,
+            "u": 85,
+            "v": 1
+          },
+          "77": {
+            "x": 77,
+            "y": 44,
+            "u": 75,
+            "v": 106
+          },
+          "83": {
+            "x": 83,
+            "y": 9,
+            "u": 47,
+            "v": 106
+          },
+          "84": {
+            "x": 84,
+            "y": 7,
+            "u": 87,
+            "v": 106
+          },
+          "89": {
+            "x": 89,
+            "y": 87,
+            "u": 104,
+            "v": 106
+          },
+          "97": {
+            "x": 97,
+            "y": 3,
+            "u": 80,
+            "v": 106
+          }
+        },
+        "draws": 6
+      },
+      "algebra": {
+        "complete": false,
+        "stopped_early": true,
+        "coordinate_sets": [
+          [
+            83,
+            84,
+            89
+          ]
+        ],
+        "solver_calls": 2,
+        "solving_degree": 4,
+        "max_rows": 14,
+        "max_columns": 20,
+        "f4_field_multiplications": 4198,
+        "timed_out": false,
+        "roots": {
+          "equation_roots_visited": 1,
+          "candidates_rejected": 0,
+          "domain_evaluations": 0,
+          "factored_univariates": 2,
+          "root_field_multiplications": 100,
+          "full_field_branches": 0
+        }
+      },
+      "recovery": {
+        "logarithm": 37,
+        "coordinates": [
+          83,
+          84,
+          89
+        ],
+        "signs": [
+          1,
+          -1,
+          -1
+        ],
+        "a": 70,
+        "b": 1
+      }
+    }
+  ],
+  "limits": "Tiny fixed fixtures only. No target scalar is passed to relation solving. F4 counters exclude setup and are not a complete cost model. Even-arity weights require one point per original partition; orbit expansion and regrouping still check B != 0. No performance, scaling, or general-security conclusion."
+}

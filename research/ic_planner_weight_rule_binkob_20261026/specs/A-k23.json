@@ -1,0 +1,111 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "ic planner weight rule (binary, Koblitz), Phase A, Koblitz curve k23: orbit columns",
+  "description": "research/ic_planner_weight_rule_binkob_20261026. The candidate arm is the ic plan (ic-planner/2, w = 0) output; every other IC arm changes the factor base only.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 23
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261027
+  },
+  "arms": [
+    {
+      "name": "rho",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius"
+      }
+    },
+    {
+      "name": "plan",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "targets": "stride-renew",
+          "factor_base": "compact-orbit-scan:columns=3,raw_x_cap=100000000"
+        }
+      }
+    },
+    {
+      "name": "c2",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "targets": "stride-renew",
+          "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=100000000"
+        }
+      }
+    },
+    {
+      "name": "c4",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "targets": "stride-renew",
+          "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000"
+        }
+      }
+    },
+    {
+      "name": "c6",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "targets": "stride-renew",
+          "factor_base": "compact-orbit-scan:columns=6,raw_x_cap=100000000"
+        }
+      }
+    },
+    {
+      "name": "c8",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "targets": "stride-renew",
+          "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=100000000"
+        }
+      }
+    },
+    {
+      "name": "c12",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "targets": "stride-renew",
+          "factor_base": "compact-orbit-scan:columns=12,raw_x_cap=100000000"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 20261028,
+    "isolation_required": "L2",
+    "timeout_seconds": 1800
+  }
+}

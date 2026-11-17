@@ -1,0 +1,105 @@
+$ target/release/ecbench verify --dir research/curve25519_autolab_20261104/round-023/sessions/train-k28 --replay 8 --out research/curve25519_autolab_20261104/round-023/analysis/verify-train-k28.json
+--- stdout ---
+{
+  "schema": "ecbench.audit/v1",
+  "session_id": "ECBS1h31d232f09128",
+  "session_status": "complete",
+  "records_bound": true,
+  "ok": true,
+  "problems": [],
+  "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "executions_planned": true,
+    "host_hash": true,
+    "last_seq": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "regraded": true,
+    "replays": true,
+    "session_build": true,
+    "session_complete": true,
+    "session_id": true,
+    "spec_id": true,
+    "status_counts": true,
+    "workloads": true
+  },
+  "records": 576,
+  "verified_records": 576,
+  "planned_executions": 576,
+  "regraded": true,
+  "replays": [
+    {
+      "seq": 308,
+      "record_id": "ECR1h960051ded9a0",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 351,
+      "record_id": "ECR1h5a2d51026896",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 374,
+      "record_id": "ECR1hfe0687987088",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 403,
+      "record_id": "ECR1h28f97c456508",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 417,
+      "record_id": "ECR1h550f3d1a1f1b",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 449,
+      "record_id": "ECR1h2908193c13c6",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 476,
+      "record_id": "ECR1h94209974e8d6",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 519,
+      "record_id": "ECR1h0dbb2ff9dafc",
+      "reproduced": true,
+      "detail": "identical"
+    }
+  ],
+  "replay_selection": "sample",
+  "replay_seed": 7407884271008367436,
+  "replay_candidates": 288,
+  "files": {
+    "host.json": "b8348bd44f9acc8aacba5609515892db64831bce872158fb014258cfa1ed706f",
+    "plan.json": "b3607a808916bf7b925acef08cce2a9e0abafd5198b0bfe52b5b9f94aeb8597c",
+    "records.jsonl": "2c0d924eb3901c833ca856409c45311fbd31f136aa7ec45219456f8b9dd7db61",
+    "session.json": "09c9463f567055350808169b62719c3f6474e52334eee4ad91cc75ed24f68968",
+    "spec.json": "56c473f66f0db98d3c92a705684e08775eac0f981f34eb7855f289b9339da92f"
+  },
+  "auditor_binary_sha256": "e7242bc192bda8c8da9e64895afe943e8aa47cfa37bd490d656e2181758e9533",
+  "auditor_env_class_id": "ECBENV3h14b998cb7595",
+  "auditor_hardware_class_id": "ECBHW1h7ab3d53affbe",
+  "audited_unix_ms": 1793778867548
+}
+
+--- stderr ---
+receipt sha256 6cf7635e0645899e5c69a1687794429f6743e1ece75f325641b779e7620a0654
+replay seed 7407884271008367436 (288 eligible runs)
+audit OK: 576 records, 576 verified, 8 replays reproduced, 0 problems
+
+--- exit Some(0) ---

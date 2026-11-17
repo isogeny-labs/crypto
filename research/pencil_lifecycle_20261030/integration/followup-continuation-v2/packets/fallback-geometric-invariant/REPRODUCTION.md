@@ -1,0 +1,3 @@
+# Reproduction
+
+Restore archived .lean.txt sources as .lean in a fresh directory. Preserve unique final module names. Adapt source-host paths in check.sh/replay.sh to the restored directory and pinned dependencies. dependencies.txt and per-attempt before.sha256 identify source/cache/toolchain bindings. Compiled caches and the native checker binary are omitted. The five modules listed in check.rs are final fresh targets; other sources are dependency snapshots. inventory.txt lists thirteen declarations. This source-and-receipt archive is not a self-contained toolchain distribution. Independent review remains pending.

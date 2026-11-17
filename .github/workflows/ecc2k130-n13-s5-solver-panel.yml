@@ -1,0 +1,26 @@
+name: ECC2K-130 n13 S5 solver panel preflight
+on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
+    paths:
+      - 'research/notes/ecc2k130/n13_s5_solver_panel_20260925/**'
+      - '.github/workflows/ecc2k130-n13-s5-solver-panel.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen-query-preflight:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-n13-s5-solver-panel.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-n13-s5-solver-panel.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Reconstruct 32 exact queries and check frozen source bytes
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 research/notes/ecc2k130/n13_s5_solver_panel_20260925/ci_replay.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only n13_s5_solver_panel_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"

@@ -1,0 +1,14 @@
+{
+  "schema": "zero-fiber-native-launch-reconciliation/v1",
+  "service": "twist-zero-native-gate-v1.service",
+  "service_terminal_exit": 2,
+  "native_compile_or_test_started": false,
+  "cause": "Isolation wrapper excluded by the existing custom sparse checkout",
+  "standard_sparse_helper": {
+    "command": "bash /home/ec2-user/crypto-twist-ic/scripts/sparse-checkout.sh add --path tools/isolated_bench.py",
+    "exit": 2,
+    "message": "sparse-checkout: no profile applied here; run 'apply' first"
+  },
+  "repair": "Materialize only the committed wrapper using git restore --ignore-skip-worktree-bits; retain the existing sparse profile and all original receipts",
+  "fresh_gate": "native-gate-v2"
+}

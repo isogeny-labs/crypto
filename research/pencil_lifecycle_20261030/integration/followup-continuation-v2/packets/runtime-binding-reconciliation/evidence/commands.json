@@ -1,0 +1,138 @@
+[
+  {
+    "label": "version",
+    "argv": [
+      "/usr/bin/sudo",
+      "-n",
+      "/usr/bin/env",
+      "-i",
+      "PATH=/usr/bin:/bin",
+      "HOME=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+      "DOCKER_CONFIG=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+      "/usr/bin/docker",
+      "--host",
+      "unix:///var/run/docker.sock",
+      "version",
+      "--format",
+      "{{json .}}"
+    ],
+    "exit": 0,
+    "timeout_seconds": 15,
+    "observed_at": "2026-11-01T20:12:55.424724+00:00"
+  },
+  {
+    "label": "upstream",
+    "argv": [
+      "/usr/bin/sudo",
+      "-n",
+      "/usr/bin/env",
+      "-i",
+      "PATH=/usr/bin:/bin",
+      "HOME=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+      "DOCKER_CONFIG=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+      "/usr/bin/docker",
+      "--host",
+      "unix:///var/run/docker.sock",
+      "image",
+      "inspect",
+      "--format",
+      "{\"Id\":{{json .Id}},\"RepoTags\":{{json .RepoTags}},\"RepoDigests\":{{json .RepoDigests}},\"Os\":{{json .Os}},\"Architecture\":{{json .Architecture}},\"OnBuild\":{{json .Config.OnBuild}},\"User\":{{json .Config.User}},\"Entrypoint\":{{json .Config.Entrypoint}},\"Volumes\":{{json .Config.Volumes}},\"Labels\":{{json .Config.Labels}},\"Layers\":{{json .RootFS.Layers}}}",
+      "public.ecr.aws/aws-cli/aws-cli@sha256:b94fc7612d131f1a3cb76145ba3385c813ad7561ef2c2b60c89fbd5dfee93d39"
+    ],
+    "exit": 0,
+    "timeout_seconds": 15,
+    "observed_at": "2026-11-01T20:12:55.594562+00:00"
+  },
+  {
+    "label": "base",
+    "argv": [
+      "/usr/bin/sudo",
+      "-n",
+      "/usr/bin/env",
+      "-i",
+      "PATH=/usr/bin:/bin",
+      "HOME=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+      "DOCKER_CONFIG=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+      "/usr/bin/docker",
+      "--host",
+      "unix:///var/run/docker.sock",
+      "image",
+      "inspect",
+      "--format",
+      "{\"Id\":{{json .Id}},\"RepoTags\":{{json .RepoTags}},\"RepoDigests\":{{json .RepoDigests}},\"Os\":{{json .Os}},\"Architecture\":{{json .Architecture}},\"OnBuild\":{{json .Config.OnBuild}},\"User\":{{json .Config.User}},\"Entrypoint\":{{json .Config.Entrypoint}},\"Volumes\":{{json .Config.Volumes}},\"Labels\":{{json .Config.Labels}},\"Layers\":{{json .RootFS.Layers}}}",
+      "sha256:347667d6ecc9294ab7bfcc83411fb47f7548c8d1ca5f7d315cca23fc4b115476"
+    ],
+    "exit": 0,
+    "timeout_seconds": 15,
+    "observed_at": "2026-11-01T20:12:55.621832+00:00"
+  },
+  {
+    "label": "runtime",
+    "argv": [
+      "/usr/bin/sudo",
+      "-n",
+      "/usr/bin/env",
+      "-i",
+      "PATH=/usr/bin:/bin",
+      "HOME=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+      "DOCKER_CONFIG=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+      "/usr/bin/docker",
+      "--host",
+      "unix:///var/run/docker.sock",
+      "image",
+      "inspect",
+      "--format",
+      "{\"Id\":{{json .Id}},\"RepoTags\":{{json .RepoTags}},\"RepoDigests\":{{json .RepoDigests}},\"Os\":{{json .Os}},\"Architecture\":{{json .Architecture}},\"OnBuild\":{{json .Config.OnBuild}},\"User\":{{json .Config.User}},\"Entrypoint\":{{json .Config.Entrypoint}},\"Volumes\":{{json .Config.Volumes}},\"Labels\":{{json .Config.Labels}},\"Layers\":{{json .RootFS.Layers}}}",
+      "sha256:1adcc3d49e5660bf25cd15f839f757786e0aa50455d6e255fe38cd19bc3cad60"
+    ],
+    "exit": 0,
+    "timeout_seconds": 15,
+    "observed_at": "2026-11-01T20:12:55.648759+00:00"
+  },
+  {
+    "label": "container-Q0",
+    "argv": [
+      "/usr/bin/sudo",
+      "-n",
+      "/usr/bin/env",
+      "-i",
+      "PATH=/usr/bin:/bin",
+      "HOME=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+      "DOCKER_CONFIG=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+      "/usr/bin/docker",
+      "--host",
+      "unix:///var/run/docker.sock",
+      "container",
+      "inspect",
+      "--format",
+      "{\"Id\":{{json .Id}},\"Name\":{{json .Name}},\"Image\":{{json .Image}},\"State\":{{json .State.Status}},\"Pid\":{{json .State.Pid}},\"Owner\":{{json (index .Config.Labels \"isolab.runtime-qualification.owner\")}}}",
+      "0b8ac008507f0556c98d3aa450d0182681e8a87423b397ed991a532fdac768b1"
+    ],
+    "exit": 1,
+    "timeout_seconds": 15,
+    "observed_at": "2026-11-01T20:12:55.674082+00:00"
+  },
+  {
+    "label": "container-Q1",
+    "argv": [
+      "/usr/bin/sudo",
+      "-n",
+      "/usr/bin/env",
+      "-i",
+      "PATH=/usr/bin:/bin",
+      "HOME=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+      "DOCKER_CONFIG=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+      "/usr/bin/docker",
+      "--host",
+      "unix:///var/run/docker.sock",
+      "container",
+      "inspect",
+      "--format",
+      "{\"Id\":{{json .Id}},\"Name\":{{json .Name}},\"Image\":{{json .Image}},\"State\":{{json .State.Status}},\"Pid\":{{json .State.Pid}},\"Owner\":{{json (index .Config.Labels \"isolab.runtime-qualification.owner\")}}}",
+      "7d27f2c3bcc377834f8aa98abffde996564450f02ba4b089420bfbae6859a70c"
+    ],
+    "exit": 1,
+    "timeout_seconds": 15,
+    "observed_at": "2026-11-01T20:12:55.696501+00:00"
+  }
+]

@@ -1,0 +1,29 @@
+⚠ [1255/1257] Built CryptoLean.Group.SingleRelation (2.5s)
+warning: CryptoLean/Group/SingleRelation.lean: imports `Mathlib.SetTheory.Cardinal.Finite` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: CryptoLean/Group/SingleRelation.lean: imports `Mathlib.Data.Nat.Choose.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: CryptoLean/Group/SingleRelation.lean: imports `Mathlib.Tactic.LinearCombination` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: CryptoLean/Group/SingleRelation.lean: imports `Mathlib.Tactic.Ring` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: CryptoLean/Group/SingleRelation.lean: imports `Mathlib.Algebra.BigOperators.Ring.Finset` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✖ [1256/1257] Building KernelInstance (18s)
+warning: KernelInstance.lean: imports `Mathlib.Data.Matrix.Mul` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: KernelInstance.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/workspace/isogeny-labs/crypto-energy/research/curve25519_torus_native_20261115/lean-kernel/.lake/packages/Cli/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-energy/research/curve25519_torus_native_20261115/lean-kernel/.lake/packages/batteries/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-energy/research/curve25519_torus_native_20261115/lean-kernel/.lake/packages/Qq/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-energy/research/curve25519_torus_native_20261115/lean-kernel/.lake/packages/aesop/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-energy/research/curve25519_torus_native_20261115/lean-kernel/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-energy/research/curve25519_torus_native_20261115/lean-kernel/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-energy/research/curve25519_torus_native_20261115/lean-kernel/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-energy/research/curve25519_torus_native_20261115/lean-kernel/.lake/packages/plausible/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-energy/research/curve25519_torus_native_20261115/lean-kernel/.lake/packages/mathlib/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-energy/research/curve25519_torus_native_20261115/lean-kernel/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-energy/research/curve25519_torus_native_20261115/lean-kernel/.lake/build/lib/lean /workspace/curve25519-lean-tools/elan/toolchains/leanprover--lean4---v4.35.0/bin/lean /workspace/isogeny-labs/crypto-energy/research/curve25519_torus_native_20261115/lean-kernel/KernelInstance.lean -o /workspace/isogeny-labs/crypto-energy/research/curve25519_torus_native_20261115/lean-kernel/.lake/build/lib/lean/KernelInstance.olean -i /workspace/isogeny-labs/crypto-energy/research/curve25519_torus_native_20261115/lean-kernel/.lake/build/lib/lean/KernelInstance.ilean -c /workspace/isogeny-labs/crypto-energy/research/curve25519_torus_native_20261115/lean-kernel/.lake/build/ir/KernelInstance.c --setup /workspace/isogeny-labs/crypto-energy/research/curve25519_torus_native_20261115/lean-kernel/.lake/build/ir/KernelInstance.setup.json --json
+error: KernelInstance.lean:27:4: failed to synthesize instance of type class
+  HDiv (ZMod scalarOrder) (ZMod scalarOrder) ?m.61
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+error: KernelInstance.lean:32:78: (deterministic) timeout at `whnf`, maximum number of heartbeats (200000) has been reached
+
+Note: Use `set_option maxHeartbeats <num>` to set the limit.
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+error: KernelInstance.lean:20:0: (deterministic) timeout at `whnf`, maximum number of heartbeats (200000) has been reached
+
+Note: Use `set_option maxHeartbeats <num>` to set the limit.
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+info: KernelInstance.lean:40:0: 'Curve25519KernelInstance.extract_scalar' does not depend on any axioms
+info: KernelInstance.lean:41:0: 'Curve25519KernelInstance.mixed_label_fiber' depends on axioms: [propext, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- KernelInstance
+error: build failed

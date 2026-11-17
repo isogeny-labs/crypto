@@ -1,0 +1,589 @@
+{
+ "schema": "e28-replay-comparison/v1",
+ "tool": "research/e28_tau_20261030/validate_e28.rs compare",
+ "rule": "every leaf of every committed record against the replay: integers and floats by their text (equal text, or equal value with the same integer/float form; integers compared exactly as i128), strings and booleans exactly; wall_ms (Stage A) and ms (each solve-cost control call) are wall-clock and listed, not compared",
+ "runs_total": 12,
+ "runs_identical": 12,
+ "fields_compared": 8690,
+ "fields_identical": 8690,
+ "all_identical": true,
+ "runs": [
+  {
+   "run": "stage0",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage0.json",
+    "sha256": "52e1fb5111d9fde3442935f6f847f1edfc6181ba87fcf7542907eeeeb6f6a4b5"
+   },
+   "replay": {
+    "path": "research/e28_tau_20261030/replay/stage0.json",
+    "sha256": "52e1fb5111d9fde3442935f6f847f1edfc6181ba87fcf7542907eeeeb6f6a4b5"
+   },
+   "fields_compared": 680,
+   "fields_identical": 680,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [],
+   "identical": true
+  },
+  {
+   "run": "stage_a_p53s1",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p53s1.json",
+    "sha256": "30033c65edc84d95ce3a40ddbcf464d0ebf469bbb16ac62f47b9048a2c8f48fb"
+   },
+   "replay": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p53s1.json",
+    "sha256": "7a3894504575eb368dc3a474e925797021f4338657306925f2856f0b23c11919"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 870.629773,
+     "replay": 890.7982880000001
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 697.067455,
+     "replay": 715.601494
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 810.737226,
+     "replay": 780.799754
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 3871.814552,
+     "replay": 3549.8672559999995
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "stage_a_p53s2",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p53s2.json",
+    "sha256": "91f4e8b4ecf2b6fca541949e4985795a02fabeb11cdb762c41f546f133a8a0bf"
+   },
+   "replay": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p53s2.json",
+    "sha256": "2794b5811fb931d0926f42527ee2d1107dc087ef52841a248d12faf63ec64506"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 2126.374859,
+     "replay": 1874.6142479999999
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 864.166392,
+     "replay": 823.090966
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 838.60062,
+     "replay": 780.9413910000001
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 4627.397665,
+     "replay": 4226.8113920000005
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "stage_a_p101s1",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p101s1.json",
+    "sha256": "c8a60cc1d6029510fab295516838cb2dfe85b5401a5ae85a23687bed815007cb"
+   },
+   "replay": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p101s1.json",
+    "sha256": "5e2a0e42cad8ab2b50e2997515138b873bd3c5957f2849dc5f052350538b38cc"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 867.682061,
+     "replay": 755.240554
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 900.4847689999999,
+     "replay": 903.2542550000001
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 714.53494,
+     "replay": 681.72385
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 7251.6978930000005,
+     "replay": 6083.322338
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "stage_a_p101s2",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p101s2.json",
+    "sha256": "70d43f1bcb88cc5632a90b8b98b664fd84d09e69401b2f37d44573b896867898"
+   },
+   "replay": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p101s2.json",
+    "sha256": "c7a426e4161f8e8fc00171efb777dc94187be44f174d1fa805e8792d62f0f197"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 801.214851,
+     "replay": 681.8283469999999
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 750.624779,
+     "replay": 702.255962
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 719.5520720000001,
+     "replay": 794.15037
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 6327.831181,
+     "replay": 5704.357996
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "stage_a_p149s1",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p149s1.json",
+    "sha256": "edab042b735f1bbe25031c0666dffcd06e6b62d34a4f21a40d092ad4014148aa"
+   },
+   "replay": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p149s1.json",
+    "sha256": "ae92d65f5b6930a3bec472b8153a5f5014029596ec6e992e8a0183fd01ed0a4c"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 916.424923,
+     "replay": 834.554115
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 818.099462,
+     "replay": 694.2519
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 828.948398,
+     "replay": 702.3270590000001
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 19059.507651,
+     "replay": 18420.248303
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "stage_a_p149s2",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p149s2.json",
+    "sha256": "4d588d77a6f5bbb30a98894b63d887851d1029f0e9880f557c839dbc06ef4340"
+   },
+   "replay": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p149s2.json",
+    "sha256": "a1c3934e670750c68a892c4998f26c285dbb6febc22c5cec89b837f2c971ed2f"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 862.697764,
+     "replay": 763.8747340000001
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 921.914042,
+     "replay": 907.571142
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 889.0017449999999,
+     "replay": 883.5903969999999
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 13831.445676,
+     "replay": 13870.918216
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "stage_a_p197s1",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p197s1.json",
+    "sha256": "8238b908e0602355fad084574a0f6624f77e8d4da344e455beb79a3b94db6f1b"
+   },
+   "replay": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p197s1.json",
+    "sha256": "03b61733cb9b5e8216900f1589a80d0a7ff48a8bf6bbcb8c992463983f64976d"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 710.067504,
+     "replay": 1259.835425
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 677.867824,
+     "replay": 922.997827
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 816.163914,
+     "replay": 1326.692786
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 48495.386747,
+     "replay": 58591.313037
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "stage_a_p197s2",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p197s2.json",
+    "sha256": "6964caa50a20383ff9cf176a2064764ea1a6224cac56e1275b455e3c8effd642"
+   },
+   "replay": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p197s2.json",
+    "sha256": "7e1c1ee866a06fed5cb6c8e38ad2d3638b9f0bb2c10fef2e8f9b547ebea6b9ea"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 783.654313,
+     "replay": 878.7068139999999
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 804.8046840000001,
+     "replay": 970.172334
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 844.0574819999999,
+     "replay": 1183.073629
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 37187.715621,
+     "replay": 43826.251284
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "stage_a_p269s1",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p269s1.json",
+    "sha256": "30bdf423eec2f3219fa6a7f10a4722de4f9fa7741950838a41a0815d350dbee3"
+   },
+   "replay": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p269s1.json",
+    "sha256": "df8a484af101e025885989dc07cd1851b7ef715b8705a68eda3c83af0d63be02"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 719.2534619999999,
+     "replay": 994.973117
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 633.594287,
+     "replay": 913.505865
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 860.467353,
+     "replay": 1268.077192
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 66426.400092,
+     "replay": 87147.714348
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "stage_a_p269s2",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p269s2.json",
+    "sha256": "2f135549359478c20392033233caa7e15e46be29cddf100451aa94eda6a6e751"
+   },
+   "replay": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p269s2.json",
+    "sha256": "6824fa84b9faf3740d9e574cad7901f761204ee3502481fb3e0693cbbeb4fd35"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 734.408208,
+     "replay": 1272.463194
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 728.2582629999999,
+     "replay": 1537.713103
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 1896.393921,
+     "replay": 2375.813038
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 110324.170603,
+     "replay": 139617.43980599998
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "control_decomposed",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/control_decomposed.json",
+    "sha256": "e99734142f86c421452a3f60bc284ed4620f48477eca470d811eca1ce8896e39"
+   },
+   "replay": {
+    "path": "research/e28_tau_20261030/replay/control_decomposed.json",
+    "sha256": "6811a5dae8cbbe3b2fcdf43406801097d6e19c5a7ddf6c664036ad4fe3699c5a"
+   },
+   "fields_compared": 240,
+   "fields_identical": 240,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].calls[0].ms",
+     "committed": 773.593265,
+     "replay": 734.065158
+    },
+    {
+     "path": "$[0].calls[1].ms",
+     "committed": 821.111124,
+     "replay": 845.160405
+    },
+    {
+     "path": "$[0].calls[2].ms",
+     "committed": 815.216112,
+     "replay": 690.497807
+    },
+    {
+     "path": "$[1].calls[0].ms",
+     "committed": 796.8679950000001,
+     "replay": 620.812466
+    },
+    {
+     "path": "$[1].calls[1].ms",
+     "committed": 659.949805,
+     "replay": 665.7813209999999
+    },
+    {
+     "path": "$[1].calls[2].ms",
+     "committed": 671.70381,
+     "replay": 789.357315
+    },
+    {
+     "path": "$[2].calls[0].ms",
+     "committed": 726.602707,
+     "replay": 871.406982
+    },
+    {
+     "path": "$[2].calls[1].ms",
+     "committed": 701.471218,
+     "replay": 839.958859
+    },
+    {
+     "path": "$[2].calls[2].ms",
+     "committed": 896.556765,
+     "replay": 942.999546
+    },
+    {
+     "path": "$[3].calls[0].ms",
+     "committed": 835.2769890000001,
+     "replay": 784.4189289999999
+    },
+    {
+     "path": "$[3].calls[1].ms",
+     "committed": 742.799121,
+     "replay": 673.005391
+    },
+    {
+     "path": "$[3].calls[2].ms",
+     "committed": 842.8428369999999,
+     "replay": 683.290516
+    },
+    {
+     "path": "$[4].calls[0].ms",
+     "committed": 773.555077,
+     "replay": 719.826648
+    },
+    {
+     "path": "$[4].calls[1].ms",
+     "committed": 828.497582,
+     "replay": 752.909799
+    },
+    {
+     "path": "$[4].calls[2].ms",
+     "committed": 754.979631,
+     "replay": 660.108287
+    },
+    {
+     "path": "$[5].calls[0].ms",
+     "committed": 903.5432460000001,
+     "replay": 728.9970089999999
+    },
+    {
+     "path": "$[5].calls[1].ms",
+     "committed": 812.4913230000001,
+     "replay": 552.975662
+    },
+    {
+     "path": "$[5].calls[2].ms",
+     "committed": 672.032346,
+     "replay": 579.585291
+    },
+    {
+     "path": "$[6].calls[0].ms",
+     "committed": 825.843455,
+     "replay": 838.367982
+    },
+    {
+     "path": "$[6].calls[1].ms",
+     "committed": 866.3876270000001,
+     "replay": 784.6921500000001
+    },
+    {
+     "path": "$[6].calls[2].ms",
+     "committed": 821.4149520000001,
+     "replay": 869.939464
+    },
+    {
+     "path": "$[7].calls[0].ms",
+     "committed": 1714.090398,
+     "replay": 2052.96681
+    },
+    {
+     "path": "$[7].calls[1].ms",
+     "committed": 848.392594,
+     "replay": 747.726997
+    },
+    {
+     "path": "$[7].calls[2].ms",
+     "committed": 628.826734,
+     "replay": 874.727224
+    },
+    {
+     "path": "$[8].calls[0].ms",
+     "committed": 680.267563,
+     "replay": 828.24775
+    },
+    {
+     "path": "$[8].calls[1].ms",
+     "committed": 667.8259330000001,
+     "replay": 922.3225170000001
+    },
+    {
+     "path": "$[8].calls[2].ms",
+     "committed": 705.393582,
+     "replay": 735.154318
+    },
+    {
+     "path": "$[9].calls[0].ms",
+     "committed": 762.500992,
+     "replay": 818.782778
+    },
+    {
+     "path": "$[9].calls[1].ms",
+     "committed": 791.921451,
+     "replay": 873.270388
+    },
+    {
+     "path": "$[9].calls[2].ms",
+     "committed": 688.124861,
+     "replay": 820.061382
+    }
+   ],
+   "identical": true
+  }
+ ]
+}

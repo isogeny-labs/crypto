@@ -1,0 +1,29 @@
+{
+  "source_commit": "57c1449cf8c3afdf7df7224da0a7fd13fa75c8aa",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--offline",
+    "--release",
+    "--bin",
+    "ecbench_owner_closure",
+    "--example",
+    "ecbench_child_overhead",
+    "-j",
+    "2",
+    "--",
+    "--quiet"
+  ],
+  "exit_code": 0,
+  "started_utc": "2026-10-30T21:33:01Z",
+  "ended_utc": "2026-10-30T21:40:29Z",
+  "source_manifest": "validation-source-hashes-v11.json",
+  "source_manifest_sha256": "f6944b055f4d735292efeeb141bb5d3097d4c264d7cf68f826a752be109657a4",
+  "scientific_cohort_execution": false,
+  "purpose": "software regression; known-answer fixtures only",
+  "logs": {
+    "stdout": "aeb47d923097d9e643d21f51e469edcdb226409947d5f4881fffff31c1171487",
+    "stderr": "4b9fcc2e4cbb640505ea233b5e08ffefa101631c84eced5dc6a1c34a55552e73"
+  }
+}

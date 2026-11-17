@@ -1,0 +1,14 @@
+if(mcAllowed!=1){print("MAPSOLVE27_NOT_ADMITTED");quit;}
+print("MAPSOLVE27_BOUNDED_GROEBNER_START");
+ideal mapGB=std(mapEquations);
+if(size(mapGB)==1 && mapGB[1]==1){
+ matrix unitCertificate=lift(mapEquations,ideal(1));
+ matrix unitResidual=matrix(mapEquations)*unitCertificate-matrix(ideal(1));
+ if(unitResidual[1,1]!=0){ERROR("map unit certificate does not recombine");}
+ link unitOut="ASCII:w map-unit-certificate.sing";open(unitOut);
+ write(unitOut,string(unitCertificate));close(unitOut);
+ print("MAPSOLVE27_COMPLETE_RR_F32_EQUIVARIANT_SPACE_EMPTY");
+}else{
+ print("MAPSOLVE27_NONUNIT_NOT_AN_EVALUATED_MAP");dim(mapGB);size(mapGB);
+}
+print("MAPSOLVE27_ALL_CHECKS_PASS");quit;

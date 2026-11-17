@@ -1,0 +1,49 @@
+{
+  "schema": "projective-law-common22-residual/v1",
+  "scope": "common 2+2 returned-coordinate congruence only; no full divisor-class or exceptional-branch theorem",
+  "rust_source_sha256": "5976e7f30b3e9c5c49a5fc0f4095404b7322832e4b02f467bc3cb7e0d9dcc8c0",
+  "lean_source_sha256": "bc7209459b15d17889aad8b7c0d9302d1fa6ef5236afa66ea229fa689c2f8eb6",
+  "rows": [
+    {
+      "obligation": "r_has_C_squared_factor",
+      "equal": true,
+      "monomials": 1369,
+      "polynomial_sha256": "ac415fa24307f2ec8262aa1c814c0e825d2ced013e4e385e0b9f2ad1aa228e01"
+    },
+    {
+      "obligation": "qdelta_matches_source",
+      "equal": true,
+      "monomials": 81,
+      "polynomial_sha256": "dddf40fe22a9c36189fd8682ab17d4d9a8a181764079333acddb9677792cc35d"
+    },
+    {
+      "obligation": "rdelta_matches_source",
+      "equal": true,
+      "monomials": 1384,
+      "polynomial_sha256": "b3fd8e8f2199f94e8f1f8cca8cd2044c6b751fdbb7bf0625dad110759157d5c5"
+    },
+    {
+      "obligation": "s_matches_lean",
+      "equal": true,
+      "monomials": 1577,
+      "polynomial_sha256": "87270f7b556085cffd3e50ac948c7dcebeb8c5f82eea67b5a933c7cbd1400568"
+    },
+    {
+      "obligation": "t_matches_lean",
+      "equal": true,
+      "monomials": 11350,
+      "polynomial_sha256": "e0bb699bd75a1a4855849e9d36ec051e993f0d0c0156e92dccf6aa1669a205db"
+    }
+  ],
+  "raw_terms": {
+    "path": "common22-residual-terms.csv",
+    "sha256": "46fc5775dc7c0ebc59929cbd730078c58968425281dcd086b3e7f76fc4bc7b44",
+    "bytes": 3295428,
+    "rows": 15761
+  },
+  "return_tuple": "q,r,s,t,(z1*z2)*ccoef,bw",
+  "negative_checks": [
+    "Rust output-s subtraction mutation rejected",
+    "Lean outputS subtraction mutation rejected"
+  ]
+}

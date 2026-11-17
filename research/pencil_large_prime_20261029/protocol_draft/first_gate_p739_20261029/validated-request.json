@@ -1,0 +1,82 @@
+{
+  "schema": "isolab.eks.resumable/v1",
+  "run_name": "pencil-p739-20261029",
+  "deadline_unix_seconds": 1793324657,
+  "build": {
+    "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:13f27597322fced9230635cedc5a4e228daf2fb951f77652edbbcab17e674c1b",
+    "source_revision": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+    "ecbench_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab"
+  },
+  "runtime_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:4201400427fcdba18fe88cfda6cd7f46b12db15fcc371ee56166d0fca5f5caa3",
+  "spec": {
+    "arms": [
+      {
+        "method": {
+          "id": "ic.three_leads_genus2_pencil_symbolic_v2",
+          "params": {
+            "matrix_coefficient_cap": "25000000",
+            "small_denominator": "8"
+          }
+        },
+        "name": "pencil",
+        "role": "candidate"
+      },
+      {
+        "method": {
+          "id": "rho.three_leads_negation_v1",
+          "params": {
+            "trial_cap": "128700"
+          }
+        },
+        "name": "rho",
+        "role": "reference"
+      },
+      {
+        "method": {
+          "id": "rho.three_leads_negation_v1",
+          "params": {
+            "trial_cap": "128700"
+          }
+        },
+        "name": "rho_AA",
+        "role": "control"
+      }
+    ],
+    "description": "Prepared specification; execution requires a frozen experiment protocol and admission. Public synthetic archived targets; fixed denominator8 selected before symbolic cohort observations. Cold/online clocks, failures and memory retained; no full-price GAE claim.",
+    "label": "pencil-symbolic-gate-p739",
+    "measurement": {
+      "algorithm_seed_round": "measured_index",
+      "isolation_required": "L2",
+      "order": "shuffle",
+      "rounds": 5,
+      "seed": 2026101801,
+      "timeout_seconds": 3600,
+      "warmup": 1
+    },
+    "schema": "ecbench.spec/v1",
+    "workloads": {
+      "curves": [
+        {
+          "a": 493102,
+          "b": 193650,
+          "family": "scholten",
+          "group_order": 546352,
+          "gx": 433246,
+          "gy": 59741,
+          "kind": "three_leads",
+          "modulus": 1,
+          "n": 2,
+          "p": 739,
+          "parameter": 0,
+          "r": 34147
+        }
+      ],
+      "target_seed": 202610181260,
+      "targets_per_curve": 60
+    }
+  },
+  "instance_type": "c8a.2xlarge",
+  "checkpoint_interval_seconds": 300,
+  "max_restores": 1,
+  "memory": "8Gi"
+}

@@ -1,0 +1,12 @@
+[package]
+name = "towerdump"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+crypto = { path = "../../.." }
+
+[profile.dev]
+opt-level = 1
+debug = 0
+incremental = false

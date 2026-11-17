@@ -1,0 +1,58 @@
+module
+
+public import Mathlib.LinearAlgebra.Dimension.Constructions
+public import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
+
+public section
+
+namespace CodedPacking
+
+variable {K C V I : Type*} [Field K]
+variable [AddCommGroup C] [Module K C] [AddCommGroup V] [Module K V]
+variable [Fintype I] [DecidableEq I]
+
+def assemble (E : I → C →ₗ[K] V) : (I → C) →ₗ[K] V :=
+  ∑ i, (E i).comp (LinearMap.proj i)
+
+omit [DecidableEq I] in
+theorem assemble_apply (E : I → C →ₗ[K] V) (x : I → C) :
+    assemble E x = ∑ i, E i (x i) := by
+  simp [assemble, LinearMap.sum_apply]
+
+theorem recover_component (E : I → C →ₗ[K] V) (F : I → V →ₗ[K] C)
+    (hcross : ∀ i j, i ≠ j → (F j).comp (E i) = 0)
+    (x : I → C) (j : I) :
+    F j (assemble E x) = F j (E j (x j)) := by
+  rw [assemble_apply, map_sum]
+  apply Finset.sum_eq_single j
+  · intro i hi hij
+    have h := congrArg (fun f : C →ₗ[K] C => f (x i)) (hcross i j hij)
+    simpa using h
+  · simp
+
+theorem assemble_injective (E : I → C →ₗ[K] V) (F : I → V →ₗ[K] C)
+    (hcross : ∀ i j, i ≠ j → (F j).comp (E i) = 0)
+    (hdiag : ∀ j, Function.Injective ((F j).comp (E j))) :
+    Function.Injective (assemble E) := by
+  intro x y hxy
+  funext j
+  apply hdiag j
+  change F j (E j (x j)) = F j (E j (y j))
+  rw [← recover_component E F hcross x j, ← recover_component E F hcross y j]
+  exact congrArg (F j) hxy
+
+theorem packing_dimension_bound [Module.Finite K C] [Module.Finite K V]
+    (E : I → C →ₗ[K] V) (F : I → V →ₗ[K] C)
+    (hcross : ∀ i j, i ≠ j → (F j).comp (E i) = 0)
+    (hdiag : ∀ j, Function.Injective ((F j).comp (E j))) :
+    Fintype.card I * Module.finrank K C ≤ Module.finrank K V := by
+  have h := (assemble E).finrank_le_finrank_of_injective
+    (assemble_injective E F hcross hdiag)
+  simpa [Module.finrank_pi_fintype] using h
+
+#print axioms assemble_apply
+#print axioms recover_component
+#print axioms assemble_injective
+#print axioms packing_dimension_bound
+
+end CodedPacking

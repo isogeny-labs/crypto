@@ -1,0 +1,90 @@
+{
+  "schema": "research.component-result/v1",
+  "component": "czero-cantor-correspondence",
+  "root": "/var/tmp/pencil-czero-cantor-20261101-v1",
+  "status": "checked-algebra-and-written-geometric-derivation",
+  "main_declarations": 12,
+  "control_declarations": 6,
+  "axiom_readbacks": 18,
+  "allowed_axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "final_gates": {
+    "cantor2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "unique1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "composition1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls3": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "failures": [
+    "probe1 unknown polynomial division APIs in loaded cache",
+    "cantor1 noncomputable constructor",
+    "controls1 indentation",
+    "controls2 constant-map numeric normalization"
+  ],
+  "source": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/src/cryptanalysis/three_leads.rs",
+    "sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+    "lines": [
+      "900-926",
+      "990-1060"
+    ]
+  },
+  "proof_assumptions": [
+    "field",
+    "monic degree-five f with coefficient4 zero",
+    "B nonzero",
+    "C zero",
+    "input support divides f-v squared",
+    "Bezout identities supplied to general composition lemma"
+  ],
+  "written_geometric_assumptions": [
+    "algebraic closure",
+    "characteristic not two",
+    "smooth y squared=f with f squarefree monic degree five",
+    "unique infinity and orders x=-2 y=-5",
+    "Mumford ideal effective divisors with local lengths"
+  ],
+  "unproved_composition": [
+    "actual curve/valuation/Picard carrier in Lean",
+    "native pegcd invariant and termination",
+    "native pdiv/pexact/prem correspondence and trim lengths",
+    "compiled equivalence"
+  ],
+  "scientific_execution": false,
+  "repository_edits": false,
+  "independent_review": false,
+  "visual_inspection": {
+    "pdf_pages": [
+      1,
+      2
+    ],
+    "diagram": "embedded SVG inspected on page1",
+    "result": "all text and diagram fit; no clipping"
+  },
+  "literature": [
+    "https://link.springer.com/article/10.1007/s13389-024-00351-7"
+  ]
+}

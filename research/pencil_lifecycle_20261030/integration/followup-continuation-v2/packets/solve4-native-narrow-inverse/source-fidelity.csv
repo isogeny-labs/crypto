@@ -1,0 +1,7 @@
+native_component,native_lines,lean_declarations,premises_and_scope
+raw_mul,13,WordComparator.mul_decode,canonical inputs; p<=2^32 prevents 64-bit multiplication overflow
+pow lowbit,29,lowbit_one;nextR,literal n&1==1
+pow square,32,nextA;next_step,unconditional square including last iteration
+pow shift,33,WideModPow.half_value;loop_decode,shift-right1; exponent<2^fuel
+pow return,35,modpow_decode,fuel64 sufficient for every UInt64 exponent
+inv,37-40,generator_product;generator_decode,"prime p,1<p,p<=2^32,x canonical and nonzero; tally_i excluded"

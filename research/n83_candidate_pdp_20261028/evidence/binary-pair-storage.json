@@ -1,0 +1,15 @@
+{
+  "schema": "n83.binary-pair-storage/v1",
+  "run_prefix": "s3://setec-astronomy-artifacts/runs/n83-binary-m2-pair-20261028-r1/local/",
+  "archive": {
+    "path": "binary-pair-archives/runs.tar.xz",
+    "kind": "raw",
+    "bytes": 1177400,
+    "sha256": "38c0fd69215a2cf966a2bd14049f4f5b465aa8b4302f363c77c23079aca861dc"
+  },
+  "object": "s3://setec-astronomy-artifacts/store/sha256/38/38c0fd69215a2cf966a2bd14049f4f5b465aa8b4302f363c77c23079aca861dc",
+  "source_archive_sha256": "662c87cd5760064a5a25f0ad7bcd5cf2ba497f7dc5448b0890e8374db0f24b72",
+  "source_commit": "ac08cf2f9029145b48e799c1de5ede0564732b3d",
+  "raw_file_count": 60,
+  "restoration": "Download archive, extract to fresh directory, sha256sum -c manifest.sha256, instrument replay ROOT; all sealed files verified before publication"
+}

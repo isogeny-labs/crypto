@@ -1,0 +1,40 @@
+{
+  "schema": "pencil.matrix-binding-status/v1",
+  "status": "fixed_identities_and_pins_verified",
+  "models": 21,
+  "actions": 105,
+  "source_pins": 12,
+  "built_in_controls": 11,
+  "copied_input_controls": [
+    {
+      "case": "digest_mismatch",
+      "native_exit": 1,
+      "expected_rejection": true
+    },
+    {
+      "case": "missing_model",
+      "native_exit": 1,
+      "expected_rejection": true
+    },
+    {
+      "case": "swapped_scalars",
+      "native_exit": 1,
+      "expected_rejection": true
+    }
+  ],
+  "loader_source": {
+    "audited_sha256": "0bd17210577ba0107c28082318c91b8acc6b375760ba30c3761199a6ffd72ff7",
+    "difference": "Historical version caches theta inverses; supplied source uses uncached inversion. Literal loader and linear definitions agree by retained source comparison.",
+    "historical_pinned_sha256": "8ce693805a5814327e88872dd33e95d47434d602a3dfe076c8f80cb9381ea2e2",
+    "same_revision": false
+  },
+  "independent_review": "pending",
+  "publication_binding": "pending",
+  "native_row_fold_attested": false,
+  "compiled_runtime_input_provenance_attested": false,
+  "geometric_action_interpretation": "separate",
+  "scientific_execution": false,
+  "point_enumeration": false,
+  "cost_ratio": null,
+  "failed_attempt": "unavailable-pin-attempt1 preserved; existing preprovided theta bytes supplied matching pin"
+}

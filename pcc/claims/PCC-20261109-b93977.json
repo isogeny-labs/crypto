@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-09T17:24:43Z",
+ "id": "PCC-20261109-b93977",
+ "kind": "theorem",
+ "producer": {
+  "commit": "3d1dd96b01ce8324440565391efeb3dbb0deabd0",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "7ad96690d2650883613c7a90bb0cac36c792ef005ba087eca5cf3e4a56465acc",
+   "kind": "lean",
+   "project": "research/theorem_census_20261109/lean",
+   "theorem": "S4DegreeAudit.s4_degree_audit_certificate"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "m=4 only. Exact evaluation/field-map and canonical polynomial semantics, no finite-field interpolation. Does not prove all-m recursion/degree, irreducibility, solving degree, regularity or attack complexity. Unsigned producer standing.",
+ "statement": "For a general Weierstrass model over any field, the actual S4 polynomial has symbolic degree4 in every one of its four input positions, represented by canonical iterated-polynomial Sylvester determinants with the other inputs formal. After specialization, each degree is at most4 and equals4 exactly when S3 on the other three coordinates is nonzero; the fourth coefficient is S3 squared. On the actual smooth F5 curve y^2=x^3-x, S4(0,1,4,T) is the nonzero constant1 of degree0, disproving universal preservation of degree under specialization."
+}

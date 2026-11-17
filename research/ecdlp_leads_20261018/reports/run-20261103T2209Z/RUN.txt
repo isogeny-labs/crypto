@@ -1,0 +1,31 @@
+commit: 579d02b3a (code); outputs recorded by this run
+start_utc: 2026-11-03T22:12:00Z
+host: Linux 6.18.44-fc-v230 x86_64
+cpu: Intel(R) Xeon(R) Processor @ 2.80GHz, 4 cores
+rustc: rustc 1.97.0 (2d8144b78 2026-07-07)
+commands (from research/ecdlp_leads_20261018/etale_search, release build):
+  etale-search g5 hyp-enum   > g5_hyp_enum.jsonl   2> g5_hyp_enum.err
+  etale-search g5 trig-enum  > g5_trig_enum.jsonl  2> g5_trig_enum.err
+  etale-search g5 sourced <Dragutinovic non-hyp-non-trig repo> <Dragutinovic MT_Curves repo> > g5_sourced.jsonl 2> g5_sourced.err
+inputs (read as data, never executed), DusanDragutinovic on GitHub:
+  non-hyp-non-trig-genus-5-over-f_2: Complete_Intersections.txt, Pts_Count_Complete_Intersections.txt, Automorphisms_Complete_Intersections.txt
+  mt_curves: HyperellipticCurvesData.txt, HyperellipticCurvesSizeOfAutoGrp.txt, NumPts_Hyp.txt, TrigonalCurvesWithAutomorphisms.txt, NumPts_Trig.txt
+isolation: none (shared cloud container, L0); timing is not a result
+wall time (s): hyp-enum 0m6.086s, trig-enum 0m12.730s, sourced 0m52.101s (4 threads for the complete-intersection recount)
+derived: python3 candidates.py g5_sourced.jsonl > candidates.csv; awk -f tables.awk g5_sourced.jsonl > reach.csv; awk -v RUN=run-20261103T2209Z -f reach.plot.awk ../../cover-genus-budget.csv reach.csv > reach.svg
+a2a7f4d045e88851e4bfc629f874fb8f1f71fc58ef7c7a87e51c3e8ebdbe94b9  research/ecdlp_leads_20261018/reports/run-20261103T2209Z/g5_hyp_enum.jsonl
+63b57e98fe64c6732ac8559992f4f51b7588d13f9a7e4b9756514552b1d7ec27  research/ecdlp_leads_20261018/reports/run-20261103T2209Z/g5_sourced.jsonl
+a733025476ccdddd2de36f394d556d2d5bd41824dd405b9c888312ccf6bd21c3  research/ecdlp_leads_20261018/reports/run-20261103T2209Z/g5_trig_enum.jsonl
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  research/ecdlp_leads_20261018/reports/run-20261103T2209Z/g5_hyp_enum.err
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  research/ecdlp_leads_20261018/reports/run-20261103T2209Z/g5_sourced.err
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  research/ecdlp_leads_20261018/reports/run-20261103T2209Z/g5_trig_enum.err
+input sha256 2690cfa2754be446d5eaac2ae6c49c1d183f65e46ee2d033b710bb2372b39ccd  Complete_Intersections.txt
+input sha256 766bc9af26cde07fd05762fa824c3f05625a858bd559340b081fc9716e17dfe0  Pts_Count_Complete_Intersections.txt
+input sha256 96b7ebf4d63712027ef6ce19ad9e13ad4799a5029a88761047407ef0a272a395  Automorphisms_Complete_Intersections.txt
+input sha256 131def436dc5560b9d5795c2993cb3377e9887dab41aede2b8d4b2e3fea9337d  HyperellipticCurvesData.txt
+input sha256 d5498423c09a5ce6b01c82653c3d0a701d372a080cbe79355a80c21470f2bc30  HyperellipticCurvesSizeOfAutoGrp.txt
+input sha256 0f7ba57a0dd34cbf95f2bb5adb59e1ef48bae234d4dfa7c3bcb455b217b9023f  NumPts_Hyp.txt
+input sha256 49944a4d631962b2cf3b128dfa151fbad3f7ee2a2f669fa5bf15160fdbd75012  TrigonalCurvesWithAutomorphisms.txt
+input sha256 f69b1421209c4a8bb4fa5a104c05088653d22d9ec94fc8181d3eddfc7793c9e4  NumPts_Trig.txt
+input commit mt_curves aa2c581a733701bc4cb5c578d1cb02322c56a5db
+input commit non-hyp-non-trig 1315f0e54f4c45f1abdd6f966e377e2f5fb72fe8

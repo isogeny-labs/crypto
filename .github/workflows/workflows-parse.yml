@@ -1,0 +1,85 @@
+name: Workflow files parse
+# A workflow GitHub cannot parse does not fail the way a failing step does. It
+# produces a run with no jobs, named after the file path instead of the
+# workflow, and the checks inside it stop happening silently. polynomial-reuse
+# spent four days in that state on main -- red on every push, its redis-cache
+# correctness tests not running once -- because a `--lib module::` filter left a
+# plain YAML scalar ending in a colon. This job reports that as a test failure
+# with a file and a line, on the pull request that introduces it.
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - 'scripts/test_workflows_parse.py'
+      - '.github/scripts/*ci-scope*'
+      - '.github/scripts/*frozen-workflow*'
+      - '.github/scripts/n53-historical-cargo-lock-view-v1.json'
+      - '.github/scripts/check-pr-budgets.py'
+      - '.github/scripts/test-pr-budgets.py'
+      - '.github/scripts/draft_tier_gate.py'
+      - '.github/scripts/merge_sweeper.py'
+      - '.github/scripts/test_merge_sweeper.py'
+      - '.github/scripts/*result-page-triggers*'
+      - 'research/weak_curve_properties_lean_20261011/EVIDENCE_SHA256.tsv'
+      - 'research/weak_curve_conjectures_20261012/EVIDENCE_SHA256SUMS'
+# A newer push to the same pull request cancels this workflow's run for the older commit.
+# Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  parse:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/workflows/
+            /.github/scripts/
+            /scripts/test_workflows_parse.py
+            /research/weak_curve_properties_lean_20261011/EVIDENCE_SHA256.tsv
+            /research/weak_curve_conjectures_20261012/EVIDENCE_SHA256SUMS
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/weak_curve_properties_lean_20261011
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install --quiet pyyaml
+      - run: python3 -B scripts/test_workflows_parse.py -v
+      - run: python3 -B .github/scripts/test_merge_sweeper.py -v
+      - run: python3 -B .github/scripts/draft_tier_gate.py --check
+      - run: node --test .github/scripts/test-ci-scope.mjs
+      - run: node --test .github/scripts/test-frozen-workflow-check.mjs
+      - run: python3 -B .github/scripts/test-pr-budgets.py -v
+      - run: python3 -B .github/scripts/test-ecbench-session-freeze.py -v
+      - run: python3 -B .github/scripts/check-pr-budgets.py
+      - run: python3 -B .github/scripts/test-result-page-triggers.py -v
+      - run: python3 -B .github/scripts/check-result-page-triggers.py

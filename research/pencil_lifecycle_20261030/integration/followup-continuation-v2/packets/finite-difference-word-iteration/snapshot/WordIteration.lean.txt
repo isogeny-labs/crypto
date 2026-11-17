@@ -1,0 +1,91 @@
+import Difference
+set_option autoImplicit false
+namespace WordIteration
+open SieveDifference
+def canonical (p : UInt64) (s : UInt64 × UInt64 × UInt64) : Prop :=
+ s.1.toNat < p.toNat ∧ s.2.1.toNat < p.toNat ∧ s.2.2.toNat < p.toNat
+def decode (p : UInt64) (s : UInt64 × UInt64 × UInt64) : ZMod p.toNat × ZMod p.toNat × ZMod p.toNat :=
+ ((s.1.toNat : ZMod p.toNat), (s.2.1.toNat : ZMod p.toNat), (s.2.2.toNat : ZMod p.toNat))
+def step (p dd f : UInt64) (s : UInt64 × UInt64 × UInt64) : UInt64 × UInt64 × UInt64 :=
+ (wordAdd p s.1 s.2.1, wordAdd p s.2.1 dd, wordAdd p s.2.2 f)
+def iterate (p a b c e f : UInt64) : Nat → UInt64 × UInt64 × UInt64
+ | 0 => (a, wordAdd p b c, e)
+ | n+1 => step p (wordAdd p c c) f (iterate p a b c e f n)
+theorem step_canonical (p dd f : UInt64) (s : UInt64 × UInt64 × UInt64) (hp : 0 < p.toNat) :
+ canonical p (step p dd f s) := by
+ exact ⟨word_add_canonical _ _ _ hp, word_add_canonical _ _ _ hp, word_add_canonical _ _ _ hp⟩
+theorem iterate_canonical (p a b c e f : UInt64) (hp : 0 < p.toNat)
+ (ha : a.toNat < p.toNat) (he : e.toNat < p.toNat) (n : Nat) :
+ canonical p (iterate p a b c e f n) := by
+ cases n with
+ | zero => exact ⟨ha,word_add_canonical _ _ _ hp,he⟩
+ | succ n => exact step_canonical _ _ _ _ hp
+theorem decoded_iteration (p a b c e f : UInt64) (hp : 0 < p.toNat)
+ (bound : p.toNat ≤ 2^63) (ha : a.toNat < p.toNat) (hb : b.toNat < p.toNat)
+ (hc : c.toNat < p.toNat) (he : e.toNat < p.toNat) (hf : f.toNat < p.toNat) (n : Nat) :
+ decode p (iterate p a b c e f n) =
+ state (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat) (c.toNat : ZMod p.toNat)
+ (e.toNat : ZMod p.toNat) (f.toNat : ZMod p.toNat) n := by
+ induction n with
+ | zero => simp only [iterate,decode,state]; rw [word_add_decode p b c bound hb hc]
+ | succ n ih =>
+   have h := iterate_canonical p a b c e f hp ha he n
+   have hdd := word_add_canonical p c c hp
+   simp only [iterate,decode,step,state]
+   rw [word_add_decode p _ _ bound h.1 h.2.1,
+       word_add_decode p _ _ bound h.2.1 hdd,
+       word_add_decode p _ _ bound h.2.2 hf,
+       word_add_decode p c c bound hc hc]
+   have h1 := congrArg Prod.fst ih
+   have h2 := congrArg (fun x => x.2.1) ih
+   have h3 := congrArg (fun x => x.2.2) ih
+   simp only [decode] at h1 h2 h3
+   rw [h1,h2,h3]
+theorem decoded_closed (p a b c e f : UInt64) (hp : 0 < p.toNat)
+ (bound : p.toNat ≤ 2^63) (ha : a.toNat < p.toNat) (hb : b.toNat < p.toNat)
+ (hc : c.toNat < p.toNat) (he : e.toNat < p.toNat) (hf : f.toNat < p.toNat) (n : Nat) :
+ decode p (iterate p a b c e f n) =
+ (U (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat) (c.toNat : ZMod p.toNat) n,
+ D (b.toNat : ZMod p.toNat) (c.toNat : ZMod p.toNat) n,
+ V (e.toNat : ZMod p.toNat) (f.toNat : ZMod p.toNat) n) := by
+ rw [decoded_iteration p a b c e f hp bound ha hb hc he hf n, state_closed]
+def observations (p a b c e f : UInt64) (count : Nat) :=
+ (List.range count).map (fun n => (n, (decode p (iterate p a b c e f n)).1,
+ (decode p (iterate p a b c e f n)).2.2))
+theorem ordered_observations (p a b c e f : UInt64) (hp : 0 < p.toNat)
+ (bound : p.toNat ≤ 2^63) (ha : a.toNat < p.toNat) (hb : b.toNat < p.toNat)
+ (hc : c.toNat < p.toNat) (he : e.toNat < p.toNat) (hf : f.toNat < p.toNat) (count : Nat) :
+ observations p a b c e f count = reference (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat)
+ (c.toNat : ZMod p.toNat) (e.toNat : ZMod p.toNat) (f.toNat : ZMod p.toNat) count := by
+ unfold observations
+ simp_rw [decoded_iteration p a b c e f hp bound ha hb hc he hf]
+ exact ordered_evaluation _ _ _ _ _ _
+theorem same_fold {S : Type*} (p a b c e f : UInt64) (hp : 0 < p.toNat)
+ (bound : p.toNat ≤ 2^63) (ha : a.toNat < p.toNat) (hb : b.toNat < p.toNat)
+ (hc : c.toNat < p.toNat) (he : e.toNat < p.toNat) (hf : f.toNat < p.toNat) (count : Nat)
+ (branch : S → Nat × ZMod p.toNat × ZMod p.toNat → S) (initial : S) :
+ (observations p a b c e f count).foldl branch initial =
+ (reference (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat) (c.toNat : ZMod p.toNat)
+ (e.toNat : ZMod p.toNat) (f.toNat : ZMod p.toNat) count).foldl branch initial := by
+ rw [ordered_observations p a b c e f hp bound ha hb hc he hf count]
+theorem canonical_decode_eq (p x y : UInt64) (hp : 0 < p.toNat)
+ (hx : x.toNat < p.toNat) (hy : y.toNat < p.toNat) :
+ (x.toNat : ZMod p.toNat) = (y.toNat : ZMod p.toNat) ↔ x=y := by
+ letI : NeZero p.toNat := ⟨Nat.ne_of_gt hp⟩
+ constructor
+ · intro h
+   apply UInt64.toNat_inj.mp
+   have hv := congrArg ZMod.val h
+   simpa only [ZMod.val_natCast_of_lt hx,ZMod.val_natCast_of_lt hy] using hv
+ · intro h; rw [h]
+theorem canonical_decode_zero (p x : UInt64) (hp : 0 < p.toNat)
+ (hx : x.toNat < p.toNat) : (x.toNat : ZMod p.toNat)=0 ↔ x=0 := by
+ simpa only [UInt64.toNat_zero, Nat.cast_zero] using canonical_decode_eq p x 0 hp hx hp
+theorem final_wrap (p a b c e f : UInt64) (hp : 0 < p.toNat)
+ (bound : p.toNat ≤ 2^63) (ha : a.toNat < p.toNat) (hb : b.toNat < p.toNat)
+ (hc : c.toNat < p.toNat) (he : e.toNat < p.toNat) (hf : f.toNat < p.toNat) :
+ decode p (iterate p a b c e f p.toNat) = decode p (iterate p a b c e f 0) := by
+ rw [decoded_closed p a b c e f hp bound ha hb hc he hf p.toNat,
+     decoded_closed p a b c e f hp bound ha hb hc he hf 0]
+ simp [U,D,V]
+end WordIteration

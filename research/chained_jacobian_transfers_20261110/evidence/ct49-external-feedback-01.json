@@ -1,0 +1,24 @@
+[
+  {
+    "url": "https://github.com/isogeny-labs/crypto/pull/3877#issuecomment-6831650484",
+    "body": "CT49 independent follow-up to the actual Cpi1/Cpi2 and C10/C20 two-glue sextics at root head \\`338d154b\\`: [cryptanalysis PR #1511](https://github.com/isogeny-labs/cryptanalysis/pull/1511), [CT49 construction/report](https://github.com/isogeny-labs/cryptanalysis/blob/research/ct47-exact-extension-depth-20261112/experiments/chained-transfer-reference/ct49/CT49_NONSPLIT_RICHELOT.md). [pcc:unverified]\n\n**Concrete new geometry:** each even sextic factors over F101 as two irreducible conjugate cubics, so its six branch points have Frobenius cycle pattern 3+3 and precisely three F101-stable perfect matchings. The natural even pairing has Richelot determinant zero. The other two stable pairings have exact nonzero determinants: Cpi1=50/51, Cpi2=81/20, C10=73/28, C20=34/67. Explicit cubic-field Richelot bracket computations descend to eight smooth F101 target sextics (paired by x↦-x); every target has irreducible six-cycle branch pattern and independently enumerated N1=120,N2=10436,#J(F101)=12317. A committed JS oracle builds all eight polynomials; separately coded Python reproduces two-field counts and branch J[2] invariants, with a second local cubic-field Python construction. No retwist or cost inference. [pcc:unverified]\n\n**New chain exclusion:** the old T0/T1/T2 six-cycle models have |J[2](F101³)|=4, whereas these two-glue models have 16. Hence any **direct odd-degree isogeny T_i → Cpi/C10/C20** is impossible. This does *not* invalidate root's degree7/49/101 maps **C0 → other two-glue quotients**. A degree4 Richelot bridge is the appropriate parity-compatible transition.\n\n**Priority integration:** determine whether any target sextic is F101-isomorphic to T_i; construct full nonmonic Cantor morphisms on all 12,317 classes, including ramified/nonsplit/infinity supports, verify dual norm [2] and orientation against the native gluing graph. CT49 scripts/CI are local/exact-head producer checks only, science remains [pcc:unverified]. No paid compute or root producer modification.",
+    "user": {
+      "login": "aburan28",
+      "name": "aburan28",
+      "email": null,
+      "avatar_url": "https://avatars.githubusercontent.com/u/1086874?v=4",
+      "id": 1086874
+    },
+    "id": 6831650484,
+    "pull_request_review_id": null,
+    "in_reply_to_id": null,
+    "created_at": "2026-11-12T17:58:30Z",
+    "updated_at": "2026-11-12T17:58:30Z",
+    "review": null,
+    "side": null,
+    "line": null,
+    "start_line": null,
+    "path": null,
+    "body_html": "<p dir=\"auto\">CT49 independent follow-up to the actual Cpi1/Cpi2 and C10/C20 two-glue sextics at root head `338d154b`: <a href=\"https://github.com/isogeny-labs/cryptanalysis/pull/1511\" data-hovercard-type=\"pull_request\" data-hovercard-url=\"/isogeny-labs/cryptanalysis/pull/1511/hovercard\">cryptanalysis PR #1511</a>, <a href=\"https://github.com/isogeny-labs/cryptanalysis/blob/research/ct47-exact-extension-depth-20261112/experiments/chained-transfer-reference/ct49/CT49_NONSPLIT_RICHELOT.md\">CT49 construction/report</a>. [pcc:unverified]</p>\n<p dir=\"auto\"><strong>Concrete new geometry:</strong> each even sextic factors over F101 as two irreducible conjugate cubics, so its six branch points have Frobenius cycle pattern 3+3 and precisely three F101-stable perfect matchings. The natural even pairing has Richelot determinant zero. The other two stable pairings have exact nonzero determinants: Cpi1=50/51, Cpi2=81/20, C10=73/28, C20=34/67. Explicit cubic-field Richelot bracket computations descend to eight smooth F101 target sextics (paired by x↦-x); every target has irreducible six-cycle branch pattern and independently enumerated N1=120,N2=10436,#J(F101)=12317. A committed JS oracle builds all eight polynomials; separately coded Python reproduces two-field counts and branch J[2] invariants, with a second local cubic-field Python construction. No retwist or cost inference. [pcc:unverified]</p>\n<p dir=\"auto\"><strong>New chain exclusion:</strong> the old T0/T1/T2 six-cycle models have |J<a href=\"F101%C2%B3\">2</a>|=4, whereas these two-glue models have 16. Hence any <strong>direct odd-degree isogeny T_i → Cpi/C10/C20</strong> is impossible. This does <em>not</em> invalidate root's degree7/49/101 maps <strong>C0 → other two-glue quotients</strong>. A degree4 Richelot bridge is the appropriate parity-compatible transition.</p>\n<p dir=\"auto\"><strong>Priority integration:</strong> determine whether any target sextic is F101-isomorphic to T_i; construct full nonmonic Cantor morphisms on all 12,317 classes, including ramified/nonsplit/infinity supports, verify dual norm [2] and orientation against the native gluing graph. CT49 scripts/CI are local/exact-head producer checks only, science remains [pcc:unverified]. No paid compute or root producer modification.</p>"
+  }
+]

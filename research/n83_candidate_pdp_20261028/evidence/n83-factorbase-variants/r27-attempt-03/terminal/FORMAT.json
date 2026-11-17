@@ -1,0 +1,20 @@
+{
+  "schema": "n83.factor-base-terminal-format/v2",
+  "files": {
+    "job-api.json": "Raw Kubernetes Job JSON with terminal condition and immutable command/resources.",
+    "pod-api.json": "Raw Kubernetes Pod JSON including node and container exit state.",
+    "events-api.json": "Raw Kubernetes Events response filtered to the attempt Pod UID.",
+    "status-tool.json": "Isolab status response with retained Job and Pod state.",
+    "results-listing.json": "Isolab S3 result listing with keys, byte counts and checksums.",
+    "container.log": "Exact bounded container log response identifying the 404 path mismatch.",
+    "terminal-receipt.json": "Normalized infrastructure failure and producer-start boundary.",
+    "observed-at.txt": "UTC collection timestamp.",
+    "DATA_INDEX.json": "Path, byte count, SHA-256 and evidence role for each file.",
+    "manifest.sha256": "SHA-256 of all other files in this package."
+  },
+  "interpretation": {
+    "container_started": "The wrapper container started but exited during exact-key source downloads.",
+    "producer_started": "False; the runner was not invoked.",
+    "factor_base_data": "No point output was uploaded; 14 source-v3 objects remain preserved."
+  }
+}

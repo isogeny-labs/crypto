@@ -1,0 +1,48 @@
+{
+  "schema": "aps.development-receipt/v1",
+  "source_manifest": "component-source-sha256.txt",
+  "phases": [
+    {
+      "phase": "standalone-release",
+      "command": "cargo test --release --locked --manifest-path tools/aps-export/Cargo.toml",
+      "exit": 0,
+      "private_log_sha256": "12802632172a58716ca04f62fbe0c36a4208ba59e2b6e4ef91c3a8046f4fb7c3"
+    },
+    {
+      "phase": "standalone-strict-stable",
+      "command": "cargo clippy --locked --manifest-path tools/aps-export/Cargo.toml --all-targets -- -D warnings",
+      "exit": 0,
+      "private_log_sha256": "20a25c3cd66411a69d91067b901dd17e0d75804b08bb37bdec623a53a4ac0069"
+    },
+    {
+      "phase": "standalone-strict-1.98",
+      "command": "cargo +1.98.0 clippy --locked --manifest-path tools/aps-export/Cargo.toml --all-targets -- -D warnings",
+      "exit": 0,
+      "private_log_sha256": "47315e563d0a4741cfcde491950c3d1d5804624f7f10d8ac51833e9eb5166ea9"
+    },
+    {
+      "phase": "workflow-syntax",
+      "command": "actionlint .github/workflows/aps-export.yml .github/workflows/ecbench.yml",
+      "exit": 0,
+      "private_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "observed_standalone_suites": [
+    {
+      "kind": "library",
+      "passed": 38,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "kind": "CLI integration",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0
+    }
+  ],
+  "root_producer_bridge": "pending; initial compile failed on an incorrect library crate import; corrected to crypto_lib; second command in flight",
+  "root_library": "not yet started; scheduled after bridge success",
+  "performance_session_launched": false,
+  "scope": "Producer-reported component checks; no signed execution or performance attestation."
+}

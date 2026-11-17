@@ -1,0 +1,51 @@
+{
+  "schema": "pencil.branch-controls-machine-review-receipt/v1",
+  "created_utc": "2026-11-11T00:22:00Z",
+  "task": "T-2111",
+  "status": "passed",
+  "execution_performed_by_reviewer": false,
+  "inputs": {
+    "freeze.json": "d20691095b0e6f932a5f34f9107e09c56629b57da85ea94dea35c007d87f3a40",
+    "source_manifest.json": "2c7a0dfb01ec07d28ed18be8930db74145c2b70d6a0e0dd377be2f06a9dd2abb",
+    "coordinator_release_original.json": "bcbe1b0b3a1da832b45e3d1fed9dabfc6c8d8fe2afdc8c60b4be9fb1c054bdfe",
+    "coordinator_release_normalized_copy.json": "0f8d8d5eff604f72dfb42247590f680ce95a2e9387cb2b7c063726ecf2cec7c1",
+    "admission.json": "096c3dc88878d9e2c9ccd6e46ff5e0cb3ddc2693e497a761e33d726b568982a1",
+    "completion.json": "7af55a9f2fb8348da2e9fd5d9fb518ad498015effde32097f10d517bdd8607b4",
+    "compiler-receipt.json": "76f90ae4c7fbc6087c3dbfbb52e0e80c08613b141db8210c4d61587050349bf2",
+    "pre-receipt.json": "de03f61c64e844d121bb173b521ba7d2d69a7c3cf5b67a7c21f0054fab425d11",
+    "post-receipt.json": "34eb2e812c3acba5f3817bbe632164e28dfe469e04272d780ae1dfd4b6662e00",
+    "Readback.stdout": "54f119e3bb33400a2ec137ba786b5ce887027c87b11b56d1ddcf31f04e4d39f8",
+    "axioms.json": "fa5c87ed54298c52dc3731f11f754c6ab445dadf7b094ff8125e08404abecca1",
+    "pre-hashes.json": "bd79b0566f9d19dbf1bdecbc1e94cd5dd119bffcf3f0bb639b9d921ff41ed2ad",
+    "post-hashes.json": "bd79b0566f9d19dbf1bdecbc1e94cd5dd119bffcf3f0bb639b9d921ff41ed2ad"
+  },
+  "outputs": {
+    "audit.py": "2e4317e22f8d6f6fee25248001e8daa42b92167a2f16f5ac75ac5e7b814711d4",
+    "review.json": "fa50566fa14a848475bff366395d7d0cfff1c6581a25dee4ce05054277284bce",
+    "review.csv": "56682cbe7650007392606d67e17a4ea4f6401fb92771eb3f86bfedb18bb345db",
+    "flow.svg": "db3d93539a6e989f45b146c639ed395a9f79774299c658f1d820e6ff3a454b27",
+    "REPORT.md": "147f8e66d340877e5aa2b947973378ee88beb0d6c419e51d18fc2bb0fe7273ff",
+    "report.typ": "9fa0fe16a8a6d58ca6b1c170c7abaeee445a306c594d26ad94531193b9746329",
+    "report.pdf": "8e977c5b21d9078f840591249baeca3964fb70e763b56ebf1bc400674edc9e2d"
+  },
+  "checks": {
+    "audit_exit_zero": true,
+    "five_calls_and_expected_exits": true,
+    "all_child_groups_reaped": true,
+    "exact_thirteen_named_readbacks": true,
+    "allowed_axioms_only": true,
+    "full_pre_post_dependency_maps_equal": true,
+    "retained_import_maps_equal": true,
+    "runtime_maps_equal": true,
+    "all_phase_terminal_owners_confirmed": true,
+    "pdf_pages": 2,
+    "pdf_visually_inspected": true,
+    "visual_clipping_observed": false
+  },
+  "limits": [
+    "No compiler, solver, payload, or cloud action was run by the reviewer.",
+    "No independent binary kernel rechecker was used.",
+    "The compiler receipt itself checked zero dependency files; separate full pre/post observations provide custody.",
+    "Semantic acceptance is restricted to the frozen theorem statements and fixed rational controls."
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema": "software.independent-review/v1",
+  "task": "T-1242",
+  "published_commit": "b4684a67ca626d338099525aefae817a3d276e78",
+  "result": "scoped native parser/custody composition checks pass",
+  "producer_controls": 35,
+  "independent_controls": 37,
+  "subject_changed": false,
+  "reviewer_authored_imported_adapter": true,
+  "reviewer_authored_new_custody_module": false,
+  "blind": false,
+  "source_first": true,
+  "after_publication": true,
+  "runtime_qualification": false,
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "full_target_scope": 1260,
+  "blocking_io_tested": false,
+  "findings": [
+    "file byte caps do not enforce an I/O deadline",
+    "directory enumeration has no independent count cap",
+    "pathname check/open race may block before identity checking",
+    "empty file with matching pin is accepted",
+    "distinct Unicode normalization forms are distinct keys"
+  ],
+  "boundaries": [
+    "external pin admission",
+    "TOCTOU",
+    "later daemon mount binding",
+    "supervisor lifecycle/cleanup/deadlines",
+    "runtime archive and preparation joins"
+  ],
+  "pdf_inspected": true,
+  "svg_inspected": true,
+  "retained_failures": [
+    "reviewer mutable borrow compile error",
+    "initial expected count38 corrected to actual37"
+  ]
+}

@@ -1,0 +1,3 @@
+# Reviewer control freeze before additional check
+
+Existing producer controls are replayed unchanged. Add reviewer-only literal controls at p7: shared-support equal nonzero ordinate a=(0,1,1,1),b=(0,0,0,1,1,1) must select positiveCoincidence, not cancellation; shared-support zero ordinate a=(0,0,1,1),b=(0,0,0,0,1,1) selects cancellation first; noncanonical word7 is nonzero UInt64 but decodes to zero in ZMod7, demonstrating why canonicality is essential to the nonzero bridge. These are fixed boundary checks, not smooth-curve examples. Also read back axioms of scales/shared_support_conclusions to cover all ledger dependency joints. One additional Lean module120seconds; no native cohort.

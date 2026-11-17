@@ -1,0 +1,22 @@
+
+running 4 tests
+test cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::diagnostic_raw_clock_offset_rejects_underflow_and_regression ... ok
+test cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::clock_identity_binds_exact_preparation_bytes_without_cycle ... ok
+
+thread 'cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::publication_collision_preserves_previous_bytes_and_pending_failure' (37598) panicked at src/cryptanalysis/ecbench/runner.rs:2774:57:
+called `Result::unwrap()` on an `Err` value: "No such file or directory (os error 2)"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::publication_collision_preserves_previous_bytes_and_pending_failure ... FAILED
+
+thread 'cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::ok_without_observed_reap_cannot_mark_or_read_sidecars' (37597) panicked at src/cryptanalysis/ecbench/runner.rs:2733:57:
+called `Result::unwrap()` on an `Err` value: "No such file or directory (os error 2)"
+test cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::ok_without_observed_reap_cannot_mark_or_read_sidecars ... FAILED
+
+failures:
+
+failures:
+    cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::ok_without_observed_reap_cannot_mark_or_read_sidecars
+    cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::publication_collision_preserves_previous_bytes_and_pending_failure
+
+test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 6144 filtered out; finished in 0.01s
+

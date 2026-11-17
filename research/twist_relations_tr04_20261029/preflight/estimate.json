@@ -1,0 +1,91 @@
+{
+  "calibration": {
+    "control_dimension": 3,
+    "control_ns": "13430371",
+    "control_target_count": 12,
+    "maximum_selector_ns": "132580",
+    "path": "research/twist_relations_tr04_20261029/preflight/calibration.json",
+    "selector_reference_budget": 3,
+    "selector_reference_prime": 7,
+    "selector_reference_state_ceiling": 22
+  },
+  "elapsed_ns": "427787",
+  "fields": [
+    {
+      "base2_cache_ceiling": "114",
+      "base2_target_cache_ceiling": "1104",
+      "base3_cache_ceiling": "108",
+      "base3_target_cache_ceiling": "1128",
+      "cache_seconds_heuristic_before_margin": 4.228079759259259,
+      "cache_seconds_with_2x_margin": 8.456159518518518,
+      "eligible_models": 8,
+      "eligible_order_model_counts": {
+        "11": 3,
+        "13": 1,
+        "7": 4
+      },
+      "field_work_planning_envelope_seconds": 100.0,
+      "model_dispositions": 49,
+      "other_nonsingular": 34,
+      "prime": 7,
+      "raw_field_work_estimate_seconds": 8.801735314882155,
+      "selector_seconds_with_8x_margin": 0.34557579636363633,
+      "singular": 7
+    },
+    {
+      "base2_cache_ceiling": "560",
+      "base2_target_cache_ceiling": "7460",
+      "base3_cache_ceiling": "870",
+      "base3_target_cache_ceiling": "12420",
+      "cache_seconds_heuristic_before_margin": 41.298390824999984,
+      "cache_seconds_with_2x_margin": 82.59678164999997,
+      "eligible_models": 20,
+      "eligible_order_model_counts": {
+        "11": 5,
+        "13": 5,
+        "17": 5,
+        "7": 5
+      },
+      "field_work_planning_envelope_seconds": 100.0,
+      "model_dispositions": 121,
+      "other_nonsingular": 90,
+      "prime": 11,
+      "raw_field_work_estimate_seconds": 85.10931996111108,
+      "selector_seconds_with_8x_margin": 2.5125383111111113,
+      "singular": 11
+    },
+    {
+      "base2_cache_ceiling": "3366",
+      "base2_target_cache_ceiling": "61380",
+      "base3_cache_ceiling": "7986",
+      "base3_target_cache_ceiling": "150732",
+      "cache_seconds_heuristic_before_margin": 468.57519834588885,
+      "cache_seconds_with_2x_margin": 937.1503966917777,
+      "eligible_models": 51,
+      "eligible_order_model_counts": {
+        "13": 12,
+        "17": 9,
+        "19": 21,
+        "23": 9
+      },
+      "field_work_planning_envelope_seconds": 1000.0,
+      "model_dispositions": 361,
+      "other_nonsingular": 291,
+      "prime": 19,
+      "raw_field_work_estimate_seconds": 961.1424591790504,
+      "selector_seconds_with_8x_margin": 23.99206248727273,
+      "singular": 19
+    }
+  ],
+  "planning": {
+    "estimated_total_seconds": 3219.0,
+    "field_work_derivation": "Per field: 2*control_seconds*(B2 target-cache ceiling/12+B3 target-cache ceiling/12*(4/3)^3) + 8*7*max_selector_seconds*sum_model_and_B max(8*p*sum_k0..B C((n-1)/2,k)/(3*7*22),p*(p-1)*8/(7*6*3)). Round up to100s; per_sample is maximum of the3 field envelopes, total=fixed+3*maximum.",
+    "fixed_derivation": "5 fresh standalone-crate builds * ceil(36.88s observed helper build) + 34s observed final native dev checks =219s. Five roles are hosted preflight, three fields, hosted aggregate; setup/router/checkpoint variability is not independently measured.",
+    "fixed_seconds": 219,
+    "limitations": "Timing extrapolation and margins are heuristic, not proved runtime bounds or admitted performance. No full panel, M8 selector census, primary rank distribution or quality tuning was performed. New runner CPU/IO/network can differ; hard deadlines still retain failures.",
+    "per_sample_seconds": 1000.0,
+    "threads": 1
+  },
+  "schema": "tr04.development-public-input-census/v1",
+  "scope": "Public model orders and combinatorial cache ceilings only; no M8 selectors, rank distributions, paid-work comparison or primary relation census executed."
+}

@@ -1,0 +1,51 @@
+def genericK (a : WeightedAdd11.Input K) (b : D2 K) : K :=
+ ((b.q*((b.z*b.z)*(a.x*(a.z*a.z)))+(a.x*a.x)*((b.z*b.z)*(b.z*b.z)))+
+ b.r*((a.z*a.z)*(a.z*a.z)))*a.w
+def genericA (a : WeightedAdd11.Input K) (b : D2 K) : K :=
+ a.y*rawW3 b-rawY3 a b*a.w
+
+def outputWith (k aa : K) (a : WeightedAdd11.Input K) (b : D2 K) (a3 : K) : D2 K :=
+ let z2 := b.z*b.z
+ let z4 := z2*z2
+ let bb := b.s*(k*a.z)+aa*b.q
+ let cc := b.t*(k*a.z)+aa*b.r
+ let ll := k*(a.z*b.w)
+ let mm := k*(b.z*b.w)
+ let ll2 := ll*ll
+ let ll4 := ll2*ll2
+ let mm2 := mm*mm
+ let q3 := (a.x*mm2-b.q*ll2)-aa*aa
+ let r3 := ((a3*z4-b.r+b.q*b.q)*ll4-aa*((bb+b.s*(k*a.z))*ll2))+q3*(a.x*mm2)
+ ⟨q3,r3,aa*q3-bb*ll2,aa*r3-cc*ll4,k*(b.z*(a.z*b.w)),1⟩
+def output (a : WeightedAdd11.Input K) (b : D2 K) (a3 : K) := outputWith (genericK a b) (genericA a b) a b a3
+
+theorem genericK_same (a : WeightedAdd11.Input K) (b : D2 K) : genericK a b=rawK a b := by
+ unfold genericK rawK; ring
+
+theorem normalized_with (k aa : K) (a : WeightedAdd11.Input K) (b : D2 K) (a3 : K)
+ (hk : k ≠ 0) (haz : a.z ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0) :
+ let c := outputWith k aa a b a3
+ let m := aa/(k*(b.z*(a.z*b.w)))
+ c.z ≠ 0 ∧ c.w ≠ 0 ∧
+ nq c=oq (WeightedAdd11.nx a) (nq b) m ∧
+ nr c=orr a3 (WeightedAdd11.nx a) (nq b) (nr b) (ns b) m ∧
+ ns c=m*oq (WeightedAdd11.nx a) (nq b) m-(ns b+m*nq b) ∧
+ nt c=m*orr a3 (WeightedAdd11.nx a) (nq b) (nr b) (ns b) m-(nt b+m*nr b) := by
+ refine ⟨mul_ne_zero hk (mul_ne_zero hbz (mul_ne_zero haz hbw)),one_ne_zero,?_,?_,?_,?_⟩
+ all_goals
+  dsimp [outputWith,nq,nr,ns,nt,oq,orr,WeightedAdd11.nx]
+  field_simp
+  <;> ring
+
+theorem slope_decode (a : WeightedAdd11.Input K) (b : D2 K)
+ (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0)
+ (hk : genericK a b ≠ 0) :
+ genericA a b/(genericK a b*(b.z*(a.z*b.w))) =
+ (WeightedAdd11.ny a-(ns b*WeightedAdd11.nx a+nt b))/
+ ((WeightedAdd11.nx a)^2+nq b*WeightedAdd11.nx a+nr b) := by
+ obtain ⟨hK,hL,hR,_,_⟩ := scales a b haz haw hbz hbw
+ have hg : genericK a b=a.z^4*b.z^4*a.w*((WeightedAdd11.nx a)^2+nq b*WeightedAdd11.nx a+nr b) := by rw [genericK_same,hK]
+ unfold genericA
+ rw [hL,hR,hg]
+ field_simp
+ <;> ring

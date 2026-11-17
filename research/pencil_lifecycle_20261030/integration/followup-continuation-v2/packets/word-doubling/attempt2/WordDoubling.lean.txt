@@ -1,0 +1,102 @@
+import WordAdd11
+import Doubling
+set_option autoImplicit false
+namespace PencilWordRefinement
+
+theorem literal5_mul_reduce (p a : UInt64) (hp : 0<p.toNat) (hb : p.toNat<2^31)
+ (ha : a.toNat<p.toNat) : (5*a)%p = ((5%p)*a)%p := by
+ have h5 : 5*a.toNat < 2^64 := by omega
+ have hr : (5%p).toNat<p.toNat := by rw [UInt64.toNat_mod]; exact Nat.mod_lt _ hp
+ apply UInt64.toNat_inj.mp
+ rw [UInt64.toNat_mod,UInt64.toNat_mul,show (5:UInt64).toNat=5 from rfl,Nat.mod_eq_of_lt h5]
+ rw [uint64_mul_mod p (5%p) a hb hr ha]
+ simp only [UInt64.toNat_mod,show (5:UInt64).toNat=5 from rfl]
+ simp [Nat.mul_mod]
+
+
+def dblExpr (p a0 a1 a2 a3 : UInt64) (a : WordD1) : PayloadExpr :=
+ let x := FieldExpr.leaf a.x
+ let y := FieldExpr.leaf a.y
+ let z := FieldExpr.leaf a.z
+ let w := FieldExpr.leaf a.w
+ let z2 := FieldExpr.mul z z
+ let z4 := FieldExpr.mul z2 z2
+ let z6 := FieldExpr.mul z4 z2
+ let z8 := FieldExpr.mul z4 z4
+ let z10 := FieldExpr.mul z8 z2
+ let x2 := FieldExpr.mul x x
+ let x3 := FieldExpr.mul x2 x
+ let x4 := FieldExpr.mul x2 x2
+ let x5 := FieldExpr.mul x4 x
+ ⟨.neg (.mul (.leaf 2) x), x2,
+ .mul (.add (.add (.add (.mul (.leaf a1) z8) (.mul (.leaf 2) (.mul (.leaf a2) (.mul x z6))))
+     (.mul (.leaf 3) (.mul (.leaf a3) (.mul x2 z4)))) (.mul (.leaf (5%p)) x4)) w,
+ .mul (.sub (.sub (.add (.mul (.leaf 2) (.mul (.leaf a0) z10)) (.mul (.leaf a1) (.mul x z8)))
+     (.mul (.leaf a3) (.mul x3 z4))) (.mul (.leaf 3) x5)) w,
+ z, .mul (.leaf 2) y⟩
+
+def dblWordPayload (p a0 a1 a2 a3 : UInt64) (a : WordD1) : WeightedWord :=
+ let z2 := (a.z*a.z)%p
+ let z4 := (z2*z2)%p
+ let z6 := (z4*z2)%p
+ let z8 := (z4*z4)%p
+ let z10 := (z8*z2)%p
+ let x2 := (a.x*a.x)%p
+ let x3 := (x2*a.x)%p
+ let x4 := (x2*x2)%p
+ let x5 := (x4*a.x)%p
+ let q := wordNeg p ((2*a.x)%p)
+ let r := x2
+ let s := ((wordAdd p (wordAdd p (wordAdd p ((a1*z8)%p) ((2*((a2*((a.x*z6)%p))%p))%p))
+    ((3*((a3*((x2*z4)%p))%p))%p)) ((5*x4)%p))*a.w)%p
+ let t := ((wordSub p (wordSub p (wordAdd p ((2*((a0*z10)%p))%p) ((a1*((a.x*z8)%p))%p))
+    ((a3*((x3*z4)%p))%p)) ((3*x5)%p))*a.w)%p
+ ⟨q,r,s,t,a.z,(2*a.y)%p⟩
+
+theorem dbl_payload_decode (p : UInt64) [Fact p.toNat.Prime]
+ (hfive : 5≤p.toNat) (hb : p.toNat<2^31) (a0 a1 a2 a3 : UInt64) (a : WordD1)
+ (h0 : a0.toNat<p.toNat) (h1 : a1.toNat<p.toNat)
+ (h2 : a2.toNat<p.toNat) (h3 : a3.toNat<p.toNat) (ha : a.canonical p) :
+ let c := dblWordPayload p a0 a1 a2 a3 a
+ let d := a.decode p
+ let f := WeightedDoubling.output (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat)
+  (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat) d.x d.y d.z d.w
+ c.canonical p ∧ (c.q.toNat:ZMod p.toNat)=f.q ∧ (c.r.toNat:ZMod p.toNat)=f.r ∧
+ (c.s.toNat:ZMod p.toNat)=f.s ∧ (c.t.toNat:ZMod p.toNat)=f.t ∧
+ (c.z.toNat:ZMod p.toNat)=f.z ∧ (c.w.toNat:ZMod p.toNat)=f.w := by
+ have hp : 0<p.toNat := by omega
+ have ht : (2:UInt64).toNat<p.toNat := by norm_num; omega
+ have hth : (3:UInt64).toNat<p.toNat := by norm_num; omega
+ have hfv : (5%p).toNat<p.toNat := by rw [UInt64.toNat_mod]; exact Nat.mod_lt _ hp
+ have good : (dblExpr p a0 a1 a2 a3 a).q.good p ∧ (dblExpr p a0 a1 a2 a3 a).r.good p ∧
+   (dblExpr p a0 a1 a2 a3 a).s.good p ∧ (dblExpr p a0 a1 a2 a3 a).t.good p ∧
+   (dblExpr p a0 a1 a2 a3 a).z.good p ∧ (dblExpr p a0 a1 a2 a3 a).w.good p := by
+  rcases ha with ⟨hx,hy,hz,hw⟩
+  simp [dblExpr,FieldExpr.good,h0,h1,h2,h3,hx,hy,hz,hw,ht,hth,hfv]
+ have q := FieldExpr.composition p hfive hb _ good.1
+ have r := FieldExpr.composition p hfive hb _ good.2.1
+ have s := FieldExpr.composition p hfive hb _ good.2.2.1
+ have t := FieldExpr.composition p hfive hb _ good.2.2.2.1
+ have z := FieldExpr.composition p hfive hb _ good.2.2.2.2.1
+ have w := FieldExpr.composition p hfive hb _ good.2.2.2.2.2
+ have hraw : (dblWordPayload p a0 a1 a2 a3 a).s = (dblExpr p a0 a1 a2 a3 a).s.word p := by
+  dsimp [dblWordPayload,dblExpr,FieldExpr.word]
+  rw [literal5_mul_reduce p _ hp hb (uint64_mul_canonical p _ _ hp)]
+ have hs : ((dblWordPayload p a0 a1 a2 a3 a).s).toNat<p.toNat := by rw [hraw]; exact s.1
+ refine ⟨⟨q.1,r.1,hs,t.1,z.1,w.1⟩,?_,?_,?_,?_,?_,?_⟩
+ · change (((dblExpr p a0 a1 a2 a3 a).q.word p).toNat:ZMod p.toNat)=_
+   rw [q.2]; rfl
+ · change (((dblExpr p a0 a1 a2 a3 a).r.word p).toNat:ZMod p.toNat)=_
+   rw [r.2]; rfl
+ · change (((dblWordPayload p a0 a1 a2 a3 a).s).toNat:ZMod p.toNat)=_
+   rw [hraw,s.2]
+   simp only [dblExpr,FieldExpr.field,WeightedDoubling.output,WordD1.decode,UInt64.toNat_mod,
+     ZMod.natCast_mod]
+   rfl
+ · change (((dblExpr p a0 a1 a2 a3 a).t.word p).toNat:ZMod p.toNat)=_
+   rw [t.2]; rfl
+ · change (((dblExpr p a0 a1 a2 a3 a).z.word p).toNat:ZMod p.toNat)=_
+   rw [z.2]; rfl
+ · change (((dblExpr p a0 a1 a2 a3 a).w.word p).toNat:ZMod p.toNat)=_
+   rw [w.2]; rfl
+end PencilWordRefinement

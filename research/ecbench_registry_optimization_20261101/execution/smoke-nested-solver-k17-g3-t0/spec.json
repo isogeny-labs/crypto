@@ -1,0 +1,81 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Koblitz n=17 algebraic solver backends 7-8, target block 1/2 — nested registry L0 diagnostic",
+  "description": "Backend-local counters remain unlike; only verified cold E2E L2 wall and complete common accounting are cross-ranked. This prospectively selected target block has four public targets, one warmup and six balanced measured rounds. Per-child censoring is fixed so the sum of child timeout ceilings is at most 2400s inside the 3,600-second EKS deadline; timeouts are retained and never retried.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 17
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 202611019304,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-strong-v2",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong_v2"
+      }
+    },
+    {
+      "name": "rho-strong-escape",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong_escape"
+      }
+    },
+    {
+      "name": "rho-strong-v2-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong_v2"
+      }
+    },
+    {
+      "name": "rho-strong-escape-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong_escape"
+      }
+    },
+    {
+      "name": "solver-xl-f2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "xl-f2",
+          "max_trials": "20000"
+        }
+      }
+    },
+    {
+      "name": "solver-sat-cdcl",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "sat-cdcl:sat_conflict_budget=20000,sat_xor_encoding=cnf",
+          "max_trials": "20000"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 4,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202611019404,
+    "isolation_required": "L0",
+    "timeout_seconds": 17
+  }
+}

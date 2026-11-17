@@ -1,0 +1,37 @@
+{
+  "schema": "native-guard-q3-parent-serial-check-v1",
+  "observed_at": "2026-10-27T01:01:11.166264+00:00",
+  "task_id": "TASK-20261026-1525ac",
+  "Q3_admission_commit": "57f3427d8019a29bd88ec6da0aa4fd366460f1bc",
+  "Q4_refusal_commit": "3d369f1f451e290c22b8e9d06b185f795179ebcb",
+  "Q4_state": "infrastructure_not_started",
+  "Q4_allocator_launches": 0,
+  "headroom_result_sha256": "228aba4f4ad3c5797e1fa07a10b71a2f2f28bed74a3e12a61e325606dfc3044f",
+  "preparation_and_probe_removed": true,
+  "owned_container_query": [
+    "docker",
+    "--host=unix:///var/run/docker.sock",
+    "ps",
+    "-a",
+    "--filter",
+    "name=1525ac",
+    "--format",
+    "{{.ID}} {{.Names}} {{.Status}}"
+  ],
+  "owned_container_query_exit": 0,
+  "owned_container_query_stdout": "",
+  "lease_observation": {
+    "task_ref": "T-4",
+    "task_status": "claimed",
+    "lease_id": "663a7e3b-c1bf-4eb7-8dd2-44b2079de2e5",
+    "expires_at": "2026-10-27T01:02:19.560155+00:00",
+    "live": true,
+    "heartbeat_at": "2026-10-27T01:00:49.560155+00:00",
+    "observed_at": "2026-10-27T01:01:02.422494+00:00"
+  },
+  "goal_claim_epoch": 1,
+  "goal_claim_expires_at": "2026-10-27T02:03:52Z",
+  "helper_sha256": "9ca4ea5bde491c2470117d7713b7cbe8e001cbc8ebd964f974f84a0f481832c4",
+  "sole_Q3_launch_permitted_after_this_check": true,
+  "scientific_execution_authorized": false
+}

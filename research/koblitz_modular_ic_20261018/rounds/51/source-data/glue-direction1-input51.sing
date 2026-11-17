@@ -1,0 +1,108 @@
+execute(read("../../source-data/compact-pid51.sing"));
+execute(read("../../source-data/compact-field51.sing"));
+execute(read("../../source-data/relative-infinity50.sing"));
+int direction51=1;
+setring compactPid51;short=0;option(redSB);
+matrix H51=matrix(basis51);
+if(nrows(H51)!=32 || ncols(H51)!=32 || clearingPower51!=14+originalLiftMaxDegree51 || deg(commonDenominator51)!=37){ERROR("GLUE51_COMPACT_INPUT_SHAPE");quit;}
+int originalClearingPower51=clearingPower51;
+int numeratorClearingPower51=maxPower51-deg(commonDenominator51)+62;
+if(numeratorClearingPower51<0){ERROR("GLUE51_NEGATIVE_NUMERATOR_BOUND");quit;}
+if(numeratorClearingPower51<clearingPower51){clearingPower51=numeratorClearingPower51;}
+print("GLUE51_BOUND original_column="+string(originalClearingPower51)+" direct_numerator="+string(numeratorClearingPower51)+" chosen="+string(clearingPower51));
+module imageNumerators51;matrix imageNumeratorMatrix51[32][32];matrix mapCoefficients51[32][32];
+proc support51(poly a){
+ list result;
+ while(a!=0){if(leadcoef(a)!=1){ERROR("GLUE51_PID_COEFFICIENT_NOT_F2");return(list());}result=insert(result,deg(lead(a)),size(result));a=a-lead(a);}
+ return(result);
+}
+int index51;int row51;int power51;int supportIndex51;int lambdaExponent51;int vExponent51;
+list supports51;string vectorString51;
+link pidOut51="ASCII:w glue-pid-witness51.sing";open(pidOut51);
+write(pidOut51,"// Native u denotes z=1/original_u; columns describe h^k times each transported e_i.");
+write(pidOut51,"ring gluePidWitness51=2,(u),(c,dp);int direction51="+string(direction51)+";int clearingPower51="+string(clearingPower51)+";module imageNumerators51;matrix imageNumeratorMatrix51[32][32];matrix mapCoefficients51[32][32];");
+setring compactField51;short=0;option(redSB);
+map actualSourceMap51=relativeInfinity50,l,v,u;
+ideal actualSource51=actualSourceMap51(relativeInfinityIdeal50);ideal baseStd51=std(ideal(actualSource51[1]));
+proc br51(poly a){return(reduce(a,baseStd51));}
+proc bp51(poly a,int k){
+ poly result=1;poly factor51=br51(a);
+ while(k>0){if(k%2==1){result=br51(result*factor51);}k=k div 2;if(k>0){factor51=br51(factor51^2);}}
+ return(result);
+}
+link inverseOut51="ASCII:w glue-inverse51.sing";open(inverseOut51);
+write(inverseOut51,"ring glueInverseWitness51=(2,u),(l,v),dp;poly denominatorImage51;poly inverseImage51;poly normImage51;");
+proc bi51(poly a){
+ a=br51(a);poly aa51=subst(a,v,0);poly bb51=(a+aa51)/v;
+ if(a==0 || subst(a,l,0)!=a || subst(bb51,v,0)!=bb51){ERROR("GLUE51_BASE_INVERSE_SHAPE");return(poly(0));}
+ poly conjugate51=aa51+bb51*(v+u^2);
+ poly localNorm51=aa51^2+u^2*aa51*bb51+(u+u^3)*bb51^2;
+ if(localNorm51==0 || localNorm51!=leadcoef(localNorm51) || a*conjugate51+localNorm51!=bb51^2*actualSource51[1]){ERROR("GLUE51_FULL_DENOMINATOR_NORM");return(poly(0));}
+ poly result=conjugate51/leadcoef(localNorm51);
+ if(br51(a*result)!=1 || br51(a*(result+1))==1){ERROR("GLUE51_INVERSE_CORRUPTION_CONTROL");return(poly(0));}
+ write(inverseOut51,"denominatorImage51="+string(a)+";inverseImage51="+string(result)+";normImage51="+string(localNorm51)+";");
+ return(result);
+}
+ideal chosenImages51;poly h51;
+if(direction51==1){chosenImages51=forwardImages51;h51=u+v;}else{if(direction51!=2){ERROR("GLUE51_DIRECTION");quit;}chosenImages51=inverseImages51;h51=u+v+u^2;}
+if(br51(chosenImages51[3]*h51+1)!=0){ERROR("GLUE51_BASE_RECIPROCAL_IMAGE");quit;}
+list zPowers51=poly(1);list lambdaPowers51=poly(1);
+for(power51=1;power51<=maxPower51;power51++){zPowers51=insert(zPowers51,br51(zPowers51[power51]*chosenImages51[3]),size(zPowers51));}
+for(power51=1;power51<=15;power51++){lambdaPowers51=insert(lambdaPowers51,br51(lambdaPowers51[power51]*chosenImages51[1]),size(lambdaPowers51));}
+setring compactPid51;supports51=support51(commonDenominator51);setring compactField51;
+poly denominatorImage51=0;
+for(supportIndex51=1;supportIndex51<=size(supports51);supportIndex51++){denominatorImage51=denominatorImage51+zPowers51[supports51[supportIndex51]+1];}
+denominatorImage51=br51(denominatorImage51);poly inverseDenominator51=bi51(denominatorImage51);close(inverseOut51);
+map pidToField51=compactPid51,u;
+poly originalDenominator51=pidToField51(commonDenominator51);poly hPower51=bp51(h51,clearingPower51);
+if(hPower51==0){ERROR("GLUE51_ZERO_CLEARING_POWER");quit;}
+link fieldOut51="ASCII:w glue-field-witness51.sing";open(fieldOut51);
+write(fieldOut51,"ring glueFieldWitness51=(2,u),(l,v),dp;int direction51="+string(direction51)+";int clearingPower51="+string(clearingPower51)+";poly h51="+string(h51)+";poly originalDenominator51="+string(originalDenominator51)+";ideal images51;ideal cleared51;module coefficientVectors51;");
+poly coefficientImage51;poly numeratorImage51;poly functionImage51;poly clearedImage51;poly remaining51;poly reconstructed51;
+vector coefficientVector51;intvec exponent51;int position51;number integralCoefficient51;
+print("GLUE51_STAGE direction="+string(direction51)+" clearing_power="+string(clearingPower51)+" denominator_image_inverse_checked=true generator_lifts_begin=true");
+for(index51=1;index51<=32;index51++){
+ numeratorImage51=0;
+ for(row51=1;row51<=32;row51++){
+  setring compactPid51;supports51=support51(H51[row51,index51]);setring compactField51;
+  coefficientImage51=0;
+  for(supportIndex51=1;supportIndex51<=size(supports51);supportIndex51++){coefficientImage51=coefficientImage51+zPowers51[supports51[supportIndex51]+1];}
+  lambdaExponent51=(row51-1)%16;vExponent51=(row51-1) div 16;
+  if(vExponent51==1){coefficientImage51=br51(coefficientImage51*chosenImages51[2]);}
+  numeratorImage51=br51(numeratorImage51+coefficientImage51*lambdaPowers51[lambdaExponent51+1]);
+ }
+ functionImage51=br51(numeratorImage51*inverseDenominator51);
+ clearedImage51=br51(hPower51*functionImage51);remaining51=originalDenominator51*clearedImage51;coefficientVector51=0;
+ while(remaining51!=0){
+  exponent51=leadexp(remaining51);
+  if(exponent51[1]>=16 || exponent51[2]>=2){ERROR("GLUE51_NONSTANDARD_FIELD_IMAGE");quit;}
+  integralCoefficient51=leadcoef(remaining51);
+  if(denominator(integralCoefficient51)!=1){ERROR("GLUE51_CLEARED_COEFFICIENT_NOT_INTEGRAL");quit;}
+  position51=exponent51[1]+16*exponent51[2]+1;
+  coefficientVector51=coefficientVector51+integralCoefficient51*gen(position51);remaining51=remaining51-lead(remaining51);
+ }
+ reconstructed51=0;
+ for(row51=1;row51<=32;row51++){reconstructed51=reconstructed51+coefficientVector51[row51]*l^((row51-1)%16)*v^((row51-1) div 16);}
+ if(reconstructed51!=originalDenominator51*clearedImage51){ERROR("GLUE51_FULL_FIELD_RECONSTRUCTION");quit;}
+ vectorString51=string(coefficientVector51);
+ write(fieldOut51,"images51["+string(index51)+"]="+string(functionImage51)+";cleared51["+string(index51)+"]="+string(clearedImage51)+";coefficientVectors51["+string(index51)+"]="+vectorString51+";");
+ setring compactPid51;execute("imageNumerators51["+string(index51)+"]="+vectorString51+";");
+ vector pidImageVector51=imageNumerators51[index51];module oneImage51=pidImageVector51;matrix oneMatrix51[32][1];
+ for(row51=1;row51<=32;row51++){oneMatrix51[row51,1]=pidImageVector51[row51];imageNumeratorMatrix51[row51,index51]=oneMatrix51[row51,1];}
+ matrix lift51=lift(basis51,oneImage51);
+ if(nrows(lift51)!=32 || ncols(lift51)!=1 || H51*lift51!=oneMatrix51){ERROR("GLUE51_COMPLETE_GENERATOR_LIFT");quit;}
+ matrix corrupted51=lift51;corrupted51[1,1]=corrupted51[1,1]+1;
+ if(H51*corrupted51==oneMatrix51){ERROR("GLUE51_CORRUPTED_LIFT_ACCEPTED");quit;}
+ write(pidOut51,"imageNumerators51["+string(index51)+"]="+vectorString51+";");
+ for(row51=1;row51<=32;row51++){
+  mapCoefficients51[row51,index51]=lift51[row51,1];
+  write(pidOut51,"imageNumeratorMatrix51["+string(row51)+","+string(index51)+"]="+string(oneMatrix51[row51,1])+";mapCoefficients51["+string(row51)+","+string(index51)+"]="+string(lift51[row51,1])+";");
+ }
+ print("GLUE51_GENERATOR direction="+string(direction51)+" index="+string(index51)+" full_field_reconstruction=true full_PID_lift=true corruption_rejected=true");
+ setring compactField51;
+}
+close(fieldOut51);setring compactPid51;
+if(H51*mapCoefficients51!=imageNumeratorMatrix51){ERROR("GLUE51_COMPLETE_32_COLUMN_PRODUCT");quit;}
+close(pidOut51);
+print("GLUE51_RESULT direction="+string(direction51)+" normalized_generators=32 clearing_power="+string(clearingPower51)+" all_full_source_and_module_products=true inverse_pair_reload_pending=true");
+print("GLUE51_ALL_CHECKS_PASS");quit;

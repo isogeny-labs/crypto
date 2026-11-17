@@ -1,0 +1,37 @@
+{
+  "job": {
+    "created_at": "2026-10-30T21:32:54Z",
+    "job_name": "hashed-ecdl-cpu-round19-20261030",
+    "state": "active",
+    "status": {
+      "active": 1,
+      "ready": 0,
+      "startTime": "2026-10-30T21:32:54Z",
+      "terminating": 0,
+      "uncountedTerminatedPods": {}
+    },
+    "uid": "e8ae4f11-53d1-4994-b2c0-a858eafc2417"
+  },
+  "pods": [
+    {
+      "name": "hashed-ecdl-cpu-round19-20261030-f46zh",
+      "node": null,
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-30T21:32:54Z",
+            "message": "0/5 nodes are available: 1 node(s) didn't match pod anti-affinity rules, 2 node(s) didn't match Pod's node affinity/selector, 2 node(s) had untolerated taint(s). no new claims to deallocate, preemption: 0/5 nodes are available: 1 No preemption victims found for incoming pod, 4 Preemption is not helpful for scheduling.",
+            "observedGeneration": 1,
+            "reason": "Unschedulable",
+            "status": "False",
+            "type": "PodScheduled"
+          }
+        ],
+        "phase": "Pending",
+        "qosClass": "Guaranteed"
+      },
+      "uid": "3344f4a5-f7a8-4e13-919c-069874338bf4"
+    }
+  ]
+}

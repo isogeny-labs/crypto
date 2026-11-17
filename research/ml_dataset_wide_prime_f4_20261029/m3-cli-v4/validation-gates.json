@@ -1,0 +1,120 @@
+{
+  "schema": "ml-dataset.wide-m3-terminal-validation-gates/v1",
+  "source": "210e8ea66e16a375c988cf76a983d9ddff306b47",
+  "source_manifest_sha256": "81c52f5eb04671eb91747fa39fb5c9dc79e505969f768159ae1399fa5993e120",
+  "validation_driver_sha256": "d5c7671527ca88813c1a52950a5fbc98fb106cead071a3a1fe2497cea68da8db",
+  "terminal_gates": {
+    "compile": {
+      "exit_code": 0,
+      "started_at": "2026-10-30T02:53:42Z",
+      "finished_at": "2026-10-30T03:00:11Z",
+      "logs_sha256": {
+        "compile.jsonl": "bf33022bda4a4cc97ada561a4e6ad968fe7ad36befa6dd7b9057466503372ae8",
+        "compile.stderr": "bc460490a8e5794f2949ed9f9b90dcbbc37dab1062750313713e73cf8eecc1ef"
+      }
+    },
+    "full": {
+      "exit_code": 0,
+      "started_at": "2026-10-30T03:01:33Z",
+      "finished_at": "2026-10-30T03:29:23Z",
+      "logs_sha256": {
+        "full.log": "65405206b812d0f5d0aace49c0ffa00ecff7b7c4efe20eef8d1588cf4a49c4dd"
+      }
+    },
+    "cli-build": {
+      "exit_code": 0,
+      "started_at": "2026-10-30T03:29:33Z",
+      "finished_at": "2026-10-30T03:33:15Z",
+      "logs_sha256": {
+        "cli-build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli-build.stderr": "a3fac91fed4efb89da7a307274cc21cbf2c84d191ae101293b6f37fcc27443b8"
+      }
+    },
+    "clippy": {
+      "exit_code": 0,
+      "started_at": "2026-10-30T03:33:16Z",
+      "finished_at": "2026-10-30T03:33:28Z",
+      "logs_sha256": {
+        "clippy.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "clippy.stderr": "aa952d2528ec0c8c814c5d9365a51c2da0255ac025be6966b483d91cbe73388e"
+      }
+    },
+    "ml_dataset": {
+      "exit_code": 0,
+      "started_at": "2026-10-30T03:00:17Z",
+      "finished_at": "2026-10-30T03:00:26Z",
+      "logs_sha256": {
+        "ml_dataset.log": "f499f92c2feec7efcdaa02219c3d71b4c4e5913d68ca2b35178447856f6c699b"
+      }
+    },
+    "cryptanalysis::f4_tower_generic": {
+      "exit_code": 0,
+      "started_at": "2026-10-30T03:00:13Z",
+      "finished_at": "2026-10-30T03:00:17Z",
+      "logs_sha256": {
+        "cryptanalysis::f4_tower_generic.log": "925eb15a0e2ca7994503dafbcbe0014325c615c78c32ffebee1733ed4521fe5a"
+      }
+    },
+    "fp64": {
+      "exit_code": 0,
+      "started_at": "2026-10-30T03:00:17Z",
+      "finished_at": "2026-10-30T03:00:17Z",
+      "logs_sha256": {
+        "fp64.log": "e09c91f1444d945c9bba234f5cd92dbc75b4fbcf3f64b364036420c890ca524e"
+      }
+    },
+    "cryptanalysis::ecbench::isolation::checked": {
+      "exit_code": 0,
+      "started_at": "2026-10-30T03:00:26Z",
+      "finished_at": "2026-10-30T03:00:26Z",
+      "logs_sha256": {
+        "cryptanalysis::ecbench::isolation::checked.log": "5081c0bab60c22a51896e3c3af5e9def993d761d99b22d9bd5c92d6017a01c04"
+      }
+    }
+  },
+  "controls_receipt_sha256": "5dfeeaa410f53a075d01230bd4d215d8900592e9436c852ebdc545cd5f362f94",
+  "cli_binary_sha256": "8d6947c533342c65b475507a6a416547bdfc5b5cc99966be4a8ac82a91b15fd9",
+  "full": {
+    "attempt": "full",
+    "exit_code": 0,
+    "summary": {
+      "passed": 5402,
+      "failed": 0,
+      "ignored": 123
+    },
+    "terminal_summary": "test result: ok. 5402 passed; 0 failed; 123 ignored; 0 measured; 0 filtered out; finished in 1669.19s",
+    "executable_sha256": "e6549836ded2a9ac7071a4e98b956281a75d7ae6ccddbf8325dd88f9f3102eb1",
+    "log_sha256": "65405206b812d0f5d0aace49c0ffa00ecff7b7c4efe20eef8d1588cf4a49c4dd",
+    "started_at": "2026-10-30T03:01:33Z",
+    "finished_at": "2026-10-30T03:29:23Z"
+  },
+  "clippy": {
+    "exit_code": 0,
+    "targets": [
+      "lib",
+      "bin:crypto",
+      "tests"
+    ],
+    "warnings_as_errors": true,
+    "command": [
+      "cargo",
+      "clippy",
+      "--release",
+      "--lib",
+      "--bin",
+      "crypto",
+      "--tests",
+      "--locked",
+      "--offline",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "aa952d2528ec0c8c814c5d9365a51c2da0255ac025be6966b483d91cbe73388e",
+    "started_at": "2026-10-30T03:33:16Z",
+    "finished_at": "2026-10-30T03:33:28Z"
+  },
+  "runtime_fixture_passed": false,
+  "scientific_cloud_cells": 0
+}

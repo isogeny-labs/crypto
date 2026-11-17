@@ -1,0 +1,27 @@
+card_id: CARD-sparse-la-timing-20261018-2
+relay_verbatim: not_checkable   # the executor ended on an API usage limit and returned no report; check-relay has no executor text to compare
+outcome: executed_as_specified   # from the tool-written receipt and files on disk only; executor behaviour is unattested
+stopped_at_step: null
+recommendation: proceed_to_analysis
+execution_class: executed_as_specified
+per_command:
+  run-fp4-p29-r2:
+    on_disk: complete
+    evidence:
+      - cards/CARD-...-2.receipt.json status=completed, commands_total=1, attempts=1, exit_code=0, timed_out=false, seconds=4112.82 (timeout 6900); receipt argv equals card argv exactly; commit 8089e7b3... equals card commit
+      - receipt card_sha256 ba2d6acf...a56f equals sha256sum of the card file
+      - receipt stderr_sha256 52f96125...aada equals sha256sum of receipts/CARD-...-2.stderr; stdout_sha256 e3b0c442...b855 (empty) equals sha256sum of the 0-byte stdout file
+      - sessions/fp4-p29-r2/session.json status=complete, executions_planned=20, records_written=20, status_counts={verified:20}, session_id ECBS1h74e873bda045
+      - records.jsonl 20 lines; sha256 b5a87d47...e511c equals session.json records_sha256
+      - sessions/fp4-p29-r2/spec.json sha256 11a4ccce...5cc0 equals card bind SPEC-fp4-p29.json; session.json binary_sha256 1ecb2154...3a43 equals card bind and the binary on disk
+      - session.json plan_sha256 4d586f01...b2e1 equals the plan_sha256 of the interrupted sessions/fp4-p29 (same spec, same plan)
+      - session options cpus=auto, wait_for_lock=true, allow_busy=true match argv; git_dirty=true in session.json (working tree had uncommitted files; receipt dirty_before lists them)
+      - the card contains no verify command, so no audit file exists for this session; audit_ok is not applicable to this card
+checks:
+  must_not_exist_sessions_fp4_p29_r2_before_run: satisfied by the receipt run completing (ecbench run claims OUT_DIR atomically)
+  write_scope: "git status --porcelain: untracked cards/CARD-...-2.receipt.json, receipts/CARD-...-2.stderr, receipts/CARD-...-2.stdout are in scope. One further untracked file, analysis/band-fp4-p29.txt (0 bytes, mtime 2026-10-19 01:16:55, after the receipt), lies outside write_scope; it is not in the receipt's dirty_after and is not attributed to this card's executor (likely the main session or card 3 pipeline). Reported for the caller to confirm."
+  only_card_argv_ran: receipt records exactly one command; unlisted commands outside the receipt wrapper cannot be ruled out from disk
+reasons:
+  - "Receipt, stderr/stdout digests, session.json and records.jsonl are mutually consistent and match the card argv and binds."
+  - "No executor report exists, so relay verbatim could not be checked and is not claimed."
+interpretation: not_assessed

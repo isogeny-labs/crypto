@@ -1,0 +1,63 @@
+item_id,status,evidence,scope,next_obligation
+finite_homogeneous_lift,checked,WeightedProjDegreeZeroScratch.lean,ordinary weighted quotient,none
+componentwise_equality,checked,WeightedProjDegreeZeroScratch.lean,ordinary weighted quotient,none
+descended_degree_projection,checked,WeightedRingComponent.lean,additive weighted quotient,none
+orthogonal_idempotent_projections,checked,WeightedRingComponent.lean,additive weighted quotient,none
+finite_reconstruction_and_separation,checked,WeightedRingComponent.lean,additive weighted quotient,none
+direct_homogeneous_sums,checked,WeightedRingComponent.lean,additive weighted quotient,none
+homogeneous_product_degree,checked,WeightedRingComponent.lean,homogeneous quotient lifts,none
+generic_away_to_one_map,checked,WeightedChartRoute.lean,any existing graded ring,none
+graded_quotient_instance,checked,WeightedRingGraded.lean,weighted quotient,none
+chart_kernel_saturation,checked,WeightedChartKernelRec.lean,nonnegative graded rings,none
+localized_degree_zero_chart_iso,checked,WeightedChartIso.lean,coordinate rings of Z nonzero and affine chart,none
+projective_chart_scheme_iso,checked,WeightedProjSchemeChart.lean,Z basic open of weighted Proj,none
+two_affine_open_cover,checked,WeightedProjCover.lean,D_X union D_Z equals Proj and both are affine,none
+x_open_explicit_infinity_chart,checked,WeightedProjInfinityChart.lean,D_X is Spec of existing explicit infinity chart ring,none
+generic_degree_one_dehomogenization,checked,WeightedChartDehomog.lean,any nonnegative graded commutative ring,none
+degree_zero_base_field,checked,WeightedProjBase.lean,degree zero subring equivalent to K,none
+proper_over_K,checked,WeightedProjBase.lean,weighted Proj morphism to Spec K,none
+pointwise_affine_and_boundary_jacobian,checked,WeightedProjSmoothPoints.lean,K points under stated perfectness odd-characteristic and squarefree hypotheses,does not imply global Smooth instance
+affine_jacobian_ideal_unit,checked,WeightedJacobianIdeal.lean,actual affine coordinate ring under perfectness odd-characteristic and squarefree hypotheses,does not alone establish a scheme Smooth instance
+common_overlap_coordinate_identities,checked,WeightedOverlapScratch.lean,common Away XZ ring on chart generators,does not prove equality of overlap morphisms
+canonical_overlap_ring_equivalence,checked,WeightedOverlapFull.lean,both projective chart localizations through Away XZ,none
+canonical_overlap_generator_images,checked,WeightedOverlapEquality.lean,affine x and y in the common weighted Proj transition,none
+conditional_full_overlap_map_equality,checked,WeightedOverlapMapEquality.lean,assuming canonical transition preserves every K scalar,none
+overlap_scalar_compatibility,checked,WeightedOverlapScalar.lean,canonical transition preserves every K scalar,none
+unconditional_full_overlap_map_equality,checked,WeightedOverlapScalar.lean,canonical projective transition equals separately presented overlap-ring equivalence,scheme-level comparison with glued curve remains open
+overlap_spec_morphism_equality,checked,WeightedOverlapScheme.lean,Spec map of canonical transition equals the transition morphism in the separately glued two-chart scheme,does not identify that glued scheme with weighted Proj or transport stalks
+infinity_boundary_jacobian_ideal_unit,checked,WeightedInfinityJacobian.lean,ideal of z and z partial is top in the infinity coordinate ring for any field and coefficients,does not alone establish a scheme Smooth instance
+actual_overlap_immersion_compatibility,checked,WeightedOverlapEmbedding.lean,both localized chart Spec maps into weighted Proj agree with the canonical D_XZ immersion,does not construct a global isomorphism to the separately glued scheme or transport stalks
+two_open_smoothness_reduction,checked,WeightedProjSmoothness.lean,actual weighted Proj morphism conditional on Smooth of both X and Z basic-open restrictions,chart Smooth premises remain open
+actual_proj_chart_maps,checked,WeightedProjGlobalGlue.lean,both separately defined charts map into actual weighted Proj through the checked chart isomorphisms,scheme-level overlap compatibility and global isomorphism remain open
+chart_localization_spec_squares,checked,WeightedProjChartNaturality.lean,both principal-open Spec maps commute with their weighted-Proj affine chart localizations,compose through chart isomorphism inverses and Proj immersions then prove global gluing
+actual_proj_overlap_immersions,checked,WeightedProjChartIntoProj.lean,both separately glued principal-open chart maps enter actual Proj through the canonical D_XZ immersion,transition compatibility and global gluing remain open
+common_overlap_transition_compatibility,checked,WeightedProjGlueCompatibility.lean,the separate glue transition commutes with both maps into Spec of the common D_XZ coordinate ring,composition with actual Proj immersion and global glue morphism remain open
+infinity_derivative_open_smooth,checked,WeightedChartRingSmooth.lean,ring map from any field to the infinity chart localized away from its z partial is Smooth,complementary D_z region and full chart remain open
+infinity_overlap_smooth_transport,checked,WeightedInfinityOpenSmooth.lean,conditional transport of Smooth from affine D_x to infinity D_z through the checked overlap equivalence,affine chart Smooth premise remains open
+affine_derivative_span_smooth_criterion,checked,WeightedAffineRingSmooth.lean,one-equation affine quotient is Smooth when its two partial images span the unit ideal; genus-2 Y partial identity checked,genus-2 X identity supplied by WeightedAffineXPartial.lean
+squarefree_affine_jacobian_span_bridge,checked,WeightedAffineSquarefreeSmooth.lean,squarefree Jacobian certificate implies derivative-range span top conditional on both genus-2 derivative identities,both identities and affine Smooth specialization supplied by new files
+proj_valued_glue_transition,checked,WeightedProjGluedMorphism.lean,forward separate-chart overlap transition is compatible after mapping into actual weighted Proj,remaining Bool cone equations supplied by WeightedProjGlueCone.lean
+global_glued_to_proj_morphism,checked,WeightedProjGlueCone.lean,separately glued two-chart scheme maps into actual weighted Proj and restricts to the intended chart maps,global inverse and isomorphism remain open
+infinity_proj_stalk_chart_localization,checked,WeightedPic0Bridge.lean,actual weighted-Proj stalk at the infinity-chart origin is isomorphic to Localization.AtPrime of the explicit chart ring,principal divisor and Pic0 class equation remain open
+infinity_proj_stalk_dvr,checked,WeightedProjInfinityDVR.lean,actual weighted-Proj infinity stalk is a DVR with transported w uniformizer and z valuation order two,global principal divisor and Pic0 class equation remain open
+affine_genus2_partial_identities,checked,WeightedAffineXPartial.lean,X and Y partial images in the affine coordinate ring,none
+squarefree_affine_ring_smooth,checked,WeightedAffineSquarefreeFinal.lean,affine chart over a perfect field of characteristic other than two and squarefree quintic,full infinity ring supplied by WeightedInfinitySquarefreeSmooth.lean; global Proj Smooth remains open
+squarefree_infinity_ring_smooth,checked,WeightedInfinitySquarefreeSmooth.lean,full explicit infinity coordinate ring over a perfect field of characteristic other than two and squarefree quintic,transport chart structure map to actual Proj then prove global Smooth
+conditional_global_proj_smooth,checked,WeightedProjGlobalSmooth.lean,actual weighted Proj structure map is Smooth if both basic-open restrictions equal canonical chart structure maps,two chart-to-structure-map equalities remain unproved
+glued_to_proj_surjective,checked,WeightedProjGlueIso.lean,checked glued-to-Proj morphism is surjective on scheme points,prove open immersion and inverse
+conditional_nonbranch_zero_order,checked,Common22FiniteZeroOrder.lean,DVR norm-factor order identity under explicit unit and nonbranch assumptions,construct actual finite stalk and global divisor
+finite_branch_stalk,checked,Common22BranchStalk.lean,actual affine Spec branch point and stalk localization,affine domain and branch DVR supplied by Common22BranchDomain.lean
+finite_branch_factor_unit,checked,Common22BranchParameter.lean,branch identity and complementary factor unit when quintic derivative nonzero,branch DVR and exact local orders supplied by Common22BranchDomain.lean
+conditional_finite_branch_order,checked,Common22BranchValuation.lean,ord(x-a)=2 ord(y) at actual branch localization assuming domain and DVR,assumptions discharged for simple roots by Common22BranchDomain.lean
+finite_branch_ideal_generators,checked,Common22BranchMaximalIdeal.lean,actual affine evaluation kernel is generated by x-a and y,domain and DVR supplied by Common22BranchDomain.lean
+finite_branch_local_parameter,checked,Common22BranchLocalParameter.lean,at a simple root the actual branch localization maximal ideal is generated by y without domain or DVR premise,DVR and exact local orders supplied by Common22BranchDomain.lean
+finite_branch_domain_dvr_orders,checked,Common22BranchDomain.lean,actual affine and branch-local domains branch DVR ord(y)=1 and ord(x-a)=2 at simple roots,global principal divisor and Pic0 transport remain open
+opposite_basic_open_preimages,checked,WeightedProjCrossChart.lean,both Proj opposite-open preimages equal the corresponding glued overlap ranges,prove cross-chart image equality and global isomorphism
+cross_chart_image_overlap_entries,checked,WeightedProjCrossImage.lean,equal opposite-chart Proj images place both points in their glued overlap ranges,equality of overlap lifts and global isomorphism remain open
+proj_chart_structure_maps,checked,WeightedProjChartStructure.lean,both actual Proj chart structure-map identities,supplied to final smoothness theorem
+proj_chart_precomposition,checked,WeightedProjSmoothFinal.lean,both chart precomposition equalities with actual Proj structure map,none for global Smooth
+conditional_glued_open_immersion,checked,WeightedProjGlueOpenImmersion.lean,each chart into Proj is an open immersion; global map if injective,prove cross-chart image equality
+conditional_glued_injectivity,checked,WeightedProjGlueInjective.lean,same-chart injectivity and global injectivity conditional on cross-chart equality,prove cross-chart overlap equality
+global_smoothness,checked,WeightedProjSmoothFinal.lean,actual weighted Proj over a perfect field with 2 nonzero and squarefree quintic,none for scheme Smooth; glued Proj isomorphism and Pic0 remain open
+overlap_gluing_comparison,open,,D_X and D_Z overlap,prove checked glued-to-Proj morphism is an open immersion then use surjectivity to obtain isomorphism
+projective_completion_pic0,open,,global geometry,prove cover gluing completion and Pic0 transport

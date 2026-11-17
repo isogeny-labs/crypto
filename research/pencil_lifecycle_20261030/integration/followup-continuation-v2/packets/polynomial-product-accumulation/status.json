@@ -1,0 +1,197 @@
+{
+  "schema": "research.proof-packet-status/v1",
+  "task": "T-1209",
+  "kind": "canonical_polynomial_product_accumulation",
+  "main_declarations": 10,
+  "control_declarations": 8,
+  "checks": {
+    "word1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "row1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "product1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "readback": [
+    {
+      "name": "ProductWord.add_product",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ProductWord.step_correct",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ProductWord.run_correct",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ProductWord.shifted_index",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ProductPolynomial.run_polynomial",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ProductPolynomial.generated_polynomial_step",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ProductPolynomial.rows_correct",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ProductPolynomial.zeros_good",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "ProductPolynomial.zeros_polynomial",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ProductPolynomial.product_correct",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ProductControls.two_linear",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ProductControls.internal_zero",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ProductControls.square",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ProductControls.empty_left",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ProductControls.empty_right",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ProductControls.trailing_zeros",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ProductControls.zero_polynomial",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ProductControls.shared_slots",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    }
+  ],
+  "failed_attempts": [],
+  "assumptions": [
+    "prime 0<p<2^31",
+    "canonical input words"
+  ],
+  "criterion": "decoded product output equals product of decoded input polynomials",
+  "empty_branches": "empty input yields empty output",
+  "preserved": [
+    "canonical words",
+    "polynomial product decoding"
+  ],
+  "independent_source_fidelity_review": "scoped model review completed; native full execution partial",
+  "independent_product_replay": {
+    "main_declarations": 10,
+    "producer_controls": 8,
+    "reviewer_controls": 6,
+    "readbacks": 24,
+    "full_review_workflow_complete": false
+  },
+  "independent_monic_replay": {
+    "main_declarations": 19,
+    "producer_controls": 16,
+    "reviewer_controls": 4,
+    "readbacks": 39,
+    "full_review_workflow_complete": false
+  },
+  "compiled_rust_equivalence": "not proved",
+  "quotient_and_instrumentation": "excluded",
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "upstream_compiled_dependencies": "retained trust boundary"
+}

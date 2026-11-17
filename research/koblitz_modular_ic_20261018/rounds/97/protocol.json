@@ -1,0 +1,44 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R97-MARKED23-BASE-DISCRIMINANT",
+  "version": 1,
+  "goal": "repair R96 degree API and compute the complete finite discriminant locus of the actual degree-7 marked-23 base order",
+  "claims": [{"id":"marked23_base_discriminant97","class":"exact_computation","statement":"the resultant of actual f23 and its y-derivative is nonzero and completely factored over F2[x]"}],
+  "arms": {
+    "reference": "R52 actual marked23-field51 donor and R63 degree-112 source field",
+    "candidate": "exact resultant and factorization of the degree-7 base polynomial",
+    "positive": ["x=0 and x=1 repeated fiber controls", "nonzero generic resultant", "full factor product"],
+    "negative": ["changed factor-product rejection"],
+    "baseline": {"not_applicable_reason":"exact algebra"},
+    "A_A": {"not_applicable_reason":"deterministic exact computation"}
+  },
+  "variables": {
+    "fixed": ["actual R52 f23 source bytes", "F2[x,y]", "one Singular thread", "300 seconds", "2 GiB virtual memory"],
+    "measured": ["source and binary hashes", "resultant degree", "factor polynomials and exponents", "native errors", "fresh replay"],
+    "statistical": "not applicable"
+  },
+  "randomization": {"method":"fixed","reason":"exact computation","seeds":[97]},
+  "blinding": {"method":"none","reason":"exact computation"},
+  "sample_size": {"instances":1,"replicates":1,"warmups":0,"power":"not applicable"},
+  "metrics": ["resultant degree", "factor count", "complete factor product", "fresh replay"],
+  "execution": {
+    "launchers": ["REPLAY_CAS.sh discriminant97-01 DISCRIMINANT97.sing DISCRIMINANT97_ALL_CHECKS_PASS"],
+    "backend":"authorized local Singular",
+    "backend_reason":"pinned CAS continuation; default EKS image lacks Singular",
+    "timeout_seconds_per_program":300,
+    "virtual_KiB_native":2097152,
+    "threads":1,
+    "seed":97,
+    "queue":"one serial exact-algebra job",
+    "source_gate":"committed source/protocol and SHA-256 donor manifest",
+    "checkpoint":"existing checkpoint gate and immutable raw copy"
+  },
+  "stopping": {
+    "accept":"exit zero, exact marker, zero native errors, full factor product, export and fresh replay",
+    "failure":"retain raw and freeze new attempt ID for repair"
+  },
+  "analysis": {
+    "method":"source-bound resultant and F2[x] factorization",
+    "scope":"finite bad-fiber locus of degree-7 monogenic base order; no normalized branch count or degree-112 discriminant claim"
+  }
+}

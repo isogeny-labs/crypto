@@ -1,0 +1,318 @@
+'MixedDispatcher.source_order_total_valid' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MixedDispatcher.none_excluded' depends on axioms: [propext, Classical.choice, Quot.sound]
+theorem MixedDispatcher.source_order_total_valid.{u_1} : ∀ {K : Type u_1} [inst : Field K] [inst_1 : DecidableEq K]
+  (a0 a1 a2 a3 : K) (a : WeightedAdd11.Input K) (b : MixedCancellation.D2 K),
+  a.z ≠ 0 →
+    a.w ≠ 0 →
+      b.z ≠ 0 →
+        b.w ≠ 0 →
+          MixedCancellation.validPoint (MixedGeneric.curve a0 a1 a2 a3) a →
+            MixedCancellation.validTwo (MixedGeneric.curve a0 a1 a2 a3) b →
+              ∃ v tag,
+                MixedDispatcher.dispatch a0 a1 a2 a3 a b = (some v, tag) ∧
+                  MixedDispatcher.valid (MixedGeneric.curve a0 a1 a2 a3) v ∧ tag ≠ MixedDispatcher.Tag.mismatch :=
+fun {K} [Field K] [DecidableEq K] a0 a1 a2 a3 a b haz haw hbz hbw ha hb =>
+  if hk : MixedCancellation.rawK a b = 0 then
+    if hc : a.y * MixedCancellation.rawW3 b = -(MixedCancellation.rawY3 a b * a.w) then
+      And.casesOn
+        (MixedCancellation.cancellation_preserves (MixedGeneric.curve a0 a1 a2 a3) a b haz haw hbz hbw ha hb hk hc)
+        fun left right =>
+        And.casesOn right fun hz right =>
+          And.casesOn right fun hw hv =>
+            Exists.intro (Sum.inl (MixedCancellation.other a b))
+              (Exists.intro MixedDispatcher.Tag.cancellation
+                ⟨of_eq_true
+                    (Eq.trans
+                      (congrFun'
+                        (congrArg Eq
+                          (Eq.trans
+                            (ite_eq_right_of_eq_false
+                              (Option.map Sum.inr (MixedGeneric.dispatch a b a3), MixedDispatcher.Tag.common)
+                              (if a.y * MixedCancellation.rawW3 b = -(MixedCancellation.rawY3 a b * a.w) then
+                                (some (Sum.inl (MixedCancellation.other a b)), MixedDispatcher.Tag.cancellation)
+                              else
+                                if a.y * MixedCancellation.rawW3 b ≠ MixedCancellation.rawY3 a b * a.w then
+                                  (none, MixedDispatcher.Tag.mismatch)
+                                else
+                                  if a.x * (b.z * b.z) = (MixedCancellation.other a b).x then
+                                    (some (Sum.inr (MixedTripling.rawOutput a1 a2 a3 a)), MixedDispatcher.Tag.tripling)
+                                  else
+                                    (Option.map Sum.inr
+                                        (MixedGeneric.dispatch (MixedCancellation.other a b)
+                                          (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3),
+                                      MixedDispatcher.Tag.positiveDistinct))
+                              (Eq.trans (congrFun' (congrArg Ne hk) 0)
+                                (Eq.trans (congrArg Not (eq_self 0)) not_true_eq_false)))
+                            (ite_eq_left_of_eq_true
+                              (some (Sum.inl (MixedCancellation.other a b)), MixedDispatcher.Tag.cancellation)
+                              (if a.y * MixedCancellation.rawW3 b ≠ MixedCancellation.rawY3 a b * a.w then
+                                (none, MixedDispatcher.Tag.mismatch)
+                              else
+                                if a.x * (b.z * b.z) = (MixedCancellation.other a b).x then
+                                  (some (Sum.inr (MixedTripling.rawOutput a1 a2 a3 a)), MixedDispatcher.Tag.tripling)
+                                else
+                                  (Option.map Sum.inr
+                                      (MixedGeneric.dispatch (MixedCancellation.other a b)
+                                        (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3),
+                                    MixedDispatcher.Tag.positiveDistinct))
+                              (Eq.trans (congrFun' (congrArg Eq hc) (-(MixedCancellation.rawY3 a b * a.w)))
+                                (eq_self (-(MixedCancellation.rawY3 a b * a.w)))))))
+                        (some (Sum.inl (MixedCancellation.other a b)), MixedDispatcher.Tag.cancellation))
+                      (eq_self (some (Sum.inl (MixedCancellation.other a b)), MixedDispatcher.Tag.cancellation))),
+                  ⟨⟨hz, ⟨hw, hv⟩⟩, of_decide_eq_true (id (Eq.refl true))⟩⟩)
+    else
+      have hp :=
+        Or.resolve_left
+          (MixedCancellation.shared_support_conclusions (MixedGeneric.curve a0 a1 a2 a3) a b haz haw hbz hbw ha hb
+              hk).left
+          hc;
+      if he : a.x * (b.z * b.z) = (MixedCancellation.other a b).x then
+        And.casesOn (MixedTripling.source_repeated_preserves a0 a1 a2 a3 a b haz haw hbz hbw ha hb hk hc he)
+          fun left right =>
+          And.casesOn right fun left right =>
+            And.casesOn right fun left right =>
+              And.casesOn right fun hz right =>
+                And.casesOn right fun hw hv =>
+                  Exists.intro (Sum.inr (MixedTripling.rawOutput a1 a2 a3 a))
+                    (Exists.intro MixedDispatcher.Tag.tripling
+                      ⟨Eq.mpr
+                          (id
+                            (congrFun'
+                              (congrArg Eq
+                                (Eq.trans
+                                  (ite_congr
+                                    (Eq.trans (congrFun' (congrArg Ne hk) 0)
+                                      (Eq.trans (congrArg Not (eq_self 0)) not_true_eq_false))
+                                    (fun a_1 =>
+                                      Eq.refl
+                                        (Option.map Sum.inr (MixedGeneric.dispatch a b a3), MixedDispatcher.Tag.common))
+                                    fun a_1 =>
+                                    ite_congr
+                                      (Eq.refl (a.y * MixedCancellation.rawW3 b = -(MixedCancellation.rawY3 a b * a.w)))
+                                      (fun a_2 =>
+                                        Eq.refl
+                                          (some (Sum.inl (MixedCancellation.other a b)),
+                                            MixedDispatcher.Tag.cancellation))
+                                      fun a_2 =>
+                                      Eq.refl
+                                        (if ¬a.y * MixedCancellation.rawW3 b = MixedCancellation.rawY3 a b * a.w then
+                                          (none, MixedDispatcher.Tag.mismatch)
+                                        else
+                                          if a.x * (b.z * b.z) = (MixedCancellation.other a b).x then
+                                            (some (Sum.inr (MixedTripling.rawOutput a1 a2 a3 a)),
+                                              MixedDispatcher.Tag.tripling)
+                                          else
+                                            (Option.map Sum.inr
+                                                (MixedGeneric.dispatch (MixedCancellation.other a b)
+                                                  (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3),
+                                              MixedDispatcher.Tag.positiveDistinct)))
+                                  (ite_false
+                                    (Option.map Sum.inr (MixedGeneric.dispatch a b a3), MixedDispatcher.Tag.common)
+                                    (if a.y * MixedCancellation.rawW3 b = -(MixedCancellation.rawY3 a b * a.w) then
+                                      (some (Sum.inl (MixedCancellation.other a b)), MixedDispatcher.Tag.cancellation)
+                                    else
+                                      if ¬a.y * MixedCancellation.rawW3 b = MixedCancellation.rawY3 a b * a.w then
+                                        (none, MixedDispatcher.Tag.mismatch)
+                                      else
+                                        if a.x * (b.z * b.z) = (MixedCancellation.other a b).x then
+                                          (some (Sum.inr (MixedTripling.rawOutput a1 a2 a3 a)),
+                                            MixedDispatcher.Tag.tripling)
+                                        else
+                                          (Option.map Sum.inr
+                                              (MixedGeneric.dispatch (MixedCancellation.other a b)
+                                                (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3),
+                                            MixedDispatcher.Tag.positiveDistinct)))))
+                              (some (Sum.inr (MixedTripling.rawOutput a1 a2 a3 a)), MixedDispatcher.Tag.tripling)))
+                          (Eq.mpr
+                            (id
+                              (congrArg
+                                (fun _a =>
+                                  _a =
+                                    (some (Sum.inr (MixedTripling.rawOutput a1 a2 a3 a)), MixedDispatcher.Tag.tripling))
+                                (if_neg hc)))
+                            (of_eq_true
+                              (Eq.trans
+                                (congrFun'
+                                  (congrArg Eq
+                                    (Eq.trans
+                                      (ite_eq_right_of_eq_false (none, MixedDispatcher.Tag.mismatch)
+                                        (if a.x * (b.z * b.z) = (MixedCancellation.other a b).x then
+                                          (some (Sum.inr (MixedTripling.rawOutput a1 a2 a3 a)),
+                                            MixedDispatcher.Tag.tripling)
+                                        else
+                                          (Option.map Sum.inr
+                                              (MixedGeneric.dispatch (MixedCancellation.other a b)
+                                                (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3),
+                                            MixedDispatcher.Tag.positiveDistinct))
+                                        (Eq.trans
+                                          (congrArg Not
+                                            (Eq.trans (congrFun' (congrArg Eq hp) (MixedCancellation.rawY3 a b * a.w))
+                                              (eq_self (MixedCancellation.rawY3 a b * a.w))))
+                                          not_true_eq_false))
+                                      (ite_eq_left_of_eq_true
+                                        (some (Sum.inr (MixedTripling.rawOutput a1 a2 a3 a)),
+                                          MixedDispatcher.Tag.tripling)
+                                        (Option.map Sum.inr
+                                            (MixedGeneric.dispatch (MixedCancellation.other a b)
+                                              (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3),
+                                          MixedDispatcher.Tag.positiveDistinct)
+                                        (Eq.trans (congrFun' (congrArg Eq he) (MixedCancellation.other a b).x)
+                                          (eq_self (MixedCancellation.other a b).x)))))
+                                  (some (Sum.inr (MixedTripling.rawOutput a1 a2 a3 a)), MixedDispatcher.Tag.tripling))
+                                (eq_self
+                                  (some (Sum.inr (MixedTripling.rawOutput a1 a2 a3 a)),
+                                    MixedDispatcher.Tag.tripling))))),
+                        ⟨⟨hz, ⟨hw, hv⟩⟩, of_decide_eq_true (id (Eq.refl true))⟩⟩)
+      else
+        And.casesOn (MixedPositiveDistinct.source_branch_preserves a0 a1 a2 a3 a b haz haw hbz hbw ha hb hk hc he)
+          fun left right =>
+          And.casesOn right fun left right =>
+            And.casesOn right fun left right =>
+              And.casesOn right fun hd right =>
+                And.casesOn right fun hz right =>
+                  And.casesOn right fun hw hv =>
+                    Exists.intro
+                      (Sum.inr
+                        (MixedGeneric.output (MixedCancellation.other a b) (MixedPositiveDistinct.doubled a0 a1 a2 a3 a)
+                          a3))
+                      (Exists.intro MixedDispatcher.Tag.positiveDistinct
+                        ⟨Eq.mpr
+                            (id
+                              (congrFun'
+                                (congrArg Eq
+                                  (Eq.trans
+                                    (ite_congr
+                                      (Eq.trans (congrFun' (congrArg Ne hk) 0)
+                                        (Eq.trans (congrArg Not (eq_self 0)) not_true_eq_false))
+                                      (fun a_1 =>
+                                        Eq.refl
+                                          (Option.map Sum.inr (MixedGeneric.dispatch a b a3),
+                                            MixedDispatcher.Tag.common))
+                                      fun a_1 =>
+                                      ite_congr
+                                        (Eq.refl
+                                          (a.y * MixedCancellation.rawW3 b = -(MixedCancellation.rawY3 a b * a.w)))
+                                        (fun a_2 =>
+                                          Eq.refl
+                                            (some (Sum.inl (MixedCancellation.other a b)),
+                                              MixedDispatcher.Tag.cancellation))
+                                        fun a_2 =>
+                                        Eq.refl
+                                          (if ¬a.y * MixedCancellation.rawW3 b = MixedCancellation.rawY3 a b * a.w then
+                                            (none, MixedDispatcher.Tag.mismatch)
+                                          else
+                                            if a.x * (b.z * b.z) = (MixedCancellation.other a b).x then
+                                              (some (Sum.inr (MixedTripling.rawOutput a1 a2 a3 a)),
+                                                MixedDispatcher.Tag.tripling)
+                                            else
+                                              (Option.map Sum.inr
+                                                  (MixedGeneric.dispatch (MixedCancellation.other a b)
+                                                    (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3),
+                                                MixedDispatcher.Tag.positiveDistinct)))
+                                    (ite_false
+                                      (Option.map Sum.inr (MixedGeneric.dispatch a b a3), MixedDispatcher.Tag.common)
+                                      (if a.y * MixedCancellation.rawW3 b = -(MixedCancellation.rawY3 a b * a.w) then
+                                        (some (Sum.inl (MixedCancellation.other a b)), MixedDispatcher.Tag.cancellation)
+                                      else
+                                        if ¬a.y * MixedCancellation.rawW3 b = MixedCancellation.rawY3 a b * a.w then
+                                          (none, MixedDispatcher.Tag.mismatch)
+                                        else
+                                          if a.x * (b.z * b.z) = (MixedCancellation.other a b).x then
+                                            (some (Sum.inr (MixedTripling.rawOutput a1 a2 a3 a)),
+                                              MixedDispatcher.Tag.tripling)
+                                          else
+                                            (Option.map Sum.inr
+                                                (MixedGeneric.dispatch (MixedCancellation.other a b)
+                                                  (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3),
+                                              MixedDispatcher.Tag.positiveDistinct)))))
+                                (some
+                                    (Sum.inr
+                                      (MixedGeneric.output (MixedCancellation.other a b)
+                                        (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3)),
+                                  MixedDispatcher.Tag.positiveDistinct)))
+                            (Eq.mpr
+                              (id
+                                (congrArg
+                                  (fun _a =>
+                                    _a =
+                                      (some
+                                          (Sum.inr
+                                            (MixedGeneric.output (MixedCancellation.other a b)
+                                              (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3)),
+                                        MixedDispatcher.Tag.positiveDistinct))
+                                  (if_neg hc)))
+                              (of_eq_true
+                                (Eq.trans
+                                  (congrFun'
+                                    (congrArg Eq
+                                      (Eq.trans
+                                        (ite_eq_right_of_eq_false (none, MixedDispatcher.Tag.mismatch)
+                                          (if a.x * (b.z * b.z) = (MixedCancellation.other a b).x then
+                                            (some (Sum.inr (MixedTripling.rawOutput a1 a2 a3 a)),
+                                              MixedDispatcher.Tag.tripling)
+                                          else
+                                            (Option.map Sum.inr
+                                                (MixedGeneric.dispatch (MixedCancellation.other a b)
+                                                  (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3),
+                                              MixedDispatcher.Tag.positiveDistinct))
+                                          (Eq.trans
+                                            (congrArg Not
+                                              (Eq.trans (congrFun' (congrArg Eq hp) (MixedCancellation.rawY3 a b * a.w))
+                                                (eq_self (MixedCancellation.rawY3 a b * a.w))))
+                                            not_true_eq_false))
+                                        (Eq.trans
+                                          (ite_eq_right_of_eq_false
+                                            (some (Sum.inr (MixedTripling.rawOutput a1 a2 a3 a)),
+                                              MixedDispatcher.Tag.tripling)
+                                            (Option.map Sum.inr
+                                                (MixedGeneric.dispatch (MixedCancellation.other a b)
+                                                  (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3),
+                                              MixedDispatcher.Tag.positiveDistinct)
+                                            (eq_false he))
+                                          (congrFun' (congrArg Prod.mk (congrArg (Option.map Sum.inr) hd))
+                                            MixedDispatcher.Tag.positiveDistinct))))
+                                    (some
+                                        (Sum.inr
+                                          (MixedGeneric.output (MixedCancellation.other a b)
+                                            (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3)),
+                                      MixedDispatcher.Tag.positiveDistinct))
+                                  (eq_self
+                                    (some
+                                        (Sum.inr
+                                          (MixedGeneric.output (MixedCancellation.other a b)
+                                            (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3)),
+                                      MixedDispatcher.Tag.positiveDistinct))))),
+                          ⟨⟨hz, ⟨hw, hv⟩⟩, of_decide_eq_true (id (Eq.refl true))⟩⟩)
+  else
+    have hg := Eq.mpr (id (congrArg (fun _a => _a ≠ 0) (MixedGeneric.genericK_same a b))) hk;
+    And.casesOn (MixedGeneric.weighted_generic_preserves a0 a1 a2 a3 a b haz haw hbz hbw hg ha hb) fun hz right =>
+      And.casesOn right fun hw hv =>
+        have hd := MixedGeneric.generic_dispatch a b a3 hg;
+        Exists.intro (Sum.inr (MixedGeneric.output a b a3))
+          (Exists.intro MixedDispatcher.Tag.common
+            ⟨of_eq_true
+                (Eq.trans
+                  (congrFun'
+                    (congrArg Eq
+                      (Eq.trans
+                        (ite_eq_left_of_eq_true
+                          (Option.map Sum.inr (MixedGeneric.dispatch a b a3), MixedDispatcher.Tag.common)
+                          (if a.y * MixedCancellation.rawW3 b = -(MixedCancellation.rawY3 a b * a.w) then
+                            (some (Sum.inl (MixedCancellation.other a b)), MixedDispatcher.Tag.cancellation)
+                          else
+                            if a.y * MixedCancellation.rawW3 b ≠ MixedCancellation.rawY3 a b * a.w then
+                              (none, MixedDispatcher.Tag.mismatch)
+                            else
+                              if a.x * (b.z * b.z) = (MixedCancellation.other a b).x then
+                                (some (Sum.inr (MixedTripling.rawOutput a1 a2 a3 a)), MixedDispatcher.Tag.tripling)
+                              else
+                                (Option.map Sum.inr
+                                    (MixedGeneric.dispatch (MixedCancellation.other a b)
+                                      (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3),
+                                  MixedDispatcher.Tag.positiveDistinct))
+                          (Eq.trans (congrArg Not (eq_false hk)) not_false_eq_true))
+                        (congrFun' (congrArg Prod.mk (congrArg (Option.map Sum.inr) hd)) MixedDispatcher.Tag.common)))
+                    (some (Sum.inr (MixedGeneric.output a b a3)), MixedDispatcher.Tag.common))
+                  (eq_self (some (Sum.inr (MixedGeneric.output a b a3)), MixedDispatcher.Tag.common))),
+              ⟨⟨hz, ⟨hw, hv⟩⟩, of_decide_eq_true (id (Eq.refl true))⟩⟩)
+'MixedDispatcher.returned_payload_valid' depends on axioms: [propext, Classical.choice, Quot.sound]

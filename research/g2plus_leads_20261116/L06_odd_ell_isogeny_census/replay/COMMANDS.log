@@ -1,0 +1,21 @@
+[2026-11-16T23:39:33Z] CMD: ./l06/target/release/l06 lagr2 --out replay/l2_lagrangians.json
+  exit=0
+[2026-11-16T23:39:33Z] CMD: ./l06/target/release/l06 gsp --samples 200000 --out replay/gsp_reference.json 2> replay/gsp.log
+  exit=0
+[2026-11-16T23:40:49Z] CMD: ./l06/target/release/l06 gate-enum --p 101 --count 200 --out replay/gate_enum_p101.jsonl 2> replay/gate_enum_p101.log
+  exit=0
+[2026-11-16T23:41:13Z] CMD: ./l06/target/release/l06 gate-enum --p 257 --count 40 --out replay/gate_enum_p257.jsonl 2> replay/gate_enum_p257.log
+  exit=0
+[2026-11-16T23:42:56Z] CMD: timeout 900 ./l06/target/release/l06 census --p 257 --u-count 3000 --prime-target 120 --draw-cap 40000 --out replay/census_p257.jsonl 2> replay/census_p257.log
+  exit=0
+[2026-11-16T23:43:17Z] CMD: timeout 900 ./l06/target/release/l06 census --p 521 --u-count 3000 --prime-target 120 --draw-cap 40000 --out replay/census_p521.jsonl 2> replay/census_p521.log
+  exit=0
+[2026-11-16T23:43:56Z] CMD: timeout 900 ./l06/target/release/l06 census --p 1031 --u-count 3000 --prime-target 120 --draw-cap 40000 --out replay/census_p1031.jsonl 2> replay/census_p1031.log
+  exit=0
+[2026-11-16T23:45:11Z] CMD: timeout 900 ./l06/target/release/l06 census --p 2053 --u-count 1000 --prime-target 120 --draw-cap 40000 --out replay/census_p2053.jsonl 2> replay/census_p2053.log
+  exit=0
+[2026-11-16T23:46:38Z] CMD: timeout 900 ./l06/target/release/l06 census --p 4099 --u-count 1000 --prime-target 120 --draw-cap 40000 --out replay/census_p4099.jsonl 2> replay/census_p4099.log
+  exit=0
+[2026-11-16T23:49:24Z] CMD: python3 -I analyze.py replay > replay/summary.json
+  exit=0
+DONE

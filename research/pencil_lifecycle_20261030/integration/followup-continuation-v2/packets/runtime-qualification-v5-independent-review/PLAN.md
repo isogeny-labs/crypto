@@ -1,0 +1,1 @@
+Archive already-completed independent Q0-Q4 postreview, T1493. No new runtime or extraction. Preserve exact reviewer JSON, selected81 nativefiles, extraction receipts and hash closure. Produce neutral SVG/PDF, max2renders each60seconds/1GiB. Deterministic archive; officialstore if over64KiB, fresh remote replay beforecommit. Noindex untilparentgrant.

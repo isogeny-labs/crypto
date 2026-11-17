@@ -1,0 +1,139 @@
+# gpu/ecc -- build + test.
+#
+#   make test          generated headers + CPU verification (no GPU needed)
+#                      (rho suites, then the baby-step giant-step suites)
+#   make bench         CUDA benchmark binary (needs nvcc)
+#   make bench ARCH=sm_100   target Blackwell (default: sm_80;sm_90;sm_100)
+#   make bench CURVE=curve25519   Ed25519's group instead of secp256k1
+#   make clean
+#
+# The CPU tests compile the *same* .cuh headers with g++, so a green
+# `make test` on a GPU-less machine means the field/point/walk logic is
+# correct; only the launch configuration and memory layout remain
+# GPU-specific.
+
+PY      ?= python3
+CXX     ?= g++
+NVCC    ?= nvcc
+CXXFLAGS ?= -O2 -std=c++17 -Wall -Wextra -Wno-unused-parameter -Wno-unknown-pragmas
+# Blackwell: sm_100 (B100/B200, GB200), sm_120 (RTX 50xx / RTX PRO Blackwell).
+# sm_90 = Hopper, sm_80 = Ampere.
+ARCH    ?= sm_90
+NVCCFLAGS ?= -O3 -std=c++17 -arch=$(ARCH) -lineinfo
+# FP_PTX=1 selects the hand-written carry chains in fp256.cuh.  Off by
+# default: see OPTIMIZATION_BLACKWELL.md section 2 for what has and has not
+# been verified about them.  MIN_BLOCKS sets __launch_bounds__ min-blocks
+# on the rho kernels (0 = unset).
+# On sm_120 (RTX PRO 6000) both are measured: the device selftest passes
+# with FP_PTX=1 and the rho walk runs 1.88x faster with it at MIN_BLOCKS=2
+# (validation/20261017-modal-rtx-pro-6000), so that is the default there.
+ifeq ($(ARCH),sm_120)
+FP_PTX     ?= 1
+MIN_BLOCKS ?= 2
+endif
+FP_PTX     ?= 0
+MIN_BLOCKS ?= 0
+
+GEN := curve_secp256k1.h curve_toy40.h curve_toy36j0.h curve_curve25519.h \
+       vec_secp256k1_mont.h vec_secp256k1_fast.h vec_toy40_mont.h vec_toy36j0_mont.h \
+       vec_curve25519_mont.h vec_curve25519_fast.h
+
+TESTS := test_secp_fast test_secp_mont test_toy_mont test_toyj0_mont \
+         test_25519_fast test_25519_mont \
+         test_bsgs_toy test_bsgs_secp_fast test_bsgs_secp_mont test_bsgs_25519_fast
+
+# Curve the CUDA benchmark binary is built for: secp256k1 (default) or
+# curve25519 (Ed25519's group in short-Weierstrass form).
+CURVE ?= secp256k1
+
+.PHONY: all test bench clean gen ptxcheck
+all: test
+
+gen: $(GEN)
+
+curve_%.h: ecref.py
+	$(PY) ecref.py params --curve $* > $@
+
+vec_secp256k1_mont.h: ecref.py
+	$(PY) ecref.py vectors --curve secp256k1 --mode mont > $@
+vec_secp256k1_fast.h: ecref.py
+	$(PY) ecref.py vectors --curve secp256k1 --mode fast > $@
+vec_toy40_mont.h: ecref.py
+	$(PY) ecref.py vectors --curve toy40 --mode mont > $@
+vec_toy36j0_mont.h: ecref.py
+	$(PY) ecref.py vectors --curve toy36j0 --mode mont > $@
+vec_curve25519_mont.h: ecref.py
+	$(PY) ecref.py vectors --curve curve25519 --mode mont > $@
+vec_curve25519_fast.h: ecref.py
+	$(PY) ecref.py vectors --curve curve25519 --mode fast > $@
+
+HDRS := fp256.cuh point.cuh rho.cuh rho_host.hpp
+BSGS_HDRS := fp256.cuh point.cuh bsgs.cuh bsgs_host.hpp
+
+# secp256k1 with the special (fast) reduction -- the production path
+test_secp_fast: test_cpu.cpp $(HDRS) curve_secp256k1.h vec_secp256k1_fast.h
+	$(CXX) $(CXXFLAGS) -DGPU_ECC_CURVE_HEADER='"curve_secp256k1.h"' \
+	  -DGPU_ECC_VECTORS_HEADER='"vec_secp256k1_fast.h"' -DFP_FAST=1 -o $@ $<
+
+# secp256k1 forced through Montgomery -- proves the generic path on the
+# same curve, and that fast/Montgomery agree on canonical values
+test_secp_mont: test_cpu.cpp $(HDRS) curve_secp256k1.h vec_secp256k1_mont.h
+	$(CXX) $(CXXFLAGS) -DGPU_ECC_CURVE_HEADER='"curve_secp256k1.h"' \
+	  -DGPU_ECC_VECTORS_HEADER='"vec_secp256k1_mont.h"' -DFP_FAST=0 -o $@ $<
+
+# 40-bit toy curve with a != 0: exercises the generic doubling formula and
+# is small enough that the end-to-end rho solve actually finds the DLP
+test_toy_mont: test_cpu.cpp $(HDRS) curve_toy40.h vec_toy40_mont.h
+	$(CXX) $(CXXFLAGS) -DGPU_ECC_CURVE_HEADER='"curve_toy40.h"' \
+	  -DGPU_ECC_VECTORS_HEADER='"vec_toy40_mont.h"' -DFP_FAST=0 -o $@ $<
+
+# 36-bit j = 0 toy curve (a = 0, prime order, p = n = 1 mod 3): the smallest
+# curve carrying the full Aut(E) = Z/6, so the fold-6 walk -- secp256k1's
+# production configuration -- is solved end to end, and its step count is
+# averaged over SOLVE_RUNS solves against folds 1 and 2 on the same curve
+test_toyj0_mont: test_cpu.cpp $(HDRS) curve_toy36j0.h vec_toy36j0_mont.h
+	$(CXX) $(CXXFLAGS) -DGPU_ECC_CURVE_HEADER='"curve_toy36j0.h"' \
+	  -DGPU_ECC_VECTORS_HEADER='"vec_toy36j0_mont.h"' -DFP_FAST=0 -DSOLVE_RUNS=8 -o $@ $<
+
+# curve25519 (Ed25519's prime-order group, cofactor 8, a != 0) with the
+# 2^256 = 38 special reduction -- the production path for that curve -- and
+# forced through Montgomery, so the two reductions agree on canonical values
+test_25519_fast: test_cpu.cpp $(HDRS) curve_curve25519.h vec_curve25519_fast.h
+	$(CXX) $(CXXFLAGS) -DGPU_ECC_CURVE_HEADER='"curve_curve25519.h"' \
+	  -DGPU_ECC_VECTORS_HEADER='"vec_curve25519_fast.h"' -DFP_FAST=1 -o $@ $<
+
+test_25519_mont: test_cpu.cpp $(HDRS) curve_curve25519.h vec_curve25519_mont.h
+	$(CXX) $(CXXFLAGS) -DGPU_ECC_CURVE_HEADER='"curve_curve25519.h"' \
+	  -DGPU_ECC_VECTORS_HEADER='"vec_curve25519_mont.h"' -DFP_FAST=0 -o $@ $<
+
+# Baby-step giant-step: the engine is curve-generic, so it is checked on
+# both secp256k1 paths (table build, steppers, a 2^22 interval log) and on
+# the toy curve, where whole-group logs fit a CPU run.
+test_bsgs_toy: test_bsgs.cpp $(BSGS_HDRS) curve_toy40.h
+	$(CXX) $(CXXFLAGS) -DGPU_ECC_CURVE_HEADER='"curve_toy40.h"' -DFP_FAST=0 -o $@ $<
+
+test_bsgs_secp_fast: test_bsgs.cpp $(BSGS_HDRS) curve_secp256k1.h
+	$(CXX) $(CXXFLAGS) -DGPU_ECC_CURVE_HEADER='"curve_secp256k1.h"' -DFP_FAST=1 -o $@ $<
+
+test_bsgs_secp_mont: test_bsgs.cpp $(BSGS_HDRS) curve_secp256k1.h
+	$(CXX) $(CXXFLAGS) -DGPU_ECC_CURVE_HEADER='"curve_secp256k1.h"' -DFP_FAST=0 -o $@ $<
+
+test_bsgs_25519_fast: test_bsgs.cpp $(BSGS_HDRS) curve_curve25519.h
+	$(CXX) $(CXXFLAGS) -DGPU_ECC_CURVE_HEADER='"curve_curve25519.h"' -DFP_FAST=1 -o $@ $<
+
+test: $(TESTS) ptxcheck
+	@rc=0; for t in $(TESTS); do \
+	  echo "=== ./$$t ==="; ./$$t || rc=1; done; exit $$rc
+
+# Differentially test the FP_PTX inline assembly against the portable path
+# by interpreting it.  Needs no GPU; does not replace ./bench selftest.
+ptxcheck: fp256.cuh ptx_asm_check.py
+	@echo "=== ptx_asm_check ==="
+	@python3 ptx_asm_check.py
+
+bench: bench.cu $(HDRS) $(BSGS_HDRS) kernels.cuh kernels_bsgs.cuh curve_$(CURVE).h
+	$(NVCC) $(NVCCFLAGS) -DFP_PTX=$(FP_PTX) -DRHO_MIN_BLOCKS=$(MIN_BLOCKS) \
+	  -DGPU_ECC_CURVE_HEADER='"curve_$(CURVE).h"' -o $@ $<
+
+clean:
+	rm -f $(GEN) $(TESTS) bench

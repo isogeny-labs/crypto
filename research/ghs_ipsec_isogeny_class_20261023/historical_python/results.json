@@ -1,0 +1,206 @@
+{
+  "field_modulus": "z^155 + z^62 + 1",
+  "self_checks": "passed",
+  "curves": {
+    "ipsec": {
+      "a": 0,
+      "b_hex": "0x7338f",
+      "b": "z^18 + z^17 + z^16 + z^13 + z^12 + z^9 + z^8 + z^7 + z^3 + z^2 + z + 1",
+      "absolute_trace_a": 0,
+      "direct_ghs": [
+        {
+          "subfield_degree": 5,
+          "extension_degree": 31,
+          "m": 26,
+          "annihilator_hex": "0x5763e69",
+          "annihilator": "T^26 + T^24 + T^22 + T^21 + T^20 + T^18 + T^17 + T^13 + T^12 + T^11 + T^10 + T^9 + T^6 + T^5 + T^3 + 1",
+          "annihilator_degree": 26,
+          "relative_trace_hex": "0x1",
+          "exact_genus": 33554432,
+          "genus_alternatives": [
+            33554431,
+            33554432
+          ]
+        },
+        {
+          "subfield_degree": 31,
+          "extension_degree": 5,
+          "m": 5,
+          "annihilator_hex": "0x21",
+          "annihilator": "T^5 + 1",
+          "annihilator_degree": 5,
+          "relative_trace_hex": "0x134d496a003e1688419d6950b820610123b78a1",
+          "exact_genus": 16,
+          "genus_alternatives": [
+            15,
+            16
+          ]
+        },
+        {
+          "subfield_degree": 1,
+          "extension_degree": 155,
+          "m": 126,
+          "annihilator_hex": "0x630006018c0318c60180600006000c63",
+          "annihilator": "T^126 + T^125 + T^121 + T^120 + T^106 + T^105 + T^96 + T^95 + T^91 + T^90 + T^81 + T^80 + T^76 + T^75 + T^71 + T^70 + T^66 + T^65 + T^56 + T^55 + T^46 + T^45 + T^26 + T^25 + T^11 + T^10 + T^6 + T^5 + T + 1",
+          "annihilator_degree": 126,
+          "relative_trace_hex": "0x1",
+          "exact_genus": 42535295865117307932921825928971026432,
+          "genus_alternatives": [
+            42535295865117307932921825928971026431,
+            42535295865117307932921825928971026432
+          ]
+        }
+      ],
+      "hess_F32_support_bound": {
+        "necessary_genus_lower_bound": 992,
+        "bound_scope": "Hess two-factor construction, fixed curve, descent to F32",
+        "is_constructed_descent": false,
+        "target_support": [
+          0,
+          1,
+          2,
+          3,
+          7,
+          8,
+          9,
+          12,
+          13,
+          16,
+          17,
+          18
+        ],
+        "target_factors": [
+          "T + 1",
+          "T^5 + T^2 + 1",
+          "T^5 + T^3 + T^2 + T + 1",
+          "T^5 + T^4 + T^2 + T + 1",
+          "T^5 + T^4 + T^3 + T + 1",
+          "T^5 + T^4 + T^3 + T^2 + 1"
+        ],
+        "F2_annihilator_support_closure": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          24,
+          25,
+          26,
+          28
+        ],
+        "unordered_support_pairs_checked": 8128,
+        "pairs_excluded_by_support": 1129,
+        "minimizing_support_pairs": [
+          {
+            "alpha_factor_mask": 8,
+            "beta_factor_mask": 72,
+            "r": 5,
+            "s": 10,
+            "t": 10,
+            "sumset_size": 26
+          }
+        ]
+      }
+    },
+    "jms_vulnerable": {
+      "a": 1,
+      "b_hex": "0x10006",
+      "b": "z^16 + z^2 + z",
+      "absolute_trace_a": 1,
+      "direct_ghs": [
+        {
+          "subfield_degree": 5,
+          "extension_degree": 31,
+          "m": 6,
+          "annihilator_hex": "0x25",
+          "annihilator": "T^5 + T^2 + 1",
+          "annihilator_degree": 5,
+          "relative_trace_hex": "0x0",
+          "exact_genus": 31,
+          "genus_alternatives": [
+            31,
+            32
+          ]
+        },
+        {
+          "subfield_degree": 31,
+          "extension_degree": 5,
+          "m": 5,
+          "annihilator_hex": "0x21",
+          "annihilator": "T^5 + 1",
+          "annihilator_degree": 5,
+          "relative_trace_hex": "0x101140000020c00040008000000000010100",
+          "exact_genus": 16,
+          "genus_alternatives": [
+            15,
+            16
+          ]
+        },
+        {
+          "subfield_degree": 1,
+          "extension_degree": 155,
+          "m": 26,
+          "annihilator_hex": "0x2000401",
+          "annihilator": "T^25 + T^10 + 1",
+          "annihilator_degree": 25,
+          "relative_trace_hex": "0x0",
+          "exact_genus": 33554431,
+          "genus_alternatives": [
+            33554431,
+            33554432
+          ]
+        }
+      ],
+      "hess_F32_support_bound": {
+        "necessary_genus_lower_bound": 31,
+        "bound_scope": "Hess two-factor construction, fixed curve, descent to F32",
+        "is_constructed_descent": false,
+        "target_support": [
+          1,
+          2,
+          16
+        ],
+        "target_factors": [
+          "T^5 + T^2 + 1"
+        ],
+        "F2_annihilator_support_closure": [
+          1,
+          2,
+          4,
+          8,
+          16
+        ],
+        "unordered_support_pairs_checked": 6112,
+        "pairs_excluded_by_support": 101,
+        "minimizing_support_pairs": [
+          {
+            "alpha_factor_mask": 1,
+            "beta_factor_mask": 2,
+            "r": 1,
+            "s": 5,
+            "t": 6,
+            "sumset_size": 5
+          }
+        ]
+      }
+    }
+  },
+  "elapsed_seconds": 0.23060097200001906
+}

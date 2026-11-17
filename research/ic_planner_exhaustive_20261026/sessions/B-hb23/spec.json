@@ -1,0 +1,73 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "exhaustive, binary curve hb23 (held out): d0 - 1, d0, d0 + 1",
+  "description": "research/ic_planner_exhaustive_20261026/PROTOCOL.md",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "binary_random",
+        "n": 23,
+        "seed": 59297,
+        "max_cofactor": 8
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261105
+  },
+  "arms": [
+    {
+      "name": "rho",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=8",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm:m=2,negation_folded=1",
+          "targets": "walk"
+        }
+      },
+      "name": "plan",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=7",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm:m=2,negation_folded=1",
+          "targets": "walk"
+        }
+      },
+      "name": "dm1",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=9",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm:m=2,negation_folded=1",
+          "targets": "walk"
+        }
+      },
+      "name": "dp1",
+      "role": "baseline"
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 20261106,
+    "isolation_required": "L2",
+    "timeout_seconds": 1800
+  }
+}

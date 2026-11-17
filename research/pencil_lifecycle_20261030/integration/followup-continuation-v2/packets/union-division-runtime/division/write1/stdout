@@ -1,0 +1,29 @@
+/var/tmp/pencil-division-quotient-20261101-v1/QuotientWrite.lean:8:74: error: unsolved goals
+K : Type u_1
+inst✝ : CommRing K
+q : K[X]
+j : ℕ
+c : K
+⊢ q.coeff j + ((C c - C (q.coeff j)) * X ^ j).coeff j = c
+/var/tmp/pencil-division-quotient-20261101-v1/QuotientWrite.lean:11:41: error: unsolved goals
+K : Type u_1
+inst✝ : CommRing K
+q : K[X]
+j i : ℕ
+c : K
+hi : i ≠ j
+⊢ ((C c - C (q.coeff j)) * X ^ j).coeff i = 0
+/var/tmp/pencil-division-quotient-20261101-v1/QuotientWrite.lean:12:18: warning: This simp argument is unused:
+  hi
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [writeCoeff, Ne.symm hi]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-division-quotient-20261101-v1/QuotientWrite.lean:12:21: warning: This simp argument is unused:
+  Ne.symm hi
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [writeCoeff, hi]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

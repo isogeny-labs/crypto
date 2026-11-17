@@ -1,0 +1,560 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "crypto-ecdl-tensor-ic-speed-20261030",
+  "version": 1,
+  "created": "2026-10-30",
+  "repository": "crypto",
+  "study_dir": "research/ecdl_tensor_ic_speed_20261030",
+  "authors": [
+    "Claude Code session (owner request: Full ecbench incl. wall time)"
+  ],
+  "links": {
+    "spec": "crypto:docs/ecbench/specs/tensor-ic-vs-rho.json (10, 12, 14 bits; counts and L2 wall time) and crypto:docs/ecbench/specs/tensor-ic-vs-rho-16.json (16 bits; counts only)",
+    "implementation": "crypto:crates/ecdl-tensor-ic (PR #2895); arm ic.tensor_contraction_v1 in src/cryptanalysis/ecbench/methods.rs",
+    "note": "Speed of a toy, exponential-time index calculus; the measurement quantifies its distance to rho, it cannot establish a speedup."
+  },
+  "question": "On the registered bench-roster prime-order curves of 10, 12, 14 and 16 bits, what does the tensor-contraction index calculus (ic.tensor_contraction_v1, m = 2) cost in counted operations S and in L2 wall time, against the matched rho.negation reference and the prime-curve ic.pipeline baseline, and how does its cost scale with r?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Every measured row of every arm recovers the planted scalar (verified by the harness).",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Per curve, the paired ratio of summed S, tensor-m2 over rho-neg, with its bootstrap interval and the §5a band (unpriced native work at 0, 0.1 and 1 GAE per operation on every arm).",
+      "class": "comparative",
+      "decided_by": [
+        "C-rho"
+      ],
+      "if_supported": "a measured gap to rho on these four curves; no claim beyond them",
+      "if_not_supported": "the ratio interval includes 1 or the order flips inside the §5a band: no ranking"
+    },
+    {
+      "id": "C3",
+      "text": "Per curve, the paired ratio of summed S, tensor-m2 over ic-mitm (the existing prime-curve IC baseline), with the §5a band.",
+      "class": "comparative",
+      "decided_by": [
+        "C-ic"
+      ],
+      "if_supported": "a measured difference from the IC baseline on these curves",
+      "if_not_supported": "no ranking against the IC baseline"
+    },
+    {
+      "id": "C4",
+      "text": "The log-log slope of median S of tensor-m2 against log2 r over the four sizes, reported descriptively with the four points.",
+      "class": "heuristic_estimate",
+      "decided_by": [],
+      "if_supported": "a fitted exponent on four toy sizes, labelled an extrapolation outside them",
+      "if_not_supported": "n/a"
+    },
+    {
+      "id": "C5",
+      "text": "Per curve of the main session (10, 12, 14 bits), the L2 wall-time ratio tensor-m2 over rho-neg, only where ecbench compare admits wall time and it is outside the A/A noise. The A/A comparison C-aa supplies the noise floor.",
+      "class": "comparative",
+      "decided_by": [
+        "C-rho"
+      ],
+      "if_supported": "an admitted wall-time gap on these curves",
+      "if_not_supported": "wall time quoted as descriptive or not at all"
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "The tensor arm costs far more than rho in S on every curve, and the gap grows with r.",
+      "mechanism": "Each relation is found by exact contraction costing about |F_1||F_2| ≈ 2r point additions, and N + 1 ≈ 2(2r)^(1/2) relations are needed, so total GAE grows like r^(3/2) and S = GAE/sqrt(r) like r; rho's S is about 1.",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "s",
+          "direction": "higher",
+          "minimum_effect": "ratio interval above 1 on every curve, increasing from 8 to 14 bits",
+          "provenance": {
+            "written_at": "2026-10-30",
+            "data_seen": [
+              {
+                "path": "crypto:docs/session-logs/2026-10-30.md",
+                "measured": "descriptive wall time of single ic tensor demo solves on a contended host (12, 14, 16 bits) used only to size the run; no S count of any arm was seen"
+              },
+              {
+                "path": "local development smoke session ECBS1hd9fc33ad31ac (not committed; recorded in docs/session-logs/2026-10-30.md)",
+                "measured": "S of rho-neg, ic-mitm and tensor-m2 on the 10- and 12-bit roster curves, 2 targets each from target_seed 20261030 (the first two workloads of those curves in the main session), at L0; seen after P1 and P2 were written"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        },
+        {
+          "id": "P2",
+          "metric": "s",
+          "direction": "higher",
+          "minimum_effect": "log-log slope of median S against log2 r between 0.7 and 1.3 (expected 1 for m = 2)",
+          "provenance": {
+            "written_at": "2026-10-30",
+            "data_seen": [
+              {
+                "path": "crypto:docs/session-logs/2026-10-30.md",
+                "measured": "descriptive wall time of single ic tensor demo solves on a contended host (12, 14, 16 bits) used only to size the run; no S count of any arm was seen"
+              },
+              {
+                "path": "local development smoke session ECBS1hd9fc33ad31ac (not committed; recorded in docs/session-logs/2026-10-30.md)",
+                "measured": "S of rho-neg, ic-mitm and tensor-m2 on the 10- and 12-bit roster curves, 2 targets each from target_seed 20261030 (the first two workloads of those curves in the main session), at L0; seen after P1 and P2 were written"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "calibration"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-neg",
+      "role": "reference",
+      "description": "rho.negation, the matched rho reference on prime curves",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation"
+      }
+    },
+    {
+      "id": "ic-mitm",
+      "role": "baseline",
+      "description": "ic.pipeline with prime-abscissa:size=32 and mitm:negation_folded=1, the prime-curve IC configuration of the smoke spec",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=32",
+        "oracle": "mitm:negation_folded=1"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "tensor-m2",
+      "role": "candidate",
+      "description": "ic.tensor_contraction_v1 with m = 2 hashed factor bases",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.tensor_contraction_v1",
+        "m": "2",
+        "max_restarts": "8"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "rho-neg-aa",
+      "role": "control_aa",
+      "description": "rho.negation repeated under a second arm name: the A/A noise floor",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation"
+      },
+      "same_instrument_as": "rho-neg"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "every workload carries a planted scalar and the harness checks [k]G = Q on every row; a miss is a wrong_answer row"
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "a cost comparison between methods on the same instances asserts nothing about a null population"
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "method",
+        "levels": [
+          "rho.negation",
+          "ic.pipeline",
+          "ic.tensor_contraction_v1"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "curve",
+        "treatment": "crossed",
+        "value": "prime_roster 10, 12, 14 (main session) and 16 (counts-only session); registered ICV1 slugs icv1-fp10-t5-192cb216, icv1-fp12-t19-d4a315df, icv1-fp14-tm43-158b6914, icv1-fp16-t351-d433f24e",
+        "how": "every arm runs every curve; comparisons are per curve"
+      },
+      {
+        "name": "targets",
+        "treatment": "fixed",
+        "value": "target_seed 20261030, 8 targets per curve",
+        "how": "the spec's target law, independent of arm"
+      },
+      {
+        "name": "binary",
+        "treatment": "fixed",
+        "value": "one ecbench binary built from the source commit the EKS image is built from",
+        "how": "sha256 pinned in the session"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "RAYON_NUM_THREADS=1 OMP_NUM_THREADS=1"
+      },
+      {
+        "name": "algorithm_seed",
+        "treatment": "randomized",
+        "how": "derived per execution by the harness from measurement.seed 20261030, independent of arm; the 16-bit session uses the same seed"
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "measurement.order alternate"
+      },
+      {
+        "name": "host_load",
+        "treatment": "measured",
+        "how": "steal, PSI, foreign busy ticks per row; affects wall time only"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-rho",
+        "arms": [
+          "rho-neg",
+          "tensor-m2"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-ic",
+        "arms": [
+          "ic-mitm",
+          "tensor-m2"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "rho-neg",
+          "rho-neg-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "main session: alternate over 6 measured rounds (balanced); 16-bit session: alternate_measured over its single round, which ecbench cannot balance; that session's metric is counted S, which arm order does not affect",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "ecbench derives algorithm_seed per execution from measurement.seed 20261030 and the plan"
+    },
+    "instance_sampling": {
+      "rule": "8 targets per curve from target_seed 20261030 under the spec's target law, in both sessions",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "not masked: arms are named by method in the harness output; the decision rule is fixed below before data",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 32,
+    "replicates": 6,
+    "warmups": 1,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 8,
+      "correction": "holm",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "main session: 8 workloads x 6 rounds = 48 paired observations per arm per curve; 16-bit session: 8 workloads x 1 round (S is deterministic per run); the expected effect is far outside any plausible interval width"
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 60,
+      "per_sample_seconds": 5,
+      "threads": 1,
+      "estimated_total_seconds": 5400,
+      "measured_on": "descriptive single tensor solves on this container: 12 bits 3 s, 14 bits 21 s, 16 bits 417 s (contended host); rho and ic.pipeline are sub-second"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "s",
+        "name": "S",
+        "unit": "total group-addition equivalents / sqrt(r)",
+        "kind": "counted",
+        "definition": "every phase charged in ecbench.gae divided by sqrt(r)",
+        "source": "records.jsonl cost.s",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE / sqrt(r)",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "solve_wall_seconds",
+        "name": "solve wall time",
+        "unit": "s",
+        "kind": "timed",
+        "definition": "the harness's solve interval",
+        "source": "records.jsonl time.solve_wall_ns",
+        "aggregation": "paired_ratio",
+        "resolution": "1 us",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "unpriced",
+        "name": "unpriced native work",
+        "unit": "operations",
+        "kind": "counted",
+        "definition": "each arm's *_uncharged counters, priced at 0, 0.1 and 1 GAE per operation for the §5a band",
+        "source": "records.jsonl counters",
+        "aggregation": "median",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "factor_base.fb_points_listed_uncharged",
+      "factor_base.fb_membership_evals_uncharged",
+      "relation_search.contraction_rows_uncharged",
+      "linear_algebra.linalg_mulmod_uncharged"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "env_class_id",
+      "isolation.level",
+      "isolation.blockers",
+      "steal_ticks",
+      "psi",
+      "run_cpu",
+      "threads"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab",
+    "placement": {
+      "instance_type": "c8a.2xlarge (contract default)",
+      "cpus": 4,
+      "spot": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 1800,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "fixed design: main session 4 arms x 24 workloads x (1 warmup + 6 rounds) = 672 executions; 16-bit session 4 arms x 8 workloads x (1 warmup + 1 round) = 64 executions; then stop",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "a row whose answer does not verify stops nothing and is recorded as wrong_answer",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "a row with outcome.status other than verified is excluded from the decisive comparison and reported",
+    "a wall-time value on a row below L2 is descriptive only; counted units stand at any level",
+    "a session whose audit is not OK with every replay identical yields no result",
+    "the 16-bit session carries no wall-time claim at any isolation level"
+  ],
+  "decision_rule": {
+    "text": "Per curve, C2 (C3) is supported when the paired ratio of summed S tensor-m2 over rho-neg (ic-mitm) has a 95% bootstrap interval excluding 1 and the order holds at 0, 0.1 and 1 GAE per unpriced operation on every arm; otherwise no ranking on that curve. C5 needs ecbench compare to admit wall time and report outside_noise true. Holm correction over the family of per-curve comparisons; C-aa is the noise floor, not a decision.",
+    "comparison_ids": [
+      "C-rho",
+      "C-ic"
+    ],
+    "threshold": "ratio interval excludes 1 across the §5a band",
+    "statistic": "sum of S over (workload, round) pairs, ratio candidate/reference (ecbench compare)",
+    "interval": "paired bootstrap over workloads, 95%",
+    "multiple_comparison_correction": "holm",
+    "effect_size_measure": "ratio of summed S per curve",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "within_control_distribution",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": null,
+    "inputs": [
+      "session/records.jsonl"
+    ],
+    "outputs": [
+      "ecbench verify --replay-all",
+      "ecbench compare --a rho-neg --b tensor-m2",
+      "ecbench compare --a ic-mitm --b tensor-m2",
+      "ecbench compare --a rho-neg --b rho-neg-aa",
+      "ecbench table"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "median S per arm against log2 r, per curve, with intervals",
+      "L2 wall time per arm per curve where admitted"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "changing the workloads, seeds, unit or accounting after seeing results",
+    "quoting wall time from rows below L2 or not outside the A/A noise as a result",
+    "reading a toy-size measurement as evidence about deployed curves",
+    "calling any result a speedup: the counters are exponential"
+  ],
+  "literature": [
+    {
+      "ref": "crypto:docs/ecbench/README.md",
+      "provenance": "internal",
+      "claim": "the counted unit S, isolation levels and paired comparison",
+      "verified_by": "this protocol"
+    },
+    {
+      "ref": "crypto:crates/ecdl-tensor-ic/README.md",
+      "provenance": "internal",
+      "claim": "the algorithm, its exponential counters and its limits",
+      "verified_by": "PR #2895 review"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "40626d715b08412d689c1a37abf92d9846b61384f4e88d10a861796df4e84656",
+    "commit": "13bbdf52ac650b693cd82f49566d3d6bef9bc8f3",
+    "frozen_at": "2026-10-30T01:59:27Z",
+    "filed_before_affected_data": true
+  }
+}

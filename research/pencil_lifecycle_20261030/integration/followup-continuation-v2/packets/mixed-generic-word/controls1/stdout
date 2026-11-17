@@ -1,0 +1,39 @@
+/var/tmp/pencil-mixed-generic-word-20261031-v1/Controls.lean:7:79: error: failed to synthesize
+  Decidable
+    (WeightedWord.canonical 7
+      (genericWords 7 { x := 0, y := 1, z := 2, w := 2 } { q := 0, r := 4, s := 0, t := 0, z := 3, w := 2 } 0).payload)
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+/var/tmp/pencil-mixed-generic-word-20261031-v1/Controls.lean:9:49: error: failed to synthesize
+  Decidable ¬WordD1.canonical 7 { x := 0, y := 7, z := 2, w := 2 }
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+/var/tmp/pencil-mixed-generic-word-20261031-v1/Controls.lean:19:3: error: failed to synthesize
+  Decidable (WordD1.canonical 7 { x := 0, y := 1, z := 2, w := 2 })
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+/var/tmp/pencil-mixed-generic-word-20261031-v1/Controls.lean:20:3: error: failed to synthesize
+  Decidable (WeightedWord.canonical 7 { q := 0, r := 4, s := 0, t := 0, z := 3, w := 2 })
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-mixed-generic-word-20261031-v1/Controls.lean:26:1: error: unsolved goals
+case hva
+⊢ 1 - X + X ^ 2 + X ^ 5 - C 64⁻¹ ^ 2 = -X + X ^ 2 + X ^ 5
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-mixed-generic-word-20261031-v1/Controls.lean:29:1: error: unsolved goals
+case hvb
+⊢ 1 - X + X ^ 2 + X ^ 5 = -(X * C (4 / 81)) + X ^ 2 - X ^ 3 + X ^ 3 * C (4 / 81) + X ^ 5 + C (4 / 81)
+/var/tmp/pencil-mixed-generic-word-20261031-v1/Controls.lean:32:1: error: unsolved goals
+case hk
+⊢ ¬128 = 0
