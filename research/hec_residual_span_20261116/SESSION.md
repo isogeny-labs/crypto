@@ -2093,3 +2093,10 @@ What was done: freezefa7db31e05a once-onlyexit101 beforefirstresultrow; debugnor
 Decisions made: preservefailure/raw, prospectivev2onlycomparisonformatfix, no scientificresultclaim.
 Open threads: freezev2correctedjoin andexecutenewgate.
 Errors: k4709} vs k4709 } comparison, no measuredrows;no S3/cloud.
+
+## Emitted-anchor v2 frozen
+
+What was done: newv2source/binary fixesonlyclosingbrace debugspace; v1rawfailure remainsimmutable, noalgorithm/verifier/gate change.
+Decisions made: original12targets/24calls andallmutation/cost gates unchanged; pushnewfreeze beforeonce-only120CPU invocation. Assertions [pcc:unverified].
+Open threads: runv2afterpush andinterpretcompletecost.
+Errors: originalformatfailureexplicit, no v2scientificexecutionyet.
