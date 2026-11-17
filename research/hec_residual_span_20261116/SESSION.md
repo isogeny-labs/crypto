@@ -2702,3 +2702,10 @@ What was done: freeze1dda21f1a15 hashespass, onequalificationrun exit0;11catalog
 Decisions made: no speed/10xclaimfromqualification; nextall6armsfreshpreparedbuild/commonlookupintegration, requireoldoutcomes/subgroupvectors, countlookups/memorynotfreeamortization.
 Open threads: fairshared completecostgate andlaterwalltimeifwarranted.
 Errors: gitdiffchecknotedtrailingblankEOFinoraclecopy;nonfunctionalwarningretainedwithfrozenhashratherthanrewriteafterexecution. Unusedsplit_referencewarningonly. No S3/cloud/merge.
+
+## All-six-arm fresh prepared integration/count gate frozen
+
+What was done: portedall6algorithms toexplicitPreparedargument, commonwrappervalidatesandbuildsfreshrootcatalogueinsidEACHcall; alloraclesincludingquadraticEDFusequalifiedtable. Compiled264freshcalls/22samefixtures/2repeats witholdoutcomes/subgroup16vectorreplay andlookup/memorycounters.
+Decisions made: no globalcache/single-armadvantage; allbaselinechoicespreparedsameway. Countedbaseprimitivesnotwalltime, explicitlookupcost/memoryandintegeromissions; nogoalcompletionfromREDCdrop. One600CPUrunafterGitfreeze.
+Open threads: executeintegration, compareSHARED-preparedcontrols,retainallregressionsandold/newqualificationboundaries.
+Errors: compilepasseswithinheritedunusedimport/report/helperwarnings, no scientificrunyet. PriorEOFblankstrippedonlyinnewprospectivecopybeforefreeze, oldhashedsourceuntouched. No S3/cloud/merge.
