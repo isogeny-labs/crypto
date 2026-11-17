@@ -2380,3 +2380,10 @@ What was done: pushedfreezef0e031eaa4f, inputhashpass, Rustexit0all3Spdescriptor
 Decisions made: do notchangeglobalHomebrewlinks oroverwriteattempt; prospectivelypinnedprivate3.6runtimev2 usingimmutableexactdescriptors/identicalCsource. Gitfreezeagainbeforeexecution.
 Open threads: v2loaderremedy thennumericalperiod/theta gate; finitefieldand10xscopeunchanged.
 Errors: dynamicloaderpathmismatch, notscientificfailure; no rerun/S3/cloud/merge.
+
+## PinnedprivateFLINT3.6 runtime numericalv2 frozen
+
+What was done: copiedexistingFLINT/MPFR/GMP intotaskspecificruntime, patchedonlyprivateMachOpaths andad-hocsigned; originalconsumer copied/pinnedwithidenticalCsource. Prior .dat exactdescriptors immutable; noRustproducer rerun.
+Decisions made: systemHomebrewlinks untouched; allpriornumericalgates unchanged,oneconsumer/descriptoreach120CPUafternewGitfreeze; originalloaderfailuresretained.
+Open threads: numericalevaluation/sourcecontrols/quotienttheta, thenboundedreconstruction/reduction, nofinitefield/10xclaimyet.
+Errors: loaderincompatibilityremedy structuralnotunchangedretry; install_name_toolsignaturewarnings resolvedbyad-hocsigningprivatecopies. NoS3/cloud/merge.
