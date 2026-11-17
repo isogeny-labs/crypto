@@ -45,3 +45,26 @@ The separate genus2 subgroup-modulus experiment shows zero rank increment in all
 
 == Evidence and interpretation
 Raw tables, stderr, statuses and output hashes live in hec_degree2_lp_20261116 and hec_residual_span_20261116/v2. V1 failure is in the parent directory. RESULTS-GIT.md, v2/RESULTS.md, original protocols, Git custody amendment and v2 fixture amendment distinguish all stages. The written proof is GENERAL-SPAN.md; this finite gate is not an independent proof or machine-checked theorem. Classical LP background: Gaudry–Thériault–Thomé, 2005; its degree-one pool is not a whole reduced-divisor pool.
+
+#pagebreak()
+= Subgroup-modulus follow-up: seven useful ranks
+The separately frozen diagnostic executes at pushed checkpoint5aa632a7033and exits zero. It tests the same genus4/F19curve and full nine-point catalogue. Each point divisor has exact order112099=13×8623, checked by group annihilation and prime-divided nonannihilation. Their common annihilator is112099; this does not claim the total Jacobian order. Projection by13lands every point in the same explicitly checked cyclic subgroup of prime order8623.
+
+== A nonzero log-nullspace witness
+The first projected point generates the subgroup. Exhaustive subgroup-coordinate reconstruction validates every projected catalogue point, with coordinates
+
+[1,1545,5387,4538,1720,3374,7077,711,1516].
+
+These coordinates serve only to check the already specified relations. They do not select anchors, construct or admit relations, or provide a target scalar to the solver. Every split/cache/direct row annihilates this vector modulo8623. Original Jacobian identities and polynomial/partition checks remain in force.
+
+#table(columns:5,inset:5pt,align:center,
+[modulus],[split rank],[cached],[direct / union],[gain],
+[1000003],[1],[9],[9 / 9],[8],
+[8623],[1],[8],[8 / 8],[7])
+
+Thus seven increments survive at a verified subgroup modulus, leaving the expected one-dimensional log nullspace. H=m=9so no off-anchor rational coordinates need eliminating. The two membership modes coincide on the full catalogue and are not independent replications. All candidate/admission columns replay exactly against the corresponding v2rows.
+
+== What remains to turn this into a solver result
+Rank8can determine relative catalogue logs once a nonzero source coordinate is fixed. The diagnostic's explicit coordinate enumeration must not supply those logs to a production implementation. Public-target descent, sparse scalar recovery, source/target verification and every preparation/cache/elimination/unused-tail cost still need integration and a completing matched baseline. The planned candidate schedules alone are2016cached versus2688direct; that difference is not a tenfold premise.
+
+This is a positive finite useful-rank result on a special curve, not a generic theorem about useful rank, novelty, fastest-tool or tenfold complete-cost result. The genus2/F251zero-gain outcome is retained. Subgroup/PROTOCOL.md, RESULTS.md, raw output and output hashes preserve the exact boundary. Both prior pages remain historical stage reports; their generic-scalar limitation is resolved for this specific follow-up, not for the whole earlier panel.
