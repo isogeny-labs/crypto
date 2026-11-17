@@ -1686,3 +1686,10 @@ What was done: freeze098b55cbb19 single invocation exit0;480distinctimages, quar
 Decisions made: retainexplicitquartic/map and exactidentity; no automaticglobalbasepoint/degree25/Jacobianlift/twistclaim.
 Open threads: reconstructgenus2curve fromquartic then map/lift/targetqualification andcost.
 Errors: none, no rerun/S3/cloud.
+
+## Quotient curve recovery frozen
+
+What was done: usermerge PR4527 verified, newbranch research/hec-quotient-recovery-20261117 fromorigin/main. Compiled nodeconic/cubic recovery withsourcecontrol, exactconicparam, quinticsquarefreeness andq/q²pointcounts.
+Decisions made: primary Bruinetal Proposition4.1read; no conjectural recovery or arbitrarytwistsign; originaltargetunchanged. Assertions [pcc:unverified].
+Open threads: pushfreeze then single120CPU invocation; coordinateidentification andtargetlift remain.
+Errors: none in compile, no science yet. Existing ownT7093lease confirmed; connectorattach reports ownscopeconflict but initialcheckallow.
