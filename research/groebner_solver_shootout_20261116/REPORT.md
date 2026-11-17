@@ -109,7 +109,19 @@ which run from 2^19.54 to 2^22.59. So M8 is **not resolved**, rather than
    | `examples/gc_rho_match.rs` | `0451f513880945152f26e3100d19e0e343376c7f6a6689595334e3b87d9eea0b` | `5e0b0b882e568b50e5898f13ad95a48763706c20331ea1e2ad5e0e3f9450e6cb` |
 
    A replay should check out commit `00df3c9214`, which holds the run bytes.
-8. **No S3 checkpoint or raw-data upload** (AWS does not work). The
+8. **Store-policy trims after the run.** Three changes keep the files
+   under the artifact store limits:
+   - `analysis-local/out/rows.tsv` was removed. It is a layout-only
+     extraction (sha256 `a3eb7d2f5fb4b63d6e16dec70158df4fe2d852e4c698d343c42f3562e52f22b5`),
+     and `analysis-local/extract.sh run-local/rows.jsonl` regenerates it.
+   - The duplicate PNG renders under `analysis-local/figures/` were removed.
+     The PDF uses the SVGs, which are kept.
+   - The PNGs in `benchmarks/20261117-gf2-semaev-solver-shootout/` were
+     palette-quantized to 256 colours to stay under 64 KiB.
+
+   The raw `run-local/rows.jsonl` (3.2 MB, sha256 `7c5c98f9…2aedf1`) still
+   belongs in the S3 store and stays committed until AWS works.
+9. **No S3 checkpoint or raw-data upload** (AWS does not work). The
    resume-checkpoint and upload refusals are recorded verbatim in
    `run-local.launch/REFUSALS.md`.
 
