@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Prime31 Dickson31 blinded adaptive eight-sum coverage gate (automation, started 2026-11-17, branch automation/prime31-dickson31-adaptive-holdout-20261117)
+- [ ] Prime31 Dickson31 blinded adaptive eight-sum coverage gate (automation, started 2026-11-17, branch automation/prime31-dickson31-adaptive-holdout-20261117, PR #4615)
 
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
