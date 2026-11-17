@@ -2443,3 +2443,10 @@ What was done: frozen input hashes passed; once-only run exit101 after362 stable
 Decisions made: preserve failed original. transformed(19I,B) incorrectly conjugates scalar; successor solves BQ=19I directly with exact Cramer division and all original checks unchanged.
 Open threads: separately freeze/run v2, then geometric construction.
 Errors: expected detQ361, got19^4=130321; implementation coordinate conversion error, not a changed mathematical prediction.
+
+## Corrected quotient-map gate v2 frozen
+
+What was done: compiled separate v2 exact left solve BQ=19I with direct identity assertion; prior F/V conjugation unchanged; all original gates retained and output paths separate.
+Decisions made: one120CPU invocation after Git freeze; arithmetic correction does not relax prediction. No S3 polling or merge.
+Open threads: run v2 and qualify completed certificates.
+Errors: only two inherited unused-helper warnings.
