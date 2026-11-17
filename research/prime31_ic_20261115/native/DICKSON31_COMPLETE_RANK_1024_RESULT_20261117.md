@@ -18,8 +18,8 @@ to recover the previously unknown target log `k`. A separate cold generic BSGS f
 
 ## Exact-source implementation and evidence
 
-- [Passing source-exact Rust 1024-Q CI](https://github.com/isogeny-labs/crypto/actions/runs/44190401085): 40 original library tests plus 1 focused 1024-Q test (source `ce045bc388ffaabb1c953d2b97eb5af317af2763`, Rust 1.100). Source control/full tests recorded on the PR branch; later cold-BSGS corner-case regression is a separate source change and must be checked in its later Actions run.
-- [Original raw Actions artifact](https://github.com/isogeny-labs/crypto/actions/runs/44190401085/artifacts/14376491440), GitHub-reported artifact ZIP SHA-256 `27cb86bf1075414d28a1b00f51dad877f909ea021bb83f84af98351bf71f3b4e`, *not independently ZIP-rehashed*.
+- [Passing final source-specific Rust 1024-Q and fallback CI](https://github.com/isogeny-labs/crypto/actions/runs/44191050925): **40/40 native library tests, 2/2 focused tests**, including complete 1024-Q index/rank/log recovery and a cold BSGS subgroup fallback regression on 0, 1, n−1, floor(n/2) and 123456789. Exact test head `d788f8a8befe3970a2c538e449d90fa5ab911135`, Rust 1.100. Earlier transcript run [44190401085](https://github.com/isogeny-labs/crypto/actions/runs/44190401085) also passed 40/40+1/1; **all 1024 target records and all 31 basis rows/logs are byte-for-byte identical between the two runs**.
+- [Final source-specific raw Actions artifact](https://github.com/isogeny-labs/crypto/actions/runs/44191050925/artifacts/14375789282), GitHub-reported ZIP SHA-256 `3810c9a22ccca670ab66ebb2882bd93fcfb2190d55888e2d81609702f3f58286`, not independently ZIP-rehashed. Earlier [transcript raw artifact](https://github.com/isogeny-labs/crypto/actions/runs/44190401085/artifacts/14376491440), digest `27cb86bf1075414d28a1b00f51dad877f909ea021bb83f84af98351bf71f3b4e`.
 - [Durable full original Rust JSON transcript](DICKSON31_COMPLETE_RANK_1024_RAW_20261117.json), with all 31 source rows, 31 derived logs, 1024 public Q, 1024 returned k, signed witness words, shifts and failed-attempt counts.
 - [Independent BigInt replay](DICKSON31_COMPLETE_RANK_1024_INDEPENDENT_AUDIT_20261117.json), separate implementation of prime-field addition/multiplication/inversion and curve arithmetic. It independently re-solved rank 31, verified all 31 original-curve factor-base logs and every signed 8-leaf relation and [k]G=Q for all 1024 public Q, plus all 31 source rows, 76 counted failed shifts.
 - [Independent historical 98-Q audit](DICKSON31_INDEPENDENT_98Q_RANK_AUDIT_20261117.json), reconstructing the true Dickson depth-six base from seed 3 and checking 98 public Q, 98 signed group relations, all 31 independently recovered base logarithms; the full B31 rank is reached by the first 31 successful relations.
@@ -28,15 +28,15 @@ A producer test is not an independently signed PCC result, and the separate BigI
 
 ## Fully charged source-specific measurements, 1024 unique Q
 
-| Component | Final replay-transcript CI wall |
+| Component | Final two-focused-test CI wall |
 |---|---:|
-| Original curve validation, special factor base and 618,885-entry generic 4A index | 215.353 ms |
-| 31 known-public-source relation equations, modular rank, 31 original-curve log checks | 164.229 ms |
-| 16 further independent known-public-source equation controls | 135.216 ms |
-| 1024 public-Q relation search, misses, recovered logs, [k]G=Q checks, fallback (not invoked) | 7,419.923 ms |
-| **Whole solver (not including caller-only corpus generation)** | **7,934.720 ms** |
+| Original curve validation, special factor base and 618,885-entry generic 4A index | 199.106 ms |
+| 31 known-public-source relation equations, modular rank, 31 original-curve log checks | 158.805 ms |
+| 16 further independent known-public-source equation controls | 132.177 ms |
+| 1024 public-Q relation search, misses, recovered logs, [k]G=Q checks, fallback (not invoked) | 7,168.071 ms |
+| **Whole solver (not including caller-only corpus generation)** | **7,658.159 ms** |
 
-The 10.853 ms caller-only Q generation is separately instrumented as harness overhead rather than solver work. Exact-source warmup / CPU scheduling is not isolated. The earlier summary-only CI measured 10,028.812 ms on a different GitHub-hosted run; **7,934.720 ms is the transcript-instrumented run's own observed wall**, not a claim of repeatably lower runtime.
+The caller-only Q generation is instrumented separately as harness overhead, rather than charged as work done by the ECDLP solver. Exact-source scheduling is not isolated. Other source-specific producer runs observed **10,028.812 ms** (summary-only) and **7,934.720 ms** (full transcript; earlier), with the same 1024 recovered outputs. **7,658.159 ms is the latest observed fully charged wall**, not a statistical claim of repeatable speed or an A/B comparison. The five deliberately run cold-BSGS fallback unit controls are correctness regressions, not part of the 1024-Q solver wall; they are separately charged in their own test run.
 
 | Complete-control metric | Observed |
 |---|---:|
@@ -55,7 +55,7 @@ The 31 basis logs exactly matched a separate reconstruction from an earlier inde
 
 ## Performance decision
 
-Historical [shared-precomputation 1024-Q Rust BSGS](../mixed_base/SHARED_BSGS_1024Q_RESULT_20261117.md) completed with a million-entry table in **170.113 ms**, while the historical mixed-base generic-table IC took **2,221.474 ms** on the same older cohort and runner. This new Dickson31 complete control's **7,934.720 ms is from another run and implementation**, so the two absolute runtimes cannot be treated as a matched speed ratio. It does, however, decisively show the currently measured Dickson31 table-based extraction is not ready for a cost-advantage claim. Current setup alone is ~215 ms on the new run, before 1,024 target descents. A genuine new mechanism must remove both the 4A table and the slow repeated 8A scans.
+Historical [shared-precomputation 1024-Q Rust BSGS](../mixed_base/SHARED_BSGS_1024Q_RESULT_20261117.md) completed with a million-entry table in **170.113 ms**, while the historical mixed-base generic-table IC took **2,221.474 ms** on the same older cohort and runner. This new Dickson31 complete control's **7,658.159 ms is from another run and implementation**, so the two absolute runtimes cannot be treated as a matched speed ratio. It does, however, decisively show the currently measured Dickson31 table-based extraction is not ready for a cost-advantage claim. Current setup alone is ~215 ms on the new run, before 1,024 target descents. A genuine new mechanism must remove both the 4A table and the slow repeated 8A scans.
 
 The separate #4596 lane owns a matched 1024-Q IC vs shared BSGS benchmark and #4604 owns public-only RR9 D9 rank/certificates; neither was duplicated in this PR. The data here cannot show best-in-class against strong rho, external published IC, or an independent PCC gate.
 
