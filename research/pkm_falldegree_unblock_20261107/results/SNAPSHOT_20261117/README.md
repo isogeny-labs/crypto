@@ -22,8 +22,8 @@ in no file here.
 | `pfd-m2c-t14-k1-rp` | `m2c:14:1:7` | done, exit "deadline" | 11-15 23:41 | 11-16 23:41 | empty result file |
 | `pfd-x-t14-k0-c7-m112-rp` | `cap:14:0:7` | done, exit 0 | 11-15 23:41 | 11-16 05:58 | capped F4 at 7: `inconsistent false`, `oversize true`, `timed_out true`, `degree_reached 7`; grid zeros 0 |
 | `pfd-x-t14-k1-c7-m112-rp` | `cap:14:1:7` | done, exit 0 | 11-15 23:41 | 11-16 05:41 | the same: not refuted, oversize, degree reached 7; grid zeros 0 |
-| `bdr-growthlaw` | not read | not read | 11-15 19:51 | | its environment has no `RUNNER_TOKEN`; only the RunPod API record is here |
-| `pkm-dense-rerun-20261115` | not read | not read | 11-15 18:19 | | the same |
+| `bdr-growthlaw` | six null-control cells (`nullw1` t = 12, `nullw2` t = 14, `nullw3` t = 13, two draws each) | nine `exec` jobs, all exit 0 | 11-15 19:51 | last log 11-16 | a different runner (file server on `/work`); every file except the 12 MB study binary is copied to `bdr-growthlaw/work/`, listed with digests in `bdr-growthlaw/files.json`. The `t = 13` and `t = 14` null closures are censored at degree 6 by `max_entries` |
+| `pkm-dense-rerun-20261115` | not read | not read | 11-15 18:19 | | a supervisor whose state is on RunPod network volume `yuzuh9rmej` mounted at `/workspace`; only the RunPod API record is here |
 
 `pfd-m2c-t14-k1-rp` answered 404 on the first `status` and `results` requests and 200 on a retry
 a few minutes later.
