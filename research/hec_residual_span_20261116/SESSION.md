@@ -2667,3 +2667,10 @@ What was done: implemented exact leadingtwoHcoefficients/knownrootsums, linear/c
 Decisions made: unchangedanchor/sample/LPstatepolicy, noperformanceinference. Structuralfirstsquarefreet qualification insyntheticcasesnotoutcome-selection. One600CPUprocess after Gitfreeze.
 Open threads: executeexactequivalence, thencompletecostgatewithdiagnosticsoff.
 Errors: pre-freeze Rubygeneratorheredocdelimiter failed and left no runnablemanifest; correctedwriter/rebuilt, no scientificrun orfreeze repeated. Inheritedunusedhelperswarnings only. No S3/cloud/merge.
+
+## Cheap quadratic-tail equivalence passes, completecost next
+
+What was done: freezeebeb00ff265 hashespass, soleequivalencerun exit0.9structuralcomponentcases qualifyfirstt, all14089tails exactfullnormdivision, everypriorbrute/principal/densecheck passes; all22completeReportstringsidentical. No source/target/sample/rankstreamchange.
+Decisions made: production avoidsfullnorm/knownrootdivisions; no speedclaimfromequivalence. Nexttwo-pencil completecountgateusesauditfalseandfrozenwalk/fullbasecountcontrols, samecatalogue/qualificationboundary, no retuning.
+Open threads: pricecompletepipeline andretainnegativecases beforefurtherarithmeticchanges.
+Errors: no scientificfailure; inheritedunusedhelperswarnings. No S3/cloud/merge.
