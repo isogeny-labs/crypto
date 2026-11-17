@@ -176,6 +176,46 @@ fn prove_unit(
     assert!(check[1..].iter().all(|&x|x==0),"unit identity has nonconstant remainder");
     json!({"identity_replayed":true,"nonzero_witness_terms":witness.len(),"witness":witness})
 }
+
+// Reduce a public coefficient-function against the degree-5 Macaulay span.
+// This computes quotient normal forms, *not* support-mask enumeration.
+fn normal_form(mut row:Vec<u64>, pivots:&[Option<Pivot>])->Vec<u64> {
+    for col in (0..row.len()).rev() {
+        let z=row[col];
+        if z==0 {continue;}
+        if let Some(p)=&pivots[col] {
+            for j in 0..=col {row[j]=sub(row[j],mul(z,p.row[j]));}
+        }
+    }
+    row
+}
+fn extract_unique_normal_form(
+    pivots:&[Option<Pivot>], index:&HashMap<Exp,usize>,
+    quadrics:&[Polynomial;8], columns:usize
+)->Option<[u64;NV]> {
+    let mut identity=vec![0u64;columns];
+    identity[0]=1; // monomials() lists the constant first
+    let normal_one=normal_form(identity,pivots);
+    let pivot_index=normal_one.iter().position(|&x|x!=0)?;
+    let inv=pow(normal_one[pivot_index],P-2);
+    let mut values=[0u64;NV];
+    for var in 0..NV {
+        let mut e=[0u8;NV];e[var]=1;
+        let mut coordinate=vec![0u64;columns];
+        coordinate[*index.get(&e)?]=1;
+        let rem=normal_form(coordinate,pivots);
+        let scalar=mul(rem[pivot_index],inv);
+        if rem.iter().zip(normal_one.iter()).any(|(&a,&b)|a!=mul(scalar,b)) {
+            return None; // quotient still has a nonconstant dimension
+        }
+        values[var]=scalar;
+    }
+    if quadrics.iter().any(|q|eval_poly(q,&values)!=0) {
+        return None; // a quotient diagnostic is not automatically a solution
+    }
+    Some(values)
+}
+
 fn public_macaulay(residual:Point, xs:&[u64;8], h:&[u64;9], degree:u8)->Result<Value,String> {
     let (r,s)=residual.ok_or("infinity residual excluded")?;
     if xs.contains(&r) {return Err("residual x lies on B8 factor base: exceptional chart excluded".into());}
@@ -213,7 +253,16 @@ fn public_macaulay(residual:Point, xs:&[u64;8], h:&[u64;9], degree:u8)->Result<V
         }
         if unit.is_some() {break;}
     }
+    let extracted=if unit.is_none() {
+        extract_unique_normal_form(&pivots,&index,&qs,columns)
+    } else { None };
+    if let Some(values)=extracted {
+        let m=independent_direct_m(&values,r,s);
+        assert_eq!(m,h.clone(),"recovered coefficients do not reconstruct public factor polynomial");
+    }
     Ok(json!({
+        "candidate_chart_coefficients":extracted,
+        "positive_solution_recovered_from_normal_forms":extracted.is_some(),
         "degree":degree,"columns":columns,"rows_generated":inputs.len(),
         "rank":rank,"unit_certificate":unit.is_some(),"replay":unit,
         "charged_wall_ns":start.elapsed().as_nanos().to_string(),
@@ -271,6 +320,35 @@ fn fixtures(ar:&mut Arithmetic,base:&[(u64,u64);8])->(Point,Vec<Point>,usize) {
     assert_eq!(negatives.len(),2);
     (positive.expect("a finite positive B8 fibre"),negatives,count)
 }
+
+// Test-only independent original-curve replay of a *public-only* coefficient
+// solution: extract signs from E(F_p), validate every F-zero, then group-sum.
+// This is NOT an input to the algebraic Macaulay solver.
+fn check_public_coefficients(
+    ar:&mut Arithmetic, r:Point, base:&[(u64,u64);8], coeff:&[u64;NV]
+)->bool {
+    let Some((rx,ry))=r else {return false;};
+    let a=[coeff[0],coeff[1],coeff[2],coeff[3]];
+    let v=[coeff[4],coeff[5],coeff[6],1];
+    let mut signed=[None;8];
+    for (i,&(x,known_y)) in base.iter().enumerate(){
+        let mut xa=0u64;let mut xv=0u64;
+        let mut power=1u64;
+        for j in 0..4 {
+            xa=add(xa,mul(a[j],power));
+            xv=add(xv,mul(v[j],power));
+            power=mul(power,x);
+        }
+        let term=mul(sub(x,rx),xa);
+        let yes=add(term,mul(add(ry,known_y),xv))==0;
+        let no=add(term,mul(sub(ry,known_y),xv))==0;
+        if yes==no{return false;} // every factor chooses exactly one signed point
+        let selected_y=if yes{known_y}else{sub(0,known_y)};
+        signed[i]=Some((x,selected_y));
+    }
+    group_sum(ar,&signed)==r
+}
+
 fn run()->Value {
     let mut ar=Arithmetic::default();
     check_curve(PRIME31,&mut ar).unwrap();
@@ -285,9 +363,17 @@ fn run()->Value {
     let (positive,negative,formal_supports)=fixtures(&mut ar,&base);
     let pos=public_macaulay(positive,&xs,&h,DEGREE).unwrap();
     assert!(!pos["unit_certificate"].as_bool().unwrap(),"genuine positive fibre ruled out by a false algebraic unit");
+    let extracted_positive=if let Some(v)=pos["candidate_chart_coefficients"].as_array() {
+        let coeff:[u64;NV]=std::array::from_fn(|i|v[i].as_u64().unwrap());
+        assert!(check_public_coefficients(&mut ar,positive,&base,&coeff),
+            "public normal-form recovery fails independent signed original-curve group-sum replay");
+        true
+    } else {false};
     let mut negatives_json=Vec::new();
     for r in negative {
         let record=public_macaulay(r,&xs,&h,DEGREE).unwrap();
+        assert_eq!(record["candidate_chart_coefficients"],Value::Null,
+            "a signed-support-free negative residual has a fabricated coefficient solution");
         negatives_json.push(json!({"residual":r,"macaulay":record}));
     }
     assert!(public_macaulay(None,&xs,&h,DEGREE).is_err());
@@ -298,6 +384,7 @@ fn run()->Value {
         "base_x":xs,"h_ascending":h,"macaulay_degree_cap":DEGREE,
         "formal_signed_supports_used_only_by_test_oracle":formal_supports,
         "positive":{"residual":positive,"macaulay":pos},
+        "positive_normal_form_solution_replayed_on_original_curve":extracted_positive,
         "negatives":negatives_json,
         "candidate_uses_no_signed_supports_or_secret_scalars":true,
         "negative_unit_is_sound_but_nonunit_is_inconclusive":true,
@@ -318,6 +405,9 @@ mod tests {
         assert_eq!(v["positive"]["macaulay"]["columns"],792);
         assert_eq!(v["positive"]["macaulay"]["rows_generated"],960);
         assert_eq!(v["positive"]["macaulay"]["unit_certificate"],false);
+        if v["positive"]["macaulay"]["positive_solution_recovered_from_normal_forms"]==true {
+            assert_eq!(v["positive_normal_form_solution_replayed_on_original_curve"],true);
+        }
         for n in v["negatives"].as_array().unwrap(){
             assert_eq!(n["macaulay"]["columns"],792);
             if n["macaulay"]["unit_certificate"]==true {
