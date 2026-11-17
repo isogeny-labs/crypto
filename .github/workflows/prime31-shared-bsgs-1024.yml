@@ -31,6 +31,7 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             research/prime31_ic_20261115/mixed_base
+            research/prime31_ic_20261115/native/examples
       - name: Checkout immutable original Rust arithmetic and complete IC
         uses: actions/checkout@v4
         with:
