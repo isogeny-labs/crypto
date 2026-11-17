@@ -2961,3 +2961,10 @@ What was done: freezeb6294030ec2 hashpass/exit0. All3FpsexticFrobenius/paircondi
 Decisions made: clearsmaprationalitystep,notsixquotients/isogenies, noJacobianmodel/nonhyp/transport/speedclaim. NextnormalizeN/DtoSmithform, constructRecillasquotient/smoothness/rationaldescent andexplicitJacobianhomomorphismforactualsource/target.
 Open threads: quotientconstructionandfieldofdefinition/transportcost oneligibleoriginalg3;g2/g4/full10xgoalactiveunachieved/independentreviewopen.
 Errors: no scientificfailure. No S3/cloud/merge/unchangedrerun.
+
+## Smith affine gate frozen with Git custody
+
+What was done: compiled six-map exact norm, resultant, discriminant, Veronese and rho reconstruction gate; source/protocol/binary hashes recorded before execution.
+Decisions made: owner-authorized Git custody replaces unavailable S3 for this bounded stage; retain nonsquare obstruction and all original sources.
+Open threads: execute once, retain raw outcomes; smooth normalization and Jacobian transport remain open.
+Errors: compilation succeeds with one unused helper warning; no scientific execution yet.
