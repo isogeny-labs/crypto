@@ -11,16 +11,11 @@ follow-ups here; history belongs in the session log, not in this file.
 
 ## Current goal
 
-Achieve a measured 2–6× speedup in the Rust Vieta evaluator over Euclid/Newton on matched complete construction-plus-query workloads, starting with word62/m16384. Preserve exact complete relation sets, reference methods and prior frozen evidence; use a corrected, preflight-validated frozen protocol.
+_(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Chase measured 2–6× Vieta speedup over Euclid/Newton (codex, started 2026-11-17, branch lane/vieta-speedup-20261117, PR #4535; in progress).
-- [x] Profile unchanged baseline and record limited attribution; test the modular-reduction hypothesis (same task/branch).
-- [x] Implement native-field NTT/half-GCD and exact small roots; check relations against schoolbook/lookup (same task/branch).
-- [x] Validate canonical fixtures and publish/freeze all affected protocols before data; preserve failed metadata exports/corrections (same task/branch).
-- [x] Measure complete/query costs through word32768 with controls; replay176+48 successful calls and preserve16cap failures (same task/branch).
-- [ ] Publish completed report/data and finish required PR gates; local unverified gains documented, independent standing pending (same task/branch).
+- [ ] Publish Vieta Rust speed results and resolve official record/publication blockers (codex, started 2026-11-17, branch lane/vieta-speed-20261117, PR #4525)
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 
@@ -29,3 +24,5 @@ Achieve a measured 2–6× speedup in the Rust Vieta evaluator over Euclid/Newto
 - [x] Track every task first in docs/ACTIVE.md and a draft PR; roll /goal out to isogeny-labs repos (claude, started 2026-11-17, branch track-first-active, PR #4499)
 
 ## Blocked / questions for the owner
+
+- Vieta:504/504 primary and72/72 calibration calls completed/replayed. Canonical seed-registration360/60 failures retained; no L2 admission. Official censored-close blocked by unchanged main20261105T0828Z archive command1 lacking successful integer exit. Shared crypto-lean PR26 CI cannot start due account billing lock; no bypass/spend. Full general tower NF instance remains unverified.
