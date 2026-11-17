@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Quartic matched-rho overpricing](quartic-matched-rho-overpricing.md) | open; review requested from quartic-row owners | trusting the IC/rho gap on existing plane-quartic IC rows (may be ~1.73x too favourable to IC) | an executed negation-walk and `<rho>`-class-walk rho on the same Jacobians, under the validation gate, then a row correction |
 | [P-192 mixed-3 quotient and projected relations](nist-mixed-three-quotient-and-relation-solver.md) | open | complete mixed-3 transfer/solver comparison | explicit quotient and dual from the realized kernel, algebraic relation solver, independent replay and budget admission |
 | [Current-main research regression gates](current-main-research-regressions.md) | open; library/lint repairs validated | merging the Rust/IC changes with passing final-head CI/review | local release library, 53 consumers, full maintained Clippy and workspace types pass; shared frozen-lock, checkout, registry, leaderboard and backlog gates remain |
 | [Secret-key Rust API timing coverage](rust-secret-api-timing-coverage.md) | open | an end-to-end side-channel resistance claim for the whole crate | complete secret-data-flow coverage, fixed-width API boundaries and independent target-specific timing/code review |
