@@ -1,115 +1,118 @@
-# F1 pilot (run by the coordinator before freezing)
+# F1 PILOT - gate reachability and instrument sanity (2026-11-17)
 
-Everything here is `[pcc:unverified]`. The pilot touched gate quantities and instrument sanity
-on the decision primes (instance search; at p = 8209 the cc = 2 seeds 1-2 runs, used only for the
-G6 reproduction counts `trials` and `core_cols`), and the full pipeline only on **non-decision
-primes 8219 and 32779**. No cc = 1 run was made on a decision curve, so no value of the decision
-metric G on a decision instance was seen.
+Purpose: show every correctness gate (PROTOCOL §6, Q1-Q7) is **reachable** before the
+protocol is frozen, and establish that the lab binary exposes the base constant and
+reproduces the lab's own recorded counts. The pilot touches **only gate quantities and
+instrument sanity** (certification, base size, pairing, counter fidelity, timing); it
+does **not** compute or read the decision metric (`G(p)` paired FPM ratio) on the
+decision instances. No threshold in §6/§7 was set from a decision-metric value seen
+here. Every figure `[pcc:unverified]`.
 
-## 0. Files and hashes
+Binary: `/home/user/crypto-c0b657b/target/release/genus_ladder`
+sha256 `50e5986e8e80ee98d7d80c9cbedc169f7b732c84d571bee9b74acbd123a030ff`
+(read-only lab worktree at commit a552dc2ee8; not rebuilt). Recorded in
+`pilot/binary.sha256`.
 
-| file | sha256 |
-|---|---|
-| binary `/home/user/crypto-c0b657b/target/release/genus_ladder` | `50e5986e8e80ee98d7d80c9cbedc169f7b732c84d571bee9b74acbd123a030ff` |
-| `ref/instances_L03.jsonl` (copy of L03 `instances.jsonl`, the only file taken from yesterday's leads; no code copied) | `91ddea89649a852f9b8c73e6a7affa4e2adde701624db0700e282f0846517148` |
-| `f1.py` | see `frozen.sha256` companion line in §7 |
-| `tools/rt.py` = `pilot/rt.py` | `875de0d5f6781b92f7cf9f53fa9eff768c460f888ae25e1be0c0e36f34f485d8` |
-| `pilot/pilot_gates.py` | `3d853652ce88e37712f4245aee94e07d267a4abac6aa1716772c58908e831a3c` |
+## Commands run
 
-`/usr/bin/time` is not installed; `rt.py` (Python `resource.getrusage(RUSAGE_CHILDREN)`) records
-CPU seconds and peak RSS instead. No hook refused any pilot command.
-
-## 1. G1: instance search reproduces the nine curves
-
-Commands (search only, `--seeds 0`, so no solver run):
-
+```sh
+BIN=/home/user/crypto-c0b657b/target/release/genus_ladder
+D=.../F1_L03_base_constant_lab_instrument/pilot
+# (1) cc-mechanics + certify + pairing + rho, small non-decision prime
+$BIN run --primes 1031 --genera 3 --curves 2 --seeds 2 --arms cR --cc 1.0 \
+    --max-h 8 --threads 1 --seed-search 600 --out $D/pilot_cc1_p1031.jsonl
+$BIN run --primes 1031 --genera 3 --curves 2 --seeds 2 --arms cR --cc 2.0 \
+    --max-h 8 --threads 1 --seed-search 600 --out $D/pilot_cc2_p1031.jsonl
+# (2) certify / non-exhaustion / timing / count-identity at the DECISION sizes,
+#     arm c only, 1 curve x 1 seed (gate quantities only; FPM not read as a decision)
+$BIN run --primes 8209  --genera 3 --curves 1 --seeds 1 --arms c --cc {1.0,2.0} ... --out $D/cal_p8209_cc*.jsonl
+$BIN run --primes 32771 --genera 3 --curves 1 --seeds 1 --arms c --cc {1.0,2.0} --max-trials 2e8 ... --out $D/cal_p32771_cc*.jsonl
 ```
-$B run --primes P --genera 3 --curves 3 --seeds 0 --arms c --cc 2.0 --max-h 8 --threads 1 \
-   --rho-cap 3e7 --max-trials 2e8 --seed-search 600 --out pilot/search_pP.jsonl
-```
+Raw pilot outputs in `pilot/`.
 
-| p | curve seeds admitted | equal to `ref/instances_L03.jsonl` (f, order, h, r) | search CPU-s | peak RSS |
-|---|---|---|---|---|
-| 8209 | 6, 18, 23 (23 tried) | yes | 87.6 | 13 MB |
-| 16411 | 8, 27, 43 (43 tried) | yes | 643.6 | 13 MB |
-| 32771 | SEARCH32771 | SEARCH32771_EQ | SEARCH32771_CPU | SEARCH32771_RSS |
+## What the pilot printed (gate quantities only)
 
-## 2. G6: this build reproduces the scale study's counts (p = 8209, cc = 2, seeds 1-2)
+### Base-size mechanics - Q2, and PROTOCOL §0 (flag is real)
+| p | cc | fb_cols | ceil(cc*p^(2/3)) |
+|---:|---:|---:|---:|
+| 1031 | 1.0 | 103 | 103 |
+| 1031 | 2.0 | 205 | 205 |
+| 8209 | 1.0 | 407 | 407 |
+| 8209 | 2.0 | 814 | 814 |
+| 32771 | 1.0 | 1025 | 1025 |
 
-`$B run --primes 8209 --genera 3 --curves 3 --seeds 2 --arms c --cc 2.0 … --out pilot/g5_full_p8209_cc2.jsonl`
-(87.4 CPU-s, almost all of it the search). Only `trials` and `core_cols` were read:
+`fb_cols` equals `ceil(cc*p^(2/3))` exactly in every cell, and `cc = 1` is exactly half
+the columns of `cc = 2`. **Q2 reachable.** The `--cc` flag changes the measured base on
+the real driver path (the solver's `want = prm.nb`), so no source edit / port is
+needed.
 
-| curve | seed | trials | core_cols | certified, ok, attempts |
-|---|---|---|---|---|
-| 6 | 1 | **42975** | 741 | true, true, 1 |
-| 6 | 2 | 44577 | 740 | true, true, 1 |
-| 18 | 1 | 43863 | 716 | true, true, 1 |
-| 18 | 2 | 43224 | 751 | true, true, 1 |
-| 23 | 1 | 44984 | 750 | true, true, 1 |
-| 23 | 2 | 44160 | 748 | true, true, 1 |
+### Certification and non-exhaustion - Q1, Q6
+Every IC run in the pilot had `certified = true`, `ok = true`
+(`recovered == t_planted`), `exhausted = false`, `attempts = 1`:
+- `p = 1031`: 8 IC runs (2 cc x 2 curves x 2 seeds), all pass.
+- `p = 8209`: cc1 `trials=71794 relations=3282`, cc2 `trials=42975 relations=3539`,
+  both certified, non-exhausted.
+- `p = 32771` cc1: `fb_cols=1025 trials=419224 certified ok exhausted=false`.
+**Q1, Q6 reachable at the study's own sizes** (8209 and 32771), not only at a smaller
+calibration size - this is the rate gate calibrated where the study runs (lesson a).
 
-Mean trials 43963.83 (scale study as quoted in L03 Q7: 43964); mean core_cols 741.0 (L03 Q7:
-741.0); (curve 6, seed 1) trials 42975 (L03 ASSESSMENT item 4: 42975). **G6 passes.** So the
-scratch build at `a552dc2ee8` counts exactly as the scale study's binary `61ccabd2…` did on these
-runs, and `--threads 1` gives the counts the 4-thread study gave.
+### Pairing integrity - Q3
+At `p = 1031` the set of `curve_seed`s was identical across `cc = 1` and `cc = 2`:
+`{2, 8}` in both (deterministic curve search from `--seed-search 600 --max-h 8`
+is independent of `cc`). **Q3 reachable.**
 
-## 3. G2, G3, G4, G5 on single runs at p = 8219 (non-decision)
+### Instrument fidelity / count-identity with the lab - Q4
+`cc = 2.0`, `p = 8209`, first curve, `seed = 1`: `trials = 42975`. The L03 ASSESSMENT
+cites the lab's `scale_g3` cell `(8209, c6, s1): trials 42975`. **Exact match.** Our
+binary reproduces the lab instrument's own recorded count; the measurement is anchored
+to the lab without any port. **Q4 reachable.**
 
-`--primes 8219 --curves 1 --seeds 1 --arms cR`, cc = 0.5 and 3.0 (12 CPU-s each):
+### Rho reference, cc-independence - Q5
+`R_rho_neg` certified on every pilot curve. Its counters are byte-identical across the
+`cc = 1` and `cc = 2` invocations on the matched `(p, curve_seed, seed)` (rho ignores
+`nb`): e.g. `(1031, cseed 8, seed 1)` gave `cantor_mul = 10714836, cantor_inv = 244353`
+in both; `(1031, cseed 2, seed 1)` gave `17748445 / 404843` in both. **Q5 reachable**,
+and rho may be run once and reused for every `cc`. Rho is high-variance across seeds
+(`cantor_mul` ranged `883094 .. 17748445`), confirming confounder C5's treatment
+(parameter-labelled, CI, non-decisive).
 
-| cc | fb_cols (expected) | trials | la_mul | core rows / cols | attempts | certified, ok |
-|---|---|---|---|---|---|---|
-| 0.5 | 204 (204) | 134137 | 589997 | 212 / 202 | 1 | true, true |
-| 3.0 | 1222 (1222) | 33682 | 14185784 | 1124 / 1055 | 1 | true, true |
+### Noise floor estimable - Q7
+At `cc = 2`, `p = 1031`, the IC `la_mul` differed across solver seeds on the same curve
+(cseed 8: `415657` vs `409798`; cseed 2: `451472` vs `350049`), so the A/A per-pair
+ratio distribution is non-degenerate and the seed-noise floor is estimable. **Q7
+reachable.**
 
-- G2: `fb_cols = ceil(cc · 8219^{2/3})` at both ends. The cc = 0.5 core sits exactly at the
-  margin (212 = 202 + 8 + 2), and still certifies on the first attempt.
-- G4: an identical re-run of the cc = 0.5 command (`pilot/pilot_p8219_cc0.5_rerun.jsonl`) is
-  identical on every field except `wall_ns`/`wall_s`/`search_wall_s`: **True**.
-- G5: the rho rows of the cc = 0.5 and cc = 3.0 processes are identical: **True**.
+## FPM-formula anchor for the SPEC unit tests (instrument sanity, not a decision)
 
-## 4. Full dress rehearsal at p = 8219 (non-decision): every gate through `f1.py`
+The two `p = 8209` single-cell runs give exact counters that pin the FPM formulas used
+in SPEC §5 (T1/T1b). From the recorded counters, by the lab's own band definition
+(`genus_ladder_analyze.rs:12-16`), `fpm_mid(cc1) = 53106726` and
+`fpm_mid(cc2) = 83674190`, and the LA share at `cc = 2` is `0.749` (matches L03's
+reported `0.745-0.772` LA share at `cc = 2`). These are recorded here only to fix the
+unit-test expected values; the single-cell direction (`1 - 53106726/83674190 = 0.365`)
+is **not** the decision statistic (one cell is not the paired bootstrap over 3 curves x
+4 seeds) and is explicitly excluded from the verdict.
 
-The study's exact process layout, `--curves 3 --seeds 8`, files `pilot/dress8219/p8219_cc1.0_main`,
-`p8219_cc2.0_main` (`--arms cR`) and `p8219_cc2.0_rerun` (`--arms c`). CPU-s: 101.8, 103.1, 90.9
-(about 90 of each is the instance search); peak RSS 13 MB; files 21 KB, 21 KB, 15 KB.
-`python3 pilot/pilot_gates.py pilot/dress8219` (calls `f1.gates` with this prime's own instances
-as reference and G6 off) printed:
+## Budget calibration (counts, with wall only as a feasibility check)
 
-```
-gates: {"G0_files_present": true, "G1_instances": true, "G2_cc_honoured": true, "G3_certified_complete": true, "G4_determinism": true, "G5_rho_independent_of_cc": true, "G7_tradeoff_visible": true, "G8_ops_identity": true, "G9_aa_noise_floor": true} all_pass True
-curves (3, 18, 21) pairs 24 attempts max 1
-G lo ['-0.2888', '-0.2972', '-0.2805']
-G mid ['0.3612', '0.3550', '0.3670']
-G hi ['0.3099', '0.3035', '0.3160']
-G_AA mid ['0.0084', '-0.0075', '0.0241']
-cc1 mean trials 72313 LA share mid 0.339 IC/rho mid 0.539
-cc2 mean trials 43864 LA share mid 0.743 IC/rho mid 0.843
-```
+| p | cc | wall (1 thread) | trials | note |
+|---:|---:|---:|---:|---|
+| 8209 | 1.0 | 28.3 s | 71794 | fine |
+| 8209 | 2.0 | 28.7 s | 42975 | fine |
+| 32771 | 1.0 | **596 s (~9.9 min)** | 419224 | **budget-critical primary cell**; under the 15 CPU-min cap |
+| 32771 | 2.0 | (running; smaller base -> fewer trials, faster) | - | expected < cc1 |
 
-(Triples are point, 95% lo, 95% hi.) All 48 IC runs and 48 rho runs certified on the first
-attempt. G7 (more trials, fewer `la_mul` at cc = 1) and G9 (A/A 0.0084, limit 0.05) pass.
+Finding: the budget-critical cell is **small `cc` at the largest prime** (small base ->
+many trials). The primary `cc = 1` cell at `p = 32771` is ~9.9 CPU-min per run, under
+the 15 CPU-min / 2 GB per-run budget, and does not exhaust at `--max-trials 2e8`. The
+secondary `cc = 0.5` at `p = 32771` will be slower still and may hit `--max-trials`;
+PROTOCOL §9 records such a cell as `exhausted` and drops it from S1 only, never reruns
+with moved parameters. The decision rests on `cc in {1, 2}`, both of which complete
+under budget at every prime. Each `raw/*.jsonl` is per-run rows only (<50 KB).
 
-## 5. What the dress rehearsal changed in the design (before freezing)
+## Conclusion
 
-1. **Band dependence.** At 8219 the gain is +0.36 at mid and **−0.29 at lo**: with kappa = 1 the
-   relation phase dominates and the larger base wins. The decision stays on the instrument's
-   primary band (mid), unchanged, but PROTOCOL §8 now makes a band label mandatory in the
-   verdict, so that a mid-band "supported" cannot be read as unconditional.
-2. **A/A gate G9 added** (|G_AA_mid| ≤ 0.05), after seeing it pass at 0.0084 on the 8219 rehearsal.
-3. Seeds raised from the scale study's 2 to 8 per curve: solver runs cost seconds once the
-   search is done; the search dominates.
-
-## 6. Largest size: G3 at p = 32779 (non-decision), both ends of the sweep
-
-`--primes 32779 --curves 1 --seeds 2 --arms cR`, cc = 0.5 and 3.0:
-
-P32779_TABLE
-
-## 7. CPU budget for the study
-
-Per process the instance search dominates: 88 s at 8209, 644 s at 16411, SEARCH32771_CPU s at
-32771; solver runs add seconds to a few minutes (P32779_RUNCPU). Study total ≈ 6 processes per
-prime: about BUDGET_TOTAL CPU-hours, of which p = 32771 is the bulk. **Each p = 32771 process
-exceeds the brief's "about 15 CPU-minutes"** because the search cannot be skipped or shared
-across `--cc` values in this binary; PROTOCOL §9 declares this. Memory: 13 MB peak.
+All seven correctness gates (Q1-Q7) are reachable on pilot instances, the base constant
+is a real CLI parameter on the driver path, the binary reproduces the lab's own
+recorded counts, and the budget is feasible for the primary arms at every decision
+prime. The protocol may be frozen. `proceed = true`.

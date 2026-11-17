@@ -1,240 +1,261 @@
-# F1: genus-3 2LP base constant cc = 1 against cc = 2, in the lab `genus_ladder` instrument (protocol)
+# F1 - L03 follow-up: 2LP base constant cc = 1 against cc = 2 in the lab genus_ladder instrument, genus 3 (frozen protocol, 2026-11-17)
 
-Status: frozen before any decision run (`frozen.sha256`). Follow-up F1 of the g2plus pass
-(L03 follow-up), coordinator 2026-11-17. Every number quoted from earlier work and everything
-this follow-up produces is `[pcc:unverified]`. **Not a benchmark**: no leaderboard row, no
-`benchmarks/` row, no speed claim, no wall-time metric. Implementation: [`SPEC.md`](SPEC.md).
-Pilot evidence for every gate: [`PILOT.md`](PILOT.md).
+Follow-up to `research/g2plus_leads_20261116/L03_base_rebalance` (a standalone
+simulator). Here the same question is re-measured **in the lab instrument itself**,
+`genus_ladder`, at its native per-trial cost (no synthetic relation discount).
+Every figure `[pcc:unverified]`. Synthetic random curves only; no deployed-curve
+statement. **Not a benchmark**: no leaderboard row, no `benchmarks/` row, no speed
+claim, no isolated host, no validator replay, no matched-rho ordering claim. Counted
+field-operation units only; wall time is never a metric.
 
-## 0. Sources read, and what the repository state allows
+The coordinator (this document, SPEC.md, PILOT.md) was frozen before any decision run.
+The decision experiment is run by a separate executor from the exact commands in §9.
 
-| source | what it gave |
-|---|---|
-| `/home/user/crypto/research/g2plus_leads_20261116/L03_base_rebalance/{ASSESSMENT,PROTOCOL}.md` | The claim to re-measure: in a standalone port, `cc = 1` cut counted FPM_mid by 0.362 / 0.372 / 0.396 at p = 8209 / 16411 / 32771 against `cc = 2`, with LA share 0.745 / 0.757 / 0.772 at `cc = 2` `[pcc:unverified]`. Its nine curves, `ref/instances_L03.jsonl` (sha256 `91ddea89…7148`, byte-identical copy). |
-| `/home/user/crypto-c0b657b/src/bin/genus_ladder.rs` | CLI. **`--cc` is a parameter** (default 2.0), global to a process. Arms `c` (2LP + parity prefilter, recorded as `C_double_lp+pre`) and `R` (negation rho, `R_rho_neg`). Curves are found by a deterministic search from curve seed 1 upward (first `--curves` admitted); solver seeds are `1..--seeds`; target seed = curve seed. |
-| `/home/user/crypto-c0b657b/src/cryptanalysis/genus_ladder.rs` 1207-1213, 1276-1530 | `nb = min(ceil(cc · p^(1−1/g)), p)` (`fb_size_2lp`); the factor base is the first `nb` abscissae `x = 0, 1, …` with `chi(f(x)) = +1`, so `fb_cols = nb` whenever at least `nb` such `x` exist. `run_ic`: RNG `StdRng::seed_from_u64(seed)`, independent of `cc`. |
-| `/home/user/crypto-c0b657b/research/genus_ladder_20261114/PROTOCOL.md` §4 | The instrument's unit (used here, not the generic "mul + 10 inv"): `FPM = cantor_mul + I·cantor_inv + rel_mul + kappa·la_mul`, `(I, kappa) ∈ {(1, 1), (10, g²), (30, g²)}`, middle primary; at g = 3 the bands are lo (1, 1), **mid (10, 9)**, hi (30, 9). Rho: `cantor_mul + I·cantor_inv`. |
-| `/home/user/crypto-c0b657b/research/genus_ladder_scale_20261115/PROTOCOL.md` | The genus-3 grid this follow-up re-uses: `--primes 8209,16411,32771 --genera 3 --curves 3 --seeds 2 --arms acR --cc 2.0 --max-h 8 --rho-cap 3e7 --max-trials 2e8 --seed-search 600`. Its data file `scale_g3.jsonl` is **not** in the scratch worktree nor in `/home/user/crypto` (lost in the 2026-11-16 merge); only its means quoted in L03 `analysis/tables.md` (Q7) and one per-run count in L03 `ASSESSMENT.md` survive. |
-| `/home/user/crypto-c0b657b/research/genus_ladder_sge_20261115/{PROTOCOL.md,paired.py}` | The lab's paired-ratio style (hierarchical bootstrap, curves then seeds). Adopted in `f1.py`. |
+## 0. Instrument exposes the base constant - no source edit, no port
 
-Binary: `/home/user/crypto-c0b657b/target/release/genus_ladder`, sha256
-`50e5986e8e80ee98d7d80c9cbedc169f7b732c84d571bee9b74acbd123a030ff`, built at commit
-`a552dc2ee8`. It is **not** the scale study's binary (`61ccabd2…`). Gate G6 checks that it
-reproduces the scale study's surviving counts exactly; the pilot shows it does.
+The lab binary **does** expose the double-large-prime base constant as the CLI flag
+`--cc` (default `2.0`). The driver computes the factor-base size that the solver uses
+as `nb = fb_size_2lp(p, g, cc) = ceil(cc * p^(1 - 1/g))` and passes it to `run_ic`
+as `IcParams.nb`, which caps the number of factor-base columns (`want = prm.nb` for
+the `DoubleLp` arm; `src/cryptanalysis/genus_ladder.rs:1303-1324`,
+`src/bin/genus_ladder.rs:368-372`). The two `fb_size_2lp(p,g,2.0)` call sites in
+`genus_ladder.rs` (lines 2249, 2503) are inside `#[cfg(test)]` helpers and are not on
+the driver path. **Therefore the measurement is done directly with the unmodified lab
+binary at `/home/user/crypto-c0b657b/target/release/genus_ladder`; no source is
+copied and no count-identity-against-a-port gate is required.** (The pilot still
+anchors the binary to the lab's own recorded counts; §Q4.) For genus 3,
+`p^(1 - 1/g) = p^(2/3)`, so `cc = 1` is half the columns of `cc = 2`.
 
-Not available in this container, recorded rather than worked around: the `research-kb` MCP
-server and `scripts/research-kb` (the bad merge removed `scripts/`); `ecdb` and
-`scripts/ecdb.sh`; `scripts/checkpoint.sh`; `tools/benchrec.py`; `tools/pcc/pcc.py`. Curve
-facts come from the instrument's own instance search (G1). The prior-art statement is limited
-to the L03 table of 2026-11-16 (nobody varied the 2LP constant at any genus in the lab
-instrument; the 2026-11-14 study lists "tune the base constant" as an open step).
+This was verified on the pilot (PILOT.md): at `p = 1031`, `--cc 1.0` gave
+`fb_cols = 103 = ceil(1031^(2/3))` and `--cc 2.0` gave `fb_cols = 205`; at
+`p = 8209`, `407` and `814`. The flag changes the measured base exactly.
 
-## 1. Corrections to the brief
+## 1. Hypothesis
 
-1. **The constant is exposed.** `--cc` exists, so no source edit, no copied crate and no
-   count-identity port is needed. The whole study runs the lab binary unchanged.
-2. **Base formula.** `nb = ceil(cc · p^{2/3})` at genus 3 (not "about `cc · p^{1−1/g}`"; it is
-   exactly that, ceiling, capped at p). Values used (computed, and checked against the binary by
-   G2 in the pilot at p = 8209 and 8219):
+**H1 (measured, no synthetic discount).** In the lab `genus_ladder` instrument, on
+genus-3 curves, the double-large-prime factor-base constant `cc = 2.0` (the lab
+default and the baseline of every prior genus-ladder study) is **past** its
+field-operation-count optimum: reducing it to `cc = 1.0` lowers the total counted
+cost `FPM_mid` of arm `c` (`C_double_lp+pre`) on the same curves and seeds, because
+the linear-algebra term (priced `g^2 * la_mul`) dominates at `cc = 2` and falls faster
+in the base size than the relation-collection term grows.
 
-   | p | cc 0.5 | 1.0 | 1.5 | 2.0 | 3.0 |
-   |---|---|---|---|---|---|
-   | 8209 | 204 | 407 | 611 | 814 | 1221 |
-   | 16411 | 323 | 646 | 969 | 1292 | 1938 |
-   | 32771 | 513 | 1025 | 1537 | 2049 | 3073 |
+This is exactly the **only non-synthetic part** of the L03 result (its `G_1`, the
+`d = 1` re-tuning, 36-40% mid-band). The L03 `H1`/`G_10` reading rested on a synthetic
+per-trial discount `d = 10`; **this follow-up does not use `d` at all** (confounder
+C1), so nothing here is conditional on a cheaper relation engine.
 
-3. **Unit.** The instrument defines its unit (§0), so it is used: FPM with inversions at
-   I = 1 / 10 / 30 and LA multiplications modulo r at kappa = 1 / 9 / 9. The brief's
-   "FPM = mul + 10 inv" is the mid band's inversion price; the mid band additionally prices
-   `la_mul` at kappa = 9. The decision is on the mid band.
-4. **"Same curves the scale study used" and "the nine curves L03 used" are the same nine
-   curves.** p = 8209: curve seeds 6, 18, 23; p = 16411: 8, 27, 43; p = 32771: 8, 16, 31. The
-   binary cannot take a curve as input; it re-finds them by its deterministic search (G1).
-5. **Seeds.** The scale study ran solver seeds 1, 2. Runs are cheap once the instance search
-   is done, so this follow-up runs seeds 1..8 on every curve (24 pairs per prime). Seeds 1, 2
-   coincide with the scale study's; G6 uses that.
-6. **Common random numbers.** The solver RNG depends only on the seed. For one (curve, seed),
-   the walk, the jump table and the root-finding draws are identical at every `cc` up to the
-   first linear-algebra attempt; Wiedemann's draws then fall at different stream positions. So
-   `cc` arms are paired by (curve, seed), and the pairing is partial, not exact. The A/A arm
-   uses different seeds and is therefore an unpaired noise floor (an upper bound on the noise of
-   the paired comparison).
-7. **The instance search is expensive and not solver work.** Each process repeats the
-   deterministic order computation for every tried curve seed (pilot: 87 CPU-s at 8209; the
-   16411 and 32771 figures are in PILOT.md). It is charged to no arm (it is the same for every
-   arm and identical to the scale study's). Because `--cc` is global per process, the study
-   needs one process per (p, cc), each repeating the search. That is why the secondary sweep
-   is ordered last and is optional at p = 32771 (§9).
-8. **L03's "36-40%" is a port figure**, at seeds {3, 4} (evaluation set) and statistically
-   calibrated, not bit-identical. This follow-up does not reuse any L03 run.
+Supporting structural claims, reported but not themselves the decision:
+- **S1 (optimum is interior).** Across `cc in {0.5, 1, 1.5, 2, 3}` the `FPM_mid` of
+  arm `c` is U-shaped in `cc` with a minimum at `cc <= 1.5`; `cc = 2` is on the rising
+  (LA-dominated) side and `cc = 0.5` on the rising (trial-dominated / exhaustion) side.
+- **S2 (LA share).** At `cc = 2` the linear-algebra share `g^2 * la_mul / FPM_mid`
+  exceeds 0.70 at every prime, and falls at `cc = 1`.
 
-## 2. Hypothesis and exact claim
+## 2. Exact claim (what "supported" asserts)
 
-H (primary): on the nine genus-3 curves above, in the lab instrument at commit `a552dc2ee8`
-(arm `C_double_lp+pre`, generic Cantor, parity prefilter, Wiedemann, certificate on every run),
-the base constant `cc = 1.0` lowers mean counted FPM at the mid band, paired over
-3 curves × 8 seeds per prime, by at least 15% against the lab's `cc = 2.0` at each of
-p = 8209, 16411, 32771:
+On genus-3 curves at `p in {8209, 16411, 32771}`, for arm `c` (`C_double_lp+pre`) in
+the lab `genus_ladder` instrument at its native cost, the paired mid-band fractional
+cost reduction from `cc = 2.0` to `cc = 1.0`,
 
-    G_p = 1 − Σ_k FPM_mid(cc=1, k) / Σ_k FPM_mid(cc=2, k),  k = (curve, seed) over the 24 pairs.
+  `G(p) = 1 - mean_over_pairs[ FPM_mid(cc=1) / FPM_mid(cc=2) ]`,
 
-The claim is a re-tuning of a constant in the lab's baseline. It changes no exponent and is not
-an ordering against rho; the IC/rho ratio is reported as the distance remaining.
+is positive and at least 0.15 at every prime, with a 95% paired-bootstrap confidence
+interval excluding 0 at every prime, and by a margin exceeding the A/A seed-noise floor
+(§4, §6). Reported alongside, never as the pass/fail: `G` at band low and high, the
+relation-phase and linear-algebra shares at each `cc`, the argmin `cc` of the secondary
+sweep, and the ratio of arm `c` to the instrument's own negation-rho arm at each `cc`
+(distance remaining, not a gate).
 
-Model expectation from L03 (not a threshold): G_p ≈ 0.36-0.40 at all three primes.
+## 3. Arms (each arm pays its own set-up; the instrument charges it)
 
-## 3. Arms
+The instrument builds every arm's factor base and walk set-up from scratch inside
+`run_ic`/`run_rho` and counts it in that arm's own counters (character table in
+`rel_mul`, jump set-up in `setup_ops`/`group_ops`), so there is no cross-arm subsidy
+(lesson c). The arms:
 
-| arm | process(es) | role |
-|---|---|---|
-| **B** baseline | `--arms cR --cc 2.0`, seeds 1..8 | the lab's arm and constant (`C_double_lp+pre`) |
-| **T** treatment | `--arms cR --cc 1.0`, seeds 1..8 | the re-tuned constant |
-| **R** negation rho | the `R` arm of the B process (its copy in the T process is G5's negative control) | the instrument's own rho, for the IC/rho distance |
-| **AA-det** A/A, determinism | a second `--arms c --cc 2.0` process, same seeds | must be count-identical to B (G4) |
-| **AA-seed** A/A, noise floor | B split into even seeds against odd seeds, matched by curve | unpaired noise floor `G_AA` |
-| **NC** negative control | rho rows of the T process against those of the B process | `--cc` must not change rho (G5) |
-| **PC** positive control | means of `trials` and `la_mul`, T against B | the trade-off is visible: cc = 1 needs more trials and fewer LA multiplications (G7) |
-| **S** secondary sweep | `--arms c --cc {0.5, 1.5, 3.0}` | shape of the cost curve; reported, never decisive |
+| role | arm | `cc` | solver seeds | note |
+|---|---|---|---|---|
+| baseline | `c` (`C_double_lp+pre`) | **2.0** | 1,2,3,4 | lab default; the thing we re-tune against |
+| treatment | `c` | **1.0** | 1,2,3,4 | half the columns |
+| positive control / secondary sweep | `c` | 0.5, 1.5, 3.0 | 1,2 | establishes the interior optimum (S1) |
+| negative control (A/A noise floor) | `c` | 2.0 | 1,2,3,4 | split into seed-group {1,2} vs {3,4}; same `cc`, different solver seeds |
+| reference | `R` (`R_rho_neg`) | n/a | 1,2,3,4 | negation-rho on the same curves; `cc`-independent, run once |
 
-Each arm pays its own set-up inside its counts: the character table ((p−1)/2 squarings, in
-`rel_mul`, same for both), the factor-base scan (8 multiplications per scanned x, in `rel_mul`,
-proportional to the arm's own `nb`), the 16-jump table (in `cantor_*`), every relation-phase
-trial, every LA attempt including failed ones, and the certificate multiplication. No arm uses a
-table another arm does not pay for. The instance search (curve order) is not charged to any arm,
-identically for IC and rho.
+Baseline justification: `cc = 2.0` is the exact setting of `research/genus_ladder_*`
+and of the lab's `C_double_lp+pre` arm; nothing is added to or removed from it. The
+A/A arm reuses the baseline's four `cc = 2` runs - no extra runs - and pairs seed-group
+A = {seed 1, seed 2} against seed-group B = {seed 3, seed 4} on the same curves to
+measure how much `G` moves from solver-seed noise alone (confounder C6). The rho
+reference is `cc`-independent (verified Q5), so it is run once (in the `cc = 2.0`
+invocation) and reused for every `cc`.
 
-## 4. Instances and seeds
+## 4. Pairing and statistic (fixed before data)
 
-- p ∈ {8209, 16411, 32771} (first primes ≥ 2^13, 2^14, 2^15), genus 3, `--curves 3 --max-h 8
-  --seed-search 600`: the first three admitted curve seeds, which must be the nine of §1.4 with
-  f, order, h, r equal to `ref/instances_L03.jsonl` (G1).
-- Solver seeds 1..8 (`--seeds 8`); target seed = curve seed (instrument rule).
-- `--max-trials 2e8`, `--rho-cap 3e7`, `--threads 1`, `restart` = 4096 (default; no
-  `--restart-sqrt`), no `--sge`, no `--smith`, no `--quartic`.
-- Run count per prime: B 24 IC + 24 rho, T 24 IC + 24 rho, AA-det 24 IC, S 3 × 24 IC.
+Pairing key: `(p, curve_seed, seed)`. For the treatment test, each `cc = 1` run is
+paired with the `cc = 2` run of the same key; the per-pair ratio is
+`FPM_band(cc=1) / FPM_band(cc=2)` for `band in {low, mid, high}`. Statistic: the mean
+of the per-pair ratios, pooled over the 3 curves x 4 seeds = 12 pairs **per prime**;
+`G(p) = 1 - mean`. 95% interval by hierarchical bootstrap: resample the 3 curve_seeds
+with replacement, then the 4 seeds within each resampled curve, 2000 resamples, RNG
+seed 20261117 (`random.Random(20261117)` in the stdlib). The same procedure gives the
+A/A statistic `G_AA(p) = 1 - mean_over_pairs[ FPM_mid(seed in B) / FPM_mid(seed in A) ]`
+pairing seed 3<->1, 4<->2 on the same curve at `cc = 2`, with its own 95% CI.
 
-## 5. Metrics
+`FPM_band = cantor_mul + I * cantor_inv + rel_mul + kappa * la_mul`, the instrument's
+own unit (`src/bin/genus_ladder_analyze.rs:12-16`): band low `(I, kappa) = (1, 1)`,
+band **mid (primary)** `(10, g^2) = (10, 9)`, band high `(30, 9)`. Relation-phase term
+`= cantor_mul + I * cantor_inv + rel_mul`; linear-algebra term `= kappa * la_mul`;
+LA share `= kappa * la_mul / FPM_band`. These are exact integer/rational combinations
+of recorded counters; no re-simulation. The rho ratio at each `cc` is
+`FPM_band(c) / FPM_band(R_rho_neg)` on the matched `(p, curve_seed, seed)` (rho has
+`rel_mul = la_mul = 0`, so its `FPM = cantor_mul + I * cantor_inv`), reported with a
+bootstrap CI, parameter-labelled, never decisive.
 
-Per run, from the instrument's JSONL record (exact counts): `trials`, `relations`,
-`rels_by_lp`, `core_rows`, `core_cols`, `attempts`, `fb_cols`, `cantor_mul`, `cantor_inv`,
-`rel_mul`, `la_mul`, `la_add`, `certified`, `ok`, `exhausted`; rho: `cantor_mul`, `cantor_inv`.
-Derived (SPEC §3): FPM at lo / mid / hi; relation-phase share `(cantor_mul + I·cantor_inv +
-rel_mul)/FPM`; LA share `kappa·la_mul/FPM`; IC/rho ratio of means; G_p. Wall time is recorded
-by the binary and never used.
+## 5. Metrics and unit
 
-## 6. Statistics
+Unit = the lab instrument's own FPM (field-multiplication-equivalents), defined in §4,
+**not** the generic FPM of the task note - the task note says to use the lab
+instrument's unit when it defines one, and it does. Exact counts; seeds recorded in
+every record; no wall time. Secondary reported counters (no decision): `trials`,
+`relations`, `rels_by_lp`, `core_rows`, `core_cols`, `fb_cols`, `la_add`,
+`la_wied_mul`, `attempts`, `exhausted`, `certified`.
 
-- G_p, and every ratio, is a ratio of sums over the same (curve, seed) keys.
-- Interval: hierarchical paired bootstrap, 4000 resamples, `random.Random(20261117)`: draw the
-  3 curves with replacement, then within each drawn curve draw its 8 seeds with replacement; the
-  same keys are used in numerator and denominator. Percentile interval at indices
-  `int(q·3999 + 0.5)`, q = 0.025, 0.975.
-- `G_AA`: same estimator with odd seeds (1,3,5,7) as denominator and even seeds (2,4,6,8),
-  re-keyed to (curve, seed − 1), as numerator, within B.
-- Counts reported beside G: pairs in which cc = 1 is cheaper at the band.
-- Three curves per prime makes the curve-level resampling coarse; this is a declared limit,
-  not corrected for.
+## 6. Correctness gates (all must pass; each shown reachable in PILOT.md)
 
-## 7. Correctness gates (all shown reachable in PILOT.md; any failure → verdict VOID)
+A run or cell that fails a gate is excluded and the exclusion reported; if a gate fails
+on a decision cell the decision is **inconclusive** for that prime.
 
-| id | gate | pilot evidence |
-|---|---|---|
-| G0 | every required file exists: `p{P}_cc1.0_main`, `p{P}_cc2.0_main`, `p{P}_cc2.0_rerun` for the 3 primes | layout exercised on p = 8219 dress rehearsal |
-| G1 | each file's instance lines are curve seeds of §1.4 with f, order, h, r, g equal to `ref/instances_L03.jsonl` | search at 8209, 16411, 32771 (PILOT §1) |
-| G2 | config `cc` equals the process's cc and `threads` = 1; every IC run has `fb_cols = ceil(cc·p^{2/3})` | 8209 cc 2; 8219 cc 0.5, 1, 2, 3 |
-| G3 | every expected (curve, seed) run present for each arm in the file (IC 24; rho 24 in main cc 1, 2 files), each `certified = ok = true`, `exhausted = false`; no `skip` row; file ends with a `done` row | 8219 dress at 24 runs; 32779 cc 0.5 and 3 (largest size, both ends of the sweep) |
-| G4 | the rerun file equals the B file on every IC run, all fields except `wall_ns` | 8219 cc 0.5 re-run; 8219 dress |
-| G5 | rho rows (all fields except `wall_ns`) are identical in the cc = 1 and cc = 2 files | 8219 cc 0.5 against cc 3; 8219 dress |
-| G6 | reproduction of the scale study with this build: (8209, curve 6, seed 1, cc 2) `trials` = 42975, and the mean `trials` over (8209, 3 curves, seeds 1, 2, cc 2) is within 0.5 of 43964 | pilot: 42975 and 43963.83 |
-| G7 | aggregate positive control at each prime: Σ trials(cc 1) > Σ trials(cc 2) and Σ la_mul(cc 1) < Σ la_mul(cc 2) over the 24 pairs | 8219 dress |
-| G8 | `group_ops = setup_ops + walk_ops + verify_ops` on every IC run | 8219 dress |
-| G9 | A/A noise floor: abs(`G_AA`) at band mid (point) ≤ 0.05 at every prime | 8219 dress: `G_AA` = 0.0084 [−0.0075, 0.0241] |
+- **Q1 - certification/recovery.** Every IC run has `certified = true`, `ok = true`
+  (`recovered == t_planted`), `exhausted = false`. Reachable: pilot, all IC runs at
+  `p in {1031, 8209}` passed.
+- **Q2 - base-size identity.** Every IC run has `fb_cols == ceil(cc * p^(2/3))`.
+  Reachable: pilot, `103/205` at 1031, `407/814` at 8209, exact.
+- **Q3 - pairing integrity.** For each prime, the multiset of `curve_seed` values is
+  identical across all `cc` invocations and across the A/A seed-groups (same deterministic
+  curve search, `--max-h 8 --seed-search 600 --curves 3`). Reachable: pilot, curve_seeds
+  identical across `cc = 1` and `cc = 2` at 1031.
+- **Q4 - instrument fidelity (count-identity with the lab's own record).** The
+  `cc = 2.0`, `p = 8209`, first curve, `seed = 1` run reproduces the lab `scale_g3`
+  cell's `trials = 42975` exactly (L03 ASSESSMENT cites lab `(8209, c6, s1): 42975`).
+  Reachable: pilot reproduced `trials = 42975`. (This anchors our binary to the lab
+  instrument without any port.)
+- **Q5 - rho independence from `cc`.** `R_rho_neg` counters are byte-identical across
+  `cc` invocations on the same `(p, curve_seed, seed)` (rho ignores `nb`), and every
+  rho run certifies. Reachable: pilot, rho `cantor_mul` identical across `cc = 1`/`2`
+  at matched keys at 1031 (e.g. cseed 8 seed 1: `10714836` both).
+- **Q6 - relation count-once and rank stop.** The instrument deduplicates relations by
+  its DSU over large primes and counts each relation row once; the stop rule is a
+  rank/solve condition, not a relation count: `certified = true` means the peeled
+  system reached full rank on the `t` column and the planted `t` was recovered, which
+  is the rank check **before** the cost is read. We re-implement no linear algebra; we
+  cite the instrument's. Report `attempts`, `relations`, `core_rows`, `core_cols`.
+  Reachable: pilot, `attempts` = 1 and all runs certified at 1031 and 8209.
+- **Q7 - noise floor estimable.** The A/A arm yields a non-degenerate per-pair ratio
+  distribution (seed-to-seed `la_mul` CV > 0 at `cc = 2`). Reachable: pilot, `cc = 2`
+  `la_mul` differs across seeds at 1031 (`415657` vs `409798`, cseed 8).
 
-**Deduplication and rank (lesson b).** The instrument does not deduplicate relations. A
-relation is one accepted walk divisor; the same divisor could be accepted twice only if the
-walk revisits it. The birthday estimate is `trials²/(2r)`: at most about 0.1 revisits per run at
-the largest trial counts here (1.3·10^5 trials at r ≥ 7.9·10^10, p = 8209, cc = 0.5; about
-10^6 trials at r ≥ 4.4·10^12, p = 32771), and a revisit only matters if that divisor is also
-smooth. The stop rule is the lab's: union-find cycles ≥ nunk + 8 + nunk/100 (a graph count,
-not a rank), then rows are built and peeled and the core must satisfy `core_rows ≥ core_cols +
-8 + core_cols/100` (the rank check before Wiedemann), then Wiedemann and the certificate
-`[t]G = T` checked by two independent scalar multiplications. A rank-deficient system cannot
-yield a wrong answer; it yields a failed attempt whose full cost stays in the counts, and the
-walk resumes. `attempts` is reported per cc; a mean above 1 is reported, not excluded.
+No threshold in Q1-Q7 was set below a value seen on the pilot; none is a rate gate
+calibrated at a smaller size than the study uses (certification/non-exhaustion were
+checked at `p = 8209` and at `p = 32771`, the study's own sizes; see PILOT.md budget).
 
-## 8. Decision rule (numeric, fixed before data)
+## 7. Decision rule (frozen, numeric; applied by the assessor as written)
 
-On band mid, cc = 1.0 against cc = 2.0, if every gate G0-G9 passes:
+Primary reading: band mid, treatment test (§4), point estimate and 95% paired CI.
 
-- **Supported**: G_p ≥ 0.15 **and** its 95% lower bound > 0 at every one of p = 8209, 16411,
-  32771.
-- **Killed**: G_32771 (point) < 0.05.
-- **Inconclusive**: otherwise.
-- **Void**: any gate fails. Nothing is rerun with other parameters under this protocol.
+- **supported** iff **all** hold:
+  1. `G(p) >= 0.15` (point estimate) at every `p in {8209, 16411, 32771}`;
+  2. the 95% paired CI for `G(p)` excludes 0 at every prime;
+  3. at the largest prime (32771) the treatment effect exceeds seed noise: the 95% CI
+     for `G(32771)` lies entirely above the 95% CI for `|G_AA(32771)|` (the A/A
+     interval does not reach the treatment interval).
+- **killed** iff `G(32771) < 0.05` (point estimate) **or** the 95% CI for `G(32771)`
+  includes 0.
+- **inconclusive** otherwise (including any decision cell failing a §6 gate, or
+  `|G_AA(p)|`'s 95% upper bound exceeding 0.05 at any prime, which would mean seed
+  noise is too large to trust the paired reading).
 
-**Mandatory band label.** The pilot on the non-decision prime 8219 (PILOT §5) showed that the
-sign of the effect depends on the price of an LA multiplication: G = 0.361 at mid but −0.289 at
-lo (kappa = 1), because at cc = 2 the LA share is 0.74 at mid and the relation phase dominates
-at lo. The verdict is therefore always stated together with the label `band_robust`
-(95% lower bound > 0 at lo, mid and hi at every prime) and the list `sign_flip_at_lo` (primes
-where G_lo < 0). A supported verdict that is not band-robust is reported as "supported at the
-instrument's primary pricing (kappa = g² = 9); reversed at kappa = 1". The thresholds above do
-not change with the label.
+Thresholds 0.15 and 0.05 are fixed here, before any decision run, and never moved after
+data (lesson: never move a threshold after data). **Honest framing** (carried from the
+L03 assessment's concern): `G >= 0.15` is a weak bar given L03 measured 36-40%; the
+scientific content is the *magnitude* of `G`, the LA-share decomposition (S2), the
+interior-optimum shape (S1) and the rho ratio, not the binary verdict. All of these are
+reported regardless of the verdict.
 
-Reported beside the verdict, never changing it: G at bands lo and hi with intervals; `G_AA` per prime; the
-secondary sweep with its argmin (same seeds select and evaluate: winner's curse, labelled);
-the IC/rho ratio at every cc and band; the L03 model expectation (0.36-0.40) as agree / disagree.
+## 8. Confounders and isolation
 
-## 9. Exact commands
+- **C1 synthetic-discount confound (the L03 H1 weakness).** Removed: no `d`. All cost
+  is the instrument's native per-trial cost. The claim is purely the measured
+  re-tuning.
+- **C2 curve/seed variance.** Paired design, common curves and seeds across `cc`
+  (Q3); hierarchical bootstrap over curves then seeds.
+- **C3 winner's curse / exhaustion.** `cc = 1` vs `cc = 2` are fixed a priori, not
+  argmin-selected, so the decision has no selection bias; the secondary-sweep argmin is
+  descriptive only. Non-exhaustion required (Q1); `--max-trials 2e8`. If a secondary
+  cell (notably `cc = 0.5` at 32771) exhausts, it is recorded `exhausted` and dropped
+  from S1, never rerun with other parameters.
+- **C4 LA pricing.** Reported at all three bands; `la_add` (the +-1 additions that
+  carry matrix weight but are unpriced in FPM) reported as a sensitivity. The direction
+  of the effect is pricing-monotone: more columns -> larger core -> more `la_mul`, so a
+  mispricing would not reverse the sign (it changes the magnitude only).
+- **C5 rho variance.** Rho is high-variance (pilot `cantor_mul` spans `8.8e5..1.8e7`
+  across seeds); its ratio is parameter-labelled with a CI and is never part of the
+  verdict.
+- **C6 solver-seed noise.** A/A arm, §4, and decision clause 3 and the inconclusive
+  guard.
+- **C7 instrument fidelity.** Q4 count-identity with the lab's recorded `scale_g3`
+  cell.
 
-`B=/home/user/crypto-c0b657b/target/release/genus_ladder`, run from the follow-up directory,
-at most two processes at a time, each under `python3 tools/rt.py LABEL CMD…` (records CPU
-seconds and peak RSS to `raw/RUNTIME.log`) and logged verbatim in `raw/COMMANDS.log`. `COMMON =
---genera 3 --curves 3 --seeds 8 --max-h 8 --threads 1 --rho-cap 3e7 --max-trials 2e8
---seed-search 600`.
+## 9. Exact commands (executor runs these; outputs under raw/)
 
-Order (primary first, so a truncated session still decides):
+Binary: `/home/user/crypto-c0b657b/target/release/genus_ladder` (read-only; do not
+rebuild). Record its sha256 first. One thread per run; the primes are run in one
+invocation per `cc` (the driver loops primes/curves/seeds internally).
 
-1. For P in 8209 16411 32771:
-   `$B run --primes P COMMON --arms cR --cc 2.0 --out raw/pP_cc2.0_main.jsonl`
-   `$B run --primes P COMMON --arms cR --cc 1.0 --out raw/pP_cc1.0_main.jsonl`
-2. For P in 8209 16411 32771:
-   `$B run --primes P COMMON --arms c --cc 2.0 --out raw/pP_cc2.0_rerun.jsonl`
-3. Secondary, for P in 8209 16411 32771, for CC in 0.5 1.5 3.0:
-   `$B run --primes P COMMON --arms c --cc CC --out raw/pP_ccCC_main.jsonl`
-   (optional at P = 32771; if skipped, say so; it never affects the verdict).
-4. `python3 f1.py gates raw analysis/gates.json`, then
-   `python3 f1.py analyze raw analysis/analysis.json analysis/tables.md`,
-   then `sha256sum raw/*.jsonl > raw/data.sha256` and `sha256sum $B > raw/binary.sha256`.
+```sh
+BIN=/home/user/crypto-c0b657b/target/release/genus_ladder
+D=/home/user/crypto/research/g2plus_followups_20261117/F1_L03_base_constant_lab_instrument
+sha256sum $BIN > $D/raw/binary.sha256
 
-CPU budget (PILOT §4): each process is dominated by the instance search; at p = 32771 a single
-process exceeds the brief's "about 15 CPU-minutes" (see PILOT.md for the measured search time),
-because the search cannot be skipped or shared across `--cc` values. This is declared here and
-is not a reason to change the grid. Peak memory per process is far under 2 GB (pilot: 13 MB).
+# Baseline + treatment (primary), 3 curves x 4 seeds; rho reference lives in the cc=2 run.
+$BIN run --primes 8209,16411,32771 --genera 3 --curves 3 --seeds 4 --arms cR \
+    --cc 2.0 --max-h 8 --threads 1 --seed-search 600 --rho-cap 3e7 \
+    --max-trials 200000000 --out $D/raw/cc2.jsonl
+$BIN run --primes 8209,16411,32771 --genera 3 --curves 3 --seeds 4 --arms c \
+    --cc 1.0 --max-h 8 --threads 1 --seed-search 600 \
+    --max-trials 200000000 --out $D/raw/cc1.jsonl
 
-If a hook refuses any command, record the refusal verbatim in `raw/COMMANDS.log` and stop;
-do not work around it.
+# Secondary sweep (S1), 3 curves x 2 seeds, arm c only, one invocation per cc.
+for cc in 0.5 1.5 3.0; do
+  $BIN run --primes 8209,16411,32771 --genera 3 --curves 3 --seeds 2 --arms c \
+      --cc $cc --max-h 8 --threads 1 --seed-search 600 \
+      --max-trials 200000000 --out $D/raw/cc${cc}.jsonl
+done
 
-## 10. Confounders and how each is isolated
+sha256sum $D/raw/cc*.jsonl > $D/raw/data.sha256
+python3 $D/analyze.py $D/raw/cc1.jsonl $D/raw/cc2.jsonl \
+    --secondary $D/raw/cc0.5.jsonl $D/raw/cc1.5.jsonl $D/raw/cc3.0.jsonl \
+    --out $D/analysis/analysis.json --tables $D/analysis/tables.md 2>&1 \
+    | tee $D/raw/analyze.log
+python3 $D/analyze.py --selftest   # Q-unit, must print OK before the line above is trusted
+```
 
-| confounder | isolation |
-|---|---|
-| different build from the scale study | G6 exact reproduction of surviving scale counts |
-| instance drift | G1 against `ref/instances_L03.jsonl` |
-| `--cc` silently ignored or mis-rounded | G2 on every run |
-| RNG / seed effects | common seeds across cc, paired bootstrap; A/A noise floor `G_AA` |
-| non-determinism, scheduling, threads | `--threads 1`; G4 identical rerun; G6 matches a 4-thread study |
-| `--cc` leaking into rho | G5 |
-| unequal set-up charging | every arm's own table and scan are inside its own counts (§3) |
-| failed LA attempts hidden | all attempts charged; `attempts` reported |
-| unpriced additions (`la_add`, `rel_add`) | the instrument's unit does not price them; mean `la_add` per cc reported |
-| kappa (price of a mod-r multiplication) | bands lo / hi reported with intervals; mandatory band label (§8). kappa = g² is the instrument's own justification (schoolbook mod r ≈ p^g against mod p); it is not re-derived here |
-| winner's curse | the decision compares a pre-chosen cc = 1 (from L03), not a selected optimum |
-| shared host | counted units only; wall time never used |
+Budget note (PILOT.md §budget): the budget-critical cell is `cc` small at
+`p = 32771` (small base -> many trials). The `cc = 0.5` cells at 32771 may hit
+`--max-trials`; they are recorded `exhausted` and excluded from S1 only. If any
+**primary** (`cc in {1, 2}`) cell at 32771 approaches 15 CPU-minutes or exhausts, the
+executor stops and reports it; the decision then rests on the primes that completed,
+with 32771 reported as "not completed within budget" (distance remaining), never
+rerun with moved parameters.
 
-## 11. Limits
+## 10. Outputs and what is NOT done here
 
-Three curves per prime, small primes (≤ 32771), one genus, generic Cantor arithmetic, no SGE.
-`[pcc:unverified]` throughout: no pcc claim, no validator, no replay certificate. A supported
-verdict makes cc = 1 a candidate default for the lab's genus-3 2LP arm, to be confirmed by an
-independent replay; it is not an improvement claim until that replay exists.
+Outputs: `raw/cc*.jsonl` (one config line + one run/skip line per arm/curve/seed),
+`raw/*.sha256`, `raw/analyze.log`, `analysis/analysis.json`, `analysis/tables.md`
+(the verdict line). Each file kept small (per-run rows only; no per-relation dumps).
+
+Not done by this follow-up (main session's responsibility per the hard rules): resume
+checkpoint, bench record, session log, git commits, any leaderboard/benchmark row,
+any §5a GAE validation band or rho ordering claim. This follow-up does not run the
+decision experiment; the coordinator freezes PROTOCOL.md, SPEC.md, PILOT.md and
+`frozen.sha256` only.
