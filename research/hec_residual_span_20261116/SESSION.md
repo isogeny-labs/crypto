@@ -115,3 +115,17 @@ Prospectiveproduction-costprotocol7200calls(5batches16freshcalls18one-targetwork
 ## Standard-input cold comparison completed
 
 At pushed714fa3e242b,7200/7200 source-verified calls and all90spread/18AA gates pass, EXIT0. Equal-informationExpanded fastestcontrolall18; Expanded/Folded1.196560–1.742197 rejects registeredtenfold. Native/Folded g2 2.210917–2.938682,g3 3.418988–7.363810,g4 7.985306–10.619135; only2g4casesabove10vsdefaultnative, no generalpromotion. Provided-valid-instance coldsetup contract excludescommonfixturequalification equally; no hiddenh/sourceindex/expectedscalar inputs. Retainedallraw/summary/hashes, closedrecordmeasuredunadmitted underGitcustody. No rerun, no S3upload, broadergoalopen.
+
+## Pencil prior-art screen and symmetry obstruction
+
+### What was done
+Retrieved the primary Improved sieving on algebraic curves PDF with curl and read sections2.2–2.3/Algorithm1. The proposed pencil and rational-point bucket formula match the published Sarkar–Singh sieve exactly. Updated PENCIL-NEXT.md with the collision and a same-anchor automorphism obstruction.
+
+### Decisions made
+Retain pencil as a classical implementation baseline, not a new mechanism. A symmetry preserving a nonzero anchor class would require lambdaR=R, impossible on the qualified ell-component when lambda!=1. Therefore final-column orbit contraction cannot automatically yield an extra n-fold saving in a fixed-anchor point scan.
+
+### Open threads
+A genuinely distinct relation-generation/reuse mechanism needs a full rank and cost argument. Broad tenfold genus2+ objective remains unachieved. No pencil scientific experiment was executed.
+
+### Errors
+Browser fetch timed out twice; direct curl retrieved the primary PDF. No experimental rerun or threshold change.
