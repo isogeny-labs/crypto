@@ -661,3 +661,17 @@ Execute source gate; then solver experiment with all cold costs, exact target id
 
 ### Errors
 None.
+
+## Source/orbit replay passed and next solver contract selected
+
+### What was done
+Atf4647780d67sourcecheckerexits0:all3exactMumfordsources/order/projections,all211orbitrecordsandcatalogueactions pass. Sharednativearithmeticlimits retained. [pcc:unverified]
+
+### Decisions made
+Nextcompare C4 folded walk and batched pencil on all3strongmodels, under public N/ell/source/target metadata. Derive scalar eigenvalue by actual source action and sqrt roots, never binomial pi=P(sigma). Charge setup inside each independent solve and retain censoring. Classical composition, no novelty claim.
+
+### Open threads
+Build/freeze/execute a bounded comparison. General10xbreakthrough unfulfilled.
+
+### Errors
+None. KB ready but refresh2026-11-14predatesnewwork; use current Git records as authoritative. KB revision9141e386254340a9bdba3036f2bb706a; lexical only. Sources checked(KB):source:a99a3a2fcb07f95da98f94e175a602f6 crypto-autoresearcher:ledger/proposals/IDEA-20260807-b42544.yaml identifies classical quotient arithmetic; source:34884c18abb08beff2ee71990c9dd502 ledger/proposals/IDEA-20260918-5a9a51.yaml identifies function-first/Sarkar-Singh priorart. Metadata/context/related inspected. Primary Improved sieving on algebraic curves https://www-fourier.univ-grenoble-alpes.fr/~viva/research/articles/SievingB.pdf and GTTD https://cacr.uwaterloo.ca/techreports/2004/corr2004-29.pdf accessed; use established sieve/quotient as controls rather than claim a new mechanism.
