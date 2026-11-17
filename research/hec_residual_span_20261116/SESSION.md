@@ -1756,3 +1756,10 @@ What was done: freeze83dfd55822d once-onlyexit0;24calls,alloldvectors/exclusivep
 Decisions made: solver-onlycannotreach10xbasefieldonpanel; investigate checkedprincipalrelations+linearwitness scalarcertificate, notverificationomission. Nativefinalcheck remains externalcontrol until new soundness/costgate.
 Open threads: originalcurve-bound certificate and mutationrejection, then fullcertificatecost andproducer improvements. Goalunchanged.
 Errors: none,no rerun/S3/cloud.
+
+## Curve-bound relation certificate frozen
+
+What was done: compiled sourcearm0packetproducer, Gaussian rowwitness, separate verifier checks public/source/pencil polynomialidentities andorbit/actionbinding;12positive/84mutation predictions.
+Decisions made: wholeprimeorder fixed-instance premise explicit; nativeaction andsourcebindingchecked, nativefinalscalarcontrol retained; no cost/signedverification claim. Firstprototype checkedscalarfolding, notpureoperatorringproof. Assertions [pcc:unverified].
+Open threads: pushfreeze then single120CPU invocation; independent serialization/replay and costgate remain.
+Errors: unusedimport removed beforefreeze, no science yet.
