@@ -1,0 +1,12 @@
+error: using `clone` on type `u64` which implements the `Copy` trait
+   --> examples/../research/extension_ic_graph_20261115/quadratic_pair_collection_check.rs:225:31
+    |
+225 |             split_keys.insert(key.clone()),
+    |                               ^^^^^^^^^^^ help: try removing the `clone` call: `key`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#clone_on_copy
+    = note: `-D clippy::clone-on-copy` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::clone_on_copy)]`
+
+error: aborting due to 1 previous error
+

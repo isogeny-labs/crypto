@@ -1,0 +1,5 @@
+# Exact degree-one source specialization
+
+Question: does substituting K(Q)=(0,1,r,r²) expose substantially smaller generic differential-addition expressions than the retained tensor evaluator? This is symbolic preparation for a circuit cost case, not a performance or novelty experiment.
+
+Rust specializes the already retained 16 Flynn tensors over Z[c,r,K1,K2,K3,K4]. Terms containing L1 vanish; L2=1,L3=r,L4=r². Merge equal monomials by exact signed integer addition, retain zero removal, print all 16 forms without selecting a favorable chart. No curve or field sampling. Input terms.rs is unchanged. Once-only run after source/protocol/binary/input hashes are pushed, under 60 CPU seconds. Retain stdout/stderr/exit/run commit and hashes in Git. No S3, paid resources or source changes after execution. Any future hand factorization must match these exact polynomials, then qualify all exceptional charts in a separately frozen arithmetic gate. Recovery alone is not enough; the existing kernel optimistic bound is below tenfold. The broad genus2+ objective remains open.

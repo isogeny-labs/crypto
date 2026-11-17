@@ -77,3 +77,38 @@ all projector actions and the degree budgets for arbitrary tower depth/degrees
 in the formal framework. BoundBridge does not assume the desired last-fall
 inequality, but its NF contracts are still hypotheses until that instance is
 built. No generic independent signed standing is claimed [pcc:unverified].
+
+## Prime-order specialization does not license changing the general ideal
+
+On an odd-prime-order target group there is no nonidentity rational two-torsion,
+so a finite target with ordinate zero is absent. This removes that runtime
+branch for those particular targets. It does not license silently radicalizing
+the proposed general tower theorem, which was stated for arbitrary target
+ordinates and exact generators. The finite nonsplit/nilpotent controls audit
+that broader statement; the explicit order19 diagonal relation audits a case
+that really occurs on a prime-order curve. These have different purposes.
+
+The hand bound is a constructible-degree statement, not a complexity statement.
+For a depth-k quadratic tower it is T=2k+2 with 2k+1 lifted variables after
+terminal substitution. The number of monomials up to T is binomial(4k+3,2k+1),
+so a small degree alone does not provide a cheap dense linear-algebra algorithm.
+This combinatorial count is a structural observation, not an empirical timing
+or a claim that a particular last-fall solver necessarily materializes that
+entire space. The new experiment measures the explicit evaluator instead.
+
+## Performance-fixture applicability
+
+The measured conjugate-square tower needs M to divide p−1. The chosen word
+prime has p−1=29·2^57; NIST P224 has p−1=2^96(2^128−1). Both support the measured
+power-of-two sizes. This does not show that the same fixture exists at those
+sizes over every prime field. The general rational API accepts other maps,
+but finding suitable maps and completely split fibers for another field is
+an additional construction/search obligation, not measured here.
+
+The auxiliary Velu map supplies a subset of the field, and that subset is
+then lifted on the separately specified target curve. No isogeny between the
+auxiliary curve and the odd-prime-order target curve is asserted. In particular,
+a rational nontrivial two-torsion kernel on the target itself would contradict
+odd prime target group order. The auxiliary/target distinction is essential
+for interpreting the prime-order19 positive test and for avoiding a fictitious
+DLP transfer claim.
