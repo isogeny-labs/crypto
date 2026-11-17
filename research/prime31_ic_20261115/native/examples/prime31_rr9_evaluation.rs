@@ -200,6 +200,125 @@ fn relation_determinant_hermite(
     Ok(determinant(a))
 }
 
+/// Compute the unique (projective) F=U(x)+y V(x) in L(9O) vanishing
+/// on the GIVEN length-eight affine divisor, including Hermite multiplicity.
+/// This is coefficient interpolation, NOT target-conditioned factor extraction.
+fn rr9_leaves_kernel(leaves: &[Point; 8]) -> Result<[u64; 9], String> {
+    let mut rows = [[0u64; 9]; 8];
+    let mut seen: HashMap<Point, usize> = HashMap::new();
+    for (i, &q) in leaves.iter().enumerate() {
+        if q.is_none() { return Err("kernel divisor includes infinity".into()); }
+        let order = seen.entry(q).or_insert(0);
+        rows[i] = evaluation_higher_jet(q, *order)?;
+        *order += 1;
+    }
+    let mut pivots = [usize::MAX; 8];
+    let mut rank = 0usize;
+    for col in 0..9 {
+        if rank == 8 { break; }
+        let Some(pivot) = (rank..8).find(|&i| rows[i][col] != 0) else {
+            continue;
+        };
+        rows.swap(rank, pivot);
+        let inv = fp_pow(rows[rank][col], P - 2);
+        for j in col..9 { rows[rank][j] = fp_mul(rows[rank][j], inv); }
+        for i in 0..8 {
+            if i == rank { continue; }
+            let scale = rows[i][col];
+            for j in col..9 {
+                rows[i][j] = fp_sub(rows[i][j], fp_mul(scale, rows[rank][j]));
+            }
+        }
+        pivots[rank] = col;
+        rank += 1;
+    }
+    if rank != 8 { return Err(format!("Riemann-Roch length-eight rank is {rank}, not 8")); }
+    let free = (0..9).find(|j| !pivots.contains(j))
+        .ok_or("missing free coefficient")?;
+    let mut out = [0u64; 9];
+    out[free] = 1;
+    for i in 0..8 {
+        out[pivots[i]] = fp_sub(0, rows[i][free]);
+    }
+    for (&q, &expected_order) in leaves.iter().zip((0..8).collect::<Vec<_>>().iter()) {
+        let _ = (q, expected_order); // Multiplicity rows are checked below independently.
+    }
+    let mut again: HashMap<Point, usize> = HashMap::new();
+    for &q in leaves {
+        let order = again.entry(q).or_insert(0);
+        let row = evaluation_higher_jet(q, *order)?;
+        let v = (0..9).fold(0, |acc, i| fp_add(acc, fp_mul(row[i], out[i])));
+        if v != 0 { return Err("interpolated kernel fails its supplied leaf jet".into()); }
+        *order += 1;
+    }
+    Ok(out)
+}
+
+/// Small original-field polynomial convolution, not group arithmetic.
+fn rr9_poly_mul(a: &[u64], b: &[u64]) -> Vec<u64> {
+    assert!(!a.is_empty() && !b.is_empty());
+    let mut c = vec![0u64; a.len() + b.len() - 1];
+    for (i, &ai) in a.iter().enumerate() {
+        for (j, &bj) in b.iter().enumerate() {
+            c[i+j] = fp_add(c[i+j], fp_mul(ai, bj));
+        }
+    }
+    c
+}
+fn rr9_function_at(coeff: &[u64; 9], q: Point) -> Result<u64, String> {
+    let row = evaluation_row(q)?;
+    Ok((0..9).fold(0, |acc, i| fp_add(acc, fp_mul(row[i], coeff[i]))))
+}
+
+/// Norm under y -> -y: U(X)^2 - (X^3+aX+b)*V(X)^2.
+fn rr9_norm(coeff: &[u64; 9]) -> [u64; 10] {
+    let u = [coeff[0], coeff[1], coeff[3], coeff[5], coeff[7]];
+    let v = [coeff[2], coeff[4], coeff[6], coeff[8]];
+    let uu = rr9_poly_mul(&u, &u);
+    let cc = [PRIME31.b, PRIME31.a, 0u64, 1u64];
+    let cvv = rr9_poly_mul(&cc, &rr9_poly_mul(&v, &v));
+    assert_eq!(uu.len(), 9);
+    assert_eq!(cvv.len(), 10);
+    std::array::from_fn(|i| fp_sub(*uu.get(i).unwrap_or(&0), cvv[i]))
+}
+
+/// Exact degree-nine coefficient identity, even for repeated leaves.
+/// The signed F(-R) evaluation is separately checked: x-norm alone
+/// deliberately forgets the orientation.
+fn rr9_norm_certificate(
+    leaves: &[Point; 8], residual: Point, wrong_residual: Point,
+) -> Result<Value, String> {
+    let coeff = rr9_leaves_kernel(leaves)?;
+    let (rx, _) = residual.ok_or("norm certificate R=O needs infinity branch")?;
+    let mut product = vec![1u64];
+    for &q in leaves.iter().chain(std::iter::once(&residual)) {
+        let (x, _) = q.ok_or("norm certificate has infinity among nine points")?;
+        product = rr9_poly_mul(&product, &[fp_sub(0, x), 1]);
+    }
+    if product.len() != 10 { return Err("norm factor polynomial degree is not nine".into()); }
+    let norm = rr9_norm(&coeff);
+    let leading = fp_sub(0, fp_mul(coeff[8], coeff[8]));
+    if leading == 0 { return Err("V_3=0; ninth zero is at infinity".into()); }
+    if norm[9] != leading { return Err("norm polynomial leading coefficient mismatch".into()); }
+    let factored: [u64; 10] = std::array::from_fn(|i| fp_mul(product[i], leading));
+    if norm != factored {
+        return Err("coefficient norm factorization fails supplied 9-point divisor".into());
+    }
+    if rr9_function_at(&coeff, neg(residual))? != 0 {
+        return Err("norm x-root has wrong F(-R) orientation".into());
+    }
+    if rr9_function_at(&coeff, neg(wrong_residual))? == 0 {
+        return Err("F unexpectedly vanishes at known wrong residual".into());
+    }
+    Ok(json!({
+        "verified":true, "residual_x":rx,
+        "kernel_coefficients_L9O":coeff,
+        "norm_coefficients_ascending":norm,
+        "factorization_leading_coefficient":leading,
+        "signed_orientation_true":true, "signed_orientation_wrong":false
+    }))
+}
+
 fn first_rational_points(ar: &mut Arithmetic) -> Vec<(u64, u64)> {
     let mut out = Vec::with_capacity(31);
     for x in 0..PRIME31.p {
@@ -267,11 +386,14 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
         assert_eq!(d_yes, 0, "elliptic RR9 determinant misses a positive");
         assert_ne!(d_no, 0, "elliptic RR9 determinant false positive on distinct nine points");
         assert_ne!(r, not_r, "G is unexpectedly identity");
+        let norm_certificate = rr9_norm_certificate(&leaves, r, not_r)
+            .expect("RR9 original-curve norm certificate for 8 distinct leaves");
         records.push(json!({
             "case":records.len(), "eight_signed_leaves":leaves, "sum_residual":r,
             "negative_residual_plus_G":not_r, "positive_det":d_yes,
             "negative_det":d_no, "no_repeated_or_infinite_points":true,
-            "original_curve_sum_witness":true
+            "original_curve_sum_witness":true,
+            "norm_certificate":norm_certificate
         }));
     }
 
@@ -327,7 +449,10 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
             .expect("negative high-multiplicity divisor");
         assert_eq!(true_det, 0, "higher jet rejects valid signed relation");
         assert_ne!(false_det, 0, "higher jet admits wrong public residual");
+        let higher_norm = rr9_norm_certificate(&repeated_leaves, true_r, false_r)
+            .expect("RR9 norm polynomial identity with repeated Hermite leaves");
         higher_controls.push(json!({
+            "norm_certificate":higher_norm,
             "multiplicity":multiplicity,
             "leaves":repeated_leaves, "true_residual":true_r,
             "wrong_residual_plus_G":false_r,
@@ -420,6 +545,12 @@ mod tests {
         for panel in data["panels"].as_array().unwrap() {
             assert_eq!(panel["accepted_positive"], 32);
             assert_eq!(panel["accepted_negative"], 32);
+            for case in panel["cases"].as_array().unwrap() {
+                assert_eq!(case["norm_certificate"]["verified"], true);
+                assert_eq!(
+                    case["norm_certificate"]["norm_coefficients_ascending"]
+                        .as_array().unwrap().len(), 10);
+            }
             assert_eq!(panel["naive_repeated_row_false_zero"], true);
             assert_eq!(panel["safe_repeated_row_rejected"], true);
             assert_eq!(panel["confluent_hermite_repeated_true_det"], 0);
@@ -431,6 +562,7 @@ mod tests {
                 assert_eq!(h[i]["multiplicity"], m);
                 assert_eq!(h[i]["true_det"], 0);
                 assert_ne!(h[i]["wrong_det"], 0);
+                assert_eq!(h[i]["norm_certificate"]["verified"], true);
             }
             assert_ne!(panel["ninth_jet_wrong_det"], 0);
             assert_eq!(panel["ninth_jet_original_curve_negative"], true);
