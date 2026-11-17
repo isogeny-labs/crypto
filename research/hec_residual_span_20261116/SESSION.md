@@ -1602,3 +1602,10 @@ What was done:1604877628bexits0,75smallprime/5integerchecks pass. Indexdegenerac
 Decisions made: no quotient/speedclaim; boundedgenus3normwitness exhaustionnext,genus2kernelpossibilitiesseparate.
 Open threads: explicitpolarizedselfisogenywitnessesandkernelcounts,notjustunpolarizedclass. Fullgoalopen.
 Errors: none,no scientificretry/S3/cloud.
+
+## Norm-witness finite gate frozen
+
+What was done: recovered edit claim T7093 after outage; retained conditional genus3 norm witnesses and genus2 Hermitian count derivation, all pcc:unverified. Compiled standalone checked Rust witness checker; no scientific execution yet.
+Decisions made: test exact integer norms, modular rank3, distinct kernels against unchanged frozen screen; expected50 model/kernel combinations. Producer checks are not independent verification. Git custody, no S3.
+Open threads: push freeze then once-only bounded invocation; ramified genus2 l5 and quotient costs remain open.
+Errors: MCP attach reports own-scope conflict; existing task card confirms own active lease. Shared docs/session-logs absent in sparse checkout; retained scoped SESSION as prior stages. KB revision9b2119e8fbac482b98b50521c0d604bb older than this work; primary Milne/Smith background checked, no novelty claim.
