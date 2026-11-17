@@ -2233,3 +2233,10 @@ What was done: pushedfreeze26578b0a249, inputhashespass, once-onlyexit0;12packet
 Decisions made: correctnessformat retained, densefullcolumn construction rejected for speed; no totalcost claim, collectors disabled in these counters. Need usefulclosure rank gain, not moreorbitdefinitionrows. No retry/S3/cloud/merge.
 Open threads: relationgeneration/rank mechanism with failedattemptcosts, originalgenus2+10x, independentvalidation/fullgenus3/4 qualification. Existing triangular implementation remains cheaper construction baseline.
 Errors: none duringrun; prefreezeCurveclonecompilefix retained in priorentry.
+
+## Fixed-pencil rank and multiroot extraction gate frozen
+
+What was done: derive same anchor/t givesoneprincipalrelation regardless pair, and g-known roots recoverlast withone multiply via Vieta; compile prospective g2/3/4 same32anchor algebra panel, retain insufficient-root buckets, exact allpair/poly/oracle/native checks and2repeatcomponentcosts.
+Decisions made: same openPR4587 extended, no newbranch; Gitfreeze beforeone120CPU, no paircount=rank or eligiblecost=coldgain claim. Sources truncated-quotient/gain-graph; KB source:91b6bbe9fb73267bbeb5d7c97f493b26 and source:23ec376126e8b485c89c2064b8a8f518 backgroundonly, revision9b2119e8fbac482b98b50521c0d604bb.
+Open threads: measure coverage first, then decide whether fullcollector canjustifyknownrootrequirement; original10x objective unchanged.
+Errors: none, releaseoverflowcheckedbuild succeeded; no scientificexecutionyet.
