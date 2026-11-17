@@ -24,3 +24,22 @@
 ## Errors (what went wrong, how it was handled)
 
 - New 1,024-case transcript increased the `json!` macro expansion past rustc default recursion limit. Run [44190175878](https://github.com/isogeny-labs/crypto/actions/runs/44190175878) failed at compile stage; fixed macro recursion limit only and retained failed run in evidence. First summary-only run had succeeded and is a separate measurement.
+
+## Final verified continuation — 2026-11-17
+
+### What was done (commands, files, features)
+- Corrected Rust macro expansion limit; source-specific [Actions run 44190401085](https://github.com/isogeny-labs/crypto/actions/runs/44190401085) passed native 40/40 library and full 1024-target 1/1. Extracted and committed exact original signed 31-by-32 rows, 31 factor-base logarithms and all 1024 Q/return values/witnesses in `DICKSON31_COMPLETE_RANK_1024_RAW_20261117.json`.
+- Independently replayed the complete frozen raw transcript through a separately written JavaScript BigInt finite-field and original-curve implementation: rank31, 31 modular equations, 31 original-curve factor-base logarithms, 31 source group relations, 1024 independent target scalar-point equations, 1024 signed eight-leaf group relations and 1024 log congruences, and 76 unsuccessful target shifts; every check passed, agreeing with the previously independent 98-case original Dickson base and 31 logs. Committed `DICKSON31_COMPLETE_RANK_1024_INDEPENDENT_AUDIT_20261117.json`. Signed PCC and isolated hardware validation remain outstanding.
+- Added original Rust cold generic-BSGS fallback endpoint regression k=0,1,n−1,floor(n/2),123456789. Final exact-source [Actions 44191050925](https://github.com/isogeny-labs/crypto/actions/runs/44191050925) passed **40/40 native library and 2/2 focused tests**. The 1024 target witness/log transcript and the 31 basis rows/logs matched the preceding source-specific run byte-for-byte. Final source run charged **7,658.159483 ms** (199.106164ms table/base, 158.804826ms rank+factor-point replay, 132.177100ms extra source controls, 7168.071393ms 1024 solved targets), 31/31 full rank, 1024/1024 complete original curve logarithms, 0 fallback on corpus, 76 exhaustive failed shifts, 1100 target attempts, 951/70/3 first-successful-shift distribution.
+- Wrote `DICKSON31_COMPLETE_RANK_1024_RESULT_20261117.md` with exact benchmarks, validation limitations, prior-lead audit and concrete nonenumerative RR9/S9/K961 next stages. Preserved 10.029s first summary-only run and a 7.935s replay-transcript run separately rather than treating host variance as a speedup.
+
+### Decisions made (and why)
+- Mark task's **bounded complete generic-equivalent control** successful, without implying the global non-generic cheaper-solver goal was achieved. Current fully charged Dickson31 table solver remains far slower in absolute wall than historical 170.113ms million-entry generic BSGS, although different-run values are not a matched performance ratio. Further optimization of generic 4A hashing is not the scientific priority.
+- No paid compute, no independent signed PCC promotion, no security inference, no automated branch merge; PR #4623 stays stacked on unmerged #4618. Continue original-ideal-certified public-residual-only algebraic extraction as next independent research goal.
+
+### Open threads (unfinished, pick up next time)
+- Establish a genuine sign-independent B31 target-conditioned polynomial/root extractor without generic 4A table, first exact B4/B8 positive/negative equivalence and then natural original Dickson31. Reuse the committed raw Q and signed witnesses for an independent grader only.
+- Advance matched shared-BSGS/external IC and WZ/rho benchmarking in owner lanes #4596 and #4604 rather than duplicating them.
+
+### Errors (what went wrong, how it was handled)
+- Initial transcript-instrumented source exceeded rustc macro recursion limit. Corrected `#![recursion_limit="512"]`; no algorithm/protocol change. The subsequent two source-specific CI runs passed, and failed CI remains linked.
