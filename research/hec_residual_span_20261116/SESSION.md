@@ -3073,3 +3073,10 @@ What was done: compiled full66point/3783line relation setup withmultiplicities/f
 Decisions made: qualificationonly,alllinesq²notoptimizedDiem scheduler,sharedsetupnotamortizationspeedclaim,partialcountersnotcompleteledger. Gitfreeze precedes sole600CPUprocess.
 Open threads: genuineICanswers ifgatequalifies, thenoptimizedscheduler/completeaccounting/matchedcontrols;full10xgenus2+goalactiveunachieved.
 Errors: prefreeze replacedtautologicallineincidenceassertwithactualdotproductcheck;unusedcopiedmodulewarnings.No scientificexecution yet.
+
+## Actual original-target quartic IC answers verified on H
+
+What was done: freezef749102e1c5 hashespass/exit0. Bothmodels66points/3783lines/209fullysplitverifiedlineclasses;4actualICoutputs83209/44792matchoriginalfixturesand[k]D=T onH. Targetwalksteps7/35/16/17,2smoothequations/212rowseach;structuredSOLVES.jsonretained.
+Decisions made: completesfixed-inputnativecorrectnesschain,notnewattack/10xgain. Alllinesq²+genericPicverificationcosthigh;sharedsetupnotamortizedclaim,countercoverageincomplete. Preservetwist/othergeneraobligations.
+Open threads: prospectiveon-demandlinegenerationandcompleteledger, matchedstrongoriginalIC/rho comparison;full10xgenus2+goalactiveunachieved/independentreviewopen.
+Errors: no scientificfailure;prefreezelineincidencefixrecorded,unusedimport/helperwarnings.Gitcustody/noS3/no merge.

@@ -82,3 +82,7 @@ Freeze `727541cc8d3` constructs both canonical quartic models. Residue-field che
 ### Original public source/target class transport
 
 Freeze `83151284040` qualifies native Smith class transport for both original fixture cases on both F61 models. Degree2point images and public moving divisors produce degree6image ideals reduced with canonical Pic64. All4pairs preserve original scalar relations, retain nonzero source order124459 and agree across different auxiliaries; zero/negation/additive/invalid controls pass. Original coordinates and class keys: `native-smith-transport/TRANSPORT.json`. Scalars are verification-driver inputs only; no quartic DLP solve or speedup is claimed. Bounded movement and incomplete counter coverage are explicit in RESULTS.md.
+
+### Actual quartic IC solves on original public targets
+
+Freeze `f749102e1c5` executes four genuine quartic IC solves through the constructed/transported models. Both models yield209verified split-line relations; each solve needs two target equations after7/35/16/17walk steps. Returned scalars83209/44792pass final verification on the original H. Labels occur only in the driver, not solver inputs. Raw relations/structured answers: `native-smith-quartic-ic/CONTROL.txt` and `SOLVES.json`. This completes the fixed-input native correctness chain for the known Smith route; exhaustive q²line setup is costly, accounting remains incomplete, and no speedup or novelty is claimed. Full10xgenus2+goal remains open.
