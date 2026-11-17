@@ -1,6 +1,7 @@
 # H113 binary/trinary section-curl winding
 
-Status: preregistration in progress; no candidate data have been scored.
+Status: paired preregistration and producer implementation are published; no
+candidate data have been scored.
 
 H113 tests a first-layer `p²` mechanism that is distinct from H111's single
 binary carry and H112's second `p`-adic digit.  It compares the two commuting
@@ -16,8 +17,19 @@ Files frozen before execution:
 - `CURVES.json`: exact ICV1 identities and exhaustive toy cohort.
 - `h113-binary-trinary-winding-flow.svg`: editable mechanism diagram.
 
-The producer, independent verifier, proof, raw artifact, measured report, and
-rendered visual report remain pending.  A protocol PR does not establish the
+The standalone Rust producer is `h113_winding_lab.rs`. It serializes every
+point-level carry, all `6 x 6` contingency matrices, tied best/exact predicate
+IDs, the row-wise and uniform conditional decoders, operation counts, and a
+SHA-256-bound summary. Development checks, which are not a candidate run:
+
+```text
+rustc --edition=2021 -D warnings -O h113_winding_lab.rs -o h113_winding_lab
+./h113_winding_lab --self-test
+```
+
+The independent verifier is implemented in paired cryptanalysis PR #1733.
+The Lean proof, raw artifact, measured report, and rendered visual report
+remain pending. A protocol and compiling implementation do not establish the
 candidate identity or an ECDLP algorithm. [pcc:unverified]
 
 ## Sources checked

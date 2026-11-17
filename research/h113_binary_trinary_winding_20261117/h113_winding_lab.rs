@@ -769,6 +769,7 @@ struct RowScore {
     targets: u64,
     best_ids: Vec<String>,
     exact_ids: Vec<String>,
+    contingency: [[[u64; 6]; 6]; 8],
 }
 
 fn score_row(
@@ -813,6 +814,7 @@ fn score_row(
         targets: r - 1,
         best_ids,
         exact_ids,
+        contingency,
     }
 }
 
@@ -884,6 +886,20 @@ fn append_score(raw: &mut String, kind: &str, curve: Curve, tag: &str, score: &R
         exact
     )
     .unwrap();
+    for (channel, matrix) in score.contingency.iter().enumerate() {
+        let flattened = matrix
+            .iter()
+            .flat_map(|row| row.iter())
+            .map(u64::to_string)
+            .collect::<Vec<_>>()
+            .join(",");
+        writeln!(
+            raw,
+            "MATRIX\t{}\t{}\t{}\t{}\t{}",
+            kind, curve.slug, tag, CHANNELS[channel], flattened
+        )
+        .unwrap();
+    }
 }
 
 fn parse_predicate(id: &str) -> (usize, [u8; 6]) {
@@ -967,6 +983,24 @@ fn median(values: &mut [f64]) -> f64 {
 }
 
 #[derive(Default)]
+struct DecoderAccounting {
+    predicate_rows: u64,
+    digit_queries: u64,
+    point_subtractions: u64,
+    radix_divisions: u64,
+    final_ec_checks: u64,
+}
+
+impl DecoderAccounting {
+    fn record(&mut self, queries: u64) {
+        self.digit_queries += queries;
+        self.point_subtractions += queries;
+        self.radix_divisions += queries;
+        self.final_ec_checks += 1;
+    }
+}
+
+#[derive(Default)]
 struct RunSummary {
     curve_rows: u64,
     targets: u64,
@@ -974,6 +1008,10 @@ struct RunSummary {
     uniform_exact_ids: Vec<String>,
     rows_decoded: u64,
     decoded_targets: u64,
+    decoder: DecoderAccounting,
+    uniform_rows_decoded: u64,
+    uniform_decoded_targets: u64,
+    uniform_decoder: DecoderAccounting,
     canonical_best: Vec<f64>,
     random_best: Vec<f64>,
     label_best: Vec<f64>,
@@ -999,6 +1037,7 @@ fn run(quick: bool) -> (String, RunSummary) {
     writeln!(raw, "MODE\t{}", if quick { "quick" } else { "full" }).unwrap();
     let mut summary = RunSummary::default();
     let mut uniform_exact: Option<BTreeSet<String>> = None;
+    let mut canonical_rows = Vec::new();
 
     for (curve_index, &curve) in CURVES[..curve_count].iter().enumerate() {
         let mut candidate_counts = Counts::default();
@@ -1050,9 +1089,10 @@ fn run(quick: bool) -> (String, RunSummary) {
                 let generator = points[multiplier as usize].unwrap();
                 summary.rows_decoded += 1;
                 for predicate in &score.exact_ids {
+                    summary.decoder.predicate_rows += 1;
                     for scalar in 1..curve.r {
                         let target = points[(scalar * multiplier % curve.r) as usize].unwrap();
-                        let (recovered, _, verified) = decode_target(
+                        let (recovered, queries, verified) = decode_target(
                             curve,
                             generator,
                             target,
@@ -1060,10 +1100,12 @@ fn run(quick: bool) -> (String, RunSummary) {
                             &mut candidate_counts,
                         );
                         assert!(verified && recovered == scalar);
+                        summary.decoder.record(queries);
                         summary.decoded_targets += 1;
                     }
                 }
             }
+            canonical_rows.push((curve, base, multiplier));
         }
 
         if curve_index < 2 {
@@ -1206,15 +1248,50 @@ fn run(quick: bool) -> (String, RunSummary) {
         summary.torsion_counts.merge(torsion_counts);
     }
     summary.uniform_exact_ids = uniform_exact.unwrap_or_default().into_iter().collect();
+    for &(curve, base, multiplier) in &canonical_rows {
+        let generator = curve
+            .mul(multiplier, Some(base), &mut summary.candidate_counts)
+            .unwrap();
+        for predicate in &summary.uniform_exact_ids {
+            summary.uniform_rows_decoded += 1;
+            summary.uniform_decoder.predicate_rows += 1;
+            for scalar in 1..curve.r {
+                let target = curve
+                    .mul(scalar, Some(generator), &mut summary.candidate_counts)
+                    .unwrap();
+                let (recovered, queries, verified) = decode_target(
+                    curve,
+                    generator,
+                    target,
+                    predicate,
+                    &mut summary.candidate_counts,
+                );
+                assert!(verified && recovered == scalar);
+                summary.uniform_decoder.record(queries);
+                summary.uniform_decoded_targets += 1;
+            }
+            writeln!(
+                raw,
+                "UNIFORM_DECODE\t{}\t{}\t{}\t{}",
+                curve.slug,
+                multiplier,
+                predicate,
+                curve.r - 1
+            )
+            .unwrap();
+        }
+    }
     writeln!(
         raw,
-        "FINAL\t{}\t{}\t{}\t{}\t{}\t{}",
+        "FINAL\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}",
         summary.curve_rows,
         summary.targets,
         summary.rows_with_exact,
         summary.uniform_exact_ids.len(),
         summary.rows_decoded,
-        summary.decoded_targets
+        summary.decoded_targets,
+        summary.uniform_rows_decoded,
+        summary.uniform_decoded_targets
     )
     .unwrap();
     (raw, summary)
@@ -1279,6 +1356,18 @@ fn counts_json(counts: Counts) -> String {
     )
 }
 
+fn decoder_json(accounting: &DecoderAccounting) -> String {
+    format!(
+        "{{\"predicate_rows\":{},\"digit_queries\":{},\"point_subtractions\":{},\"radix_divisions\":{},\"final_ec_checks\":{},\"hypothetical_online_winding_evaluations\":{}}}",
+        accounting.predicate_rows,
+        accounting.digit_queries,
+        accounting.point_subtractions,
+        accounting.radix_divisions,
+        accounting.final_ec_checks,
+        3 * accounting.digit_queries + 2 * accounting.predicate_rows
+    )
+}
+
 fn summary_json(
     summary: &RunSummary,
     digest: &str,
@@ -1305,6 +1394,10 @@ fn summary_json(
             "  \"uniform_exact_predicate_ids\": {},\n",
             "  \"rows_decoded\": {},\n",
             "  \"decoded_targets\": {},\n",
+            "  \"decoder_accounting\": {},\n",
+            "  \"uniform_rows_decoded\": {},\n",
+            "  \"uniform_decoded_targets\": {},\n",
+            "  \"uniform_decoder_accounting\": {},\n",
             "  \"canonical_best_accuracy\": {{\"minimum\": {:.12}, \"median\": {:.12}, \"maximum\": {:.12}}},\n",
             "  \"random_section_best_accuracy\": {{\"minimum\": {:.12}, \"median\": {:.12}, \"maximum\": {:.12}, \"rows\": {}}},\n",
             "  \"matched_label_best_accuracy\": {{\"minimum\": {:.12}, \"median\": {:.12}, \"maximum\": {:.12}, \"rows\": {}}},\n",
@@ -1328,6 +1421,10 @@ fn summary_json(
         json_array(&summary.uniform_exact_ids),
         summary.rows_decoded,
         summary.decoded_targets,
+        decoder_json(&summary.decoder),
+        summary.uniform_rows_decoded,
+        summary.uniform_decoded_targets,
+        decoder_json(&summary.uniform_decoder),
         canonical.0,
         canonical.1,
         canonical.2,
