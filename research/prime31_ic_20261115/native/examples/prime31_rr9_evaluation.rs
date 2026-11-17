@@ -395,6 +395,61 @@ fn rr9_public_norm_support(
     Ok(rr9_poly_pow_mod(h, 8, &m)?.iter().all(|&x| x == 0))
 }
 
+/// Exact signed-target parameterization:
+/// F=(X-r)A(X)+(Y+s)V(X), R=(r,s), deg A,deg V <=3.
+/// On the V_3=1 projective chart it has exactly seven free coefficients.
+fn rr9_from_signed_chart(
+    a: &[u64; 4], v: &[u64; 4], residual: Point,
+) -> Result<[u64; 9], String> {
+    let (r, s) = residual.ok_or("signed chart R=O needs a separate branch")?;
+    if r >= P || s >= P || a.iter().chain(v.iter()).any(|&x| x >= P) || v[3] != 1 {
+        return Err("noncanonical point/chart or V_3 not normalized to one".into());
+    }
+    let mut u = [0u64; 5];
+    for i in 0..4 {
+        u[i] = fp_sub(u[i], fp_mul(r, a[i]));
+        u[i+1] = fp_add(u[i+1], a[i]);
+        u[i] = fp_add(u[i], fp_mul(s, v[i]));
+    }
+    Ok([u[0], u[1], v[0], u[2], v[1], u[3], v[2], u[4], v[3]])
+}
+
+/// Recover unique normalized A,V from a *supplied* F with F(-R)=0 and V3 !=0.
+/// It does not discover F or an unknown DLP. Invalid signed input returns None.
+fn rr9_to_signed_chart(
+    coeff: &[u64; 9], residual: Point,
+) -> Result<Option<([u64; 4], [u64; 4])>, String> {
+    let (r, s) = residual.ok_or("signed chart R=O needs a separate branch")?;
+    if r >= P || s >= P || coeff.iter().any(|&x| x >= P) {
+        return Err("noncanonical signed chart input".into());
+    }
+    if coeff[8] == 0 { return Ok(None); }
+    let inv = fp_pow(coeff[8], P-2);
+    let u = [coeff[0], coeff[1], coeff[3], coeff[5], coeff[7]]
+        .map(|c| fp_mul(c, inv));
+    let v = [coeff[2], coeff[4], coeff[6], coeff[8]]
+        .map(|c| fp_mul(c, inv));
+    let mut numerator = [0u64; 5];
+    for i in 0..5 {
+        numerator[i] = fp_sub(u[i], if i < 4 { fp_mul(s, v[i]) } else { 0 });
+    }
+    let mut a = [0u64; 4];
+    a[3] = numerator[4];
+    for i in (0..3).rev() {
+        a[i] = fp_add(numerator[i+1], fp_mul(r, a[i+1]));
+    }
+    if fp_add(numerator[0], fp_mul(r, a[0])) != 0 { return Ok(None); }
+    let reconstructed = rr9_from_signed_chart(&a, &v, residual)?;
+    let normalized = coeff.map(|z| fp_mul(z, inv));
+    if reconstructed != normalized {
+        return Err("signed chart reconstruction lost coefficients".into());
+    }
+    if rr9_function_at(&reconstructed, neg(residual))? != 0 {
+        return Err("signed chart failed F(-R)=0".into());
+    }
+    Ok(Some((a, v)))
+}
+
 /// A falsifier that preserves the full signed F(-R)=0 equation while changing
 /// the norm support: add (X-x(R)) to U. Rejected unless a genuine collision.
 fn rr9_preserve_target_mutation(coeff: &[u64; 9], residual: Point) -> Result<[u64; 9], String> {
@@ -487,8 +542,12 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
         ).expect("nine coefficient witness values");
         assert!(rr9_public_norm_support(&coeff, r, &h)
             .expect("public coefficient-only positive support test"));
+        assert!(rr9_to_signed_chart(&coeff, r)
+            .expect("signed target chart") .is_some());
         let changed_coeff = rr9_preserve_target_mutation(&coeff, r)
             .expect("negative control preserves signed F(-R)=0");
+        assert!(rr9_to_signed_chart(&changed_coeff, r)
+            .expect("altered F remains on target chart").is_some());
         assert!(!rr9_public_norm_support(&changed_coeff, r, &h)
             .expect("same-target altered F support test"),
             "altered F unexpectedly has eight factor-base x roots");
@@ -499,6 +558,7 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
             "original_curve_sum_witness":true,
             "norm_certificate":norm_certificate,
             "public_norm_support_true":true,
+            "signed_target_chart_valid":true,
             "target_preserving_norm_mutation_rejected":true
         }));
     }
@@ -562,13 +622,18 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
         ).expect("confluent RR9 coefficients");
         assert!(rr9_public_norm_support(&coeff, true_r, &h)
             .expect("public support with repeated signed leaves"));
+        assert!(rr9_to_signed_chart(&coeff, true_r)
+            .expect("confluent signed target chart").is_some());
         let changed_coeff = rr9_preserve_target_mutation(&coeff, true_r)
             .expect("target-preserving repeated mutation");
+        assert!(rr9_to_signed_chart(&changed_coeff, true_r)
+            .expect("confluent changed chart").is_some());
         assert!(!rr9_public_norm_support(&changed_coeff, true_r, &h)
             .expect("altered repeated support check"));
         higher_controls.push(json!({
             "norm_certificate":higher_norm,
             "public_norm_support_true":true,
+            "signed_target_chart_valid":true,
             "target_preserving_norm_mutation_rejected":true,
             "multiplicity":multiplicity,
             "leaves":repeated_leaves, "true_residual":true_r,
@@ -673,6 +738,8 @@ mod tests {
         let zero = [0u64; 9];
         let h = [1u64, 1];
         assert!(rr9_public_norm_support(&zero, None, &h).is_err());
+        assert!(rr9_to_signed_chart(&zero, None).is_err());
+        assert!(rr9_to_signed_chart(&zero, Some(PRIME31.g)).unwrap().is_none());
         let mut bad = zero;
         bad[0] = P;
         assert!(rr9_public_norm_support(&bad, Some(PRIME31.g), &h).is_err());
@@ -688,6 +755,7 @@ mod tests {
             for case in panel["cases"].as_array().unwrap() {
                 assert_eq!(case["norm_certificate"]["verified"], true);
                 assert_eq!(case["public_norm_support_true"], true);
+                assert_eq!(case["signed_target_chart_valid"], true);
                 assert_eq!(case["target_preserving_norm_mutation_rejected"], true);
                 assert_eq!(
                     case["norm_certificate"]["norm_coefficients_ascending"]
@@ -706,6 +774,7 @@ mod tests {
                 assert_ne!(h[i]["wrong_det"], 0);
                 assert_eq!(h[i]["norm_certificate"]["verified"], true);
                 assert_eq!(h[i]["public_norm_support_true"], true);
+                assert_eq!(h[i]["signed_target_chart_valid"], true);
                 assert_eq!(h[i]["target_preserving_norm_mutation_rejected"], true);
             }
             assert_ne!(panel["ninth_jet_wrong_det"], 0);
