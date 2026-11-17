@@ -25,4 +25,4 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Blocked / questions for the owner
 
-- Relation15x / PR #4530: complete packed constructor implemented,68/69producer and14checker tests pass; fixed36proof cases match legacy bytes/metadata; actual-root packed198 and old199 pass36cases each. Archive206/207 preserves/replays full proof evidence. Prospective1260-call matched protocol200 awaits publication/execution; primary packed-dag487 vs12strong controls. Ordinary root165 and historical metadata gates remain incomplete/unchanged; goal active, no15x admitted. [pcc:unverified]
+- Relation15x / PR #4530: complete packed constructor and native integration qualified. Repeated200/211 completes1260calls/full-proof replays; primary ratios1.0027–1.1244 inside A/A spread, no15x/improvement admitted. All raw archive214/215 reproduces analysis; clock closure218 passes. Next descriptive parent trace216/324calls, preserving same fixed inputs, strongest matched controls and every proof check. Ordinary root165/historical gates remain incomplete/unchanged. Goal active. [pcc:unverified]
