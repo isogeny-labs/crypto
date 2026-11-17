@@ -2646,3 +2646,10 @@ What was done: freeze144459efdc2 hashes pass, one run exit0;176calls complete, a
 Decisions made: everyfixture subgroupimproves, allg3/4baseworkregresses; no field-envelope10x or mixedfield/wall claim. Keep2LPand Fast/Dense/Hybrid allascontrols, not an unconditionalreplacement. p4001Dense matters; weakFastonlyratio notheadline.
 Open threads: general-curve RRpencil2LPproducer with exact principal/source binding and genuinebasecostcase, and sharedgenericfastfactorbase ifused; previousbinomialrestricted/streaming failures stillscreened. Knownclassicalbaseline notbreakthrough; full10xgoal active/unachieved.
 Errors: none in scientificrun; inheritedunusedreportfield warning only. No S3/cloud/merge.
+
+## Initial-family general RRpencil2LPcorrectness frozen
+
+What was done: implemented generic(noautomorphism)RRanchorsT+aD, smallpointbucketqueries/batchinverse, exactnorm andknownrootdivision leavingdegree<=2, signedmultiplicity rows andweightedLPelimination. Compiledsame22initialfamilies/publicfixtures,512prospectiveanchors. EveryqueriedHbrutefactored independently inFp; everyacceptedresidual nativeprincipalidentity; first128LProwsdensechecked.
+Decisions made: do not claim exhaustive repeated-smallhit sampling, speed or novelty. Allu0/degree-skips/nonsplits/overlap/repeats/failures counted. Previousbinomial128anchorfailure distinctandpreserved; noactualrerun orafter-outcomebudgetchange. One600CPUprocess after Gitfreeze.
+Open threads: executeall22, retainanygenus4coveragefailure beforecostgate.
+Errors: eprintprimaryfetch403, earlierread/PENCIL-NEXTandexplicitderivation used, gaprecorded. Inheritedunusedhelper warnings, compilepasses. No S3/cloud/merge.
