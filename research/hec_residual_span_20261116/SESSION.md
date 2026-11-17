@@ -339,3 +339,17 @@ Executeonceafterpushedfreezeandcompareequallynormalizedcontrols. Broadobjectiveo
 
 ### Errors
 No runtimeexperimentyet. Unusedimport/enum/reportwarningsretained; originalfrozenimplementationsunchanged.
+
+## Equalpublicnormalization gate passes
+
+### What was done
+At pushed813ff56b030,108sourceverifiedsolves/repeats/REDCgatespassEXIT0;FoldedExpandedprefixesagreeall18. Directnormalizationavailable6g2only. Pencilfirstanchorcompletion4/6g2,2stillneedsecondanchor. EqualnormalizedFolded/PencilbaseREDCrangesg2 1.236275–1.773936,g3 2.364468–8.764122,g4 2.568023–6.555429. Rawhashesverify.
+
+### Decisions made
+Normalizationnecessaryinformationdoesnotguaranteefullrank; information/costequalinallcontrols. No10xsolve/wall/newmathclaim. Failedsourceattemptoverheadretainedg3/g4. PR4490externallymerged2026-11-17T04:16:09Z atcce9fea818edf2bfa813aeda8108526e1fd2033b,observedviaGitHub. Deliveronlynewnormalizationworkinsuccessorfrommerge, noteditmergedPR.
+
+### Open threads
+Needstrongerchargedrelation-generation/anchorworkmechanismbeyondnormalization, especiallyg2. Broadgoalopen.
+
+### Errors
+No scientificfailures/retries. Priorwallnoiseunchanged; source/buildwarningsretained.
