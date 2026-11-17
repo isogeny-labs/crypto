@@ -59,3 +59,21 @@
 
 ### Errors
 - No new runtime benchmark or performance data yet.
+
+
+## Result closure — first source-specific ABBA panel (2026-11-17 02:32 UTC)
+
+### What was done
+- Exact [Actions #44003116725](https://github.com/isogeny-labs/crypto/actions/runs/44003116725) passed: original and candidate 40/40 native and 22/22 APS example Rust tests; old 2/2 Rust audit tests. Four cold panels old/new/new/old each solved 24 Q × 6 arms; 576/576 returned the caller-supplied known scalar and old/new signed S3 transcripts matched. Raw artifact [#14293546662](https://github.com/isogeny-labs/crypto/actions/runs/44003116725/artifacts/14293546662) stored.
+- Auditor's two predeclared old/new result ratios were **1.0017067635 (9/24 paired target wins)** and **1.0016402766 (13/24 wins)**, each missing the ≤0.95 plus ≥18/24 speed gate. Combined descriptive candidate/original ratio **1.0016735319**; A/A and between-repeat drifts were below 0.3%. **No APS speedup** at this scope. All are [pcc:unverified], no isolated host or strongest external comparison.
+- Created [full null report](../../research/prime31_ic_20261115/native/APS_S3_BUFFER_ABBA_RESULT_20261117.md) on PR branch, commit `4ec36a2fa3586ca57d85297d246ec02b90cb144b`.
+
+### Decisions made
+- Retire this unchanged scratch-buffer-only optimization as a zero-gain lead. Do not reroll the cohort. Only the separately predeclared source-identity, proof-certified RR9 relation extractor is worth further algebraic exploration.
+- This historical CI auditor did not separately recompute `[k]G=Q`, although the original native APS Rust source did its own caller replay. The later standalone affine Rust auditor commit `0cc827ce` is separately checking new independent group law and requires its own passing CI before claiming external-style arithmetic readback.
+
+### Open threads
+- Check hardened source-specific CI, then update evidence/PR body with its result and distinguish it from historical run. Keep strongest-WZ control blocked until exact Rust dependency closure is repaired.
+
+### Errors
+- Scientific null, not a CI failure: candidate adds ~0.17% time at this resolution. Auto-merge through GitHub connector failed because it inferred squash merging while repository disallows squash; leave PR open pending checks/review.
