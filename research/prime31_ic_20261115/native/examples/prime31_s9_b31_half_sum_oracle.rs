@@ -466,3 +466,299 @@ mod adaptive_b31_tests {
         );
     }
 }
+
+
+// Matched arithmetic-control follow-up to the parent Dickson31 98-Q cohort.
+// This changes ONLY how the original generic 4A complement search computes R-L.
+// Montgomery simultaneous inversion is established prior art, NOT a new
+// non-generic decomposition or ECDLP method.
+#[cfg(test)]
+mod batch_complement_tests {
+    use super::*;
+
+    const WINDOW: usize = 512;
+    const HOLDOUT_SEED: u64 = 0x5339_4248_4f4c_4431;
+
+    #[derive(Default, Clone, Copy, Debug)]
+    struct BatchStats {
+        windows: u64,
+        processed: u64,
+        regular: u64,
+        special: u64,
+        identity: u64,
+        inversions: u64,
+        multiplications: u64,
+        replayed: u64,
+    }
+
+    impl BatchStats {
+        fn add(&mut self, rhs: Self) {
+            self.windows += rhs.windows;
+            self.processed += rhs.processed;
+            self.regular += rhs.regular;
+            self.special += rhs.special;
+            self.identity += rhs.identity;
+            self.inversions += rhs.inversions;
+            self.multiplications += rhs.multiplications;
+            self.replayed += rhs.replayed;
+        }
+    }
+
+    #[inline]
+    fn mul(a: u64, b: u64, stats: &mut BatchStats) -> u64 {
+        stats.multiplications += 1;
+        ((a as u128 * b as u128) % PRIME31.p as u128) as u64
+    }
+
+    fn pow(mut base: u64, mut exp: u64, stats: &mut BatchStats) -> u64 {
+        let mut out = 1_u64;
+        while exp > 0 {
+            if exp & 1 != 0 {
+                out = mul(out, base, stats);
+            }
+            base = mul(base, base, stats);
+            exp >>= 1;
+        }
+        out
+    }
+
+    #[inline]
+    fn sub(a: u64, b: u64) -> u64 {
+        (a + PRIME31.p - b) % PRIME31.p
+    }
+
+    // One inversion for all nonzero x-differences in this window. The fallback
+    // is the ORIGINAL native arithmetic for equal-x, so tangent, inverse,
+    // 2-torsion and identity branches are never silently discarded.
+    fn complement_window(
+        ar: &mut Arithmetic,
+        residual: Point,
+        left: &[Point],
+        stats: &mut BatchStats,
+    ) -> Vec<Point> {
+        stats.windows += 1;
+        stats.processed += left.len() as u64;
+        let mut answers: Vec<Point> = vec![None; left.len()];
+        let mut positions = Vec::with_capacity(left.len());
+        let mut denoms = Vec::with_capacity(left.len());
+        let mut prefixes = Vec::with_capacity(left.len());
+        let mut running = 1_u64;
+
+        for (i, &point) in left.iter().enumerate() {
+            match (residual, point) {
+                (Some((rx, _ry)), Some((lx, _ly))) if rx != lx => {
+                    let denominator = sub(rx, lx);
+                    assert_ne!(denominator, 0);
+                    positions.push(i);
+                    denoms.push(denominator);
+                    prefixes.push(running);
+                    running = mul(running, denominator, stats);
+                    stats.regular += 1;
+                }
+                (Some(_), Some(_)) => {
+                    let inverse_point = ar.neg(PRIME31, point);
+                    answers[i] = ar.add(PRIME31, residual, inverse_point);
+                    stats.special += 1;
+                }
+                _ => {
+                    // R-O = R; O-L = -L, both with zero field inversions.
+                    answers[i] = if residual.is_none() {
+                        ar.neg(PRIME31, point)
+                    } else {
+                        residual
+                    };
+                    stats.identity += 1;
+                }
+            }
+        }
+
+        if !positions.is_empty() {
+            stats.inversions += 1;
+            let mut inverse_product = pow(running, PRIME31.p - 2, stats);
+            // Reverse prefix products recover every inverse exactly:
+            // inv(d_i) = prefix_i * inv(product_all), then divide product by d_i.
+            for j in (0..positions.len()).rev() {
+                let reciprocal = mul(prefixes[j], inverse_product, stats);
+                inverse_product = mul(inverse_product, denoms[j], stats);
+                let i = positions[j];
+                let (rx, ry) = residual.expect("regular finite target");
+                let (lx, ly) = left[i].expect("regular finite left half");
+                // R + (-L): lambda = (ry+ly)/(rx-lx).
+                let numerator = (ry + ly) % PRIME31.p;
+                let slope = mul(numerator, reciprocal, stats);
+                let sx = mul(slope, slope, stats);
+                let x = sub(sub(sx, rx), lx);
+                let y = sub(mul(slope, sub(rx, x), stats), ry);
+                answers[i] = Some((x, y));
+            }
+        }
+        answers
+    }
+
+    fn recover_batched(
+        ar: &mut Arithmetic,
+        half: &FourSet,
+        pts: &[Point],
+        residual: Point,
+        stats: &mut BatchStats,
+    ) -> (Option<Word8>, usize) {
+        for (chunk_i, chunk) in half.ordered.chunks(WINDOW).enumerate() {
+            let answers = complement_window(ar, residual, chunk, stats);
+            for (offset, needed) in answers.into_iter().enumerate() {
+                if let Some(&right) = half.index.get(&needed) {
+                    let probe = chunk_i * WINDOW + offset;
+                    let left = half.index.get(&half.ordered[probe]).expect("stable left index");
+                    let witness = [
+                        left[0], left[1], left[2], left[3],
+                        right[0], right[1], right[2], right[3],
+                    ];
+                    assert_eq!(evaluate(ar, pts, &witness), residual, "original-curve replay");
+                    stats.replayed += 1;
+                    return (Some(witness), probe + 1);
+                }
+            }
+        }
+        (None, half.ordered.len())
+    }
+
+    #[test]
+    fn actual_dickson31_matched_batched_complements() {
+        let mut ar = Arithmetic::default();
+        check_curve(PRIME31, &mut ar).expect("original cofactor-one prime31 curve");
+        let base = Base::build(PRIME31, 6, &mut ar).expect("unchanged Dickson31");
+        assert_eq!(base.points.len(), B31);
+        let pts = tokens(&ar, &base.points);
+        let half = FourSet::build(&mut ar, &pts);
+        assert_eq!(half.index.len(), 618_885);
+
+        // Explicit same-x and identity tests at the arithmetic operation level,
+        // not a claim that a naturally successful query visited those branches.
+        let same_x_left = half.ordered.iter().copied().find(|x| x.is_some())
+            .expect("4A contains nonidentity");
+        let mut corner_stats = BatchStats::default();
+        let same = complement_window(&mut ar, same_x_left, &[same_x_left], &mut corner_stats);
+        let minus_same = ar.neg(PRIME31, same_x_left);
+        assert_eq!(same[0], ar.add(PRIME31, same_x_left, minus_same));
+        assert_eq!(corner_stats.special, 1);
+        assert_eq!(corner_stats.inversions, 0);
+        let none = complement_window(&mut ar, None, &[same_x_left, None], &mut corner_stats);
+        assert_eq!(none[0], minus_same);
+        assert_eq!(none[1], None);
+        let target_identity_half = complement_window(&mut ar, same_x_left, &[None], &mut corner_stats);
+        assert_eq!(target_identity_half[0], same_x_left);
+
+        let mut state = HOLDOUT_SEED;
+        let mut seen = HashSet::<u64>::new();
+        let mut public_targets = Vec::new();
+        for _ in 0..96 {
+            let k = loop {
+                let k = 1 + splitmix64(&mut state) % (PRIME31.n - 1);
+                if seen.insert(k) { break k; }
+            };
+            public_targets.push(ar.scalar(PRIME31, k, Some(PRIME31.g)));
+        }
+        for k in [1_610_011_808_u64, 1_264_623_843_u64] {
+            public_targets.push(ar.scalar(PRIME31, k, Some(PRIME31.g)));
+        }
+
+        let mut old_total_ns = 0_u128;
+        let mut new_total_ns = 0_u128;
+        let mut old_fp_inversions = 0_u64;
+        let mut old_fp_multiplications = 0_u64;
+        let mut old_group_additions = 0_u64;
+        let mut optimized_native_fp_inversions = 0_u64;
+        let mut optimized_native_fp_multiplications = 0_u64;
+        let mut new_stats = BatchStats::default();
+        let mut first_shift_histogram = [0_usize; 10];
+        let mut total_attempts = 0_usize;
+        let mut total_positive = 0_usize;
+        let mut total_negative = 0_usize;
+        let mut old_probes = 0_u64;
+        let mut old_full_eight_replay = 0_usize;
+
+        for (case, q) in public_targets.iter().copied().enumerate() {
+            let mut found = false;
+            for shift in 0..=8_u64 {
+                let delta = ar.scalar(PRIME31, shift, Some(PRIME31.g));
+                let residual = ar.add(PRIME31, q, delta);
+                total_attempts += 1;
+
+                let old_before = ar.counts;
+                let start = Instant::now();
+                let (old_witness, old_count) = half.recover(&mut ar, &pts, residual);
+                old_total_ns += start.elapsed().as_nanos();
+                old_fp_inversions += ar.counts.fp_inversions - old_before.fp_inversions;
+                old_fp_multiplications += ar.counts.fp_multiplications - old_before.fp_multiplications;
+                old_group_additions += ar.counts.group_additions - old_before.group_additions;
+                old_probes += old_count as u64;
+
+                let new_before = ar.counts;
+                let start = Instant::now();
+                let (new_witness, new_count) =
+                    recover_batched(&mut ar, &half, &pts, residual, &mut new_stats);
+                new_total_ns += start.elapsed().as_nanos();
+                optimized_native_fp_inversions +=
+                    ar.counts.fp_inversions - new_before.fp_inversions;
+                optimized_native_fp_multiplications +=
+                    ar.counts.fp_multiplications - new_before.fp_multiplications;
+
+                assert_eq!(new_count, old_count, "identical lookup order case={case}, shift={shift}");
+                assert_eq!(new_witness, old_witness, "exact same first witness case={case}, shift={shift}");
+                if old_witness.is_some() {
+                    total_positive += 1;
+                    old_full_eight_replay += 1;
+                    first_shift_histogram[shift as usize] += 1;
+                    found = true;
+                    break;
+                }
+                total_negative += 1;
+                assert_eq!(old_count, half.ordered.len(), "exhaustive negative");
+            }
+            assert!(found, "heldout target absent within frozen shift cap, case={case}");
+        }
+        assert_eq!(&first_shift_histogram[0..3], &[88, 9, 1]);
+        assert_eq!(first_shift_histogram[3..9], [0; 6]);
+        assert_eq!(total_attempts, 109);
+        assert_eq!(total_positive, 98);
+        assert_eq!(total_negative, 11);
+        assert_eq!(new_stats.replayed as usize, old_full_eight_replay);
+        assert_eq!(old_probes, 18_049_427);
+
+        println!("DICKSON31_BATCH_COMPLEMENTS_JSON={}", json!({
+            "schema":"prime31.dickson31.batch_complement.v1",
+            "field_p":PRIME31.p, "group_n":PRIME31.n,
+            "original_dickson31_base_size":B31,
+            "signed_four_group_points":half.index.len(),
+            "four_set_setup_ns_diagnostic":half.build_ns.to_string(),
+            "four_set_setup_group_additions":half.build_additions,
+            "hashmap_capacity_entries_not_bytes":half.index.capacity(),
+            "public_target_count":public_targets.len(),
+            "public_shift_max":8,
+            "first_successful_shift_histogram":first_shift_histogram,
+            "total_attempts":total_attempts,
+            "positive_witnesses":total_positive,
+            "exhaustive_negative_attempts":total_negative,
+            "legacy_probes_before_return":old_probes,
+            "legacy_attempt_wall_ns_diagnostic":old_total_ns.to_string(),
+            "batch_attempt_wall_ns_diagnostic":new_total_ns.to_string(),
+            "legacy_fp_inversions":old_fp_inversions,
+            "legacy_fp_multiplications":old_fp_multiplications,
+            "legacy_group_additions":old_group_additions,
+            "batch_regular_lanes":new_stats.regular,
+            "batch_all_processed_lanes_including_final_window":new_stats.processed,
+            "batch_special_equal_x_lanes":new_stats.special,
+            "batch_identity_lanes":new_stats.identity,
+            "batch_windows":new_stats.windows,
+            "batch_field_inversions_in_custom_arithmetic":new_stats.inversions,
+            "batch_field_multiplications_in_custom_arithmetic":new_stats.multiplications,
+            "batch_fallback_and_replay_native_fp_inversions":optimized_native_fp_inversions,
+            "batch_fallback_and_replay_native_fp_multiplications":optimized_native_fp_multiplications,
+            "montgomery_window":WINDOW,
+            "first_witness_equal_in_all_positive_cases":true,
+            "generic_equivalent_mitm_control":true,
+            "sign_independent_algebraic_extractor":false,
+            "complete_unknown_ecdlp_logs":0,
+            "pcc":"unverified"
+        }));
+    }
+}
