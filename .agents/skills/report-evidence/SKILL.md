@@ -47,6 +47,15 @@ trial38 transport receipts. [pcc:unverified]
 
 ## Separate measurement from interpretation
 
+Adopted lesson `L-6a262d13caf4` (confirmations `T-ee365dc7b8f9` and
+`T-5260309cabf5`): when branch-local recomputation reaches a reservation cap on
+controls the baseline completes, retain the capped traces as incomplete
+outcomes. Share the immutable original prefix and bound conditional row and
+certificate storage before a separately frozen comparison. Charge the added
+work and state any unpriced cold or live-storage costs. Keep the original
+budgets; a shorter capped prefix is not a pruning or speed result. These two
+producer evidence records do not establish signed validation. [pcc:unverified]
+
 - Lead with observed values, units, sample counts, uncertainty, comparison conditions, and evidence links. Report arithmetic ratios with their exact measured scope.
 - Keep observations, derived calculations, hypotheses, extrapolations, and optional interpretations explicitly distinct.
 - Leave research significance and priority to the user. Do not independently label a result "massive", "breakthrough", "promising", "worthless", or "not worth running". Do not abandon an authorized experiment on that basis.

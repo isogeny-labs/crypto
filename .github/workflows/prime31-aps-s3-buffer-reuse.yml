@@ -1,0 +1,124 @@
+name: Prime31 APS reused-S3-buffer complete-cold ABBA
+
+on:
+  push:
+    branches: [research/prime31-aps-reusable-s3-buffers-20261117]
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs
+      - research/prime31_ic_20261115/native/examples/prime31_aps_buffer_audit.rs
+      - research/prime31_ic_20261115/native/APS_REUSABLE_S3_BUFFER_PROTOCOL_20261117.md
+      - .github/workflows/prime31-aps-s3-buffer-reuse.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs
+      - research/prime31_ic_20261115/native/examples/prime31_aps_buffer_audit.rs
+      - research/prime31_ic_20261115/native/APS_REUSABLE_S3_BUFFER_PROTOCOL_20261117.md
+      - .github/workflows/prime31-aps-s3-buffer-reuse.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  complete-cold-abba:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    env:
+      RAYON_NUM_THREADS: '1'
+      CARGO_BUILD_JOBS: '2'
+    steps:
+      - name: Checkout candidate source and immutable scientific protocol
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout immutable already-merged APS baseline
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: aps-old
+          persist-credentials: false
+      - name: Checkout identical source for single-file candidate overlay
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: aps-new
+          persist-credentials: false
+      - name: Install pinned Rust 1.100
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only new Rust oracle and Rust audit, freeze fresh target seed
+        run: |
+          set -euo pipefail
+          path=research/prime31_ic_20261115/native/examples
+          cmp "aps-old/${path}/prime31_aps_one_relation.rs" "aps-new/${path}/prime31_aps_one_relation.rs"
+          cp "${path}/prime31_aps_one_relation.rs" "aps-new/${path}/prime31_aps_one_relation.rs"
+          cp "${path}/prime31_aps_buffer_audit.rs" "aps-new/${path}/prime31_aps_buffer_audit.rs"
+          # Target seeds change in the two temporary test checkouts only.
+          # The existing source, arithmetic, rho, source profile and workflow pin
+          # are all preserved. Fail closed if source layout changes.
+          python3 - <<'PY'
+          from pathlib import Path
+          path = 'research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs'
+          old='const TARGET_SEED:u64=0x434F_4D50_4150_5331;'
+          new='const TARGET_SEED:u64=0x4255_4646_5245_5553;'
+          for dir_name in ('aps-old','aps-new'):
+              f=Path(dir_name)/path
+              s=f.read_text()
+              assert s.count(old)==1, f'{dir_name} target roster changed'
+              assert s.count(new)==0
+              f.write_text(s.replace(old,new,1))
+          PY
+          sha256sum "aps-old/${path}/prime31_aps_one_relation.rs" \
+            "aps-new/${path}/prime31_aps_one_relation.rs" \
+            "aps-new/${path}/prime31_aps_buffer_audit.rs" \
+            > prime31-aps-buffer-source-shas.txt
+          echo 'Immutable old/new Rust source manifest:'
+          cat prime31-aps-buffer-source-shas.txt
+
+      - name: Compile and run all existing source-specific Rust test controls
+        run: |
+          set -euo pipefail
+          for arm in aps-old aps-new; do
+            cargo +1.100.0 test --locked --release --manifest-path "${arm}/research/prime31_ic_20261115/native/Cargo.toml" --lib
+            cargo +1.100.0 test --locked --release --manifest-path "${arm}/research/prime31_ic_20261115/native/Cargo.toml" --example prime31_aps_one_relation
+          done
+          cargo +1.100.0 test --locked --release --manifest-path aps-new/research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_buffer_audit
+
+      - name: Four full cold panels in preregistered old-new-new-old order
+        run: |
+          set -euo pipefail
+          for pair in old:1 new:1 new:2 old:2; do
+            arm=${pair%%:*}
+            ordinal=${pair##*:}
+            cargo +1.100.0 run --locked --release \
+              --manifest-path "aps-${arm}/research/prime31_ic_20261115/native/Cargo.toml" \
+              --example prime31_aps_one_relation -- \
+              --aps-composed-win4-publicy-24q > "prime31-aps-${arm}${ordinal}.json"
+          done
+
+      - name: Independent-of-source Rust transcript and gate audit
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release \
+            --manifest-path aps-new/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_aps_buffer_audit -- \
+            prime31-aps-old1.json prime31-aps-new1.json \
+            prime31-aps-new2.json prime31-aps-old2.json \
+            > prime31-aps-buffer-audit.json
+          cat prime31-aps-buffer-audit.json
+          echo 'Mathematical recovery and transcript checks are mandatory.'
+          echo 'The frozen 5-percent speed gate is reported, not post-hoc forced to pass.'
+
+      - name: Preserve all raw complete cold runs and source pins, even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-aps-reused-s3-buffer-abba
+          if-no-files-found: warn
+          retention-days: 30
+          path: |
+            prime31-aps-old1.json
+            prime31-aps-new1.json
+            prime31-aps-new2.json
+            prime31-aps-old2.json
+            prime31-aps-buffer-audit.json
+            prime31-aps-buffer-source-shas.txt

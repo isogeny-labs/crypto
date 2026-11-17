@@ -1,3 +1,17 @@
+# Raw combined correctness replay is preserved as one archive; retain named receipts.
+/evidence/e2e-v1/*
+!/evidence/e2e-v1/COMPLETE.txt
+!/evidence/e2e-v1/MANIFEST.sha256
+/evidence/e2e-v2/*
+!/evidence/e2e-v2/COMPLETE.txt
+!/evidence/e2e-v2/MANIFEST.sha256
+/evidence/geometry-e2e-v1/*
+!/evidence/geometry-e2e-v1/COMPLETE.txt
+!/evidence/geometry-e2e-v1/MANIFEST.sha256
+# Fresh recorded-kernel trees are archived after completion; keep status receipts visible.
+/evidence/kernel2-v1/replay/
+/evidence/kernel3-v1/replay/
+/evidence/kernel3-resume-v1/replay/
 /evidence/complete-maps-v1/qualifier
 /evidence/transpose-maps-v1/qualifier
 /evidence/closed-transpose-v1/qualifier
