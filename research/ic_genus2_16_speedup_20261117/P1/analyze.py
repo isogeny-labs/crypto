@@ -70,6 +70,41 @@ def main(paths):
             cert = d['certified'] if not d.get('exhausted') else 'EXHAUSTED'
             print(f"| {g} | {p} | {cs} | {sd} | {name} | {cert} | {d['trials']} | {d['relations']} | {d['fb_cols']} | {f1:.3e} | {fg:.3e} | {r1} | {rg} | {e1} | {eg} | {g0} | {g1} |")
 
+def summary(paths):
+    """Per (g, p): geometric means over (curve, seed) pairs."""
+    import math
+    cells = load(paths)
+    by = defaultdict(list)
+    for key, arms in cells.items():
+        by[key[:2]].append(arms)
+    def gm(xs):
+        return math.exp(sum(math.log(x) for x in xs) / len(xs)) if xs else float('nan')
+    print()
+    print('| g | p | pairs | c/rhoE | D/rhoE | E/rhoE | D/rhoE (g2) | E/rhoE (g2) | c/D | c/E | c/D range | c/E range | c exhausted | all certified |')
+    print('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
+    for (g, p) in sorted(by):
+        rows = []
+        for arms in by[(g, p)]:
+            rho = arms.get('R_rho_neg')
+            c, D, E = arms.get('C_double_lp+pre'), arms.get('D_deg2_full'), arms.get('E_deg2_lp')
+            if not (rho and rho['kind'] == 'run' and c and D and E):
+                continue
+            rf = rho['cantor_mul'] + 10 * rho['cantor_inv']
+            re = rf / rho['steps'] * (math.pi * rho['r'] / 4) ** 0.5
+            rows.append(dict(c=fpm(c, 1) / re, D=fpm(D, 1) / re, E=fpm(E, 1) / re,
+                             Dg=fpm(D, g * g) / re, Eg=fpm(E, g * g) / re,
+                             cD=fpm(c, 1) / fpm(D, 1), cE=fpm(c, 1) / fpm(E, 1),
+                             ex=bool(c.get('exhausted')),
+                             cert=all(x['certified'] for x in (c, D, E) if not x.get('exhausted')) and rho['certified']))
+        if not rows:
+            continue
+        f = lambda k: gm([r[k] for r in rows])
+        rng = lambda k: f"{min(r[k] for r in rows):.3g}-{max(r[k] for r in rows):.3g}"
+        nex = sum(r['ex'] for r in rows)
+        lb = '>=' if nex else ''
+        print(f"| {g} | {p} | {len(rows)} | {lb}{f('c'):.3g} | {f('D'):.3g} | {f('E'):.3g} | {f('Dg'):.3g} | {f('Eg'):.3g} | {lb}{f('cD'):.3g} | {lb}{f('cE'):.3g} | {rng('cD')} | {rng('cE')} | {nex} | {all(r['cert'] for r in rows)} |")
+
 if __name__ == '__main__':
     paths = sys.argv[1:] or glob.glob(os.path.join(os.path.dirname(__file__), 'pilot', '*.jsonl'))
     main(paths)
+    summary(paths)

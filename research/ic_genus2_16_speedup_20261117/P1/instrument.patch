@@ -44,7 +44,7 @@ index d58f6a605d..aa2bcc26d3 100644
  #[derive(Clone, Copy, Debug)]
  pub(crate) struct Rel {
 diff --git a/src/cryptanalysis/genus_ladder.rs b/src/cryptanalysis/genus_ladder.rs
-index b0b96531d1..c5c2df7fb6 100644
+index b0b96531d1..0e61de896f 100644
 --- a/src/cryptanalysis/genus_ladder.rs
 +++ b/src/cryptanalysis/genus_ladder.rs
 @@ -60,10 +60,10 @@ use super::ic_boundary::{
@@ -60,7 +60,7 @@ index b0b96531d1..c5c2df7fb6 100644
  
  // ── polynomials over F_p on the stack ───────────────────────────────────
  
-@@ -627,6 +627,125 @@ impl JCurve {
+@@ -627,6 +627,130 @@ impl JCurve {
  
      // ── point counts and the group order ────────────────────────────
  
@@ -167,7 +167,12 @@ index b0b96531d1..c5c2df7fb6 100644
 +                if pf.powi(kk as i32) > 2.0e8 {
 +                    break;
 +                }
-+                enum_cost += pf.powi(kk as i32) * (2.0 * gf + 2.0) * kk as f64;
++                // Per element: (2g+2)k additions of the difference walk, or,
++                // when p < deg f, the per-line Horner table (fdeg+1)·fdeg·k²/p.
++                let fdeg = 2.0 * gf + 1.0;
++                let per = ((2.0 * gf + 2.0) * kk as f64)
++                    .max((fdeg + 1.0) * fdeg * (kk * kk) as f64 / pf);
++                enum_cost += pf.powi(kk as i32) * per;
 +            }
 +            let w: f64 = (kk + 1..=g)
 +                .map(|i| {
@@ -186,7 +191,7 @@ index b0b96531d1..c5c2df7fb6 100644
      /// `#C(F_{p^k})` with the point at infinity, `k ∈ {1, 2}`, by enumeration.
      pub fn count_points(&self, k: u32) -> u64 {
          assert!((1..=2).contains(&k));
-@@ -680,15 +799,45 @@ impl JCurve {
+@@ -680,15 +804,45 @@ impl JCurve {
      /// window the Weil bounds leave for the remaining ones; every candidate
      /// is checked on 32 random divisors and exactly one must survive.
      pub fn jacobian_order(&self, seed: u64) -> Result<u64, String> {
@@ -234,7 +239,7 @@ index b0b96531d1..c5c2df7fb6 100644
              .collect();
          let mut c = vec![0i128; known + 1];
          c[0] = 1;
-@@ -787,6 +936,28 @@ impl JCurve {
+@@ -787,6 +941,28 @@ impl JCurve {
          match surv.as_slice() {
              [one] => Ok(*one),
              [] => Err("no candidate".into()),
@@ -263,7 +268,7 @@ index b0b96531d1..c5c2df7fb6 100644
              many => Err(format!("ambiguous: {} candidates", many.len())),
          }
      }
-@@ -969,6 +1140,159 @@ impl ModU {
+@@ -969,6 +1145,159 @@ impl ModU {
          }
          res
      }
@@ -423,7 +428,7 @@ index b0b96531d1..c5c2df7fb6 100644
  }
  
  fn mod_u(p: u64, u: &[u64]) -> ModU {
-@@ -1168,6 +1492,11 @@ pub fn disc_character(p: u64, u: &[u64], chi: &[i8], n: &mut Nat) -> i8 {
+@@ -1168,6 +1497,11 @@ pub fn disc_character(p: u64, u: &[u64], chi: &[i8], n: &mut Nat) -> i8 {
  pub enum Arm {
      Full,
      DoubleLp,
@@ -435,7 +440,7 @@ index b0b96531d1..c5c2df7fb6 100644
  }
  
  impl Arm {
-@@ -1175,14 +1504,24 @@ impl Arm {
+@@ -1175,14 +1509,24 @@ impl Arm {
          match self {
              Arm::Full => "A_full",
              Arm::DoubleLp => "C_double_lp",
@@ -462,7 +467,7 @@ index b0b96531d1..c5c2df7fb6 100644
  }
  
  #[derive(Clone, Copy, Debug)]
-@@ -1428,7 +1767,7 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+@@ -1428,7 +1772,7 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
          chi[(y * y % p) as usize] = 1;
      }
      res.rel.mul += (p - 1) / 2;
@@ -471,7 +476,7 @@ index b0b96531d1..c5c2df7fb6 100644
          usize::MAX
      } else {
          prm.nb
-@@ -1450,6 +1789,39 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+@@ -1450,6 +1794,39 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
              ncols += 1;
          }
      }
@@ -511,7 +516,7 @@ index b0b96531d1..c5c2df7fb6 100644
      res.fb_cols = ncols;
      let tcol = ncols as u32;
      let nunk = ncols + 1;
-@@ -1523,8 +1895,23 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+@@ -1523,8 +1900,23 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
              }
              res.candidates += 1;
              let u = curve.u_coeffs(&cur);
@@ -537,7 +542,7 @@ index b0b96531d1..c5c2df7fb6 100644
                  let ch = disc_character(p, &u, &chi, &mut res.rel);
                  if ch != 1 {
                      res.prefilter_rejects += 1;
-@@ -1534,7 +1921,7 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+@@ -1534,7 +1926,7 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
                  decided = g == 2;
              }
              let mut fer_roots = None;
@@ -546,7 +551,7 @@ index b0b96531d1..c5c2df7fb6 100644
                  match ferrari_split(co, p, &u, &mut res.rel) {
                      Some(None) => continue,
                      Some(Some(r)) => fer_roots = Some(r),
-@@ -1545,9 +1932,10 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+@@ -1545,9 +1937,10 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
                  continue;
              }
              res.splits += 1;
@@ -560,7 +565,7 @@ index b0b96531d1..c5c2df7fb6 100644
                      let Some(r) = roots_of(p, &u, &mut rng, &mut res.rel) else {
                          continue;
                      };
-@@ -1584,6 +1972,23 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+@@ -1584,6 +1977,23 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
                      lps.push((x as u32, eps));
                  }
              }
@@ -584,7 +589,7 @@ index b0b96531d1..c5c2df7fb6 100644
              if lps.len() > prm.arm.max_lp() {
                  continue;
              }
-@@ -1605,6 +2010,15 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+@@ -1605,6 +2015,15 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
                      let pt = curve.point(x, y).expect("a root of u lies on the curve");
                      sum = curve.cantor(sum, pt);
                  }
@@ -600,7 +605,7 @@ index b0b96531d1..c5c2df7fb6 100644
                  if sum != cur {
                      res.bad_relations += 1;
                  }
-@@ -1623,7 +2037,7 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+@@ -1623,7 +2042,7 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
  
          res.cycles = dsu.cycles0();
          let nver = dsu.parent.len();
