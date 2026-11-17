@@ -2289,3 +2289,10 @@ What was done: pushedfreeze4e47f661bd8, hashcheckspass, onceexit0;24calls prior1
 Decisions made: sqrt-onlyoptimizationcannotdeliveruniform10x withthisexactremainder, evenentiresplitfree; no cachedbenefit/wholewall/generalimpossibility claim. Needcombinedquery/anchor/relationredesign. Assertions [pcc:unverified].
 Open threads: materiallynewusefulrelationarrival reducingpaidquery/anchorwork, independentvalidation/fullgenus3/4 andoriginal10xgoalactive.
 Errors: none,no retry/S3/cloud/merge.
+
+## Automorphism anchor transport screened before execution
+
+What was done: derived complete-row R-module span invariance under Z^i transport, including zero-divisor action rings and irreducible components; separated target-fixed rotated-source family by correction b(T-sigma^iT). Recorded genus4 order3 caveat and component rank/normalization distinction in ANCHOR-TRANSPORT-SCREEN.md.
+Decisions made: reject free rank multiplier from whole-pencil rotations before another run; fixed-target source rotations remain a different unmeasured algorithm with correction/newgeometry costs. No new performance/novelty claim, [pcc:unverified]. Sources anchor-rank/PENCIL-NEXT/orbit-incidence and current phase evidence; KB source:e331f4a51e3488bf4c9154e923353096 background only.
+Open threads: construction with demonstrably new component span and paid support generation, separately frozen targets, complete genus3/4 premises and original10x objective.
+Errors: none. OwnT7093reservation confirmed despite attach ownconflict; checkallow. No measurement/S3/cloud/merge.
