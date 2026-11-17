@@ -1,6 +1,6 @@
 # A degree-nine projective separator for the B8 RR9 public coefficient ideal
 
-**Date:** 2026-11-17 UTC. **PR:** #4550 (stacked on #4549). **Validation:** mathematical argument plus proposed source-specific Rust replay; producer-only [pcc:unverified]. **This is NOT an ECDLP speed result or a support-free extractor.**
+**Date:** 2026-11-17 UTC. **PR:** #4550 (stacked on #4549). **Validation:** mathematical argument and actual passing exact-source native Rust 1.100 CI; producer-only [pcc:unverified]. **This is NOT an ECDLP speed result or a support-free extractor.**
 
 ## 1. Setup and two exact lemmas
 
@@ -73,4 +73,13 @@ Actual p=2^31-1 curve: a=847514846, b=2087444724, cofactor one subgroup order n=
 - Literature: Petit–Kosters–Messeng, PKC 2016, DOI 10.1007/978-3-662-49387-8_1; Amadori–Pintore–Sala, FFA 2018, DOI 10.1016/j.ffa.2018.01.009; Kudo et al., CANS 2018, DOI 10.1007/978-3-030-00434-7_19; Macaulay2 [resultants documentation](https://macaulay2.com/doc/Macaulay2-1.22/share/doc/Macaulay2/Resultants/html/_resultant.html).
 - Research-KB MCP and repository wrapper unavailable in this connector-only runtime; fallback was exact live GitHub files and public primary/publication links. Novelty unestablished.
 
-**Status:** degree-nine mathematical separator proved at the stated algebraic scope; exact-source Rust PASS/FAIL, artifact and measured bounded witness wall are to be recorded separately when CI completes. No complete non-generic solver has been measured.
+## 6. Completed exact-source native Rust test, source and artifact
+
+- **PASS** [GitHub Actions #44104421359](https://github.com/isogeny-labs/crypto/actions/runs/44104421359), PR event, source \`32d6ba5489dbf69f0fa2bc98556fff315a23a80f\`: pinned 1.100.0 original library and bounded new example tests, release build, full raw JSON validation.
+- [Raw artifact #14337801335](https://github.com/isogeny-labs/crypto/actions/runs/44104421359/artifacts/14337801335), archive SHA-256 **12f74c30d341c53def98c226bbf149eee6c9eb0a711d2b2082776d9c269e7f3e**, independently checked against downloaded 822-byte ZIP.
+- Original-curve positive **test-only chart coefficients** (455835358, 518652820, 754716693, 932383545, 62510441, 1884059825, 1142049404) passed all eight q_i, direct M=H_B, and independent original-group signed sum R=(1911579686,548820096).
+- Degree-nine **positive evaluation null certificate** passed **27,456/27,456 sparse row dot products** comprising **240,240 term products**; its h^9 coordinate is 1. Therefore the actual positive D9 matrix has rank at most 11,439, regardless of elimination algorithm. The negative D9 rank **was not computed** and remains JSON null.
+- Charged wall for bounded witness-only construction and checking: **6,846,317 ns (6.846317 ms)** on the GitHub runner. This number is **not** the runtime of a public-residual-only extractor, a unit-certificate solver, a relation generator or a complete ECDLP algorithm. Public-only nonenumerative extraction=false and complete unknown logarithms recovered=0 in raw JSON.
+- All statuses remain producer [pcc:unverified], no signed independent PCC or measured generic-frontier improvement.
+
+**Status:** The exact D9 separation theorem is proved for the stated B8 chart and a concrete p31 positive-null certificate is replayed in Rust with passing CI. The next missing executable step is public-only sparse negative full-rank/unit-certificate extraction; B31 full ECDLP and any speed advantage are not established.
