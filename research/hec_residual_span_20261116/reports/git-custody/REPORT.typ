@@ -206,3 +206,33 @@ The bounds are about32.967,60.775and96.648forg2,3,4. Withp≡1mod(2g+1), possibl
 For representativePj, projectedlogs satisfy log(h*phiᵃPj)=lambdaᵃLj. Every orbit has its own unknownLj. Contract a principalrow by summing its signedcoefficients weighted bylambdaᵃ, retaining all representatives. For the walkrow sum cᵢPᵢ−aD−bT=0, D=hP0andT=kD, the projectedscalar equation is sumweightedcoeff*Lj−b*h*k=a*h. UsingYj=h⁻¹Ljreturns the usualtarget coefficients. Silently assigning allorbitlogs to one source would fabricate information.
 
 The generalizedcharactercertificate now hascorrectnesscoverage acrossgenera2/3/4; a generictenfoldbreakthrough is not established. Next: exact multi-orbit row/operator qualification and supplied-target integration with allcosts, plus independentproof/replay/count/externalreference work. The priorg4localwallresult keeps its originalsinglefixture/proof-contractlimits. Full164roweligibility and everyzero/rejectedoutcome remain inGit.
+
+#pagebreak()
+= Multiple orbits: exact contraction beyond the small-field bound
+Pushed execution checkpoint68078797efc · exit0 · larger-field correctness gate
+
+The certificate now uses S_n=1+X+...+Xⁿ⁻¹, the actual characteristic relation of the tameautomorphism. This excludes a spurious unit factor and treats zeroabscissapoints as knownzero projected columns. Every nontrivialorbit retains an independentunknown; no inter-orbit log is supplied.
+
+#table(columns:6,inset:4pt,align:center,
+[g,field,c],[point columns],[orbit unknowns],[fixedzeros],[ell],[h],
+[2,101,2],[35],[7],[0],[7481],[1],
+[3,113,2],[36],[5],[1],[143669],[7],
+[4,109,3],[64],[7],[1],[432343],[387])
+
+Allfields exceed the fulloneorbitbound. Fixtures are the first eligibleirreducible models under a frozen c1..32scan; priorrejections remain in FIXTURES.tsv. Allcanonicalpointorders, commonannihilator, largestprimesubgroup, fullFrobenius and S_noperators, weightedpointmaps, sourceorder and a corruptedweightnegativecontrol qualify. No wholeJacobianorder is claimed.
+
+== Independent equation and target checks
+The fullreference includes m−rexplicitpoint/orbitconstraints and the same hY_s=1source normalization as the folded system. A single fullbasewalk drives both. Rawtaken and orbitfoldedtaken are updated independently. Every rationaldecomposition and absolutewalkrow is checked in the originalgroup, then contracted by two paths.
+
+#table(columns:5,inset:4pt,align:center,
+[g,p],[targets],[walk trials],[retained relations],[genericnative trials],
+[2,101],[37,2026,7001],[29,20,26],[7,9,7],[132,114,159],
+[3,113],[37,2026,7001],[100,79,50],[5,7,7],[744,627,498],
+[4,109],[37,2026,7001],[131,82,29],[7,7,7],[1016,1085,1003])
+
+Allninecandidate/nativeanswers verifyagainst originalpublicsource andtarget. At all63retainedsmoothprefixes, expandedreference and foldedsolver agree on targetdetermination and scalar. At37selected/finalprefixes, independent densecoefficient/augmented/drop-targetranks verify consistency, the exactm−roffset and targetuniqueness. No expectedscalar or loglookup constructs the answer. BSGSis only a fixturepoint-orderqualification tool.
+
+== Claim and next measurement boundary
+These are exactrepresentation/solvercontrols for a classicalmulti-orbit method. Column and trialratios are not completecostratios. Genericnativecontrols have differentmargins/endomorphisminformation; the expandedreference shares the same knowledge. The present gate repeatedly solves bothsystems and performs heavyqualification, so its work counters are not productioncosts.
+
+Next: retain onlyorbitstates in the production solver, define a sharedsource/subgroupmetadata contract, and prospectively compare full preparation/collection/LA/verification against an equally normalized reference. Includeor justify qualificationcosts explicitly. No genericcurve/newexponent/fastestexternal or tenfoldcompleteclaim follows from this gate. The earlierfixedg4wallresult remains scoped; the broadergoal remains unachieved. Multi/THEORY.md, PROTOCOL.md, RESULTS.md and allrawhashes preserve the boundary under authorizedGitcustody.
