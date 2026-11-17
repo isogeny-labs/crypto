@@ -1679,3 +1679,10 @@ What was done: compiled fixedmap interpolation from128x4catalogue sumimages,35qu
 Decisions made: require nullity1,>=70distinctimages, zeroexactremainder; no substitution of finitevanishing for polynomialidentity. Assertions [pcc:unverified].
 Open threads: pushfreeze then single120CPU invocation, generalmodelnormalization remains.
 Errors: none in compile; no science yet.
+
+## Imagequartic exact identity completed
+
+What was done: freeze098b55cbb19 single invocation exit0;480distinctimages, quarticnullity1; degree20composition1577terms reducesexactlyzero modulo sourcequartic. Originimage[1,284,243,459] singular. Producer assertions [pcc:unverified].
+Decisions made: retainexplicitquartic/map and exactidentity; no automaticglobalbasepoint/degree25/Jacobianlift/twistclaim.
+Open threads: reconstructgenus2curve fromquartic then map/lift/targetqualification andcost.
+Errors: none, no rerun/S3/cloud.
