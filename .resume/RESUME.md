@@ -88178,3 +88178,26 @@ No48pod/call yet; all owned runners through47deleted. Lifetime6000seconds,4CPU8G
 ≤0.40USDh, live detached guardian before sole dispatch. AllscienceRust, no local
 natural-yield/performance measurement. Old46/47/core48proof subjects unchanged.
 Goal ACTIVE; complete native/fresh/scaling/signed rho admission remains open.
+
+## Active continuation after Runpod48cap outcome
+
+Execution source f58a7eb96be9fe47c40f5ef5dcaabe74e2392854, PR4537ready/BLOCKED,
+immutable measure/quadratic-pair48-run-source. Sole call07:18:13Z; all3workers0,
+candidate capped at262144quartic histories before sparse checkpoint, no scalar;
+frozen qualifier1. Owned pod1juwnyxwvu3w98deleted07:21:23Z (204/independent404),
+all owned runners through48deleted. Original archives/raw157MBwitness LOCAL under
+/workspace/ic-runpod-runs/runpod-quadratic-pair-20261117-48, hash-bound. Preserve!
+Separate native postexecution cap checker0checks94685originals/417projections/
+262144quartic histories/309699candidates/cohort/RNG; true rank417<508target,
+producer certified bound0. Original/table full math replay pass. Failed original
+complete-pipeline admission stays unchanged. PCC3cdb59/8c1742/a27dc9/7185d3UNVERIFIED.
+One viewed native cap report PDF43215B/SVG408146B/150dpiPNG36481B plus benchmarkcopies.
+Next publish resultpacket+3native postexecution programs to PR4537, then implement
+new typed quartic discriminant screen. Sources read: Swan1962PJMCorollary1and§4,
+https://msp.org/pjm/1962/12-3/pjm-v12-n3-p27-s.pdf,
+SHA256db8a73496c10f2a32549b31b673f3039d2b6ba1533a90b2d3fac3e81a2cfbdc2.
+KB unavailable(wrapper127). Written necessary screen/proposed controls in48/NEXT.md.
+Dominant174609irreducible-quartic refusals vs4repeated, so repeated-root-onlyfilter
+is not pursued. Proposed scalar resultant/discriminant character must preserve
+successful2quad/admission/RNG/witness/rank/affine math and get separate Runpod
+source/protocol; no new screen implementation/measurement yet. Goal ACTIVE.
