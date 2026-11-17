@@ -15,6 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [ ] Prime31 public-only RR9 B8 Macaulay unit-certificate experiment and negative-fibre gate (ChatGPT automation, started 2026-11-17, branch research/prime31-rr9-macaulay-public-20261117)
 - [x] Prime31 RR9 seven-anchor algebraic generic-equivalence and signed-list obstruction (ChatGPT automation, started 2026-11-17, branch research/prime31-rr9-seven-anchor-20261117, PR #4547; pinned Rust CI PASS; producer [pcc:unverified])
 - [x] Prime31 RR9 exceptional x=r residual and exact signed fibre checks (ChatGPT automation, started 2026-11-17, branch research/prime31-rr9-exceptional-residual-20261117, PR #4546)
 
