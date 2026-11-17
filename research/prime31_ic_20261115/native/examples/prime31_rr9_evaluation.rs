@@ -316,6 +316,98 @@ fn rr9_norm_certificate(
     }))
 }
 
+/// Ordinary polynomial remainder modulo a monic polynomial (ascending coefficients).
+/// This performs no elliptic additions, square-root searches or support enumeration.
+fn rr9_poly_rem_monic(mut numerator: Vec<u64>, divisor: &[u64]) -> Result<Vec<u64>, String> {
+    if divisor.len() < 2 || divisor[divisor.len()-1] != 1 {
+        return Err("polynomial divisor must be monic of positive degree".into());
+    }
+    if numerator.iter().chain(divisor.iter()).any(|&x| x >= P) {
+        return Err("noncanonical polynomial coefficient".into());
+    }
+    while numerator.len() >= divisor.len() {
+        let lead = *numerator.last().unwrap();
+        let shift = numerator.len() - divisor.len();
+        if lead != 0 {
+            for j in 0..(divisor.len()-1) {
+                numerator[shift+j] = fp_sub(numerator[shift+j], fp_mul(lead, divisor[j]));
+            }
+        }
+        numerator.pop(); // top coefficient cancelled against monic divisor
+    }
+    numerator.resize(divisor.len()-1, 0);
+    Ok(numerator)
+}
+
+/// H^exponent mod monic M; O(log exponent) polynomial multiplications.
+/// This does NOT find M from a public residual, so it is not an ECDLP oracle.
+fn rr9_poly_pow_mod(
+    base: &[u64], mut exponent: u32, modulus: &[u64],
+) -> Result<Vec<u64>, String> {
+    let mut acc = vec![1u64];
+    let mut power = rr9_poly_rem_monic(base.to_vec(), modulus)?;
+    while exponent > 0 {
+        if exponent & 1 == 1 {
+            acc = rr9_poly_rem_monic(rr9_poly_mul(&acc, &power), modulus)?;
+        }
+        exponent >>= 1;
+        if exponent > 0 {
+            power = rr9_poly_rem_monic(rr9_poly_mul(&power, &power), modulus)?;
+        }
+    }
+    acc.resize(modulus.len()-1, 0);
+    Ok(acc)
+}
+
+/// Public coefficient-only support test (NOT a coefficient extractor).
+///
+/// Input F=U+yV is already supplied, as are public R and H_B. The test
+/// F(-R)=0, deg N_F=9, and [N_F / (-v3^2 (X-x(R)))] | H_B^8
+/// is equivalent to F's other eight zeros being supported at +/-base points
+/// (with multiplicities), under the stated ordinary prime31 curve assumptions.
+/// No signed leaves, group arithmetic, baby/giant tables or secret logs enter.
+fn rr9_public_norm_support(
+    coeff: &[u64; 9], residual: Point, h: &[u64],
+) -> Result<bool, String> {
+    let (rx, ry) = residual.ok_or("R=O requires the infinity branch")?;
+    if rx >= P || ry >= P || coeff.iter().any(|&x| x >= P) {
+        return Err("noncanonical public input".into());
+    }
+    if h.len() < 2 || h.last() != Some(&1) {
+        return Err("factor-base polynomial H must be monic".into());
+    }
+    let rhs = fp_add(fp_add(fp_mul(fp_mul(rx, rx), rx), fp_mul(PRIME31.a, rx)), PRIME31.b);
+    if fp_mul(ry, ry) != rhs { return Err("residual off original curve".into()); }
+    if rr9_function_at(coeff, neg(residual))? != 0 { return Ok(false); }
+    let norm = rr9_norm(coeff);
+    let lead = norm[9]; // -v3^2; zero means a lower pole-order branch
+    if lead == 0 { return Ok(false); }
+    // Synthetic division by (X-rx); a nonzero remainder is a false fibre.
+    let mut m = [0u64; 9];
+    m[8] = norm[9];
+    for i in (0..8).rev() {
+        m[i] = fp_add(norm[i+1], fp_mul(rx, m[i+1]));
+    }
+    if fp_add(norm[0], fp_mul(rx, m[0])) != 0 { return Ok(false); }
+    let inverse_lead = fp_pow(lead, P-2);
+    for c in &mut m { *c = fp_mul(*c, inverse_lead); }
+    if m[8] != 1 { return Err("norm quotient failed monic normalization".into()); }
+    Ok(rr9_poly_pow_mod(h, 8, &m)?.iter().all(|&x| x == 0))
+}
+
+/// A falsifier that preserves the full signed F(-R)=0 equation while changing
+/// the norm support: add (X-x(R)) to U. Rejected unless a genuine collision.
+fn rr9_preserve_target_mutation(coeff: &[u64; 9], residual: Point) -> Result<[u64; 9], String> {
+    let (rx, _) = residual.ok_or("R=O unsupported")?;
+    let mut out = *coeff;
+    out[0] = fp_sub(out[0], rx);
+    out[1] = fp_add(out[1], 1);
+    if rr9_function_at(&out, neg(residual))? != 0 {
+        return Err("mutation did not preserve signed residual condition".into());
+    }
+    Ok(out)
+}
+
 fn first_rational_points(ar: &mut Arithmetic) -> Vec<(u64, u64)> {
     let mut out = Vec::with_capacity(31);
     for x in 0..PRIME31.p {
@@ -341,6 +433,11 @@ fn group_sum(ar: &mut Arithmetic, pts: &[Point; 8]) -> Point {
 fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
     assert_eq!(base.len(), 31);
     let mut seed = SEED ^ if label.starts_with("dickson") { 0x1234_5678 } else { 0 };
+    let mut h = vec![1u64];
+    for &(x, _) in base {
+        h = rr9_poly_mul(&h, &[fp_sub(0, x), 1]);
+    }
+    assert_eq!(h.len(), 32);
     let mut attempts = 0usize;
     let mut pos_ns = 0u128;
     let mut neg_ns = 0u128;
@@ -385,12 +482,24 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
         assert_ne!(r, not_r, "G is unexpectedly identity");
         let norm_certificate = rr9_norm_certificate(&leaves, r, not_r)
             .expect("RR9 original-curve norm certificate for 8 distinct leaves");
+        let coeff: [u64; 9] = serde_json::from_value(
+            norm_certificate["kernel_coefficients_L9O"].clone()
+        ).expect("nine coefficient witness values");
+        assert!(rr9_public_norm_support(&coeff, r, &h)
+            .expect("public coefficient-only positive support test"));
+        let changed_coeff = rr9_preserve_target_mutation(&coeff, r)
+            .expect("negative control preserves signed F(-R)=0");
+        assert!(!rr9_public_norm_support(&changed_coeff, r, &h)
+            .expect("same-target altered F support test"),
+            "altered F unexpectedly has eight factor-base x roots");
         records.push(json!({
             "case":records.len(), "eight_signed_leaves":leaves, "sum_residual":r,
             "negative_residual_plus_G":not_r, "positive_det":d_yes,
             "negative_det":d_no, "no_repeated_or_infinite_points":true,
             "original_curve_sum_witness":true,
-            "norm_certificate":norm_certificate
+            "norm_certificate":norm_certificate,
+            "public_norm_support_true":true,
+            "target_preserving_norm_mutation_rejected":true
         }));
     }
 
@@ -448,8 +557,19 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
         assert_ne!(false_det, 0, "higher jet admits wrong public residual");
         let higher_norm = rr9_norm_certificate(&repeated_leaves, true_r, false_r)
             .expect("RR9 norm polynomial identity with repeated Hermite leaves");
+        let coeff: [u64; 9] = serde_json::from_value(
+            higher_norm["kernel_coefficients_L9O"].clone()
+        ).expect("confluent RR9 coefficients");
+        assert!(rr9_public_norm_support(&coeff, true_r, &h)
+            .expect("public support with repeated signed leaves"));
+        let changed_coeff = rr9_preserve_target_mutation(&coeff, true_r)
+            .expect("target-preserving repeated mutation");
+        assert!(!rr9_public_norm_support(&changed_coeff, true_r, &h)
+            .expect("altered repeated support check"));
         higher_controls.push(json!({
             "norm_certificate":higher_norm,
+            "public_norm_support_true":true,
+            "target_preserving_norm_mutation_rejected":true,
             "multiplicity":multiplicity,
             "leaves":repeated_leaves, "true_residual":true_r,
             "wrong_residual_plus_G":false_r,
@@ -482,7 +602,9 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
         "confluent_hermite_higher_controls":higher_controls,
         "ninth_jet_wrong_det":ninth_jet_wrong_det,
         "ninth_jet_original_curve_negative":true,
-        "no_unknown_ecdlp_solved":true, "cases":records
+        "no_unknown_ecdlp_solved":true,
+        "public_norm_membership_only_not_extraction":true,
+        "cases":records
     })
 }
 
@@ -535,6 +657,27 @@ mod tests {
         assert!(evaluation_higher_jet(Some(points[0]), 9).is_err());
     }
     #[test]
+    fn rr9_public_support_polynomial_repeated_root_control() {
+        // H=X-7, M=(X-7)^8: M divides H^8, not H^7.
+        let h = [fp_sub(0, 7), 1u64];
+        let mut m = vec![1u64];
+        for _ in 0..8 { m = rr9_poly_mul(&m, &h); }
+        assert_eq!(m.len(), 9);
+        assert_eq!(rr9_poly_pow_mod(&h, 8, &m).unwrap(), vec![0; 8]);
+        assert_ne!(rr9_poly_pow_mod(&h, 7, &m).unwrap(), vec![0; 8]);
+        assert!(rr9_poly_rem_monic(vec![1], &[1]).is_err());
+        assert!(rr9_poly_rem_monic(vec![2], &[1, 2]).is_err());
+    }
+    #[test]
+    fn rr9_public_support_rejects_infinity_and_invalid_coefficients() {
+        let zero = [0u64; 9];
+        let h = [1u64, 1];
+        assert!(rr9_public_norm_support(&zero, None, &h).is_err());
+        let mut bad = zero;
+        bad[0] = P;
+        assert!(rr9_public_norm_support(&bad, Some(PRIME31.g), &h).is_err());
+    }
+    #[test]
     fn rr9_original_prime31_bases_and_duplicate_control() {
         let data = run();
         assert_eq!(data["positive_count"], 64);
@@ -544,6 +687,8 @@ mod tests {
             assert_eq!(panel["accepted_negative"], 32);
             for case in panel["cases"].as_array().unwrap() {
                 assert_eq!(case["norm_certificate"]["verified"], true);
+                assert_eq!(case["public_norm_support_true"], true);
+                assert_eq!(case["target_preserving_norm_mutation_rejected"], true);
                 assert_eq!(
                     case["norm_certificate"]["norm_coefficients_ascending"]
                         .as_array().unwrap().len(), 10);
@@ -560,6 +705,8 @@ mod tests {
                 assert_eq!(h[i]["true_det"], 0);
                 assert_ne!(h[i]["wrong_det"], 0);
                 assert_eq!(h[i]["norm_certificate"]["verified"], true);
+                assert_eq!(h[i]["public_norm_support_true"], true);
+                assert_eq!(h[i]["target_preserving_norm_mutation_rejected"], true);
             }
             assert_ne!(panel["ninth_jet_wrong_det"], 0);
             assert_eq!(panel["ninth_jet_original_curve_negative"], true);
