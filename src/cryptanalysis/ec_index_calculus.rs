@@ -1082,9 +1082,11 @@ fn find_one_relation_counted_with_rng<R: rand::RngCore>(
 }
 
 /// The sweep's inner loop on `u64` words (small odd prime fields below 2^40): the same candidate set,
-/// in the same order, as the `BigUint` loop in [`find_one_relation_sweep_with_index`].  Experimental
-/// (`IC_FAST_SWEEP=1`, which also hoists the x-index); the default sweep is unchanged.  The design and
-/// the equality of results were first established by an independent validator's probe.
+/// in the same order, as the `BigUint` loop in [`find_one_relation_sweep_with_index`].  It is the
+/// default since 2026-11-17 (`IC_FAST_SWEEP=0` restores the BigUint sweep); `WordSweep::new` declines
+/// any modulus it cannot carry, so larger primes keep the BigUint path.  The design and the equality
+/// of results were first established by an independent validator's probe and are covered by
+/// `word_sweep_matches_the_biguint_sweep`.
 struct WordSweep {
     p: u64,
     a: u64,
@@ -1248,7 +1250,7 @@ fn find_one_relation_sweep_with_index<R: rand::RngCore>(
                 if qb.is_zero() {
                     continue;
                 }
-                let inv = match qb.inv() {
+                let inv = match qb.inv_vartime() {
                     Some(v) => v,
                     None => continue,
                 };
@@ -1273,7 +1275,7 @@ fn find_one_relation_sweep_with_index<R: rand::RngCore>(
                 Some(v) => v,
                 None => continue,
             };
-            let two_qa_inv = match qa.add(&qa).inv() {
+            let two_qa_inv = match qa.add(&qa).inv_vartime() {
                 Some(v) => v,
                 None => continue,
             };
@@ -2393,9 +2395,14 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     } else {
         None
     };
-    // Experimental: IC_HOIST_SWEEP=1 builds the sweep's x-index once per solve.
-    let fast_sweep = std::env::var("IC_FAST_SWEEP").as_deref() == Ok("1");
-    let hoisted_index = if fast_sweep || std::env::var("IC_HOIST_SWEEP").as_deref() == Ok("1") {
+    // The word sweep and the hoisted x-index are the default: they return the
+    // same relations in the same trials as the BigUint sweep
+    // (`word_sweep_matches_the_biguint_sweep`), and `WordSweep::new` declines
+    // moduli it cannot carry so larger primes keep the BigUint path.
+    // `IC_FAST_SWEEP=0` / `IC_HOIST_SWEEP=0` restore the old behaviour for a
+    // controlled comparison.
+    let fast_sweep = std::env::var("IC_FAST_SWEEP").as_deref() != Ok("0");
+    let hoisted_index = if std::env::var("IC_HOIST_SWEEP").as_deref() != Ok("0") {
         Some(factor_base_x_index(&fb))
     } else {
         None
