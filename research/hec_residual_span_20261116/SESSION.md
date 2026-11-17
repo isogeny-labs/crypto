@@ -1763,3 +1763,10 @@ What was done: compiled sourcearm0packetproducer, Gaussian rowwitness, separate 
 Decisions made: wholeprimeorder fixed-instance premise explicit; nativeaction andsourcebindingchecked, nativefinalscalarcontrol retained; no cost/signedverification claim. Firstprototype checkedscalarfolding, notpureoperatorringproof. Assertions [pcc:unverified].
 Open threads: pushfreeze then single120CPU invocation; independent serialization/replay and costgate remain.
 Errors: unusedimport removed beforefreeze, no science yet.
+
+## Curve-bound relation certificate gate completed
+
+What was done: freezeb712a22d7b0 once-onlyexit0;12originalcertificates accepted,84target/source/action/row/witness/k/supportmutations rejected; rows6-67, fullpacketsretained. Assertions [pcc:unverified].
+Decisions made: separateverifier notindependentlysigned/sharednativearithmetic; wholeprimefixedinstancepremise explicit. No speedclaim, action/generatorchecks maydominate.
+Open threads: fullcertificateconstruction/verifier costs and standalone replay; nativefinalcontrolretained.
+Errors: none,no rerun/S3/cloud.
