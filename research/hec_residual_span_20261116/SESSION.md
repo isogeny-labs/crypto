@@ -2219,3 +2219,10 @@ What was done: pushed freeze33b96ad90bb, verified INPUT hashes, once-only exit0;
 Decisions made: stronger all-component format supports proposed rank-independent theorem under explicit annihilator/membership/splitting assumptions; existing prime-order genus2 certificate unchanged. No construction/verification cost or genus3/4 curve conclusion. [pcc:unverified].
 Open threads: packet-bound homogeneous verifier then full counted construction/verification; independent validation and broader speedup objective remain.
 Errors: none in scientific invocation; no rerun/S3/cloud/merge.
+
+## Homogeneous geometric-packet gate frozen
+
+What was done: prospective17mutations/packet and fixed original12target protocol; full primitive polynomial/source/context/root/matrix verifier implemented, dense construction and verifier counters separate. Rust release overflowchecked build passed. Prior PR4586 externally merged; successor rebased actualfetched main.
+Decisions made: one120CPU invocation only after Gitfreeze push, noS3/cloud/merge. Originalfull10x scope intact; certificate alone cannot remove collectionfloor. KB source:4548c0e85d47f9299ddc900c047c266d background, local homogeneous/triangular records primary.
+Open threads: execute and inspect all12/204mutation gates, construction/verifier costs; then return to collection mechanism.
+Errors: moved Curve compileerror corrected with contextclone before freeze, no experiment executed; unused-helper warnings remain. Conductor check allow; own T7093 confirmed claimed despite attachment ownconflict.
