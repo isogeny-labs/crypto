@@ -1448,3 +1448,10 @@ What was done:60e22f8e941single invocation exits0;all6originalworkloads complete
 Decisions made: genuineproduction qualification,not10xmeasurement;all16anchors generated plusFB/actionsetup andsymbolicwork remaincharged in futurecoldcomparison.
 Open threads: fresh-target coldnativecounter comparison against strongfullscanSparse with equalpublicsourceinformation andfailure-retention; originalgenus2+10xgoalopen.
 Errors: no scientificerrors/retries/S3/cloud; coordination500whileownleasevalidnoted inprotocol.
+
+## Fresh sparse inactivation cold gate frozen
+
+What was done:12fresh targetsseed2026112900,source1/17,48alternatingcoldcalls; botharms receive/verifypublicD=smC. Strong fullscanSparse removesdiagnosticpolynomialreconstruction fromcount; candidate removesdiagnosticreferences/groupchecks, allalgorithmicworkandfinalverify retained. Bothdiagnosticgates precedemeasurement. Buildpasses,hashesfrozen.
+Decisions made: sourcepromise explicit andequal; controlalsoretainsderivedsmoothsourceequation. Fixedseed1and16anchors, stallsretained,no arbitrarycounterweights.
+Open threads: execute once andevaluatecompletions/fullcounts,notpointvisitgain.
+Errors: noneinbuild, nosciencebeforepushedfreeze.
