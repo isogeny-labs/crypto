@@ -2016,3 +2016,10 @@ What was done: freeze211c0536b61 once-onlyexit0;24completecalls/12targets bytepa
 Decisions made: reject firstdensecover implementation foracceleration; retainmathematicalcover and216mutation-qualified verifier. Nextneed sparse triangular contradictionprovenance and supportverification, notfreeomission.
 Open threads: prospectivesparse4component proof gate/fullcost; originalgenus2+10x,independentreview/publicationartifacts andgenus3/4extensions.
 Errors: noexecutionerrors; negativeoutcome retained,no retry/S3/cloud.
+
+## Sparse eigen-cover frozen
+
+What was done: sparsefullcolumn rows+witnesses withsamepivots/contradiction, exactzero/unit arithmetic, precomputedbranchpowers andzero-weight skip afterallgeometry/membership/ranges. Bothold/newverifiers216mutation gate, exactfullpackets expected.
+Decisions made: controlledengineering step before triangularcontradiction specialization;24completecalls/12targets/all4branches charged, permoduluscontrols, Gitfreeze beforeone120CPU invocation. Assertions [pcc:unverified].
+Open threads: executeafterpush, assess remainingcost versus densecover/triangular/botharms.
+Errors: onlyunusedwarnings,no scientificexecutionyet.
