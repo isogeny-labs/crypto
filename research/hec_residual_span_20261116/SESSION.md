@@ -2499,3 +2499,10 @@ What was done: derived exact all-length indexed-tuple equivalence under subgroup
 Decisions made: distinguish group energy from coordinate-field energy and uniform success from solving cost. No actual quotient maps or Jacobian orders supplied. One120CPU execution after Git freeze. KB/current references and existing normalization/production controls reviewed; no novelty claim.
 Open threads: execute census, then require concrete cheaper solving circuit or genuinely different paid base/sampling/rank mechanism rather than transported combinatorics.
 Errors: none at compile. Conflict check allows; attach reports existing own T-7093 reservation, verified still active. No S3/cloud/merge.
+
+## Cross-genus pair census confirms transported-base collision constraint
+
+What was done: freezefcf616e7976 hashes passed, one invocation exit0. All288152ordered pairs across3genera valid. Energies217890/563766/80196 match3m²-3m+w, nonzero multiplicities only1/2. Raw histograms and exact sumset sizes retained.
+Decisions made: transported-same-base extra group collisions are not a speed mechanism, by all-length bijection proof. Do not build quotient maps to test this invariant. Coordinate-solving complexity and genuinely different paid bases remain open; no speed or whole-Jacobian/subgroup claim.
+Open threads: explicit cheaper decomposition circuit or paid nonuniform/new-rank construction capable of changing full costs; genus-three reduction certificate and genus-four mechanism remain required. Goal active, unachieved.
+Errors: none in frozen run; shared arithmetic not independent review. No S3/cloud/merge.
