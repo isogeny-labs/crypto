@@ -2597,3 +2597,10 @@ What was done: inspected lazy-indexing/streaming/restricted-scan prior results a
 Decisions made: retain original10xtarget, do not move it after verifier improvement. Require phase sums reconcile actual integrated raw16vectors; count constraints are necessary implementation-specific conditions, not universal lowerbounds or runtime. One post-analysis invocation after Git freeze, no new measurements.
 Open threads: inspect minimal joint-change requirements and use them to reject isolated-phase mechanisms before more prototypes.
 Errors: none in compilation. Conflict check allows; attach same existing reservation. No S3/cloud/merge.
+
+## Exact phase requirements reconcile, original target kept fixed
+
+What was done: freeze597fa1ad5c3 hashes pass, deterministic analyzer exit0. All12integrated totals reconcile. All32phase subsets/workload/budget and120singlephase conditions retained. Fixed-original minimal common set prepare+source+scan+verify; separate stronger-current set addsanchor. No single-phase-free condition passes.
+Decisions made: original10xreference unchanged; stronger comparator report separate. Common-set statement is acrosspanel, not allfourphases mandatoryineverycase. Reject isolated-phase prototyping absent joint cost construction; earlier lazy/streaming/restricted results screened and not rerun.
+Open threads: concrete joint source/setup/producer/verification construction or distinct geometric route with fulltarget/rank/cost evidence; entiregenus2+goal active/unachieved. No new speed measurement or universal impossibility assertion.
+Errors: none in post-analysis; no S3/cloud/merge.
