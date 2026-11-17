@@ -272,3 +272,69 @@ throughput results. The CI runner also reported `perf version 7.0.14`
 but `perf_event_paranoid=4`, so the PMU measurement gate still failed
 closed. GPU correctness/occupancy and full `rf64_decompose` throughput
 remain unverified. Keep this PR draft until those gates are satisfied.
+
+
+## Follow-up: host P-256 Montgomery multiply-accumulate (2026-11-17)
+
+The 4x64-bit SOS Montgomery multiplication performs 32 unsigned
+64x64-to-128 multiply/accumulate operations per field multiply. On the host
+the original implementation used an explicit low/high multiplication
+and two separate carry comparisons. Replace only the **host** path with a
+single unsigned 128-bit accumulator:
+
+    sum = (unsigned __int128)a * b + cur + carry;
+    lo = (uint64_t)sum; hi = (uint64_t)(sum >> 64);
+
+The maximum possible sum is (2^64-1)^2 + 2(2^64-1) = 2^128-1,
+so it fits exactly. The **CUDA path is unchanged**; no GPU improvement
+is claimed. The repository's bench_mul256.cpp freezes the original MAC
+and SOS multiply, then compares with the actual fp256_mul header.
+It checks 32,768 input pairs including zero, Montgomery one, and
+the maximal representative, and uses nine-sample timing medians.
+
+**Actual-header CI:** [run 44190074548](https://github.com/isogeny-labs/crypto/actions/runs/44190074548),
+Ubuntu 24.04, GCC -O2. C++ tests and the benchmark passed:
+
+| Arm | ns per P-256 Montgomery multiplication |
+|---|---:|
+| Before: explicit carries | 38.941 |
+| After: native host 128-bit MAC | 34.248 |
+| **Speedup** | **1.137x** |
+
+An **isolated C++ reproduction** on a pinned AMD EPYC 9V74 VM,
+GCC 14.2, 32,768 public random pairs, 16 repetitions and nine-sample
+medians per arm produced:
+
+| Compiler | Speedup, four independent paired rounds |
+|---|---|
+| GCC -O2 | 1.027–1.047x |
+| GCC -O3 | 1.224–1.288x |
+| Clang -O2 | 0.974–1.052x, inconclusive |
+| Clang -O3 | 0.983–1.055x, inconclusive |
+
+The independent reproduction agreed bitwise on all 32,768 pairs.
+Linux perf_event_open with PERF_TYPE_SOFTWARE / PERF_COUNT_SW_TASK_CLOCK
+on the same pinned host, GCC -O3, yielded old/new median ns/op in four
+paired rounds: 39.064/30.580, 38.721/30.685, 38.171/30.516 and
+37.875/30.585, for **1.238–1.277x software task-clock speedups**.
+These are actual kernel perf **software task-clock** counters, not
+hardware cycle counts nor an invocation of the missing local perf CLI.
+The VM has no exposed hardware PMU (hardware perf_event_open ENOENT).
+
+A second candidate, early-exit carry propagation, was tested locally
+but **rejected**: unpredictable branches slowed the operation by
+14–40% across compilers and optimization levels.
+
+To reproduce the header benchmark on a PMU-enabled host:
+
+    make -C gpu/rootfind test bench-mul256
+    perf stat -r 5 -e cycles,instructions,branches,branch-misses,cache-misses \
+      -- gpu/rootfind/bench_mul256 --perf-before
+    perf stat -r 5 -e cycles,instructions,branches,branch-misses,cache-misses \
+      -- gpu/rootfind/bench_mul256 --perf-after
+
+Hosted CI installed perf but denied PMU access with
+perf_event_paranoid=4. Thus the actual-header table is **wall-clock**
+and the local perf numbers are **software task-clock**, not hardware
+cycles or instructions. End-to-end root-finding throughput and GPU
+validation are pending. Keep PR #4609 draft until those gates pass.
