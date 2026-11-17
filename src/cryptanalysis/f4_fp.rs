@@ -7487,7 +7487,6 @@ mod tests {
         }
     }
 
-
     fn recursive_visitors_reject_all_checkpoint_options_before_callbacks_or_file_effects() {
         let root = std::env::temp_dir().join(format!(
             "f4-visitor-checkpoint-rejection-{}-{}",
