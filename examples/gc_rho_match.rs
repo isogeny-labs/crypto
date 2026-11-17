@@ -30,7 +30,10 @@ use num_bigint::BigUint;
 use serde_json::{json, Value};
 
 fn cpu_seconds() -> f64 {
-    let mut ts = libc::timespec { tv_sec: 0, tv_nsec: 0 };
+    let mut ts = libc::timespec {
+        tv_sec: 0,
+        tv_nsec: 0,
+    };
     // SAFETY: valid pointer to a timespec on the stack.
     unsafe { libc::clock_gettime(libc::CLOCK_PROCESS_CPUTIME_ID, &mut ts) };
     ts.tv_sec as f64 + ts.tv_nsec as f64 * 1e-9
@@ -45,15 +48,18 @@ fn main() {
     let kc = match KoblitzCurve::new(a, n) {
         Some(kc) => kc,
         None => {
-            println!("{}", json!({"status": "error", "reason": "KoblitzCurve::new refused"}));
+            println!(
+                "{}",
+                json!({"status": "error", "reason": "KoblitzCurve::new refused"})
+            );
             std::process::exit(2);
         }
     };
     let fc = FastCurve::new(&kc.curve).expect("fast curve");
     let r_u64 = kc.subgroup_order.to_u64_digits()[0];
     let low: Vec<u32> = kc.curve.irreducible.low_terms.clone();
-    let modulus_int: u64 = (1u64 << kc.curve.irreducible.degree)
-        | low.iter().fold(0u64, |acc, &t| acc | (1u64 << t));
+    let modulus_int: u64 =
+        (1u64 << kc.curve.irreducible.degree) | low.iter().fold(0u64, |acc, &t| acc | (1u64 << t));
 
     // t_GA: sequential single additions, best of the batches.
     let batches = req["tga_batches"].as_u64().unwrap_or(7);
@@ -77,7 +83,10 @@ fn main() {
         let d = item[0].as_u64().expect("d");
         let seed = item[1].as_u64().expect("seed");
         let q = kc.mul(kc.generator(), &BigUint::from(d));
-        let opts = KoblitzSignedRhoOptions { seed, ..Default::default() };
+        let opts = KoblitzSignedRhoOptions {
+            seed,
+            ..Default::default()
+        };
         let c0 = cpu_seconds();
         let rep = koblitz_signed_frobenius_rho_with_progress(&kc, &q, &opts, &mut |_| {});
         let cpu = cpu_seconds() - c0;

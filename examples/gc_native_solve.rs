@@ -50,7 +50,9 @@ fn parse_system(nvars: usize, eqs: &Value) -> Vec<F2BoolPoly> {
     if nvars > MASK_BITS || nvars > 64 {
         fail(format!("{nvars} unknowns exceed the 64-bit mask build"));
     }
-    let rows = eqs.as_array().unwrap_or_else(|| fail("equations must be a list"));
+    let rows = eqs
+        .as_array()
+        .unwrap_or_else(|| fail("equations must be a list"));
     rows.iter()
         .map(|row| {
             let monos: Vec<F2BoolMono> = row
@@ -73,7 +75,11 @@ fn parse_system(nvars: usize, eqs: &Value) -> Vec<F2BoolPoly> {
 }
 
 fn degree(p: &F2BoolPoly) -> u32 {
-    p.terms.iter().map(|t| t.mask.count_ones()).max().unwrap_or(0)
+    p.terms
+        .iter()
+        .map(|t| t.mask.count_ones())
+        .max()
+        .unwrap_or(0)
 }
 
 /// Every solution of `equations` on the affine space cut out by the degree-<=1
@@ -191,12 +197,18 @@ fn trace_to_json(t: &F4Trace) -> Value {
 }
 
 fn trace_from_json(v: &Value) -> F4Trace {
-    let u = |k: &str| v[k].as_u64().unwrap_or_else(|| fail(format!("trace.{k} missing")));
+    let u = |k: &str| {
+        v[k].as_u64()
+            .unwrap_or_else(|| fail(format!("trace.{k} missing")))
+    };
     let list = |k: &str| -> Vec<u64> {
         v[k].as_array()
             .unwrap_or_else(|| fail(format!("trace.{k} missing")))
             .iter()
-            .map(|x| x.as_u64().unwrap_or_else(|| fail(format!("trace.{k} entry"))))
+            .map(|x| {
+                x.as_u64()
+                    .unwrap_or_else(|| fail(format!("trace.{k} entry")))
+            })
             .collect()
     };
     let steps = v["steps"]
@@ -225,7 +237,10 @@ fn trace_from_json(v: &Value) -> F4Trace {
         poly_degrees: list("poly_degrees").into_iter().map(|d| d as u32).collect(),
         steps,
         rank: u("rank") as usize,
-        leading_by_degree: list("leading_by_degree").into_iter().map(|d| d as usize).collect(),
+        leading_by_degree: list("leading_by_degree")
+            .into_iter()
+            .map(|d| d as usize)
+            .collect(),
         record_word_ops: u("record_word_ops"),
     }
 }
@@ -241,7 +256,12 @@ fn replay_columns(polys: &[F2BoolPoly], trace: &F4Trace) -> usize {
                 for term in &p.terms {
                     *count.entry(term.mask as u64 | t).or_default() += 1;
                 }
-                cols.extend(count.into_iter().filter(|(_, c)| c % 2 == 1).map(|(m, _)| m));
+                cols.extend(
+                    count
+                        .into_iter()
+                        .filter(|(_, c)| c % 2 == 1)
+                        .map(|(m, _)| m),
+                );
             }
         }
     }
@@ -249,7 +269,9 @@ fn replay_columns(polys: &[F2BoolPoly], trace: &F4Trace) -> usize {
 }
 
 fn op_solve(req: &Value) -> Value {
-    let nvars = req["nvars"].as_u64().unwrap_or_else(|| fail("nvars missing")) as usize;
+    let nvars = req["nvars"]
+        .as_u64()
+        .unwrap_or_else(|| fail("nvars missing")) as usize;
     let system = BooleanSystem {
         equations: parse_system(nvars, &req["equations"]),
         n_vars: nvars,
@@ -294,9 +316,15 @@ fn op_solve(req: &Value) -> Value {
 }
 
 fn op_learn(req: &Value) -> Value {
-    let nvars = req["nvars"].as_u64().unwrap_or_else(|| fail("nvars missing")) as usize;
-    let degree = req["degree"].as_u64().unwrap_or_else(|| fail("degree missing")) as u32;
-    let systems = req["systems"].as_array().unwrap_or_else(|| fail("systems missing"));
+    let nvars = req["nvars"]
+        .as_u64()
+        .unwrap_or_else(|| fail("nvars missing")) as usize;
+    let degree = req["degree"]
+        .as_u64()
+        .unwrap_or_else(|| fail("degree missing")) as u32;
+    let systems = req["systems"]
+        .as_array()
+        .unwrap_or_else(|| fail("systems missing"));
     let started = Instant::now();
     let mut merged: Option<F4Trace> = None;
     let mut kernel_ops = 0u64;
@@ -337,7 +365,9 @@ fn op_learn(req: &Value) -> Value {
 }
 
 fn op_replay(req: &Value) -> Value {
-    let nvars = req["nvars"].as_u64().unwrap_or_else(|| fail("nvars missing")) as usize;
+    let nvars = req["nvars"]
+        .as_u64()
+        .unwrap_or_else(|| fail("nvars missing")) as usize;
     let polys = parse_system(nvars, &req["equations"]);
     let trace = trace_from_json(&req["trace"]);
     let audit = req["audit"].as_u64().unwrap_or(DEFAULT_AUDIT as u64) as usize;
@@ -347,10 +377,24 @@ fn op_replay(req: &Value) -> Value {
     let (basis, ops, path, refusal, refused_ops) =
         match matrix_f4_f2_replay_checked(&polys, nvars, trace.degree, &trace, audit) {
             Ok((b, ops)) => (Some(b), ops, "replay", None, 0u64),
-            Err((why, spent)) if fallback => match matrix_f4_f2_counted(&polys, nvars, trace.degree) {
-                Some((b, ops)) => (Some(b), ops, "fallback-full", Some(format!("{why:?}")), spent),
-                None => (None, 0, "fallback-oversize", Some(format!("{why:?}")), spent),
-            },
+            Err((why, spent)) if fallback => {
+                match matrix_f4_f2_counted(&polys, nvars, trace.degree) {
+                    Some((b, ops)) => (
+                        Some(b),
+                        ops,
+                        "fallback-full",
+                        Some(format!("{why:?}")),
+                        spent,
+                    ),
+                    None => (
+                        None,
+                        0,
+                        "fallback-oversize",
+                        Some(format!("{why:?}")),
+                        spent,
+                    ),
+                }
+            }
             Err((why, spent)) => (None, 0, "refused", Some(format!("{why:?}")), spent),
         };
     let mut tests = 0u64;
@@ -369,11 +413,21 @@ fn op_replay(req: &Value) -> Value {
     let reason = match (&basis, &roots) {
         (None, _) => Some(format!("no basis ({path})")),
         (Some(_), None) => Some(format!(
-            "degree-{} Macaulay basis leaves more than {max_free} free variables", trace.degree)),
+            "degree-{} Macaulay basis leaves more than {max_free} free variables",
+            trace.degree
+        )),
         _ => None,
     };
-    let rows = if path == "replay" { trace.total_survivors() } else { trace.total_rows() };
-    let cols = if path == "replay" { Some(replay_columns(&polys, &trace)) } else { None };
+    let rows = if path == "replay" {
+        trace.total_survivors()
+    } else {
+        trace.total_rows()
+    };
+    let cols = if path == "replay" {
+        Some(replay_columns(&polys, &trace))
+    } else {
+        None
+    };
     json!({
         "status": status,
         "reason": reason,

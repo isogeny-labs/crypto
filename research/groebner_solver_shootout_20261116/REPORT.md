@@ -96,7 +96,20 @@ which run from 2^19.54 to 2^22.59. So M8 is **not resolved**, rather than
 6. **Arms not run:** Magma (UNAVAILABLE); trace-f4 (it decides no grid
    target, see `problems/gf2-fixed-schedule-f4-unavailable.md`); Groebner.jl
    (Julia blocked); repository Boolean F4 (dropped by amendment-1).
-7. **No S3 checkpoint or raw-data upload** (AWS does not work). The
+7. **Post-run source formatting.** After the run, `rustfmt` (edition 2021)
+   reformatted both adapter sources to pass the `rustfmt (changed files)`
+   check. The changes are layout only: whitespace, line breaks, trailing
+   commas, and braces around single-expression closures. The binaries used
+   in the run were built from the original bytes, which are the bytes
+   `cells.json` records:
+
+   | File | sha256 at run (in `cells.json`) | sha256 committed |
+   |---|---|---|
+   | `examples/gc_native_solve.rs` | `6ba8bd67ed026963e32b2c5d7c34db91376e61dfd9083ffeb3e9501d80d326b3` | `01654e667faf14f318681883035d6e95b2dc862190fda500f5ea516b26f2ece8` |
+   | `examples/gc_rho_match.rs` | `0451f513880945152f26e3100d19e0e343376c7f6a6689595334e3b87d9eea0b` | `5e0b0b882e568b50e5898f13ad95a48763706c20331ea1e2ad5e0e3f9450e6cb` |
+
+   A replay should check out commit `00df3c9214`, which holds the run bytes.
+8. **No S3 checkpoint or raw-data upload** (AWS does not work). The
    resume-checkpoint and upload refusals are recorded verbatim in
    `run-local.launch/REFUSALS.md`.
 
