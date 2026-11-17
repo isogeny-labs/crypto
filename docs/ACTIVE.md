@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Prime31 RR9 public-only B8 barycentric extraction, independent Rust replay, and B31 frontier assessment (automation, started 2026-11-17, branch research/prime31-rr9-barycentric-public-20261117)
+- [ ] Prime31 RR9 public-only B8 barycentric extraction, independent Rust replay, and B31 frontier assessment (automation, started 2026-11-17, branch research/prime31-rr9-barycentric-public-20261117, PR #4556)
 
 - [ ] Publish Vieta Rust speed results and resolve official record/publication blockers (codex, started 2026-11-17, branch lane/vieta-speed-20261117, PR #4525)
 
