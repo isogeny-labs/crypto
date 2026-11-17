@@ -416,3 +416,68 @@ mod tests {
         }
     }
 }
+
+
+/// Separately frozen degree-six B8 public-only Macaulay gate (PR #4549).
+/// Reuses the EXACT preceding-degree candidate and finite-field implementation.
+pub fn degree_six_controls() -> Value {
+    let mut ar = Arithmetic::default();
+    check_curve(PRIME31, &mut ar).expect("the original ordinary prime31 curve");
+    let base = first_eight(&mut ar);
+    let xs = base.map(|pt| pt.0);
+    assert_eq!(xs, [0, 1, 2, 3, 5, 6, 8, 9], "frozen first eight x coordinates");
+    let h = factor_polynomial(&xs);
+
+    let positive: Point = Some((1_911_579_686, 548_820_096));
+    let negatives: [Point;2] = [
+        Some((625_037_715, 2_100_627_251)),
+        Some((1_923_055_775, 307_731_458))
+    ];
+    // The test-only sign oracle checks the frozen fixtures, but passes no
+    // sign masks, group lookup, or secret labels to public_macaulay.
+    let (oracle_positive, oracle_negatives, supports) = fixtures(&mut ar, &base);
+    assert_eq!(oracle_positive, positive, "frozen positive was changed");
+    assert_eq!(oracle_negatives.as_slice(), &negatives, "frozen negative panel was changed");
+    assert_eq!(supports, 256);
+    let pos = public_macaulay(positive, &xs, &h, 6).expect("B8 positive degree-six chart");
+    assert_eq!(pos["degree"], 6);
+    assert_eq!(pos["columns"], 1716);
+    assert_eq!(pos["rows_generated"], 2640);
+    assert_eq!(pos["unit_certificate"], false, "cannot prove an actual signed solution impossible");
+    let positive_replayed = if let Some(values) = pos["candidate_chart_coefficients"].as_array() {
+        let coeff: [u64;NV] = std::array::from_fn(|i| values[i].as_u64().unwrap());
+        assert!(check_public_coefficients(&mut ar, positive, &base, &coeff),
+                "positive degree-six coefficients failed independent curve-group sum");
+        true
+    } else { false };
+    let mut negative_results = Vec::new();
+    for residual in negatives {
+        let diag = public_macaulay(residual, &xs, &h, 6)
+            .expect("B8 off-support negative degree-six chart");
+        assert_eq!(diag["degree"], 6);
+        assert_eq!(diag["columns"], 1716);
+        assert_eq!(diag["rows_generated"], 2640);
+        assert_eq!(diag["candidate_chart_coefficients"], Value::Null,
+                   "off-support residual may not produce chart coefficients");
+        if diag["unit_certificate"] == true {
+            assert_eq!(diag["replay"]["identity_replayed"], true,
+                       "unit replay must be exact");
+        }
+        negative_results.push(json!({"residual": residual, "macaulay": diag}));
+    }
+    json!({
+        "schema": "prime31.rr9.public-macaulay-d6.v1",
+        "preregistered_protocol": "RR9_PUBLIC_MACAULAY_D6_PROTOCOL_20261117.md",
+        "p": P, "n": PRIME31.n, "curve_a": PRIME31.a,
+        "curve_b": PRIME31.b, "generator": PRIME31.g,
+        "base_x": xs, "h_ascending": h, "degree": 6,
+        "candidate_receives_only_public_R_and_factor_polynomial": true,
+        "positive": {"residual": positive, "macaulay": pos},
+        "positive_coefficient_original_curve_replay": positive_replayed,
+        "negatives": negative_results,
+        "test_oracle_frozen_sign_supports": supports,
+        "complete_unknown_ecdlp_solves": 0,
+        "interpretation": "unit proves only absent B8 chart; nonunit without coefficients is inconclusive",
+        "pcc": "unverified"
+    })
+}
