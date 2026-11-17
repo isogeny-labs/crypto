@@ -1350,3 +1350,10 @@ What was done: compiled prepared-reference/shared-six-cross-term driver, all5unc
 Decisions made: isolate residual arithmetic after equal shared preparation; preserve degree drops and prior mixed rank outcomes. Push before scientific execution.
 Open threads: once-only counter gate and split-total comparison with prior four-point qualification; full objective unresolved.
 Errors: none; own T7071lease retained, no scientific execution yet.
+
+## Four-point shared circuit completed
+
+What was done: frozen d27d2d03141 exits0;20calls/1600outputs exact arm equality,polynomial checks,exact repeated vectors. All split totals23/27/45/45/41 match prior independent gate. Base REDC reference/shared1.136-1.299;poly divisions80to10,products1960to1200, additions increase. Inversions80or81 unchanged.
+Decisions made: component gain only; no cold/full/tenfold claim. High normalization inversions identify a batch-normalization follow-up requiring equal strong controls.
+Open threads: qualify batch normalization before considering cold four-point collection; preserve three-point mixed rank outcomes and uncovered stream. Genus2+tenfold objective open.
+Errors: none; no scientific retry/S3/cloud.
