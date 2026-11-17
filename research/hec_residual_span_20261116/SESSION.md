@@ -2723,3 +2723,10 @@ What was done: derived exact residual degree N=2g+1-d and interpolation paramete
 Decisions made: do not implement skipped anchors on an unsupported parameter advantage. Cubic residual could reduce interpolation consistency conditions by one but requires qualified arbitrary-hyperedge elimination; existing implementation must be inspected before duplication. Documented concrete complete-cost/rank falsifier and genus2 zero-known-root scheduling distinction.
 Open threads: inspect current large_prime_filter and derive a fully charged cubic-tail adapter/schedule before any frozen execution; 10x mathematical goal remains active and unachieved.
 Errors: first output-manifest check in preceding turn used stage directory for repository-relative paths; rerun from root passed all8. Coordination check allows; attach reports own existing T-7093 scope, CLI confirms claimed owner/executor. No S3/cloud/merge or new experiment.
+
+## Cubic residual pencil qualification prepared and frozen
+
+What was done: inspected existing arbitrary-hyperedge batch filter; extended retained incremental weighted LP elimination from input-width2 to3 with unlimited intermediate width bounded by catalogue, explicit fill counters and unchanged dense-prefix checker. Added prospective128row planted synthetic dense comparison. Cubic-tail fullnorm collector uses all t for genus2 and g-2-known-point buckets for genus3/4, all22 initial public fixtures and512anchor budget.
+Decisions made: one600CPU correctness invocation only after Git source/protocol/binary freeze; every queried norm split brute-checked and every admitted principal identity native-checked. No field/time speed claim from auditing. Known higher-LP machinery, no novelty inference.
+Open threads: execute frozen qualification, retain unresolved/failure if any, then separately cost complete verified mechanism against shared preparation controls if justified.
+Errors: compile only inherited unused-import/helper warnings; no scientific execution before freeze. Check allowed own T-7093 scope; attach still reports same own reservation. No S3/cloud/merge.
