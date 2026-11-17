@@ -2996,3 +2996,10 @@ What was done: freeze44693a66ca8 hashes pass/exit0. Exhausted6900rho/420900rho-s
 Decisions made: retainedallpointcoordinates, nofullcurvepointcount orsupersetclaim;newstricteropenloses4oldsplitpoints. Thisfinitebijectionisnotglobalnormalization/Jacobiantransport/speed.
 Open threads: functionfieldinverseandexceptionalplaces, canonicaladjoints/smoothnonhypermodel, completedivisortransport;full10xgenus2+goalactiveunachieved.
 Errors: no scientificfailure, unusedhelperwarningsonly;S3notqueried/no merge.
+
+## Smith trace inverse derived and frozen
+
+What was done: derived coefficient X through nondegenerate quartic trace pairing, moments from cubic W=a/Gprime² and4signorbit; rational sigma/tau reconstruction and denominator conditions recorded. Compiled native115parameter/109point exact-match gate plus4synthetic sign roots.
+Decisions made: generic proof distinct from finite implementation evidence; no novelty/speed/globalnormalizationclaim;Gitfreeze precedes600CPU sole invocation.
+Open threads: execute gate; canonical adjoints and complete target transport remain.
+Errors: unused copied helper/import compile warnings only;no scientificexecution yet.
