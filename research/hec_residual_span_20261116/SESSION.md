@@ -2695,3 +2695,10 @@ What was done: separatedgenericrootenumeration/finite-differencecataloguefrombin
 Decisions made: no freeglobal/cross-targetcache or binomialpremise; lookupbuild/memory/countersvisibleandfuturepreparedfacilitysharedallarms. NoDLP/speed/10xclaimfromqualificationorvanishingREDC. One600CPUinvocationafterGitfreeze.
 Open threads: executeequivalence, thenintegratefreshpreparationforallsolverarmswithcompletecostsandunchangedoutcomes.
 Errors: compilepasses, unusedsplit_referencewarningonly. Ownscopecheckallows, attachsameexistingreservation. No S3/cloud/merge.
+
+## Generic prepared oracle qualification passes allinitialcatalogues/polynomials
+
+What was done: freeze1dda21f1a15 hashespass, onequalificationrun exit0;11catalogues/allfieldroots/allf(x)exact.19687exhaustivemonicp5/7/11polys plus5632initialfieldseededpolys haveequallegacy/tabledecisions/multiplicities/stats. TablesincludequadraticEDF/Legendreandpbyteboundexplicit.
+Decisions made: no speed/10xclaimfromqualification; nextall6armsfreshpreparedbuild/commonlookupintegration, requireoldoutcomes/subgroupvectors, countlookups/memorynotfreeamortization.
+Open threads: fairshared completecostgate andlaterwalltimeifwarranted.
+Errors: gitdiffchecknotedtrailingblankEOFinoraclecopy;nonfunctionalwarningretainedwithfrozenhashratherthanrewriteafterexecution. Unusedsplit_referencewarningonly. No S3/cloud/merge.
