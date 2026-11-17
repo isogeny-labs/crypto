@@ -1043,6 +1043,24 @@ def trace_local_runtime(ref, since):
                  source=source)
 
 
+def root_recurrence_runtime(ref, since):
+    """Read native complete-call observations; no estimates or recomputation."""
+    path = "research/trace_incidence_20261116/recurrence_20261117/results/a3-final.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        for arm, name in (("0:dense", "dense"), ("0:trace", "prior_trace"), ("5:trace", "block32")):
+            value = data["groups"]["translation/256/all/" + arm]["wall_seconds"]["median"]
+            emit("trace.recurrence.local.d256." + name + ".wall_s", value,
+                 date=date, problem="auxiliary-curve-translation", unit="wall_s", better="neutral",
+                 label="Complete translation median; shared local CPU, PCC unverified",
+                 source=f"{path}@{commit}")
+        value = data["paired_ratios"]["translation/256/all/0:trace_over_5:trace"]["wall"]["median"]
+        emit("trace.recurrence.local.d256.prior_over_block32", value,
+             date=date, problem="auxiliary-curve-translation", unit="ratio", better="neutral",
+             label="Median paired complete-call ratio; PCC unverified",
+             source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -1087,6 +1105,7 @@ def main():
     n83_d18_vsids_gate(a.ref, a.since)
     vieta_component(a.ref, a.since)
     trace_local_runtime(a.ref, a.since)
+    root_recurrence_runtime(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
