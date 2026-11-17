@@ -2562,3 +2562,10 @@ What was done: freeze400c5341373 hashes pass, sole run exit0; all12native verify
 Decisions made: no10x/integrated/wall/independent verification claim. Conditional operator contract explicit; next prospective integration checks complete solver outputs/counters against derived totals without changing producer.
 Open threads: integrated fullcount replay, then remaining producer/setup costs and stronger10x mechanism acrossgenus2+.
 Errors: none in run; inherited helper warnings only. No S3/cloud/merge.
+
+## Complete original solver short-verification integration frozen
+
+What was done: copied retained source-phases solver and replaced only final verification with checked short kernel; reused P/z already in prepare. Compiled24fresh complete calls on same12targets, required exact derived fullbase16vectors/original subgroup16vectors and native finalscalar/repeat outcomes.
+Decisions made: integration replay not a new wall study or10x claim; conditional operator premise retained, unchanged producer and no other phase removal. One120CPU invocation after Git freeze/push.
+Open threads: inspect fullcount replay and remaining phase budgets.
+Errors: inherited unused phase snapshot warning only; no scientific execution yet. No S3/cloud/merge.
