@@ -1,0 +1,8 @@
+# Dense residue-block cancellation instance
+
+1. Structure: actual OrientationAnchor completed polynomials and OrientationNonscalarOrigin.kernel over rational matrices. Polynomial evaluation homomorphisms, nodal_puncture, existing OneModTwo.prod laws.
+2. Named laws as stated: OrientationDiagonal.factor_eval, OrientationResidue.matching_mask/anchor_ratio_one, Polynomial.funext, eval_mul, nodal_puncture. Existing matching_value_mul is pointwise only; consumer needs full polynomial identity, so actual correction instance assembled from factor_eval. No new generic polynomial/valuation law.
+3. Object: Sxy=-product of actual anchor ratios for every distinct x,y with equal low-u residue, zero otherwise. K=oldW+D*C(S-I). No supplied inverse/unit witness.
+4. Probe152: actual same-residue correction identity -> original Cauchy polynomial transfer -> actual dense entry -> (X-Cdelta)*K=Cdelta*D*C(Uxy). Independent integral weight from existing anchor_ratio_one/OneModTwo.prod. Test all a, arbitrary natural multiplicities; no source-root restriction or favorable precision premise.
+5. Missing components: these actual polynomial equalities and dense/minimal compatibility, no generic factor law. Countercontrol151 remains unchanged and excluded from dense claim. Opening correction/base only to connect existing defining product and nodal law; factor implementation kept opaque, factor_eval used.
+6. Inheritance: old kernel nonzero-node and degree laws used as stated later. Cancellation does not prove unit/inverse/weighted compactness/Boolean-mode or runtime admission. Those remain separate obligations. [pcc:unverified]
