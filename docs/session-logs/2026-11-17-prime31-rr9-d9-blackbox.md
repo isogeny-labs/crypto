@@ -24,3 +24,18 @@
 
 ### Errors
 - No local Rust compiler or research-KB MCP/CLI available in this connected runtime; GitHub Actions exact-source CI used. No claim inferred from pending test.
+
+## 19:18–19:27 UTC — certified negative D9 ideals with standalone unit-witness replay
+
+### What was done
+- Initial registered GitHub Actions run #44156703850 (source fe7f58c) passed 40 original native tests and focused sparse operator control. Both public negatives produced rank gate BM complexity N=11440, with nonzero terminal coefficients 804920363 and 948224476.
+- After seeing rank success, amended the preregistration **before** writing a constructive certificate extension. From BM characteristic-polynomial inverse applied to constant e0, computed w=D M x and asserted the exact finite-field polynomial identity M^T w=e0.
+- Exact-source run #44157634359 passed. Retrieved both full 27,456-coefficient unit witnesses; independently checked ZIP SHA256 1bcb1c9653f59b6c40aa31f2c511b208ab74808a4f87a33bb158acb00ade563f. Reconstructed each public polynomial independently in a separate modular arithmetic program and verified exactly constant 1 and all 11,439 nonconstant monomial coefficients zero. Separately enumerated all 256 signed B8 original-curve sums to confirm the two public negative fixtures are absent and the known-positive fixture present (validation only, not candidate input).
+- Added independent **Rust** unit certificate verifier prime31_rr9_d9_unit_verify.rs, which reconstructs the eight RR9 quadrics independently of the Krylov candidate and checks the full polynomial identity. CI #44157953813 succeeded: 40 native library tests, two candidate example tests, one independent verifier example test, both full negative rank+witness runs and their independent replay. Downloaded full vectors; ZIP SHA256 7072196fa51a60b7b0559c3caa88ac7e0491938e8c9749d5f062c0a6133fbbe4 matched GitHub.
+- Published permanent report RR9_D9_BLACKBOX_RESULT_20261117.md and concise JSON evidence index RR9_D9_BLACKBOX_SUMMARY_20261117.json. Full coefficient witnesses remain in GitHub Actions 30-day-retention artifacts. Updated workflow to additionally archive the independent replay JSON without changing original algorithm or frozen parameters.
+
+### Results, limits, and future
+- D9 M has 27456 rows, 11440 columns and 240240 nonzeros. Both R0 and R1 have explicit modular Bézout unit certificates. BM rank work used 22880 Krylov steps; inverse construction 11439 further Gram applications. Producer full wall ~27.142s and 27.190s respectively.
+- This is **not** a complete ECDLP solver or a speed advantage: zero new blinded unknown-target logs, no sign-independent positive chart extraction, no B31 completeness. [pcc:unverified] — independent standalone arithmetic replay completed, external signed PCC validation still missing.
+- Global 'Workflow files parse' check failed at upstream external artifact-store pull before parser execution, unrelated to new pinned Rust source-specific passing workflow.
+- Next: public-only positive coefficient extraction in original Rust sparse F4/quotient; B31 Dickson H31/K961/S5 and repeated-root/exceptional cases; fully charged unknown-log test vs shared-advice BSGS, optimized rho and published prime IC. Separate owner has concurrent full 1024-Q batched IC comparison #4596; avoid duplication.
