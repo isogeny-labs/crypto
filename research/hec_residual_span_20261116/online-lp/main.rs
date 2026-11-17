@@ -51,6 +51,9 @@ fn main() {
     let mut arithmetic =
         fs::File::create_new("research/hec_residual_span_20261116/online-lp/ARITH.tsv").unwrap();
     writeln!(arithmetic,"g\tp\tsm\tcase\tcut\tanchor\tt\tpartials\tlp_rank\tlabel_rank\tonline_cells\tinput_cells\tmax_lp_width\tonline_mul\tonline_inv\tonline_redc\tref_mul\tref_inv\tref_redc\tk").unwrap();
+    let mut full_receipt =
+        fs::File::create_new("research/hec_residual_span_20261116/online-lp/FULL.tsv").unwrap();
+    writeln!(full_receipt,"g\tp\tsm\tcase\tcut\tanchor\tt\tpartials\tfull_rank\tfull_cells\tfull_mul\tfull_inv\tfull_redc\tk").unwrap();
     let mut graph_checks = 0;
 
     let mut false_cycle_prefixes = 0;
@@ -78,6 +81,11 @@ fn main() {
                     .iter()
                     .map(|&cut| online::Online::new(cut, x.reps.len() - cut, x.ell))
                     .collect();
+                let mut full_incremental: Vec<_> = cuts
+                    .iter()
+                    .map(|_| online::Full::new(x.reps.len() + 1, x.ell))
+                    .collect();
+                let mut full_stats = vec![[0u64; 16]; 2];
                 let mut own_stats = vec![[0u64; 16]; 2];
                 let mut ref_stats = vec![[0u64; 16]; 2];
 
@@ -230,6 +238,17 @@ fn main() {
                                 ref_stats[ci][j] += measured[j]
                             }
                             assert_eq!(incremental[ci].k(), k);
+                            counted::reset();
+                            full_incremental[ci].insert(v, f.neg(a % x.ell));
+                            let cost = counted::snapshot().get(&x.ell).copied().unwrap_or([0; 16]);
+                            for j in 0..16 {
+                                full_stats[ci][j] += cost[j]
+                            }
+                            assert_eq!(full_incremental[ci].k(), k);
+                            assert_eq!(full_incremental[ci].rank, exact + labelrank);
+                            let fc = full_stats[ci];
+                            assert_eq!(fc[8], 2 * fc[7] + fc[5] + fc[6]);
+                            writeln!(full_receipt,"{g}\t{p}\t{sm}\t{case}\t{cut}\t{a}\t{t}\t{}\t{}\t{}\t{}\t{}\t{}\t{}",partials[ci].len(),full_incremental[ci].rank,full_incremental[ci].cells(),fc[4],fc[9],fc[8],k.map(|v|v.to_string()).unwrap_or("none".into())).unwrap();
                             let own = own_stats[ci];
                             let reference = ref_stats[ci];
                             assert_eq!(own[8], 2 * own[7] + own[5] + own[6]);
