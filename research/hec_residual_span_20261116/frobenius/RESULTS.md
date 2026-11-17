@@ -1,0 +1,11 @@
+# Character polynomial and Bezout eigenvalue certificate pass
+
+Execution checkpoint22a085d0738, EXIT0. Same fixed binomial curve/source/ell and three known-answer public targets; no timing claim. Character enumeration independently computes coefficient vector[0,-1,-2,2,0,2,0,-2,0], hence P(X)=-X-2X²+2X³+2X⁵-2X⁷. Over F8623the verified extended-gcd identity gives gcd(X9-1,P-1)=X+3236=X-5387. Both root equations pass.
+
+For each target case, the full original group operator P(phi)fixes all9raw canonical-point divisors. phi(D)=[5387]Dand all9projected catalogue reconstructions pass. The reversed character polynomial infers4538=5387^{-1}mod8623and fails the original pushforward equation, as prospectively required. This negative control binds the convention rather than retroactively choosing a sign/inverse after a failure.
+
+All targets37/2026/7001recover and verify withunchanged11/9/2descenttrials. Native sameinputcontrols complete469/366/519trials. All recovery/descent/nativefields replaybyte-identically against orbitgate. Character sum has18terms; exactgcddegree1. No hardcoded coefficient/eigenvalue/log table, BSGS or candidate subgroup scalar search supplies the fast preparation. Sourceandpoint group checks are still explicitly performed in this correctnessgate.
+
+The written proof uses classical diagonal-curve character sums and tame automorphism eigenspace traces, followed by an exact Bezout argument on rationalell-torsion. It is a general conditional statement for the stated binomial/roots-of-unity domain, not an algorithm for generic hyperelliptic curves, new priority or machinechecked proof. O(p)character enumeration is real setup. The one-orbit catalogue condition remains essential to obtaining every log from one source normalization.
+
+Next measurement distinguishes a proof-based runtime contract (character sum, exactBezout/root/model/orbit checks, descent and finaloriginal-source verification) from qualification-only group operator/reconstruction/negative controls. The fullqualification arm remains in that comparison. Removing qualification work prospectively must never be represented as a same-check-path timing gain or a tenfold general mathematical breakthrough. All current costs/failures/freezes are preserved.
