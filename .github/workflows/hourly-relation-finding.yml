@@ -14,7 +14,7 @@ permissions:
 
 concurrency:
   group: hourly-koblitz-relation-finding
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   record:
@@ -80,6 +80,11 @@ jobs:
           if [ -f results/hourly_log.csv ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            # Other research sessions may push while this benchmark runs.
+            # Fast-forward before staging the new CSV row, so the log push
+            # does not discard their branch changes.
+            git fetch origin hourly-runs
+            git merge --ff-only origin/hourly-runs
             git add -f results/hourly_log.csv
             if [ -f results/relation_baseline.json ]; then
               git add -f results/relation_baseline.json
