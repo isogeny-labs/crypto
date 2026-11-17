@@ -30,9 +30,9 @@ unknowns: A0,A1,A2,A3,V0,V1,V2  (V3=1)
 equations: all 8 coefficients of H_B(X)^8 mod M_(A,V,R)(X) equal zero.
 ```
 
-The existing Rust file now implements `rr9_signed_chart_monic_factor` (source commit `4680ec0578eb85138c84c5afdad4f9d4619f851f`) and checks all 64 + six signed-leaf fixtures against the *separately computed full norm quotient*, including six repeated-point divisors. The 70 target-preserving mutations must yield a distinct unsupported factor. The expression's algebraic identity follows by direct expansion; its **numerical Rust gates require source-specific CI #44039910636**, not yet assumed passed. This is a lower-cost *verification representation*, not evidence of a cheaper complete ECDLP solver.
+The existing Rust file now implements `rr9_signed_chart_monic_factor` (source commit `4680ec0578eb85138c84c5afdad4f9d4619f851f`) and checks all 64 + six signed-leaf fixtures against the *separately computed full norm quotient*, including six repeated-point divisors. The 70 target-preserving mutations must yield a distinct unsupported factor. The expression's algebraic identity follows by direct expansion; its **numerical Rust gates passed source-specific CI #44039910636** (producer-level only). This is a lower-cost *verification representation*, not evidence of a cheaper complete ECDLP solver.
 
-The chart construction and round-trip are algebraic reductions, **not** an elimination algorithm recovering the seven variables from R. The source commit is `67a3f6302cf2d72eee3b56946c27902625596e67`; exact-source CI on that commit is required before asserting passing numerical tests.
+The chart construction and round-trip are algebraic reductions, **not** an elimination algorithm recovering the seven variables from R. The chart source was introduced in commit `67a3f6302cf2d72eee3b56946c27902625596e67` and checked in source-specific passing CI #44039385332, subsequently extended and rechecked by #44039910636.
 
 The original signed norm interpolator, Hermite jets, determinant gates, actual cofactor-one `p=2147483647` curve, first-x31 and Dickson-depth-six31 bases are reused byte-for-byte outside this addition. The existing GitHub Action uses pinned original native Rust 1.100 source as main's old native package is incomplete.
 
@@ -56,9 +56,15 @@ The prospective protocol is `RR9_PUBLIC_NORM_MEMBERSHIP_PROTOCOL_20261117.md`, c
 - 64 corresponding mutations `F'=F+X-x(R)` preserve the signed `F'(-R)=0` condition exactly, but are required to fail support divisibility.
 - Six repeated-leaf controls (two bases × multiplicity 3/4/8) must pass; six signed-constraint-preserving mutations must fail. The RR9 test pre-existing 128 determinant positive/negative checks, naive diagonal false-positive, Hermite and ninth-jet falsifiers remain unchanged.
 - A separate polynomial-only toy test requires `(X-7)^8 | (X-7)^8` but rejects `(X-7)^8 | (X-7)^7`, exercising non-squarefree high multiplicity without group arithmetic.
-- Pinned GitHub source-specific Rust CI must compile and pass. **No passing CI or 70/70 statement is assumed in this report pending its actual status.** Rust compiler and EKS runner are unavailable locally in the current session; the source CI is the execution gate.
+- Pinned GitHub source-specific Rust CI must compile and pass. **The later source-specific CI #44039910636 passed all asserted 70 positive and 70 negative certificate/monic-factor controls.** Rust compiler and EKS runner are unavailable locally in the current session; the source CI is the execution gate.
 
-No timed comparison is conducted by this test. The status is **new mathematical interface and implemented check; executable validation pending** until an actual passing Actions run is observed.
+No timed comparison is conducted by this test. The status is **new mathematical interface and implemented check; exact-source Rust CI passed, independent signed PCC pending**.
+
+## Exact-source verification completed (producer level; no signed PCC)
+
+**SUCCESS:** [GitHub Actions run #44039910636](https://github.com/isogeny-labs/crypto/actions/runs/44039910636), job `133891681530`, on immutable source `4680ec0578eb85138c84c5afdad4f9d4619f851f`, pinned native Rust 1.100.0 + original source `1df714645aa683cf975bc76fcacb9842cb4780fd`. Log confirms **40/40 library tests**, **5/5 RR9 example tests**, and the complete original-curve program printed **32 true + 32 false determinant decisions for each actual B31 factor base** (128 total). The Rust example's assertions additionally checked **64 distinct and six repeated-point public coefficient support certificates**, **70 same-target altered-polynomial negatives**, **70 signed-chart round-trips**, **70 direct monic factor identities versus the independently computed full x-norm quotient**, and retained duplicate/Hermite/ninth-jet controls; no assertion failed. All fixture classes remain producer-generated, not blinded unknown-scalar discrete logarithms.
+
+[Raw deterministic JSON artifact #14308623652](https://github.com/isogeny-labs/crypto/actions/runs/44039910636/artifacts/14308623652), 13,663-byte ZIP, recorded SHA-256 `40664cacbb8f80ab6d45f20d2c21a9b8688c5312082aa2d0a1d14c781967d7fe`. This is an exact-source CI + self-check result **[pcc:unverified]**, not an independent PCC verdict, peer review, formal proof audit or measured speedup. Prior passing run #44039385332 checked the signed-chart-only revision; the newer run above supersedes it for direct monic-factor assertions.
 
 ## Prior-lead and full-cost frontier triage
 
