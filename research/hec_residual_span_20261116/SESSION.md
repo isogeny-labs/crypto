@@ -241,3 +241,17 @@ Runonceafterpushedfreeze, thenselectmechanismusingactualdominantwork.
 
 ### Errors
 Generatorheredocsyntaxcaughtbeforebuild/run, fixedbeforefreeze. Buildunusedfieldwarningsretained, no arithmeticchanges.
+
+## Phase attribution passes and preparation floor derived
+
+### What was done
+At pushed5f8af424242,108solvesverify; allpriorvector/repeat/stagesum/REDCchecks pass. Genus2Pencilprep61–75percentbasefieldREDC; fixed9006=5390FB+3616action. DerivedconditionalFolded/Pceiling1.63–2.01g2,4.72–10.65g3,6.51–9.19g4, onlyforunchangedpreparation/basefieldREDC, notwall/globalalgorithm bound. Rawhashesverify.
+
+### Decisions made
+Bucket/LA-only improvements cannot give10basefieldreductioncountergainoncurrentgenus2panelwithunchangedprep. Sharedsetup mustimproveequallyinallcontrols; classicaltable/finite-difference/characterenumeration candidates requireequivalence, notnoveltypromotion.
+
+### Open threads
+PR4480wasexternallymerged2026-11-17T04:01:52Z at67eb72188e249d62baa292f5a732cce49ddb756d,observedviaGitHub. Oldremotebranchhadbeendeleted,pushrecreatedit. Preparea successorPRcontainingonlyphaseworkbasedonthemerge; do noteditmergedPR. Broadgoalopen.
+
+### Errors
+Noscientificruntimefailure; no noisererun. Generatorheredocsyntaxfixedbeforefreeze. Unrelated.resumechangespreserved.
