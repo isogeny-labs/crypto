@@ -3094,3 +3094,10 @@ What was done: freezecc9f3a0f902 hashespass/exit0.212/242pairtrials,190/215disti
 Decisions made: ranksetupadds12915/13983ellmul+66inv;targetLAreductionnotfullgain. FoundPicuncountedstd_values/eval_f/normalize/pointenumeration=>newPiccounter0notzerowork. Fullvectors/countergapretained,not10x/noveltyclaim.
 Open threads: repaircountercoverage/calibratesamekeys/answers, complete construction/transport/hostledger and matchedstrongoriginalIC/rho comparison;othergenera/fullgoalactiveunachieved.
 Errors: no scientificfailure;unusedcopiedmodulewarnings.Gitcustody/noS3/no merge.
+
+## Pic helper endpoint meter and exact replay frozen
+
+What was done: compiled12telemetryhooks atall3Picrawmodularproductsites/2inversebackends/Euclidloops/helpermetadata;stripidentityverified. Exhaustiveprimitivecountercontrols, pairedlegacy/meteredclasses/aux/certificates/reports/legacycounts/nativevectors andphaseledgercompiled;freshmeteredexhaustivecontrols included.
+Decisions made: repairPicM/Icoverage,notallhostinstructions/wholeattackcost;kernel/modelconstructsuppliedfrozenartifacts. No tuning/labelsinsidealgorithms.Gitfreeze precedes sole600CPUrun.
+Open threads: executeexactcalibration,inspectcorrectedphasecosts,thencompletepipelineledger/matchedoriginalIC/rho.Full10xgoalactiveunachieved.
+Errors: noneincompile;unusedcopiedmodulewarnings.Noscientificexecutionyet.
