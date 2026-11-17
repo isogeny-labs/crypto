@@ -1,0 +1,82 @@
+{
+  "main": "CubicPermutationCountAudit.cubic_permutation_count_certificate",
+  "binding": "bb894ca30f297e8548c0a85fdbce66f660ae55191557c09b50f5f846b9c3dcaa",
+  "custom_imports": {
+    "CubePermutation": "research/cubic_permutation_count_audit_20261114/lean/CubePermutation.lean",
+    "CubicCountCertificate": "research/cubic_permutation_count_audit_20261114/lean/CubicCountCertificate.lean",
+    "CubicCurveCount": "research/cubic_permutation_count_audit_20261114/lean/CubicCurveCount.lean"
+  },
+  "modules": [
+    {
+      "file": "CubePermutation.lean",
+      "role": "Derived explicit finite-field cube inverse and permutation, including zero; no group-cardinality/copremise assumed."
+    },
+    {
+      "file": "CubicCurveCount.lean",
+      "role": "Actual curve/discriminant, equation/nonsingular coordinate equivalence to K, actual Point≃OptionK and exact point count."
+    },
+    {
+      "file": "CubicCountCertificate.lean",
+      "role": "Actual trace and divisor/actual-point order consequences, arbitrary primefield specialization with characteristic guards derived, concrete omission negations and r2exception."
+    }
+  ],
+  "claims": [
+    {
+      "declaration": "cubeRoot_cube / cube_cubeRoot",
+      "hypotheses": "Finite field K, cardinalqmod3=2",
+      "conclusion": "Explicit two-sided cube inverse, including zero."
+    },
+    {
+      "declaration": "curve_nonsingular",
+      "hypotheses": "Field K, 2≠0,3≠0,b≠0",
+      "conclusion": "Actual discriminant is nonzero."
+    },
+    {
+      "declaration": "actualPointEquiv / actual_point_count",
+      "hypotheses": "Finite field qmod3=2,2≠0,3≠0,b≠0",
+      "conclusion": "Actual Point≃OptionK and exact cardinalq+1."
+    },
+    {
+      "declaration": "actual_trace_zero",
+      "hypotheses": "Same field/curve guards",
+      "conclusion": "Point-count trace is0."
+    },
+    {
+      "declaration": "actual_divisor_order",
+      "hypotheses": "Same guards,r>2,r divides actual point count",
+      "conclusion": "Modular orderOf(q:ZModr)=2, including composites."
+    },
+    {
+      "declaration": "actual_point_order_embedding",
+      "hypotheses": "Same guards,DecidableEqK,actual P of additive order>2",
+      "conclusion": "Lagrange-derived modular order2 for actual point order; finiteness derived from equivalence."
+    },
+    {
+      "declaration": "prime_field_count",
+      "hypotheses": "FactPrimep,p≥5,pmod3=2,bnonzero",
+      "conclusion": "All count/trace/divisor-order results; characteristic guards derived."
+    },
+    {
+      "declaration": "coefficient_zero_count / characteristic_two_count / congruence_one_count / deleting_coefficient_guard_false / deleting_characteristic_guard_false / deleting_congruence_guard_false",
+      "hypotheses": "Literal F5b0/F2b1/F7b1 actual models",
+      "conclusion": "Actual nonsingular-point counts5/2/12 and direct negation of omitted-guard counts."
+    },
+    {
+      "declaration": "r_two_control",
+      "hypotheses": "Literal actual F5b1 curve",
+      "conclusion": "Actual count6/r2divisor/order1 and direct negation of exact2."
+    }
+  ],
+  "gate_declarations": 26,
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "not established",
+  "exact_hypotheses": "Finite field cardinalqmod3=2, char≠2,3 and bnonzero; actual point-order part DecidableEqK. Primefield p≥5/pmod3=2, FactPrimep and bnonzero, no upper p bound; r>2 any actual cardinal divisor or actual point order.",
+  "open": "General geometric supersingularity/p-rank/endomorphism/Hasse/all-torsionfield statements and original14 residuals. Native parsing observation is not kernel parser/hash/execution refinement."
+}

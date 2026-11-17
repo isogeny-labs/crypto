@@ -1,0 +1,25 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp28-t4155-50f492b1 | 26.20 | ic-mitm | 24/24 | 128.473 | 156.903 | 412.777 | — |
+| icv1-fp28-t4155-50f492b1 | 26.20 | ic-rootfind | 24/24 | 131.757 | 160.307 | 417.264 | — |
+| icv1-fp28-t4155-50f492b1 | 26.20 | rho-neg | 24/24 | 0.961 | 1.053 | 1.878 | — |
+| icv1-fp28-t4155-50f492b1 | 26.20 | rho-neg-aa | 24/24 | 0.961 | 1.053 | 1.878 | — |
+| icv1-fp28-tm7557-9dd7f10c | 28.00 | ic-mitm | 24/24 | 70.068 | 87.464 | 244.030 | — |
+| icv1-fp28-tm7557-9dd7f10c | 28.00 | ic-rootfind | 24/24 | 71.823 | 88.967 | 243.264 | — |
+| icv1-fp28-tm7557-9dd7f10c | 28.00 | rho-neg | 24/24 | 0.923 | 1.013 | 1.824 | — |
+| icv1-fp28-tm7557-9dd7f10c | 28.00 | rho-neg-aa | 24/24 | 0.923 | 1.013 | 1.824 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp28-t4155-50f492b1 | ic-mitm vs ic-rootfind | ic-mitm < ic-rootfind |
+| icv1-fp28-t4155-50f492b1 | ic-mitm vs rho-neg | rho-neg < ic-mitm |
+| icv1-fp28-t4155-50f492b1 | ic-mitm vs rho-neg-aa | rho-neg-aa < ic-mitm |
+| icv1-fp28-t4155-50f492b1 | ic-rootfind vs rho-neg | rho-neg < ic-rootfind |
+| icv1-fp28-t4155-50f492b1 | ic-rootfind vs rho-neg-aa | rho-neg-aa < ic-rootfind |
+| icv1-fp28-t4155-50f492b1 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp28-tm7557-9dd7f10c | ic-mitm vs ic-rootfind | unresolved inside the band |
+| icv1-fp28-tm7557-9dd7f10c | ic-mitm vs rho-neg | rho-neg < ic-mitm |
+| icv1-fp28-tm7557-9dd7f10c | ic-mitm vs rho-neg-aa | rho-neg-aa < ic-mitm |
+| icv1-fp28-tm7557-9dd7f10c | ic-rootfind vs rho-neg | rho-neg < ic-rootfind |
+| icv1-fp28-tm7557-9dd7f10c | ic-rootfind vs rho-neg-aa | rho-neg-aa < ic-rootfind |
+| icv1-fp28-tm7557-9dd7f10c | rho-neg vs rho-neg-aa | unresolved inside the band |

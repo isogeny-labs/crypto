@@ -1,0 +1,31 @@
+module
+
+public import Mathlib.NumberTheory.Padics.PadicVal.Basic
+public import Mathlib.Data.ZMod.Basic
+
+public section
+
+namespace TernaryValuationProbe
+
+theorem quotient_not_dvd {p : Nat} (hp : p ≠ 1) (t : Int) (ht : t ≠ 0) :
+    ¬ (p : Int) ∣ t / (p : Int) ^ padicValInt p t := by
+  intro hd
+  have hv : (p : Int) ^ padicValInt p t ∣ t := padicValInt_dvd t
+  have hbig : (p : Int) ^ (padicValInt p t + 1) ∣ t := by
+    have hm := mul_dvd_mul_right hd ((p : Int) ^ padicValInt p t)
+    rw [← pow_succ'] at hm
+    simpa only [Int.ediv_mul_cancel_of_dvd hv] using hm
+  rcases (padicValInt_dvd_iff_of_ne_one hp (padicValInt p t + 1) t).mp hbig with hz | hle
+  · exact ht hz
+  · exact Nat.not_succ_le_self _ hle
+
+theorem leading_ternary_nonzero (t : Int) (ht : t ≠ 0) :
+    ((t / (3 : Int) ^ padicValInt 3 t : Int) : ZMod 3) ≠ 0 := by
+  intro h
+  exact quotient_not_dvd (p := 3) (by decide) t ht
+    ((ZMod.intCast_zmod_eq_zero_iff_dvd _ _).mp h)
+
+#print axioms quotient_not_dvd
+#print axioms leading_ternary_nonzero
+
+end TernaryValuationProbe

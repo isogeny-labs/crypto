@@ -1,0 +1,54 @@
+import StoredInput
+set_option autoImplicit false
+namespace StoredInput
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest DivisorArrayCopy
+
+theorem stored_inputs (p : UInt64) [Fact p.toNat.Prime] (f : Polynomial (ZMod p.toNat))
+ (d : Stored) (hp : 1<p.toNat) (hw : WellFormed p f d) :
+ Canon p (up d) ∧ Canon p (vp d) ∧ Normal (up d) ∧ Normal (vp d) ∧
+ up d≠[] ∧ (up d).length=d.degree+1 ∧ (vp d).length≤d.degree ∧
+ (wordsPoly p (up d)).natDegree=d.degree ∧ MumfordValidity.Valid f (wordsPoly p (up d)) (wordsPoly p (vp d)) := by
+ obtain ⟨hul,hl,hn,hvn,hvl,huc,hvc⟩:=accessor_shape p f d hw
+ have hue : up d≠[] := by intro he;simp [he] at hul
+ have hdeg:=ReductionWord.normal_natDegree p (up d) hp huc hn hue
+ rw [hul] at hdeg
+ refine ⟨huc,hvc,hn,hvn,hue,hul,hvl,by simpa using hdeg,?_⟩
+ exact ResidualAcceptance.shape_valid p d.degree (up d) (vp d) f hw.1 hul hvl hl hw.2.2.2.2.2
+
+def extract (a b : Stored) : FastPrelude.Inputs :=
+ ⟨a.u.toList[1]?.getD 0,a.u.toList[0]?.getD 0,a.v.toList[1]?.getD 0,a.v.toList[0]?.getD 0,
+  b.u.toList[1]?.getD 0,b.u.toList[0]?.getD 0,b.v.toList[1]?.getD 0,b.v.toList[0]?.getD 0⟩
+
+theorem degree_two_inputs (p : UInt64) [Fact p.toNat.Prime]
+ (f : Polynomial (ZMod p.toNat)) (a b : Stored)
+ (ha : WellFormed p f a) (hb : WellFormed p f b) (hda : a.degree=2) (hdb : b.degree=2) :
+ (extract a b).canonical p ∧ up a=FastCalls.ua (extract a b) ∧ up b=FastCalls.ub (extract a b) ∧
+ vp a=FastCalls.va (extract a b) ∧
+ wordsPoly p (vp b)=FastCRT.delta ((extract a b).sb.toNat : ZMod p.toNat) (extract a b).tb.toNat ∧
+ FastCRT.support ((extract a b).qa.toNat : ZMod p.toNat) (extract a b).ra.toNat ∣
+  f-(FastCRT.delta ((extract a b).sa.toNat : ZMod p.toNat) (extract a b).ta.toNat)^2 ∧
+ FastCRT.support ((extract a b).qb.toNat : ZMod p.toNat) (extract a b).rb.toNat ∣
+  f-(FastCRT.delta ((extract a b).sb.toNat : ZMod p.toNat) (extract a b).tb.toNat)^2 := by
+ obtain ⟨ra,qa,ca,ta,sa,eua,eva⟩:=lists_three_two a ha.2.1 ha.2.2.1
+ obtain ⟨rb,qb,cb,tb,sb,eub,evb⟩:=lists_three_two b hb.2.1 hb.2.2.1
+ have hca : ca=1 := by simpa [hda,eua] using ha.2.2.2.2.1
+ have hcb : cb=1 := by simpa [hdb,eub] using hb.2.2.2.2.1
+ subst ca;subst cb
+ have hac:=ha.2.2.2.1
+ have hbc:=hb.2.2.2.1
+ have hav:=ha.2.2.2.2.2
+ have hbv:=hb.2.2.2.2.2
+ have eupA : wordsPoly p (up a)=FastCRT.support (qa.toNat : ZMod p.toNat) ra.toNat := by
+  simp [up,hda,eua,wordsPoly,listPoly,FastCRT.support];ring
+ have eupB : wordsPoly p (up b)=FastCRT.support (qb.toNat : ZMod p.toNat) rb.toNat := by
+  simp [up,hdb,eub,wordsPoly,listPoly,FastCRT.support];ring
+ have evpA : wordsPoly p (vp a)=FastCRT.delta (sa.toNat : ZMod p.toNat) ta.toNat := by
+  simp only [vp,hda,eva,List.take_succ_cons,List.take_zero,List.length_cons,List.length_nil]
+  rw [trim_preserves];simp [wordsPoly,listPoly,FastCRT.delta];ring
+ have evpB : wordsPoly p (vp b)=FastCRT.delta (sb.toNat : ZMod p.toNat) tb.toNat := by
+  simp only [vp,hdb,evb,List.take_succ_cons,List.take_zero,List.length_cons,List.length_nil]
+  rw [trim_preserves];simp [wordsPoly,listPoly,FastCRT.delta];ring
+ rw [eupA,evpA] at hav
+ rw [eupB,evpB] at hbv
+ simp_all [extract,FastPrelude.Inputs.canonical,Stored.canonical,Canon,up,vp,FastCalls.ua,FastCalls.ub,FastCalls.va]
+end StoredInput

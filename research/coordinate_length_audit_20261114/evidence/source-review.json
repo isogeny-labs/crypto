@@ -1,0 +1,97 @@
+{
+  "schema": "coordinate-length-source-review/v1",
+  "diem_primary": {
+    "author": "Claus Diem",
+    "title": "On the discrete logarithm problem in elliptic curves",
+    "journal": "Compositio Mathematica147(2011),75-104",
+    "doi": "10.1112/S0010437X10005075",
+    "url": "https://doi.org/10.1112/S0010437X10005075",
+    "pdf_bytes": 878749,
+    "pdf_sha256": "74902b5816cd550aa57e180c60fb5bc60b64d93c8ce9f2019a53ca30a934a58a"
+  },
+  "diem_read_scope": "Original Proposition2.5 pp80-81, multiplicities/isolated-point scope. Existing prior source read and actual msolve fixture/output records reviewed; no new full-paper read.",
+  "web_primary": [
+    {
+      "url": "https://stacks.math.columbia.edu/tag/09HS",
+      "tag": "09HS",
+      "bytes": 15160,
+      "sha256": "53412111cac87bd89bf040be8b5edb3cfb8eb3e409b7fc7980d078d6743f7f4b",
+      "read_scope": "Finite extension automorphisms versus separable degree; equality iff normal. Not the general nonreduced-algebra bound.",
+      "retained_in_attempt_archive": "primary/coordinate-algebra-stacks-09HS.html"
+    },
+    {
+      "url": "https://stacks.math.columbia.edu/tag/0CKM",
+      "tag": "0CKM",
+      "bytes": 14137,
+      "sha256": "2489006e9d7320a42c8bc7d7d49d208a4abc5967e22bfbe304d89723f90b6758",
+      "read_scope": "Linear independence of distinct field embeddings. Actual Mathlib implementation proves stronger monoid/semiring-algebra form; inspect actual proof/hypotheses.",
+      "retained_in_attempt_archive": "primary/coordinate-algebra-stacks-0CKM.html"
+    }
+  ],
+  "formal_primary_sources": {
+    "mathlib_commit": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "files": [
+      "Mathlib/Algebra/MvPolynomial/Eval.lean",
+      "Mathlib/RingTheory/Ideal/Quotient/Operations.lean",
+      "Mathlib/LinearAlgebra/FreeModule/Finite/Matrix.lean",
+      "Mathlib/LinearAlgebra/LinearIndependent/Lemmas.lean",
+      "Mathlib/RingTheory/AdjoinRoot.lean",
+      "Mathlib/RingTheory/Length.lean",
+      "Mathlib/Algebra/Module/Torsion/Free.lean"
+    ],
+    "read_scope": "Actual quotient lifts/ext/evaluation uniqueness; linear independence of algebra maps into a domain and finite/free cardinal bound; no reducedness/domain premise on source algebra. Monic power basis, finiteness, quotient dimension including X^m, actual root/lifts, module length. Scalar torsion-free injectivity for actual endomorphism control.",
+    "citation_boundary": "Stacks annotations are narrower field-extension statements. Actual general formal statement and checked proof, not annotation or powerBasis docstring saying irreducible, supplies the used hypotheses. No irreducibility/reducedness premise is required for monic X^m."
+  },
+  "prior_packets": [
+    "research/solver_multiplicity_audit_20261109/README.md",
+    "research/theorem_census_20261109/lean/BivariateMultiplicity.lean",
+    "research/jv_hilbert_audit_20261113/lean/QuotientBasis.lean"
+  ],
+  "corpus": {
+    "path": "docs/ecdlp-hardness-corpus/lit-sumpoly.json",
+    "bytes": 115102,
+    "sha256": "73bbae7663b8ecf407be06ffe4c52a4655ca377a8c347f156d8ccff65ebd373c",
+    "node": {
+      "id": "THM-SP-DIEM11-DECOMPOSITION-ALG",
+      "label": "Diem: decomposition algorithm in Poly(e^(n^2) log q)",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "algebraic_coordinate",
+      "statement": "(a) n multihomogeneous polynomials of multidegree (d,...,d) on (P^1)^n have at most n! d^n isolated points counted with multiplicity, with equality iff the scheme is zero-dimensional. (b) A randomized algorithm (Rojas' toric resultants plus univariate factoring) outputs a list of size Poly(n! d^n) containing all F_q-rational isolated points in expected time Poly(n! d^n log q). Applied to the Weil descent S^(1..n) of S_{phi,n+1}(.., phi(P)) (multidegree 2^(n-1)), it lists all phi-isolated decompositions of P in expected time Poly(e^(n^2) log q).",
+      "scope": "Finds only isolated decompositions; positive-dimensional components are skipped, not solved. This is why Diem needs no zero-dimensionality hypothesis: he only needs enough points with isolated decompositions.",
+      "assumptions": [
+        "Multihomogeneous system of equal multidegree"
+      ],
+      "source_refs": [
+        "S-DIEM-2011"
+      ],
+      "tags": [
+        "polynomial-system",
+        "decomposition",
+        "theorem"
+      ],
+      "source_locations": [
+        "Diem 2011, Proposition 2.5",
+        "Diem 2011, Proposition 2.6",
+        "Diem 2011, Definition 2.4"
+      ],
+      "evidence_class": "theorem",
+      "formula": "T_decomp = Poly(e^(n^2) log q); #isolated <= n! d^n",
+      "parameters": [
+        "n",
+        "d",
+        "q"
+      ]
+    },
+    "effect": "Main bound/decomposition node remains unrefuted. New family addresses support versus finite coordinate-algebra length, not equal-multidegree projective isolated-point bound."
+  },
+  "method": "Actual solution/quotient AlgHom equivalence for every variable type and field extension. Finite coordinate algebra gives finite support/card<=finrank=scalar-module length even with nilpotents. Actual bivariate ideal(x^m,y-x) quotient equivalent to actual K[t]/t^m for all m/fields; actual basis yields dimension/lengthm, root^m=0 and previous power nonzero for m>0. All field-extension support1forpositive m, arbitrary gap and direct universal equality negation. m0empty/zero-dimension control; m1actual reduced quotient equivalent to K. Actual finite F3dual numbers have dimension2and at least3endomorphisms from injective coefficient scalings of nonzero nilpotent root, giving direct bound failure without target-domain assumption.",
+  "boundary": "Module.length K A is scalar-module length. No formal scheme-cycle/local intersection multiplicity identification, projective isolated-point geometry, positive-dimensional component extraction, general n!d^n bound or Rojas/C solver refinement. Existing16native calls unchanged, no new solver experiment. No qualified main theorem/corpus node refutation or novelty.",
+  "kb": "MCP absent; status/two distinct searches/theorem query127. Bounded original/formal/repository/primary-web fallback before edits.",
+  "conductor": "Scope check attempted before edits; executable unavailable127.",
+  "source_or_qualified_node_refuted": false,
+  "universal_support_equals_dimension_refuted": true,
+  "target_domain_deletion_refuted": true,
+  "new_native_experiment": false,
+  "paid_compute_and_agent_upload": 0
+}

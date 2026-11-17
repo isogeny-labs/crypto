@@ -1,0 +1,22 @@
+{
+  "card_id": "CARD-native-natural-1m-k4096-v20",
+  "relay_verbatim": true,
+  "record_digests_verified": true,
+  "outcome": "executed_as_specified",
+  "stopped_at_step": null,
+  "recommendation": "proceed_to_analysis",
+  "reasons": [
+    "Native runner-v20 card-check exit 0: record_digests_verified=true, relay_verbatim=true, status=completed. Exact stdout/stderr/status preserved beside assessment.",
+    "Original receipt and actual relay bytecmp passes; both SHA256 ea8f70fa161e6a1d763001e48740ab7371613d63f5eb9d6dc907858e43cb9eb9. Card unchanged; one exact specified argv attempt, exit 0, timed_out=false, seconds=3648.855038327; all fourteen declared outputs exist with verified receipt digests.",
+    "Frozen native prompt PATH equals card.native_path and includes /usr/sbin. Actual card-run dispatch passes lint before execution; lint requires exact PATH equality. Root dispatch-correction record states initial /usrsbin typo was withdrawn before any command or relay existed; corrected saved native prompt supplied the sole actual attempt. No executor deviation or retry is indicated.",
+    "Audit records PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY and terminal conflicts=1000000, models=0, relations=0, rank=0. Research meaning is not assessed.",
+    "Startup synchronization records worker_held_until_sync=true, owned unit MemorySwapMax infinity->0 before release, kernel memory.max=8589934592, memory.swap.max=0, cpu.max=100000 100000, cpuset=14. RESOURCE_READY binds synchronization digest matching outer.json. All 61 retained memory samples record memory.max=8589934592 and memory.swap.max=0; sampling does not prove no changes between samples.",
+    "outer.json records exit_code=0, wall_censored=false, cleanup_verified=true, systemd_runtime_cleanup_verified=true. Final inspect shows exited 0, OOMKilled=false; Docker Memory and MemorySwap remain 8589934592. Owned runtime MemorySwapMax file absent on independent read-only check; final isolation output exists and digest verifies.",
+    "Frozen HEAD 66ab009b1d91792c46d078e15adfeda45eacf29f verified; receipt dirty_before/dirty_after empty; independent git status output zero bytes. Director performed no tracked edits, HEAD moves or further workloads."
+  ],
+  "interpretation": "not_assessed",
+  "commit": "66ab009b1d91792c46d078e15adfeda45eacf29f",
+  "receipt_sha256": "ea8f70fa161e6a1d763001e48740ab7371613d63f5eb9d6dc907858e43cb9eb9",
+  "relay_sha256": "ea8f70fa161e6a1d763001e48740ab7371613d63f5eb9d6dc907858e43cb9eb9",
+  "card_check_exit_code": 0
+}

@@ -1,0 +1,505 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "nist-generator-b-full21-20261029",
+  "version": 1,
+  "created": "2026-10-29",
+  "repository": "crypto",
+  "study_dir": "research/nist_skip_criterion_20261025/generator_b_execution_20261029",
+  "authors": [
+    "native-curve-analysis"
+  ],
+  "links": {
+    "preparation": "../generator_b_20261029/PROTOCOL.md",
+    "pr": "https://github.com/isogeny-labs/crypto/pull/2666"
+  },
+  "question": "What exact generator/coefficient traits, same-field differences and fixed public-scalar equalities occur in all 21 recorded choices?",
+  "claims": [
+    {
+      "id": "finite-inventory",
+      "class": "exact_computation",
+      "text": "The declared finite trait inventory and fixed envelopes are computed for all 21 choices and independently checked.",
+      "decided_by": [
+        "exact-recompute"
+      ]
+    },
+    {
+      "id": "historical-selector",
+      "class": "out_of_scope",
+      "text": "An exact finite fit does not establish the historical skip criterion.",
+      "decided_by": []
+    },
+    {
+      "id": "security",
+      "class": "out_of_scope",
+      "text": "No attack, DLP recovery or security proof follows from this trait inventory.",
+      "decided_by": []
+    },
+    {
+      "id": "runtime-planning",
+      "class": "heuristic_estimate",
+      "text": "The synthetic-preflight scaling model is a planning estimate only, tested by the fixed watchdog; not a performance conclusion.",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "positive",
+      "role": "control_positive",
+      "description": "Planted tiny native self-test from the same admitted producer; no historical samples.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "6eb320e17a0e8582f1769b66086d118ae797fd21",
+        "build": [
+          [
+            "sh",
+            "../generator_b_20261029/build-controls.sh"
+          ]
+        ],
+        "binary_sha256": "60658d827cea06a77e7d0e6162af1418858761c96c5061a60e263d4c7a9093a8",
+        "flags": {
+          "language": "C++17",
+          "optimization": "-O2 -Wall -Wextra -Werror",
+          "scope": "exact deterministic values; no clock"
+        },
+        "env": {
+          "LANG": "C",
+          "LC_ALL": "C"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "same_instrument_as": "production"
+    },
+    {
+      "id": "production",
+      "role": "candidate",
+      "description": "Complete 21-choice parameter census, two coefficient views and fourteen point choices.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "6eb320e17a0e8582f1769b66086d118ae797fd21",
+        "build": [
+          [
+            "sh",
+            "../generator_b_20261029/build-controls.sh"
+          ]
+        ],
+        "binary_sha256": "60658d827cea06a77e7d0e6162af1418858761c96c5061a60e263d4c7a9093a8",
+        "flags": {
+          "language": "C++17",
+          "optimization": "-O2 -Wall -Wextra -Werror",
+          "scope": "exact deterministic values; no clock"
+        },
+        "env": {
+          "LANG": "C",
+          "LC_ALL": "C"
+        },
+        "threads": 1,
+        "image_digest": null
+      }
+    },
+    {
+      "id": "verification",
+      "role": "baseline",
+      "description": "Separate GMP affine recomputation of all raw points, traits, recipes, envelopes, differences and headline summary.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "6eb320e17a0e8582f1769b66086d118ae797fd21",
+        "build": [
+          [
+            "sh",
+            "../generator_b_20261029/build-controls.sh"
+          ]
+        ],
+        "binary_sha256": "b8a293701b9794ace1bb9b15a0470600f19fa4636a3d58ac4453ed8d6c1f2b53",
+        "flags": {
+          "language": "C++17",
+          "optimization": "-O2 -Wall -Wextra -Werror",
+          "scope": "exact deterministic values; no clock"
+        },
+        "env": {
+          "LANG": "C",
+          "LC_ALL": "C"
+        },
+        "threads": 1,
+        "image_digest": null
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact deterministic arithmetic; no clock, host-variance or statistical equivalence claim."
+    },
+    "positive": {
+      "present": true,
+      "arm": "positive",
+      "expected_detection": "Canonical point (1,1) over p101,b3; checked double/triple and planted b-scalar relation; native self-test exits0.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No random-population or unusualness claim. Nine corrupted synthetic outputs were already refused in the frozen development controls; all exact census results are independently recomputed."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "instrument",
+        "levels": [
+          "PARI",
+          "GMP"
+        ]
+      },
+      {
+        "name": "coefficient_view",
+        "levels": [
+          "historical",
+          "smaller_b_p224"
+        ]
+      },
+      {
+        "name": "point_rule",
+        "levels": [
+          "both signs of k in 1,2,3,5,7,11,17"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "crossed",
+        "how": "PARI generation and separately implemented GMP affine verification; SHA engine explicitly shared."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "how": "Frozen input.sha256 and preparation archive; all21 choices retained with matched field identity."
+      },
+      {
+        "name": "coefficient_view",
+        "treatment": "crossed",
+        "how": "Both explicit b models; no claim that views are independent historical samples."
+      },
+      {
+        "name": "point_rule",
+        "treatment": "crossed",
+        "how": "All fourteen declared point rules, not a favorable choice after data."
+      },
+      {
+        "name": "host",
+        "treatment": "fixed",
+        "how": "Local shared host; no clock or host-sensitive performance metric admitted."
+      },
+      {
+        "name": "memory_layout",
+        "treatment": "fixed",
+        "how": "Clean native environment and bounded address space; output is exact integer arithmetic."
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "Positive control, production, verification; deterministic outputs, no timing comparison."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Labels already public and visible; explicitly exploratory descriptions only."
+      },
+      {
+        "name": "preemption",
+        "treatment": "fixed",
+        "how": "No automatic retries or process restore; failures retained."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-recompute",
+        "arms": [
+          "production",
+          "verification"
+        ],
+        "differs_in": [
+          "instrument"
+        ],
+        "design": "one_factor",
+        "reason": "Literal arithmetic/table equality on identical fixed inputs; no statistical inference."
+      }
+    ],
+    "crosses_map": false,
+    "aa_not_applicable": "No clock and no random-population claim."
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Exact computation with a required positive-control admission and subsequent independent verification, not a timing comparison.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "No random sampling; original literal curve seeds stay in cohort.tsv. Export seeds are null for deterministic execution phases."
+    },
+    "instance_sampling": {
+      "rule": "One frozen input bundle, containing all21 historical choices and the tiny control; no omitted curve and no new population sampling.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "All labels were already visible. This is finite exact enumeration, with no blinded or historical holdout claim."
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 19152,
+      "correction": "other",
+      "passes": true,
+      "note": "No p-value or rejection claim. Retain all19152 exact envelopes and every failure; any exact label fit is exploratory."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0.04,
+      "per_sample_seconds": 321.536,
+      "threads": 1,
+      "estimated_total_seconds": 321.576,
+      "measured_on": "evidence/preflight-runtime.json: one synthetic call per arm, six tiny fields repeated into21 parser rows. Planning model scales the two synthetic census phases by512. This is an explicit heuristic; no cryptographic-size cost or performance result is claimed."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "curve_choices",
+        "name": "Original curve choices retained",
+        "unit": "integer records",
+        "kind": "exact",
+        "definition": "Original curve choices retained for the complete fixed census; not a runtime or sampled population estimate",
+        "source": "results/summary.json:curve_choices; verification.json:curve_choices",
+        "aggregation": "per_row",
+        "resolution": "one integer",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "trait_cells",
+        "name": "Point-trait cells produced and independently checked",
+        "unit": "integer records",
+        "kind": "exact",
+        "definition": "Point-trait cells produced and independently checked for the complete fixed census; not a runtime or sampled population estimate",
+        "source": "results/summary.json:trait_cells; verification.json:trait_cells_checked",
+        "aggregation": "per_row",
+        "resolution": "one integer",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "scalar_recipe_tests",
+        "name": "Fixed known-scalar equality checks",
+        "unit": "integer records",
+        "kind": "exact",
+        "definition": "Fixed known-scalar equality checks for the complete fixed census; not a runtime or sampled population estimate",
+        "source": "results/summary.json:scalar_recipe_tests",
+        "aggregation": "per_row",
+        "resolution": "one integer",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "scalar_recipe_matches",
+        "name": "Literal fixed-recipe matches",
+        "unit": "integer records",
+        "kind": "exact",
+        "definition": "Literal fixed-recipe matches for the complete fixed census; not a runtime or sampled population estimate",
+        "source": "results/summary.json:scalar_recipe_matches",
+        "aggregation": "per_row",
+        "resolution": "one integer",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "exact_single_separators",
+        "name": "Exact single-envelope label fits",
+        "unit": "integer records",
+        "kind": "exact",
+        "definition": "Exact single-envelope label fits for the complete fixed census; not a runtime or sampled population estimate",
+        "source": "results/summary.json:exact_single_separators",
+        "aggregation": "per_row",
+        "resolution": "one integer",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [],
+    "record": [
+      "source commit",
+      "binary hashes",
+      "input hashes",
+      "phase status",
+      "raw exact tables",
+      "unknown historical generators",
+      "independent verification"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "route_reason": "Portable EKS request-v1 supports ecbench only, not arbitrary argv. No EKS MCP is installed. Project inspection denied. Explicitly reported local exact-analysis fallback; no fixture or paid job substituted.",
+      "address_limit_bytes": 805306368
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 630,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "One self-test, one full-census production invocation and one full independent verifier; no automatic retries.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Self-test30seconds; production and verifier300seconds each,768MiB address limit.",
+      "kind": "budget",
+      "preregistered": true
+    },
+    {
+      "rule": "Stop on any identity, control, row-count, arithmetic or hash failure; preserve partial outputs and status.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Admit only complete exact recomputation. Report all fixed recipes/envelopes and matched differences. A finite exact separator is descriptive and exploratory, never historical/security evidence.",
+    "comparison_ids": [
+      "exact-recompute"
+    ],
+    "statistic": "Exact equality of all raw values and the recomputed headline summary.",
+    "interval": "none: exact deterministic integers",
+    "multiple_comparison_correction": "other",
+    "effect_size_measure": "Literal differences and retained-skip counts; no significance test.",
+    "verdict_vocabulary": [
+      "verified_exact_inventory",
+      "incomplete",
+      "refuted_arithmetic",
+      "exploratory_fit_only"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "../generator_b_20261029/analyze.cpp",
+      "sha256": "2217a6f61c3b96dda629055a70c14b8763a1d10eb6404ec9348176c0a25c8fac"
+    },
+    "inputs": [
+      "../generator_b_20261029/input.sha256",
+      "../generator_b_20261029/source.sha256",
+      "evidence/preparation-delivery.json"
+    ],
+    "outputs": [
+      "results/points.tsv",
+      "results/point-pairwise.tsv",
+      "results/existing-pairwise.tsv",
+      "results/recipes.tsv",
+      "results/cutoffs.tsv",
+      "results/summary.json",
+      "verification.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "visual.svg"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "No omitted P384/P521 controls or numeric encoding of unknown historical generators.",
+    "No post-outcome generator choice, coefficient-sign conflation or fitted conjunction.",
+    "No random-population significance, historical-use attribution, attack, DLP or performance claim."
+  ],
+  "literature": [
+    {
+      "ref": "https://www.secg.org/sec1-v2.pdf section3.1.3.2",
+      "provenance": "retrieved",
+      "claim": "Seed/hash point generation is a method to compare, not authentication of the historical caller."
+    },
+    {
+      "ref": "https://www.rfc-editor.org/rfc/rfc5639.html#appendix-A.2",
+      "provenance": "retrieved",
+      "claim": "A public scalar times a smallest-x point motivates the fixed recipe family."
+    },
+    {
+      "ref": "../generator_b_20261029/REPORT.md",
+      "provenance": "internal",
+      "claim": "Prepared exact family, source bindings and synthetic checks; actual census not yet run."
+    }
+  ],
+  "amendments": [
+    {
+      "id": "access-route",
+      "filed": "2026-10-29",
+      "filed_before_affected_data": true,
+      "reason": "Previously authorized credentials authenticate; portable default backend does not support this custom native analysis. Record the local exact route before affected data.",
+      "changes": [
+        "Use existing authorized temporary client; no new key or identity.",
+        "Admit full S3 preparation and checkpoint before local execution.",
+        "Preserve earlier prepared/unrun and failed-checkpoint records as history."
+      ]
+    },
+    {
+      "id": "preflight-estimate",
+      "filed": "2026-10-29",
+      "filed_before_affected_data": true,
+      "reason": "Canonical freeze requires a recorded non-null runtime estimate. Time synthetic controls without reading the real cohort, then record an explicit scaling assumption and fixed watchdog.",
+      "changes": [
+        "Three synthetic timings recorded under a successful S3 checkpoint.",
+        "Trait family, all21 inputs, decision rules and30/300/300-second limits unchanged."
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "ba71e2072759f7b701c5259253eca4f3e51f101b2d78898538cd1a348252df8c",
+    "commit": "0599b7c6eb829e5c770f980dc040d7ccaa03a993",
+    "frozen_at": "2026-10-29T04:46:35Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "source_revision": "6eb320e17a0e8582f1769b66086d118ae797fd21",
+    "canonical_tool_revision": "8c5db250d4fff65eb40fffede9c8391de403897f",
+    "native_verifier_source_sha256": "8bde41aff257e76b1f27e1ede2bb9619a81b146ee6fd3194d678d6c4cc3d841d",
+    "native_source_bindings": "add8438a92e5f8a091e43d2ae63dbe1c77a61436aedf1eabfc4f360600bdabd9",
+    "input_bindings": "7b73fdd57e0a7a9a3b368b0db027175934d377a95291db44d85bbd72a2646e0c",
+    "production_flow": {
+      "curve_choices": 21,
+      "published": 10,
+      "skipped": 11,
+      "historical_skipped_generators_known": 0,
+      "coefficient_views": 2,
+      "point_choices": 14,
+      "traits": 171,
+      "cutoff_comparisons": 19152
+    },
+    "control_scope": "The positive phase is not a historical sample; all three exported phases share the frozen-bundle instance identity."
+  }
+}

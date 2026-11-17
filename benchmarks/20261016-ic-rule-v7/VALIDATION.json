@@ -1,0 +1,41 @@
+{
+  "replay_certificate": {
+    "path": "../../research/ic_tool_program/rule/v7/replay-certificate.json",
+    "sha256": "517e996cd8092957570c73ebfd735ae28b92a4f92e3fb36ea6220c998b2f75d5"
+  },
+  "rho_reference": {
+    "binary_or_process": "Each selected price report records one process running both IC and rho arms; binary_blake3 is shared by those arms. The strong walk is a separate same-target cross-check, not the substituted rho arm.",
+    "gae_band": {
+      "0": {
+        "ic": 6.028928414488287,
+        "rho": 1.7577267801186496
+      },
+      "0.1": {
+        "ic": 6.028928414488287,
+        "rho": 1.7577267801186496
+      },
+      "1": {
+        "ic": 6.028928414488287,
+        "rho": 1.7577267801186496
+      }
+    },
+    "gae_band_basis": "Both full arms were timed in one process and all native operations are inside those intervals, as frozen PROTOCOL.md states; the unpriced count is zero, so adding 0, 0.1 or 1 GAE per unpriced operation leaves each measured S unchanged. Count-only model readings remain lower bounds.",
+    "gae_band_rows": "../../research/ic_tool_program/rule/v7/rho-reference.json",
+    "kind": "negation_frobenius",
+    "matches_protocol": true,
+    "order_holds_across_band": true,
+    "protocol": "Frozen v7 PROTOCOL.md: same-process signed-Frobenius rho on each public target, cross-checked against the strong signed-Frobenius walk on 48 matching targets.",
+    "same_binary_or_process": true,
+    "same_unit": true,
+    "strongest_available": true,
+    "unit": "recorded S per sqrt(subgroup order), both arms from the same process"
+  },
+  "rows": [
+    "20261016-ic-rule-v7"
+  ],
+  "schema": "validation-gate/v1",
+  "validator_report": {
+    "path": "validator-report.json",
+    "sha256": "37457dddb0f283a695a8b561667ac1eb579a4eea2d7829437eeb4e745dbe0a52"
+  }
+}

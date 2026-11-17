@@ -1,0 +1,20 @@
+{
+  "schema": "ghs-nonsplit-q256-index-attempt-v1",
+  "endpoint": "https://calculator.magma-maths.org/execute",
+  "http_status": 200,
+  "input_sha256": "6266bc3d1f8c15bec73c7fe1e82c8e11c25143fedae100305933341a20e61353",
+  "response": {
+    "success": false,
+    "stdout": "BASE_ORDER_CHECKS false true true\nLIFT_ORDER_CHECKS false true true\n\nFind splitting multiple of first input\n\nFind splitting multiple of second input\n\nFirst index calculus input: Divisor 1*Place at ($.1^209 : $.1^22 : 1) + 1*Place \nat ($.1^173 : $.1^92 : 1) + 1*Place at ($.1^240 : $.1^163 : 1)\nMultiple of original input: 2\n\nSecond index calculus input: Divisor 1*Place at ($.1^48 : 0 : 1) + 1*Place at \n($.1^15 : $.1^20 : 1) + 1*Place at ($.1^240 : $.1^65 : 1)\nMultiple of original input: 3\n\nSieving\n\nNumber of relations found: 3\nNumber of elements in factor base: 54\nRuntime error: \nNot enough relations found\n\n\n>> print \"INDEX_ANSWER\", answer, \"INDEX_CPU\", Cputime(tic);\n                         ^\nUser error: Identifier 'answer' has not been declared or assigned\n\n>> if answer eq 7 then print \"SOURCE_VERIFIED\", true; else error \"wrong logari\n      ^\nUser error: Identifier 'answer' has not been declared or assigned\n",
+    "exit_code": 0,
+    "truncated": false,
+    "magma": {
+      "version": "2.30-1",
+      "seed": 1809866877,
+      "time_sec": 67.039,
+      "memory": "64.12MB"
+    },
+    "warnings": [],
+    "error": "An error occurred. See the output for details."
+  }
+}

@@ -1,0 +1,36 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "a7298f6ce922776737bf958a29eaca58ba7a2574e7b021c5cbbcfff69ac9003a"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "9ded5bef45b41086dc393d9d3443bd6d853c1f0de9549e998f2b16aa528b8ff2"
+ },
+ "rho_reference": {
+  "kind": "negation_frobenius",
+  "protocol": "Named by the protocol: E25's matched rho (note §9.15), inherited by E31 (§9.22) and strengthened by E27's pre-registration (§9.25, committed b3a0617ad before any E27 code): on each GLS curve the <±psi> walk, psi the GLS endomorphism (psi^2 = -1), a class {±P, ±psi P} of 4 points, E25's seeds 1000*seed + k (k < 16), r = 32 partitions, look-ahead and fruitless-cycle escape unchanged, run (i) with E25's arithmetic, (ii) with Karatsuba F_p4 products and (iii) with Karatsuba products and the norm inversions of a 16-walk lockstep pool batched by Montgomery's trick (3(m-1)+16 per round, shared in integers; fillers keep the pool full and pay their share), set-up included. Distances use the E27 IC side's S (E31 solver A with Karatsuba products) against walk (iii) and E31 A's S against walk (i), per row, E25's convention (the [d]G = Q check main's 652238c03 charges is excluded and recorded apart). Strongest available: E27 runs on E25's ten instances (n, #E, h, base points and planted d equal, checked leaf by leaf), on which j(E) is in F_p2 but not in F_p (checked independently by E25's validator, benchmarks/20261018-k4-gls-v4/replay-certificate.json), so Aut(E) = {±1} and psi is the only Frobenius-type endomorphism over F_p4: <±psi> is the largest fold, and (iii) is the cheapest arithmetic implemented for it (1.4559-1.4634x below (i) on the <±psi> walk). Unpriced native work (AGENTS.md §5a): both arms charge F_p multiplications only; the index calculus leaves unpriced its Macaulay-matrix entry traffic (emitted as macaulay_entries), its F_p additions and per-phase row scans (not emitted); the walks leave unpriced each step's hash lookup/insert and partition hash (emitted as steps) and the batch's bookkeeping (not emitted). Band: S(g) = F_p multiplications + g * 97 * native operations, one native operation per Macaulay entry or walk step, GAE = 97 F_p multiplications (E25's affine addition, the registered primary; the re-measured 66.3-66.7 is a sensitivity in validator-report.json), g = 0, 0.1, 1. gae_band values: medians over the ten curves of arm B (E25's GLS-fold benchmark arm), E27 IC side against walk (iii). Walk (iii) is below every one of the 20 IC rows (ten curves, both arms) at every weight, by 6.39e3-4.06e5x (0), 2.13e4-1.39e6x (0.1), 9.07e4-6.64e6x (1 GAE), so the order rho < IC holds across the band.",
+  "unit": "F_p multiplications, both arms counted by the same Fp4 counters of one build: an F_p4 product 13 (Karatsuba tower) on both sides; an F_p4 inversion 40 (24 products + 16 for its F_p inversion) on the IC side and in walks (i)/(ii), 24 + the round's batch share in walk (iii); the solve's F_p multiplications counted directly, the Wiedemann matrix at 16 per multiplication mod n; walk set-up included, the walk's [d]G = Q check excluded (E25's convention)",
+  "binary_or_process": "One fresh build of the recorded binary commit af2504ef1 (examples quartic_pipeline_gls sha256 91de8b21227fc478ef23d7306bbd3a1120bd5e00489b537368549a7044af1b7a and e27_walk sha256 97e01b2c3fd42893fd91e8850cce577907778342311be60124f6898fd6afc2e3, the same crypto_lib and counters). The IC side runs in quartic_pipeline_gls --solver chain --karatsuba (one process per (p, seed), arm A then arm B), which also runs the 16 <±psi>, 16 negation and 16 unfolded serial walks on the same instance and counters; walk (iii) runs in e27_walk on the same instances. The pipeline process's own <±psi> and negation walks equal e27_walk's walk (ii) record for record, cost included (640 of 640), and walk (iii) differs from (ii) only by the price of the recorded F_p inversions (16 * inversions - batch share, checked on all 20 pools); same_binary_or_process is asserted on that basis. The producer's records (binary af2504ef1) and this replay agree on every non-timing leaf.",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 19116369529,
+    "rho": 693398.21875
+   },
+   "0.1": {
+    "ic": 69442537157.8,
+    "rho": 744678.1781250001
+   },
+   "1": {
+    "ic": 522378045817,
+    "rho": 1206197.8125
+   }
+  },
+  "order_holds_across_band": true
+ }
+}

@@ -1,0 +1,14 @@
+{
+  "inputs": {
+    "feature-native-normalized-transport/lib.rs": "3a8dab74d71fb814cbd6b244b0c055d085c2404c64f804cfc7a62678fc5542c6",
+    "feature-native-quartic-recovery/routed/source.rs": "b0c87ed25c3cf53b1d77b3b26d229f067f597d60bdb93ae919a4795fdd292e7f"
+  },
+  "outputs": {
+    "transport.rs": "febd9e54445d77431878281ff1af74214538419d4443f34e2c3016eae6031848",
+    "residual.rs": "f65fc4464aba90c3bec0c497d8fb90bfe6cdefab967cfe1a72ea24f9e0c4ceb6"
+  },
+  "changes": [
+    "retain production transport; append seed n=1 using existing public shifts; retain full grids from same geometry window",
+    "extract frozen scalar residual body; specialize four inputs to one for production; scalar-input reference is test-only"
+  ]
+}

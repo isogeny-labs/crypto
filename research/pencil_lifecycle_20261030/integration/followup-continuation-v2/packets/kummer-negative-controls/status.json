@@ -1,0 +1,51 @@
+{
+  "schema": "research.software-check/v1",
+  "exit_code": 0,
+  "fixed_negative_controls": 3,
+  "negative_controls_rejected": 3,
+  "contextual_positive": 1,
+  "candidate_source_unchanged": true,
+  "scope": "boundary recovery helper with separately supplied neighbour",
+  "neighbour_construction_priced": false,
+  "oracle_independent_collector_established": false,
+  "scientific_execution": false,
+  "results": {
+    "no_match": {
+      "output": null,
+      "status": "degree1_no_signed_lift",
+      "supplied_neighbour": "project(G)"
+    },
+    "nonsquare": {
+      "euler": 738,
+      "output": null,
+      "rhs": 654,
+      "status": "degree1_nonsquare",
+      "x": 2
+    },
+    "p": 739,
+    "positive": {
+      "oracle_independent_collector": false,
+      "output": {
+        "degree": 1,
+        "u": [
+          362,
+          1,
+          0
+        ],
+        "v": [
+          303,
+          0
+        ]
+      },
+      "status": "degree1_unique_signed_lift",
+      "supplied_neighbour": "project(expected+G)"
+    },
+    "schema": "kummer-boundary-negative-controls/v1",
+    "scientific_execution": false,
+    "singular": {
+      "output": null,
+      "status": "singular_coordinate_map"
+    },
+    "source_exception_index": 8
+  }
+}

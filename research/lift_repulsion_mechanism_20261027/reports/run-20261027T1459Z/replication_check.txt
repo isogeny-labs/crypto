@@ -1,0 +1,12 @@
+Replication of the parent study (research/lift_dense_factor_base_20261027,
+reports/run-20261027T0356Z/summary.json, kmax.<N>.{curve,null}.count_ratio["4"]).
+This run's `orig` population (pop == "orig", same seed 0x11F7_2026_1027_C, same
+generator tags) was compared set by set with the parent's arrays, in order:
+  N=9  curve 26/26  max |diff| = 0.0     N=9  null 26/26  max |diff| = 0.0
+  N=11 curve 26/26  max |diff| = 0.0     N=11 null 26/26  max |diff| = 0.0
+  N=13 curve  6/6   max |diff| = 0.0     N=13 null  6/6   max |diff| = 0.0
+  N=12 curve  6/6   max |diff| = 0.0     N=12 null  6/6   max |diff| = 0.0
+(float equality on the printed 17-digit values; comparison done with jq and a
+five-line diff script, no research computation). The exact all-lift counts A_4
+of all 104 parent sets are therefore reproduced bit-for-bit by this crate's
+depth-capped DFS.

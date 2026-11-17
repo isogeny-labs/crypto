@@ -1,0 +1,1 @@
+Changed assumption: missing odd_solver group-order implementation is bypassed with a direct polynomial no-root certificate, not a rerun of the failed import. Prime proof and nonsingularity are explicit; h is modular Frobenius, and independent polynomial extended Euclid emits a checked Bezout identity. No Hasse/group-order claim is made by this variant. Every field is retained.

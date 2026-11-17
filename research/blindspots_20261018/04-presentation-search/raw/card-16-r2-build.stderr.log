@@ -1,0 +1,26 @@
+warning: field `low` is never read
+   --> examples/blindspots_04_presentation_search.rs:138:5
+    |
+136 | struct Gf {
+    |        -- field in this struct
+137 |     n: u32,
+138 |     low: u64,
+    |     ^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `rss_kb` and `seed_rows` are never read
+    --> examples/blindspots_04_presentation_search.rs:2661:5
+     |
+2652 | struct DegreeResult {
+     |        ------------ fields in this struct
+...
+2661 |     rss_kb: u64,
+     |     ^^^^^^
+2662 |     seed_rows: usize,
+     |     ^^^^^^^^^
+     |
+     = note: `DegreeResult` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: 2 warnings emitted
+

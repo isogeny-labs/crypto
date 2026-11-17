@@ -1,0 +1,109 @@
+// Exact output-certificate issuer. Never linked into the point recognizer.
+#include "identity_support.hpp"
+#include "v2/exact.hpp"
+using weber::E;using weber::P;using weber::Q;using weber::I;
+namespace w=weber;
+P compose(const P& f,const P& g){P out;for(auto i=f.rbegin();i!=f.rend();++i)out=out*g+w::scalar(*i);return out;}
+I lcm(const I& a,const I& b){I out;mpz_lcm(out.get_mpz_t(),a.get_mpz_t(),b.get_mpz_t());return out;}
+I denominator(const P& f){I out=1;for(const E& a:f){out=lcm(out,a.a.get_den());out=lcm(out,a.b.get_den());}return out;}
+std::int64_t integer(const Q& a){
+    w::require(a.get_den()==1&&mpz_fits_slong_p(a.get_num().get_mpz_t()),"IDC1 integer range");return a.get_num().get_si();
+}
+std::string lean_poly(const P& f,bool imag){
+    std::string out="0";
+    for(size_t j=0;j<f.size();++j){const Q& q=imag?f[j].b:f[j].a;if(q==0)continue;
+        out+=" + Polynomial.C (("+q.get_str()+") : ℚ)";
+        if(j)out+=" * X ^ "+std::to_string(j);
+    }return "("+out+")";
+}
+std::string lean_pair(const P& f){return "⟨"+lean_poly(f,false)+", "+lean_poly(f,true)+"⟩";}
+struct Pair {Expr re,im;};
+Pair plus(Pair a,Pair b){return {add({a.re,b.re}),add({a.im,b.im})};}
+Pair product(Pair a,Pair b){return {sub(mul({a.re,b.re}),mul({a.im,b.im})),
+    sub(add({mul({a.re,b.im}),mul({a.im,b.re})}),mul({a.im,b.im}))};}
+Pair constant(const E& a){return {num(integer(a.a)),num(integer(a.b))};}
+Pair polynomial(const P& f){
+    Pair out{num(0),num(0)},x{var("w"),num(0)};
+    for(auto i=f.rbegin();i!=f.rend();++i)out=plus(product(out,x),constant(*i));
+    return out;
+}
+Pair homogeneous(const P& c,Pair a,const I& d){
+    Pair out=constant(c.back());I factor=1;
+    for(size_t j=c.size()-1;j>0;--j){factor*=d;out=plus(product(out,a),constant(c[j-1]*E(Q(factor))));}return out;
+}
+std::ofstream output(const std::filesystem::path& p){
+    if(std::filesystem::exists(p))throw std::runtime_error("refusing output replacement: "+p.string());
+    return std::ofstream(p);
+}
+int main(int argc,char** argv)try{
+    if(argc!=5)throw std::runtime_error("usage: root_certificates MODEL ROOT_INPUT OUTDIR LEAN_SOURCE");
+    std::ifstream model(argv[1]),input(argv[2]);std::string line;
+    for(unsigned i=0;i<5;++i)std::getline(model,line);
+    size_t n;model>>n;P c(n);for(E& a:c)model>>a;
+    w::require(model.good()&&n==4,"bad u3 certificate model");
+    std::filesystem::create_directories(argv[3]);auto lean=output(argv[4]);
+    lean<<"import Mathlib.Algebra.QuadraticAlgebra\nimport Mathlib.RingTheory.Ideal.Quotient.Operations\n"
+        <<"import Mathlib.Algebra.Polynomial.SpecificDegree\nimport Mathlib.Tactic\n\n"
+        <<"namespace WeberRootBoundary\nopen Polynomial\nabbrev A := QuadraticAlgebra (Polynomial ℚ) (-1) (-1)\n"
+        <<"def W : A := ⟨X, 0⟩\ndef kernel (t : A) : A :=\n"
+        <<"  t ^ 3 + (⟨-36, -24⟩ : A) * t ^ 2 + (⟨-48, -48⟩ : A) * t +\n"
+        <<"    ⟨Polynomial.C ((-128/19) : ℚ), Polynomial.C ((192/19) : ℚ)⟩\n\n"
+        <<"def homogeneous (t : A) (d : ℕ) : A :=\n"
+        <<"  19 * t ^ 3 + (⟨-684, -456⟩ : A) * t ^ 2 * d +\n"
+        <<"    (⟨-912, -912⟩ : A) * t * d ^ 2 + (⟨-128, 192⟩ : A) * d ^ 3\n\n";
+    std::vector<Statement> statements;unsigned count;input>>count;w::require(count==2,"root input count");
+    for(unsigned i=0;i<count;++i){
+        std::string name;input>>name>>n;P beta(n);for(E& a:beta)input>>a;
+        w::require(input.good()&&(name=="two"||name=="four"),"bad root input");
+        auto qr=w::divide(compose(c,beta),c);w::require(qr.second.empty(),"global root quotient failed");
+        I d=denominator(beta),dcube=d*d*d;P numerator=w::scale(beta,E(Q(d))),scaled=w::scale(qr.first,E(Q(dcube)));
+        I multiplier=denominator(scaled);scaled=w::scale(scaled,E(Q(multiplier)));
+        P g=w::scale(c,E(19));
+        const std::string cap=name=="two"?"Two":"Four";
+        lean<<"def beta"<<cap<<" : A := "<<lean_pair(beta)<<"\n"
+            <<"def quotient"<<cap<<" : A := "<<lean_pair(qr.first)<<"\n"
+            <<"def numerator"<<cap<<" : A := "<<lean_pair(numerator)<<"\n"
+            <<"def clearedQuotient"<<cap<<" : A := "<<lean_pair(scaled)<<"\n\n"
+            <<"theorem beta_"<<name<<"_identity : kernel beta"<<cap<<" = kernel W * quotient"<<cap<<" := by\n"
+            <<"  apply QuadraticAlgebra.ext <;> apply Polynomial.funext <;> intro x <;>\n"
+            <<"    simp [kernel, beta"<<cap<<", quotient"<<cap<<", W, pow_succ,\n"
+            <<"      QuadraticAlgebra.re_mul, QuadraticAlgebra.im_mul] <;> ring\n\n"
+            <<"theorem beta_"<<name<<"_root :\n"
+            <<"    Ideal.Quotient.mk (Ideal.span ({kernel W} : Set A)) (kernel beta"<<cap<<") = 0 :=\n"
+            <<"  Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_span_singleton.mpr\n"
+            <<"    ⟨quotient"<<cap<<", beta_"<<name<<"_identity⟩)\n\n"
+            <<"theorem beta_"<<name<<"_cleared_identity :\n"
+            <<"    ("<<multiplier<<" : A) * homogeneous numerator"<<cap<<" "<<d<<" =\n"
+            <<"      homogeneous W 1 * clearedQuotient"<<cap<<" := by\n"
+            <<"  apply QuadraticAlgebra.ext <;> apply Polynomial.funext <;> intro x <;>\n"
+            <<"    simp [homogeneous, numerator"<<cap<<", clearedQuotient"<<cap<<", W, pow_succ,\n"
+            <<"      QuadraticAlgebra.re_mul, QuadraticAlgebra.im_mul] <;> ring\n\n";
+        Pair lhs=product(constant(E(Q(multiplier))),homogeneous(g,polynomial(numerator),d)),
+             rhs=product(polynomial(g),polynomial(scaled));
+        for(unsigned part=0;part<2;++part){
+            std::string suffix=part==0?"real":"imag";
+            statements.push_back({"beta-"+name+"-"+suffix,"cleared Weber root "+name+" "+suffix,
+                "WeberRootBoundary.beta_"+name+"_cleared_identity",{"w"},6,
+                part==0?lhs.re:lhs.im,part==0?rhs.re:rhs.im});
+        }
+        std::cout<<"root "<<name<<" exact quotient degree"<<qr.first.size()-1
+                 <<"; beta denominator"<<d<<"; cleared multiplier"<<multiplier<<'\n';
+    }
+    lean<<"end WeberRootBoundary\n";lean.close();
+    std::ifstream proof(argv[4],std::ios::binary);std::string bytes((std::istreambuf_iterator<char>(proof)),{});
+    std::string proofHash=hex(digest(bytes));unsigned controls=0;
+    for(const auto& s:statements){
+        w::require(std::max(s.lhs.degree(),s.rhs.degree())<=s.degree,"identity degree bound");
+        std::string id="IDC1h"+hex(digest(s.json())).substr(0,16),values,ignored;U seed=20261116;
+        w::require(evaluate(s,id,seed,values),"IDC1 root identity refused");
+        Statement bad=s;bad.rhs=add({bad.rhs,num(1)});w::require(!evaluate(bad,id,seed,ignored),"mutated identity accepted");++controls;
+        auto out=output(std::filesystem::path(argv[3])/(s.file+".json"));
+        out<<"{\"schema\":\"identity.certificate/v1\",\"id\":"<<quote(id)<<",\"statement\":"<<s.json()
+           <<",\"modulus\":"<<modulus<<",\"points\":32,\"seed\":"<<seed
+           <<",\"value_digest\":"<<quote(hex(digest(values)))
+           <<",\"independence\":\"Native producer issuer; component projections of literal Lean equality, not independent replay.\""
+           <<",\"proof\":{\"kind\":\"lean4\",\"path\":"<<quote(argv[4])<<",\"sha256\":"<<quote(proofHash)<<"}}\n";
+        std::cout<<s.file<<' '<<id<<" accepted32\n";
+    }
+    std::cout<<"mutated controls refused "<<controls<<"/4\n";return 0;
+}catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}

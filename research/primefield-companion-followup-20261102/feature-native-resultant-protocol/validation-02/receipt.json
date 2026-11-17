@@ -1,0 +1,56 @@
+{
+  "scope": "canonical software adapter validation only; no native panel or cloud job",
+  "python": "3.9.25 (main, Jul 15 2026, 00:00:00) \n[GCC 11.5.0 20240719 (Red Hat 11.5.0-5)]",
+  "files": {
+    "feature-native-resultant-accounting/README.md": "0615b67de4037abf887baf81d3ebf23284cc9d827a264d7e6b3d37c70a22d7cb",
+    "feature-native-resultant-accounting/generated/euclid.rs": "81c327ea821163701f0a9fdd29a8a2c6db9e3ea78b509ecac194dd8d73c2b85b",
+    "feature-native-resultant-accounting/generated/half.rs": "96afe40aeab98356548528bce6074bcf9886f997e49082ab37193d0b5879fb20",
+    "feature-native-resultant-accounting/generated/scalar.rs": "978093fb1bdd5e847f6c094e241b6524486bff1e065ec609a57f4c8d346f54cb",
+    "feature-native-resultant-accounting/meter.rs": "99443bf3affb9a19c6dc3c014b33923255c7fc8ff23c5eb31983fd24a83c46c8",
+    "feature-native-resultant-accounting/names.rs": "ca2f39c064827c488cbf0fc64043ad241148c61302b03636ec166613d881b810",
+    "feature-native-resultant-panel/analyze.py": "2a28a9cb2eddb10d3fc94be7542f54a35abe89fb01d0ce76cc2c9027d0926dd7",
+    "feature-native-resultant-panel/inputs.tsv": "ade4adbda52cfc01290b5262eca1fa258e2407d42a527ce417e480764f478575",
+    "feature-native-resultant-panel/main.rs": "65bb58dbdc72a2133ca4db118e50bd8c945607916162ca995360f57f54f31805",
+    "feature-native-resultant-panel/metrics.txt": "5de4571ed18f0142b807a198c20bb1f4945ea3cdd7f71f392bc121ff16cb4640",
+    "feature-native-resultant-panel/panel.rs": "c64418ce6fc3d30fa7b07e973acf1fadb2e6c996206d02ccc445eb9998d2de00",
+    "feature-native-resultant-protocol/authority/docs/experiment-protocol.md": "111beee86ce91364cc23098ab232a151b1ece271eabdc544df49ba56067fecf2",
+    "feature-native-resultant-protocol/authority/schemas/experiment-export.v1.json": "108f0ae9c1be3ed141bca3c22216eba049f2c76677f11013109a4740f19bd757",
+    "feature-native-resultant-protocol/authority/schemas/experiment-protocol.v1.json": "a9b948f2be323f862b98301eb7a5aa147ecc29db35041737f0aa3dfd03ad2443",
+    "feature-native-resultant-protocol/authority/tools/experiment_protocol.py": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+    "feature-native-resultant-protocol/authority.json": "aa66f939fe8d47a0e25f4dfeadaf8ed8ded1ed6dcaea775b418a7ad5a8756c0a",
+    "feature-native-resultant-protocol/capture.py": "13eb1f89251a0b9ac7a5b99b4674978be66f8306c23a5a11f8bfd99e016a2f06",
+    "feature-native-resultant-protocol/common.py": "1e8af5f95aa18b67a7003b049bb15d1663d3c7a4ccb1b8e133a654d8ab2cd4d0",
+    "feature-native-resultant-protocol/export.py": "f8e66d378b086ace31caa708fd226070f73b612fda4e95dc9a321d9f01258bea",
+    "feature-native-resultant-protocol/make_draft.py": "dea12068329a6a980511ab09cc427f89aaf16639835c1d80c55edc5132264fb0",
+    "feature-native-resultant-protocol/protocol.draft.json": "99b70cd046bf762dd117eeb7bee98eeeb6acb3c61fc8228a0929735b6ca86e9d",
+    "feature-native-resultant-protocol/test_adapter.py": "6e74241d9dff2ab33035eac09fd75517f9931d447d8ffc73455bfb11d55a3aaa",
+    "feature-native-resultant-protocol/validate.py": "b7b18830c7947f0bf0057c4fde8fec816aed185ba027226551524fff6f1520b7"
+  },
+  "commands": [
+    {
+      "name": "canonical-draft",
+      "argv": [
+        "/home/ec2-user/primefield-ecdlp-research-20261028/.venv/bin/python",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-resultant-protocol/authority/tools/experiment_protocol.py",
+        "validate",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-resultant-protocol/protocol.draft.json"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0,
+      "stdout_sha256": "34f4fdb047ddc5ec2310f8daf1988b61e238c448533bb9bc88aad1a83fc146de",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "synthetic-tests",
+      "argv": [
+        "/home/ec2-user/primefield-ecdlp-research-20261028/.venv/bin/python",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-resultant-protocol/test_adapter.py"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "4d2a158ee6881021d7621f776266cc773a3830cd1ce4bb917a769b828b0ccb93"
+    }
+  ],
+  "passed": true
+}

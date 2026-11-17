@@ -1,0 +1,105 @@
+--- /var/tmp/pencil-copy-only-assembly-supervisor-20261031-v1/assemble.py
++++ recover.py
+@@ -5,6 +5,9 @@
+ ROOT=P('/home/ec2-user/crypto-pencil-signed-graph-20261029')
+ PARENT='public.ecr.aws/aws-cli/aws-cli@sha256:b94fc7612d131f1a3cb76145ba3385c813ad7561ef2c2b60c89fbd5dfee93d39'
+ PARENT_ID='sha256:f88bac9411086e0c87b0a1ff6a2d211897548182f86d5db16d02b9cfc38a6eaf'
++OLD=P('/var/tmp/pencil-copy-only-assembly-execution-20261031-v1')
++ADOPT_ID='sha256:347667d6ecc9294ab7bfcc83411fb47f7548c8d1ca5f7d315cca23fc4b115476'
++OWNER='467e8502-46d8-4ab9-a13b-8d2375dd2ca2'
+ ARTIFACTS=P('/var/tmp/pencil-local-image-assembly-proposal-20261031-v1/bindings.json')
+ MEMBERS=P('/var/tmp/pencil-local-image-assembly-proposal-20261031-v1/runtime-members.json')
+ def require(x,msg):
+@@ -30,6 +33,16 @@
+  try:
+   binding_raw=P(a.binding).read_bytes();b=strict(binding_raw);require(b.get('admitted') is True,'not admitted');require(b['reviewed_supervisor_sha256']==H(P(__file__).read_bytes()),'supervisor review binding')
+   for key in ['prospective_review_sha256','legacy_route_review_sha256','local_parent_resolution_review_sha256']:require(re.fullmatch('[0-9a-f]{64}',b.get(key,'')),'unfilled '+key)
++  expected_paths=['receipt.json','binding.json','context-inventory.json','Dockerfile.ecbench','Dockerfile.runtime','005-build-base/receipt.json','006-uncertain-readback-base/inspection.json']
++  require(set(b['recovery_sources'])==set(expected_paths),'recovery input inventory')
++  retained={n:pinned(OLD/n,b['recovery_sources'][n]) for n in expected_paths}
++  original=strict(retained['receipt.json']);original_binding=strict(retained['binding.json']);base_command=strict(retained['005-build-base/receipt.json'])
++  require(original['owner']==OWNER and original['tags']=={phase:'pencil-local-'+phase+':'+OWNER for phase in ['base','runtime']},'original owner/tags')
++  require(len(original['attempts'])==1 and original['attempts'][0]['phase']=='base' and original['attempts'][0]['attempt']==1,'sole original base attempt')
++  require(original.get('client_unknown') is False and base_command['client_terminal_exit']==0 and base_command['client_unknown'] is False,'terminal base build evidence')
++  require(original['attempts'][0]['iidfile']==str(OLD/'base.iid') and original['attempts'][0]['tag']==original['tags']['base'],'original attempt paths')
++  for key,value in original_binding.items():
++   if key not in ['reviewed_supervisor_sha256','prospective_review_sha256']:require(b.get(key)==value,'original binding changed '+key)
+   docker=P(b['docker_client']);pinned(docker,b['docker_client_sha256'])
+   artifacts=strict(pinned(ARTIFACTS,b['artifact_bindings_sha256']));members=strict(pinned(MEMBERS,b['runtime_members_sha256']))
+   blobs={}
+@@ -67,21 +80,22 @@
+     for p in directory.rglob('*'):
+      require(not p.is_symlink(),'context symlink');st=p.stat();require(stat.S_ISREG(st.st_mode) or stat.S_ISDIR(st.st_mode),'context special');rows[str(p.relative_to(context))]={'kind':'directory' if p.is_dir() else 'file','mode':oct(stat.S_IMODE(st.st_mode)),'sha256':None if p.is_dir() else H(p.read_bytes())}
+    return rows
+-  frozen=snapshot();(out/'context-inventory.json').write_text(json.dumps(frozen,indent=2)+'\n');(out/'binding.json').write_bytes(binding_raw)
++  frozen=snapshot();require(frozen==strict(retained['context-inventory.json']),'full original context inventory mismatch');require(dockerfiles==[retained['Dockerfile.ecbench'],retained['Dockerfile.runtime']],'original recipes mismatch');(out/'context-inventory.json').write_text(json.dumps(frozen,indent=2)+'\n');(out/'binding.json').write_bytes(binding_raw)
+   put(out/'Dockerfile.ecbench',dockerfiles[0],0o444);put(out/'Dockerfile.runtime',dockerfiles[1],0o444)
+   config=out/'empty-docker-config';config.mkdir(mode=0o700);prefix=['/usr/bin/sudo','-n','/usr/bin/env','-i','PATH=/usr/bin:/bin','HOME='+str(config),'DOCKER_CONFIG='+str(config),'DOCKER_BUILDKIT=0',str(docker),'--host','unix:///var/run/docker.sock'];env={'PATH':'/usr/bin:/bin','HOME':str(config),'LANG':'C'}
+-  def run(label,argv,cap=15,inspect=False,readback=False):
++  def run(label,argv,cap=15,inspect=False,readback=False,iid_read=False):
+    nonlocal seq,client_unknown
+-   require(pending is None or readback,'deferred interruption');stop=deadline if readback else work_deadline;remaining=stop-time.monotonic();require(remaining>3,'deadline exhausted');cap=min(cap,remaining-2);seq+=1;d=out/f'{seq:03d}-{label}';d.mkdir();proc=None;t=time.monotonic();so=None;se=None;receipt={'argv':prefix+argv,'cap_seconds':cap}
++   require(pending is None or readback,'deferred interruption');stop=deadline if readback else work_deadline;remaining=stop-time.monotonic();require(remaining>3,'deadline exhausted');cap=min(cap,remaining-2);seq+=1;d=out/f'{seq:03d}-{label}';d.mkdir();proc=None;t=time.monotonic();so=None;se=None;command=(['/usr/bin/sudo','-n','/usr/bin/cat']+argv) if iid_read else prefix+argv;require(not iid_read or (len(argv)==1 and argv[0] in [str(OLD/'base.iid'),str(out/'runtime.iid')]),'scoped IID command');receipt={'argv':command,'cap_seconds':cap}
+    try:
+-    so=tempfile.TemporaryFile('w+b') if inspect else (d/'stdout').open('w+b');se=(d/'stderr').open('wb');client_unknown=True;proc=subprocess.Popen(prefix+argv,env=env,stdout=so,stderr=se,start_new_session=True)
++    so=tempfile.TemporaryFile('w+b') if inspect else (d/'stdout').open('w+b');se=(d/'stderr').open('wb');client_unknown=True;proc=subprocess.Popen(command,env=env,stdout=so,stderr=se,start_new_session=True)
+     while proc.poll() is None:
+      require(pending is None or readback,'deferred interruption');require(time.monotonic()-t<cap,'client timeout');require(os.fstat(so.fileno()).st_size<16*1024**2 and os.fstat(se.fileno()).st_size<16*1024**2,'output cap');time.sleep(.04)
+     so.seek(0);raw=so.read(16*1024**2+1);require(len(raw)<=16*1024**2,'output cap');obj=strict(raw) if inspect and proc.returncode==0 else None
+     if obj is not None:
+      redacted=json.loads(json.dumps(obj))
+      for x in redacted:
+-      if x.get('Config',{}).get('Env') is not None:x['Config']['Env']=[{'name':v.split('=',1)[0],'sha256':H(v.encode())} for v in x['Config']['Env']]
++      for section in ['Config','ContainerConfig']:
++       if x.get(section,{}).get('Env') is not None:x[section]['Env']=[{'name':v.split('=',1)[0],'sha256':H(v.encode())} for v in x[section]['Env']]
+      (d/'inspection.json').write_text(json.dumps(redacted,indent=2)+'\n')
+     return proc.returncode,raw,(d/'stderr').read_bytes(),obj
+    finally:
+@@ -101,21 +115,41 @@
+      receipt.update({'started_monotonic':t,'ended_monotonic':time.monotonic(),'client_unknown':client_unknown});(d/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+   rc,raw,err,_=run('daemon',['info','--format','{{.ID}}']);require(rc==0 and raw.decode().strip()==parent_receipt['daemon_id'],'same local daemon binding')
+   rc,raw,err,parent=run('parent',['image','inspect',PARENT],inspect=True);require(rc==0 and len(parent)==1,'local parent absent');par=parent[0];require(par['Id']==PARENT_ID and PARENT in par.get('RepoDigests',[]) and par['Os']=='linux' and par['Architecture']=='amd64' and not par['Config'].get('OnBuild'),'parent resolution mismatch')
+-  nonce=str(uuid.uuid4());tags={phase:'pencil-local-'+phase+':'+nonce for phase in ['base','runtime']};result['owner']=nonce;result['tags']=tags
+-  # Fresh tags must be absent, not permission/daemon errors.
+-  for phase,tag in tags.items():
+-   rc,raw,err,_=run('tag-absence-'+phase,['image','inspect',tag],inspect=True);require(rc!=0 and b'No such image' in err and tag.encode() in err,'exclusive tag unavailable')
+-  for phase,ctx,df in [('base',base,out/'Dockerfile.ecbench'),('runtime',overlay,out/'Dockerfile.runtime')]:
++  def read_iid(path,label):
++   for c in [path,*path.parents]:require(not c.is_symlink(),'IID symlink path')
++   st=path.lstat();require(stat.S_ISREG(st.st_mode) and st.st_nlink==1 and st.st_uid==0 and stat.S_IMODE(st.st_mode)==0o600 and st.st_size in [71,72],'IID type/owner/mode/size')
++   rc,raw,err,_=run(label,[str(path)],iid_read=True,readback=True)
++   require(rc==0 and re.fullmatch(rb'sha256:[0-9a-f]{64}\n?',raw),'IID read/shape')
++   after=path.lstat();require((st.st_dev,st.st_ino,st.st_size,st.st_mtime_ns)==(after.st_dev,after.st_ino,after.st_size,after.st_mtime_ns),'IID changed')
++   return raw.decode().strip()
++  nonce=OWNER;tags=original['tags'];result['owner']=nonce;result['tags']=tags
++  expected_command=prefix[:];expected_command[5]='HOME='+str(OLD/'empty-docker-config');expected_command[6]='DOCKER_CONFIG='+str(OLD/'empty-docker-config')
++  expected_command+=['build','--pull=false','--network=none','--platform=linux/amd64','--iidfile',str(OLD/'base.iid'),'--build-arg','SOURCE_REVISION='+revision,'--label','isolab.local-assembly.owner='+nonce,'--label','isolab.local-assembly.phase=base','--tag',tags['base'],'--file',str(OLD/'Dockerfile.ecbench'),str(OLD/'contexts/base')]
++  require(base_command['argv']==expected_command,'original exact build command mismatch')
++  require(read_iid(OLD/'base.iid','adopt-base-iid')==ADOPT_ID,'adopted IID mismatch')
++  retained_base=strict(retained['006-uncertain-readback-base/inspection.json']);require(len(retained_base)==1,'retained base shape')
++  for ref in [ADOPT_ID,tags['base']]:
++   rc,raw,err,ims=run('adopt-base-readback',['image','inspect',ref],inspect=True)
++   require(rc==0 and len(ims)==1,'adopt base readback');x=ims[0];cfg=x['Config'];lab=cfg.get('Labels',{})
++   require(x['Id']==ADOPT_ID and x['Os']=='linux' and x['Architecture']=='amd64' and not cfg.get('OnBuild'),'adopt base identity')
++   require(lab.get('isolab.local-assembly.owner')==OWNER and lab.get('isolab.local-assembly.phase')=='base' and lab.get('org.opencontainers.image.revision')==revision,'adopt labels')
++   require(cfg['User']=='1000:1000' and not cfg.get('Entrypoint') and cfg.get('Cmd')==['/usr/local/bin/ecbench','--help'] and cfg.get('WorkingDir')=='/work','adopt config')
++   require(x['RootFS']['Layers']==retained_base[0]['RootFS']['Layers'],'adopt layers')
++  result['images']['base']={'id':ADOPT_ID,'tag':tags['base'],'layers':x['RootFS']['Layers'],'adopted':True,'original_command_exit':0}
++  rc,raw,err,_=run('tag-absence-runtime',['image','inspect',tags['runtime']],inspect=True)
++  require(rc!=0 and b'No such image' in err and tags['runtime'].encode() in err,'runtime tag unavailable')
++  for phase,ctx,df in [('runtime',overlay,out/'Dockerfile.runtime')]:
+    require(snapshot()==frozen,'context changed');require(time.monotonic()<work_deadline-3,'build budget exhausted');iid=out/(phase+'.iid');require(not iid.exists(),'IID already exists')
+    parent_arg='SOURCE_REVISION='+revision if phase=='base' else 'BASE_IMAGE='+result['images']['base']['id']
+    if phase=='runtime':
+     rc,raw,err,local=run('base-parent-readback',['image','inspect',result['images']['base']['id']],inspect=True);require(rc==0 and local[0]['Id']==result['images']['base']['id'] and not local[0]['Config'].get('OnBuild'),'local base ID unavailable')
+    attempts.append({'phase':phase,'tag':tags[phase],'iidfile':str(iid),'attempt':1,'status':'started'})
+    rc,raw,err,_=run('build-'+phase,['build','--pull=false','--network=none','--platform=linux/amd64','--iidfile',str(iid),'--build-arg',parent_arg,'--label','isolab.local-assembly.owner='+nonce,'--label','isolab.local-assembly.phase='+phase,'--tag',tags[phase],'--file',str(df),str(ctx)],cap=240)
+-   require(rc==0,'build failed/uncertain');image_id=iid.read_text().strip();require(re.fullmatch('sha256:[0-9a-f]{64}',image_id),'IID format')
++   require(rc==0,'build failed/uncertain');image_id=read_iid(iid,'runtime-iid');require(re.fullmatch('sha256:[0-9a-f]{64}',image_id),'IID format')
+    rc,raw,err,ims=run('readback-'+phase,['image','inspect',tags[phase]],inspect=True,readback=True);require(rc==0 and len(ims)==1,'tag readback');x=ims[0]
+    require(x['Id']==image_id and x['Os']=='linux' and x['Architecture']=='amd64' and not x['Config'].get('OnBuild'),'built image identity');labels=x['Config']['Labels'];require(labels.get('isolab.local-assembly.owner')==nonce and labels.get('isolab.local-assembly.phase')==phase and labels.get('org.opencontainers.image.revision')==revision,'built ownership/source labels')
+    require(x['Config']['User']==('1000:1000' if phase=='base' else '0:0') and not x['Config'].get('Entrypoint'),'built recipe config');require(snapshot()==frozen,'context changed after build')
++   require(x['RootFS']['Layers'][:len(result['images']['base']['layers'])]==result['images']['base']['layers'],'runtime base layer prefix');require(len(x['RootFS']['Layers'])>len(result['images']['base']['layers']),'runtime layer missing')
+    result['images'][phase]={'id':image_id,'tag':tags[phase],'layers':x['RootFS']['Layers'],'user':x['Config']['User'],'entrypoint':x['Config'].get('Entrypoint'),'cmd':x['Config'].get('Cmd')};attempts[-1]['status']='built_readback_verified'
+   result['status']='local_copy_only_images_built_pending_qualification'
+  except BaseException as e:

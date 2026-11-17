@@ -1,0 +1,36 @@
+{
+  "schema": "frobenius-finite-extension-source-plan/v1",
+  "created": "2026-11-10T05:47:53.744643+00:00",
+  "status": "Whole490kernel gate passed; preissue source plan, no finite-extension packet yet.",
+  "formal": {
+    "project": "research/theorem_census_20261109/lean",
+    "theorem": "FrobeniusFiniteExtensionAudit.finite_extension_audit_certificate",
+    "statement": "theorem finite_extension_audit_certificate : ∀ (F K B : Type*) [Field F] [Fintype F] [Field K] [Fintype K] [Field B] [Algebra F K] [Algebra F B] [Algebra K B] [IsScalarTower F K B] [DecidableEq K] [DecidableEq B], Fintype.card K=Fintype.card F^Module.finrank F K ∧ ∀ W : WeierstrassCurve.Affine F, (∀ P : (W.baseChange B).Point, (pointFrobenius W)^[Module.finrank F K] P=P ↔ ∃ Q : (W.baseChange K).Point, WeierstrassCurve.Affine.Point.map (W'",
+    "decl_sha256": "632f7b213dce07f0800397055bf7d66be985ffe17099c7d3d44224f2f8ddb746",
+    "sources": [
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusFiniteExtension.lean",
+        "bytes": 8610,
+        "sha256": "71cc43700fceabc138db6ad52f4e41449c1a7b440f92054d582836e2571eeb9a"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusPointDescent.lean",
+        "bytes": 6808,
+        "sha256": "772180baf24ea48b16ba3cae5c2039e2cf21d925ed1e7f1370b906711d60dc72"
+      }
+    ],
+    "gate": {
+      "path": "evidence/frobenius-finite-extension-gate.log",
+      "declarations": 490,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Every actual finite-field tower F⊆K⊆B with B any field extension, explicit compatible algebra/scalar-tower data, every general Weierstrass model WoverF: actual point PoverB comes from actual W(K) iff [K:F]iterations of actual F-Frobenius fix P. Same equivalence for every actual r-torsion set. Actual |K|=|F|^[K:F]proved, and explicit kforms derived from |K|=|F|^k. Chosen embedded finite extension, not a construction of a canonical subfield in a fixed closure. Geometric torsion rank/determinant and Weil necessity remain open for qualified BK."
+  },
+  "literature": "BK1998Theorem1/proof/Remark1pp142–143re-read, qualified exclusion retained. Mathlib actual Point.map composition/nonsingularity descent, AlgHom powers/restrictScalars, Finite.Basic Frobeniusiteration, FieldTheory.Finiteness Module.card_eq_pow_finrank and Finite.Extension degree/cardinality proof reviewed. KB/Conductor unavailable; bounded primary/repository/Mathlib fallback, no novelty or blanket source promotion.",
+  "native_experiments": 0,
+  "paid_compute": 0,
+  "inherited_sources": "All issued modules/plans unchanged; new source imports frozen PointDescent and its transitive source pins, additive Lake root only.",
+  "fresh_checker": "lean4checker unavailable; actual kernel builds plus complete transitive axiom audit.",
+  "elaboration": "This module adds no elaboration or linter option."
+}

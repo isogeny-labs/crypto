@@ -1,0 +1,42 @@
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/higher/bivariate-evidence/draft-007.lean.txt:328:17: error(lean.unknownIdentifier): Unknown identifier `diagonalJet`
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/higher/bivariate-evidence/draft-007.lean.txt:333:40: error(lean.unknownIdentifier): Unknown identifier `diagonalJet`
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/higher/bivariate-evidence/draft-007.lean.txt:334:8: error(lean.unknownIdentifier): Unknown identifier `diagonalJet_valuation`
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/higher/bivariate-evidence/draft-007.lean.txt:333:72: error: unsolved goals
+a u i k : ℕ
+m : ℕ → ℕ
+hiu : i < u
+hu : u ≤ a
+x : Ports a
+rb : MomentLabels u k
+⊢ jetWeight a u i m ≤ padicValRat 2 sorry
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/higher/bivariate-evidence/draft-007.lean.txt:344:9: error: Function expected at
+  diagonalJet
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  a
+
+Hint: The identifier `diagonalJet` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/higher/bivariate-evidence/draft-007.lean.txt:345:30: warning: declaration uses `sorry`
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/higher/bivariate-evidence/draft-007.lean.txt:356:40: error(lean.unknownIdentifier): Unknown identifier `diagonalJet`
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/higher/bivariate-evidence/draft-007.lean.txt:357:8: error(lean.unknownIdentifier): Unknown identifier `diagonalJet_valuation`
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/higher/bivariate-evidence/draft-007.lean.txt:356:72: error: unsolved goals
+a u i k : ℕ
+t : ℤ
+m : ℕ → ℕ
+ht : ↑t ∈ grid a
+ht0 : t ≠ 0
+hi : padicValInt 2 t = i
+hiu : i < u
+hu : u ≤ a
+x y : Ports a
+⊢ jetWeight a u i m ≤ padicValRat 2 sorry
+'OrientationBivariate.denom_rows_eval' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationBivariate.actual_low_rows_precision' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationBivariate.poly_right_integral' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationBivariate.actual_compact_poly_precision' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationBivariate.actual_compact_weighted_profile' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

@@ -1,0 +1,25 @@
+{
+  "schema": "local_software_gate_status/v1",
+  "source": "7d340f8710e4c22cb8a1a3be356f85f10944467a",
+  "base": "4355e5c648b67a679729ac7963f3c054d8362d30",
+  "artifacts": {
+    "command": "python3 tools/artifacts/artifacts.py check 4355e5c648b67a679729ac7963f3c054d8362d30",
+    "exit": 0,
+    "stdout": "artifacts check: no data files committed\n",
+    "scope": "Only published source/metadata/report checked; withheld local archive is not admitted by this pass."
+  },
+  "admission": {
+    "command": "python3 scripts/validation_gate.py check --base 4355e5c648b67a679729ac7963f3c054d8362d30",
+    "exit": 1,
+    "stdout": "benchmarks 20261026-humbert-genus5-cover: unvalidated: row is not in the pre-gate freeze\nbenchmarks 20261020-ic-oracle-setup-blocked: unvalidated: row is not in the pre-gate freeze\nbenchmarks 20261019-ic-ledger-r10: unvalidated: row is not in the pre-gate freeze\nbenchmarks 20261019-s5-plain-c4-options: unvalidated: row is not in the pre-gate freeze\nbenchmarks 20261019-volcano-tall-layers: unvalidated: row is not in the pre-gate freeze\nbenchmarks 20261018-volcano-prime-layers: unvalidated: row is not in the pre-gate freeze\nbenchmarks 20261018-volcano-koblitz-n83: unvalidated: row is not in the pre-gate freeze\nbenchmarks 20261018-volcano-koblitz-layers: unvalidated: row is not in the pre-gate freeze\nbenchmarks 20261019-isogeny-class-rho-n45: unvalidated: row is not in the pre-gate freeze\nbenchmarks 20261018-isogeny-class-rho: unvalidated: row is not in the pre-gate freeze\nbenchmarks 20261017-n83-structured-m4: unvalidated: row is not in the pre-gate freeze\nbenchmarks 20261015-ic-improve3-01-genus3-relations: unvalidated: row changed since the pre-gate freeze\nbenchmarks 20261015-ic-improve3-02-harvest-gate: unvalidated: row changed since the pre-gate freeze\nbenchmarks 20261015-ic-improve2-06-genus3-kappa-bw: unvalidated: row changed since the pre-gate freeze\nbenchmarks 20261015-ic-improve2-05-linear-harvest: unvalidated: row changed since the pre-gate freeze\nbenchmarks 20261015-ic-improve2-03-fallrow-gate: unvalidated: row changed since the pre-gate freeze\nbenchmarks 20261015-ic-improve2-02-freerel-production: unvalidated: row changed since the pre-gate freeze\nbenchmarks 20261014-ic-improve-03-tracezero-freerel: unvalidated: row changed since the pre-gate freeze\nbenchmarks 20261014-ic-improve-01-d4-2lp: unvalidated: row changed since the pre-gate freeze\nbenchmarks 20261014-ic-improve-04-genus3-2lp: unvalidated: row changed since the pre-gate freeze\nbenchmarks 20261015-ic-linear-algebra-cado: unvalidated: row changed since the pre-gate freeze\nbenchmarks/ARCHIVE.json rows[0] is still admitted in benchmarks/README.md\n\n22 row(s) fail the validation gate (docs/VALIDATION_GATE.md)\n",
+    "compared_pathspecs": [
+      "benchmarks",
+      "docs/ic/leaderboard.json",
+      "docs/ic/validation",
+      "scripts/validation_gate.py",
+      "research/validation_sweep_20261019"
+    ],
+    "changed_paths": [],
+    "scope": "22 existing admission problems in exact-base benchmark/gate/freeze/verdict inputs; no new benchmark row, freeze edit or fabricated VALIDATION.json."
+  }
+}

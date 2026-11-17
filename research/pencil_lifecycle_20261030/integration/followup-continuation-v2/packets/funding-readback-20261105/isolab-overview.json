@@ -1,0 +1,386 @@
+{
+  "observed_utc": "2026-11-05T15:47:00Z",
+  "timestamp_precision": "minute; tool response observed during this minute",
+  "source": "isolab_k8s_overview",
+  "compiled_pool_fields_not_live_enforcement": true,
+  "benchmark_node_pool": "cpu-l2-spot",
+  "configured_vcpu_limit": 64,
+  "guidance": "Run trusted lab commands as Kubernetes Jobs in the isolab namespace on CPU Spot nodes. Start with isolab_k8s_overview. Submit with a unique job_name; on timeout check that name before retrying. Poll isolab_k8s_status for completion, then read logs and results. Commands receive temporary /work/results and ISOLAB_RESULTS_URI; they must upload outputs before exiting. Spot interruptions can lose unuploaded data. These VM pods do not establish legacy Iso Lab strict fidelity. No cryptographic performance claim follows from job success.",
+  "jobs": [
+    {
+      "created_at": "2026-11-04T16:01:08Z",
+      "job_name": "arity-koblitz-m56-20261104",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-11-04T16:07:44Z",
+            "lastTransitionTime": "2026-11-04T16:07:44Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-11-04T16:07:45Z",
+            "lastTransitionTime": "2026-11-04T16:07:45Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-11-04T16:01:08Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "bfa5cf9f-649e-4616-bee3-0336322acde1"
+    },
+    {
+      "created_at": "2026-11-04T16:24:30Z",
+      "job_name": "arity-koblitz-m56-20261104-a2",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-11-04T16:43:44Z",
+            "lastTransitionTime": "2026-11-04T16:43:44Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-11-04T16:43:44Z",
+            "lastTransitionTime": "2026-11-04T16:43:44Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-11-04T16:24:30Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "3263dc01-afa7-43e3-8d88-4781ac847b60"
+    },
+    {
+      "created_at": "2026-11-04T18:49:12Z",
+      "job_name": "arity-koblitz-m56-20261104-a4",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-11-05T11:44:12Z",
+            "lastTransitionTime": "2026-11-05T11:44:12Z",
+            "message": "Job was active longer than specified deadline",
+            "reason": "DeadlineExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-11-05T11:44:16Z",
+            "lastTransitionTime": "2026-11-05T11:44:16Z",
+            "message": "Job was active longer than specified deadline",
+            "reason": "DeadlineExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-11-04T18:49:12Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "20b9ddab-7f7f-4c8b-91c5-37f286d52d84"
+    },
+    {
+      "created_at": "2026-11-04T16:11:03Z",
+      "job_name": "arity-prime-m5-main-20261104",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-11-04T16:21:11Z",
+            "lastTransitionTime": "2026-11-04T16:21:11Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-11-04T16:21:11Z",
+            "lastTransitionTime": "2026-11-04T16:21:11Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-11-04T16:11:03Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "d376c6cc-a1f0-4101-807e-fd577f065c6e"
+    },
+    {
+      "created_at": "2026-11-04T16:36:13Z",
+      "job_name": "arity-prime-m5-main-20261104-a2",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-11-04T16:59:45Z",
+            "lastTransitionTime": "2026-11-04T16:59:45Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-11-04T16:59:45Z",
+            "lastTransitionTime": "2026-11-04T16:59:45Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-11-04T16:36:13Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "7f74ee40-0b3e-4670-a3e8-b75e99e6c8d6"
+    },
+    {
+      "created_at": "2026-11-04T19:04:51Z",
+      "job_name": "arity-prime-m5-main-20261104-a4",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-11-04T19:25:27Z",
+            "lastTransitionTime": "2026-11-04T19:25:27Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-11-04T19:25:28Z",
+            "lastTransitionTime": "2026-11-04T19:25:28Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-11-04T19:04:51Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "5085f014-b79c-4950-9600-979bb6393049"
+    },
+    {
+      "created_at": "2026-11-04T15:53:18Z",
+      "job_name": "arity-smoke-20261104b",
+      "state": "succeeded",
+      "status": {
+        "completionTime": "2026-11-04T15:54:20Z",
+        "conditions": [
+          {
+            "lastProbeTime": "2026-11-04T15:54:20Z",
+            "lastTransitionTime": "2026-11-04T15:54:20Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "SuccessCriteriaMet"
+          },
+          {
+            "lastProbeTime": "2026-11-04T15:54:20Z",
+            "lastTransitionTime": "2026-11-04T15:54:20Z",
+            "message": "Reached expected number of succeeded pods",
+            "reason": "CompletionsReached",
+            "status": "True",
+            "type": "Complete"
+          }
+        ],
+        "ready": 0,
+        "startTime": "2026-11-04T15:53:18Z",
+        "succeeded": 1,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "d1008130-4269-4295-b0d3-2cfae7251c59"
+    },
+    {
+      "created_at": "2026-11-05T06:18:27Z",
+      "job_name": "bridge-fbcm-k1n17-20261105a",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-11-05T07:18:27Z",
+            "lastTransitionTime": "2026-11-05T07:18:27Z",
+            "message": "Job was active longer than specified deadline",
+            "reason": "DeadlineExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-11-05T07:18:28Z",
+            "lastTransitionTime": "2026-11-05T07:18:28Z",
+            "message": "Job was active longer than specified deadline",
+            "reason": "DeadlineExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-11-05T06:18:27Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "fc01b0fb-bc5c-4b62-86f0-8b43a2577ea3"
+    },
+    {
+      "created_at": "2026-11-05T07:04:19Z",
+      "job_name": "bridge-fbcm-k1n17-pilot-20261105a",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-11-05T07:44:19Z",
+            "lastTransitionTime": "2026-11-05T07:44:19Z",
+            "message": "Job was active longer than specified deadline",
+            "reason": "DeadlineExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-11-05T07:44:20Z",
+            "lastTransitionTime": "2026-11-05T07:44:20Z",
+            "message": "Job was active longer than specified deadline",
+            "reason": "DeadlineExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-11-05T07:04:19Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "80386237-e858-4f28-bb03-d1dcdd71792b"
+    },
+    {
+      "created_at": "2026-11-05T07:45:57Z",
+      "job_name": "bridge-fbcm-k1n17-pilot-20261105b",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-11-05T08:25:57Z",
+            "lastTransitionTime": "2026-11-05T08:25:57Z",
+            "message": "Job was active longer than specified deadline",
+            "reason": "DeadlineExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-11-05T08:25:58Z",
+            "lastTransitionTime": "2026-11-05T08:25:58Z",
+            "message": "Job was active longer than specified deadline",
+            "reason": "DeadlineExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-11-05T07:45:57Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "2590ffb4-96b7-4c34-8e9a-c1a5b8bf7637"
+    },
+    {
+      "created_at": "2026-11-05T06:18:26Z",
+      "job_name": "bridge-fbcm-k1n19-20261105a",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-11-05T07:18:26Z",
+            "lastTransitionTime": "2026-11-05T07:18:26Z",
+            "message": "Job was active longer than specified deadline",
+            "reason": "DeadlineExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-11-05T07:18:27Z",
+            "lastTransitionTime": "2026-11-05T07:18:27Z",
+            "message": "Job was active longer than specified deadline",
+            "reason": "DeadlineExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-11-05T06:18:26Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "b91b889f-28cc-476f-b591-fe2f2c32dbbc"
+    },
+    {
+      "created_at": "2026-10-30T14:55:24Z",
+      "job_name": "sat-hpo-metal-qualification-20261030",
+      "state": "pending",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-30T14:55:24Z",
+            "lastTransitionTime": "2026-10-30T14:55:24Z",
+            "message": "Job suspended",
+            "reason": "JobSuspended",
+            "status": "True",
+            "type": "Suspended"
+          }
+        ],
+        "ready": 0,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "e83a3ba3-36c4-4958-8d04-20b78c44d3dc"
+    }
+  ],
+  "namespace": "isolab",
+  "node_pool": "cpu-spot",
+  "pool_limits": {
+    "cpu-l2-spot": {
+      "cpu": 32,
+      "memory": "128Gi"
+    },
+    "cpu-spot": {
+      "cpu": 32,
+      "memory": "128Gi"
+    }
+  }
+}

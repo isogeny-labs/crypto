@@ -1,0 +1,128 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.01,
+    0.03,
+    0.1,
+    0.3,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-f2m23-tm4129-45500fce",
+      "log2_r": 22.00071011355575,
+      "arm": "dm1",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        21.150271026061642,
+        21.51398134891107,
+        22.24140199460993,
+        24.78737425455591,
+        32.06158071154446,
+        57.521303311004324
+      ],
+      "charged_sum": 1039834.0,
+      "native_sum": 1788149,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m23-tm4129-45500fce",
+      "log2_r": 22.00071011355575,
+      "arm": "dp1",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        38.55718039116072,
+        38.6483292207196,
+        38.830626879837375,
+        39.46866868674962,
+        41.29164527792741,
+        47.67206334704971
+      ],
+      "charged_sum": 1895629.0,
+      "native_sum": 448125,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m23-tm4129-45500fce",
+      "log2_r": 22.00071011355575,
+      "arm": "plan",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        17.729949970076316,
+        17.919776903891517,
+        18.299430771521916,
+        19.62821930822832,
+        23.42475798453232,
+        36.71264335159632
+      ],
+      "charged_sum": 871677.0,
+      "native_sum": 933267,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m23-tm4129-45500fce",
+      "log2_r": 22.00071011355575,
+      "arm": "rho",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1.1585486600490515,
+        1.1683629354745375,
+        1.18799148632551,
+        1.2566914143039132,
+        1.4529769228136369,
+        2.1399762025976705
+      ],
+      "charged_sum": 56959.0,
+      "native_sum": 48251,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-f2m23-tm4129-45500fce",
+      "a": "dm1",
+      "b": "dp1",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m23-tm4129-45500fce",
+      "a": "dm1",
+      "b": "plan",
+      "verdict": "plan < dm1"
+    },
+    {
+      "curve": "icv1-f2m23-tm4129-45500fce",
+      "a": "dm1",
+      "b": "rho",
+      "verdict": "rho < dm1"
+    },
+    {
+      "curve": "icv1-f2m23-tm4129-45500fce",
+      "a": "dp1",
+      "b": "plan",
+      "verdict": "plan < dp1"
+    },
+    {
+      "curve": "icv1-f2m23-tm4129-45500fce",
+      "a": "dp1",
+      "b": "rho",
+      "verdict": "rho < dp1"
+    },
+    {
+      "curve": "icv1-f2m23-tm4129-45500fce",
+      "a": "plan",
+      "b": "rho",
+      "verdict": "rho < plan"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Curve25519 k=32 algebraic scale-up, chunk 2",
+  "description": "research/curve25519_algebraic_ecbench_scale_20261105/PROTOCOL.md (frozen before data). Public synthetic curve and target; no security claim.",
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=512,scan_cap=8192",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "proj-a",
+      "role": "baseline"
+    }
+  ],
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate_measured",
+    "rounds": 1,
+    "warmup": 0,
+    "seed": 2026110532,
+    "timeout_seconds": 1800
+  },
+  "workloads": {
+    "curves": [
+      {
+        "a": 1173263412,
+        "b": 337904346,
+        "group_order": 4295077112,
+        "gx": 1431665017,
+        "gy": 592057774,
+        "kind": "prime_explicit",
+        "p": 4294967197,
+        "r": 536884639
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 2026110522,
+    "targets_per_curve": 1
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "formal.source_review_plan/v1",
+  "task": "T-1734",
+  "created_utc": "2026-11-07T00:27:29.186854+00:00",
+  "candidate_read": false,
+  "claim": "Actual coefficientData wrapper derives base support root multiplicity sum one by composing source_norm_identity with support_base_multiplicity_sum, without caller-supplied generic norm premise.",
+  "prior": "Composition plausible; exact hypotheses and type elaboration remain unverified.",
+  "joints": [
+    {
+      "owner": "review_specialization",
+      "joint": "identity instantiation",
+      "attack": "Check swapped arguments, wrong conjugation, mismatch between E and coefficientData, and equality orientation."
+    },
+    {
+      "owner": "review_specialization",
+      "joint": "multiplicity bridge",
+      "attack": "Zero support polynomial has rootMultiplicity zero but infinite valuation: require finite stalk sum to exclude it, and retain branch ramification and nonzero premises."
+    },
+    {
+      "owner": "review_specialization",
+      "joint": "nonvacuity and claim scope",
+      "attack": "Inspect all inherited assumptions for contradiction/circularity; test on paper a branch point where u=X-a, v=1, norm=(X-a)*t and t(a) nonzero; do not claim a checked inhabitant."
+    }
+  ],
+  "blind_derivation": "If actual norm identity has RHS E(u)*E(v) and existing support theorem accepts that exact identity with stalk sum two, applying the support theorem yields rootMultiplicity(a,u)+rootMultiplicity(a,v)=1. No new valuation theorem follows from this composition.",
+  "permitted_reads": "Candidate source after producer readiness plus exact imported primary sources and hashes. No sibling review verdicts.",
+  "machine_status": "not_verified",
+  "execution": "No Lean/compiler/evaluation: campaign deadline expired; source-only review.",
+  "controls": "Paper adverse-case reasoning only; no executed control claim.",
+  "publication": "Freeze this plan before candidate read; final source verdict conditional until immutable candidate publication verified."
+}

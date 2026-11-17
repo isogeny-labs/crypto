@@ -1,0 +1,24 @@
+Sending build context to Docker daemon  10.52MB
+Step 1/7 : ARG BASE_IMAGE
+Step 2/7 : FROM ${BASE_IMAGE}
+ ---> 347667d6ecc9
+Step 3/7 : COPY runtime/ /opt/isolab/recovery/
+ ---> 62c4afccaeaf
+Step 4/7 : USER 0:0
+ ---> Running in c6abacabcdc4
+ ---> Removed intermediate container c6abacabcdc4
+ ---> 579fba9e7bd6
+Step 5/7 : ENTRYPOINT []
+ ---> Running in 5497dd8dff7e
+ ---> Removed intermediate container 5497dd8dff7e
+ ---> b2f9f58f4d8c
+Step 6/7 : LABEL isolab.local-assembly.owner=467e8502-46d8-4ab9-a13b-8d2375dd2ca2
+ ---> Running in bf8d913fcce6
+ ---> Removed intermediate container bf8d913fcce6
+ ---> 966be660272f
+Step 7/7 : LABEL isolab.local-assembly.phase=runtime
+ ---> Running in 09eaeee6f6cb
+ ---> Removed intermediate container 09eaeee6f6cb
+ ---> 1adcc3d49e56
+Successfully built 1adcc3d49e56
+Successfully tagged pencil-local-runtime:467e8502-46d8-4ab9-a13b-8d2375dd2ca2

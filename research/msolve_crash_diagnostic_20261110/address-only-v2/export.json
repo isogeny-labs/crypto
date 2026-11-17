@@ -1,0 +1,774 @@
+{
+  "schema": "experiment.export/v1",
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": null,
+    "role": "executor"
+  },
+  "backend": "local",
+  "host": {
+    "path": "provenance.json",
+    "sha256": "131e26517853d82b3c237db84043444e7bef481c8002588072d7930cf137da1c",
+    "class_id": "local-shared-msolve-diagnostic",
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": "6.18.57",
+      "hypervisor": null,
+      "isolation_tier_max": "none"
+    }
+  },
+  "reviews_dir": "reviews",
+  "export_id": "msolve-crash-diagnostic-20261110-v2",
+  "created": "2026-11-10T17:35:07.692895+00:00",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "dc99c9764a4d5448c7aabb220361c47fd8aa3e661bb6d910ad73c997fb549b58",
+    "protocol_id": "msolve-crash-diagnostic-20261110",
+    "version": 2
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "a549657b3f64b2c6dfd2bcb911e7a84e0d728e8d",
+    "dirty": true
+  },
+  "arms": [
+    {
+      "id": "address-l2-ordinary",
+      "role": "candidate",
+      "binary_sha256": "4e176df0d497548afc0783f59d0c78e391829ef4258576b7042bbb49e42aae23",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "address-l2-saturation",
+      "role": "candidate",
+      "binary_sha256": "4e176df0d497548afc0783f59d0c78e391829ef4258576b7042bbb49e42aae23",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "address-l1-ordinary",
+      "role": "candidate",
+      "binary_sha256": "4e176df0d497548afc0783f59d0c78e391829ef4258576b7042bbb49e42aae23",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "address-l1-saturation",
+      "role": "candidate",
+      "binary_sha256": "4e176df0d497548afc0783f59d0c78e391829ef4258576b7042bbb49e42aae23",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "address-l2-ordinary",
+      "arm": "address-l2-ordinary",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Frozen exact C++ checker only, not independently signed execution."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/address-l2-ordinary.argv",
+          "sha256": "d7d4942e30c8112be0860b9defddfbab1b0dfdb2692eff14e1d8af7cf3f7d48b",
+          "bytes": 140,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l2-ordinary.end",
+          "sha256": "82f12ce82c1e976bd32004ed489362ec154d1e46cae2767f383c7c8f55e12c44",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l2-ordinary.exit",
+          "sha256": "e726b440cc164001999e718b51780d80314709efe06e7857282377be9111127b",
+          "bytes": 4,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l2-ordinary.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l2-ordinary.start",
+          "sha256": "82f12ce82c1e976bd32004ed489362ec154d1e46cae2767f383c7c8f55e12c44",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l2-ordinary.stderr",
+          "sha256": "df4319c41f7081ff68a7608b1aa6ce926c1c51ce7e4cc6ca5650b207ac21f3e4",
+          "bytes": 2024,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l2-ordinary.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:32:57Z",
+      "finished_at": "2026-11-10T17:32:57Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "address-l2-saturation",
+      "arm": "address-l2-saturation",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "timeout",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Frozen exact C++ checker only, not independently signed execution."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/address-l2-saturation.argv",
+          "sha256": "e7ed29d71c296fa8cedcc69f386a59aee40cdfdd74136bd4620d204e99388d86",
+          "bytes": 147,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l2-saturation.end",
+          "sha256": "90dcf3e9d96005165cc059a9a608dbdd2f8deecdfce5982cc6663b9fc0039b77",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l2-saturation.exit",
+          "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+          "bytes": 4,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l2-saturation.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l2-saturation.start",
+          "sha256": "82f12ce82c1e976bd32004ed489362ec154d1e46cae2767f383c7c8f55e12c44",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l2-saturation.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l2-saturation.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:32:57Z",
+      "finished_at": "2026-11-10T17:33:02Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "address-l1-ordinary",
+      "arm": "address-l1-ordinary",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 1,
+          "dimension": 3
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen exact C++ checker only, not independently signed execution."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/address-l1-ordinary.argv",
+          "sha256": "689c3c527226ff0e9640a90298945f348e47a449d32f0f0d58af727d8adaa703",
+          "bytes": 140,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l1-ordinary.end",
+          "sha256": "90dcf3e9d96005165cc059a9a608dbdd2f8deecdfce5982cc6663b9fc0039b77",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l1-ordinary.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l1-ordinary.out",
+          "sha256": "1ac5710f628f5ec9478d4de8c196e05624bf42bd6d09f4372022f24f6794541e",
+          "bytes": 270,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l1-ordinary.start",
+          "sha256": "90dcf3e9d96005165cc059a9a608dbdd2f8deecdfce5982cc6663b9fc0039b77",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l1-ordinary.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l1-ordinary.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:33:02Z",
+      "finished_at": "2026-11-10T17:33:02Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "address-l1-saturation",
+      "arm": "address-l1-saturation",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "timeout",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Frozen exact C++ checker only, not independently signed execution."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/address-l1-saturation.argv",
+          "sha256": "9776b624bc341aee65e38f7888b0b290d9370a8215c38c1e00296ef0c0c85f40",
+          "bytes": 147,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l1-saturation.end",
+          "sha256": "651fc9799a0b01cf1cf954895854bd87acb4e4d0c23a25922d7f035b78dec90c",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l1-saturation.exit",
+          "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+          "bytes": 4,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l1-saturation.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l1-saturation.start",
+          "sha256": "90dcf3e9d96005165cc059a9a608dbdd2f8deecdfce5982cc6663b9fc0039b77",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l1-saturation.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/address-l1-saturation.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:33:02Z",
+      "finished_at": "2026-11-10T17:33:07Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    }
+  ],
+  "flow": {
+    "planned": 4,
+    "attempted": 4,
+    "completed": 2,
+    "not_completed": 2,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "build-sanitized.sh",
+      "sha256": "9ad5e221611c91a7c3e908089668086fc42811fe5858b884635b6d7f5534fe29",
+      "bytes": 1169,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analysis.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analysis.jsonl",
+      "sha256": "565e70fdf77248b9dc69393443bfb488c022502716dc0f6eca0f0854b2f311a3",
+      "bytes": 413,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analysis.stderr",
+      "sha256": "b40d1b55eb819f455fc9a96457cad825f7c58740551bf544baa7e23e5e1ca86c",
+      "bytes": 187,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-build.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-calibration.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-calibration.jsonl",
+      "sha256": "66354c704bba13f25a49e544741278300aa90c81320629e92cd11a08dfe914be",
+      "bytes": 61,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-freeze.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-freeze.json",
+      "sha256": "88051abb1aef6390e4fc9783db9c90e35c0c868a813e409f373b05e8867870ed",
+      "bytes": 247,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-validation.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-validation.log",
+      "sha256": "5f97063a2752c249c61c9b1b8592027eeedd4374a11f3eb1afa2347f95ac7f7c",
+      "bytes": 114,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/run.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/run.log",
+      "sha256": "b48adb114053398b648f077d81eaea287817259321c0b6ff12b9fc3916479e92",
+      "bytes": 492,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l1-ordinary.argv",
+      "sha256": "689c3c527226ff0e9640a90298945f348e47a449d32f0f0d58af727d8adaa703",
+      "bytes": 140,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l1-ordinary.end",
+      "sha256": "90dcf3e9d96005165cc059a9a608dbdd2f8deecdfce5982cc6663b9fc0039b77",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l1-ordinary.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l1-ordinary.out",
+      "sha256": "1ac5710f628f5ec9478d4de8c196e05624bf42bd6d09f4372022f24f6794541e",
+      "bytes": 270,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l1-ordinary.start",
+      "sha256": "90dcf3e9d96005165cc059a9a608dbdd2f8deecdfce5982cc6663b9fc0039b77",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l1-ordinary.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l1-ordinary.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l1-saturation.argv",
+      "sha256": "9776b624bc341aee65e38f7888b0b290d9370a8215c38c1e00296ef0c0c85f40",
+      "bytes": 147,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l1-saturation.end",
+      "sha256": "651fc9799a0b01cf1cf954895854bd87acb4e4d0c23a25922d7f035b78dec90c",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l1-saturation.exit",
+      "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+      "bytes": 4,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l1-saturation.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l1-saturation.start",
+      "sha256": "90dcf3e9d96005165cc059a9a608dbdd2f8deecdfce5982cc6663b9fc0039b77",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l1-saturation.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l1-saturation.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l2-ordinary.argv",
+      "sha256": "d7d4942e30c8112be0860b9defddfbab1b0dfdb2692eff14e1d8af7cf3f7d48b",
+      "bytes": 140,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l2-ordinary.end",
+      "sha256": "82f12ce82c1e976bd32004ed489362ec154d1e46cae2767f383c7c8f55e12c44",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l2-ordinary.exit",
+      "sha256": "e726b440cc164001999e718b51780d80314709efe06e7857282377be9111127b",
+      "bytes": 4,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l2-ordinary.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l2-ordinary.start",
+      "sha256": "82f12ce82c1e976bd32004ed489362ec154d1e46cae2767f383c7c8f55e12c44",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l2-ordinary.stderr",
+      "sha256": "df4319c41f7081ff68a7608b1aa6ce926c1c51ce7e4cc6ca5650b207ac21f3e4",
+      "bytes": 2024,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l2-ordinary.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l2-saturation.argv",
+      "sha256": "e7ed29d71c296fa8cedcc69f386a59aee40cdfdd74136bd4620d204e99388d86",
+      "bytes": 147,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l2-saturation.end",
+      "sha256": "90dcf3e9d96005165cc059a9a608dbdd2f8deecdfce5982cc6663b9fc0039b77",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l2-saturation.exit",
+      "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+      "bytes": 4,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l2-saturation.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l2-saturation.start",
+      "sha256": "82f12ce82c1e976bd32004ed489362ec154d1e46cae2767f383c7c8f55e12c44",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l2-saturation.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/address-l2-saturation.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/sanitized-build.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/sanitized-build.log",
+      "sha256": "bdaf8d1637043a25929e04837f8ad60013df81bf55c5ebe1a8847869d98517dd",
+      "bytes": 975,
+      "kind": "raw"
+    },
+    {
+      "path": "frozen-files.sha256",
+      "sha256": "744678cad953e9ef165383cbf4f3feffaa1669fd1d1ff7285ec2549bb2a2646e",
+      "bytes": 665,
+      "kind": "raw"
+    },
+    {
+      "path": "inputs/ordinary.ms",
+      "sha256": "940be6ee58679144408ba008d350282f4b68a0ba7477bbdc1bec0d64068e131a",
+      "bytes": 28,
+      "kind": "raw"
+    },
+    {
+      "path": "inputs/saturation.ms",
+      "sha256": "5ecba116ff9e4bbd08cd59cba53fe4c7a346f0468476fd29f00f3b383e5647d0",
+      "bytes": 31,
+      "kind": "raw"
+    },
+    {
+      "path": "native/analyze.cpp",
+      "sha256": "8f99f8eb297c918f14211184b80d819a205ba25e220d63c89a020c8d86e92f45",
+      "bytes": 3245,
+      "kind": "raw"
+    },
+    {
+      "path": "native/polynomial.hpp",
+      "sha256": "6e299d2f8f1032d1bdb1f4459a46ec3e32cc1f88a30fa105f08b082607b9b59b",
+      "bytes": 5491,
+      "kind": "raw"
+    },
+    {
+      "path": "protocol.json",
+      "sha256": "3677845401c2c198f6919c10aad7b6c39e7f5eb57feefb2a62e56c7d7ca71fb3",
+      "bytes": 18782,
+      "kind": "raw"
+    },
+    {
+      "path": "provenance.json",
+      "sha256": "131e26517853d82b3c237db84043444e7bef481c8002588072d7930cf137da1c",
+      "bytes": 1211,
+      "kind": "raw"
+    },
+    {
+      "path": "run.sh",
+      "sha256": "97fd1ad378d279e2f895b76b33878298f0af428dcb068694e3d164002465f556",
+      "bytes": 1842,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "native/analyze.cpp",
+      "sha256": "8f99f8eb297c918f14211184b80d819a205ba25e220d63c89a020c8d86e92f45",
+      "bytes": 3245,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "evidence/analysis.jsonl",
+        "sha256": "565e70fdf77248b9dc69393443bfb488c022502716dc0f6eca0f0854b2f311a3",
+        "bytes": 413,
+        "kind": "summary"
+      },
+      {
+        "path": "evidence/analysis.stderr",
+        "sha256": "b40d1b55eb819f455fc9a96457cad825f7c58740551bf544baa7e23e5e1ca86c",
+        "bytes": 187,
+        "kind": "summary"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "All4fixed calls retained: address-only LA1ordinary exactPASS,LA2ordinary134/ASANSEGVat la_ff_32.c543; bothsat5stimeouts. Original signedshift remains uninstrumented and unrepaired. This is a fault site, not a Crefinement or complete root-cause proof.",
+      "by": "producer"
+    },
+    {
+      "kind": "observation",
+      "text": "Prior combined-sanitizer8cells and original2failures retained,10priorcalls; new4calls only under separately frozen amendment. No paidcompute, exclusions or timing inference.",
+      "by": "producer"
+    }
+  ]
+}

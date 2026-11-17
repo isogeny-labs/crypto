@@ -1,0 +1,34 @@
+name: ECC2K130 rotated near-threshold slot placement
+
+on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
+    paths:
+      - 'research/notes/ecc2k130/rotated_nearthreshold_slot_20260925/**'
+      - '.github/workflows/ecc2k130-rotated-nearthreshold-slot.yml'
+
+jobs:
+  replay:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-rotated-nearthreshold-slot.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-rotated-nearthreshold-slot.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Frozen source and independent factor-only preflight
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 research/notes/ecc2k130/rotated_nearthreshold_slot_20260925/ci_replay.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only rotated_nearthreshold_slot_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
+      - name: Replay complete evidence only when later committed
+        shell: bash
+        env:
+          FROZEN_VIEW_STEP: |
+            if test -f research/notes/ecc2k130/rotated_nearthreshold_slot_20260925/evidence/receipt.json; then
+              python3 research/notes/ecc2k130/rotated_nearthreshold_slot_20260925/ci_replay.py --evidence research/notes/ecc2k130/rotated_nearthreshold_slot_20260925/evidence
+            fi
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only rotated_nearthreshold_slot_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"

@@ -1,0 +1,39 @@
+Crypto strict-input root validation (2026-10-30)
+
+Command: cargo test --release --lib
+Source commit at launch: 6eb7175e38a3488f305da3faee30703e3c325961
+Shared 17-file manifest SHA256:
+f3ab5c7f5e2aa83b47c40b5cb43d150d9c9fd5b9ed24fef66939965167df24b4
+Compiler: rustc 1.99.1
+Test executable: target/release/deps/crypto_lib-c8838d47a984e319
+Executable SHA256:
+8f96e9e517319cb77236e87da83e8504f5f01c0710af3d9544df5a737d8c649f
+
+Attempt 1: INTERRUPTED, not a full pass.
+Raw log: /tmp/hashed-ecdl-input-root-tests.txt
+Preserved copy: /tmp/hashed-ecdl-input-root-interrupted-20261030T0101.txt
+Raw bytes: 301088
+Raw SHA256:
+3f576c29d308c47a31f45df1ff7d426acc65db9c2a3332dea0f8c715e87ee4c5
+Observed after environment restart: cargo PID58411 and parent test PID59999
+were zombies with Linux exit_code9 (SIGKILL). The former tool session83100
+was unavailable. The log starts5512 tests but has no complete parent result.
+Its one passing child-test summary does not establish a full-root pass.
+Storage: NOT_UPLOADED; no configured artifact-store identity. Local paths
+are not durable remote artifacts; the oversized raw trace is not committed.
+
+Attempt 2: PASS, complete parent result and terminal exit code0.
+Uncapped retry log: /tmp/hashed-ecdl-input-root-retry-20261030T0101.txt
+Terminal status marker: /tmp/hashed-ecdl-input-root-retry-20261030T0101.exitcode
+The retry reused the completed build in0.12s and started5512 tests.
+No source, test input, assertion, limit or validation gate changed.
+Parent result: 5389 passed;0 failed;123 pre-existing ignored;0 filtered out.
+Raw bytes: 482248
+Raw SHA256:
+4ff5132bc52999d37aeea60e54ae56b83fffd5b7ddd45b08c122f6449372d18f
+Verbatim parent summary:
+test result: ok. 5389 passed; 0 failed; 123 ignored; 0 measured; 0 filtered out; finished in 1661.02s
+The persisted terminal marker contains0. This is a full-root pass for the
+source snapshot above, not a passing nested child summary.
+Storage: NOT_UPLOADED; oversized raw output remains local, not a durable
+remote artifact. The compact receipt retains its digest and terminal result.

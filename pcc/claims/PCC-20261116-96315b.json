@@ -1,0 +1,22 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T06:58:38Z",
+ "id": "PCC-20261116-96315b",
+ "kind": "theorem",
+ "producer": {
+  "commit": "e398666199bdf5f1987ee7f5b7f796cb85a29092",
+  "model": "",
+  "session": "prime-field-transfer-goal-round-04"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "e5f9ae2caa2056156e1217543268330bdc3b0102314061bef9155301be139dd5",
+   "kind": "lean",
+   "project": "research/prime_field_transfer_goal_20261116/lean",
+   "theorem": "WeberRootBoundaryV3.beta_two_root"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Literal Weber polynomial/quotient/residue endpoint only; CM, oriented specialization, LLL, Smart and full scalar transfer remain outside formalization.",
+ "statement": "theorem beta_two_root : Ideal.Quotient.mk (Ideal.span ({kernel W} : Set A)) (kernel betaTwo) = 0"
+}

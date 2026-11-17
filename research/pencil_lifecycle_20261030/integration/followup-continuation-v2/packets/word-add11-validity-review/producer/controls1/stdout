@@ -1,0 +1,51 @@
+/var/tmp/pencil-add11-word-validity-20261031-v1/Controls.lean:19:51: error: Tactic `decide` failed for proposition
+  WeightedAdd11.nx (WordD1.decode 7 a) = 0
+because its `Decidable` instance
+  ZMod.decidableEq (UInt64.toNat 7) (WeightedAdd11.nx (WordD1.decode 7 a)) 0
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqFin`, `instDecidableEqNat`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match h : (↑(WeightedAdd11.nx (WordD1.decode 7 a))).beq ↑0 with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/var/tmp/pencil-add11-word-validity-20261031-v1/Controls.lean:20:51: error: Tactic `decide` failed for proposition
+  WeightedAdd11.ny (WordD1.decode 7 a) = 0
+because its `Decidable` instance
+  ZMod.decidableEq (UInt64.toNat 7) (WeightedAdd11.ny (WordD1.decode 7 a)) 0
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqFin`, `instDecidableEqNat`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match h : (↑(WeightedAdd11.ny (WordD1.decode 7 a))).beq ↑0 with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/var/tmp/pencil-add11-word-validity-20261031-v1/Controls.lean:21:21: error: No goals to be solved
+/var/tmp/pencil-add11-word-validity-20261031-v1/Controls.lean:23:51: error: Tactic `decide` failed for proposition
+  WeightedAdd11.nx (WordD1.decode 7 b) = 1
+because its `Decidable` instance
+  ZMod.decidableEq (UInt64.toNat 7) (WeightedAdd11.nx (WordD1.decode 7 b)) 1
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqFin`, `instDecidableEqNat`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match h : (↑(WeightedAdd11.nx (WordD1.decode 7 b))).beq ↑1 with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/var/tmp/pencil-add11-word-validity-20261031-v1/Controls.lean:24:51: error: Tactic `decide` failed for proposition
+  WeightedAdd11.ny (WordD1.decode 7 b) = 1
+because its `Decidable` instance
+  ZMod.decidableEq (UInt64.toNat 7) (WeightedAdd11.ny (WordD1.decode 7 b)) 1
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqFin`, `instDecidableEqNat`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match h : (↑(WeightedAdd11.ny (WordD1.decode 7 b))).beq ↑1 with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/var/tmp/pencil-add11-word-validity-20261031-v1/Controls.lean:28:3: error: Tactic `decide` failed for proposition
+  WeightedAdd11.nx (WordD1.decode 7 a) ≠ WeightedAdd11.nx (WordD1.decode 7 b)
+because its `Decidable` instance
+  instDecidableNot
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableNot`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match h : (↑(WeightedAdd11.nx (WordD1.decode 7 a))).beq ↑(WeightedAdd11.nx (WordD1.decode 7 b)) with
+  | true => isTrue ⋯
+  | false => isFalse ⋯

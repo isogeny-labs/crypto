@@ -1,0 +1,108 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-postgb-la-20261026-A1
+experiment_id: postgb_la_20261026
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+receipt: research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-A1.receipt.json
+binds:
+- path: research/postgb_linear_stage_20261026/PROTOCOL.md
+  sha256: 0689a650288d0947c26d3609e66d0712829ba8400920862f8c60d9a1df7b08cb
+- path: examples/postgb_la_bench.rs
+  sha256: 16e500399da64523e26742d5ddd261f3fdd7cb3f4ea267ee08264f6126f4697f
+- path: ./target/release/examples/postgb_la_bench
+  sha256: 10e7922674ac7291a0aa4e11ec572bf957cfc2ed6893681d2feeb75f3c84c369
+- path: ./target/release/examples/jv_cover
+  sha256: afa830fc99087f12978f1e072c16b3f6e164c99b2b15e17fd6a3a7cc92bb050f
+must_not_exist:
+- research/postgb_linear_stage_20261026/runs/A1.json
+commands:
+- id: git-clean
+  argv:
+  - python3
+  - -c
+  - import subprocess,sys; out=subprocess.run(['git','status','--porcelain','--untracked-files=all','--',':(exclude)research/postgb_linear_stage_20261026/cards'],capture_output=True,text=True).stdout; sys.exit(1 if out.strip() else 0)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: output-absent
+  argv:
+  - python3
+  - -c
+  - import os,sys; sys.exit(1 if os.path.exists('research/postgb_linear_stage_20261026/runs/A1.json') else 0)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: mkdir-runs
+  argv:
+  - mkdir
+  - -p
+  - research/postgb_linear_stage_20261026/runs
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-record
+  argv:
+  - df
+  - -h
+  - /
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-A1.disk-start.stdout
+- id: lscpu-record
+  argv:
+  - lscpu
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-A1.lscpu.stdout
+- id: disk-before-run
+  argv:
+  - python3
+  - -c
+  - import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: quiet-before-run
+  argv:
+  - python3
+  - -c
+  - "import re, sys, time\nstart = time.time()\nheld = 0\nwhile True:\n    value = float(re.search(r'some avg10=([0-9.]+)', open('/proc/pressure/cpu').read()).group(1))\n    if value <= 1.0:\n        held += 1\n    else:\n        held = 0\n    if held >= 6:\n        sys.exit(0)\n    if time.time() - start >= 1800:\n        sys.exit(1)\n    time.sleep(5)\n"
+  timeout_seconds: 1860
+  success_exit_codes:
+  - 0
+- id: run
+  argv:
+  - ./target/release/examples/postgb_la_bench
+  - --families
+  - jv-nagao,gaudry-s4,gaudry-d4,dense
+  - --per
+  - '8'
+  - --reps
+  - '3'
+  - --arms
+  - sparse,fast
+  - --json
+  - research/postgb_linear_stage_20261026/runs/A1.json
+  timeout_seconds: 1700
+  success_exit_codes:
+  - 0
+  stdout: research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-A1.run.stdout
+  stderr: research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-A1.run.stderr
+  outputs:
+  - research/postgb_linear_stage_20261026/runs/A1.json
+  env:
+    ZERO_DIM_LA_SIMD: portable
+bus_address: executor-mechanical-postgb-la-20261026-a1
+background: true
+write_scope:
+- research/postgb_linear_stage_20261026/runs/
+- research/postgb_linear_stage_20261026/cards/
+stop_when:
+- Any command in the card exits with a status other than 0, or times out.
+- The quiet-before-run command exits with status 1, meaning the CPU did not become quiet within 1800 seconds.
+- The disk has less than 1000000000 bytes free before the run.
+- The working tree has a change outside research/postgb_linear_stage_20261026/cards before the run.
+- 'On any stop: report the printed text verbatim, retry nothing and edit nothing.'

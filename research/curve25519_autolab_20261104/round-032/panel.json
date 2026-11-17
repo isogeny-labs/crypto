@@ -1,0 +1,903 @@
+{
+  "created": "2026-11-04T11:20:39Z",
+  "round": 32,
+  "rules": {
+    "exploration_slots": 16,
+    "families_enabled": [
+      "mitm2",
+      "ksum3",
+      "ksum4",
+      "ksum5",
+      "rfmitm2",
+      "mitmbatch",
+      "mitmblocked",
+      "ksum3f",
+      "ksum4f",
+      "ksum5f",
+      "wsum-b4",
+      "wsum-b5",
+      "wsum-b12",
+      "wsum-b20",
+      "wsum-b8",
+      "wsum-b16",
+      "wsum-b24",
+      "wsum-b30",
+      "wsum2-b30",
+      "wsum2-b60",
+      "wsum2-b120",
+      "wsum2-b200",
+      "wsum2-b15",
+      "wsum2-b20",
+      "wsum2-b40",
+      "wsum2-b45",
+      "wsum2-b50",
+      "wsum2-b75",
+      "wsum2-b90",
+      "wsum2-b100",
+      "wsum2-b140",
+      "wsum2-b160",
+      "wsum2g-b20",
+      "wsum2g-b30",
+      "wsum2g-b45",
+      "wsum2g-b60",
+      "wsum2g-b90",
+      "wsum2g-b120",
+      "wsum2g-b10",
+      "wsum2g-b15",
+      "wsum2g-b160",
+      "wsum2g-b180",
+      "wwalk-x08",
+      "wwalkg-x08",
+      "wwalk-x08-grow",
+      "wwalkg-x08-grow",
+      "wwalk-x10",
+      "wwalkg-x10",
+      "wwalk-x10-grow",
+      "wwalkg-x10-grow",
+      "wwalk-x12",
+      "wwalkg-x12",
+      "wwalk-x05",
+      "wwalkg-x05",
+      "wwalk-x05-grow",
+      "wwalkg-x05-grow",
+      "wwalk-x06",
+      "wwalkg-x06",
+      "wwalk-x06-grow",
+      "wwalkg-x06-grow",
+      "wwalk-x07",
+      "wwalkg-x07",
+      "wwalk-x07-grow",
+      "wwalkg-x07-grow",
+      "wwalk-x09",
+      "wwalkg-x09",
+      "wwalk-x09-grow",
+      "wwalkg-x09-grow"
+    ],
+    "max_candidates": 18,
+    "n_grid": [
+      0.5,
+      0.7,
+      0.85,
+      1.2,
+      1.4,
+      2.0
+    ]
+  },
+  "schema": "ic_autolab.panel/v1",
+  "sizes": {
+    "20": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x05",
+            "n": 2,
+            "name": "wwalk-x05-n2",
+            "oracle": "wwalk:x=0.5"
+          },
+          "reason": "exploration: family wwalk-x05 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x05",
+            "n": 2,
+            "name": "wwalkg-x05-n2",
+            "oracle": "wwalk:x=0.5",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x05 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x05-grow",
+            "n": 2,
+            "name": "wwalk-x05-grow-n2",
+            "oracle": "wwalk:x=0.5,grow=1"
+          },
+          "reason": "exploration: family wwalk-x05-grow untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x05-grow",
+            "n": 2,
+            "name": "wwalkg-x05-grow-n2",
+            "oracle": "wwalk:x=0.5,grow=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x05-grow untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x06",
+            "n": 2,
+            "name": "wwalk-x06-n2",
+            "oracle": "wwalk:x=0.6"
+          },
+          "reason": "exploration: family wwalk-x06 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x06",
+            "n": 2,
+            "name": "wwalkg-x06-n2",
+            "oracle": "wwalk:x=0.6",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x06 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x06-grow",
+            "n": 2,
+            "name": "wwalk-x06-grow-n2",
+            "oracle": "wwalk:x=0.6,grow=1"
+          },
+          "reason": "exploration: family wwalk-x06-grow untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x06-grow",
+            "n": 2,
+            "name": "wwalkg-x06-grow-n2",
+            "oracle": "wwalk:x=0.6,grow=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x06-grow untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x07",
+            "n": 2,
+            "name": "wwalk-x07-n2",
+            "oracle": "wwalk:x=0.7"
+          },
+          "reason": "exploration: family wwalk-x07 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x07",
+            "n": 2,
+            "name": "wwalkg-x07-n2",
+            "oracle": "wwalk:x=0.7",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x07 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x07-grow",
+            "n": 2,
+            "name": "wwalk-x07-grow-n2",
+            "oracle": "wwalk:x=0.7,grow=1"
+          },
+          "reason": "exploration: family wwalk-x07-grow untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x07-grow",
+            "n": 2,
+            "name": "wwalkg-x07-grow-n2",
+            "oracle": "wwalk:x=0.7,grow=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x07-grow untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x09",
+            "n": 2,
+            "name": "wwalk-x09-n2",
+            "oracle": "wwalk:x=0.9"
+          },
+          "reason": "exploration: family wwalk-x09 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x09",
+            "n": 2,
+            "name": "wwalkg-x09-n2",
+            "oracle": "wwalk:x=0.9",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x09 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x09-grow",
+            "n": 2,
+            "name": "wwalk-x09-grow-n2",
+            "oracle": "wwalk:x=0.9,grow=1"
+          },
+          "reason": "exploration: family wwalk-x09-grow untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x09-grow",
+            "n": 2,
+            "name": "wwalkg-x09-grow-n2",
+            "oracle": "wwalk:x=0.9,grow=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x09-grow untried at k = 20, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wsum2g-b15",
+        "n": 2,
+        "name": "wsum2g-b15-n2",
+        "oracle": "wsum:coef=15,free=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "incumbent_s": [
+        2.5745780660849693,
+        2.691211404585748,
+        3.740911451092766
+      ],
+      "tried_before": 75
+    },
+    "24": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x05",
+            "n": 2,
+            "name": "wwalk-x05-n2",
+            "oracle": "wwalk:x=0.5"
+          },
+          "reason": "exploration: family wwalk-x05 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x05",
+            "n": 2,
+            "name": "wwalkg-x05-n2",
+            "oracle": "wwalk:x=0.5",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x05 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x05-grow",
+            "n": 2,
+            "name": "wwalk-x05-grow-n2",
+            "oracle": "wwalk:x=0.5,grow=1"
+          },
+          "reason": "exploration: family wwalk-x05-grow untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x05-grow",
+            "n": 2,
+            "name": "wwalkg-x05-grow-n2",
+            "oracle": "wwalk:x=0.5,grow=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x05-grow untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x06",
+            "n": 2,
+            "name": "wwalk-x06-n2",
+            "oracle": "wwalk:x=0.6"
+          },
+          "reason": "exploration: family wwalk-x06 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x06",
+            "n": 2,
+            "name": "wwalkg-x06-n2",
+            "oracle": "wwalk:x=0.6",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x06 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x06-grow",
+            "n": 2,
+            "name": "wwalk-x06-grow-n2",
+            "oracle": "wwalk:x=0.6,grow=1"
+          },
+          "reason": "exploration: family wwalk-x06-grow untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x06-grow",
+            "n": 2,
+            "name": "wwalkg-x06-grow-n2",
+            "oracle": "wwalk:x=0.6,grow=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x06-grow untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x07",
+            "n": 2,
+            "name": "wwalk-x07-n2",
+            "oracle": "wwalk:x=0.7"
+          },
+          "reason": "exploration: family wwalk-x07 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x07",
+            "n": 2,
+            "name": "wwalkg-x07-n2",
+            "oracle": "wwalk:x=0.7",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x07 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x07-grow",
+            "n": 2,
+            "name": "wwalk-x07-grow-n2",
+            "oracle": "wwalk:x=0.7,grow=1"
+          },
+          "reason": "exploration: family wwalk-x07-grow untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x07-grow",
+            "n": 2,
+            "name": "wwalkg-x07-grow-n2",
+            "oracle": "wwalk:x=0.7,grow=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x07-grow untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x09",
+            "n": 2,
+            "name": "wwalk-x09-n2",
+            "oracle": "wwalk:x=0.9"
+          },
+          "reason": "exploration: family wwalk-x09 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x09",
+            "n": 2,
+            "name": "wwalkg-x09-n2",
+            "oracle": "wwalk:x=0.9",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x09 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x09-grow",
+            "n": 2,
+            "name": "wwalk-x09-grow-n2",
+            "oracle": "wwalk:x=0.9,grow=1"
+          },
+          "reason": "exploration: family wwalk-x09-grow untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x09-grow",
+            "n": 2,
+            "name": "wwalkg-x09-grow-n2",
+            "oracle": "wwalk:x=0.9,grow=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x09-grow untried at k = 24, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x08-grow",
+        "n": 2,
+        "name": "wwalkg-x08-grow-n2",
+        "oracle": "wwalk:x=0.8,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "incumbent_s": [
+        2.1637944506942914,
+        2.2429065062462166,
+        2.9549150062135494
+      ],
+      "tried_before": 75
+    },
+    "28": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x05",
+            "n": 2,
+            "name": "wwalk-x05-n2",
+            "oracle": "wwalk:x=0.5"
+          },
+          "reason": "exploration: family wwalk-x05 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x05",
+            "n": 2,
+            "name": "wwalkg-x05-n2",
+            "oracle": "wwalk:x=0.5",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x05 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x05-grow",
+            "n": 2,
+            "name": "wwalk-x05-grow-n2",
+            "oracle": "wwalk:x=0.5,grow=1"
+          },
+          "reason": "exploration: family wwalk-x05-grow untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x05-grow",
+            "n": 2,
+            "name": "wwalkg-x05-grow-n2",
+            "oracle": "wwalk:x=0.5,grow=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x05-grow untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x06",
+            "n": 2,
+            "name": "wwalk-x06-n2",
+            "oracle": "wwalk:x=0.6"
+          },
+          "reason": "exploration: family wwalk-x06 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x06",
+            "n": 2,
+            "name": "wwalkg-x06-n2",
+            "oracle": "wwalk:x=0.6",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x06 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x06-grow",
+            "n": 2,
+            "name": "wwalk-x06-grow-n2",
+            "oracle": "wwalk:x=0.6,grow=1"
+          },
+          "reason": "exploration: family wwalk-x06-grow untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x06-grow",
+            "n": 2,
+            "name": "wwalkg-x06-grow-n2",
+            "oracle": "wwalk:x=0.6,grow=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x06-grow untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x07",
+            "n": 2,
+            "name": "wwalk-x07-n2",
+            "oracle": "wwalk:x=0.7"
+          },
+          "reason": "exploration: family wwalk-x07 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x07",
+            "n": 2,
+            "name": "wwalkg-x07-n2",
+            "oracle": "wwalk:x=0.7",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x07 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x07-grow",
+            "n": 2,
+            "name": "wwalk-x07-grow-n2",
+            "oracle": "wwalk:x=0.7,grow=1"
+          },
+          "reason": "exploration: family wwalk-x07-grow untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x07-grow",
+            "n": 2,
+            "name": "wwalkg-x07-grow-n2",
+            "oracle": "wwalk:x=0.7,grow=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x07-grow untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x09",
+            "n": 2,
+            "name": "wwalk-x09-n2",
+            "oracle": "wwalk:x=0.9"
+          },
+          "reason": "exploration: family wwalk-x09 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x09",
+            "n": 2,
+            "name": "wwalkg-x09-n2",
+            "oracle": "wwalk:x=0.9",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x09 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x09-grow",
+            "n": 2,
+            "name": "wwalk-x09-grow-n2",
+            "oracle": "wwalk:x=0.9,grow=1"
+          },
+          "reason": "exploration: family wwalk-x09-grow untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x09-grow",
+            "n": 2,
+            "name": "wwalkg-x09-grow-n2",
+            "oracle": "wwalk:x=0.9,grow=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x09-grow untried at k = 28, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x08",
+        "n": 2,
+        "name": "wwalkg-x08-n2",
+        "oracle": "wwalk:x=0.8",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "incumbent_s": [
+        1.9210982989570122,
+        2.029106402748029,
+        3.001179336867195
+      ],
+      "tried_before": 90
+    },
+    "32": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x05",
+            "n": 2,
+            "name": "wwalk-x05-n2",
+            "oracle": "wwalk:x=0.5"
+          },
+          "reason": "exploration: family wwalk-x05 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x05",
+            "n": 2,
+            "name": "wwalkg-x05-n2",
+            "oracle": "wwalk:x=0.5",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x05 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x05-grow",
+            "n": 2,
+            "name": "wwalk-x05-grow-n2",
+            "oracle": "wwalk:x=0.5,grow=1"
+          },
+          "reason": "exploration: family wwalk-x05-grow untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x05-grow",
+            "n": 2,
+            "name": "wwalkg-x05-grow-n2",
+            "oracle": "wwalk:x=0.5,grow=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x05-grow untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x06",
+            "n": 2,
+            "name": "wwalk-x06-n2",
+            "oracle": "wwalk:x=0.6"
+          },
+          "reason": "exploration: family wwalk-x06 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x06",
+            "n": 2,
+            "name": "wwalkg-x06-n2",
+            "oracle": "wwalk:x=0.6",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x06 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x06-grow",
+            "n": 2,
+            "name": "wwalk-x06-grow-n2",
+            "oracle": "wwalk:x=0.6,grow=1"
+          },
+          "reason": "exploration: family wwalk-x06-grow untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x06-grow",
+            "n": 2,
+            "name": "wwalkg-x06-grow-n2",
+            "oracle": "wwalk:x=0.6,grow=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x06-grow untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x07",
+            "n": 2,
+            "name": "wwalk-x07-n2",
+            "oracle": "wwalk:x=0.7"
+          },
+          "reason": "exploration: family wwalk-x07 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x07",
+            "n": 2,
+            "name": "wwalkg-x07-n2",
+            "oracle": "wwalk:x=0.7",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x07 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x07-grow",
+            "n": 2,
+            "name": "wwalk-x07-grow-n2",
+            "oracle": "wwalk:x=0.7,grow=1"
+          },
+          "reason": "exploration: family wwalk-x07-grow untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x07-grow",
+            "n": 2,
+            "name": "wwalkg-x07-grow-n2",
+            "oracle": "wwalk:x=0.7,grow=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x07-grow untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x09",
+            "n": 2,
+            "name": "wwalk-x09-n2",
+            "oracle": "wwalk:x=0.9"
+          },
+          "reason": "exploration: family wwalk-x09 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x09",
+            "n": 2,
+            "name": "wwalkg-x09-n2",
+            "oracle": "wwalk:x=0.9",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x09 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalk-x09-grow",
+            "n": 2,
+            "name": "wwalk-x09-grow-n2",
+            "oracle": "wwalk:x=0.9,grow=1"
+          },
+          "reason": "exploration: family wwalk-x09-grow untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkg-x09-grow",
+            "n": 2,
+            "name": "wwalkg-x09-grow-n2",
+            "oracle": "wwalk:x=0.9,grow=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkg-x09-grow untried at k = 32, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x10",
+        "n": 2,
+        "name": "wwalk-x10-n2",
+        "oracle": "wwalk:x=1.0"
+      },
+      "incumbent_s": [
+        2.1099514840315168,
+        2.3163940892115056,
+        4.1743775358313995
+      ],
+      "tried_before": 81
+    }
+  },
+  "track": "generic"
+}

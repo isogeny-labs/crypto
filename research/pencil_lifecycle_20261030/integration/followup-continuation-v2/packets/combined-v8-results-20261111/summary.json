@@ -1,0 +1,200 @@
+{
+  "schema": "research.terminal-result/v1",
+  "attempt": "signed-kummer-combined-v8-20261111",
+  "status": "failed",
+  "seal_status": "passed",
+  "cleanup_complete": true,
+  "sealed_after_owned_cgroup_empty": true,
+  "materialization": {
+    "status": "passed",
+    "source_files": 4485,
+    "source_manifest_sha256": "a9423e8a2b468c159402c65f9608b870058a423f82ca1ba06d63223ceab50871",
+    "fresh_cache_manifest_sha256": "9eae2a2fc003071692c5058e52b6e712f2d3ee0ad87e5c2086bc08240479c850",
+    "cache_mode_inventory_sha256": "c432da2dff731eaf5cd58593ef3267500c64bc13e53f25e57f22184b990bf241",
+    "cache_mode_files": 2165,
+    "cache_executable_files": 82,
+    "cache_modes_preserved": true,
+    "workspace": "/var/tmp/pencil-signed-kummer-combined-v8-20261111",
+    "build_end_monotonic": 435186.862813704,
+    "absolute_deadline": "2026-11-11T12:00:00Z",
+    "compiler_started": false,
+    "donor_modified": false
+  },
+  "filesystem_controls": {
+    "schema": "pencil.concurrent-tree-control/v1",
+    "status": "passed",
+    "positive_controls": {
+      "compiler_directory_disappearance": true,
+      "compiler_descent_scandir_disappearance": true,
+      "compiler_file_disappearance": true,
+      "atomic_receipt_temp_disappearance": true
+    },
+    "negative_controls": [
+      {
+        "label": "immutable disappearance",
+        "rejected": true,
+        "error": "FileNotFoundError"
+      },
+      {
+        "label": "symlink",
+        "rejected": true,
+        "error": "RuntimeError"
+      },
+      {
+        "label": "special file",
+        "rejected": true,
+        "error": "RuntimeError"
+      },
+      {
+        "label": "permission error",
+        "rejected": true,
+        "error": "PermissionError"
+      },
+      {
+        "label": "unrecognized durable disappearance",
+        "rejected": true,
+        "error": "FileNotFoundError"
+      }
+    ],
+    "fail_closed_count": 5,
+    "final_fixture_files": 1,
+    "final_fixture_bytes": 1,
+    "fixture_bytes_cap": 1048576,
+    "source_root_mode": 448,
+    "elapsed_seconds": 0.0036882429849356413
+  },
+  "root_test_binary": {
+    "path": "/var/tmp/pencil-signed-kummer-combined-v8-20261111/cache/target/release/deps/crypto_lib-0f5740d1cfe22c09",
+    "sha256": "e641bcf1d5e2be3369b52ca60ee0721fc8a89b734375e5334b026c31389feb88",
+    "bytes": 253684264,
+    "reporter_rehashed": true
+  },
+  "commands_executed": [
+    "materialize",
+    "compile",
+    "stage-driver",
+    "compile-driver"
+  ],
+  "command_reaped_exits": [
+    0,
+    0,
+    0,
+    101
+  ],
+  "all_commands_reaped": true,
+  "tests_invoked": false,
+  "unattempted": [
+    "root signed/Labels tests",
+    "full739 driver",
+    "forced probes",
+    "adapter negatives"
+  ],
+  "failure": {
+    "repr": "AssertionError('compile-driver failed')",
+    "traceback": "Traceback (most recent call last):\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v8-20261111/durable-worker.py\", line 230, in <module>\n    driver_output=command('compile-driver',[cargo,'test','--manifest-path',str(driver_manifest),'--release','--bin','equivalence','--locked','--offline','--no-run','--message-format=json'],cwd=driver_root)\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v8-20261111/durable-worker.py\", line 128, in command\n    assert row['exit_code']==0,label+' failed'\nAssertionError: compile-driver failed\n"
+  },
+  "elapsed_seconds": {
+    "materializer": 37.19961454201257,
+    "root_compile": 1298.221752360987,
+    "stage_driver": 0.31908915896201506,
+    "driver_compile": 11.976296013977844,
+    "worker": 1384.3180906749913,
+    "completion": 1386.0954978250084,
+    "caller": 1386.2475144969649
+  },
+  "cgroup_cpu_seconds": 1390.513635,
+  "nested_intervals_not_additive": true,
+  "attempt_charge_seconds": 2400,
+  "campaign_charged_seconds": 25380,
+  "campaign_remaining_seconds": 104220,
+  "deadline_utc": "2026-11-11T12:00:00Z",
+  "raw_files": 24,
+  "raw_terminal_entries_rehashed": 15,
+  "reporter_self_checks": true,
+  "independent_result_review": false,
+  "dollar_cost": null,
+  "scientific_cost_ratio": null,
+  "source_and_cache_modified_by_reporter": false,
+  "driver_compiler_errors": [
+    {
+      "rendered": "error: no rules expected `0`\n   --> src/driver-controls.rs:122:87\n    |\n122 |         begin_driver(&mut observer,&mut calls,\"lift\",||json!({\"labels\":[0,1],\"pair\":[[0;4],[0;4]]})).unwrap();\n    |                                                                                       ^ no rules expected this token in macro call\n    |\n    = note: while trying to match end of macro\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "note",
+          "message": "while trying to match end of macro",
+          "rendered": null,
+          "spans": []
+        }
+      ],
+      "level": "error",
+      "message": "no rules expected `0`",
+      "spans": [
+        {
+          "byte_end": 7785,
+          "byte_start": 7784,
+          "column_end": 88,
+          "column_start": 87,
+          "expansion": null,
+          "file_name": "src/driver-controls.rs",
+          "is_primary": true,
+          "label": "no rules expected this token in macro call",
+          "line_end": 122,
+          "line_start": 122,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 88,
+              "highlight_start": 87,
+              "text": "        begin_driver(&mut observer,&mut calls,\"lift\",||json!({\"labels\":[0,1],\"pair\":[[0;4],[0;4]]})).unwrap();"
+            }
+          ]
+        }
+      ],
+      "code": null
+    },
+    {
+      "rendered": "error: no rules expected `0`\n   --> src/driver-controls.rs:122:93\n    |\n122 |         begin_driver(&mut observer,&mut calls,\"lift\",||json!({\"labels\":[0,1],\"pair\":[[0;4],[0;4]]})).unwrap();\n    |                                                                                             ^ no rules expected this token in macro call\n    |\n    = note: while trying to match end of macro\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "note",
+          "message": "while trying to match end of macro",
+          "rendered": null,
+          "spans": []
+        }
+      ],
+      "level": "error",
+      "message": "no rules expected `0`",
+      "spans": [
+        {
+          "byte_end": 7791,
+          "byte_start": 7790,
+          "column_end": 94,
+          "column_start": 93,
+          "expansion": null,
+          "file_name": "src/driver-controls.rs",
+          "is_primary": true,
+          "label": "no rules expected this token in macro call",
+          "line_end": 122,
+          "line_start": 122,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 94,
+              "highlight_start": 93,
+              "text": "        begin_driver(&mut observer,&mut calls,\"lift\",||json!({\"labels\":[0,1],\"pair\":[[0;4],[0;4]]})).unwrap();"
+            }
+          ]
+        }
+      ],
+      "code": null
+    }
+  ]
+}

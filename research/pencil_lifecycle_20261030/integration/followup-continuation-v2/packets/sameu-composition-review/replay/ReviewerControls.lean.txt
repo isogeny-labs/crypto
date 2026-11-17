@@ -1,0 +1,20 @@
+import Controls
+set_option autoImplicit false
+open MixedCancellation SameUMixed SameUCompositionControls
+-- Independent hand derivation: v1=1,v2=X meet at (1,1).
+example : WeightedAdd11.nx (sourcePoint a b)=(1:ZMod 5) ∧
+ WeightedAdd11.ny (sourcePoint a b)=(1:ZMod 5) := by
+ norm_num [WeightedAdd11.nx,WeightedAdd11.ny,sourcePoint,sourceK,a,b]
+ <;> decide
+-- f'= -1 and 2*y=2 give tangent slope2 in F5; u=(X-1)^2, v=2X-1.
+example : let o := MixedPositiveDistinct.doubled (1:ZMod 5) (-1) 0 0 (sourcePoint a b)
+ nq o=3 ∧ nr o=1 ∧ ns o=2 ∧ nt o=4 := by
+ norm_num [sourcePoint,sourceK,a,b,MixedPositiveDistinct.doubled,WeightedDoubling.output,nq,nr,ns,nt]
+ refine ⟨?_,?_,?_,?_⟩
+ · apply (div_eq_iff (by decide)).2
+   decide
+ · decide
+ · apply (div_eq_iff (by decide)).2
+   decide
+ · apply (div_eq_iff (by decide)).2
+   decide

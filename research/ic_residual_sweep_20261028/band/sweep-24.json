@@ -1,0 +1,432 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "log2_r": 23.813296121662056,
+      "arm": "pair-table-b256",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        21.9564903249468,
+        22.891680080713986,
+        31.308387882618717
+      ],
+      "charged_sum": 3034755.0,
+      "native_sum": 1292589,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "log2_r": 23.813296121662056,
+      "arm": "rho-lanes16",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        1.4697783170411756,
+        1.6068543106533475,
+        2.8405382531628955
+      ],
+      "charged_sum": 203148.0,
+      "native_sum": 189462,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "log2_r": 23.813296121662056,
+      "arm": "rho-neg",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        1.0273211282987167,
+        1.1203293843438629,
+        1.9574036887501818
+      ],
+      "charged_sum": 141993.0,
+      "native_sum": 128553,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "log2_r": 23.813296121662056,
+      "arm": "sweep-b128",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        13.282137216810542,
+        14.627767060554245,
+        26.73843565424751
+      ],
+      "charged_sum": 1835814.0,
+      "native_sum": 1859886,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "log2_r": 23.813296121662056,
+      "arm": "sweep-b16",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        5.569816484275564,
+        6.102785849754592,
+        10.89951013906583
+      ],
+      "charged_sum": 769842.0,
+      "native_sum": 736653,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "log2_r": 23.813296121662056,
+      "arm": "sweep-b2",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        2.9288560506116594,
+        3.1922792378166074,
+        5.563087922661134
+      ],
+      "charged_sum": 404817.0,
+      "native_sum": 364095,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "log2_r": 23.813296121662056,
+      "arm": "sweep-b32",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        7.147013031735499,
+        7.842392510556904,
+        14.100807819949516
+      ],
+      "charged_sum": 987837.0,
+      "native_sum": 961131,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "log2_r": 23.813296121662056,
+      "arm": "sweep-b4",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        3.5600385401201566,
+        3.8872050813549723,
+        6.8317039524683105
+      ],
+      "charged_sum": 492057.0,
+      "native_sum": 452199,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "log2_r": 23.813296121662056,
+      "arm": "sweep-b64",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        9.477113918812726,
+        10.415496485591152,
+        18.86093958659699
+      ],
+      "charged_sum": 1309896.0,
+      "native_sum": 1297002,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "log2_r": 23.813296121662056,
+      "arm": "sweep-b8",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        4.2287924494821345,
+        4.624227845058458,
+        8.183146405245374
+      ],
+      "charged_sum": 584490.0,
+      "native_sum": 546558,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "pair-table-b256",
+      "b": "rho-lanes16",
+      "verdict": "rho-lanes16 < pair-table-b256"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "pair-table-b256",
+      "b": "rho-neg",
+      "verdict": "rho-neg < pair-table-b256"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "pair-table-b256",
+      "b": "sweep-b128",
+      "verdict": "sweep-b128 < pair-table-b256"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "pair-table-b256",
+      "b": "sweep-b16",
+      "verdict": "sweep-b16 < pair-table-b256"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "pair-table-b256",
+      "b": "sweep-b2",
+      "verdict": "sweep-b2 < pair-table-b256"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "pair-table-b256",
+      "b": "sweep-b32",
+      "verdict": "sweep-b32 < pair-table-b256"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "pair-table-b256",
+      "b": "sweep-b4",
+      "verdict": "sweep-b4 < pair-table-b256"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "pair-table-b256",
+      "b": "sweep-b64",
+      "verdict": "sweep-b64 < pair-table-b256"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "pair-table-b256",
+      "b": "sweep-b8",
+      "verdict": "sweep-b8 < pair-table-b256"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "rho-lanes16",
+      "b": "rho-neg",
+      "verdict": "rho-neg < rho-lanes16"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "rho-lanes16",
+      "b": "sweep-b128",
+      "verdict": "rho-lanes16 < sweep-b128"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "rho-lanes16",
+      "b": "sweep-b16",
+      "verdict": "rho-lanes16 < sweep-b16"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "rho-lanes16",
+      "b": "sweep-b2",
+      "verdict": "rho-lanes16 < sweep-b2"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "rho-lanes16",
+      "b": "sweep-b32",
+      "verdict": "rho-lanes16 < sweep-b32"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "rho-lanes16",
+      "b": "sweep-b4",
+      "verdict": "rho-lanes16 < sweep-b4"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "rho-lanes16",
+      "b": "sweep-b64",
+      "verdict": "rho-lanes16 < sweep-b64"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "rho-lanes16",
+      "b": "sweep-b8",
+      "verdict": "rho-lanes16 < sweep-b8"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "rho-neg",
+      "b": "sweep-b128",
+      "verdict": "rho-neg < sweep-b128"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "rho-neg",
+      "b": "sweep-b16",
+      "verdict": "rho-neg < sweep-b16"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "rho-neg",
+      "b": "sweep-b2",
+      "verdict": "rho-neg < sweep-b2"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "rho-neg",
+      "b": "sweep-b32",
+      "verdict": "rho-neg < sweep-b32"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "rho-neg",
+      "b": "sweep-b4",
+      "verdict": "rho-neg < sweep-b4"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "rho-neg",
+      "b": "sweep-b64",
+      "verdict": "rho-neg < sweep-b64"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "rho-neg",
+      "b": "sweep-b8",
+      "verdict": "rho-neg < sweep-b8"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b128",
+      "b": "sweep-b16",
+      "verdict": "sweep-b16 < sweep-b128"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b128",
+      "b": "sweep-b2",
+      "verdict": "sweep-b2 < sweep-b128"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b128",
+      "b": "sweep-b32",
+      "verdict": "sweep-b32 < sweep-b128"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b128",
+      "b": "sweep-b4",
+      "verdict": "sweep-b4 < sweep-b128"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b128",
+      "b": "sweep-b64",
+      "verdict": "sweep-b64 < sweep-b128"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b128",
+      "b": "sweep-b8",
+      "verdict": "sweep-b8 < sweep-b128"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b16",
+      "b": "sweep-b2",
+      "verdict": "sweep-b2 < sweep-b16"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b16",
+      "b": "sweep-b32",
+      "verdict": "sweep-b16 < sweep-b32"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b16",
+      "b": "sweep-b4",
+      "verdict": "sweep-b4 < sweep-b16"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b16",
+      "b": "sweep-b64",
+      "verdict": "sweep-b16 < sweep-b64"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b16",
+      "b": "sweep-b8",
+      "verdict": "sweep-b8 < sweep-b16"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b2",
+      "b": "sweep-b32",
+      "verdict": "sweep-b2 < sweep-b32"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b2",
+      "b": "sweep-b4",
+      "verdict": "sweep-b2 < sweep-b4"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b2",
+      "b": "sweep-b64",
+      "verdict": "sweep-b2 < sweep-b64"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b2",
+      "b": "sweep-b8",
+      "verdict": "sweep-b2 < sweep-b8"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b32",
+      "b": "sweep-b4",
+      "verdict": "sweep-b4 < sweep-b32"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b32",
+      "b": "sweep-b64",
+      "verdict": "sweep-b32 < sweep-b64"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b32",
+      "b": "sweep-b8",
+      "verdict": "sweep-b8 < sweep-b32"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b4",
+      "b": "sweep-b64",
+      "verdict": "sweep-b4 < sweep-b64"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b4",
+      "b": "sweep-b8",
+      "verdict": "sweep-b4 < sweep-b8"
+    },
+    {
+      "curve": "icv1-fp24-tm1809-c1393549",
+      "a": "sweep-b64",
+      "b": "sweep-b8",
+      "verdict": "sweep-b8 < sweep-b64"
+    }
+  ]
+}

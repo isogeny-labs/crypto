@@ -1,0 +1,63 @@
+{
+  "schema": "software-validation/v1",
+  "created": "2026-10-29T23:24:03Z",
+  "scope": "Native canonical packaging correction; public synthetic mathematical software fixtures; no solver execution",
+  "adapter_sha256": "fc96a3d15f1a50e255a86870fea3b351d655a674b09f4b6d05f3befa573b39f1",
+  "python_runtime_invoked": false,
+  "tests": {
+    "command": "cargo +1.99.1 test --release --locked",
+    "passed": 40,
+    "failed": 0,
+    "ignored": 0,
+    "private_unit_contracts": 37,
+    "native_protocol_cli": 1,
+    "historical_digest_semantics": 1,
+    "production_full_denominator_replay": 1,
+    "production_seconds": 205.38,
+    "log": "validation/review-fixes-final-tests.log",
+    "sha256": "8cbcfd0d790c4f4a91e4866540dbc9cb4cf4f1df67500e683d16dae744b30e83"
+  },
+  "clippy": {
+    "command": "cargo +1.99.1 clippy --release --locked --all-targets -- -D warnings",
+    "passed": true,
+    "log": "validation/review-fixes-final-clippy.log",
+    "sha256": "532d4127b1dd878759c3048f4390b8910c7af8f2a7faf9ae0048e73017103cd2"
+  },
+  "fmt": {
+    "command": "cargo +1.99.1 fmt --check",
+    "passed": true,
+    "log": "validation/review-fixes-final-fmt.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "source_manifest": {
+    "path": "validation/review-fixes-source-files.sha256",
+    "sha256": "6a1cfa53e9e490022090a81f6b4a745edaaaabd6aaaef0bca369e54af00be05d"
+  },
+  "production_fixture": {
+    "planned_workloads": 1260,
+    "planned_execution_slots": 22680,
+    "observed_solver_records": 0,
+    "mock_build_binary_receipts": true,
+    "actual_source_linked_native_aggregate_replayed": true,
+    "control_and_partial_cost_mutations_rejected": true
+  },
+  "admission": {
+    "runtime_replay_bypass": false,
+    "independent_mathematical_implementation": false,
+    "original_binary_execution_attested": false,
+    "qualified": false
+  },
+  "cohort_targets_executed": 0,
+  "qualified_cost_ratio": null,
+  "independent_review": "pending corrected-source review",
+  "prior_receipt_preserved": "validation/receipt.json",
+  "failed_intermediate_logs_preserved": [
+    "validation/review-fixes-first.log",
+    "validation/review-fixes-unit.log"
+  ],
+  "remaining_obligations": [
+    "Independent corrected-source review",
+    "Bind final native adapter hash in protocol before use",
+    "Actual frozen execution and independent mathematical evidence review remain separate"
+  ]
+}

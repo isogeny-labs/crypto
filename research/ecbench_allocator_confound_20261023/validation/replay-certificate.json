@@ -1,0 +1,114 @@
+{
+  "schema": "validation-gate/replay-certificate/v1",
+  "status": "verified",
+  "scalars_verified": true,
+  "independent": false,
+  "study": "research/ecbench_allocator_confound_20261023",
+  "what_was_replayed": "every session re-audited with `ecbench verify --replay-all --exit-code`: file hashes, spec and plan identity, seeds, record seals; every recovered logarithm [k]G = Q rechecked; every measured deterministic run re-executed requiring identical answer, total, phases and counters.",
+  "independence": {
+    "independent": false,
+    "reason": "the replay was run on the same VM, by the same agent and with the same binary (the PR binary) that produced the fix sessions, minutes after the sessions; no host of another ecbench class and no validator who did not run the study took part. The gate requires independent: true, so this certificate is a candidate only.",
+    "auditor_binary_sha256": "26f25d9fa47a004af88ad7c4cd76104ca1ddef19393cc3c06aa2296a297da09c",
+    "same_host_as_sessions": true
+  },
+  "runs": [
+    {
+      "session": "base-claim",
+      "session_id": "ECBS1h7c0082ac7265",
+      "receipt": "../audits/base-claim.audit.json",
+      "receipt_sha256": "815f324762660f72639487edd67a078308d01fe46112d41c0c258c2dde9f0672",
+      "result": "audit OK: 66 records, 66 verified, 60 replays reproduced, 0 problems"
+    },
+    {
+      "session": "base-claim-rev",
+      "session_id": "ECBS1h4d78060e6148",
+      "receipt": "../audits/base-claim-rev.audit.json",
+      "receipt_sha256": "3a9a18193fa77680b8e865cb531e3f9a39fc67c2ff770a85ceb89daa8cef22b8",
+      "result": "audit OK: 66 records, 66 verified, 60 replays reproduced, 0 problems"
+    },
+    {
+      "session": "base-smoke",
+      "session_id": "ECBS1hd3725d8a32c3",
+      "receipt": "../audits/base-smoke.audit.json",
+      "receipt_sha256": "d5555c654486c34acea37d6f5b3323ee20b89cee730120e239f9e27d0a88cf2d",
+      "result": "audit OK: 72 records, 72 verified, 54 replays reproduced, 0 problems"
+    },
+    {
+      "session": "base-smoke-rev",
+      "session_id": "ECBS1h420293eaa9c5",
+      "receipt": "../audits/base-smoke-rev.audit.json",
+      "receipt_sha256": "9293dbb1de70521559c580f010110606985ab828b02588134ed778a576fa3858",
+      "result": "audit OK: 72 records, 72 verified, 54 replays reproduced, 0 problems"
+    },
+    {
+      "session": "fix-claim",
+      "session_id": "ECBS1h157a7553e392",
+      "receipt": "../audits/fix-claim.audit.json",
+      "receipt_sha256": "aa176c9a193431ce320c16ebd73df97eb455c5ec188c6dc0b01e264e0b164cb0",
+      "result": "audit OK: 66 records, 66 verified, 60 replays reproduced, 0 problems"
+    },
+    {
+      "session": "fix-claim-rev",
+      "session_id": "ECBS1ha418537656ed",
+      "receipt": "../audits/fix-claim-rev.audit.json",
+      "receipt_sha256": "b28948fa6b5c0d4fcaa9c82c15b3b852949c94addc833e4f59d7847c87ed1927",
+      "result": "audit OK: 66 records, 66 verified, 60 replays reproduced, 0 problems"
+    },
+    {
+      "session": "fix-noprobe-claim",
+      "session_id": "ECBS1h11617fea463f",
+      "receipt": "../audits/fix-noprobe-claim.audit.json",
+      "receipt_sha256": "2f02029deafeb217b35fdf657f8907da468e28d9bb4d129ec1a117b4c3749bc0",
+      "result": "audit OK: 66 records, 66 verified, 60 replays reproduced, 0 problems"
+    },
+    {
+      "session": "fix-noprobe-smoke",
+      "session_id": "ECBS1h322f7c2815eb",
+      "receipt": "../audits/fix-noprobe-smoke.audit.json",
+      "receipt_sha256": "1031b73483b6c1fdbd4a343c1c0541165ec306123316e6b44912885dbd56c696",
+      "result": "audit OK: 72 records, 72 verified, 54 replays reproduced, 0 problems"
+    },
+    {
+      "session": "fix-notrim-claim",
+      "session_id": "ECBS1hc3e67b6813c4",
+      "receipt": "../audits/fix-notrim-claim.audit.json",
+      "receipt_sha256": "0cdece2b6530dcb0f28b4f494dd5835b449d1ba25773c72bb027ae382a802994",
+      "result": "audit OK: 66 records, 66 verified, 60 replays reproduced, 0 problems"
+    },
+    {
+      "session": "fix-notrim-smoke",
+      "session_id": "ECBS1h628195e31e14",
+      "receipt": "../audits/fix-notrim-smoke.audit.json",
+      "receipt_sha256": "8f74a1153146b0f0816f2bb2db3a935a6943a7c6f18cb335f74ae02f5aeee270",
+      "result": "audit OK: 72 records, 72 verified, 54 replays reproduced, 0 problems"
+    },
+    {
+      "session": "fix-notrim2-claim",
+      "session_id": "ECBS1h9d777ef2e237",
+      "receipt": "../audits/fix-notrim2-claim.audit.json",
+      "receipt_sha256": "f167259ef6e436c8da3df3e90052f7a148958d62f0682e7e4bc1d767d15b27be",
+      "result": "audit OK: 66 records, 66 verified, 60 replays reproduced, 0 problems"
+    },
+    {
+      "session": "fix-notrim2-smoke",
+      "session_id": "ECBS1h0aa59508bb08",
+      "receipt": "../audits/fix-notrim2-smoke.audit.json",
+      "receipt_sha256": "bf90686384699e2275b655f9922fcff2a21398f139c708633bccdfe9dbb6642b",
+      "result": "audit OK: 72 records, 72 verified, 54 replays reproduced, 0 problems"
+    },
+    {
+      "session": "fix-smoke",
+      "session_id": "ECBS1hff17ab9636f0",
+      "receipt": "../audits/fix-smoke.audit.json",
+      "receipt_sha256": "ac3916ce8351130a7b4ac33ec4e264ad73a05b33b5c26a2be7fab9d44841cfee",
+      "result": "audit OK: 72 records, 72 verified, 54 replays reproduced, 0 problems"
+    },
+    {
+      "session": "fix-smoke-rev",
+      "session_id": "ECBS1h5d29a35e9eba",
+      "receipt": "../audits/fix-smoke-rev.audit.json",
+      "receipt_sha256": "5e4a97f3f1375662228d305286f0389bd9fd183c7d7bc8f21e736824c7d79a41",
+      "result": "audit OK: 72 records, 72 verified, 54 replays reproduced, 0 problems"
+    }
+  ]
+}

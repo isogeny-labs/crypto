@@ -1,0 +1,16 @@
+family	change	level	ratio	lo	hi	verdict	source
+genus-3 GHS	Lucas splitting test, C1 (q=2^22)	whole	0.756	0.755	0.756	improves (exponent)	research/ic_improve4_20261015/01-genus3-relations
+genus-3 GHS	C1 + 32 walks per inversion (q=2^22)	whole	0.715	0.715	0.715	improves (constant)	research/ic_improve4_20261015/01-genus3-relations
+genus-3 GHS	kappa retuned per size, 04b (q=2^20)	whole	0.961	0.961	0.961	improves (constant)	research/ic_improve_20261014/04b-genus3-2lp-rebalance
+k=4 F_p⁴	D4 oracle: pivots, weights, replay (p=269)	stage	0.002704	0.002691	0.002718	engineering (constant)	research/gaudry_quartic_d4_cost_20261014
+k=4 F_p⁴	same oracle, ecbench S	whole	0.002488	0.002463	0.002513	improves (constant)	research/gaudry_quartic_d4_cost_20261014
+k=4 F_(2^m)⁴	Frobenius D4 form vs plain, C4 (m=8)	stage	0.002079	0.002070	0.002088	engineering (constant)	research/gaudry_quartic_d4_char2_20261015
+k=4 F_(2^m)⁴	Frobenius vs plain, ecbench S (m=6)	whole	0.0057	0.0057	0.0057	improves (constant)	research/gaudry_quartic_d4_char2_20261015
+Koblitz	F6-IC gate first, word XORs (9 cells)	stage	0.65	0.577	0.749	engineering (constant)	research/f6_gate_first_x86_20261016
+Koblitz	greedy coverage base, trials (K0/2^13)	stage	0.843	0.843	0.843	improves (constant)	research/greedy_factor_base_yield_20261014
+Koblitz	greedy coverage base, sampled (r=2^39)	stage	1.000	1.000	1.000	engineering (vanishes)	research/greedy_factor_base_yield_20261014
+Koblitz	inherited-F4 root-shape replay	stage	1.048	1.015	1.328	regresses	research/pdp_shape_replay_20261015
+binary	MITM pair-table oracle, l=10	stage	0.000236	0.000236	0.000236	engineering (constant)	research/binary_mitm_oracle_l9_l10_20261015
+binary	MITM pair-table oracle, l=12	stage	0.000457	0.000457	0.000457	engineering (constant)	research/binary_mitm_oracle_l11_l12_20261016
+prime	f4_fp blocked pair reduction (quad n11)	stage	0.89	0.89	0.89	engineering (constant)	research/f4_fp_blocked_pairs_20261016
+prime	sparse-CADO LA in ecbench, S	whole	1.000	1.000	1.000	engineering (wall only)	research/ic_linalg_pipeline_20261019

@@ -1,0 +1,105 @@
+{
+  "branch": "claude/curve25519-autolab-ruling",
+  "closed_utc": "2026-11-04T15:49:08+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "-c",
+        "./target/release/ecbench run --wait --spec research/curve25519_autolab_20261104/r4-i1/specs/seeds-k32.json --out research/curve25519_autolab_20261104/r4-i1/sessions/seeds-k32 --cpus auto --allow-busy && ./target/release/ecbench run --wait --spec research/curve25519_autolab_20261104/r4-i1/specs/seeds-k28.json --out research/curve25519_autolab_20261104/r4-i1/sessions/seeds-k28 --cpus auto --allow-busy && for k in 32 28; do ./target/release/ecbench verify --dir research/curve25519_autolab_20261104/r4-i1/sessions/seeds-k$k --replay 8 --out research/curve25519_autolab_20261104/r4-i1/verify-k$k.json && ./target/release/ecbench band --dir research/curve25519_autolab_20261104/r4-i1/sessions/seeds-k$k --json research/curve25519_autolab_20261104/r4-i1/band-k$k.json --ranks > research/curve25519_autolab_20261104/r4-i1/band-k$k.txt; done"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-04T15:47:16+00:00",
+      "wall_s": 57.331
+    }
+  ],
+  "commit": "047d0d6c531cf435caba5e9027d4fc185475e95a",
+  "commit_dirty": false,
+  "created_utc": "2026-11-04T15:46:51+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v233-x86_64-with-glibc2.39"
+  },
+  "id": "20261104T1546Z-c25519-r4i1-walk-seed",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "s_w0_seed_mean_k32",
+      "note": "16 walk seeds x 32 targets; seed 0 = 1.480",
+      "reference": 0.977,
+      "reference_kind": "matched_rho",
+      "spread": [
+        1.602,
+        1.96
+      ],
+      "unit": "S",
+      "value": 1.781
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "s_w0_seed_mean_k28",
+      "note": "16 walk seeds x 32 targets; seed 0 = 1.707",
+      "reference": 1.059,
+      "reference_kind": "matched_rho",
+      "spread": [
+        1.808,
+        2.131
+      ],
+      "unit": "S",
+      "value": 1.969
+    }
+  ],
+  "problem": "ic:curve25519-family-k28-32",
+  "raw": [
+    {
+      "bytes": 2513,
+      "path": "research/curve25519_autolab_20261104/r4-i1/verify-k32.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/de/de1138912157976aaa83dbbc37a07fca6a974e47eb3fda139f87a591fad1473c",
+      "sha256": "de1138912157976aaa83dbbc37a07fca6a974e47eb3fda139f87a591fad1473c",
+      "uploaded": false
+    },
+    {
+      "bytes": 2512,
+      "path": "research/curve25519_autolab_20261104/r4-i1/verify-k28.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f4/f42396f84dfbdca8f414d6bfaa656a1f6612952d0dd08ee0ebbf9942cd85ea89",
+      "sha256": "f42396f84dfbdca8f414d6bfaa656a1f6612952d0dd08ee0ebbf9942cd85ea89",
+      "uploaded": false
+    },
+    {
+      "bytes": 25208,
+      "path": "research/curve25519_autolab_20261104/r4-i1/band-k32.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3a/3aa17fa0cd68461ba2c2f74e0c24505db4bb7c4d15462f113f9533c694449ab9",
+      "sha256": "3aa17fa0cd68461ba2c2f74e0c24505db4bb7c4d15462f113f9533c694449ab9",
+      "uploaded": false
+    },
+    {
+      "bytes": 24731,
+      "path": "research/curve25519_autolab_20261104/r4-i1/band-k28.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/45/45cde57e47fd6c3a030eff3881c9e513dc9f4c4c1cae1d05fae4b066d0a519e9",
+      "sha256": "45cde57e47fd6c3a030eff3881c9e513dc9f4c4c1cae1d05fae4b066d0a519e9",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/curve25519_autolab_20261104/r4-i1/REPORT.pdf",
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "c25519-r4i1-walk-seed",
+  "status": "measured",
+  "summary": "R4-I1: wwalk g=1 grow=2 seed-averaged S 1.78 (k = 32) and 1.97 (k = 28), 1.82x and 1.86x rho; incumbents' table draw was favourable (1.48, 1.71)",
+  "validation": null
+}

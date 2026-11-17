@@ -1,0 +1,13 @@
+card_id: CARD-prime-medium-tier-rho-20261107-6
+relay_verbatim: true
+outcome: executed_as_specified
+stopped_at_step: null
+recommendation: proceed_to_analysis
+reasons:
+  - "receipt status 'completed', 20 of 20 commands succeeded (cards/CARD-...-6.receipt.json): preconditions 1-11 exit 0; wait-j4 exit 0 (1.923 s); admit-j4 exit 0; launch-j5 exit 26 (987.007 s) and launch-j6 exit 26 (860.91 s), both within the card's success_exit_codes [0, 26]; admit-j5 and admit-j6 exit 0; every declared output present"
+  - "relay: tools check_relay on cards/CARD-...-6.run.log (the executor's copied tail; no separate report file was supplied) gave relay_verbatim true, missing_lines []; the command-line check-relay refuses after the run because the card no longer lints (the benchmark record bind changed by design and the result.json files now exist), so the library function was called directly"
+  - "task_card assessment_facts reports outputs_changed_since_run [] and writes_outside_scope ['enchmarks/records/20261107T2115Z-prime-medium-rho-bound.json']; that path is the benchmark record with its first character cut off by the tool's git-status parsing (known quirk), and the record is inside write_scope, so no write left scope and the tool's executor_deviated label is not adopted"
+  - "receipts/J4, J5 and J6 admission.json (written by check_session_complete.sh): job_exit_code 42, audit_records 140, audit_replays 120, admitted_for_counts true; l2_below_l2 50 (J4), 67 (J5), 46 (J6); pod_uids 6c891815-afca-495a-86b0-06736d3622cf, ba6247ab-b09f-4ac7-b1fc-30bec3672c43, 0ab86855-193c-4bba-b47c-90249590ea47"
+  - "J2 and J3 admission.json from card -5: audit_records 560 and 140, job_exit_code 42, l2_below_l2 14 and 57, admitted_for_counts true; receipts/J1/admission.json does not exist (card -3 had no admit step)"
+  - "no J4 resubmission: launch-j4 is absent from the card's commands, wait-j4 fetched the existing build's result"
+interpretation: not_assessed

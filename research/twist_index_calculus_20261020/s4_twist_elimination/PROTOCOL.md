@@ -1,0 +1,140 @@
+# Exact S4 structure and quartic-twist elimination
+
+Frozen 23 October 2026 before implementing this structural probe.
+
+The original objective remains a verified improvement in elliptic-curve
+index calculus using twist symmetry. The previous native k=1 collector
+peels a signed line-2 factor and solves four degree-four equations in
+three elementary symmetric line-0 variables. Its same-target arithmetic
+cost remains well above twist24 rho. Exact-orbit caching identified at
+most 790 redundant solves in 142,248 full-stream peels. This round tests
+a different mechanism: sparse algebraic structure *inside each solve*.
+
+## Requirements and frozen inputs
+
+| Requirement | Evidence to obtain |
+| --- | --- |
+| Derive the exact j=0 S4 polynomial | Native integer polynomial resultant and symmetric reduction, zero exact remainder; explicit coefficient record; identity certificate and feasible Lean proof |
+| Identify which structure is supplied by the twist | Substitute `B=b0*t^3`, `t^4=d` and compare four descended components with the existing interpolated S4 on the same inputs |
+| Test a complete elimination path if the structure permits one | Complete symmetric roots and signed relations on the frozen panel; explicit treatment of every zero denominator and exceptional locus |
+| Compare the actual relation finder | Preserve the old native source/binary, identical factor bases, residual order, roots and answer checks; count every phase; no oracle hits added to candidate output |
+| Preserve scope and limits | All failures, exceptional systems and misses retained; whole-method pricing and external-solver comparison remain separate gates |
+
+Worktree baseline: `ab7bbcaed1` on `codex/twist-ic-20261020`.
+The exact curve models and generator/target data are those in
+`../quartic_twist_mixed_v1.ndjson` and the native p=37/73/97 scaling
+records. The source is `examples/quartic_twist_tagged_s5.rs`, especially
+`SymS4` and `collect_mixed_pattern`; no historical file is overwritten.
+All targets are public synthetic `[271]G` fixtures.
+
+## Structural derivation, before any performance comparison
+
+Implement sparse polynomials over the integers in native Rust. Expand
+the quadratic resultant
+
+`(a2*b0-a0*b2)^2-(a2*b1-a1*b2)*(a1*b0-a0*b1)`
+
+for `S3(x1,x2,Z)` and `S3(x3,X,Z)` on `y^2=x^3+B`, then reduce the
+first three variables into `e1,e2,e3` by lexicographic symmetric
+reduction. Require the entire coefficient remainder to be exactly zero,
+not merely zero on selected finite-field points. Emit the resulting
+integer coefficients and degree profile. Check the independent direct
+resultant and the compact formula with the repository identity
+certificate, including checker-derived extra points and a deliberately
+corrupted negative control. Attempt the central identity in pinned Lean
+using the same resultant and elementary-symmetric definitions.
+
+After deriving the exact formula, inspect its four components on
+`Fp[t]/(t^4-d)` with `B=b0*t^3` and the line-0 variables. The structural
+pilot uses all finite signed line-2 peels of the first eight frozen p=37
+seed-zero residuals, all full-base processed prefixes of the six p=73/97
+scaling runs, and specifically includes the p=73 seed-one failed peel.
+Match the component polynomial coefficients exactly to the old
+interpolated implementation. Retain degenerate and zero components.
+Use native field/group arithmetic throughout. The reference oracle and
+known scalar are confined to post-run correctness checks.
+
+An explicit solver suggested by the structure receives its own frozen
+complete comparison protocol before running performance measurements.
+Algebraic structure or a low-degree formula alone does not establish a
+relation-yield, rank, total-cost, asymptotic or novelty claim. Ordinary
+symmetrization and invariant coordinates are prior work; novelty needs
+a concrete additional mechanism and literature comparison.
+
+## Execution and reporting
+
+Use 8 GiB address-space and 1,200 s process watchdog bounds for the
+structural probe and any independent replay; preserve exit codes and
+stderr. Counted arithmetic is primary. Any native-time comparison must
+use the repository isolation tool, fixed thread counts, A/A and at least
+five interleaved rounds on the same inputs. msolve/Magma comparisons,
+complete native memory/CPU accounting, matched strongest rho and the
+0/0.1/1 GAE band remain necessary before a priced whole-method claim.
+Keep source-linked reports, figures and inspected PDFs for all outcomes.
+
+## Structural supplement after the first exact derivation
+
+The first standard-library native job produced 49 terms in the three
+elementary variables and a zero integer coefficient remainder. Before
+running a further derivation, also freeze the full four-abscissa symmetric
+reduction: elementary variables `s1,s2,s3,s4` of `x1,x2,x3,X`, with `B`
+left independent. Require exact reconstruction over the integers and a
+faithful commutative-ring Lean theorem. This checks for a smaller formula
+whose specializations could expose an elimination pattern. It makes no
+novelty or relation-finder performance claim by itself.
+
+## Same-system completeness discriminator
+
+Frozen after the 46,200-system profile passed exact coefficient equality
+and showed degree profile `[4,4,4,4]` before and after linear reduction
+on every system. Test every one of the eight retained representative
+systems: the first finite peel of each of seven p=37/73/97 workloads,
+plus p=73 seed-one query 18, physical peel 54, sign +1. Preserve their
+four exact component polynomials unchanged.
+
+Enumerate all `Fp^3` symmetric assignments with a native Horner scan to
+obtain the complete rational root set. Independently call the existing
+native `f4_fp::solve` on the same equations with its standard quartic
+settings: grevlex, degree bound 12, no staircase stop, one Rayon thread,
+1,200 s cooperative deadline and 8 GiB process address-space cap. Compare
+the complete sets, not only the two known missing decompositions. Split
+every returned cubic, resolve all signs in the original curve group and
+retain every valid relation. A coefficient mutation must be detected
+against the immutable fixture before solving. Any F4 timeout,
+undetermined verdict, root mismatch or false relation is retained.
+
+This is a solver-completeness pilot and records row-reduction
+multiplications with their limited boundary. It supplies no priced
+whole-method or fastest-external-solver result. A successful pilot must
+be integrated and compared on the full frozen relation stream before a
+pipeline improvement can be claimed.
+
+## Frozen-prefix collector integration
+
+The eight-system pilot returned exactly the exhaustive field-root sets,
+including both previously missed p=73 seed-one relations. Freeze the next
+step before execution: replace the polynomial solver by F4 on **every**
+finite signed line-2 peel in all seven original processed prefixes (46,200
+systems). Use the exact coefficient derivation already checked against
+interpolation on all 46,200 inputs. Pin the profile fixture hash and check
+each original input's hash against that profile before solving.
+
+Produce relations without access to reference hits or factor logarithms.
+After each run, compare every query's entire signed relation set against
+an independently constructed group-pair oracle. Record missing and extra
+relations, undetermined systems, infinity peels, cubic split failures and
+foreign factors. Rebuild the anchored matrix in the original sorted
+relation order using only the verified public endomorphism orbit map;
+verify recovered target and all physical factor logarithms in the group.
+Report rank progress, first complete-rank query and the old baseline's
+relation counts. Continue through the entire original processed prefix
+even if the new collector reaches full rank earlier.
+
+Use one Rayon thread, the original F4 settings from the eight-system
+pilot, 8 GiB process address-space limit and a 1,200 s process watchdog.
+Retain a record after every query so a timeout cannot erase completed
+work. Repeat the complete deterministic collector (A/A) and require equal
+relation, rank and arithmetic records. This step measures F4's row-reduction
+multiplications only; it does not price complete F4 arithmetic or cold
+index calculus. No elapsed-time speed claim or full-stream result is
+inferred from a processed-prefix comparison.

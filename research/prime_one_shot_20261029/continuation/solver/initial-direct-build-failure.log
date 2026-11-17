@@ -1,0 +1,19 @@
+research/prime_one_shot_20261029/continuation/solver/direct_ic.cpp: In function ‘int main(int, char**)’:
+research/prime_one_shot_20261029/continuation/solver/direct_ic.cpp:163:36: error: ‘Point’ was not declared in this scope
+  163 |         reference::Curve E{17,2,2};Point P{5,1,false},Q;
+      |                                    ^~~~~
+research/prime_one_shot_20261029/continuation/solver/direct_ic.cpp:163:36: note: suggested alternatives:
+In file included from research/prime_one_shot_20261029/continuation/solver/direct_ic.cpp:6:
+research/prime_one_shot_20261029/continuation/solver/point_oracle.cpp:11:8: note:   ‘reference::Point’
+   11 | struct Point {int x=0,y=0;bool infinity=true;};
+      |        ^~~~~
+research/prime_one_shot_20261029/continuation/solver/point_oracle.cpp:11:8: note:   ‘reference::Point’
+research/prime_one_shot_20261029/continuation/solver/direct_ic.cpp:163:54: error: expected primary-expression before ‘,’ token
+  163 |         reference::Curve E{17,2,2};Point P{5,1,false},Q;
+      |                                                      ^
+research/prime_one_shot_20261029/continuation/solver/direct_ic.cpp:163:55: error: ‘Q’ was not declared in this scope
+  163 |         reference::Curve E{17,2,2};Point P{5,1,false},Q;
+      |                                                       ^
+research/prime_one_shot_20261029/continuation/solver/direct_ic.cpp:165:23: error: ‘P’ was not declared in this scope
+  165 |             Q=E.sum(Q,P);
+      |                       ^

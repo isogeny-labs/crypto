@@ -1,0 +1,5 @@
+# H2 sparse helper host-tool repair, 2026-11-16 UTC
+
+Attempt 2 used the repository sparse-checkout helper with the frozen path list, but the helper called `realpath -m`, while the ambient macOS BSD `realpath` rejects `-m`. The terminal sparse stderr was `realpath: illegal option -- m`; it stopped before a Cargo build or S3 stage. The [write-once report](../../reports/run-20261116-k600-arm-admission/attempt-2-bsd-realpath-stop/REPORT.md) preserves the source, error, launcher and incomplete timing evidence.
+
+The [attempt-3 launcher](run-admission-attempt-3.sh) keeps H2, source/input hashes and all prior build/stage caps. It resolves GNU coreutils `realpath` from `/opt/homebrew/opt/coreutils/libexec/gnubin` and checks `realpath -m --relative-to` before creating output. The sparse helper itself has a 900-second process cap in a new output directory; its later Cargo metadata check remains. No first- or second-attempt output is overwritten. This amendment was filed before attempt-3 data. It repairs a host-tool dependency, not the mathematical method or the K600 input.

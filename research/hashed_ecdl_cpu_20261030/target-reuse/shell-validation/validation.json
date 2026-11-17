@@ -1,0 +1,60 @@
+{
+  "source": {
+    "base_commit": "7df1b4d35e7c9acc60e1bbd1320e7b8c7871eedb",
+    "path": "src/cryptanalysis/hashed_ecdl.rs",
+    "base_sha256": "9c27f57a09433ae1b2ae7668e4f897e0aea9b3079451c8fa199541fc1a83f225",
+    "candidate_sha256": "613ad64310739d62d13d5a3c9895cf0f7a67743eec553198e3d4272eddfd4f7c",
+    "patch_sha256": "0efe612d42f2e44586fd5e418eb3715e86eda38e6e93b572d160dc57eba46491",
+    "status": "unapplied; shared path reserved by T-906"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--all-targets",
+        "--manifest-path",
+        "/workspace/pr-integration/2963-shell-snapshot/crates/hashed-ecdl-cpu/Cargo.toml",
+        "--target-dir",
+        "/workspace/pr-integration/2963-shell-target"
+      ],
+      "exit_code": 0,
+      "log": "validation-0.log",
+      "sha256": "47d9daa52250f665ea11022430df55c9a5be2db3a0a06ea38206972037c35d87"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--all-targets",
+        "--manifest-path",
+        "/workspace/pr-integration/2963-shell-snapshot/crates/hashed-ecdl-cpu/Cargo.toml",
+        "--target-dir",
+        "/workspace/pr-integration/2963-shell-target",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "log": "validation-1.log",
+      "sha256": "85439d83a3c11d318bb18f69b1db895c01e8268e9003cf9906bc6dd821652727"
+    },
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--check",
+        "--manifest-path",
+        "/workspace/pr-integration/2963-shell-snapshot/crates/hashed-ecdl-cpu/Cargo.toml"
+      ],
+      "exit_code": 0,
+      "log": "validation-2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "shared_source_unchanged": true,
+  "scope": "development correctness checks only; no timing or EKS execution"
+}

@@ -1,0 +1,164 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.04kB done
+#1 DONE 0.0s
+
+#2 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#2 DONE 0.4s
+
+#3 docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#3 CACHED
+
+#4 [internal] load metadata for docker.io/library/debian:bookworm-slim@sha256:99c0b25c46d0214d5a2091092e7908907dcaecd6a962cde0ac700acee222b6f3
+#4 DONE 0.0s
+
+#5 [internal] load metadata for docker.io/library/rust:1.99.1-bookworm@sha256:c9155318d07341301a78b45ecdd81af2e43b8b297d64e8fd4c5e80d7735607c3
+#5 DONE 0.0s
+
+#6 [internal] load .dockerignore
+#6 transferring context: 220B done
+#6 DONE 0.0s
+
+#7 [build 1/9] FROM docker.io/library/rust:1.99.1-bookworm@sha256:c9155318d07341301a78b45ecdd81af2e43b8b297d64e8fd4c5e80d7735607c3
+#7 CACHED
+
+#8 [stage-1 1/8] FROM docker.io/library/debian:bookworm-slim@sha256:99c0b25c46d0214d5a2091092e7908907dcaecd6a962cde0ac700acee222b6f3
+#8 CACHED
+
+#9 [internal] load build context
+#9 transferring context: 81.38kB done
+#9 DONE 0.0s
+
+#10 [build 2/9] RUN --mount=type=secret,id=proxy_ca,required=true     apt-get update && apt-get install -y --no-install-recommends libgmp-dev libssl-dev python3-venv ca-certificates     && rm -rf /var/lib/apt/lists/*     && python3 -m venv /opt/z3     && PIP_CERT=/run/secrets/proxy_ca /opt/z3/bin/pip install --no-cache-dir --only-binary=:all: z3-solver==5.3.3.0
+#10 ...
+
+#11 [stage-1 2/8] RUN --mount=type=secret,id=proxy_ca,required=true     apt-get update && apt-get install -y --no-install-recommends libgmp10 libgmpxx4ldbl libssl3 libstdc++6 ca-certificates     && rm -rf /var/lib/apt/lists/* && install -d -o 1000 -g 1000 /work
+#11 3.292 Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+#11 3.334 Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+#11 3.382 Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [34.8 kB]
+#11 3.551 Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8790 kB]
+#11 3.808 Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+#11 3.835 Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [361 kB]
+#11 5.003 Fetched 9399 kB in 2s (5312 kB/s)
+#11 5.003 Reading package lists...
+#11 6.324 Reading package lists...
+#11 7.359 Building dependency tree...
+#11 7.624 Reading state information...
+#11 7.816 libgmp10 is already the newest version (2:6.2.1+dfsg1-1.1).
+#11 7.816 libgmp10 set to manually installed.
+#11 7.816 libstdc++6 is already the newest version (12.2.0-14+deb12u1).
+#11 7.816 libstdc++6 set to manually installed.
+#11 7.816 The following additional packages will be installed:
+#11 7.817   openssl
+#11 7.849 The following NEW packages will be installed:
+#11 7.851   ca-certificates libgmpxx4ldbl libssl3 openssl
+#11 7.959 0 upgraded, 4 newly installed, 0 to remove and 3 not upgraded.
+#11 7.959 Need to get 3981 kB of archives.
+#11 7.959 After this operation, 9335 kB of additional disk space will be used.
+#11 7.959 Get:1 http://deb.debian.org/debian-security bookworm-security/main amd64 libssl3 amd64 3.0.22-1~deb12u2 [2040 kB]
+#11 8.039 Get:2 http://deb.debian.org/debian-security bookworm-security/main amd64 openssl amd64 3.0.22-1~deb12u2 [1442 kB]
+#11 8.084 Get:3 http://deb.debian.org/debian-security bookworm-security/main amd64 ca-certificates all 20250419~deb12u2 [161 kB]
+#11 8.104 Get:4 http://deb.debian.org/debian bookworm/main amd64 libgmpxx4ldbl amd64 2:6.2.1+dfsg1-1.1 [338 kB]
+#11 8.386 debconf: delaying package configuration, since apt-utils is not installed
+#11 8.444 Fetched 3981 kB in 0s (15.9 MB/s)
+#11 8.500 Selecting previously unselected package libssl3:amd64.
+#11 8.500 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 6096 files and directories currently installed.)
+#11 8.510 Preparing to unpack .../libssl3_3.0.22-1~deb12u2_amd64.deb ...
+#11 8.516 Unpacking libssl3:amd64 (3.0.22-1~deb12u2) ...
+#11 9.227 Selecting previously unselected package openssl.
+#11 9.229 Preparing to unpack .../openssl_3.0.22-1~deb12u2_amd64.deb ...
+#11 9.233 Unpacking openssl (3.0.22-1~deb12u2) ...
+#11 9.417 Selecting previously unselected package ca-certificates.
+#11 9.420 Preparing to unpack .../ca-certificates_20250419~deb12u2_all.deb ...
+#11 9.422 Unpacking ca-certificates (20250419~deb12u2) ...
+#11 9.515 Selecting previously unselected package libgmpxx4ldbl:amd64.
+#11 9.518 Preparing to unpack .../libgmpxx4ldbl_2%3a6.2.1+dfsg1-1.1_amd64.deb ...
+#11 9.520 Unpacking libgmpxx4ldbl:amd64 (2:6.2.1+dfsg1-1.1) ...
+#11 9.581 Setting up libssl3:amd64 (3.0.22-1~deb12u2) ...
+#11 9.589 Setting up libgmpxx4ldbl:amd64 (2:6.2.1+dfsg1-1.1) ...
+#11 9.594 Setting up openssl (3.0.22-1~deb12u2) ...
+#11 9.601 Setting up ca-certificates (20250419~deb12u2) ...
+#11 9.712 debconf: unable to initialize frontend: Dialog
+#11 9.712 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#11 9.712 debconf: falling back to frontend: Readline
+#11 9.712 debconf: unable to initialize frontend: Readline
+#11 9.712 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.36.0 /usr/local/share/perl/5.36.0 /usr/lib/x86_64-linux-gnu/perl5/5.36 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.36 /usr/share/perl/5.36 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 7.)
+#11 9.712 debconf: falling back to frontend: Teletype
+#11 10.61 Updating certificates in /etc/ssl/certs...
+#11 12.12 148 added, 0 removed; done.
+#11 12.14 Processing triggers for libc-bin (2.36-9+deb12u14) ...
+#11 12.15 Processing triggers for ca-certificates (20250419~deb12u2) ...
+#11 12.16 Updating certificates in /etc/ssl/certs...
+#11 13.10 0 added, 0 removed; done.
+#11 13.10 Running hooks in /etc/ca-certificates/update.d...
+#11 13.10 done.
+#11 DONE 13.2s
+
+#10 [build 2/9] RUN --mount=type=secret,id=proxy_ca,required=true     apt-get update && apt-get install -y --no-install-recommends libgmp-dev libssl-dev python3-venv ca-certificates     && rm -rf /var/lib/apt/lists/*     && python3 -m venv /opt/z3     && PIP_CERT=/run/secrets/proxy_ca /opt/z3/bin/pip install --no-cache-dir --only-binary=:all: z3-solver==5.3.3.0
+#10 14.41 Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+#10 14.44 Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+#10 14.47 Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [34.8 kB]
+#10 14.54 Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8790 kB]
+#10 14.73 Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+#10 14.75 Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [361 kB]
+#10 15.73 Fetched 9399 kB in 1s (7012 kB/s)
+#10 15.73 Reading package lists...
+#10 16.44 Reading package lists...
+#10 17.10 Building dependency tree...
+#10 17.34 Reading state information...
+#10 17.59 libgmp-dev is already the newest version (2:6.2.1+dfsg1-1.1).
+#10 17.59 libssl-dev is already the newest version (3.0.22-1~deb12u2).
+#10 17.59 ca-certificates is already the newest version (20250419~deb12u2).
+#10 17.59 The following NEW packages will be installed:
+#10 17.59   python3-pip-whl python3-setuptools-whl python3-venv python3.11-venv
+#10 17.63 0 upgraded, 4 newly installed, 0 to remove and 18 not upgraded.
+#10 17.63 Need to get 2836 kB of archives.
+#10 17.63 After this operation, 3171 kB of additional disk space will be used.
+#10 17.63 Get:1 http://deb.debian.org/debian bookworm/main amd64 python3-pip-whl all 23.0.1+dfsg-1 [1717 kB]
+#10 17.69 Get:2 http://deb.debian.org/debian bookworm/main amd64 python3-setuptools-whl all 66.1.1-1+deb12u2 [1112 kB]
+#10 17.71 Get:3 http://deb.debian.org/debian-security bookworm-security/main amd64 python3.11-venv amd64 3.11.2-6+deb12u9 [5896 B]
+#10 17.73 Get:4 http://deb.debian.org/debian bookworm/main amd64 python3-venv amd64 3.11.2-1+b1 [1200 B]
+#10 17.93 debconf: delaying package configuration, since apt-utils is not installed
+#10 17.99 Fetched 2836 kB in 0s (21.1 MB/s)
+#10 18.01 Selecting previously unselected package python3-pip-whl.
+#10 18.01 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 23259 files and directories currently installed.)
+#10 18.02 Preparing to unpack .../python3-pip-whl_23.0.1+dfsg-1_all.deb ...
+#10 18.02 Unpacking python3-pip-whl (23.0.1+dfsg-1) ...
+#10 18.14 Selecting previously unselected package python3-setuptools-whl.
+#10 18.14 Preparing to unpack .../python3-setuptools-whl_66.1.1-1+deb12u2_all.deb ...
+#10 18.14 Unpacking python3-setuptools-whl (66.1.1-1+deb12u2) ...
+#10 18.23 Selecting previously unselected package python3.11-venv.
+#10 18.24 Preparing to unpack .../python3.11-venv_3.11.2-6+deb12u9_amd64.deb ...
+#10 18.24 Unpacking python3.11-venv (3.11.2-6+deb12u9) ...
+#10 18.26 Selecting previously unselected package python3-venv.
+#10 18.26 Preparing to unpack .../python3-venv_3.11.2-1+b1_amd64.deb ...
+#10 18.26 Unpacking python3-venv (3.11.2-1+b1) ...
+#10 18.30 Setting up python3-setuptools-whl (66.1.1-1+deb12u2) ...
+#10 18.31 Setting up python3-pip-whl (23.0.1+dfsg-1) ...
+#10 18.31 Setting up python3.11-venv (3.11.2-6+deb12u9) ...
+#10 18.36 Setting up python3-venv (3.11.2-1+b1) ...
+#10 22.57 Collecting z3-solver==5.3.3.0
+#10 22.71   Downloading z3_solver-5.3.3.0-py3-none-manylinux_2_27_x86_64.whl (37.9 MB)
+#10 23.61      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 37.9/37.9 MB 47.1 MB/s eta 0:00:00
+#10 23.68 Installing collected packages: z3-solver
+#10 24.39 Successfully installed z3-solver-5.3.3.0
+#10 DONE 24.5s
+
+#12 [build 3/9] WORKDIR /source
+#12 DONE 2.8s
+
+#13 [build 4/9] COPY Makefile study.cpp curve25519_fixture.hpp bv_lowering.hpp openssl_replay.cpp ./
+#13 ERROR: failed to prepare fbk13mow3suzov66i5x5csm12 as 6gz086prqyocpogl33gacr8tm: mkdir /home/dockerd/.local/share/docker/vfs/dir/6gz086prqyocpogl33gacr8tm/usr/lib/x86_64-linux-gnu/perl/5.36.0/File: no space left on device
+------
+ > [build 4/9] COPY Makefile study.cpp curve25519_fixture.hpp bv_lowering.hpp openssl_replay.cpp ./:
+------
+Dockerfile:10
+--------------------
+   8 |         && PIP_CERT=/run/secrets/proxy_ca /opt/z3/bin/pip install --no-cache-dir --only-binary=:all: z3-solver==5.3.3.0
+   9 |     WORKDIR /source
+  10 | >>> COPY Makefile study.cpp curve25519_fixture.hpp bv_lowering.hpp openssl_replay.cpp ./
+  11 |     COPY control/Cargo.toml control/Cargo.lock ./control/
+  12 |     COPY control/src ./control/src/
+--------------------
+ERROR: failed to build: failed to solve: ResourceExhausted: failed to prepare fbk13mow3suzov66i5x5csm12 as 6gz086prqyocpogl33gacr8tm: mkdir /home/dockerd/.local/share/docker/vfs/dir/6gz086prqyocpogl33gacr8tm/usr/lib/x86_64-linux-gnu/perl/5.36.0/File: no space left on device

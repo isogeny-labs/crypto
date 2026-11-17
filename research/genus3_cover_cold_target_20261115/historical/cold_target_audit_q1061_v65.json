@@ -1,0 +1,2767 @@
+{
+  "summary": {
+    "curve": {
+      "q": 1061,
+      "extension_modulus": "alpha^3+alpha+65",
+      "E": "Y^2=X*(X-alpha)*(X-alpha^1061)",
+      "C": "y^2=(t^3+t+65)*(t^4-2*t^2-520*t+1)",
+      "group_order": 1194429244,
+      "subgroup_order": 298607311,
+      "cofactor": 4,
+      "generator": [
+        [
+          167,
+          623,
+          69
+        ],
+        [
+          1004,
+          699,
+          413
+        ]
+      ]
+    },
+    "trials": 64,
+    "cover_mean_seconds": 0.05663239334374559,
+    "direct_mean_seconds": 0.07878538950000369,
+    "cover_median_seconds": 0.05609523699996544,
+    "direct_median_seconds": 0.07782574550003574,
+    "speedup_ratio_of_means": 1.3911718161334716,
+    "paired_bootstrap_95_percent_interval": [
+      1.301961216113285,
+      1.4815007696886637
+    ],
+    "cover_faster_trials": 52,
+    "all_answers_verified": true,
+    "bsgs": "fresh negation-aware BSGS; m=floor(sqrt(ell/4))+1 for one target",
+    "cold_scope": "Fresh solver, curve construction, factor-base enumeration, relations, exact linear solve, target descent and answer verification for every cover trial; fresh BSGS table and verification for every direct trial. No DLP precomputation is shared. Known curve/order/generator inputs, runtime imports and shared target generation are excluded.",
+    "target_seed": 2026111501,
+    "relation_seed_source": 2026111502,
+    "order_seed": 2026111503,
+    "source_sha256": {
+      "cold_target.py": "e55c08f81e0b2fef7b3c7712031e7b474d2b96d93fdc3061c9cfd711c242dbb1",
+      "cold_target_audit.py": "862d1a8b175f973980dbcc9e60329c911fd22d15500cd25307ef1a2b4b9213fb",
+      "speedup.py": "b00db1ef7d7146e062e3c061b38753da27c1febd83c98fa9720ad0162db4fe71",
+      "smaller_field_descent.py": "c23ed5977df5b89072986d36755013a19a939a6968bd9746147dadef4168adee",
+      "descent_dlp.py": "fb0695dd08e1fe1a83fd777a6359b00527857db2a5190c2513a2da90e9790793"
+    },
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "order_certificate": {
+      "hasse_interval": [
+        1194320863,
+        1194459101
+      ],
+      "certified_points": [
+        {
+          "point": [
+            [
+              799,
+              472,
+              846
+            ],
+            [
+              333,
+              260,
+              767
+            ]
+          ],
+          "exact_point_order": 597214622
+        }
+      ],
+      "lcm_of_point_orders": 597214622,
+      "unique_group_order": 1194429244
+    }
+  },
+  "raw_trials": [
+    {
+      "trial": 0,
+      "target": [
+        [
+          483,
+          1022,
+          184
+        ],
+        [
+          769,
+          104,
+          25
+        ]
+      ],
+      "relation_seed": 3084232973,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.08296568499997647,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.06734536900000876,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 546,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3824,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 3
+      },
+      "recovered_log": 147899283
+    },
+    {
+      "trial": 1,
+      "target": [
+        [
+          685,
+          621,
+          68
+        ],
+        [
+          657,
+          574,
+          500
+        ]
+      ],
+      "relation_seed": 2305773707,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.06895799500000521,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05711195799995039,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 545,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3817,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 2
+      },
+      "recovered_log": 102690728
+    },
+    {
+      "trial": 2,
+      "target": [
+        [
+          409,
+          311,
+          272
+        ],
+        [
+          160,
+          681,
+          155
+        ]
+      ],
+      "relation_seed": 3229562341,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.056084050999970714,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 539,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3775,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 3
+      },
+      "direct_seconds": 0.10104217299999618,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 154717455
+    },
+    {
+      "trial": 3,
+      "target": [
+        [
+          154,
+          931,
+          882
+        ],
+        [
+          108,
+          529,
+          932
+        ]
+      ],
+      "relation_seed": 3562804355,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.07487168500006192,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05584522399999514,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 540,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3782,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 8
+      },
+      "recovered_log": 138484275
+    },
+    {
+      "trial": 4,
+      "target": [
+        [
+          390,
+          643,
+          1007
+        ],
+        [
+          266,
+          1032,
+          684
+        ]
+      ],
+      "relation_seed": 2761306628,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.05457182199995714,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3456,
+          "smooth_relations": 548,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3838,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 1
+      },
+      "direct_seconds": 0.10498754699995061,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 262410144
+    },
+    {
+      "trial": 5,
+      "target": [
+        [
+          437,
+          485,
+          116
+        ],
+        [
+          448,
+          957,
+          691
+        ]
+      ],
+      "relation_seed": 147892710,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.07388345699996535,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.055006508000019494,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3456,
+          "smooth_relations": 544,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3810,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 2
+      },
+      "recovered_log": 138205587
+    },
+    {
+      "trial": 6,
+      "target": [
+        [
+          993,
+          58,
+          583
+        ],
+        [
+          850,
+          642,
+          659
+        ]
+      ],
+      "relation_seed": 3874116149,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.07019368199996734,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.055302329000028294,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 562,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3936,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 0
+      },
+      "recovered_log": 126904251
+    },
+    {
+      "trial": 7,
+      "target": [
+        [
+          160,
+          545,
+          64
+        ],
+        [
+          444,
+          950,
+          843
+        ]
+      ],
+      "relation_seed": 1241629358,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.053879953999967256,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 538,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3768,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 2
+      },
+      "direct_seconds": 0.07231102900004771,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 125181622
+    },
+    {
+      "trial": 8,
+      "target": [
+        [
+          381,
+          604,
+          760
+        ],
+        [
+          354,
+          1006,
+          456
+        ]
+      ],
+      "relation_seed": 2791656393,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.05794921700010036,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05773021699997116,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3456,
+          "smooth_relations": 545,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3817,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 1
+      },
+      "recovered_log": 64586932
+    },
+    {
+      "trial": 9,
+      "target": [
+        [
+          901,
+          366,
+          641
+        ],
+        [
+          365,
+          114,
+          205
+        ]
+      ],
+      "relation_seed": 1455935321,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.05610642299996016,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 550,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3852,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 0
+      },
+      "direct_seconds": 0.060737636999988354,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 66822304
+    },
+    {
+      "trial": 10,
+      "target": [
+        [
+          457,
+          578,
+          710
+        ],
+        [
+          259,
+          1003,
+          1030
+        ]
+      ],
+      "relation_seed": 2806904930,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.09056146000000354,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05350997499999721,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3456,
+          "smooth_relations": 545,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3817,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 0
+      },
+      "recovered_log": 199430699
+    },
+    {
+      "trial": 11,
+      "target": [
+        [
+          451,
+          469,
+          173
+        ],
+        [
+          798,
+          982,
+          278
+        ]
+      ],
+      "relation_seed": 641608286,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.0625797049999619,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 539,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3775,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 0
+      },
+      "direct_seconds": 0.061341474000073504,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 84827970
+    },
+    {
+      "trial": 12,
+      "target": [
+        [
+          90,
+          229,
+          313
+        ],
+        [
+          767,
+          395,
+          411
+        ]
+      ],
+      "relation_seed": 3994489029,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.05522288999998182,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.054993489000025875,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 540,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3782,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 6
+      },
+      "recovered_log": 68588152
+    },
+    {
+      "trial": 13,
+      "target": [
+        [
+          641,
+          254,
+          1000
+        ],
+        [
+          227,
+          361,
+          687
+        ]
+      ],
+      "relation_seed": 326692669,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.09476314999994884,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.057056015000057414,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 545,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3817,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 6
+      },
+      "recovered_log": 228801121
+    },
+    {
+      "trial": 14,
+      "target": [
+        [
+          906,
+          438,
+          798
+        ],
+        [
+          381,
+          523,
+          251
+        ]
+      ],
+      "relation_seed": 2818990565,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.05422658899999533,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 541,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3789,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 1
+      },
+      "direct_seconds": 0.1053224140000566,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 269067964
+    },
+    {
+      "trial": 15,
+      "target": [
+        [
+          13,
+          765,
+          451
+        ],
+        [
+          509,
+          937,
+          482
+        ]
+      ],
+      "relation_seed": 4232052459,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.10378299800004243,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.054109544999960235,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3456,
+          "smooth_relations": 543,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3803,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 2
+      },
+      "recovered_log": 273270035
+    },
+    {
+      "trial": 16,
+      "target": [
+        [
+          867,
+          793,
+          591
+        ],
+        [
+          280,
+          884,
+          435
+        ]
+      ],
+      "relation_seed": 48089011,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.04698540599997614,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05443380700000944,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 543,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3803,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 2
+      },
+      "recovered_log": 33973320
+    },
+    {
+      "trial": 17,
+      "target": [
+        [
+          358,
+          635,
+          68
+        ],
+        [
+          709,
+          289,
+          606
+        ]
+      ],
+      "relation_seed": 1667292765,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.05418114199994761,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3456,
+          "smooth_relations": 559,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3915,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 4
+      },
+      "direct_seconds": 0.10073055999998815,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 247532000
+    },
+    {
+      "trial": 18,
+      "target": [
+        [
+          691,
+          786,
+          327
+        ],
+        [
+          871,
+          510,
+          566
+        ]
+      ],
+      "relation_seed": 3315372608,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.0564639439999155,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3456,
+          "smooth_relations": 546,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3824,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 11
+      },
+      "direct_seconds": 0.044742012999904546,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 18998904
+    },
+    {
+      "trial": 19,
+      "target": [
+        [
+          941,
+          852,
+          34
+        ],
+        [
+          109,
+          827,
+          1011
+        ]
+      ],
+      "relation_seed": 511191556,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.05430529599993861,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 547,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3831,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 2
+      },
+      "direct_seconds": 0.07848974299997735,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 155650302
+    },
+    {
+      "trial": 20,
+      "target": [
+        [
+          105,
+          542,
+          293
+        ],
+        [
+          723,
+          996,
+          686
+        ]
+      ],
+      "relation_seed": 3009496171,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.05896254799995404,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 547,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3831,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 2
+      },
+      "direct_seconds": 0.08838385800004289,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 198606539
+    },
+    {
+      "trial": 21,
+      "target": [
+        [
+          461,
+          109,
+          245
+        ],
+        [
+          41,
+          173,
+          1017
+        ]
+      ],
+      "relation_seed": 3332005544,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.05534178699997483,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3456,
+          "smooth_relations": 557,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3901,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 8
+      },
+      "direct_seconds": 0.052520402999903126,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 51904012
+    },
+    {
+      "trial": 22,
+      "target": [
+        [
+          527,
+          909,
+          572
+        ],
+        [
+          18,
+          747,
+          439
+        ]
+      ],
+      "relation_seed": 2380838003,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.10738194600003226,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.0629882880000423,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3584,
+          "smooth_relations": 554,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3880,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 18
+      },
+      "recovered_log": 284382922
+    },
+    {
+      "trial": 23,
+      "target": [
+        [
+          512,
+          31,
+          80
+        ],
+        [
+          929,
+          600,
+          726
+        ]
+      ],
+      "relation_seed": 1511621471,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.06262056500008839,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3584,
+          "smooth_relations": 557,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3901,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 6
+      },
+      "direct_seconds": 0.10711781400004838,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 243440382
+    },
+    {
+      "trial": 24,
+      "target": [
+        [
+          50,
+          860,
+          62
+        ],
+        [
+          1057,
+          858,
+          418
+        ]
+      ],
+      "relation_seed": 2736172169,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.11167661900003623,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.054966488999980356,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3072,
+          "smooth_relations": 538,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3768,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 9
+      },
+      "recovered_log": 282599796
+    },
+    {
+      "trial": 25,
+      "target": [
+        [
+          230,
+          697,
+          607
+        ],
+        [
+          150,
+          545,
+          468
+        ]
+      ],
+      "relation_seed": 2227957902,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.10684067099998629,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05832655300002898,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3584,
+          "smooth_relations": 557,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3901,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 3
+      },
+      "recovered_log": 253546149
+    },
+    {
+      "trial": 26,
+      "target": [
+        [
+          1006,
+          72,
+          91
+        ],
+        [
+          384,
+          183,
+          854
+        ]
+      ],
+      "relation_seed": 4248806326,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.058174177000068994,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 552,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3866,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 14
+      },
+      "direct_seconds": 0.08272927400003027,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 164414738
+    },
+    {
+      "trial": 27,
+      "target": [
+        [
+          617,
+          1049,
+          16
+        ],
+        [
+          89,
+          936,
+          638
+        ]
+      ],
+      "relation_seed": 78861374,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.05689692900000409,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3584,
+          "smooth_relations": 539,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3775,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 1
+      },
+      "direct_seconds": 0.06918058600001586,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 30992042
+    },
+    {
+      "trial": 28,
+      "target": [
+        [
+          456,
+          702,
+          11
+        ],
+        [
+          958,
+          251,
+          431
+        ]
+      ],
+      "relation_seed": 587750499,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.05573353900001621,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 564,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3950,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 5
+      },
+      "direct_seconds": 0.07758327599992754,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 150468553
+    },
+    {
+      "trial": 29,
+      "target": [
+        [
+          832,
+          128,
+          191
+        ],
+        [
+          59,
+          101,
+          109
+        ]
+      ],
+      "relation_seed": 2572378674,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.07495693100008793,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05458349100001669,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 542,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3796,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 7
+      },
+      "recovered_log": 140653928
+    },
+    {
+      "trial": 30,
+      "target": [
+        [
+          686,
+          222,
+          166
+        ],
+        [
+          206,
+          1020,
+          118
+        ]
+      ],
+      "relation_seed": 2122963782,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.0689421609999954,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05488941500004785,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 551,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3859,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 4
+      },
+      "recovered_log": 98198170
+    },
+    {
+      "trial": 31,
+      "target": [
+        [
+          846,
+          315,
+          543
+        ],
+        [
+          121,
+          909,
+          112
+        ]
+      ],
+      "relation_seed": 2234537680,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.04531227899997248,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05611588700003267,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3456,
+          "smooth_relations": 544,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3810,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 3
+      },
+      "recovered_log": 17505975
+    },
+    {
+      "trial": 32,
+      "target": [
+        [
+          254,
+          298,
+          686
+        ],
+        [
+          296,
+          922,
+          310
+        ]
+      ],
+      "relation_seed": 3486658254,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.05925715599994419,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05662276099997143,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3456,
+          "smooth_relations": 548,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3838,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 1
+      },
+      "recovered_log": 61640240
+    },
+    {
+      "trial": 33,
+      "target": [
+        [
+          590,
+          537,
+          987
+        ],
+        [
+          318,
+          667,
+          608
+        ]
+      ],
+      "relation_seed": 1491304963,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.06262124600004881,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.053611404999969636,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 560,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3922,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 2
+      },
+      "recovered_log": 86137771
+    },
+    {
+      "trial": 34,
+      "target": [
+        [
+          426,
+          913,
+          287
+        ],
+        [
+          462,
+          796,
+          648
+        ]
+      ],
+      "relation_seed": 3753448756,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.05077639099999942,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.057318233999922086,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3712,
+          "smooth_relations": 561,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3929,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 1
+      },
+      "recovered_log": 34744529
+    },
+    {
+      "trial": 35,
+      "target": [
+        [
+          907,
+          280,
+          96
+        ],
+        [
+          703,
+          393,
+          737
+        ]
+      ],
+      "relation_seed": 1543052161,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.11302564400000392,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05616328799999337,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 538,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3768,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 5
+      },
+      "recovered_log": 281158707
+    },
+    {
+      "trial": 36,
+      "target": [
+        [
+          879,
+          819,
+          16
+        ],
+        [
+          241,
+          500,
+          586
+        ]
+      ],
+      "relation_seed": 2576268456,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.060705087999963325,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 538,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3768,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 15
+      },
+      "direct_seconds": 0.045190409000042564,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 13296929
+    },
+    {
+      "trial": 37,
+      "target": [
+        [
+          336,
+          891,
+          512
+        ],
+        [
+          655,
+          297,
+          836
+        ]
+      ],
+      "relation_seed": 858685181,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.0561746050000238,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 542,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3796,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 1
+      },
+      "direct_seconds": 0.04959790899999916,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 30408914
+    },
+    {
+      "trial": 38,
+      "target": [
+        [
+          203,
+          362,
+          869
+        ],
+        [
+          388,
+          828,
+          79
+        ]
+      ],
+      "relation_seed": 531661298,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.056833274000041456,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 547,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3831,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 3
+      },
+      "direct_seconds": 0.04557805499996448,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 12342217
+    },
+    {
+      "trial": 39,
+      "target": [
+        [
+          479,
+          167,
+          832
+        ],
+        [
+          486,
+          300,
+          982
+        ]
+      ],
+      "relation_seed": 1091706609,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.0567648820000386,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.06245569999998679,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 550,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3852,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 13
+      },
+      "recovered_log": 32730901
+    },
+    {
+      "trial": 40,
+      "target": [
+        [
+          808,
+          763,
+          323
+        ],
+        [
+          123,
+          333,
+          903
+        ]
+      ],
+      "relation_seed": 1968358868,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.05604050500005542,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 560,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3922,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 11
+      },
+      "direct_seconds": 0.07884838600000421,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 155113173
+    },
+    {
+      "trial": 41,
+      "target": [
+        [
+          118,
+          564,
+          785
+        ],
+        [
+          322,
+          350,
+          497
+        ]
+      ],
+      "relation_seed": 2184914571,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.05552936500009764,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 546,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3824,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 15
+      },
+      "direct_seconds": 0.10489110299999993,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 239523735
+    },
+    {
+      "trial": 42,
+      "target": [
+        [
+          834,
+          308,
+          740
+        ],
+        [
+          601,
+          486,
+          581
+        ]
+      ],
+      "relation_seed": 4155318640,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.08467355400000542,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.058750222999947255,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3456,
+          "smooth_relations": 547,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3831,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 7
+      },
+      "recovered_log": 168945143
+    },
+    {
+      "trial": 43,
+      "target": [
+        [
+          800,
+          688,
+          862
+        ],
+        [
+          961,
+          252,
+          572
+        ]
+      ],
+      "relation_seed": 860846106,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.06661772600000404,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05650822999996308,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3456,
+          "smooth_relations": 556,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3894,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 5
+      },
+      "recovered_log": 84233106
+    },
+    {
+      "trial": 44,
+      "target": [
+        [
+          118,
+          557,
+          261
+        ],
+        [
+          1028,
+          35,
+          71
+        ]
+      ],
+      "relation_seed": 2517798405,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.05316424999989522,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 541,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3789,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 7
+      },
+      "direct_seconds": 0.07800865700005488,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 148259647
+    },
+    {
+      "trial": 45,
+      "target": [
+        [
+          617,
+          914,
+          166
+        ],
+        [
+          157,
+          921,
+          472
+        ]
+      ],
+      "relation_seed": 2794937413,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.10302484100009224,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05884142799993697,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 547,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3831,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 16
+      },
+      "recovered_log": 264023511
+    },
+    {
+      "trial": 46,
+      "target": [
+        [
+          556,
+          147,
+          81
+        ],
+        [
+          189,
+          1055,
+          953
+        ]
+      ],
+      "relation_seed": 1624510645,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.06398524399992311,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05623947199990198,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 557,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3901,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 2
+      },
+      "recovered_log": 98900768
+    },
+    {
+      "trial": 47,
+      "target": [
+        [
+          398,
+          297,
+          79
+        ],
+        [
+          906,
+          305,
+          470
+        ]
+      ],
+      "relation_seed": 3150889091,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.10337866600002599,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.055659347999949205,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3456,
+          "smooth_relations": 550,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3852,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 5
+      },
+      "recovered_log": 244587620
+    },
+    {
+      "trial": 48,
+      "target": [
+        [
+          163,
+          946,
+          107
+        ],
+        [
+          947,
+          615,
+          936
+        ]
+      ],
+      "relation_seed": 305552157,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.09399228400002357,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05452492300003087,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 547,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3831,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 4
+      },
+      "recovered_log": 221845178
+    },
+    {
+      "trial": 49,
+      "target": [
+        [
+          184,
+          236,
+          1044
+        ],
+        [
+          788,
+          800,
+          227
+        ]
+      ],
+      "relation_seed": 589939149,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.053204820000019026,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 546,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3824,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 5
+      },
+      "direct_seconds": 0.09013277799999742,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 194271565
+    },
+    {
+      "trial": 50,
+      "target": [
+        [
+          1031,
+          207,
+          821
+        ],
+        [
+          48,
+          864,
+          835
+        ]
+      ],
+      "relation_seed": 3630862652,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.05590926000002128,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 542,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3796,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 3
+      },
+      "direct_seconds": 0.09738119200005713,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 224489459
+    },
+    {
+      "trial": 51,
+      "target": [
+        [
+          692,
+          53,
+          375
+        ],
+        [
+          865,
+          571,
+          140
+        ]
+      ],
+      "relation_seed": 1824045738,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.10192010799994478,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05565150699999322,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 541,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3789,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 14
+      },
+      "recovered_log": 252851639
+    },
+    {
+      "trial": 52,
+      "target": [
+        [
+          680,
+          292,
+          100
+        ],
+        [
+          538,
+          423,
+          503
+        ]
+      ],
+      "relation_seed": 2196815968,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.05477143900009196,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 545,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3817,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 2
+      },
+      "direct_seconds": 0.10408194100000401,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 256601858
+    },
+    {
+      "trial": 53,
+      "target": [
+        [
+          711,
+          134,
+          437
+        ],
+        [
+          1052,
+          975,
+          1038
+        ]
+      ],
+      "relation_seed": 3128841024,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.053505366999957005,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 545,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3817,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 0
+      },
+      "direct_seconds": 0.08872749399995428,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 115808671
+    },
+    {
+      "trial": 54,
+      "target": [
+        [
+          451,
+          155,
+          58
+        ],
+        [
+          126,
+          630,
+          926
+        ]
+      ],
+      "relation_seed": 2832312481,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.08575645300004453,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.06149865999998383,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3712,
+          "smooth_relations": 555,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3887,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 7
+      },
+      "recovered_log": 191543002
+    },
+    {
+      "trial": 55,
+      "target": [
+        [
+          319,
+          214,
+          789
+        ],
+        [
+          183,
+          690,
+          929
+        ]
+      ],
+      "relation_seed": 4147738164,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.05543881500000225,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 553,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3873,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 0
+      },
+      "direct_seconds": 0.08494526300000871,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 161653026
+    },
+    {
+      "trial": 56,
+      "target": [
+        [
+          526,
+          1007,
+          411
+        ],
+        [
+          154,
+          30,
+          255
+        ]
+      ],
+      "relation_seed": 3431290101,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.056760297999971954,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3328,
+          "smooth_relations": 549,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3845,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 3
+      },
+      "direct_seconds": 0.07764283400001659,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 129283916
+    },
+    {
+      "trial": 57,
+      "target": [
+        [
+          461,
+          508,
+          453
+        ],
+        [
+          895,
+          419,
+          193
+        ]
+      ],
+      "relation_seed": 2437136927,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.05620355500002461,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 551,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3859,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 1
+      },
+      "direct_seconds": 0.06802572399999463,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 112580413
+    },
+    {
+      "trial": 58,
+      "target": [
+        [
+          927,
+          70,
+          131
+        ],
+        [
+          710,
+          21,
+          724
+        ]
+      ],
+      "relation_seed": 1607923720,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.05774970000004487,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3584,
+          "smooth_relations": 544,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3810,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 2
+      },
+      "direct_seconds": 0.0559277080000129,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 49914322
+    },
+    {
+      "trial": 59,
+      "target": [
+        [
+          169,
+          622,
+          25
+        ],
+        [
+          598,
+          877,
+          688
+        ]
+      ],
+      "relation_seed": 760789768,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.0586141870001029,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3584,
+          "smooth_relations": 544,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3810,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 2
+      },
+      "direct_seconds": 0.07328108900003372,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 121012980
+    },
+    {
+      "trial": 60,
+      "target": [
+        [
+          282,
+          879,
+          234
+        ],
+        [
+          898,
+          854,
+          953
+        ]
+      ],
+      "relation_seed": 4121904845,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.058202689000040664,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3584,
+          "smooth_relations": 555,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3887,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 2
+      },
+      "direct_seconds": 0.05319969699996818,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 49280969
+    },
+    {
+      "trial": 61,
+      "target": [
+        [
+          1056,
+          205,
+          820
+        ],
+        [
+          219,
+          532,
+          929
+        ]
+      ],
+      "relation_seed": 1084592540,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.07072789599999396,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05608006399995702,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3456,
+          "smooth_relations": 553,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3873,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 2
+      },
+      "recovered_log": 125555921
+    },
+    {
+      "trial": 62,
+      "target": [
+        [
+          19,
+          369,
+          1014
+        ],
+        [
+          973,
+          481,
+          236
+        ]
+      ],
+      "relation_seed": 1282904815,
+      "timing_order": [
+        "direct",
+        "cover"
+      ],
+      "direct_seconds": 0.10209866100001364,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "cover_seconds": 0.05506539500004237,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3584,
+          "smooth_relations": 549,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3845,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 2
+      },
+      "recovered_log": 247368014
+    },
+    {
+      "trial": 63,
+      "target": [
+        [
+          564,
+          178,
+          54
+        ],
+        [
+          1005,
+          164,
+          312
+        ]
+      ],
+      "relation_seed": 2710224630,
+      "timing_order": [
+        "cover",
+        "direct"
+      ],
+      "cover_seconds": 0.056232288999922275,
+      "cover_metadata": {
+        "relations": {
+          "candidates": 3200,
+          "smooth_relations": 560,
+          "rank": 530,
+          "factor_base": 531,
+          "linear_algebra": {
+            "method": "exact finite-field conjugate gradients",
+            "iterations": 531,
+            "diagonal_attempts": 1,
+            "nonzero_entries": 3922,
+            "original_equations_verified": true
+          }
+        },
+        "target_shifts": 12
+      },
+      "direct_seconds": 0.08571590399992601,
+      "direct_metadata": {
+        "table_entries": 8642
+      },
+      "recovered_log": 179781514
+    }
+  ]
+}

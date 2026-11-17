@@ -1,0 +1,37 @@
+/var/tmp/pencil-monic-remainder-termination-20261031-v1/Descent.lean:13:7: warning: `List.getLast?_eq_getLast` has been deprecated: Use `List.getLast?_eq_some_getLast` instead
+/var/tmp/pencil-monic-remainder-termination-20261031-v1/Descent.lean:19:38: error: unsolved goals
+p : UInt64
+b r : List UInt64
+hr : r ≠ []
+hl : b.length ≤ r.length
+⊢ (↑(RemainderWord.run p (r.getLast hr) (events (r.length - b.length) b ⋯) (state r))).size = r.length
+/var/tmp/pencil-monic-remainder-termination-20261031-v1/Descent.lean:20:36: warning: This simp argument is unused:
+  Subtype.property
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [raw, Array.length_toList]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-monic-remainder-termination-20261031-v1/Descent.lean:35:81: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+/var/tmp/pencil-monic-remainder-termination-20261031-v1/Descent.lean:52:8: warning: `List.getLast?_eq_getLast` has been deprecated: Use `List.getLast?_eq_some_getLast` instead
+/var/tmp/pencil-monic-remainder-termination-20261031-v1/Descent.lean:52:1: error: Tactic `assumption` failed
+
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+b r : List UInt64
+hr : r ≠ []
+hl : b.length ≤ r.length
+hp : 0 < p.toNat
+hb : p.toNat < 2 ^ 31
+hbs : Canon p b
+hrs : Canon p r
+hm : b.getLast? = some 1
+out : List UInt64 := raw p b r hr hl
+hlen : out.length = r.length
+hn : out ≠ []
+hg : Canon p out
+hz : ↑(out.getLast hn).toNat = 0
+hv : (out.getLast hn).toNat = ZMod.val 0
+hw : out.getLast hn = 0
+⊢ (raw p b r hr hl).getLast? = some 0
+/var/tmp/pencil-monic-remainder-termination-20261031-v1/Descent.lean:64:17: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead

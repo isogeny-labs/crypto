@@ -1,0 +1,102 @@
+{
+  "columns": 2048,
+  "outer_wall_ms": 393756.25381,
+  "phases": [
+    {
+      "data": {
+        "points": 339968,
+        "summands": 5,
+        "target": [
+          "6261116474805304534310590",
+          "4505575220639647215230954"
+        ]
+      },
+      "elapsed_ms": 0.003264,
+      "phase": "closure_begin",
+      "schema": "n83.chain-phase/v1"
+    },
+    {
+      "data": {
+        "domain_clauses": 892470,
+        "representatives": 2048
+      },
+      "elapsed_ms": 133.491677,
+      "phase": "closure_complete",
+      "schema": "n83.chain-phase/v1"
+    },
+    {
+      "data": {},
+      "elapsed_ms": 210.711853,
+      "phase": "index_complete",
+      "schema": "n83.chain-phase/v1"
+    },
+    {
+      "data": {
+        "identity_mask": 0
+      },
+      "elapsed_ms": 210.733599,
+      "phase": "encoding_begin",
+      "schema": "n83.chain-phase/v1"
+    },
+    {
+      "data": {
+        "identity_mask": 0,
+        "variables": 84743
+      },
+      "elapsed_ms": 224.495702,
+      "phase": "circuit_complete",
+      "schema": "n83.chain-phase/v1"
+    },
+    {
+      "data": {
+        "clauses": 1140557,
+        "domain_clauses": 892470,
+        "identity_mask": 0,
+        "variables": 111478
+      },
+      "elapsed_ms": 300.279738,
+      "phase": "domain_complete",
+      "schema": "n83.chain-phase/v1"
+    },
+    {
+      "data": {
+        "call": 1,
+        "conflict_budget": 100000,
+        "identity_mask": 0
+      },
+      "elapsed_ms": 300.310627,
+      "phase": "solver_enter",
+      "schema": "n83.chain-phase/v1"
+    },
+    {
+      "data": {
+        "conflicts": 100000,
+        "identity_mask": 0,
+        "outcome": "Unknown"
+      },
+      "elapsed_ms": 384237.701485,
+      "phase": "solver_return",
+      "schema": "n83.chain-phase/v1"
+    }
+  ],
+  "queries": [
+    {
+      "a": "555041861612817674392871",
+      "b": "1880544021900751415145556",
+      "schema": "n83.chain-query/v1",
+      "target": [
+        "6261116474805304534310590",
+        "4505575220639647215230954"
+      ]
+    }
+  ],
+  "schema": "n83.native-audit/v1",
+  "selected_best_total_runtime": null,
+  "status": "PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY",
+  "terminal_counters": {
+    "conflicts": 100000,
+    "models": 0,
+    "rank": 0,
+    "relations": 0
+  }
+}

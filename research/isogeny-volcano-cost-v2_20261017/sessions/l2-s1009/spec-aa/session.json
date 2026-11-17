@@ -1,0 +1,158 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1hbcc4ba83f56a",
+  "label": "isogeny volcano: independent A/A rho",
+  "spec_id": "ECS1hf837c125cb9f",
+  "spec_sha256": "f837c125cb9f70b4d84a35ea2597d358ea8571fcf0f0e1f574c5b35036b4cae4",
+  "env_class_id": "ECBENV2ha20a995299c2",
+  "host_sha256": "69de443580f4c565b6a9ab77122331632cc406caf81e72298cb297f7d0605881",
+  "plan_sha256": "7fe268c931f156ba78462e2c49a1c0e36936badbc50386ec7455f6bdedd0fa00",
+  "binary_sha256": "7da27ec3f0dadbae565181b0faa74582eb94a8f36cf6fe806eecc7b4b1fa7a9f",
+  "git_commit": "d4ed77ce0607cc2ba79baaf1b26305eff98c07c9",
+  "git_dirty": false,
+  "options": {
+    "cpus": "inherit",
+    "lock_path": "/tmp/crypto-bench-g1.lock",
+    "wait_for_lock": true,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": {
+    "run_cpu": 3,
+    "reserved": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "node": 0,
+    "request": "inherit",
+    "unreserved_siblings": [],
+    "observed": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  "preflight": {
+    "quiet": false,
+    "reasons": [
+      "CPU 3 was busy 1.980s of the 2.0s settle",
+      "PSI cpu some avg10 61.59 > 5.00"
+    ],
+    "settle_seconds": 2.0,
+    "reserved_busy_seconds": {
+      "0": 0.04,
+      "1": 0.01,
+      "2": 0.06,
+      "3": 1.98
+    },
+    "before": {
+      "unix_ms": 1792236653409,
+      "loadavg": [
+        3.93310546875,
+        4.19580078125,
+        4.66796875
+      ],
+      "psi_cpu_some_avg10": 63.49,
+      "psi_cpu_some_total_us": 7080103857,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "0": {
+          "busy": 135767,
+          "idle": 752120,
+          "steal": 4056
+        },
+        "1": {
+          "busy": 135306,
+          "idle": 747927,
+          "steal": 3915
+        },
+        "2": {
+          "busy": 125990,
+          "idle": 755228,
+          "steal": 3945
+        },
+        "3": {
+          "busy": 833557,
+          "idle": 45179,
+          "steal": 8957
+        }
+      }
+    },
+    "after": {
+      "unix_ms": 1792236655409,
+      "loadavg": [
+        3.85791015625,
+        4.17578125,
+        4.65869140625
+      ],
+      "psi_cpu_some_avg10": 61.59,
+      "psi_cpu_some_total_us": 7082032922,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "0": {
+          "busy": 135771,
+          "idle": 752316,
+          "steal": 4056
+        },
+        "1": {
+          "busy": 135307,
+          "idle": 748124,
+          "steal": 3915
+        },
+        "2": {
+          "busy": 125996,
+          "idle": 755419,
+          "steal": 3946
+        },
+        "3": {
+          "busy": 833755,
+          "idle": 45179,
+          "steal": 8959
+        }
+      }
+    }
+  },
+  "eviction": {
+    "moved_count": 0,
+    "failed_user_threads": 51,
+    "failed_kernel_threads": 69
+  },
+  "runner_on_run_cpu": false,
+  "runner_cpus": [
+    0,
+    1,
+    2
+  ],
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1792236655413,
+  "finished_unix_ms": 1792236783382,
+  "status": "complete",
+  "executions_planned": 496,
+  "records_written": 496,
+  "records_sha256": "1d3d7c879228f07dc50602a15d68da6f9493d647c30c07c4b02eb378ef94a9e7",
+  "status_counts": {
+    "verified": 496
+  }
+}

@@ -1,0 +1,9 @@
+{"schema": "ecbench.spec/v1", "label": "plane-quartic Jacobians: rho and BSGS",
+ "workloads": {"curves": [{"kind": "plane_quartic_search", "p_bits": 6, "seed": 1, "max_cofactor": 64},
+                          {"kind": "plane_quartic_search", "p_bits": 7, "seed": 1, "max_cofactor": 64}],
+               "targets_per_curve": 4, "target_seed": 20261025},
+ "arms": [
+  {"name": "rho-plain", "role": "reference", "method": {"id": "rho.plain"}},
+  {"name": "bsgs", "role": "candidate", "method": {"id": "bsgs.textbook"}},
+  {"name": "rho-plain-aa", "role": "control", "method": {"id": "rho.plain"}}],
+ "measurement": {"rounds": 3, "warmup": 1, "seed": 20261025, "isolation_required": "L0", "timeout_seconds": 600}}

@@ -1,0 +1,83 @@
+{
+  "schema": "research.fixed-composition-controls/v1",
+  "coordinate_order": [
+    "q",
+    "r",
+    "s",
+    "t",
+    "z",
+    "w"
+  ],
+  "p": 5,
+  "curve_coefficients_constant_through_cubic": [
+    0,
+    4,
+    1,
+    0
+  ],
+  "curve_monic_degree": 5,
+  "a": [
+    1,
+    0,
+    4,
+    0,
+    2,
+    3
+  ],
+  "b": [
+    4,
+    0,
+    1,
+    0,
+    1,
+    1
+  ],
+  "outer_branch": "sameUDouble",
+  "B": 0,
+  "derived_s_nonzero": true,
+  "extracted_point_xyzw": [
+    4,
+    4,
+    3,
+    3
+  ],
+  "doubled_output": [
+    2,
+    1,
+    3,
+    2,
+    3,
+    3
+  ],
+  "new_fixed_propositions": 6,
+  "negative_or_boundary_cases": [
+    {
+      "input": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1
+      ],
+      "branch": "sameUInverse"
+    },
+    {
+      "input": [
+        0,
+        1,
+        1,
+        0,
+        1,
+        1
+      ],
+      "branch": "sameUDouble",
+      "B": 3
+    },
+    {
+      "p": 2,
+      "accepted_prime_bound": false
+    }
+  ],
+  "scientific_execution": false
+}

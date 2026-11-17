@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T03:25:39Z",
+ "id": "PCC-20261116-cc48bc",
+ "kind": "statement",
+ "producer": {
+  "commit": "6c123eb24953a6791ec066dc84d23fb0c19be634",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/many-cosets-v1/native-control-v1/pre-call.json",
+    "sha256": "8405fc5582e591dffa290576bdc147df206547bcfb5aeac215ba8e9791d3d527"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/many-cosets-v1/native-control-v1/many-coset.json",
+    "sha256": "2a2fdf14c841d05d42323b4b37d4ed9635a1a98ca6974641f0fe85ef710af54c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/many-cosets-v1/SOURCES.sha256",
+    "sha256": "217407c74a6106260f2e6966368b2ef15b6852276b92c08dcdcaef0b7f05937a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/many-cosets-v1/source-v5-post-call.tar.gz",
+    "sha256": "67c15df0382d781aff5493fa0fa482187b5d67473dacfeacacc3fc13bce2b320"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/many-cosets-v1/development/rust-test-01.log",
+    "sha256": "1e1e078a0bd541537314f96b711004bf9ea820d6210b387c967749e33a8f2496"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/many-cosets-v1/development/clippy-01.log",
+    "sha256": "31a4e11327b1060c5c73f4a6dc2d21d21600ebecaf082ef4e3541d13844b657d"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/curve25519_torus_native_20261115/many-cosets-v1",
+ "statement": "Fixed native Rust development control replays the existing actual-field generator checks, builds 20633 membership labels and records 43 designated cases (9 members and 34 exclusions). The example test, formatting and strict Clippy pass; a 33-input source manifest and post-call archive bind the source. No timing, full-base enumeration, decomposition or independently signed execution is asserted."
+}

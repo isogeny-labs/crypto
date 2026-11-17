@@ -1,0 +1,149 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=26,scan_cap=416",
+          "oracle": "ksum:m=4"
+        }
+      },
+      "name": "inc",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=22,scan_cap=352",
+          "oracle": "ksum:m=4"
+        }
+      },
+      "name": "ksum4-n22",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=31,scan_cap=496",
+          "oracle": "ksum:m=4"
+        }
+      },
+      "name": "ksum4-n31",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=36,scan_cap=576",
+          "oracle": "ksum:m=4"
+        }
+      },
+      "name": "ksum4-n36",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=18,scan_cap=288",
+          "oracle": "ksum:m=4"
+        }
+      },
+      "name": "ksum4-n18",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=13,scan_cap=208",
+          "oracle": "ksum:m=4"
+        }
+      },
+      "name": "ksum4-n13",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=150,scan_cap=2400",
+          "oracle": "ksum:m=3"
+        }
+      },
+      "name": "ksum3-n150",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=211,scan_cap=3376",
+          "oracle": "ksum:m=3"
+        }
+      },
+      "name": "ksum3-n211",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=179,scan_cap=2864",
+          "oracle": "rootfind-pairs:m=3"
+        }
+      },
+      "name": "rfpairs3-n179",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=256,scan_cap=4096",
+          "oracle": "mitm:m=3,negation_folded=1"
+        }
+      },
+      "name": "mitm3-n256",
+      "role": "candidate"
+    }
+  ],
+  "description": "research/curve25519_autolab_20261104/round-009/PROTOCOL.md (frozen before data), train screen. Public synthetic Curve25519-family miniature and targets; no security claim. In-sample selection; promotion_eligible=false.",
+  "label": "ic_autolab round 9 train, generic track, k = 32",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate_measured",
+    "rounds": 1,
+    "seed": 2026119439,
+    "timeout_seconds": 1800,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 1173263412,
+        "b": 337904346,
+        "group_order": 4295077112,
+        "gx": 1431665017,
+        "gy": 592057774,
+        "kind": "prime_explicit",
+        "p": 4294967197,
+        "r": 536884639
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 2026119432,
+    "targets_per_curve": 32
+  }
+}

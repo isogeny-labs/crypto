@@ -1,0 +1,3 @@
+# H2 arm admission prelaunch checks, 2026-11-16 UTC
+
+This amendment precedes all arm-admission data and changes only the frozen launcher. The first committed launcher checked H2 and the store index but omitted the protocol's Docker image ID/architecture/source-label check and did not reject a newly built executable with a wrong host architecture or embedded source path. The amended launcher checks the exact image identity before creating output, then checks Mach-O ARM64 format and the embedded H2 checkout path before read-only staging. The source commit, K600 object, build/stage limits and no-search boundary are unchanged. No first-attempt output existed at this amendment.

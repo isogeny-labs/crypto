@@ -1,0 +1,44 @@
+warning: field `reason` is never read
+    --> src/ml_dataset/koblitz_m3.rs:7527:5
+     |
+7526 | struct SavedPersistenceResult {
+     |        ---------------------- field in this struct
+7527 |     reason: String,
+     |     ^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `crypto` (lib test) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 2.54s
+     Running unittests src/lib.rs (/var/tmp/crypto-ml-dynamic-adapter-target/release/deps/crypto_lib-e38f712455658d63)
+
+running 26 tests
+test cryptanalysis::f4_fp::tests::autoreduce_keeps_generators_with_equal_leading_monomials ... ok
+test cryptanalysis::f4_fp::tests::avx2_lazy_accumulation_matches_scalar_at_boundaries ... ok
+test cryptanalysis::f4_fp::tests::avx512_lazy_accumulation_matches_scalar_at_boundaries ... ok
+test cryptanalysis::f4_fp::tests::barrett_matches_the_hardware_remainder ... ok
+test cryptanalysis::f4_fp::tests::basis_from_the_parallel_path_is_a_reduced_groebner_basis ... ok
+test cryptanalysis::f4_fp::tests::blocked_pair_reduction_matches_direct_product ... ok
+test cryptanalysis::f4_fp::tests::circle_and_line_over_f7_match_buchberger ... ok
+test cryptanalysis::f4_fp::tests::degree_bound_truncates_and_reports_it ... ok
+test cryptanalysis::f4_fp::tests::hilbert_function_of_a_complete_intersection ... ok
+test cryptanalysis::f4_fp::tests::hilbert_stop_falls_back_when_the_leading_forms_are_not_regular ... ok
+test cryptanalysis::f4_fp::tests::hilbert_stop_gives_the_same_reduced_basis_as_the_plain_run ... ok
+test cryptanalysis::f4_fp::tests::inconsistent_system_is_refuted ... ok
+test cryptanalysis::f4_fp::tests::narrow_arithmetic_matches_wide_rref ... ok
+test cryptanalysis::f4_fp::tests::narrow_f4_matches_wide_basis ... ok
+test cryptanalysis::f4_fp::tests::random_zero_dimensional_systems_agree_with_brute_force ... ok
+test cryptanalysis::f4_fp::tests::recursive_visitors_reject_all_checkpoint_options_before_callbacks_or_file_effects ... ok
+test cryptanalysis::f4_fp::tests::run_log_is_opt_in ... ok
+test cryptanalysis::f4_fp::tests::solving_degree_max_sees_the_highest_productive_step ... ok
+test cryptanalysis::f4_fp::tests::staircase_counts_standard_monomials ... ok
+test cryptanalysis::f4_fp::tests::stopping_below_a_staircase_keeps_every_solution ... ok
+test cryptanalysis::f4_fp::tests::streaming_domains_follow_original_variables_and_match_the_legacy_solver ... ok
+test cryptanalysis::f4_fp::tests::streaming_verifies_truncated_roots_and_distinguishes_stop_timeout_and_exhaustion ... ok
+test cryptanalysis::f4_fp::tests::traced_visit_checks_truncated_candidates_and_stops_lazy_full_field_branching ... ok
+test cryptanalysis::f4_fp::tests::traced_visit_matches_plain_with_unrestricted_auxiliary_and_serializable_events ... ok
+test cryptanalysis::f4_fp::tests::traced_visit_sink_failure_is_sticky_and_distinct_from_other_stops ... ok
+test cryptanalysis::f4_fp::tests::unrestricted_rational_factors_handle_repeated_roots_and_characteristic_two ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 6104 filtered out; finished in 0.47s
+

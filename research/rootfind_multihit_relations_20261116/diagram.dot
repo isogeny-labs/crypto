@@ -1,0 +1,16 @@
+digraph multihit {
+  rankdir=LR;
+  graph [fontname="Helvetica Neue", bgcolor="white", pad="0.2"];
+  node [fontname="Helvetica Neue", shape=box, style="rounded,filled", fillcolor="#eef5f8", color="#456274"];
+  edge [color="#456274"];
+  target [label="One fixed residual R\nQ + [a]G"];
+  scan [label="Ordered factor-base scan\nrest = R - P_k"];
+  table [label="First-witness pair table\nprobe rest"];
+  verify [label="Verify P_i + P_j + P_k = R"];
+  first [label="First-hit control\nstop at first valid row", fillcolor="#dcebf1"];
+  all [label="All-hit candidate\ncontinue through all k", fillcolor="#dcefe5"];
+  rank [label="Mod-r row reduction\ncount independent rows"];
+  target -> scan -> table -> verify;
+  verify -> first -> rank;
+  verify -> all -> rank;
+}

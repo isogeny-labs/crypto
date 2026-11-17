@@ -1,0 +1,33 @@
+{
+  "previous_run": 40846184703,
+  "previous_head": "a9e68b61d91cc2774e09d31ca0d9ee2f25846e9c",
+  "previous_jobs": {
+    "success": 118,
+    "cancelled": 2,
+    "failure": 0
+  },
+  "cancelled_targets": [
+    "research/fall_degree_bounds_20261008/lean",
+    "research/weak_line_7_4_followup_20261013/lean"
+  ],
+  "reason": "Full repository checkout used almost the entire 25-minute budget; target6 printed PASS8theorems immediately before cancellation.",
+  "retained_proof_context_files": 595,
+  "explicit_source_io": [
+    {
+      "path": "tools/lean/AuditAxioms.lean",
+      "input": "trusted manifest retained under tools/lean"
+    }
+  ],
+  "all_original_failed_targets_now_successful": true,
+  "checkout_pattern_control": "Real Git sparse checkout of every tracked proof/context/tool path preserves all 602 required paths and excludes unrelated archive/source placeholders.",
+  "gate_selftest_pass": true,
+  "matrix_controls_passed": 6,
+  "published_sparse_checkout_run": "pending",
+  "setup_followup": {
+    "first_sparse_run": 40855702179,
+    "failure": "coverage control also reads the workflow YAML, now retained and included in the independent checkout inventory",
+    "proof_context_files": 595,
+    "all_tracked_proof_context_tool_and_workflow_paths": 604,
+    "artifact_wiring": "Regenerated ic-leaderboard.yml against all tracked artifact manifests; includes postgb linear-stage and twist study inputs."
+  }
+}

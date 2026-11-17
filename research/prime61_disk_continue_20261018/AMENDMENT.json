@@ -1,0 +1,9 @@
+{
+  "schema": "prime61.disk-continuation-amendment/v1",
+  "before_measurement": true,
+  "reason": "The frozen current-main source e063d98475589d9aba7ae265a8cba830927e3156 fails compilation with unrelated ecbench API/module/type errors. No continued measurements have been collected. Retain the build failure; do not alter unrelated sources.",
+  "execution_source_revision": "b68341cd72b51acf9c5ce6c4f755351cc83053db",
+  "execution_source_rationale": "Exact validated source revision recorded by the restored checkpoint, including its final discriminant check. Run an isolated detached worktree of that revision with Rust 1.99.1. Preserve source/build-input hashes and the failed current-main build. The new evidence PR remains based on current main.",
+  "changes": "Use the pinned previous source for native worker build, example tests, collector replay and all continuation batches; the original spec, controls, cumulative targets, per-stream budgets, capacity limits, validation and coverage obligations remain unchanged. The continuation script accepts an absolute WORKER override for this exact-source build.",
+  "validation": "Run current-main release library tests to document its state, and run the pinned-source release library and example tests. Current-main failures cannot be represented as passing checks, even if pinned-source validation passes. Retain exact logs and distinguish the two."
+}

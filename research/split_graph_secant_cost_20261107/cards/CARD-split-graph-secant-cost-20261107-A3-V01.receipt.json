@@ -1,0 +1,404 @@
+{
+  "card_id": "CARD-split-graph-secant-cost-20261107-A3-V01",
+  "card_path": "research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A3-V01.yaml",
+  "card_sha256": "f1c1e1f8bddab10a8d5830ee544aa36d6d5d1f19e5a0a9181f02c0c9b80be842",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "773893e2d63e26decef72791df237255a58766f4",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-ancestor",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--quiet",
+        "773893e2d63e26decef72791df237255a58766f4",
+        "HEAD",
+        "--",
+        "research/split_graph_secant_cost_20261107",
+        ":(exclude)research/split_graph_secant_cost_20261107/cards",
+        ":(exclude)research/split_graph_secant_cost_20261107/receipts",
+        ":(exclude)research/split_graph_secant_cost_20261107/results",
+        "taskq/",
+        "tools/task_card.py",
+        "tools/benchrec.py"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-paths-unchanged",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "20acbf94d87b87f47fa20b4866c79143e9df6154e64cc1a07de9e56e10a84ed1",
+        ".provenance.protocol_sha256 == $h",
+        "research/split_graph_secant_cost_20261107/eks/r2img_request_attempt3.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "request-protocol-identity",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "job",
+        "sgsecant-panel-20261108-a3",
+        ".job_name == $job and (.job_uid | length) > 0 and (.state == \"submitted\" or .state == \"active\" or .state == \"succeeded\")",
+        "research/split_graph_secant_cost_20261107/receipts/A3/launch/result.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch-receipt-exists",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/split_graph_secant_cost_20261107/cards/wait_command_status.sh",
+        "research/split_graph_secant_cost_20261107/cards/status_request_a3.json",
+        "sgsecant-panel-20261108-a3",
+        "research/split_graph_secant_cost_20261107/receipts/A3/collect-v01",
+        "900",
+        "60",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 54.067,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "status-once",
+      "index": 5,
+      "outputs": {
+        "research/split_graph_secant_cost_20261107/receipts/A3/collect-v01/final-status.json": "7b4159c4c4103f5aaf03bcd355f6353cd7afe5457a8e29a86788afc771fd3c01"
+      },
+      "seconds": 54.067,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "c0fae525ce2ff2f356c0f04b4f853efdb256a9603c476445dbe2ad3bb2060304",
+      "stdout_tail": [
+        "2026-11-08T12:08:10Z poll 1 launcher_exit 0 state succeeded",
+        "{\"state\":\"succeeded\",\"job_name\":\"sgsecant-panel-20261108-a3\",\"job_uid\":\"517e76f8-a6c1-482f-aed0-3c15347e88e3\",\"pods\":[],\"launcher\":\"isolab-experiment-launcher:571d69ae-e910-48c6-b797-462cc67af386\",\"receipt_uri\":\"s3://isolab-results-104186811093-us-east-2/runs/sgsecant-panel-20261108-a3/launcher/571d69ae-e910-48c6-b797-462cc67af386/\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/split_graph_secant_cost_20261107/cards/status_with_audit_pod.sh",
+        "research/split_graph_secant_cost_20261107/receipts/A3/collect-v01/final-status.json",
+        "2026-11-08T00:00:00Z",
+        "2026-11-08T12:06:59Z",
+        "research/split_graph_secant_cost_20261107/receipts/A3/collect-v01/status-with-audit-pod.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 22.173,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "pod-from-audit",
+      "index": 6,
+      "outputs": {
+        "research/split_graph_secant_cost_20261107/receipts/A3/collect-v01/status-with-audit-pod.json": "ed8945af8aae4f755e8d21f7e96585cca15f2bcdff82eced2235703a2ca34ee1"
+      },
+      "seconds": 22.173,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "20d5b1af8b692a347bd757c6179b03acb8dc7fad6f8112cf9043efccb758edd8",
+      "stdout_tail": [
+        "pod sgsecant-panel-20261108-a3-l9dtd uid 90583573-94c9-4b32-9381-df556d030f0c exit 0 (from 1 node report(s)); job sgsecant-panel-20261108-a3 uid 517e76f8-a6c1-482f-aed0-3c15347e88e3"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "aws",
+        "s3",
+        "sync",
+        "s3://isolab-results-104186811093-us-east-2/runs/sgsecant-panel-20261108-a3/",
+        "research/split_graph_secant_cost_20261107/results/A3",
+        "--exclude",
+        "launcher/*",
+        "--only-show-errors"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.748,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "download",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.748,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/split_graph_secant_cost_20261107/cards/verify_results.sh",
+        "research/split_graph_secant_cost_20261107/receipts/A3/collect-v01/status-with-audit-pod.json",
+        "research/split_graph_secant_cost_20261107/receipts/A3/launch/result.json",
+        "research/split_graph_secant_cost_20261107/results/A3",
+        "SHA256SUMS",
+        "dc7c013bc2ac19aecc69f6cd5c9a253563ef02e49d72c5590b0d9e951ef88ee9  /opt/sgsecant/sgsecant"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.031,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.031,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "72b5f277149e5b0bdfa5d564f1e4ff7d4b412059d5462c418a184418b16e64f5",
+      "stdout_tail": [
+        "binary hash line present in SHA256SUMS: dc7c013bc2ac19aecc69f6cd5c9a253563ef02e49d72c5590b0d9e951ef88ee9  /opt/sgsecant/sgsecant",
+        "panel/records.jsonl: OK",
+        "panel/summary.json: OK",
+        "panel/summary.txt: OK",
+        "panel/config.txt: OK",
+        "SHA256SUMS lines: 5",
+        "verified: job sgsecant-panel-20261108-a3 job_uid 517e76f8-a6c1-482f-aed0-3c15347e88e3 pod_uid 90583573-94c9-4b32-9381-df556d030f0c"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "find",
+        "research/split_graph_secant_cost_20261107/results/A3",
+        "-type",
+        "f",
+        "-exec",
+        "python3",
+        "tools/benchrec.py",
+        "add-raw",
+        "benchmarks/records/20261108T0449Z-split-graph-secant-panel.json",
+        "{}",
+        "+"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.07,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "add-raw",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.07,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "8da6bfc1cd0aeccc6facaabe3fa25c0284fa25a6b11b7544328de8baa3c005a2",
+      "stdout_tail": [
+        "5 raw file(s) recorded"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "upload",
+        "benchmarks/records/20261108T0449Z-split-graph-secant-panel.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 10.234,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "upload-raw",
+      "index": 10,
+      "outputs": {},
+      "seconds": 10.234,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "find",
+        "research/split_graph_secant_cost_20261107/results/A3",
+        "-type",
+        "d",
+        "-name",
+        "panel",
+        "-exec",
+        "python3",
+        "-I",
+        "research/split_graph_secant_cost_20261107/sgsecant_recheck.py",
+        "{}",
+        "+"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.751,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "recheck",
+      "index": 11,
+      "outputs": {},
+      "seconds": 1.751,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "9f93d09fdb1d28a70a3fe62e870a02682ffdebe09ed71a5a0c4662512044926b",
+      "stdout_tail": [
+        "recheck: 600 comparison rows recomputed, 0 mismatches"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 11,
+  "commit": "773893e2d63e26decef72791df237255a58766f4",
+  "dirty_after": [
+    "enchmarks/records/20261108T0449Z-split-graph-secant-panel.json",
+    "research/ml_learnability_control_20261107/cards/CARD-ml-learnability-control-20261107-M16-C01.yaml",
+    "research/ml_learnability_control_20261107/cards/CARD-ml-learnability-control-20261107-M16-V01.yaml",
+    "research/ml_learnability_control_20261107/cards/status_with_audit_pod.sh",
+    "research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A3-C01.yaml",
+    "research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A3-C02.yaml",
+    "research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A3-V01.yaml",
+    "research/split_graph_secant_cost_20261107/cards/status_with_audit_pod.sh"
+  ],
+  "dirty_before": [
+    "research/ml_learnability_control_20261107/cards/CARD-ml-learnability-control-20261107-M16-C01.yaml",
+    "research/ml_learnability_control_20261107/cards/CARD-ml-learnability-control-20261107-M16-V01.yaml",
+    "research/ml_learnability_control_20261107/cards/status_with_audit_pod.sh",
+    "research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A3-C01.yaml",
+    "research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A3-C02.yaml",
+    "research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A3-V01.yaml",
+    "research/split_graph_secant_cost_20261107/cards/status_with_audit_pod.sh"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

@@ -1,0 +1,52 @@
+name: ECC2K-130 m3 base-selector source lock
+
+on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/ecc2k130-m3-base-selector-source.yml
+      - research/notes/ecc2k130/m3_base_selector_20260930/**
+
+permissions:
+  contents: read
+
+jobs:
+  source-lock:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-m3-base-selector-source.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-m3-base-selector-source.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            .github/scripts/frozen-workflow-check.mjs
+            .github/scripts/run-frozen-workflow-replays.mjs
+            .github/scripts/frozen-workflow-pins.json
+            .github/workflows/ecc2k130-m3-four-policy.yml
+            .github/workflows/ecc2k130-m3-base-selector-source.yml
+            research/notes/ecc2k130/m3_base_selector_20260930
+            research/notes/ecc2k130/m3_four_policy_20260930
+            research/ecc2k130_factor_base_pilot_20260924
+            research/ecc2k130_factor_base_replication_20260925
+            research/ecc2k130_dual_transport_20260925
+            research/ecc2k130_relations
+            research/ecc2k130_oriented_transport_20260924
+          sparse-checkout-cone-mode: false
+      - name: Audit exact source and dependency bytes
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 research/notes/ecc2k130/m3_base_selector_20260930/check_source_lock.py
+            python3 -m py_compile \
+              research/notes/ecc2k130/m3_base_selector_20260930/score.py \
+              research/notes/ecc2k130/m3_base_selector_20260930/produce.py \
+              research/notes/ecc2k130/m3_base_selector_20260930/verify.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only m3_base_selector_20260930 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
+      - name: Regress score on archived independent bases only
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 -m unittest discover \
+              research/notes/ecc2k130/m3_base_selector_20260930 \
+              -p 'test_score.py' -v
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only m3_base_selector_20260930 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"

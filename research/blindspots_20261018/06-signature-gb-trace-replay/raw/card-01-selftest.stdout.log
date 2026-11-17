@@ -1,0 +1,12 @@
+orders ok: key = plain grevlex; rk = key on squarefree, multiplicative, degree-first with squares
+toy (m,n,l)=(3, 5, 2) nv=11: 3 unsat, 3 sat systems, all engines agree
+toy (m,n,l)=(4, 4, 1) nv=12: 3 unsat, 3 sat systems, all engines agree
+toy (m,n,l)=(2, 7, 3) nv=6: 3 unsat, 3 sat systems, all engines agree
+toy (m,n,l)=(3, 6, 3) nv=15: 3 unsat, 3 sat systems, all engines agree
+toy (m,n,l)=(4, 5, 2) nv=18: 3 unsat, 3 sat systems, all engines agree
+toy (m,n,l)=(3, 7, 3) nv=16: 3 unsat, 3 sat systems, all engines agree
+toy (m,n,l)=(2, 9, 5) nv=10: 3 unsat, 3 sat systems, all engines agree
+systems: 60 unsat, 72 sat; engines f4, sig, sig0 and each criterion alone agree (refutation, standard monomials = brute force, vanishing, identical reduced bases)
+criteria fired in sig over the selftest: K0 107115944 K1 5278789 K2 161226124 K3 602 K4 1738182 singular 85285
+replays: 980 run, 120 own-trace replays of unsat systems refuted without fallback, 619 fell back (never a wrong verdict)
+SELFTEST OK

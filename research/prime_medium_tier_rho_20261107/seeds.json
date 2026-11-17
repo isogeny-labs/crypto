@@ -1,0 +1,84 @@
+{
+ "schema": "prime_medium_tier_rho.seeds/v1",
+ "rule": "seed(tag) = int(SHA-256(UTF-8(prefix + tag)).hexdigest()[0:12], 16), a 48-bit integer",
+ "prefix": "prime_medium_tier_rho_20261107/v1/",
+ "written": "2026-11-07, before any measured session",
+ "seeds": [
+  {
+   "tag": "curve/bits=33/index=1",
+   "seed": 201624291843241
+  },
+  {
+   "tag": "curve/bits=33/index=2",
+   "seed": 24642267360510
+  },
+  {
+   "tag": "curve/bits=37/index=1",
+   "seed": 18561872162765
+  },
+  {
+   "tag": "curve/bits=37/index=2",
+   "seed": 135799598603144
+  },
+  {
+   "tag": "curve/bits=41/index=1",
+   "seed": 119518173357916
+  },
+  {
+   "tag": "curve/bits=41/index=2",
+   "seed": 181458334271012
+  },
+  {
+   "tag": "curve/bits=45/index=1",
+   "seed": 185150999512726
+  },
+  {
+   "tag": "curve/bits=45/index=2",
+   "seed": 196853410870112
+  },
+  {
+   "tag": "curve/bits=49/index=1",
+   "seed": 40016877808970
+  },
+  {
+   "tag": "curve/bits=49/index=2",
+   "seed": 203571419754608
+  },
+  {
+   "tag": "target_seed/block=A",
+   "seed": 54849620745713
+  },
+  {
+   "tag": "target_seed/block=B",
+   "seed": 262858262117844
+  },
+  {
+   "tag": "measurement_seed/job=J1",
+   "seed": 107516164087790
+  },
+  {
+   "tag": "measurement_seed/job=J2",
+   "seed": 26995759977218
+  },
+  {
+   "tag": "measurement_seed/job=J3",
+   "seed": 166668755239101
+  },
+  {
+   "tag": "measurement_seed/job=J4",
+   "seed": 6472169882280
+  },
+  {
+   "tag": "measurement_seed/job=J5",
+   "seed": 54391810056847
+  },
+  {
+   "tag": "measurement_seed/job=J6",
+   "seed": 22552766203232
+  },
+  {
+   "tag": "measurement_seed/job=SMOKE",
+   "seed": 227095582935304
+  }
+ ]
+}

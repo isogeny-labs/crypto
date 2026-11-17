@@ -1,0 +1,62 @@
+{
+  "E1-mixed-solution-census": {
+    "reproduced": false,
+    "compared": 52,
+    "mismatches": [
+      "Incomplete: the full run (rereplicate/full, run.sh) and the reduced run (rereplicate/reduced, run_reduced.sh) were still in progress when this was returned, so the raw-output comparison against results.json and the original raw outputs has not been performed. reproduced cannot be true yet.",
+      "Completed with no mismatch: validate_results.sh on the original directory gave 52 PASS and 0 FAIL (validate_results_original_dir.txt in research/twist_ecdlp_20261027/E1-mixed-solution-census/rereplicate/).",
+      "Completed with no mismatch: opcounts.tsv and opcounts_summary.json regenerated and byte-identical to the originals; instrumented gp check gave pkeys_calls_table_build=1378, pkeys_calls=5200, distinct_solutions=779 (opcount_verify_check.txt).",
+      "Script hashes of e1_census.gp, e1_aggregate.gp and plot_e1.py match the original raw/script_hashes.txt.",
+      "Deviation: run.sh and run_reduced.sh were run with E1_DIR and E1_RED_DIR pointed into rereplicate/, not in place, to avoid overwriting the original results and to stay within the output directory the task names."
+    ]
+  },
+  "E2-twin-target-amortization": {
+    "reproduced": true,
+    "compared": 15352,
+    "mismatches": [
+      "Frozen command ./opcounts.sh failed on its first run in rereplicate/ (exit 1): e2_analyze.gp writes results.json with GP's 'x e-5' spacing, which is invalid JSON, so the python merge step raised JSONDecodeError. opcounts.csv and raw_rho_opcounts.txt were written. Applying the sed fix already documented in the original reconciliation (cp to raw/results_gp_original.json, sed, rerun opcounts.sh) made it exit 0. This is a reproduction failure of the frozen command as written, not a numeric mismatch. No non-timing number differed."
+    ]
+  },
+  "E4-koblitz-twist-pair": {
+    "reproduced": true,
+    "compared": 31953,
+    "mismatches": [
+      "Timing-derived, excluded from the non-timing count: supp_totals.txt L44 all-draw median CPU-time ratio S/E 1.5921 (original) vs 1.5739 (rereplicate)",
+      "Timing-derived, excluded: verdict.txt NC1 line (E time >= 100 ms) n 753 vs 721, band [0.8059,1.2356] vs [0.8665,1.1493]",
+      "Timing-derived, excluded: results.json nc1_noise_band.lo 0.8166 vs 0.861111 and hi 1.239474 vs 1.151515"
+    ]
+  },
+  "E5-kummer-multiplicative-walk": {
+    "reproduced": false,
+    "compared": 0,
+    "mismatches": [
+      "Re-replication not finished: the four frozen commands were launched in the background by research/twist_ecdlp_20261027/E5-kummer-multiplicative-walk/rereplicate/drive.sh (log: rereplicate/drive.log). No comparison has been run, so no number has been compared and COMPARISON.md has not been written. reproduced=false is a placeholder for an incomplete run, not a finding of mismatch.",
+      "Replica tree is at rereplicate/replica/ with run.sh, run_reduced.sh and check_reduced.sh pointed at that tree (D overridden), so the original raw/ and out/ are untouched. Comparison script is at <scratch>/E5_compare.py and must be run after drive.log contains 'end'.",
+      "The reduced-run check embedded in run_reduced.sh runs while the full run is still writing raw/, so its output is not valid; the valid reduced check is the one re-run after the full run finishes."
+    ]
+  },
+  "E6-genus2-gluing": {
+    "reproduced": false,
+    "compared": 0,
+    "mismatches": [
+      "Re-replication not finished: the full, reduced and quick runs of E6-genus2-gluing were still running in the background under rereplicate/out_full, out_reduced and out_quick, so no non-timing number has been compared yet. COMPARISON.md has not been written. Two earlier launch mistakes (duplicate full run, orphaned gp processes) were stopped and their output directories were cleared before the clean restart; the original out/ and results.json were not modified."
+    ]
+  },
+  "G1-sound-negation-map-rho-baseline": {
+    "reproduced": false,
+    "compared": 52397,
+    "mismatches": [
+      "Cell n1sab b36 i1: original 12 trials (0/12, Wilson [0.000, 0.243], rc=124 at 840 s cap) vs replication 20 trials (0/20, Wilson [0.000, 0.161], rc=0). Common prefix identical.",
+      "Cell n1c2 b36 i1: original 10 trials (1/10, Wilson [0.018, 0.404], rc=124) vs replication 20 trials (4/20, Wilson [0.081, 0.416], rc=0). Common prefix identical.",
+      "Derived values differing only for these two cells: out/summary.txt lines 13, 17, 57, 61; out/solve.csv lines 12, 16; out/opcounts.txt lines 13, 17; out/opcounts.csv rows n1sab b36 and n1c2 b36; results.json opcounts[10], opcounts[14], solve_rates[10], solve_rates[14], controls_verbatim_from_summary_txt[12] and [16], cells_nonzero_exit.",
+      "All other compared numbers match: 64 of 66 raw cells value-identical (timing masked), out/ratios.csv identical, repro_quick.sh 0 differences, frozen-hash check 0 mismatches."
+    ]
+  },
+  "G2-decoupled-AB-projection-arm": {
+    "reproduced": false,
+    "compared": 0,
+    "mismatches": [
+      "Not finished: the full run.sh replication was still running in the background when this output was requested, so no non-timing number has been compared and COMPARISON.md was not written. Replication directory: research/twist_ecdlp_20261027/G2-decoupled-AB-projection-arm/rereplicate/ (driver: rereplicate/run/, log: rereplicate/run_driver.log, exit marker 'exit=' appended on completion). The reduced opcounts stage (g2_opcounts.gp) has not been run separately. Hash checks of SCRIPTS.sha256 and PREREG.sha256 pass on the copy."
+    ]
+  }
+}

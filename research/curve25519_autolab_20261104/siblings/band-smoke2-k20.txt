@@ -1,0 +1,17 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-tm898-793f1c4c | 17.00 | rho-neg | 24/24 | 1.337 | 1.428 | 2.243 | — |
+| icv1-fp20-tm898-793f1c4c | 17.00 | tw2cj-lazy | 24/24 | 2.534 | 2.719 | 4.384 | — |
+| icv1-fp20-tm898-793f1c4c | 17.00 | tw2cj-lazy-sib8-p256 | 24/24 | 2.361 | 2.661 | 5.361 | — |
+| icv1-fp20-tm898-793f1c4c | 17.00 | tw2cj-lazy-sib8-p64 | 24/24 | 1.725 | 2.017 | 4.641 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-tm898-793f1c4c | rho-neg vs tw2cj-lazy | rho-neg < tw2cj-lazy |
+| icv1-fp20-tm898-793f1c4c | rho-neg vs tw2cj-lazy-sib8-p256 | rho-neg < tw2cj-lazy-sib8-p256 |
+| icv1-fp20-tm898-793f1c4c | rho-neg vs tw2cj-lazy-sib8-p64 | rho-neg < tw2cj-lazy-sib8-p64 |
+| icv1-fp20-tm898-793f1c4c | tw2cj-lazy vs tw2cj-lazy-sib8-p256 | unresolved inside the band |
+| icv1-fp20-tm898-793f1c4c | tw2cj-lazy vs tw2cj-lazy-sib8-p64 | unresolved inside the band |
+| icv1-fp20-tm898-793f1c4c | tw2cj-lazy-sib8-p256 vs tw2cj-lazy-sib8-p64 | tw2cj-lazy-sib8-p64 < tw2cj-lazy-sib8-p256 |

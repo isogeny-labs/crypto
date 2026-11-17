@@ -19,3 +19,7 @@ dot -Tpdf figures/backmap.dot -o figures/backmap.pdf
 sed 's@figures/backmap.svg@figures/backmap.pdf@g' BACKMAP.md |
   pandoc --from markdown+tex_math_dollars --pdf-engine=pdflatex -V geometry:margin=0.7in -V fontsize=10pt -V colorlinks=true --resource-path=. -o BACKMAP.pdf
 pandoc FORMAL_RECONSTRUCTION.md --from markdown+tex_math_dollars --pdf-engine=pdflatex -V geometry:margin=0.7in -V fontsize=10pt -V colorlinks=true --resource-path=. -o FORMAL_RECONSTRUCTION.pdf
+dot -Tsvg figures/polarized-quotient.dot -o figures/polarized-quotient.svg
+dot -Tpdf figures/polarized-quotient.dot -o figures/polarized-quotient.pdf
+sed 's@figures/polarized-quotient.svg@figures/polarized-quotient.pdf@g' POLARIZED_QUOTIENT.md |
+  pandoc --from markdown+tex_math_dollars --pdf-engine=pdflatex -V geometry:margin=0.7in -V fontsize=10pt -V colorlinks=true --resource-path=. -o POLARIZED_QUOTIENT.pdf

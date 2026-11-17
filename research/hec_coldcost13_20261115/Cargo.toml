@@ -1,0 +1,16 @@
+[package]
+name = "hec-coldcost13-worker-gate"
+version = "0.1.0"
+edition = "2021"
+[workspace]
+[dependencies]
+hec-native-ic = { path = "../../crates/hec-native-ic" }
+num-bigint = "0.4"
+[[bin]]
+name = "coldcost13-worker"
+path = "worker.rs"
+[profile.release]
+debug = 1
+[[bin]]
+name = "coldcost13-collector"
+path = "collector.rs"

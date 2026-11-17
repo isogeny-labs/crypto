@@ -1,0 +1,12 @@
+CryptoMiniSat arm (e) binary, built once outside the cards (item 08, 2026-10-18).
+
+source        https://github.com/msoos/cryptominisat tag 5.11.21 (shallow clone), revision 4c9a6b6b459b7c1381744115ccfe744f1121794b
+configure     cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF -DSTATS=OFF -DNOZLIB=ON -DNOM4RI=ON -DSTATICCOMPILE=ON
+build         make -j2 cryptominisat5-bin   (gcc 13.3.0, Ubuntu 24.04; no Boost needed at this version)
+installed at  target/blindspots-08/cryptominisat5   (statically linked, 3,889,168 bytes)
+sha256        a9dc572b482caa32a86a7bdf5e1d1afee45e08e43fc90dd6828733cf02525323
+version line  c CryptoMiniSat version 5.11.21
+run flags     --verb 1 --threads 1 --maxtime 40 <file.cnf>   (CNF clauses plus native x-lines)
+note          the committed ICPERF corpus rows used CMS 5.11.15 (dynamic, ZLIB on); counters are CMS's own and
+              are rounded to K/M by CMS for large values. The binary lives in the shared target/ directory and is
+              pinned by sha256 in card-09; if it is missing the card stops (rebuild with the lines above).

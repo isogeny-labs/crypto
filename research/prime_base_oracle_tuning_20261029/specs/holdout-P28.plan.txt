@@ -1,0 +1,57 @@
+spec ECS1hda2d8d1f26a5 (XP-20261016-prime-base-oracle-tuning Stage H (holdout), 28-bit fresh prime-order curve): 1008 executions
+  arm rho-neg          reference  ECM1hefea4e0ebe79 rho.negation {"cap_multiple": "64"}
+  arm inc              baseline   ECM1h1729b9b88605 ic.pipeline {"factor_base": "prime-abscissa:size=407", "linalg": "incremental-gauss", "max_trials": "26479085", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm sel              candidate  ECM1h2987a943bb0f ic.pipeline {"factor_base": "prime-abscissa:size=288", "linalg": "incremental-gauss", "max_trials": "26479085", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm size             candidate  ECM1h2987a943bb0f ic.pipeline {"factor_base": "prime-abscissa:size=288", "linalg": "incremental-gauss", "max_trials": "26479085", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm stride           control    ECM1h625b480e7a3d ic.pipeline {"factor_base": "prime-abscissa:size=288,stride=7919", "linalg": "incremental-gauss", "max_trials": "26479085", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm inc-aa           control    ECM1h1729b9b88605 ic.pipeline {"factor_base": "prime-abscissa:size=407", "linalg": "incremental-gauss", "max_trials": "26479085", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm rho-neg-aa       control    ECM1hefea4e0ebe79 rho.negation {"cap_multiple": "64"}
+  workload Wf22cd5392bfb icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W844ed62c36de icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload We69c2954f281 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W15fc1b175edd icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload Wd9d1cc718d56 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W14b46959bc3c icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W114b11fc33bc icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload Wda752f30651f icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W378fab75762a icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W3a4c40505aa1 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload We463571e13da icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload Wb95a60f04413 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W8502f2fc44f7 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W3dfaf31e576c icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W15f7fa0ad7cc icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W5aeb9c0fadc2 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W8bf594f3610e icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W5e321a5d2a42 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload Wefdbfb343ef5 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload Wff734d14f424 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W1ea12c440c18 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W22d506e103a0 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W7b53d162dae0 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W8a62b6462084 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W8478c0e1a154 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W4b4cc8215d7b icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W0b4e72f269ec icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W3f22845f4d05 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W427d0890a13e icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload Wbd2ce8f7348a icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload Wf62fda2e549b icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W5d0b2240fc84 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload Wa95854fac3ed icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W2ae1dbf576ed icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W997c3e95c845 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload Wafd59e24fde9 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W322516e94110 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W84b0a2da6787 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W55338a6a9a03 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload Wf729531ef42c icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W4b570a942987 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload Wdcf075e842f7 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W5982f6679efa icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload W8d18a765f0f6 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload Wf0e5ab61454d icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload Wdef1f31bd6d4 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload We6191c243365 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+  workload Wa45041cc1ca7 icv1-fp28-tm1499-56171ddc r=2^27.57 A=2 registered=false ec1=-
+note: 48 slug(s) are not in docs/curves/registry.json; register before citing them in prose (AGENTS.md §11)

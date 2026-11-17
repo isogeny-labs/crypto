@@ -1,0 +1,185 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp10-t5-192cb216 | 9.68 | ic-mitm | 8/8 | 52.178 | 53.183 | 62.234 | — |
+| icv1-fp10-t5-192cb216 | 9.68 | native-partial | 8/8 | 1742.703 | 2014.740 | 4463.072 | — |
+| icv1-fp10-t5-192cb216 | 9.68 | native-selectors | 8/8 | 4593.898 | 5308.341 | 11738.332 | — |
+| icv1-fp10-t5-192cb216 | 9.68 | native-selectors-aa | 8/8 | 4593.898 | 5308.341 | 11738.332 | — |
+| icv1-fp10-t5-192cb216 | 9.68 | native-source | 0/8 | — | — | — | — |
+| icv1-fp10-t5-192cb216 | 9.68 | native-width | 0/8 | — | — | — | — |
+| icv1-fp10-t5-192cb216 | 9.68 | rho-neg | 8/8 | 3.516 | 3.660 | 4.950 | — |
+| icv1-fp10-t5-192cb216 | 9.68 | rho-neg-aa | 8/8 | 3.516 | 3.660 | 4.950 | — |
+| icv1-fp10-t5-192cb216 | 9.68 | rho-neg-v2 | 8/8 | 3.569 | 3.761 | 5.490 | — |
+| icv1-fp12-t19-d4a315df | 11.93 | ic-mitm | 8/8 | 26.693 | 27.335 | 33.117 | — |
+| icv1-fp12-t19-d4a315df | 11.93 | native-partial | 8/8 | 4792.874 | 5555.707 | 12421.196 | — |
+| icv1-fp12-t19-d4a315df | 11.93 | native-selectors | 5/8 | 23201.901 | 26845.363 | 59636.524 | — |
+| icv1-fp12-t19-d4a315df | 11.93 | native-selectors-aa | 5/8 | 23201.901 | 26845.363 | 59636.524 | — |
+| icv1-fp12-t19-d4a315df | 11.93 | native-source | 0/8 | — | — | — | — |
+| icv1-fp12-t19-d4a315df | 11.93 | native-width | 0/8 | — | — | — | — |
+| icv1-fp12-t19-d4a315df | 11.93 | rho-neg | 8/8 | 2.736 | 2.906 | 4.434 | — |
+| icv1-fp12-t19-d4a315df | 11.93 | rho-neg-aa | 8/8 | 2.736 | 2.906 | 4.434 | — |
+| icv1-fp12-t19-d4a315df | 11.93 | rho-neg-v2 | 8/8 | 2.828 | 3.039 | 4.931 | — |
+| icv1-fp14-tm43-158b6914 | 13.99 | ic-mitm | 8/8 | 14.994 | 15.499 | 20.048 | — |
+| icv1-fp14-tm43-158b6914 | 13.99 | native-partial | 7/8 | 13835.776 | 15934.408 | 34822.103 | — |
+| icv1-fp14-tm43-158b6914 | 13.99 | native-selectors | 0/8 | — | — | — | — |
+| icv1-fp14-tm43-158b6914 | 13.99 | native-selectors-aa | 0/8 | — | — | — | — |
+| icv1-fp14-tm43-158b6914 | 13.99 | native-source | 0/8 | — | — | — | — |
+| icv1-fp14-tm43-158b6914 | 13.99 | native-width | 0/8 | — | — | — | — |
+| icv1-fp14-tm43-158b6914 | 13.99 | rho-neg | 8/8 | 1.758 | 1.877 | 2.944 | — |
+| icv1-fp14-tm43-158b6914 | 13.99 | rho-neg-aa | 8/8 | 1.758 | 1.877 | 2.944 | — |
+| icv1-fp14-tm43-158b6914 | 13.99 | rho-neg-v2 | 8/8 | 1.672 | 1.803 | 2.986 | — |
+| icv1-fp16-t351-d433f24e | 15.99 | ic-mitm | 8/8 | 10.603 | 11.290 | 17.467 | — |
+| icv1-fp16-t351-d433f24e | 15.99 | native-partial | 1/8 | 1681.849 | 2160.105 | 6464.411 | — |
+| icv1-fp16-t351-d433f24e | 15.99 | native-selectors | 0/8 | — | — | — | — |
+| icv1-fp16-t351-d433f24e | 15.99 | native-selectors-aa | 0/8 | — | — | — | — |
+| icv1-fp16-t351-d433f24e | 15.99 | native-source | 0/8 | — | — | — | — |
+| icv1-fp16-t351-d433f24e | 15.99 | native-width | 0/8 | — | — | — | — |
+| icv1-fp16-t351-d433f24e | 15.99 | rho-neg | 8/8 | 2.042 | 2.186 | 3.481 | — |
+| icv1-fp16-t351-d433f24e | 15.99 | rho-neg-aa | 8/8 | 2.042 | 2.186 | 3.481 | — |
+| icv1-fp16-t351-d433f24e | 15.99 | rho-neg-v2 | 8/8 | 1.815 | 1.947 | 3.138 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp10-t5-192cb216 | ic-mitm vs native-partial | ic-mitm < native-partial |
+| icv1-fp10-t5-192cb216 | ic-mitm vs native-selectors | ic-mitm < native-selectors |
+| icv1-fp10-t5-192cb216 | ic-mitm vs native-selectors-aa | ic-mitm < native-selectors-aa |
+| icv1-fp10-t5-192cb216 | ic-mitm vs native-source | incomplete |
+| icv1-fp10-t5-192cb216 | ic-mitm vs native-width | incomplete |
+| icv1-fp10-t5-192cb216 | ic-mitm vs rho-neg | rho-neg < ic-mitm |
+| icv1-fp10-t5-192cb216 | ic-mitm vs rho-neg-aa | rho-neg-aa < ic-mitm |
+| icv1-fp10-t5-192cb216 | ic-mitm vs rho-neg-v2 | rho-neg-v2 < ic-mitm |
+| icv1-fp10-t5-192cb216 | native-partial vs native-selectors | native-partial < native-selectors |
+| icv1-fp10-t5-192cb216 | native-partial vs native-selectors-aa | native-partial < native-selectors-aa |
+| icv1-fp10-t5-192cb216 | native-partial vs native-source | incomplete |
+| icv1-fp10-t5-192cb216 | native-partial vs native-width | incomplete |
+| icv1-fp10-t5-192cb216 | native-partial vs rho-neg | rho-neg < native-partial |
+| icv1-fp10-t5-192cb216 | native-partial vs rho-neg-aa | rho-neg-aa < native-partial |
+| icv1-fp10-t5-192cb216 | native-partial vs rho-neg-v2 | rho-neg-v2 < native-partial |
+| icv1-fp10-t5-192cb216 | native-selectors vs native-selectors-aa | unresolved inside the band |
+| icv1-fp10-t5-192cb216 | native-selectors vs native-source | incomplete |
+| icv1-fp10-t5-192cb216 | native-selectors vs native-width | incomplete |
+| icv1-fp10-t5-192cb216 | native-selectors vs rho-neg | rho-neg < native-selectors |
+| icv1-fp10-t5-192cb216 | native-selectors vs rho-neg-aa | rho-neg-aa < native-selectors |
+| icv1-fp10-t5-192cb216 | native-selectors vs rho-neg-v2 | rho-neg-v2 < native-selectors |
+| icv1-fp10-t5-192cb216 | native-selectors-aa vs native-source | incomplete |
+| icv1-fp10-t5-192cb216 | native-selectors-aa vs native-width | incomplete |
+| icv1-fp10-t5-192cb216 | native-selectors-aa vs rho-neg | rho-neg < native-selectors-aa |
+| icv1-fp10-t5-192cb216 | native-selectors-aa vs rho-neg-aa | rho-neg-aa < native-selectors-aa |
+| icv1-fp10-t5-192cb216 | native-selectors-aa vs rho-neg-v2 | rho-neg-v2 < native-selectors-aa |
+| icv1-fp10-t5-192cb216 | native-source vs native-width | incomplete |
+| icv1-fp10-t5-192cb216 | native-source vs rho-neg | incomplete |
+| icv1-fp10-t5-192cb216 | native-source vs rho-neg-aa | incomplete |
+| icv1-fp10-t5-192cb216 | native-source vs rho-neg-v2 | incomplete |
+| icv1-fp10-t5-192cb216 | native-width vs rho-neg | incomplete |
+| icv1-fp10-t5-192cb216 | native-width vs rho-neg-aa | incomplete |
+| icv1-fp10-t5-192cb216 | native-width vs rho-neg-v2 | incomplete |
+| icv1-fp10-t5-192cb216 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp10-t5-192cb216 | rho-neg vs rho-neg-v2 | rho-neg < rho-neg-v2 |
+| icv1-fp10-t5-192cb216 | rho-neg-aa vs rho-neg-v2 | rho-neg-aa < rho-neg-v2 |
+| icv1-fp12-t19-d4a315df | ic-mitm vs native-partial | ic-mitm < native-partial |
+| icv1-fp12-t19-d4a315df | ic-mitm vs native-selectors | incomplete |
+| icv1-fp12-t19-d4a315df | ic-mitm vs native-selectors-aa | incomplete |
+| icv1-fp12-t19-d4a315df | ic-mitm vs native-source | incomplete |
+| icv1-fp12-t19-d4a315df | ic-mitm vs native-width | incomplete |
+| icv1-fp12-t19-d4a315df | ic-mitm vs rho-neg | rho-neg < ic-mitm |
+| icv1-fp12-t19-d4a315df | ic-mitm vs rho-neg-aa | rho-neg-aa < ic-mitm |
+| icv1-fp12-t19-d4a315df | ic-mitm vs rho-neg-v2 | rho-neg-v2 < ic-mitm |
+| icv1-fp12-t19-d4a315df | native-partial vs native-selectors | incomplete |
+| icv1-fp12-t19-d4a315df | native-partial vs native-selectors-aa | incomplete |
+| icv1-fp12-t19-d4a315df | native-partial vs native-source | incomplete |
+| icv1-fp12-t19-d4a315df | native-partial vs native-width | incomplete |
+| icv1-fp12-t19-d4a315df | native-partial vs rho-neg | rho-neg < native-partial |
+| icv1-fp12-t19-d4a315df | native-partial vs rho-neg-aa | rho-neg-aa < native-partial |
+| icv1-fp12-t19-d4a315df | native-partial vs rho-neg-v2 | rho-neg-v2 < native-partial |
+| icv1-fp12-t19-d4a315df | native-selectors vs native-selectors-aa | incomplete |
+| icv1-fp12-t19-d4a315df | native-selectors vs native-source | incomplete |
+| icv1-fp12-t19-d4a315df | native-selectors vs native-width | incomplete |
+| icv1-fp12-t19-d4a315df | native-selectors vs rho-neg | incomplete |
+| icv1-fp12-t19-d4a315df | native-selectors vs rho-neg-aa | incomplete |
+| icv1-fp12-t19-d4a315df | native-selectors vs rho-neg-v2 | incomplete |
+| icv1-fp12-t19-d4a315df | native-selectors-aa vs native-source | incomplete |
+| icv1-fp12-t19-d4a315df | native-selectors-aa vs native-width | incomplete |
+| icv1-fp12-t19-d4a315df | native-selectors-aa vs rho-neg | incomplete |
+| icv1-fp12-t19-d4a315df | native-selectors-aa vs rho-neg-aa | incomplete |
+| icv1-fp12-t19-d4a315df | native-selectors-aa vs rho-neg-v2 | incomplete |
+| icv1-fp12-t19-d4a315df | native-source vs native-width | incomplete |
+| icv1-fp12-t19-d4a315df | native-source vs rho-neg | incomplete |
+| icv1-fp12-t19-d4a315df | native-source vs rho-neg-aa | incomplete |
+| icv1-fp12-t19-d4a315df | native-source vs rho-neg-v2 | incomplete |
+| icv1-fp12-t19-d4a315df | native-width vs rho-neg | incomplete |
+| icv1-fp12-t19-d4a315df | native-width vs rho-neg-aa | incomplete |
+| icv1-fp12-t19-d4a315df | native-width vs rho-neg-v2 | incomplete |
+| icv1-fp12-t19-d4a315df | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp12-t19-d4a315df | rho-neg vs rho-neg-v2 | rho-neg < rho-neg-v2 |
+| icv1-fp12-t19-d4a315df | rho-neg-aa vs rho-neg-v2 | rho-neg-aa < rho-neg-v2 |
+| icv1-fp14-tm43-158b6914 | ic-mitm vs native-partial | incomplete |
+| icv1-fp14-tm43-158b6914 | ic-mitm vs native-selectors | incomplete |
+| icv1-fp14-tm43-158b6914 | ic-mitm vs native-selectors-aa | incomplete |
+| icv1-fp14-tm43-158b6914 | ic-mitm vs native-source | incomplete |
+| icv1-fp14-tm43-158b6914 | ic-mitm vs native-width | incomplete |
+| icv1-fp14-tm43-158b6914 | ic-mitm vs rho-neg | rho-neg < ic-mitm |
+| icv1-fp14-tm43-158b6914 | ic-mitm vs rho-neg-aa | rho-neg-aa < ic-mitm |
+| icv1-fp14-tm43-158b6914 | ic-mitm vs rho-neg-v2 | rho-neg-v2 < ic-mitm |
+| icv1-fp14-tm43-158b6914 | native-partial vs native-selectors | incomplete |
+| icv1-fp14-tm43-158b6914 | native-partial vs native-selectors-aa | incomplete |
+| icv1-fp14-tm43-158b6914 | native-partial vs native-source | incomplete |
+| icv1-fp14-tm43-158b6914 | native-partial vs native-width | incomplete |
+| icv1-fp14-tm43-158b6914 | native-partial vs rho-neg | incomplete |
+| icv1-fp14-tm43-158b6914 | native-partial vs rho-neg-aa | incomplete |
+| icv1-fp14-tm43-158b6914 | native-partial vs rho-neg-v2 | incomplete |
+| icv1-fp14-tm43-158b6914 | native-selectors vs native-selectors-aa | incomplete |
+| icv1-fp14-tm43-158b6914 | native-selectors vs native-source | incomplete |
+| icv1-fp14-tm43-158b6914 | native-selectors vs native-width | incomplete |
+| icv1-fp14-tm43-158b6914 | native-selectors vs rho-neg | incomplete |
+| icv1-fp14-tm43-158b6914 | native-selectors vs rho-neg-aa | incomplete |
+| icv1-fp14-tm43-158b6914 | native-selectors vs rho-neg-v2 | incomplete |
+| icv1-fp14-tm43-158b6914 | native-selectors-aa vs native-source | incomplete |
+| icv1-fp14-tm43-158b6914 | native-selectors-aa vs native-width | incomplete |
+| icv1-fp14-tm43-158b6914 | native-selectors-aa vs rho-neg | incomplete |
+| icv1-fp14-tm43-158b6914 | native-selectors-aa vs rho-neg-aa | incomplete |
+| icv1-fp14-tm43-158b6914 | native-selectors-aa vs rho-neg-v2 | incomplete |
+| icv1-fp14-tm43-158b6914 | native-source vs native-width | incomplete |
+| icv1-fp14-tm43-158b6914 | native-source vs rho-neg | incomplete |
+| icv1-fp14-tm43-158b6914 | native-source vs rho-neg-aa | incomplete |
+| icv1-fp14-tm43-158b6914 | native-source vs rho-neg-v2 | incomplete |
+| icv1-fp14-tm43-158b6914 | native-width vs rho-neg | incomplete |
+| icv1-fp14-tm43-158b6914 | native-width vs rho-neg-aa | incomplete |
+| icv1-fp14-tm43-158b6914 | native-width vs rho-neg-v2 | incomplete |
+| icv1-fp14-tm43-158b6914 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp14-tm43-158b6914 | rho-neg vs rho-neg-v2 | unresolved inside the band |
+| icv1-fp14-tm43-158b6914 | rho-neg-aa vs rho-neg-v2 | unresolved inside the band |
+| icv1-fp16-t351-d433f24e | ic-mitm vs native-partial | incomplete |
+| icv1-fp16-t351-d433f24e | ic-mitm vs native-selectors | incomplete |
+| icv1-fp16-t351-d433f24e | ic-mitm vs native-selectors-aa | incomplete |
+| icv1-fp16-t351-d433f24e | ic-mitm vs native-source | incomplete |
+| icv1-fp16-t351-d433f24e | ic-mitm vs native-width | incomplete |
+| icv1-fp16-t351-d433f24e | ic-mitm vs rho-neg | rho-neg < ic-mitm |
+| icv1-fp16-t351-d433f24e | ic-mitm vs rho-neg-aa | rho-neg-aa < ic-mitm |
+| icv1-fp16-t351-d433f24e | ic-mitm vs rho-neg-v2 | rho-neg-v2 < ic-mitm |
+| icv1-fp16-t351-d433f24e | native-partial vs native-selectors | incomplete |
+| icv1-fp16-t351-d433f24e | native-partial vs native-selectors-aa | incomplete |
+| icv1-fp16-t351-d433f24e | native-partial vs native-source | incomplete |
+| icv1-fp16-t351-d433f24e | native-partial vs native-width | incomplete |
+| icv1-fp16-t351-d433f24e | native-partial vs rho-neg | incomplete |
+| icv1-fp16-t351-d433f24e | native-partial vs rho-neg-aa | incomplete |
+| icv1-fp16-t351-d433f24e | native-partial vs rho-neg-v2 | incomplete |
+| icv1-fp16-t351-d433f24e | native-selectors vs native-selectors-aa | incomplete |
+| icv1-fp16-t351-d433f24e | native-selectors vs native-source | incomplete |
+| icv1-fp16-t351-d433f24e | native-selectors vs native-width | incomplete |
+| icv1-fp16-t351-d433f24e | native-selectors vs rho-neg | incomplete |
+| icv1-fp16-t351-d433f24e | native-selectors vs rho-neg-aa | incomplete |
+| icv1-fp16-t351-d433f24e | native-selectors vs rho-neg-v2 | incomplete |
+| icv1-fp16-t351-d433f24e | native-selectors-aa vs native-source | incomplete |
+| icv1-fp16-t351-d433f24e | native-selectors-aa vs native-width | incomplete |
+| icv1-fp16-t351-d433f24e | native-selectors-aa vs rho-neg | incomplete |
+| icv1-fp16-t351-d433f24e | native-selectors-aa vs rho-neg-aa | incomplete |
+| icv1-fp16-t351-d433f24e | native-selectors-aa vs rho-neg-v2 | incomplete |
+| icv1-fp16-t351-d433f24e | native-source vs native-width | incomplete |
+| icv1-fp16-t351-d433f24e | native-source vs rho-neg | incomplete |
+| icv1-fp16-t351-d433f24e | native-source vs rho-neg-aa | incomplete |
+| icv1-fp16-t351-d433f24e | native-source vs rho-neg-v2 | incomplete |
+| icv1-fp16-t351-d433f24e | native-width vs rho-neg | incomplete |
+| icv1-fp16-t351-d433f24e | native-width vs rho-neg-aa | incomplete |
+| icv1-fp16-t351-d433f24e | native-width vs rho-neg-v2 | incomplete |
+| icv1-fp16-t351-d433f24e | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp16-t351-d433f24e | rho-neg vs rho-neg-v2 | rho-neg-v2 < rho-neg |
+| icv1-fp16-t351-d433f24e | rho-neg-aa vs rho-neg-v2 | rho-neg-v2 < rho-neg-aa |

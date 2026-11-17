@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="470" font-family="Helvetica, Arial, sans-serif" font-size="13"><rect width="860" height="470" fill="white"/>
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#555"/></marker></defs>
+<text x="30" y="26" font-size="15" font-weight="bold">Theorem K, fibre step: every y in A_s lands in two fibres of M</text>
+<text x="30" y="50" font-size="12">y -> y + s*nu is a lattice translation (injective), so  #fibre_t(A_s) &lt;= min( l(t + s*m), l(t + s*M&apos;) ),  l(t) = #{mu in M : mu_i = t}.</text>
+<text x="30" y="68" font-size="12">Summing over s and t counts pairs (t&apos;, t&apos;&apos;) whose difference is a positive multiple of w = M&apos; - m (m, M&apos; = min and max of nu_i over supp f).</text>
+<line x1="60" y1="400" x2="800" y2="400" stroke="#333"/><line x1="60" y1="400" x2="60" y2="96" stroke="#333"/>
+<text x="805" y="404">x_i</text><text x="40" y="92">other coordinates</text>
+<path d="M60 400 L60 110 L420 130 L700 270 L700 400 Z" fill="#eaf2f8" stroke="#2874a6" stroke-width="2"/><text x="440" y="190" fill="#2874a6">M (lattice points of a convex R)</text>
+<path d="M60 400 L60 210 L230 220 L330 310 L330 400 Z" fill="#fdebd0" stroke="#d68910" stroke-width="2"/><text x="72" y="250" fill="#9c640c" font-size="12">A_s = { y : y + s*supp f in M }</text>
+<line x1="120" y1="400" x2="120" y2="300" stroke="#a93226" stroke-width="4"/><text x="100" y="420" fill="#a93226">fibre t of A_s</text>
+<line x1="260" y1="400" x2="260" y2="180" stroke="#1e8449" stroke-width="4"/><text x="200" y="438" fill="#1e8449">fibre t + s*m of M</text>
+<line x1="540" y1="400" x2="540" y2="240" stroke="#1e8449" stroke-width="4"/><text x="470" y="420" fill="#1e8449">fibre t + s*M&apos; of M</text>
+<path d="M124 320 C 160 280 220 280 256 300" fill="none" stroke="#555" marker-end="url(#a)"/><text x="150" y="272" fill="#555" font-size="12">+ s*nu_min</text>
+<path d="M124 350 C 220 392 440 392 536 350" fill="none" stroke="#555" marker-end="url(#a)"/><text x="300" y="368" fill="#555" font-size="12">+ s*nu_max</text>
+<text x="30" y="462" font-size="11" fill="#444">The layer-cake and counting lemma (class_count_le, pairs_le_sum in the Lean file) then give  w * E &lt;= sum_{mu in M} mu_i = c_i.  Editable source: plot.mjs.</text></svg>

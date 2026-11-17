@@ -1,0 +1,3088 @@
+{
+  "instances": [
+    {
+      "E_add_gates": "3395",
+      "E_order": 32902,
+      "E_order_factorisation": [
+        [
+          2,
+          1
+        ],
+        [
+          16451,
+          1
+        ]
+      ],
+      "N": 15,
+      "a": 1,
+      "applicable": true,
+      "beta": 7673,
+      "chosen_fb_columns": 14,
+      "cofactor": 2,
+      "ell": 16451,
+      "ell_is_largest_prime_of_E": true,
+      "ell_squared_divides_E": false,
+      "factor_base_available": {
+        "affine_points": 29,
+        "columns": 14,
+        "enumeration_gae": 12.168777614138438,
+        "ramified_points": 1,
+        "wall_s": 0.000154526
+      },
+      "genus": 4,
+      "holdout": {
+        "S_online": {
+          "bsgs": 1.6136452556166487,
+          "ic": 57.39439408345442,
+          "rho": 2.898283093160001
+        },
+        "best_generic": "bsgs",
+        "logs": 20,
+        "mean_bsgs_E_ops": 203.8,
+        "mean_gae": {
+          "bsgs": [
+            206.96848306332836,
+            191.8260677466863,
+            222.5731516936671
+          ],
+          "ic_online": [
+            7361.4883063328425,
+            6672.1461266568485,
+            8094.386627393224
+          ],
+          "rho": [
+            371.7379970544919,
+            317.2518556701031,
+            424.461060382916
+          ]
+        },
+        "mean_jacobian_additions": 569.05,
+        "mean_rho_E_ops": 335.6,
+        "mean_wall_ms": {
+          "bsgs": 0.38680060000000005,
+          "ic_untallied": 45.15054265,
+          "note": "contended container; secondary",
+          "rho": 0.9400325999999997
+        },
+        "ratio_ic_cold_over_best_generic": {
+          "ci95": [
+            32.624032388577554,
+            41.52358896120132
+          ],
+          "point": 36.647535216278776
+        },
+        "ratio_ic_over_best_generic": {
+          "ci95": [
+            31.615352161507946,
+            40.405473444828694
+          ],
+          "point": 35.56816089762019
+        },
+        "ratio_ic_over_bsgs": {
+          "ci95": [
+            31.552122899892613,
+            40.37930817358729
+          ],
+          "point": 35.56816089762019
+        },
+        "ratio_ic_over_rho": {
+          "ci95": [
+            16.852929437404836,
+            23.49621661028878
+          ],
+          "point": 19.802894416665577
+        },
+        "raw_group_op_ratio_ic_Jadds_over_best_generic_Eops": {
+          "ci95": [
+            2.442576367511248,
+            3.1921419518377694
+          ],
+          "point": 2.7921982335623157
+        },
+        "raw_group_op_ratio_ic_Jadds_over_rho_Eops": {
+          "ci95": [
+            1.4347317643619353,
+            1.9976205583756346
+          ],
+          "note": "counts each Jacobian addition as one group operation: the most favourable pricing for IC",
+          "point": 1.6956197854588793
+        },
+        "solved_bsgs": 20,
+        "solved_ic": 20,
+        "solved_rho": 20
+      },
+      "host": {
+        "arch": "x86_64",
+        "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+        "logical_cpus": 4,
+        "note": "shared cloud container; wall times are contended and secondary",
+        "os": "linux"
+      },
+      "instance": "ghs-l5-n3-a1-b0x1df9",
+      "irr_K_low_terms": [
+        0,
+        1
+      ],
+      "l": 5,
+      "largest_prime_of_E": 16451,
+      "magic": 3,
+      "model": "V",
+      "n": 3,
+      "primes_killed_by_phi": [],
+      "q": 32,
+      "reusable_setup": {
+        "cover_construction": "not priced (library finds the F_q embedding by search over K; wall time recorded)",
+        "factor_base_enumeration_gae": 12.168777614138438,
+        "phi_P_additions_over_K": 8,
+        "phi_P_gae": 211.22768777614138
+      },
+      "rows": [
+        {
+          "bsgs": {
+            "S_online": 1.2743736870320381,
+            "d_found": 1365,
+            "gates": "554923",
+            "group_additions": 143,
+            "group_doublings": 18,
+            "hash_probes": 140,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 163.45301914580264,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.142177,
+          "ic": {
+            "S_online": 56.9136226054672,
+            "budget_exhausted": false,
+            "d_found": 1365,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "2308905",
+              "online_total": "24782902",
+              "phi_Q": "717986",
+              "relation_search": "17377748",
+              "step_setup": "4327378",
+              "verify": "50885"
+            },
+            "inconsistent": false,
+            "independent": 15,
+            "jacobian_additions": 581,
+            "modr_add": 1929,
+            "modr_inv": 16,
+            "modr_mul": 670,
+            "online_gae": 7299.823858615611,
+            "phase_gae": {
+              "linear_algebra": 680.0898379970545,
+              "phi_Q": 211.48335787923418,
+              "relation_search": 5118.629749631811,
+              "step_setup": 1274.6326951399117,
+              "verify": 14.988217967599411
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 15,
+            "relations": 15,
+            "smoothness_tests": 445,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 141.36109399999998
+          },
+          "log_index": 10,
+          "planted_d": 1365,
+          "rho": {
+            "S_online": 3.819883013837819,
+            "d_found": 1365,
+            "gates": "1663359",
+            "group_additions": 391,
+            "group_doublings": 49,
+            "hash_probes": 359,
+            "modr_add": 716,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 489.94374079528717,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 4.458238,
+          "seed": 1017
+        },
+        {
+          "bsgs": {
+            "S_online": 1.211183539259512,
+            "d_found": 625,
+            "gates": "527407",
+            "group_additions": 136,
+            "group_doublings": 17,
+            "hash_probes": 134,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 155.3481590574374,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.13786700000000002,
+          "ic": {
+            "S_online": 36.49333457202197,
+            "budget_exhausted": false,
+            "d_found": 625,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "3639345",
+              "online_total": "15890936",
+              "phi_Q": "710230",
+              "relation_search": "7264334",
+              "step_setup": "4232928",
+              "verify": "44099"
+            },
+            "inconsistent": false,
+            "independent": 15,
+            "jacobian_additions": 324,
+            "modr_add": 1657,
+            "modr_inv": 16,
+            "modr_mul": 1174,
+            "online_gae": 4680.688070692195,
+            "phase_gae": {
+              "linear_algebra": 1071.9720176730486,
+              "phi_Q": 209.19882179675994,
+              "relation_search": 2139.715463917526,
+              "step_setup": 1246.8123711340206,
+              "verify": 12.98939617083947
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 15,
+            "relations": 15,
+            "smoothness_tests": 188,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 73.05174000000001
+          },
+          "log_index": 11,
+          "planted_d": 625,
+          "rho": {
+            "S_online": 4.161641678295291,
+            "d_found": 625,
+            "gates": "1812177",
+            "group_additions": 431,
+            "group_doublings": 47,
+            "hash_probes": 403,
+            "modr_add": 804,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 533.7782032400589,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.504027,
+          "seed": 1018
+        },
+        {
+          "bsgs": {
+            "S_online": 1.4408483563945254,
+            "d_found": 3888,
+            "gates": "627414",
+            "group_additions": 163,
+            "group_doublings": 19,
+            "hash_probes": 160,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 184.80530191458027,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.156825,
+          "ic": {
+            "S_online": 83.870078969851,
+            "budget_exhausted": false,
+            "d_found": 3888,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "4427745",
+              "online_total": "36521027",
+              "phi_Q": "689540",
+              "relation_search": "26498493",
+              "step_setup": "4850973",
+              "verify": "54276"
+            },
+            "inconsistent": false,
+            "independent": 15,
+            "jacobian_additions": 829,
+            "modr_add": 3307,
+            "modr_inv": 16,
+            "modr_mul": 1344,
+            "online_gae": 10757.298085419736,
+            "phase_gae": {
+              "linear_algebra": 1304.1958762886597,
+              "phi_Q": 203.10456553755523,
+              "relation_search": 7805.152577319587,
+              "step_setup": 1428.858026509573,
+              "verify": 15.987039764359352
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 15,
+            "relations": 15,
+            "smoothness_tests": 681,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 197.981299
+          },
+          "log_index": 12,
+          "planted_d": 3888,
+          "rho": {
+            "S_online": 2.1042622344590303,
+            "d_found": 3888,
+            "gates": "916296",
+            "group_additions": 199,
+            "group_doublings": 46,
+            "hash_probes": 170,
+            "modr_add": 338,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 269.89572901325477,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 4.243039,
+          "seed": 1019
+        },
+        {
+          "bsgs": {
+            "S_online": 1.203386964478013,
+            "d_found": 553,
+            "gates": "524012",
+            "group_additions": 135,
+            "group_doublings": 17,
+            "hash_probes": 134,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 154.3481590574374,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.138188,
+          "ic": {
+            "S_online": 48.39682803315107,
+            "budget_exhausted": false,
+            "d_found": 553,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "2865690",
+              "online_total": "21074284",
+              "phi_Q": "703032",
+              "relation_search": "12912467",
+              "step_setup": "4552391",
+              "verify": "40704"
+            },
+            "inconsistent": false,
+            "independent": 15,
+            "jacobian_additions": 475,
+            "modr_add": 1800,
+            "modr_inv": 16,
+            "modr_mul": 882,
+            "online_gae": 6207.447422680412,
+            "phase_gae": {
+              "linear_algebra": 844.0913107511045,
+              "phi_Q": 207.07864506627394,
+              "relation_search": 3803.3776141384387,
+              "step_setup": 1340.9104565537555,
+              "verify": 11.98939617083947
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 15,
+            "relations": 15,
+            "smoothness_tests": 332,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 113.216653
+          },
+          "log_index": 13,
+          "planted_d": 553,
+          "rho": {
+            "S_online": 2.1021953957835224,
+            "d_found": 553,
+            "gates": "915396",
+            "group_additions": 199,
+            "group_doublings": 46,
+            "hash_probes": 168,
+            "modr_add": 334,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 269.6306332842415,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 4.255447,
+          "seed": 1020
+        },
+        {
+          "bsgs": {
+            "S_online": 1.6152573897835454,
+            "d_found": 6693,
+            "gates": "703360",
+            "group_additions": 184,
+            "group_doublings": 20,
+            "hash_probes": 181,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 207.17525773195877,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.18292699999999998,
+          "ic": {
+            "S_online": 59.25651284745069,
+            "budget_exhausted": false,
+            "d_found": 6693,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "3750750",
+              "online_total": "25803108",
+              "phi_Q": "670859",
+              "relation_search": "16621607",
+              "step_setup": "4702225",
+              "verify": "57667"
+            },
+            "inconsistent": false,
+            "independent": 15,
+            "jacobian_additions": 568,
+            "modr_add": 2355,
+            "modr_inv": 16,
+            "modr_mul": 1165,
+            "online_gae": 7600.326362297496,
+            "phase_gae": {
+              "linear_algebra": 1104.7864506627393,
+              "phi_Q": 197.60206185567012,
+              "relation_search": 4895.907805596466,
+              "step_setup": 1385.0441826215022,
+              "verify": 16.985861561119293
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 15,
+            "relations": 15,
+            "smoothness_tests": 423,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 136.840827
+          },
+          "log_index": 14,
+          "planted_d": 6693,
+          "rho": {
+            "S_online": 3.2235770910796364,
+            "d_found": 6693,
+            "gates": "1403699",
+            "group_additions": 323,
+            "group_doublings": 49,
+            "hash_probes": 295,
+            "modr_add": 588,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 413.46067746686305,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.378062,
+          "seed": 1021
+        },
+        {
+          "bsgs": {
+            "S_online": 1.3063775356785685,
+            "d_found": 2072,
+            "gates": "568859",
+            "group_additions": 146,
+            "group_doublings": 19,
+            "hash_probes": 146,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 167.5578792341679,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.154842,
+          "ic": {
+            "S_online": 52.2188720416485,
+            "budget_exhausted": false,
+            "d_found": 2072,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "3719400",
+              "online_total": "22738584",
+              "phi_Q": "709242",
+              "relation_search": "13441649",
+              "step_setup": "4824202",
+              "verify": "44091"
+            },
+            "inconsistent": false,
+            "independent": 15,
+            "jacobian_additions": 504,
+            "modr_add": 2152,
+            "modr_inv": 16,
+            "modr_mul": 1168,
+            "online_gae": 6697.668335787924,
+            "phase_gae": {
+              "linear_algebra": 1095.5522827687776,
+              "phi_Q": 208.90780559646538,
+              "relation_search": 3959.248600883652,
+              "step_setup": 1420.9726067746685,
+              "verify": 12.987039764359352
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 15,
+            "relations": 15,
+            "smoothness_tests": 354,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 114.64182600000001
+          },
+          "log_index": 15,
+          "planted_d": 2072,
+          "rho": {
+            "S_online": 1.1230535381358577,
+            "d_found": 2072,
+            "gates": "489031",
+            "group_additions": 83,
+            "group_doublings": 51,
+            "hash_probes": 58,
+            "modr_add": 114,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 144.0444771723122,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.124334,
+          "seed": 1022
+        },
+        {
+          "bsgs": {
+            "S_online": 1.5519202668163163,
+            "d_found": 5704,
+            "gates": "675780",
+            "group_additions": 176,
+            "group_doublings": 20,
+            "hash_probes": 174,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 199.05154639175257,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.175044,
+          "ic": {
+            "S_online": 58.624200298477746,
+            "budget_exhausted": false,
+            "d_found": 5704,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "2254350",
+              "online_total": "25527769",
+              "phi_Q": "699860",
+              "relation_search": "18177147",
+              "step_setup": "4342140",
+              "verify": "54272"
+            },
+            "inconsistent": false,
+            "independent": 15,
+            "jacobian_additions": 606,
+            "modr_add": 1973,
+            "modr_inv": 16,
+            "modr_mul": 647,
+            "online_gae": 7519.225036818852,
+            "phase_gae": {
+              "linear_algebra": 664.020618556701,
+              "phi_Q": 206.1443298969072,
+              "relation_search": 5354.093372606775,
+              "step_setup": 1278.9808541973491,
+              "verify": 15.985861561119293
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 15,
+            "relations": 15,
+            "smoothness_tests": 468,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 144.209263
+          },
+          "log_index": 16,
+          "planted_d": 5704,
+          "rho": {
+            "S_online": 2.44137051189661,
+            "d_found": 5704,
+            "gates": "1063089",
+            "group_additions": 235,
+            "group_doublings": 49,
+            "hash_probes": 202,
+            "modr_add": 402,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 313.1337260677467,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.276273,
+          "seed": 1023
+        },
+        {
+          "bsgs": {
+            "S_online": 1.5831065659423122,
+            "d_found": 5755,
+            "gates": "689360",
+            "group_additions": 180,
+            "group_doublings": 20,
+            "hash_probes": 174,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 203.05154639175257,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.170406,
+          "ic": {
+            "S_online": 70.6529143290062,
+            "budget_exhausted": false,
+            "d_found": 5755,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "2554965",
+              "online_total": "30765644",
+              "phi_Q": "711098",
+              "relation_search": "22929147",
+              "step_setup": "4502582",
+              "verify": "67852"
+            },
+            "inconsistent": false,
+            "independent": 15,
+            "jacobian_additions": 758,
+            "modr_add": 2487,
+            "modr_inv": 16,
+            "modr_mul": 720,
+            "online_gae": 9062.045360824743,
+            "phase_gae": {
+              "linear_algebra": 752.5670103092783,
+              "phi_Q": 209.4544918998527,
+              "relation_search": 6753.7988217967595,
+              "step_setup": 1326.2391752577319,
+              "verify": 19.985861561119293
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 15,
+            "relations": 15,
+            "smoothness_tests": 616,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 271.98254
+          },
+          "log_index": 17,
+          "planted_d": 5755,
+          "rho": {
+            "S_online": 3.615243020088371,
+            "d_found": 5755,
+            "gates": "1574249",
+            "group_additions": 364,
+            "group_doublings": 54,
+            "hash_probes": 327,
+            "modr_add": 652,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 463.6963181148748,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.410214,
+          "seed": 1024
+        },
+        {
+          "bsgs": {
+            "S_online": 1.4330517816130264,
+            "d_found": 3904,
+            "gates": "624019",
+            "group_additions": 162,
+            "group_doublings": 19,
+            "hash_probes": 160,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 183.80530191458027,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.17569600000000002,
+          "ic": {
+            "S_online": 44.16962393558125,
+            "budget_exhausted": false,
+            "d_found": 3904,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "3106530",
+              "online_total": "19233558",
+              "phi_Q": "700638",
+              "relation_search": "10898444",
+              "step_setup": "4477065",
+              "verify": "50881"
+            },
+            "inconsistent": false,
+            "independent": 15,
+            "jacobian_additions": 421,
+            "modr_add": 1740,
+            "modr_inv": 16,
+            "modr_mul": 974,
+            "online_gae": 5665.260088365243,
+            "phase_gae": {
+              "linear_algebra": 915.0309278350516,
+              "phi_Q": 206.3734904270987,
+              "relation_search": 3210.1455081001473,
+              "step_setup": 1318.7231222385863,
+              "verify": 14.987039764359352
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 15,
+            "relations": 15,
+            "smoothness_tests": 283,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 102.702043
+          },
+          "log_index": 18,
+          "planted_d": 3904,
+          "rho": {
+            "S_online": 4.196934096923296,
+            "d_found": 3904,
+            "gates": "1827545",
+            "group_additions": 432,
+            "group_doublings": 50,
+            "hash_probes": 407,
+            "modr_add": 812,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 538.3048600883652,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.47766,
+          "seed": 1025
+        },
+        {
+          "bsgs": {
+            "S_online": 1.6387849033730761,
+            "d_found": 6771,
+            "gates": "713605",
+            "group_additions": 187,
+            "group_doublings": 20,
+            "hash_probes": 182,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 210.19293078055964,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.20636600000000002,
+          "ic": {
+            "S_online": 53.986949186611675,
+            "budget_exhausted": false,
+            "d_found": 6771,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "2778900",
+              "online_total": "23508489",
+              "phi_Q": "713066",
+              "relation_search": "15194283",
+              "step_setup": "4757783",
+              "verify": "64457"
+            },
+            "inconsistent": false,
+            "independent": 14,
+            "jacobian_additions": 542,
+            "modr_add": 1948,
+            "modr_inv": 15,
+            "modr_mul": 842,
+            "online_gae": 6924.444477172312,
+            "phase_gae": {
+              "linear_algebra": 818.5272459499264,
+              "phi_Q": 210.03416789396172,
+              "relation_search": 4475.488365243004,
+              "step_setup": 1401.4088365243003,
+              "verify": 18.985861561119293
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 14,
+            "relations": 14,
+            "smoothness_tests": 394,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 129.667183
+          },
+          "log_index": 19,
+          "planted_d": 6771,
+          "rho": {
+            "S_online": 3.04646968497537,
+            "d_found": 6771,
+            "gates": "1326578",
+            "group_additions": 308,
+            "group_doublings": 43,
+            "hash_probes": 282,
+            "modr_add": 562,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 390.74462444771723,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.35302100000000003,
+          "seed": 1026
+        },
+        {
+          "bsgs": {
+            "S_online": 1.9718812172927533,
+            "d_found": 12108,
+            "gates": "858651",
+            "group_additions": 228,
+            "group_doublings": 21,
+            "hash_probes": 223,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 252.9163475699558,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.225076,
+          "ic": {
+            "S_online": 62.28429831079947,
+            "budget_exhausted": false,
+            "d_found": 12108,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "3719655",
+              "online_total": "27121550",
+              "phi_Q": "714050",
+              "relation_search": "18014345",
+              "step_setup": "4605652",
+              "verify": "67848"
+            },
+            "inconsistent": false,
+            "independent": 15,
+            "jacobian_additions": 608,
+            "modr_add": 2463,
+            "modr_inv": 16,
+            "modr_mul": 1146,
+            "online_gae": 7988.674521354934,
+            "phase_gae": {
+              "linear_algebra": 1095.6273932253314,
+              "phi_Q": 210.3240058910162,
+              "relation_search": 5306.139911634757,
+              "step_setup": 1356.59852724595,
+              "verify": 19.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 15,
+            "relations": 15,
+            "smoothness_tests": 464,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 150.087066
+          },
+          "log_index": 20,
+          "planted_d": 12108,
+          "rho": {
+            "S_online": 3.0983886725041265,
+            "d_found": 12108,
+            "gates": "1349186",
+            "group_additions": 303,
+            "group_doublings": 56,
+            "hash_probes": 272,
+            "modr_add": 542,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 397.40382916053017,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.36430700000000005,
+          "seed": 1027
+        },
+        {
+          "bsgs": {
+            "S_online": 1.3932421722353283,
+            "d_found": 3132,
+            "gates": "606684",
+            "group_additions": 157,
+            "group_doublings": 19,
+            "hash_probes": 154,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 178.69926362297497,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.16479600000000003,
+          "ic": {
+            "S_online": 89.4283868831207,
+            "budget_exhausted": false,
+            "d_found": 3132,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "2632845",
+              "online_total": "38941379",
+              "phi_Q": "700886",
+              "relation_search": "31213940",
+              "step_setup": "4339432",
+              "verify": "54276"
+            },
+            "inconsistent": false,
+            "independent": 14,
+            "jacobian_additions": 930,
+            "modr_add": 3029,
+            "modr_inv": 15,
+            "modr_mul": 712,
+            "online_gae": 11470.2147275405,
+            "phase_gae": {
+              "linear_algebra": 775.5066273932254,
+              "phi_Q": 206.44653902798234,
+              "relation_search": 9194.091310751104,
+              "step_setup": 1278.1832106038291,
+              "verify": 15.987039764359352
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 14,
+            "relations": 14,
+            "smoothness_tests": 795,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 231.14056399999998
+          },
+          "log_index": 21,
+          "planted_d": 3132,
+          "rho": {
+            "S_online": 4.360081156018215,
+            "d_found": 3132,
+            "gates": "1898587",
+            "group_additions": 450,
+            "group_doublings": 52,
+            "hash_probes": 414,
+            "modr_add": 826,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 559.2303387334315,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.5509240000000001,
+          "seed": 1028
+        },
+        {
+          "bsgs": {
+            "S_online": 1.932209397160089,
+            "d_found": 11463,
+            "gates": "841376",
+            "group_additions": 223,
+            "group_doublings": 21,
+            "hash_probes": 218,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 247.8279823269514,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.22249,
+          "ic": {
+            "S_online": 38.1330862965977,
+            "budget_exhausted": false,
+            "d_found": 11463,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "3501750",
+              "online_total": "16604962",
+              "phi_Q": "701258",
+              "relation_search": "7699900",
+              "step_setup": "4634206",
+              "verify": "67848"
+            },
+            "inconsistent": false,
+            "independent": 14,
+            "jacobian_additions": 342,
+            "modr_add": 1643,
+            "modr_inv": 15,
+            "modr_mul": 1127,
+            "online_gae": 4891.00500736377,
+            "phase_gae": {
+              "linear_algebra": 1031.4432989690722,
+              "phi_Q": 206.5561119293078,
+              "relation_search": 2268.011782032401,
+              "step_setup": 1365.0091310751104,
+              "verify": 19.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 14,
+            "relations": 14,
+            "smoothness_tests": 198,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 95.810732
+          },
+          "log_index": 22,
+          "planted_d": 11463,
+          "rho": {
+            "S_online": 1.387491767742582,
+            "d_found": 11463,
+            "gates": "604180",
+            "group_additions": 115,
+            "group_doublings": 50,
+            "hash_probes": 80,
+            "modr_add": 158,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 177.9617083946981,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.170059,
+          "seed": 1029
+        },
+        {
+          "bsgs": {
+            "S_online": 1.47230104806092,
+            "d_found": 4221,
+            "gates": "641110",
+            "group_additions": 166,
+            "group_doublings": 20,
+            "hash_probes": 162,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 188.83946980854196,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.169521,
+          "ic": {
+            "S_online": 48.096984857032886,
+            "budget_exhausted": false,
+            "d_found": 4221,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "3174600",
+              "online_total": "20943718",
+              "phi_Q": "711098",
+              "relation_search": "12443769",
+              "step_setup": "4553189",
+              "verify": "61062"
+            },
+            "inconsistent": false,
+            "independent": 15,
+            "jacobian_additions": 470,
+            "modr_add": 1892,
+            "modr_inv": 16,
+            "modr_mul": 988,
+            "online_gae": 6168.989101620029,
+            "phase_gae": {
+              "linear_algebra": 935.081001472754,
+              "phi_Q": 209.4544918998527,
+              "relation_search": 3665.322238586156,
+              "step_setup": 1341.1455081001473,
+              "verify": 17.985861561119293
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 15,
+            "relations": 15,
+            "smoothness_tests": 327,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 125.158296
+          },
+          "log_index": 23,
+          "planted_d": 4221,
+          "rho": {
+            "S_online": 2.905189779067323,
+            "d_found": 4221,
+            "gates": "1265058",
+            "group_additions": 284,
+            "group_doublings": 53,
+            "hash_probes": 251,
+            "modr_add": 500,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 372.6238586156112,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.333926,
+          "seed": 1030
+        },
+        {
+          "bsgs": {
+            "S_online": 1.742198028258402,
+            "d_found": 8644,
+            "gates": "758636",
+            "group_additions": 199,
+            "group_doublings": 21,
+            "hash_probes": 197,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 223.45684830633283,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.198061,
+          "ic": {
+            "S_online": 63.93654522341235,
+            "budget_exhausted": false,
+            "d_found": 8644,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "2668815",
+              "online_total": "27841017",
+              "phi_Q": "653594",
+              "relation_search": "19350493",
+              "step_setup": "5110452",
+              "verify": "57663"
+            },
+            "inconsistent": false,
+            "independent": 14,
+            "jacobian_additions": 657,
+            "modr_add": 2214,
+            "modr_inv": 15,
+            "modr_mul": 783,
+            "online_gae": 8200.5941089838,
+            "phase_gae": {
+              "linear_algebra": 786.101620029455,
+              "phi_Q": 192.51664212076582,
+              "relation_search": 5699.703387334315,
+              "step_setup": 1505.2877761413845,
+              "verify": 16.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 14,
+            "relations": 14,
+            "smoothness_tests": 500,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 167.523065
+          },
+          "log_index": 24,
+          "planted_d": 8644,
+          "rho": {
+            "S_online": 3.3768148069692043,
+            "d_found": 8644,
+            "gates": "1470426",
+            "group_additions": 343,
+            "group_doublings": 46,
+            "hash_probes": 315,
+            "modr_add": 628,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 433.11516936671575,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.418425,
+          "seed": 1031
+        },
+        {
+          "bsgs": {
+            "S_online": 1.9874743668557513,
+            "d_found": 12091,
+            "gates": "865441",
+            "group_additions": 230,
+            "group_doublings": 21,
+            "hash_probes": 223,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 254.9163475699558,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.225375,
+          "ic": {
+            "S_online": 64.54764511811234,
+            "budget_exhausted": false,
+            "d_found": 12091,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "3520590",
+              "online_total": "28107119",
+              "phi_Q": "677615",
+              "relation_search": "19269575",
+              "step_setup": "4564701",
+              "verify": "74638"
+            },
+            "inconsistent": false,
+            "independent": 15,
+            "jacobian_additions": 648,
+            "modr_add": 2512,
+            "modr_inv": 16,
+            "modr_mul": 1070,
+            "online_gae": 8278.974668630339,
+            "phase_gae": {
+              "linear_algebra": 1036.9926362297497,
+              "phi_Q": 199.5920471281296,
+              "relation_search": 5675.868924889543,
+              "step_setup": 1344.536377025037,
+              "verify": 21.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 15,
+            "relations": 15,
+            "smoothness_tests": 506,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 168.906295
+          },
+          "log_index": 25,
+          "planted_d": 12091,
+          "rho": {
+            "S_online": 2.6590201068646713,
+            "d_found": 12091,
+            "gates": "1157864",
+            "group_additions": 260,
+            "group_doublings": 49,
+            "hash_probes": 224,
+            "modr_add": 446,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 341.0497790868925,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.28263900000000003,
+          "seed": 1032
+        },
+        {
+          "bsgs": {
+            "S_online": 1.6309883285915772,
+            "d_found": 6741,
+            "gates": "710210",
+            "group_additions": 186,
+            "group_doublings": 20,
+            "hash_probes": 182,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 209.19293078055964,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 4.202372,
+          "ic": {
+            "S_online": 53.95293591147507,
+            "budget_exhausted": false,
+            "d_found": 6741,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "3608175",
+              "online_total": "23493678",
+              "phi_Q": "684173",
+              "relation_search": "15013870",
+              "step_setup": "4126398",
+              "verify": "61062"
+            },
+            "inconsistent": false,
+            "independent": 15,
+            "jacobian_additions": 514,
+            "modr_add": 2201,
+            "modr_inv": 16,
+            "modr_mul": 1124,
+            "online_gae": 6920.081885125184,
+            "phase_gae": {
+              "linear_algebra": 1062.7908689248895,
+              "phi_Q": 201.52371134020618,
+              "relation_search": 4422.347569955818,
+              "step_setup": 1215.4338733431516,
+              "verify": 17.985861561119293
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 15,
+            "relations": 15,
+            "smoothness_tests": 385,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 140.592441
+          },
+          "log_index": 26,
+          "planted_d": 6741,
+          "rho": {
+            "S_online": 4.003227679767284,
+            "d_found": 6741,
+            "gates": "1743196",
+            "group_additions": 410,
+            "group_doublings": 51,
+            "hash_probes": 378,
+            "modr_add": 754,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 513.4597938144329,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.474697,
+          "seed": 1033
+        },
+        {
+          "bsgs": {
+            "S_online": 2.1625815324196096,
+            "d_found": 15396,
+            "gates": "941691",
+            "group_additions": 252,
+            "group_doublings": 21,
+            "hash_probes": 249,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 277.3758468335788,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.253469,
+          "ic": {
+            "S_online": 50.03158719408174,
+            "budget_exhausted": false,
+            "d_found": 15396,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "3665730",
+              "online_total": "21786136",
+              "phi_Q": "710114",
+              "relation_search": "12785186",
+              "step_setup": "4564048",
+              "verify": "61058"
+            },
+            "inconsistent": false,
+            "independent": 15,
+            "jacobian_additions": 483,
+            "modr_add": 2102,
+            "modr_inv": 16,
+            "modr_mul": 1152,
+            "online_gae": 6417.124005891016,
+            "phase_gae": {
+              "linear_algebra": 1079.7437407952873,
+              "phi_Q": 209.16465390279822,
+              "relation_search": 3765.8868924889543,
+              "step_setup": 1344.3440353460971,
+              "verify": 17.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 15,
+            "relations": 15,
+            "smoothness_tests": 342,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 111.97800500000001
+          },
+          "log_index": 27,
+          "planted_d": 15396,
+          "rho": {
+            "S_online": 1.6970490856356422,
+            "d_found": 15396,
+            "gates": "738976",
+            "group_additions": 145,
+            "group_doublings": 56,
+            "hash_probes": 108,
+            "modr_add": 214,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 217.6659793814433,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.185091,
+          "seed": 1034
+        },
+        {
+          "bsgs": {
+            "S_online": 1.8133317260071302,
+            "d_found": 9649,
+            "gates": "789611",
+            "group_additions": 208,
+            "group_doublings": 21,
+            "hash_probes": 204,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 232.58055964653903,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.209323,
+          "ic": {
+            "S_online": 51.37054040377373,
+            "budget_exhausted": false,
+            "d_found": 9649,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "2819130",
+              "online_total": "22369180",
+              "phi_Q": "711113",
+              "relation_search": "14463140",
+              "step_setup": "4311344",
+              "verify": "64453"
+            },
+            "inconsistent": false,
+            "independent": 15,
+            "jacobian_additions": 505,
+            "modr_add": 1885,
+            "modr_inv": 16,
+            "modr_mul": 859,
+            "online_gae": 6588.860088365243,
+            "phase_gae": {
+              "linear_algebra": 830.3770250368188,
+              "phi_Q": 209.45891016200295,
+              "relation_search": 4260.129602356406,
+              "step_setup": 1269.9098674521356,
+              "verify": 18.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 15,
+            "relations": 15,
+            "smoothness_tests": 370,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 119.10534100000001
+          },
+          "log_index": 28,
+          "planted_d": 9649,
+          "rho": {
+            "S_online": 3.0459437893568237,
+            "d_found": 9649,
+            "gates": "1326349",
+            "group_additions": 303,
+            "group_doublings": 49,
+            "hash_probes": 274,
+            "modr_add": 546,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 390.67717231222383,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.367199,
+          "seed": 1035
+        },
+        {
+          "bsgs": {
+            "S_online": 1.9084063050804905,
+            "d_found": 11086,
+            "gates": "831011",
+            "group_additions": 220,
+            "group_doublings": 21,
+            "hash_probes": 215,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 244.77496318114873,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.225191,
+          "ic": {
+            "S_online": 61.52293465141523,
+            "budget_exhausted": false,
+            "d_found": 11086,
+            "dependent": 0,
+            "fb_columns": 14,
+            "gates": {
+              "linear_algebra": "3124005",
+              "online_total": "26790016",
+              "phi_Q": "695458",
+              "relation_search": "18144741",
+              "step_setup": "4757964",
+              "verify": "67848"
+            },
+            "inconsistent": false,
+            "independent": 15,
+            "jacobian_additions": 616,
+            "modr_add": 2266,
+            "modr_inv": 16,
+            "modr_mul": 943,
+            "online_gae": 7891.020913107511,
+            "phase_gae": {
+              "linear_algebra": 920.1782032400589,
+              "phi_Q": 204.8477172312224,
+              "relation_search": 5344.548159057437,
+              "step_setup": 1401.4621502209131,
+              "verify": 19.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 15,
+            "relations": 15,
+            "smoothness_tests": 467,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 153.856556
+          },
+          "log_index": 29,
+          "planted_d": 11086,
+          "rho": {
+            "S_online": 1.5978247537993453,
+            "d_found": 11086,
+            "gates": "695769",
+            "group_additions": 139,
+            "group_doublings": 49,
+            "hash_probes": 110,
+            "modr_add": 218,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 204.93932253313696,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.17307,
+          "seed": 1036
+        }
+      ],
+      "tuning_scan": [
+        {
+          "fb_columns": 14,
+          "logs": 10,
+          "mean_online_gae": 7255.232724594993,
+          "mean_positions_tested": 420.7,
+          "position_budget": 300000,
+          "solved": 10
+        },
+        {
+          "fb_columns": 12,
+          "logs": 10,
+          "mean_online_gae": 11478.058703976436,
+          "mean_positions_tested": 815.4,
+          "position_budget": 5207,
+          "solved": 10
+        },
+        {
+          "fb_columns": 8,
+          "logs": 10,
+          "mean_online_gae": 22971.733225331365,
+          "mean_positions_tested": 1918.7,
+          "position_budget": 5207,
+          "solved": 10
+        }
+      ],
+      "wall_s": {
+        "count_E": 0.050485125,
+        "cover_construction": 0.000173214,
+        "total": 12.682123461
+      }
+    },
+    {
+      "E_add_gates": "3395",
+      "E_order": 32698,
+      "E_order_factorisation": [
+        [
+          2,
+          1
+        ],
+        [
+          16349,
+          1
+        ]
+      ],
+      "N": 15,
+      "a": 1,
+      "applicable": true,
+      "beta": 12710,
+      "chosen_fb_columns": 16,
+      "cofactor": 2,
+      "ell": 16349,
+      "ell_is_largest_prime_of_E": true,
+      "ell_squared_divides_E": false,
+      "factor_base_available": {
+        "affine_points": 33,
+        "columns": 16,
+        "enumeration_gae": 12.205301914580264,
+        "ramified_points": 1,
+        "wall_s": 0.000144315
+      },
+      "genus": 4,
+      "holdout": {
+        "S_online": {
+          "bsgs": 1.7922296722030608,
+          "ic": 51.338789949972046,
+          "rho": 3.1537272577891864
+        },
+        "best_generic": "bsgs",
+        "logs": 20,
+        "mean_bsgs_E_ops": 225.6,
+        "mean_gae": {
+          "bsgs": [
+            229.16023564064798,
+            211.0060824742268,
+            246.2466568483063
+          ],
+          "ic_online": [
+            6564.3423858615615,
+            6091.14556701031,
+            7002.444506627394
+          ],
+          "rho": [
+            403.24568483063325,
+            332.5953019145803,
+            480.8815611192931
+          ]
+        },
+        "mean_jacobian_additions": 477.25,
+        "mean_rho_E_ops": 365.7,
+        "mean_wall_ms": {
+          "bsgs": 0.2267016,
+          "ic_untallied": 39.198781000000004,
+          "note": "contended container; secondary",
+          "rho": 0.7966176500000001
+        },
+        "ratio_ic_cold_over_best_generic": {
+          "ci95": [
+            27.072030518374863,
+            32.5734399182912
+          ],
+          "point": 29.613682536867024
+        },
+        "ratio_ic_over_best_generic": {
+          "ci95": [
+            26.078010724647722,
+            31.522891322960994
+          ],
+          "point": 28.645206998980726
+        },
+        "ratio_ic_over_bsgs": {
+          "ci95": [
+            26.115750922488374,
+            31.57173376462372
+          ],
+          "point": 28.645206998980726
+        },
+        "ratio_ic_over_rho": {
+          "ci95": [
+            13.359290111548335,
+            20.02721085594898
+          ],
+          "point": 16.278766600115368
+        },
+        "raw_group_op_ratio_ic_Jadds_over_best_generic_Eops": {
+          "ci95": [
+            1.9130052724077329,
+            2.3491486946651534
+          ],
+          "point": 2.1154698581560285
+        },
+        "raw_group_op_ratio_ic_Jadds_over_rho_Eops": {
+          "ci95": [
+            1.0764211457642114,
+            1.6026941362916007
+          ],
+          "note": "counts each Jacobian addition as one group operation: the most favourable pricing for IC",
+          "point": 1.3050314465408805
+        },
+        "solved_bsgs": 20,
+        "solved_ic": 20,
+        "solved_rho": 20
+      },
+      "host": {
+        "arch": "x86_64",
+        "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+        "logical_cpus": 4,
+        "note": "shared cloud container; wall times are contended and secondary",
+        "os": "linux"
+      },
+      "instance": "ghs-l5-n3-a1-b0x31a6",
+      "irr_K_low_terms": [
+        0,
+        1
+      ],
+      "l": 5,
+      "largest_prime_of_E": 16349,
+      "magic": 3,
+      "model": "V",
+      "n": 3,
+      "primes_killed_by_phi": [],
+      "q": 32,
+      "reusable_setup": {
+        "cover_construction": "not priced (library finds the F_q embedding by search over K; wall time recorded)",
+        "factor_base_enumeration_gae": 12.205301914580264,
+        "phi_P_additions_over_K": 8,
+        "phi_P_gae": 209.73078055964655
+      },
+      "rows": [
+        {
+          "bsgs": {
+            "S_online": 1.9621046983761,
+            "d_found": 11885,
+            "gates": "851741",
+            "group_additions": 226,
+            "group_doublings": 21,
+            "hash_probes": 221,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 250.88100147275404,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.22037299999999999,
+          "ic": {
+            "S_online": 37.54827349554521,
+            "budget_exhausted": false,
+            "d_found": 11885,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "2187416",
+              "online_total": "16299540",
+              "phi_Q": "695672",
+              "relation_search": "8872278",
+              "step_setup": "4472931",
+              "verify": "71243"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 371,
+            "modr_add": 1360,
+            "modr_inv": 18,
+            "modr_mul": 772,
+            "online_gae": 4801.042709867452,
+            "phase_gae": {
+              "linear_algebra": 644.3051546391753,
+              "phi_Q": 204.91075110456555,
+              "relation_search": 2613.336671575847,
+              "step_setup": 1317.5054491899853,
+              "verify": 20.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 233,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 87.380639
+          },
+          "log_index": 10,
+          "planted_d": 11885,
+          "rho": {
+            "S_online": 5.2447111732569605,
+            "d_found": 11885,
+            "gates": "2276706",
+            "group_additions": 552,
+            "group_doublings": 52,
+            "hash_probes": 517,
+            "modr_add": 1032,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 670.6055964653902,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.6571819999999999,
+          "seed": 1017
+        },
+        {
+          "bsgs": {
+            "S_online": 1.5091376474223583,
+            "d_found": 5169,
+            "gates": "655110",
+            "group_additions": 170,
+            "group_doublings": 20,
+            "hash_probes": 169,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 192.96318114874816,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.170185,
+          "ic": {
+            "S_online": 34.9730503847853,
+            "budget_exhausted": false,
+            "d_found": 5169,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "3133480",
+              "online_total": "15181647",
+              "phi_Q": "699364",
+              "relation_search": "6934287",
+              "step_setup": "4360244",
+              "verify": "54272"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 314,
+            "modr_add": 1586,
+            "modr_inv": 18,
+            "modr_mul": 1150,
+            "online_gae": 4471.766421207658,
+            "phase_gae": {
+              "linear_algebra": 922.9690721649484,
+              "phi_Q": 205.9982326951399,
+              "relation_search": 2042.499852724595,
+              "step_setup": 1284.3134020618556,
+              "verify": 15.985861561119293
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 180,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 73.244777
+          },
+          "log_index": 11,
+          "planted_d": 5169,
+          "rho": {
+            "S_online": 2.2007433806917063,
+            "d_found": 5169,
+            "gates": "955333",
+            "group_additions": 206,
+            "group_doublings": 51,
+            "hash_probes": 179,
+            "modr_add": 356,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 281.3941089837997,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.24919500000000003,
+          "seed": 1018
+        },
+        {
+          "bsgs": {
+            "S_online": 1.246921208972106,
+            "d_found": 1292,
+            "gates": "541283",
+            "group_additions": 139,
+            "group_doublings": 18,
+            "hash_probes": 139,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 159.43534609720177,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.138082,
+          "ic": {
+            "S_online": 37.909555671642195,
+            "budget_exhausted": false,
+            "d_found": 1292,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "3245410",
+              "online_total": "16456371",
+              "phi_Q": "709456",
+              "relation_search": "8224409",
+              "step_setup": "4233001",
+              "verify": "44095"
+            },
+            "inconsistent": false,
+            "independent": 16,
+            "jacobian_additions": 343,
+            "modr_add": 1716,
+            "modr_inv": 17,
+            "modr_mul": 1189,
+            "online_gae": 4847.237407952872,
+            "phase_gae": {
+              "linear_algebra": 955.9381443298969,
+              "phi_Q": 208.97083946980854,
+              "relation_search": 2422.5063328424153,
+              "step_setup": 1246.8338733431517,
+              "verify": 12.988217967599411
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 16,
+            "relations": 16,
+            "smoothness_tests": 210,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 80.71050000000001
+          },
+          "log_index": 12,
+          "planted_d": 1292,
+          "rho": {
+            "S_online": 3.01603846033502,
+            "d_found": 1292,
+            "gates": "1309249",
+            "group_additions": 304,
+            "group_doublings": 45,
+            "hash_probes": 277,
+            "modr_add": 552,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 385.640353460972,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.330646,
+          "seed": 1019
+        },
+        {
+          "bsgs": {
+            "S_online": 1.2071350412924315,
+            "d_found": 707,
+            "gates": "524012",
+            "group_additions": 135,
+            "group_doublings": 17,
+            "hash_probes": 134,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 154.3481590574374,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.154175,
+          "ic": {
+            "S_online": 58.15813724735619,
+            "budget_exhausted": false,
+            "d_found": 707,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "4229694",
+              "online_total": "25246191",
+              "phi_Q": "704059",
+              "relation_search": "15511081",
+              "step_setup": "4757258",
+              "verify": "44099"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 555,
+            "modr_add": 2637,
+            "modr_inv": 18,
+            "modr_mul": 1528,
+            "online_gae": 7436.286008836524,
+            "phase_gae": {
+              "linear_algebra": 1245.859793814433,
+              "phi_Q": 207.38114874815906,
+              "relation_search": 4568.80147275405,
+              "step_setup": 1401.2541973490427,
+              "verify": 12.98939617083947
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 405,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 179.138417
+          },
+          "log_index": 13,
+          "planted_d": 707,
+          "rho": {
+            "S_online": 3.1333352055098023,
+            "d_found": 707,
+            "gates": "1360167",
+            "group_additions": 317,
+            "group_doublings": 46,
+            "hash_probes": 285,
+            "modr_add": 568,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 400.6382916053019,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.366253,
+          "seed": 1020
+        },
+        {
+          "bsgs": {
+            "S_online": 2.018232888724966,
+            "d_found": 13059,
+            "gates": "876106",
+            "group_additions": 233,
+            "group_doublings": 21,
+            "hash_probes": 231,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 258.0577319587629,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.24244,
+          "ic": {
+            "S_online": 64.29431105558972,
+            "budget_exhausted": false,
+            "d_found": 13059,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "3172008",
+              "online_total": "27909877",
+              "phi_Q": "688435",
+              "relation_search": "19427810",
+              "step_setup": "4560566",
+              "verify": "61058"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 649,
+            "modr_add": 2508,
+            "modr_inv": 18,
+            "modr_mul": 1096,
+            "online_gae": 8220.876877761413,
+            "phase_gae": {
+              "linear_algebra": 934.3175257731958,
+              "phi_Q": 202.77908689248895,
+              "relation_search": 5722.477172312224,
+              "step_setup": 1343.318409425626,
+              "verify": 17.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 505,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 233.873893
+          },
+          "log_index": 14,
+          "planted_d": 13059,
+          "rho": {
+            "S_online": 3.0717151372298184,
+            "d_found": 13059,
+            "gates": "1333418",
+            "group_additions": 306,
+            "group_doublings": 50,
+            "hash_probes": 278,
+            "modr_add": 554,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 392.759351988218,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.35891900000000004,
+          "seed": 1021
+        },
+        {
+          "bsgs": {
+            "S_online": 2.1532607515322226,
+            "d_found": 15074,
+            "gates": "934721",
+            "group_additions": 250,
+            "group_doublings": 21,
+            "hash_probes": 246,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 275.32282768777617,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.236851,
+          "ic": {
+            "S_online": 58.76246727286617,
+            "budget_exhausted": false,
+            "d_found": 15074,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "4032126",
+              "online_total": "25508528",
+              "phi_Q": "709576",
+              "relation_search": "15725935",
+              "step_setup": "4973043",
+              "verify": "67848"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 548,
+            "modr_add": 2538,
+            "modr_inv": 18,
+            "modr_mul": 1453,
+            "online_gae": 7513.557584683358,
+            "phase_gae": {
+              "linear_algebra": 1187.6659793814433,
+              "phi_Q": 209.0061855670103,
+              "relation_search": 4632.086892488955,
+              "step_setup": 1464.8138438880708,
+              "verify": 19.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 396,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 130.477683
+          },
+          "log_index": 15,
+          "planted_d": 15074,
+          "rho": {
+            "S_online": 2.222243253481609,
+            "d_found": 15074,
+            "gates": "964666",
+            "group_additions": 208,
+            "group_doublings": 52,
+            "hash_probes": 177,
+            "modr_add": 352,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 284.14315169366716,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.232404,
+          "seed": 1022
+        },
+        {
+          "bsgs": {
+            "S_online": 2.0024529542332883,
+            "d_found": 12992,
+            "gates": "869256",
+            "group_additions": 231,
+            "group_doublings": 21,
+            "hash_probes": 230,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 256.04005891016203,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.403156,
+          "ic": {
+            "S_online": 37.021417189289195,
+            "budget_exhausted": false,
+            "d_found": 12992,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "3676050",
+              "online_total": "16070834",
+              "phi_Q": "676135",
+              "relation_search": "7399911",
+              "step_setup": "4261075",
+              "verify": "57663"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 318,
+            "modr_add": 1818,
+            "modr_inv": 18,
+            "modr_mul": 1359,
+            "online_gae": 4733.677172312224,
+            "phase_gae": {
+              "linear_algebra": 1082.7835051546392,
+              "phi_Q": 199.1561119293078,
+              "relation_search": 2179.6497790868925,
+              "step_setup": 1255.1030927835052,
+              "verify": 16.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 187,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 74.380949
+          },
+          "log_index": 16,
+          "planted_d": 12992,
+          "rho": {
+            "S_online": 2.2574520883386606,
+            "d_found": 12992,
+            "gates": "979950",
+            "group_additions": 214,
+            "group_doublings": 50,
+            "hash_probes": 181,
+            "modr_add": 360,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 288.64506627393223,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.449173,
+          "seed": 1023
+        },
+        {
+          "bsgs": {
+            "S_online": 1.8749695126611043,
+            "d_found": 10801,
+            "gates": "813916",
+            "group_additions": 215,
+            "group_doublings": 21,
+            "hash_probes": 213,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 239.73961708394697,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.22018,
+          "ic": {
+            "S_online": 48.534118759326894,
+            "budget_exhausted": false,
+            "d_found": 10801,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "3639020",
+              "online_total": "21068447",
+              "phi_Q": "706504",
+              "relation_search": "12464861",
+              "step_setup": "4197004",
+              "verify": "61058"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 450,
+            "modr_add": 2167,
+            "modr_inv": 18,
+            "modr_mul": 1317,
+            "online_gae": 6205.728129602357,
+            "phase_gae": {
+              "linear_algebra": 1071.8762886597938,
+              "phi_Q": 208.10132547864507,
+              "relation_search": 3671.5349042709868,
+              "step_setup": 1236.2309278350515,
+              "verify": 17.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 319,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 161.832111
+          },
+          "log_index": 17,
+          "planted_d": 10801,
+          "rho": {
+            "S_online": 1.4069758175191562,
+            "d_found": 10801,
+            "gates": "610762",
+            "group_additions": 113,
+            "group_doublings": 55,
+            "hash_probes": 79,
+            "modr_add": 156,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 179.90044182621503,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.155698,
+          "seed": 1024
+        },
+        {
+          "bsgs": {
+            "S_online": 1.6202882808856374,
+            "d_found": 6772,
+            "gates": "703360",
+            "group_additions": 184,
+            "group_doublings": 20,
+            "hash_probes": 181,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 207.17525773195877,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.18988300000000002,
+          "ic": {
+            "S_online": 58.386241383623556,
+            "budget_exhausted": false,
+            "d_found": 6772,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "3307318",
+              "online_total": "25345210",
+              "phi_Q": "706981",
+              "relation_search": "17071940",
+              "step_setup": "4197909",
+              "verify": "61062"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 566,
+            "modr_add": 2357,
+            "modr_inv": 18,
+            "modr_mul": 1164,
+            "online_gae": 7465.452135493372,
+            "phase_gae": {
+              "linear_algebra": 974.1731958762887,
+              "phi_Q": 208.2418262150221,
+              "relation_search": 5028.5537555228275,
+              "step_setup": 1236.4974963181148,
+              "verify": 17.985861561119293
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 433,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 192.74876799999998
+          },
+          "log_index": 18,
+          "planted_d": 6772,
+          "rho": {
+            "S_online": 2.816575481080067,
+            "d_found": 6772,
+            "gates": "1222663",
+            "group_additions": 276,
+            "group_doublings": 51,
+            "hash_probes": 249,
+            "modr_add": 496,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 360.13637702503684,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.396852,
+          "seed": 1025
+        },
+        {
+          "bsgs": {
+            "S_online": 1.2942610124471399,
+            "d_found": 1741,
+            "gates": "561833",
+            "group_additions": 145,
+            "group_doublings": 18,
+            "hash_probes": 142,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 165.4883652430044,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.144943,
+          "ic": {
+            "S_online": 54.74622054432623,
+            "budget_exhausted": false,
+            "d_found": 1741,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "3917256",
+              "online_total": "23765093",
+              "phi_Q": "702583",
+              "relation_search": "14510917",
+              "step_setup": "4580057",
+              "verify": "54280"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 518,
+            "modr_add": 2433,
+            "modr_inv": 18,
+            "modr_mul": 1413,
+            "online_gae": 7000.027393225331,
+            "phase_gae": {
+              "linear_algebra": 1153.8309278350516,
+              "phi_Q": 206.9463917525773,
+              "relation_search": 4274.20235640648,
+              "step_setup": 1349.059499263623,
+              "verify": 15.988217967599411
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 374,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 129.099073
+          },
+          "log_index": 19,
+          "planted_d": 1741,
+          "rho": {
+            "S_online": 1.7374859695373333,
+            "d_found": 1741,
+            "gates": "754235",
+            "group_additions": 162,
+            "group_doublings": 41,
+            "hash_probes": 137,
+            "modr_add": 272,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 222.16053019145804,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 4.209802000000001,
+          "seed": 1026
+        },
+        {
+          "bsgs": {
+            "S_online": 1.6282473573336296,
+            "d_found": 6860,
+            "gates": "706815",
+            "group_additions": 185,
+            "group_doublings": 20,
+            "hash_probes": 182,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 208.19293078055964,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.337719,
+          "ic": {
+            "S_online": 55.371216524920115,
+            "budget_exhausted": false,
+            "d_found": 6860,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "3258990",
+              "online_total": "24036401",
+              "phi_Q": "704536",
+              "relation_search": "15430271",
+              "step_setup": "4581542",
+              "verify": "61062"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 535,
+            "modr_add": 2223,
+            "modr_inv": 18,
+            "modr_mul": 1154,
+            "online_gae": 7079.941384388807,
+            "phase_gae": {
+              "linear_algebra": 959.9381443298969,
+              "phi_Q": 207.52164948453608,
+              "relation_search": 4544.99882179676,
+              "step_setup": 1349.496907216495,
+              "verify": 17.985861561119293
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 393,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 129.446903
+          },
+          "log_index": 20,
+          "planted_d": 6860,
+          "rho": {
+            "S_online": 5.343410632132281,
+            "d_found": 6860,
+            "gates": "2319551",
+            "group_additions": 560,
+            "group_doublings": 55,
+            "hash_probes": 530,
+            "modr_add": 1058,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 683.2256259204713,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.9884229999999999,
+          "seed": 1027
+        },
+        {
+          "bsgs": {
+            "S_online": 1.7715015188372043,
+            "d_found": 9094,
+            "gates": "769001",
+            "group_additions": 202,
+            "group_doublings": 21,
+            "hash_probes": 200,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 226.5098674521355,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.203454,
+          "ic": {
+            "S_online": 48.198561331911456,
+            "budget_exhausted": false,
+            "d_found": 9094,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "3831758",
+              "online_total": "20922783",
+              "phi_Q": "716344",
+              "relation_search": "11903209",
+              "step_setup": "4410414",
+              "verify": "61058"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 440,
+            "modr_add": 2200,
+            "modr_inv": 18,
+            "modr_mul": 1395,
+            "online_gae": 6162.8226804123715,
+            "phase_gae": {
+              "linear_algebra": 1128.6474226804123,
+              "phi_Q": 210.99970544918997,
+              "relation_search": 3506.099852724595,
+              "step_setup": 1299.0910162002945,
+              "verify": 17.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 303,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 152.00540800000002
+          },
+          "log_index": 21,
+          "planted_d": 9094,
+          "rho": {
+            "S_online": 2.9367909382257915,
+            "d_found": 9094,
+            "gates": "1274848",
+            "group_additions": 288,
+            "group_doublings": 54,
+            "hash_probes": 252,
+            "modr_add": 502,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 375.50751104565535,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 4.34579,
+          "seed": 1028
+        },
+        {
+          "bsgs": {
+            "S_online": 1.8904730103441691,
+            "d_found": 10731,
+            "gates": "820646",
+            "group_additions": 217,
+            "group_doublings": 21,
+            "hash_probes": 212,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 241.7219440353461,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.25124,
+          "ic": {
+            "S_online": 57.14195093161342,
+            "budget_exhausted": false,
+            "d_found": 10731,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "4776940",
+              "online_total": "24805069",
+              "phi_Q": "690992",
+              "relation_search": "14605958",
+              "step_setup": "4659936",
+              "verify": "71243"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 512,
+            "modr_add": 2750,
+            "modr_inv": 18,
+            "modr_mul": 1748,
+            "online_gae": 7306.353166421208,
+            "phase_gae": {
+              "linear_algebra": 1407.0515463917525,
+              "phi_Q": 203.5322533136966,
+              "relation_search": 4302.19675994109,
+              "step_setup": 1372.5879234167894,
+              "verify": 20.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 370,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 120.68970599999999
+          },
+          "log_index": 22,
+          "planted_d": 10731,
+          "rho": {
+            "S_online": 1.489130533398968,
+            "d_found": 10731,
+            "gates": "646425",
+            "group_additions": 127,
+            "group_doublings": 50,
+            "hash_probes": 91,
+            "modr_add": 180,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 190.40500736377024,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.165435,
+          "seed": 1029
+        },
+        {
+          "bsgs": {
+            "S_online": 1.3577861910664846,
+            "d_found": 2651,
+            "gates": "589409",
+            "group_additions": 152,
+            "group_doublings": 19,
+            "hash_probes": 149,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 173.61089837997054,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.160843,
+          "ic": {
+            "S_online": 51.31579870059967,
+            "budget_exhausted": false,
+            "d_found": 2651,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "4835404",
+              "online_total": "22275962",
+              "phi_Q": "715724",
+              "relation_search": "12577623",
+              "step_setup": "4089540",
+              "verify": "57671"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 445,
+            "modr_add": 2624,
+            "modr_inv": 18,
+            "modr_mul": 1782,
+            "online_gae": 6561.4026509572905,
+            "phase_gae": {
+              "linear_algebra": 1424.2721649484536,
+              "phi_Q": 210.81708394698086,
+              "relation_search": 3704.7490427098674,
+              "step_setup": 1204.5773195876288,
+              "verify": 16.987039764359352
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 317,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 105.247697
+          },
+          "log_index": 23,
+          "planted_d": 2651,
+          "rho": {
+            "S_online": 3.3551803517021486,
+            "d_found": 2651,
+            "gates": "1456469",
+            "group_additions": 337,
+            "group_doublings": 52,
+            "hash_probes": 304,
+            "modr_add": 606,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 429.0041237113402,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.406055,
+          "seed": 1030
+        },
+        {
+          "bsgs": {
+            "S_online": 1.970616648441319,
+            "d_found": 12484,
+            "gates": "855436",
+            "group_additions": 227,
+            "group_doublings": 21,
+            "hash_probes": 226,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 251.96936671575847,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.23519700000000002,
+          "ic": {
+            "S_online": 54.025314812983936,
+            "budget_exhausted": false,
+            "d_found": 12484,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "3640378",
+              "online_total": "23452151",
+              "phi_Q": "714980",
+              "relation_search": "14548992",
+              "step_setup": "4490138",
+              "verify": "57663"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 509,
+            "modr_add": 2306,
+            "modr_inv": 18,
+            "modr_mul": 1307,
+            "online_gae": 6907.850073637703,
+            "phase_gae": {
+              "linear_algebra": 1072.2762886597939,
+              "phi_Q": 210.5979381443299,
+              "relation_search": 4285.417378497791,
+              "step_setup": 1322.5737849779086,
+              "verify": 16.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 369,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 125.790918
+          },
+          "log_index": 24,
+          "planted_d": 12484,
+          "rho": {
+            "S_online": 3.2604085991492098,
+            "d_found": 12484,
+            "gates": "1415329",
+            "group_additions": 331,
+            "group_doublings": 46,
+            "hash_probes": 303,
+            "modr_add": 604,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 416.8863033873343,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.35202,
+          "seed": 1031
+        },
+        {
+          "bsgs": {
+            "S_online": 2.185097057324192,
+            "d_found": 15501,
+            "gates": "948541",
+            "group_additions": 254,
+            "group_doublings": 21,
+            "hash_probes": 250,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 279.3935198821797,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.280656,
+          "ic": {
+            "S_online": 51.22715693427774,
+            "budget_exhausted": false,
+            "d_found": 15501,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "4306078",
+              "online_total": "22237483",
+              "phi_Q": "708472",
+              "relation_search": "12241964",
+              "step_setup": "4913121",
+              "verify": "67848"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 459,
+            "modr_add": 2399,
+            "modr_inv": 18,
+            "modr_mul": 1578,
+            "online_gae": 6550.068630338734,
+            "phase_gae": {
+              "linear_algebra": 1268.358762886598,
+              "phi_Q": 208.68100147275405,
+              "relation_search": 3605.880412371134,
+              "step_setup": 1447.163770250368,
+              "verify": 19.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 308,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 111.159211
+          },
+          "log_index": 25,
+          "planted_d": 15501,
+          "rho": {
+            "S_online": 4.0433651794649075,
+            "d_found": 15501,
+            "gates": "1755207",
+            "group_additions": 417,
+            "group_doublings": 50,
+            "hash_probes": 384,
+            "modr_add": 766,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 516.9976435935199,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.44389,
+          "seed": 1032
+        },
+        {
+          "bsgs": {
+            "S_online": 2.177276199280506,
+            "d_found": 15491,
+            "gates": "945146",
+            "group_additions": 253,
+            "group_doublings": 21,
+            "hash_probes": 250,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 278.3935198821797,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.244911,
+          "ic": {
+            "S_online": 56.730274325306226,
+            "budget_exhausted": false,
+            "d_found": 15491,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "4836706",
+              "online_total": "24626362",
+              "phi_Q": "713392",
+              "relation_search": "14824677",
+              "step_setup": "4187134",
+              "verify": "64453"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 508,
+            "modr_add": 2789,
+            "modr_inv": 18,
+            "modr_mul": 1770,
+            "online_gae": 7253.714874815906,
+            "phase_gae": {
+              "linear_algebra": 1424.6556701030927,
+              "phi_Q": 210.1301914580265,
+              "relation_search": 4366.620618556701,
+              "step_setup": 1233.3237113402063,
+              "verify": 18.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 375,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 129.45700399999998
+          },
+          "log_index": 26,
+          "planted_d": 15491,
+          "rho": {
+            "S_online": 1.6670176197416502,
+            "d_found": 15491,
+            "gates": "723645",
+            "group_additions": 145,
+            "group_doublings": 52,
+            "hash_probes": 113,
+            "modr_add": 224,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 213.15022091310752,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.17527299999999998,
+          "seed": 1033
+        },
+        {
+          "bsgs": {
+            "S_online": 2.1536754067451422,
+            "d_found": 15376,
+            "gates": "934901",
+            "group_additions": 250,
+            "group_doublings": 21,
+            "hash_probes": 249,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 275.3758468335788,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.262401,
+          "ic": {
+            "S_online": 56.810159955715335,
+            "budget_exhausted": false,
+            "d_found": 15376,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "3931424",
+              "online_total": "24661040",
+              "phi_Q": "706012",
+              "relation_search": "15828784",
+              "step_setup": "4137157",
+              "verify": "57663"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 537,
+            "modr_add": 2524,
+            "modr_inv": 18,
+            "modr_mul": 1412,
+            "online_gae": 7263.929307805596,
+            "phase_gae": {
+              "linear_algebra": 1158.0041237113403,
+              "phi_Q": 207.9564064801178,
+              "relation_search": 4662.381148748159,
+              "step_setup": 1218.6029455081002,
+              "verify": 16.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 406,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 171.014787
+          },
+          "log_index": 27,
+          "planted_d": 15376,
+          "rho": {
+            "S_online": 4.280842827184337,
+            "d_found": 15376,
+            "gates": "1858295",
+            "group_additions": 438,
+            "group_doublings": 57,
+            "hash_probes": 403,
+            "modr_add": 804,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 547.3622974963181,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.493637,
+          "seed": 1034
+        },
+        {
+          "bsgs": {
+            "S_online": 1.8826521523004833,
+            "d_found": 10699,
+            "gates": "817251",
+            "group_additions": 216,
+            "group_doublings": 21,
+            "hash_probes": 212,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 240.7219440353461,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.209351,
+          "ic": {
+            "S_online": 57.47520471895709,
+            "budget_exhausted": false,
+            "d_found": 10699,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "4063766",
+              "online_total": "24949733",
+              "phi_Q": "705028",
+              "relation_search": "15966639",
+              "step_setup": "4146452",
+              "verify": "67848"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 527,
+            "modr_add": 2554,
+            "modr_inv": 18,
+            "modr_mul": 1465,
+            "online_gae": 7348.964064801178,
+            "phase_gae": {
+              "linear_algebra": 1196.9855670103093,
+              "phi_Q": 207.66656848306332,
+              "relation_search": 4702.986450662739,
+              "step_setup": 1221.3407952871871,
+              "verify": 19.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 398,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 62.551005
+          },
+          "log_index": 28,
+          "planted_d": 10699,
+          "rho": {
+            "S_online": 3.2193300893892682,
+            "d_found": 10699,
+            "gates": "1397497",
+            "group_additions": 324,
+            "group_doublings": 49,
+            "hash_probes": 293,
+            "modr_add": 584,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 411.6338733431517,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.360056,
+          "seed": 1035
+        },
+        {
+          "bsgs": {
+            "S_online": 1.9385039058407363,
+            "d_found": 11672,
+            "gates": "841496",
+            "group_additions": 223,
+            "group_doublings": 21,
+            "hash_probes": 220,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "online_gae": 247.86332842415317,
+            "solved_and_verified": true
+          },
+          "bsgs_wall_ms": 0.227992,
+          "ic": {
+            "S_online": 48.146367758805184,
+            "budget_exhausted": false,
+            "d_found": 11672,
+            "dependent": 0,
+            "fb_columns": 16,
+            "gates": {
+              "linear_algebra": "3735382",
+              "online_total": "20900126",
+              "phi_Q": "707995",
+              "relation_search": "11726603",
+              "step_setup": "4665693",
+              "verify": "64453"
+            },
+            "inconsistent": false,
+            "independent": 17,
+            "jacobian_additions": 441,
+            "modr_add": 2144,
+            "modr_inv": 18,
+            "modr_mul": 1359,
+            "online_gae": 6156.149042709868,
+            "phase_gae": {
+              "linear_algebra": 1100.259793814433,
+              "phi_Q": 208.54050073637703,
+              "relation_search": 3454.080412371134,
+              "step_setup": 1374.2836524300442,
+              "verify": 18.984683357879234
+            },
+            "phi_Q_additions_over_K": 8,
+            "rank": 17,
+            "relations": 17,
+            "smoothness_tests": 297,
+            "solved_and_verified": true,
+            "wall_ms_untallied": 53.677557
+          },
+          "log_index": 29,
+          "planted_d": 11672,
+          "rho": {
+            "S_online": 6.371792418415041,
+            "d_found": 11672,
+            "gates": "2765967",
+            "group_additions": 681,
+            "group_doublings": 50,
+            "hash_probes": 654,
+            "modr_add": 1306,
+            "modr_inv": 1,
+            "modr_mul": 1,
+            "online_gae": 814.7178203240059,
+            "solved_and_verified": true
+          },
+          "rho_wall_ms": 0.79565,
+          "seed": 1036
+        }
+      ],
+      "tuning_scan": [
+        {
+          "fb_columns": 16,
+          "logs": 10,
+          "mean_online_gae": 6917.902680412371,
+          "mean_positions_tested": 371.0,
+          "position_budget": 300000,
+          "solved": 10
+        },
+        {
+          "fb_columns": 12,
+          "logs": 10,
+          "mean_online_gae": 11155.401325478644,
+          "mean_positions_tested": 798.2,
+          "position_budget": 4710,
+          "solved": 10
+        },
+        {
+          "fb_columns": 8,
+          "logs": 10,
+          "mean_online_gae": 27945.42851251841,
+          "mean_positions_tested": 2378.8,
+          "position_budget": 4710,
+          "solved": 10
+        }
+      ],
+      "wall_s": {
+        "count_E": 0.054469211,
+        "cover_construction": 0.00016818,
+        "total": 13.834002271
+      }
+    }
+  ],
+  "params": {
+    "budget_positions": 300000,
+    "holdout_logs": 20,
+    "scan": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      8,
+      12,
+      16,
+      24,
+      32,
+      48,
+      64,
+      96,
+      128
+    ],
+    "seed": 7,
+    "tune_logs": 10,
+    "walk_steps_r": 8
+  },
+  "unit": "bitop/v1 (docs/units/BITOPS.md); gae = gates / gates(GroupAdd on E)"
+}

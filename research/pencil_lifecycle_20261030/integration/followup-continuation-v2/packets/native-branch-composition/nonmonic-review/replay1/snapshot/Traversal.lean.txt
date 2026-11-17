@@ -1,0 +1,98 @@
+import Storage
+set_option autoImplicit false
+namespace CoefficientTraversal
+open WordCoefficient WideModPow CoefficientStorage
+abbrev State (n : Nat) := {xs : Array UInt64 // xs.size=n}
+abbrev Event (n : Nat) := {t : Nat×Nat // t.1<n ∧ t.2≤t.1}
+def schedule (n : Nat) : List (Event n) :=
+ (List.finRange n).flatMap fun k => (List.finRange (k.val+1)).map fun j =>
+ ⟨(k.val,j.val),k.isLt,by have := j.isLt; omega⟩
+def read {n : Nat} (xs : State n) (i : Fin n) : UInt64 := xs.val[i.val]'(by rw [xs.property]; exact i.isLt)
+def Good {n : Nat} (p : UInt64) (xs : State n) : Prop := ∀ i, (read xs i).toNat<p.toNat
+noncomputable def decode {n : Nat} (p : UInt64) (xs : State n) (i : Fin n) : ZMod p.toNat := (read xs i).toNat
+
+def step {n : Nat} (hn : n≤6) (p : UInt64) (coeff : Fin n→UInt64)
+ (a b iw : UInt64) (xs : State n) (e : Event n) : State n :=
+ let k : Fin 6 := ⟨e.val.1,by have := e.property.1; omega⟩
+ let j : Fin 6 := ⟨e.val.2,by have := e.property.1; have := e.property.2; omega⟩
+ let ki : Fin n := ⟨e.val.1,e.property.1⟩
+ let ji : Fin n := ⟨e.val.2,by have := e.property.1; have := e.property.2; omega⟩
+ ⟨xs.val.set e.val.2 (updateWord p (read xs ji) (coeff ki) a b iw k j)
+   (by rw [xs.property]; exact ji.isLt), by simp [xs.property]⟩
+noncomputable def contribution {n : Nat} (p : UInt64) (coeff : Fin n→UInt64)
+ (a b s : UInt64) (e : Event n) (i : Fin n) : ZMod p.toNat :=
+ if i.val=e.val.2 then
+ ((coeff ⟨e.val.1,e.property.1⟩).toNat : ZMod p.toNat)*
+ ((e.val.1.choose e.val.2 : ZMod p.toNat)*
+ ((a.toNat : ZMod p.toNat)^e.val.2*(b.toNat : ZMod p.toNat)^(e.val.1-e.val.2)))*(s.toNat : ZMod p.toNat)⁻¹ else 0
+
+theorem step_correct {n : Nat} (hn : n≤6) (p : UInt64) [Fact p.toNat.Prime]
+ (coeff : Fin n→UInt64) (a b s iw : UInt64) (xs : State n) (e : Event n)
+ (hp : 1<p.toNat) (hb : p.toNat<2^31) (hc : ∀i,(coeff i).toNat<p.toNat)
+ (ha : a.toNat<p.toNat) (hbeta : b.toNat<p.toNat) (hw : InverseWitness p s iw)
+ (hx : Good p xs) :
+ Good p (step hn p coeff a b iw xs e) ∧
+ ∀i, decode p (step hn p coeff a b iw xs e) i=decode p xs i+contribution p coeff a b s e i := by
+ let k : Fin 6 := ⟨e.val.1,by have := e.property.1; omega⟩
+ let j : Fin 6 := ⟨e.val.2,by have := e.property.1; have := e.property.2; omega⟩
+ let ki : Fin n := ⟨e.val.1,e.property.1⟩
+ let ji : Fin n := ⟨e.val.2,by have := e.property.1; have := e.property.2; omega⟩
+ have hu := WordCoefficient.update_decode p (read xs ji) (coeff ki) a b s iw k j
+  e.property.2 hp hb (hx ji) (hc ki) ha hbeta hw
+ constructor
+ · intro i
+   by_cases he : e.val.2=i.val
+   · have hi : i=ji := Fin.ext he.symm
+     subst i
+     simpa [read,step,k,j,ki,ji] using hu.1
+   · simpa [read,step,Array.getElem_set,he] using hx i
+ · intro i
+   by_cases he : e.val.2=i.val
+   · have hi : i=ji := Fin.ext he.symm
+     subst i
+     simpa [decode,read,step,contribution,k,j,ki,ji] using hu.2
+   · simp [decode,read,step,contribution,Array.getElem_set,he,Ne.symm he]
+
+def run {n : Nat} (hn : n≤6) (p : UInt64) (coeff : Fin n→UInt64)
+ (a b iw : UInt64) (xs : State n) : List (Event n) → State n
+ | [] => xs
+ | e::es => run hn p coeff a b iw (step hn p coeff a b iw xs e) es
+
+theorem run_correct {n : Nat} (hn : n≤6) (p : UInt64) [Fact p.toNat.Prime]
+ (coeff : Fin n→UInt64) (a b s iw : UInt64) (es : List (Event n))
+ (hp : 1<p.toNat) (hb : p.toNat<2^31) (hc : ∀i,(coeff i).toNat<p.toNat)
+ (ha : a.toNat<p.toNat) (hbeta : b.toNat<p.toNat) (hw : InverseWitness p s iw)
+ (xs : State n) (hx : Good p xs) :
+ Good p (run hn p coeff a b iw xs es) ∧ ∀i,
+ decode p (run hn p coeff a b iw xs es) i=decode p xs i+(es.map fun e=>contribution p coeff a b s e i).sum := by
+ induction es generalizing xs with
+ | nil => simpa [run] using And.intro hx (fun i => Eq.refl (decode p xs i))
+ | cons e es ih =>
+   have hs := step_correct hn p coeff a b s iw xs e hp hb hc ha hbeta hw hx
+   have hr := ih (step hn p coeff a b iw xs e) hs.1
+   refine ⟨hr.1,?_⟩
+   intro i
+   rw [run,hr.2 i,hs.2 i]
+   simp only [List.map_cons,List.sum_cons]
+   exact add_assoc _ _ _
+
+def zeros (n : Nat) : State n := ⟨Array.replicate n 0,by simp⟩
+theorem zeros_good (n : Nat) (p : UInt64) (hp : 0<p.toNat) : Good p (zeros n) := by
+ intro i
+ simpa [read,zeros] using hp
+
+def transform {n : Nat} (hn : n≤6) (p : UInt64) (coeff : Fin n→UInt64)
+ (a b s : UInt64) : State n :=
+ let iw := inverseGenerator p s
+ run hn p coeff a b iw (zeros n) (schedule n)
+
+theorem transform_correct {n : Nat} (hn : n≤6) (p : UInt64) [Fact p.toNat.Prime]
+ (coeff : Fin n→UInt64) (a b s : UInt64)
+ (hp : 1<p.toNat) (hb : p.toNat<2^31) (hc : ∀i,(coeff i).toNat<p.toNat)
+ (ha : a.toNat<p.toNat) (hbeta : b.toNat<p.toNat) (hs : s.toNat<p.toNat) (hs0 : s≠0) :
+ Good p (transform hn p coeff a b s) ∧ ∀i,
+ decode p (transform hn p coeff a b s) i=((schedule n).map fun e=>contribution p coeff a b s e i).sum := by
+ have h := run_correct hn p coeff a b s (inverseGenerator p s) (schedule n)
+  hp hb hc ha hbeta (generator_witness p s hp hb hs hs0) (zeros n) (zeros_good n p (by omega))
+ simpa [transform,decode,read,zeros] using h
+end CoefficientTraversal

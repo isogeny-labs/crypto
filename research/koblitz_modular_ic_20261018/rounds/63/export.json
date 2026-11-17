@@ -1,0 +1,49 @@
+{
+  "schema": "experiment.export/v1",
+  "experiment_id": "KOBLITZ-R63",
+  "claim_class": "exact_computation",
+  "protocols": [
+    {
+      "attempt": "check112-01",
+      "path": "runs/check112-01/protocol.json",
+      "sha256": "1bf93c66892b990c2f17b66f19a033a5a4b0772f0e7531f5921a8a15cd6da7be",
+      "frozen_revision": "26e281713a2cc48b9977a22b96d4175da45c169d"
+    },
+    {
+      "attempt": "generator112-01",
+      "path": "runs/generator112-01/protocol.json",
+      "sha256": "9d70dbf2934208a08f668fcbb481e7a4bd57e59ce921038150ebd2ba7ffe5d4c",
+      "frozen_revision": "d17eacf875b74273362ae3c0455b1830eaf2b14c"
+    },
+    {
+      "attempt": "half-descent63-01",
+      "path": "runs/half-descent63-01/protocol.json",
+      "sha256": "eb9189355cea600120045dcda66d50df2f676a67000778807b53f7c491117138",
+      "frozen_revision": "0bf3356d69f1035e64b68d53d93ee72514878d6b"
+    },
+    {
+      "attempt": "half-descent63-02",
+      "path": "runs/half-descent63-02/protocol.json",
+      "sha256": "4deb1489a546dba749ed9521ff5d231f9c50655622362ca54f21740b5c3d5baf",
+      "frozen_revision": "2da27902c21fbf41fd0bfb1dbfac3ef249f65909"
+    },
+    {
+      "attempt": "half-lean63-01",
+      "path": "runs/half-lean63-01/LEAN-PROTOCOL.md",
+      "sha256": "16ee451884024b82969ab7af509fbc3cc42d4f6e30c84cee61af8c872fc4ea2d",
+      "frozen_revision": "0bf3356d69f1035e64b68d53d93ee72514878d6b"
+    }
+  ],
+  "raw_archive": "runs.tar.xz; content address in .artifacts.json after custody publication",
+  "results": {
+    "path": "results.json",
+    "sha256": "b6d620492a4a7eeb4c324e1099ed31bc2e7201fae3d68438fe998bcf9484c8dc"
+  },
+  "flow": {
+    "accepted": 4,
+    "rejected": 1,
+    "interrupted": 0
+  },
+  "canonical_schema_validation": "unavailable in selected Git index and disk; manual source-byte and exact contract checks only",
+  "notes": "Complete actual degree112 source identities and degree32 half-space involution/trace-one source functions; five conditional Lean theorems. Proper normalization, valuations, level77 map, selected991 action and subgroup transfer remain separate."
+}

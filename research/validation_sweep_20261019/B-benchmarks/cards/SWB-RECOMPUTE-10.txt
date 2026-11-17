@@ -1,0 +1,71 @@
+CARD SWB-RECOMPUTE-10  (frozen before dispatch; experiment-director style; mechanical tier)
+GOAL  Recompute, from raw records committed in this repository, the headline numbers of the benchmark-README rows listed below, and check the identical-output claims. COMPUTE AND COPY ONLY. You do not judge, classify, explain or repair anything.
+REPO  /home/user/crypto (cwd). Read everything; write ONLY under research/validation_sweep_20261019/B-benchmarks/scripts/recompute/ and research/validation_sweep_20261019/B-benchmarks/recompute/.
+TOOLS  python3 -I (isolated mode) for every computation; grep/ls/zcat/xz -dc/tar -tf/sed for reading. FORBIDDEN: cargo/rustc builds or tests, running any benchmark or ecbench/crypto binary, network access, editing or deleting any file outside the two write dirs, git commands other than read-only (git log/show/ls-files).
+PER ROW (do these in order; at most 25 tool calls per row, then record status cannot_define for what is left):
+ 1. Open the row's study directories (listed per row) and read the README/PROTOCOL/REPORT only as needed to find which raw files hold per-run records.
+ 2. From the row's HEADLINE copy up to 10 numeric claims, preferring ratios, speedups, quotients, medians, intervals and counts (verbatim string each).
+ 3. For each, find the raw per-run/per-pair records in the repo that the number is computed from. Write ONE script per row at scripts/recompute/<row_no>.py (python3 -I, reads only committed files, prints the computed values with the field names used). Run it. If the aggregation (median vs mean, paired vs pooled, which rounds are excluded) is not stated in the study, try the study's stated rule; if still undefined record status cannot_define and say which choice is missing. Never pick the aggregation that happens to match.
+ 4. status per claim: match (relative difference <= 1% or equal at the precision the row prints), mismatch (state both numbers), no_raw_in_repo (the records are not in the repo), cannot_define, partial.
+ 5. If the HEADLINE or MEASURED text claims identical/bit-identical/equal outputs, counters, answers, digests or checksums between arms: find the corresponding fields in the raw records of both arms and report n_compared, n_equal, n_differ, files. If the raw records contain no such field, status no_raw_in_repo.
+ 6. Copy verbatim (path:line) every sentence in the row's study files that points to data outside the repo (drive.google.com, /Volumes, SSD, /Users, s3://, gs://, store:<name>, Modal volume, 'not committed', 'scratch'). For each store:<name> check store/index.json lists it (yes/no).
+ 7. Copy verbatim from the study files: (a) the A/A or null-control result lines (path:line), (b) the isolation tier or isolation statement (path:line), (c) whether PROTOCOL/spec is committed in git before the first raw record (run `git log --diff-filter=A --format=%H%x20%cI -- <protocol path>` and `git log --diff-filter=A --format=%H%x20%cI -- <first raw file>` and print both dates; if either is empty say so).
+OUTPUT  Write research/validation_sweep_20261019/B-benchmarks/recompute/SWB-RECOMPUTE-10.jsonl, one JSON object per row: {"row_no":int,"slug":str,"claims":[{"claimed":str,"computed":str,"definition":str,"files":[str],"status":str}],"identical":{"claimed":bool,"n_compared":int|null,"n_equal":int|null,"n_differ":int|null,"files":[str],"status":str},"offrepo_refs":[str],"aa_lines":[str],"isolation_lines":[str],"protocol_git_date":str,"first_raw_git_date":str,"script":str,"notes":str}. notes holds only facts you saw, never opinions. Then reply with the file path and one line per row: row_no, number of match/mismatch/no_raw/cannot_define claims.
+STOP_WHEN  a row's study directory does not exist; a file you must read is unreadable; you are about to write outside the two write dirs. Report the stop verbatim and continue with the next row.
+ROWS
+
+--- ROW 73 | 2026-10-14 | 20261014-ic-improve-04-genus3-2lp
+MEASURED: genus-3 hyperelliptic IC after the cubic GHS transfer (split arm): double large primes against the full-factor-base incumbent, Rust port, paired on instance/target/seed, q = 2^10–2^20, 3 curves per size; F_q-mult-equivalent counted cost
+HEADLINE: ADVANCES (exponent and constant): IC-2LP q^1.385 [1.379, 1.391] vs incumbent q^1.910 [1.904, 1.913] over 2^10–2^18 (Δ −0.525 [−0.529, −0.521]); paired ratio 0.620 at 2^10 → 0.036 [0.035, 0.036] at 2^18; tuned 1LP q^1.446; IC-2LP local exponent rises to 1.46 at 2^20 (linear algebra q^1.52), not 4/3; port reproduces item 7 Python on 42/42 solves
+HOST (as reported): 4-core shared, single thread, 3 GB cap, counted unit
+STUDY DIRS: research/ic_improve_20261014/04-genus3-2lp/README.md; research/ic_improve_20261014/04-genus3-2lp
+RAW CANDIDATES (largest first): research/ic_improve_20261014/04-genus3-2lp/results/run-20261014/b15_c0_all.jsonl, research/ic_improve_20261014/04-genus3-2lp/results/run-20261014/b15_c2_all.jsonl, research/ic_improve_20261014/04-genus3-2lp/results/run-20261014/progress.log, research/ic_improve_20261014/04-genus3-2lp/results/run-20261014/summary.json, research/ic_improve_20261014/04-genus3-2lp/results/tune/progress.log, research/ic_improve_20261014/04-genus3-2lp/results/xcheck/progress.log
+
+--- ROW 74 | 2026-10-14 | 20261014-ic-next10-09-equal-advice
+MEASURED: free-relation harvest from existing compact-orbit pair tables (E-3 census), Koblitz a=0 n=61; equal-advice audit of the online IC rows against Bernstein–Lange preprocessing rho, n=41/53/61, 64 unseen targets each
+HEADLINE: improvement over collecting every relation: 49 independent free relations at K=600, 8.2 % of the 599 needed (×1.09); full rank would need K≈2,050; audit: BL with equal or smaller advice is 53–317× faster online than IC, so the online rows are not IC improvements
+HOST (as reported): 4 vCPU shared by 10 jobs, L0
+STUDY DIRS: research/ic_next10_20261014/09-equal-advice/README.md; research/ic_next10_20261014/09-equal-advice
+RAW CANDIDATES (largest first): research/ic_next10_20261014/09-equal-advice/data/bl_n61_64th.jsonl, research/ic_next10_20261014/09-equal-advice/data/census_n61_K800.jsonl, research/ic_next10_20261014/09-equal-advice/data/ic_n41_K100.jsonl, research/ic_next10_20261014/09-equal-advice/data/ic_n53_K200.jsonl, research/ic_next10_20261014/09-equal-advice/data/ic_n61_K256.jsonl, research/ic_next10_20261014/09-equal-advice/data/ic_n61_K360.jsonl
+
+--- ROW 75 | 2026-10-14 | 20261014-ic-next10-07-cubic-ghs-genus3
+MEASURED: genus-3 hyperelliptic IC after cubic GHS (m=3, r=5): double large primes against the full-factor-base incumbent, complete solves, q=2^8–2^15, 3 curves per size
+HEADLINE: exponent improvement: q^1.650 [1.639, 1.660] → q^1.300 [1.292, 1.308] (q^1.377 over 2^11–2^15), 24/24 + 18/18 solves verified; transfer built over F_{q^3} reaches q=2^15 (previous build q≤13); for reference the rho model is q^1.53
+HOST (as reported): 4 vCPU shared by 10 jobs, single-threaded Python, counted F_q-mult equivalents
+STUDY DIRS: research/ic_next10_20261014/07-cubic-ghs-genus3/README.md; research/ic_next10_20261014/07-cubic-ghs-genus3
+RAW CANDIDATES (largest first): research/ic_next10_20261014/07-cubic-ghs-genus3/results/pilot_kappa_k2.jsonl, research/ic_next10_20261014/07-cubic-ghs-genus3/results/pilot_kappa_k4.jsonl, research/ic_next10_20261014/07-cubic-ghs-genus3/results/rho-randmult-20261014/progress.log, research/ic_next10_20261014/07-cubic-ghs-genus3/results/run-20261014/progress.log, research/ic_next10_20261014/07-cubic-ghs-genus3/results/run-20261014/solves.csv, research/ic_next10_20261014/07-cubic-ghs-genus3/results/run-20261014/summary.json
+
+--- ROW 76 | 2026-10-14 | 20261014-ic-next10-06-equivariant-f4-m4
+MEASURED: G2 equivariant Macaulay pass against full F₂ reduction (barrel system, l=3, degree 3); msolve F4 against the committed XL degree on m=4 / m=3 Weil-descent cells
+HEADLINE: equivariant pass completed, bit-identical at n=7–17, 44× / 58× / 73× CPU at n=11/13/17 (25–45× with assembly), n=31 in 31 s where the full matrix needs about 21 GB; solving degree 4 with F4 where XL reads 5 to ≥7 (1 to ≥3 degrees lower), modelled n=131 m=4 price +21/+112 → +7.6 bits before K; (4,5)/(4,6) blocked at 3 GB
+HOST (as reported): 4 vCPU shared, single thread, 3 GB cap, L0
+STUDY DIRS: research/ic_next10_20261014/06-equivariant-f4-m4/README.md; research/ic_next10_20261014/06-equivariant-f4-m4
+RAW CANDIDATES (largest first): research/ic_next10_20261014/06-equivariant-f4-m4/runs/c2_calibration.jsonl, research/ic_next10_20261014/06-equivariant-f4-m4/runs/work/m4-n10-l3-s20261006-d3.log, research/ic_next10_20261014/06-equivariant-f4-m4/runs/work/m4-n11-l4-s20261014-d0.log, research/ic_next10_20261014/06-equivariant-f4-m4/runs/work/m4-n11-l4-s20261014-d1.log, research/ic_next10_20261014/06-equivariant-f4-m4/runs/work/m4-n6-l2-s20261006-u1.log, research/ic_next10_20261014/06-equivariant-f4-m4/runs/work/m4-n9-l3-s20261006-d3.log
+
+--- ROW 77 | 2026-10-14 | 20261014-ic-next10-03-pkm-degree
+MEASURED: PKM Kummer-tower solving degree with msolve 0.6.5 (1 thread, 5 GB, 45 min) against committed f4_fp_tower, p₁ = 2013265921, m=2–4, N up to 24; XL degree and δ census
+HEADLINE: instrument: msolve runs m=4 N=20 to three productive degree-8 rounds within 5 GB, where f4_fp_tower needs >14 GB; matched f4_fp_tower on all 16 finished systems; degree result is a regression for the lead: m=4 plateau at 7 breaks (D ≥ 8), m=3 D ≥ 7 undecided; XL degree = N + 4 exactly for m=2
+HOST (as reported): 4 vCPU shared, single thread, 5 GB cap, L0
+STUDY DIRS: research/ic_next10_20261014/03-pkm-degree/README.md; research/ic_next10_20261014/03-pkm-degree
+RAW CANDIDATES (largest first): research/ic_next10_20261014/03-pkm-degree/logs/convert.jsonl, research/ic_next10_20261014/03-pkm-degree/logs/delta_m2.jsonl, research/ic_next10_20261014/03-pkm-degree/runs/pkm_kummer_p2013265921_m4_t2_x1102336260.log, research/ic_next10_20261014/03-pkm-degree/runs/pkm_kummer_p2013265921_m4_t3_x1710525890.log, research/ic_next10_20261014/03-pkm-degree/runs/pkm_kummer_p2013265921_m4_t3_x259303215.log, research/ic_next10_20261014/03-pkm-degree/runs/pkm_kummer_p2013265921_m4_t4_x1142649783.log
+
+--- ROW 78 | 2026-10-14 | 20261014-ic-next10-01-fp4-ladder
+MEASURED: E(F_{p⁴}) k=4 IC ladder: D₄-symmetrised and double-large-prime arms against the plain S₄ incumbent; p=101–1033 (log₂ #E 26.6–40.1), 21 curves, h=4; ecbench session ECBS1hf49e5346dc2b
+HEADLINE: D₄/plain 0.0548 [0.048, 0.061] = 18.2× constant improvement, same exponent; double large primes: linear-algebra exponent 0.495 → 0.420 [0.405, 0.440], relation phase 0.238 → 0.333, whole solve 2.31× [2.10, 2.62] costlier at measured sizes; 84/84 IC and 672/672 rho logs verified, 12/12 replays identical; IC costs are lower bounds (oracle, C₄ charged)
+HOST (as reported): 4 vCPU shared by 10 jobs, L0, operation counts only
+STUDY DIRS: research/ic_next10_20261014/01-fp4-ladder/README.md; research/ic_next10_20261014/01-fp4-ladder
+RAW CANDIDATES (largest first): research/ic_next10_20261014/01-fp4-ladder/ecbench/compare.txt, research/ic_next10_20261014/01-fp4-ladder/ecbench/run.log, research/ic_next10_20261014/01-fp4-ladder/ecbench/session-20261014-fp4/plan.json, research/ic_next10_20261014/01-fp4-ladder/ecbench/session-20261014-fp4/records.jsonl, research/ic_next10_20261014/01-fp4-ladder/raw/ladder.jsonl, research/ic_next10_20261014/01-fp4-ladder/raw/summary.json
+
+--- ROW 79 | 2026-10-15 | 20261015-ecdlp-speedups
+MEASURED: matched baseline/candidate whole-process A/B of the Koblitz compact-orbit shared-log DLP fast path at n=41 (timer hoist in `lift128`, sparse-canonical selector in the wide probe path, root-table Bloom on by default), 16 public synthetic targets × 3 interleaved reps; and the prime j=0 staged IC relation stage at 16 bits (orbit-index map hoisted out of the relation loop), 3 reps
+HEADLINE: engineering: orbit fast path whole-process median 60.9 s → 37.5 s (1.63×; targets stage 1.95×), bit-identical recovered scalars/relations on all reps; j=0 relation stage 13.99 s → 11.90 s (1.17× median, ~8% per trial), same planted scalar recovered and rho agreement; wall on a shared host without `isolated_bench`, stage diagnostics, not a frozen-suite end-to-end claim
+HOST (as reported): Apple M4 Pro, 14 cores, shared, no isolation receipt
+STUDY DIRS: research/ecdlp_speedups_20261015
+RAW CANDIDATES (largest first): research/ecdlp_speedups_20261015/raw/o2-base-1.jsonl, research/ecdlp_speedups_20261015/raw/o2-base-2.jsonl, research/ecdlp_speedups_20261015/raw/o2-base-3.jsonl, research/ecdlp_speedups_20261015/raw/o2-cand-1.jsonl, research/ecdlp_speedups_20261015/raw/o2-cand-2.jsonl, research/ecdlp_speedups_20261015/raw/o2-cand-3.jsonl
+
+--- ROW 80 | 2026-10-15 | 20261015-joux-vitse-k5-n1
+MEASURED: Joux–Vitse `(n − 1)`-decomposition at `n = 5` on `E(F_{p⁵})`: cost of one trial (F4 with trace replay, every trial checked against meet in the middle) on a 12-rung ladder `p = 11…241` (2 curves × 32 trials + `500p` rate trials each), and complete DLPs at `p = 11` (2 seeds; a third stopped, one-point factor base) and `p = 31`, paired with rho on the same target; the committed `jv_quintic` plain test re-run on today's engine
+HEADLINE: trial `5.9–9.2·10⁹` `F_p` mult., flat (`p^{−0.12±0.05}`); trials per relation `≈ 25p` (rate·24p `0.96` at `p = 241`); complete DLPs IC / rho `4.5·10⁷`, `1.8·10⁸` (`p = 11`) and `6.8·10⁷` (`p = 31`), all answers verified; extrapolated crossover `q ≈ 2^{58.2}` (group `≈ 2^{291}`); `jv_quintic` `C″ = 1.104·10¹⁰` (was `3.0·10¹⁰`)
+HOST (as reported): Claude Code cloud container, 4 vCPU Xeon @ 2.10 GHz, isolation none (counts are the metric)
+STUDY DIRS: research/joux_vitse_n1_20261015/README.md; research/joux_vitse_n1_20261015/reports/run-20261015T0518Z
+RAW CANDIDATES (largest first): research/joux_vitse_n1_20261015/data/edwards/cost_p271_s1.jsonl, research/joux_vitse_n1_20261015/data/edwards/cost_p271_s2.jsonl, research/joux_vitse_n1_20261015/data/edwards/cost_p521_s1.jsonl, research/joux_vitse_n1_20261015/data/edwards/cost_p521_s2.jsonl, research/joux_vitse_n1_20261015/data/ladder/p151_s2.jsonl, research/joux_vitse_n1_20261015/summary.json

@@ -1,0 +1,97 @@
+module
+public import OrientationProduct
+import all OrientationAnchor
+import all OrientationValuation
+import all OrientationContent
+import all OrientationProduct
+public section
+open Polynomial Finset
+namespace OrientationHierarchy
+open OrientationAnchor
+
+def loss (i : ℕ) (m : ℕ → ℕ) (j : ℕ) : ℤ := ((j-i:ℕ):ℤ)*m j
+
+theorem masked_baseline (u x y i s : ℕ) (m : ℕ → ℕ) (hi : i ∈ mask u x y) :
+    (m i:ℤ) - ∑ j ∈ mask u x y, loss i m j ≤ gain u x y i s m := by
+  have h : ∑ j ∈ mask u x y,
+      ((if j=i then (m i:ℤ) else 0)-loss i m j) ≤ gain u x y i s m := by
+    apply sum_le_sum
+    intro j hj
+    have hb := mul_le_mul_of_nonneg_left (beta_lower i s j) (by positivity : (0:ℤ) ≤ m j)
+    by_cases he : j=i
+    · subst j
+      simpa [loss] using hb
+    · simpa [loss, he, mul_neg, mul_comm] using hb
+  simpa [sum_sub_distrib, hi] using h
+
+theorem omitted_high_gain (u x y i s : ℕ) (m : ℕ → ℕ)
+    (hi : i ∈ mask u x y) (hs : s < u) (hn : s ∉ mask u x y) :
+    schedule u i m + loss i m s ≤ gain u x y i s m := by
+  have hbase := masked_baseline u x y i s m hi
+  have hsub : mask u x y ⊆ (range u).erase s := by
+    intro j hj
+    apply mem_erase.mpr
+    exact ⟨by intro h; subst j; exact hn hj, (mem_filter.mp hj).1⟩
+  have hsum : (∑ j ∈ mask u x y, loss i m j) ≤ ∑ j ∈ (range u).erase s, loss i m j :=
+    sum_le_sum_of_subset_of_nonneg hsub (by intros; dsimp [loss]; positivity)
+  have hwhole := sum_erase_add (range u) (loss i m) (mem_range.mpr hs)
+  dsimp [schedule]
+  change (m i:ℤ) - (∑ j ∈ range u, loss i m j) + loss i m s ≤ _
+  omega
+
+theorem low_order_gain (u x y i s : ℕ) (m : ℕ → ℕ)
+    (hi : i ∈ mask u x y) (hs : s < i) :
+    schedule u i m + ((i-s:ℕ):ℤ)*m i ≤ gain u x y i s m := by
+  have h : ∑ j ∈ mask u x y,
+      ((if j=i then (m i:ℤ)+((i-s:ℕ):ℤ)*m i else 0)-loss i m j) ≤ gain u x y i s m := by
+    apply sum_le_sum
+    intro j hj
+    by_cases he : j=i
+    · subst j
+      have hdiff : ((i-s:ℕ):ℤ) = (i:ℤ)-s := by omega
+      have hmin : min (s:ℤ) i = s := by omega
+      simp only [ite_true, loss, Nat.sub_self, Nat.cast_zero, zero_mul, sub_zero,
+        beta, hmin, hdiff]
+      ring_nf
+      exact le_rfl
+    · have hb := mul_le_mul_of_nonneg_left (beta_lower i s j) (by positivity : (0:ℤ) ≤ m j)
+      simpa [he, loss, mul_neg, mul_comm] using hb
+  have hsum : (∑ j ∈ mask u x y, loss i m j) ≤ ∑ j ∈ range u, loss i m j :=
+    sum_le_sum_of_subset_of_nonneg (filter_subset ..) (by intros; dsimp [loss]; positivity)
+  simp only [sum_sub_distrib] at h
+  have hone : (∑ j ∈ mask u x y, if j=i then (m i:ℤ)+((i-s:ℕ):ℤ)*m i else 0) =
+      (m i:ℤ)+((i-s:ℕ):ℤ)*m i := by simp [hi]
+  rw [hone] at h
+  dsimp [schedule]
+  change (m i:ℤ) - (∑ j ∈ range u, loss i m j) + ((i-s:ℕ):ℤ)*m i ≤ _
+  omega
+
+theorem strict_crossing_gain (u x y i s : ℕ) (m : ℕ → ℕ)
+    (hi : i ∈ mask u x y) (hs : s < u) (hn : s ∉ mask u x y)
+    (hm : ∀ j < u, 0 < m j) :
+    schedule u i m + 1 ≤ gain u x y i s m := by
+  have hsi : s ≠ i := by intro h; subst s; exact hn hi
+  have hiu : i < u := mem_range.mp (mem_filter.mp hi).1
+  rcases lt_or_gt_of_ne hsi with hlt | hgt
+  · have h := low_order_gain u x y i s m hi hlt
+    have hp : 0 < (i-s)*m i := Nat.mul_pos (by omega) (hm i hiu)
+    have hpZ : (1:ℤ) ≤ ((i-s:ℕ):ℤ)*m i := by exact_mod_cast Nat.succ_le_iff.mpr hp
+    omega
+  · have h := omitted_high_gain u x y i s m hi hs hn
+    have hp : 0 < (s-i)*m s := Nat.mul_pos (by omega) (hm s hs)
+    have hpZ : (1:ℤ) ≤ loss i m s := by
+      dsimp [loss]
+      exact_mod_cast Nat.succ_le_iff.mpr hp
+    omega
+
+/-- A strict extra bit follows from actual differing retained indices, not an assumed mask property. -/
+theorem actual_strict_crossing_content (a u x y i : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (ht : t ≠ 0) (hit : padicValInt 2 t = i) (hia : i ≤ a)
+    (hiu : i < u) (hc : x.testBit i = y.testBit i) (hxy : x ≠ y)
+    (hs : order x y < u) (hm : ∀ j < u, 0 < m j) :
+    Content (schedule u i m+1) (chart a t (correction u x y m)) := by
+  have h := chart_correction_content a u x y i t m ht hit hia
+  simp only [chartOrder, ite_eq_right hxy] at h
+  exact h.mono (strict_crossing_gain u x y i (order x y) m
+    (mem_filter.mpr ⟨mem_range.mpr hiu, hc⟩) hs (mask_omits_order u x y hxy) hm)
+end OrientationHierarchy

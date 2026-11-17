@@ -1,0 +1,59 @@
+name: CT20 F101 gluing reference regression
+on:
+  pull_request:
+    paths:
+      - 'research/chained_jacobian_transfers_20261110/ct20_gluing_oracle.py'
+      - 'research/chained_jacobian_transfers_20261110/CT20_F101_GLUING_INVENTORY.md'
+      - 'isogeny_algos/tests/ct20_f101_gluing.rs'
+      - '.github/workflows/ct20-gluing-oracle.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  oracle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/chained_jacobian_transfers_20261110/ct20_gluing_oracle.py
+      - name: Run bounded, standard-library F101/F101-squared controls
+        run: |
+          set -euo pipefail
+          source=research/chained_jacobian_transfers_20261110/ct20_gluing_oracle.py
+          python3 -S "$source" | tee "$RUNNER_TEMP/ct20-f101-oracle.txt"
+          python3 -m py_compile "$source"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ct20-f101-oracle-${{ github.sha }}
+          path: ${{ runner.temp }}/ct20-f101-oracle.txt
+          if-no-files-found: ignore
+
+  native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            isogeny_algos
+      - name: Check CT20 against unchanged FpR, Kohel, and genus2 gluing implementations
+        env:
+          RUSTUP_TOOLCHAIN: 1.99.1
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.99.1 --profile minimal --component rustfmt --component clippy
+          cargo test --manifest-path isogeny_algos/Cargo.toml --test ct20_f101_gluing --locked --offline -- --nocapture 2>&1 | tee "$RUNNER_TEMP/ct20-native.txt"
+          cargo clippy --manifest-path isogeny_algos/Cargo.toml --test ct20_f101_gluing --locked --offline -- -D warnings
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ct20-f101-native-${{ github.sha }}
+          path: ${{ runner.temp }}/ct20-native.txt
+          if-no-files-found: ignore

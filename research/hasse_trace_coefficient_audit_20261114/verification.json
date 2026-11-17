@@ -1,0 +1,80 @@
+{
+  "schema": "hasse-trace-coefficient-verification/v1",
+  "source_commit": "5577c4a964d9548c304a27bafeb15e4883834a2a",
+  "claim_id": "PCC-20261114-20a800",
+  "declaration_sha256": "f95163d2e900734bb416540950d0eaa880dcbfac10f07433ee777214cf07a88a",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 99,
+  "gate_declarations": 35,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 83,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-20a800",
+    "claim_sha256": "a56648ec2b1aa00f65295357abef64762372c74db6be95d4688a899191eb78f7",
+    "commit": "5577c4a964d9548c304a27bafeb15e4883834a2a",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/hasse_trace_coefficient_audit_20261114/lean (HasseTraceCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T20:56:17Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-20a800",
+    "claim_sha256": "a56648ec2b1aa00f65295357abef64762372c74db6be95d4688a899191eb78f7",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46981,
+    "sha256": "45d4a766e413d060977deedb89c8f1a7a992f58f55391fdf37545186bf439874",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 35,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_Point_count_proved": true,
+    "actual_count_defined_trace_residue_proved": true,
+    "characteristic_divisibility_equivalence_proved": true,
+    "prime13_actual_curve_nonuniqueness_proved": true,
+    "actual_F9_characteristic_vs_fieldsize_coefficient_control_proved": true,
+    "helper_domain_negative_controls_proved": true,
+    "geometric_supersingularity_proved": false,
+    "actual_general_Hasse_bound_proved": false,
+    "canonical_Frobenius_endomorphism_trace_bridge_proved": false,
+    "generic_Hp_Hq_norm_identity_proved": false,
+    "qualified_point_count_recovery_beyond13_proved": false,
+    "qualified_source_refutation": false,
+    "novelty_claim": false,
+    "canonical_corpus_promoted": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

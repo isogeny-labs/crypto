@@ -1,0 +1,120 @@
+{
+  "schema": "crypto.native-halftrace-development-recheck-start/v1",
+  "recorded_on": "2026-11-04",
+  "native_source_commit": "507829726fbc731543f4527348b55c5e479242c9",
+  "native_sources_edited": false,
+  "source_manifest": "source.sha256",
+  "checks": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--lib",
+        "--locked",
+        "cached_"
+      ],
+      "state": "compiling",
+      "log": "/tmp/crypto-halftrace-nov4-cached.log",
+      "exec_session": 73044
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--lib",
+        "--locked",
+        "fast_base_lifts_preserve_roots_and_order"
+      ],
+      "state": "queued_after_cache_filter",
+      "log": "/tmp/crypto-halftrace-nov4-ordered.log",
+      "exec_session": 73044
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--example",
+        "koblitz_halftrace",
+        "--locked"
+      ],
+      "state": "queued_after_ordered_lift",
+      "log": "/tmp/crypto-halftrace-nov4-e2e.log",
+      "exec_session": 73044
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--lib",
+        "--locked"
+      ],
+      "attempt": 1,
+      "state": "driver_terminated_without_terminal_receipt",
+      "retained_log": "detached-library-attempt.txt",
+      "completed": false
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--lib",
+        "--locked"
+      ],
+      "attempt": 2,
+      "state": "waiting_for_build_lock",
+      "log": "/tmp/crypto-halftrace-nov4-full-library-attempt2.log",
+      "exit_file": "/tmp/crypto-halftrace-nov4/full-library-attempt2.exit",
+      "exec_session": 34529
+    }
+  ],
+  "administrative_checks": [
+    {
+      "check": "focused_existing_artifact_generator_transform",
+      "exit_code": 0,
+      "log": "wiring-transform.txt",
+      "scope": "three_CI_reported_store_paths"
+    },
+    {
+      "check": "whole_store_discovery_before",
+      "exit_code": 143,
+      "outcome": "interrupted_while_hydrating_unrelated_promisor_manifests"
+    },
+    {
+      "check": "whole_store_discovery_after",
+      "exit_code": 143,
+      "outcome": "interrupted_while_hydrating_unrelated_promisor_manifests"
+    },
+    {
+      "check": "actionlint_1.7.12",
+      "exit_code": 0,
+      "stdout_bytes": 0
+    },
+    {
+      "check": "touched_file_rustfmt",
+      "exit_code": 0
+    },
+    {
+      "check": "frozen_spec_protocol_diff_since_02e43b8a1",
+      "exit_code": 0
+    }
+  ],
+  "checkpoint_access_observation": {
+    "cloud_observations_current": true,
+    "ready_identities": 0,
+    "configured_secrets": 0,
+    "local_token_present": false,
+    "aws_cli_present": false,
+    "actions_secret_metadata_http": 403,
+    "observed_cause_change": false
+  },
+  "checkpoint_retry": false,
+  "scientific_jobs": 0,
+  "scientific_measurements": 0,
+  "review_p1": "unresolved",
+  "auto_merge": "paused"
+}

@@ -1,0 +1,10 @@
+digraph checked_roots {
+  graph [rankdir=LR,bgcolor="white",pad="0.2",label="Same query solutions and source scalars; request change only",labelloc=t];
+  node [shape=box,style="rounded,filled",fillcolor="#eef2f6",fontname="Helvetica",fontsize=11];
+  source [label="Checked base points\nPreserve column order"];
+  roots [label="Two root paths\nScan:129 checks/query\nChecked:4 checks/setup"];
+  query [label="Four constraint pairs\nSame ordered root set"];
+  solver [label="Same row solver\nSame witnesses/degrees"];
+  recovery [label="Same signs and base logs\nAll 800 scalars verify"];
+  source->roots->query->solver->recovery;
+}
