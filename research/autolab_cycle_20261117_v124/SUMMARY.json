@@ -1,0 +1,178 @@
+{
+  "oracle": {
+    "out": {
+      "circuits": 80,
+      "configurations": 320,
+      "assignments": 9600,
+      "value_checks": 230400,
+      "forced_cuts": 1208,
+      "work_cap_checks": 1,
+      "original_complete": false
+    },
+    "error": null
+  },
+  "profile": {
+    "out": {
+      "variants": {
+        "4": {
+          "status": "complete",
+          "inputs": 63,
+          "variables": 51759,
+          "clauses": 184526,
+          "gate_kinds": {
+            "false": 1,
+            "true": 1,
+            "input": 63,
+            "not": 126,
+            "xor": 29312,
+            "and": 22258
+          },
+          "graph_sha256": "a4276f2fe0a2f9924e61ce05030b8b6bf49a9a42c7e07494b484d644c912476b",
+          "rewrite_and_check_seconds": 1.5971034099929966,
+          "stats": {
+            "support_work": 34182,
+            "cuts": 7969,
+            "introduced_atoms": 30290
+          },
+          "actual_controls": 32
+        },
+        "8": {
+          "status": "complete",
+          "inputs": 63,
+          "variables": 53561,
+          "clauses": 191798,
+          "gate_kinds": {
+            "false": 1,
+            "true": 1,
+            "input": 63,
+            "not": 108,
+            "xor": 31160,
+            "and": 22230
+          },
+          "graph_sha256": "501e4bf63670d08df72fe3e3f53624831c369f1c83e88f450e16f7fa7c79f356",
+          "rewrite_and_check_seconds": 1.8762484999897424,
+          "stats": {
+            "support_work": 38801,
+            "cuts": 4086,
+            "introduced_atoms": 26406
+          },
+          "actual_controls": 32
+        },
+        "16": {
+          "status": "complete",
+          "inputs": 63,
+          "variables": 56552,
+          "clauses": 203835,
+          "gate_kinds": {
+            "false": 1,
+            "true": 1,
+            "input": 63,
+            "not": 86,
+            "xor": 34202,
+            "and": 22201
+          },
+          "graph_sha256": "1452589667462acb82ba9461b478a47e505d0ef3743ae03eecdcd5bfa5876b8f",
+          "rewrite_and_check_seconds": 1.6049390069965739,
+          "stats": {
+            "support_work": 47387,
+            "cuts": 2152,
+            "introduced_atoms": 24472
+          },
+          "actual_controls": 32
+        }
+      },
+      "original_complete": false,
+      "cost_improved": true,
+      "selected_terms": 4,
+      "source": {
+        "inputs": 63,
+        "variables": 53794,
+        "clauses": 192485,
+        "graph_sha256": "1f77cc2df83d9ec0d4d7cb42f6ad0b795b75da40f061cfe4cf78c6a84b6b8733"
+      },
+      "total_seconds": 5.86977806899813,
+      "scope": "trainingrepresentationcalibrationonly;selectionbypreregisteredclauses/vars/termsrule;notqualifiedperformanceholdout"
+    },
+    "error": null
+  },
+  "search": {
+    "out": {
+      "models": [],
+      "original_complete": false,
+      "original_exact_root_count": null,
+      "independent_unsat_certificate": false,
+      "scope": "conditional k3only,fixednecessarynormfamily;otherstrata/outerfamilies/source/Uunresolved",
+      "rewrite_stats": {
+        "support_work": 34182,
+        "cuts": 7969,
+        "introduced_atoms": 30290
+      },
+      "inputs": 63,
+      "variables": 51759,
+      "cold_compile_seconds": 2.1677203239814844,
+      "soft_total_target_seconds": 40,
+      "backend_configuration_readback": {
+        "threads": "1",
+        "cut": "true",
+        "cut.xor": "true",
+        "cut.aig": "true",
+        "cut.delay": "0",
+        "anf": "false"
+      },
+      "formulation_seconds": 5.158073537983,
+      "version": "4.15.4",
+      "cpu_affinity": [
+        0
+      ],
+      "last_answer": "unknown",
+      "termination": "unknown",
+      "reason_unknown": "timeout",
+      "statistics": {
+        "sat mk clause 2ary": "194798",
+        "sat mk clause 3ary": "83292",
+        "sat mk clause nary": "339017",
+        "sat mk var": "103331",
+        "sat gc clause": "104105",
+        "sat del clause": "244389",
+        "sat conflicts": "128950",
+        "sat decisions": "138420",
+        "sat propagations 2ary": "23075951",
+        "sat propagations nary": "129190075",
+        "sat restarts": "6034",
+        "sat minimized lits": "3217585",
+        "sat subs resolution dyn": "25571",
+        "sat units": "519",
+        "sat elim bool vars res": "24356",
+        "sat backjumps": "128950",
+        "sat elim clauses": "570",
+        "sat elim literals": "572",
+        "sat subsumed": "3223",
+        "sat subs resolution": "7395",
+        "sat scc elim vars": "51737",
+        "sat scc elim binary": "1",
+        "sat tr": "22",
+        "sat probing assigned": "3",
+        "sat-cut.eqs": "68",
+        "sat-cut.cuts": "224194",
+        "sat-cut.ands": "22258",
+        "sat-cut.xors": "29312",
+        "sat-cut.xands": "4399",
+        "sat-cut.xites": "8737",
+        "sat-cut.xxors": "8493",
+        "sat-cut.dc-reduce": "1310",
+        "rlimit count": "150542711",
+        "max memory": "237.47",
+        "memory": "84.67",
+        "num allocs": "13648850444.0",
+        "time": "35.039"
+      },
+      "engine_seconds": 40.20277640299173,
+      "soft_target_overshoot_seconds": 0.20277640299173072,
+      "complete": false,
+      "exact_root_count": null
+    },
+    "error": "nativeunknown"
+  },
+  "original_complete": false,
+  "qualified_speedup": null
+}

@@ -1,0 +1,5 @@
+# Cluster-aware exact product trees
+
+The clipped root generator outputs the same five domain words for every assignment. Only the association of their five linear factors changes. Polynomial multiplication over F2[X][T] is associative; every binary tree with the fixed leaf order computes exactly the same six coefficient polynomials. Full raw coefficient equality is unchanged, as are accepted root multiplicities, q lifts and invalid-input root wire semantics. No pruning or generic-rank assumption is introduced.
+
+There are14 ordered full binary trees for five leaves. Enumerate all14 before looking at cost; test each on all32768d2inputs, supported d3catalogs and random cases. Then compile the actual63parameter chart and compare every constraint/root wire value on16fixed assignments, not only acceptance. A deterministic clause/variable/index training rule chooses a representation; this is not a performance holdout. Store all graph hashes/costs and unsuccessful arms. The 2+3 grouping may exploit coprime-cluster arithmetic sharing, but may also cost more; both outcomes are falsifiable. Worst-case algorithmic search complexity is unchanged.
