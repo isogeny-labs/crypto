@@ -2422,3 +2422,10 @@ What was done: compileexplicitundefinedJflagwhenScontains0, Rindependentlydefine
 Decisions made: sourceJhasno valuebecauseofdomain, notforcedzero. New4onceprocesses120CPUeachafterGitfreeze, oldfailureimmutable; nofinitefieldcriterionrelaxed.
 Open threads: successfulportablemodularscalarchecks thenexact421-adic/algebraiccertificateandconstructioncost; fullgoalunchanged.
 Errors: inheritedCindentationwarning, no compilefailure/S3/cloud/merge.
+
+## PortablecomplexR invariance andabsolute-simplicity support qualified
+
+What was done: pushedfreeze4577bfddc0d, inputhashpass,4onceCexit0.256/512period/thetacontrols,Rdennonzero/sourceRcontains0,quotientJ/Rnonzero; sourceJexplicitundefined. Exactballreload/flags/precisionandpartneroverlap pass. PrimaryR369bits/partner342; previousFrob14rank6mod1009certificate reusedsupportsabsimplicityconditionaltheory.
+Decisions made: portableballscalarsnotexactalgebraicrecognitionor421-adicvaluation; no roundedfit. Sufficientreductioncriterionv421(R)<=0needsintegralnormalization/finitecharpremises; remainsuncomputed. No curve/transport/speedclaim. [pcc:unverified].
+Open threads: exactalgebraic/padicbridgewithheight/denomboundsorfinitefieldgeometrickernel, Serreobstruction andfull10x/genus2/4cost/independentvalidation.
+Errors: originalsourceJdomainfailure preserved, v2properdomainhandlingpasses; no overwrite/S3/cloud/merge.
