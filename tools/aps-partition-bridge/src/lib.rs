@@ -1,4 +1,5 @@
 //! Production-linked finite correctness bridge; no timing or speed verdicts.
+pub mod encoding_panel;
 pub mod model;
 pub mod oracle;
 pub mod quartic_cells;
