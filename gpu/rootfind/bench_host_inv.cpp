@@ -14,6 +14,7 @@
 #include <chrono>
 #include <cstdint>
 #include <cstdio>
+#include <cstring>
 #include <random>
 #include <vector>
 
@@ -98,8 +99,27 @@ static double ns_per_batch(Fn fn, const Fp64Ctx &f, const std::vector<uint64_t> 
     return t[3];
 }
 
-int main() {
+int main(int argc, char **argv) {
     std::mt19937_64 rng(0x426c);
+    /* Perf mode runs one algorithm at a time; the main run still performs
+     * full bitwise before/after verification before timing all fields. */
+    if (argc == 2) {
+        const Fp64Ctx f = fp64_ctx_new(2305843009213693951ull);
+        std::vector<uint64_t> xs(65536);
+        for (auto &x : xs) x = fp64_to_mont(f, 1 + rng() % (f.p - 1));
+        const char *mode = argv[1];
+        if (std::strcmp(mode, "--perf-inv-before") == 0)
+            std::printf("Fp64 before inverse %.1f ns/op\n", ns_per_inv(inv_before, f, xs));
+        else if (std::strcmp(mode, "--perf-inv-after") == 0)
+            std::printf("Fp64 after inverse %.1f ns/op\n", ns_per_inv(inv_after, f, xs));
+        else if (std::strcmp(mode, "--perf-batch32-before") == 0)
+            std::printf("Fp64 before batch32 %.1f ns/op\n", ns_per_batch(batch_before, f, xs, 32));
+        else if (std::strcmp(mode, "--perf-batch32-after") == 0)
+            std::printf("Fp64 after batch32 %.1f ns/op\n", ns_per_batch(batch_after, f, xs, 32));
+        else { std::fprintf(stderr, "Unknown perf mode: %s\n", mode); return 2; }
+        return 0;
+    }
+    if (argc != 1) { std::fprintf(stderr, "Usage: %s [--perf-inv-before|--perf-inv-after|--perf-batch32-before|--perf-batch32-after]\n", argv[0]); return 2; }
     const uint64_t primes[] = {1099511627689ull, 72057594037927931ull,
                                2305843009213693951ull, 4611686018427387847ull};
     for (uint64_t p : primes) {
