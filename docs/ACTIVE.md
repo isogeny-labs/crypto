@@ -11,7 +11,7 @@ follow-ups here; history belongs in the session log, not in this file.
 
 ## Current goal
 
-Run the index-calculus autolab (`ic-autolab` skill, Curve25519-family loop `research/curve25519_autolab_20261104`): round 38 on the generic track, frozen before data, development evidence only.
+Run the index-calculus autolab (`ic-autolab` skill, Curve25519-family loop `research/curve25519_autolab_20261104`): rounds 38 and 39 on the generic track, frozen before data, development evidence only.
 
 ## Active items (top = next)
 
@@ -20,6 +20,7 @@ Run the index-calculus autolab (`ic-autolab` skill, Curve25519-family loop `rese
 - [x] Choose and freeze round 38 (`propose`, `freeze`): sizes and arms with a falsifiable prediction from the cost model, not a knob re-sweep.
 - [x] Resume checkpoint and benchmark record before any `run`: S3 gate waived by the owner for round 38 (no upload token in this session); no benchrec record filed.
 - [x] Train, select, assess, ratchet, report and PDF for round 38: no challenger at k = 20 or 24 (no holdout); PR with the result and `ratchet.svg`.
+- [x] Round 39: `tw2l-x20-j16-n2` replaces the k = 28 incumbent, sel / inc 0.944 [0.919, 0.970] over 1024 pairs (`PCC-20261117-15fb13`, unverified); S gap to rho-neg 1.7x.
 - [ ] Next lever (code, not a re-sweep): the generic configuration space is exhausted at k = 20, 24, 28, 32; add a family (fewer unknowns, cheaper price per point, or a construction change per `ideas/OBSTRUCTION.md`) to `families.json` and its oracle in ecbench, then round 39.
 - [ ] Fix or report the `hashed-ecdl-tensor` standalone build failure on `main` (`crate::metrics` undeclared in `lib.rs`). Root cause found: `metrics.rs`, `batch.rs`, `optimized.rs`, `relation_graph.rs`, `subgroup.rs`, `target_walk.rs`, `witness_policy.rs`, `collector_metrics.rs` exist in `src/` but no revision of `lib.rs` in history ever declared them (restored by 1e85fdf181 / added by 43f559e053 without their `mod` lines); `curve.rs` and `partial.rs` call `crate::metrics`. Needs the owning branch's `lib.rs`, not a guess.
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
