@@ -68,6 +68,21 @@ jobs:
           assert ("                Instance::Wide(_)" + chr(10) + "                | Instance::Fp4(_)") in s
           path.write_text(s)
           print("Removed 1 duplicate ecbench branch; existing Rust APS/WZ code intact")
+          # The immutable pinned checkout has a preexisting, unrelated
+          # missing close-brace in a Koblitz test (CI #43987323713).
+          # Repair only that exact syntax defect; refuse any source drift.
+          bench = Path("aps-pinned/src/cryptanalysis/koblitz_bench.rs")
+          b = bench.read_text()
+          needle = ('        assert!(two > 0 && one > 0 && none > 0, "{two} {one} {none}");\\n'
+                    '    /// The Artin')
+          replacement = ('        assert!(two > 0 && one > 0 && none > 0, "{two} {one} {none}");\\n'
+                         '    }\\n\\n'
+                         '    /// The Artin')
+          assert b.count(needle) == 1, "immutable Koblitz test source changed: refuse repair"
+          b = b.replace(needle, replacement, 1)
+          assert b.count(replacement) == 1
+          bench.write_text(b)
+          print("Closed 1 preexisting unrelated Koblitz test fn; APS and WZ code intact")
           PY
 
       - name: Test pinned repository WZ runner and existing native Rust solver
