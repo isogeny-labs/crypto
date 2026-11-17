@@ -2779,3 +2779,10 @@ What was done: freezeec1f1f48b1b hashpass/exit0.22audit+44freshcounted solves al
 Decisions made: qualifiedsharedquotientringconstantfactoroptimization, not10x/newmath/runtimeclaim. Keepstrongerimagecontrolforfuturecomparisons; cannottransplant oldphasecounts asnewphasepartition. LP/verificationcostcase stillrequired.
 Open threads: integrateddeferredLPpayload/solver/publicverificationconstruction withcrediblefullcost;fullgoalactiveunachieved/independentreviewpending.
 Errors: no scientificfailure; inheritedunusedsource/importwarnings only. No S3/cloud/merge orunchangedrerun.
+
+## Deferred target membership proof and gate frozen
+
+What was done: derived normalizedellprojection onwholeJ from sourceorder/uniqueellpart, so offsubgroupT still gives consistentprojectedrows; finalnative kD=T is soleacceptance and enforcesexactmembership. Retainedsourceorder/model/targetvaliditychecks, removedonlypreflightellT. Compiled44freshcalls requiringnew+omittedtargetscalar=oldFULL16. Prospectiveoffsubgroupnativeaudits/invalidsource/zero/composite andabstractdirectproductcontrols included.
+Decisions made: failurepathchangeexplicit (lateNone/rejectedinsteadpreflightabort), notfreecertifiedmembershipornewmath/10x. One600CPUrun afterGitfreeze, negativeunavailabilityretained.
+Open threads: executesoundness/costgate, retainallnegativeoutcomes andfullcostratio;LPcostcase stillopen.
+Errors: inheritedunusedsource/importwarnings only;no scientificexecutionbeforefreeze.No S3/cloud/merge.
