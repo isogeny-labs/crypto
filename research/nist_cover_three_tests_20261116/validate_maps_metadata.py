@@ -4,6 +4,12 @@ import importlib.util
 import json
 from pathlib import Path
 import subprocess
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--receipt-name", default="maps-main-validation.json")
+args = parser.parse_args()
+assert Path(args.receipt_name).name == args.receipt_name
 
 root = Path.cwd()
 spec = importlib.util.spec_from_file_location("pcc_api", root / "tools/pcc/pcc.py")
@@ -66,7 +72,7 @@ out = {
     "native_pre_call_bindings": receipts,
     "standing": "metadata checks; no independent mathematical verification",
 }
-target = study / "evidence/maps-main-validation.json"
+target = study / "evidence" / args.receipt_name
 assert not target.exists(), "new metadata receipt required"
 target.write_text(json.dumps(out, indent=2) + "\n")
 print(json.dumps({key: val for key, val in out.items() if key != "diagnostics"}, indent=2))

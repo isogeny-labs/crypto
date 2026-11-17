@@ -38,11 +38,16 @@ def stamp(block):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--pcc-api", type=Path, required=True)
+    parser.add_argument("--receipt-prefix", default=None)
     args = parser.parse_args()
     root = Path.cwd()
     evidence = root / "research/nist_cover_three_tests_20261116/evidence"
     out = evidence / "maps-main-history-retention.json"
     raw_path = evidence / "maps-ledger-branch-suffix.jsonl"
+    if args.receipt_prefix:
+        assert re.fullmatch(r"[a-z0-9-]+", args.receipt_prefix)
+        out = evidence / f"{args.receipt_prefix}-history-retention.json"
+        raw_path = evidence / f"{args.receipt_prefix}-ledger-branch-suffix.jsonl"
     assert not out.exists() and not raw_path.exists(), "fresh receipts required"
     ours = staged(2, "pcc/ledger.jsonl")
     canonical = staged(3, "pcc/ledger.jsonl")
