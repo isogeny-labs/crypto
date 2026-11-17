@@ -1,0 +1,112 @@
+{
+  "branch": "lane/relation-fusion",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "/workspace/relation-native-qualifiers/direct-monitor-20261117/isolated_bench.py",
+        "reserve",
+        "--cpus",
+        "0",
+        "--out",
+        "/workspace/fusion-phase-monitor-71.jsonl",
+        "--period",
+        "0.05",
+        "--label",
+        "fusion-phase-71",
+        "--",
+        "taskset",
+        "-c",
+        "0",
+        "/workspace/relation-native-qualifiers/phase-probe-6aeefbe4d-71",
+        "/workspace/fusion-phase-71",
+        "/workspace/relation-native-qualifiers/fused-native-6aeefbe4d-71",
+        "/workspace/fusion-qualification-66"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-17T05:21:11+00:00",
+      "wall_s": 2.358
+    }
+  ],
+  "commit": "6aeefbe4de638eba0efe788ff4767f2d9a776fe7",
+  "commit_dirty": true,
+  "created_utc": "2026-11-17T05:21:09+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261117-fusion-phase"
+  ],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "bc0ac39ff549",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261117T0521Z-fusion-phase-20261117",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 18,
+      "name": "correct_calls",
+      "note": "Descriptive once-only18callphase run;no timingratio or15xadmission",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 18.0
+    }
+  ],
+  "problem": "kernel:relation_fusion",
+  "raw": [
+    {
+      "bytes": 25028,
+      "path": "research/relation_fusion_20261117/fusion-phase-71.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/99/99740b9c7707c499acd4425396eacc06eba23d982510eb0f976058da1234e3b3",
+      "sha256": "99740b9c7707c499acd4425396eacc06eba23d982510eb0f976058da1234e3b3",
+      "uploaded": false
+    },
+    {
+      "bytes": 6325,
+      "path": "research/relation_fusion_20261117/PHASE_SUMMARY_71.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/35/3511c4b589867d5835465b9c6845780f2660c580b8a87ca61a9af730db5285fc",
+      "sha256": "3511c4b589867d5835465b9c6845780f2660c580b8a87ca61a9af730db5285fc",
+      "uploaded": false
+    },
+    {
+      "bytes": 1978,
+      "path": "research/relation_fusion_20261117/phase-isolation-71.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8f/8faeec9c0d1a6a012e92f2fb3c436a8e8fd38e207c4925dd99807b63764e4e04",
+      "sha256": "8faeec9c0d1a6a012e92f2fb3c436a8e8fd38e207c4925dd99807b63764e4e04",
+      "uploaded": false
+    },
+    {
+      "bytes": 4603,
+      "path": "research/relation_fusion_20261117/phase-pins-before-71.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9f/9fdbdecc26bdeea8dde8d049119d3f010700f7912af6efed62181ec5e6afbde8",
+      "sha256": "9fdbdecc26bdeea8dde8d049119d3f010700f7912af6efed62181ec5e6afbde8",
+      "uploaded": false
+    },
+    {
+      "bytes": 4603,
+      "path": "research/relation_fusion_20261117/phase-pins-after-71.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9f/9fdbdecc26bdeea8dde8d049119d3f010700f7912af6efed62181ec5e6afbde8",
+      "sha256": "9fdbdecc26bdeea8dde8d049119d3f010700f7912af6efed62181ec5e6afbde8",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "fusion-phase-20261117",
+  "status": "open",
+  "summary": "",
+  "validation": null
+}

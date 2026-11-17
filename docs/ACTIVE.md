@@ -11,16 +11,11 @@ follow-ups here; history belongs in the session log, not in this file.
 
 ## Current goal
 
-Establish an exponent-reducing relation-collection method for ordinary prime-field elliptic curves, with complete charged costs, a frozen matched baseline, and independent scaling validation. Contract: [prime-field exponent goal](../research/aps_prime_field_exponent_20261117/GOAL.md).
+_(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [x] Pin prime-field relation-collection exponent goal and acceptance contract (Codex, started 2026-11-17, branch codex/aps-prime-field-exponent-goal-20261117, PR #4531)
-- [ ] Derive the size-dependent collection cost model; specify a mechanism that can change its exponent, family and parameter laws.
-- [ ] Complete native cost/memory accounting and independent replay/export; freeze the strongest applicable matched baseline.
-- [ ] Preregister sizes, public targets, exponent margin, power, budgets and held-out test; complete prospective checkpoint and run admission.
-- [ ] Run admitted growing-size experiments; account for every attempt and test aggregate/per-phase exponents and frozen predictions.
-- [ ] Independently audit the mechanism, assumptions and costs; record a stage-scoped exponent result or falsification and its end-to-end effect.
+- [ ] Publish Vieta Rust speed results and resolve official record/publication blockers (codex, started 2026-11-17, branch lane/vieta-speed-20261117, PR #4525)
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 
@@ -30,9 +25,4 @@ Establish an exponent-reducing relation-collection method for ordinary prime-fie
 
 ## Blocked / questions for the owner
 
-The exponent goal remains open. Complete accounting, canonical export/replay,
-frozen protocol, prospective checkpoint and admission are prerequisites to
-performance runs. Canonical protocol/schema access and checkpoint readback
-remain unresolved. The APS native-ledger publication/reconciliation hold remains
-in force; keep PR #4531 auto-merge off.
-
+- Vieta:504/504 primary and72/72 calibration calls completed/replayed. Canonical seed-registration360/60 failures retained; no L2 admission. Official censored-close blocked by unchanged main20261105T0828Z archive command1 lacking successful integer exit. Shared crypto-lean PR26 CI cannot start due account billing lock; no bypass/spend. Full general tower NF instance remains unverified.

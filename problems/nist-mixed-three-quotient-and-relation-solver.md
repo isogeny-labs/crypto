@@ -1,5 +1,16 @@
 # P-192 mixed-3 quotient and projected relation solver
 
+2026-11-17 relation-pipeline follow-up: the single-entrypoint native replay
+recomputes the fixed226-point pool/seven fibers,six actual target-KM principal
+relations,and their source transport. A distinct OpenSSL executable checks
+all226 images and six sums;rank6 on225 projected columns leaves deficiency219.
+The fresh complete pi*/phi/KM/psi/pi_* panel passes O,G,-G,2G,Q,-2G,with
+OpenSSL checks of all six outputs. PCC-20261117-36d3c9,12c12a and87d5fd retain
+producer standing. This closes the executable fixed-fixture pipeline gap;
+signed independent verification,admitted EKS costs and a broader relation
+collector remain open. See [relation report](../research/nist_cover_three_tests_20261116/RELATION_PIPELINE.md).
+[pcc:unverified]
+
 - **Status:** open
 - **Kind:** implementation gap, independent-verification gap, resource/access limit
 - **Affected work:** [test report](../research/nist_cover_three_tests_20261116/README.md), [protocol](../research/nist_cover_three_tests_20261116/PROTOCOL.md), [odd-isogeny execution](odd-isogeny-quartic-transfer-execution.md), [projected relation cost](prime-cover-projected-relation-cost-missing.md)

@@ -1,0 +1,33 @@
+{
+  "scope": "existing maintained producer suite after shared-kernel refactor; no packed-output qualification or timing claim",
+  "command": "CARGO_BUILD_JOBS=1 taskset -c 0 cargo test --release --manifest-path crates/certified-relations/Cargo.toml --locked",
+  "exit_code": 0,
+  "tests_passed": 65,
+  "failed": 0,
+  "ignored": 0,
+  "first_check_193": "exit101: CofactorTerm field incorrectly named input; corrected to generator",
+  "source_sha256": {
+    "crates/certified-relations/src/cheap.rs": "b89b9c2e9812a3662c73b527f0afcce9fa690f9a7aa6c8c49a963dcdc7f7b7a6",
+    "crates/certified-relations/src/dag.rs": "fac42760e1a3063b74d9c44fb54858052b027760a9d8daf45af7bf64ac6ad3ab",
+    "crates/certified-relations/src/kernels/arithmetic.rs": "2a51007e3e756e52c2eea96b10f424b46620a084d1869a719fe26d6373178875",
+    "crates/certified-relations/src/kernels/cheap.rs": "ffafff530d18a1a7a40bc18edd1fd3e4e4e37c2a586fcbe9bfd9aa43e99dff0a",
+    "crates/certified-relations/src/kernels/check.rs": "d02b31327a65312a65bf0e3d38fa2deaaaeca94ea1b9e763f20fe560956e7170",
+    "crates/certified-relations/src/kernels/compact.rs": "c204eeb1a48ee39bb2ff489dea7c4eada5736f48269eb495efd90d6c5691af53",
+    "crates/certified-relations/src/kernels/projection.rs": "529ba3320d0605ac810d8b8df58c46b0ab3d96bacd7c9bc31e70fd94477147ee",
+    "crates/certified-relations/src/kernels/quotient.rs": "76976d88e84e8d35f47402f040100a188d4b3c77afccac2c1fb55324749d7f0f",
+    "crates/certified-relations/src/lib.rs": "c64b0ffb3388a8e5c5a5271f3bffee8ffe1911adf2925863c5ed5e5207e6ec48",
+    "crates/certified-relations/src/monomial.rs": "9a3ebca330de58175c6a02f87bdfb6ea4c1ba7d2b889c63a23d321a06edd1549",
+    "crates/certified-relations/src/packed_constructor.rs": "074b6ba627fa8e0aae2603c885c2265fe14cda089821990a61ddf8a894ebe8f2",
+    "crates/certified-relations/src/projection.rs": "f06297476021906778e8bcbc5be25dfe65353efcf46c7303751e062e1575cfc9",
+    "crates/certified-relations/src/quotient.rs": "e8e47bd643dd6ddc3c703b5e2bee4177c6671dec99c718147f211f1d852b24c8",
+    "crates/certified-relations/src/quotient/compact.rs": "5c9e5aae21f4e5dd58a30b02dbafd61a9e56787e4eff1c92ef159427795fd3a3",
+    "crates/certified-relations/src/replay.rs": "47e43919232c08c9f55ccbf225db4bdddbb9b9ea1335ab3e2fb7992e774ae623",
+    "crates/certified-relations/src/workload.rs": "caad0aad06b00b8287d16a5de9157b2f7d4dbf45024a3e69614e3679e3016df6"
+  },
+  "logs": {
+    "research/relation_fusion_20261117/development-01/packed-check-193.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/relation_fusion_20261117/development-01/packed-check-193.stderr": "9bceecd2c2554afe9da7f76c345150b5855900d43e3ed92b9b5a1674b3140ab0",
+    "research/relation_fusion_20261117/development-01/packed-legacy-tests-194.stdout": "def83f373a21f2d0e181840d40437b31bec203f06e100eaaf4d6ee391b6a40ce",
+    "research/relation_fusion_20261117/development-01/packed-legacy-tests-194.stderr": "5223b0b7233fa29442af4be49a47329b513e01ce95d52aca2f3935ad6bfefde1"
+  }
+}

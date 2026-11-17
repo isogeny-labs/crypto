@@ -1,0 +1,32 @@
+{
+  "schema": "lean.matrix-certificate-check/v1",
+  "source_sha256": {
+    "AssemblyProbe.lean": "4d7999c5832f0f090d3ef107aa2d0fae30993f5f866d877310201d7607b380bd",
+    "lakefile.toml": "c567ddd7e35ca72c3d514c652288413743e34ddde82ccc4f0b9857a34224804e",
+    "lake-manifest.json": "8b1d15f72100c88ea843c35b41a09d7c0cce6ab3453d39c51cf343e5f132fb5d",
+    "lean-toolchain": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c",
+    "LEAN_INSTANCE.json": "f2bf9f3441d655f0568085115e565491dbc84da02ebf7c6611074e3a7fca06d3",
+    "PROOF_MAP.md": "5198c4c38ba182e98c7b5e943a0e69e439e57d9074ddf0ddc47ace8d3d443a76"
+  },
+  "native_case": "Fp101-multiplicity-6-0-0-target-6",
+  "crypto_lean_rev": "5f2ca251cb34806f69fd5455175434cac3567dfa",
+  "mathlib_rev": "cfc55fc58714a59dc06e6e79edc6d1d95140d3c2",
+  "toolchain": "leanprover/lean4:v4.35.0",
+  "named_endpoints": [
+    "SectionCertificate.toy_section_kernel",
+    "SectionCertificate.toy_section_det_zero"
+  ],
+  "audit_declarations": 3,
+  "supporting_declaration": "101 primality instance",
+  "failing": 0,
+  "trusted_native": 0,
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "direct_audit_exit": 0,
+  "full_proof_gate": "NO_USABLE_RECEIPT: attempted wrapper during disk-space exhaustion; empty stdout/no receipt, not established pass or mathematical failure",
+  "disk_scope": "ENOSPC observed on Git index; exact operation responsible not established. Generated caches cleaned; all source/results and copied native binary preserved.",
+  "scope": "one literal native matrix/kernel certificate; no formal geometric/Rust/group conversion or complexity theorem"
+}
