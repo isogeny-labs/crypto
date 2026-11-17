@@ -1165,3 +1165,17 @@ Mustchangeanchorlaw,arithmeticsharing,qualifiedgeometry orweightedrank/matrixcos
 
 ### Errors
 No failedanalysis/producerretry/S3/cloud. Olddataused onlyforitsdeclaredscope.
+
+## One-orbit useful target rank qualified across all cores
+
+### What was done
+Frozenaf2da5d2845 postanalysis reconstructssignedweightedrows/publicnormalization fromretainedsupports. All204coresresolve6originaltargets within16anchors;17001prefixcomparisons betweenSparse/referenceagreeandallreturnedscalarsmultiplyback. Core0resolvesatanchors3–9 acrossworkloads. Atp601allcoresidentifykwithoutfullrank. [pcc:unverified]
+
+### Decisions made
+Positivegenus2structuralresult,notperformance/novelty/generalranktheorem. Anyproduceronnewtargetsneedsprospectivefullcostcase; cannotcreditgenericvsdenseeliminationorfreecorelearning. Existingincidenceboundstillrejects10xrowyieldalone. Broadgoalactive.
+
+### Open threads
+Constructiveconstantcore/weightedLPcompressionwithfreshfullcostqualificationornewgeometry;g3/g4andbreakthroughproofremainopen.
+
+### Errors
+No analysisassertionfailure,scientificproducerretry,S3/cloud. Fullrankisnotrequiredfortargetuniqueness; preservedcounterexamples.
