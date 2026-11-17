@@ -51,3 +51,21 @@ Riemann–Roch then gives determinant zero iff the full **length-nine effective 
 Add a predeclared adversarial original-curve fixture with one duplicated signed factor-base point: the **naive** repeated-row determinant must spuriously vanish against a deliberately wrong target; the **Hermite-jetted** determinant must be nonzero against the same wrong target and zero for its true group residual. Run this fixture on both actual prime31 bases and record exact determinant values and all positivity/rejection flags. All distinct-point 128 checks remain unchanged; no hidden scalar or F4 root extraction is claimed.
 
 If the root runner compilation or result fails, retain the negative evidence and correct the source via a separate commit; no magic `det==0` claim is made on diagonals without jet certification.
+
+## Prospective extension B — all affine multiplicities through nine (frozen before code)
+
+The two-occurrence limitation is artificial for the **actual cofactor-one prime31 curve**. If a rational affine point had y=0 it would have order two, impossible when #E(Fp)=2147446831 is odd prime. Thus x-x(P) is a local uniformizer for every affine rational P on this *particular* curve. This does not claim validity on other curves with rational 2-torsion or at O.
+
+For each repeated P=(x0,y0), use t=x-x0 and the truncated formal expansion y(t)=sum_{j>=0} y_j t^j satisfying y(t)^2=(x0+t)^3+a(x0+t)+b and y_0=y0. For j>=1,
+
+  2*y0*y_j = c_j - sum_{i=1}^{j-1} y_i*y_{j-i},
+
+where c_1=3*x0^2+a, c_2=3*x0, c_3=1, c_j=0 for j>3, in Fp. Generate the t^j coefficients of all nine L(9O) basis monomials by truncated polynomial multiplication. For multiplicity m, feed the value, first, ..., (m-1)-th Taylor-*coefficient* rows (not factorial derivatives) to the same 9x9 determinant. This implements the correct confluent divisor condition for any m<=9 without enumerating signed leaves, but still requires supplied points.
+
+**Predeclared tests (all on actual curve, using existing Rust Arithmetic):**
+1. For the first 16 rational x points, order-zero series row must equal the old evaluation row, and order-one must equal the hand-derived elliptic tangent row.
+2. For each of first31 and Dickson31 bases, form eight leaves with multiplicities m in {3,4,8} at P0 and the other 8-m leaves at P1. Set R=sum leaves *outside the determinant*. The confluent determinant must vanish for R and be nonzero for the wrong R+G, with both finite. This is 2 bases x 3 multiplicities x 2 signed decisions = 12 new checks; keep the original 128 distinct + 4 double controls unchanged.
+3. Emit the per-base m, true/false determinant values, original-curve residual and unchanged complete_unknown_target_ecdlp_recoveries=0 into the raw JSON artifact; fail CI rather than discarding any counterexample.
+4. Reject infinity explicitly; y=0 remains rejected in the generic function, though none exists on the checked prime31 curve. Do not generalize to unspecified curves.
+
+The mathematical result, if tests pass, is **diagonal-correct S9 predicate completeness for all affine multiplicity patterns on this curve**, not an unknown-residual factor extractor or a cheaper index-calculus solver. No performance claim unless a fully cold unknown-scalar solver also succeeds. Existing #4228/#4349 quotient work, #4451 zero-fibre, #4454 APS and #4468 WZ control stay separate; do not duplicate their experiments.
