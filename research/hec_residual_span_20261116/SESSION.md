@@ -1840,3 +1840,10 @@ What was done: compiled orderednonzero Gaussian rows/witness propagation, samepi
 Decisions made: no geometry/action/premise changes,12accept84mutation24costcontrols retained; onlysubgroupconstruction/checking changes. Assertions [pcc:unverified].
 Open threads: pushfreeze then once-only120CPU invocation.
 Errors: none in compile, no science yet.
+
+## Sparse proof witnesses qualified
+
+What was done: freeze47bb75c8634 once-onlyexit0; fullpackets sameasdense,12cert/84mutation/action/geometrycontrols and24costcalls replay/phases/repeats pass. Subgroupcandidatecost p6014.039-5.737x lowerthanpreviousdense, still1.803-2.138xsource. Baseunchanged. Assertions [pcc:unverified].
+Decisions made: exactcertificatepreserved, no fullgain. Nextlazycore primitivecertificate integration musthandle residualmultiplicities/anchorintersection, nottrustlabels/discardrows.
+Open threads: lazyproducer primitivepacket/witness withexactfallback/fullcost againstbothsourcearms; whole10xgoalunchanged.
+Errors: none,no rerun/S3/cloud.
