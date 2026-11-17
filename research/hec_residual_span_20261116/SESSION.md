@@ -787,3 +787,17 @@ Freeze/build/push integrationandrunonce; measureallcountedcoldcosts. Separatelya
 
 ### Errors
 None. Previousgoalturnclassifiedprogress(newalgebraicprimitiveandexclusivecostdiagnosis).
+
+## Integrated Gaussian C4 solves passed identical prefixes
+
+### What was done
+At1cfe3eee443once-onlyrunexits0with72calls,all12workloadsallarmscomplete,scalars/repeats/prefixespass. Rustsummaryconfirmsall144outcome-prefixrecordsmatchold,all16countersetupdeltasconstantbymodel/source/modulus. Oldpencil/newpencilpREDC1.217–1.326;newfolded/newpencil2.641–6.067. Localobservations. [pcc:unverified]
+
+### Decisions made
+Retainlargeeigencomponentgainasmodestintegratedgain; no10xtotalclaim. No sourcevalidationorfinalcheckremoved. Qualifiedgenus4scopeandgeneralHdetgapremainexplicit. Nextauditgenus2C4scopebeforeextendingroute.
+
+### Open threads
+GeneralHdetreview; genus2C4geometric-splittingobstruction; choosebroadrelation-generationmechanismwithremainingcostscontrolled. Goalactive.
+
+### Errors
+None; no runtimefailureorretry.
