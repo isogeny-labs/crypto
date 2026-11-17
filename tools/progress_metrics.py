@@ -1017,6 +1017,32 @@ def vieta_component(ref, since):
                      source=f"{path}@{commit}")
 
 
+def trace_local_runtime(ref, since):
+    """Export already-computed native observations, without re-estimating them."""
+    path = "research/trace_incidence_20261116/measure_20261117/results/report-data.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        source = f"{path}@{commit}"
+        for row in data.get("table", []):
+            if row.get("B") != 128:
+                continue
+            arm = row["arm"]
+            if arm not in ("known", "compose", "pairs", "first-bloom", "rho"):
+                continue
+            emit(f"trace.local.b128.{arm.replace('-', '_')}.wall_s",
+                 row["wall_seconds"]["median"], date=date,
+                 problem="prime-labelled-pool-recovery", unit="wall_s", better="neutral",
+                 label="B128 complete target median; shared local host, PCC unverified",
+                 source=source)
+        for comparison in ("pairs/first-bloom", "window-horner/compose", "first-bloom/rho"):
+            metric = comparison.replace("-", "_").replace("/", "_over_")
+            emit(f"trace.local.b128.{metric}.paired_ratio",
+                 data["paired_completed_only"][comparison]["128"]["wall_ratio"]["median"],
+                 date=date, problem="prime-labelled-pool-recovery", unit="ratio", better="neutral",
+                 label="Median of paired completed-target ratios; local provisional, PCC unverified",
+                 source=source)
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -1060,6 +1086,7 @@ def main():
     explicit_gpu_fullcache(a.ref, a.since)
     n83_d18_vsids_gate(a.ref, a.since)
     vieta_component(a.ref, a.since)
+    trace_local_runtime(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
