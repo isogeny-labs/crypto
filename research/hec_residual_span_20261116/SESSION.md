@@ -3052,3 +3052,10 @@ What was done: freeze727541cc8d3 hashespass/exit0. Residuefields2,2,1,6and1,3,2,
 Decisions made: actualnativecanonicalmodelprogress underpriorgenus/infinitydependencies,notnovelattack/fulltargettransport/speed. Two mapsonekernel;pointcountnotisogenyproof.
 Open threads: completeoriginalpublicsource/targetdivisortransportincludingexceptionalsupport, nativequarticclassarithmeticandmatchedcostcase;othergenera/full10xgoalactiveunachieved.Independentreviewopen.
 Errors: no scientificfailure;prefreezefixespreviouslyrecorded,unusedcopiedhelperwarningsonly.Gitcustody/noS3/no merge.
+
+## Original Smith public class transport frozen
+
+What was done: compiled degree2sourcepoint-image quadratic in6dimensional residuealgebra, cubicideal reconstruction and canonicalPic64reduction. Public movingdivisorscancelreferenceinfinity;twoauxstartchecks/originalscalar/subgroup/additive/invalidcontrolsfor4map-fixturepairs. CopiedunmodifiedstdPicmodulewithprovenance.
+Decisions made: expectedscalaronlydriver, noDLPsolverinvocation, bounded512movingsearchnotuniversalguarantee. Piccountersnotcompletecost.Gitfreeze precedes sole600CPUrun.
+Open threads: executequalification;fullmatchedcostandquarticDLPimplementationnext ifqualified.Full10xgenus2+goalactive.
+Errors: unused copied module/helper warnings only;no scientificexecution yet.
