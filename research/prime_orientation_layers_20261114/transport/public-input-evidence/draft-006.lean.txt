@@ -1,0 +1,314 @@
+module
+public import OrientationStudyBase121
+public import NormSignedHankel
+import all OrientationStudyBase121
+import all NormSignedHankel
+public section
+noncomputable section
+namespace OrientationPublicHankel
+open OrientationConvolutionTrace OrientationStoredBox
+open scoped BigOperators
+variable {K : Type*} [Field K] [DecidableEq K]
+
+def node (S : Finset K) (i : Fin (Fintype.card S)) : K :=
+  ((Fintype.equivFin S).symm i).val
+
+def publicCoefficient (S : Finset K) (x : K) (j : ℕ) : K :=
+  x^j / ∏ t∈S.erase x, (x-t)
+
+def momentPairs (S : Finset K) (z : K → K) (j : ℕ) : List (K × K) :=
+  List.ofFn (fun i : Fin (Fintype.card S) => (z (node S i), publicCoefficient S (node S i) j))
+
+def momentLogged (S : Finset K) (z : K → K) (j : ℕ) : Logged K :=
+  dotLogged (momentPairs S z j)
+
+theorem momentLogged_value (S : Finset K) (z : K → K) (j : ℕ) :
+    (momentLogged S z j).value=NormSignedHankel.moment S z j := by
+  rw [momentLogged,dotLogged_value]
+  simp only [momentPairs,List.map_ofFn,Function.comp_def,Fin.sum_ofFn]
+  calc
+    _ = ∑ x : S, z x*publicCoefficient S x j := by
+      exact Equiv.sum_comp (Fintype.equivFin S).symm
+        (fun x : S => z x*publicCoefficient S x j)
+    _ = NormSignedHankel.moment S z j := by
+      calc
+        _ = ∑ x : S, z x*(x:K)^j / ∏ t∈S.erase (x:K), ((x:K)-t) := by
+          apply Finset.sum_congr rfl
+          intro x hx
+          dsimp only [publicCoefficient]
+          ring
+        _ = _ := Finset.sum_coe_sort S
+          (fun x : K => z x*x^j / ∏ t∈S.erase x, (x-t))
+
+theorem momentLogged_multiply (S : Finset K) (z : K → K) (j : ℕ) :
+    (momentLogged S z j).events.count .multiply=S.card := by
+  simp only [momentLogged,dotLogged_multiply,momentPairs,List.length_ofFn,Fintype.card_coe]
+
+theorem momentLogged_add (S : Finset K) (z : K → K) (j : ℕ) :
+    (momentLogged S z j).events.count .add=S.card := by
+  simp only [momentLogged,dotLogged_add,momentPairs,List.length_ofFn,Fintype.card_coe]
+
+def momentsLogged (S : Finset K) (z : K → K) (m : ℕ) : Logged (Stored K (2*m-1) 1) :=
+  materializeLogged (fun j _ => momentLogged S z j.val)
+
+theorem momentsLogged_value (S : Finset K) (z : K → K) (m : ℕ) (j : Fin (2*m-1)) :
+    view (momentsLogged S z m).value j 0=NormSignedHankel.moment S z j.val := by
+  simp only [momentsLogged,materializeLogged_value,momentLogged_value]
+
+theorem momentsLogged_multiply (S : Finset K) (z : K → K) (m : ℕ) :
+    (momentsLogged S z m).events.count .multiply=(2*m-1)*S.card := by
+  simp only [momentsLogged,materializeLogged_count,momentLogged_multiply]
+  simp
+
+theorem momentsLogged_add (S : Finset K) (z : K → K) (m : ℕ) :
+    (momentsLogged S z m).events.count .add=(2*m-1)*S.card := by
+  simp only [momentsLogged,materializeLogged_count,momentLogged_add]
+  simp
+
+def rowPairs {m : ℕ} (moments : Stored K (2*m-1) 1) (b : Fin m → K) (j : Fin m) :
+    List (K × K) :=
+  List.ofFn (fun k : Fin m =>
+    (view moments ⟨j.val+k.val,by omega⟩ 0,b k))
+
+def kernelLogged (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K) :
+    Logged (Stored K m 1) :=
+  let moments := momentsLogged S z m
+  let rows := materializeLogged (fun j _ => dotLogged (rowPairs moments.value b j))
+  ⟨rows.value,moments.events++rows.events⟩
+
+theorem kernelLogged_value (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K) (j : Fin m) :
+    view (kernelLogged S z m b).value j 0=(NormSignedHankel.hankel S z m).mulVec b j := by
+  simp only [kernelLogged,materializeLogged_value,dotLogged_value,rowPairs,List.map_ofFn,
+    Function.comp_def,Fin.sum_ofFn,momentsLogged_value]
+  rfl
+
+theorem kernelLogged_multiply (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K) :
+    (kernelLogged S z m b).events.count .multiply=(2*m-1)*S.card+m*m := by
+  simp only [kernelLogged,List.count_append,momentsLogged_multiply,materializeLogged_count,
+    dotLogged_multiply,rowPairs,List.length_ofFn]
+  simp
+
+theorem kernelLogged_add (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K) :
+    (kernelLogged S z m b).events.count .add=(2*m-1)*S.card+m*m := by
+  simp only [kernelLogged,List.count_append,momentsLogged_add,materializeLogged_count,
+    dotLogged_add,rowPairs,List.length_ofFn]
+  simp
+
+theorem kernelLogged_zero_iff (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K) :
+    (∀ j : Fin m, view (kernelLogged S z m b).value j 0=0) ↔
+      (NormSignedHankel.hankel S z m).mulVec b=0 := by
+  simp only [kernelLogged_value,funext_iff,Pi.zero_apply]
+
+theorem exists_kernelLogged_iff (S : Finset K) (z : K → K) (m : ℕ) :
+    (∃ b : Fin m → K, b≠0 ∧ ∀ j : Fin m, view (kernelLogged S z m b).value j 0=0) ↔
+      (NormSignedHankel.hankel S z m).det=0 := by
+  simp only [kernelLogged_zero_iff]
+  exact Matrix.exists_mulVec_eq_zero_iff
+
+def branch (y : K → K) (bits : K → Bool) (x : K) : K :=
+  if bits x then -y x else y x
+
+omit [DecidableEq K] in
+theorem branch_square (y : K → K) (bits : K → Bool) (x : K) :
+    (branch y bits x)^2=(y x)^2 := by
+  simp only [branch]
+  split <;> ring
+
+end OrientationPublicHankel
+#print axioms OrientationPublicHankel.momentLogged_value
+#print axioms OrientationPublicHankel.momentLogged_multiply
+#print axioms OrientationPublicHankel.momentLogged_add
+#print axioms OrientationPublicHankel.momentsLogged_value
+#print axioms OrientationPublicHankel.momentsLogged_multiply
+#print axioms OrientationPublicHankel.momentsLogged_add
+#print axioms OrientationPublicHankel.kernelLogged_value
+#print axioms OrientationPublicHankel.kernelLogged_multiply
+#print axioms OrientationPublicHankel.kernelLogged_add
+#print axioms OrientationPublicHankel.kernelLogged_zero_iff
+#print axioms OrientationPublicHankel.exists_kernelLogged_iff
+#print axioms OrientationPublicHankel.branch_square
+
+namespace OrientationPublicHankel
+open OrientationConvolutionTrace
+variable {K : Type*} [Field K] [DecidableEq K]
+
+abbrev BinaryCalls (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K) :=
+  Fin ((kernelLogged S z m b).events.count .multiply) ⊕
+    Fin ((kernelLogged S z m b).events.count .add)
+
+abbrev WordPorts (q : ℕ) (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K) :=
+  BinaryCalls S z m b × Fin (3*q)
+
+theorem wordPorts_card (q : ℕ) (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K) :
+    Fintype.card (WordPorts q S z m b)=6*q*((2*m-1)*S.card+m*m) := by
+  simp only [WordPorts,BinaryCalls,Fintype.card_prod,Fintype.card_sum,Fintype.card_fin,
+    kernelLogged_multiply,kernelLogged_add]
+  ring
+
+theorem wordPorts_cubic (q : ℕ) (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K)
+    (hq : m≤q) : 6*m^3≤Fintype.card (WordPorts q S z m b) := by
+  rw [wordPorts_card]
+  have ht : m*m≤(2*m-1)*S.card+m*m := by omega
+  have H := Nat.mul_le_mul hq ht
+  nlinarith
+
+theorem literal_incidence_edges {E : Type*} [Fintype E]
+    (q : ℕ) (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K)
+    (incidence : WordPorts q S z m b ↪ E × Bool) :
+    3*q*((2*m-1)*S.card+m*m)≤Fintype.card E := by
+  have H := Fintype.card_le_of_injective incidence incidence.injective
+  rw [wordPorts_card] at H
+  simp only [Fintype.card_prod,Fintype.card_bool] at H
+  nlinarith
+
+theorem literal_incidence_cubic {E : Type*} [Fintype E]
+    (q : ℕ) (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K)
+    (incidence : WordPorts q S z m b ↪ E × Bool) (hq : m≤q) :
+    3*m^3≤Fintype.card E := by
+  have H := literal_incidence_edges q S z m b incidence
+  have ht : m*m≤(2*m-1)*S.card+m*m := by omega
+  have Hm := Nat.mul_le_mul hq ht
+  nlinarith
+
+end OrientationPublicHankel
+#print axioms OrientationPublicHankel.wordPorts_card
+#print axioms OrientationPublicHankel.wordPorts_cubic
+#print axioms OrientationPublicHankel.literal_incidence_edges
+#print axioms OrientationPublicHankel.literal_incidence_cubic
+
+namespace OrientationCurveAuxiliary
+open Polynomial
+variable {K : Type*} [Field K] [DecidableEq K]
+
+def curveAux (f A B : K[X]) : K[X] := A^2-f*B^2
+
+omit [DecidableEq K] in
+theorem curveAux_eval (f A B : K[X]) (x : K) :
+    (curveAux f A B).eval x=(A.eval x)^2-f.eval x*(B.eval x)^2 := by
+  simp [curveAux]
+
+omit [DecidableEq K] in
+theorem curveAux_branch (S : Finset K) (z : K → K) (f : K[X])
+    (hp : ∀ x∈S, (z x)^2=f.eval x) (x : K) (hx : x∈S) :
+    (curveAux f (C (z x)) 1).eval x=0 := by
+  rw [curveAux_eval]
+  simp [hp x hx]
+
+omit [DecidableEq K] in
+theorem curveAux_nonzero (S : Finset K) (f A B : K[X]) (c : K) (hc : c≠0)
+    (hn : curveAux f A B=C c*Lagrange.nodal S id) : curveAux f A B≠0 := by
+  rw [hn]
+  exact mul_ne_zero (C_ne_zero.mpr hc) (Lagrange.nodal_monic.ne_zero)
+
+omit [DecidableEq K] in
+theorem curveAux_natDegree (S : Finset K) (f A B : K[X]) (c : K) (hc : c≠0)
+    (hn : curveAux f A B=C c*Lagrange.nodal S id) :
+    (curveAux f A B).natDegree=S.card := by
+  rw [hn,natDegree_mul (C_ne_zero.mpr hc) (Lagrange.nodal_monic.ne_zero)]
+  simp only [natDegree_C,Lagrange.natDegree_nodal,zero_add]
+
+omit [DecidableEq K] in
+theorem curveAux_power_nonzero (S : Finset K) (f A B : K[X]) (c : K) (hc : c≠0)
+    (hn : curveAux f A B=C c*Lagrange.nodal S id) (r : ℕ) :
+    (curveAux f A B)^r≠0 :=
+  pow_ne_zero r (curveAux_nonzero S f A B c hc hn)
+
+omit [DecidableEq K] in
+theorem curveAux_power_degree (S : Finset K) (f A B : K[X]) (c : K) (hc : c≠0)
+    (hn : curveAux f A B=C c*Lagrange.nodal S id) (r a : ℕ) (hcard : S.card=2*a) :
+    ((curveAux f A B)^r).natDegree=r*(2*a) := by
+  rw [natDegree_pow,curveAux_natDegree S f A B c hc hn,hcard]
+
+omit [DecidableEq K] in
+theorem curveAux_power_not_strict (S : Finset K) (f A B : K[X]) (c : K) (hc : c≠0)
+    (hn : curveAux f A B=C c*Lagrange.nodal S id) (r a : ℕ) (hcard : S.card=2*a) :
+    ¬((curveAux f A B)^r).natDegree<r*(2*a) := by
+  rw [curveAux_power_degree S f A B c hc hn r a hcard]
+  exact Nat.lt_irrefl _
+
+theorem public_curveAux_boundary (S : Finset K) (z : K → K) (f : K[X]) (a : ℕ)
+    (ha : 2≤a) (hcard : S.card=2*a) (hf : f.natDegree=3)
+    (hp : ∀ x∈S, (z x)^2=f.eval x)
+    (hd : (NormSignedHankel.hankel S z (a-1)).det=0) :
+    ∃ B : K[X], B≠0 ∧ B.natDegree<a-1 ∧ ∀ r : ℕ,
+      (curveAux f (((Lagrange.interpolate S id z)*B)%ₘ Lagrange.nodal S id) B)^r≠0 ∧
+      ((curveAux f (((Lagrange.interpolate S id z)*B)%ₘ Lagrange.nodal S id) B)^r).natDegree=
+        r*(2*a) := by
+  obtain ⟨B,hb,hB,c,hc,hn⟩ := NormSignedHankel.publicInputCertificate S z f a ha hcard hf hp hd
+  refine ⟨B,hb,hB,?_⟩
+  intro r
+  exact ⟨curveAux_power_nonzero S f _ B c hc hn r,
+    curveAux_power_degree S f _ B c hc hn r a hcard⟩
+
+end OrientationCurveAuxiliary
+#print axioms OrientationCurveAuxiliary.curveAux_eval
+#print axioms OrientationCurveAuxiliary.curveAux_branch
+#print axioms OrientationCurveAuxiliary.curveAux_nonzero
+#print axioms OrientationCurveAuxiliary.curveAux_natDegree
+#print axioms OrientationCurveAuxiliary.curveAux_power_nonzero
+#print axioms OrientationCurveAuxiliary.curveAux_power_degree
+#print axioms OrientationCurveAuxiliary.curveAux_power_not_strict
+#print axioms OrientationCurveAuxiliary.public_curveAux_boundary
+
+namespace OrientationQuadraticRecovery
+open Polynomial
+variable {K : Type*} [Field K] [DecidableEq K]
+
+def StrictBudget (a : ℕ) (q0 q1 q2 : K[X]) : Prop :=
+  q0.degree+((2*(a-2):ℕ):WithBot ℕ)<((2*a:ℕ):WithBot ℕ) ∧
+  q1.degree+((a+(a-2):ℕ):WithBot ℕ)<((2*a:ℕ):WithBot ℕ) ∧
+  q2.degree+((2*a:ℕ):WithBot ℕ)<((2*a:ℕ):WithBot ℕ)
+
+omit [DecidableEq K] in
+theorem strictBudget_coefficients (a : ℕ) (q0 q1 q2 : K[X]) (ha : 2≤a)
+    (h : StrictBudget a q0 q1 q2) :
+    q2=0 ∧ q1.natDegree<2 ∧ q0.natDegree<4 := by
+  obtain ⟨h0,h1,h2⟩ := h
+  have hq2 : q2=0 := by
+    by_contra hn
+    rw [degree_eq_natDegree hn] at h2
+    have H : q2.natDegree+2*a<2*a := by exact_mod_cast h2
+    omega
+  refine ⟨hq2,?_,?_⟩
+  · by_cases hn : q1=0
+    · simp [hn]
+    · rw [degree_eq_natDegree hn] at h1
+      have H : q1.natDegree+(a+(a-2))<2*a := by exact_mod_cast h1
+      omega
+  · by_cases hn : q0=0
+    · simp [hn]
+    · rw [degree_eq_natDegree hn] at h0
+      have H : q0.natDegree+2*(a-2)<2*a := by exact_mod_cast h0
+      omega
+
+theorem strict_quadratic_interpolator_zero (S : Finset K) (z : K → K) (a : ℕ)
+    (q0 q1 q2 : K[X]) (ha : 2≤a) (hcard : S.card=2*a) (hchar : (2:K)≠0)
+    (hz : ∀ x∈S, z x≠0) (hb : StrictBudget a q0 q1 q2)
+    (hplus : ∀ x∈S, q0.eval x+q1.eval x*z x+q2.eval x*(z x)^2=0)
+    (hminus : ∀ x∈S, q0.eval x+q1.eval x*(-z x)+q2.eval x*(-z x)^2=0) :
+    q0=0 ∧ q1=0 ∧ q2=0 := by
+  obtain ⟨hq2,hd1,hd0⟩ := strictBudget_coefficients a q0 q1 q2 ha hb
+  have hroots : ∀ x∈S, q0.eval x=0 ∧ q1.eval x=0 := by
+    intro x hx
+    have hp : q0.eval x+q1.eval x*z x=0 := by simpa only [hq2,eval_zero,zero_mul,add_zero] using hplus x hx
+    have hm : q0.eval x-q1.eval x*z x=0 := by
+      simpa only [hq2,eval_zero,zero_mul,add_zero,mul_neg,sub_eq_add_neg] using hminus x hx
+    have hprod : (2:K)*(q1.eval x*z x)=0 := by linear_combination hp-hm
+    have h1 : q1.eval x=0 := ((mul_eq_zero.mp hprod).resolve_left hchar |> mul_eq_zero.mp).resolve_right (hz x hx)
+    have h0 : q0.eval x=0 := by simpa only [h1,zero_mul,add_zero] using hp
+    exact ⟨h0,h1⟩
+  have hq0 : q0=0 := by
+    by_contra hn
+    have H := natDegree_le_of_dvd hn (NormSignedHankel.nodalDivides S q0 (fun x hx => (hroots x hx).1))
+    rw [Lagrange.natDegree_nodal,hcard] at H
+    omega
+  have hq1 : q1=0 := by
+    by_contra hn
+    have H := natDegree_le_of_dvd hn (NormSignedHankel.nodalDivides S q1 (fun x hx => (hroots x hx).2))
+    rw [Lagrange.natDegree_nodal,hcard] at H
+    omega
+  exact ⟨hq0,hq1,hq2⟩
+
+end OrientationQuadraticRecovery
+#print axioms OrientationQuadraticRecovery.strictBudget_coefficients
+#print axioms OrientationQuadraticRecovery.strict_quadratic_interpolator_zero

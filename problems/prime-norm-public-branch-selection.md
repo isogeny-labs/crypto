@@ -277,3 +277,30 @@ visits and preserve full curve/norm/target validity. No attack/scaling/paid
 campaign was launched; original finder and total expected-cost exit
 criteria remain open. The separate old W-jet correction map remains absent;
 no identification of its correction H with the norm H is made.
+
+
+## 2026-11-17: stored public construction and rational list-recovery screen
+
+[Public-input report](../research/prime_orientation_layers_20261114/transport/public-input-evidence/STATUS-20261117-001.md)
+binds actual stored moments/Hankel row semantics and arithmetic-call counts,
+plus a scoped algebraic test of rational list recovery. The declared literal
+q-bit field-gate port count is6qT; a conditional incidence bound is not an
+arbitrary-circuit lower bound or constructed graph [pcc:unverified].
+
+The natural curve auxiliary and its powers specialize to nonzero full norms
+of exact degree2a*r, not a strictly lower-degree root certificate. More
+strongly, at multiplicityONE, natural weights(1,a,a-2), a>=2,2a distinct
+abscissas, characteristic!=2 and nonzero opposite branches, every homogeneous
+helper of ANY degree satisfying the strict weighted budget<2a and vanishing
+at both branches is zero. Public009/build010/receipt005, unsigned
+PCC-20261117-108594; this does not exclude higher/nonuniform multiplicities,
+other budgets/support or ECDLP algorithms [pcc:unverified].
+
+Next check a faithful higher-multiplicity/Hasse-jet model and the actual
+root-cancellation premise before treating multiplicity as a rescue. The
+induction sketch in public PROTOCOL-001.md is prospective, not accepted
+evidence. A positive changed rule must select valid signs from public inputs,
+keep a useful nonzero target-scalar coefficient and charge complete expected
+bit work. No native/paid/attack/scaling campaign was launched.
+
+Readable final: [versioned final report](../research/prime_orientation_layers_20261114/transport/public-input-evidence/report/report-final-001.pdf) makes natural subtraction explicit at m=0; all frozen earlier reports/source evidence stay exact.

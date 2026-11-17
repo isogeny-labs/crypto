@@ -1,0 +1,18 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=.25,ranksep=.3];
+ node [shape=box,fontname="Helvetica",fontsize=12,style="rounded,filled",fillcolor="#edf4fa",margin=".12,.08"];
+ edge [fontname="Helvetica",fontsize=10];
+ public [label="Actual public branches and barycentric data"];
+ stored [label="Stored moments -> actual Hankel kernel rows\nEach multiply/add trace count T=(2m-1)|S|+m^2"];
+ ports [label="Literal q-bit call ports = 6qT\nConditional edge incidence bound; no general lower bound"];
+ source [label="Known rational list-recovery theorem\nStrict weighted degree < multiplicity x agreement"];
+ curve [label="Natural curve helper and every power\nValid norm pullback nonzero; degree exactly 2ar"];
+ symmetric [label="ALL homogeneous degrees, multiplicity ONE\nStrict natural budget + paired branches => helper zero"];
+ next [label="OPEN: faithful higher-multiplicity test\nChanged public weights/support and an actual finder",fillcolor="#fff2d9",style="rounded,filled,dashed"];
+ public -> stored -> ports;
+ source -> curve;
+ source -> symmetric;
+ curve -> next [style=dashed,label="fixed helper only"];
+ symmetric -> next [style=dashed,label="r=1 only"];
+ ports -> next [style=dashed,label="full public bit cost still required"];
+}

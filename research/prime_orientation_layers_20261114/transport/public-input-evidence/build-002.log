@@ -1,0 +1,59 @@
+/workspace/audit/orientation-proof-cache-20261117/public-hankel001-59b428271f22.lean.txt:31:12: error: typeclass instance problem is stuck
+  AddCommMonoid ?m.49
+
+Note: Lean will not try to resolve this typeclass instance problem because the type argument to `AddCommMonoid` is a metavariable. This argument must be fully determined before Lean will try to resolve the typeclass.
+
+Hint: Adding type annotations and supplying implicit arguments to functions can give Lean more information for typeclass resolution. For example, if you have a variable `x` that you intend to be a `Nat`, but Lean reports it as having an unresolved type like `?m`, replacing `x` with `(x : Nat)` can get typeclass resolution un-stuck.
+/workspace/audit/orientation-proof-cache-20261117/public-hankel001-59b428271f22.lean.txt:34:6: error: Tactic `apply` failed: could not unify the conclusion of `Finset.sum_congr rfl`
+  Finset.sum ?m.66 ?m.63 = Finset.sum ?m.66 ?m.64
+with the goal
+  ∑ x, z ↑x * (↑x ^ j / ∏ t ∈ S.erase ↑x, (↑x - t)) = ∑ x ∈ S, z x * x ^ j / ∏ t ∈ S.erase x, (x - t)
+
+Note: The full type of `Finset.sum_congr rfl` is
+  (∀ x ∈ ?m.66, ?m.63 x = ?m.64 x) → Finset.sum ?m.66 ?m.63 = Finset.sum ?m.66 ?m.64
+
+K : Type u_1
+inst✝¹ : Field K
+inst✝ : DecidableEq K
+S : Finset K
+z : K → K
+j : ℕ
+⊢ ∑ x, z ↑x * (↑x ^ j / ∏ t ∈ S.erase ↑x, (↑x - t)) = ∑ x ∈ S, z x * x ^ j / ∏ t ∈ S.erase x, (x - t)
+/workspace/audit/orientation-proof-cache-20261117/public-hankel001-59b428271f22.lean.txt:33:41: warning: This simp argument is unused:
+  Finset.sum_coe_sort
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [NormSignedHankel.moment, publicCoefficient]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/workspace/audit/orientation-proof-cache-20261117/public-hankel001-59b428271f22.lean.txt:51:44: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  (momentLogged ?S ?z ?j).value
+in the target expression
+  (fun b n => (momentLogged S z ↑b).value) j 0 = NormSignedHankel.moment S z ↑j
+
+K : Type u_1
+inst✝¹ : Field K
+inst✝ : DecidableEq K
+S : Finset K
+z : K → K
+m : ℕ
+j : Fin (2 * m - 1)
+⊢ (fun b n => (momentLogged S z ↑b).value) j 0 = NormSignedHankel.moment S z ↑j
+/workspace/audit/orientation-proof-cache-20261117/public-hankel001-59b428271f22.lean.txt:106:0: warning: automatically included section variable(s) unused in theorem `OrientationPublicHankel.branch_square`:
+  [DecidableEq K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+'OrientationPublicHankel.momentLogged_value' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationPublicHankel.momentLogged_multiply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.momentLogged_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.momentsLogged_value' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationPublicHankel.momentsLogged_multiply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.momentsLogged_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.kernelLogged_value' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationPublicHankel.kernelLogged_multiply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.kernelLogged_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.kernelLogged_zero_iff' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationPublicHankel.exists_kernelLogged_iff' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationPublicHankel.branch_square' depends on axioms: [propext, Quot.sound]
