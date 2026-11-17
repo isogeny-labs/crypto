@@ -4,6 +4,7 @@
 #   make bench-host-inv  public-input host Fp64 inversion + batch benchmark
 #   make bench-mul256   compare old versus native-128 host P-256 MAC
 #   make bench-sparse256  compare generic versus sparse-modulus P-256 REDC
+#   make bench-carry256   compare host P-256 limb carry/borrow chains
 #   make bench-host-inv256  P-256 sparse-exponent host inverse + batch benchmark
 #   make lib             librootfind_oracle.a, emulation backend only
 #                        (what gpu/rootfind/rs/build.rs builds for the gpu-rootfind cargo crate)
@@ -51,7 +52,7 @@ RF_DEFS := -DRF_BLOCK=$(RF_BLOCK) -DRF_MIN_BLOCKS=$(RF_MIN_BLOCKS) -DRF_PROFILE=
 
 HDRS := fp64.cuh fp256x64.cuh rootfind.cuh rootfind_host.hpp rootfind_api.h
 
-.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv bench-host-inv256 bench-batch-core bench-sparse256 ptxas-info clean
+.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv bench-host-inv256 bench-batch-core bench-sparse256 bench-carry256 ptxas-info clean
 
 all: test
 
@@ -94,6 +95,13 @@ bench_sparse256: bench_sparse256.cpp fp256x64.cuh fp64.cuh
 
 bench-sparse256: bench_sparse256
 	./bench_sparse256
+
+# Compare original explicit carries against x86 carry-flag chains on host.
+bench_carry256: bench_carry256.cpp fp256x64.cuh fp64.cuh
+	$(CXX) $(CXXFLAGS) -o $@ bench_carry256.cpp
+
+bench-carry256: bench_carry256
+	./bench_carry256
 
 # --- emulation-only static library (no CUDA toolchain required) -------
 rootfind_api_emul.o: rootfind_api.cpp $(HDRS)
