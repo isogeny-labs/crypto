@@ -649,6 +649,44 @@ class S3Argv(unittest.TestCase):
         with self.assertRaises(SystemExit):
             artifacts.object_key("../../etc/passwd")
 
+    def test_get_uses_exact_object_without_head_preflight(self):
+        self.assertEqual(self.r.get_args(self.d, Path("download")),
+                         ["aws", "s3api", "get-object", "--bucket", "bucket",
+                          "--key", f"store/sha256/{self.d[:2]}/{self.d}", "download"])
+        self.r.cfg.endpoint = "https://store.example.invalid"
+        self.assertEqual(self.r.get_args(self.d, Path("download"))[-2:],
+                         ["--endpoint-url", self.r.cfg.endpoint])
+
+    def test_download_failures_remove_partial_bytes_and_explain_cause(self):
+        cases = [
+            ("AllAccessDisabled", "bucket owner must restore access"),
+            ("NoSuchKey", "restore the exact manifest SHA-256"),
+            ("AccessDenied", "do not treat it as absence"),
+            ("(403) Forbidden", "do not treat it as absence"),
+        ]
+        for error, hint in cases:
+            with self.subTest(error=error), tempfile.TemporaryDirectory() as tmp:
+                dest = Path(tmp) / "partial"
+                dest.write_bytes(b"partial response")
+                result = subprocess.CompletedProcess([], 1, "", error)
+                with mock.patch.object(self.r, "_run", return_value=result), \
+                     mock.patch("sys.stderr") as stderr, self.assertRaises(SystemExit):
+                    self.r.get(self.d, dest)
+                self.assertFalse(dest.exists())
+                message = "".join(call.args[0] for call in stderr.write.call_args_list)
+                self.assertIn(hint, message)
+                self.assertIn("s3://bucket/store", message)
+
+    def test_direct_download_still_rejects_corrupt_object(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.r.cfg.cache = Path(tmp) / "cache"
+            def corrupt_get(digest, dest):
+                dest.write_bytes(b"y")  # same size, different SHA-256
+            with mock.patch.object(self.r, "get", side_effect=corrupt_get), \
+                 mock.patch("sys.stderr"), self.assertRaises(SystemExit):
+                artifacts.ensure_cached(self.r.cfg, self.r, self.d, 1)
+            self.assertFalse(artifacts.cache_path(self.r.cfg, self.d).exists())
+
 
 class WorkflowBootstrap(unittest.TestCase):
     def test_sparse_clone_can_load_tool_and_remote_configuration(self):
