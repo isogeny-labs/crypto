@@ -507,3 +507,17 @@ Runonlynew160solvegatesafterpushedfreeze; broadgenus4/10xobjectiveopen.
 
 ### Errors
 No strengthscreenfailures/retries. No targetsolvesclaimedfromscreen.
+
+## Primewhole-Jacobian solves pass, tenfold still unsupported
+
+### What was done
+At720ef8cc584all5integerordercertificatesgiveN=ellprime(7481,67931,411491,1247429,77152909);160calls/20freshworkloadsverifyEXIT0. Allrepeat/prefix/normalization/countergatespass,missing/incomplete0,rawhashesverify. G2baseREDCFolded/Batch0.993–2.167,g31.807–4.269acrossfixedmodels/workloads.
+
+### Decisions made
+Weaksubgroupsnolongertheexplanationonthispanel,stillno10x. WholeorderdeducedfromFrobeniusdeterminantnotpointLCM;independentHasse+no2torsionargumentmatches. Structuredfamilyonly,notgenericcurvesorcertifiedgenus4. Allscreenacceptedmodelsincluded,3earlierineligiblefieldsretained.
+
+### Open threads
+Needactualstrongnewmechanismandseparategenus4order4qualificationwithnewproofs. Broadobjectiveopen;PR4507lastobservedopen,currentdeliverymustreflectnewscope.
+
+### Errors
+No scientificfailures/retries. No target/field/budgetselectionafteroutcomes;compileunusedfieldwarningsretained.
