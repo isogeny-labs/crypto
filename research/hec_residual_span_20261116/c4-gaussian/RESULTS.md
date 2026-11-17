@@ -17,3 +17,7 @@ The selected-control certificates directly include fullGaussianfactoridentities 
 An important mathematical difference fromtheprevioussetup is that theautomorphismeigenvalue comesfromorientedFrobeniustraceplusGaussianorder-normarithmetic, ratherthantrialscalarmultiplicationsonapublicsource. Normfactorizationandtwist/Lefschetzreasoningareclassicalingredients. PrimaryParkJeongLim2002wasreadanditsC4/GLVpriorartisretainedinTHEORY.md; notclaimingtheautomorphismorGLVisnew.
 
 Allrawoutputsandprotocol/source/native/input/binaryhashes retainedinGit. No retry,modellistsubstitution,extracountmetadataorS3access. No fulltargetsolveinthisgate. No registry/leaderboardchange.
+
+## Independent arithmetic implementation replay
+
+Atpushedfreeze fe0851492ab, standaloneRustcheckerexits0:all6orientationsagree, all24rawrecordsrepeat, and exhaustiveb/unitlineenumerationfindsonecandidateeach. GenericFp²evaluation/exponentiationindependentlyreproducesordinary/twistedcounts; allfullpolynomialnorm/A/B/lambdafieldsagree. Importsneitherproducer nor nativearithmetic. This audits the selected arithmetic, not the generaldeterminantlemma or a signedPCCverdict. [pcc:unverified]

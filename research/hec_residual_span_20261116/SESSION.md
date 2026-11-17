@@ -773,3 +773,17 @@ IndependentGaussianarithmeticaudit,determinantlemma,thenintegratedcoldsolvecompa
 
 ### Errors
 None; allambiguity/certificategatespasswithoutretry.
+
+## Independent Gaussian replay passed; integration prepared
+
+### What was done
+Atfe0851492abstandalonereplayerexits0withall6orientations/all24rawrecords; genericFp²twistedcountandbruteGaussianlineenumerationmatch. No producer/nativeimports. Startedisolatedintegrationcopywithonlyeigenvalueblockreplaced; sourcevalidation andallfinalchecks retained. Localobservations. [pcc:unverified]
+
+### Decisions made
+Selected3modelsalreadyhavefullnorm/actioncertificates, so integrateunderthoseexplicitpreconditions; unrestrictedHdettheoremstillopen. Same72calls/seeds/bounds/streams; exactoutcomeprefixgateagainstc4-solves. No newhiddeninputorqualificationcostsilentlyremoved.
+
+### Open threads
+Freeze/build/push integrationandrunonce; measureallcountedcoldcosts. Separatelyauditgeneralordinarydeterminantlemma.
+
+### Errors
+None. Previousgoalturnclassifiedprogress(newalgebraicprimitiveandexclusivecostdiagnosis).
