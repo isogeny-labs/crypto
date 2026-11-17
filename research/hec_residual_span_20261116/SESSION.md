@@ -2310,3 +2310,10 @@ What was done: pushedfreezec9f4f728ef1, inputhashespass, onceexit0; indicesfacto
 Decisions made: conditionaltheorem independentlyunreviewed, no quotient/speedclaim. Dimensionobstruction removes13/97; characteristicprimesexcluded;251/659/14489 needreciprocalisotropyclassification, notgcd-onlyadmission. [pcc:unverified].
 Open threads: classifyremaining3exceptionalprimekernels, explicitquotient andcost onlyif warranted; original10x/genus2/4scope intact.
 Errors: none,no retry/S3/cloud/merge.
+
+## Exceptional reciprocal-isotropy profile frozen
+
+What was done: derive reciprocalblockstableLagrangian counts for3survivingindexprimes; compileexactallfieldroot/multiplicity/reciprocaldegreechecks andconditionalisotropycounts. l=-1mod7simplequadraticblocks implyno3dim isotropy; split659 potentiallynewkernels distinguishedfrom8Ostable.
+Decisions made: counts notenumeratedkernels/quotients, EndFp=O implication explicitconditional; no nonhyperelliptic/speedclaim. Gitfreeze beforeone120CPU, no scientificexecutionyet.
+Open threads: runprofile, thenconstructrepresentativekernel/quotient onlyif justified andcostbounded; fullgoalunchanged.
+Errors: unusedcopiedhelpers warnings, no buildfailure/S3/cloud/merge.
