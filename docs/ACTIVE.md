@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Make the prime-field index-calculus root-finding decomposition oracle the fastest: local baseline + measured optimization (claude, started 2026-11-17, branch claude/prime-rootfind-fastest-20261117)
+- [ ] Make the prime-field index-calculus root-finding decomposition oracle the fastest: local baseline + measured optimization (claude, started 2026-11-17, branch claude/prime-rootfind-fastest-20261117, PR #4572)
 
 - [x] Freeze and audit #4556 exact-source public B8 RR9 result with native JSON receipt (automation, started 2026-11-17, branch research/prime31-barycentric-evidence-20261117, PR #4558)
 
