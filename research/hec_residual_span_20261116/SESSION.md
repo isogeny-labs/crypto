@@ -1109,3 +1109,17 @@ A mechanism satisfying those concrete admission conditions is needed; no implica
 
 ### Errors
 No execution/failure/retry. Priorleaseexpired; newdistinctT7050claimed for geometric screen. NoS3/cloud.
+
+## Restricted small-prime producer measured with censoring
+
+### What was done
+Frozen aec41463d93 executes classical shortened sieve with quadraticremainder factoring andLP-first genericSparse.20of32workloads complete(g2all12,g3all8),g4all12incomplete at128anchors.64calls,561prefixchecks,128exact repeatedmodulusrecords; allreturnedscalarsverify. Allfailedcostsretained. [pcc:unverified]
+
+### Decisions made
+Rejectthisfixedcutasfullpanel10xroute. Basefieldcompletedratios g2 0.542–1.084,g3 0.719–0.967; censoredg4countsnotreportedasspeedups. No budgetextension/adaptivecut/sourcechange. Added conditionalroot-incidence costmodel withoutpromotingit to usefullranktheorem. Broadgoalactive.
+
+### Open threads
+A genuinelybettercompletecost/rankmechanism isrequired; classicalLPproducer nowhas actualcostevidence ratherthanfullscanfilterdiagnostics.
+
+### Errors
+No runtime/assertionfailure;24incompletecalls areexplicit scientificoutcomes, notinfrastructurefailures. NoS3/cloud/oldbaselinererun.
