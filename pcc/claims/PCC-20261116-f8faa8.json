@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T19:38:48Z",
+ "id": "PCC-20261116-f8faa8",
+ "kind": "statement",
+ "producer": {
+  "commit": "b9791e11707281d9c84d20f5af4436debf317e2b",
+  "model": "",
+  "session": "codex-20261116-nist-differential-test"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/PAIR_CURVE_PROTOCOL.md",
+    "sha256": "da5cb06c0f550f41541a025fbd8270d6afb5f8b055f9f6b0f1d7b7a0302a8252"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/paired_curve_map.cpp",
+    "sha256": "19026b622f63b59ae8248d6ed5ba60a30717d38e18f40258566e1190f77353c7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/check-paired-curve.sh",
+    "sha256": "dca2af262183f33907914edae1dd398a62e7edc8946f7eaffe90bfdd722f7697"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/paired-curve-v2/result.json",
+    "sha256": "47bb1dee9e04718ff90cfe0d635ec9ebc1d5440b27360774e455ebf7183657ba"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/paired-curve-v2/pre-call-manifest.sha256",
+    "sha256": "f6af2be9ea00ab332f9d207f1eaa9234b568e5060e3f8a0247ed2ff4aa73cc1f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/paired-curve-v2/post-call-source-manifest.sha256",
+    "sha256": "68da9d32e266b08af4229615bc8e588c06eb703619f8e0a2c4868f42bc1fd0f9"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "The native kernel1/kernel2 candidate-curve comparison derives the source2-torsion involution, emits a nonsingular projective point map and inverse over the original P-192 field, checks all 28 labelled bitangents and the full quartic equation identity, and rejects a changed matrix. This is a degree1 map between reconstructed candidates, not the missing source-Jacobian divisor isogeny. Producer-unverified."
+}

@@ -25,7 +25,7 @@ main session's one-line interpretation and is labelled as such.
 | L03 base re-balance | supported | Re-tuning the 2LP base constant from 2 to 1 at genus 3 cuts counted cost 36-40% with no cheaper relation engine at all | The useful part is not the synthetic discount but that the lab's current constant is past its optimum |
 | L04 batch smooth-part | killed | Batch arms cost 9-44x more per candidate than the per-divisor test at g = 3 | Closed for schoolbook arithmetic |
 | L05 even-degree models | supported (parity) | Even-model sieve costs 0.995-1.022 of the odd-model sieve | Gain is reach (curves with no odd model), not cost |
-| L06 odd-l isogeny census | not run | First coordinator wrote no protocol | Rerun in progress; see below |
+| L06 odd-l isogeny census | void (instrument) on the rerun | Kernel criterion fires on 167/600 (27.8%), 161/600 (26.8%) and 144/600 (24.0%) prime-order curves at l = 3, 5, 7; kill bar was 1%. One gate failed: 3.75% ambiguous draws against a 2% limit | The assessor recomputed all 600 fire flags independently with 0 mismatches and judges the gate miscalibrated, not the instrument broken. Needs a re-freeze, not new mathematics. See `L06_odd_ell_isogeny_census/ASSESSMENT_RERUN.md` |
 | L07 Prym index calculus | killed | 2LP exponent 16/9 (dim 4) and 20/11 (dim 5), above the hyperelliptic 3/2 and 8/5 | As predicted |
 | L08 non-hyperelliptic ladder | inconclusive (instrument) | Duplicate lines were counted as useful relations in the 2LP arms | The apparent sub-4/3 slope is an artefact. Needs a corrected rerun |
 | L09 gonal pencil seeds | inconclusive | A correctness gate was unreachable as frozen | Proxy saving falls from 31% to 7% as p grows; even if valid, a shrinking constant |
@@ -35,8 +35,11 @@ main session's one-line interpretation and is labelled as such.
 
 ## What moved the baseline, and what did not
 
-- **Exponent.** No lead changed an exponent. The only lead that could (L06)
-  was not run in the first pass.
+- **Exponent.** No lead changed an exponent. L06, the only lead that could,
+  is a necessary first step only: it counts curves that have a rational
+  (l,l,l) kernel for odd l. The isogeny, and the proof that its codomain is a
+  plane quartic Jacobian, are not computed. About a quarter of prime-order
+  curves pass the criterion per l, on numbers the frozen rule voids.
 - **Constants with a verified-looking mechanism.** L01 (cheaper relations at
   genus 2), L03 (base constant re-tuning at genus 3) and L02 at genus 2. Each
   is a relation-phase or component measurement, not an end-to-end solve
@@ -59,11 +62,20 @@ main session's one-line interpretation and is labelled as such.
 
 ## Known problems with this pass
 
-- **L06 was skipped silently.** The coordinator returned `proceed = true`
-  without writing files. The executor correctly refused to invent a spec.
+- **L06 was skipped silently in the first pass.** The coordinator returned
+  `proceed = true` without writing files; the executor correctly refused to
+  invent a spec. It was rerun separately. The rerun's replay reused the
+  producer's binary, so it shows determinism, not correctness.
+- **L06, l = 2.** The rerun's derivation states that every odd-order genus-3
+  hyperelliptic Jacobian has two rational (2,2,2) Lagrangians of non-pair
+  type (1583 of 1583 in the census), which Smith's construction does not
+  cover. The lab's closure of Smith's route for prime order therefore holds
+  for pair-type kernels only. Whether the non-pair isogeny is computable is
+  open and is not claimed here.
 - **A `git stash` by the main session** briefly reverted tracked files while
-  the L03 replay was writing. If an L03 replay file is short, that is the
-  cause.
+  the L03 replay was writing. Checked afterwards: the affected replay cell is
+  byte-identical to its raw original and `replay/REPLAY.md` lists no differing
+  file.
 - **Instrument defects found by assessors:** L08 (duplicate counting), L09
   (unreachable gate), L10 (gate infeasible on tiny curves), L12 (stop rule).
   Three of four are protocol design errors by the coordinator, caught only at
@@ -79,7 +91,9 @@ main session's one-line interpretation and is labelled as such.
 
 ## Next steps, in order
 
-1. L06 rerun (in progress).
+1. L06: re-freeze with the ambiguity gate measured at the census primes, or
+   with ambiguous draws excluded by a pre-stated rule, and rerun. Then decide
+   whether to fund a theta-coordinate (l,l,l)-isogeny implementation.
 2. L03: re-measure base constant 1 against 2 in `src/bin/genus_ladder` on the
    same nine genus-3 curves, under a frozen paired spec.
 3. L01: end-to-end 2LP at genus 2 and 3 with descent, table set-up and
