@@ -1357,3 +1357,10 @@ What was done: frozen d27d2d03141 exits0;20calls/1600outputs exact arm equality,
 Decisions made: component gain only; no cold/full/tenfold claim. High normalization inversions identify a batch-normalization follow-up requiring equal strong controls.
 Open threads: qualify batch normalization before considering cold four-point collection; preserve three-point mixed rank outcomes and uncovered stream. Genus2+tenfold objective open.
 Errors: none; no scientific retry/S3/cloud.
+
+## Four-point batch normalization frozen
+
+What was done: compiled equal batch normalization for prepared reference and shared circuit, all80residuals perburst, ordinary-monic root cross-check outside counters. Same20calls/1600outputs and fixed panels; hashes frozen.
+Decisions made: charge batching in both arms and compare retained three-point split/REDC with explicit structural-only boundary; freeze/push before run.
+Open threads: execute once, inspect inversion/counter tradeoff and panel yield per work before full-cost qualification.
+Errors: none; own existing T7071task remains claimed.
