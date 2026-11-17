@@ -100,3 +100,20 @@
 
 ### Errors (what went wrong, how it was handled)
 - Captured original report lint refusal; citation-only additive revision avoids changing frozen evidence. Earlier source-pack sparse refusal and report layout attempts remain intact. No new scientific control failure or solver-hardness observation.
+
+
+## 2026-11-17T03:39:50.854441+00:00 — Monomial evidence published to existing regular PR4482
+
+### What was done (commands, files, features)
+- Scientific/report local8d66b72789c77a5cebe68577342449462ceab126 published by maintained helper asdcb38e540d7178b42c4ec69bae5d7552fd5a4270; parentsca3a61e6/8d66b727 and exact whole tree28c3a439a258f1b68269775efd33206778d391cd match. Updated/read back regular main-based PR4482 final consequence-engine/rollback title and exact linted body. MERGE auto-request remains enabled. Git metadata105c5d pins this initial publication,not a signed execution receipt. [pcc:unverified]
+- All53new subjects match. Six new typed records and all earlier1283 plus now-published1288 events remain exact prefixes; current1289rows. Maintained chain/prefix functions report zero errors; maintained full ledger CLI FAILS on inherited missing claim_type fields. Complete lossless diagnostic and per-claim readback confirm each failing old claim equals both HEAD and main; do not call full ledger validation passing. No unrelated baseline repair. [pcc:unverified]
+
+### Decisions made (and why)
+- Preserve publication identity in one metadata-only follow-up. No qualified source change or native rerun. Keep original report lint refusal and additive standing citation revision,raw whitespace advisory and all original artifacts unchanged. Existing selected-payload/history dependencies remain separate canonical-owner work. [pcc:unverified]
+- Fresh final-head CI/readback follows this metadata push only; prior ca3a failures/passes are historical. Resume SAMEchecker for4482 only,with no research in its scope. Proposed univariate successor is not running/scheduled.
+
+### Open threads (unfinished, pick up next time)
+- Final actual-head gate/size/artifacts/reviews must permit merge; do not bypass inherited source/service/schema failures. Full cold accounting and original growing-family/recovery obligations stay open. Terminal4482 episode/outcome due only on actual merge/closure.
+
+### Errors (what went wrong, how it was handled)
+- Maintained full ledger CLI reports BROKEN for historical claim schemas although chain/prefix checks succeed. Preserve exact failures and old bytes; no type injection,ledger rewrite or verifier/keyring/policy workaround. A metadata assertion initially expected every new record to be data; the literature receipt is correctly literature. The guard stopped before publication and was corrected to admit the three maintained types; no claim was changed. Native/report limitations and earlier metadata/layout failures remain disclosed.
