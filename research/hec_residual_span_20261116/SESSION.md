@@ -2737,3 +2737,10 @@ What was done: freeze7ba6689ba9e input checks pass, sole600CPU gate exit0; all22
 Decisions made: generic cubic-tail/weighted-LP path now qualified, not a10x/newmath/runtime result. Next audit=false complete-cost gate must replay qualified outcomes and compare all shared-preparation controls, reporting both fields/lookup/fill and later charged runtime.
 Open threads: prepare prospective full cost gate; mathematical10xgenus2+ objective remains active, independent arithmetic review pending.
 Errors: no scientific failure; inherited unused source/import warnings. No S3/cloud/merge; no unchanged rerun.
+
+## Cubic residual complete-cost gate frozen
+
+What was done: prepared44freshcalls using path-imported qualified cubic collector with audit=false; exact qualifiedReport replay except dense_audits0, nativeanswers, repeated16vectors/lookups/rootbytes. Matched validation/freshpreparation starts insidecounterinterval, nativefinalverification included.
+Decisions made: compare retained six-arm shared-preparation vectors rather than rerun controls; bothfields separate, integer/map/memorycost notfieldpriced. One600CPUprocess afterGitfreeze; retainregressions, no10x/wall/newmathclaim fromcounts.
+Open threads: execute frozen count gate and classify completefieldcost relativequadratic andbestpriorcontrols; laterwallgate only ifwarranted.
+Errors: inherited unused-import/helper warnings only. Priorresultpush timedout, retrysucceeded d197a87417c; no scientificrerun. No S3/cloud/merge.
