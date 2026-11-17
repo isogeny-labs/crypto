@@ -25,4 +25,4 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Blocked / questions for the owner
 
-- P-192 #4529: separate OpenSSL checks pass, but the producer cannot issue its own independent signed verdict. EKS cost admission also requires current daily/monthly balance and capacity readback; this runtime has no AWS CLI/EKS MCP. The standing allowance exists; no increased allowance is requested. See RELATION_PIPELINE.md for the completed local replay and excluded costs.
+- P-192 #4529: the functional pipeline and portable replay handoff pass, but keyring keys/verifiers are empty and the producer cannot issue its own independent verdict. The existing read-only main OIDC route (run44035933968) fails sts:AssumeRoleWithWebIdentity before budget reads; live reservations/capacity are also unobserved. Restore an existing authorized verifier and cloud readback route; no increased allowance is requested. See PORTABLE_REPLAY.md and the original report's timing exclusions.

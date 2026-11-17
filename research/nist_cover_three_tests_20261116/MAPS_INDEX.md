@@ -12,6 +12,9 @@
 5. [RELATION_PIPELINE](RELATION_PIPELINE.md): one-entrypoint fixed quartic
    relation collection,source transport,separate OpenSSL checking and fresh
    complete transfer on six public inputs,including negative2G.
+6. [PORTABLE_REPLAY](PORTABLE_REPLAY.md): relative artifact bindings and typed
+   result comparison,qualified after relocating the checkout subset;external
+   independent signing and admitted accounting routes remain open.
 
 Earlier pinned reports are historical records,not retroactively edited when
 an interface is added. All these results retain producer standing unless an
