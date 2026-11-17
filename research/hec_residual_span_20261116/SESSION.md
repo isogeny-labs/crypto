@@ -1798,3 +1798,10 @@ What was done: freeze0bb73a644a4 exits101 phasecounterunderflow afterfirsttarget
 Decisions made: no claim of12targetpass; newindexed-certificate-v2 resets phase before uncountedqualification. No mathematicalverifier/inputcriterion change. Assertions [pcc:unverified].
 Open threads: compile/freeze newversion then once-only gate.
 Errors: stalephaseLAST frompreviousinterval; retained, not overwritten.
+
+## Indexed orbit verifier qualified and measured
+
+What was done: freezef0f7c529ce4 once-onlyexit0;12certificates/84mutations agreebothverifiers,24calls replay/phases/repeats exact. p601verifierbase7.554-7.986x,ell14.099-14.249x reduction versusoldverifier, butfullcandidate stillbase1.912-1.997x andell8.615-10.308xsourcecost. Assertions [pcc:unverified].
+Decisions made: scopedverifiedlookup improvement, no fullgain; nativebinding unchangeddominates, densewitness cost remains. Failedv1retained.
+Open threads: soundFrobenius/Bezout actionproof anddegree/root principalcertificate equivalence, completecost andchangedproducer.
+Errors: onlypreviousv1instrumentationfailure, correctedprospectively; no overwrite/S3/cloud.
