@@ -95,7 +95,7 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
     if (/^\.github\/workflows\/release\.ya?ml$/.test(file)) {
       result.release_rust = result.release_native = result.release_cuda = true;
     }
-    if (/^\.github\/workflows\/ecbench\.ya?ml$/.test(file)) result.ecbench_replay = true;
+    if (/^\.github\/workflows\/ecbench(-smoke)?\.ya?ml$/.test(file)) result.ecbench_replay = true;
     if (/^\.github\/workflows\/codeql\.ya?ml$/.test(file)) {
       result.actions = result.c_cpp = result.javascript = result.python = result.rust = true;
     }

@@ -135,13 +135,14 @@ Rules for the token:
 | `ecdb_schema` | tables and views with comments; with `table`, its columns, types, keys and CHECKs | `GET /v1/schema` |
 | `ecdb_search_curves` | filtered, sorted page of `v_curve_summary` (field, genus, model, family, trace, j, CM, class number, End, subgroup bits, cofactor, embedding degree, twist security, ...) | `GET /v1/curves` |
 | `ecdb_get_curve` | the whole curve document | `GET /v1/curves/{ref}` |
-| `ecdb_curve_detail` | one part: `isogenies`, `graph` (with `depth`, `ell`), `transfers`, `covers`, `traits`, `relations`, `endomorphisms`, `division-polynomials`, `measurements` (leaderboard rows, ecbench arms, dataset measurements, sibling records) | `GET /v1/curves/{ref}/{part}` |
+| `ecdb_curve_detail` | one part: `isogenies`, `graph` (with `depth`, `ell`), `transfers`, `covers`, `traits`, `relations`, `endomorphisms`, `division-polynomials`, `measurements` (result records), `features` (model-ready structural row and typed observations) | `GET /v1/curves/{ref}/{part}` |
 | `ecdb_isogeny_class` | one isogeny class over F_q (any dimension) by label `g.q.a1_..._ag` or id | `GET /v1/isogeny-classes/{label}` |
 | `ecdb_transfers` | transfer routes across all curves, by route kind, verdict, target and minimum ratio | `GET /v1/transfers` |
 | `ecdb_polynomials` | `modular` (Phi_l, l = 2..19), `class` (H_D, class number one) or `summation` (Semaev S_2, S_3) | `GET /v1/*-polynomials` |
 | `ecdb_results` | `leaderboard` (filters `family`, `regime`, `validation`; `recipes=true`), `progress` (`series`), `boundary` (`regime`, `stage`), `benchmarks` (`listed`, `q`), `claims` (IC tool-program claims; `rule_version`, `curve`, `candidate_id`, `validation_status`; `summary=true`), `designs` (factor-base design grids) | `GET /v1/ic/*`, `GET /v1/benchmarks`, `GET /v1/factor-base-designs` |
 | `ecdb_ecbench` | a page of ecbench sessions (filters `method`, `curve`, `label`, `path`); with `session_id`, its per-arm summaries and comparisons | `GET /v1/ecbench/sessions[/{id}]` |
 | `ecdb_factor_bases` | factor bases of the IC work: a page filtered by `curve`, `family`, `scheme`, `min_columns`, `max_columns`, `solved` (sorted by `results`, `best_s`, `columns`, `key`). With `key` (FB1h…, FBS1h…, archive digest, PS1 label, cited digest), the base with its aliases, FBM1 configurations and results by source. Add `results=true` for its results, or `points=true` for its points | `GET /v1/factor-bases[/{key}[/results]]` |
+| `ecdb_research` | saved research configuration: versioned Koblitz/binary/prime/CM-isogeny sweeps, feature contracts, and model-dataset recipes with feature roles and leakage-aware split policies. These are plans, not results | `GET /v1/sweeps`, `GET /v1/features`, `GET /v1/datasets` |
 | `ecdb_sql` | one read-only SELECT over schema `ec` (15 s timeout, 5,000 rows) | `POST /v1/sql` |
 | `ecdb_record_evidence` | attach a claim, with its artifact, to a curve; needs the write token | `POST /v1/evidence` |
 
