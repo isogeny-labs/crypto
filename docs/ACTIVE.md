@@ -15,7 +15,7 @@ Measure the baseline performance of the root-finding decomposition (`rootfind-mi
 
 ## Active items (top = next)
 
-- [ ] Root-finding 100x: baseline and plan (claude, started 2026-11-17, branch claude/rootfind-baseline-100x, stacked on #4607)
+- [ ] Root-finding 100x: baseline and plan (claude, started 2026-11-17, branch claude/rootfind-baseline-100x, PR #4619, stacked on #4607)
   - [ ] Survey what the repository already measured and ruled out for root finding (research/rootfind_*, ecbench_rootfind*, docs/perf)
   - [ ] Local baseline: per-phase time and counted operations for rootfind-mitm (prime and binary), with an A/A noise floor
   - [ ] Profile where the time goes (table build, batched additions, probes, memory)
