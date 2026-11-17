@@ -15,7 +15,7 @@ or narrowed with linked evidence and regenerated graphs.
 
 ![Compact dependency view of the six attack lanes. Green nodes are checked,
 blue nodes are definitions, yellow nodes are open, red is blocked, and pink is
-conditional.](foundational-attack-queue.png)
+conditional.](foundational-attack-queue.svg)
 
 Editable source: [`foundational-attack-queue.dot`](foundational-attack-queue.dot);
 vector rendering: [`foundational-attack-queue.svg`](foundational-attack-queue.svg).
