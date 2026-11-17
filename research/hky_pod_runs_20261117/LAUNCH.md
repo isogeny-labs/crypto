@@ -30,3 +30,18 @@ bench.record and no pcc claim exist for these runs; every number they produce is
 - The CPU host is shared and was loaded at start, so the "quiet host" condition for the optlevel
   full-parallel points is not met; the records carry the load average.
 - Wall times on this host are not comparable with the container's or the earlier pods' beyond a factor.
+
+## m-sweep (owner request 16:0x UTC: "run m=4-9 … immediately to give more data")
+
+| item | value |
+|---|---|
+| pods | `msweep-a` `o3cc7qp0n24apx` (EU-RO-1) and `msweep-b` `edjws4kb7e711m` (EUR-IS-1): cpu5m, 32 vCPU, 256 GB, US$2.08/h each, cap 50,400 s, worst case US$29.12 each; both hosts shared and loaded at start (load average 36 to 73) |
+| instrument | the same frozen `pilot_candidate` (47d6c281…), `--engine hky2`, Kummer tower (split presentation), P1 = 2013265921, `--random 2`, `--hky-cmax 9`, `--budget 2400` s per closure, `--hky-max-cols 3000000` |
+| cells | `msweep-a`: m = 4, 5, 6; `msweep-b`: m = 7, 8, 9; each at `--t-min 2 --max-t 2`, which emits depth 2 and depth 3 (N = m x depth) |
+| started | 16:11:40 UTC, `msweep_job.sh` 7d740003… |
+
+Checks and predictions written before the sweep's new cells:
+
+- Calibration against certified values (lfd-summation-systems `experiments/ic-bounds-split-m`): (m, k) = (4,2) 6, (5,2) 6, (4,3) 7, (6,2) 7; (5,3) lower bound 8. Local run of this binary before launch: (4,2) 6, (4,3) 7, (5,2) 6, (5,3) no 1 through degree 7 (censored at 8 by a 200 s budget), (7,2) no 1 through degree 7.
+- New cells: (7,2), (8,2), (9,2) and depth 3 for m >= 5. No prediction is stated for their values; the only reading rule is that "1 enters at c" is an exact value for this instrument and a censored closure is a lower bound of the censored degree.
+- This instrument has no closure verification pass of the kind the lfd-summation-systems engine has; values new to this sweep are single-instrument and `[pcc:unverified]`.
