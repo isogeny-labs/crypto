@@ -54,14 +54,14 @@ fn interpolate_complete(values: &[u64], p: u64) -> Vec<u64> {
             continue;
         }
         let a = a as u64;
-        for k in 0..p as usize {
+        for (k, coefficient) in coefficients.iter_mut().enumerate() {
             let power = crypto_lib::cryptanalysis::pkm_smooth_tower::powm(a, p - 1 - k as u64, p);
             let delta = if k == 0 {
                 subm(1, power, p)
             } else {
                 subm(0, power, p)
             };
-            coefficients[k] = addm(coefficients[k], mulm(value, delta, p), p);
+            *coefficient = addm(*coefficient, mulm(value, delta, p), p);
         }
     }
     coefficients
