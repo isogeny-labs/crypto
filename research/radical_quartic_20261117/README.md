@@ -104,3 +104,12 @@ cd prototype && rustc -O radical_quartic.rs -o rq
 ./rq quartic   # ~4.5 min on 4 cores (125M tuples)
 ./rq measure   # counted-mul tables
 ```
+
+## Crate test (one build)
+
+`cargo test --release --lib cryptanalysis::prime_radical_root`: 4 passed, 0 failed
+(`crate_test_result.txt`). The worktree base had a broken `f4_fp.rs` (duplicate
+`VisitReport` fall-degree fields and a duplicate `recording_degree_falls`); the
+no-op duplicates were removed (the real, recording versions kept) so the lib
+test target compiles. Repeated build attempts were OOM-killed by concurrent
+builds from other worktrees; only the final successful run is recorded.
