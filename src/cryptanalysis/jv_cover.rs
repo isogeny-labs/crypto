@@ -1292,6 +1292,12 @@ impl WeilForms {
 pub struct ZeroDimStats {
     pub degree_reached: u32,
     pub solving_degree: u32,
+    /// Measured degree-fall diagnostics from the F4 solve, when
+    /// `record_degree_falls` was set on the options. Diagnostic only: never
+    /// priced into the counted unit, never a stopping rule.
+    pub first_fall_degree: Option<u32>,
+    pub last_fall_degree: Option<u32>,
+    pub degree_of_regularity_observed: Option<u32>,
     pub max_rows: usize,
     pub max_cols: usize,
     pub f4_muls: u64,
@@ -1464,6 +1470,9 @@ pub fn solve_zero_dim_mode(
     st.f4_muls = r.field_ops;
     st.degree_reached = r.degree_reached;
     st.solving_degree = r.solving_degree;
+    st.first_fall_degree = r.first_fall_degree;
+    st.last_fall_degree = r.last_fall_degree;
+    st.degree_of_regularity_observed = r.degree_of_regularity_observed;
     st.max_rows = r.max_rows;
     st.max_cols = r.max_cols;
     st.f4_ms = r.ms;
@@ -2670,6 +2679,12 @@ pub struct NagaoCost {
     pub post_muls: u64,
     pub delta: usize,
     pub degree_reached: u32,
+    /// Measured degree-fall diagnostics carried up from the F4 solve
+    /// (`degree_story = "polynomial-system"`). Diagnostic only: never priced
+    /// into the counted unit, never a stopping rule.
+    pub first_fall_degree: Option<u32>,
+    pub last_fall_degree: Option<u32>,
+    pub degree_of_regularity_observed: Option<u32>,
     pub max_rows: usize,
     pub max_cols: usize,
     pub f4_ms: f64,
@@ -2700,6 +2715,7 @@ impl NagaoCost {
 pub fn jv_options(max_degree: u32, budget_secs: f64) -> F4Options {
     F4Options::new(F4Ordering::Grevlex, max_degree)
         .with_budget(std::time::Duration::from_secs_f64(budget_secs))
+        .recording_degree_falls()
 }
 
 /// [`jv_options`] with F4 stopped as soon as the leading monomials found so
@@ -2770,6 +2786,9 @@ pub fn nagao_decompose(
     cost.lin_muls = st.lin_muls;
     cost.delta = st.delta;
     cost.degree_reached = st.degree_reached;
+    cost.first_fall_degree = st.first_fall_degree;
+    cost.last_fall_degree = st.last_fall_degree;
+    cost.degree_of_regularity_observed = st.degree_of_regularity_observed;
     cost.max_rows = st.max_rows;
     cost.max_cols = st.max_cols;
     cost.f4_ms = st.f4_ms;
@@ -4806,6 +4825,75 @@ mod tests {
             applied >= n - 3,
             "applied {applied} fallbacks {fallbacks} of {n}"
         );
+    }
+
+    /// The cover descent's inner zero-dim solve now records degree-fall
+    /// diagnostics (`jv_options` sets `record_degree_falls`). A regular
+    /// sequence has no fall and its observed degree of regularity is the
+    /// generic bound `n + 1`; an over-determined but consistent system falls,
+    /// so a first-fall degree is recorded and is bounded by the last-fall
+    /// degree. The diagnostic must not change the solutions.
+    #[test]
+    fn solve_zero_dim_records_degree_falls() {
+        let p = 101u64;
+        // x_i^2 - 1 in n variables.
+        let quad = |i: usize, n: usize| -> f4_fp::Poly {
+            let mut e = vec![0u32; n];
+            e[i] = 2;
+            vec![(e, 1u64), (vec![0u32; n], p - 1)]
+        };
+        let opts = jv_options(6, 120.0);
+        let mut rng = StdRng::seed_from_u64(0x0D_FA11);
+
+        // Regular sequence {x^2 - 1, y^2 - 1}: realized Hilbert == semi-regular
+        // prediction at every degree, so no fall and d_reg_obs = n + 1 = 3.
+        let reg: Vec<f4_fp::Poly> = (0..2).map(|i| quad(i, 2)).collect();
+        let (sols, st) = solve_zero_dim(&reg, 2, p, &opts, &mut rng);
+        assert_eq!(
+            st.degree_of_regularity_observed,
+            Some(3),
+            "regular sequence: observed d_reg is the generic bound n+1"
+        );
+        assert_eq!(
+            st.first_fall_degree, None,
+            "regular sequence has no degree fall"
+        );
+        // All four rational roots (±1, ±1) are found and every returned point
+        // satisfies the system (recording did not perturb the solve).
+        for w in [[1u64, 1], [1, 100], [100, 1], [100, 100]] {
+            assert!(
+                sols.iter().any(|s| s[0] == w[0] && s[1] == w[1]),
+                "missing root {w:?} among {sols:?}"
+            );
+        }
+        for s in &sols {
+            assert_eq!((s[0] * s[0]) % p, 1);
+            assert_eq!((s[1] * s[1]) % p, 1);
+        }
+
+        // Over-determined consistent system {x^2-1, y^2-1, xy-1}: the third
+        // relation cuts the four points to {(1,1), (-1,-1)}, forcing a fall.
+        let xy: f4_fp::Poly = vec![(vec![1u32, 1u32], 1u64), (vec![0u32, 0u32], p - 1)];
+        let over: Vec<f4_fp::Poly> = vec![quad(0, 2), quad(1, 2), xy];
+        let (sols2, st2) = solve_zero_dim(&over, 2, p, &opts, &mut rng);
+        assert!(
+            st2.degree_of_regularity_observed.is_some(),
+            "observed d_reg recorded on the over-determined system"
+        );
+        if let (Some(f), Some(l)) = (st2.first_fall_degree, st2.last_fall_degree) {
+            assert!(f <= l, "first-fall {f} must not exceed last-fall {l}");
+        }
+        for w in [[1u64, 1], [100, 100]] {
+            assert!(
+                sols2.iter().any(|s| s[0] == w[0] && s[1] == w[1]),
+                "missing root {w:?} among {sols2:?}"
+            );
+        }
+        for s in &sols2 {
+            assert_eq!((s[0] * s[0]) % p, 1);
+            assert_eq!((s[1] * s[1]) % p, 1);
+            assert_eq!((s[0] * s[1]) % p, 1, "xy = 1");
+        }
     }
 
     #[test]

@@ -11,28 +11,24 @@ follow-ups here; history belongs in the session log, not in this file.
 
 ## Current goal
 
-Achieve at least a 2x reduction in degree of regularity for the P-256
-factor-base relation systems, under a frozen definition and matched workload.
-Require exact algebraic certificates and relation replay; input degree,
-variable count and final Gröbner-basis degree alone do not meet this goal.
+_(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [x] Freeze the ideal-module regularity definition and comparison protocol (codex, started 2026-11-17, branch lane/p256-complete-law-dreg-20261117, PR #4583; merged component PR #4567; tracking4555 merged before research publication)
-- [ ] Establish a complete-system baseline on the frozen finite depth4 cell, preserving the original depth8 workload (codex, PR #4583; merged component PR #4567; four native cells censored; no admitted full D)
-- [ ] Extend retained membership certificates (signed D8→4 and16→5) to complete baseline/candidate relation ideals (codex, PR #4583; merged component PR #4567; full-system certificate pending)
-- [ ] Establish a candidate with D_candidate <= D_baseline/2, preserving exact relations and charging auxiliary variables/covers (codex, PR #4583; merged component PR #4567)
-- [ ] Validate m=2–7 and record scope, replay, costs and remaining obligations (codex, PR #4583; merged component PR #4567; 48 paired exports/12 planted replays checked; full solve/depth8 pending)
+- [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
 - [ ] Add a Faugère–Lachartre reducer/free-column split to Boolean F4 for Semaev systems (Codex, started 2026-11-17, branch codex/semaev-f4-subset-reducers, PR #4562)
 
 - [x] Freeze and audit #4556 exact-source public B8 RR9 result with native JSON receipt (automation, started 2026-11-17, branch research/prime31-barycentric-evidence-20261117, PR #4558)
 
-- [ ] Build TorsionGuard finite-primary-module soundness analyzer (Codex, started 2026-11-17, branch codex/torsionguard-core-20261117, PR #4554)
+- [x] Build TorsionGuard finite-primary-module soundness analyzer (Codex, started 2026-11-17, branch codex/torsionguard-core-20261117, PR #4579)
 
 - [ ] Publish Vieta Rust speed results and resolve official record/publication blockers (codex, started 2026-11-17, branch lane/vieta-speed-20261117, PR #4525)
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
+- [ ] Port the linearized two-summand root finder (lfd-summation-systems PR #28) into ic_framework as a decomposition oracle and compare it with rootfind-mitm, rootfind-pairs and matrix-F4 on the same instances (claude, started 2026-11-17, branch claude/index-calculus-root-finding-e95kd6)
+
+- [x] Repair main-side CI breakage left by the 2026-11-16 merges: parity lock and IC reference currency (workflow store pulls deferred until the store is repaired) (claude, started 2026-11-17, branch claude/hyperelliptic-index-calculus-td1fdn, PR #4576)
 
 <!-- One line per task, added as the task's first step with its draft PR:
 - [ ] <task> (<runtime>, started YYYY-MM-DD, branch <branch>, PR #<n>) -->
