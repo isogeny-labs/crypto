@@ -18,8 +18,9 @@ variable count and final Gröbner-basis degree alone do not meet this goal.
 
 ## Active items (top = next)
 
-- [ ] Freeze the regularity definition, nontrivial baseline and matched controls (codex, started 2026-11-17, branch lane/p256-dreg-half-20261117, PR #4555; in progress)
-- [ ] Implement exact regularity certificates and falsification controls for baseline/candidate (codex, PR #4555)
+- [x] Freeze the ideal-module regularity definition and comparison protocol (codex, started 2026-11-17, branch lane/p256-dreg-half-20261117, PR #4555)
+- [ ] Establish a complete-system baseline on the frozen finite depth4 cell, preserving the original depth8 workload (codex, PR #4555; in progress; public qualifier exhausted two calls without a value)
+- [ ] Extend exact component certificates and falsification controls to complete baseline/candidate relation ideals (codex, PR #4555; component verifier implemented)
 - [ ] Establish a candidate with D_candidate <= D_baseline/2, preserving exact relations and charging auxiliary variables/covers (codex, PR #4555)
 - [ ] Validate m=2–7 and record scope, replay, costs and remaining obligations (codex, PR #4555)
 
