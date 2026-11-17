@@ -1819,3 +1819,10 @@ What was done: freeze201de1a202e once-onlyexit0;12certificates/84mutations agree
 Decisions made: retain guardedsmallverificationgain, no fullpipelinegain; nativebindingunchanged, actionproof/producer remain.
 Open threads: soundFrobeniusaction qualification and originalsource producer mechanism, full10xgoalunchanged.
 Errors: none,no rerun/S3/cloud.
+
+## Frobenius/Bezout action certificate frozen
+
+What was done: derivedtwistedfixedpointtracesidentify pi=P(sigma) byrank1cyclotomicTatemodule/tracepairing; compiled internalcharacter/Bezout verifier replacingnativeactioncheck. Fourorientations/curve andallFBnativecontrols scheduled.
+Decisions made: wholeprimeorderpremiseunchanged impliesLagrangeredundancy of[ell]C, notnewassumption. Nonzero/publicsourcebindingretained. Fullcharacter/Bezoutcostcounted. Mathematicalproofnotformal/independentreviewed, allassertions [pcc:unverified].
+Open threads: pushfreeze then once-only120CPU invocation andcomparecompletecosts.
+Errors: none in compile, no science yet; MilneLEC25.1/AV10.23primarytext read.
