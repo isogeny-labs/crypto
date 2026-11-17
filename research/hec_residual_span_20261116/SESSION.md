@@ -1721,3 +1721,10 @@ What was done: compiled fixedstandardquintic map, generalquintic Mumfordlift, or
 Decisions made: includeall degree0/1/repeatedsupports andsignambiguity; no unknowntargetsolve/performance claim. Assertions [pcc:unverified].
 Open threads: pushfreeze then once-only120CPU invocation, cost/targettransport afterward.
 Errors: none in compile, no science yet.
+
+## Full original rational-group transport qualified
+
+What was done: freeze82eb6786e20 single invocation exit0;411491positions validity/nonzeromap/Kummercompatibility/lift pass; degreehist[1,680,410810],680repeatedsupports, bothwalks closeatN. D=(600,1;157),Dimage=(498,272,1;576,232). Assertions [pcc:unverified].
+Decisions made: finitegroupqualification, notunknownlogsolve/speed/globaldegreeproof; signambiguity retained.
+Open threads: sameoriginaltarget fullcost ICtransport withbestsourcecontrol.
+Errors: apply_patch reportwrite failed withresearchvolume29MiBfree; directRubywrite succeeded, no data/cache deleted. Rawrun intact. No scientificretry/S3/cloud.
