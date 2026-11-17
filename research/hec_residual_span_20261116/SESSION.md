@@ -1399,3 +1399,10 @@ What was done: cdbea1ba123 single invocation exits0,40trials/24splitgrouprelatio
 Decisions made:60%split fraction not useful-target improvement. Exhausted same-orbit triple representatives without scalar-copy inflation; standalone circuit optimization not justified. Avoid further minor fixture variations without new useful-rank/cost mechanism.
 Open threads: mathematically different mechanism for original genus2+10xobjective; combined adaptive pool not justified by hit counts alone.
 Errors: none; incomplete cases scientific outcomes, no retries/S3/cloud.
+
+## Direct-target interpolation screened against existing arithmetic
+
+What was done: checked current add_place/reduce and prior section-sieve notes; direct target-Mumford plus rational-point interpolation is exactly existing CRT/Cantor path, including irreducible u. Derived generic residual degree max(2g+1-n,n-2), minimumg atn=g+1,g+2; standard Riemann-Roch gives residual>=g for independent prescribed zero conditions with actual pole degree>2g-2. Primary Handbook theorem4.106 and Stoll notes read. Added section-sieve/INTERPOLATION-BUDGET.md.
+Decisions made: no experiment on a relabelled bootstrap. Higher-degree interpolation alone does not lower generic residual degree; a useful new mechanism must escape independent constraints, improve target rank or reduce complete arithmetic cost. Explicit degree-drop/dependent/special-divisor exceptions retained.
+Open threads: find and cost a target-log-independent dependency finder or other mechanism; original genus2+tenfold goal remains unresolved.
+Errors: initial proposed bootstrap collides with current implementation, corrected before any scientific execution. No S3/cloud or fixture campaign.
