@@ -2513,3 +2513,10 @@ What was done: checked prior qualified holdout tuples, found nontrivial h in fiv
 Decisions made: do not extrapolate ambient pair uniqueness through noninjective projection. All five cases retained; no performance threshold. Diagnostic exhaustive logs not production inputs or cheap solver evidence; duplicate/zero images explicitly separated. One120CPU run after Git freeze/push.
 Open threads: inspect projection collision/coverage outcomes, then require paid construction/rank/cost before promoting any effect toward10x.
 Errors: none in compilation; conflict check allows, attach reports existing own reservation as before. No S3/cloud/merge.
+
+## Proper-subgroup collision census passes, uneven orbit compression identified
+
+What was done: freezea574d18bf98 hashes passed, sole invocation exit0. Five projected cyclic memberships exhaustively verified; weighted/deduplicated convolutions exact. Pair support covers fullsubgroup in g2p251/g2p1021/g4p271, but coverage is diagnostic, not a cheap public oracle. Derived projected signed-action orbit counts10/52/14/10/7 versus retained24/102/14/10/9.
+Decisions made: ambient1/2histogram does not survive noninjective projection. Distinguish raw duplicate weights from generators/rank. Retain paid cross-orbit equality remapping hypothesis; no gain in two cases or original h1genus-two target, no10x/general novelty claim. Never reuse exhaustive labels as production inputs.
+Open threads: cost-case/full paid setup test for projection-based remapping versus strongest equal-information controls, or genuinely different producer/certificate mechanism. Genus-three reduction and full genus2+objective open.
+Errors: none in run; no wholeJacobian-order inference or S3/cloud/merge. Shared group implementation remains unreviewed independently.
