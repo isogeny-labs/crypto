@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Pursue 15x relation-pipeline speedup with qualified Rust integration and matched measurements (Codex, started 2026-11-17, branch lane/relation-fusion-next; in progress)
+- [ ] Pursue 15x relation-pipeline speedup with qualified Rust integration and matched measurements (Codex, started 2026-11-17, branch lane/relation-fusion-next, PR #4530; in progress)
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 

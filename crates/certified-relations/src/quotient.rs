@@ -155,6 +155,24 @@ fn coordinate(
     y: usize,
     p: u64,
 ) -> Result<Option<Row>, String> {
+    let Some(linear) = prepare_coordinate(f, g, h, rules, t, y, p)? else {
+        return Ok(None);
+    };
+    let u = coefficient(&linear.poly, y, 1);
+    let Some(inverse) = inverse_mod(&u, &h.poly, rules.len(), t, p) else {
+        return Ok(None);
+    };
+    finish_coordinate(linear, &inverse, h, rules, t, y, p)
+}
+fn prepare_coordinate(
+    f: Row,
+    g: Row,
+    h: &Row,
+    rules: &[Option<Row>],
+    t: usize,
+    y: usize,
+    p: u64,
+) -> Result<Option<Row>, String> {
     let f = rewrite(f, h, rules, t, p)?;
     let g = rewrite(g, h, rules, t, p)?;
     if f.poly.keys().chain(g.poly.keys()).any(|m| {
@@ -173,16 +191,143 @@ fn coordinate(
     if linear.poly.keys().any(|m| m[y] > 1) {
         return Ok(None);
     }
-    let u = coefficient(&linear.poly, y, 1);
-    let Some(inverse) = inverse_mod(&u, &h.poly, rules.len(), t, p) else {
-        return Ok(None);
-    };
-    let result = rewrite(times(&linear, &inverse, p), h, rules, t, p)?;
+    Ok(Some(linear))
+}
+fn finish_coordinate(
+    linear: Row,
+    inverse: &Poly,
+    h: &Row,
+    rules: &[Option<Row>],
+    t: usize,
+    y: usize,
+    p: u64,
+) -> Result<Option<Row>, String> {
+    let result = rewrite(times(&linear, inverse, p), h, rules, t, p)?;
     let ypoly = variable(rules.len(), y);
     let mut tail = result.poly.clone();
     axpy(&mut tail, &ypoly, p - 1, p);
     if !is_univariate(&tail, t) || degree(&tail) >= degree(&h.poly) {
         return Ok(None);
+    }
+    Ok(Some(result))
+}
+fn batch_inverse_mod(polys: &[Poly], h: &Poly, n: usize, t: usize, p: u64) -> Option<Vec<Poly>> {
+    let d = degree(h);
+    if polys.len() < 2
+        || polys.len() > 16
+        || !(2..=8).contains(&d)
+        || !is_univariate(h, t)
+        || h.get(lead(h)) != Some(&1)
+    {
+        return None;
+    }
+    let dense = |f: &Poly, cap: usize| -> Option<Vec<u64>> {
+        if !is_univariate(f, t) || f.keys().any(|m| m.len() != n || m[t] >= cap) {
+            return None;
+        }
+        let mut out = vec![0; cap];
+        for (m, c) in f {
+            out[m[t]] = *c;
+        }
+        Some(out)
+    };
+    let sparse = |coefficients: &[u64]| -> Poly {
+        coefficients
+            .iter()
+            .enumerate()
+            .filter(|(_, c)| **c != 0)
+            .map(|(i, c)| {
+                let mut m = vec![0; n];
+                m[t] = i;
+                (m, *c)
+            })
+            .collect()
+    };
+    let hc = dense(h, d + 1)?;
+    let values: Vec<_> = polys.iter().map(|f| dense(f, d)).collect::<Option<_>>()?;
+    let mut one = vec![0; d];
+    one[0] = 1;
+    let mut prefix = vec![one.clone()];
+    for value in &values {
+        prefix.push(qmul(prefix.last().unwrap(), value, &hc, p));
+    }
+    let inverse = inverse_mod(&sparse(prefix.last().unwrap()), h, n, t, p)?;
+    let mut inverse = dense(&inverse, d)?;
+    let mut result = vec![Poly::new(); values.len()];
+    for i in (0..values.len()).rev() {
+        let value = qmul(&inverse, &prefix[i], &hc, p);
+        if qmul(&values[i], &value, &hc, p) != one {
+            return None;
+        }
+        result[i] = sparse(&value);
+        inverse = qmul(&inverse, &values[i], &hc, p);
+    }
+    Some(result)
+}
+
+#[cfg(test)]
+mod batch_unit_tests {
+    use super::*;
+    #[test]
+    fn batched_units_equal_separate_checked_inverses_in_nonfield_quotients() {
+        for p in [101u64, 2147483647, 9007199254740881] {
+            for n in [3, 6, 16] {
+                for t in [0, n - 1] {
+                    let m = |degree: usize| {
+                        let mut m = vec![0; n];
+                        m[t] = degree;
+                        m
+                    };
+                    let h = Poly::from([(m(2), 1)]);
+                    let values: Vec<_> = (1..=5)
+                        .map(|c| Poly::from([(m(0), c), (m(1), 1)]))
+                        .collect();
+                    let batch = batch_inverse_mod(&values, &h, n, t, p).unwrap();
+                    for (a, b) in values.iter().zip(&batch) {
+                        assert_eq!(*b, inverse_mod(a, &h, n, t, p).unwrap());
+                    }
+                    let mut nonunits = values.clone();
+                    nonunits[2] = Poly::from([(m(1), 1)]);
+                    assert!(batch_inverse_mod(&nonunits, &h, n, t, p).is_none());
+                    assert!(
+                        batch_inverse_mod(&values, &Poly::from([(m(2), 2)]), n, t, p).is_none()
+                    );
+                    assert!(batch_inverse_mod(&values[..1], &h, n, t, p).is_none());
+                }
+            }
+        }
+    }
+}
+fn coordinate_batch(
+    candidates: Vec<(Row, Row, usize)>,
+    h: &Row,
+    rules: &[Option<Row>],
+    t: usize,
+    p: u64,
+) -> Result<Option<Vec<Row>>, String> {
+    let mut prepared = Vec::new();
+    let mut ys = Vec::new();
+    for (f, g, y) in candidates {
+        let Some(linear) = prepare_coordinate(f, g, h, rules, t, y, p)? else {
+            return Ok(None);
+        };
+        prepared.push(linear);
+        ys.push(y);
+    }
+    let coefficients: Vec<_> = prepared
+        .iter()
+        .zip(&ys)
+        .map(|(r, y)| coefficient(&r.poly, *y, 1))
+        .collect();
+    let Some(inverses) = batch_inverse_mod(&coefficients, &h.poly, rules.len(), t, p) else {
+        return Ok(None);
+    };
+    let mut result = Vec::new();
+    for ((row, inverse), y) in prepared.into_iter().zip(inverses).zip(ys) {
+        let Some(row) = finish_coordinate(row, &inverse, h, rules, t, y, p)? else {
+            return Ok(None);
+        };
+        result.push(row);
     }
     Ok(Some(result))
 }

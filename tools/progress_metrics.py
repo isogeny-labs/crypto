@@ -1043,6 +1043,21 @@ def trace_local_runtime(ref, since):
                  source=source)
 
 
+def relation_fusion_observations(ref, since):
+    """Export raw declared-call observations, without computing ratios."""
+    path = "research/relation_fusion_20261117/CANDIDATE_SUMMARY_84.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        for row in data.get("outcomes", []):
+            if row.get("status") != "complete":
+                continue
+            key = f"p{row['prime']}.n{row['n']}.{row['kind']}.{row['kernel']}"
+            emit(f"relation.fusion.scan.{key}.parent_ns", row["parent_ns"], date=date,
+                 problem="complete-certificate-replay", unit="ns", better="neutral",
+                 label="Single declared call including controller replay; PCC unverified",
+                 source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -1087,6 +1102,7 @@ def main():
     n83_d18_vsids_gate(a.ref, a.since)
     vieta_component(a.ref, a.since)
     trace_local_runtime(a.ref, a.since)
+    relation_fusion_observations(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
