@@ -1,0 +1,7 @@
+# Selected native packet: trusted artifact migration pending
+
+The real policy selects native-v1/controls.json.gz (71625bytes, above the64KiB data threshold). Expected GZIP object SHA256 eb6f5804066ed2c58f67656641838e2893c8d8cd86096094021214a1c2d05e9e; this is distinct from the decompressed JSON digest d11cce0e804eee70a38c38402d1a0d6c980094883e21ab306d683e7a389133c9. No upload or trusted receipt is claimed yet.
+
+Publish the unchanged selected bytes on the lane PR and let the maintained artifact-autofix pull_request_target workflow use the trusted base helper/policy to upload, replay remote bytes and commit .artifacts.json/.gitignore plus tracked-byte removal. Both repositories use s3://setec-astronomy-artifacts/store. Require a real trusted receipt for exactly this compressed digest/size before claiming success. Keep original local raw JSON, compressed packet and all pinned source/evidence. Do not rename/split/recompress to avoid selection, add exemptions, alter policy/verifier, export credentials or delete remote objects.
+
+Any later trusted migration commit must preserve every new source/claim/ledger/journal prefix. Byte-pointer adoption is publishing metadata, not a new scientific run or signed validation. If upload fails on canonical credentials, report actual logs and wait for canonical repair; do not invent a receipt or patch around baseline failures. The CI-only checker may finish this publishing action using maintained tools and exact bytes.

@@ -1454,7 +1454,7 @@ pub fn basis_view(
     });
     if v.cost.total_gae.is_some() {
         v.cost.total_gae = Some(g);
-        let s = g / ((r.workload.curve.r as f64).sqrt() * add);
+        let s = g / (r.workload.curve.r.to_f64().sqrt() * add);
         v.cost.s = Some(s);
         v.boundaries.ratio_to_floor = Some(s / v.boundaries.floor_s);
     }

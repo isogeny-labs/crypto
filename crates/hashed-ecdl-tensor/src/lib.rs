@@ -24,6 +24,7 @@ pub mod encoding;
 pub mod factoring;
 pub mod finite;
 pub mod joint;
+pub mod metrics;
 pub mod network;
 pub mod partial;
 pub mod prepared;

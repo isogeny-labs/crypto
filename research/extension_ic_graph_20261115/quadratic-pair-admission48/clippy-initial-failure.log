@@ -1,0 +1,44 @@
+error: manual implementation of `.is_multiple_of()`
+  --> examples/../research/extension_ic_graph_20261115/quadratic_pair_certificate_check.rs:26:56
+   |
+26 |     p >= 2 && (2..).take_while(|d| d * d <= p).all(|d| p % d != 0)
+   |                                                        ^^^^^^^^^^ help: replace with: `!p.is_multiple_of(d)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#manual_is_multiple_of
+   = note: `-D clippy::manual-is-multiple-of` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::manual_is_multiple_of)]`
+
+error: very complex type used. Consider factoring parts into `type` definitions
+   --> examples/../src/cryptanalysis/jv_principal_relation.rs:283:29
+    |
+283 |       pub(crate) fn hand() -> (
+    |  _____________________________^
+284 | |         Fq,
+285 | |         Poly,
+286 | |         Vec<BaseEl>,
+...   |
+291 | |         Vec<u64>,
+292 | |     ) {
+    | |_____^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#type_complexity
+    = note: `-D clippy::type-complexity` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::type_complexity)]`
+
+error: very complex type used. Consider factoring parts into `type` definitions
+  --> examples/jv_sieve_quadratic_pair_relation_controls.rs:41:18
+   |
+41 |       fn hand() -> (
+   |  __________________^
+42 | |         Fq,
+43 | |         Vec<E2>,
+44 | |         Vec<BaseEl>,
+...  |
+49 | |         Vec<Vec<u64>>,
+50 | |     ) {
+   | |_____^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#type_complexity
+
+error: aborting due to 3 previous errors
+
