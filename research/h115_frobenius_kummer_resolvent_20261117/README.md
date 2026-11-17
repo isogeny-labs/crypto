@@ -32,6 +32,16 @@ Files:
 | `mechanism.png` | Inspected 1,200-by-640 rendering | `6dfa6ac9033d15f9424125b290a7546fbb54f2dc394862336ba002567f23ef79` |
 | `h115_curve_fixture_check.rs` | Native base-field cohort/isomorphism checker | `bd47365d63c0091371e36a3cd3f6f243b21b319e6fec0cd460e0d66f56275757` |
 
+Post-freeze proof artifacts:
+
+| Artifact | Role | SHA-256 |
+| --- | --- | --- |
+| `H115FrobeniusKummerResolvent.lean` | Generic factorization, exact fibers, finite score, radix-six decoder and cost boundary | `55137b5f366e8dc345a42b67c3b815e23a07051f0042fc319580d02b76c79ee0` |
+| `lakefile.toml` | Pinned mathlib project | `c8281549c072207f652ff9cbf642a29e954eb24dcab0481024c5599ff0c31554` |
+| `lean-toolchain` | Pinned Lean toolchain | `d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b` |
+| `lake-manifest.json` | Resolved dependency graph | `05bb6c0943a46ac7b9afe4831996b3fcd2091949c7c8b9c085b5ea269f818dfb` |
+| `LEAN_PROOF_GATE.md` | Strict compile receipt and remaining obligations | self-hash intentionally omitted |
+
 The first post-freeze native check is structural only:
 
 ```text
