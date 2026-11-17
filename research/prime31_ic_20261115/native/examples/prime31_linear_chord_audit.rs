@@ -20,7 +20,13 @@ fn on_curve((x,y):(u64,u64))->bool{
     x<P&&y<P&&mul(y,y,P)==((mul(mul(x,x,P),x,P)+mul(A,x,P))%P+B)%P
 }
 fn add(p:Pt,q:Pt)->Pt{
-    let (x,y)=p?;let (u,v)=q?;
+    // The group identity must be a *two-sided* identity; Option '?' would
+    // incorrectly map O+P and P+O to O, corrupting independent replay.
+    let ((x,y),(u,v))=match (p,q){
+        (None,r)=>return r,
+        (r,None)=>return r,
+        (Some(p),Some(q))=>(p,q)
+    };
     if x==u&&y!=v{return None}
     let slope=if x==u {
         if y==0{return None}
