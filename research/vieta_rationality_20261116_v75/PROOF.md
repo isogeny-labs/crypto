@@ -1,0 +1,11 @@
+# Vieta trace cut: exact scope and redundancy test
+
+For an ordinary binary curve Y2+XY=X3+A X2+B, write b=sqrt(B). A nonzero x has rational lifts iff Tr(x+A+b/x)=0. Let H be monic degree m with roots x_i in the ground field, counting multiplicity, and H0 nonzero. Vieta gives sum x_i=e1 and sum 1/x_i=e_(m-1)/e_m, hence the parity of nonrational roots equals Tr(e1+(m mod2)A+b e_(m-1)/e_m). All-rational roots require zero, but two or four anti-rational roots also pass. This is not a sufficient rationality or support criterion. Factor every X root first; those are rational torsion and do not enter the reciprocal formula. The remaining degree and coefficients supply the same identity.
+
+The actual C74 main-target theorem makes this a necessary cut for true original finite-chain source norms. Arbitrary support-valid polynomials and other targets do not inherit that theorem. The affine norm relaxation is only a candidate family; rejection there does not prove any original solution exists.
+
+A key possible refutation: for the full monic degree5 norm N=Norm(a2 X2+a1 X+a0+(X+b0)Y), N4=a2^2+a2+A, N0=(a0+b b0)^2 and N1=a0 b0. If N0 nonzero, b*N1/N0=t^2+t with t=a0/(a0+b b0). Thus the scalar trace cut is identically zero on this norm form. It can only help where the affine relaxation has not already enforced those identities; it cannot be advertised as an independent filter of complete norms.
+
+Batch inversion computes k nonzero reciprocals with one field inverse and O(k) multiplies. The field trace is an F2-linear functional, verified on the entire field basis and then evaluated by a bit-mask parity. All scalar results must match literal point-tag parity on independent small root multisets, with repetitions and zero roots retained.
+
+Join preflight: a binary source set with r nonzero rational x values has S=2r+1 finite points including unique T. The number of finite unordered pair-fiber records with repetition is S(S+1)/2-(r+1)=2r(r+1); inverse pairs and (T,T) sum to O. The declared packed 128-bit format stores one record per pair, not merely distinct images. Its exact footprint exceeds 4GiB if 16*2r(r+1)>cap. This refuses that representation before allocation; it does not rule out a more compact algorithm or prove expected image-collision estimates.

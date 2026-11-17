@@ -1,0 +1,1603 @@
+{
+  "schema": "local.ml-dataset.requirements-audit/v1",
+  "audit_date": "2026-11-07",
+  "purpose": "Requirement-by-requirement completion map; preserves the full user scope and does not redefine delivery as selected successes.",
+  "full_requested_axes": {
+    "families": [
+      "koblitz",
+      "binary",
+      "prime"
+    ],
+    "twists": [
+      false,
+      true
+    ],
+    "field_sizes": [
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61
+    ],
+    "prime_modulus_explicit": "2305843009213693951",
+    "arities": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "method_ids": [
+      "enumerate",
+      "bsgs",
+      "sat",
+      "weil",
+      "f4",
+      "f5",
+      "f6",
+      "root",
+      "pkm",
+      "double-large-prime"
+    ],
+    "additional_explicit_adapter": "f4-wide-dynamic-v1",
+    "multiple_generators_and_keys": true,
+    "matched_controls_and_special_factor_bases": true,
+    "intermediate_artifacts": true,
+    "measured_costs_and_instruction_scope": true,
+    "s3_persistence": true,
+    "native_cli": true
+  },
+  "audit_boundary": {
+    "cloud_requests": 0,
+    "scientific_executions": 0,
+    "builds": 0,
+    "source_mutations": 0,
+    "conductor_actions": 0,
+    "software_tests_run_this_audit": 0,
+    "full_campaign_enumerated": false,
+    "corpus_scope": "seven selected non-overlapping native cohorts plus separately classified software acceptance evidence",
+    "missing_evidence_is_not_proof_of_global_absence": true
+  },
+  "status_semantics": {
+    "implemented": "The exact inspected source contains a route/API at the described scope; does not imply release validation or all requested cells executed.",
+    "implemented_partial": "A real implementation exists with explicit family/arity/domain/instrumentation limitations.",
+    "implemented_pending_validation": "Code exists in separately identified frozen recovery source; required validation or publication remains incomplete.",
+    "missing": "Explicit source guard/capability gap in the inspected integrated source; does not rule out unrelated unintegrated research prototypes.",
+    "partial_native_cohorts": "Actual retained generated cells exist; all outcomes remain in denominator.",
+    "software_acceptance": "Real bounded native software executions whose scope is functional acceptance, kept separate from prospective scientific cohorts.",
+    "custody": "File hash/length/readback integrity, distinct from mathematical correctness and semantic replay."
+  },
+  "source_scopes": {
+    "baseline": {
+      "root": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/",
+      "identity": "exact source file hashes in evidence/source-files.sha256; do not assume clean HEAD",
+      "release_validation": "per-component retained receipts only; no tests run here"
+    },
+    "recovered": {
+      "root": "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-native-recovery-20261107/source/src/ml_dataset/",
+      "manifest_sha256": "9b37a6cbdf1c4b3f6ab00b1544d0703f8af630cc45b179949c767bca75ee5565",
+      "input_files": 1442,
+      "validation": "historical isolated compile pass; original full gate timeout124; migration rebuild interrupted; retry approval pending at snapshot",
+      "publication": "PR3490 recovery evidence/manifests, not corrected source implementation"
+    }
+  },
+  "evidence_registry": {
+    "cells124": {
+      "path": "/home/ec2-user/ml-dataset-requirements-audit-20261107/evidence/retained-cells.jsonl",
+      "kind": "current_local_manifest_inventory",
+      "scope": "124 original method cells, all statuses; no solver replay"
+    },
+    "cohorts": {
+      "path": "/home/ec2-user/crypto-ml-n26-n31-20261101/research/ml_dataset_campaign_inventory_20261101/README.md",
+      "kind": "committed_historical_cohort_inventory"
+    },
+    "strict_exports": {
+      "path": "/home/ec2-user/ml-dataset-coverage-audit-20261107/evidence/strict-export-summary.json",
+      "details": "/home/ec2-user/ml-dataset-coverage-audit-20261107/evidence/strict-export-inventory.jsonl",
+      "checks": "/home/ec2-user/ml-dataset-coverage-audit-20261107/evidence/export-artifact-checks.jsonl",
+      "kind": "current_local_custody_check",
+      "manifests": 78,
+      "artifact_refs": 926
+    },
+    "custody": {
+      "path": "/home/ec2-user/ml-dataset-coverage-audit-20261107/evidence/custody-byte-checks.jsonl",
+      "kind": "current_local_custody_check"
+    },
+    "custody_plan": {
+      "path": "/home/ec2-user/ml-dataset-coverage-audit-20261107/CUSTODY_PLAN.md",
+      "kind": "prepared_not_executed_s3_plan"
+    },
+    "s3_receipts": {
+      "path": "/home/ec2-user/ml-dataset-coverage-audit-20261107/REPORT.md",
+      "kind": "saved_remote_receipts_no_fresh_s3_audit"
+    },
+    "cli46": {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/full-objective-coverage-audit-20261101/evidence.json",
+      "kind": "saved_native_software_acceptance",
+      "cells": 46,
+      "outcomes": {
+        "verified": 39,
+        "partial": 3,
+        "unsupported": 4
+      }
+    },
+    "boolean4": {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/nov2-boolean-cli-acceptance-pass-checkpoint/payload/acceptance/analysis.json",
+      "kind": "saved_native_software_acceptance",
+      "cells": 4
+    },
+    "sat2": {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-acceptance-report-20261105/data.json",
+      "kind": "saved_native_initial_acceptance",
+      "cells": 2,
+      "solver_completed": 0
+    },
+    "sat_recovery": {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-native-recovery-20261107/recovery.receipt.json",
+      "interruption": "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-native-recovery-20261107/interruption.receipt.json",
+      "kind": "source_and_validation_recovery_not_dataset"
+    },
+    "dynamic432": {
+      "path": "/home/ec2-user/ml-dataset-coverage-audit-20261107/evidence/status.snapshot.json",
+      "keys": [
+        "dynamic_native_panel_216c_terminal",
+        "dynamic_native_panel_342_terminal",
+        "dynamic_native_panel_6e94_terminal"
+      ],
+      "kind": "failed_native_software_gates",
+      "warning": "Do not pool repeated432-row panels or treat them as432completed method cells."
+    },
+    "wide_fixture": {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/corpus-coverage-audit-20261030.md",
+      "kind": "historical_software_fixture_inventory"
+    },
+    "policy24": {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/full-objective-coverage-audit-20261101/ACCEPTANCE.md",
+      "kind": "historical_policy_fixture_inventory",
+      "cells": 24,
+      "verified": 20,
+      "unsupported": 4
+    },
+    "source_baseline": {
+      "path": "/home/ec2-user/ml-dataset-requirements-audit-20261107/evidence/source-files.sha256",
+      "kind": "current_source_hashes"
+    },
+    "source_tests": {
+      "path": "/home/ec2-user/ml-dataset-requirements-audit-20261107/evidence/source-test-pointers.txt",
+      "kind": "test_definitions_inspected_not_executed"
+    },
+    "owned_matrix_proposal": {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/original-owner-matrix-adapter-proposal-20261107/README.md",
+      "manifest_sha256": "0bdef92d9d7d2d4aa5418c2edd937b629547de9a92f0d1b3e5482254a52b99fe",
+      "kind": "external_unregistered_uncompiled_source_proposal",
+      "api": "OriginalOwner::matrix_phase(&mut self, Caps) -> Attempt"
+    },
+    "matrix_bridge": {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/scheduler-bqi-bridge-20261107/receipt.json",
+      "log": "/home/ec2-user/ml-dataset-resume-20261029/scheduler-bqi-bridge-20261107/tests.log",
+      "kind": "standalone_native_software_validation",
+      "compile_exit": 0,
+      "test_exit": 0,
+      "tests_passed": 22,
+      "tests_failed": 0,
+      "source_hashes_unchanged": true,
+      "binary_sha256": "2aa6a7c8cb2da9a9cf40114834c5d09a6f5920f1ab442bc77bdb9022955078c6",
+      "publication": {
+        "commit_prefix": "f0b00a5d9655",
+        "basis": "parent-reported; no GitHub request by this audit"
+      }
+    },
+    "cohort_index_v3": {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/cohort-index-20261107-v3",
+      "kind": "parent_reported_published_native_metadata_index",
+      "commit_prefix": "b36ae180",
+      "tests_passed": 24,
+      "cohorts": 7,
+      "manifests": 78,
+      "artifact_refs": 926,
+      "scope": "Core feature inputs.n bound to split_component and checked target/index joins and exact metadata custody; auxiliary descriptors remain distinct from full semantic/eligibility checks.",
+      "new_cloud_or_scientific_execution": false
+    }
+  },
+  "requirements": [
+    {
+      "id": "families_twists",
+      "requirement": "Koblitz, ordinary binary and prime curves; both twists",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented",
+        "finding": "Synthetic constructor authenticates original model, curve order, subgroup, generator/target and actual twist.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/curves.rs",
+            "line": 648
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/curves.rs",
+            "line": 770
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/curves.rs",
+            "line": 1870
+          }
+        ],
+        "limits": [
+          "Fixed construction caps may yield retained refusals; no replacement draw inferred."
+        ]
+      },
+      "execution": {
+        "state": "partial_native_cohorts",
+        "finding": "All three families and both twists occur at n24–31; n23/n47/n61 cohorts cover only listed families/methods.",
+        "evidence_refs": [
+          "cells124",
+          "cohorts"
+        ]
+      },
+      "custody": {
+        "state": "mixed_local_and_saved_s3"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Preserve a per-family/n/twist ledger; constructor eligibility does not fill unattempted method cells."
+      ]
+    },
+    {
+      "id": "low_sizes",
+      "requirement": "Every n=23..31",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented",
+        "finding": "Plan and constructor admit every requested low-band degree.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/mod.rs",
+            "line": 241
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/curves.rs",
+            "line": 770
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "partial_native_cohorts",
+        "finding": "n24–31: m2 enumerate all families/twists; n23: selected binary/Koblitz enumerate m3–15. Prime n23 not in the seven cohorts.",
+        "evidence_refs": [
+          "cells124"
+        ]
+      },
+      "custody": {
+        "state": "mixed_local_and_saved_s3"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Fill the per-n/family/method cohort ledger with existing cells and explicit absent cells; prospective production remains separate."
+      ]
+    },
+    {
+      "id": "high_sizes",
+      "requirement": "Every n=47..61 and prime p=2^61−1",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "Constructor admits all requested sizes, prime n61 chooses 2^61−1; method adapters have separate restrictions.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/curves.rs",
+            "line": 653
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/curves.rs",
+            "line": 1885
+          }
+        ],
+        "limits": [
+          "No extrapolation from endpoint constructor tests."
+        ]
+      },
+      "execution": {
+        "state": "partial_native_cohorts",
+        "finding": "Seven cohorts contain n47 binary/Koblitz m4 and prime n61 m2; no n48–60 cohort cells. Separate n47/53/61 F4 software fixtures are not this corpus.",
+        "evidence_refs": [
+          "cells124",
+          "wide_fixture"
+        ]
+      },
+      "custody": {
+        "state": "saved_s3_receipts_for_selected_cells"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Implement missing method-domain routes and retain n48–60 as unfilled in the corpus ledger."
+      ]
+    },
+    {
+      "id": "all_arities",
+      "requirement": "Every m=2..15",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "Plan retains all arities; enumerate/BSGS/legacy SAT/double-large-prime admit the full range while other methods narrow it.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/mod.rs",
+            "line": 247
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1032
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "partial_native_cohorts",
+        "finding": "All m occur only because n23 enumeration retained m3–15; high-m attempts are mostly censored. Broad method-by-arity completion absent.",
+        "evidence_refs": [
+          "cells124"
+        ]
+      },
+      "custody": {
+        "state": "mixed_local_and_saved_s3"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Keep method-specific support and observed outcomes distinct for every requested arity."
+      ]
+    },
+    {
+      "id": "multiple_generators_keys",
+      "requirement": "Multiple curve populations, generators and public synthetic known-answer keys",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented",
+        "finding": "Curve seed, generator_index and key_index are frozen constructor axes; private scalar construction is separated from public features.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/mod.rs",
+            "line": 257
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/curves.rs",
+            "line": 812
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/types.rs",
+            "line": 137
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "partial_native_cohorts",
+        "finding": "Koblitz n47 cohort uses two generators and two keys; other selected cohorts use one generator/key. Native known-answer checks do not mean scalar recovery.",
+        "evidence_refs": [
+          "cells124"
+        ]
+      },
+      "custody": {
+        "state": "mixed_local_and_saved_s3"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Expand independent populations under a prospective fixed budget; retain generator/key/twist split components and provenance restrictions."
+      ]
+    },
+    {
+      "id": "known_answers",
+      "requirement": "Replayable synthetic public instances with known-answer provenance",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented",
+        "finding": "Public generator/target and separate private witness are constructed; verifier checks curve/subgroup/target binding.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/curves.rs",
+            "line": 770
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/curves.rs",
+            "line": 842
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "partial_native_cohorts",
+        "finding": "Known-answer replay reported for all12 n24–25 cells and35 of36 n26–31; timeout remains without known-answer replay.",
+        "evidence_refs": [
+          "cells124",
+          "custody"
+        ]
+      },
+      "custody": {
+        "state": "local_custody_checked"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Keep constructed-known-answer, verified PDP witness and independently recovered scalar as separate eligible labels."
+      ]
+    },
+    {
+      "id": "pdp",
+      "requirement": "PDP decomposition and finite-domain negatives",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented",
+        "finding": "Bounded signed-domain enumeration records visited group transitions, exact candidates and group lift checks.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1456
+          }
+        ],
+        "limits": [
+          "Only the frozen finite signed domain is covered by exhaustive negatives."
+        ]
+      },
+      "execution": {
+        "state": "partial_native_cohorts",
+        "finding": "112 enumeration cells:68 solver_completed=true. The complete seven-cohort inventory has one PDP-witness flagtrue; all censored cases remain.",
+        "evidence_refs": [
+          "cells124"
+        ]
+      },
+      "custody": {
+        "state": "mixed_local_and_saved_s3"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Add a prospective explicit positive/control population API only after a frozen contract; do not relabel current natural negatives or censored attempts."
+      ]
+    },
+    {
+      "id": "f4_binary_small",
+      "requirement": "Binary/Koblitz F4 at m2 and admitted m3",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "Base Boolean matrix/splitting m2; separate original-bound m3 profiles support requested n bands and both twists.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 547
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 823
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1902
+          }
+        ],
+        "limits": [
+          "m3 degree bound1..6 and sign-closed domain profile; partial identity acceptance is not complete search."
+        ]
+      },
+      "execution": {
+        "state": "software_acceptance_only_in_named_evidence",
+        "finding": "CLI46 has four Koblitz n23/m3 F4/F5 cells; ordinary n23/m3 Boolean identity acceptance has four partial cells. No F4 cell in the124 selected cohort set.",
+        "evidence_refs": [
+          "cli46",
+          "boolean4",
+          "cells124"
+        ]
+      },
+      "custody": {
+        "state": "saved_acceptance_s3_and_local_exports"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Expand m3 beyond exactly four signed points/two x-codes; export independently checked matrix derivations."
+      ]
+    },
+    {
+      "id": "f4_f5_binary_high_m",
+      "requirement": "Binary/Koblitz F4 and F5 at m4..15",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "missing",
+        "finding": "Base boolean_solve rejects m!=2; the separate extension is m3 only. External original-owner adapter source now exists but is unregistered/uncompiled; a separate scheduler-to-BQI arithmetic bridge has22 passing standalone tests.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1033
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1913
+          }
+        ],
+        "limits": [
+          "Existing lift(group,domain,xs,target,limit) at solvers.rs:1617 is a semantic donor only: its Vec allocations and recursive group calls do not carry originalOwner/deadline admission; direct reuse is not safe for the new owned route."
+        ]
+      },
+      "execution": {
+        "state": "no_evidence",
+        "finding": "No delivered dataset route or cohort for this scope. The scheduler/BQI bridge has checked arithmetic component evidence; original-owner integration and CLI execution remain pending.",
+        "evidence_refs": [
+          "source_baseline",
+          "owned_matrix_proposal",
+          "matrix_bridge"
+        ]
+      },
+      "custody": {
+        "state": "not_applicable"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Review and compile the existing private OriginalOwner::matrix_phase proposal against the final recovered owner; preserve signed_target/search fields.",
+        "Exercise genuine original-owner n23/m4 both-family/both-twist fixtures and refusal paths under the same ownership_id/deadline; synthetic generic-owner tests do not replace this gate.",
+        "Bind retained normalized generators/rows to the checked BQI bridge under the same original ledger and actual checker limits; then add owned transport/capture/central replay.",
+        "Implement same-ledger outer pattern enumeration, dynamic splitting, original assignment evaluation and exact signed-domain lift before bounded F4 CLI outcomes. F5 needs distinct signature-safe semantics."
+      ],
+      "component_progress": [
+        {
+          "component": "scheduler row arithmetic certificate bridge",
+          "state": "standalone_native_tests_passed",
+          "scope": "checks equality of retained rows against exact ordered generators, including capped attempts; not original source authentication or closure"
+        },
+        {
+          "component": "OriginalOwner::matrix_phase adapter",
+          "state": "external_uncompiled",
+          "scope": "private same-budget phase proposal retaining map/source/scheduler state"
+        }
+      ]
+    },
+    {
+      "id": "f4_prime",
+      "requirement": "Prime F4 across low/wide fields and m2..15",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "Small-prime m2/reference and m3..15 affine chain; supervised wide m2/m3; explicit f4-wide-dynamic-v1 for n33..61,m4..15,degree12.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 2794
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 2995
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1038
+          }
+        ],
+        "limits": [
+          "Dynamic adapter is explicit; ordinary f4 does not silently select it.",
+          "Affine-chain exceptional infinity branches limit general negative PDP conclusions."
+        ]
+      },
+      "execution": {
+        "state": "software_acceptance_partial",
+        "finding": "CLI46 includes four n7/m3 F4 cells; wide fixtures exist. Repeated432-row dynamic software gates failed their useful-coverage rule; no F4 cell in selected124.",
+        "evidence_refs": [
+          "cli46",
+          "dynamic432",
+          "wide_fixture"
+        ]
+      },
+      "custody": {
+        "state": "saved_acceptance_s3"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Finish exact-source acceptance, add independent basis derivation and retain exceptional-infinity limitations before negative labels.",
+        "Produce method-specific requested-size cohorts after route qualification."
+      ]
+    },
+    {
+      "id": "f5_binary",
+      "requirement": "Binary/Koblitz F5",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "Native Boolean row-criterion F5 and splitting at m2 plus narrow supervised m3 profiles.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1044
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1902
+          }
+        ],
+        "limits": [
+          "Named route is row-criterion F5, not a claim to all general incremental F5 variants."
+        ]
+      },
+      "execution": {
+        "state": "software_acceptance_partial",
+        "finding": "Requested-size m3 software acceptance exists; no F5 cell in selected124.",
+        "evidence_refs": [
+          "cli46",
+          "boolean4",
+          "cells124"
+        ]
+      },
+      "custody": {
+        "state": "saved_acceptance_s3"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Capture per-row signatures and rejected-signature witnesses; extend larger domains/high arity."
+      ]
+    },
+    {
+      "id": "f5_prime",
+      "requirement": "Prime F5",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "missing",
+        "finding": "Dataset F5 requires characteristic two.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1908
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "no_evidence",
+        "finding": "No prime F5 cohort or acceptance route established.",
+        "evidence_refs": [
+          "source_baseline"
+        ]
+      },
+      "custody": {
+        "state": "not_applicable"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Design a distinct native prime-field F5 adapter and replay contract; retain unsupported rows until present."
+      ]
+    },
+    {
+      "id": "f6_binary",
+      "requirement": "Binary/Koblitz F6",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "F6WidePairIndex is exact geometric four-sum at m4.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 3197
+          }
+        ],
+        "limits": [
+          "The implementation is geometric four-sum, not general Groebner elimination."
+        ]
+      },
+      "execution": {
+        "state": "partial_native_cohorts",
+        "finding": "Ten n47 F6 cells completed in the selected cohorts, across binary/Koblitz and both twists.",
+        "evidence_refs": [
+          "cells124"
+        ]
+      },
+      "custody": {
+        "state": "saved_s3_receipts"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Expose actual internal lookup trajectory if needed for causal labels; decide/document any higher-arity route separately."
+      ]
+    },
+    {
+      "id": "f6_other",
+      "requirement": "Prime F6 and F6 beyond m4",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "missing",
+        "finding": "Current F6 adapter requires a binary curve and exactly four summands.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 3203
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "no_evidence",
+        "finding": "No matching requested-domain execution evidence.",
+        "evidence_refs": [
+          "source_baseline"
+        ]
+      },
+      "custody": {
+        "state": "not_applicable"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Define the intended prime/higher-arity F6 algorithm and native adapter; do not generalize m4 capability metadata."
+      ]
+    },
+    {
+      "id": "root",
+      "requirement": "Native root solvers",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "Binary/prime S3 univariate root paths at m2, bounded internal traces and distinct-root certificate checks.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 3271
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 3405
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 5248
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "partial_native_cohorts",
+        "finding": "Selected corpus has two prime61 root attempts, both timeouts; separate root correctness fixtures exist.",
+        "evidence_refs": [
+          "cells124",
+          "source_tests"
+        ]
+      },
+      "custody": {
+        "state": "saved_s3_for_censored_attempts"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Implement higher-m elimination and causal root-state projection with exact source/domain binding.",
+        "Preserve root timeouts and validate completed requested-size cohorts separately."
+      ]
+    },
+    {
+      "id": "sat_legacy",
+      "requirement": "Native binary/Koblitz SAT search",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "Legacy route constructs chained S3 CNF/XOR, loops intermediate identity patterns, calls native solve and verifies model/signed lift.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1677
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1774
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 5172
+          }
+        ],
+        "limits": [
+          "Legacy route has explicit circuit/event/conflict/time caps.",
+          "One model per pattern with a spurious lift does not refute the pattern."
+        ]
+      },
+      "execution": {
+        "state": "software_acceptance_and_source_tests",
+        "finding": "Source tests exercise decisions/trace caps; no SAT cell in selected124. Two delivered initial cells are separate and partial.",
+        "evidence_refs": [
+          "sat2",
+          "source_tests"
+        ]
+      },
+      "custody": {
+        "state": "saved_partial_acceptance_s3"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Retain search vs initial-only vs model-check outcomes separately; add independent UNSAT derivation before UNSAT proof labels."
+      ]
+    },
+    {
+      "id": "sat_owned_continuation",
+      "requirement": "Original-bound cumulative SAT continuation and verified execution",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_pending_validation",
+        "finding": "Recovered1442-file source includes sat_search_worker, retained owner continuation, qualification and central replay; validation interrupted.",
+        "source_refs": [
+          {
+            "scope": "recovered",
+            "path": "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-native-recovery-20261107/source/src/ml_dataset/sat_search_worker.rs",
+            "line": 5
+          },
+          {
+            "scope": "recovered",
+            "path": "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-native-recovery-20261107/source/src/ml_dataset/solvers.rs",
+            "line": 821
+          },
+          {
+            "scope": "recovered",
+            "path": "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-native-recovery-20261107/source/src/ml_dataset/search_replay_caller.rs",
+            "line": 248
+          }
+        ],
+        "limits": [
+          "PR3490 publishes recovery evidence/manifests, not the corrected implementation."
+        ]
+      },
+      "execution": {
+        "state": "pending_validation",
+        "finding": "Historical isolated compile passed; original full gate timed out124, recovery rebuild interrupted without terminal receipt. No new completed dataset claimed.",
+        "evidence_refs": [
+          "sat_recovery"
+        ]
+      },
+      "custody": {
+        "state": "source_evidence_s3_not_dataset"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Resume the existing approved validation sequence only after its bounded retry authorization; do not duplicate implementation or generation.",
+        "After qualification, add registered model/relation acceptance that genuinely invokes search and preserves failures."
+      ]
+    },
+    {
+      "id": "sat_prime",
+      "requirement": "Prime-field SAT",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "missing",
+        "finding": "Current chained-S3 SAT adapter requires a binary curve.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1683
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "no_evidence",
+        "finding": "No prime SAT route or selected cohort.",
+        "evidence_refs": [
+          "source_baseline"
+        ]
+      },
+      "custody": {
+        "state": "not_applicable"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Specify prime arithmetic encoding and independent model/certificate replay before adding a separate dispatch route."
+      ]
+    },
+    {
+      "id": "weil",
+      "requirement": "Weil descent",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "m2 exact finite-selector coordinate ANF/lift encoding for binary/Koblitz; weil output is explicitly encoding-only.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1042
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1902
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 5201
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "source_tests_only_in_named_evidence",
+        "finding": "No Weil cell in selected124; equation/selector correctness fixtures exist.",
+        "evidence_refs": [
+          "source_tests"
+        ]
+      },
+      "custody": {
+        "state": "source_artifacts_only_for_missing_cohort"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Generalize authenticated descent to higher m and implement a separately identified solving route.",
+        "Keep encoding generation separate from solver_completed."
+      ]
+    },
+    {
+      "id": "pkm",
+      "requirement": "PKM",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "Prime Kummer-tower F4 with finite-grid extraction, exact alternative domain, m2/3 and p<2^31.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 2256
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 2277
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/export.rs",
+            "line": 489
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "software_acceptance_partial",
+        "finding": "CLI46 has four n7/m2 PKM cells:one verified,three partial; no PKM cell in selected124.",
+        "evidence_refs": [
+          "cli46"
+        ]
+      },
+      "custody": {
+        "state": "saved_acceptance_s3"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Add wide-prime and higher-m native tower/elimination support with exact domain labels and replay.",
+        "Preserve partial PKM attempts; do not compare different actual factor-base domains as matched routes."
+      ]
+    },
+    {
+      "id": "factor_base_policies",
+      "requirement": "Controls and special factor-base policies",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "Legacy, sampled-x projected control, binary subspace intersection and binary Frobenius-union intersection; strict recipe/config binding.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/types.rs",
+            "line": 8
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/factor_bases.rs",
+            "line": 169
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/factor_bases.rs",
+            "line": 500
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/export.rs",
+            "line": 2720
+          }
+        ],
+        "limits": [
+          "Candidate cap1..65536; supplied binary basis dimension<=min(n,12).",
+          "A declared subspace is not a verified subfield; sampled-x projection is not uniform subgroup sampling."
+        ]
+      },
+      "execution": {
+        "state": "software_acceptance_partial",
+        "finding": "Named24-cell policy fixture has20verified/4prime-policy unsupported; all124 selected corpus configs have absent legacy policy.",
+        "evidence_refs": [
+          "policy24",
+          "cells124"
+        ]
+      },
+      "custody": {
+        "state": "saved_acceptance_evidence"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Expose matched policy cohorts using identical original curve/generator/target while retaining explicit recipe/domain identities.",
+        "Add requested prime special-base recipes and any automatic subfield-basis construction with real subfield checks."
+      ]
+    },
+    {
+      "id": "control_populations",
+      "requirement": "Positive, negative and matched factor-base controls",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "Target-independent recipe comparison exists; current constructor uses unconditioned uniform nonzero subgroup scalar population.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/curves.rs",
+            "line": 829
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/factor_bases.rs",
+            "line": 602
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/factor_bases.rs",
+            "line": 635
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "partial_native_cohorts",
+        "finding": "Selected124 have one PDP witness and many complete negatives/censored attempts; no pooled balanced-control experiment established.",
+        "evidence_refs": [
+          "cells124",
+          "policy24"
+        ]
+      },
+      "custody": {
+        "state": "mixed_local_and_saved_s3"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Implement/version an explicit target-population request if planted-positive data is desired, with restricted planting provenance and independent group checks.",
+        "Freeze natural controls, planted positives and sampling denominators separately; preserve current cohorts unchanged."
+      ]
+    },
+    {
+      "id": "symmetry_frobenius",
+      "requirement": "Symmetry, negation and Frobenius orbits",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "Actual coefficient-field Frobenius power, negation action, orbit points/closure/stabilizer and policy domain are public structural projections.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/curves.rs",
+            "line": 847
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/export.rs",
+            "line": 135
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/factor_bases.rs",
+            "line": 743
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/factor_bases.rs",
+            "line": 843
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "partial_native_cohorts",
+        "finding": "Binary/Koblitz cohort artifacts retain model/action information; matched symmetry-ablation or optimized-choice reward experiment absent.",
+        "evidence_refs": [
+          "strict_exports",
+          "cells124"
+        ]
+      },
+      "custody": {
+        "state": "hashed_public_export_artifacts"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Add symmetry-aware causal decision labels only from observed legal actions and matched controls.",
+        "Build explicit cross-size/isomorphism/orbit linkage components before transfer evaluation."
+      ]
+    },
+    {
+      "id": "double_large_prime",
+      "requirement": "Double-large-prime relations and filtering",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "All families,m2..15:two-residual elimination, exact signed Frobenius or identity/sign domains, sparse filtering and determined-column recovery.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1048
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/export.rs",
+            "line": 516
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/export.rs",
+            "line": 2398
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "software_acceptance_partial",
+        "finding": "CLI46 includes four verified prime n7/m2 double-large-prime cells; no corresponding cell in selected124.",
+        "evidence_refs": [
+          "cli46"
+        ]
+      },
+      "custody": {
+        "state": "saved_acceptance_s3"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Add full requested-family/method cohorts and internal pivot/filter mutation events with independently checked causal targets.",
+        "Keep relation recovery separate from constructed known-answer scalar."
+      ]
+    },
+    {
+      "id": "intermediates",
+      "requirement": "Persist meaningful intermediate equations, states and traces",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "Original equations, bounded exposed events, committed payloads, counters, group prefixes and partial native state boundaries are retained.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1050
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/capture.rs",
+            "line": 240
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/capture.rs",
+            "line": 260
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "partial_native_cohorts",
+        "finding": "Actual per-step enumeration artifacts, F6 domain/pairs and censored traces survive; matrix/SAT/root software paths expose bounded components.",
+        "evidence_refs": [
+          "strict_exports",
+          "custody",
+          "cells124"
+        ]
+      },
+      "custody": {
+        "state": "checked_artifact_custody"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Instrument missing native matrix pivots/row combinations/zero rows/F5 rejection witnesses and SAT watch/heap/minimization derivations.",
+        "Declare all uninstrumented or in-flight state omissions; artifact snapshots do not restore full opaque solver memory."
+      ]
+    },
+    {
+      "id": "cost_counters",
+      "requirement": "Measured per-method costs and instruction-to-solve targets",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "Counted group calls, candidate tests, native counters, resource ledgers and diagnostic clocks are distinct fields.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1456
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/report.rs",
+            "line": 590
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/telemetry.rs",
+            "line": 34
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "partial_native_cohorts",
+        "finding": "n24–25 records744 complete candidate tests; n26–31 records2240. Other counters remain scoped to their originating method.",
+        "evidence_refs": [
+          "cohorts",
+          "strict_exports"
+        ]
+      },
+      "custody": {
+        "state": "retained_measurement_artifacts"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Define target eligibility by counted unit and phase scope; retain failed/censored work and avoid interpreting modeled reservations as measured hardware cost."
+      ]
+    },
+    {
+      "id": "hardware_instructions",
+      "requirement": "Whole-worker retired instructions and instruction trajectories",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "Phase PMU collector distinguishes raw/exact-in-scope/multiplexed/unavailable; whole-worker count is explicitly null.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/telemetry.rs",
+            "line": 67
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/mod.rs",
+            "line": 1953
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/report.rs",
+            "line": 406
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "no_eligible_whole_solve_labels",
+        "finding": "CLI46 has184 scoped raw phase observations with training_cost_eligible=false; inspected corpus contracts do not provide complete instruction-to-solve labels.",
+        "evidence_refs": [
+          "cli46",
+          "source_tests"
+        ]
+      },
+      "custody": {
+        "state": "scoped_pmu_receipts_retained"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Integrate an admitted whole-worker collector with lifecycle/thread coverage checks and independently verified eligibility.",
+        "Preserve PMU unavailable/scaled/raw states; do not synthesize a missing count."
+      ]
+    },
+    {
+      "id": "s3_persistence",
+      "requirement": "S3 persistence of datasets and intermediate/failure artifacts",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "Native budget-bound immutable publication/roundtrip/catalog/fetch and restricted custody APIs exist; observed publication coverage differs by cohort.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/storage.rs",
+            "line": 596
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/storage.rs",
+            "line": 838
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/custody.rs",
+            "line": 457
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/custody.rs",
+            "line": 670
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "partial_native_cohorts",
+        "finding": "First five cohorts have saved S3 receipts. n24–31 currently audited local custody; two exact artifact-only archives prepared but not uploaded by this audit.",
+        "evidence_refs": [
+          "custody",
+          "s3_receipts",
+          "custody_plan"
+        ]
+      },
+      "custody": {
+        "state": "partial_local_gap"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Publish the two already-prepared archives through an applicable authorized bounded operator profile; require exact fresh GET/hash before durable acknowledgement.",
+        "Finish native grant-bound remote roundtrip qualification separately; never substitute source archive custody for scientific data custody."
+      ]
+    },
+    {
+      "id": "native_cli",
+      "requirement": "Native CLI planning, generation, verification, reporting, export, custody and admission",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented",
+        "finding": "DatasetCommand exposes plan/generate/preflight/verify/status/report/export/publish/restore/reconcile/custody/budget/start/capabilities.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/mod.rs",
+            "line": 35
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/mod.rs",
+            "line": 51
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/mod.rs",
+            "line": 241
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "partial_native_acceptance",
+        "finding": "Retained cohorts and CLI46/Boolean/SAT acceptance execute real native commands; newer SAT/affine integrations retain their own pending gates.",
+        "evidence_refs": [
+          "cohorts",
+          "cli46",
+          "boolean4",
+          "sat2",
+          "sat_recovery"
+        ]
+      },
+      "custody": {
+        "state": "native_receipts_and_exports_retained"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Keep exact source/binary/plan bindings per invocation and complete pending integration gates; do not equate command availability with all method support."
+      ]
+    },
+    {
+      "id": "learnable_features",
+      "requirement": "Learnable public graphs/traces, restricted labels and leakage control",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "Structural allowlists, separate restricted targets/proofs/index, prime-chain graphs and bounded branch/consequence channels exist.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/export.rs",
+            "line": 103
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/export.rs",
+            "line": 1066
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/export.rs",
+            "line": 1923
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "partial_native_exports",
+        "finding": "Published V3 cohort index (b36ae180; parent reports 24 passing tests) verifies 7 cohorts, 78 manifests and 926 artifact references with core feature inputs.n binding to split_component and target/index join checks. Auxiliary descriptor checks are not full semantic/eligibility validation; no model fit.",
+        "evidence_refs": [
+          "strict_exports",
+          "cohort_index_v3"
+        ]
+      },
+      "custody": {
+        "state": "checked_local_export_artifacts"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Independently validate remaining semantic/eligibility links and auxiliary-channel contracts using the published V3 index; do not rebuild the metadata index.",
+        "Add real method-specific causal matrix/root/PKM/F6/relation decision targets without future-state leakage."
+      ],
+      "component_progress": [
+        {
+          "component": "native metadata cohort index V3",
+          "state": "published_scoped_component",
+          "scope": "seven separate cohorts; metadata custody/core feature inputs.n binding to split_component and target/index join checks; 24 software tests reported by parent"
+        }
+      ]
+    },
+    {
+      "id": "splits",
+      "requirement": "Cross-cohort grouping, population isolation and evaluation eligibility",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "implemented_partial",
+        "finding": "Whole-field-size split keeps same-size families/twists/generators/keys together; n24–31 forbids cross-population pooling.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/curves.rs",
+            "line": 850
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/export.rs",
+            "line": 1066
+          }
+        ],
+        "limits": []
+      },
+      "execution": {
+        "state": "partial_native_exports",
+        "finding": "Published V3 metadata index preserves separate cohort/protocol/source identities and core feature inputs.n binding to split_component and target/index join checks. The n24–25 split is 6 train/6 test and the n26–31 split is 30 train/6 validation; these remain separate with no audited pooled-training contract.",
+        "evidence_refs": [
+          "strict_exports",
+          "cohort_index_v3"
+        ]
+      },
+      "custody": {
+        "state": "hash_checked_separate_exports"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Retain the completed metadata index and independently check remaining semantic/eligibility links, auxiliary descriptors and cross-size/isomorphism group rules.",
+        "Freeze an explicit policy contract before any pooling, fit or evaluation; do not infer permission from absent fields."
+      ]
+    },
+    {
+      "id": "fall_degree_labels",
+      "requirement": "Exact first/last-fall labels where claimed",
+      "required_axes": "full_requested_axes unless an explicit method-domain qualification is recorded",
+      "implementation": {
+        "state": "missing",
+        "finding": "Capability declarations explicitly leave exact FFD/LFD certificates unimplemented; checked row identities are narrower.",
+        "source_refs": [
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/solvers.rs",
+            "line": 1050
+          },
+          {
+            "scope": "baseline",
+            "path": "/home/ec2-user/crypto-ml-ordinary-ownership-20261101/src/ml_dataset/export.rs",
+            "line": 1599
+          }
+        ],
+        "limits": [
+          "This row records a requested research-label boundary, not a newly added requirement for every method cell."
+        ]
+      },
+      "execution": {
+        "state": "no_exact_labels",
+        "finding": "Selected corpus contracts preserve exact degrees as null. Separate historical fall-degree studies are not silently imported as these labels.",
+        "evidence_refs": [
+          "cohorts"
+        ]
+      },
+      "custody": {
+        "state": "null_labels_preserved"
+      },
+      "full_requirement_complete": false,
+      "next_actions": [
+        "Only add finite-instance degree labels through an explicit certificate/independent checker with its hypotheses; keep observed cancellations distinct."
+      ]
+    }
+  ],
+  "overall": {
+    "requirement_rows": 32,
+    "completion_percentage": null,
+    "reason_no_percentage": "Routes, successful cells, censored attempts, labels and custody have different denominators; the full requested cohort matrix remains required.",
+    "next_work_order": [
+      "Retain published V3 metadata cohort index b36ae180 (24tests;7cohorts/78manifests/926artifacts). Next independently validate remaining semantic/eligibility links and auxiliary-channel policy contracts without pooling.",
+      "Close the concrete n24–31 S3 artifact custody gap under applicable authorized finite preservation limits.",
+      "Complete existing owned SAT validation sequence after its approval; do not write a duplicate.",
+      "Integrate the existing uncompiled original-owner matrix adapter and checked arithmetic bridge; then add same-ledger patterns, splitting, assignment/lift, capture/replay and explicit F4 dispatch. F5 signatures remain distinct.",
+      "Add native matrix derivation/causal data and remaining root/PKM/prime-method routes, then prospective full-scope cohorts."
+    ]
+  },
+  "observed_selected_cohort_totals": {
+    "terminal_cells": 124,
+    "verified_status": 78,
+    "timeout_status": 26,
+    "budget_exhausted_status": 20,
+    "method_counts": {
+      "enumerate": {
+        "attempts": 112,
+        "solver_completed_true": 68
+      },
+      "f6": {
+        "attempts": 10,
+        "solver_completed_true": 10
+      },
+      "root": {
+        "attempts": 2,
+        "solver_completed_true": 0
+      }
+    },
+    "pdp_witness_verified_true": 1,
+    "scalar_recovered_without_witness_true": 0,
+    "explicit_factor_base_policy_cells": 0,
+    "scope": "Exactly the124 original manifests in evidence/retained-cells.jsonl; no population pooling or success-only denominator."
+  },
+  "unresolved_checks": [
+    "Global later scientific corpus inventory beyond the named seven cohorts and separately saved acceptance records was not exhaustively scanned; observe no cloud requests.",
+    "Current release/merge status of source candidate and current cloud budget/approval are not inferred from saved receipts.",
+    "New owner adapter needs genuine original-owner integration review/compile/tests; standalone bridge arithmetic tests do not settle it.",
+    "The published V3 metadata index and core feature inputs.n binding to split_component and target/index join checks are completed scoped work; independent auxiliary-channel semantics, remaining eligibility links and pooled-training policy remain separate obligations.",
+    "Full whole-worker PMU and native private-state trace coverage remain unverified in the named retained datasets."
+  ]
+}

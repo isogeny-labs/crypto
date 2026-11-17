@@ -1,0 +1,25 @@
+import UnionAfterFinds
+set_option autoImplicit false
+namespace UnionCompositionControls
+open SignedWord
+
+def chain : State 3 := ⟨fun i=>if i=1 then 0 else i,fun i=>if i=1 then ⟨-1,2,3⟩ else ident⟩
+def found : Pot := compose 17 (chain.pot 1) ident
+def compressed : State 3 := compress chain 1 0 found
+def initial : UnionState 3 := ⟨chain,fun i=>if i=0 then some (7,8) else none⟩
+def lifted : UnionState 3 := ⟨compressed,initial.fixed⟩
+def pot : Pot := reducedUnionPot 17 found ident 1 1 5 7
+
+theorem actual_first_find : Run 17 chain 1 compressed 0 found :=
+ Run.step chain chain 1 0 ident (by decide) (Run.root chain 0 (by decide))
+theorem actual_second_find : Run 17 compressed 2 compressed 2 ident :=
+ Run.root compressed 2 (by decide)
+theorem reduced_labels : pot.s=1 ∧ pot.a=14 ∧ pot.b=13 := by decide
+theorem forward_anchor_transfer :
+ (branchWord 17 lifted 0 2 pot true).graph.parent 0=2 ∧
+ (branchWord 17 lifted 0 2 pot true).fixed 2=some (10,12) := by decide
+theorem backward_retains_anchor :
+ (branchWord 17 lifted 0 2 pot false).graph.parent 2=0 ∧
+ (branchWord 17 lifted 0 2 pot false).fixed 0=some (7,8) := by decide
+theorem invalid_sign_excluded : ¬Sign (0:Int8) := by simp [Sign]
+end UnionCompositionControls

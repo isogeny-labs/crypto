@@ -1,0 +1,31 @@
+import CZero
+set_option autoImplicit false
+namespace FastCRT
+open Polynomial
+variable {R : Type*} [CommRing R]
+noncomputable def support (q r : R) : R[X] := X^2+C q*X+C r
+noncomputable def delta (a b : R) : R[X] := C a*X+C b
+noncomputable def adjugate (a b q : R) : R[X] := C (b-a*q)-C a*X
+def norm (a b q r : R) : R := b^2-a*b*q+a^2*r
+def slopeOne (a b c d : R) : R := c*b-a*d
+def slopeZero (a b c d q r : R) : R := d*(b-a*q)+a*c*r
+
+theorem support_inverse_certificate (qa ra qb rb : R) :
+ (support qa ra-support qb rb)*adjugate (qa-qb) (ra-rb) qb =
+ C (norm (qa-qb) (ra-rb) qb rb)-C ((qa-qb)^2)*support qb rb := by
+ simp only [support,adjugate,norm,map_sub,map_mul,map_pow]
+ ring
+
+theorem crt_slope_identity (a b c d q r : R) :
+ delta c d*adjugate a b q-
+ (C (slopeZero a b c d q r)+C (slopeOne a b c d)*X) =
+ support q r*C (-a*c) := by
+ simp only [delta,adjugate,slopeZero,slopeOne,support,map_add,map_sub,map_mul,map_neg]
+ ring
+
+theorem crt_slope_certificate (qa ra sa ta qb rb sb tb : R) :
+ support qb rb ∣ delta (sb-sa) (tb-ta)*adjugate (qa-qb) (ra-rb) qb-
+ (C (slopeZero (qa-qb) (ra-rb) (sb-sa) (tb-ta) qb rb)+
+ C (slopeOne (qa-qb) (ra-rb) (sb-sa) (tb-ta))*X) := by
+ exact ⟨C (-(qa-qb)*(sb-sa)),crt_slope_identity _ _ _ _ _ _⟩
+end FastCRT

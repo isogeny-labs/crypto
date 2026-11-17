@@ -1,0 +1,197 @@
+{
+  "card_id": "CARD-arity-launch-prime-main",
+  "card_path": "research/arity_completion_20261104/cards/CARD-arity-launch-prime-main.yaml",
+  "card_sha256": "c543b914eeec7f08f70a970ce2e8120045b12df940f487e1428ac6a0254d9544",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "research/arity_completion_20261104/cards/gates/source-identity.py",
+        "research/arity_completion_20261104/launch/request-prime-main.json",
+        "research/arity_completion_20261104/launch/image.json",
+        "4fa25efc0e2392b2e02e4c84253059ebc7c67e02"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.628,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "source-identity",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.628,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "16943c6e5bdf0f03c0a5b8d394857cfa7e7a2c0d111bb2b081482e17c6ae6b66",
+      "stdout_tail": [
+        "HEAD 2d57e7fa55a643d5c427fb5d081e8e25e0cf620f",
+        "request.provenance.source_revision 4fa25efc0e2392b2e02e4c84253059ebc7c67e02",
+        "image.source_revision 4fa25efc0e2392b2e02e4c84253059ebc7c67e02",
+        "request.job.image 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:dd52495564680cb69576321fb1d6b5239d6ab8d9929b3965292040172e644b05",
+        "image.image_uri 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:dd52495564680cb69576321fb1d6b5239d6ab8d9929b3965292040172e644b05",
+        "OK   git HEAD is 40 hex",
+        "OK   git status --porcelain is empty",
+        "OK   request provenance.source_revision == image.json source_revision",
+        "OK   image.json source_revision == frozen commit",
+        "OK   request job.image == image.json image_uri"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/arity_completion_20261104/cards/gates/image-identity.py",
+        "research/arity_completion_20261104/launch/image.json",
+        "sha256:dd52495564680cb69576321fb1d6b5239d6ab8d9929b3965292040172e644b05"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.02,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "image-identity",
+      "index": 2,
+      "outputs": {},
+      "seconds": 1.02,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "3f6f1217c8435df44234906234b8646aa1ec947ab2b50a3d368113291ad73a25",
+      "stdout_tail": [
+        "aws exit 0",
+        "aws stdout sha256:dd52495564680cb69576321fb1d6b5239d6ab8d9929b3965292040172e644b05",
+        "OK image digest present in ECR: sha256:dd52495564680cb69576321fb1d6b5239d6ab8d9929b3965292040172e644b05"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "aws",
+        "budgets",
+        "describe-budgets",
+        "--account-id",
+        "104186811093",
+        "--query",
+        "Budgets[].{name:BudgetName,actual:CalculatedSpend.ActualSpend.Amount,limit:BudgetLimit.Amount}",
+        "--output",
+        "json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.867,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "budget-readback",
+      "index": 3,
+      "outputs": {
+        "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-prime-main-budgets.json": "a15272c5f938a9aa2ad2be00e76f7d49986ff596a7a091ff797c1ddbd35afe67"
+      },
+      "seconds": 0.867,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a15272c5f938a9aa2ad2be00e76f7d49986ff596a7a091ff797c1ddbd35afe67",
+      "stdout_tail": [
+        "[",
+        "    {",
+        "        \"name\": \"isolab-daily-cost-100\",",
+        "        \"actual\": \"107.557\",",
+        "        \"limit\": \"200.0\"",
+        "    },",
+        "    {",
+        "        \"name\": \"isolab-monthly-account-cost\",",
+        "        \"actual\": \"407.416\",",
+        "        \"limit\": \"1000.0\"",
+        "    },",
+        "    {",
+        "        \"name\": \"spot-experiments-daily-25\",",
+        "        \"actual\": \"44.125\",",
+        "        \"limit\": \"200.0\"",
+        "    }",
+        "]"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command",
+        "research/arity_completion_20261104/launch/request-prime-main.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 658.312,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "submit",
+      "index": 4,
+      "outputs": {
+        "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-prime-main/submit/build-start.json": "e39d2ceb5c2571ce79a230efb300ed8ed103fe27ea1b12cda502b2caeb250354",
+        "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-prime-main/submit/result.json": "9cd56eb1de96a1d4ffc34d033e7ae6f2d60d1c4bbe4e9ca0f5e7bdcf597d8828"
+      },
+      "seconds": 658.312,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "115960ee574c68cffd210054412fc321decaf4dd728bd75cd6d370e7779f1aae",
+      "stdout_tail": [
+        "{",
+        "  \"schema\": \"isolab.eks.command-result/v1\",",
+        "  \"state\": \"active\",",
+        "  \"job_name\": \"arity-prime-m5-main-20261104\",",
+        "  \"job_uid\": \"d376c6cc-a1f0-4101-807e-fd577f065c6e\",",
+        "  \"pods\": [",
+        "    {",
+        "      \"uid\": \"eed0517c-84f0-4bdd-b33d-a38b24c7a54b\",",
+        "      \"phase\": \"Failed\",",
+        "      \"node\": \"ip-10-84-25-33.us-east-2.compute.internal\",",
+        "      \"exit_code\": 31",
+        "    }",
+        "  ],",
+        "  \"results_prefix\": \"s3://isolab-results-104186811093-us-east-2/runs/arity-prime-m5-main-20261104/\",",
+        "  \"receipt_uri\": \"s3://isolab-results-104186811093-us-east-2/runs/arity-prime-m5-main-20261104/launcher/367b7870-55e8-489d-9379-1ab0aa9ea5e9/\",",
+        "  \"request_sha256\": \"04c98eeeb54e0d953c3c7907d6634ed66109ecf85d3ef5190cc0c048e6d9918f\",",
+        "  \"manifest_sha256\": \"d7fe605782bfb64fde931826e63323c285b580aa4ef829da95fa4ad96eccc901\",",
+        "  \"launcher\": \"isolab-experiment-launcher:367b7870-55e8-489d-9379-1ab0aa9ea5e9\",",
+        "  \"exit_code\": 0",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 4,
+  "commit": "2d57e7fa55a643d5c427fb5d081e8e25e0cf620f",
+  "dirty_after": [
+    "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-prime-main-budgets.json",
+    "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-prime-main-submit.stderr",
+    "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-prime-main-submit.stdout",
+    "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-prime-main/submit/build-start.json",
+    "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-prime-main/submit/build.json",
+    "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-prime-main/submit/request.json",
+    "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-prime-main/submit/result.json",
+    "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-prime-main/submit/start-request.json"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

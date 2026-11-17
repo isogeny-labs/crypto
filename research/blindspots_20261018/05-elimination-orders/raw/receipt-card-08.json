@@ -1,0 +1,217 @@
+{
+  "card_id": "CARD-BLINDSPOT-05-08",
+  "card_path": "research/blindspots_20261018/05-elimination-orders/card-08.yaml",
+  "card_sha256": "72e552db200a70593c4d54a2e55d0b2c3ca136214e48b1592c9e6a7cb1ae64fb",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-05/card-08"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-05/card-08/b05",
+        "examples/blindspots_05_elimination_orders.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 4.487,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 4.487,
+      "stderr_sha256": "68c726b2922de2b59f9658ee1bf338ad10c01ad3911f3a25af38414155bbe22c",
+      "stderr_tail": [
+        "    |",
+        "458 | fn poly_degree(p: &Poly) -> u32 {",
+        "    |    ^^^^^^^^^^^",
+        "",
+        "warning: field `nv` is never read",
+        "   --> examples/blindspots_05_elimination_orders.rs:549:5",
+        "    |",
+        "548 | struct Order {",
+        "    |        ----- field in this struct",
+        "549 |     nv: usize,",
+        "    |     ^^",
+        "",
+        "warning: constant `FIXED_ARMS` is never used",
+        "    --> examples/blindspots_05_elimination_orders.rs:1334:7",
+        "     |",
+        "1334 | const FIXED_ARMS: [&str; 6] = [\"grevlex\", \"blkLI\", \"blkIL\", \"wdeg\", \"mindeg\", \"tw\"];",
+        "     |       ^^^^^^^^^^",
+        "",
+        "warning: 4 warnings emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-05/card-08/b05",
+        "run",
+        "--draws",
+        "research/blindspots_20261018/05-elimination-orders/draws.tsv",
+        "--cell",
+        "c17-4-4",
+        "--targets",
+        "0",
+        "--arms",
+        "wdeg",
+        "--time-limit",
+        "370",
+        "--total-limit",
+        "370"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 370.172,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "wdeg-c17-4-4-t0",
+      "index": 3,
+      "outputs": {},
+      "seconds": 370.172,
+      "stderr_sha256": "6a337d716712c8e9cc2eab28b56ea339f65cc822dcbfb3fd40d5cdd4bec0b291",
+      "stderr_tail": [
+        "c17-4-4 t0 wdeg: timelimit D=6 steps=39 touches=29056547382 370.1s"
+      ],
+      "stdout_sha256": "51f4fa146276e248836eaf85075f424f94fe024d2a1a83ba5c7d61c88d89fa21",
+      "stdout_tail": [
+        "{\"cell\":\"c17-4-4\",\"m\":4,\"n\":17,\"ell\":4,\"nv\":50,\"target\":0,\"arm\":\"wdeg\",\"solutions\":0,\"status\":\"timelimit\",\"d_mat\":6,\"d_sel\":6,\"steps\":39,\"pairs_sel\":59087,\"pairs_gen\":262842,\"rows_max\":73789,\"cols_max\":76084,\"rc_max\":5614162276,\"nnz_max\":33541537,\"cols_sum\":258706,\"rows_sum\":187370,\"touches\":29056547382,\"build\":40877007,\"elim\":25036487913,\"back\":3979182462,\"zero_red\":30058,\"new_elems\":8730,\"g_size\":8781,\"ms\":370121.4,\"ms_sym\":1945.7,\"ms_elim\":45413.9,\"ms_back\":5670.0,\"ms_add\":3030.8,\"rss_kb\":829568,\"step_rows\":[16,18,125,101,1190,240,7,98,86,285,2153,47,90,995,655,346,270,2260,1630,1668,459,2521,558,23702,478,2616,2004,16256,2571,1790,29566,1753,63,488,7505,101,7636,73789,1234],\"step_cols\":[89,93,623,160,4240,141,20,89,79,276,4180,57,93,3166,1532,676,702,2814,2396,1888,690,2717,989,27698,710,2796,2026,24605,3848,4066,42954,6847,996,1927,14639,180,15023,76084,6597],\"pg_edges\":941,\"pg_pairs\":1225,\"width_mindeg\":37,\"width_minfill\":37}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-05/card-08/b05"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-05/card-08"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "49990049d5edaef70306cb315223f803356da84c",
+  "dirty_after": [
+    "research/blindspots_20261018/04-presentation-search/raw/card-17-b-cell4-t5.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-17-b-cell4-t5.log",
+    "research/blindspots_20261018/04-presentation-search/raw/receipt-card-17.json",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-06-blkli-c15-3-4.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-06-blkli-c15-3-4.stdout.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-06-main-c15-3-4.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-06-main-c15-3-4.stdout.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-08-wdeg-c17-4-4-t0.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-08-wdeg-c17-4-4-t0.stdout.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/receipt-card-06.json",
+    "research/blindspots_20261018/09-learned-f4-policy/PROTOCOL.md",
+    "xamples/blindspots_09_learned_f4.rs"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/04-presentation-search/raw/card-17-b-cell4-t5.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-17-b-cell4-t5.log",
+    "research/blindspots_20261018/04-presentation-search/raw/receipt-card-17.json",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-06-blkli-c15-3-4.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-06-blkli-c15-3-4.stdout.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-06-main-c15-3-4.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-06-main-c15-3-4.stdout.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/receipt-card-06.json",
+    "xamples/blindspots_09_learned_f4.rs"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

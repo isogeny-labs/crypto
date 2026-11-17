@@ -1,0 +1,33 @@
+{
+  "schema": "ml-dataset.native-consumer-review-followup/v1",
+  "recorded_utc": "2026-10-28T08:31:45Z",
+  "task": "T-715",
+  "pull_request": "https://github.com/isogeny-labs/crypto/pull/2757",
+  "source_parent": "af10d1bf7da2a7b70b3a674766d97b0523127ba5",
+  "merged_main": "189ac727fcc4475b42755d4f1c15f97a4a102070",
+  "source_files": "source-hashes.json",
+  "binary_sha256": "185cf7b5d907bf885fc74513bd7d467eba3a7bc38f6c853389f8144fbe597af4",
+  "regression": "complete_cycles_do_not_make_incomplete_instruction_timing_exact",
+  "release_tests": {
+    "library": 73,
+    "integration": 7,
+    "failed": 0,
+    "ignored": 0
+  },
+  "clippy_warnings_denied": true,
+  "format_checked": true,
+  "release_binary_built": true,
+  "commands": [
+    "cargo fmt --manifest-path native/Cargo.toml --check",
+    "cargo test --release --locked --offline --manifest-path native/Cargo.toml",
+    "cargo clippy --release --locked --offline --manifest-path native/Cargo.toml --all-targets -- -D warnings",
+    "cargo build --release --locked --offline --manifest-path native/Cargo.toml"
+  ],
+  "software_validation": true,
+  "scientific_observation": false,
+  "producer_replay_performed": false,
+  "new_compute_workers": 0,
+  "iam_mutated": false,
+  "remote_ci_for_followup_head_verified": false,
+  "review_threads_resolved": false
+}

@@ -1,0 +1,20 @@
+[package]
+name = "ml-dataset-independent-consumer"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+anyhow = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["preserve_order"] }
+sha2 = "0.10"
+tempfile = "3.27"
+libc = "0.2"
+rand = "=0.8.8"
+
+[[bin]]
+name = "dataset-consumer"
+path = "src/main.rs"

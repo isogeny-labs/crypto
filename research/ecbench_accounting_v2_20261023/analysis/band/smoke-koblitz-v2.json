@@ -1,0 +1,180 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "log2_r": 16.001122266128682,
+      "arm": "bsgs-neg-v2",
+      "runs": 6,
+      "verified": 6,
+      "mean_s": [
+        1.0484202649299448,
+        1.1417433350670982,
+        1.9816509663014783
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "log2_r": 16.001122266128682,
+      "arm": "claw-v2",
+      "runs": 6,
+      "verified": 6,
+      "mean_s": [
+        1.1610066745096346,
+        1.281402546025488,
+        2.3649653896681686
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "log2_r": 16.001122266128682,
+      "arm": "ic-frob",
+      "runs": 6,
+      "verified": 6,
+      "mean_s": [
+        16.89707247587901,
+        17.33049761333608,
+        21.23132385044973
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "log2_r": 16.001122266128682,
+      "arm": "rho-frob-v2",
+      "runs": 6,
+      "verified": 6,
+      "mean_s": [
+        0.8902786607226347,
+        0.9211911142199485,
+        1.1994031956957718
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "log2_r": 16.001122266128682,
+      "arm": "rho-neg-v2",
+      "runs": 6,
+      "verified": 6,
+      "mean_s": [
+        1.7219863569240434,
+        1.8458314074617024,
+        2.9604368623006323
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "log2_r": 16.001122266128682,
+      "arm": "rho-strong-v2",
+      "runs": 6,
+      "verified": 6,
+      "mean_s": [
+        0.8675207830717065,
+        0.9319488440450551,
+        1.511801392805192
+      ],
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "bsgs-neg-v2",
+      "b": "claw-v2",
+      "verdict": "bsgs-neg-v2 < claw-v2"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "bsgs-neg-v2",
+      "b": "ic-frob",
+      "verdict": "bsgs-neg-v2 < ic-frob"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "bsgs-neg-v2",
+      "b": "rho-frob-v2",
+      "verdict": "rho-frob-v2 < bsgs-neg-v2"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "bsgs-neg-v2",
+      "b": "rho-neg-v2",
+      "verdict": "bsgs-neg-v2 < rho-neg-v2"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "bsgs-neg-v2",
+      "b": "rho-strong-v2",
+      "verdict": "rho-strong-v2 < bsgs-neg-v2"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "claw-v2",
+      "b": "ic-frob",
+      "verdict": "claw-v2 < ic-frob"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "claw-v2",
+      "b": "rho-frob-v2",
+      "verdict": "rho-frob-v2 < claw-v2"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "claw-v2",
+      "b": "rho-neg-v2",
+      "verdict": "claw-v2 < rho-neg-v2"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "claw-v2",
+      "b": "rho-strong-v2",
+      "verdict": "rho-strong-v2 < claw-v2"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "ic-frob",
+      "b": "rho-frob-v2",
+      "verdict": "rho-frob-v2 < ic-frob"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "ic-frob",
+      "b": "rho-neg-v2",
+      "verdict": "rho-neg-v2 < ic-frob"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "ic-frob",
+      "b": "rho-strong-v2",
+      "verdict": "rho-strong-v2 < ic-frob"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "rho-frob-v2",
+      "b": "rho-neg-v2",
+      "verdict": "rho-frob-v2 < rho-neg-v2"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "rho-frob-v2",
+      "b": "rho-strong-v2",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "rho-neg-v2",
+      "b": "rho-strong-v2",
+      "verdict": "rho-strong-v2 < rho-neg-v2"
+    }
+  ]
+}

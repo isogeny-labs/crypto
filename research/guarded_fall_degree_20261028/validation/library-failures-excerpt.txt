@@ -1,0 +1,44 @@
+failures:
+
+---- cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar stdout ----
+
+thread 'cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar' (23311) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:
+tracked gpu/certicom source must be materialized
+
+---- cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures stdout ----
+
+thread 'cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures' (23312) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:
+tracked gpu/certicom source must be materialized
+
+---- cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic stdout ----
+
+thread 'cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic' (23313) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:
+tracked gpu/certicom source must be materialized
+
+---- cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver stdout ----
+
+thread 'cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver' (23314) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:
+tracked gpu/certicom source must be materialized
+
+---- cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed stdout ----
+
+thread 'cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed' (23315) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:
+tracked gpu/certicom source must be materialized
+
+---- cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version stdout ----
+
+thread 'cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version' (23846) panicked at src/cryptanalysis/ecbench/bounds.rs:2435:38:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-research/research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/session.json: No such file or directory (os error 2)"
+
+
+failures:
+    cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar
+    cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures
+    cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic
+    cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver
+    cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed
+    cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version
+
+test result: FAILED. 4988 passed; 6 failed; 122 ignored; 0 measured; 0 filtered out; finished in 1372.18s
+
+error: test failed, to rerun pass `--lib`

@@ -1,0 +1,156 @@
+{
+  "schema": "pencil-accounting-implementation-state/v1",
+  "observed_utc": "2026-10-29T19:09:49.028795+00:00",
+  "supersedes_status_only": "coverage-ledger.json is an earlier gap inventory, retained unchanged",
+  "state": "software_validated_source_review_complete_binding_pending",
+  "categories": [
+    {
+      "category": "outer_and_constructor_validation",
+      "source": "src/outer_primality.rs; src/cryptanalysis/three_leads_constructor_primality.rs",
+      "implementation": "Integrated separate modulus-domain observations; actual helper invocations only.",
+      "coverage_certified": false
+    },
+    {
+      "category": "field_and_scalar_arithmetic",
+      "source": "native_price/src/analyzer.rs; native_price/src/importer.rs",
+      "implementation": "Checked inverse expansion normalization and domain-specific pricing; impossible counts reject.",
+      "coverage_certified": false
+    },
+    {
+      "category": "collection_graph_elimination",
+      "source": "src/meter.rs; src/tracked_set.rs; src/collector.rs; src/residual.rs; src/sparse.rs; src/native_solver.rs",
+      "implementation": "Observed disjoint comparisons, visits, copies and initializations; diagnostic aggregates excluded.",
+      "coverage_certified": false
+    },
+    {
+      "category": "hash_rng",
+      "source": "src/cryptanalysis/three_leads_rho_events.rs; src/native_solver.rs",
+      "implementation": "Pinned reference table hash policy and actual atomic walk_label_calls; no inferred event count.",
+      "coverage_certified": false
+    },
+    {
+      "category": "setup_transfer_and_source_verification",
+      "source": "src/cryptanalysis/three_leads_geometry_events.rs; src/cryptanalysis/ecbench/pencil.rs; src/cryptanalysis/ecbench/three_leads.rs",
+      "implementation": "Geometry snapshots partition cold solver, extra verification, calibration and report assembly.",
+      "coverage_certified": false
+    },
+    {
+      "category": "metadata_clone",
+      "source": "src/cryptanalysis/three_leads_geometry_events.rs",
+      "implementation": "Value node copies observed; bytes supplemental; observer traversal not algorithm events.",
+      "coverage_certified": false
+    },
+    {
+      "category": "calibration",
+      "source": "native_price/src/importer.rs; native_price/src/analyzer.rs",
+      "implementation": "Preparation+addition=total and addition=source unit checked; separate and combined prices.",
+      "coverage_certified": false
+    },
+    {
+      "category": "paired_analysis",
+      "source": "native_price/src/analyzer.rs",
+      "implementation": "Session/binary/seed/workload/round binding; null grid for missing or unverified pairs; complete independent coverage required.",
+      "coverage_certified": false
+    },
+    {
+      "category": "cohort_aggregation",
+      "source": "native_price/",
+      "implementation": "Implemented checked exact-rational sums and complete-plan binding; 28 analyzer tests pass. Plan-only validation observes zero records and retains null ratios.",
+      "coverage_certified": false
+    },
+    {
+      "category": "separate_resources",
+      "source": "COST_BOUNDARY.md",
+      "implementation": "Wall, RSS, reporting, harness, audit, retries and infrastructure retain own units; no invented GAE conversion.",
+      "coverage_certified": false
+    }
+  ],
+  "software_evidence": {
+    "pre_label_root": {
+      "passed": 5274,
+      "failed": 0,
+      "ignored": 123
+    },
+    "post_label_producer": {
+      "passed": 44,
+      "failed": 0,
+      "ignored": 1
+    },
+    "corrected_analyzer": {
+      "passed": 19,
+      "failed": 0,
+      "ignored": 0
+    },
+    "final_root": {
+      "passed": 5277,
+      "failed": 0,
+      "ignored": 123,
+      "exit_code": 0,
+      "source_files_unchanged": 20,
+      "source_set_sha256": "aad3f6036117b3fc5811a079b87669a8cf00571ae5e2d4d161b6a3ff5814ff22",
+      "assertion": "post-closure-root-release-lib-20261029T1855Z.source-hash-assertion.json"
+    },
+    "pre_consolidation_root": {
+      "passed": 5275,
+      "failed": 0,
+      "ignored": 123,
+      "source_hashes_unchanged": true
+    },
+    "post_consolidation_producer": {
+      "passed": 49,
+      "failed": 0,
+      "ignored": 1
+    },
+    "native_pair_and_cohort_analyzer": {
+      "passed": 28,
+      "failed": 0,
+      "ignored": 0
+    },
+    "root_library_clippy": "passed -D warnings on corrected source",
+    "strict_isolated_test": {
+      "passed": 1,
+      "failed": 0,
+      "log": "consolidated-fixes/final-copy-exclusive-test.log"
+    }
+  },
+  "experiment_evidence": {
+    "new_cohort_targets": 0,
+    "new_measured_price_ratios": null
+  },
+  "remaining": [
+    "Scoped PR delivery and exact-head CI",
+    "Final instrument binary and approved protocol identities with independent bound review",
+    "Previously requested scoped infrastructure authorization",
+    "Staged gates and full prescribed cohort with controls",
+    "Independent replay, neutral PDF, graph and standardized measured rows"
+  ],
+  "independent_coverage_report": "finite-coverage-audit.md",
+  "independent_coverage_findings_open_status": "three reported groups closed by independent targeted source review; not whole-algorithm qualification",
+  "aggregator_review": "targeted independent read-only review found no new concrete blocker; no scientific qualification",
+  "targeted_closure_report": "consolidated-fixes/independent-targeted-closure-review.json",
+  "research_scope": "Mathematical research using public synthetic known-answer fixtures; correctness and reproducible cost accounting.",
+  "independent_coverage_findings_closed": [
+    {
+      "site": "src/cryptanalysis/three_leads.rs Ring::new",
+      "finding": "Scalar-domain is_prime(r) invocation not observed by existing base constructor counter; reached in reference rho_native.",
+      "action": "Add separate scalar validation domain observations, never base-field M/S."
+    },
+    {
+      "site": "src/sparse.rs and src/tracked_set.rs",
+      "finding": "Some successful reads and fresh-entry initializations absent while matched reference counts them.",
+      "action": "Consolidate source semantics after complete audit, preserve std collection algorithm/results."
+    },
+    {
+      "site": "engine pdiv/pexact; residual coefficient-cap checks",
+      "finding": "Selected length/emptiness predicates missing despite matched candidate equivalents being priced.",
+      "action": "Count actual evaluated predicates; preserve short circuit behavior."
+    }
+  ],
+  "independent_coverage_findings_open": [],
+  "finite_source_audit": {
+    "report": "finite-nine-category-source-audit.json",
+    "sha256": "28aa7c41bfc25552d9c63431671616d627fac61429b649ff4bffc1f8efba3724",
+    "status": "source_review_complete_binding_pending",
+    "qualified_cohort_prices": false
+  }
+}

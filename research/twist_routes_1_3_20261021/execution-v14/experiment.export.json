@@ -1,0 +1,292 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "twist-rank-repair-20261028-v1",
+  "created": "2026-10-28T23:44:23.893Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "e031cee91eef30ca50d2ddef24cd36c7ca6ee739a3f173bd9885005efb7c61bf",
+    "protocol_id": "twist-rank-repair-v1",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": "GPT-6",
+    "session": "twist-rank-repair-20261028",
+    "role": "research-and-implementation"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "d377251611bc9fd3da22096c3b128862816ef268",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": "HOST.json",
+    "sha256": "50cb723d631ce2a6397c4d2f13d8fb567b088ac792cfb4fdc5dd6367a4ea37d2",
+    "class_id": null,
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": 5,
+      "memory_bytes": 18882674688,
+      "kernel": "Linux 73c1cf569004 6.18.55 #1 SMP Wed Oct 14 19:45:18 UTC 2026 x86_64 GNU/Linux",
+      "hypervisor": "KVM",
+      "isolation_tier_max": "L0"
+    }
+  },
+  "arms": [
+    {
+      "id": "native",
+      "role": "baseline",
+      "binary_sha256": "f811e0dac685bc4f97296825e13db05e0d403c0ca0165afed14fd2bb0486bd81",
+      "commit": "d377251611bc9fd3da22096c3b128862816ef268"
+    },
+    {
+      "id": "pari",
+      "role": "reference",
+      "binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "commit": "d377251611bc9fd3da22096c3b128862816ef268"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "rank-repair-native-000",
+      "arm": "native",
+      "instance_id": "p827-fixed-42-base-panel",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "target_identifiable_systems": 114
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "configurations": 42,
+          "filled_configurations": 29,
+          "underfilled_configurations": 13,
+          "planned_queries": 1344,
+          "attempted_queries": 928,
+          "zero_witness_queries": 402,
+          "raw_witnesses": 5389,
+          "planned_systems": 252,
+          "analyzed_systems": 174,
+          "excluded_underfilled_systems": 78,
+          "target_identifiable_systems": 114,
+          "target_ambiguous_systems": 60,
+          "base_point_map_scalar_controls": 395,
+          "legacy_bases_replayed": 2,
+          "legacy_queries_replayed": 64
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact correctness experiment; no performance comparison."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Native complete witness/fiber census and independent PARI base/map/query/row/rank/kernel/recovery replay"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "2fd7a36e7a9755ea9687e93d7cc86bec661943dcf6fb63853968432b52d41e13",
+          "bytes": 61888,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "df7120b9b126073586bd7480b2804c4f1fc414804e3ee7cfca0b00c075afed22",
+          "bytes": 1687,
+          "kind": "receipt"
+        },
+        {
+          "path": "ADMISSION.json",
+          "sha256": "385724daa4fb6c95b4384faa087f14b44546bb763b000c5139c39c24d4a788b7",
+          "bytes": 137852,
+          "kind": "receipt"
+        },
+        {
+          "path": "SUMMARY.json",
+          "sha256": "df1f6a3a664fbd9ff0502913d8b300ab49530779458a17cd375ede52347e1c5f",
+          "bytes": 176432,
+          "kind": "analysis"
+        },
+        {
+          "path": "runs/pari-v1/RECEIPT.json",
+          "sha256": "ff42f78f388d7efdae38c15d58f7c9a6c41636b24b2c918e79e98afeb4a1f9c7",
+          "bytes": 1043,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-28T23:44:23.763Z",
+      "finished_at": "2026-10-28T23:44:23.893Z",
+      "worker": "f811e0dac685bc4f97296825e13db05e0d403c0ca0165afed14fd2bb0486bd81",
+      "backend_ref": "runs/rank-v1"
+    },
+    {
+      "run_id": "rank-repair-pari-000",
+      "arm": "pari",
+      "instance_id": "p827-fixed-42-base-panel",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "target_identifiable_systems": 114
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "configurations": 42,
+          "filled_configurations": 29,
+          "underfilled_configurations": 13,
+          "planned_queries": 1344,
+          "attempted_queries": 928,
+          "zero_witness_queries": 402,
+          "raw_witnesses": 5389,
+          "planned_systems": 252,
+          "analyzed_systems": 174,
+          "excluded_underfilled_systems": 78,
+          "target_identifiable_systems": 114,
+          "target_ambiguous_systems": 60,
+          "base_point_map_scalar_controls": 395,
+          "legacy_bases_replayed": 2,
+          "legacy_queries_replayed": 64
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact correctness experiment; no performance comparison."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Native complete witness/fiber census and independent PARI base/map/query/row/rank/kernel/recovery replay"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "2fd7a36e7a9755ea9687e93d7cc86bec661943dcf6fb63853968432b52d41e13",
+          "bytes": 61888,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "df7120b9b126073586bd7480b2804c4f1fc414804e3ee7cfca0b00c075afed22",
+          "bytes": 1687,
+          "kind": "receipt"
+        },
+        {
+          "path": "ADMISSION.json",
+          "sha256": "385724daa4fb6c95b4384faa087f14b44546bb763b000c5139c39c24d4a788b7",
+          "bytes": 137852,
+          "kind": "receipt"
+        },
+        {
+          "path": "SUMMARY.json",
+          "sha256": "df1f6a3a664fbd9ff0502913d8b300ab49530779458a17cd375ede52347e1c5f",
+          "bytes": 176432,
+          "kind": "analysis"
+        },
+        {
+          "path": "runs/pari-v1/RECEIPT.json",
+          "sha256": "ff42f78f388d7efdae38c15d58f7c9a6c41636b24b2c918e79e98afeb4a1f9c7",
+          "bytes": 1043,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "backend_ref": "runs/pari-v1"
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 2,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "FROZEN.json",
+      "sha256": "064886d5ea8d38f69d237cfc4d5094d308ecf5099280fe2c1bef0aadbc081782",
+      "bytes": 2556,
+      "kind": "receipt"
+    },
+    {
+      "path": "protocol.json",
+      "sha256": "b875be9c4aadb043245cfc810014de358e8bb3d7071d7dbf3afa120c9c4cb684",
+      "bytes": 12070,
+      "kind": "protocol"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../runner/src/rank_repair_20261028.rs",
+      "sha256": "8aa3897279b155be8e0cef37f053148dc096ef408c3fb9371c2489af23f6e853",
+      "bytes": 28827,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "SUMMARY.json",
+        "sha256": "df1f6a3a664fbd9ff0502913d8b300ab49530779458a17cd375ede52347e1c5f",
+        "bytes": 176432,
+        "kind": "analysis"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "42 fixed target-blind base configurations; all underfills/excluded matrices and zero queries retained. Complete exact witness and affine-nullspace checks; known alpha equations given to all ordinary/twist arms. No factor-base log oracle, timed/cost/generalization/novelty claim. Development controls are separate, not pooled scientific rows.",
+      "by": "native frozen publication tool"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

@@ -1,0 +1,10 @@
+digraph G {
+ rankdir=LR; graph[bgcolor="white",pad=0.12];
+ node[shape=box,style="rounded,filled",fillcolor="#eef3f7",fontname="Helvetica",fontsize=10];
+ edge[fontname="Helvetica",fontsize=9];
+ a[label="Frozen protocol\n96 arms /896 targets planned"];
+ b[label="GMP producer v2\nRust audit + exact fractions\nBuilt only"];
+ c[label="S3 checkpoint gate held\nAuthorization + token pending",fillcolor="#fff0d9"];
+ d[label="Study + replay + controls\nNOT EXECUTED",fillcolor="#f2f2f2"];
+ a->b; b->c; c->d[style=dashed,label="blocked"];
+}

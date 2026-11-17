@@ -1,0 +1,146 @@
+\section{Small extension fields and higher-genus pipelines}\label{sec:extension}
+
+This work is where the programme most clearly explores known
+non-generic asymptotic routes rather than trying to manufacture prime-field
+structure. The results are interesting precisely because complete costs
+can be measured against the same problem. They remain separate from
+deployed prime-field curves and prime-degree binary challenges.
+
+\subsection{The residual-walk and parity ledgers}
+
+The $\F_{p^3}$ harness studies subspace factor bases, residual walks,
+large primes, GLV symmetries, decomposition oracles and sparse matrices.
+Its corrections show that an oracle that reduces the number of walked
+residuals can make the method more expensive if the per-residual work
+increases. One cited example reduces a headline walked count by around
+two orders of magnitude while total cost worsens by about 4.6 times.
+\src{RESIDUAL}
+
+The same record prices linear algebra that earlier rounds omitted. The
+linear-algebra growth then dominates a relation-phase exponent and
+changes the claimed crossover. This provides an unusually concrete
+negative result: the bottleneck is named and priced, rather than the
+route being declared unsuccessful because it did not immediately beat
+rho. The parity ledger extends this discipline to several degrees and
+decomposition choices.\src{PARITY}
+
+\subsection{Degree four: symmetry improves a real algebraic constant}
+
+On suitable curves over $\F_{p^4}$, a rational two-torsion point and an
+appropriate coordinate make the summation system invariant under a
+$D_4$ action. The unweighted invariant formulation reduces a generic
+4,096-dimensional quotient to 512. Its recorded decomposition constant
+at $p=269$ is about $2.54\cdot10^{10}$ base-field multiplications,
+approximately 48 times below the plain formulation.\src{PRIOR}
+
+The weighted four-variable follow-up is stronger evidence of iteration
+than quoting that original factor forever. It replaces the five-variable
+presentation by invariants of weights $(2,2,2,1)$ and records a
+3,979-row, 4,200-column matrix rather than the previous 13,412 by
+11,628 matrix. At $p=269,1033,4093$, median counted costs are around
+$1.4\cdot10^9$ multiplications including lift-back and reruns at the
+next degree when required. This is roughly another 18 times below the
+previous invariant formulation, and about 844--863 times below the
+named plain reference at those primes.\src{D4}
+
+The study keeps exceptions. At $p=17$, one of six planted targets is
+degenerate; the other five agree with brute force and MITM. The nine
+generic positive-control systems have the expected quotient dimension.
+The gain is a decomposition-stage constant. The study explicitly does
+not measure end-to-end $S$ for that weighted formulation.
+
+Its crossover calculations are therefore model outputs. Earlier models
+moved a degree-four handover from around $2^{150}$ to $2^{135}$; the
+weighted follow-up reports a further handover near $2^{118.9}$ in its
+particular model. Those are not three observed ECDLP crossings. They
+depend on the relation rate, cofactor, matrix model, unit conversion and
+the constant measured at much smaller sizes.\src{D4}\src{LEADS18}
+
+The subsequent complete-method experiments also show that combining
+individually attractive ideas need not help. A D4-plus-double-large-prime
+variant makes linear algebra cheaper but total cost worse on its
+held-out panel. Stopping at the first actual dependency then repairs
+part of that loss: the later complete candidate/incumbent ratio is
+0.979 [0.973,0.986] over 27 held-out curves. This is progress against the
+incumbent, not a claim that the weighted stage and the complete variant
+were one already-measured stack.\src{ROUND1}\src{ROUND2}
+
+\subsection{Degree five: a large stage factor with a distant model crossing}
+
+The quintic Joux--Vitse/torsion programme implements a four-point
+decomposition test over $\F_{p^5}$. Its plain and Edwards-symmetry systems
+have very different costs: the cited constants are roughly
+$3.0\cdot10^{10}$ and $7.3\cdot10^7$ base-field multiplications, a
+recorded stage factor around 416. But a corrected exact yield census
+changes the residual rate from $1/(24p)$ to $1/(192p)$, worsening the
+extrapolated crossover. A four-torsion follow-up then retracts an
+anticipated degree-halving lever: the available translation does not
+implement the needed involution over the stated base field, and the
+measured saturation costs about as much as it gains in rate.
+\src{QUINTIC}
+
+These examples explain why a several-hundred-fold algebraic improvement
+can coexist with an impractical complete-method prediction. The
+programme has learned both a useful symmetry implementation and the
+conditions under which its hoped-for scaling argument fails. Neither
+observation should be compressed into simply ``torsion works'' or
+``torsion does not work''.
+
+\subsection{Covers and genus-three index calculus}
+
+The cover programme implements extension fields, Cantor-style divisor
+arithmetic, a GHS/Joux--Vitse-type cover, a point transfer and a
+decomposition test checked against a separate enumeration oracle.
+On the favourable weak class, reducing the oracle constant improves the
+complete IC/rho ratio as size grows. It reproduces a known attack route;
+the difficult additional question is whether a generic source can find
+and reach such a class at a total cost below its own rho reference.
+\src{COVER}
+
+The more recent cubic-GHS/genus-three work adds double large primes and
+new matrix strategies. The first improvement round reports a complete
+cost exponent about 1.385 rather than 1.910 on a common
+$q=2^{10}$--$2^{18}$ range. Earlier headlines compared different ranges
+and are corrected. The candidate's local exponent rises at larger
+sizes, so a global finite-range fit is not evidence that it has reached
+the asymptotic $4/3$ prediction.\src{ROUND1}
+
+A separately rebuilt genus-three baseline reports IC/rho around 0.252
+at $q=2^{14}$ after the study's rho normalisation. That comparator is
+rho on the same Jacobian subgroup, not rho on the original elliptic
+curve before transport. The timeline explicitly labels it as a
+Jacobian result. An ECDLP crossover requires the source transfer and
+source reference to be in the comparison.\src{TIMELINE}
+
+The later structured-elimination and block-Wiedemann rounds reduce
+complete costs further, but also identify the relation phase and matrix
+growth that remain. This is the strongest recorded fitted-exponent
+improvement over an incumbent among the selected complete toy pipelines.
+It is appropriately described as reproducing and engineering a known
+higher-genus route at toy scale, not discovering a new exponent for
+general prime-field ECDLP.\src{ROUND2}
+
+\subsection{Post-snapshot correction to a separate rho reference}
+
+During integration, a later main revision supplied another useful
+falsification sequence on eighteen prime-field Jacobian instances of
+genus two through four. Negation folding first failed its registered
+large-$N$ threshold; stronger hash mixing also failed to repair the
+largest rows. An integer-group control reproduced the excess but failed
+its own admission gate, so its registered localisation test was not read.
+The next test replaced eight-bit branch coefficients with full-width
+coefficients. All four arms on eighteen instances and forty seeds return
+verified logs; the slow-reference factor is about 1.42--1.50 on the two
+largest rows. The full-width walk becomes the new default.
+\src{HEC-REFERENCE}
+
+These are counted walk-stage observations in that named thread. The
+full-width setup cost is separate, and its historical cross-method ratios
+are explicitly unranked because unpriced work and the required ecbench
+family remain missing. Existing IC/rho ratios need a matched remeasurement,
+not multiplication by the observed walk factor. Its round-thirteen
+negation test is registered, not measured at the cited revision. The
+earlier incumbent/IC improvements above are distinct studies; their
+historical records are not silently rewritten by this later reference
+correction. Only the appended rounds were read in this integration pass.
+\src{HEC-REFERENCE}

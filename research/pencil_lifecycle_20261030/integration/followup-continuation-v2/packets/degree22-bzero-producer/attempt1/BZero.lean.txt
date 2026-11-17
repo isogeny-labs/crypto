@@ -1,0 +1,47 @@
+import GlobalSmooth
+set_option autoImplicit false
+set_option maxHeartbeats 2000000
+namespace BZero
+open Polynomial MixedCancellation
+variable {K : Type*} [Field K]
+def sourceB (a : D2 K) : K := 2*((a.q*a.s-a.t)*a.t-(a.r*a.s)*a.s)
+def point (a : D2 K) : WeightedAdd11.Input K :=
+ let n1 := a.q*a.s-a.t
+ let x := -(n1*a.s)
+ ⟨x,(a.s*a.t+x)*((a.s*a.s)*(a.s*a.s)),a.s*a.z,a.w⟩
+theorem scale (a : D2 K) (hz : a.z≠0) (hw : a.w≠0) :
+ sourceB a = a.z^10*a.w^2*2*((nq a*ns a-nt a)*nt a-nr a*(ns a)^2) := by
+ dsimp [sourceB,nq,nr,ns,nt]
+ field_simp <;> ring
+
+theorem decode (a : D2 K) (hz : a.z≠0) (hw : a.w≠0) (hs : a.s≠0) :
+ (point a).z≠0 ∧ (point a).w≠0 ∧
+ WeightedAdd11.nx (point a)=nt a/ns a-nq a ∧
+ WeightedAdd11.ny (point a)=2*nt a-nq a*ns a := by
+ refine ⟨mul_ne_zero hs hz,hw,?_,?_⟩
+ all_goals dsimp [point,WeightedAdd11.nx,WeightedAdd11.ny,nq,ns,nt]; field_simp <;> ring
+
+theorem normalized_root (q r s t : K) (hs : s≠0)
+ (hb : (q*s-t)*t-r*s^2=0) : (t/s-q)^2+q*(t/s-q)+r=0 := by
+ apply (mul_eq_zero.mp (show s^2*((t/s-q)^2+q*(t/s-q)+r)=0 from ?_)).resolve_left (pow_ne_zero 2 hs)
+ field_simp
+ calc
+  _ = -((q*s-t)*t-r*s^2) := by ring
+  _ = 0 := by rw [hb];ring
+
+theorem extraction (f : K[X]) (a : D2 K) (hz : a.z≠0) (hw : a.w≠0)
+ (hs : a.s≠0) (h2 : (2:K)≠0) (hb : sourceB a=0) (ha : validTwo f a) :
+ (point a).z≠0 ∧ (point a).w≠0 ∧ validPoint f (point a) := by
+ have hsn : ns a≠0 := div_ne_zero hs (mul_ne_zero (pow_ne_zero 3 hz) hw)
+ have hb' : (nq a*ns a-nt a)*nt a-nr a*(ns a)^2=0 := by
+  rw [scale a hz hw] at hb
+  exact (mul_eq_zero.mp hb).resolve_left (mul_ne_zero (mul_ne_zero (pow_ne_zero 10 hz) (pow_ne_zero 2 hw)) h2)
+ have hr := normalized_root (nq a) (nr a) (ns a) (nt a) hsn hb'
+ have hv := (extracted_valid f (nt a/ns a-nq a) (nq a) (nr a) (ns a) (nt a) hr ha).1
+ have hy : ns a*(nt a/ns a-nq a)+nt a=2*nt a-nq a*ns a := by field_simp;ring
+ obtain ⟨hpz,hpw,hpx,hpy⟩ := decode a hz hw hs
+ refine ⟨hpz,hpw,?_⟩
+ unfold validPoint
+ rw [hpx,hpy]
+ rwa [hy] at hv
+end BZero

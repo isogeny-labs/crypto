@@ -1,0 +1,23 @@
+digraph n83_attempt3 {
+  graph [rankdir=TB, ranksep=0.22, bgcolor="white", fontname="Helvetica", labelloc=t,
+         label="N83 full-D18 attempt 3 · input and launch gates · 2026-10-26"];
+  node [shape=box, style="rounded,filled", fillcolor="#eef3fa", color="#43617d",
+        fontname="Helvetica", fontsize=11];
+  edge [color="#62798f", fontname="Helvetica", fontsize=10];
+  s3 [label="Original D18 S3 generation\n2 exact objects · 160,747,529-byte base"];
+  local_get [label="Local fresh GET\nSHA-256 and provider checksums match", fillcolor="#e5f5ec"];
+  local_gate [label="Local host gate FAIL\n1-minute load 114.84 > 24", fillcolor="#fff0e0"];
+  local_stop [label="Local worker not launched", fillcolor="#f5e9e9"];
+  denied [label="ephemeral runner: manifest HEAD 403\naccount 104186811093 · us-east-1", fillcolor="#fff0e0"];
+  policies [label="Two exact-object policy proposals\nsource bucket + runner role", fillcolor="#fff8d8"];
+  cloud_stop [label="D18 job not submitted", fillcolor="#f5e9e9"];
+  s3 -> local_get [label="GET"];
+  local_get -> local_gate;
+  local_gate -> local_stop;
+  s3 -> denied [label="cross-account HEAD"];
+  denied -> policies [label="proposal"];
+  policies -> cloud_stop [label="approval pending"];
+  {rank=same; local_get; denied;}
+  {rank=same; local_gate; policies;}
+  {rank=same; local_stop; cloud_stop;}
+}

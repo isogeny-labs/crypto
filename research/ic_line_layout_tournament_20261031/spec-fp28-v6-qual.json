@@ -1,0 +1,79 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Prime IC line-layout tournament v6, fp28 qualification",
+  "description": "research/ic_line_layout_tournament_20261031/PROTOCOL-V6.md: infrastructure and minimum-solve qualification on a non-scientific fp28 curve, not a performance claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 2026110628111
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 2026110628112,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "incumbent",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=407",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "26479085",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "incumbent-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=407",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "26479085",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "candidate",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=407",
+          "oracle": "mitm:negation_folded=1,layout=lines",
+          "max_trials": "26479085",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "pc-fb2x",
+      "role": "reference",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=814",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "26479085",
+          "targets": "walk"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 5,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 2026110628113,
+    "isolation_required": "L2",
+    "timeout_seconds": 600
+  }
+}

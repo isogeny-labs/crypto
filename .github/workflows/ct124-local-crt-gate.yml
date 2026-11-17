@@ -1,0 +1,38 @@
+name: CT124 two-prime CRT and Hensel false-positive controls
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct124/**'
+      - '.github/workflows/ct124-local-crt-gate.yml'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct124/**'
+      - '.github/workflows/ct124-local-crt-gate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct124:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          sparse-checkout: |
+            research/cross_characteristic_global_torsion_20261112/ct124
+      - name: Independent exact source-group and local-prime negatives
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct124
+          python3 -B "$D/ct124_local_crt_control.py" >/tmp/ct124-py.json
+          python3 -O -B "$D/ct124_local_crt_control.py" >/tmp/ct124-pyo.json
+          node "$D/ct124_independent.js" >/tmp/ct124-js.json
+          node --no-opt "$D/ct124_independent.js" >/tmp/ct124-jso.json
+          cmp /tmp/ct124-py.json /tmp/ct124-pyo.json
+          cmp /tmp/ct124-py.json /tmp/ct124-js.json
+          cmp /tmp/ct124-py.json /tmp/ct124-jso.json
+          printf '%s  %s\n' a6e989814ce3c2039d71038cbf4dfd9965e40b3c11f15e36c06da885ec2f901f /tmp/ct124-py.json | sha256sum -c

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="300" viewBox="0 0 1080 300" role="img" aria-labelledby="title desc">
+  <title id="title">D18 XOR cadence 32 resource-censored control</title>
+  <desc id="desc">Schematic, not time-scaled. The constructed arm started, but the full-base import did not complete before the worker's own 300 second cap. The natural arm was not launched.</desc>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#4b5563"/></marker></defs>
+  <rect width="1080" height="300" rx="16" fill="#f8fafc"/>
+  <text x="32" y="42" font-family="sans-serif" font-size="25" font-weight="700" fill="#13263b">Native XOR cadence 32 · run 20261026T0121Z</text>
+  <text x="32" y="68" font-family="sans-serif" font-size="15" fill="#475569">Schematic stage order; boxes do not encode duration · L0 shared Mac</text>
+  <rect x="32" y="102" width="240" height="75" rx="9" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="49" y="129" font-family="sans-serif" font-size="17" font-weight="700" fill="#153e75">Constructed arm starts</text>
+  <text x="49" y="157" font-family="sans-serif" font-size="15" fill="#153e75">exact source and S3 identity</text>
+  <line x1="275" y1="139" x2="328" y2="139" stroke="#4b5563" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="336" y="102" width="322" height="75" rx="9" fill="#ffedd5" stroke="#ea580c"/>
+  <text x="353" y="129" font-family="sans-serif" font-size="17" font-weight="700" fill="#9a3412">Internal wall cap at 300 s</text>
+  <text x="353" y="157" font-family="sans-serif" font-size="15" fill="#9a3412">import_checked not emitted</text>
+  <line x1="661" y1="139" x2="714" y2="139" stroke="#4b5563" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="722" y="102" width="326" height="75" rx="9" fill="#e5e7eb" stroke="#6b7280"/>
+  <text x="739" y="129" font-family="sans-serif" font-size="17" font-weight="700" fill="#374151">Natural arm skipped</text>
+  <text x="739" y="157" font-family="sans-serif" font-size="15" fill="#374151">no SAT cadence comparison</text>
+  <text x="32" y="217" font-family="sans-serif" font-size="16" fill="#475569">Observed: 303.192 s supervisor wall · 24.28 s user CPU · 6.93 s system CPU · zero swaps</text>
+  <text x="32" y="246" font-family="sans-serif" font-size="16" fill="#475569">One-minute host load: 100.818 before → 173.849 after. Maximum RSS: 966,737,920 bytes.</text>
+  <text x="32" y="278" font-family="sans-serif" font-size="13" fill="#64748b">Source: xor-cadence-20261025/evidence/independent-audit.json and positive/stderr-time.txt</text>
+</svg>

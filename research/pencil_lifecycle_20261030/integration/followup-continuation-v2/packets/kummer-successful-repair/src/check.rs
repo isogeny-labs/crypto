@@ -1,0 +1,5 @@
+
+mod eager;mod pruned;use serde_json::{json,Value};
+fn main(){let fixtures:Value=serde_json::from_str(include_str!("../fixtures.json")).unwrap();let mut rows=vec![];let mut failed=0;
+ for f in fixtures.as_array().unwrap(){let e=eager::fixture_check(f);let p=pruned::fixture_check(f);let mut eq=true;for key in["next","choice","selected","repaired_mixed","expected_signed","recovered","signed_ok","sign_rejected"]{eq&=e[key]==p[key];}let masks=e["evaluated"]==json!([true,true,true])&&p["evaluated"]==p["selected"];let pass=eq&&masks&&p["raw_mixed"].is_null()&&!p["repair_root"].is_null()&&p["repaired_correct"]==true&&p["pair_correct"]==true&&p["signed_ok"]==true&&p["sign_rejected"]==true;if !pass{failed+=1;}rows.push(json!({"eager":e,"pruned":p,"semantic_equal":eq,"mask_valid":masks,"pass":pass}));}
+ println!("{}",json!({"schema":"kummer-successful-repair-check/v1","rows":rows,"failed":failed,"scientific_execution":false}));assert_eq!(failed,0,"all fixed cases must meet prospective checks");}

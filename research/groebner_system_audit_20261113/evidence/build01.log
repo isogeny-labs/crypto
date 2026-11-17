@@ -1,0 +1,51 @@
+research/groebner_system_audit_20261113/native/analyze.cpp: In function ‘bool lower(Mon, Mon)’:
+research/groebner_system_audit_20261113/native/analyze.cpp:29:3: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   29 |   for(int i=variables-1;i>=0;i--)if(a[i]!=b[i])return a[i]>b[i];return false; }
+      |   ^~~
+research/groebner_system_audit_20261113/native/analyze.cpp:29:65: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   29 |   for(int i=variables-1;i>=0;i--)if(a[i]!=b[i])return a[i]>b[i];return false; }
+      |                                                                 ^~~~~~
+research/groebner_system_audit_20261113/native/analyze.cpp: In function ‘Mon lead(const Poly&)’:
+research/groebner_system_audit_20261113/native/analyze.cpp:32:3: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   32 |   for(auto [m,c]:f)if(lower(a,m))a=m;return a; }
+      |   ^~~
+research/groebner_system_audit_20261113/native/analyze.cpp:32:38: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   32 |   for(auto [m,c]:f)if(lower(a,m))a=m;return a; }
+      |                                      ^~~~~~
+research/groebner_system_audit_20261113/native/analyze.cpp: In function ‘Poly times(const Poly&, Mon, int)’:
+research/groebner_system_audit_20261113/native/analyze.cpp:37:27: error: assignment of read-only location ‘(& m)->std::array<int, 3>::operator[](((std::array<int, 3>::size_type)i))’
+   37 |   for(int i=0;i<3;i++)m[i]+=shift[i];term(r,m,mod(a*c));}return r; }
+research/groebner_system_audit_20261113/native/analyze.cpp:37:3: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   37 |   for(int i=0;i<3;i++)m[i]+=shift[i];term(r,m,mod(a*c));}return r; }
+      |   ^~~
+research/groebner_system_audit_20261113/native/analyze.cpp:37:38: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   37 |   for(int i=0;i<3;i++)m[i]+=shift[i];term(r,m,mod(a*c));}return r; }
+      |                                      ^~~~
+research/groebner_system_audit_20261113/native/analyze.cpp: In function ‘bool allSpairsZero(const std::vector<std::map<std::array<int, 3>, int> >&)’:
+research/groebner_system_audit_20261113/native/analyze.cpp:68:3: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   68 |   for(size_t j=0;j<i;j++)if(!remainder(spair(gs[i],gs[j]),gs).empty())return false;return true; }
+      |   ^~~
+research/groebner_system_audit_20261113/native/analyze.cpp:68:84: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   68 |   for(size_t j=0;j<i;j++)if(!remainder(spair(gs[i],gs[j]),gs).empty())return false;return true; }
+      |                                                                                    ^~~~~~
+research/groebner_system_audit_20261113/native/analyze.cpp:67:51: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   67 | bool allSpairsZero(const std::vector<Poly>& gs) { for(size_t i=0;i<gs.size();i++)
+      |                                                   ^~~
+research/groebner_system_audit_20261113/native/analyze.cpp:68:84: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   68 |   for(size_t j=0;j<i;j++)if(!remainder(spair(gs[i],gs[j]),gs).empty())return false;return true; }
+      |                                                                                    ^~~~~~
+research/groebner_system_audit_20261113/native/analyze.cpp: In function ‘Input input(const std::string&)’:
+research/groebner_system_audit_20261113/native/analyze.cpp:88:3: error: this ‘while’ clause does not guard... [-Werror=misleading-indentation]
+   88 |   while(std::getline(f,line))s+=line;return {parseList(s),prime,variables}; }
+      |   ^~~~~
+research/groebner_system_audit_20261113/native/analyze.cpp:88:38: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘while’
+   88 |   while(std::getline(f,line))s+=line;return {parseList(s),prime,variables}; }
+      |                                      ^~~~~~
+research/groebner_system_audit_20261113/native/analyze.cpp: In function ‘int rationalZeros(const std::vector<std::map<std::array<int, 3>, int> >&)’:
+research/groebner_system_audit_20261113/native/analyze.cpp:118:84: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+  118 | int rationalZeros(const std::vector<Poly>& fs){int count=0;for(int x=0;x<prime;x++)for(int y=0;y<prime;y++)
+      |                                                                                    ^~~
+research/groebner_system_audit_20261113/native/analyze.cpp:119:119: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+  119 |   for(int h=0;h<(variables==3?prime:1);h++){bool zero=true;for(auto& f:fs)if(value(f,{x,y,h}))zero=false;count+=zero;}return count;}
+      |                                                                                                                       ^~~~~~
+cc1plus: all warnings being treated as errors

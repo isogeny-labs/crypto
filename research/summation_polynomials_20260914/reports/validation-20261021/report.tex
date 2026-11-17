@@ -1,0 +1,51 @@
+\documentclass[11pt]{article}
+\usepackage[landscape,margin=0.65in]{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+\begin{document}
+\begin{center}
+{\LARGE Frozen performance-gains dashboard audit}\\[4pt]
+2026-10-21; crypto branch f535212dd762dde6b23a1891eb94c1e9fe28b07a
+\end{center}
+
+\noindent\textbf{Scope.} Read-only check of the 2026-09-14 summation-polynomial
+performance page. No benchmark, scientific run, or new measurement was made.
+The existing chart is on page 2; its source is
+\texttt{docs/performance-gains/summary.svg}.
+
+\medskip\noindent\textbf{Source binding.} Four source hashes in the page match
+their committed Git blobs. The two frozen comparisons report 342 ablation
+runs and 140 confirmation runs, both complete with zero failures. All 804
+dashboard rows match their source arrays exactly, and the HTML-embedded data
+matches the page's JSON file.
+
+\medskip\noindent\textbf{Independent arithmetic check.} The native Rust
+checker recomputed 766 individual timing ratios and 32 input-cluster
+geometric point ratios. All matched. The 32 published intervals are identical
+to the frozen comparison JSON; the checker did not regenerate the bootstrap
+distribution. For p=67, seed=11, repetition=0, hash-bound raw outputs give
+1,342 reference and 1,199 Horner field multiplications per specialization.
+
+\medskip\noindent\textbf{Code check.} On the final source,
+\texttt{cargo test --release --lib} passed 4,474 tests with zero failures
+and 119 ignored. A pre-fix parallel run exposed cross-thread contamination
+of an opt-in profiling counter; the switch is now local to its requesting
+thread, with a cross-thread control. Solver arithmetic and archived timing
+records are unchanged.
+
+\medskip\noindent\textbf{Boundary.} This historical page distinguishes a
+local specialization gain from the unproved full-DLP improvement. The graph
+and all rendered exports remain unchanged because their measured source and
+conclusion did not change. Interactive JavaScript behavior could not be run
+here because Node was unavailable. This audit does not validate all historical
+experiments, prove their implementations in Lean, or establish current public
+dashboard deployment. The full evidence and commands are in
+\texttt{REPORT.md} beside this PDF.
+
+\newpage
+\begin{center}
+{\Large Existing chart: frozen measurements of 14 September 2026}\\[4pt]
+\includegraphics[width=0.94\textwidth,height=0.87\textheight,keepaspectratio]{../../../../docs/performance-gains/summary.png}
+\end{center}
+\end{document}

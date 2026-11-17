@@ -1,0 +1,982 @@
+{
+  "card_id": "CARD-ic-planner-weight-rule-20261021-4",
+  "card_path": "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-4.yaml",
+  "card_sha256": "375ed19e7a666f88f685346d43158aada817d91179d6f9b2b848ce594abb7d81",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import subprocess,sys; out=subprocess.run(['git','status','--porcelain','--untracked-files=all','--',':(exclude)research/ic_planner_weight_rule_20261021/cards'],capture_output=True,text=True).stdout; sys.exit(1 if out.strip() else 0)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.511,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "git-clean",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.511,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import glob,sys; sys.exit(1 if glob.glob('research/ic_planner_weight_rule_20261021/sessions/B-*') else 0)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.034,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "sessions-absent",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.034,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "df",
+        "-h",
+        "/"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-record",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "8682b1cf5c156a59d86d54c99c8251f24a3a39d0e4b9b1f8be70b26dff5b2edd",
+      "stdout_tail": [
+        "Filesystem      Size  Used Avail Use% Mounted on",
+        "/dev/vda        252G   36G  3.7G  91% /"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.032,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-run-h21",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.032,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import re, sys, time\nstart = time.time()\nheld = 0\nwhile True:\n    value = float(re.search(r'some avg10=([0-9.]+)', open('/proc/pressure/cpu').read()).group(1))\n    if value <= 1.0:\n        held += 1\n    else:\n        held = 0\n    if held >= 6:\n        sys.exit(0)\n    if time.time() - start >= 1800:\n        sys.exit(1)\n    time.sleep(5)\n"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 55.036,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "quiet-before-run-h21",
+      "index": 5,
+      "outputs": {},
+      "seconds": 55.036,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ic_planner_weight_rule_20261021/specs/B-h21.json",
+        "--out",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h21",
+        "--cpus",
+        "auto",
+        "--wait",
+        "--quiet"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 10.81,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-h21",
+      "index": 6,
+      "outputs": {
+        "research/ic_planner_weight_rule_20261021/sessions/B-h21/host.json": "82095c85b45f2efda6840f60261012b35aae61a07dac61d9580b536a00f5b5c3",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h21/plan.json": "086f2fbc7b129009fbebba8b463f856df80b4f7826ba791abc3f9cdfecfdfe84",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h21/records.jsonl": "37bcdf608e1473f3da2ad1b4839e0626d194906dd41683755a0f11c870e68378",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h21/session.json": "cd076373fb1c8ff1128419b3b382fc7fbaf3bdb430d0ea74a077fd7572cad43e",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h21/spec.json": "53393bc27b06dc9f58d7c5f470f62234a7165f29127654390384f87a1f24fd5a"
+      },
+      "seconds": 10.81,
+      "stderr_sha256": "a5243bb405e273414c09c73b880f1f9d008c9adc83ded3dd9f7a78b54bf92c5a",
+      "stderr_tail": [
+        "session ECBS1h2973f4f1298e complete -> research/ic_planner_weight_rule_20261021/sessions/B-h21 (96 records: {\"verified\": 96})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.032,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-run-h22",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.032,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import re, sys, time\nstart = time.time()\nheld = 0\nwhile True:\n    value = float(re.search(r'some avg10=([0-9.]+)', open('/proc/pressure/cpu').read()).group(1))\n    if value <= 1.0:\n        held += 1\n    else:\n        held = 0\n    if held >= 6:\n        sys.exit(0)\n    if time.time() - start >= 1800:\n        sys.exit(1)\n    time.sleep(5)\n"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 25.034,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "quiet-before-run-h22",
+      "index": 8,
+      "outputs": {},
+      "seconds": 25.034,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ic_planner_weight_rule_20261021/specs/B-h22.json",
+        "--out",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h22",
+        "--cpus",
+        "auto",
+        "--wait",
+        "--quiet"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 10.714,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-h22",
+      "index": 9,
+      "outputs": {
+        "research/ic_planner_weight_rule_20261021/sessions/B-h22/host.json": "18f27a977d5100080629ebfc5d3cc6dea5ebb8ce001bad03619ce5d86145292a",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h22/plan.json": "5538f29dbad37986d9a610e5b2b55e364e26c8f49f807e6bcc75bd13a54ca907",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h22/records.jsonl": "b61413b79ab56ed1bd284d128cc72700bc5adccc84a056dfbc2fea04b98b94c2",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h22/session.json": "a0427ac4e617a7cb711882c0d0dbeed8243e549f04e7fc17f511569582910a23",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h22/spec.json": "317a45736751b1b0581d4cacbc1e32e00c19858915177331920a2a89662b3bdd"
+      },
+      "seconds": 10.714,
+      "stderr_sha256": "6e5c8d0f8a0ce5ee8a6a6677229e40a49dfeef720df3fda3e4f267055ab19aa1",
+      "stderr_tail": [
+        "session ECBS1hed29e4805a29 complete -> research/ic_planner_weight_rule_20261021/sessions/B-h22 (96 records: {\"verified\": 96})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.033,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-run-h24",
+      "index": 10,
+      "outputs": {},
+      "seconds": 0.033,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import re, sys, time\nstart = time.time()\nheld = 0\nwhile True:\n    value = float(re.search(r'some avg10=([0-9.]+)', open('/proc/pressure/cpu').read()).group(1))\n    if value <= 1.0:\n        held += 1\n    else:\n        held = 0\n    if held >= 6:\n        sys.exit(0)\n    if time.time() - start >= 1800:\n        sys.exit(1)\n    time.sleep(5)\n"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 25.033,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "quiet-before-run-h24",
+      "index": 11,
+      "outputs": {},
+      "seconds": 25.033,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ic_planner_weight_rule_20261021/specs/B-h24.json",
+        "--out",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h24",
+        "--cpus",
+        "auto",
+        "--wait",
+        "--quiet"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 11.831,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-h24",
+      "index": 12,
+      "outputs": {
+        "research/ic_planner_weight_rule_20261021/sessions/B-h24/host.json": "a3813f6e8df2a2d166eec6a9487a5fe6ee2f500a1b4e4729cc3a0b4e6b56bc98",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h24/plan.json": "8a56594d111c4cf0770fd5943fb4318d3306dba4ec9343f0abea4ae2c80ef69f",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h24/records.jsonl": "c44996300b73399e8bc2d6b878fe26abfbe1195dbf9be9a6a5d1f3881ea9d916",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h24/session.json": "b3e52551a794ea2ea80b11f5e260cd653cf4ee708dfef72f5543b4d5ce7186be",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h24/spec.json": "4ce4d345539157a2baf32a7927075f22f16b0af0662d84c58af743bccd07c1ce"
+      },
+      "seconds": 11.831,
+      "stderr_sha256": "a899f79f0e8e20999a84028225d5053acca34b195c3e9e83b150d490a2c9e7bb",
+      "stderr_tail": [
+        "session ECBS1h965648e19e1e complete -> research/ic_planner_weight_rule_20261021/sessions/B-h24 (96 records: {\"verified\": 96})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.038,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-run-h29",
+      "index": 13,
+      "outputs": {},
+      "seconds": 0.038,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import re, sys, time\nstart = time.time()\nheld = 0\nwhile True:\n    value = float(re.search(r'some avg10=([0-9.]+)', open('/proc/pressure/cpu').read()).group(1))\n    if value <= 1.0:\n        held += 1\n    else:\n        held = 0\n    if held >= 6:\n        sys.exit(0)\n    if time.time() - start >= 1800:\n        sys.exit(1)\n    time.sleep(5)\n"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 25.04,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "quiet-before-run-h29",
+      "index": 14,
+      "outputs": {},
+      "seconds": 25.04,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ic_planner_weight_rule_20261021/specs/B-h29.json",
+        "--out",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h29",
+        "--cpus",
+        "auto",
+        "--wait",
+        "--quiet"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 21.355,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-h29",
+      "index": 15,
+      "outputs": {
+        "research/ic_planner_weight_rule_20261021/sessions/B-h29/host.json": "a6703e2548b84d43e7a3211e51ec63a503e0fa95fc31d7d6aa69e9aed6e804dd",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h29/plan.json": "6c8020c493c569b51eadca98243d883e3959f6b341c2ae2fe0f182286eb90d2e",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h29/records.jsonl": "e9aced2a89cbcaf392076ad251783a2372ec86db9af4aee8f71104056bd6a82f",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h29/session.json": "9caf202bf8ece6248a82a242f5994f37cfe716700ad43ccad0c7024ea38c6417",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h29/spec.json": "385bcb6ec0f133b776a58ddd054ca4ab017fa5adefe7b30e6bb31ded816bd362"
+      },
+      "seconds": 21.355,
+      "stderr_sha256": "31b9a8edf1a0813fdbdb3aff95f2a7f0bb5b185d11214c37db5892b8b5bc5097",
+      "stderr_tail": [
+        "session ECBS1h15d2acdf38fa complete -> research/ic_planner_weight_rule_20261021/sessions/B-h29 (96 records: {\"verified\": 96})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.043,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-h21",
+      "index": 16,
+      "outputs": {},
+      "seconds": 0.043,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h21",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.599,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-h21",
+      "index": 17,
+      "outputs": {
+        "research/ic_planner_weight_rule_20261021/sessions/B-h21.audit.json": "d1e8884a7f4cd9d399234d5604d3ca7ab0a6385f9adc0c0e4aa34eac6ecab9b8"
+      },
+      "seconds": 1.599,
+      "stderr_sha256": "261fdb76e19a80e3e8df374fde2cc863ea494a317343315b2592ae2ae0eadb70",
+      "stderr_tail": [
+        "audit OK: 96 records, 96 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "d1e8884a7f4cd9d399234d5604d3ca7ab0a6385f9adc0c0e4aa34eac6ecab9b8",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 90,",
+        "      \"record_id\": \"ECR1h119e8c861d4a\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"82095c85b45f2efda6840f60261012b35aae61a07dac61d9580b536a00f5b5c3\",",
+        "    \"plan.json\": \"086f2fbc7b129009fbebba8b463f856df80b4f7826ba791abc3f9cdfecfdfe84\",",
+        "    \"records.jsonl\": \"37bcdf608e1473f3da2ad1b4839e0626d194906dd41683755a0f11c870e68378\",",
+        "    \"session.json\": \"cd076373fb1c8ff1128419b3b382fc7fbaf3bdb430d0ea74a077fd7572cad43e\",",
+        "    \"spec.json\": \"53393bc27b06dc9f58d7c5f470f62234a7165f29127654390384f87a1f24fd5a\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"25e1e76f5a0ae0a78859cb940d09c2307a7343facbb16eb424ea4971ef76c53f\",",
+        "  \"auditor_env_class_id\": \"ECBENV2h6639ae09b95e\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1hc00b2367431c\",",
+        "  \"audited_unix_ms\": 1792559941567",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_weight_rule_20261021/sessions/B-h21.audit.json')); s=json.load(open('research/ic_planner_weight_rule_20261021/sessions/B-h21/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.031,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-h21",
+      "index": 18,
+      "outputs": {},
+      "seconds": 0.031,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.041,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-h22",
+      "index": 19,
+      "outputs": {},
+      "seconds": 0.041,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h22",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.521,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-h22",
+      "index": 20,
+      "outputs": {
+        "research/ic_planner_weight_rule_20261021/sessions/B-h22.audit.json": "1b32bfad1f1e90ee436cbc0c5cabed6fc3f4accfbeca1bf7484630418f5b7599"
+      },
+      "seconds": 1.521,
+      "stderr_sha256": "261fdb76e19a80e3e8df374fde2cc863ea494a317343315b2592ae2ae0eadb70",
+      "stderr_tail": [
+        "audit OK: 96 records, 96 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "1b32bfad1f1e90ee436cbc0c5cabed6fc3f4accfbeca1bf7484630418f5b7599",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 90,",
+        "      \"record_id\": \"ECR1h494526c1a7b9\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"18f27a977d5100080629ebfc5d3cc6dea5ebb8ce001bad03619ce5d86145292a\",",
+        "    \"plan.json\": \"5538f29dbad37986d9a610e5b2b55e364e26c8f49f807e6bcc75bd13a54ca907\",",
+        "    \"records.jsonl\": \"b61413b79ab56ed1bd284d128cc72700bc5adccc84a056dfbc2fea04b98b94c2\",",
+        "    \"session.json\": \"a0427ac4e617a7cb711882c0d0dbeed8243e549f04e7fc17f511569582910a23\",",
+        "    \"spec.json\": \"317a45736751b1b0581d4cacbc1e32e00c19858915177331920a2a89662b3bdd\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"25e1e76f5a0ae0a78859cb940d09c2307a7343facbb16eb424ea4971ef76c53f\",",
+        "  \"auditor_env_class_id\": \"ECBENV2h6639ae09b95e\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1hc00b2367431c\",",
+        "  \"audited_unix_ms\": 1792559943162",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_weight_rule_20261021/sessions/B-h22.audit.json')); s=json.load(open('research/ic_planner_weight_rule_20261021/sessions/B-h22/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.048,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-h22",
+      "index": 21,
+      "outputs": {},
+      "seconds": 0.048,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.043,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-h24",
+      "index": 22,
+      "outputs": {},
+      "seconds": 0.043,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h24",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.663,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-h24",
+      "index": 23,
+      "outputs": {
+        "research/ic_planner_weight_rule_20261021/sessions/B-h24.audit.json": "ec3644ccaf461812a708ab373cdda0126376659faacc4e5ebded0fe0140a5104"
+      },
+      "seconds": 1.663,
+      "stderr_sha256": "261fdb76e19a80e3e8df374fde2cc863ea494a317343315b2592ae2ae0eadb70",
+      "stderr_tail": [
+        "audit OK: 96 records, 96 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "ec3644ccaf461812a708ab373cdda0126376659faacc4e5ebded0fe0140a5104",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 90,",
+        "      \"record_id\": \"ECR1h72e7ba34fde8\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"a3813f6e8df2a2d166eec6a9487a5fe6ee2f500a1b4e4729cc3a0b4e6b56bc98\",",
+        "    \"plan.json\": \"8a56594d111c4cf0770fd5943fb4318d3306dba4ec9343f0abea4ae2c80ef69f\",",
+        "    \"records.jsonl\": \"c44996300b73399e8bc2d6b878fe26abfbe1195dbf9be9a6a5d1f3881ea9d916\",",
+        "    \"session.json\": \"b3e52551a794ea2ea80b11f5e260cd653cf4ee708dfef72f5543b4d5ce7186be\",",
+        "    \"spec.json\": \"4ce4d345539157a2baf32a7927075f22f16b0af0662d84c58af743bccd07c1ce\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"25e1e76f5a0ae0a78859cb940d09c2307a7343facbb16eb424ea4971ef76c53f\",",
+        "  \"auditor_env_class_id\": \"ECBENV2h6639ae09b95e\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1hc00b2367431c\",",
+        "  \"audited_unix_ms\": 1792559944916",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_weight_rule_20261021/sessions/B-h24.audit.json')); s=json.load(open('research/ic_planner_weight_rule_20261021/sessions/B-h24/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.03,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-h24",
+      "index": 24,
+      "outputs": {},
+      "seconds": 0.03,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.031,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-h29",
+      "index": 25,
+      "outputs": {},
+      "seconds": 0.031,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h29",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2.377,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-h29",
+      "index": 26,
+      "outputs": {
+        "research/ic_planner_weight_rule_20261021/sessions/B-h29.audit.json": "e02df979715c8f3a103b8950c180a5ab3ca8f9e163398f2ef50bd602794d5a16"
+      },
+      "seconds": 2.377,
+      "stderr_sha256": "261fdb76e19a80e3e8df374fde2cc863ea494a317343315b2592ae2ae0eadb70",
+      "stderr_tail": [
+        "audit OK: 96 records, 96 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "e02df979715c8f3a103b8950c180a5ab3ca8f9e163398f2ef50bd602794d5a16",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 90,",
+        "      \"record_id\": \"ECR1h729e383c8c6c\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"a6703e2548b84d43e7a3211e51ec63a503e0fa95fc31d7d6aa69e9aed6e804dd\",",
+        "    \"plan.json\": \"6c8020c493c569b51eadca98243d883e3959f6b341c2ae2fe0f182286eb90d2e\",",
+        "    \"records.jsonl\": \"e9aced2a89cbcaf392076ad251783a2372ec86db9af4aee8f71104056bd6a82f\",",
+        "    \"session.json\": \"9caf202bf8ece6248a82a242f5994f37cfe716700ad43ccad0c7024ea38c6417\",",
+        "    \"spec.json\": \"385bcb6ec0f133b776a58ddd054ca4ab017fa5adefe7b30e6bb31ded816bd362\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"25e1e76f5a0ae0a78859cb940d09c2307a7343facbb16eb424ea4971ef76c53f\",",
+        "  \"auditor_env_class_id\": \"ECBENV2h6639ae09b95e\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1hc00b2367431c\",",
+        "  \"audited_unix_ms\": 1792559947356",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_weight_rule_20261021/sessions/B-h29.audit.json')); s=json.load(open('research/ic_planner_weight_rule_20261021/sessions/B-h29/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.03,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-h29",
+      "index": 27,
+      "outputs": {},
+      "seconds": 0.03,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 27,
+  "commit": "66f1642d1c04fb4fc236aacfbe746e2ebb639a87",
+  "dirty_after": [
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.disk-start.stdout",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.receipt.json",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.run-h21.stderr",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.run-h21.stdout",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.yaml",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-3.disk-start.stdout",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-3.receipt.json",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-3.run-h21.stderr",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-3.run-h21.stdout",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-3.yaml",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-4.disk-start.stdout",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-4.run-h21.stderr",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-4.run-h21.stdout",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-4.run-h22.stderr",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-4.run-h22.stdout",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-4.run-h24.stderr",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-4.run-h24.stdout",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-4.run-h29.stderr",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-4.run-h29.stdout",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-4.verify-h21.stderr",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-4.verify-h22.stderr",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-4.verify-h24.stderr",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-4.verify-h29.stderr",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-4.yaml",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h21.audit.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h21/host.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h21/plan.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h21/records.jsonl",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h21/session.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h21/spec.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h22.audit.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h22/host.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h22/plan.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h22/records.jsonl",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h22/session.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h22/spec.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h24.audit.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h24/host.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h24/plan.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h24/records.jsonl",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h24/session.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h24/spec.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h29.audit.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h29/host.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h29/plan.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h29/records.jsonl",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h29/session.json",
+    "research/ic_planner_weight_rule_20261021/sessions/B-h29/spec.json"
+  ],
+  "dirty_before": [
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.disk-start.stdout",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.receipt.json",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.run-h21.stderr",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.run-h21.stdout",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.yaml",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-3.disk-start.stdout",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-3.receipt.json",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-3.run-h21.stderr",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-3.run-h21.stdout",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-3.yaml",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-4.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

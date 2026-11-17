@@ -1,0 +1,150 @@
+BivariateMultiplicity.lean:23:2: error: Type mismatch: After simplification, term
+  h
+ has type
+  Polynomial.eval₂ (algebraMap K (AdjoinRoot (Polynomial.X ^ 2 - Polynomial.C c * Polynomial.X)))
+      (AdjoinRoot.root (Polynomial.X ^ 2 - Polynomial.C c * Polynomial.X))
+      (Polynomial.X ^ 2 - Polynomial.C c * Polynomial.X) =
+    0
+but is expected to have type
+  AdjoinRoot.root (Polynomial.X ^ 2 - Polynomial.C c * Polynomial.X) ^ 2 =
+    (algebraMap K (Q K c)) c * AdjoinRoot.root (Polynomial.X ^ 2 - Polynomial.C c * Polynomial.X)
+BivariateMultiplicity.lean:39:6: error: Not a comparison: X 0 * X 1 ∈
+  ↑(RingHom.ker
+      ↑(aeval fun i =>
+          if i = 0 then (algebraMap K (Q K c)) c - AdjoinRoot.root (quadratic K c)
+          else AdjoinRoot.root (quadratic K c)))
+BivariateMultiplicity.lean:42:6: error: No goals to be solved
+BivariateMultiplicity.lean:36:17: warning: This simp argument is unused:
+  RingHom.mem_ker
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [AlgHom.toRingHom_eq_coe, evaluate, map_mul, MvPolynomial.aeval_X, ↓reduceIte, ne_eq, Fin.zero_eta,
+    one_ne_zero, not_false_eq_true, Fin.isValue]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+BivariateMultiplicity.lean:37:8: warning: This simp argument is unused:
+  map_mul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [RingHom.mem_ker, AlgHom.toRingHom_eq_coe, evaluate, MvPolynomial.aeval_X, ↓reduceIte, ne_eq,
+    Fin.zero_eta, one_ne_zero, not_false_eq_true, Fin.isValue]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+BivariateMultiplicity.lean:37:17: warning: This simp argument is unused:
+  MvPolynomial.aeval_X
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [RingHom.mem_ker, AlgHom.toRingHom_eq_coe, evaluate, map_mul, ↓reduceIte, ne_eq, Fin.zero_eta,
+    one_ne_zero, not_false_eq_true, Fin.isValue]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+BivariateMultiplicity.lean:37:39: warning: This simp argument is unused:
+  ↓reduceIte
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [RingHom.mem_ker, AlgHom.toRingHom_eq_coe, evaluate, map_mul, MvPolynomial.aeval_X, ne_eq,
+    Fin.zero_eta, one_ne_zero, not_false_eq_true, Fin.isValue]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+BivariateMultiplicity.lean:37:51: warning: This simp argument is unused:
+  ne_eq
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [RingHom.mem_ker, AlgHom.toRingHom_eq_coe, evaluate, map_mul, MvPolynomial.aeval_X, ↓reduceIte,
+    Fin.zero_eta, one_ne_zero, not_false_eq_true, Fin.isValue]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+BivariateMultiplicity.lean:37:58: warning: This simp argument is unused:
+  Fin.zero_eta
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [RingHom.mem_ker, AlgHom.toRingHom_eq_coe, evaluate, map_mul, MvPolynomial.aeval_X, ↓reduceIte,
+    ne_eq, one_ne_zero, not_false_eq_true, Fin.isValue]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+BivariateMultiplicity.lean:38:8: warning: This simp argument is unused:
+  one_ne_zero
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [RingHom.mem_ker, AlgHom.toRingHom_eq_coe, evaluate, map_mul, MvPolynomial.aeval_X, ↓reduceIte,
+    ne_eq, Fin.zero_eta, not_false_eq_true, Fin.isValue]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+BivariateMultiplicity.lean:38:21: warning: This simp argument is unused:
+  not_false_eq_true
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [RingHom.mem_ker, AlgHom.toRingHom_eq_coe, evaluate, map_mul, MvPolynomial.aeval_X, ↓reduceIte,
+    ne_eq, Fin.zero_eta, one_ne_zero, Fin.isValue]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+BivariateMultiplicity.lean:73:44: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+c : K
+i : Fin 2
+⊢ (Ideal.Quotient.lift (equationsIdeal K c)
+        ↑(aeval fun i =>
+            if i = 0 then (AdjoinRoot.of (quadratic K c)) c - AdjoinRoot.root (quadratic K c)
+            else AdjoinRoot.root (quadratic K c))
+        ⋯)
+      ((Ideal.Quotient.mk (equationsIdeal K c)) (X i)) =
+    if i = 0 then (AdjoinRoot.of (quadratic K c)) c - AdjoinRoot.root (quadratic K c)
+    else AdjoinRoot.root (quadratic K c)
+BivariateMultiplicity.lean:91:8: error: ring failed, ring expressions not equal
+K : Type u_1
+inst✝ : Field K
+c : K
+⊢ (backward K c)
+              (if ⟨0, ⋯⟩ = 0 then (algebraMap K (Q K c)) c - AdjoinRoot.root (quadratic K c)
+              else AdjoinRoot.root (quadratic K c)) +
+            coordinate K c 0 +
+          coordinate K c 1 -
+        coordinate K c ⟨0, ⋯⟩ -
+      (algebraMap K (A K c)) c =
+    0
+BivariateMultiplicity.lean:89:39: warning: This simp argument is unused:
+  ↓reduceIte
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [forward_coordinate, map_sub, AlgHom.commutes, backward_root]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+BivariateMultiplicity.lean:89:51: warning: This simp argument is unused:
+  map_sub
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [forward_coordinate, ↓reduceIte, AlgHom.commutes, backward_root]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+BivariateMultiplicity.lean:89:60: warning: This simp argument is unused:
+  AlgHom.commutes
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [forward_coordinate, ↓reduceIte, map_sub, backward_root]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+BivariateMultiplicity.lean:90:10: warning: This simp argument is unused:
+  backward_root
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [forward_coordinate, ↓reduceIte, map_sub, AlgHom.commutes]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+BivariateMultiplicity.lean:96:27: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  GetElem (Type u_1) (?m.33 → MvPolynomial ?m.33 ?m.32) ?m.29 ?m.30
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+BivariateMultiplicity.lean:96:27: error: failed to prove index is valid, possible solutions:
+  - Use `have`-expressions to prove the index is valid
+  - Use `a[i]!` notation instead, runtime check is performed, and 'Panic' error message is produced if index is not valid
+  - Use `a[i]?` notation instead, result is an `Option` type
+  - Use `a[i]'h` notation instead, where `h` is a proof that index is valid
+K : Type u_1
+inst✝ : Field K
+c : K
+⊢ ?m.30 K X
+BivariateMultiplicity.lean:118:0: error: Unexpected name `BivariateMultiplicityAudit` after `end`: The current section is unnamed
+
+Hint: Delete the name `BivariateMultiplicityAudit` to end the current unnamed scope; outer named scopes can then be closed using additional `end` command(s):
+  end ̵B̵i̵v̵a̵r̵i̵a̵t̵e̵M̵u̵l̵t̵i̵p̵l̵i̵c̵i̵t̵y̵A̵u̵d̵i̵t̵

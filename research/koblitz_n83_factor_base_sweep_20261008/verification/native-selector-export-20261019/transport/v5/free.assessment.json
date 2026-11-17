@@ -1,0 +1,37 @@
+{
+  "card_id": "CARD-n83-selector-export-20261019-free",
+  "outcome": "executed_as_specified",
+  "stopped_at_step": null,
+  "recommendation": "proceed_to_analysis",
+  "relay_verbatim": true,
+  "record_digests_verified": true,
+  "interpretation": "not_assessed",
+  "native_card_check": {
+    "exit_code": 0,
+    "status": "completed",
+    "relay_verbatim": true,
+    "record_digests_verified": true
+  },
+  "reasons": [
+    "Frozen native card-check verified the exact returned relay and all command-stream/declared-output digests under the card's exact native_path.",
+    "Receipt records exactly one frozen argv in repository root,exit0,succeeded=true,timed_out=false; all nine declared outputs exist and their SHA256s match.",
+    "Receipt card_changed=false; dirty_before and dirty_after empty; current HEAD remains frozen cbe8e44da5ac0a792922d746368882a3b8f40170 with clean tracked status.",
+    "Declared receipt,streams and outputs are under the frozen exec/v5 write_scope; no executor deviation observed.",
+    "This assessment concerns execution and custody only. Earlier stopped audit and failed transport records remain separate and unchanged; no scientific interpretation or retrospective promotion."
+  ],
+  "evidence": {
+    "card": "/home/ec2-user/scratch/n83-selector-export-20261019/cards/free.json",
+    "card_sha256": "cb39ee4cd7e60b4b2d4030db2c902798f0389fe7daf15eb7e3f517a86523e1fe",
+    "relay": "/home/ec2-user/scratch/n83-selector-export-20261019/free-relay.txt",
+    "relay_sha256": "e5ef96581ba990a1da14a5e23c9644eadce4ddcfba0d4923ab6897cc10db4f67",
+    "receipt": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free.receipt.json",
+    "source_commit": "cbe8e44da5ac0a792922d746368882a3b8f40170"
+  },
+  "custody": {
+    "streams_verified": 2,
+    "declared_outputs_verified": 9
+  },
+  "experiment_rerun_by_director": false,
+  "source_or_spec_changes": false,
+  "scientific_interpretation": "not_assessed"
+}

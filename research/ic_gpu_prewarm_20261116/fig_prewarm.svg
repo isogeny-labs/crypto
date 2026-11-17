@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 330" width="640" height="330" font-family="system-ui, -apple-system, Segoe UI, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">Early worker spawn: wall time of the first fes-f2-gpu row</title>
+<desc id="d">Wall time of the first fes-f2-gpu row of a host run, per run and as a mean, with the early worker spawn on and off, and off again as a noise floor; a worker that takes 150 ms to start stands in for a CUDA context.</desc>
+<style>.bg{fill:#fcfcfb}.on{fill:#1baf7a}.off{fill:#eb6834}.off2{fill:#c9a227}.p{fill:#0b0b0b}.q{fill:#52514e}.g{stroke:#e4e3df}@media (prefers-color-scheme: dark){.bg{fill:#1a1a19}.on{fill:#199e70}.off{fill:#d95926}.off2{fill:#b8921a}.p{fill:#f0efec}.q{fill:#c3c2b7}.g{stroke:#383835}}</style>
+<rect class="bg" width="640" height="330"/>
+<text class="p" x="16" y="24" font-size="15" font-weight="600">First fes-f2-gpu row: early worker spawn on vs off (host, 150 ms start-up stand-in)</text>
+<text class="q" x="16" y="42" font-size="12">per run (dots) and mean (bar), 4 interleaved runs per arm; counted fields identical in 24 of 24</text>
+<line class="g" x1="114" y1="270.0" x2="620" y2="270.0"/><text class="q" x="110" y="274.0" font-size="10" text-anchor="end">0.0</text>
+<line class="g" x1="114" y1="220.0" x2="620" y2="220.0"/><text class="q" x="110" y="224.0" font-size="10" text-anchor="end">0.1</text>
+<line class="g" x1="114" y1="170.0" x2="620" y2="170.0"/><text class="q" x="110" y="174.0" font-size="10" text-anchor="end">0.2</text>
+<line class="g" x1="114" y1="120.0" x2="620" y2="120.0"/><text class="q" x="110" y="124.0" font-size="10" text-anchor="end">0.3</text>
+<line class="g" x1="114" y1="70.0" x2="620" y2="70.0"/><text class="q" x="110" y="74.0" font-size="10" text-anchor="end">0.4</text>
+<text class="q" x="16" y="170.0" font-size="11" transform="rotate(-90 16 170.0)" text-anchor="middle">row wall, s</text>
+<rect class="off" x="156" y="102.4" width="68" height="167.6" opacity="0.55"><title>off (spawn at first call): mean 0.335 s</title></rect>
+<circle class="off" cx="169" cy="114.0" r="3.5"/>
+<circle class="off" cx="183" cy="115.4" r="3.5"/>
+<circle class="off" cx="197" cy="82.2" r="3.5"/>
+<circle class="off" cx="211" cy="97.9" r="3.5"/>
+<text class="p" x="190" y="94.4" font-size="11" text-anchor="middle">0.335</text>
+<text class="q" x="190" y="288" font-size="10" text-anchor="middle">off (spawn at first call)</text>
+<rect class="off2" x="316" y="102.7" width="68" height="167.3" opacity="0.55"><title>off again (noise): mean 0.335 s</title></rect>
+<circle class="off2" cx="329" cy="85.0" r="3.5"/>
+<circle class="off2" cx="343" cy="101.1" r="3.5"/>
+<circle class="off2" cx="357" cy="111.7" r="3.5"/>
+<circle class="off2" cx="371" cy="113.1" r="3.5"/>
+<text class="p" x="350" y="94.7" font-size="11" text-anchor="middle">0.335</text>
+<text class="q" x="350" y="288" font-size="10" text-anchor="middle">off again (noise)</text>
+<rect class="on" x="476" y="188.8" width="68" height="81.2" opacity="0.55"><title>on (spawn early): mean 0.162 s</title></rect>
+<circle class="on" cx="489" cy="180.6" r="3.5"/>
+<circle class="on" cx="503" cy="190.9" r="3.5"/>
+<circle class="on" cx="517" cy="187.5" r="3.5"/>
+<circle class="on" cx="531" cy="196.2" r="3.5"/>
+<text class="p" x="510" y="180.8" font-size="11" text-anchor="middle">0.162</text>
+<text class="q" x="510" y="288" font-size="10" text-anchor="middle">on (spawn early)</text>
+</svg>

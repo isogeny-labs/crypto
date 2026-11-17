@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-13T10:39:40Z",
+ "id": "PCC-20261113-b52e23",
+ "kind": "statement",
+ "producer": {
+  "commit": "00ffe72fbeadaca1eb519459b77e00717f18fda3",
+  "model": "",
+  "session": "cover-graph-builder-20261113"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_cover_encoding_audit_20261113/evidence/builder/none/manifest.json",
+    "sha256": "3ae5fdec725f102979721a707c9a5909bd39c960c299d4cb7ef1cd8788166989"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_cover_encoding_audit_20261113/evidence/builder/cubic/manifest.json",
+    "sha256": "3b86925161a2771847b96e42c33869423e009693226feddcf327e9987dcda465"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_cover_encoding_audit_20261113/evidence/builder/checks.json",
+    "sha256": "058a02f2ab6e5091e68250fb719079a7f8304d5d7403ec1af8e1f8452bf2410a"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Only two pinned saved polynomial systems; unsigned construction checks, no solver ingestion, elliptic witness, runtime benefit, relation-yield or asymptotic conclusion.",
+ "statement": "For the two frozen saved m4t4 inputs, native paired construction checks exact coefficient projection; graph systems have22 variables,23 equations and maximum input degree4, versus18/19/4 for reference direct and18/19/12 for cubic direct."
+}

@@ -1,0 +1,83 @@
+{
+  "schema": "bk-general-verification/v1",
+  "source_commit": "22f17d94431c98e944011fd555dc7743be48df92",
+  "claim_id": "PCC-20261115-bec94e",
+  "declaration_sha256": "1496e8cfdebbf83c0db95c47a6fd234bcd8e9f29294f9a4ae96b80b88e4be677",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 52,
+  "gate_declarations": 59,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 300,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-bec94e",
+    "claim_sha256": "4d9f5c7cc43cdef44371f88c7a1b976ef4270598bc4ad521dc060988b64c7288",
+    "commit": "22f17d94431c98e944011fd555dc7743be48df92",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/bk_general_frobenius_audit_20261115/lean (GeneralCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T17:19:12Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-bec94e",
+    "claim_sha256": "4d9f5c7cc43cdef44371f88c7a1b976ef4270598bc4ad521dc060988b64c7288",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47798,
+    "sha256": "8ae07093c051ce1ddfb980749b59c13dd719dc9a4a04eca1fdf9ea06637054ee",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 59,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_allr_torsion_Frobenius_module": true,
+    "actual_algebraic_ambient_Frobenius_automorphism": true,
+    "actual_fixedpower_field_torsion_linear_equivalence": true,
+    "actual_finite_fixedpopulation_derived": true,
+    "actual_rational_prime_fixedpoint": true,
+    "r1_trivial_r0_allpoints": true,
+    "source_F19_known_control_verified": true,
+    "source_F19_allk_criterion": true,
+    "source_actual_cubic_field_and_embedding": true,
+    "source_only_determinantq_derived": true,
+    "arbitrary_prime_geometric_rank2": false,
+    "general_determinantq": false,
+    "canonical_Weil_necessity": false,
+    "qualified_source_refuted": false,
+    "full_allk_p_under500_census": false,
+    "new_native_crypto_experiment": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

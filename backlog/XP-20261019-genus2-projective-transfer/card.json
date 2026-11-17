@@ -1,0 +1,99 @@
+{
+  "authors": [
+    "ECDLP research lane"
+  ],
+  "blocked_on": [],
+  "cairn": {
+    "env": {
+      "name": "crypto-rust",
+      "recipe": "TODO: how to build the environment tree from code.commit"
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 4096,
+      "publish": "runs/XP-20261019-genus2-projective-transfer",
+      "sandbox": "auto",
+      "timeout_s": 3600
+    },
+    "funding": {
+      "rationale": "No funding requested; draft experiment design only.",
+      "units": 0
+    },
+    "mode": "lab-task",
+    "notes": "No remote execution authorized by this draft; qualification and runtime requirements are in README.md.",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261019-genus2-projective-transfer"
+    ],
+    "ttl_s": 86400
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "code": {
+    "branch": "codex/new-leads-20261019",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--bin",
+        "TODO"
+      ]
+    ],
+    "commit": null,
+    "repo": "crypto"
+  },
+  "created": "2026-10-19",
+  "decision_value": "The verified pipeline uses a generic affine Jacobian backend whose addition was counted as 70M+3S+I. Faster arithmetic is a distinct implementation lead, not a claim that the observed IC-to-rho gap disappears. Favorable inversion prices alone do not prove a backend improvement.",
+  "id": "XP-20261019-genus2-projective-transfer",
+  "links": {
+    "lead": "research/new_leads_20261019/README.md#l5",
+    "notes": [
+      "https://arxiv.org/abs/1510.03174"
+    ],
+    "prs": []
+  },
+  "outputs": {
+    "land": "research/new_leads_20261019/followups/genus2-projective-transfer",
+    "result_schema": "backlog.shard-result/v1",
+    "verify": []
+  },
+  "owner_hint": "ECDLP research lane",
+  "protocol": {
+    "blob": null,
+    "path": null
+  },
+  "question": "Can a checked projective or Kummer-assisted backend reduce the actual cost of the genus-2 transfer pipeline?",
+  "resources": {
+    "cpus": 1,
+    "disk_gb": 1,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "gpu": null,
+    "notes": "Provisional implementation envelope only; estimates remain unknown until the producer and small pilot exist. No large run is scheduled.",
+    "ram_gb": 4
+  },
+  "run": {
+    "argv": [
+      "target/release/TODO",
+      "--out",
+      "{out}"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1"
+    },
+    "timeout_per_shard_s": 3600
+  },
+  "schema": "backlog.card/v1",
+  "shards": {
+    "count": 1,
+    "params": {},
+    "scheme": "single",
+    "stop": "all"
+  },
+  "status": "draft",
+  "status_note": "Draft: construction/producer, independent verifier, checkpoints and frozen execution protocol remain to be implemented. Not dispatched or funded.",
+  "title": "Projective genus-2 transfer pipeline with matched source arithmetic"
+}

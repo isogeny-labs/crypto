@@ -1,0 +1,45 @@
+{
+ "schema": "validation-gate/v1",
+ "rows": [
+  "icv1-fp32-t89141-95879fe3",
+  "icv1-fp32-tm68303-f902d2f0"
+ ],
+ "replay_certificate": {
+  "path": "../../research/ic_packed_filter_20261029/validation/replay-certificate.json",
+  "sha256": "b357028b1c2187dc67abfbafe8999bf5f1b1a79e9c74c2471304b16e14f4d533"
+ },
+ "validator_report": {
+  "path": "../../research/ic_packed_filter_20261029/validation/validator-report.json",
+  "sha256": "df9624c2849a9496c44598e1b27d5c671bd4275bcfe4dba87740ada8c8797a6a"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "PROTOCOL.md §2 and §6.2 (backlog/XP-20261029-packed-filter, freeze f870408c17): arm rho-neg (rho.negation), with A/A rho-neg-aa, in the counted session ic-dgbf-rho-p32-20261029, on the same curves, targets and seeds as dgb and dgbf",
+  "unit": "counted S′ = (band.rs priced GAE at w + w × table_filter_bit_sets) / √r, w GAE per unpriced native operation (PROTOCOL §5)",
+  "binary_or_process": "ecbench sha256 21701be6c420c3507a81767ed20f759e230f1fe5ec002ef3f7bb63a9c0b64503 from 3271a25d02, image 32144a29e437376b9bf8b902aef4ba6b9cc723a15f01d296fb7b09eb131b817b; rho-neg, dgb and dgbf in the same counted pod; the counted dgb and dgbf records equal the wall records",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "strongest_available_basis": "prime-field curves with A != 0 and B != 0 (replay-certificate.json curve_binding), so j != 0, 1728: no automorphism fold exists and Frobenius is trivial over a prime field, so negation is the strongest reference",
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 31.693595555358375,
+    "rho": 1.0070458230707695,
+    "ic_baseline_dgb": 31.693595555358375
+   },
+   "0.1": {
+    "ic": 34.87384979037822,
+    "rho": 1.1071161527651106,
+    "ic_baseline_dgb": 33.19776876637305
+   },
+   "1": {
+    "ic": 63.49613790555689,
+    "rho": 2.00774912001418,
+    "ic_baseline_dgb": 46.73532766550515
+   }
+  },
+  "order_holds_across_band": true,
+  "ic_vs_ic_order": "dgbf is not ranked against dgb in the counted unit: tie at w = 0, dgbf costlier at w > 0"
+ }
+}

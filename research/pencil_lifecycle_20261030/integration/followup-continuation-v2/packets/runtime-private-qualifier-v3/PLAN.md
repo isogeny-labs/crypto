@@ -1,0 +1,9 @@
+# Private qualifier inspection-directory correction — T1459
+
+Prospective ordinary software plan. Preserve immutable qualifier-v2/supervisor-v3 and qualification-attempt-v3. Root authorizes new source only, no runtime retry. Exact failure: tempfile.TemporaryFile without dir performs default lookup under ProtectSystem=strict; callback has no TMPDIR/TEMP/TMP; reported candidates /tmp,/var/tmp,/usr/tmp,/ are read-only. First daemon-info inspection allocates before Popen. Existing command directory d is under the writable bounded private filesystem.
+
+Minimal change: top-level inspection_capture(directory) calls tempfile.TemporaryFile(mode='w+b',dir=directory); command uses inspection_capture(d). No environment fallback or global writable paths. Keep gate, endpoint, binding, strict diff, limits, ownership and cleanup logic unchanged. Draft admission remains false.
+
+One validation attempt, outer TERM115seconds plus KILL5second reserve, RLIMIT_AS2GiB, one unittest process. Run original14 controls plus8 targeted controls: forced default resolver failure, poisoned temp environment, binary roundtrip/unlinked lifecycle, O_TMPFILE fallback, missing directory fail-closed, EROFS fail-closed, exception closes file, and static call-site ordering. Tests perform bounded local tempfile I/O and mocks only; no Docker/systemd/mount/container/root/cloud invocation. Freeze exact source/test/runner before running, retain failure with no automatic retry. Reports/rendering max2calls60seconds/1GiB each. Parent owns publication; no staging until explicit slot.
+
+Claim boundary: controls establish explicit-directory file allocation behavior and source ordering; they do not validate live service namespace integration or qualify any case. New runtime admission requires separate review and authorization.

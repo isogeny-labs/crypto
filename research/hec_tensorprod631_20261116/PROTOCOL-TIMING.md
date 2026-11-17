@@ -1,0 +1,11 @@
+# Prospective controlled compiled-map comparison
+
+Do not run until a new bench.record, full binaries/inputs/hash recheck, source commit and checkpoint/gate. The production correctness gate has passed. Baseline uses the same production no-base section evaluator but original target ring multiplication/colon; candidate uses compiled maps. Both have identical opt-in nested phase probes. Only arithmetic implementation changes. Common quotient/public-coordinate setup reused, but target map compilation is charged inside reconstruction.
+
+Five sequential blocks,20fresh cells. Even order baseline_a,tensor_a,tensor_b,baseline_b; odd reverse. A/Blabels run identical executables/data/options within each algorithm. No warmup, seed search, concurrency, omitted cell or rerun. Charge identical direct generations, solver/exact verification, reconstruction/adjacency and final independent class comparisons. Every child300scap. All20cells must pass both classes. Fixed source-pair repeats are not independent curves.
+
+Stability qualification BEFORE speed inference: for each algorithm, larger/smaller of its A/Bmediancomponenttimes must be<=1.10; separately every one of the four labelseries must have max/min<=1.25. Failure of anyqualifier retains the cohort but precludes a stable speedup/regression claim. No threshold changes after viewing results. Primary ratio median(baseline_a)/median(tensor_a), each5samples; Bcells are retained controls, never pooled or dropped. Numeric10xcomponentgate and stabilitygate both required. No fullcold/genus2/4claim even on pass.
+
+Primary internal component and secondary parent process wall follow the preceding collector. Disjoint child STAGE_WALLincludes spawn/wait/outputsetup and is diagnostic inside primary. Reconstruction TRACE_PHASEmodel_construction,input_D1,input_Bare disjoint top-level phases; per-candidate phases are nested inside input spans and must not be added again. Logging overhead is charged equally. No claim that wall phases equal CPU or instruction costs.
+
+Archive all inputs/stdout/stderr/statuses, class matches and phases in S3, use Rust reduction, closed measured/invalid/censored record, inspected visual report and benchmark entry. Earlier noisy0.930cohort and1.621xcomparison remain immutable and separate. No silent retry on unstable host.

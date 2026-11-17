@@ -1,0 +1,230 @@
+{
+  "accepted": true,
+  "count": 37,
+  "rows": [
+    {
+      "accepted": false,
+      "case": "escaped-null-duplicate",
+      "error": "duplicate JSON key at line 1 column 20",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "surrogate-alias-duplicate",
+      "error": "duplicate JSON key at line 1 column 24",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "deep-array-duplicate",
+      "error": "duplicate JSON key at line 1 column 26",
+      "expected": false
+    },
+    {
+      "accepted": true,
+      "case": "distinct-normalization",
+      "error": null,
+      "expected": true
+    },
+    {
+      "accepted": false,
+      "case": "lone-surrogate",
+      "error": "unexpected end of hex escape at line 1 column 13",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "trailing-comma",
+      "error": "trailing comma at line 1 column 8",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "comment",
+      "error": "trailing characters at line 1 column 3",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "leading-zero",
+      "error": "invalid number at line 1 column 2",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "unescaped-control",
+      "error": "control character (\\u0000-\\u001F) found while parsing a string at line 2 column 0",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "trailing-token",
+      "error": "trailing characters at line 1 column 6",
+      "expected": false
+    },
+    {
+      "accepted": true,
+      "case": "array-scalar-json",
+      "error": null,
+      "expected": true
+    },
+    {
+      "accepted": true,
+      "case": "exact-json-cap",
+      "error": null,
+      "expected": true
+    },
+    {
+      "accepted": false,
+      "case": "zero-json-cap",
+      "error": "JSON byte cap",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "serde-depth-limit",
+      "error": "recursion limit exceeded at line 1 column 128",
+      "expected": false
+    },
+    {
+      "accepted": true,
+      "case": "fresh-custody",
+      "error": null,
+      "expected": true
+    },
+    {
+      "accepted": false,
+      "case": "empty-inventory",
+      "error": "empty fixture inventory",
+      "expected": false
+    },
+    {
+      "accepted": true,
+      "case": "exact-file-cap",
+      "error": null,
+      "expected": true
+    },
+    {
+      "accepted": false,
+      "case": "one-byte-over-cap",
+      "error": "file byte cap",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "trailing-slash-key-alias",
+      "error": "exact fixture inventory",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "dot-path",
+      "error": "canonical path spelling",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "double-slash-path",
+      "error": "canonical path spelling",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "uppercase-digest",
+      "error": "digest shape",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "special-mode-bit",
+      "error": "file type/mode/link count",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "gate-hardlink",
+      "error": "file type/mode/link count",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "gate-symlink",
+      "error": "canonical path spelling",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "directory-member",
+      "error": "file type/mode/link count",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "socket-member-before-open",
+      "error": "file type/mode/link count",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "extra-empty-file",
+      "error": "exact fixture inventory",
+      "expected": false
+    },
+    {
+      "accepted": true,
+      "case": "empty-file-allowed-with-pin",
+      "error": null,
+      "expected": true
+    },
+    {
+      "accepted": true,
+      "case": "actual-composition",
+      "error": null,
+      "expected": true
+    },
+    {
+      "accepted": false,
+      "case": "composition-writable-mount",
+      "error": "readonly bind identity",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "composition-owner-mismatch",
+      "error": "owner name/nonce",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "composition-transport",
+      "error": "diff transport exit",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "composition-extra-diff",
+      "error": "exact three additions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "composition-expected-alias",
+      "error": "duplicate JSON key at line 1 column 508",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "composition-custody-mode",
+      "error": "file type/mode/link count",
+      "expected": false
+    },
+    {
+      "accepted": true,
+      "case": "final-composition",
+      "error": null,
+      "expected": true
+    }
+  ],
+  "runtime_qualification": false,
+  "scientific_execution": false
+}

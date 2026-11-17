@@ -1,0 +1,884 @@
+{
+  "analysis": {
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "bytes": 113578,
+        "kind": "summary",
+        "path": "evidence/results.json",
+        "sha256": "3117cdce7f2ee5d5cccc3cbf5255b0206dbdee10b007b69adf82ea18f9f4124d"
+      }
+    ],
+    "script": {
+      "bytes": 11918,
+      "kind": "analysis",
+      "path": "../../src/bin/prime_fall.rs",
+      "sha256": "c1cd5e1cfbba80e5f2f34491cfc106faafbbc02c0686a6159d25679339695979"
+    },
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "binary_sha256": "638ef803dc993aad93ae3f9d83eaa183649e8dd9e798c7cdc8a1658d0ded2fc1",
+      "commit": "0c9543a2b5a95266792dadf15a921ac24a779bf0",
+      "id": "prime_planted",
+      "image_digest": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0f591bb57d9c2c0a694d0fec1b83ef822453df0a10632f2ad4ffff731f51b2ab",
+      "role": "reference"
+    },
+    {
+      "binary_sha256": "638ef803dc993aad93ae3f9d83eaa183649e8dd9e798c7cdc8a1658d0ded2fc1",
+      "commit": "0c9543a2b5a95266792dadf15a921ac24a779bf0",
+      "id": "prime_natural",
+      "image_digest": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0f591bb57d9c2c0a694d0fec1b83ef822453df0a10632f2ad4ffff731f51b2ab",
+      "role": "candidate"
+    }
+  ],
+  "backend": "isolab-k8s",
+  "created": "2026-10-27",
+  "export_id": "N83-PRIME-LEADING-FIRST-FALL-20261027-R4",
+  "files": [
+    {
+      "bytes": 113578,
+      "kind": "raw",
+      "path": "evidence/results.json",
+      "sha256": "3117cdce7f2ee5d5cccc3cbf5255b0206dbdee10b007b69adf82ea18f9f4124d"
+    },
+    {
+      "bytes": 218125,
+      "kind": "raw",
+      "path": "evidence/r3-results.json",
+      "sha256": "95bc8431d46e11cffa11051b2ae9ff82c2b5c8cfc0dfef1b373629c50c4c94a2"
+    },
+    {
+      "bytes": 1694,
+      "kind": "raw",
+      "path": "evidence/controls.json",
+      "sha256": "1907f661d3aabebd6b4742a09908d7f6432454e7ee1c57ea397d45c430d6ba91"
+    },
+    {
+      "bytes": 1152,
+      "kind": "raw",
+      "path": "evidence/replay.jsonl",
+      "sha256": "beb435cebffaccd594299c567c193d10f5adc5ff4bdf80943169d3167678a0a4"
+    },
+    {
+      "bytes": 2403,
+      "kind": "raw",
+      "path": "evidence/producer.log",
+      "sha256": "68f7dd50a6bb59ff99a26086abaf01d92280c34c7d4e682dfed4d81c903e6498"
+    },
+    {
+      "bytes": 4187,
+      "kind": "other",
+      "path": "evidence/raw-manifest.sha256",
+      "sha256": "7512c545d988aff5f4e3050cea72a4b3c20d50eaa6e47e09768d4f711a735251"
+    },
+    {
+      "bytes": 329,
+      "kind": "receipt",
+      "path": "request.json",
+      "sha256": "3ad9bc03082b82dfaf972ea523d8f88de96649ef009ee2d15cd0b86971ec741b"
+    },
+    {
+      "bytes": 872,
+      "kind": "receipt",
+      "path": "submission.json",
+      "sha256": "c2a5ffe3c2842f1a073635c0fc9cd8f60f15634e1e6ecf7a1b997703b9ac27ed"
+    },
+    {
+      "bytes": 5361,
+      "kind": "receipt",
+      "path": "terminal.json",
+      "sha256": "a9edb85764effdab65803074cab5d35324587295d4c25c9fbfd2c67504aee29a"
+    },
+    {
+      "bytes": 5358,
+      "kind": "other",
+      "path": "ARGUMENT.md",
+      "sha256": "50b219daa9cd83676966531ee17758800db76d0c21f36baeac018939a9e504da"
+    },
+    {
+      "bytes": 1934,
+      "kind": "other",
+      "path": "PROOF_MAP.md",
+      "sha256": "65b57f4824122915172dafa8d4b7670ca2334392f1497995c5165eaf959603e4"
+    },
+    {
+      "bytes": 14247,
+      "kind": "analysis",
+      "path": "../../src/bin/prime_report.rs",
+      "sha256": "4bb9cd1b9d71424ab8443edf2f1ef7edad2c565cc54ef9a5977fbfafa16a92b6"
+    }
+  ],
+  "flow": {
+    "attempted": 16,
+    "completed": 16,
+    "excluded": [],
+    "interrupted": 0,
+    "not_completed": 0,
+    "planned": 16,
+    "resumed": 0
+  },
+  "host": {
+    "class_id": "eks-spot-L0",
+    "path": "evidence/host.txt",
+    "sha256": "832561f26ab83cb50068c46f5944864d5b9ab0f78871bb655cdb9ded93669385",
+    "summary": {
+      "cpu_model": "Intel(R) Xeon(R) 6975P-C",
+      "hypervisor": "Amazon EC2",
+      "isolation_tier_max": "L0",
+      "kernel": "Linux n83-prime-first-fall-m2-m9-20261027-r4-x8nxp 6.18.54-121.166.amzn2023.x86_64 #2 SMP PREEMPT_DYNAMIC Tue Oct  6 23:11:34 UTC 2026 x86_64 GNU/Linux",
+      "logical_cpus": 8,
+      "memory_bytes": null
+    }
+  },
+  "notes": [
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "All16 prime certificates, original-presentation replays and new fresh-process replays completed. Five exact small-matrix controls passed. Values are standard leading-syzygy first falls with proof-assisted lower bounds; no full n83 rank measurement. Earliest NEW affine fall and last fall remain null. Full Lean formalization open; one structural dependency checked without axioms."
+    }
+  ],
+  "producer": {
+    "model": null,
+    "role": "producer",
+    "runtime": "codex",
+    "session": "n83-prime-first-fall-m2-m9-20261027-r4"
+  },
+  "protocol": {
+    "path": "protocol.json",
+    "protocol_id": "N83-PRIME-LEADING-FIRST-FALL-20261027-R4",
+    "sha256": "6e12ffdda6e1610783f0e3d0caea595387737eb798900659f3466d50edcf79b7",
+    "version": 1
+  },
+  "reviews_dir": "reviews",
+  "runs": [
+    {
+      "arm": "prime_planted",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-prime-first-fall-m2-m9-20261027-r4/8504c912-0848-46f3-a1d7-7ee0029ebdf5/certificates/prime-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "affine_product_degree_upper_bound": 23,
+          "first_fall_degree": 24
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m2-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Pinned original-presentation replay and fresh-process factored witness/hypothesis replay; written lower-bound derivation, full Lean theorem open; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-prime-first-fall-m2-m9-20261027-r4-x8nxp"
+    },
+    {
+      "arm": "prime_natural",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-prime-first-fall-m2-m9-20261027-r4/8504c912-0848-46f3-a1d7-7ee0029ebdf5/certificates/prime-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "affine_product_degree_upper_bound": 23,
+          "first_fall_degree": 24
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m2-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Pinned original-presentation replay and fresh-process factored witness/hypothesis replay; written lower-bound derivation, full Lean theorem open; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-prime-first-fall-m2-m9-20261027-r4-x8nxp"
+    },
+    {
+      "arm": "prime_planted",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-prime-first-fall-m2-m9-20261027-r4/8504c912-0848-46f3-a1d7-7ee0029ebdf5/certificates/prime-m3-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "affine_product_degree_upper_bound": 16,
+          "first_fall_degree": 17
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Pinned original-presentation replay and fresh-process factored witness/hypothesis replay; written lower-bound derivation, full Lean theorem open; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-prime-first-fall-m2-m9-20261027-r4-x8nxp"
+    },
+    {
+      "arm": "prime_natural",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-prime-first-fall-m2-m9-20261027-r4/8504c912-0848-46f3-a1d7-7ee0029ebdf5/certificates/prime-m3-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "affine_product_degree_upper_bound": 16,
+          "first_fall_degree": 17
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Pinned original-presentation replay and fresh-process factored witness/hypothesis replay; written lower-bound derivation, full Lean theorem open; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-prime-first-fall-m2-m9-20261027-r4-x8nxp"
+    },
+    {
+      "arm": "prime_planted",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-prime-first-fall-m2-m9-20261027-r4/8504c912-0848-46f3-a1d7-7ee0029ebdf5/certificates/prime-m4-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "affine_product_degree_upper_bound": 13,
+          "first_fall_degree": 14
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m4-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Pinned original-presentation replay and fresh-process factored witness/hypothesis replay; written lower-bound derivation, full Lean theorem open; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-prime-first-fall-m2-m9-20261027-r4-x8nxp"
+    },
+    {
+      "arm": "prime_natural",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-prime-first-fall-m2-m9-20261027-r4/8504c912-0848-46f3-a1d7-7ee0029ebdf5/certificates/prime-m4-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "affine_product_degree_upper_bound": 13,
+          "first_fall_degree": 14
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m4-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Pinned original-presentation replay and fresh-process factored witness/hypothesis replay; written lower-bound derivation, full Lean theorem open; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-prime-first-fall-m2-m9-20261027-r4-x8nxp"
+    },
+    {
+      "arm": "prime_planted",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-prime-first-fall-m2-m9-20261027-r4/8504c912-0848-46f3-a1d7-7ee0029ebdf5/certificates/prime-m5-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "affine_product_degree_upper_bound": 11,
+          "first_fall_degree": 12
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m5-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Pinned original-presentation replay and fresh-process factored witness/hypothesis replay; written lower-bound derivation, full Lean theorem open; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-prime-first-fall-m2-m9-20261027-r4-x8nxp"
+    },
+    {
+      "arm": "prime_natural",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-prime-first-fall-m2-m9-20261027-r4/8504c912-0848-46f3-a1d7-7ee0029ebdf5/certificates/prime-m5-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "affine_product_degree_upper_bound": 11,
+          "first_fall_degree": 12
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m5-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Pinned original-presentation replay and fresh-process factored witness/hypothesis replay; written lower-bound derivation, full Lean theorem open; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-prime-first-fall-m2-m9-20261027-r4-x8nxp"
+    },
+    {
+      "arm": "prime_planted",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-prime-first-fall-m2-m9-20261027-r4/8504c912-0848-46f3-a1d7-7ee0029ebdf5/certificates/prime-m6-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "affine_product_degree_upper_bound": 9,
+          "first_fall_degree": 10
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m6-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Pinned original-presentation replay and fresh-process factored witness/hypothesis replay; written lower-bound derivation, full Lean theorem open; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-prime-first-fall-m2-m9-20261027-r4-x8nxp"
+    },
+    {
+      "arm": "prime_natural",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-prime-first-fall-m2-m9-20261027-r4/8504c912-0848-46f3-a1d7-7ee0029ebdf5/certificates/prime-m6-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "affine_product_degree_upper_bound": 9,
+          "first_fall_degree": 10
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m6-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Pinned original-presentation replay and fresh-process factored witness/hypothesis replay; written lower-bound derivation, full Lean theorem open; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-prime-first-fall-m2-m9-20261027-r4-x8nxp"
+    },
+    {
+      "arm": "prime_planted",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-prime-first-fall-m2-m9-20261027-r4/8504c912-0848-46f3-a1d7-7ee0029ebdf5/certificates/prime-m7-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "affine_product_degree_upper_bound": 8,
+          "first_fall_degree": 9
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m7-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Pinned original-presentation replay and fresh-process factored witness/hypothesis replay; written lower-bound derivation, full Lean theorem open; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-prime-first-fall-m2-m9-20261027-r4-x8nxp"
+    },
+    {
+      "arm": "prime_natural",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-prime-first-fall-m2-m9-20261027-r4/8504c912-0848-46f3-a1d7-7ee0029ebdf5/certificates/prime-m7-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "affine_product_degree_upper_bound": 8,
+          "first_fall_degree": 9
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m7-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Pinned original-presentation replay and fresh-process factored witness/hypothesis replay; written lower-bound derivation, full Lean theorem open; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-prime-first-fall-m2-m9-20261027-r4-x8nxp"
+    },
+    {
+      "arm": "prime_planted",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-prime-first-fall-m2-m9-20261027-r4/8504c912-0848-46f3-a1d7-7ee0029ebdf5/certificates/prime-m8-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "affine_product_degree_upper_bound": 8,
+          "first_fall_degree": 9
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m8-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Pinned original-presentation replay and fresh-process factored witness/hypothesis replay; written lower-bound derivation, full Lean theorem open; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-prime-first-fall-m2-m9-20261027-r4-x8nxp"
+    },
+    {
+      "arm": "prime_natural",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-prime-first-fall-m2-m9-20261027-r4/8504c912-0848-46f3-a1d7-7ee0029ebdf5/certificates/prime-m8-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "affine_product_degree_upper_bound": 8,
+          "first_fall_degree": 9
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m8-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Pinned original-presentation replay and fresh-process factored witness/hypothesis replay; written lower-bound derivation, full Lean theorem open; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-prime-first-fall-m2-m9-20261027-r4-x8nxp"
+    },
+    {
+      "arm": "prime_planted",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-prime-first-fall-m2-m9-20261027-r4/8504c912-0848-46f3-a1d7-7ee0029ebdf5/certificates/prime-m9-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "affine_product_degree_upper_bound": 7,
+          "first_fall_degree": 8
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m9-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Pinned original-presentation replay and fresh-process factored witness/hypothesis replay; written lower-bound derivation, full Lean theorem open; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-prime-first-fall-m2-m9-20261027-r4-x8nxp"
+    },
+    {
+      "arm": "prime_natural",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-prime-first-fall-m2-m9-20261027-r4/8504c912-0848-46f3-a1d7-7ee0029ebdf5/certificates/prime-m9-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "affine_product_degree_upper_bound": 7,
+          "first_fall_degree": 8
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m9-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Pinned original-presentation replay and fresh-process factored witness/hypothesis replay; written lower-bound derivation, full Lean theorem open; not independent research review"
+      },
+      "warmup": false,
+      "worker": "n83-prime-first-fall-m2-m9-20261027-r4-x8nxp"
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "commit": "0c9543a2b5a95266792dadf15a921ac24a779bf0",
+    "dirty": false,
+    "repo": "crypto"
+  }
+}

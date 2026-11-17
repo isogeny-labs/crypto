@@ -1,0 +1,11 @@
+digraph G { graph [rankdir=LR,bgcolor="white"]; node [shape=box,style="rounded,filled",fillcolor="#e7f1f3",fontname="Helvetica",fontsize=12]; edge [color="#526a73"];
+
+  fb [label="Seeded n=7 factor base\n4 signed points"];
+  triples [label="All 64 ordered triples\nincluding repeats"];
+  noic [label="0 sums in prime subgroup\nno 3-point relation support",fillcolor="#f7e6d1"];
+  group [label="All 29 subgroup points"];
+  canon [label="3 canonical points\nincluding infinity"];
+  nodp [label="0 pass dp_bits=4\nno stored collisions",fillcolor="#f7e6d1"];
+  fb -> triples -> noic; group -> canon -> nodp;
+
+}

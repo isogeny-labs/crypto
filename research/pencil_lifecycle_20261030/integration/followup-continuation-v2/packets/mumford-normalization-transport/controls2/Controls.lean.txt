@@ -1,0 +1,16 @@
+import Transport
+set_option autoImplicit false
+namespace MumfordNormalizationControls
+open Polynomial MumfordNormalization
+theorem input_witness : ((X^5+1 : ℚ[X])-1^2)=X*X^4 := by ring
+theorem support_root : (T 1 (2:ℚ) 3 X).eval (-3/2)=0 := by rw [eval_transport]; norm_num
+theorem ordinate : (T 3 (2:ℚ) 3 1).eval (-3/2)=1/8 := by rw [eval_transport]; norm_num
+theorem curve_value : (T 6 (2:ℚ) 3 (X^5+1)).eval (-3/2)=1/64 := by rw [eval_transport]; norm_num
+theorem correct_residual : (1/64:ℚ)-(1/8)^2=0 := by norm_num
+theorem wrong_scale_residual : (1/64:ℚ)-1^2= -63/64 := by norm_num
+theorem wrong_scale_nonzero : (1/64:ℚ)-1^2≠0 := by norm_num
+theorem zero_scale_collapse : affine (0:ℚ) 3=C 3 := by simp [affine]
+theorem fixed_transport : T 1 (2:ℚ) 3 X ∣ T 6 2 3 (X^5+1)-(T 3 2 3 1)^2 := by
+ apply congruence_transport 2 3 (by norm_num) 1
+ exact ⟨X^4,input_witness⟩
+end MumfordNormalizationControls

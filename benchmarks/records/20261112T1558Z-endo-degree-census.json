@@ -1,0 +1,338 @@
+{
+  "branch": "claude/ecdlp-chained-transfers-8cpiek",
+  "closed_utc": "2026-11-12T16:44:17+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/endo_degree_census"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T15:58:35+00:00",
+      "wall_s": 56.747
+    },
+    {
+      "argv": [
+        "./target/release/endo_degree_census"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T15:59:47+00:00",
+      "wall_s": 103.78
+    }
+  ],
+  "commit": "e9d5dbdccdeb55b6d8527ebae1113135b42b26bf",
+  "commit_dirty": true,
+  "created_utc": "2026-11-12T15:58:28+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261111-chained-prime-transfer"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T1558Z-endo-degree-census",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "registry_prime_rows_analysed",
+      "note": "prime-field rows of docs/curves/registry.json; 1545 non-prime-field rows skipped",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 20733.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 8800,
+      "name": "controls_detected",
+      "note": "all 11 control discriminants, 4 bit sizes, 200 each",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 8800.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "control_failures",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "null_max_abs_z_tested_sizes",
+      "note": "z-score, sizes with expected hits >= 5",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 1.4467047343070853
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 29701,
+      "name": "null_12bit_hits_dk_le_44",
+      "note": "expected 2206.697 exact formula; z=-0.78",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 2172.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 29701,
+      "name": "null_12bit_fraction_dk_le_44",
+      "note": "expected 7.355656 percent",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 7.312885088044173
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 99786,
+      "name": "null_16bit_hits_dk_le_44",
+      "note": "expected 1803.326 exact formula; z=1.45",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 1864.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 99786,
+      "name": "null_16bit_fraction_dk_le_44",
+      "note": "expected 1.803326 percent",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 1.8679975146814183
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 99941,
+      "name": "null_20bit_hits_dk_le_44",
+      "note": "expected 442.337 exact formula; z=-0.97",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 422.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 99941,
+      "name": "null_20bit_fraction_dk_le_44",
+      "note": "expected 0.442337 percent",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 0.4222491269849211
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 99985,
+      "name": "null_24bit_hits_dk_le_44",
+      "note": "expected 115.096 exact formula; z=1.20",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 128.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 99985,
+      "name": "null_24bit_fraction_dk_le_44",
+      "note": "expected 0.115096 percent",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 0.12801920288043206
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 49997,
+      "name": "null_28bit_hits_dk_le_44",
+      "note": "expected 14.230 exact formula; z=0.47",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 49997,
+      "name": "null_28bit_fraction_dk_le_44",
+      "note": "expected 0.028460 percent",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 0.03200192011520691
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 20000,
+      "name": "null_32bit_hits_dk_le_44",
+      "note": "expected 1.538 exact formula; z=-0.43",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 1.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 20000,
+      "name": "null_32bit_fraction_dk_le_44",
+      "note": "expected 0.007689 percent",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 0.005
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2000,
+      "name": "null_40bit_hits_dk_le_44",
+      "note": "expected 0.007 exact formula; z=-0.09",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 2000,
+      "name": "null_40bit_fraction_dk_le_44",
+      "note": "expected 0.000373 percent",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 20730,
+      "name": "registry_prime_hits_dk_le_44",
+      "note": "lab-constructed curves in bulk; not a random sample",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 2184.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 54,
+      "name": "registry_named_standard_hits_dk_le_44",
+      "note": "all d_k=-3 (j=0)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 6.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 29,
+      "name": "registry_pairing_friendly_hits_dk_le_44",
+      "note": "28 with d_k=-3, Bandersnatch d_k=-8",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 29.0
+    }
+  ],
+  "problem": "prime-field-chained-transfer-no-advantage",
+  "raw": [
+    {
+      "bytes": 1202561,
+      "path": "research/endo_degree_census_20261112/rows.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e7/e7fc4e76326d31f9827c8b068862949f14395107b3b9b45e8469456ce420141b",
+      "sha256": "e7fc4e76326d31f9827c8b068862949f14395107b3b9b45e8469456ce420141b",
+      "uploaded": false
+    },
+    {
+      "bytes": 89941,
+      "path": "research/endo_degree_census_20261112/census.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7c/7c5365dc1d4eaf1a6aa8e33cbb574fbae8ac1b7c5e7c36271a805b9295232994",
+      "sha256": "7c5365dc1d4eaf1a6aa8e33cbb574fbae8ac1b7c5e7c36271a805b9295232994",
+      "uploaded": false
+    },
+    {
+      "bytes": 25204,
+      "path": "research/endo_degree_census_20261112/run.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/47/47a404d28b5c7a33727d715a133f8191aa04f46fabdd0def07caced43daeb778",
+      "sha256": "47a404d28b5c7a33727d715a133f8191aa04f46fabdd0def07caced43daeb778",
+      "uploaded": false
+    },
+    {
+      "bytes": 1771,
+      "path": "research/endo_degree_census_20261112/posthoc.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3c/3c7533b75d758929eee406b5957ee312a93eccb41253d369708f96214194c3c3",
+      "sha256": "3c7533b75d758929eee406b5957ee312a93eccb41253d369708f96214194c3c3",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261111-chained-prime-transfer/REPORT_cover_census_20261112.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261111-chained-prime-transfer/census.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "endo-degree-census",
+  "status": "measured",
+  "summary": "Endomorphism of degree <=11 needs |d_K|<=44: random-curve rate ~4/sqrt(p) matches exact prediction (12-28 bits); standard curves only j=0 plus Bandersnatch (D=-8) [pcc:unverified]",
+  "validation": null
+}

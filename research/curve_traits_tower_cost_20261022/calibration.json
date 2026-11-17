@@ -1,0 +1,11 @@
+{
+  "what": "seconds per scalar multiplication by a 256-bit scalar (all-ones), same total degree D over GF(p), p of 26 bits; timed for 2 s per row on the 4-core build container, single thread",
+  "word": {"curve": "icv1-fp26-t11496-20ba3109", "arithmetic": "PrimeExt (GF(p^D) in word arithmetic)",
+           "rows": [[20, 1.235e-2], [40, 4.997e-2], [80, 1.911e-1], [160, 5.981e-1], [320, 2.227]]},
+  "tower": {"curve": "icv1-fp26k10-t46798729328837941259637387338213709722-36a56223", "arithmetic": "Ext over FpK (GF(p^10)[w]/(m), degree m = D/10)",
+            "rows": [[20, 2.359e-2], [40, 9.116e-2], [80, 4.058e-1], [160, 1.478], [320, 6.178]]},
+  "modeled_unweighted_equal": "multiplication_cost gives the same count for both at every D (1.229e6 at D = 20)",
+  "overhead_charged_before": 64,
+  "overhead_charged_after": 3,
+  "command": "debug test points.rs::debug_calibrate (scratch patch, not committed), SLUGS=<curve> MS=<degrees>"
+}

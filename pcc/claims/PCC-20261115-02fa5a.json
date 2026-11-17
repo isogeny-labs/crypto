@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T22:24:20Z",
+ "id": "PCC-20261115-02fa5a",
+ "kind": "statement",
+ "producer": {
+  "commit": "2a28ed369fdfde81dbdfbb815ebb818e365daae0",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/four-point-final-controls.log",
+    "sha256": "b87e7795fa0ba7ad5f39ed3748c15b223f805c7d22906e8cda4d10de30acafbc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/four-point-v1/construction-pre-call.json",
+    "sha256": "491aa0ed6cd1ef31a832ffe7c3d96c85401e38858dcf1c88a00dabcbebc87986"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/four-point-v1/construction-post-call.json",
+    "sha256": "b7d129d6f6f778864aa50e1e5266b6c71727702d78bf27d6d2c18dabaf3326e0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/four-point-v1/energy-arithmetic.json",
+    "sha256": "510853779a945e16c0ef24bb2bb14af19875ac2352a91d1c44fd6b45a123f102"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Producer native Rust checks construct a four-point actual-Curve25519 torus/Semaev system with M=12965132697890207, four cosets, 454 variables and 455 quadratic equations, check planted group/circuit witnesses and eight raw cofactor sections, and check six branch roots, all 36 branch ratios and an exact integer inequality used by a proposed average-energy argument. These are construction/arithmetic checks; no solver was invoked on the large-base systems, no geometric theorem or changed exponent is verified."
+}

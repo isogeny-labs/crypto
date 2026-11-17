@@ -1,0 +1,75 @@
+{
+  "created_utc": "2026-10-25T00:10:14.441849+00:00",
+  "prepared_curve_coverage_counterexample": {
+    "p": 109,
+    "r": 1293169,
+    "all_twelve_jacobian_orders": 1296891,
+    "explicit_divisor_witnesses": 12,
+    "one_more_3_isogeny_repairs": true,
+    "weaker_existential_one_step_conjecture_refuted": false
+  },
+  "polynomial_transfers": [
+    {
+      "p": 7,
+      "r": 373,
+      "scalar": 218,
+      "total_seconds": 45.635267012999975,
+      "three_inversions_seconds": 2.8966950209978677,
+      "target_index_calculus_seconds": 16.67300625200005,
+      "source_bsgs_seconds": 0.001091460002498934,
+      "extension_field_point_enumeration": false,
+      "target_group_enumeration": false
+    },
+    {
+      "p": 13,
+      "r": 2137,
+      "scalar": 803,
+      "total_seconds": 92.87582858899987,
+      "three_inversions_seconds": 3.476376912996784,
+      "target_index_calculus_seconds": 65.18764961399938,
+      "source_bsgs_seconds": 0.0021635059965774417,
+      "extension_field_point_enumeration": false,
+      "target_group_enumeration": false
+    }
+  ],
+  "searches": {
+    "closed_walk_classes": 49,
+    "walk_frontier": 0,
+    "walk_truncation": 0,
+    "broad_orbits": 1000,
+    "hesse_accepted_before_hit": 4430
+  },
+  "source_hashes": {
+    "complete_toy.py": "a3cbc1230ac04b8d5835ee68f327cbda2d4453878a44a9180139ec977b88f242",
+    "composed_fixture.py": "6de86c291c0b421a608fd850eefdf7473271ec18bc8e474ec20146b26a48d955",
+    "counterexample_audit.py": "409f990fec2ab45d5fa42573bd1e268ffd6da1bbcfef7727c40729bc04cd6f12",
+    "coverage_hunt.py": "d3fbb79d7b3701c0d853dae463a1adae837b6fb3e8bb9ab7d7670b0de2f37cd7",
+    "coverage_search2.py": "77fe0e5f465933ac7edc782a50e5c09594b55754e0ebba5ad21abf415e446eb3",
+    "coverage_walk.py": "4a66d91ee7d88f82ca81feee06d9057b31c07c67a72fb6b04f85f5e1f76bf926",
+    "explicit_counterexample_witnesses.py": "0bea48bfd06b5d2b954cb36d5f72e5af7ba7043b335d60b9601c45f6b65fdb1d",
+    "fast_counterexample.py": "f0da7518b2056385f84bce115430f247a651b555f15d9b97a44832fee0774530",
+    "finalize_transfer_results.py": "af432adc19d20ca2b39378068061f91b78c62c45a848befefec8e1a52d82b431",
+    "inverse_map.py": "16020505c20043c89042c40b9cb54a3aa819c2111150477cfd13fc3eba43b03a",
+    "isogeny_probe.py": "138754be304e71e015b99f67a2677eb0cfc259d636994271755e7d4a99fc2351",
+    "kernel_screen.py": "8aa2c0d729b6e7d2471e46726006c632b66b6fdafe7288408fe41e5912bd3001",
+    "large_instance.py": "8e86b167007606ad5cec9fe19b20f1d4c4b193c03d3813fe48cf1b0a2a2249b0",
+    "make_report.py": "2c98ceb2aeac710c9ddb1b5db7055bd19112f82f5b14e3f31283d90aec0733aa",
+    "next_report.py": "4e9f7cc5debfa577b0b8570a8fc44e730bfd9233ebd21fbf7d55654bfcee69ea",
+    "obstruction_probe.py": "4b7096aa398eebf5cee79f2189dc229269ce96400e1b6bf6f83cf156f88a78ad",
+    "polynomial_inverse.py": "defc841a5fab07dff284fd58e80712a8c7c6de0b3ffa8e488bb10c181f7212e0",
+    "quotient_report.py": "3cde378344cf2409a3943037b263d988039372c6c0d59ae95c7e1b4b845eda42",
+    "quotient_sweep.py": "c4665830e1456d8086a1b59a732dfeea7780fe3ca18cb0c668d2d0b350713e78",
+    "quotient_theta.py": "02afe4496ebed577b747c3a57162f81e2c36afdf3d5d0c29fe2719f8c394e5c6",
+    "target_index_calculus.py": "d0d61db1b8d45856f996a66a07c4278dd5c2aaddfcaf2581f7a6583e596044a8",
+    "theta_point_probe.py": "9c92f72746bf2fa529e378143843ea3cc612f62ef94aa27efe073d11b509268d",
+    "verify_large_sources.py": "7258c12effa4f88fd185c8293213591bc415eed28c48f9ef6fee4b5b6c63998c",
+    "zero_test_regression.py": "e1e2c1b4e4338e2460bcf880aa8b8682242ab35d284457fe2b1882bcc4ad6d9b"
+  },
+  "limits": [
+    "The weaker existential one-step coverage claim remains open.",
+    "Only two small-field complete ECDLP tests are reported.",
+    "The target index-calculus solver is basic and much slower than source BSGS in these tests.",
+    "Comprehensive nongeneric chart handling and cryptographic-size DLP benchmarking remain unfinished.",
+    "No new attack exponent or literature-priority claim is established."
+  ]
+}

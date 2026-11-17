@@ -1,0 +1,14 @@
+{
+  "schema": "zero-fiber-nested-reservation-reconciliation/v1",
+  "service": "twist-zero-five-panel-v1.service",
+  "outer_busy_pid": 2872796,
+  "inner_busy_pid": 2873334,
+  "condition": "Outer busy reservation held while same service inner collector busy waits on that reservation",
+  "candidate_records": 0,
+  "audit_records": 0,
+  "native_collector_started": false,
+  "raw_directory": "runs/panel-v1",
+  "frozen_runner_sha256": "a63ac9be5888ceb1293686127418720e80ff3a335839b252f59c80f917419dfe",
+  "action": "Stop only the verified deadlocked study service; preserve all raw files. Keep the separately queued journalled native gate alive. Corrected panel must be launched without an outer busy wrapper.",
+  "science_result": "No mathematical or timing verdict"
+}

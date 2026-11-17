@@ -1,0 +1,12 @@
+{
+  "schema": "software.review-observation/v1",
+  "review_type": "independent_agent_read_only_code_review",
+  "backend_sha256": "c69d3594657538131c11963af2f021a90f27af3400f7f76be216468703c9afca",
+  "tests_sha256": "4c91ca9edf07014322d3cdec70f34b5a2cffd161cc4b78fe1b64cf8c548fbf0b",
+  "resolved_finding": "A non-403 error containing Forbidden could invoke LIST; fallback now requires the explicit (403) marker and tests assert zero LIST calls for HTTP500 and bare Forbidden.",
+  "remaining_material_findings": [],
+  "existing_limitations": ["The AWS CLI process wrapper has no added wall-clock deadline or output cap."],
+  "reviewer_executed_tests": false,
+  "worker_role_permissions_validated": false,
+  "scientific_run_independently_reviewed": false
+}

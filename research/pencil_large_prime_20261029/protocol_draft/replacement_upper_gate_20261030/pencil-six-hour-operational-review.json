@@ -1,0 +1,70 @@
+{
+  "schema": "pencil-six-hour-operational-source-review/v1",
+  "reviewer": "/root/four_lead_state",
+  "status": "accepted_conditional_resource_guard_only",
+  "scope": "Read-only re-derivation for new six-hour authorization; no request or live deployed state independently observed in this review.",
+  "client_sha256": "ac7d57132617775679770dc55b6f8b3acc83f4454e31b025a1f35e9b915abc21",
+  "sources": [
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/source/taskq/deploy/eks-karpenter/resume/controller/src/cloud.rs",
+      "sha256": "ec633a6af0e9475731f0b7f9757828bfdd6b6baab6918ec6d082803a6cd0ec91"
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/source/taskq/deploy/eks-karpenter/resume/controller/src/supervisor.rs",
+      "sha256": "7cae58e46359ff72955ee52ac3e87c82987c68f20ffdf8778492e0e0a606f939"
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/source/taskq/deploy/eks-karpenter/resume/controller/src/io.rs",
+      "sha256": "115b5c03eaa4035e33cfe7c44b6d8117afdedca6cf0291741b05e0874d01a08f"
+    }
+  ],
+  "observations": [
+    "Re-read cloud.rs20-45: AWS and Kubernetes subprocess wrappers use180s timeout plus5s kill grace.",
+    "cloud.rs670-704: up to four sequential Kubernetes calls after fresh remaining calculation: manifest save, getJob, attempted save, createJob; fresh remaining=G-now-120.",
+    "cloud.rs240-250: computation Pod has relative activeDeadlineSeconds; supervisor.rs628-635 independently checks absoluteG in loop.",
+    "supervisor.rs530-576: native verification runs synchronously after completed/reaped computation; controller starts fresh only after verified status, cloud.rs923-959.",
+    "cloud.rs802-826: restore requires predecessor instance terminated; no restart from zero fallback.",
+    "Fresh measurement and in-worker replay must remain inside existing worker deadline; post-fresh verify-build identity work is not an additional scientific replay.",
+    "Relative Pod/Job deadlines are not absolute host-failure or arbitrary scheduling guarantees; stated operational delay assumptions are required.",
+    "No new concrete request was supplied/bound in this review; request admission must bind exact G and unchanged image/client/runtime."
+  ],
+  "no_hard_realtime_claim": true,
+  "scientific_admission": false,
+  "launch_authorized": false,
+  "guard": {
+    "C0": 1793337474,
+    "G": 1793347824,
+    "D": 1793359074,
+    "R": 900,
+    "C0_utc": "2026-10-30T05:17:54Z",
+    "G_utc": "2026-10-30T08:10:24Z",
+    "D_utc": "2026-10-30T11:17:54Z",
+    "inequality": "2*1793347824-1793337474+900=1793359074",
+    "guard_span_seconds": 10350,
+    "outer_span_seconds": 21600,
+    "four_network_calls_and_grace_seconds": 800,
+    "additional_local_slack_seconds": 100,
+    "fresh_subtraction120_not_used_for_bound": true
+  },
+  "conditions": [
+    "Use exactly the unchanged approved client/runtime/controller whose source hashes are bound here; verify actual request/image/runtime identities before launch.",
+    "Ordinary local/control and relevant scheduling delays beyond the four bounded calls and60s termination grace must fit100s remaining margin. Arbitrarily delayed Pod starts, suspended hosts or broken Kubernetes enforcement are not covered.",
+    "Kubernetes Pod/Job deadline and termination enforcement operate normally, including synchronous CRIU/native replay fallback.",
+    "At most one scientific payload at a time across computation, restores, replay, fresh epoch and later requests; observe predecessor termination before another active payload begins.",
+    "All new active-worker intervals lie within C0..D under the conditional guard. Their sum is then at most21600s by seriality; allocated-idle/controller time is separately retained, not asserted to equal active scientific time.",
+    "Every later request retains this original C0,D and cumulative21600 budget, never resets C0 to its own start, and must bind G no later than08:10:24 or a separately reviewed stricter remaining-budget guard.",
+    "Before later requests, reconcile all actual attempts/restore/fresh/replay intervals and unresolved workers. Reserve known spend; missing spend/termination evidence must not be treated as zero.",
+    "Scientific admission, cap changes, replay success, cohort completion and timing qualification remain separate decisions."
+  ],
+  "resource_guard_scope_accepted": true,
+  "authorization": {
+    "recorded_at": "2026-10-30T05:17:54Z",
+    "active_worker_seconds": 21600,
+    "outer_expiry": "2026-10-30T11:17:54Z",
+    "prior_budget_reset": false,
+    "prior_run_termination": "Reported by parent; not independently queried"
+  },
+  "conclusion": "Conditional guard arithmetic and unchanged lifecycle semantics checked; not a universal hard-deadline theorem, live deployment attestation, or launch authorization.",
+  "new_cloud_calls": 0,
+  "new_solver_executions": 0
+}

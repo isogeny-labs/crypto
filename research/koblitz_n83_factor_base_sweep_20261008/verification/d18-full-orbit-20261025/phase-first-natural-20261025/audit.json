@@ -1,0 +1,49 @@
+{
+  "binary_sha256": "9605c08a4aeeb61e6ce3196cb74d5a87ddea9d13f9f1d79a0a4e643d85ac5152",
+  "natural": {
+    "import_ms": 144501.769417,
+    "model_ms": 310.10083399999996,
+    "observed_post_model_window_ms": 154116.73099999997,
+    "process_wall_ms": 300025.42533299996,
+    "relation": null,
+    "search_ms": null,
+    "solver_answer": null,
+    "solver_conflicts": null,
+    "status": "UNKNOWN_wall_cap",
+    "supervisor_max_rss_bytes": 1996554240
+  },
+  "negative_controls": {
+    "changed_row_digest": "REJECTED",
+    "changed_target": "REJECTED"
+  },
+  "object_sha256": "eaef94ef45b3d2d4cd2ec2f40c1173b4cdb2a437b7e618a858c73fb1caf3902b",
+  "positive": {
+    "import_ms": 189298.431666,
+    "model_ms": 614.2308330000001,
+    "process_wall_ms": 193081.704458,
+    "relation": {
+      "group_replay": "PASS",
+      "indices": [
+        0,
+        166,
+        332,
+        498
+      ],
+      "row_decimal_blake3": "b3bd9bf4a43afb05f1090a192e90a1c80070b5edb253526c2686af1b64b3db19",
+      "tamper_rejected": true,
+      "target": [
+        "6594052263204820946437856",
+        "9593508870534830450764009"
+      ]
+    },
+    "search_ms": 1388.2016669999998,
+    "solver_answer": "Sat",
+    "solver_conflicts": 0,
+    "status": "PASS_CONSTRUCTED_CONTROL",
+    "supervisor_max_rss_bytes": 1817919488
+  },
+  "schema": "n83.full-d18-phase-first-natural-independent-audit/v1",
+  "selected_best_total_runtime": null,
+  "source_commit": "43a422ce66ebce82b48af036d15dcbef8a5ac785",
+  "status": "PASS_CENSORED_NATURAL_WALL_CAP"
+}

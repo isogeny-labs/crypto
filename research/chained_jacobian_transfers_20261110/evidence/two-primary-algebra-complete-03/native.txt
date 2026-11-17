@@ -1,0 +1,36 @@
+   Compiling chained-gluing-algebra-certificates v0.1.0 (/workspace/crypto/research/chained_jacobian_transfers_20261110/algebra-certificates)
+    Finished `release` profile [optimized] target(s) in 3.40s
+     Running unittests src/main.rs (research/chained_jacobian_transfers_20261110/algebra-certificates/target/release/deps/chained_gluing_algebra_certificates-6377e434650e09f1)
+
+running 23 tests
+test identity::tests::field_arithmetic_agrees_with_u128_reference ... ok
+test identity::tests::degree_bound_is_checked_syntactically_not_trusted ... ok
+test identity::tests::committed_schoenhage_certificate_still_checks ... ok
+test identity::tests::canonical_bytes_are_sorted_and_round_trip ... ok
+test identity::tests::swapping_the_statement_under_a_sealed_id_is_malformed ... ok
+test identity::tests::schoenhage_identity_certifies_and_checks ... ok
+test identity::tests::points_depend_on_the_id_so_the_author_cannot_pre_pick_them ... ok
+test identity::tests::tampering_with_the_digest_is_detected ... ok
+test mutated_identities_are_rejected ... ok
+test sha256_native::tests::sha224_abc ... ok
+test sha256_native::tests::sha224_empty ... ok
+test sha256_native::tests::sha256_block_boundary_55 ... ok
+test identity::tests::the_identity_without_its_error_term_is_false_and_cannot_be_issued ... ok
+test sha256_native::tests::sha256_empty ... ok
+test sha256_native::tests::sha256_fips180_112byte ... ok
+test sha256_native::tests::sha256_fips180_56byte ... ok
+test sha256_native::tests::sha256_hello_world ... ok
+test sha256_native::tests::sha256_two_blocks_64 ... ok
+test sha256_native::tests::sha256_abc ... ok
+test sha256_native::tests::sha_extensions_agree_with_the_portable_rounds ... ok
+test sha256_native::tests::streaming_million_a ... ok
+test sha256_native::tests::streaming_matches_one_shot_at_every_split ... ok
+test sha256_native::tests::sha256_million_a ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+   Compiling chained-gluing-algebra-certificates v0.1.0 (/workspace/crypto/research/chained_jacobian_transfers_20261110/algebra-certificates)
+    Finished `release` profile [optimized] target(s) in 1.75s
+     Running `research/chained_jacobian_transfers_20261110/algebra-certificates/target/release/chained-gluing-algebra-certificates /workspace/scratch/ct39-duplication-replay-03.json research/chained_jacobian_transfers_20261110/evidence/two-primary-halving-identity-03.json`
+PASS IDC1he156b6adc8f9cdd5:32issuer+64domain-separatedchecker points over fixed2^61-1;existing unchanged checker and SHA;not a signed or all-characteristics proof
+PASS IDC1h26ac6af51218fa21:32issuer+64domain-separatedchecker points over fixed2^61-1;existing unchanged checker and SHA;not a signed or all-characteristics proof

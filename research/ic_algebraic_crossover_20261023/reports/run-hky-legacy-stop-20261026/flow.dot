@@ -1,0 +1,16 @@
+digraph LegacyStop {
+  graph [rankdir=TB, bgcolor="white", pad="0.15", nodesep="0.3", ranksep="0.35", fontname="DejaVu Sans", fontsize=15, label="Legacy HKY batch: actual state at controlled stop", labelloc="t"];
+  node [shape=box, style="rounded,filled", fillcolor="#edf5ff", color="#365779", fontname="DejaVu Sans", fontsize=11];
+  edge [color="#526779", arrowsize=0.7];
+  planned [label="Original registration\n124 tuples x 2 real arms = 248 children"];
+  a [label="hky: 124 planned"];
+  b [label="hky-aa: 124 planned"];
+  ac [label="2 actual 900s timeouts\n0 verified primary outputs", fillcolor="#fff0dc", color="#b56815"];
+  bc [label="2 actual 900s timeouts\n0 verified primary outputs", fillcolor="#fff0dc", color="#b56815"];
+  au [label="122 unexecuted\nNo rank or cost imputation", fillcolor="#f4f4f4", color="#888888"];
+  bu [label="122 unexecuted\nNo rank or cost imputation", fillcolor="#f4f4f4", color="#888888"];
+  stop [label="Controlled stop at 21:10:27 UTC\nManifest verification exit0; no fifth child started\n0 verified A/A rank pairs; every minimum and independent cost unknown", fillcolor="#ffffff"];
+  planned -> a; planned -> b;
+  a -> ac; a -> au; b -> bc; b -> bu;
+  ac -> stop; au -> stop; bc -> stop; bu -> stop;
+}

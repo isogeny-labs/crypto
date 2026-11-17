@@ -1,0 +1,56 @@
+\documentclass[10pt]{article}
+\usepackage[margin=15mm]{geometry}\usepackage{tikz,longtable,array,hyperref}
+\begin{document}\raggedright\sloppy\section*{Software fixture only}
+Run: fixture\_not\_a\_run. Caller-supplied source commit: fixture.\par
+Observations only. No statistical, speed, mathematical or timing qualification is inferred.\par
+Synthetic renderer test; zero solver executions\par Workloads: 1; expected pairs per price cell: 5; slots: 18; observed: 0; missing: 18.\par
+\subsection*{Recorded outcomes}
+No observed outcome rows.\par
+ Missing rows remain missing; capped, timeout, error and other outcomes retain their original labels. Counts from different epochs are not pooled.\par
+\subsection*{Pair coverage by price cell}
+\begin{tikzpicture}[x=0.85cm,y=1cm,font=\scriptsize]
+\node[draw,text width=15cm,align=left] at (8,0) {Workloads: 1; expected pairs per price cell: 5; slots: 18; observed: 0; missing: 18.};\node[draw,text width=15cm,align=left] at (8,-1.2) {Arms: pencil, rho, rho\_AA. Planned slots are not observations.};\end{tikzpicture}\par
+Fewer than two comparable ratio cells are present. Diagram of planned scope and observed progress; no performance plot.\par
+No empirical result. Fixture numbers only.\par
+\newpage\section*{All36 exact price cells}
+S2 is twice S/M; N10 is ten times the native event price. Incomplete/unavailable ratios are null, not zero. Partial admitted sums are retained in JSON as diagnostic only; no partial sum is promoted to a complete ratio.\par
+\begin{longtable}{r l l p{4.2cm} p{4.2cm}}Cell&S2/I/N10&Admitted/expected&Method/rho exact&With calibration/rho exact\\\hline\endhead
+1 & 0/1/0 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+2 & 0/1/1 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+3 & 0/1/10 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+4 & 0/10/0 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+5 & 0/10/1 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+6 & 0/10/10 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+7 & 0/100/0 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+8 & 0/100/1 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+9 & 0/100/10 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+10 & 0/1000/0 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+11 & 0/1000/1 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+12 & 0/1000/10 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+13 & 1/1/0 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+14 & 1/1/1 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+15 & 1/1/10 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+16 & 1/10/0 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+17 & 1/10/1 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+18 & 1/10/10 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+19 & 1/100/0 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+20 & 1/100/1 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+21 & 1/100/10 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+22 & 1/1000/0 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+23 & 1/1000/1 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+24 & 1/1000/10 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+25 & 2/1/0 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+26 & 2/1/1 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+27 & 2/1/10 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+28 & 2/10/0 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+29 & 2/10/1 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+30 & 2/10/10 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+31 & 2/100/0 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+32 & 2/100/1 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+33 & 2/100/10 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+34 & 2/1000/0 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+35 & 2/1000/1 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+36 & 2/1000/10 & 0/5 & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} & n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{} \\ \hline
+\end{longtable}
+\section*{Evidence bindings}\texttt{\small /\allowbreak{}h\allowbreak{}o\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}e\allowbreak{}c\allowbreak{}2\allowbreak{}-\allowbreak{}u\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}/\allowbreak{}c\allowbreak{}r\allowbreak{}y\allowbreak{}p\allowbreak{}t\allowbreak{}o\allowbreak{}-\allowbreak{}p\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}i\allowbreak{}l\allowbreak{}-\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}-\allowbreak{}2\allowbreak{}0\allowbreak{}2\allowbreak{}6\allowbreak{}1\allowbreak{}0\allowbreak{}2\allowbreak{}9\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}c\allowbreak{}h\allowbreak{}/\allowbreak{}p\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}i\allowbreak{}l\allowbreak{}\_\allowbreak{}l\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}\_\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}\_\allowbreak{}2\allowbreak{}0\allowbreak{}2\allowbreak{}6\allowbreak{}1\allowbreak{}0\allowbreak{}2\allowbreak{}9\allowbreak{}/\allowbreak{}n\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}\_\allowbreak{}o\allowbreak{}b\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}\_\allowbreak{}r\allowbreak{}e\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}/\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}/\allowbreak{}f\allowbreak{}i\allowbreak{}x\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}m\allowbreak{}i\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}x\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{}y\allowbreak{}s\allowbreak{}i\allowbreak{}s\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n\allowbreak{}}\par\texttt{\small 7\allowbreak{}6\allowbreak{}2\allowbreak{}2\allowbreak{}a\allowbreak{}4\allowbreak{}f\allowbreak{}a\allowbreak{}5\allowbreak{}b\allowbreak{}e\allowbreak{}7\allowbreak{}3\allowbreak{}b\allowbreak{}5\allowbreak{}0\allowbreak{}8\allowbreak{}7\allowbreak{}2\allowbreak{}8\allowbreak{}9\allowbreak{}e\allowbreak{}a\allowbreak{}8\allowbreak{}5\allowbreak{}5\allowbreak{}3\allowbreak{}e\allowbreak{}7\allowbreak{}8\allowbreak{}6\allowbreak{}5\allowbreak{}7\allowbreak{}3\allowbreak{}6\allowbreak{}f\allowbreak{}f\allowbreak{}f\allowbreak{}3\allowbreak{}7\allowbreak{}6\allowbreak{}1\allowbreak{}c\allowbreak{}3\allowbreak{}5\allowbreak{}b\allowbreak{}d\allowbreak{}c\allowbreak{}2\allowbreak{}7\allowbreak{}2\allowbreak{}e\allowbreak{}6\allowbreak{}2\allowbreak{}7\allowbreak{}5\allowbreak{}4\allowbreak{}2\allowbreak{}5\allowbreak{}c\allowbreak{}e\allowbreak{}8\allowbreak{}f\allowbreak{}3\allowbreak{}}\par
+\end{document}

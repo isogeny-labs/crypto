@@ -1,0 +1,26 @@
+PencilWordRefinement.scaled_composition (p q r s t z w : UInt64) (hp : 0 < p.toNat) (hb : p.toNat < 2 ^ 31)
+  (hq : q.toNat < p.toNat) (hr : r.toNat < p.toNat) (hs : s.toNat < p.toNat) (ht : t.toNat < p.toNat)
+  (hz : z.toNat < p.toNat) (hw : w.toNat < p.toNat) :
+  have v := PencilWordRefinement.scaledWords p q r s t z w;
+  v.1.toNat < p.toNat ∧
+    v.2.1.toNat < p.toNat ∧
+      v.2.2.1.toNat < p.toNat ∧
+        v.2.2.2.toNat < p.toNat ∧
+          ↑v.1.toNat = ↑q.toNat * ↑z.toNat ^ 2 ∧
+            ↑v.2.1.toNat = ↑r.toNat * ↑z.toNat ^ 4 ∧
+              ↑v.2.2.1.toNat = ↑s.toNat * ↑z.toNat ^ 3 * ↑w.toNat ∧ ↑v.2.2.2.toNat = ↑t.toNat * ↑z.toNat ^ 5 * ↑w.toNat
+PencilWordRefinement.cross_classifier_decode (p : UInt64) (a b : PencilWordRefinement.WeightedWord)
+  [Fact (Nat.Prime p.toNat)] (hfive : 5 ≤ p.toNat) (hbound : p.toNat < 2 ^ 31)
+  (ha : PencilWordRefinement.WeightedWord.canonical p a) (hb : PencilWordRefinement.WeightedWord.canonical p b) :
+  PencilWordRefinement.crossClassifyWord p a b =
+    ProjectiveLawRuntime.classifySameU22 (↑a.s.toNat * ↑b.z.toNat ^ 3 * ↑b.w.toNat)
+      (↑a.t.toNat * ↑b.z.toNat ^ 5 * ↑b.w.toNat) (↑b.s.toNat * ↑a.z.toNat ^ 3 * ↑a.w.toNat)
+      (↑b.t.toNat * ↑a.z.toNat ^ 5 * ↑a.w.toNat)
+PencilWordRefinement.cross_prelude_decode (p : UInt64) (a b : PencilWordRefinement.WeightedWord)
+  [Fact (Nat.Prime p.toNat)] (hfive : 5 ≤ p.toNat) (hbound : p.toNat < 2 ^ 31)
+  (ha : PencilWordRefinement.WeightedWord.canonical p a) (hb : PencilWordRefinement.WeightedWord.canonical p b) :
+  PencilWordRefinement.crossPreludeWord p a b = PencilWordRefinement.crossPreludeField p a b
+'PencilWordRefinement.MulExpr.composition' depends on axioms: [propext, Quot.sound]
+'PencilWordRefinement.scaled_composition' depends on axioms: [propext, Quot.sound]
+'PencilWordRefinement.cross_classifier_decode' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PencilWordRefinement.cross_prelude_decode' depends on axioms: [propext, Classical.choice, Quot.sound]

@@ -1,0 +1,250 @@
+{
+  "schema": "pencil.formal-review/v1",
+  "published_commit": "ceecc0b38f9a3e14370781b2275afc6e59b27894",
+  "reviewer": "/root/portfolio_audit",
+  "joint": "cantor-reduction",
+  "machine_status": "passed",
+  "polynomial_fidelity": "faithful_scoped",
+  "written_geometric_fidelity": "holds_under_stated_smooth_curve_assumptions",
+  "mechanized_divisor_class_theorem": false,
+  "main_declarations": 12,
+  "producer_controls": 6,
+  "independent_controls": 7,
+  "axiom_audit": {
+    "declarations": [
+      {
+        "name": "CZeroCantor.crt_numerator",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "CZeroCantor.negative_remainder_certificate",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "CZeroCantor.remainder_constant_bound",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "CZeroCantor.linear_degree",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "CZeroCantor.linear_monic",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "CZeroCantor.product_degree",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "CZeroCantor.interpolant_initial_remainder_bound",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "CZeroCantor.one_reduction_certificate",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "CZeroCantor.support_monic",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "CZeroCantor.product_monic",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "CZeroCantor.exact_quotient_unique",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "CZeroCantor.full_cantor_numerator",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "CantorControls.negative_remainder_example",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "CantorControls.positive_sign_rejected",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "CantorControls.wrong_abscissa_rejected",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "CantorControls.unit_quotient_degree",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "CantorControls.multiplicity_allowed",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "CantorControls.characteristic_two_identity",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "ReviewerCantor.nonzero_second_bezout",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "ReviewerCantor.second_coefficient_nonzero",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "ReviewerCantor.wrong_linear_quotient",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "ReviewerCantor.ramification_factorization",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "ReviewerCantor.ramification_simple_coefficient",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "ReviewerCantor.positive_and_negative_points_differ",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "ReviewerCantor.repeated_residual_support",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    ],
+    "count": 25,
+    "allowed_only": true
+  },
+  "scope": [
+    "General arbitrary-c2 Cantor numerator",
+    "Exact monic quotient and negative remainder certificates",
+    "Written local divisor calculation and passage to Div0/Prin"
+  ],
+  "retained_boundaries": [
+    "Native egcd/pdiv/prem invariants and termination",
+    "Native word and trim semantics",
+    "Concrete curve, valuation and Picard carrier in Lean",
+    "Original-field descent"
+  ],
+  "scientific_execution": false,
+  "new_cost_ratio": null,
+  "source_first": true,
+  "blind": false,
+  "publication_before_dispatch": true,
+  "failures_preserved": [
+    "extraction-attempt1: wrong .lean archive suffix and empty modules, superseded by byte-checked .lean.txt extraction",
+    "reviewer-controls-attempt1: ambiguous support identifier"
+  ],
+  "dependency_boundary": "Pinned Lean and retained compiled imports; no independent binary rechecker",
+  "sources": [
+    "snapshot/native-cantor-source.rs.txt",
+    "snapshot/REPORT.md",
+    "snapshot/Cantor.lean",
+    "snapshot/Unique.lean",
+    "snapshot/Composition.lean",
+    "snapshot/CantorControls.lean",
+    "/var/tmp/pencil-czero-interpolation-20261101-v1/CZero.lean"
+  ],
+  "visual_inspection": "One-page PDF and SVG inspected; text and diagram legible without clipping"
+}

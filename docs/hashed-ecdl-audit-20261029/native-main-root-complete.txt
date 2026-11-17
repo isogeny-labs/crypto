@@ -1,0 +1,27 @@
+Complete current-native-main root regression, 2026-10-30 07:00 UTC
+
+Command: cargo test --locked --release --lib
+Directory: /workspace/crypto
+Tested source: bdfbad66714020f732fb4dd50cd749dda1100277
+Started: 2026-10-30T05:56:42Z
+Finished: 2026-10-30T06:49:02Z
+Actual exit: 0
+Complete parent summary:
+test result: ok. 5444 passed; 0 failed; 123 ignored; 0 measured; 0 filtered out; finished in 2650.38s
+
+Raw output: /tmp/crypto-root-native-main-restored-20261030.log
+Bytes: 488763
+SHA-256: 02d592aa1dbdee84b2d84ab894900093ff1f5596b57f0583934a7f5dd743d6e7
+Metadata/actual exit: /tmp/crypto-root-native-main-restored-20261030.{meta,exit}
+Raw runtime evidence is local only, NOT_UPLOADED. No live test remains.
+
+This covers current native source matching official peer55f65930 over36files,
+including its existing hash-prime helpers and the merged crypto3b34d504b base.
+The native/core, binding, lint/MSRV/fmt checks are recorded separately. Strict
+API docs still FAIL at existing upstream broken links; that failure is retained
+and reported, not suppressed or relabelled. Current-native-main-integration.txt
+and current-*-docs-error.txt describe the exact pre-existing failure and scope.
+Subsequent edits are receipts only. All earlier incomplete/failure and complete
+scoped receipts are preserved. No test/check/admission/ignore policy changed.
+No benchmark, cloud experiment or deployed-curve campaign was launched.
+General theorem, correctness and complexity audit remain open.

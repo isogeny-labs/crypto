@@ -1,0 +1,114 @@
+{
+  "id": "IDC1ha50d552f2f9b8cb1",
+  "independence": "native issuer; additional domain-separated checker seed and 128 points",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": null,
+  "schema": "identity.certificate/v1",
+  "seed": 2026102524,
+  "statement": {
+    "degree_bound": 3,
+    "lhs": {
+      "args": [
+        {
+          "args": "z",
+          "op": "var"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "lambda",
+                  "op": "var"
+                },
+                {
+                  "args": "lambda",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": {
+                "args": "lambda",
+                "op": "var"
+              },
+              "op": "neg"
+            },
+            {
+              "args": "q",
+              "op": "var"
+            }
+          ],
+          "op": "add"
+        }
+      ],
+      "op": "mul"
+    },
+    "name": "orbit-recurrence-factorization",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": "lambda",
+              "op": "var"
+            },
+            {
+              "args": [
+                {
+                  "args": "lambda",
+                  "op": "var"
+                },
+                {
+                  "args": "z",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": {
+            "args": [
+              {
+                "args": "lambda",
+                "op": "var"
+              },
+              {
+                "args": "z",
+                "op": "var"
+              }
+            ],
+            "op": "mul"
+          },
+          "op": "neg"
+        },
+        {
+          "args": [
+            {
+              "args": "q",
+              "op": "var"
+            },
+            {
+              "args": "z",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "conductor_gap_replication_20261025: distributivity underlying the conditional group recurrence",
+    "variables": [
+      "lambda",
+      "q",
+      "z"
+    ]
+  },
+  "value_digest": "3f202fff038f1888da59382b589a15c7914b6f131c5a094b780f88f7c79d331e"
+}

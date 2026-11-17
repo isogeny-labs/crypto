@@ -1,0 +1,49 @@
+F2 := GF(2); P<X> := PolynomialRing(F2);
+K<w> := ext<F2|X^12+X^7+X^6+X^5+X^3+X+1>;
+assert Order(w) eq 4095;
+k := FiniteField(2,4); Embed(k,K);
+E := EllipticCurve([K|1,(w^5),0,0,(w+w^4+w^5+w^8)]);
+assert #E eq 3974;
+counts := [Integers()|0:i in [0..99]]; first3 := -1; errors := 0;
+for i in [0..4094] do
+    try
+        g := WeilDescentGenus(E,k,w^i);
+        assert g le 99;
+        counts[g+1] +:= 1;
+        if g eq 3 and first3 eq -1 then first3 := i; end if;
+    catch e
+        errors +:= 1;
+    end try;
+end for;
+assert &+counts + errors eq 4095;
+print "ORDER",3974,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"FIRST3",first3,"ERRORS",errors;
+E := EllipticCurve([K|1,(w^5),0,0,(1+w+w^3)]);
+assert #E eq 3978;
+counts := [Integers()|0:i in [0..99]]; first3 := -1; errors := 0;
+for i in [0..4094] do
+    try
+        g := WeilDescentGenus(E,k,w^i);
+        assert g le 99;
+        counts[g+1] +:= 1;
+        if g eq 3 and first3 eq -1 then first3 := i; end if;
+    catch e
+        errors +:= 1;
+    end try;
+end for;
+assert &+counts + errors eq 4095;
+print "ORDER",3978,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"FIRST3",first3,"ERRORS",errors;
+E := EllipticCurve([K|1,(w^5),0,0,(1+w+w^2+w^3+w^4)]);
+assert #E eq 4178;
+counts := [Integers()|0:i in [0..99]]; first3 := -1; errors := 0;
+for i in [0..4094] do
+    try
+        g := WeilDescentGenus(E,k,w^i);
+        assert g le 99;
+        counts[g+1] +:= 1;
+        if g eq 3 and first3 eq -1 then first3 := i; end if;
+    catch e
+        errors +:= 1;
+    end try;
+end for;
+assert &+counts + errors eq 4095;
+print "ORDER",4178,"GENUS_HIST",[<g,counts[g+1]>:g in [0..99]|counts[g+1] ne 0],"FIRST3",first3,"ERRORS",errors;

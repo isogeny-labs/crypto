@@ -1,0 +1,129 @@
+LIB "linalg.lib";
+proc require58(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump58(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){require58(A[i,j]==1,"SPACE58_EXPORTED_BINARY_MATRIX_ENTRY");write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
+execute(read("../../../57/source-data/rr-literals57.sing"));
+list terms58;list oneTerms58;poly remaining58;int ti58;intvec exp58;
+for(ti58=1;ti58<=68;ti58++){
+ remaining58=original57[ti58];oneTerms58=list();
+ while(remaining58!=0){exp58=leadexp(remaining58);oneTerms58=insert(oneTerms58,exp58,size(oneTerms58));remaining58=remaining58-lead(remaining58);}
+ terms58[ti58]=oneTerms58;
+}
+ring spaceJets58=(2,a),(w),dp;minpoly=a^2+a+1;short=0;
+execute(read("../../source-data/laurent-helper58.sing"));
+short=1;execute(read("../../../57/source-data/r27-charts.sing"));execute(read("../../../57/source-data/r27-sigma.sing"));short=0;
+execute(read("../../source-data/pairs58.sing"));
+proc cache58(list coordinates,list uu,list vv){
+ list np;list ll;list vp;list up;list ans;int i;int j;int k;int m;int ix;
+ np[1]=lc(1);ll[1]=lc(1);vp[1]=lc(1);vp[2]=vv;up[1]=lc(1);
+ for(i=1;i<=3;i++){np[i+1]=lm(np[i],coordinates[1]);ll[i+1]=lm(ll[i],coordinates[2]);}
+ for(i=1;i<=48;i++){up[i+1]=lm(up[i],uu);}
+ list cacheDen58=lm(lpw(uu,16),lpw(la(uu,lc(1)),16));list invden=li(cacheDen58);list common;
+ for(k=0;k<=1;k++){for(j=0;j<=3;j++){for(i=0;i<=3;i++){
+  common=lm(lm(lm(np[i+1],ll[j+1]),vp[k+1]),invden);
+  for(m=0;m<=48;m++){ix=1+m+49*(i+4*j+16*k);ans[ix]=lm(common,up[m+1]);}
+ }}}
+ return(ans);
+}
+proc eval58(list termList,list cache){
+ list ans=lc(0);int i;int ix;intvec ex;
+ for(i=1;i<=size(termList);i++){ex=termList[i];ix=1+ex[4]+49*(ex[1]+4*ex[2]+16*ex[3]);ans=la(ans,cache[ix]);}
+ return(ans);
+}
+proc scale58(list x,number q){return(lnrm(q*x[1],x[2],x[3]));}
+proc conjugate58(list x){
+ poly pp=x[1];poly ans=0;int i;
+ for(i=1;i<=size(pp);i++){ans=ans+leadcoef(pp[i])^2*w^deg(pp[i]);}
+ return(lnrm(ans,x[2],x[3]));
+}
+proc coefficient58(list x,int exponent){
+ if(x[3]<=exponent){ERROR("SPACE58_COEFFICIENT_PRECISION_INSUFFICIENT");return(number(0));}
+ if(x[1]==0 || exponent<x[2]){return(number(0));}
+ poly pp=x[1];int i;
+ for(i=1;i<=size(pp);i++){if(deg(pp[i])+x[2]==exponent){return(leadcoef(pp[i]));}}
+ return(number(0));
+}
+proc real58(number q){number im=q^2+q;number re=q+a*im;require58((re==0 || re==1) && (im==0 || im==1),"SPACE58_REAL_IMAG_BINARY");return(re);}
+proc imag58(number q){number im=q^2+q;require58(im==0 || im==1,"SPACE58_IMAG_BINARY");return(im);}
+list sigmaSupports58;list support58;poly column58;int i58;int j58;int k58;
+matrix sigmaOld58[68][68];
+for(j58=1;j58<=68;j58++){
+ column58=sigmaColumns[j58];support58=list();
+ for(k58=1;k58<=size(column58);k58++){i58=deg(column58[k58])+1;support58=insert(support58,i58,size(support58));sigmaOld58[i58,j58]=1;}
+ sigmaSupports58[j58]=support58;
+}
+require58(sigmaOld58*sigmaOld58==unitmat(68),"SPACE58_OLD_SIGMA_SQUARE");
+// Extract a binary jet in one support pass, without rescanning for each order.
+proc jetColumn58(list val,int orders){
+ require58(val[3]>=orders && (val[1]==0 || val[2]>=0),"INCLUDE58_JET_PRECISION");
+ matrix ans[2*orders][1];poly pp=val[1];int k;int jetExponent58;number q;
+ for(k=1;k<=size(pp);k++){
+  jetExponent58=deg(pp[k])+val[2];
+  if(jetExponent58>=0 && jetExponent58<orders){q=leadcoef(pp[k]);ans[2*jetExponent58+1,1]=real58(q);ans[2*jetExponent58+2,1]=imag58(q);}
+ }
+ return(ans);
+}
+execute(read("../../../57/runs/space57-02/complete-space57.sing"));
+execute(read("../../../57/runs/trace57-02/trace-space57.sing"));
+execute(read("../space58-01/complete-space58.sing"));
+setring spaceJets58;
+map oldColumns58=completeSpace57,0;matrix oldKernel58=oldColumns58(kernel57);matrix oldSigmaRestricted58=oldColumns58(sigmaRestricted57);
+map newColumns58=completeSpace58,0;matrix newKernel58=newColumns58(kernel58);matrix newRecovery58=newColumns58(recovery58);matrix newConstraints58=newColumns58(constraints58);matrix newJets58=newColumns58(jets58);matrix newSigmaRestricted58=newColumns58(sigmaRestricted58);
+map oldTrace58=traceSpace57,0;matrix oldExceptional58=oldTrace58(exceptional57);
+list chart58=charts[1];list coordinates58=chart58[1];list uu58=chart58[2];list vv58=chart58[3];
+list cached58=cache58(coordinates58,uu58,vv58);list oldValues58;list actualValues58;list val58;list sig58;
+for(j58=1;j58<=68;j58++){oldValues58[j58]=eval58(terms58[j58],cached58);}
+for(j58=1;j58<=68;j58++){
+ sig58=lc(0);support58=sigmaSupports58[j58];for(k58=1;k58<=size(support58);k58++){sig58=la(sig58,oldValues58[support58[k58]]);}
+ actualValues58[j58]=la(sig58,scale58(la(oldValues58[j58],sig58),a));
+}
+list A58=la(lc(1),coordinates58[4]);matrix inclusionJets58[514][24];matrix oneJet58;
+for(j58=1;j58<=24;j58++){
+ val58=lc(0);for(i58=1;i58<=68;i58++){if(oldKernel58[i58,j58]!=0){val58=la(val58,actualValues58[i58]);}}
+ val58=lm(A58,val58);oneJet58=jetColumn58(val58,257);
+ for(i58=1;i58<=514;i58++){inclusionJets58[i58,j58]=oneJet58[i58,1];}
+}
+matrix ambientInclusion58=lift(module(newJets58),module(inclusionJets58));
+require58(newJets58*ambientInclusion58==inclusionJets58,"INCLUDE58_ALL24_AMBIENT_JET_BINDINGS");
+matrix zero58[96][24];require58(newConstraints58*ambientInclusion58==zero58,"INCLUDE58_ALL24_NEW_POLE_BOUNDS");
+matrix inclusion58=newRecovery58*ambientInclusion58;
+require58(newKernel58*inclusion58==ambientInclusion58 && mat_rk(inclusion58)==24,"INCLUDE58_FULL_INJECTIVE_EMBEDDING");
+require58(newSigmaRestricted58*inclusion58==inclusion58*oldSigmaRestricted58,"INCLUDE58_ACTUAL_EQUIVARIANCE");
+matrix newN58=newSigmaRestricted58+unitmat(100);matrix oldTargets58=inclusion58*oldExceptional58;
+require58(mat_rk(newN58)==50,"INCLUDE58_FREE_TRACE_RANK");
+module traceModule58=std(module(newN58));require58(size(traceModule58)==50,"INCLUDE58_TRACE_MODULE_SIZE");
+matrix traceBasis58[100][50];for(i58=1;i58<=100;i58++){for(j58=1;j58<=50;j58++){traceBasis58[i58,j58]=traceModule58[j58][i58];}}
+require58(ncols(traceBasis58)==50 && mat_rk(traceBasis58)==50,"INCLUDE58_TRACE_IMAGE_BASIS");
+matrix traceLifts58=lift(module(newN58),module(traceBasis58));
+require58(newN58*traceLifts58==traceBasis58,"INCLUDE58_ALL50_TRACE_LIFTS");
+module jordanModule58=module(traceBasis58),module(traceLifts58);matrix jordan58=matrix(jordanModule58);
+matrix jordanInverse58=lift(module(jordan58),module(unitmat(100)));
+require58(jordan58*jordanInverse58==unitmat(100) && jordanInverse58*jordan58==unitmat(100),"INCLUDE58_FULL_JORDAN_RECOVERY");
+matrix fixedPart58[50][100];for(i58=1;i58<=50;i58++){for(j58=1;j58<=100;j58++){fixedPart58[i58,j58]=jordanInverse58[i58,j58];}}
+matrix contraction58=traceLifts58*fixedPart58;matrix zeroContraction58[100][100];
+require58(newN58*contraction58+contraction58*newN58==unitmat(100) && contraction58*contraction58==zeroContraction58,"INCLUDE58_COMPLETE_TRACE_CONTRACTION");
+matrix oldTracePreimages58=contraction58*oldTargets58;
+require58(newN58*oldTracePreimages58==oldTargets58,"INCLUDE58_ALL_FOUR_OLD_QUOTIENT_CLASSES_BECOME_TRACES");
+link out58="ASCII:w inclusion-space58.sing";open(out58);write(out58,"ring inclusionSpace58=2,(w),dp;short=0;");
+dump58(out58,"contraction58",contraction58);dump58(out58,"traceBasis58",traceBasis58);dump58(out58,"traceLifts58",traceLifts58);dump58(out58,"jordan58",jordan58);dump58(out58,"jordanInverse58",jordanInverse58);dump58(out58,"inclusion58",inclusion58);dump58(out58,"ambientInclusion58",ambientInclusion58);dump58(out58,"inclusionJets58",inclusionJets58);dump58(out58,"oldExceptional58",oldExceptional58);dump58(out58,"oldTargets58",oldTargets58);dump58(out58,"oldTracePreimages58",oldTracePreimages58);close(out58);
+// Reload the certified binary data to avoid a nonexistent F4 -> F2 field map.
+execute(read("inclusion-space58.sing"));
+execute(read("../../../57/runs/field57-01/field-space57.sing"));ideal oldDivided58=dividedValues57;
+execute(read("../field58-01/field-space58.sing"));ideal GB58=std(sourceIdeal58);
+map oldField58=fieldSpace57,l,v;ideal sourceOldDivided58=oldField58(oldDivided58);
+map actualColumns58=inclusionSpace58,0;matrix E58=actualColumns58(inclusion58);matrix H58=actualColumns58(oldExceptional58);matrix P58=actualColumns58(oldTracePreimages58);
+poly actual58;poly expected58;poly preimage58;ideal newTracePreimages58;
+for(j58=1;j58<=24;j58++){
+ actual58=0;for(i58=1;i58<=100;i58++){actual58=actual58+E58[i58,j58]*dividedValues58[i58];}
+ require58(reduce(actual58+sourceOldDivided58[j58],GB58)==0,"INCLUDE58_ALL24_ACTUAL_NORMALIZED_SOURCE_IDENTITIES");
+}
+for(j58=1;j58<=4;j58++){
+ expected58=0;for(i58=1;i58<=24;i58++){expected58=expected58+H58[i58,j58]*sourceOldDivided58[i58];}
+ preimage58=0;for(i58=1;i58<=100;i58++){preimage58=preimage58+P58[i58,j58]*dividedValues58[i58];}
+ require58(reduce(subst(preimage58,l,l+actualA58)+preimage58+expected58,GB58)==0,"INCLUDE58_ALL_FOUR_ACTUAL_TRACE_IDENTITIES");
+ newTracePreimages58[j58]=reduce(preimage58,GB58);
+}
+require58(reduce(subst(preimage58+l*inverseA58,l,l+actualA58)+preimage58+l*inverseA58+expected58,GB58)!=0,"INCLUDE58_CHANGED_TRACE_PREIMAGE_REJECTED");
+link fieldOut58="ASCII:w inclusion-field58.sing";open(fieldOut58);write(fieldOut58,"ring inclusionField58=(2,u),(l,v),dp;short=0;ideal newTracePreimages58;");
+for(j58=1;j58<=4;j58++){write(fieldOut58,"newTracePreimages58["+string(j58)+"]="+string(newTracePreimages58[j58])+";");}close(fieldOut58);
+print("INCLUDE58_RESULT old_dimension=24 new_dimension=100 inclusion_rank=24 jet_bindings=24 equivariant=1 trace_rank=50 full_trace_contraction=1 old_fixed_mod_trace_classes=4 new_trace_preimages=4 normalized_source_identities=24 actual_trace_identities=4 changed_preimage_rejected=1");
+print("INCLUDE58_ALL_CHECKS_PASS");quit;

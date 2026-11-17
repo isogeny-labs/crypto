@@ -1,0 +1,36 @@
+# Geometric quotient and exact jet reconstruction session
+
+## What was done
+Revalidated8a13215b70bc/globalrelations. Read datedlog/handoffs,KBstatus/
+twoqueries, primaryOort–UenoTheorem4scanincludingpositivecharproof,Müller
+quadric,Pauly/Pauly–PreviatoGamma00andLRZTorelliTheorem1.1.1.
+PROOF.md excludesdecomposable/hyperellipticquotients. Protocoldfd2fa054e/
+source54661e56dd/checkpoint152922precedeexecution. Bothrationalnodesrank1,
+eightordinarycontrolsrank4,localcurvejetexact,54scalarchecks,rank7Gamma00,
+twosmoothplanequartics,#points127and129. RawfalseJacflagretained.
+RECONSTRUCTION-PROOFaddschar0Fay+unitminorlifting+functorialTorelliargument:
+Q1issamefieldJacobian,A0nontrivialSerretwist. Nosci rerun.
+
+## Decisions made
+Useunframedsections toavoidTheta(T)=0pole. Exactdegree4jets,notnumerical
+finitesdifferences. Candidateinterpretationprovedseparatelyviacharacteristic0
+identity/specialization ratherthanassuminganalyticstatementinchar127.
+Pointcountchoosessignonlyafterfunctorialdescent; noJacclaimfromcountalone.
+Bothoutcomesretained. Fullgenus2/3/4tenfoldgoalactive. Noexplicitdivisormapyet.
+
+## Open threads
+ReportPDF/SVGinspection,existingPR4274/checkpoint/currentheadCI. Nextactual
+source-to-Q1divisortransport,destinationsolver,andcompletecostcase.
+
+## Errors
+Cleanbuild,originalrunexit0emptystderr,nocap. FirstpublicRyieldednonzero2torsion.
+Scopedleaseexpired;cleanrelease/check/reclaimbeforeproofedits(epoch3).
+InitialWeltersPDFfetchtimeout;Pauly–Previatomainidentity/Torellitheoremsread.
+Sharedresume untouched. No oldrecord/default/leaderboardmutation.
+
+## Report and identity checks
+OnepageREPORT.pdf/QUARTICS.svg rendered and visually inspected; exacttrace
+plotcopiescounts127/129andderived128-N,notruntime. rustfmt/diffpass.
+AGENTS§11explicitlycoversellipticcurves; thesegenus3planequarticsretainfull
+coefficient/exponentidentityratherthaninventinganellipticICV1slug.
+OriginalSerreappendixTheorems2/3/5read directly atarxivmath/0104247.

@@ -1,0 +1,93 @@
+{
+  "main": "SidonRhoCounterfamilyAudit.sidon_rho_counterfamily_certificate",
+  "binding": "f4550e4315788edd2a98a3625997981779e48497f43bb1391580f556d5203953",
+  "custom_imports": {
+    "BoundedSteps": "research/rho_collision_audit_20261110/lean/BoundedSteps.lean",
+    "CollisionProbability": "research/general_two_step_collision_audit_20261114/lean/CollisionProbability.lean",
+    "Cylinder": "research/static_hash_collision_audit_20261114/lean/Cylinder.lean",
+    "ExpectedCollision": "research/general_two_step_collision_audit_20261114/lean/ExpectedCollision.lean",
+    "FiniteGraphs": "research/two_step_collision_audit_20261114/lean/FiniteGraphs.lean",
+    "FirstCollision": "research/rho_collision_audit_20261110/lean/FirstCollision.lean",
+    "GeneralCollisionCertificate": "research/general_two_step_collision_audit_20261114/lean/GeneralCollisionCertificate.lean",
+    "LabelCoefficient": "research/two_step_collision_audit_20261114/lean/LabelCoefficient.lean",
+    "PairLabelEquiv": "research/general_two_step_collision_audit_20261114/lean/PairLabelEquiv.lean",
+    "QueryGeometry": "research/general_two_step_collision_audit_20261114/lean/QueryGeometry.lean",
+    "SidonCounterfamily": "research/sidon_rho_counterfamily_audit_20261114/lean/SidonCounterfamily.lean",
+    "SidonTable": "research/sidon_rho_counterfamily_audit_20261114/lean/SidonTable.lean",
+    "SlowCollision": "research/sidon_rho_counterfamily_audit_20261114/lean/SlowCollision.lean",
+    "UniformCollision": "research/rho_collision_audit_20261110/lean/UniformCollision.lean",
+    "WalkBoundary": "research/walk_audit_20261109/lean/WalkBoundary.lean",
+    "WalkWeighted": "research/walk_audit_20261109/lean/WalkWeighted.lean",
+    "WalkWeightedGeneral": "research/walk_audit_20261109/lean/WalkWeightedGeneral.lean"
+  },
+  "claims": [
+    {
+      "declaration": "SidonRhoCounterfamilyAudit.base_sidon",
+      "hypotheses": "Explicit finite20-value natural table",
+      "conclusion": "Kernel-checked unordered pair-sum uniqueness including diagonals."
+    },
+    {
+      "declaration": "SidonRhoCounterfamilyAudit.generic",
+      "hypotheses": "Every natural p>1902",
+      "conclusion": "Actual increments satisfy unchanged full source degree0/1/2guard."
+    },
+    {
+      "declaration": "SidonRhoCounterfamilyAudit.firstCollision_bounds",
+      "hypotheses": "Every p!=0 and actual20-label static hash",
+      "conclusion": "Actual leastrepeat p<=951T and T<=p; pointwise embedding, no Fin951 uniform law."
+    },
+    {
+      "declaration": "SidonRhoCounterfamilyAudit.mean_eq_actual_pmf",
+      "hypotheses": "Actual uniform20-label product PMF",
+      "conclusion": "Actual expected leastrepeat; same original distribution as in-degree/localcollision theorem."
+    },
+    {
+      "declaration": "SidonRhoCounterfamilyAudit.mean_lower",
+      "hypotheses": "Every p!=0",
+      "conclusion": "Actual expected firstcollision p<=951E."
+    },
+    {
+      "declaration": "SidonRhoCounterfamilyAudit.actual_moments",
+      "hypotheses": "Every p>1902 and target",
+      "conclusion": "Actual indegree mean1/variance19/20."
+    },
+    {
+      "declaration": "SidonRhoCounterfamilyAudit.actual_local_probability",
+      "hypotheses": "Every p>1902",
+      "conclusion": "Genuine actual fresh two-step event measure7581/(8000p)."
+    },
+    {
+      "declaration": "SidonRhoCounterfamilyAudit.arbitrarily_large_collision_ratio",
+      "hypotheses": "Every natural C",
+      "conclusion": "Exists primep>1902 with E²>Cp."
+    },
+    {
+      "declaration": "SidonRhoCounterfamilyAudit.universal_degree_two_collision_bound_false",
+      "hypotheses": "Literal sourceguard retained",
+      "conclusion": "Direct negation of a real uniform square-root bound for this actual fixedtablefamily."
+    },
+    {
+      "declaration": "SidonRhoCounterfamilyAudit.concrete_prime",
+      "hypotheses": "No premise",
+      "conclusion": "Kernel-checked primality10000019."
+    },
+    {
+      "declaration": "SidonRhoCounterfamilyAudit.concrete_collision_ratio",
+      "hypotheses": "Actual p10000019 originalhashlaw",
+      "conclusion": "Actual E²>4p, no hugehash enumeration."
+    }
+  ],
+  "gate_declarations": 27,
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "qualified_random_table_refutation": false,
+  "infinite_greedy_sequence_proved": false,
+  "physicalhost_parser_hash_execution_refinement": false
+}

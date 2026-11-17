@@ -1,0 +1,39 @@
+{
+  "schema": "pencil.materializer-recovery/v1",
+  "claim_status": "pcc:unverified",
+  "run_id": "t1716-materializer-20261105",
+  "status": "failed",
+  "phase": "vendor",
+  "recorded_elapsed_seconds": 880.0473303619947,
+  "recorded_files": 13018,
+  "compiler_invoked": false,
+  "failure": "RuntimeError('880-second work limit')",
+  "native_limits_status": "qualified",
+  "cgroup_controls": {
+    "cpu.max": "200000 100000",
+    "memory.max": "4294967296",
+    "memory.swap.max": "0",
+    "pids.max": "512"
+  },
+  "campaign_accounting": {
+    "campaign_total_seconds": 46800,
+    "prior_charged_seconds": 4500,
+    "this_attempt_conservative_charge_seconds": 900,
+    "cumulative_charged_seconds": 5400,
+    "remaining_worker_seconds": 41400,
+    "no_reset": true,
+    "automatic_retry": false
+  },
+  "historical_terminal_custody_verified": false,
+  "complete_materialized_input_manifest_available": false,
+  "original_deadline": "2026-11-06T04:00:00Z",
+  "new_execution_performed": false,
+  "matched_cohort_results_produced": false,
+  "source_revision": "29861c9a55f9ae5a33e1e09b3866aa397fbde605",
+  "result_status": "timeout",
+  "attempts_requested": 1,
+  "attempts_attempted": 1,
+  "attempts_completed": 0,
+  "attempts_timed_out": 1,
+  "scientific_trials": 0
+}

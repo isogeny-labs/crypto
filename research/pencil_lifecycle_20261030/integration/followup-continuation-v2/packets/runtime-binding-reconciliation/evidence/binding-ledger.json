@@ -1,0 +1,120 @@
+{
+  "schema": "runtime.prospective-binding-ledger/v1",
+  "admitted": false,
+  "observed_at": "2026-11-01T20:13:41.165778+00:00",
+  "route": "sudo -n env -i /usr/bin/docker --host unix:///var/run/docker.sock with private empty config",
+  "managed_environment_status": "tool unavailable in active tool metadata; not inferred from prior state",
+  "images": {
+    "base": {
+      "Id": "sha256:347667d6ecc9294ab7bfcc83411fb47f7548c8d1ca5f7d315cca23fc4b115476",
+      "RepoTags": [
+        "pencil-local-base:467e8502-46d8-4ab9-a13b-8d2375dd2ca2"
+      ],
+      "RepoDigests": [],
+      "Os": "linux",
+      "Architecture": "amd64",
+      "OnBuild": null,
+      "User": "1000:1000",
+      "Entrypoint": null,
+      "Volumes": null,
+      "Labels": {
+        "isolab.local-assembly.owner": "467e8502-46d8-4ab9-a13b-8d2375dd2ca2",
+        "isolab.local-assembly.phase": "base",
+        "org.opencontainers.image.revision": "3c592af96f3916fef3403e4cf173f22b6f7ef536",
+        "org.opencontainers.image.source": "https://github.com/aburan28/crypto"
+      },
+      "Layers": [
+        "sha256:a7f1338342af6f458d3f71d297f7eab630f50e15082a57f26f1dd0c99ebcf46e",
+        "sha256:3c13691c781aaa5c2f803309a8e0c4e16e766c4fb0d845346611ab0e9df70cd5",
+        "sha256:a256ee0545958efd2ef352855d981fc9937c8c406da2fef425e635384711ea4b",
+        "sha256:562057a12c2197efc298cb2b820c03cbc2b9b317361ca748e5c6e1113f887521",
+        "sha256:bad77c75da89d171a85e32cc9ab9919237beb26d12a0df327b99107f2cd8e7fb",
+        "sha256:4c005cd7b321e974793c7515809f4e22a5986ea2b059f9959b7d13fca4b40598",
+        "sha256:2e5601a9d87c9df8e236f226fb04fbb10ce88d68e6633f24405c475118a4b0c1",
+        "sha256:e0fa034e0f0c2ddba76c05524bbd1a67520376c7edf166e674472e7826d730d4",
+        "sha256:0874f9be4d2b0a27b54c618be092fdfd96921b18652003b681a14c9f23de47f2",
+        "sha256:bff7217a78d93c37eff24a8baa2859be2a2e9b7276e1e60c03b14bee47fb47da"
+      ]
+    },
+    "runtime": {
+      "Id": "sha256:1adcc3d49e5660bf25cd15f839f757786e0aa50455d6e255fe38cd19bc3cad60",
+      "RepoTags": [
+        "pencil-local-runtime:467e8502-46d8-4ab9-a13b-8d2375dd2ca2"
+      ],
+      "RepoDigests": [],
+      "Os": "linux",
+      "Architecture": "amd64",
+      "OnBuild": null,
+      "User": "0:0",
+      "Entrypoint": null,
+      "Volumes": null,
+      "Labels": {
+        "isolab.local-assembly.owner": "467e8502-46d8-4ab9-a13b-8d2375dd2ca2",
+        "isolab.local-assembly.phase": "runtime",
+        "org.opencontainers.image.revision": "3c592af96f3916fef3403e4cf173f22b6f7ef536",
+        "org.opencontainers.image.source": "https://github.com/aburan28/crypto"
+      },
+      "Layers": [
+        "sha256:a7f1338342af6f458d3f71d297f7eab630f50e15082a57f26f1dd0c99ebcf46e",
+        "sha256:3c13691c781aaa5c2f803309a8e0c4e16e766c4fb0d845346611ab0e9df70cd5",
+        "sha256:a256ee0545958efd2ef352855d981fc9937c8c406da2fef425e635384711ea4b",
+        "sha256:562057a12c2197efc298cb2b820c03cbc2b9b317361ca748e5c6e1113f887521",
+        "sha256:bad77c75da89d171a85e32cc9ab9919237beb26d12a0df327b99107f2cd8e7fb",
+        "sha256:4c005cd7b321e974793c7515809f4e22a5986ea2b059f9959b7d13fca4b40598",
+        "sha256:2e5601a9d87c9df8e236f226fb04fbb10ce88d68e6633f24405c475118a4b0c1",
+        "sha256:e0fa034e0f0c2ddba76c05524bbd1a67520376c7edf166e674472e7826d730d4",
+        "sha256:0874f9be4d2b0a27b54c618be092fdfd96921b18652003b681a14c9f23de47f2",
+        "sha256:bff7217a78d93c37eff24a8baa2859be2a2e9b7276e1e60c03b14bee47fb47da",
+        "sha256:615b3d488cdc22b3d661802c11203d1767b7a2297a58206b3f882a165f4e15b7"
+      ]
+    },
+    "upstream": {
+      "Id": "sha256:f88bac9411086e0c87b0a1ff6a2d211897548182f86d5db16d02b9cfc38a6eaf",
+      "RepoTags": [],
+      "RepoDigests": [
+        "public.ecr.aws/aws-cli/aws-cli@sha256:b94fc7612d131f1a3cb76145ba3385c813ad7561ef2c2b60c89fbd5dfee93d39"
+      ],
+      "Os": "linux",
+      "Architecture": "amd64",
+      "OnBuild": null,
+      "User": "",
+      "Entrypoint": [
+        "/usr/local/bin/aws"
+      ],
+      "Volumes": null,
+      "Labels": null,
+      "Layers": [
+        "sha256:a7f1338342af6f458d3f71d297f7eab630f50e15082a57f26f1dd0c99ebcf46e",
+        "sha256:3c13691c781aaa5c2f803309a8e0c4e16e766c4fb0d845346611ab0e9df70cd5",
+        "sha256:a256ee0545958efd2ef352855d981fc9937c8c406da2fef425e635384711ea4b",
+        "sha256:562057a12c2197efc298cb2b820c03cbc2b9b317361ca748e5c6e1113f887521",
+        "sha256:bad77c75da89d171a85e32cc9ab9919237beb26d12a0df327b99107f2cd8e7fb"
+      ]
+    }
+  },
+  "proposed_BASE_IMAGE": "sha256:347667d6ecc9294ab7bfcc83411fb47f7548c8d1ca5f7d315cca23fc4b115476",
+  "base_onbuild_empty_current": true,
+  "upstream_onbuild_empty_current": true,
+  "recipes": {
+    "Dockerfile.runtime.original": "dc0cc3650c5cd41b3d50e66e66bc97bc0673dcae35119c84d9b201511f6b7a61",
+    "Dockerfile.runtime.proposed": "5d86b44b9f087a430969c40882db60127d4fcfdb5934bb87cc4d2398dbcec21b"
+  },
+  "runtime_payload_observed_matches_retained_inventory": true,
+  "context_manifest": "proposed-context-member-ledger.json",
+  "context_staged": false,
+  "new_image_id": null,
+  "qualification_receipt": null,
+  "historical_qualification_status": "failed Q1 writable layer diff",
+  "owned_containers_current": "both exact old IDs and names absent on local daemon; no cleanup performed",
+  "local_owner_processes_current": "no exact assembly/recovery/qualification script or owned build-tag argument match in corrected /proc observation",
+  "ancestor_metadata_current": "unknown; image inspect does not expose filesystem ancestor type/mode; no create/save/export used",
+  "remaining_bindings": [
+    "fresh staged context exact inventory and mode checks",
+    "pre-build exact parent/path/type/mode inspection under admitted method",
+    "prospective amended assembler bindings and review",
+    "new execution limits/admission",
+    "new final image ID and qualifier binding"
+  ],
+  "scientific_execution": false,
+  "budget_renewed": false
+}

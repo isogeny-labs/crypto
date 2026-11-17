@@ -1,0 +1,13 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=.35,ranksep=.5];
+ node [shape=box,style="rounded,filled",fillcolor="#eef4ff",color="#31568b",fontname="Helvetica",fontsize=11];
+ edge [color="#41658d"];
+ actual [label="Same actual completed W; arbitrary retained node t\nExisting nonzero diagonal c; local first jet may vanish"];
+ first [label="Actual reciprocal first-jet family\nConstructed 2^u*k moment factors; weights w+b"];
+ row [label="Actual row polynomial identity\nDerived D*P=N, D-1 content 1; integral P,N"];
+ geom [label="S_k = sum (1-D)^n, n<k\nWhole-polynomial error k; scaled error w+k"];
+ degree [label="Explicit per-entry approximation N*S_k\nDegree <= representative chart degree + k"];
+ compact [label="OPEN: compact whole-polynomial matrix factors\nBivariate H coefficients, all labels and original mode costs",fillcolor="#fff2d9",color="#a66a13"];
+ actual -> first; actual -> row; row -> geom; geom -> degree;
+ first -> compact [style=dashed]; degree -> compact [style=dashed];
+}

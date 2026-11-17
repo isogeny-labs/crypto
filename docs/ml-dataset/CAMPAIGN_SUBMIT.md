@@ -1,0 +1,31 @@
+# One-shot suspended Job submission
+
+`dataset_campaign_submit` is the native controller-side CLI for the first Kubernetes write of a dataset shard. It requires an **existing** ownerless native launch reservation in the original campaign SQLite allocator. It does not create a budget ledger, reserve new money, issue a spendable worker grant, deliver the late mailbox bundle, or unsuspend the Job. Those later steps require the observed Job and Pod UIDs and independent admission evidence.
+
+The command takes the original `policy.json`, allocator SQLite path, native `reservation.json`, plan, protocol, and exact `crypto` executable used for the reservation. Its `--access-approval` is a separately reviewed `crypto.ml-dataset.worker-access-approval/v1` JSON file; `--trusted-approval-sha256` must match a root-owned, non-writable `--approval-trust-anchor` file with schema `crypto.ml-dataset.submit-trust-anchor/v1` and field `approval_sha256`. Every ancestor of that trust anchor must also be root-owned and non-writable by group or others. The approval binds campaign, cluster ARN, explicit kube context, API server, SHA-256 of the kubeconfig CA **base64 text**, namespace, Job name, service account and IRSA role, digest-pinned image, destination bucket/prefix, typed policy and reservation hashes, exact Job bytes hash, config/mailbox names and UIDs, startup config data hash, expiry, maximum Job deadline, and an issuer evidence digest. The issuer evidence digest is a provenance reference; the CLI does not infer IAM permission from it. The currently missing worker policy/grant and renewed budget remain prerequisites.
+
+Inputs are deliberately JSON. Render the reviewed [startup Job template](../../research/ml_dataset_20261028/startup-deployment-proposed/job.template.yaml) as an exact Kubernetes Job JSON object, with `spec.suspend: true`, one completion, one container, `backoffLimit: 0`, finite `activeDeadlineSeconds`, digest-pinned image and exact service account. Keep only the reviewed environment, mounts and volume types, with finite work/tmp `emptyDir` limits. The approval pins the exact Job JSON bytes. `--resource-envelope` is a typed `crypto.ml-dataset.priced-job-envelope/v1` JSON object; its exact file SHA-256 must equal the native policy and reservation resource-envelope digest. It must contain `job_resources`, `node_selector`, `active_deadline_seconds`, `billable_resource_seconds`, `billable_resource_count`, and `compute_rate_micro_usd_per_hour`, exactly matching the Job and policy. The native budget gate checks the reservation's compute-money floor. The startup config is a separate immutable ConfigMap whose UID and `startup-gate.json` bytes are checked live. The empty, pre-provisioned mailbox UID is also checked live. The service account must expose the approved IRSA role annotation. These observations do not replace a separate IAM S3 write/read preflight for that role.
+
+Run it only from the controller host that owns the original allocator and a durable intent directory:
+
+```sh
+dataset_campaign_submit \
+  --policy policy.json --ledger /durable/campaign.sqlite \
+  --reservation reservation.json \
+  --access-approval access-approval.json \
+  --approval-trust-anchor /etc/crypto-dataset/approval-pin.json \
+  --trusted-approval-sha256 APPROVED_EXACT_BYTES_SHA256 \
+  --job job.json --startup-config startup-gate.json \
+  --resource-envelope priced-envelope.json \
+  --plan plan.json --protocol protocol.json \
+  --crypto-bin /exact/build/crypto \
+  --kubectl /usr/local/bin/kubectl \
+  --kubeconfig /etc/crypto-dataset/kubeconfig \
+  --intent-dir /durable/intents/LAUNCH_ID
+```
+
+The CLI opens the original typed allocator and requires the exact reservation to be present and unbound. It invokes the native `dataset preflight` and matches source, binary, native plan binding hash and full protocol file digest. The kubectl executable and kubeconfig must be absolute, root-owned, non-writable files with protected ancestors; the same explicit kubeconfig is used for every call. It checks the context against independently approved API server and CA pins, queries the exact Job name through a field selector, and asks Kubernetes for a server-side dry run. The Job bytes are held in memory and supplied to kubectl on stdin, so a mutable input path cannot change the submitted payload after hashing. Before the write, an exclusive SQLite transaction rechecks the native reservation and unbound state, inserts a one-shot create marker keyed by launch ID into the original allocator database, and appends a hash-chained `submit_attempt_committed` budget event. Only then does the command create and fsync `intent.json` under a new directory and make **one** `create` call. A failed or ambiguous create is never retried by this command. A crash after the marker but before the intent file leaves the launch conservatively spent. On a successful create response, it matches that response's UID to the live Job and writes `observation.json` with the real UID and full observed Job JSON. A later invocation with the same intent requires `--reconcile-uid` from an independent observation and only reconciles; it never issues another create. A missing Job after an ambiguous outcome remains unknown and charged against the original reservation. Do not delete the intent directory or allocator marker to force another submit.
+
+The Job remains suspended. Before any unsuspend or late grant delivery, independently inspect the admitted Pod spec and actual Job/Pod owner UIDs, Kubernetes admission mutations, IRSA token projection and role trust, S3 conditional PUT/GET/hash behavior under the worker role, node/provider and finite resource lifetime, namespace issuer RBAC, current budget headroom and billing tail. Bind the native reservation once to the actual owner, then deliver the typed startup bundle through the exact mailbox. Preserve the observed Job UID and intent/observation files in restricted custody; neither belongs in public model features.
+
+The CLI does not parse the prose full-campaign experiment contract or promote any mathematical result. The full plan's launch admission still requires its frozen protocol/source/image/analysis bindings and a current budget grant. No cloud Job is authorized by this document alone.

@@ -1,0 +1,73 @@
+{
+  "source_commit": "bd285741477393334f526f620fcc5526a132e536",
+  "test_source": "/workspace/crypto-ml-large-prime-trace-integration-repair/tests/ml_dataset_live_capture.rs",
+  "test_source_sha256": "ebaeac861a5957c4228cf6f879c7c80e138580486fb860edcfdd515abcd52b45",
+  "real_cli": {
+    "path": "/workspace/ml2958-cli-test-artifacts-20261030/crypto-bd285741477",
+    "bytes": 48894504,
+    "sha256": "99ae3662b8698a2d56ab963bb38072c21bcec4e6917e7e3788da755f05a41a31",
+    "original_build_path": "/workspace/crypto/target/release/crypto"
+  },
+  "libraries_from_actual_cargo_build": {
+    "crypto_lib": "/workspace/crypto/target/release/deps/libcrypto_lib-89ef1d48843faef6.rlib",
+    "serde": "/workspace/crypto/target/release/deps/libserde-90d17f1323a5c338.rlib",
+    "serde_json": "/workspace/crypto/target/release/deps/libserde_json-b62070e59ca92248.rlib",
+    "hex": "/workspace/crypto/target/release/deps/libhex-4ed7147d3e203501.rlib",
+    "libc": "/workspace/crypto/target/release/deps/liblibc-1ea52c1397d8163e.rlib"
+  },
+  "results": [
+    {
+      "at": "2026-10-30T18:29:41.921361+00:00",
+      "stage": "compile",
+      "command": [
+        "rustup",
+        "run",
+        "1.98.0",
+        "rustc",
+        "--edition=2021",
+        "--test",
+        "--crate-name",
+        "ml_dataset_live_capture",
+        "/workspace/crypto-ml-large-prime-trace-integration-repair/tests/ml_dataset_live_capture.rs",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "debug-assertions=no",
+        "-L",
+        "dependency=/workspace/crypto/target/release/deps",
+        "-o",
+        "/workspace/ml2958-cli-test-artifacts-20261030/ml_dataset_live_capture",
+        "--extern",
+        "crypto_lib=/workspace/crypto/target/release/deps/libcrypto_lib-89ef1d48843faef6.rlib",
+        "--extern",
+        "serde=/workspace/crypto/target/release/deps/libserde-90d17f1323a5c338.rlib",
+        "--extern",
+        "serde_json=/workspace/crypto/target/release/deps/libserde_json-b62070e59ca92248.rlib",
+        "--extern",
+        "hex=/workspace/crypto/target/release/deps/libhex-4ed7147d3e203501.rlib",
+        "--extern",
+        "libc=/workspace/crypto/target/release/deps/liblibc-1ea52c1397d8163e.rlib"
+      ],
+      "exit_code": 0,
+      "seconds": 1.9926707849954255,
+      "log": "/workspace/ml2958-original-cli-process-boundary-compile-attempt2-20261030.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-10-30T18:29:42.149651+00:00",
+      "stage": "run",
+      "command": [
+        "/workspace/ml2958-cli-test-artifacts-20261030/ml_dataset_live_capture",
+        "--test-threads",
+        "2"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2280836139980238,
+      "log": "/workspace/ml2958-original-cli-process-boundary-run-attempt2-20261030.log",
+      "bytes": 754,
+      "sha256": "405c9bbbd62b6b1b0a7a94e28c9b58a474a816ca87c6754b6225df3d6f21f94c"
+    }
+  ],
+  "scope": "Exact unchanged original integration test source, real Cargo-built crypto CLI and root production library plus exact runtime dependency artifacts. Direct native rustc harness avoids Cargo automatically linking every unrelated root binary on this disk-limited host. No stubs, source edits, filtered/ignored tests, S3 qualification, real solver recovery, or scientific run is claimed."
+}

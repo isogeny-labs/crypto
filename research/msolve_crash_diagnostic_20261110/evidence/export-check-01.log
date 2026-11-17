@@ -1,0 +1,14 @@
+FINDING: schema: <root>: Additional properties are not allowed ('extensions' was unexpected)
+FINDING: schema: analysis: Additional properties are not allowed ('frozen_before_data' was unexpected)
+FINDING: schema: analysis: 'blinding_key_sha256' is a required property
+FINDING: schema: analysis: 'unmasked_at' is a required property
+FINDING: schema: analysis/outputs/0: 'bytes' is a required property
+FINDING: schema: analysis/script: {'path': 'native/analyze.cpp', 'sha256': '8fd28ef5b7e52b35112a36bf6174ed5a2e18b77b6639c95f045402f8331dd31b'} is not valid under any of the given schemas
+FINDING: schema: flow: 'not_completed' is a required property
+FINDING: schema: flow: 'interrupted' is a required property
+FINDING: schema: flow: 'resumed' is a required property
+FINDING: schema: flow/excluded: {} is not of type 'array'
+FINDING: schema: runs/1/status: 'timed_out' is not one of ['succeeded', 'failed', 'timeout', 'cancelled', 'infra_error', 'interrupted']
+FINDING: schema: runs/4/verification/status: 'pass' is not one of ['verified', 'refuted', 'no_claim', 'error', 'not_run']
+FINDING: schema: runs/5/status: 'timed_out' is not one of ['succeeded', 'failed', 'timeout', 'cancelled', 'infra_error', 'interrupted']
+FAIL: export research/msolve_crash_diagnostic_20261110/export.json against research/msolve_crash_diagnostic_20261110/protocol.json (13 finding(s))

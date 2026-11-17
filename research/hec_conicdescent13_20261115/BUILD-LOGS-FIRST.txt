@@ -1,0 +1,39 @@
+error[E0599]: no associated function or constant named `new` found for struct `Poly` in the current scope
+  --> research/hec_conicdescent13_20261115/log_api.rs:12:86
+   |
+12 |  let sf=crate::fp::Fp::new(P);let curve=crate::jac::Curve{fp:sf,f:crate::poly::Poly::new(&[31,89,73,48,91,41,123,1]),g:3};
+   |                                                                                      ^^^ associated function or constant not found in `Poly`
+   |
+  ::: research/hec_conicdescent13_20261115/../../crates/hec-native-ic/src/poly.rs:13:1
+   |
+13 | pub struct Poly {
+   | --------------- associated function or constant `new` not found for this struct
+   |
+note: if you're trying to build a new `Poly` consider using one of the following associated functions:
+      Poly::zero
+      Poly::constant
+      Poly::one
+      Poly::x
+      and 3 others
+  --> research/hec_conicdescent13_20261115/../../crates/hec-native-ic/src/poly.rs:21:5
+   |
+21 |     pub const fn zero() -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+26 |     pub fn constant(a: u64) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+36 |     pub fn one() -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^
+...
+42 |     pub fn x() -> Self {
+   |     ^^^^^^^^^^^^^^^^^^
+help: there is a method `ne` with a similar name
+   |
+12 -  let sf=crate::fp::Fp::new(P);let curve=crate::jac::Curve{fp:sf,f:crate::poly::Poly::new(&[31,89,73,48,91,41,123,1]),g:3};
+12 +  let sf=crate::fp::Fp::new(P);let curve=crate::jac::Curve{fp:sf,f:crate::poly::Poly::ne(&[31,89,73,48,91,41,123,1]),g:3};
+   |
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0599`.

@@ -1,0 +1,73 @@
+{
+  "schema": "rho-worker-rebased-main-validation-v1",
+  "date_utc": "2026-10-18",
+  "measurement_tier": "local_correctness_only",
+  "base_main_commit": "abee07ee7337d04a7e734333669ca1bacd6c763a",
+  "rho_branch_commit_before_evidence": "a55580e41120388d49eae3d8a7c28ef2d64d0e00",
+  "source_bundle": {
+    "builder": "make_worker_source_bundle.py",
+    "file_count": 1224,
+    "sha256": "abd7a2eaeebca050dcf0a9f2290c02b116dbdd4b0bfb43cb45bf4be1ca5f7025",
+    "rebuilt_identically_twice": true,
+    "fresh_target_extracted_build": "pass",
+    "build_command": "CARGO_TARGET_DIR=/Volumes/SSD990/llm/tmp/rho-worker-clean-target-20261018 cargo build --offline --release --example rho_worker_batch_benchmark",
+    "build_log": "rebased-main-extracted-smoke/clean-build.log",
+    "build_log_sha256": "ab14da39243cd221a506b813d5fdc3d72f64c87dd90bfda03b8528ab3b1392fc"
+  },
+  "binary_sha256": "b8b79be216e453a4c7f50713ea642d7e87911519254a3e3dc91bbed5ccca849c",
+  "source_components_sha256": {
+    "src/cryptanalysis/pollard_collab/job.rs": "f62d8fcb066e0780e6fd6035767dcc7457217cce92812a8b76059c16c6cce05d",
+    "src/cryptanalysis/pollard_collab/walk.rs": "fdefcf5ea40cc7e2a7eadd71cd2bd140635cc87a4f3215761f4b3ad0dc4d6a6c",
+    "src/cryptanalysis/pollard_collab/worker.rs": "49d98c29aeecb2f87cb18c2138207b8fa570f74e5fb4e8bf58ac8f937a6ca47f",
+    "examples/rho_worker_batch_benchmark.rs": "da7853077821b63a6a5d22188712a1dcd7ac315b15bb2f0be85c6f12cb25445b",
+    "experiments/rho-worker-phase-profile-20261017/run_tier1_worker_batch.py": "39aecc602cfd3450941f359bf358423dde7ec57e89d9f9a4853dedce47845d17",
+    "experiments/rho-worker-phase-profile-20261017/analyze_tier1_worker_batch.py": "3d4a0e838c95deaa8564134b281f3f622f1a0b373923c8d7eec7b486d4852373",
+    "experiments/rho-worker-phase-profile-20261017/build_worker_batch_plan.py": "172451e64726a4303689e13e592ae3d83e7ce2743bce5d089e66a61669ed1c7c",
+    "experiments/rho-worker-phase-profile-20261017/make_worker_source_bundle.py": "c78b1b34064e20d7f5012e25f629dd6a26c2d4570781c9151f90fc74b3783ec5"
+  },
+  "fresh_target_binary_matches_checkout_binary": true,
+  "fixture_manifest_sha256": "f46ad43788b7f9241927904541cbeb03ea70a96ca95aa84d527a9b22ba8d12b8",
+  "rebased_long_replay": {
+    "receipt": "local-all32-rebased-main-worker-replay/summary.json",
+    "raw_arms": "local-all32-rebased-main-worker-replay/arms.jsonl",
+    "raw_arms_sha256": "0866a7181e457b6c122e49cfbc4d608d2865b460f56a4733a0c6e0debc298a17",
+    "arms": 64,
+    "same_q_pairs": 32,
+    "failures": 0,
+    "dp_bits": 12,
+    "step_cap": 8192
+  },
+  "extracted_q00_replay": {
+    "status": "pass",
+    "serial_output": "rebased-main-extracted-smoke/q00-serial.json",
+    "serial_output_sha256": "195e8251778d87ff7153ea223a2763610ea34a817d37a69a667e96a2399c1b24",
+    "batch_output": "rebased-main-extracted-smoke/q00-batch.json",
+    "batch_output_sha256": "795e2569d92875ef4e97c03ee4311e931f1d83701e1c0be4500023437ae504d9",
+    "walk_steps": 120070,
+    "verified_distinguished_points": 26,
+    "checkins": 5,
+    "ordered_checkins_equal": true
+  },
+  "complete_release_library_suite": {
+    "command": "cargo test --offline --release --lib",
+    "status": "pass",
+    "passed": 4396,
+    "failed": 0,
+    "ignored": 118,
+    "log": "rebased-main-full-library.log",
+    "log_sha256": "e2a463ca21f7ce3e3717dd141e8aa07212a63f939f1428978f59abc866d06eb9"
+  },
+  "tier1_plan_smoke": {
+    "cases": 96,
+    "planned_arms": 768,
+    "plan_sha256": "aed0b0116b2291ba6301d5cf4ed325f3d59555923a05fded6c7a3dff8f506758",
+    "allocation_kind": "synthetic_local_smoke"
+  },
+  "auditor_policy_selfcheck": {
+    "receipt": "rebased-main-auditor-selfcheck.json",
+    "sha256": "e7f034bcb577fdff5421f674697f1be1815f2907bae2877746c50e7ab2a2173a",
+    "status": "pass",
+    "data_kind": "synthetic_policy_validation_only"
+  },
+  "hosted_performance_result": null
+}

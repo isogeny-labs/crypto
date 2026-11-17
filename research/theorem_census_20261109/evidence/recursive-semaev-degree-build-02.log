@@ -1,0 +1,101 @@
+RecursiveSemaevDegree.lean:23:4: warning: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+RecursiveSemaevDegree.lean:37:25: error: unsolved goals
+K : Type u
+inst✝ : Field K
+W : WeierstrassCurve.Affine K
+t : ↑(InputRing K 0)
+⊢ eval t (C (-(pairX * pairY * 2) + pairX ^ 2 + pairY ^ 2)) * t ^ 2 +
+        t *
+          eval t
+            (C
+              (-(pairX * pairY * liftPair (WeierstrassCurve.b₂ W)) - pairX * pairY ^ 2 * 2 -
+                      pairX * liftPair (WeierstrassCurve.b₄ W) -
+                    pairX ^ 2 * pairY * 2 -
+                  pairY * liftPair (WeierstrassCurve.b₄ W) -
+                liftPair (WeierstrassCurve.b₆ W))) +
+      eval t
+        (C
+          (-(pairX * pairY * liftPair (WeierstrassCurve.b₄ W)) - pairX * liftPair (WeierstrassCurve.b₆ W) +
+                pairX ^ 2 * pairY ^ 2 -
+              pairY * liftPair (WeierstrassCurve.b₆ W) -
+            liftPair (WeierstrassCurve.b₈ W))) =
+    -(pairX * pairY * liftPair (WeierstrassCurve.b₄ W)) - pairX * pairY * t ^ 2 * 2 -
+                  pairX * liftPair (WeierstrassCurve.b₆ W) +
+                pairX ^ 2 * pairY ^ 2 +
+              pairX ^ 2 * t ^ 2 -
+            pairY * liftPair (WeierstrassCurve.b₆ W) +
+          pairY ^ 2 * t ^ 2 -
+        liftPair (WeierstrassCurve.b₈ W) +
+      (-(pairX * pairY * liftPair (WeierstrassCurve.b₂ W)) - pairX * pairY ^ 2 * 2 -
+                pairX * liftPair (WeierstrassCurve.b₄ W) -
+              pairX ^ 2 * pairY * 2 -
+            pairY * liftPair (WeierstrassCurve.b₄ W) -
+          liftPair (WeierstrassCurve.b₆ W)) *
+        t
+RecursiveSemaevDegree.lean:44:2: error: Type mismatch: After simplification, term
+  pairA_nonzero
+ has type
+  pairA ≠ 0
+but is expected to have type
+  (quad pairA (pairB W) (pairC W)).coeff 2 ≠ 0
+RecursiveSemaevDegree.lean:68:12: error: Type mismatch: After simplification, term
+  basePolynomial_natDegree W
+ has type
+  @Eq ℕ (basePolynomial W).natDegree 2
+but is expected to have type
+  @Eq ℕ (basePolynomial W).natDegree (2 ^ (0 + 1))
+RecursiveSemaevDegree.lean:76:8: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  (resultantStep (2 ^ (n + 1)) (recursivePolynomial W n) ?m.104 ?m.105 ?m.106 ?m.107).natDegree
+in the target expression
+  (resultantStep (2 ^ (n + 1)) (recursivePolynomial W n) ((coefficientEmbedding n) (WeierstrassCurve.b₂ W))
+        ((coefficientEmbedding n) (WeierstrassCurve.b₄ W)) ((coefficientEmbedding n) (WeierstrassCurve.b₆ W))
+        ((coefficientEmbedding n) (WeierstrassCurve.b₈ W))).natDegree =
+    2 ^ (n + 1 + 1)
+
+case succ
+K : Type u
+inst✝ : Field K
+W : WeierstrassCurve.Affine K
+n : ℕ
+ih : (recursivePolynomial W n).natDegree = 2 ^ (n + 1)
+hn : recursivePolynomial W n ≠ 0
+⊢ (resultantStep (2 ^ (n + 1)) (recursivePolynomial W n) ((coefficientEmbedding n) (WeierstrassCurve.b₂ W))
+        ((coefficientEmbedding n) (WeierstrassCurve.b₄ W)) ((coefficientEmbedding n) (WeierstrassCurve.b₆ W))
+        ((coefficientEmbedding n) (WeierstrassCurve.b₈ W))).natDegree =
+    2 ^ (n + 1 + 1)
+
+Note: The target expression is not type-correct under the `implicit` transparency level, which may have triggered the failure. This is usually caused by unfolding of semireducible definitions in prior tactic steps. Use `set_option linter.tacticCheckInstances true` to investigate the source of the issue.
+Full error:
+  Application type mismatch: The argument
+    resultantStep (2 ^ (n + 1)) (recursivePolynomial W n) ((coefficientEmbedding n) (WeierstrassCurve.b₂ W))
+      ((coefficientEmbedding n) (WeierstrassCurve.b₄ W)) ((coefficientEmbedding n) (WeierstrassCurve.b₆ W))
+      ((coefficientEmbedding n) (WeierstrassCurve.b₈ W))
+  has type
+    @Polynomial (↑(InputRing K n))[X] semiring
+  but is expected to have type
+    @Polynomial (↑(InputRing K (n + 1))) CommRing.toCommSemiring.toSemiring
+  in the application
+    (resultantStep (2 ^ (n + 1)) (recursivePolynomial W n) ((coefficientEmbedding n) (WeierstrassCurve.b₂ W))
+        ((coefficientEmbedding n) (WeierstrassCurve.b₄ W)) ((coefficientEmbedding n) (WeierstrassCurve.b₆ W))
+        ((coefficientEmbedding n) (WeierstrassCurve.b₈ W))).natDegree
+'RecursiveSemaevDegreeAudit.recursivePolynomial_natDegree' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'RecursiveSemaevDegreeAudit.all_arities_last_input_degree' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

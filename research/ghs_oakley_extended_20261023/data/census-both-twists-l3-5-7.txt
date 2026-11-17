@@ -1,0 +1,23 @@
+cost model oakley3: N=155 n=5 q=2^31 rho~2^76.5
+  m=5 g=16 gaudry=2^ 106.3 (+29.8 bits vs rho)  nagao(exp only)=2^ 58.1 (-18.4 bits vs rho, constant unknown)
+cost model oakley4: N=185 n=5 q=2^37 rho~2^91.5
+  m=5 g=16 gaudry=2^ 118.3 (+26.8 bits vs rho)  nagao(exp only)=2^ 69.4 (-22.1 bits vs rho, constant unknown)
+oakley3 N=155 tower n=5 l=31: orbits_visited=300 representatives=600 (both twists) max_depth=12 best(descending)=Some((5, 0))
+  magic=   5  descends=  600  no-descent=    0
+oakley3 N=155 tower n=31 l=5: orbits_visited=300 representatives=600 (both twists) max_depth=12 best(descending)=Some((26, 0))
+  magic=  26  descends=    2  no-descent=    0
+  magic=  31  descends=  598  no-descent=    0
+oakley3 N=155 tower n=155 l=1: orbits_visited=300 representatives=600 (both twists) max_depth=12 best(descending)=Some((126, 0))
+  magic= 126  descends=    2  no-descent=    0
+  magic= 145  descends=    4  no-descent=    0
+  magic= 146  descends=    2  no-descent=    0
+  magic= 150  descends=   78  no-descent=    0
+  magic= 151  descends=   26  no-descent=    0
+  magic= 155  descends=  488  no-descent=    0
+oakley4 N=185 tower n=5 l=37: orbits_visited=300 representatives=600 (both twists) max_depth=75 best(descending)=Some((5, 0))
+  magic=   5  descends=  600  no-descent=    0
+oakley4 N=185 tower n=37 l=5: orbits_visited=300 representatives=600 (both twists) max_depth=75 best(descending)=Some((37, 0))
+  magic=  37  descends=  600  no-descent=    0
+oakley4 N=185 tower n=185 l=1: orbits_visited=300 representatives=600 (both twists) max_depth=75 best(descending)=Some((181, 3))
+  magic= 181  descends=   48  no-descent=    0
+  magic= 185  descends=  552  no-descent=    0

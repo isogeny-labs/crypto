@@ -1,0 +1,23 @@
+[ephemeral 02:12:08] phase: booting
+[ephemeral 02:12:09] phase: setup
+[ephemeral 02:12:10] toolchain preset: rust (baked into the image: 2026-10-16T22:38:40Z)
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+[ephemeral 02:12:12] phase: running (set -euo pipefail
+mkdir -p /work/fall-degree-source
+cd /work/fall-degree-source
+aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-371035216942.tgz source.tgz --only-show-errors
+echo '4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f  source.tgz' | sha256sum -c -
+tar xzf source.tgz
+rm source.tgz
+printf '%s\n' 371035216942660c4615dfbb88d85a14afaf5c16 >"$EPHEMERAL_OUT/source_commit"
+printf '%s\n' "$E12_PROTOCOL_SHA256" >"$EPHEMERAL_OUT/protocol_sha256"
+printf '%s\n' "$E12_PROTOCOL_COMMIT" >"$EPHEMERAL_OUT/protocol_commit"
+case "$E12_PART" in
+  a) KEEP=2 CMAX=5 bash research/fall_degree_bounds_20261008/e12/run_par.sh "$EPHEMERAL_OUT" 3:21:7 ;;
+  c) bash research/fall_degree_bounds_20261008/e12/run_window.sh "$EPHEMERAL_OUT" 4:28:7 ;;
+  *) exit 2 ;;
+esac)
+source.tgz: OK
+2026-10-28T02:15:08Z gate 0
+2026-10-28T02:18:06Z gate 1
+2026-10-28T02:19:18Z gate 1 B_3-18-6 reproduces e11/validate_final

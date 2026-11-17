@@ -1,0 +1,23 @@
+    Checking serde_core v1.0.229
+    Checking serde v1.0.229
+    Checking serde_json v1.0.154
+    Checking cubic-graph-analysis v0.1.0 (/workspace/crypto/research/extension_ic_graph_20261115/native_analysis)
+error: variant name ends with the enum's name
+   --> src/bin/../../../../../src/cryptanalysis/bitops.rs:469:5
+    |
+469 |     MatrixEntry,
+    |     ^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#enum_variant_names
+    = note: `-D clippy::enum-variant-names` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::enum_variant_names)]`
+
+error: variant name ends with the enum's name
+   --> src/bin/../../../../../src/cryptanalysis/bitops.rs:472:5
+    |
+472 |     TableEntry,
+    |     ^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#enum_variant_names
+
+error: could not compile `cubic-graph-analysis` (bin "cover-validation-analysis") due to 2 previous errors

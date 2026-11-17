@@ -1,0 +1,82 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation",
+        "params": {}
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "cm-scalar-orbit:columns=4,length=32,abs_d=19,mode=scalar",
+          "linalg": "incremental-gauss",
+          "max_trials": "1000000",
+          "oracle": "mitm:negation_folded=1",
+          "targets": "walk"
+        }
+      },
+      "name": "ic-scalar",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "cm-scalar-orbit:columns=4,length=32,abs_d=19,mode=recurrence",
+          "linalg": "incremental-gauss",
+          "max_trials": "1000000",
+          "oracle": "mitm:negation_folded=1",
+          "targets": "walk"
+        }
+      },
+      "name": "ic-recurrence",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "cm-scalar-orbit:columns=4,length=32,abs_d=19,mode=velu",
+          "linalg": "incremental-gauss",
+          "max_trials": "1000000",
+          "oracle": "mitm:negation_folded=1",
+          "targets": "walk"
+        }
+      },
+      "name": "ic-velu",
+      "role": "candidate"
+    }
+  ],
+  "description": "Frozen conductor-gap replication; independent one-target solves, no shared setup; see PROTOCOL.md",
+  "label": "Excluded runtime calibration: pilot-b-c0",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "shuffle",
+    "rounds": 1,
+    "seed": 2026102521,
+    "timeout_seconds": 120,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 136723475,
+        "b": 99645764,
+        "group_order": 320091991,
+        "gx": 2,
+        "gy": 73685980,
+        "kind": "prime_explicit",
+        "p": 320092037,
+        "r": 320091991
+      }
+    ],
+    "target_kind": "planted_shared",
+    "target_seed": 2026102520,
+    "targets_per_curve": 4
+  }
+}

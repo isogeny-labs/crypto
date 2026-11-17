@@ -1,0 +1,58 @@
+{
+  "schema": "research.independent-source-fidelity-review/v1",
+  "producer_manifest_sha256": "72d78e87062bc94555794d3f982f003f7d4b9ce42e57b26bda5906a1a5bc9134",
+  "plan_sha256": "9e4466fab4824d2baebc275f0fe736ea97d4ad476d119e3f2be9b715a802699f",
+  "source_sha256": {
+    "Add11": "ac2937d569afcda33e3a7f3449e49f37fb712b5f3241fdf20f0bb4039baacc4c",
+    "Controls": "ae1828a543d53d82faf9bfa7337a0ad30bc714c7fed4fc2618f075a5951dc092",
+    "Readback": "d1dac52df0c42207bb07aa76971c0c0901c716269ea25af2467cb3aaf4bd3fa5"
+  },
+  "rust_source": {
+    "path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/src/bin/projective_law_gate.rs",
+    "sha256": "5976e7f30b3e9c5c49a5fc0f4095404b7322832e4b02f467bc3cb7e0d9dcc8c0",
+    "lines": "511-532 add11;569-580 from_affine"
+  },
+  "compile_exit_codes": {
+    "Add11": 0,
+    "Controls": 0,
+    "Readback": 0,
+    "ReviewerControls": 0
+  },
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "warnings": "four unnecessarySeqFocus linter warnings, no native failure",
+  "claims": [
+    {
+      "claim": "unit-weight distinct branch outputs q=-(x1+x2),r=x1*x2,s=y1-y2,t=x1*y2-x2*y1,z=1,w=x1-x2",
+      "finding": "matches field specialization of actual Rust branch"
+    },
+    {
+      "claim": "nonzero weights and normalized support divisibility from degree-one input divisibility and x1!=x2",
+      "finding": "supported via explicit interpolation and constant Bezout identity"
+    },
+    {
+      "claim": "distinct x excludes inverse and doubling guards",
+      "finding": "supported; source precedence inverse then doubling"
+    }
+  ],
+  "controls": [
+    "Producer full validity instance on X^5-X+1 with points(0,1),(1,1)",
+    "Producer inverse precedence at(0,0),(0,0), doubling at(0,1),(0,1), zero denominator equal-x",
+    "Reviewer full nonzero-slope instance on X^5-X+X^2 with points(0,0),(1,1)",
+    "Reviewer invalid equal-x points(0,1),(0,2) reach modeled distinct fallback although native assertion rejects; main theorem excludes them"
+  ],
+  "scope_notes": [
+    "AMENDMENT.md explicitly replaces evaluation predicate with equivalent degree-one support-divisibility premise before proof implementation",
+    "Unit-weight field values only; no UInt64/canonical-arithmetic correspondence",
+    "Formal theorem does not establish Rust Jacobian::valid refinement",
+    "classify is faithful for stated distinct-x result, not total native classifier correspondence outside its premise",
+    "Normalized divisor validity is not a formal group-law/class-sum theorem",
+    "No generic weighted branch or whole-walk closure"
+  ],
+  "blocking_findings": [],
+  "scientific_execution": false,
+  "cost_ratio": null
+}

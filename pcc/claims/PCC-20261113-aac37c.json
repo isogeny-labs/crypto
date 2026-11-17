@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-13T05:12:54Z",
+ "id": "PCC-20261113-aac37c",
+ "kind": "theorem",
+ "producer": {
+  "commit": "eab262e36c633668ac0550254eb90679f7283bc6",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "65ce9c199663449ad222dcdc9c88e1f900f9507f80d28d4c01ff9d458537ab7e",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/Descent.lean",
+   "theorem": "G3PrimeDescent.zero_abscissa_ordinate_factor"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "G3 complete encoded-point descent algebra and conditional group implications plus exact primitive-shift coordinate algebra. Actual curves/Picard/Cartier-ideal products/Galois descent/cover and reducer identification remain written/native bridges. Not full geometric formalization or acceptance of the initially failed native model. Local binding/kernel results remain unsigned until main CI verdict.",
+ "statement": "theorem zero_abscissa_ordinate_factor {K : Type} [CommRing K] (Y alpha : K) (curve_at_zero : Y^2=alpha^2) : (Y-alpha)*(Y+alpha)=0"
+}

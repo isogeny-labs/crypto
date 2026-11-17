@@ -1,0 +1,26 @@
+   Compiling version_check v0.9.5
+   Compiling typenum v1.20.1
+   Compiling zmij v1.0.23
+   Compiling serde_core v1.0.229
+   Compiling serde_json v1.0.154
+   Compiling itoa v1.0.18
+   Compiling cpufeatures v0.2.17
+   Compiling memchr v2.8.3
+   Compiling cfg-if v1.0.5
+   Compiling generic-array v0.14.7
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling digest v0.10.7
+   Compiling sha2 v0.10.9
+   Compiling n83-fall-catalog v0.1.0 (/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_fixed_fall_catalog_20261028)
+error[E0271]: type mismatch resolving `<usize as SliceIndex<[Vec<u64>]>>::Output == [u64]`
+   --> src/main.rs:245:30
+    |
+245 |                 xor(&mut r, &rows[id]);
+    |                              ^^^^^^^^ expected `[u64]`, found `Vec<u64>`
+    |
+    = note: expected slice `[u64]`
+              found struct `Vec<u64>`
+
+For more information about this error, try `rustc --explain E0271`.
+error: could not compile `n83-fall-catalog` (bin "n83-fall-catalog" test) due to 1 previous error

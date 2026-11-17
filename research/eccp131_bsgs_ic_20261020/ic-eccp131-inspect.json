@@ -1,0 +1,107 @@
+{
+  "capabilities": {
+    "factor_base_built": false,
+    "imported_target_solving": false,
+    "linear_algebra": false,
+    "parameter_inspection": true,
+    "point_checks_attempted": true,
+    "relation_collection": false
+  },
+  "checks": [
+    {
+      "details": "fixed-base Miller-Rabin with bases 2..37; a pass is not a primality proof",
+      "name": "subgroup_order_screen",
+      "status": "pass"
+    },
+    {
+      "details": "cofactor must be positive",
+      "name": "positive_cofactor",
+      "status": "pass"
+    },
+    {
+      "details": "fixed-base Miller-Rabin; not a primality proof",
+      "name": "field_modulus_screen",
+      "status": "pass"
+    },
+    {
+      "details": "coefficients must lie in [0,p)",
+      "name": "canonical_coefficients",
+      "status": "pass"
+    },
+    {
+      "details": "4*a^3 + 27*b^2 != 0 mod p",
+      "name": "nonsingular_curve",
+      "status": "pass"
+    },
+    {
+      "details": "direct curve-equation check",
+      "name": "generator_on_curve",
+      "status": "pass"
+    },
+    {
+      "details": "[r]P = O; exact-order interpretation remains conditional on primality",
+      "name": "generator_subgroup",
+      "status": "pass"
+    },
+    {
+      "details": "direct curve-equation check",
+      "name": "point_on_curve",
+      "status": "pass"
+    },
+    {
+      "details": "[r]P = O; exact-order interpretation remains conditional on primality",
+      "name": "point_subgroup",
+      "status": "pass"
+    },
+    {
+      "details": "general prime-curve point counting is not implemented",
+      "name": "group_cardinality",
+      "status": "not_checked"
+    },
+    {
+      "details": "necessary cardinality bound only; not a point-count certificate",
+      "name": "hasse_necessary_bound",
+      "status": "pass"
+    }
+  ],
+  "evidence_scope": "parameter_validation_only",
+  "limitations": [
+    "Primality screens are not proofs.",
+    "Missing or unsupported checks are explicitly listed.",
+    "Imported parameters are never passed to the synthetic solver."
+  ],
+  "operation": "inspect",
+  "parameters": {
+    "a": "0x41cb121ce2b31f608a76fc8f23d73cb66",
+    "b": "0x2f74f717e8dec90991e5ea9b2ff03da58",
+    "cofactor": "1",
+    "field": {
+      "kind": "prime",
+      "modulus": "0x48e1d43f293469e33194c43186b3abc0b"
+    },
+    "fixture": null,
+    "generator": {
+      "x": "0x3df84a96b5688ef574fa91a32e197198a",
+      "y": "0x14721161917a44fb7b4626f36f0942e71"
+    },
+    "name": "ECCp-131",
+    "point": {
+      "x": "0x03AA6F004FC62E2DA1ED0BFB62C3FFB568",
+      "y": "0x009C21C284BA8A445BB2701BF55E3A67ED"
+    },
+    "schema_version": 1,
+    "subgroup_order": "0x48e1d43f293469e317f7ed728f6b8e6f1"
+  },
+  "schema_version": 1,
+  "software": {
+    "arch": "aarch64",
+    "binary_blake3": "6dc9634e18ad222b0cde73dad2d7b5f1f354f7fd28f03070488897ddc2286144",
+    "git_commit": null,
+    "git_commit_source": null,
+    "git_dirty": null,
+    "os": "macos",
+    "version": "0.1.0"
+  },
+  "source": "builtin:eccp-131; local repository parameter definitions",
+  "status": "checks_passed"
+}

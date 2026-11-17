@@ -1,0 +1,21 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "R12 ecbench rho ns/step at small Koblitz sizes",
+  "description": "R12 paired ns per walk step: strong (lockstep batched inversion) and tuned signed-Frobenius rho, interleaved.",
+  "workloads": {
+    "curves": [
+      {"kind": "koblitz", "a": 0, "n": 41},
+      {"kind": "koblitz", "a": 0, "n": 53},
+      {"kind": "koblitz", "a": 0, "n": 61}
+    ],
+    "targets_per_curve": 6,
+    "target_seed": 2026102601,
+    "target_kind": "public"
+  },
+  "arms": [
+    {"name": "rho-strong", "role": "baseline", "method": {"id": "rho.signed_frobenius_strong"}},
+    {"name": "rho-tuned", "role": "reference", "method": {"id": "rho.signed_frobenius"}},
+    {"name": "rho-strong-aa", "role": "control", "method": {"id": "rho.signed_frobenius_strong"}}
+  ],
+  "measurement": {"rounds": 6, "warmup": 1, "order": "alternate", "seed": 2026102602, "isolation_required": "L0", "timeout_seconds": 600}
+}

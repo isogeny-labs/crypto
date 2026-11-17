@@ -1,0 +1,35 @@
+test_rules (test_artifacts.Policy.test_rules) ... ok
+test_the_committed_policy_keeps_every_pdf_in_git (test_artifacts.Policy.test_the_committed_policy_keeps_every_pdf_in_git) ... ok
+test_check_asks_git_for_full_object_ids (test_artifacts.RoundTrip.test_check_asks_git_for_full_object_ids)
+A blobless sparse checkout can fetch a missing blob by full id, not by the ... ok
+test_check_gate (test_artifacts.RoundTrip.test_check_gate) ... ok
+test_check_gate_in_blobless_clone (test_artifacts.RoundTrip.test_check_gate_in_blobless_clone) ... ok
+test_corrupt_remote_object_is_refused (test_artifacts.RoundTrip.test_corrupt_remote_object_is_refused) ... ok
+test_migrate_from_sparse_checkout_fetches_changed_blob (test_artifacts.RoundTrip.test_migrate_from_sparse_checkout_fetches_changed_blob) ... ok
+test_migrate_from_subdirectory_resolves_root_level_candidates (test_artifacts.RoundTrip.test_migrate_from_subdirectory_resolves_root_level_candidates) ... ok
+test_migrate_refuses_same_size_corrupt_remote_before_staging (test_artifacts.RoundTrip.test_migrate_refuses_same_size_corrupt_remote_before_staging) ... ok
+test_migrate_selects_changed_data_and_replays_remote (test_artifacts.RoundTrip.test_migrate_selects_changed_data_and_replays_remote) ... ok
+test_pull_into_absent_sparse_directory_preserves_bytes_and_clean_tree (test_artifacts.RoundTrip.test_pull_into_absent_sparse_directory_preserves_bytes_and_clean_tree) ... ok
+test_push_commit_clone_pull_verify (test_artifacts.RoundTrip.test_push_commit_clone_pull_verify) ... ok
+test_push_from_sparse_checkout_reads_blobs (test_artifacts.RoundTrip.test_push_from_sparse_checkout_reads_blobs) ... ok
+test_push_merges_existing_manifest_and_gitignore (test_artifacts.RoundTrip.test_push_merges_existing_manifest_and_gitignore) ... ok
+test_layout_matches_crypto_store (test_artifacts.S3Argv.test_layout_matches_crypto_store) ... ok
+test_put_is_write_once_and_checksummed (test_artifacts.S3Argv.test_put_is_write_once_and_checksummed) ... ok
+test_rejects_non_digest (test_artifacts.S3Argv.test_rejects_non_digest) ... artifacts: not a sha256 digest: '../../etc/passwd'
+ok
+test_conditional_full_checkout_is_preserved (test_artifacts.WorkflowBootstrap.test_conditional_full_checkout_is_preserved) ... ok
+test_rewiring_refreshes_paths_and_keeps_checkout_condition (test_artifacts.WorkflowBootstrap.test_rewiring_refreshes_paths_and_keeps_checkout_condition) ... ok
+test_sparse_clone_can_load_tool_and_remote_configuration (test_artifacts.WorkflowBootstrap.test_sparse_clone_can_load_tool_and_remote_configuration) ... ok
+test_rewiring_is_idempotent_and_refreshes_a_stale_step (test_artifacts.WorkflowPullStep.test_rewiring_is_idempotent_and_refreshes_a_stale_step) ... ok
+test_step_installs_the_aws_cli_when_absent (test_artifacts.WorkflowPullStep.test_step_installs_the_aws_cli_when_absent) ... ok
+test_block_list_gets_tools_and_config (test_artifacts.WorkflowSparsePatterns.test_block_list_gets_tools_and_config) ... ok
+test_existing_patterns_are_not_duplicated (test_artifacts.WorkflowSparsePatterns.test_existing_patterns_are_not_duplicated) ... ok
+test_scalar_pattern_becomes_a_list (test_artifacts.WorkflowSparsePatterns.test_scalar_pattern_becomes_a_list) ... ok
+test_nested_artifact_does_not_make_sibling_notes_a_reader (test_artifacts.WorkflowWiringPaths.test_nested_artifact_does_not_make_sibling_notes_a_reader) ... ok
+test_research_study_path_pulls_its_moved_data (test_artifacts.WorkflowWiringPaths.test_research_study_path_pulls_its_moved_data) ... ok
+test_unrelated_research_path_does_not_pull_all_research_data (test_artifacts.WorkflowWiringPaths.test_unrelated_research_path_does_not_pull_all_research_data) ... ok
+
+----------------------------------------------------------------------
+Ran 28 tests in 3.324s
+
+OK

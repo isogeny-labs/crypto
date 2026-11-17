@@ -1,0 +1,61 @@
+/// Signed Recover with the locally verified Mumford-coordinate equations.
+use five_leads_study::three_leads::{Divisor, Field, Jacobian};
+use serde_json::{json, Value};
+use std::{collections::BTreeMap, fs};
+#[derive(Clone,Copy,Default,serde::Serialize)]
+pub struct Ops { pub m:u64,pub a:u64,pub i:u64 }
+thread_local! { static OPS:std::cell::Cell<Ops>=std::cell::Cell::new(Ops{m:0,a:0,i:0}); }
+pub fn reset_ops(){ OPS.with(|o|o.set(Ops::default())); }
+pub fn read_ops()->Ops{ OPS.with(|o|o.get()) }
+fn tally_m(){OPS.with(|o|{let mut v=o.get();v.m+=1;o.set(v);});}
+fn tally_a(){OPS.with(|o|{let mut v=o.get();v.a+=1;o.set(v);});}
+fn tally_i(){OPS.with(|o|{let mut v=o.get();v.i+=1;o.set(v);});}
+fn raw_mul(x:u64,y:u64,p:u64)->u64{x*y%p}
+fn m(x: u64, y: u64, p: u64) -> u64 {
+    tally_m();
+    x * y % p
+}
+fn a(x: u64, y: u64, p: u64) -> u64 {
+    tally_a();
+    (x + y) % p
+}
+fn s(x: u64, y: u64, p: u64) -> u64 {
+    tally_a();
+    (x + p - y) % p
+}
+fn pow(mut x: u64, mut n: u64, p: u64) -> u64 {
+    let mut z = 1;
+    while n > 0 {
+        if n & 1 == 1 {
+            z = raw_mul(z, x, p)
+        }
+        x = raw_mul(x, x, p);
+        n >>= 1
+    }
+    z
+}
+fn inv(x: u64, p: u64) -> u64 {
+    assert_ne!(x, 0);
+    tally_i();
+    pow(x, p - 2, p)
+fn solve4(mut mat: [[u64; 5]; 4], p: u64) -> Option<[u64; 4]> {
+    for col in 0..4 {
+        let pivot = (col..4).find(|&i| mat[i][col] != 0)?;
+        mat.swap(col, pivot);
+        let unit = inv(mat[col][col], p);
+        for j in col..5 {
+            mat[col][j] = m(mat[col][j], unit, p)
+        }
+        for i in 0..4 {
+            if i != col {
+                let z = mat[i][col];
+                for j in col..5 {
+                    mat[i][j] = s(mat[i][j], m(z, mat[col][j], p), p)
+                }
+            }
+        }
+    }
+    Some(std::array::from_fn(|i| mat[i][4]))
+}
+fn general_homogeneous(k: [u64; 4], theta: &Value, p: u64) -> Option<[u64; 4]> {
+    let (l, mu, nu) = (
