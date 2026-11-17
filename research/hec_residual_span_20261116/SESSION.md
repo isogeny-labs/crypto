@@ -1406,3 +1406,10 @@ What was done: checked current add_place/reduce and prior section-sieve notes; d
 Decisions made: no experiment on a relabelled bootstrap. Higher-degree interpolation alone does not lower generic residual degree; a useful new mechanism must escape independent constraints, improve target rank or reduce complete arithmetic cost. Explicit degree-drop/dependent/special-divisor exceptions retained.
 Open threads: find and cost a target-log-independent dependency finder or other mechanism; original genus2+tenfold goal remains unresolved.
 Errors: initial proposed bootstrap collides with current implementation, corrected before any scientific execution. No S3/cloud or fixture campaign.
+
+## Adaptive-label peeling oracle frozen
+
+What was done: derived two-known-root collision leaves linear residual and affine newpoint. Prepared optimistic retained-support closure across all6original16anchor panels, public source-normalized core only. Compiled exact affine original-group and Sparse/nativeFast prefix checker; hashes frozen.
+Decisions made: free-support reachability falsifier before building adaptive bucketproducer; repeat to fixedpoint, all unresolved outcomes retained. No rank/cost inference from positive closure.
+Open threads: execute once; if closure stalls, new supports or multiunknown elimination needed; if succeeds, actual adaptiveproducer costs stillrequired. Original genus2+10xgoalopen.
+Errors: none, no scientificexecution before pushedfreeze.
