@@ -15,13 +15,14 @@ REL_FB 16, F_{p^k} point counts, arms D/E). Binary /home/user/bin/genus_ladder_g
 (build in sparse worktree /home/user/crypto-c0b657b; ~8 min). Cell runner P1/run_cell.sh.
 
 ## State
-P0 passed (exact count identity at g=4 p=2053). P1 gates: relation verification at
-g=3 p=101 (0 bad, all certified, arms A,c,D,E); order cross-check K=2 vs K=3 at g=3
-identical. Pilot grid g=6..12 running into P1/pilot/.
+P0 and P1 done (P1/RESULTS.md); P2 lever F negative (P2/RESULTS_F.md); crossover
+p*(g) measured/extrapolated (P2/RESULTS_crossover.md). Binaries g16d (P1) and g16e
+(adds arm F) in /home/user/bin; source patches in P1/instrument.patch and P2_instrument.patch.
+PR #4598 open, subscribed.
 
 ## Next steps
-Finish pilot, freeze P1 protocol, run the grid, write RESULTS.md; then P2 levers
-and P3 non-hyperelliptic. Container restarts ~30 min: keep cells short, commit often.
+P3 non-hyperelliptic small-e models (PLAN.md); optional degree-3 base for g >= 10;
+more p at g=8 to measure its decay. Keep cells short; use run_curve.sh for big p.
 
 ---
 
