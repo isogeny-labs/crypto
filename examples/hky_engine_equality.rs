@@ -26,7 +26,11 @@ use serde_json::Value;
 
 /// What identifies a cell and its system.
 fn cell_key(r: &Value) -> String {
-    let f = |k: &str| r.get(k).map(|v| v.to_string()).unwrap_or_else(|| "-".into());
+    let f = |k: &str| {
+        r.get(k)
+            .map(|v| v.to_string())
+            .unwrap_or_else(|| "-".into())
+    };
     format!(
         "p={} kind={} m={} control={} t={} target={} k={} g={} null_width={}",
         f("p"),
@@ -50,7 +54,10 @@ fn rows(path: &str) -> BTreeMap<String, Value> {
             continue; // the summary line
         }
         let k = cell_key(&v);
-        assert!(out.insert(k.clone(), v).is_none(), "{path}: cell twice: {k}");
+        assert!(
+            out.insert(k.clone(), v).is_none(),
+            "{path}: cell twice: {k}"
+        );
     }
     out
 }
@@ -83,18 +90,44 @@ fn compare(reference: &str, candidate: &str) -> Vec<String> {
     for (k, x) in &a {
         let Some(y) = b.get(k) else { continue };
         // the same system
-        for field in ["x_r", "curve", "tower", "nf_degrees", "n_vars", "hky_cmin", "hky_cmax", "planted_ok"] {
+        for field in [
+            "x_r",
+            "curve",
+            "tower",
+            "nf_degrees",
+            "n_vars",
+            "hky_cmin",
+            "hky_cmax",
+            "planted_ok",
+        ] {
             if x.get(field) != y.get(field) {
-                diffs.push(format!("{k}: system field `{field}` differs: {:?} vs {:?}", x.get(field), y.get(field)));
+                diffs.push(format!(
+                    "{k}: system field `{field}` differs: {:?} vs {:?}",
+                    x.get(field),
+                    y.get(field)
+                ));
             }
         }
         // the same answer
-        for field in ["falls", "first_fall_degree", "last_fall_degree", "censored_at", "timed_out"] {
+        for field in [
+            "falls",
+            "first_fall_degree",
+            "last_fall_degree",
+            "censored_at",
+            "timed_out",
+        ] {
             if x.get(field) != y.get(field) {
-                diffs.push(format!("{k}: `{field}` differs: {:?} vs {:?}", x.get(field), y.get(field)));
+                diffs.push(format!(
+                    "{k}: `{field}` differs: {:?} vs {:?}",
+                    x.get(field),
+                    y.get(field)
+                ));
             }
         }
-        let (ca, cb) = (x["closures"].as_array().unwrap(), y["closures"].as_array().unwrap());
+        let (ca, cb) = (
+            x["closures"].as_array().unwrap(),
+            y["closures"].as_array().unwrap(),
+        );
         if ca.len() != cb.len() {
             diffs.push(format!("{k}: {} closures vs {}", ca.len(), cb.len()));
         }
@@ -122,7 +155,8 @@ fn times(specs: &[String]) {
     println!("| cell | engine | repeats | wall ms median | min | max | last c | cols | dim | one | rows reduced | muladds | stored entries |");
     println!("|:--|:--|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|--:|");
     // cell -> label -> (ms list, last row)
-    let mut table: BTreeMap<(u64, u64, String), BTreeMap<String, (Vec<f64>, Value)>> = BTreeMap::new();
+    let mut table: BTreeMap<(u64, u64, String), BTreeMap<String, (Vec<f64>, Value)>> =
+        BTreeMap::new();
     let mut labels = Vec::new();
     for spec in specs {
         let (label, files) = spec.split_once('=').expect("LABEL=file[,file…]");
@@ -132,21 +166,36 @@ fn times(specs: &[String]) {
                 let t = r["t"].as_u64().unwrap_or(0);
                 let m = r["m"].as_u64().unwrap_or(0);
                 let e = table.entry((m, t, k)).or_default();
-                let slot = e.entry(label.to_string()).or_insert_with(|| (Vec::new(), Value::Null));
-                slot.0.push(r["ms"].as_f64().or_else(|| r["wall_s"].as_f64().map(|s| s * 1e3)).unwrap_or(f64::NAN));
+                let slot = e
+                    .entry(label.to_string())
+                    .or_insert_with(|| (Vec::new(), Value::Null));
+                slot.0.push(
+                    r["ms"]
+                        .as_f64()
+                        .or_else(|| r["wall_s"].as_f64().map(|s| s * 1e3))
+                        .unwrap_or(f64::NAN),
+                );
                 slot.1 = r;
             }
         }
     }
     for ((m, t, k), per) in &table {
         for label in &labels {
-            let Some((ms, r)) = per.get(label) else { continue };
+            let Some((ms, r)) = per.get(label) else {
+                continue;
+            };
             let mut ms = ms.clone();
             let med = median(&mut ms);
-            let last = r["closures"].as_array().and_then(|c| c.last()).cloned().unwrap_or(Value::Null);
+            let last = r["closures"]
+                .as_array()
+                .and_then(|c| c.last())
+                .cloned()
+                .unwrap_or(Value::Null);
             let short = k
                 .split(' ')
-                .filter(|s| s.starts_with("control=") || s.starts_with("k=") || s.starts_with("target="))
+                .filter(|s| {
+                    s.starts_with("control=") || s.starts_with("k=") || s.starts_with("target=")
+                })
                 .collect::<Vec<_>>()
                 .join(" ")
                 .replace('"', "");
@@ -185,7 +234,10 @@ fn main() -> ExitCode {
                     println!("NEGATIVE CONTROL FAILED: {cells} cells compared equal, a difference was expected");
                     return ExitCode::from(1);
                 }
-                println!("negative control ok: {} differences over {cells} cells (expected)", diffs.len());
+                println!(
+                    "negative control ok: {} differences over {cells} cells (expected)",
+                    diffs.len()
+                );
                 ExitCode::SUCCESS
             } else if diffs.is_empty() {
                 println!("EQUAL: {cells} cells, every closure, fall degree and censoring field identical");

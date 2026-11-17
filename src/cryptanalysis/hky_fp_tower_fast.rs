@@ -590,7 +590,9 @@ impl Echelon {
     /// Whether a row reduced before this batch meets a pivot added since.
     fn meets_fresh_pivot(&self, r: &[(u32, u32)], lead_only: bool) -> bool {
         if lead_only {
-            return r.first().is_some_and(|&(c, _)| self.pivot[c as usize] != NONE);
+            return r
+                .first()
+                .is_some_and(|&(c, _)| self.pivot[c as usize] != NONE);
         }
         self.fresh > 0 && r.iter().any(|&(c, _)| self.pivot[c as usize] != NONE)
     }
@@ -638,7 +640,10 @@ pub fn check_symmetry(ring: &HkyRing, perm: &[usize], gens: &[NfPoly]) -> Result
         return Err("p = 2".into());
     }
     if perm.len() != nt {
-        return Err(format!("permutation of {} variables, ring has {nt}", perm.len()));
+        return Err(format!(
+            "permutation of {} variables, ring has {nt}",
+            perm.len()
+        ));
     }
     for j in 0..nt {
         if perm[j] >= nt || perm[perm[j]] != j {
@@ -652,7 +657,10 @@ pub fn check_symmetry(ring: &HkyRing, perm: &[usize], gens: &[NfPoly]) -> Result
         let (r, s) = (ring.rules[j], ring.rules[perm[j]]);
         let next_ok = r.next.map(|x| perm[x as usize]) == s.next.map(|x| x as usize);
         if !(next_ok && r.a == s.a && r.b == s.b && r.c == s.c && r.d == s.d) {
-            return Err(format!("tower rule {j} is not the rule of its image {}", perm[j]));
+            return Err(format!(
+                "tower rule {j} is not the rule of its image {}",
+                perm[j]
+            ));
         }
     }
     let mut signs = Vec::with_capacity(gens.len());
@@ -755,9 +763,19 @@ impl<'a> Space<'a> {
         let nt = ring.n_tower();
         let mk_index = |keys: &[Key]| -> Index {
             if fast_index {
-                Index::Fast(keys.iter().enumerate().map(|(i, &k)| (k, i as u32)).collect())
+                Index::Fast(
+                    keys.iter()
+                        .enumerate()
+                        .map(|(i, &k)| (k, i as u32))
+                        .collect(),
+                )
             } else {
-                Index::Sip(keys.iter().enumerate().map(|(i, &k)| (k, i as u32)).collect())
+                Index::Sip(
+                    keys.iter()
+                        .enumerate()
+                        .map(|(i, &k)| (k, i as u32))
+                        .collect(),
+                )
             }
         };
         let part_of = |keys: Vec<Key>| -> Part {
@@ -892,7 +910,11 @@ impl<'a> Space<'a> {
                             (sk, if q == 0 { cc } else { (p - cc) % p })
                         };
                         let cp = self.index.get(&rep);
-                        let col = if q == 0 { cp } else { self.minus_col[cp as usize] };
+                        let col = if q == 0 {
+                            cp
+                        } else {
+                            self.minus_col[cp as usize]
+                        };
                         cols.push((col, coef));
                     }
                     cols.sort_unstable_by_key(|t| t.0);
@@ -941,7 +963,11 @@ impl<'a> Space<'a> {
                         continue; // zero by antisymmetry (checked)
                     }
                     let cp = self.index.get(&k);
-                    let col = if q == 0 { cp } else { self.minus_col[cp as usize] };
+                    let col = if q == 0 {
+                        cp
+                    } else {
+                        self.minus_col[cp as usize]
+                    };
                     r.push((col, *x as u32));
                 }
                 r.sort_unstable_by_key(|t| t.0);
@@ -961,7 +987,11 @@ fn sparse_bucket(nnz: usize, width: usize) -> usize {
 enum Item {
     Row(u8, Row),
     /// `x_var ·` (row `row` of part `part`), formed when dequeued.
-    Prod { part: u8, row: u32, var: u16 },
+    Prod {
+        part: u8,
+        row: u32,
+        var: u16,
+    },
 }
 
 /// `V_{F,c}`, as [`closure`](crate::cryptanalysis::hky_fp_tower::closure)
@@ -975,7 +1005,10 @@ pub fn closure_fast(
 ) -> (Closure, FastStats) {
     let started = Instant::now();
     let p = ring.p;
-    assert!(p < 1 << 31 || opts.level == 0, "hky_fp_tower_fast: levels 1+ need p < 2^31");
+    assert!(
+        p < 1 << 31 || opts.level == 0,
+        "hky_fp_tower_fast: levels 1+ need p < 2^31"
+    );
     let n_cols = count_monomials(ring.n_tower(), ring.n_free, c);
     let mut stats = FastStats {
         symmetry: "off".into(),
@@ -1020,10 +1053,17 @@ pub fn closure_fast(
     let space = Space::build(ring, c, perm, opts.level >= 3);
     let total_cols: usize = space.parts.iter().map(|q| q.keys.len()).sum();
     if !space.split() {
-        assert_eq!(total_cols as u128, n_cols, "hky_fp_tower_fast: column count");
+        assert_eq!(
+            total_cols as u128, n_cols,
+            "hky_fp_tower_fast: column count"
+        );
     }
     stats.part_cols = space.parts.iter().map(|q| q.keys.len() as u64).collect();
-    let simd = if opts.level >= 4 { detect_simd() } else { Simd::Portable };
+    let simd = if opts.level >= 4 {
+        detect_simd()
+    } else {
+        Simd::Portable
+    };
     stats.simd = match simd {
         Simd::Portable => "portable",
         Simd::Avx2 => "avx2",
@@ -1239,7 +1279,11 @@ pub fn closure_fast(
         dims[d] += dims[d - 1];
     }
     if contains_one {
-        assert_eq!(u128::from(dims[c as usize]), n_cols, "hky_fp_tower_fast: full space");
+        assert_eq!(
+            u128::from(dims[c as usize]),
+            n_cols,
+            "hky_fp_tower_fast: full space"
+        );
     }
     (
         Closure {
@@ -1436,14 +1480,22 @@ mod tests {
                         sparse_width: 1,
                     };
                     let fast = fall_degrees_fast(ring, gens, 1, cmax, &limits, &opts);
-                    same(&reference, &fast, &format!("level {level} sym {sym} batch {batch} {order:?}"));
+                    same(
+                        &reference,
+                        &fast,
+                        &format!("level {level} sym {sym} batch {batch} {order:?}"),
+                    );
                     if level >= 2 {
                         let opts = FastOptions {
                             lead_only: true,
                             ..opts
                         };
                         let fast = fall_degrees_fast(ring, gens, 1, cmax, &limits, &opts);
-                        same(&reference, &fast, &format!("lead-only level {level} sym {sym} batch {batch}"));
+                        same(
+                            &reference,
+                            &fast,
+                            &format!("lead-only level {level} sym {sym} batch {batch}"),
+                        );
                     }
                 }
             }
@@ -1519,7 +1571,11 @@ mod tests {
         let anti = ring.from_raw(&[(e(&[(0, 1), (u, 1)]), 1), (e(&[(t, 1), (u, 1)]), P - 1)]);
         let perm = swap_first_two_blocks(t, 3);
         assert_eq!(
-            check_symmetry(&ring, perm.as_ref().unwrap(), &[g1.clone(), g2.clone(), anti.clone()]),
+            check_symmetry(
+                &ring,
+                perm.as_ref().unwrap(),
+                &[g1.clone(), g2.clone(), anti.clone()]
+            ),
             Ok(vec![1, 1, -1])
         );
         all_variants(&ring, &[g1.clone(), g2.clone()], perm.clone(), 4);
@@ -1532,7 +1588,10 @@ mod tests {
         let ring = HkyRing::new(P, kummer_rules(t, 2, 3), 0);
         let mut g = symmetric_gen(&ring, t, 2);
         // break the symmetry in one coefficient
-        let i = g.iter().position(|&(m, _, _)| m == 1).expect("the term y_0");
+        let i = g
+            .iter()
+            .position(|&(m, _, _)| m == 1)
+            .expect("the term y_0");
         g[i].2 = (g[i].2 + 1) % P;
         let perm = swap_first_two_blocks(t, 2).unwrap();
         assert!(check_symmetry(&ring, &perm, std::slice::from_ref(&g)).is_err());
@@ -1590,7 +1649,10 @@ mod tests {
         let (ring, gens) = consistent(t);
         let reference = fall_degrees(&ring, &gens, 1, 5, &HkyLimits::default());
         assert_eq!(reference.last_fall, None);
-        assert!(reference.closures.iter().all(|c| u128::from(c.dim()) < c.cols));
+        assert!(reference
+            .closures
+            .iter()
+            .all(|c| u128::from(c.dim()) < c.cols));
         all_variants(&ring, &gens, swap_first_two_blocks(t, 2), 5);
     }
 
@@ -1612,7 +1674,11 @@ mod tests {
                     let opts = FastOptions {
                         fault,
                         level,
-                        symmetry: if sym { swap_first_two_blocks(t, 2) } else { None },
+                        symmetry: if sym {
+                            swap_first_two_blocks(t, 2)
+                        } else {
+                            None
+                        },
                         dense_num: 1,
                         dense_den: 8,
                         ..FastOptions::default()
@@ -1620,8 +1686,14 @@ mod tests {
                     let b = fall_degrees_fast(&ring, &gens, 1, 5, &limits, &opts);
                     let differ = a.last_fall != b.last_fall
                         || a.closures.len() != b.closures.len()
-                        || a.closures.iter().zip(&b.closures).any(|(x, y)| x.dims != y.dims);
-                    assert!(differ, "fault {fault} sym {sym} level {level} must not pass");
+                        || a.closures
+                            .iter()
+                            .zip(&b.closures)
+                            .any(|(x, y)| x.dims != y.dims);
+                    assert!(
+                        differ,
+                        "fault {fault} sym {sym} level {level} must not pass"
+                    );
                 }
             }
         }
@@ -1630,14 +1702,18 @@ mod tests {
     #[test]
     fn dense_kernel_matches_the_definition() {
         let p2 = P * P;
-        let row: Vec<u32> = (0..1000u64).map(|i| ((i * 2654435761) % P) as u32).collect();
+        let row: Vec<u32> = (0..1000u64)
+            .map(|i| ((i * 2654435761) % P) as u32)
+            .collect();
         let f = P - 12345;
         for simd in [Simd::Portable, detect_simd()] {
             let mut acc: Vec<u64> = (0..1000u64).map(|i| (i * i * 40503 + 7) % p2).collect();
             let want: Vec<u64> = acc
                 .iter()
                 .zip(&row)
-                .map(|(&a, &x)| ((u128::from(a) + u128::from(f) * u128::from(x)) % u128::from(P)) as u64)
+                .map(|(&a, &x)| {
+                    ((u128::from(a) + u128::from(f) * u128::from(x)) % u128::from(P)) as u64
+                })
                 .collect();
             axpy_dense(simd, &mut acc, &row, f, p2);
             assert!(acc.iter().all(|&a| a < p2));

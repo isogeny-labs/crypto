@@ -3197,11 +3197,15 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
             a.null_width,
             &mut rng,
         );
-        if !matches!(a.engine, Engine::F4 | Engine::Hky | Engine::Hky2) && cell.control == Control::Naive {
+        if !matches!(a.engine, Engine::F4 | Engine::Hky | Engine::Hky2)
+            && cell.control == Control::Naive
+        {
             // The naive control has no tower to rewrite by.
             continue;
         }
-        if cell.control == Control::Multiples && !matches!(a.engine, Engine::F4 | Engine::Hky | Engine::Hky2) {
+        if cell.control == Control::Multiples
+            && !matches!(a.engine, Engine::F4 | Engine::Hky | Engine::Hky2)
+        {
             // The extra free variables u'_k are not in the tower engines' rings.
             eprintln!(
                 "-- multiples runs under --engine f4 and --engine hky only; skipping {} m={} t={}",
