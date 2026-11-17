@@ -955,3 +955,17 @@ A cheaper kernel or mathematically justified higher-yield relation mechanism is 
 
 ### Errors
 Conductor reports this scope held by our own live T7044 lease; no competing scope was taken. No source failure or producer retry. Algebraic derivation is not advertised as replay validation.
+
+## Point-source symbolic sparsity measured
+
+### What was done
+Frozen Rust specialization at4ff60ed3fe3 exited0, retaining all16 exact integer-polynomial forms with6–8 terms each. Derived shared-factor identities B11=U² and B12=U*V+2*(r5+c)*K1² with explicit coefficient expansion. No field benchmark or full-solve run.
+
+### Decisions made
+This supplies a concrete smaller-circuit lead, not tenfold evidence. Complete the other entries/all charts and an exact identity/cost gate before arithmetic execution. Keep original sources/unknown-log accounting and genus2+ objective.
+
+### Open threads
+Complete factored differential circuit and stronger relation-yield mechanism; signed recovery exceptions remain separate. No mathematical breakthrough is claimed.
+
+### Errors
+No symbolic execution failure or retry. No S3 access. Current task remains the same own live lease.
