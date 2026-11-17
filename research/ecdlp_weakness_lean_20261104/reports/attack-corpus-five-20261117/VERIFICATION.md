@@ -63,6 +63,13 @@ ledger currently fails the modern claim-schema check because legacy claims do
 not carry `claim_type`; all five records above do carry
 `claim_type = interpretive`.
 
+The PCC implementation's own declaration parser matched all ten pinned theorem
+hashes. A full local `pcc verify` of the representative ZK claim returned
+`verdict: pass` for both Lean references at report commit `128dbd0512`; each
+reference independently reran the 158-theorem project proof gate. This local
+verdict is not a signed main-branch verdict and does not change the
+`[pcc:unverified]` standing.
+
 ## Additional checks
 
 Four independent review passes covered Lean statement fidelity, primary-source
