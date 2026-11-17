@@ -717,3 +717,17 @@ Exclusivepfieldphaseattributionandnewrelation-generationmechanismsremainthenexts
 
 ### Errors
 ExternalmergeracedPRupdate: gh edit targeted4518justbeforeitsmergedstatewasobserved. CorrectedbysuccessorPR; no code/result loss.
+
+## Exclusive C4 phase attribution frozen
+
+### What was done
+Copied72callC4studywithonlyexclusivephaselabels/output; nativearithmeticunchanged, separateenabledcounterwrapperpreservestotals. Warningfreebuild. Protocolrequiresoriginalbyte-identicalCONTROL,all16phasesums,phaserepeatsandpriorcorrectnessgates. Noexecutionyet.
+
+### Decisions made
+Previousgoalturnclassifiedprogress(actualstronggroupsolvesandcertificatereplays). Attributeimprovedpencilcostbeforeselectingnewmath; conditionalAmdahlboundsnotuniversalalgorithmicbarriers. Gitcustodycontinues.
+
+### Open threads
+Executeonce,quantifyscan/anchor/setup/residualshares,thennewgeneratorcandidateagainstthisbaseline.
+
+### Errors
+None.
