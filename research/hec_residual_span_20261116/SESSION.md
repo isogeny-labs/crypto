@@ -2548,3 +2548,10 @@ What was done: freeze461a0eed144 hashes passed, sole run exit0. Every raw canoni
 Decisions made: count reduction is a real component result, not full solver or novelty.70/80all-arm inequalities reject, ten weaker comparisons do not; strongest equal-information controls reject all20workloads even with all remaining phases free. Preserve kernel/certificates, do not chase10xcomponent headline or build alias solver on this setup.
 Open threads: genuinely different producer/verification/coordinate construction capable of full10x; original h1genus-two and genus-three reduction/genus-four scope remain open. Goal active/unachieved.
 Errors: no scientific failure; inherited unused-helper warnings only. No S3/cloud/merge, shared arithmetic remains independently unreviewed.
+
+## Short scalar verification on original genus-two targets frozen
+
+What was done: compiled joint automorphism evaluator for arbitrary reduced source Div, exact reducer/witness reuse, all12original source-phases workloads and native verify-vector replay. Prespecified wrong scalar/target/source controls and two fresh count intervals per arm.
+Decisions made: targets/source unchanged; test final verification rather than cofactor compression, so original h1instances included. Certified Frobenius-operator premise conditional and checked outside core; no independent verification/admission claimed. Derived fullsource totals retain all other phases; no wall or integrated-solver claim. One120CPU process after Git freeze.
+Open threads: execute/replay, inspect every regression and derived total before choosing further construction.
+Errors: only inherited unused-helper warnings; no scientific run yet. Own scope check allows, attach same reservation. No S3/cloud/merge.
