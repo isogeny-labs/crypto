@@ -2002,3 +2002,10 @@ What was done: freeze01f132ab44e once-onlyexit0;12boundpackets accepted,216mutat
 Decisions made: proceed to fullcostscreen, no performanceclaim fromqualification.
 Open threads: price all4proofs/rootgeneration/geometry/binding andproducer onoriginaltargets.
 Errors: none,no retry/S3/cloud.
+
+## Complete eigen-cover cost frozen
+
+What was done: compiled unchanged216mutation-qualified coverpacket/verifier fullcost harness; chargeall4proofs/rootgeneration/selfchecks/geometry/binding andproducer.
+Decisions made:24calls/12targets exactpacket/producer-control replay,repeats,permoduluscomparisons versus triangular/botharms; Gitfreeze beforeone120CPU invocation. Assertions [pcc:unverified].
+Open threads: execute afterpush, compareavoidedcharactersum with additionalproof costs.
+Errors: onlyunusedwarnings,noscienceyet.
