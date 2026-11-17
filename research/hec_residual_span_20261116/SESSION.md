@@ -1595,3 +1595,10 @@ What was done:literature-first Smith/Costaetalgraphscreen on5originalg2/g3models
 Decisions made: rankdeficiencyonlyadmission,nokernel/nonhyperelliptic/speedclaim; goodprimesnotdeclaredselfloops,dimensionpassnotisotropy. Genus4outsidecyclotomicmodelpremise.
 Open threads: executeonceandinspectactualcandidateprimesbeforekernelcode.
 Errors: oldT7083retrybudgetexpired,newT7088claimed; no sciencebeforepushedfreeze.
+
+## Frobenius small-prime screen completed
+
+What was done:1604877628bexits0,75smallprime/5integerchecks pass. Indexdegeneraciesg2p251l19,g2p601l5admittednecessaryonly;g3p113l13excludedbyevenfactordegrees. Bothg3models only2,7,11,23,29,37,43passdimtest; ram7Frobeniusalgebrafullrank6. No scalarflag.
+Decisions made: no quotient/speedclaim; boundedgenus3normwitness exhaustionnext,genus2kernelpossibilitiesseparate.
+Open threads: explicitpolarizedselfisogenywitnessesandkernelcounts,notjustunpolarizedclass. Fullgoalopen.
+Errors: none,no scientificretry/S3/cloud.
