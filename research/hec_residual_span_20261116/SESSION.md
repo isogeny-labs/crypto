@@ -2457,3 +2457,10 @@ What was done: freeze2bef62517c8 input hashes passed; corrected sole invocation 
 Decisions made: publish exact module result and preserve original failure. Predicted discriminant not independently certified; four symmetry orbits not unconditionally four geometric classes. No speed measurement.
 Open threads: certified genus-two algebraic invariants/reduction, explicit finite-field quotient curves and maps, same-target collection cost; genus-three valuation and genus-four work remain open.
 Errors: corrected scalar-conjugation bug resolved by direct BQ=19I identity; no rerun of original, S3 polling, cloud or merge.
+
+## Genus-two complex invariant construction frozen
+
+What was done: read actual FLINT3.6 header and primary implementation; compiled C consumer for five immutable quotient/source descriptors,256/512 periods/positive form/theta/even-weight forms and exact ball reload. All10 pairwise function comparisons prespecified, no separation-count assumption. KB review recorded in protocol; refresh older than work, literature pointers not accepted as proofs.
+Decisions made: chi10-only denominators avoid source numerator-domain mistake; source automorphism predicts vanishing psi4,psi6,chi12 as a consistency control. Numerical functions not normalized Igusa or algebraic certificates. No timing claim, one120CPU invocation after Git freeze.
+Open threads: execute, inspect actual separation/control outcomes; exact algebraic bounds/reduction and maps before collection comparison.
+Errors: no compile warnings; private pinned runtime reused to avoid known Homebrew install-name mismatch. Existing own reservation check allows, attach same-task conflict unchanged.
