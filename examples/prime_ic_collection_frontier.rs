@@ -38,8 +38,9 @@
 use std::time::Instant;
 
 use crypto_lib::cryptanalysis::prime_fast::{
-    collect_relations, collect_relations_table, find_a3_curve, ic_multi_solve_ex, ic_solve, ic_solve_fast,
-    ic_solve_table, rho_parallel, solve_relations, FastFactorBase, PairTable, RhoConfig,
+    collect_relations, collect_relations_table, find_a3_curve, ic_multi_solve_ex, ic_solve,
+    ic_solve_fast, ic_solve_table, rho_parallel, solve_relations, FastFactorBase, PairTable,
+    RhoConfig,
 };
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -234,7 +235,11 @@ fn main() {
                 });
                 (r.expect("ic_multi_solve_ex"), s)
             };
-            assert_eq!(logs_ba.first().copied().flatten(), Some(k), "batched wrong log");
+            assert_eq!(
+                logs_ba.first().copied().flatten(),
+                Some(k),
+                "batched wrong log"
+            );
             let rows = |t: f64| format!("{t:.4}");
             println!(
                 "| sweep `ic_solve` | {} | {}/{} | 1.00× | {:.3}× |",
@@ -267,8 +272,12 @@ fn main() {
             assert_eq!(x_fa, k, "ic_solve_fast wrong log");
             println!(
                 "| `ic_solve_fast` (auto B={}) | {:.4} | {}/{} | {:.2}× | {:.3}× |",
-                rep_fa.factor_base_size, fa_s, rep_fa.determined_logs, rep_fa.target_points_walked,
-                sw_s / fa_s, rho_wall / fa_s
+                rep_fa.factor_base_size,
+                fa_s,
+                rep_fa.determined_logs,
+                rep_fa.target_points_walked,
+                sw_s / fa_s,
+                rho_wall / fa_s
             );
             out.push(json!({
                 "section": "e2e_fast", "bits": bits, "sweep_B": b, "fast_B": rep_fa.factor_base_size,

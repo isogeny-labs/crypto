@@ -2374,7 +2374,17 @@ pub fn ic_solve_fast(
     seed: u64,
 ) -> Option<(u64, IcFastReport)> {
     let b = fb_size.unwrap_or_else(|| ic_fast_auto_fb(curve.f.p));
-    let (logs, rep) = ic_multi_solve_ex(curve, g, &[q], b, extra_relations, max_walk, seed, true, true)?;
+    let (logs, rep) = ic_multi_solve_ex(
+        curve,
+        g,
+        &[q],
+        b,
+        extra_relations,
+        max_walk,
+        seed,
+        true,
+        true,
+    )?;
     let x = logs.first().copied().flatten()?;
     Some((
         x,
