@@ -1,7 +1,165 @@
 //! Certified edge resultants and shared-vertex univariate gcd consequences.
 //! No Groebner basis or witness is used in construction.
 use super::*;
+fn packed_terms(poly: &Poly, n: usize) -> Option<(Vec<(u128, u64)>, usize)> {
+    if n == 0 || n > 16 {
+        return None;
+    }
+    let mut maximum = 0;
+    let mut terms = Vec::with_capacity(poly.len());
+    for (m, c) in poly {
+        if m.len() != n {
+            return None;
+        }
+        let degree = m.iter().try_fold(0usize, |a, b| a.checked_add(*b))?;
+        if degree > 64 {
+            return None;
+        }
+        maximum = maximum.max(degree);
+        let bits = m
+            .iter()
+            .enumerate()
+            .fold(0u128, |value, (i, e)| value | ((*e as u128) << (7 * i)));
+        terms.push((bits, *c));
+    }
+    Some((terms, maximum))
+}
+fn unpack(bits: u128, n: usize) -> Mono {
+    (0..n).map(|i| ((bits >> (7 * i)) & 127) as usize).collect()
+}
+fn packed_product(a: &Poly, b: &Poly, p: u64) -> Option<Poly> {
+    let n = a.keys().next().or_else(|| b.keys().next())?.len();
+    let (a, da) = packed_terms(a, n)?;
+    let (b, db) = packed_terms(b, n)?;
+    if da + db > 64 {
+        return None;
+    }
+    let mut out = BTreeMap::new();
+    for (m, c) in a {
+        for (e, d) in &b {
+            axpy_owned(&mut out, m + e, *d, c, p);
+        }
+    }
+    Some(out.into_iter().map(|(m, c)| (unpack(m, n), c)).collect())
+}
+fn packed_times(row: &Row, f: &Poly, p: u64) -> Option<Row> {
+    let n = row.poly.keys().next().or_else(|| f.keys().next())?.len();
+    let (a, da) = packed_terms(&row.poly, n)?;
+    let (f, df) = packed_terms(f, n)?;
+    let mut proof = Vec::with_capacity(row.proof.len());
+    let mut maximum = 0;
+    for ((i, m), c) in &row.proof {
+        if m.len() != n {
+            return None;
+        }
+        let degree = m.iter().try_fold(0usize, |a, b| a.checked_add(*b))?;
+        if degree > 64 {
+            return None;
+        }
+        maximum = maximum.max(degree);
+        let bits = m
+            .iter()
+            .enumerate()
+            .fold(0u128, |value, (i, e)| value | ((*e as u128) << (7 * i)));
+        proof.push(((*i, bits), *c));
+    }
+    if da + df > 64 || maximum + df > 64 {
+        return None;
+    }
+    let mut poly = BTreeMap::new();
+    let mut coefficients = BTreeMap::new();
+    for (m, c) in f {
+        for (e, d) in &a {
+            axpy_owned(&mut poly, m + e, *d, c, p);
+        }
+        for ((i, e), d) in &proof {
+            axpy_owned(&mut coefficients, (*i, m + e), *d, c, p);
+        }
+    }
+    Some(Row {
+        poly: poly.into_iter().map(|(m, c)| (unpack(m, n), c)).collect(),
+        proof: coefficients
+            .into_iter()
+            .map(|((i, m), c)| ((i, unpack(m, n)), c))
+            .collect(),
+    })
+}
+
+#[cfg(test)]
+mod packed_product_tests {
+    use super::*;
+    #[test]
+    fn packed_products_and_local_coefficients_equal_legacy_with_counters() {
+        let mut state = 0x73ae19u64;
+        for p in [2147483647u64, 9007199254740881] {
+            for n in [3, 4, 6, 16, 17] {
+                for _ in 0..12 {
+                    let mut make = || {
+                        let mut f = Poly::new();
+                        for _ in 0..12 {
+                            state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+                            let mut m = vec![0; n];
+                            m[state as usize % n] += 1;
+                            m[(state >> 17) as usize % n] += 1;
+                            f.insert(m, state % p);
+                        }
+                        f
+                    };
+                    let a = make();
+                    let b = make();
+                    let row = Row {
+                        poly: a.clone(),
+                        proof: a
+                            .iter()
+                            .enumerate()
+                            .map(|(i, (m, c))| ((i % 3, m.clone()), *c))
+                            .collect(),
+                    };
+                    reset_counters();
+                    let old = with_native_kernel_bits(103, || product(&a, &b, p));
+                    let count = serde_json::to_value(counters()).unwrap();
+                    reset_counters();
+                    let new = with_native_kernel_bits(231, || product(&a, &b, p));
+                    assert_eq!(old, new);
+                    assert_eq!(count, serde_json::to_value(counters()).unwrap());
+                    reset_counters();
+                    let old = with_native_kernel_bits(103, || times(&row, &b, p));
+                    let count = serde_json::to_value(counters()).unwrap();
+                    reset_counters();
+                    let new = with_native_kernel_bits(231, || times(&row, &b, p));
+                    assert_eq!(old, new);
+                    assert_eq!(count, serde_json::to_value(counters()).unwrap());
+                }
+            }
+        }
+    }
+    #[test]
+    fn cancellation_empty_and_outside_packing_domain_keep_exact_semantics() {
+        let p = 2147483647;
+        let a = Poly::from([(vec![1, 0, 0], 1), (vec![0, 1, 0], 1)]);
+        let b = Poly::from([(vec![1, 0, 0], 1), (vec![0, 1, 0], p - 1)]);
+        let expected = with_native_kernel_bits(103, || product(&a, &b, p));
+        let actual = with_native_kernel_bits(231, || product(&a, &b, p));
+        assert_eq!(expected, actual);
+        assert!(!actual.contains_key(&vec![1, 1, 0]));
+        for left in [
+            Poly::new(),
+            Poly::from([(vec![65, 0, 0], 1)]),
+            Poly::from([(vec![1], 1)]),
+        ] {
+            assert_eq!(
+                with_native_kernel_bits(103, || product(&left, &b, p)),
+                with_native_kernel_bits(231, || product(&left, &b, p))
+            );
+        }
+    }
+}
 pub(super) fn product(a: &Poly, b: &Poly, p: u64) -> Poly {
+    if native_kernel_bits() & 128 != 0 {
+        if let Some(out) = packed_product(a, b, p) {
+            return out;
+        }
+    }
     let mut out = Poly::new();
     for (m, c) in a {
         axpy(&mut out, &shift(b, m), *c, p);
@@ -9,6 +167,11 @@ pub(super) fn product(a: &Poly, b: &Poly, p: u64) -> Poly {
     out
 }
 pub(super) fn times(row: &Row, f: &Poly, p: u64) -> Row {
+    if native_kernel_bits() & 128 != 0 {
+        if let Some(out) = packed_times(row, f, p) {
+            return out;
+        }
+    }
     let mut out = Row {
         poly: Poly::new(),
         proof: Proof::new(),

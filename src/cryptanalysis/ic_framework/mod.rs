@@ -63,10 +63,10 @@
 //! report what comes out.
 
 pub mod archive;
+pub mod binary_subtract;
 pub mod cm_orbit;
 pub mod explicit_base;
 pub mod fiber;
-pub mod binary_subtract;
 pub mod hashed;
 pub mod large_prime;
 pub mod linalg;
@@ -2981,9 +2981,9 @@ mod tests {
             construction: String::new(),
             field_degree: Some(inst.n),
             field_bits: None,
-            group_order: u128::from(inst.group_order),
-            r: u128::from(inst.r),
-            cofactor: u128::from(inst.cofactor),
+            group_order: u128::from(inst.group_order).into(),
+            r: u128::from(inst.r).into(),
+            cofactor: u128::from(inst.cofactor).into(),
             generator: [String::new(), String::new()],
             automorphisms_available: 2 * inst.n,
             registered: false,

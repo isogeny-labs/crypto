@@ -320,10 +320,6 @@ pub trait DecompositionOracle<G: CountedGroup> {
         point: G::Elt,
     ) -> Option<Vec<usize>>;
 
-    /// Request data that a future decomposition of `point` will read.
-    /// The default is a no-op and the hook may not decide or count.
-    fn touch(&self, _ctx: &InstanceCtx<G>, _point: &G::Elt) {}
-
     /// Select the cache-line relation guard.  Both representations return
     /// identical membership answers; the default preserves every recorded
     /// run's hash-map path.
