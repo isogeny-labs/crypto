@@ -871,3 +871,17 @@ Freeze and push, execute once, then use the strengthened pencil for the next mat
 
 ### Errors
 None. Previous goal turn classified as progress from its completed falsifier and stronger solver reference.
+
+## Incremental pencil baseline completed
+
+### What was done
+At `f5d84e08de0`, 64 calls on 32 workloads across all eight models completed. Old/new solvers agreed at 998 accepted prefixes. All 128 raw record comparisons, scalar checks and repeats pass; every base-field counter is identical. Subgroup inversions improve 2.8–31.7x; REDC improves unevenly and regresses on some small genus-2 cases. Local observations only. [pcc:unverified]
+
+### Decisions made
+Retain both pivot strategies as controls rather than claim uniform dominance. This is solver engineering and does not provide the mathematical tenfold objective. Next screen Kummer projective arithmetic and model prerequisites before prototyping a base-field reduction.
+
+### Open threads
+A mechanism that changes base-field work is still required. Kummer model/field-of-definition requirements and ordinary/prime-order input compatibility need review. Gaussian determinant proof remains separate.
+
+### Errors
+No runtime failures, censoring or retries. The strengthened solver does not uniformly reduce REDC; regressions are retained.
