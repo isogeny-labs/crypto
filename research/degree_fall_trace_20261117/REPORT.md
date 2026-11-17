@@ -49,3 +49,18 @@ constructed family — not an ECDLP result, speedup, or rho comparison.
 - Reachability: the same diagnostic is recorded on real ecbench runs for the
   elliptic summation-polynomial IC family (APS); see PR #4538. Covers,
   genus-2+, and sparse-LA families are tracked separately.
+
+## Growth rate (measured)
+
+The companion growth-rate analysis `src/cryptanalysis/ecbench/growth.rs` fits a
+measured metric against an instance-size parameter three ways (linear, power,
+exponential; ranked by R²) and reports the top fit's slope with a 95% interval.
+For the regular sequence `{x_i^2 - 1}` over F_101 swept across n = 2..6
+variables, the measured degree of regularity is `n + 1`, so the growth is
+**linear with slope 1.000 (95% CI 1.00..1.00, R² 1.000)** — the expected
+baseline (see `reports/run-20261117T1511Z/growth.svg` / `growth.png`, dataset
+`growth_dataset.json` = `ecbench.growth-dataset/v1`). A family whose solving
+degree or degree of regularity grew sub-linearly or logarithmically in the
+instance size is what would signal an index-calculus advantage; the harness can
+now measure and report that slope. The fit functions are unit-tested
+(`growth::tests`) to recover known linear, power and exponential slopes exactly.

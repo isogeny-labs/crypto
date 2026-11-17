@@ -62,3 +62,39 @@ constructed family, not an ECDLP result or a rho comparison.
 *Data and source.* Recorded dataset: `degree_fall_dataset.json`
 (`ecbench.degree-fall-dataset/v1`, written by the `emit_degree_fall_dataset`
 test). Figure source: `plot_degree_fall_trace.py` (layout only, no computation).
+
+#v(10pt)
+#line(length: 100%, stroke: 0.5pt + gray)
+#v(6pt)
+
+#text(size: 13pt, weight: "bold")[Growth rate: degree vs instance size]
+
+*What this shows.* The companion growth-rate measurement ecbench now carries
+(`src/cryptanalysis/ecbench/growth.rs`). For the regular sequence
+{x#sub[i]#super[2] − 1 : i < n} over GF(101) swept across n = 2…6 variables,
+the engine measures the degree of regularity and solving degree, and fits each
+against n three ways (linear, power, exponential, ranked by R#super[2]). The
+reported growth rate is the top fit's slope under its model with a 95% interval.
+
+#figure(
+  image("growth.svg", width: 85%),
+  caption: [
+    The measured degree of regularity against the instance size n, with the
+    recorded best-fit line, its model, slope and 95% interval (linear, slope
+    1.000, R#super[2] 1.000). The solving degree is 0 across this family — the
+    generators are already a Gröbner basis — so only the degree of regularity is
+    drawn. Degrees measured by `f4_fp`; the least-squares fits are computed by
+    `ecbench::growth` (unit-tested to recover known linear, power and
+    exponential slopes). The figure only lays the recorded values out.
+  ],
+)
+
+*Reading.* For this regular family the degree of regularity is n + 1, so the
+measured growth is linear with slope ≈ 1 — the expected baseline. The same fit
+applied to a family whose solving degree grows sub-linearly, or only
+logarithmically, in the instance size is what would signal an index-calculus
+advantage; the machinery to measure and report that slope is now in the harness.
+
+*Data and source.* Recorded dataset: `growth_dataset.json`
+(`ecbench.growth-dataset/v1`, written by the `emit_growth_dataset` test). Figure
+source: `plot_growth.py` (layout only, no computation).
