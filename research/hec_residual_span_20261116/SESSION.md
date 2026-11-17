@@ -2037,3 +2037,10 @@ What was done: built perroot pointdefinition provenance, reduced2variableconstra
 Decisions made: all4roots/proofs/selfchecks charged,24completecalls/12targets,repeats,newpacketraw retained, no nontriangular/unresolvedpanic usedasexclusion. Assertions [pcc:unverified].
 Open threads: pushfreeze thenone120CPU invocation, compareallcompletecosts to sparse/densecover/triangular/botharms.
 Errors: onlyunusedwarnings,noscienceyet.
+
+## Triangular all-component cover qualified
+
+What was done: freezeea843b8170e once-onlyexit0;24calls/12targets exactpacketexceptweights, bothverifiers216mutations, scalar/contradiction originalsparsewitnesses/native/phase/repeats pass. P601complete subgroupold/new3.328-3.865vs sparsecover;1.861-2.176x single-actiontriangular;0.738-0.979x retainedarm0. Baseunchanged. Assertions [pcc:unverified].
+Decisions made: retain finitecover alternative, no10x/fullgainclaim. All4branches charged; basecollection/setup/geometry remains needed mechanism.
+Open threads: basefieldcollection/proofsharedwork withCRTprovenance obligations; originalgenus2+goal, independentreview/publicationartifacts/genus3/4coverage.
+Errors: no executionfailure,no retry/S3/cloud.
