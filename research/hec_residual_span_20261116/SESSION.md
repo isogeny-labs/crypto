@@ -997,3 +997,17 @@ Assess broader relation-yield mechanisms or a stronger complete cost case rather
 
 ### Errors
 Prior prose overcounted reconstruction by3 products; corrected explicitly. Scientific records are unaffected. No producer retries, S3 access or cloud spend.
+
+## Factored arithmetic gate executed
+
+### What was done
+Frozen7ee004a87fa once-only gate passes3168steps/1556signedrecoveries/52nonfirstcharts and all repeats.6336retained native or degree-two-source records exactly match; all9504records and36setups validate. Point-source kernel REDC falls1.298–1.714 versus old Kummer; full primitive improvement only1.029–1.210. [pcc:unverified]
+
+### Decisions made
+Full primitive remains more REDC than native on every group. Even a free-rest optimistic REDC bound reaches only5.903. Close this unchanged factored circuit as a tenfold candidate, retaining measured component improvement. Seek different yield/cost mechanism rather than an unjustified full collector run. General goal stays active.
+
+### Open threads
+Useful independent-relation yield mechanism, genus3/4 coverage and Gaussian determinant proof remain separate. No completion claim.
+
+### Errors
+No arithmetic/counter failure or retry. No S3 polling/cloud spend. Generic fallback setup and all exception cases retained.
