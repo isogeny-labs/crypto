@@ -177,8 +177,12 @@ impl Fq {
     #[inline]
     fn add(&self, a: u64, b: u64) -> u64 {
         self.c_add.set(self.c_add.get() + 1);
-        let s = a as u64 + b as u64;
-        (if s >= self.q { s - self.q } else { s }) as u64
+        let s = a + b;
+        if s >= self.q {
+            s - self.q
+        } else {
+            s
+        }
     }
     #[inline]
     fn sub(&self, a: u64, b: u64) -> u64 {
@@ -186,7 +190,7 @@ impl Fq {
         if a >= b {
             a - b
         } else {
-            (a as u64 + self.q - b as u64) as u64
+            a + self.q - b
         }
     }
     #[inline]
@@ -194,7 +198,7 @@ impl Fq {
         if a == 0 {
             0
         } else {
-            (self.q - a as u64) as u64
+            self.q - a
         }
     }
     fn invu(&self, a: u64) -> u64 {
@@ -278,7 +282,7 @@ pub struct PlaneQuartic {
 /// the partials have a common zero.
 pub fn smoothness_certificate(q: u64, f: &[u64; 15]) -> bool {
     let fq = Fq {
-        q: q as u64,
+        q,
         c_mul: Cell::new(0),
         c_inv: Cell::new(0),
         c_add: Cell::new(0),
@@ -367,7 +371,7 @@ impl Fq {
         if a >= b {
             a - b
         } else {
-            (a as u64 + self.q - b as u64) as u64
+            a + self.q - b
         }
     }
 }
@@ -425,7 +429,7 @@ impl PlaneQuartic {
     /// rational point `p0` as the base point. Fails unless `q` is an odd prime
     /// `< 2^62`, the smoothness certificate passes and `p0` lies on `C`.
     pub fn new(q: u64, f: [u64; 15], p0: Pt) -> Result<PlaneQuartic, PicError> {
-        if !is_odd_prime_below_2_62(q as u64) {
+        if !is_odd_prime_below_2_62(q) {
             return Err(PicError::BadField);
         }
         if f.iter().any(|&c| c >= q) {
@@ -435,7 +439,7 @@ impl PlaneQuartic {
             return Err(PicError::NotSmooth);
         }
         let fq = Fq {
-            q: q as u64,
+            q,
             c_mul: Cell::new(0),
             c_inv: Cell::new(0),
             c_add: Cell::new(0),
@@ -609,7 +613,7 @@ impl PlaneQuartic {
                     .mulu(self.fq.powu(p[0], a as u64), self.fq.powu(p[1], b as u64)),
                 self.fq.powu(p[2], c as u64),
             );
-            s = (s as u64 + self.fq.mulu(t, self.f[i]) as u64).rem_euclid(self.q as u64) as u64;
+            s = (s + self.fq.mulu(t, self.f[i])).rem_euclid(self.q);
         }
         s
     }
@@ -995,7 +999,7 @@ impl PlaneQuartic {
                     self.fq
                         .mulu(self.fq.mulu(pw(a - 1, p0[0]), pw(b, p0[1])), pw(c, p0[2])),
                 );
-                grad[0] = ((grad[0] as u64 + t as u64) % self.q as u64) as u64;
+                grad[0] = (grad[0] + t) % self.q;
             }
             if b > 0 {
                 let t = self.fq.mulu(
@@ -1003,7 +1007,7 @@ impl PlaneQuartic {
                     self.fq
                         .mulu(self.fq.mulu(pw(a, p0[0]), pw(b - 1, p0[1])), pw(c, p0[2])),
                 );
-                grad[1] = ((grad[1] as u64 + t as u64) % self.q as u64) as u64;
+                grad[1] = (grad[1] + t) % self.q;
             }
             if c > 0 {
                 let t = self.fq.mulu(
@@ -1011,7 +1015,7 @@ impl PlaneQuartic {
                     self.fq
                         .mulu(self.fq.mulu(pw(a, p0[0]), pw(b, p0[1])), pw(c - 1, p0[2])),
                 );
-                grad[2] = ((grad[2] as u64 + t as u64) % self.q as u64) as u64;
+                grad[2] = (grad[2] + t) % self.q;
             }
         }
         assert!(grad != [0, 0, 0], "singular base point");
@@ -1050,7 +1054,7 @@ impl PlaneQuartic {
                 t = self.fq.mulu(t, tau[v]);
                 d = (d + t) % self.q;
             }
-            r2[i] = (d % self.q as u64) as u64;
+            r2[i] = d % self.q;
         }
         let ns = self.nullspace(vec![r1, r2], 6);
         assert_eq!(ns.len(), 4);
@@ -1442,7 +1446,7 @@ pub fn largest_prime_below_pow2(k: u64) -> u64 {
     while !is_odd_prime_below_2_62(n) {
         n -= 1;
     }
-    n as u64
+    n
 }
 
 fn pmod_trim(a: &mut Vec<u64>) {
@@ -1524,8 +1528,8 @@ fn pmod_powx(q: u64, base: &[u64], mut e: u64, g: &[u64]) -> Vec<u64> {
 /// All roots in `F_q` of the polynomial with ascending coefficients `c`
 /// (Cantor-Zassenhaus; setup only).
 pub fn poly_roots(q: u64, c: &[u64], rng: &mut u64) -> Vec<u64> {
-    let q = q as u64;
-    let mut g: Vec<u64> = c.iter().map(|&x| x as u64).collect();
+    let q = q;
+    let mut g: Vec<u64> = c.to_vec();
     pmod_trim(&mut g);
     if g.len() <= 1 {
         return vec![];
@@ -1595,7 +1599,7 @@ pub fn poly_roots(q: u64, c: &[u64], rng: &mut u64) -> Vec<u64> {
 /// `(1 : y : z)`, `z` a root of `F(1,y,z)` (setup only).
 pub fn find_rational_point(q: u64, f: &[u64; 15], rng: &mut u64, max_tries: usize) -> Option<Pt> {
     let m4 = mons_of_degree(4);
-    let qq = q as u64;
+    let qq = q;
     for _ in 0..max_tries {
         let y = xorshift_next(rng) % qq;
         // F(1,y,z) = sum_c z^c * (sum coef * y^b)
@@ -1612,7 +1616,7 @@ pub fn find_rational_point(q: u64, f: &[u64; 15], rng: &mut u64, max_tries: usiz
         }
         let roots = poly_roots(q, &coef, rng);
         if let Some(&z) = roots.first() {
-            return Some([1, y as u64, z]);
+            return Some([1, y, z]);
         }
     }
     None
@@ -1622,7 +1626,7 @@ pub fn find_rational_point(q: u64, f: &[u64; 15], rng: &mut u64, max_tries: usiz
 /// then `[0,1,y]`, then `[0,0,1]` (brute force; small `q`).
 pub fn first_rational_point_canonical(q: u64, f: &[u64; 15]) -> Option<Pt> {
     let fq = Fq {
-        q: q as u64,
+        q,
         c_mul: Cell::new(0),
         c_inv: Cell::new(0),
         c_add: Cell::new(0),
@@ -1637,7 +1641,7 @@ pub fn first_rational_point_canonical(q: u64, f: &[u64; 15]) -> Option<Pt> {
             );
             s = (s + fq.mulu(t, f[i])) % q;
         }
-        s.is_multiple_of(q as u64)
+        s.is_multiple_of(q)
     };
     for x in 0..q {
         for y in 0..q {
@@ -1667,7 +1671,7 @@ pub fn next_smooth_quartic_with_point(q: u64, rng: &mut u64) -> ([u64; 15], Pt) 
     loop {
         let mut f = [0u64; 15];
         for c in f.iter_mut() {
-            *c = (xorshift_next(rng) % q as u64) as u64;
+            *c = xorshift_next(rng) % q;
         }
         if !smoothness_certificate(q, &f) {
             continue;
