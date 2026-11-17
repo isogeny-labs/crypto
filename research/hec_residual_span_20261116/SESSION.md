@@ -2317,3 +2317,10 @@ What was done: derive reciprocalblockstableLagrangian counts for3survivingindexp
 Decisions made: counts notenumeratedkernels/quotients, EndFp=O implication explicitconditional; no nonhyperelliptic/speedclaim. Gitfreeze beforeone120CPU, no scientificexecutionyet.
 Open threads: runprofile, thenconstructrepresentativekernel/quotient onlyif justified andcostbounded; fullgoalunchanged.
 Errors: unusedcopiedhelpers warnings, no buildfailure/S3/cloud/merge.
+
+## Exceptional659 yields a concrete non-O-stable kernel lane
+
+What was done: pushedfreeze28fad65adee, hashespass, onceexit0;3profiles roots/multiplicities/reciprocalblocks checked.251/14489simplequadraticcomponents exclude stableLagrangiandim3.659pairs219/357dim2 and388/424dim1 yield662*2=1324,8Ostable,1316nonOstable.
+Decisions made: countsnotcoordinates/quotientclasses; rationalnonselfquotient implicationconditionalEndFp=O, no nonhyperelliptic/geometry/speedclaim. Degree659³ andtorsionfield costsmustbeadmitted beforeconstruction. [pcc:unverified].
+Open threads: boundedrepresentativekernel/torsionfield/quotientconstructioncost thennonhyperellipticity/ICevaluation, independentreview andoriginalgenus2+10xgoal.
+Errors: none,no retry/S3/cloud/merge.
