@@ -35,6 +35,10 @@ jobs:
           ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
           path: aps-pinned
           persist-credentials: false
+          # Only the reusable self-contained native crate is required.
+          # Avoid the multi-GB unrelated root workspace and damaged sat.rs.
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
       - name: Rust 1.100.0
         run: rustup toolchain install 1.100.0 --profile minimal
       - name: Install example on original native crate without changing arithmetic
