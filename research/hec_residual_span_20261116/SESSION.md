@@ -563,3 +563,17 @@ Run modular replay, then publish calibrated geometric/action controls. No target
 
 ### Errors
 No scientificreplayexecutionyet; existingrawpointcounts/witnessesunchanged.
+
+## Independent modular replay passes
+
+### What was done
+At7903d33ad45standalone replay exits0:296positivewitnessesverified,85unresolvedretained,all127exponentscoveredforbothdeclaredF17absolutemodels. Determinant/interpolation/standalonepolynomialarithmeticandown totientsieve/controlspass. Original/replayrawhashesverify.
+
+### Decisions made
+Twoabsolutelysimplegenus4/action-qualifiedcontrolsnowavailableunderwrittenfinitecertificate;grouporders89/53andlargecofactorsareexplicit. Independentmodularreplayisnotindependentpointcountreplay/formalproof/admission/attackgain. Nextneedsstrongsubgroup/newsolvercontractornewmechanism,broad10xgoalopen.
+
+### Open threads
+Useorder4classonlywithnewexactN/projection/eigenactioncontract,neveroldpi=P(sigma). Larger/strongergenus4coverageandactual10xmechanismunfulfilled. PR4507lastobservedopen.
+
+### Errors
+No qualification/replayfailuresorretries; earlierstablepathunavailable,Homebrew1.93.1recorded. No timingcomparisonsacrosstoolchains.

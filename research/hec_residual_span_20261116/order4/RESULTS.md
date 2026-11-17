@@ -16,7 +16,7 @@ The two absolute certificates each contain a squarefree modular power-polynomial
 - p17/model0: T8+8T7+48T6+248T5+1182T4+4216T3+13872T²+39304T+83521.
 - p17/model1: T8+4T7−20T6+12T5+774T4+204T3−5780T²+19652T+83521.
 
-These claims follow the stated ordinary-factor and Howe–Zhu/power-field certificate arguments. An independent implementation will replay the positive modular witness arithmetic before this class is used for further solver work; that replay is a separate verification gate, not a rerun of point counting. No formal-proof or scientific-admission claim is made.
+These claims follow the stated ordinary-factor and Howe–Zhu/power-field certificate arguments. The independent replay subsequently passed at pushed checkpoint `7903d33ad45`: all 296 positive witness records were verified, including all 127 exponents for each declared absolute model. It uses determinant evaluation/interpolation and standalone polynomial arithmetic rather than the producer’s Newton traces/native gcd. All 85 unresolved records remain unresolved. This is independent modular-arithmetic verification, not an independent rerun of point counting, a proof-assistant certificate or full scientific admission.
 
 The p13/model1 polynomial is even. Post-run deduction: its roots occur in distinct pairs alpha,-alpha, so squaring Frobenius lowers the degree of the power field. Together with ordinary base-field simplicity, the Howe–Zhu criterion shows it is not absolutely simple. The main program conservatively reported unresolved witnesses; this deduction does not change its frozen output.
 
