@@ -1,0 +1,25 @@
+# Commands the validator ran (paths: G = validator scratchpad g4val/, repo = /home/user/crypto)
+python3 -I scripts/paths.py /home/user/crypto <commit> > paths_<commit>.txt ; git archive <commit> $(cat paths_<commit>.txt) | tar -x -C src_<commit>
+scripts/build2.sh / build3.sh <commit> genus_ladder        # see out/build_evidence.txt for attempts and yields
+scripts/freeze_check.sh > out/freeze_check.txt
+python3 -I scripts/selftest.py > out/selftest.txt
+python3 -I scripts/certs.py /home/user/crypto out/certs.json
+python3 -I scripts/recompute.py /home/user/crypto out/recompute.json > out/recompute.txt
+python3 -I scripts/sensitivity.py /home/user/crypto out/sensitivity.json > out/sensitivity.txt
+python3 -I scripts/claims_check.py out/recompute.json out/claims_check.json > out/claims_check.txt
+python3 -I scripts/exact_intervals.py /home/user/crypto out/exact_intervals.json > out/exact_intervals.txt
+python3 -I scripts/compare_analysis.py /home/user/crypto out/exact_intervals.json > out/exact_vs_analysis.txt
+python3 -I scripts/claims_classify.py out/claims_check.json out/exact_intervals.json > out/claims_classified.txt
+python3 -I scripts/mc_spread.py /home/user/crypto out/mc_spread.json > out/mc_spread.txt
+python3 -I scripts/f2_check.py research/genus4_positive_control_20261116/run.jsonl > out/f2_check.txt
+python3 -I scripts/rho_efficiency.py <study1 run.jsonl> <study2 run.jsonl> > out/rho_efficiency.txt
+B=bin/producer/genus_ladder.g4 TAG=_prodbin scripts/replay_s1.sh > out/replay_s1_prodbin.out
+B=bin/genus_ladder.bce0eb2148 TAG=_valbin scripts/replay_s1.sh > out/replay_s1_valbin.out
+B=bin/producer/genus_ladder.rhorefs TAG=_prodbin scripts/replay_s2.sh > out/replay_s2_prodbin.out
+bin/genus_ladder.a99e7267f1 run --primes 8209 --genera 4 --curves 3 --targets 2 --seeds 2 --arms w --cc 2.0 --max-h 2 --threads 1 --rho-cap 1.2e8 --curve-seeds 8209=363/393/407 --out out/replay_s2_w_t2_valbin.jsonl
+bin/genus_ladder.a99e7267f1 run --primes 8209 --genera 4 --curves 1 --targets 1 --seeds 1 --arms R --cc 2.0 --max-h 2 --threads 1 --rho-cap 1.2e8 --curve-seeds 8209=363 --out out/replay_s2_R1_valbin.jsonl
+bin/val_g4dump.a99e7267f1 < out/dump_in_main.txt > out/dump_main.jsonl
+echo G3 | bin/val_g4dump.a99e7267f1 > out/dump_g3.jsonl
+bin/val_g4dump.a99e7267f1 < out/dump_in_rho.txt > out/dump_rho.jsonl
+python3 -I scripts/verify_dump.py /home/user/crypto out/certs.json out/verify_dump.json out/dump_main.jsonl out/dump_rho.jsonl > out/verify_dump.txt
+scripts/binary_diff.sh <validator binary> <producer binary> > out/binary_diff_<commit>.txt

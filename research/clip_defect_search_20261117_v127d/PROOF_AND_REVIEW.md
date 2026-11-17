@@ -1,0 +1,5 @@
+# Changed hard diagnostic
+
+The first2early correction wires must be zero on every supported norm polynomial by unique bounded Hensel lifting. Their addition is redundant with exact raw root-product equality but can strengthen propagation. The fixed training rule selected2rows after all2/4/8oracles passed. Source graph47,423variables169,943clauses is frozen in the input receipt. There is no assumed affine cut: the conservative affine classifier returned unknown on both rows. This is a changed algebraic constraint set, not an identical timeout retry.
+
+All original theta/q readbacks,degree checks,numeric untruncatedfactor lift,quadratic and cubic roots with multiplicities,exactrawproduct,local residue andGF83prefix checks remain. Original source/U/outer recovery is still required for any norm model. NativeUNSATneedsindependentcertification. Worker caps are90souter/4GiB/CPU0;40ssofttotaltime;78/84sdemotion/finalserialization boundaries. Every nativeunknown or cap remains inconclusive with counts unset.

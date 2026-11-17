@@ -1,0 +1,241 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "CM-BLOCK-COLD-V4-admission-001",
+  "created": "2026-11-09T18:43:32Z",
+  "protocol": {
+    "path": "research/cm-marked-scalar/protocol/block-cold-v4/protocol.json",
+    "sha256": "909d66a15190fd989d183f6d29866c0152bb6c3e7498a8fb6fecddc98f566d72",
+    "protocol_id": "CM-BLOCK-COLD-V3",
+    "version": 4
+  },
+  "producer": {
+    "runtime": "codex_cli/native-cpp",
+    "model": null,
+    "session": "T-1888",
+    "role": "producer"
+  },
+  "source": {
+    "repo": "isogeny-labs/crypto",
+    "commit": "be6490725cd3299f85562136df7b3ba231755757",
+    "dirty": true
+  },
+  "backend": "local",
+  "host": {
+    "path": "research/cm-marked-scalar/block-v4/host.json",
+    "sha256": "603fb88d3f576f01abaae9ed4cc7e522e9aea323d5443d8388b055534283d781",
+    "class_id": "native-admission-refused",
+    "summary": {
+      "cpu_model": " Intel(R) Xeon(R) 6975P-C",
+      "logical_cpus": 32,
+      "memory_bytes": null,
+      "kernel": "6.18.54-121.166.amzn2023.x86_64",
+      "hypervisor": null,
+      "isolation_tier_max": "none"
+    }
+  },
+  "arms": [
+    {
+      "id": "window",
+      "role": "reference",
+      "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+      "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016"
+    },
+    {
+      "id": "window-aa",
+      "role": "baseline",
+      "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+      "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016"
+    },
+    {
+      "id": "selected",
+      "role": "reference",
+      "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+      "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016"
+    },
+    {
+      "id": "selected-aa",
+      "role": "baseline",
+      "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+      "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016"
+    },
+    {
+      "id": "openssl-public",
+      "role": "reference",
+      "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+      "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016"
+    },
+    {
+      "id": "openssl-public-aa",
+      "role": "baseline",
+      "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+      "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016"
+    },
+    {
+      "id": "openssl-single",
+      "role": "reference",
+      "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+      "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016"
+    },
+    {
+      "id": "openssl-single-aa",
+      "role": "baseline",
+      "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+      "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016"
+    },
+    {
+      "id": "block-binary",
+      "role": "reference",
+      "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+      "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016"
+    },
+    {
+      "id": "block-binary-aa",
+      "role": "baseline",
+      "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+      "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016"
+    },
+    {
+      "id": "binary-installed",
+      "role": "reference",
+      "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+      "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016"
+    },
+    {
+      "id": "binary-installed-aa",
+      "role": "baseline",
+      "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+      "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016"
+    },
+    {
+      "id": "block-default",
+      "role": "candidate",
+      "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+      "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016"
+    },
+    {
+      "id": "cache-default",
+      "role": "baseline",
+      "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+      "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016"
+    },
+    {
+      "id": "cache-installed",
+      "role": "baseline",
+      "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+      "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "calibration-admission-001",
+      "arm": "block-default",
+      "instance_id": "all-five-curves:calibration-panel-preflight",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "preflight_other_cpu_seconds": 4.24,
+          "preflight_cpu_psi_avg10": 0,
+          "preflight_memory_psi_avg10": 0
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "busy preflight: other CPU4.24s >0.2s limit; worker never started"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Native preflight refusal; no worker or timing rows"
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-isolate preflight; no measurement child"
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 1,
+    "completed": 0,
+    "not_completed": 1,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": [
+      {
+        "rule": "Native preflight refusal",
+        "run_ids": [
+          "calibration-admission-001"
+        ]
+      }
+    ]
+  },
+  "files": [
+    {
+      "path": "research/cm-marked-scalar/block-v4/runs.tar.xz",
+      "sha256": "6273aeec44467a099554bfd0ea44bbbc0c54d89c6006720cf9693f84da013751",
+      "bytes": 1240,
+      "kind": "raw"
+    },
+    {
+      "path": "research/cm-marked-scalar/block-v4/admission-receipt.json",
+      "sha256": "ffb1b8b0011dd88e8b20bcca0c30dcc3da442c4011bf81b2cf61b8d4ca1de1ee",
+      "bytes": 151,
+      "kind": "receipt"
+    },
+    {
+      "path": "research/cm-marked-scalar/block-v4/summary.json",
+      "sha256": "a20107bd7970438c1e636988806bec9848f5c055ea9a3b1130d88b5a2a2afd40",
+      "bytes": 504,
+      "kind": "summary"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "research/cm-marked-scalar/block_analyze.cpp",
+      "sha256": "177f7d6e3f6397862634f3809bb4cccbe09923bba592735a742b14cf3bea94ec",
+      "bytes": 32640,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "native producer",
+      "text": "The export row represents the shared calibration admission gate for all25 configurations, not a candidate function call. Heldout was conditional and never attempted. No measured point outputs or clocks exist."
+    },
+    {
+      "kind": "observation",
+      "by": "native producer",
+      "text": "Source was published before the frozen protocol; both hosted receipts preceded admission. Dirty=true records untracked publication receipts and new output artifacts at launch; implementation and nine frozen inputs were unchanged."
+    },
+    {
+      "kind": "observation",
+      "by": "native producer",
+      "text": "No unchanged retry, cloud submission, generator/controller restart or role/budget/cap change. Summary records zero measurement workers and rows. Software qualification is separate from empirical timing."
+    }
+  ],
+  "reviews_dir": "reviews"
+}

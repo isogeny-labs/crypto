@@ -1080,6 +1080,12 @@ impl DecompositionOracle<Curve4> for D4Oracle<'_> {
     fn summands(&self) -> u32 {
         4
     }
+    /// The set-up interpolates the symmetrised system (solver work, in the
+    /// solver block) and builds no table: no table inserts to count
+    /// (`ecbench::work`).
+    fn setup_work_native(&self) -> std::collections::BTreeMap<String, u64> {
+        std::collections::BTreeMap::from([("counted:table_insert_attempts".to_string(), 1)])
+    }
     fn describe(&self, _params: &Params) -> String {
         let mut d = if self.opts.weighted {
             format!(

@@ -1,0 +1,709 @@
+{
+  "schema": "conductor-gap.validator-report/v1",
+  "status": "pass",
+  "independent": true,
+  "implementation": "standalone C++20, no shared curve arithmetic or analyzer",
+  "physical_runner": "same host; separate implementation, second-host replay pending CI",
+  "raw_data": [
+    {
+      "path": "analysis/records-A.csv",
+      "sha256": "6fa39076dbdf67e398eb82a6dbc42be98819389904e003ef1551adcd0785692d"
+    },
+    {
+      "path": "analysis/records-B.csv",
+      "sha256": "49cc62d693f4794bcd6f06a01d20073acacab6acea3ff30114b7ff0a03cbd1f9"
+    }
+  ],
+  "headline": [
+    {
+      "name": "A level 0 S2/S1",
+      "claimed": 1.0111251967610384,
+      "recomputed": 1.0111251967610386,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "A level 1 S2/S1",
+      "claimed": 0.9986990691816354,
+      "recomputed": 0.998699069181635,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "A level 2 S2/S1",
+      "claimed": 1.0021324822082815,
+      "recomputed": 1.0021324822082818,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "A level 3 S2/S1",
+      "claimed": 0.9858990292570785,
+      "recomputed": 0.9858990292570786,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "A level 4 S2/S1",
+      "claimed": 0.9994434070483691,
+      "recomputed": 0.9994434070483692,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "A equal-level secondary S2/S1",
+      "claimed": 0.9994269880239592,
+      "recomputed": 0.9994269880239592,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "A A/A",
+      "claimed": 0.9999022550317314,
+      "recomputed": 0.9999022550317317,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "A coordinate model 1 / model 0",
+      "claimed": 0.9998829560907659,
+      "recomputed": 0.9998829560907658,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "A plain / negation positive control",
+      "claimed": 1.3670380017886228,
+      "recomputed": 1.367038001788623,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/0/0/ic-recurrence mean counted S cost floor",
+      "claimed": 3.532776631755158,
+      "recomputed": 3.5327766317551585,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/0/0/ic-scalar mean counted S cost floor",
+      "claimed": 3.7809445091783247,
+      "recomputed": 3.7809445091783247,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/0/0/ic-velu mean counted S cost floor",
+      "claimed": 3.501532072412917,
+      "recomputed": 3.5015320724129175,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/0/0/rho-neg mean counted S cost floor",
+      "claimed": 0.9415497653484832,
+      "recomputed": 0.9415497653484832,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/0/1/ic-recurrence mean counted S cost floor",
+      "claimed": 3.4303549820061474,
+      "recomputed": 3.430354982006147,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/0/1/ic-scalar mean counted S cost floor",
+      "claimed": 3.6785228594293127,
+      "recomputed": 3.6785228594293127,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/0/1/ic-velu mean counted S cost floor",
+      "claimed": 3.3991104226639064,
+      "recomputed": 3.399110422663906,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/0/1/rho-neg mean counted S cost floor",
+      "claimed": 0.7133953137383426,
+      "recomputed": 0.7133953137383425,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/1/0/ic-recurrence mean counted S cost floor",
+      "claimed": 3.951479577761752,
+      "recomputed": 3.951479577761752,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/1/0/ic-scalar mean counted S cost floor",
+      "claimed": 4.199647455184918,
+      "recomputed": 4.199647455184918,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/1/0/rho-neg mean counted S cost floor",
+      "claimed": 0.9548000575650666,
+      "recomputed": 0.9548000575650664,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/1/1/ic-recurrence mean counted S cost floor",
+      "claimed": 3.69163691083481,
+      "recomputed": 3.6916369108348106,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/1/1/ic-scalar mean counted S cost floor",
+      "claimed": 3.9398047882579768,
+      "recomputed": 3.9398047882579768,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/1/1/rho-neg mean counted S cost floor",
+      "claimed": 0.9127121270020835,
+      "recomputed": 0.9127121270020835,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/2/0/ic-recurrence mean counted S cost floor",
+      "claimed": 3.713868616520636,
+      "recomputed": 3.713868616520636,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/2/0/ic-scalar mean counted S cost floor",
+      "claimed": 3.962036493943802,
+      "recomputed": 3.9620364939438018,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/2/0/rho-neg mean counted S cost floor",
+      "claimed": 0.990124854531607,
+      "recomputed": 0.9901248545316071,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/2/1/ic-recurrence mean counted S cost floor",
+      "claimed": 4.029321987849315,
+      "recomputed": 4.029321987849314,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/2/1/ic-scalar mean counted S cost floor",
+      "claimed": 4.27748986527248,
+      "recomputed": 4.27748986527248,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/2/1/rho-neg mean counted S cost floor",
+      "claimed": 1.3372629478229563,
+      "recomputed": 1.337262947822956,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/3/0/ic-recurrence mean counted S cost floor",
+      "claimed": 3.2780517286292437,
+      "recomputed": 3.2780517286292437,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/3/0/ic-scalar mean counted S cost floor",
+      "claimed": 3.5262196060524094,
+      "recomputed": 3.52621960605241,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/3/0/rho-neg mean counted S cost floor",
+      "claimed": 1.0852069672526619,
+      "recomputed": 1.085206967252662,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/3/1/ic-recurrence mean counted S cost floor",
+      "claimed": 3.608348361657965,
+      "recomputed": 3.608348361657965,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/3/1/ic-scalar mean counted S cost floor",
+      "claimed": 3.85651623908113,
+      "recomputed": 3.856516239081131,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 0/3/1/rho-neg mean counted S cost floor",
+      "claimed": 0.900621628356791,
+      "recomputed": 0.900621628356791,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/0/0/ic-recurrence mean counted S cost floor",
+      "claimed": 3.273158740862028,
+      "recomputed": 3.273158740862028,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/0/0/ic-scalar mean counted S cost floor",
+      "claimed": 3.5009115911898707,
+      "recomputed": 3.5009115911898707,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/0/0/ic-velu mean counted S cost floor",
+      "claimed": 3.2424009417123614,
+      "recomputed": 3.2424009417123614,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/0/0/rho-neg mean counted S cost floor",
+      "claimed": 0.7399874319015837,
+      "recomputed": 0.7399874319015834,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/0/1/ic-recurrence mean counted S cost floor",
+      "claimed": 3.6587302214683626,
+      "recomputed": 3.6587302214683626,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/0/1/ic-scalar mean counted S cost floor",
+      "claimed": 3.8864830717962047,
+      "recomputed": 3.8864830717962047,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/0/1/ic-velu mean counted S cost floor",
+      "claimed": 3.627972422318695,
+      "recomputed": 3.6279724223186953,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/0/1/rho-neg mean counted S cost floor",
+      "claimed": 0.8939997147580828,
+      "recomputed": 0.8939997147580828,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/1/0/ic-recurrence mean counted S cost floor",
+      "claimed": 3.879002953672692,
+      "recomputed": 3.8790029536726927,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/1/0/ic-scalar mean counted S cost floor",
+      "claimed": 4.106755804000535,
+      "recomputed": 4.106755804000535,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/1/0/rho-neg mean counted S cost floor",
+      "claimed": 0.8543906750863305,
+      "recomputed": 0.8543906750863304,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/1/1/ic-recurrence mean counted S cost floor",
+      "claimed": 3.6837453553049224,
+      "recomputed": 3.6837453553049224,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/1/1/ic-scalar mean counted S cost floor",
+      "claimed": 3.911498205632765,
+      "recomputed": 3.911498205632765,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/1/1/rho-neg mean counted S cost floor",
+      "claimed": 0.9168552435953636,
+      "recomputed": 0.9168552435953636,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/2/0/ic-recurrence mean counted S cost floor",
+      "claimed": 3.5974832654710394,
+      "recomputed": 3.597483265471039,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/2/0/ic-scalar mean counted S cost floor",
+      "claimed": 3.825236115798881,
+      "recomputed": 3.8252361157988815,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/2/0/rho-neg mean counted S cost floor",
+      "claimed": 1.0009228398193173,
+      "recomputed": 1.0009228398193173,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/2/1/ic-recurrence mean counted S cost floor",
+      "claimed": 3.609010462430034,
+      "recomputed": 3.609010462430034,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/2/1/ic-scalar mean counted S cost floor",
+      "claimed": 3.8367633127578764,
+      "recomputed": 3.8367633127578764,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/2/1/rho-neg mean counted S cost floor",
+      "claimed": 0.873994585410965,
+      "recomputed": 0.873994585410965,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/3/0/ic-recurrence mean counted S cost floor",
+      "claimed": 3.6642077333405245,
+      "recomputed": 3.664207733340524,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/3/0/ic-scalar mean counted S cost floor",
+      "claimed": 3.891960583668366,
+      "recomputed": 3.8919605836683666,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/3/0/rho-neg mean counted S cost floor",
+      "claimed": 1.2536873351226545,
+      "recomputed": 1.2536873351226545,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/3/1/ic-recurrence mean counted S cost floor",
+      "claimed": 3.487350388229939,
+      "recomputed": 3.487350388229939,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/3/1/ic-scalar mean counted S cost floor",
+      "claimed": 3.715103238557782,
+      "recomputed": 3.7151032385577816,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 1/3/1/rho-neg mean counted S cost floor",
+      "claimed": 1.085199767707175,
+      "recomputed": 1.0851997677071752,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/0/0/ic-recurrence mean counted S cost floor",
+      "claimed": 4.334564072775934,
+      "recomputed": 4.334564072775934,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/0/0/ic-scalar mean counted S cost floor",
+      "claimed": 4.507937652120093,
+      "recomputed": 4.507937652120093,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/0/0/ic-velu mean counted S cost floor",
+      "claimed": 4.304890517849722,
+      "recomputed": 4.304890517849722,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/0/0/rho-neg mean counted S cost floor",
+      "claimed": 0.9087178893309131,
+      "recomputed": 0.9087178893309132,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/0/1/ic-recurrence mean counted S cost floor",
+      "claimed": 3.9409009306708063,
+      "recomputed": 3.9409009306708063,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/0/1/ic-scalar mean counted S cost floor",
+      "claimed": 4.114274510014965,
+      "recomputed": 4.114274510014965,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/0/1/ic-velu mean counted S cost floor",
+      "claimed": 3.911227375744594,
+      "recomputed": 3.911227375744595,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/0/1/rho-neg mean counted S cost floor",
+      "claimed": 0.7472637435666651,
+      "recomputed": 0.7472637435666653,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/1/0/ic-recurrence mean counted S cost floor",
+      "claimed": 5.266442431046212,
+      "recomputed": 5.266442431046212,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/1/0/ic-scalar mean counted S cost floor",
+      "claimed": 5.439816010390371,
+      "recomputed": 5.439816010390371,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/1/0/rho-neg mean counted S cost floor",
+      "claimed": 0.8710609997148153,
+      "recomputed": 0.8710609997148154,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/1/1/ic-recurrence mean counted S cost floor",
+      "claimed": 4.4298639729603035,
+      "recomputed": 4.4298639729603035,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/1/1/ic-scalar mean counted S cost floor",
+      "claimed": 4.603237552304462,
+      "recomputed": 4.603237552304463,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/1/1/rho-neg mean counted S cost floor",
+      "claimed": 0.8715842693319598,
+      "recomputed": 0.87158426933196,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/2/0/ic-recurrence mean counted S cost floor",
+      "claimed": 5.173914007550879,
+      "recomputed": 5.173914007550877,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/2/0/ic-scalar mean counted S cost floor",
+      "claimed": 5.347287586895037,
+      "recomputed": 5.347287586895036,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/2/0/rho-neg mean counted S cost floor",
+      "claimed": 1.203883629741598,
+      "recomputed": 1.203883629741598,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/2/1/ic-recurrence mean counted S cost floor",
+      "claimed": 3.951204248353519,
+      "recomputed": 3.951204248353519,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/2/1/ic-scalar mean counted S cost floor",
+      "claimed": 4.124577827697678,
+      "recomputed": 4.124577827697678,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/2/1/rho-neg mean counted S cost floor",
+      "claimed": 0.9553328769502502,
+      "recomputed": 0.9553328769502502,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/3/0/ic-recurrence mean counted S cost floor",
+      "claimed": 5.032980829117388,
+      "recomputed": 5.032980829117389,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/3/0/ic-scalar mean counted S cost floor",
+      "claimed": 5.206354408461547,
+      "recomputed": 5.206354408461548,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/3/0/rho-neg mean counted S cost floor",
+      "claimed": 1.0804012615046497,
+      "recomputed": 1.0804012615046497,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/3/1/ic-recurrence mean counted S cost floor",
+      "claimed": 3.7852189581611655,
+      "recomputed": 3.7852189581611655,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/3/1/ic-scalar mean counted S cost floor",
+      "claimed": 3.958592537505324,
+      "recomputed": 3.9585925375053246,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 2/3/1/rho-neg mean counted S cost floor",
+      "claimed": 0.8523436918166025,
+      "recomputed": 0.8523436918166025,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/0/0/ic-recurrence mean counted S cost floor",
+      "claimed": 3.797224572331084,
+      "recomputed": 3.797224572331084,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/0/0/ic-scalar mean counted S cost floor",
+      "claimed": 3.966070849819573,
+      "recomputed": 3.966070849819573,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/0/0/ic-velu mean counted S cost floor",
+      "claimed": 3.767565390693303,
+      "recomputed": 3.767565390693303,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/0/0/rho-neg mean counted S cost floor",
+      "claimed": 1.003876283361663,
+      "recomputed": 1.0038762833616628,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/0/1/ic-recurrence mean counted S cost floor",
+      "claimed": 4.641615641697143,
+      "recomputed": 4.641615641697143,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/0/1/ic-scalar mean counted S cost floor",
+      "claimed": 4.810461919185632,
+      "recomputed": 4.810461919185633,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/0/1/ic-velu mean counted S cost floor",
+      "claimed": 4.611956460059362,
+      "recomputed": 4.611956460059362,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/0/1/rho-neg mean counted S cost floor",
+      "claimed": 1.0275254076716254,
+      "recomputed": 1.0275254076716256,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/1/0/ic-recurrence mean counted S cost floor",
+      "claimed": 4.881231096345693,
+      "recomputed": 4.881231096345693,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/1/0/ic-scalar mean counted S cost floor",
+      "claimed": 5.050077373834181,
+      "recomputed": 5.050077373834182,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/1/0/rho-neg mean counted S cost floor",
+      "claimed": 1.0449075950375253,
+      "recomputed": 1.0449075950375253,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/1/1/ic-recurrence mean counted S cost floor",
+      "claimed": 3.4855185147488177,
+      "recomputed": 3.4855185147488177,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/1/1/ic-scalar mean counted S cost floor",
+      "claimed": 3.6543647922373075,
+      "recomputed": 3.654364792237307,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/1/1/rho-neg mean counted S cost floor",
+      "claimed": 0.9263726946405896,
+      "recomputed": 0.9263726946405895,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/2/0/ic-recurrence mean counted S cost floor",
+      "claimed": 3.9665591525135167,
+      "recomputed": 3.966559152513516,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/2/0/ic-scalar mean counted S cost floor",
+      "claimed": 4.135405430002005,
+      "recomputed": 4.135405430002006,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/2/0/rho-neg mean counted S cost floor",
+      "claimed": 0.9767928405786613,
+      "recomputed": 0.9767928405786613,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/2/1/ic-recurrence mean counted S cost floor",
+      "claimed": 4.310014142125176,
+      "recomputed": 4.310014142125176,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/2/1/ic-scalar mean counted S cost floor",
+      "claimed": 4.478860419613666,
+      "recomputed": 4.478860419613666,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/2/1/rho-neg mean counted S cost floor",
+      "claimed": 0.9184233119216618,
+      "recomputed": 0.9184233119216618,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/3/0/ic-recurrence mean counted S cost floor",
+      "claimed": 4.948413215801432,
+      "recomputed": 4.948413215801433,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/3/0/ic-scalar mean counted S cost floor",
+      "claimed": 5.117259493289923,
+      "recomputed": 5.117259493289923,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/3/0/rho-neg mean counted S cost floor",
+      "claimed": 0.9395499246847159,
+      "recomputed": 0.9395499246847159,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/3/1/ic-recurrence mean counted S cost floor",
+      "claimed": 3.7325418221144817,
+      "recomputed": 3.7325418221144817,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/3/1/ic-scalar mean counted S cost floor",
+      "claimed": 3.9013880996029715,
+      "recomputed": 3.901388099602971,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "B 3/3/1/rho-neg mean counted S cost floor",
+      "claimed": 0.8428011928222736,
+      "recomputed": 0.8428011928222735,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "main verified rows",
+      "claimed": 43520,
+      "recomputed": 43520,
+      "rel_tol": 1e-12
+    }
+  ],
+  "limitations": [
+    "No complete-cost IC/rho gain is admitted.",
+    "Bootstrap intervals use independently seeded different RNGs; point estimates compared here.",
+    "Missing setup operation counts cannot be repaired by conversion-price bands."
+  ],
+  "raw_data_base": "research/conductor_gap_replication_20261025"
+}

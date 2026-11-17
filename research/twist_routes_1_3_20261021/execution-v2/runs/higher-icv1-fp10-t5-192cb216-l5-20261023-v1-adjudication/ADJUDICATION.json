@@ -1,0 +1,42 @@
+{
+  "schema": "twist.native-cas-adjudication/v1",
+  "log_prefix": "research/twist_routes_1_3_20261021/execution-v2/receipts/higher-icv1-fp10-t5-192cb216-l5-20261023-v1-gp",
+  "transport_metadata": {
+    "schema": "twist.CAS-transport/v2",
+    "source_commit": "2ef53b9236614175bf02b8f101276b4ee410624e",
+    "tool": "PARI/GP 2.17.2",
+    "tool_binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+    "argv": [
+      "/tmp/twist-cas/root/usr/bin/gp",
+      "-f",
+      "-q",
+      "research/twist_routes_1_3_20261021/execution-v2/runs/higher-torsion-input-20261023-v1/icv1-fp10-t5-192cb216-l5.gp"
+    ],
+    "script_sha256": "322c9e75afa1e52818a414b64cd4265288109a8b68dce934d72d9f625d4a33fb",
+    "started_utc": "2026-10-23T16:31:07Z",
+    "finished_utc": "2026-10-23T16:31:07.984Z",
+    "exit_code": 0,
+    "timeout_s": 1800,
+    "address_space_kib": 4194304,
+    "threads": 1,
+    "stdout_sha256": "ca868db89d396a08780726446d9e4ac44c886a72178aadd67ab60dd123988b5f",
+    "stderr_sha256": "823654b018f1fafb3bba97e34a086562e530d7b5d1c94b8f461ffd5ba17c7e5e",
+    "scientific_acceptance": "requires-native-adjudication"
+  },
+  "completion_marker_present": true,
+  "raw_hashes_match": true,
+  "script_hash_matches": true,
+  "allowed_stack_warning_present": true,
+  "unaccepted_error_lines": [
+    "  ***   at top-level: twist_higher_construct(827,1,15,823,2,5,8,\"icv",
+    "  ***                 ^----------------------------------------------",
+    "  ***   in function twist_higher_construct: ...1,Q=R;break););if(Q==[0],",
+    "  ***   error(\"bounded torsio",
+    "  ***   ^---------------------",
+    "  ***   user error: bounded torsion basis search exhausted",
+    "... skipping file 'research/twist_routes_1_3_20261021/execution-v2/runs/higher-torsion-input-20261023-v1/icv1-fp10-t5-192cb216-l5.gp'"
+  ],
+  "accepted": false,
+  "status": "invalid-or-incomplete-CAS-replay",
+  "scope": "The GP script performs independent group/pairing/polynomial checks. This Rust gate rejects errors even when GP exits zero and prints a marker."
+}

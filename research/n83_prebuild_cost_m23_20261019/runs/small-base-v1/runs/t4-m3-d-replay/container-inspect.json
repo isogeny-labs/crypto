@@ -1,0 +1,306 @@
+[
+    {
+        "Id": "2958ffff6ba89b3f7bfc7ab0f0ba067ac0daefa0010bb7704e6655d2bcc1c1b2",
+        "Created": "2026-10-19T16:17:08.924166585Z",
+        "Path": "/usr/bin/timeout",
+        "Args": [
+            "-s",
+            "TERM",
+            "-k",
+            "5",
+            "1800",
+            "/opt/worker",
+            "replay",
+            "D12",
+            "/inputs/base",
+            "/inputs/public.json",
+            "/inputs/receipts/worker.json",
+            "/out/worker.json"
+        ],
+        "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-10-19T16:17:09.164652823Z",
+            "FinishedAt": "2026-10-19T16:17:09.623191515Z"
+        },
+        "Image": "sha256:24b8580b081b53113046267a47ad12858ad97752c9735e1125fcdb7a62d1d2c9",
+        "ResolvConfPath": "/var/lib/docker/containers/2958ffff6ba89b3f7bfc7ab0f0ba067ac0daefa0010bb7704e6655d2bcc1c1b2/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/2958ffff6ba89b3f7bfc7ab0f0ba067ac0daefa0010bb7704e6655d2bcc1c1b2/hostname",
+        "HostsPath": "/var/lib/docker/containers/2958ffff6ba89b3f7bfc7ab0f0ba067ac0daefa0010bb7704e6655d2bcc1c1b2/hosts",
+        "LogPath": "/var/lib/docker/containers/2958ffff6ba89b3f7bfc7ab0f0ba067ac0daefa0010bb7704e6655d2bcc1c1b2/2958ffff6ba89b3f7bfc7ab0f0ba067ac0daefa0010bb7704e6655d2bcc1c1b2-json.log",
+        "Name": "/n83-m23-t4-m3-d-replay",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "none",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "CapAdd": null,
+            "CapDrop": [
+                "ALL"
+            ],
+            "CgroupnsMode": "private",
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": true,
+            "SecurityOpt": [
+                "no-new-privileges"
+            ],
+            "Tmpfs": {
+                "/tmp": "rw,noexec,nosuid,nodev,size=64m"
+            },
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 4294967296,
+            "NanoCpus": 1000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": [],
+            "BlkioDeviceWriteBps": [],
+            "BlkioDeviceReadIOps": [],
+            "BlkioDeviceWriteIOps": [],
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "31",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 4294967296,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": 256,
+            "Ulimits": [
+                {
+                    "Name": "nofile",
+                    "Hard": 65536,
+                    "Soft": 32768
+                }
+            ],
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "Mounts": [
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/n83-m23-20261019/target-small/release/examples/n83_prebuild_cost_m23",
+                    "Target": "/opt/worker",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/n83-m23-20261019/inputs/D12",
+                    "Target": "/inputs/base",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/n83-m23-20261019/inputs/public/public-targets.json",
+                    "Target": "/inputs/public.json",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/n83-m23-20261019/small-base-v1/runs/t4-m3-d",
+                    "Target": "/inputs/receipts",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/n83-m23-20261019/small-base-v1/runs/t4-m3-d-replay",
+                    "Target": "/out"
+                }
+            ],
+            "MaskedPaths": [
+                "/proc/asound",
+                "/proc/acpi",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/sys/firmware",
+                "/sys/devices/virtual/powercap"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/ff4de3d7a4bd36bbc075a462e6b8d9df031776632a7425f6946e7a0363855a5a-init/diff:/var/lib/docker/overlay2/cc1ec6313c249a0eaedcde3ba035ec0ef4a0fa5660495124c1b755502adb9e8e/diff",
+                "MergedDir": "/var/lib/docker/overlay2/ff4de3d7a4bd36bbc075a462e6b8d9df031776632a7425f6946e7a0363855a5a/merged",
+                "UpperDir": "/var/lib/docker/overlay2/ff4de3d7a4bd36bbc075a462e6b8d9df031776632a7425f6946e7a0363855a5a/diff",
+                "WorkDir": "/var/lib/docker/overlay2/ff4de3d7a4bd36bbc075a462e6b8d9df031776632a7425f6946e7a0363855a5a/work"
+            },
+            "Name": "overlay2"
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/n83-m23-20261019/target-small/release/examples/n83_prebuild_cost_m23",
+                "Destination": "/opt/worker",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/n83-m23-20261019/inputs/D12",
+                "Destination": "/inputs/base",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/n83-m23-20261019/inputs/public/public-targets.json",
+                "Destination": "/inputs/public.json",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/n83-m23-20261019/small-base-v1/runs/t4-m3-d",
+                "Destination": "/inputs/receipts",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/n83-m23-20261019/small-base-v1/runs/t4-m3-d-replay",
+                "Destination": "/out",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "2958ffff6ba8",
+            "Domainname": "",
+            "User": "1000:1000",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Cmd": [
+                "/usr/bin/timeout",
+                "-s",
+                "TERM",
+                "-k",
+                "5",
+                "1800",
+                "/opt/worker",
+                "replay",
+                "D12",
+                "/inputs/base",
+                "/inputs/public.json",
+                "/inputs/receipts/worker.json",
+                "/out/worker.json"
+            ],
+            "Image": "amazonlinux@sha256:8ed3c0a996841537f75607e7d1de2114d8150391f75792e8da9268738547e73f",
+            "Volumes": null,
+            "WorkingDir": "/",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {}
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "ff19c02b5c18e426465f4f17c27107e8f209589ce4b4c4f97452cdac29e60c10",
+            "SandboxKey": "/var/run/docker/netns/ff19c02b5c18",
+            "Ports": {},
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "",
+            "Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "MacAddress": "",
+            "Networks": {
+                "none": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "",
+                    "NetworkID": "a2ddb2b7e18c0818f057fc99735114577e95eff943267e29c6da0229d0da6174",
+                    "EndpointID": "",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DriverOpts": null,
+                    "DNSNames": null
+                }
+            }
+        }
+    }
+]

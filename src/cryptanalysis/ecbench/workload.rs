@@ -20,11 +20,13 @@ use std::sync::OnceLock;
 
 use crate::binary_ecc::IrreduciblePoly;
 use crate::cryptanalysis::ec_index_calculus_curves::CurveKind;
-use crate::cryptanalysis::ecbench::canonical::{bare_id, compat_u128, derive_u128, derive_u64};
+use crate::cryptanalysis::ecbench::canonical::{bare_id, derive_biguint, derive_u128, derive_u64};
 use crate::cryptanalysis::ecbench::conductor_gap::{self, GapLevel};
+use crate::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use crate::cryptanalysis::ecbench::ext::ExtInstance;
 use crate::cryptanalysis::ecbench::fp4::Fp4Instance;
 use crate::cryptanalysis::ecbench::ghs_cover::GhsInstance;
+use crate::cryptanalysis::ecbench::hec::{thread_scalar, HecInstance};
 use crate::cryptanalysis::ecbench::hyper::HyperInstance;
 use crate::cryptanalysis::ecbench::jacobian::Genus2Instance;
 use crate::cryptanalysis::ecbench::plane_quartic::QuarticInstance;
@@ -38,7 +40,8 @@ use crate::cryptanalysis::ic_boundary::{
     PrimePoint, PrimeRepresentation, QuarticClasses,
 };
 use crate::cryptanalysis::isogeny_eval::counted_fp::is_prime_u64;
-use crate::cryptanalysis::koblitz_strong_rho::{RawPointG, WideStrongRho};
+use crate::cryptanalysis::koblitz_big::{BigKoblitz, BigStrongRho, BIG_DEGREES, W192};
+use crate::cryptanalysis::koblitz_strong_rho::{RawPointG, RhoScalar, WideStrongRho};
 use crate::cryptanalysis::koblitz_wide::WideKoblitz;
 use crate::cryptanalysis::prime_orbit_index_calculus::{
     generate_instance, Coefficient, ScaledShape,
@@ -62,7 +65,9 @@ pub enum CurveSpec {
     PrimeRoster { bits: u32 },
     /// `ic_boundary::koblitz_instance(a, n)`: `K_a / F_{2^n}`, `n ≤ 62`;
     /// for `64 ≤ n ≤ 127`, `koblitz_wide::WideKoblitz` over the registry's
-    /// modulus for that `K_a` (the m = 83 gate curve of AGENTS.md §8a).
+    /// modulus for that `K_a` (the m = 83 gate curve of AGENTS.md §8a);
+    /// for `128 ≤ n ≤ 191`, `koblitz_big::BigKoblitz` over the registry's
+    /// modulus (ECC2K-130's field at `n = 131`, K-163 at `n = 163`).
     Koblitz { a: u8, n: u32 },
     /// `ic_boundary::random_binary_instance(n, seed, max_cofactor)`.
     BinaryRandom {
@@ -288,6 +293,13 @@ pub enum CurveSpec {
         gu: Vec<u64>,
         gv: Vec<u64>,
     },
+    /// `hyperelliptic_ic_bench::thread_instance(p, genus)`: the
+    /// hyperelliptic thread's instance rule (`ecbench::hec`), the Jacobian
+    /// of `y² = f(x)` over `F_p` for the first `c` with a prime subgroup
+    /// above 1000, genus 2 to 4, `p < 2^15`.  A reduced divisor is written
+    /// as two packed words.  `#Jac` is not computed, so only planted
+    /// targets exist.  Unregistered: ICV1 has no Jacobian form.
+    HecThread { p: u64, genus: u32 },
 }
 
 impl CurveSpec {
@@ -463,6 +475,14 @@ impl CurveSpec {
             CurveSpec::PrimeRoster { bits } => roster_prime_instance(bits)
                 .map(Instance::Prime)
                 .ok_or_else(|| format!("the bench roster has no {bits}-bit curve")),
+            CurveSpec::Koblitz { a, n } if BIG_DEGREES.contains(&n) && a <= 1 => {
+                let irr = registry_koblitz_modulus(a, n).ok_or_else(|| {
+                    format!("K_{a} over F_2^{n} is not in docs/curves/registry.json; register it first (AGENTS.md §11)")
+                })?;
+                let kc = BigKoblitz::new(a, &irr)?;
+                let rho = kc.strong_rho();
+                Ok(Instance::Big(Box::new(BigInstance { kc, rho })))
+            }
             CurveSpec::Koblitz { a, n } if (64..=127).contains(&n) && a <= 1 => {
                 let irr = registry_koblitz_modulus(a, n).ok_or_else(|| {
                     format!("K_{a} over F_2^{n} is not in docs/curves/registry.json; register it first (AGENTS.md §11)")
@@ -474,7 +494,7 @@ impl CurveSpec {
             CurveSpec::Koblitz { a, n } => {
                 if a > 1 || !(3..=62).contains(&n) {
                     return Err(format!(
-                        "koblitz takes a ∈ {{0,1}} and 3 ≤ n ≤ 62, or 64 ≤ n ≤ 127 (wide), not a={a} n={n}"
+                        "koblitz takes a ∈ {{0,1}} and 3 ≤ n ≤ 62, 64 ≤ n ≤ 127 (wide) or 128 ≤ n ≤ 191 (big), not a={a} n={n}"
                     ));
                 }
                 koblitz_instance(a, n).map(|i| Instance::Binary(Box::new(i))).ok_or_else(|| {
@@ -659,6 +679,9 @@ impl CurveSpec {
                 ref gv,
             } => HyperInstance::build_explicit(p, genus, f, group_order, r, gu, gv)
                 .map(|i| Instance::Hyper(Box::new(i))),
+            CurveSpec::HecThread { p, genus } => {
+                HecInstance::build(p, genus).map(|i| Instance::Hec(Box::new(i)))
+            }
         }
     }
 
@@ -722,11 +745,13 @@ impl CurveSpec {
             }),
             Instance::Binary(_)
             | Instance::Wide(_)
+            | Instance::Big(_)
             | Instance::Fp4(_)
             | Instance::Fp4Torsion(_)
             | Instance::F2m4(_)
             | Instance::ThreeLeads(_)
-            | Instance::Ext(_) => None,
+            | Instance::Ext(_)
+            | Instance::Hec(_) => None,
             // The thread rule and the order's point counts are the slow
             // part; a child rebuilds from the explicit model.
             Instance::Hyper(i) => {
@@ -747,7 +772,6 @@ impl CurveSpec {
     /// The constructor call, in the registry's `generator_call` form.
     pub fn call(&self) -> String {
         match *self {
-            CurveSpec::ThreeLeads {p,n,a,b,ref family,parameter,..}=>format!("three_leads_explicit(p={p},n={n},a={a},b={b},family={family},parameter={parameter})"),
             CurveSpec::PrimeSearch { bits, seed } => {
                 format!("find_prime_order_curve({bits}, {seed})")
             }
@@ -765,6 +789,9 @@ impl CurveSpec {
                 "prime_orbit_index_calculus::generate_instance({shape}, {bits}, {seed})"
             ),
             CurveSpec::PrimeRoster { bits } => format!("roster_prime_instance({bits})"),
+            CurveSpec::Koblitz { a, n } if n >= 128 => {
+                format!("BigKoblitz::new({a}, registry modulus for n = {n})")
+            }
             CurveSpec::Koblitz { a, n } if n >= 64 => {
                 format!("WideKoblitz::new({a}, registry modulus for n = {n})")
             }
@@ -808,6 +835,9 @@ impl CurveSpec {
             CurveSpec::Fp4Translation { p, seed } => {
                 format!("quartic_folds::generate_translation_instance({p}, {seed}, 16)")
             }
+            CurveSpec::ThreeLeads { p, n, a, b, ref family, parameter, .. } => format!(
+                "three_leads_explicit(p={p},n={n},a={a},b={b},family={family},parameter={parameter})"
+            ),
             CurveSpec::GlsFp2 {
                 p_bits,
                 seed,
@@ -846,6 +876,9 @@ impl CurveSpec {
             CurveSpec::HyperellipticExplicit {
                 p, genus, ref f, ..
             } => format!("HCurve {{ p: {p}, genus: {genus}, f: {f:?} }} (explicit)"),
+            CurveSpec::HecThread { p, genus } => {
+                format!("hyperelliptic_ic_bench::thread_instance({p}, {genus})")
+            }
         }
     }
 }
@@ -861,6 +894,9 @@ pub enum Instance {
     Binary(Box<BinaryInstance>),
     /// A Koblitz curve past one word (`64 ≤ n ≤ 127`).
     Wide(Box<WideInstance>),
+    /// A Koblitz curve past two words (`128 ≤ n ≤ 191`), whose subgroup
+    /// order is past `2^128`.
+    Big(Box<BigInstance>),
     /// A curve over `F_{p⁴}` (`ecbench::fp4`); a point is one 64-bit word
     /// per coordinate, four 16-bit limbs.
     Fp4(Box<Fp4Instance>),
@@ -877,6 +913,9 @@ pub enum Instance {
     /// A hyperelliptic Jacobian of genus 2 to 4 over `F_p`, `p < 256`
     /// (`ecbench::hyper`); a divisor is two packed words.
     Hyper(Box<HyperInstance>),
+    /// A hyperelliptic Jacobian over `F_p` (`ecbench::hec`); a reduced
+    /// divisor is two packed words.
+    Hec(Box<HecInstance>),
 }
 
 /// A wide Koblitz curve and the strong reference's arithmetic on it, which
@@ -884,6 +923,14 @@ pub enum Instance {
 pub struct WideInstance {
     pub kc: WideKoblitz,
     pub rho: WideStrongRho,
+}
+
+/// A Koblitz curve over a three-word field and the strong reference's
+/// arithmetic on it, which every big method and the workload's own `[k]G`
+/// use.
+pub struct BigInstance {
+    pub kc: BigKoblitz,
+    pub rho: BigStrongRho,
 }
 
 /// The registry's modulus for `K_a` over `F_{2^n}`, if it lists one.
@@ -895,11 +942,11 @@ pub fn registry_koblitz_modulus(a: u8, n: u32) -> Option<IrreduciblePoly> {
             && p.and_then(|p| p.get("n")).and_then(Value::as_u64) == Some(u64::from(n))
     })?;
     let hex = entry.get("params")?.get("modulus")?.as_str()?;
-    let bits = u128::from_str_radix(hex.trim_start_matches("0x"), 16).ok()?;
-    if 127 - bits.leading_zeros() != n {
+    let bits = num_bigint::BigUint::parse_bytes(hex.trim_start_matches("0x").as_bytes(), 16)?;
+    if bits.bits() != u64::from(n) + 1 {
         return None;
     }
-    let low_terms = (0..n).filter(|&i| (bits >> i) & 1 == 1).collect();
+    let low_terms = (0..n).filter(|&i| bits.bit(u64::from(i))).collect();
     Some(IrreduciblePoly {
         degree: n,
         low_terms,
@@ -912,21 +959,22 @@ pub struct CurveFacts {
     /// The ICV1 slug: the curve's name in prose and tables (AGENTS.md §11).
     pub slug: String,
     pub icv1: String,
-    /// `prime`, `koblitz` or `binary`.
+    /// `prime`, `koblitz`, `binary`, `fp4`, `extension` or
+    /// `hyperelliptic`.
     pub family: String,
     pub construction: String,
     /// Field degree for binary curves; `None` for prime fields.
     pub field_degree: Option<u32>,
     /// Bits of the field characteristic for prime curves.
     pub field_bits: Option<u32>,
-    /// Orders as `u128` for wide curves; a value that fits a `u64` is
-    /// written as the number it always was (`canonical::compat_u128`).
-    #[serde(with = "compat_u128")]
-    pub group_order: u128,
-    #[serde(with = "compat_u128")]
-    pub r: u128,
-    #[serde(with = "compat_u128")]
-    pub cofactor: u128,
+    /// Orders exactly, through 256 bits; a value that fits a `u64` is
+    /// written as the number it always was, and a wider one as a decimal
+    /// string ([`ExactScalar`], byte for byte the `canonical::compat_u128`
+    /// encoding these fields had while they were `u128`).
+    /// HEC thread Jacobian order/cofactor zero means unknown.
+    pub group_order: ExactScalar,
+    pub r: ExactScalar,
+    pub cofactor: ExactScalar,
     /// Generator coordinates as lower-case hex.
     pub generator: [String; 2],
     /// Automorphisms a generic algorithm may use, under the floor rule
@@ -1143,24 +1191,30 @@ fn json_object_end(text: &[u8], open: usize) -> Option<usize> {
     None
 }
 
-fn parse_hex(s: &str) -> Option<u128> {
-    u128::from_str_radix(s.trim_start_matches("0x"), 16).ok()
+fn parse_hex(s: &str) -> Option<num_bigint::BigUint> {
+    num_bigint::BigUint::parse_bytes(s.trim_start_matches("0x").as_bytes(), 16)
 }
 
 /// `(ec1, curve_uid)` of the representation with this subgroup and
-/// generator.
-fn matching_representation(entry: &Value, r: u128, gx: u128, gy: u128) -> Option<(String, String)> {
+/// generator.  Compared as exact integers: a registry value that a `u128`
+/// could not hold matches nothing narrower, as it never did.
+fn matching_representation(
+    entry: &Value,
+    r: &num_bigint::BigUint,
+    gx: &num_bigint::BigUint,
+    gy: &num_bigint::BigUint,
+) -> Option<(String, String)> {
     entry
         .get("representations")?
         .as_array()?
         .iter()
         .find_map(|rep| {
             let c = rep.get("curve")?;
-            let order: u128 = c.get("subgroup_order")?.as_str()?.parse().ok()?;
+            let order: num_bigint::BigUint = c.get("subgroup_order")?.as_str()?.parse().ok()?;
             let g = c.get("generator")?.as_array()?;
             let x = parse_hex(g.first()?.as_str()?)?;
             let y = parse_hex(g.get(1)?.as_str()?)?;
-            if order != r || x != gx || y != gy {
+            if order != *r || x != *gx || y != *gy {
                 return None;
             }
             Some((
@@ -1171,8 +1225,18 @@ fn matching_representation(entry: &Value, r: u128, gx: u128, gy: u128) -> Option
 }
 
 impl Instance {
-    pub fn r(&self) -> u128 {
+    /// The prime subgroup order, exactly.
+    pub fn r(&self) -> ExactScalar {
+        if let Instance::Big(i) = self {
+            return ExactScalar::from_biguint(&i.kc.r).expect("r < 2^192");
+        }
+        ExactScalar::from(self.r_narrow())
+    }
+
+    /// The subgroup order of every class but [`Instance::Big`].
+    fn r_narrow(&self) -> u128 {
         match self {
+            Instance::Big(_) => unreachable!("a big instance's order is past u128"),
             Instance::ThreeLeads(i) => u128::from(i.r),
             Instance::Prime(i) => u128::from(i.r),
             Instance::Binary(i) => u128::from(i.r),
@@ -1185,6 +1249,7 @@ impl Instance {
             Instance::Quartic(i) => u128::from(i.r),
             Instance::Ghs(i) => u128::from(i.l),
             Instance::Hyper(i) => u128::from(i.r()),
+            Instance::Hec(i) => u128::from(i.r),
         }
     }
 
@@ -1223,9 +1288,9 @@ impl Instance {
                 construction: spec.call(),
                 field_degree: None,
                 field_bits: Some(64 - p.leading_zeros()),
-                group_order: u128::from(order),
-                r: u128::from(r),
-                cofactor: u128::from(h),
+                group_order: ExactScalar::from(order),
+                r: ExactScalar::from(r),
+                cofactor: ExactScalar::from(h),
                 generator,
                 automorphisms_available: 2,
                 registered: false,
@@ -1242,9 +1307,9 @@ impl Instance {
                 construction: spec.call(),
                 field_degree: Some(6),
                 field_bits: Some(64 - i.p.leading_zeros()),
-                group_order: u128::from(i.group_order()),
-                r: u128::from(i.l),
-                cofactor: 4,
+                group_order: ExactScalar::from(i.group_order()),
+                r: ExactScalar::from(i.l),
+                cofactor: ExactScalar::from(4u64),
                 generator: i.encode(&i.generator),
                 automorphisms_available: 2,
                 registered: false,
@@ -1261,9 +1326,9 @@ impl Instance {
                 construction: spec.call(),
                 field_degree: None,
                 field_bits: Some(64 - i.p().leading_zeros()),
-                group_order: u128::from(i.group_order()),
-                r: u128::from(i.r()),
-                cofactor: u128::from(i.cofactor()),
+                group_order: ExactScalar::from(i.group_order()),
+                r: ExactScalar::from(i.r()),
+                cofactor: ExactScalar::from(i.cofactor()),
                 generator: i.generator_hex(),
                 automorphisms_available: i.automorphisms_available(),
                 registered: false,
@@ -1280,9 +1345,9 @@ impl Instance {
                 construction: spec.call(),
                 field_degree: None,
                 field_bits: Some(64 - i.p.leading_zeros()),
-                group_order: u128::from(i.group_order),
-                r: u128::from(i.r),
-                cofactor: u128::from(i.cofactor),
+                group_order: ExactScalar::from(i.group_order),
+                r: ExactScalar::from(i.r),
+                cofactor: ExactScalar::from(i.cofactor),
                 generator: i.generator_hex(),
                 automorphisms_available: 2,
                 registered: false,
@@ -1300,14 +1365,60 @@ impl Instance {
                 construction: spec.call(),
                 field_degree: None,
                 field_bits: Some(64 - i.p.leading_zeros()),
-                group_order: u128::from(i.group_order),
-                r: u128::from(i.r),
-                cofactor: u128::from(i.cofactor),
+                group_order: ExactScalar::from(i.group_order),
+                r: ExactScalar::from(i.r),
+                cofactor: ExactScalar::from(i.cofactor),
                 generator: g,
                 automorphisms_available: 2,
                 registered: false,
                 ec1: None,
                 curve_uid: None,
+            };
+        }
+        if let Instance::Hec(i) = self {
+            let (icv1, slug) = i.names();
+            return CurveFacts {
+                slug,
+                icv1,
+                family: "hyperelliptic".into(),
+                construction: spec.call(),
+                field_degree: None,
+                field_bits: Some(64 - i.p.leading_zeros()),
+                group_order: 0u64.into(),
+                r: i.r.into(),
+                cofactor: 0u64.into(),
+                generator: i.generator_hex(),
+                automorphisms_available: 2,
+                registered: false,
+                ec1: None,
+                curve_uid: None,
+            };
+        }
+        if let Instance::Big(i) = self {
+            let id = i.kc.curve_id();
+            let entry = registry_entry(&id.slug);
+            let (gx, gy) = (i.kc.generator.0, i.kc.generator.1);
+            let rep = entry.as_ref().and_then(|e| {
+                matching_representation(e, &i.kc.r, &gx.to_biguint(), &gy.to_biguint())
+            });
+            let exact = |v: &num_bigint::BigUint| {
+                ExactScalar::from_biguint(v).expect("an order below 2^192")
+            };
+            return CurveFacts {
+                slug: id.slug,
+                icv1: id.icv1,
+                family: "koblitz".into(),
+                construction: spec.call(),
+                field_degree: Some(i.kc.n),
+                field_bits: None,
+                group_order: exact(&i.kc.group_order),
+                r: exact(&i.kc.r),
+                cofactor: ExactScalar::from(i.kc.cofactor),
+                generator: [gx.hex(), gy.hex()],
+                automorphisms_available: 2 * i.kc.n,
+                registered: entry.is_some(),
+                ec1: rep.as_ref().map(|(a, _)| a.clone()),
+                curve_uid: rep.map(|(_, u)| u),
             };
         }
         let (id, family, degree, bits, order, r, h, gx, gy, aut) = match self {
@@ -1345,7 +1456,9 @@ impl Instance {
             | Instance::Genus2(_)
             | Instance::Quartic(_)
             | Instance::Ghs(_)
-            | Instance::Hyper(_) => {
+            | Instance::Hyper(_)
+            | Instance::Hec(_)
+            | Instance::Big(_) => {
                 unreachable!("returned above")
             }
             Instance::Wide(i) => (
@@ -1415,9 +1528,14 @@ impl Instance {
             }
         };
         let entry = registry_entry(&id.slug);
-        let rep = entry
-            .as_ref()
-            .and_then(|e| matching_representation(e, r, gx, gy));
+        let rep = entry.as_ref().and_then(|e| {
+            matching_representation(
+                e,
+                &num_bigint::BigUint::from(r),
+                &num_bigint::BigUint::from(gx),
+                &num_bigint::BigUint::from(gy),
+            )
+        });
         CurveFacts {
             slug: id.slug,
             icv1: id.icv1,
@@ -1425,9 +1543,9 @@ impl Instance {
             construction: spec.call(),
             field_degree: degree,
             field_bits: bits,
-            group_order: order,
-            r,
-            cofactor: h,
+            group_order: order.into(),
+            r: r.into(),
+            cofactor: h.into(),
             generator: [format!("0x{gx:x}"), format!("0x{gy:x}")],
             automorphisms_available: aut,
             registered: entry.is_some(),
@@ -1436,12 +1554,20 @@ impl Instance {
         }
     }
 
-    /// Verify an exact scalar on a legacy instance. Reduction happens before
-    /// conversion, so no high bits are discarded. All current instance orders
-    /// fit u128; a future full-width instance must supply its own branch here.
-    pub fn mul_generator_exact(&self, k: super::exact_scalar::ExactScalar) -> Option<[String; 2]> {
-        let reduced = k.to_biguint() % num_bigint::BigUint::from(self.r());
-        let narrow = super::exact_scalar::ExactScalar::from_biguint(&reduced)?.checked_u128()?;
+    /// `[k]G` for an exact scalar. Reduction happens before conversion, so
+    /// no high bits are discarded: a big instance multiplies by the reduced
+    /// scalar on its own three-word arithmetic, every other instance (whose
+    /// order fits a `u128`) through [`Self::mul_generator_hex`].
+    pub fn mul_generator_exact(&self, k: ExactScalar) -> Option<[String; 2]> {
+        let reduced = k.to_biguint() % self.r().to_biguint();
+        if let Instance::Big(i) = self {
+            let k = <crate::cryptanalysis::koblitz_big::U192 as RhoScalar>::from_biguint(&reduced)?;
+            return match i.rho.scalar_mul(i.rho.generator(), k) {
+                RawPointG::Affine { x, y } => Some([x.hex(), y.hex()]),
+                RawPointG::Infinity => None,
+            };
+        }
+        let narrow = ExactScalar::from_biguint(&reduced)?.checked_u128()?;
         self.mul_generator_hex(narrow)
     }
 
@@ -1449,6 +1575,9 @@ impl Instance {
     /// double-and-add on a ledger nobody reads.  Used to build the
     /// target and, separately, to verify an answer.
     pub fn mul_generator_hex(&self, k: u128) -> Option<[String; 2]> {
+        if let Instance::Big(_) = self {
+            return self.mul_generator_exact(ExactScalar::from(k));
+        }
         let mut scratch = GroupOps::default();
         if let Instance::Wide(i) = self {
             return match i.rho.scalar_mul(i.rho.generator(), k % i.kc.r) {
@@ -1470,7 +1599,7 @@ impl Instance {
         }
         // A one-word instance's subgroup order fits a word, so a reduced
         // scalar does too.
-        let k = u64::try_from(k % self.r()).ok()?;
+        let k = u64::try_from(k % self.r_narrow()).ok()?;
         if let Instance::Fp4(i) = self {
             return i.mul_generator_hex(k);
         }
@@ -1488,6 +1617,9 @@ impl Instance {
             return i.mul_generator_hex(k);
         }
         if let Instance::Ghs(i) = self {
+            return i.mul_generator_hex(k);
+        }
+        if let Instance::Hec(i) = self {
             return i.mul_generator_hex(k);
         }
         if let Instance::Hyper(i) = self {
@@ -1525,13 +1657,15 @@ impl Instance {
                 })
             }
             Instance::Wide(_)
+            | Instance::Big(_)
             | Instance::Fp4(_)
             | Instance::ThreeLeads(_)
             | Instance::Ext(_)
             | Instance::Genus2(_)
             | Instance::Quartic(_)
             | Instance::Ghs(_)
-            | Instance::Hyper(_) => {
+            | Instance::Hyper(_)
+            | Instance::Hec(_) => {
                 unreachable!("returned above")
             }
         }
@@ -1572,10 +1706,40 @@ impl Instance {
         | Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
         | Instance::ThreeLeads(_)
-        | Instance::Hyper(_) = self
+        | Instance::Hyper(_)
+        | Instance::Hec(_) = self
         {
             // Planted targets only on E(F_{p^4}), the tower, the three-leads
             // study and the hyperelliptic Jacobians: no public-target law yet.
+            return None;
+        }
+        if let Instance::Big(i) = self {
+            // PUBLIC_TARGET_LAW_BIG: the same inputs as decimal strings, the
+            // whole 256-bit digest; its low n bits are the abscissa and its
+            // top bit (bit 255, never one of them) chooses the ordinate.
+            let f = i.kc.field();
+            let h = crate::cryptanalysis::koblitz_big::U192::from_u128(u128::from(i.kc.cofactor));
+            let mask = (num_bigint::BigUint::from(1u8) << i.kc.n) - 1u8;
+            for counter in 0..10_000u64 {
+                let parts = [
+                    model.to_string(),
+                    curve.r.to_string(),
+                    seed.to_string(),
+                    index.to_string(),
+                    counter.to_string(),
+                ];
+                let d = derive_biguint(PUBLIC_TARGET_LAW_BIG, &parts);
+                let flip = d.bit(255);
+                let x = W192::from_biguint(&(&d & &mask)).expect("n ≤ 191 bits");
+                let pts = i.kc.points_with_x(&f, x);
+                let Some(&(x, y)) = pts.get(usize::from(flip && pts.len() > 1)) else {
+                    continue;
+                };
+                if let RawPointG::Affine { x, y } = i.rho.scalar_mul(RawPointG::Affine { x, y }, h)
+                {
+                    return Some(([x.hex(), y.hex()], counter));
+                }
+            }
             return None;
         }
         if let Instance::Wide(i) = self {
@@ -1605,7 +1769,7 @@ impl Instance {
         }
         for counter in 0..10_000u64 {
             // One-word curves only: their order fits the law's u64 parts.
-            let r = u64::try_from(curve.r).ok()?;
+            let r = curve.r.checked_u64()?;
             let h = derive_u64(PUBLIC_TARGET_LAW, &[model, r, seed, index, counter]);
             let flip = (h >> 63) & 1 == 1;
             match self {
@@ -1628,9 +1792,11 @@ impl Instance {
                     }
                 }
                 Instance::Wide(_)
+                | Instance::Big(_)
                 | Instance::Fp4(_)
                 | Instance::ThreeLeads(_)
-                | Instance::Hyper(_) => {
+                | Instance::Hyper(_)
+                | Instance::Hec(_) => {
                     unreachable!("handled above")
                 }
                 Instance::Ext(i) => {
@@ -1764,6 +1930,13 @@ pub const PUBLIC_TARGET_LAW: &str = "hash_to_subgroup_v1";
 /// inputs, hashed as decimal strings, with a 128-bit draw.
 pub const PUBLIC_TARGET_LAW_WIDE: &str = "hash_to_subgroup_v2";
 
+/// The public-target law of the three-word Koblitz class
+/// ([`Instance::Big`], subgroup order past `2^128`): the same inputs as
+/// [`PUBLIC_TARGET_LAW_WIDE`], hashed as decimal strings, with the whole
+/// 256-bit digest ([`derive_biguint`]): its low `n` bits are the
+/// abscissa, its bit 255 chooses the ordinate.  Used for no other class.
+pub const PUBLIC_TARGET_LAW_BIG: &str = "hash_to_subgroup_big_v3";
+
 /// Whether a workload's target was built from a known scalar.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -1780,11 +1953,18 @@ pub enum TargetKind {
     PlantedShared,
     /// `Q` hashed to the subgroup; the answer is checked by `[d]G = Q`.
     Public,
+    /// `Q = [k]D₁` with `k = ⌊r/3⌋ + 7 + index` (`HEC_THREAD_TARGET_LAW`):
+    /// the fixed target of the hyperelliptic thread's studies, so their
+    /// rows can be reproduced as records.  `hec_thread` curves only.
+    PlantedHecThread,
 }
 
 impl TargetKind {
     pub fn is_planted(&self) -> bool {
-        matches!(self, TargetKind::Planted | TargetKind::PlantedShared)
+        matches!(
+            self,
+            TargetKind::Planted | TargetKind::PlantedShared | TargetKind::PlantedHecThread
+        )
     }
     /// Only the default kind stays unserialised.
     pub fn is_plain_planted(&self) -> bool {
@@ -1792,10 +1972,27 @@ impl TargetKind {
     }
 }
 
+/// The hyperelliptic thread's fixed target, `k = ⌊r/3⌋ + 7 + index`
+/// (`examples/hyperelliptic_ic_vs_rho_bitops.rs` uses `k = N/3 + 7`).  Not
+/// drawn from the seed: it exists to reproduce that thread's rows.
+pub const HEC_THREAD_TARGET_LAW: &str = "hec_thread_scalar_v1";
+
+const NOT_HEC: &str = "planted_hec_thread targets need a hec_thread curve";
+const HEC_NO_PUBLIC: &str =
+    "a hec_thread Jacobian has no public-target law (its order is not computed)";
+
 /// The planted-scalar law for a subgroup order past `2^64`: the same
 /// inputs, hashed as decimal strings, with a 128-bit draw.  A one-word
 /// order keeps [`TARGET_LAW`], so every existing workload is unchanged.
 pub const TARGET_LAW_WIDE: &str = "uniform_scalar_sha256_v2";
+
+/// The planted-scalar law for a subgroup order past `2^128` (the
+/// three-word Koblitz class): the same inputs as [`TARGET_LAW_WIDE`],
+/// hashed as decimal strings, with the whole 256-bit digest
+/// ([`derive_biguint`]); `k = 1 + D mod (r − 1)`, a modulo bias below
+/// `2^-64` for `r < 2^192`.  An order that fits a `u128` keeps its law, so
+/// every existing workload is unchanged.
+pub const TARGET_LAW_BIG: &str = "uniform_scalar_sha256_big_v3";
 
 /// The paired planted-scalar law: `k` derives from `[r, target_seed,
 /// index]` alone — no curve model — so every curve of the same subgroup
@@ -1809,25 +2006,49 @@ pub fn shared_planted_scalar(r: u64, target_seed: u64, index: u64) -> u128 {
     u128::from(1 + derive_u64(SHARED_TARGET_LAW, &[r, target_seed, index]) % (r - 1))
 }
 
-/// `k ∈ [1, r−1]` for target `index` under `target_seed`.
-pub fn planted_scalar(curve: &CurveFacts, target_seed: u64, index: u64) -> u128 {
+/// `k ∈ [1, r−1]` for target `index` under `target_seed`, and the law
+/// that drew it: [`TARGET_LAW`] for a one-word order, [`TARGET_LAW_WIDE`]
+/// for an order that fits a `u128`, [`TARGET_LAW_BIG`] past that.
+pub fn planted_scalar_exact(
+    curve: &CurveFacts,
+    target_seed: u64,
+    index: u64,
+) -> (ExactScalar, &'static str) {
     // The curve's model hash and subgroup enter the derivation, so the
     // same seed on two curves gives unrelated scalars.
     let model = model_hash(curve);
-    match u64::try_from(curve.r) {
-        Ok(r) => u128::from(1 + derive_u64(TARGET_LAW, &[model, r, target_seed, index]) % (r - 1)),
-        Err(_) => {
-            let parts = [model, target_seed, index].map(|v| v.to_string());
-            let parts = [
-                parts[0].clone(),
-                curve.r.to_string(),
-                parts[1].clone(),
-                parts[2].clone(),
-            ];
-            // The modulo bias of a 128-bit draw over r < 2^127 is below 2^-1.
-            1 + derive_u128(TARGET_LAW_WIDE, &parts) % (curve.r - 1)
-        }
+    if let Some(r) = curve.r.checked_u64() {
+        let k = 1 + derive_u64(TARGET_LAW, &[model, r, target_seed, index]) % (r - 1);
+        return (ExactScalar::from(k), TARGET_LAW);
     }
+    let parts = [model, target_seed, index].map(|v| v.to_string());
+    let parts = [
+        parts[0].clone(),
+        curve.r.to_string(),
+        parts[1].clone(),
+        parts[2].clone(),
+    ];
+    if let Some(r) = curve.r.checked_u128() {
+        // The modulo bias of a 128-bit draw over r < 2^127 is below 2^-1.
+        let k = 1 + derive_u128(TARGET_LAW_WIDE, &parts) % (r - 1);
+        return (ExactScalar::from(k), TARGET_LAW_WIDE);
+    }
+    let r = curve.r.to_biguint();
+    let k = derive_biguint(TARGET_LAW_BIG, &parts) % (&r - 1u8) + 1u8;
+    (
+        ExactScalar::from_biguint(&k).expect("k < r < 2^256"),
+        TARGET_LAW_BIG,
+    )
+}
+
+/// `k ∈ [1, r−1]` for target `index` under `target_seed`, for an order
+/// that fits a `u128` (every class but [`Instance::Big`]); `None` past it,
+/// where [`planted_scalar_exact`] draws.
+pub fn planted_scalar(curve: &CurveFacts, target_seed: u64, index: u64) -> Option<u128> {
+    curve.r.checked_u128()?;
+    planted_scalar_exact(curve, target_seed, index)
+        .0
+        .checked_u128()
 }
 
 /// One built single-target workload.
@@ -1847,8 +2068,8 @@ pub struct Workload {
     /// The planted `k` with `Q = [k]G`, for a planted target.  Not in the
     /// identity (the target point is) and never passed to a solver.
     /// `None` for a public target, whose logarithm nobody knows.
-    #[serde(default, with = "compat_u128::option")]
-    pub planted: Option<u128>,
+    #[serde(default)]
+    pub planted: Option<ExactScalar>,
     /// The hash counter that landed a public target in the subgroup.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub target_counter: Option<u64>,
@@ -1885,67 +2106,83 @@ impl Workload {
         kind: TargetKind,
     ) -> Result<Workload, String> {
         let curve = inst.facts(spec);
-        if curve.r < 5 {
+        if curve.r < ExactScalar::from(5u64) {
             return Err(format!(
                 "subgroup order {} is too small to measure",
                 curve.r
             ));
         }
-        let (law, target, planted, counter) =
-            if let CurveSpec::PrimePublicFixture { qx, qy, .. } = *spec {
-                if kind != TargetKind::Public || index != 0 {
-                    return Err("external fixture is exactly one public target per curve".into());
+        let (law, target, planted, counter) = if let CurveSpec::PrimePublicFixture {
+            qx, qy, ..
+        } = *spec
+        {
+            if kind != TargetKind::Public || index != 0 {
+                return Err("external fixture is exactly one public target per curve".into());
+            }
+            (
+                "ecbench.public-fixture/v1",
+                [format!("0x{qx:x}"), format!("0x{qy:x}")],
+                None,
+                None,
+            )
+        } else {
+            match kind {
+                TargetKind::Planted => {
+                    let (k, law) = planted_scalar_exact(&curve, target_seed, index);
+                    let q = match k.checked_u128() {
+                        Some(k) => inst.mul_generator_hex(k),
+                        None => inst.mul_generator_exact(k),
+                    }
+                    .ok_or("the planted scalar gave the identity; the subgroup order is wrong")?;
+                    (law, q, Some(k), None)
                 }
-                (
-                    "ecbench.public-fixture/v1",
-                    [format!("0x{qx:x}"), format!("0x{qy:x}")],
-                    None,
-                    None,
-                )
-            } else {
-                match kind {
-                    TargetKind::Planted => {
-                        let k = planted_scalar(&curve, target_seed, index);
-                        let q = inst.mul_generator_hex(k).ok_or(
-                            "the planted scalar gave the identity; the subgroup order is wrong",
-                        )?;
-                        let law = if u64::try_from(curve.r).is_ok() {
-                            TARGET_LAW
-                        } else {
-                            TARGET_LAW_WIDE
-                        };
-                        (law, q, Some(k), None)
-                    }
-                    TargetKind::PlantedShared => {
-                        let r = u64::try_from(curve.r)
-                            .map_err(|_| "planted_shared targets need a one-word subgroup order")?;
-                        let k = shared_planted_scalar(r, target_seed, index);
-                        let q = inst.mul_generator_hex(k).ok_or(
-                            "the planted scalar gave the identity; the subgroup order is wrong",
-                        )?;
-                        (SHARED_TARGET_LAW, q, Some(k), None)
-                    }
-                    TargetKind::Public => {
-                        // With r | h the r-torsion can be Z/r × Z/r, and a cleared
-                        // point need not lie in <G>.
-                        if curve.cofactor.is_multiple_of(curve.r) {
-                            return Err(format!(
-                        "r = {} divides the cofactor {}: a hashed target need not lie in <G>",
-                        curve.r, curve.cofactor
-                    ));
-                        }
-                        let (q, c) = inst
-                            .hash_to_subgroup(&curve, target_seed, index)
-                            .ok_or("no public target found in 10 000 hash attempts")?;
-                        let law = if u64::try_from(curve.r).is_ok() {
-                            PUBLIC_TARGET_LAW
-                        } else {
-                            PUBLIC_TARGET_LAW_WIDE
-                        };
-                        (law, q, None, Some(c))
-                    }
+                TargetKind::PlantedShared => {
+                    let r = curve
+                        .r
+                        .checked_u64()
+                        .ok_or("planted_shared targets need a one-word subgroup order")?;
+                    let k = shared_planted_scalar(r, target_seed, index);
+                    let q = inst.mul_generator_hex(k).ok_or(
+                        "the planted scalar gave the identity; the subgroup order is wrong",
+                    )?;
+                    (SHARED_TARGET_LAW, q, Some(ExactScalar::from(k)), None)
                 }
-            };
+                TargetKind::PlantedHecThread => {
+                    let Instance::Hec(i) = inst else {
+                        return Err(NOT_HEC.into());
+                    };
+                    let k = thread_scalar(i.r, index);
+                    let q = inst.mul_generator_hex(k).ok_or("k gave the identity")?;
+                    (HEC_THREAD_TARGET_LAW, q, Some(ExactScalar::from(k)), None)
+                }
+                TargetKind::Public if matches!(inst, Instance::Hec(_)) => {
+                    return Err(HEC_NO_PUBLIC.into());
+                }
+                TargetKind::Public => {
+                    // With r | h the r-torsion can be Z/r × Z/r, and a cleared
+                    // point need not lie in <G>.
+                    if (curve.cofactor.to_biguint() % curve.r.to_biguint())
+                        == num_bigint::BigUint::from(0u8)
+                    {
+                        return Err(format!(
+                            "r = {} divides the cofactor {}: a hashed target need not lie in <G>",
+                            curve.r, curve.cofactor
+                        ));
+                    }
+                    let (q, c) = inst
+                        .hash_to_subgroup(&curve, target_seed, index)
+                        .ok_or("no public target found in 10 000 hash attempts")?;
+                    let law = if curve.r.checked_u64().is_some() {
+                        PUBLIC_TARGET_LAW
+                    } else if matches!(inst, Instance::Big(_)) {
+                        PUBLIC_TARGET_LAW_BIG
+                    } else {
+                        PUBLIC_TARGET_LAW_WIDE
+                    };
+                    (law, q, None, Some(c))
+                }
+            }
+        };
         let (workload_id, workload_sha256) = bare_id(
             "W",
             &Self::identity_view(&curve, law, target_seed, index, &target),
@@ -1973,11 +2210,14 @@ impl Workload {
     pub fn kind(&self) -> TargetKind {
         if self.target_law == PUBLIC_TARGET_LAW
             || self.target_law == PUBLIC_TARGET_LAW_WIDE
+            || self.target_law == PUBLIC_TARGET_LAW_BIG
             || self.target_law == "ecbench.public-fixture/v1"
         {
             TargetKind::Public
         } else if self.target_law == SHARED_TARGET_LAW {
             TargetKind::PlantedShared
+        } else if self.target_law == HEC_THREAD_TARGET_LAW {
+            TargetKind::PlantedHecThread
         } else {
             TargetKind::Planted
         }
@@ -2038,9 +2278,7 @@ mod tests {
                 inst.mul_generator_hex(scalar)
             );
         }
-        let wide = (num_bigint::BigUint::from(1u8) << 200usize)
-            * num_bigint::BigUint::from(inst.r())
-            + 13u8;
+        let wide = (num_bigint::BigUint::from(1u8) << 200usize) * inst.r().to_biguint() + 13u8;
         let exact = ExactScalar::from_biguint(&wide).unwrap();
         assert!(exact.checked_u128().is_none());
         assert_eq!(inst.mul_generator_exact(exact), inst.mul_generator_hex(13));
@@ -2114,7 +2352,9 @@ mod tests {
             assert_eq!(inst.r(), facts.r);
             assert_eq!(inst.mul_generator_hex(1).unwrap(), facts.generator);
             assert!(inst.mul_generator_hex(0).is_none());
-            assert!(inst.mul_generator_hex(inst.r()).is_none());
+            assert!(inst
+                .mul_generator_hex(inst.r().checked_u128().unwrap())
+                .is_none());
             assert!(inst.mul_generator_hex(2).is_some());
             assert!(
                 inst.hash_to_subgroup(&facts, 1, 0).is_none(),
@@ -2371,7 +2611,8 @@ mod tests {
                 w
             );
             // In <G>, by exhaustion on a subgroup this small.
-            assert!((1..w.curve.r).any(|k| inst.mul_generator_hex(k).as_ref() == Some(&w.target)));
+            assert!((1..w.curve.r.checked_u128().unwrap())
+                .any(|k| inst.mul_generator_hex(k).as_ref() == Some(&w.target)));
         }
     }
 
@@ -2445,7 +2686,7 @@ mod tests {
         .unwrap();
         let n = 20_000u64;
         let mut xs: Vec<f64> = (0..n)
-            .map(|i| planted_scalar(&w.curve, 20261002, i) as f64 / w.curve.r as f64)
+            .map(|i| planted_scalar(&w.curve, 20261002, i).unwrap() as f64 / w.curve.r.to_f64())
             .collect();
         xs.sort_by(f64::total_cmp);
         let d = xs
@@ -2541,9 +2782,9 @@ mod merged_variant_tests {
         for spec in specs {
             let i = spec.build().unwrap();
             let facts = i.facts(&spec);
-            assert!(facts.r > 2);
+            assert!(facts.r > 2u64.into());
             assert_eq!(i.mul_generator_hex(1).unwrap(), facts.generator);
-            assert!(i.mul_generator_hex(i.r()).is_none());
+            assert!(i.mul_generator_hex(i.r().checked_u128().unwrap()).is_none());
             assert_eq!(
                 serde_json::from_str::<CurveSpec>(&serde_json::to_string(&spec).unwrap()).unwrap(),
                 spec
@@ -2569,7 +2810,7 @@ mod merged_variant_tests {
         let instance = spec.build().unwrap();
         let facts = instance.facts(&spec);
         assert_eq!(facts.family, "prime");
-        assert_eq!(facts.r, 269);
+        assert_eq!(facts.r, 269u64.into());
         let (workload, _) = Workload::build(&spec, 1, 0, TargetKind::Planted).unwrap();
         let representation = workload.representation.expect("EFD representation");
         assert_eq!(representation.model, "montgom");
@@ -2578,5 +2819,215 @@ mod merged_variant_tests {
             serde_json::from_str::<CurveSpec>(&serde_json::to_string(&spec).unwrap()).unwrap(),
             spec
         );
+    }
+}
+
+#[cfg(test)]
+mod big_koblitz_tests {
+    //! The three-word Koblitz class and the scalar laws past `2^128`.
+    use super::*;
+    use crate::cryptanalysis::koblitz_big::U192;
+
+    fn spec(a: u8, n: u32) -> CurveSpec {
+        CurveSpec::Koblitz { a, n }
+    }
+
+    /// ECC2K-130's field and K-163 build as big instances, by their
+    /// registered moduli, with exact orders past `2^128` in the facts.
+    #[test]
+    fn big_koblitz_curves_build_with_their_registered_identities() {
+        for (a, n, slug, r) in [
+            (
+                0u8,
+                131u32,
+                "icv1-f2m131-tm22283658519494248867-115e0dc5",
+                "680564733841876926932320129493409985129",
+            ),
+            (
+                1,
+                163,
+                "icv1-f2m163-tm4845466632539410776804317-e15e581e",
+                "5846006549323611672814741753598448348329118574063",
+            ),
+        ] {
+            let s = spec(a, n);
+            let inst = s.build().unwrap();
+            assert!(matches!(inst, Instance::Big(_)));
+            let f = inst.facts(&s);
+            assert_eq!(f.slug, slug);
+            // The registry document lists the curve (with the modulus the
+            // build used).  `f.registered` reads it through
+            // `registry_index.txt`, which must be current for the flag to
+            // be true.
+            assert!(
+                registry_curves()
+                    .iter()
+                    .any(|c| c.get("slug").and_then(Value::as_str) == Some(slug)),
+                "{slug} is in docs/curves/registry.json"
+            );
+            assert_eq!(f.family, "koblitz");
+            assert_eq!(f.field_degree, Some(n));
+            assert_eq!(f.automorphisms_available, 2 * n);
+            assert_eq!(f.r.to_string(), r);
+            assert!(f.r.checked_u128().is_none());
+            assert_eq!(
+                f.group_order.to_biguint(),
+                f.r.to_biguint() * f.cofactor.to_biguint()
+            );
+            assert_eq!(inst.r(), f.r);
+            assert_eq!(
+                f.construction,
+                format!("BigKoblitz::new({a}, registry modulus for n = {n})")
+            );
+            // The constructor's generator is not the published point.
+            assert_eq!(f.ec1, None);
+            // [1]G is the generator, [r]G and [0]G the identity.
+            assert_eq!(
+                inst.mul_generator_exact(ExactScalar::from(1u64)).unwrap(),
+                f.generator
+            );
+            assert!(inst.mul_generator_exact(f.r).is_none());
+            assert!(inst.mul_generator_hex(0).is_none());
+            // A scalar past r reduces before it multiplies.
+            let k = ExactScalar::from_biguint(&(f.r.to_biguint() * 3u8 + 2u8)).unwrap();
+            assert_eq!(
+                inst.mul_generator_exact(k),
+                inst.mul_generator_exact(ExactScalar::from(2u64))
+            );
+            // The facts serialise the wide orders as decimal strings.
+            let v = serde_json::to_value(&f).unwrap();
+            assert_eq!(v["r"], serde_json::json!(r));
+            assert_eq!(serde_json::from_value::<CurveFacts>(v).unwrap(), f);
+        }
+        // Degrees 128..=191 with no usable prime are refused, as are a > 1.
+        assert!(spec(0, 137).build().is_err());
+        assert!(spec(2, 131).build().is_err());
+        assert!(spec(0, 192).build().is_err());
+    }
+
+    /// The planted law past `2^128`: `1 + D mod (r − 1)` of the whole digest,
+    /// `[k]G` the target, the workload serialising and re-deriving its id.
+    #[test]
+    fn planted_targets_past_2_128_use_the_big_law_and_round_trip() {
+        let s = spec(0, 131);
+        let inst = s.build().unwrap();
+        let mut seen = std::collections::BTreeSet::new();
+        for index in 0..4 {
+            let w = Workload::on(&s, &inst, 77, index, TargetKind::Planted).unwrap();
+            assert_eq!(w.target_law, TARGET_LAW_BIG);
+            assert_eq!(w.kind(), TargetKind::Planted);
+            let k = w.planted.unwrap();
+            assert!(k >= ExactScalar::from(1u64) && k < w.curve.r);
+            assert!(seen.insert(k));
+            // The law, by hand.
+            let parts = [
+                model_hash(&w.curve).to_string(),
+                w.curve.r.to_string(),
+                "77".to_string(),
+                index.to_string(),
+            ];
+            let want =
+                derive_biguint(TARGET_LAW_BIG, &parts) % (w.curve.r.to_biguint() - 1u8) + 1u8;
+            assert_eq!(k.to_biguint(), want);
+            assert_eq!(inst.mul_generator_exact(k).unwrap(), w.target);
+            // Q is in the order-r subgroup.
+            let Instance::Big(bi) = &inst else {
+                unreachable!()
+            };
+            let q = RawPointG::Affine {
+                x: W192::parse_hex(&w.target[0]).unwrap(),
+                y: W192::parse_hex(&w.target[1]).unwrap(),
+            };
+            assert_eq!(bi.rho.scalar_mul(q, bi.kc.r192()), RawPointG::Infinity);
+            let text = serde_json::to_string(&w).unwrap();
+            assert!(text.contains(&format!("\"planted\":\"{k}\"")));
+            let back: Workload = serde_json::from_str(&text).unwrap();
+            assert_eq!(back, w);
+            assert_eq!(back.recompute_id().unwrap(), w.workload_id);
+        }
+        assert!(
+            Workload::on(&s, &inst, 77, 0, TargetKind::PlantedShared).is_err(),
+            "the shared law is one-word only"
+        );
+    }
+
+    /// The public law past `2^128`: a hashed abscissa lifted to the
+    /// subgroup, no planted answer, stable in its inputs.
+    #[test]
+    fn public_targets_past_2_128_use_the_big_law() {
+        for (a, n) in [(0u8, 131u32), (1, 163)] {
+            let s = spec(a, n);
+            let inst = s.build().unwrap();
+            let Instance::Big(bi) = &inst else {
+                unreachable!()
+            };
+            let w = Workload::on(&s, &inst, 5, 1, TargetKind::Public).unwrap();
+            assert_eq!(w.target_law, PUBLIC_TARGET_LAW_BIG);
+            assert_eq!(w.kind(), TargetKind::Public);
+            assert_eq!(w.planted, None);
+            let again = Workload::on(&s, &inst, 5, 1, TargetKind::Public).unwrap();
+            assert_eq!(again, w);
+            let other = Workload::on(&s, &inst, 5, 2, TargetKind::Public).unwrap();
+            assert_ne!(other.target, w.target);
+            let q = RawPointG::Affine {
+                x: W192::parse_hex(&w.target[0]).unwrap(),
+                y: W192::parse_hex(&w.target[1]).unwrap(),
+            };
+            assert_ne!(q, RawPointG::Infinity);
+            assert_eq!(bi.rho.scalar_mul(q, bi.kc.r192()), RawPointG::Infinity);
+            // The abscissa law by hand: the counter's digest, its low n bits
+            // lifted, bit 255 choosing the ordinate, the cofactor cleared.
+            let parts = [
+                model_hash(&w.curve).to_string(),
+                w.curve.r.to_string(),
+                "5".to_string(),
+                "1".to_string(),
+                w.target_counter.unwrap().to_string(),
+            ];
+            let d = derive_biguint(PUBLIC_TARGET_LAW_BIG, &parts);
+            let mask = (num_bigint::BigUint::from(1u8) << n) - 1u8;
+            let x = W192::from_biguint(&(&d & &mask)).unwrap();
+            let pts = bi.kc.points_with_x(&bi.kc.field(), x);
+            let (px, py) = pts[usize::from(d.bit(255) && pts.len() > 1)];
+            let h = U192::from_u128(u128::from(bi.kc.cofactor));
+            assert_eq!(bi.rho.scalar_mul(RawPointG::Affine { x: px, y: py }, h), q);
+        }
+    }
+
+    /// The laws of every order that fits a `u128` are the committed ones:
+    /// the one-word and the wide planted scalar, recomputed by the formulas
+    /// they were written with before the big law existed.
+    #[test]
+    fn existing_laws_draw_the_scalars_they_always_drew() {
+        for s in [spec(0, 41), spec(1, 47), spec(0, 83)] {
+            let inst = s.build().unwrap();
+            let f = inst.facts(&s);
+            let model = model_hash(&f);
+            for index in 0..5u64 {
+                let (k, law) = planted_scalar_exact(&f, 9, index);
+                let want = match f.r.checked_u64() {
+                    Some(r) => {
+                        assert_eq!(law, TARGET_LAW);
+                        u128::from(1 + derive_u64(TARGET_LAW, &[model, r, 9, index]) % (r - 1))
+                    }
+                    None => {
+                        assert_eq!(law, TARGET_LAW_WIDE);
+                        let r = f.r.checked_u128().unwrap();
+                        let parts = [
+                            model.to_string(),
+                            r.to_string(),
+                            "9".into(),
+                            index.to_string(),
+                        ];
+                        1 + derive_u128(TARGET_LAW_WIDE, &parts) % (r - 1)
+                    }
+                };
+                assert_eq!(k, ExactScalar::from(want));
+                assert_eq!(planted_scalar(&f, 9, index), Some(want));
+                let w = Workload::on(&s, &inst, 9, index, TargetKind::Planted).unwrap();
+                assert_eq!(w.planted, Some(ExactScalar::from(want)));
+                assert_eq!(Some(w.target.clone()), inst.mul_generator_hex(want));
+            }
+        }
     }
 }

@@ -1,0 +1,20 @@
+{
+  "schema": "compact-counter-build/v1",
+  "source_commit": "96f0c814d928f07e96e15361cc43a35fe7306377",
+  "class": "counter-feature development correctness, not performance samples or total operation pricing",
+  "captured_utc": "2026-11-15T22:55:18.972465+00:00",
+  "executable": {
+    "path": "/workspace/relation-native-qualifiers/compact-counter-96f0c814d-01",
+    "sha256": "888befce676c2eb15cd985e41eacfc55191ebbe198f3df4f9550f6fb37179450",
+    "bytes": 2544064
+  },
+  "feature": "count-field-ops",
+  "argv": [
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "process_cap_seconds": 180,
+  "address_space_cap_kib": 2097152,
+  "command": "cargo test --release --locked --lib --no-run --features count-field-ops --manifest-path crates/certified-relations/Cargo.toml --message-format=json",
+  "transform": "separate copy, strip debug, read-only before hash"
+}

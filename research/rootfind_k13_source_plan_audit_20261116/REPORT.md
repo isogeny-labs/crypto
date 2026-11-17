@@ -65,3 +65,14 @@ python3 research/rootfind_k13_source_plan_audit_20261116/audit.py \
   --panel research/rootfind_f456_batch_combined_20261115/SPEC-K13.json \
   --records /Users/adamburan/.cache/crypto-store/sha256/dc/dc16c97ae21a250cc1d47237231d9642960c100dc3fdb68f4dd210af171bff44
 ```
+
+## Subsequent gate outcome (2026-11-16)
+
+The native argument check listed above as pending was subsequently completed
+by the separate [launcher check](../rootfind_k13_native_launcher_check_20261116/REPORT.md).
+Its [machine receipt](../rootfind_k13_native_launcher_check_20261116/RESULT.json)
+records eight passing source-compiled Rust tests, including exact embedding of
+the frozen v3 spec, with no image or Job submission. This is a later result;
+the plan and archived-counter findings in this report are unchanged. The
+deployed launcher, verified image, current budget and checkpoint gates, L2
+execution, and independent replay remain outstanding. [pcc:unverified]

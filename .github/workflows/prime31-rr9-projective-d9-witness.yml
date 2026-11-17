@@ -1,0 +1,85 @@
+name: Prime31 RR9 B8 projective degree-nine witness (Rust 1.100)
+on:
+  push:
+    branches:
+      - research/prime31-rr9-degree9-separator-20261117
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_projective_d9_witness.rs'
+      - '.github/workflows/prime31-rr9-projective-d9-witness.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_projective_d9_witness.rs'
+      - 'research/prime31_ic_20261115/rr9/RR9_PROJECTIVE_D9_PROTOCOL_20261117.md'
+      - '.github/workflows/prime31-rr9-projective-d9-witness.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sparse-positive-d9-witness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out exact candidate sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs
+            research/prime31_ic_20261115/native/examples/prime31_rr9_projective_d9_witness.rs
+          sparse-checkout-cone-mode: false
+      - name: Reuse immutable original native prime31 library and field arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: prime31-native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Pin Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only existing RR9 quadrics and new bounded witness wrapper
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_projective_d9_witness.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+      - name: Native original arithmetic and new example unit tests
+        run: |
+          cargo +1.100.0 test --release --locked --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          timeout -k 10 300 cargo +1.100.0 test --release --locked --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_projective_d9_witness
+          cargo +1.100.0 build --release --locked --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_projective_d9_witness
+      - name: Capture bounded sparse positive witness with 1 GiB address-space cap
+        run: |
+          timeout -k 10 300 bash -c '
+            ulimit -v 1048576
+            exec "$1"
+          ' _ prime31-native-pinned/research/prime31_ic_20261115/native/target/release/examples/prime31_rr9_projective_d9_witness > prime31-rr9-projective-d9-witness.json
+          jq -e '
+             .schema == "prime31.rr9.projective-d9-positive-witness.v1" and
+             .p == 2147483647 and .n == 2147446831 and
+             .base_x == [0,1,2,3,5,6,8,9] and
+             .positive_residual == [1911579686,548820096] and
+             .degree == 9 and
+             .macaulay_columns == 11440 and
+             .macaulay_rows_checked == 27456 and
+             .evaluation_at_h_equals_one_nonzero == true and
+             .all_D9_rows_annihilated == true and
+             .degree_nine_rank_upper_bound_for_positive == 11439 and
+             .negative_degree_nine_rank == null and
+             .complete_unknown_ecdlp_solves == 0 and
+             .public_only_non_enumerative_extractor_implemented == false and
+             .pcc == "unverified"
+          ' prime31-rr9-projective-d9-witness.json
+      - name: Retain exact-source bounded native witness JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-projective-d9-witness
+          path: prime31-rr9-projective-d9-witness.json
+          if-no-files-found: warn
+          retention-days: 30

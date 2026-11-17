@@ -1,0 +1,51 @@
+    Checking hashed-ecdl-tensor v0.1.0 (/workspace/crypto-trace/crates/hashed-ecdl-tensor)
+error[E0433]: cannot find `metrics` in the crate root
+   --> crates/hashed-ecdl-tensor/src/curve.rs:275:16
+    |
+275 |         crate::metrics::group(left == right && left != &Point::Infinity)?;
+    |                ^^^^^^^ could not find `metrics` in the crate root
+
+error[E0433]: cannot find `metrics` in the crate root
+   --> crates/hashed-ecdl-tensor/src/curve.rs:322:16
+    |
+322 |         crate::metrics::scalar()?;
+    |                ^^^^^^^ could not find `metrics` in the crate root
+
+error[E0433]: cannot find `metrics` in the crate root
+   --> crates/hashed-ecdl-tensor/src/partial.rs:171:16
+    |
+171 |         crate::metrics::phase("target_validation")?;
+    |                ^^^^^^^ could not find `metrics` in the crate root
+
+error[E0433]: cannot find `metrics` in the crate root
+   --> crates/hashed-ecdl-tensor/src/partial.rs:190:16
+    |
+190 |         crate::metrics::phase("relation_check")?;
+    |                ^^^^^^^ could not find `metrics` in the crate root
+
+error[E0433]: cannot find `metrics` in the crate root
+   --> crates/hashed-ecdl-tensor/src/partial.rs:219:16
+    |
+219 |         crate::metrics::phase("linear_algebra")?;
+    |                ^^^^^^^ could not find `metrics` in the crate root
+
+error[E0433]: cannot find `metrics` in the crate root
+   --> crates/hashed-ecdl-tensor/src/partial.rs:258:16
+    |
+258 |         crate::metrics::phase("recovery_check")?;
+    |                ^^^^^^^ could not find `metrics` in the crate root
+
+error[E0433]: cannot find `metrics` in the crate root
+   --> crates/hashed-ecdl-tensor/src/partial.rs:369:16
+    |
+369 |         crate::metrics::phase("relation_target")?;
+    |                ^^^^^^^ could not find `metrics` in the crate root
+
+error[E0433]: cannot find `metrics` in the crate root
+   --> crates/hashed-ecdl-tensor/src/partial.rs:376:16
+    |
+376 |         crate::metrics::phase("relation_search")?;
+    |                ^^^^^^^ could not find `metrics` in the crate root
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `hashed-ecdl-tensor` (lib) due to 8 previous errors

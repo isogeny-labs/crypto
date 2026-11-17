@@ -1,0 +1,50 @@
+proc require92s(int ok,string tag){if(!ok){print("SEMANTIC92_FATAL "+tag);exit;}}
+string saved92s=read("rr-pid50.sing");
+int start92s=find(saved92s,"ring inverseBaseCertificate50=");
+require92s(start92s>0,"PID_HEADER");
+execute(saved92s[start92s,size(saved92s)-start92s+1]);
+setring inverseBaseCertificate50;
+matrix B092s=matrix(basis50);poly F092s=commonDenominator50;
+execute(read("relative-infinity50.sing"));
+ring field92s=(2,u),(l,v),dp;
+map relativeMap92s=relativeInfinity50,l,v,u;
+ideal I92s=std(relativeMap92s(relativeInfinityIdeal50));
+require92s(vdim(I92s)==32,"SOURCE_FIELD_DIMENSION");
+qring Q92s=I92s;
+map pidMap92s=inverseBaseCertificate50,u;
+matrix B92s=pidMap92s(B092s);poly F92s=pidMap92s(F092s);
+poly invF92s=lift(F92s,1)[1,1];
+ideal powers92s;ideal monomials92s;ideal generators92s;
+powers92s[1]=1;int i92s;int j92s;
+for(i92s=2;i92s<=16;i92s++){powers92s[i92s]=reduce(powers92s[i92s-1]*l,std(0));}
+for(i92s=1;i92s<=32;i92s++){
+ monomials92s[i92s]=powers92s[((i92s-1)%16)+1];
+ if(i92s>16){monomials92s[i92s]=reduce(monomials92s[i92s]*v,std(0));}
+}
+poly numerator92s;
+for(j92s=1;j92s<=32;j92s++){
+ numerator92s=0;
+ for(i92s=1;i92s<=32;i92s++){
+  if(B92s[i92s,j92s]!=0){numerator92s=reduce(numerator92s+B92s[i92s,j92s]*monomials92s[i92s],std(0));}
+ }
+ generators92s[j92s]=reduce(numerator92s*invF92s,std(0));
+}
+execute(read("multiplication92.sing"));
+int a92s;int b92s;int pair92s=0;
+poly exported92s;poly actual92s;
+for(a92s=1;a92s<=32;a92s++){
+ for(b92s=a92s;b92s<=32;b92s++){
+  pair92s=pair92s+1;
+  require92s(pairA92[pair92s]==a92s && pairB92[pair92s]==b92s,"PAIR_INDEX_"+string(pair92s));
+  exported92s=0;
+  for(i92s=1;i92s<=32;i92s++){
+   exported92s=reduce(exported92s+productW92[i92s,pair92s]*monomials92s[i92s],std(0));
+  }
+  actual92s=reduce(generators92s[a92s]*generators92s[b92s],std(0));
+  require92s(reduce(exported92s+actual92s,std(0))==0,"PRODUCT_MISMATCH_"+string(pair92s));
+ }
+}
+require92s(pair92s==528,"FINAL_COUNT");
+print("REPLAY92_SEMANTIC actual_products=528 exported_power_vectors=528 source_field_dimension=32");
+print("REPLAY92_SEMANTIC_PASS");
+quit;

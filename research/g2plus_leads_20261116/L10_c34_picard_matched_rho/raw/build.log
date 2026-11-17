@@ -1,0 +1,76 @@
+warning: method `fpm` is never used
+ --> src/fp.rs:8:12
+  |
+7 | impl Cnt {
+  | -------- method in this implementation
+8 |     pub fn fpm(&self) -> u64 {
+  |            ^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `fpm` is never used
+  --> src/fp.rs:12:8
+   |
+12 | pub fn fpm(c: &Cnt) -> u64 {
+   |        ^^^
+
+warning: method `mul_u` is never used
+  --> src/fp.rs:30:12
+   |
+20 | impl Fp {
+   | ------- method in this implementation
+...
+30 |     pub fn mul_u(&self, a: u64, b: u64) -> u64 {
+   |            ^^^^^
+
+warning: fields `n_cols` and `rows_target` are never read
+  --> src/lines.rs:57:9
+   |
+52 | pub struct SearchResult {
+   |            ------------ fields in this struct
+...
+57 |     pub n_cols: usize,
+   |         ^^^^^^
+58 |     pub rows_target: usize,
+   |         ^^^^^^^^^^^
+
+warning: `l10` (bin "l10") generated 4 warnings
+    Finished `release` profile [optimized] target(s) in 0.01s
+warning: method `fpm` is never used
+ --> src/fp.rs:8:12
+  |
+7 | impl Cnt {
+  | -------- method in this implementation
+8 |     pub fn fpm(&self) -> u64 {
+  |            ^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `fpm` is never used
+  --> src/fp.rs:12:8
+   |
+12 | pub fn fpm(c: &Cnt) -> u64 {
+   |        ^^^
+
+warning: method `mul_u` is never used
+  --> src/fp.rs:30:12
+   |
+20 | impl Fp {
+   | ------- method in this implementation
+...
+30 |     pub fn mul_u(&self, a: u64, b: u64) -> u64 {
+   |            ^^^^^
+
+warning: fields `n_cols` and `rows_target` are never read
+  --> src/lines.rs:57:9
+   |
+52 | pub struct SearchResult {
+   |            ------------ fields in this struct
+...
+57 |     pub n_cols: usize,
+   |         ^^^^^^
+58 |     pub rows_target: usize,
+   |         ^^^^^^^^^^^
+
+warning: `l10` (bin "l10") generated 4 warnings
+    Finished `release` profile [optimized] target(s) in 0.00s

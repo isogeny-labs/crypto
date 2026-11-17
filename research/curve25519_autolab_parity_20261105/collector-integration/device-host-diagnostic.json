@@ -1,0 +1,12 @@
+{
+  "observed_at": "2026-11-07T00:47:15.144464+00:00",
+  "test": "cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic",
+  "exit_code": 101,
+  "failure": "device_tests.rs:40 Command::new(CXX or c++).output().unwrap(): ENOENT",
+  "command_lookup": {
+    "c++": "absent",
+    "g++": "absent",
+    "clang++": "absent"
+  },
+  "action": "restore host C++ toolchain, preserve original gate failures; rerun affected group and required full gate after original terminal"
+}

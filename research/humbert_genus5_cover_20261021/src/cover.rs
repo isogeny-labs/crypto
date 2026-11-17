@@ -432,7 +432,7 @@ pub struct Stats {
 }
 
 /// Identify the zero of G in the fibre over a root x (must be a rational point).
-fn identify(fb: &FactorBase, c: &[u64; 12], x: u64, p: u64) -> Option<usize> {
+pub fn identify(fb: &FactorBase, c: &[u64; 12], x: u64, p: u64) -> Option<usize> {
     let j = fb.xidx[x as usize];
     if j == usize::MAX {
         return None;

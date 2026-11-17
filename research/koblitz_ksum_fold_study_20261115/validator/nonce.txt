@@ -1,0 +1,5 @@
+ls_remote=b8cd452f3f52d8ad32aa77813f44a6b385567033	refs/heads/main
+utc=2026-11-15T22:41:48.077154652Z
+urandom_sha256=c91e2aa832ee39aab928718f7980df51dc38ccbd1b6432f21b7670049a7d199a
+nonce=c43be3fd423ec533b5436156cc99152efff0012a2cecfa44622c021477b42c57
+derivation=nonce = sha256(ls_remote line, utc, urandom_sha256 joined by newlines); target_seed_i = int(nonce[8*i:8*i+12], 16) mod 10^12 for i = 0,1,2; measurement seed = target_seed + 1000

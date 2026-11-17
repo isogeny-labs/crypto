@@ -7386,6 +7386,83 @@ pub fn prime_factor_base(inst: &PrimeInstance, size: usize) -> FactorBase<PrimeP
     fb
 }
 
+/// The cofactor-cleared base: `[h]P` for the points `P` above the
+/// smallest abscissae, until `size` distinct abscissae of `[h]P` are
+/// collected, each with its negative, one column per abscissa.
+///
+/// Every base point then lies in the order-`r` subgroup that the targets
+/// live in.  A pair sum of base points then always lands there, so a
+/// meet-in-the-middle table over this base hits a target `h` times as often
+/// as one over the raw small-abscissa base, at the same size
+/// (`research/isogeny_conductor_gap_round5_20261012/`, E7a).  The `[h]`
+/// multiplications are charged to `ops`.  With `h = 1` it is
+/// [`prime_factor_base`] with the same points.
+pub fn prime_factor_base_cleared(
+    inst: &PrimeInstance,
+    size: usize,
+    ops: &mut GroupOps,
+) -> FactorBase<PrimePoint> {
+    let start = Instant::now();
+    let curve = &inst.curve;
+    let h = inst.cofactor;
+    let mut fb = FactorBase::empty(format!("[{h}]·(smallest abscissae), {size} columns"));
+    let mut x = 1u64;
+    let mut scanned = 0u64;
+    let mut sqrts = 0u64;
+    let mut cleared = 0u64;
+    while fb.abscissae < size && x < curve.p {
+        scanned += 1;
+        let rhs = curve.rhs(x);
+        if curve.legendre(rhs) >= 0 {
+            sqrts += 1;
+            if let Some(y) = curve.sqrt(rhs) {
+                let raw = PrimePoint::affine(x, y);
+                let p = if h == 1 {
+                    raw
+                } else {
+                    cleared += 1;
+                    curve.mul(ops, raw, h)
+                };
+                if !p.infinity && !fb.x_index.contains_key(&p.x) {
+                    let y = if p.y == 0 { 0 } else { p.y.min(curve.p - p.y) };
+                    let p = PrimePoint::affine(p.x, y);
+                    let q = curve.neg(p);
+                    let col = fb.abscissae;
+                    let i = fb.points.len();
+                    fb.points.push(p);
+                    fb.col_of.push(col);
+                    fb.coef_of.push(1);
+                    if q != p {
+                        fb.points.push(q);
+                        fb.col_of.push(col);
+                        fb.coef_of.push(inst.r - 1);
+                        fb.neg_index.push(i + 1);
+                        fb.neg_index.push(i);
+                        fb.x_index.insert(p.x, vec![i, i + 1]);
+                    } else {
+                        fb.neg_index.push(i);
+                        fb.x_index.insert(p.x, vec![i]);
+                    }
+                    fb.abscissae += 1;
+                }
+            }
+        }
+        x += 1;
+    }
+    fb.columns = fb.abscissae;
+    for (i, p) in fb.points.iter().enumerate() {
+        fb.point_index.insert(curve.key(p), i);
+    }
+    fb.abscissa_list = fb.x_index.keys().copied().collect();
+    fb.abscissa_list.sort_unstable();
+    fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
+    fb.cost.count("abscissae_scanned", scanned);
+    fb.cost.count("legendre_symbols", scanned);
+    fb.cost.count("sqrt_solves", sqrts);
+    fb.cost.count("cofactor_clearings", cleared);
+    fb
+}
+
 /// Coverage control: scan canonical abscissae in a fixed nonzero stride
 /// modulo p.  This changes the base while retaining the same column count
 /// and the same exact point-lift, setup and table accounting as the ordinary
@@ -9391,6 +9468,9 @@ pub struct KSumTable {
     /// Each is a candidate relation among the base logs that the table
     /// found for free; [`KSumTable::free_rows`] verifies them.
     pub keep_collisions: bool,
+    /// Skip partial sums that cannot be completed to `k` summands
+    /// ([`KSumTable::build_negation_folded_opts`]).
+    pub prune: bool,
     pub collisions: Vec<(u64, u64)>,
 }
 
@@ -9412,6 +9492,21 @@ impl KSumTable {
         fb: &FactorBase<G::Elt>,
         k: u32,
         keep_collisions: bool,
+    ) -> Result<Self, String> {
+        Self::build_negation_folded_opts(g, fb, k, keep_collisions, false)
+    }
+
+    /// The same table; with `prune`, a partial sum of `d + 1` summands is
+    /// formed only when at least `k - d - 1` abscissae remain after its
+    /// last one, so no add is spent on a partial that can never reach `k`
+    /// summands.  The kept sums, their keys and the inserts are identical
+    /// either way; only the dead-end adds of the lower levels go.
+    pub fn build_negation_folded_opts<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        k: u32,
+        keep_collisions: bool,
+        prune: bool,
     ) -> Result<Self, String> {
         if !(3..=KSUM_MAX_K).contains(&k) {
             return Err(format!(
@@ -9456,6 +9551,7 @@ impl KSumTable {
             insert_attempts: 0,
             index_lookups: a,
             keep_collisions: false,
+            prune,
             collisions: Vec::new(),
         };
         t.keep_collisions = keep_collisions;
@@ -9478,7 +9574,14 @@ impl KSumTable {
         idx: &mut [u32; KSUM_MAX_K as usize],
     ) {
         let last = depth + 1 == self.k as usize;
-        for (ai, group) in groups.iter().enumerate().skip(from) {
+        // With `prune`, stop where fewer than `k - depth - 1` abscissae
+        // would remain for the deeper levels.
+        let end = if self.prune {
+            groups.len().saturating_sub(self.k as usize - depth - 1)
+        } else {
+            groups.len()
+        };
+        for (ai, group) in groups.iter().enumerate().take(end).skip(from) {
             let signs: &[usize] = if depth == 0 { &group[..1] } else { group };
             for &j in signs {
                 let s = match partial {
@@ -22152,6 +22255,36 @@ mod ksum_wide_index_tests {
             assert!(k * ksum_index_bits(k) <= 64, "k = {k}");
         }
         assert_eq!(KSUM_MAX_K, 9);
+    }
+
+    /// `prune` builds the same table (keys, entries, inserts) and spends
+    /// only the adds of partial sums that can still reach k summands:
+    /// `Σ_{j=2..k} 2^(j-1)·C(a-(k-j), j)` against `Σ 2^(j-1)·C(a, j)`.
+    #[test]
+    fn pruned_build_is_the_same_table_with_fewer_adds() {
+        let inst = prime_instance_for(24, 5);
+        let g = &inst.curve;
+        let choose = |n: u64, j: u64| (0..j).fold(1u64, |c, i| c * (n - i) / (i + 1));
+        for (k, a) in [(3u32, 14usize), (4, 12), (5, 11), (6, 12), (7, 11)] {
+            let fb = prime_factor_base(&inst, a);
+            let full = KSumTable::build_negation_folded_opts(g, &fb, k, true, false).unwrap();
+            let pr = KSumTable::build_negation_folded_opts(g, &fb, k, true, true).unwrap();
+            assert_eq!(full.map, pr.map, "k = {k}");
+            assert_eq!(full.collisions, pr.collisions, "k = {k}");
+            assert_eq!(full.insert_attempts, pr.insert_attempts, "k = {k}");
+            assert_eq!(full.entries, pr.entries, "k = {k}");
+            let a = a as u64;
+            let k = u64::from(k);
+            let want_full: u64 = (2..=k).map(|j| (1u64 << (j - 1)) * choose(a, j)).sum();
+            let want_pr: u64 = (2..=k)
+                .map(|j| (1u64 << (j - 1)) * choose(a - (k - j), j))
+                .sum();
+            // Identities are skipped before their subtree, so the counts
+            // can fall a little short of the formula, never above it.
+            assert!(full.build_ops.adds <= want_full && full.build_ops.adds + 64 >= want_full);
+            assert!(pr.build_ops.adds <= want_pr && pr.build_ops.adds + 64 >= want_pr);
+            assert!(pr.build_ops.adds < full.build_ops.adds, "k = {k}");
+        }
     }
 
     fn is_sum_of_base<G: CountedGroup>(

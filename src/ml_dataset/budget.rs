@@ -26,6 +26,31 @@ const STATE_MAX_BYTES: usize = 32 * 1024 * 1024;
 const MAX_GRANTS: usize = 4096;
 const MONEY_CEILING: u64 = 200_000_000;
 const OUTPUT_CEILING: u64 = 20 * 1024 * 1024 * 1024;
+pub(super) const OWNER_LEASE_ENV: &str = "CRYPTO_ML_DATASET_OWNER_LEASE_FD";
+
+/// Consume the descriptor from the private helper protocol once. Keep a
+/// process-local ownership record instead of mutating the process environment.
+pub(super) fn take_inherited_owner_lease() -> Result<File, String> {
+    #[cfg(unix)]
+    {
+        use std::os::fd::FromRawFd;
+        static TAKEN: Mutex<BTreeSet<libc::c_int>> = Mutex::new(BTreeSet::new());
+        let raw = std::env::var(OWNER_LEASE_ENV)
+            .map_err(|_| "budgeted helper requires the original owner's inherited lease")?
+            .parse::<libc::c_int>()
+            .map_err(|_| "invalid inherited owner lease descriptor")?;
+        let mut taken = TAKEN.lock().map_err(|_| "poisoned owner lease handoff")?;
+        if raw < 3 || taken.contains(&raw) || unsafe { libc::fcntl(raw, libc::F_GETFD) } < 0 {
+            return Err("inherited owner lease is absent or already consumed".into());
+        }
+        taken.insert(raw);
+        // This function is the sole owner of this protocol descriptor. The
+        // session constructor checks its lock identity before admitting work.
+        Ok(unsafe { File::from_raw_fd(raw) })
+    }
+    #[cfg(not(unix))]
+    Err("supervised budget owner leases require Unix".into())
+}
 
 /// GET and HEAD share read_attempts; all values include failed/unknown attempts.
 /// Money is conservative reserved micro-USD, never an observed billing total.
@@ -1786,10 +1811,20 @@ impl BudgetSession {
             );
         }
         let held = lease(&path)?;
-        let conn = database(&path, false, false)?;
+        Self::resume_with_lease(&path, policy, grant, owner, held)
+    }
+
+    fn resume_with_lease(
+        path: &Path,
+        policy: &CampaignPolicy,
+        grant: &WorkerGrant,
+        owner: &OwnerIdentity,
+        held: File,
+    ) -> Result<Self, String> {
+        let conn = database(path, false, false)?;
         verify_events(&conn)?;
         let state: WorkerState = read_state(&conn, "worker")?;
-        Self::check_authority(&path, &state)?;
+        Self::check_authority(path, &state)?;
         if state.policy != *policy || state.grant != *grant || grant.request.owner != *owner {
             return Err("worker policy/grant/owner binding changed".into());
         }
@@ -1815,6 +1850,86 @@ impl BudgetSession {
             grant: grant.clone(),
             nonce: state.nonce,
         })
+    }
+
+    /// Duplicate the same owner's open-file-description lease for a supervised
+    /// helper. It retains this grant, journal, activation nonce and balance.
+    pub(super) fn duplicate_owner_lease(&self) -> Result<File, String> {
+        self.require_active()?;
+        self._lease.try_clone().map_err(|e| e.to_string())
+    }
+
+    /// Inherit the same owner's lease across exec without clearing CLOEXEC in
+    /// the parent or selecting a fixed fd that could overwrite an exec pipe.
+    pub(super) fn configure_helper_lease(
+        &self,
+        command: &mut std::process::Command,
+    ) -> Result<(), String> {
+        let inherited = self.duplicate_owner_lease()?;
+        #[cfg(unix)]
+        {
+            use std::os::fd::AsRawFd;
+            use std::os::unix::process::CommandExt;
+            command.env(OWNER_LEASE_ENV, inherited.as_raw_fd().to_string());
+            unsafe {
+                command.pre_exec(move || {
+                    let raw = inherited.as_raw_fd();
+                    let flags = libc::fcntl(raw, libc::F_GETFD);
+                    if flags < 0 || libc::fcntl(raw, libc::F_SETFD, flags & !libc::FD_CLOEXEC) < 0 {
+                        return Err(std::io::Error::last_os_error());
+                    }
+                    Ok(())
+                });
+            }
+            Ok(())
+        }
+        #[cfg(not(unix))]
+        Err("supervised budget owner leases require Unix".into())
+    }
+
+    /// Resume through an inherited owner lease, never by acquiring a second
+    /// independent owner or creating worker state. Normal open remains exclusive.
+    pub(super) fn open_with_owner_lease(
+        path: &Path,
+        policy: &CampaignPolicy,
+        grant: &WorkerGrant,
+        owner: &OwnerIdentity,
+        held: File,
+    ) -> Result<Self, String> {
+        let path = db_path(path, false)?;
+        Self::check_path(&path, grant)?;
+        if !path.exists() {
+            return Err(
+                "budget session state is missing; a helper may not reset its balance".into(),
+            );
+        }
+        #[cfg(unix)]
+        {
+            use std::os::fd::AsRawFd;
+            use std::os::unix::fs::MetadataExt;
+            let expected = fs::symlink_metadata(format!("{}.lock", path.display()))
+                .map_err(|e| format!("owner lease path: {e}"))?;
+            let actual = held
+                .metadata()
+                .map_err(|e| format!("owner lease descriptor: {e}"))?;
+            let flags = unsafe { libc::fcntl(held.as_raw_fd(), libc::F_GETFL) };
+            if !expected.is_file()
+                || !actual.is_file()
+                || (actual.dev(), actual.ino()) != (expected.dev(), expected.ino())
+                || flags < 0
+                || flags & libc::O_ACCMODE != libc::O_RDWR
+            {
+                return Err("inherited owner lease does not match the worker journal lock".into());
+            }
+            // A dup of the existing open-file description shares its lock. A
+            // separately opened descriptor cannot acquire it while the owner lives.
+            if unsafe { libc::flock(held.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) } != 0 {
+                return Err("inherited owner lease is not held by this supervised owner".into());
+            }
+        }
+        #[cfg(not(unix))]
+        return Err("inherited budget owner leases require Unix flock".into());
+        Self::resume_with_lease(&path, policy, grant, owner, held)
     }
 
     pub fn policy(&self) -> &CampaignPolicy {
@@ -3327,6 +3442,192 @@ mod tests {
             expected_bytes: 0,
             scope,
         }
+    }
+
+    #[test]
+    fn supervised_owner_lease_shares_the_original_nonce_charges_and_exclusive_lock() {
+        let temp = Temp::new();
+        let (policy, grant, parent) = session(&temp.0);
+        activate_mock(&parent);
+        let path = temp.0.join("worker.sqlite");
+        let before = parent.snapshot().unwrap()["charged_attempts"]
+            .as_u64()
+            .unwrap();
+        let helper = BudgetSession::open_with_owner_lease(
+            &path,
+            &policy,
+            &grant,
+            &grant.request.owner,
+            parent.duplicate_owner_lease().unwrap(),
+        )
+        .unwrap();
+        assert_eq!(parent.nonce, helper.nonce);
+        let first = parent
+            .before_http_attempt(&head(BudgetScope::Work))
+            .unwrap();
+        let second = helper
+            .before_http_attempt(&head(BudgetScope::Work))
+            .unwrap();
+        assert_ne!(first.attempt_id, second.attempt_id);
+        assert_eq!(parent.snapshot().unwrap(), helper.snapshot().unwrap());
+        assert_eq!(parent.snapshot().unwrap()["charged_attempts"], before + 2);
+        assert!(BudgetSession::open(&path, &policy, &grant, &grant.request.owner).is_err());
+        drop(helper);
+        assert!(BudgetSession::open(&path, &policy, &grant, &grant.request.owner).is_err());
+        drop(parent);
+        let resumed = BudgetSession::open(&path, &policy, &grant, &grant.request.owner).unwrap();
+        assert_eq!(resumed.snapshot().unwrap()["charged_attempts"], before + 2);
+    }
+
+    #[test]
+    fn supervised_lease_refuses_separate_descriptors_replaced_paths_and_wrong_owner() {
+        let temp = Temp::new();
+        let (policy, grant, parent) = session(&temp.0);
+        activate_mock(&parent);
+        let path = temp.0.join("worker.sqlite");
+        let lock = temp.0.join("worker.sqlite.lock");
+        let separately_opened = OpenOptions::new()
+            .read(true)
+            .write(true)
+            .open(&lock)
+            .unwrap();
+        assert!(BudgetSession::open_with_owner_lease(
+            &path,
+            &policy,
+            &grant,
+            &grant.request.owner,
+            separately_opened,
+        )
+        .is_err());
+        let mut wrong_owner = grant.request.owner.clone();
+        wrong_owner.pod_uid.push_str("-other");
+        assert!(BudgetSession::open_with_owner_lease(
+            &path,
+            &policy,
+            &grant,
+            &wrong_owner,
+            parent.duplicate_owner_lease().unwrap(),
+        )
+        .is_err());
+        let moved = temp.0.join("worker.sqlite.lock.original");
+        fs::rename(&lock, &moved).unwrap();
+        fs::write(&lock, b"replacement").unwrap();
+        assert!(BudgetSession::open_with_owner_lease(
+            &path,
+            &policy,
+            &grant,
+            &grant.request.owner,
+            parent.duplicate_owner_lease().unwrap(),
+        )
+        .err()
+        .unwrap()
+        .contains("does not match"));
+        fs::remove_file(&lock).unwrap();
+        fs::rename(&moved, &lock).unwrap();
+        assert!(BudgetSession::open(&path, &policy, &grant, &grant.request.owner).is_err());
+    }
+
+    #[test]
+    fn supervised_helper_process_keeps_parent_lock_and_unknown_attempt_charges() {
+        const CHILD_FIXTURE: &str = "CRYPTO_TEST_ML_OWNER_LEASE_FIXTURE";
+        if let Some(fixture) = std::env::var_os(CHILD_FIXTURE) {
+            let (policy, grant): (CampaignPolicy, WorkerGrant) =
+                serde_json::from_slice(&fs::read(fixture).unwrap()).unwrap();
+            let held = take_inherited_owner_lease().unwrap();
+            assert!(take_inherited_owner_lease().is_err());
+            let helper = BudgetSession::open_with_owner_lease(
+                Path::new(&grant.request.worker_journal_path),
+                &policy,
+                &grant,
+                &grant.request.owner,
+                held,
+            )
+            .unwrap();
+            // No response is recorded: exit must retain the conservative charge.
+            helper
+                .before_http_attempt(&head(BudgetScope::Work))
+                .unwrap();
+            return;
+        }
+        let temp = Temp::new();
+        let (policy, grant, parent) = session(&temp.0);
+        activate_mock(&parent);
+        let before = parent.snapshot().unwrap();
+        let fixture = temp.0.join("helper-fixture.json");
+        fs::write(&fixture, serde_json::to_vec(&(&policy, &grant)).unwrap()).unwrap();
+        let mut child = std::process::Command::new(std::env::current_exe().unwrap());
+        child.args([
+            "--exact",
+            "ml_dataset::budget::tests::supervised_helper_process_keeps_parent_lock_and_unknown_attempt_charges",
+            "--nocapture",
+        ]).env(CHILD_FIXTURE, fixture);
+        parent.configure_helper_lease(&mut child).unwrap();
+        let inherited_fd: libc::c_int = child
+            .get_envs()
+            .find(|(name, _)| *name == std::ffi::OsStr::new(OWNER_LEASE_ENV))
+            .unwrap()
+            .1
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .parse()
+            .unwrap();
+        let original_flags = unsafe { libc::fcntl(inherited_fd, libc::F_GETFD) };
+        assert_ne!(original_flags & libc::FD_CLOEXEC, 0);
+        let output = child.output().unwrap();
+        assert!(
+            output.status.success(),
+            "{}\n{}",
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+        assert!(String::from_utf8_lossy(&output.stdout).contains("1 passed; 0 failed"));
+        assert_eq!(
+            unsafe { libc::fcntl(inherited_fd, libc::F_GETFD) },
+            original_flags
+        );
+        let after = parent.snapshot().unwrap();
+        assert_eq!(
+            after["charged_attempts"].as_u64().unwrap(),
+            before["charged_attempts"].as_u64().unwrap() + 1
+        );
+        assert_eq!(
+            after["outcome_unknown_attempts"].as_u64().unwrap(),
+            before["outcome_unknown_attempts"].as_u64().unwrap() + 1
+        );
+        drop(child);
+        assert!(BudgetSession::open(
+            &temp.0.join("worker.sqlite"),
+            &policy,
+            &grant,
+            &grant.request.owner
+        )
+        .is_err());
+        let nonce = parent.nonce.clone();
+        drop(parent);
+        let resumed = BudgetSession::open(
+            &temp.0.join("worker.sqlite"),
+            &policy,
+            &grant,
+            &grant.request.owner,
+        )
+        .unwrap();
+        assert_eq!(resumed.nonce, nonce);
+        assert_eq!(
+            resumed.snapshot().unwrap()["charged_attempts"],
+            after["charged_attempts"]
+        );
+    }
+
+    #[test]
+    fn inactive_or_closed_session_cannot_delegate_its_owner_lease() {
+        let temp = Temp::new();
+        let (_policy, _grant, parent) = session(&temp.0);
+        assert!(parent.duplicate_owner_lease().is_err());
+        activate_mock(&parent);
+        assert!(parent.duplicate_owner_lease().is_ok());
+        parent.close("finished control").unwrap();
+        assert!(parent.duplicate_owner_lease().is_err());
     }
 
     #[test]

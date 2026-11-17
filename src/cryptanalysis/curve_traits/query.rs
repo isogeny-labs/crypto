@@ -88,7 +88,7 @@ pub struct Match<'a> {
 
 /// Every other curve ranked by likeness to `target`: least mismatch
 /// weight first, then nearest in the two size-free reals.  With
-/// `other_sizes`, curves over a field of the target's size are left out.
+/// `other_sizes`, curves with the target's field kind and bit length are left out.
 pub fn similar<'a>(
     curves: &'a [CurveTraits],
     target: &CurveTraits,
@@ -156,8 +156,15 @@ mod tests {
         assert_eq!(file.schema, SCHEMA);
         // Explicit compile-time inputs also let sparse CI restore exactly the
         // source files this catalog binds, without loading research archives.
+        let catalog = include_str!("../../../docs/curves/cover-catalog.json");
+        let rows = crate::cryptanalysis::cover_catalog::restrict(
+            include_str!("../../../docs/curves/registry.json"),
+            catalog,
+        )
+        .unwrap();
         let inputs = [
-            ("docs/curves/registry.json", include_str!("../../../docs/curves/registry.json")),
+            ("docs/curves/registry.json (rows named by docs/curves/cover-catalog.json)", rows.as_str()),
+            ("docs/curves/cover-catalog.json", catalog),
             ("docs/curves/factor-hints.txt", include_str!("../../../docs/curves/factor-hints.txt")),
             ("docs/curves/trait-sources.json", include_str!("../../../docs/curves/trait-sources.json")),
             (
@@ -180,6 +187,10 @@ mod tests {
                 .digest()
             })
             .collect();
+        assert_eq!(
+            file.catalog,
+            crate::cryptanalysis::cover_catalog::MANIFEST_PATH
+        );
         assert_eq!(file.catalog_rows_sha256, digests[0].sha256);
         assert_eq!(file.inputs, digests);
     }
@@ -205,7 +216,8 @@ mod tests {
         let ranked = similar(&file.curves, target, DEFAULT_WEIGHTS, true);
         assert!(ranked
             .iter()
-            .all(|m| m.curve.field.size_bits != target.field.size_bits));
+            .all(|m| m.curve.field.kind != target.field.kind
+                || m.curve.field.size_bits != target.field.size_bits));
         for m in ranked.iter().take(5) {
             assert_eq!(m.curve.keys["cm"], "-7");
             assert_eq!(m.curve.keys["descent"], "k1|t|=1");

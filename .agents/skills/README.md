@@ -30,6 +30,7 @@ research-kb (prior art)  →  controlled-experiment / experiment-protocol (desig
 | `ecbench-measure`, `ecbench-extend` | cross-method ECDLP measurements; adding a method |
 | `ic-autolab`, `dreg-triage` | index-calculus iterations and parameter sweeps |
 | `perf-ipc`, `profile` | cycles, IPC, where time goes |
+| `optlevel` | how close a kernel runs to its machine's roofline (not a speed claim) |
 | `curve-algebra`, `ecdlp-surfaces`, `isogeny-volcano`, `isogeny-volcano-diagrams` | curve structure, transfers, isogeny graphs |
 | `lean-instance-gate` | before any Lean definition, statement or proof; when a proof grows long or needs `maxHeartbeats` |
 | `ecbench-bounds` | what a method costs; whether a change beat it |

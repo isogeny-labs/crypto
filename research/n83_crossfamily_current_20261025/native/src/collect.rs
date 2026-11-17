@@ -17,7 +17,7 @@ fn version(key: &str) -> Result<Value> {
             "--prefix",
             key,
         ],
-        aws::REGION,
+        aws::BUCKET_REGION,
     )?;
     rows["Versions"]
         .as_array()
@@ -44,7 +44,7 @@ fn download(key: &str, path: &Path) -> Result<Value> {
             id,
             name,
         ],
-        aws::REGION,
+        aws::BUCKET_REGION,
     )?;
     let size = fs::metadata(path)?.len();
     if fetched["VersionId"] != id || fetched["ContentLength"] != size {
@@ -106,6 +106,7 @@ pub fn run(receipt_path: &Path, output: &Path) -> Result<Value> {
     fs::create_dir(output)?;
     fs::copy(receipt_path, output.join("allocation.json"))?;
     let mut rows = Vec::new();
+    let mut complete_raw = true;
     for stratum in 0..2 {
         let folder = output.join(format!("stratum{stratum}"));
         fs::create_dir(&folder)?;
@@ -117,18 +118,28 @@ pub fn run(receipt_path: &Path, output: &Path) -> Result<Value> {
             .ok_or("status object key absent")?;
         let raw = folder.join("raw_results.tar.gz");
         let status = folder.join("status.tar.gz");
-        let raw_record = download(key, &raw)?;
         let status_record = download(status_key, &status)?;
-        extract(&raw, &folder)?;
-        if !folder.join("results/host.json").is_file()
-            || !folder.join("results/source.json").is_file()
-        {
-            return Err("raw result archive lacks host/source receipts".into());
-        }
+        let raw_record = match version(key) {
+            Ok(_) => {
+                let record = download(key, &raw)?;
+                extract(&raw, &folder)?;
+                if !folder.join("results/host.json").is_file()
+                    || !folder.join("results/source.json").is_file()
+                {
+                    return Err("raw result archive lacks host/source receipts".into());
+                }
+                Some(record)
+            }
+            Err(err) if err.to_string().starts_with("S3 object ") => {
+                complete_raw = false;
+                None
+            }
+            Err(err) => return Err(err),
+        };
         rows.push(json!({"stratum":stratum,"raw":raw_record,"status":status_record}));
     }
-    // With both immutable S3 versions in local custody, stop billing before
-    // the six-hour deletion guards whenever the host work finished early.
+    // Status is uploaded last on each host, after its raw upload attempt.
+    // Preserve status-only failures and stop billing once both hosts finish.
     let ids = controller["instance_ids"]
         .as_array()
         .ok_or("instance IDs absent")?
@@ -139,7 +150,8 @@ pub fn run(receipt_path: &Path, output: &Path) -> Result<Value> {
     args.extend(ids.iter().copied());
     let termination = aws::cli(&args, aws::REGION)?;
     let receipt = json!({"schema":"n83.crossfamily-aws-collection/v1",
-        "status":"BOTH_RAW_ARCHIVES_COLLECTED_TERMINATION_REQUESTED",
+        "status":if complete_raw {"BOTH_RAW_ARCHIVES_COLLECTED_TERMINATION_REQUESTED"}
+            else {"STATUS_ARCHIVES_COLLECTED_RAW_INCOMPLETE_TERMINATION_REQUESTED"},
         "source_head_sha":controller["source_head_sha"],
         "instance_ids":ids,"objects":rows,"termination":termination});
     let mut file = OpenOptions::new()

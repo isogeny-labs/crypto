@@ -895,7 +895,7 @@ fn reduce_bitwise(value: &mut [u64], irreducible: &IrreduciblePoly) {
 /// Spread the low 32 bits of `x` so that bit `i` lands at bit `2i`:
 /// squaring in characteristic 2 before reduction.
 #[inline(always)]
-fn spread32(x: u64) -> u64 {
+pub(crate) fn spread32(x: u64) -> u64 {
     let mut x = x & 0xFFFF_FFFF;
     x = (x | (x << 16)) & 0x0000_FFFF_0000_FFFF;
     x = (x | (x << 8)) & 0x00FF_00FF_00FF_00FF;
@@ -978,7 +978,7 @@ fn has_hw_clmul() -> bool {
 /// `out ^= a · b` over `F_2[z]`. Hardware two- and three-word products
 /// use Karatsuba cross terms; other widths use one carry-less multiply
 /// per limb pair. `out` must hold at least `a.len() + b.len()` words.
-fn mul_words_into(a: &[u64], b: &[u64], out: &mut [u64]) {
+pub(crate) fn mul_words_into(a: &[u64], b: &[u64], out: &mut [u64]) {
     debug_assert!(out.len() >= a.len() + b.len());
     #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
     if has_hw_clmul() {
@@ -1069,7 +1069,7 @@ unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
 /// Every NIST and SECG field satisfies `m − deg r ≥ 64`.  The toy fields
 /// (`m = 8, 16`) and dense tails do not, and take [`reduce_chunked`].
 /// Both are tested against the bit-at-a-time `reduce_bitwise`.
-fn reduce_words(value: &mut [u64], irreducible: &IrreduciblePoly) {
+pub(crate) fn reduce_words(value: &mut [u64], irreducible: &IrreduciblePoly) {
     let m = irreducible.degree as usize;
     let terms = &irreducible.low_terms;
     let t_max = terms.iter().copied().max().unwrap_or(0) as usize;
@@ -1326,6 +1326,81 @@ mod tests {
         let sum_sq = a.add(&b).square(&irr);
         let sq_sum = a.square(&irr).add(&b.square(&irr));
         assert_eq!(sum_sq, sq_sum);
+    }
+
+    /// Batching changes scratch-buffer reuse, not the number of field squares.
+    #[test]
+    fn square_k_times_tally_matches_repeated_squaring() {
+        use crate::binary_ecc::operation_tally::OperationTally;
+
+        for irr in [
+            IrreduciblePoly::deg_8(),
+            IrreduciblePoly::deg_16(),
+            IrreduciblePoly::deg_113(),
+            IrreduciblePoly::deg_127(),
+            IrreduciblePoly::deg_163(),
+        ] {
+            let m = irr.degree;
+            for a in [
+                F2mElement::zero(m),
+                F2mElement::one(m),
+                F2mElement::from_bit_positions(&[0, 3, m - 1], m),
+            ] {
+                for k in [0, 1, 2, 7, m - 1, m, m + 1] {
+                    let tally = OperationTally::begin();
+                    let batched = a.square_k_times(k, &irr);
+                    let batched_counts = tally.finish();
+
+                    let tally = OperationTally::begin();
+                    let mut repeated = a.clone();
+                    for _ in 0..k {
+                        repeated = repeated.square(&irr);
+                    }
+                    let repeated_counts = tally.finish();
+
+                    assert_eq!(batched, repeated, "field degree {m}, k={k}");
+                    assert_eq!(batched_counts, repeated_counts, "degree {m}, k={k}");
+                    if k == 0 {
+                        assert_eq!(batched, a);
+                        assert!(batched_counts.is_empty());
+                    } else {
+                        assert_eq!(batched_counts.len(), 1);
+                        assert_eq!(batched_counts[&format!("f2m{m}_square")], u64::from(k));
+                    }
+                }
+            }
+        }
+    }
+
+    /// Itoh--Tsujii inversion uses m-1 squares, including its batched steps.
+    #[test]
+    fn flt_inverse_tally_includes_all_squarings() {
+        use crate::binary_ecc::operation_tally::OperationTally;
+
+        for irr in [
+            IrreduciblePoly::deg_8(),
+            IrreduciblePoly::deg_16(),
+            IrreduciblePoly::deg_113(),
+            IrreduciblePoly::deg_127(),
+            IrreduciblePoly::deg_163(),
+        ] {
+            let m = irr.degree;
+            for a in [
+                F2mElement::one(m),
+                F2mElement::from_bit_positions(&[0, 3, m - 1], m),
+            ] {
+                let tally = OperationTally::begin();
+                let inverse = a.flt_inverse(&irr).expect("nonzero field element");
+                let counts = tally.finish();
+
+                assert_eq!(counts[&format!("f2m{m}_square")], u64::from(m - 1));
+                assert_eq!(counts[&format!("f2m{m}_inverse_informational")], 1);
+                assert!(counts[&format!("f2m{m}_mul")] > 0);
+                assert_eq!(counts.len(), 3);
+                // Check the field result outside the inversion's counting window.
+                assert_eq!(a.mul(&inverse, &irr), F2mElement::one(m));
+            }
+        }
     }
 
     /// `a · a⁻¹ = 1` for non-zero `a`.

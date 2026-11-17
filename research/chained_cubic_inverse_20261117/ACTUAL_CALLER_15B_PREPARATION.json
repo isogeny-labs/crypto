@@ -1,0 +1,17 @@
+{
+  "prepared": "2026-11-17T11:01:42.677071+00:00",
+  "original_source_A": "14e707ea89a6f2b50f1331db50faff899255e678",
+  "first_negative_claim_path": "pcc/claims/PCC-20261117-9faa15.json",
+  "changes_full_diff": "--- frozen-A/run_first_unit_15.py\n+++ new-B/run_first_unit_15B.py\n@@ -53,7 +53,7 @@\n   assert free_temp>=3*1024*1024,('compiler scratch preflight',free_temp)\n   return {'RAM_available':free_ram,'scratch_available':free_temp,'minimum_RAM':8*1024*1024,'minimum_scratch':3*1024*1024}\n  local_phase('frozen-storage-preflight',storage)\n- lock=study/'SOURCE_LOCK_15.json'\n+ lock=study/'SOURCE_LOCK_15B.json'\n  git_env=dict(env,GIT_OPTIONAL_LOCKS='0',GIT_NO_LAZY_FETCH='1')\n  def exact_public_source():\n   subject=lock.relative_to(repo).as_posix()\n@@ -136,7 +136,7 @@\n  lean=originals['pinned_Lean_compiler_and_direct_imports'][0]['path']\n  command('Lean-version',[lean,'--version'])\n  (hold/'proof-output').mkdir()\n- out,_=command('first-frozen-Lean-proof',['timeout','--signal=TERM','--kill-after=5s','120s',lean,'-DwarningAsError=true','-o',str(hold/'proof-output/Inverse15.olean'),str(proof_path)])\n+ out,_=command('first-frozen-Lean-proof',['timeout','--signal=TERM','--kill-after=5s','120s',lean,'--root='+str(hold),'-DwarningAsError=true','-o',str(hold/'proof-output/Inverse15.olean'),str(proof_path)])\n  def axioms_record():\n   text=out.read_text();names=['norm_cubic','inverse_by_square','cubic_inverse_pair']\n   assert all('ChainedCubicInverse15.'+name in text for name in names),text\n",
+  "all28_original_A_source_hashes_still_equal": true,
+  "all_scientific_source_and_original_acceptance_unchanged": true,
+  "metadata_AST_parse_only": true,
+  "B_scientific_compiler_proof_native_calls": 0,
+  "whole_failed_A_packet": {
+    "path": "/dev/net/chained-transfers-owned-storage-20261117/native15-complete-packets/entire-first15A-source-full-three-rlibs-compiled-ELF-proof-and-all-logs.tar.xz",
+    "bytes": 1737984,
+    "sha256": "4c36de55392ed11be1692a76a2b3865eb8b823b60a2e9bb758f7618a82033a99",
+    "members": 65,
+    "all_full_bytes_and_modes_compared": true
+  }
+}

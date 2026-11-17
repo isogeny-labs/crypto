@@ -1,0 +1,126 @@
+warning: unused import: `PathBuf`
+ --> src/bin/twist-interval-audit.rs:9:18
+  |
+9 |     path::{Path, PathBuf},
+  |                  ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: function `multi_event_profiles_and_missing_footers_are_not_Ir_totals` should have a snake case name
+   --> src/bin/twist-interval-audit.rs:384:8
+    |
+384 |     fn multi_event_profiles_and_missing_footers_are_not_Ir_totals() {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: convert the identifier to snake case (notice the capitalization): `multi_event_profiles_and_missing_footers_are_not_ir_totals`
+    |
+    = note: `#[warn(non_snake_case)]` on by default
+
+warning: `twist-route-experiments` (bin "twist-interval-audit" test) generated 2 warnings (run `cargo fix --bin "twist-interval-audit" --tests` to apply 1 suggestion)
+warning: unused import: `PathBuf`
+ --> src/bin/twist-decomposition-cost.rs:9:18
+  |
+9 |     path::{Path, PathBuf},
+  |                  ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: `twist-route-experiments` (bin "twist-decomposition-cost" test) generated 1 warning (run `cargo fix --bin "twist-decomposition-cost" --tests` to apply 1 suggestion)
+warning: unused import: `PathBuf`
+ --> src/bin/twist-frontier-audit.rs:9:18
+  |
+9 |     path::{Path, PathBuf},
+  |                  ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: `twist-route-experiments` (bin "twist-frontier-audit" test) generated 1 warning (run `cargo fix --bin "twist-frontier-audit" --tests` to apply 1 suggestion)
+   Compiling twist-route-experiments v0.1.0 (/workspace/crypto-twist-runs/research/twist_routes_1_3_20261021/runner)
+warning: unused import: `PathBuf`
+  --> src/bin/twist-incidence-frontier.rs:11:18
+   |
+11 |     path::{Path, PathBuf},
+   |                  ^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: function `reference_calls` is never used
+ --> src/bin/../../../../../src/cryptanalysis/twist_ic_field.rs:6:8
+  |
+6 | pub fn reference_calls() -> u64 {
+  |        ^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: methods `pm`, `trace`, and `points` are never used
+   --> src/bin/../../../../../src/cryptanalysis/twist_ic_field.rs:183:12
+    |
+ 81 | impl Quad {
+    | --------- methods in this implementation
+...
+183 |     pub fn pm(self, mut x: P, mut n: u128) -> P {
+    |            ^^
+...
+195 |     pub fn trace(self, x: P) -> P {
+    |            ^^^^^
+...
+213 |     pub fn points(self) -> Vec<P> {
+    |            ^^^^^^
+
+warning: methods `lift`, `fp`, `pn`, `pm`, and `frob` are never used
+   --> src/bin/../../../../../src/cryptanalysis/twist_ic_field.rs:393:12
+    |
+256 | impl Sext {
+    | --------- methods in this implementation
+...
+393 |     pub fn lift(self, q: Q) -> S {
+    |            ^^^^
+...
+397 |     pub fn fp(self, s: S) -> Option<u64> {
+    |            ^^
+...
+405 |     pub fn pn(self, x: SP) -> SP {
+    |            ^^
+...
+434 |     pub fn pm(self, mut x: SP, mut n: u128, a: S) -> SP {
+    |            ^^
+...
+446 |     pub fn frob(self, x: SP) -> SP {
+    |            ^^^^
+
+warning: `twist-route-experiments` (bin "twist-incidence-frontier" test) generated 4 warnings (run `cargo fix --bin "twist-incidence-frontier" --tests` to apply 1 suggestion)
+warning: function `incomplete_and_multi_event_traces_are_not_single_Ir_totals` should have a snake case name
+   --> src/bin/twist-sweep-audit.rs:317:8
+    |
+317 |     fn incomplete_and_multi_event_traces_are_not_single_Ir_totals() {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: convert the identifier to snake case (notice the capitalization): `incomplete_and_multi_event_traces_are_not_single_ir_totals`
+    |
+    = note: `#[warn(non_snake_case)]` on by default
+
+warning: `twist-route-experiments` (bin "twist-sweep-audit" test) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 5.01s
+     Running unittests src/bin/twist-block-audit.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_block_audit-8801406a5235948d)
+     Running unittests src/bin/twist-block-cost.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_block_cost-5275e347d0761a6d)
+     Running unittests src/bin/twist-block-sweep.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_block_sweep-fd744a52c1a193e3)
+     Running unittests src/bin/twist-browser-refresh.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_browser_refresh-2ece82193288f392)
+     Running unittests src/bin/twist-decomposition-cost.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_decomposition_cost-aee7c6c10cec203d)
+     Running unittests src/bin/twist-endo-symmetry.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_endo_symmetry-ca20679ad8d05d81)
+     Running unittests src/bin/twist-frontier-audit.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_frontier_audit-440234015b939ef1)
+     Running unittests src/bin/twist-generator-census.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_generator_census-b737529ac13578c6)
+     Running unittests src/bin/twist-incidence-cost-audit.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_incidence_cost_audit-0d0b95cc508d1d23)
+     Running unittests src/bin/twist-incidence-frontier.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_incidence_frontier-0a5a9eaea7d0524a)
+     Running unittests src/bin/twist-interval-audit.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_interval_audit-caeabd35c8733493)
+     Running unittests src/bin/twist-kernel-publication.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_kernel_publication-3c3d1884840d1dfb)
+     Running unittests src/bin/twist-kernel-relations.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_kernel_relations-fe249d63f89e07c5)
+     Running unittests src/bin/twist-kernel-symmetry.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_kernel_symmetry-05cb10721b3d3320)
+     Running unittests src/bin/twist-max-order-census.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_max_order_census-af3647cc374c2934)
+     Running unittests src/bin/twist-pari-transport.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_pari_transport-ce683858de1f9c65)
+     Running unittests src/bin/twist-progression.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_progression-9c5fafa07f292c8b)
+     Running unittests src/bin/twist-progression-export.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_progression_export-25a4762ff093d547)
+     Running unittests src/bin/twist-quotient-cycle.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_quotient_cycle-923d214f7ddb23e5)
+     Running unittests src/bin/twist-registry-check.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_registry_check-1464919888289865)
+     Running unittests src/bin/twist-relation-rank.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_relation_rank-4adc46d79e2d6f69)
+     Running unittests src/main.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_route_experiments-361c665bce22dea9)
+     Running unittests src/bin/twist-route-summary.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_route_summary-aac4944e426817d8)
+     Running unittests src/bin/twist-route-supplement.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_route_supplement-0f02b6f5aab8c03c)
+     Running unittests src/bin/twist-shift-overlap.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_shift_overlap-c9c836f57ab4f3dd)
+     Running unittests src/bin/twist-sweep-audit.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_sweep_audit-c8f0062b1ed527cd)
+     Running unittests src/bin/twist-transfer-cost.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_transfer_cost-c5a5c91f594a7325)

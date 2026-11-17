@@ -1,0 +1,8 @@
+research/prime_field_transfer_goal_20261116/round-04/root_certificates.cpp: In function ‘Pair polynomial(const weber::P&)’:
+research/prime_field_transfer_goal_20261116/round-04/root_certificates.cpp:27:5: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   27 |     for(auto i=f.rbegin();i!=f.rend();++i)out=plus(product(out,x),constant(*i));return out;
+      |     ^~~
+research/prime_field_transfer_goal_20261116/round-04/root_certificates.cpp:27:81: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   27 |     for(auto i=f.rbegin();i!=f.rend();++i)out=plus(product(out,x),constant(*i));return out;
+      |                                                                                 ^~~~~~
+cc1plus: all warnings being treated as errors

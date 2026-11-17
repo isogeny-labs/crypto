@@ -1,0 +1,46 @@
+{
+  "schema": "local-software-exact-source-gate/v1",
+  "kind": "full_library",
+  "verdict": "PASS",
+  "exit_code": 0,
+  "source_unchanged": true,
+  "source_commit": "3a3f8fa7205405207e73ae303f35523cd44e8258",
+  "source_tree_before": "4ef568b90ddaa79a26b40a03919b0ec9e597004b",
+  "source_tree_after": "4ef568b90ddaa79a26b40a03919b0ec9e597004b",
+  "evidence": [
+    {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/boolean-cli-release-delivery-validation-20261102/library.receipt.json",
+      "sha256": "fb9e23e966ee1b2cb0972517da43aec7bd8aaac7d3584fc98a55f27cb25b1015"
+    },
+    {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/boolean-cli-release-delivery-validation-20261102/library.log",
+      "sha256": "f0ef677fdc8ba06540f093bbf01ed43e37c28d37a2a2e20795d26b92089e4f5b"
+    },
+    {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/boolean-cli-release-delivery-validation-20261102/source-hashes.json",
+      "sha256": "60298032b13614485dcceb12c6915963eccd5d85a541f60d872b0cc111fd3fa9"
+    },
+    {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/boolean-cli-release-delivery-validation-20261102/run.py",
+      "sha256": "1d70cdb74191c293e23fa072698725b121824442d6c4b532aa7b723370b6900b"
+    }
+  ],
+  "test_log": {
+    "path": "/home/ec2-user/ml-dataset-resume-20261029/boolean-cli-release-delivery-validation-20261102/library.log",
+    "sha256": "f0ef677fdc8ba06540f093bbf01ed43e37c28d37a2a2e20795d26b92089e4f5b"
+  },
+  "counts": [
+    6103,
+    0,
+    125,
+    0,
+    0
+  ],
+  "required_passing_tests": [
+    "ml_dataset::solvers::koblitz_m3::ordinary_construction::persisted::native_ownership::worker::boolean_producer_worker_tests::genuine_producer_original16384_positive_functional_gate",
+    "ml_dataset::channel_plan_tests::frozen_protocol_requires_exact_channels_in_canonical_extensions",
+    "ml_dataset::solvers::koblitz_m3::ordinary_construction::persisted::native_ownership::replay::boolean_replay::tests::projection_resource_and_deadline_refusals_are_distinct"
+  ],
+  "recorded_at": "2026-11-02T19:35:24.142972+00:00",
+  "interpretation": "Operator attestation from terminal wrapper receipt, exact log and source readback; no test rerun."
+}

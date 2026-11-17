@@ -1,0 +1,15 @@
+{
+  "action": "Check inherited identifier bindings before compilation; use a distinct wrapper result alias or a compatible generic default-error alias. Keep failed and pinned source intact when creating a corrected version.",
+  "created": "2026-11-17T04:09:56Z",
+  "evidence": [
+    "pcc/claims/PCC-20261117-d3ae2a.json",
+    "pcc/claims/PCC-20261117-42a9c2.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "chained-transfers"
+  ],
+  "trigger": "Including unchanged arithmetic core that uses standard Result<T,E> inside a new qualifier module",
+  "why": "The first wrapper shadowed the core Result arity and failed E0107; isolatedC changed only the alias and passed its first arithmetic execution."
+}

@@ -8,10 +8,17 @@ fn existing_output_is_refused_before_a_solver_call_and_left_unchanged() {
     for binary in [
         env!("CARGO_BIN_EXE_aps-partition-bridge"),
         env!("CARGO_BIN_EXE_quartic"),
+        env!("CARGO_BIN_EXE_encoding-compare"),
+        env!("CARGO_BIN_EXE_four-leads"),
     ] {
+        let mode = if binary == env!("CARGO_BIN_EXE_four-leads") {
+            "aux_domains"
+        } else {
+            "structural"
+        };
         let result = Command::new(binary)
             .args([
-                "structural",
+                mode,
                 "--source-revision",
                 &"a".repeat(40),
                 "--source-manifest-sha256",
@@ -32,6 +39,8 @@ fn missing_source_pins_cannot_start_the_fixed_panel() {
     for binary in [
         env!("CARGO_BIN_EXE_aps-partition-bridge"),
         env!("CARGO_BIN_EXE_quartic"),
+        env!("CARGO_BIN_EXE_encoding-compare"),
+        env!("CARGO_BIN_EXE_four-leads"),
     ] {
         let result = Command::new(binary).arg("structural").output().unwrap();
         assert!(!result.status.success());

@@ -1,0 +1,91 @@
+{
+  "schema": "isolab.eks.request/v1",
+  "job": {
+    "job_name": "ic-dgb-rho-p32-20261029",
+    "instance_type": "c8a.2xlarge",
+    "seconds": 3600,
+    "spec": {
+      "schema": "ecbench.spec/v1",
+      "label": "XP-20261029-dg-blocked P32 counted session: matched rho.negation for dg and dgb at N 1024",
+      "description": "Frozen protocol (backlog/XP-20261029-dg-blocked/PROTOCOL.md and APPROVAL.md): counted units only (S = GAE/sqrt(r), w = 0, 0.1, 1), same curves, targets and seeds as spec-P32.json; rho.negation reference and A/A. No wall field of this session is read. Public synthetic curves and targets; no security claim.",
+      "workloads": {
+        "curves": [
+          {
+            "kind": "prime_search",
+            "bits": 32,
+            "seed": 202610295323
+          },
+          {
+            "kind": "prime_search",
+            "bits": 32,
+            "seed": 202610295324
+          }
+        ],
+        "targets_per_curve": 24,
+        "target_seed": 202610295326,
+        "target_kind": "public"
+      },
+      "arms": [
+        {
+          "name": "rho-neg",
+          "role": "reference",
+          "method": {
+            "id": "rho.negation"
+          }
+        },
+        {
+          "name": "dg",
+          "role": "baseline",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=1024",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "167871873",
+              "targets": "stride-renew-deferred-guard"
+            }
+          }
+        },
+        {
+          "name": "dgb",
+          "role": "candidate",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=1024",
+              "oracle": "mitm-prime-blocked:m=2",
+              "max_trials": "167871873",
+              "targets": "stride-renew-deferred-guard"
+            }
+          }
+        },
+        {
+          "name": "rho-neg-aa",
+          "role": "control",
+          "method": {
+            "id": "rho.negation"
+          }
+        }
+      ],
+      "measurement": {
+        "rounds": 6,
+        "warmup": 1,
+        "order": "alternate",
+        "seed": 202610295328,
+        "isolation_required": "L2",
+        "timeout_seconds": 1800
+      }
+    },
+    "build": {
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:cf0dcc8ba2f6e399f3c16aec8dda0eaccb65dd0f8b75a2f90daf2b543ffb620c",
+      "source_revision": "be2969cebf30a0cfb79088fd10094324c3efb3bb",
+      "ecbench_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c"
+    }
+  },
+  "provenance": {
+    "harness": "claude-code-local",
+    "source_revision": "be2969cebf30a0cfb79088fd10094324c3efb3bb",
+    "workflow_revision": "be2969cebf30a0cfb79088fd10094324c3efb3bb",
+    "run_url": "https://github.com/isogeny-labs/crypto/blob/cd04cfd2d1df985e34f59b6a19bb8354e0f9a5ae/backlog/XP-20261029-dg-blocked/PROTOCOL.md"
+  }
+}

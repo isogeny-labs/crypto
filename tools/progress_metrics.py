@@ -29,6 +29,8 @@ Sources (all committed, read at --ref unless noted):
                                 exact fixed-score allocation coverage, not sampled curves or security
   research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json
                                 IC collect-phase component: paired native ratio and its A/A floor
+  research/ic_stride_renew_prime_20261029/P{20,24,28,32}/analysis/compare-*.json
+                                stride-renew / walk and stride-renew / matched rho, recorded ratios
   research/explicit_relations_e2e_20261030/results-v*/
                                 exact recovery counts and bounded two-target frontier; no L0 timing rank
   research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-cms-vsids-20261114/evidence/audit.json
@@ -235,6 +237,129 @@ def e2e_runs(ref):
          label="ic e2e gate history records", source="docs/ic/ci/runs/")
 
 
+def algebraic_stage(ref, since):
+    """Coverage of finite native panels, kept separate from pipeline ratios."""
+    path = "research/ic_algebraic_crossover_20261023/report-data.json"
+    for date, commit, txt in file_history(ref, path, since):
+        d = json.loads(txt)
+        if d.get("schema") != "ic-campaign-report-data/v1" or d.get("status") != "recomputed_from_raw":
+            continue
+        for panel in d.get("panels", []):
+            degree = panel.get("degree")
+            for field, label in (("paired_queries", "completed direct/symmetric pairs"),
+                                 ("symmetric_lower_words", "pairs with lower symmetric solver words")):
+                emit(f"ic.algebraic.closure-d{degree}.{field}", panel.get(field), date=date,
+                     problem=P_IC, unit="count", better="neutral",
+                     label=f"finite closure cap {degree}: {label}; stage only",
+                     source=f"{path}@{commit}")
+
+
+def algebraic_audits(ref, since):
+    """Recorded finite correctness/relevance counts, never a performance index."""
+    study = "research/ic_algebraic_crossover_20261023/pipeline-receipts/"
+    sources = [
+        ("fresh-target-relevance-20261025/receipt.json", "ic-fresh-target-relevance/v1",
+         "status", "all_target_roots_and_trace_criteria_agree", [
+             (("totals", field), f"ic.algebraic.fresh-target.{field}",
+              f"fresh Boolean fixtures: {label} on E0 reference; this audit checks lifts only")
+             for field, label in [
+                 ("sat_liftable", "SAT, target liftable"),
+                 ("sat_nonliftable", "SAT, target nonliftable"),
+                 ("unsat_liftable", "UNSAT, target liftable"),
+                 ("unsat_nonliftable", "UNSAT, target nonliftable"),
+             ]]),
+        ("quartic-smoke-20261025-02.json", "ecbench.audit/v1", "ok", True, [
+            (("verified_records",), "ic.algebraic.quartic-smoke.verified_records",
+             "quartic m6/8/10/12 smoke: verified records; counted L0 only")]),
+        ("external-cas-strengthened-20261025/replay.json", "ic-cas-correctness-replay/v1",
+         "status", "all_external_zero_sets_equal", [
+             (("cases",), "ic.algebraic.external-cas.correctness_cases",
+              "finite systems with equal Singular/native Boolean zero sets; no speed comparison")]),
+        ("fixture-subgroups-enumerated-20261025/receipt.json", "ic-fixture-subgroups/v2",
+         "status", "all_lifts_trace_orders_and_membership_checks_agree", [
+             (("totals", field), f"ic.algebraic.fixture-subgroups.{field}", label)
+             for field, label in [
+                 ("in_generated_subgroup", "original/fresh targets inside declared reference/twist G"),
+                 ("outside_generated_subgroup", "original/fresh targets outside declared reference/twist G"),
+                 ("generated_subgroup_unknown", "original/fresh targets with unresolved declared subgroup membership"),
+             ]]),
+        ("qualified-queries-20261025/summary.json", "ic-qualified-query-summary/v1",
+         "status", "all_2048_finite_chain_counts_and_paired_targets_verified", [
+             ((field,), f"ic.algebraic.qualified-queries.{field}", label)
+             for field, label in [
+                 ("rows", "additional qualified a0/full-degree-b query draws"),
+                 ("boolean_sat", "additional qualified queries with finite-chain roots"),
+                 ("point_sat", "additional qualified queries with actual subgroup point decompositions"),
+                 ("independent_point_arithmetic_rows_verified", "qualified point counts checked by independent arithmetic"),
+                 ("paired_target_count", "underlying public targets paired across qualified basis families"),
+             ]]),
+        *[(f"wide-core-audit-20261025/m{m}/output.json", "ic-quartic-wide-core-audit/v1",
+           "status", "verified", [
+               ((field,), f"ic.algebraic.wide-core.m{m}.{field}", f"m{m} wide-core {label}; full IC unmeasured")
+               for field, label in [
+                   ("independent_field_products", "independent field-product controls"),
+                   ("independent_scalar_controls", "independent full-width scalar controls"),
+               ]]) for m in (16, 17, 18)],
+    ]
+    for relative, schema, key, expected, fields in sources:
+        path = study + relative
+        for date, commit, txt in file_history(ref, path, since):
+            data = json.loads(txt)
+            if data.get("schema") != schema or data.get(key) != expected:
+                continue
+            for keys, metric, label in fields:
+                value = data
+                for part in keys:
+                    value = value.get(part) if isinstance(value, dict) else None
+                emit(metric, value, date=date, problem=P_IC, unit="count", better="neutral",
+                     label=label, source=f"{path}@{commit}")
+    path = study + "qualified-closure-replay-20261025/summary.json"
+    for date, commit, txt in file_history(ref, path, since):
+        data = json.loads(txt)
+        if data.get("schema") != "ic-qualified-closure-summary/v1":
+            continue
+        for group in data.get("groups", []):
+            degree = group.get("degree")
+            kind = "positive" if group.get("sat_control") else "negative"
+            for field in ("nonrefuting", "independent_hky_verified"):
+                emit(f"ic.algebraic.qualified-closure.d{degree}.{kind}.{field}", group.get(field),
+                     date=date, problem=P_IC, unit="count", better="neutral",
+                     label=f"qualified {kind} D{degree} {field}; finite closure only",
+                     source=f"{path}@{commit}")
+
+
+def completed_guess(ref, since):
+    """Frozen producer counts; separate from independent HKY and full IC price."""
+    study = "research/ic_algebraic_crossover_20261023/pipeline-receipts/"
+    path = study + "guess-completion-20261025-01/summary.json"
+    for date, commit, txt in file_history(ref, path, since):
+        data = json.loads(txt)
+        if data.get("status") != "all_registered_attempts_terminated_native_raw_accounting_recomputed":
+            continue
+        for field in ("producer_refuted", "producer_saturated_nonrefuting", "producer_unknown"):
+            emit(f"ic.algebraic.completed-guess.{field}", data.get(field), date=date,
+                 problem=P_IC, unit="count", better="neutral",
+                 label=f"registered original Boolean branches: {field}; producer classification",
+                 source=f"{path}@{commit}")
+        for row in data.get("draws", []):
+            for field, unit in (("balanced_prefix_minimum", "count"),
+                                ("passing_set_solver_words", "solver_word_ops"),
+                                ("search_through_first_passing_set_solver_words", "solver_word_ops")):
+                emit(f"ic.algebraic.completed-guess.draw{row['draw']}.{field}", row.get(field),
+                     date=date, problem=P_IC, unit=unit, better="neutral",
+                     label=f"draw {row['draw']} registered balanced prefix: {field}; no global minimum or full price",
+                     source=f"{path}@{commit}")
+    path = study + "cofactor-projection-20261025/receipt.json"
+    for date, commit, txt in file_history(ref, path, since):
+        data = json.loads(txt)
+        if data.get("status") != "all_finite_projected_membership_and_relation_checks_agree":
+            continue
+        for field in ("selected_projected_witness_relations", "selected_all_summands_in_prime_subgroup_relations"):
+            emit(f"ic.algebraic.cofactor-projection.{field}", data.get(field), date=date,
+                 problem=P_IC, unit="count", better="neutral",
+                 label=f"one canonical-sign witness per original SAT draw: {field}; no base logs or full IC",
+                 source=f"{path}@{commit}")
+
 
 def photo_volcano(ref):
     path = 'research/photo_volcano_restart_20261017/reports/completion_20261025/completion.json'
@@ -282,6 +407,30 @@ def nist_factorization(ref, since):
                  problem="nist-skipped-curve-factorization", unit=unit, better=better,
                  label=label, source=source)
 
+def publication_followup(ref, since):
+    """Native retained-profile/scalar diagnostics; no full IC performance index."""
+    path = "research/ic_algebraic_crossover_20261023/pipeline-receipts/publication-followup-audit-v3-20261026/output.json"
+    for date, commit, txt in file_history(ref, path, since):
+        data = json.loads(txt)
+        if data.get("status") != "native_profile_accounting_and_partial_scalar_checks_pass":
+            continue
+        for arm in data.get("constructor", {}).get("arms", []):
+            emit(f"ic.algebraic.narrow-constructor.{arm['arm']}.ir", arm.get("whole_process_ir"),
+                 date=date, problem=P_IC, unit="simulated_Ir", better="neutral",
+                 label=f"narrow6 {arm['arm']}: simulated whole-process Ir including loader/Valgrind; no native speedup",
+                 source=f"{path}@{commit}")
+        for row in data.get("partial_quartics", []):
+            for field in ("recorded", "missing_registered_executions", "independent_scalar_checks"):
+                emit(f"ic.algebraic.partial-quartic.m{row['m']}.{field}", row.get(field),
+                     date=date, problem=P_IC, unit="count", better="neutral",
+                     label=f"interrupted m{row['m']}: {field}; no completed IC comparison",
+                     source=f"{path}@{commit}")
+            for arm, statuses in row.get("counts", {}).items():
+                for status, value in statuses.items():
+                    emit(f"ic.algebraic.partial-quartic.m{row['m']}.{arm}.{status}", value,
+                         date=date, problem=P_IC, unit="count", better="neutral",
+                         label=f"interrupted m{row['m']} {arm}: {status}; missing/censored costs unknown",
+                         source=f"{path}@{commit}")
 def nist_selection_factor_census(ref, since):
     path = "research/nist_skip_criterion_20261025/factor_followup_20261026/results/factor-summary.json"
     for date, commit, text in file_history(ref, path, since):
@@ -618,6 +767,32 @@ def ic_aimed_gather(ref, since):
              source=src)
 
 
+def ic_stride_renew(ref, since):
+    """Prime-field IC baseline, relation targets stride-renew against walk
+    (XP-20261029-stride-renew-prime), per size: the measured ratio
+    sum S_srenew / sum S_walk and the distance remaining to the matched rho,
+    sum S_srenew / sum S_rho-neg, at each 5a band weight, with the upper end
+    of each recorded 95% cluster-bootstrap interval. Values are the `ops`
+    block `ecbench compare` recorded; nothing is recomputed. 20 and 28 bits
+    are validated improvements; 24 and 32 bits are nulls."""
+    study = "research/ic_stride_renew_prime_20261029"
+    for bits in (20, 24, 28, 32):
+        for w in ("0", "0.1", "1"):
+            for pair, name, label in (
+                    ("walk__srenew", "srenew_over_walk", "stride-renew / walk (the baseline target source)"),
+                    ("rho-neg__srenew", "srenew_over_rho", "stride-renew / matched rho.negation (distance remaining)")):
+                path = f"{study}/P{bits}/analysis/compare-{pair}-w{w}.json"
+                for date, commit, text in file_history(ref, path, since):
+                    ops = json.loads(text).get("ops", {})
+                    ci = ops.get("ci95_bootstrap") or [None, None]
+                    metric = f"ic_baseline.stride_renew.p{bits}.{name}.w{w}"
+                    what = f"Prime-field IC {bits}-bit, {label}, sum S at w = {w}"
+                    src = f"{path}@{commit}"
+                    emit(metric, ops.get("ratio_b_over_a"), date=date, problem=P_IC, unit="ratio of S",
+                         better="lower", label=what, source=src)
+                    emit(f"{metric}.ci95_hi", ci[1], date=date, problem=P_IC, unit="ratio of S",
+                         better="lower", label=f"{what}: upper end of the 95% cluster-bootstrap interval",
+                         source=src)
 def ic_packed_filter(ref, since):
     """The membership filter on the packed pair table (a wall component, not a whole-pipeline row):
     at 32 bits, the corrected whole-solve wall per charged GAE dgbf / dgb and its 95% upper end,
@@ -827,15 +1002,122 @@ def n83_d18_vsids_gate(ref, since):
 def vieta_component(ref, since):
     """Export stored native observations; censored records do not imply admission."""
     for slug in ("20261115T2104Z-vieta-coset-local-scale",
-                 "20261115T2147Z-vieta-three-fixture-repair"):
+                 "20261115T2147Z-vieta-three-fixture-repair",
+                 "20261116T1553Z-vieta-polynomial-backends",
+                 "20261116T1646Z-vieta-polynomial-registration",
+                 "20261116T1938Z-vieta-half-gcd-rational"):
         path = f"benchmarks/records/{slug}.json"
         for date, commit, text in file_history(ref, path, since):
             record = json.loads(text)
             for metric in record.get("metrics", []):
                 emit(f"vieta.component.{metric['name']}", metric.get("value"),
-                     date=date, problem="vieta-coset-component",
+                     date=date, problem=("vieta-rational-component" if slug == "20261116T1938Z-vieta-half-gcd-rational" else "vieta-coset-component"),
                      unit=metric.get("unit", ""), better="neutral",
                      label="Generic-reference operation counts; censored epoch, PCC unverified",
+                     source=f"{path}@{commit}")
+
+
+def vieta_native_speedup(ref, since):
+    """Copy frozen Rust medians only: no Python estimates or timing admission."""
+    # Git date-only --since retains the current time; use the UTC day boundary.
+    since_day = since + "T00:00:00Z" if len(since) == 10 else since
+    root = "research/vieta_coset_rust_20261115/speedup-20261117/evidence"
+    for panel, filename in (("primary", "primary-summary.json"),
+                            ("budget8b", "budget-summary.json")):
+        path = f"{root}/{filename}"
+        for date, commit, text in file_history(ref, path, since_day):
+            data = json.loads(text)
+            source = f"{path}@{commit}"
+            emit(f"vieta.native.{panel}.failed_calls", data.get("failed"),
+                 date=date, problem="vieta-relation-component", unit="calls",
+                 better="neutral", label="Stored failed-call count; PCC unverified",
+                 source=source)
+            for group in data.get("groups", []):
+                identity = group["group"].replace(":", "_").replace("-", "_")
+                ratio = group["paired_ratios"].get("newton/fiber-half:cold_ns", {})
+                if "median" in ratio:
+                    emit(f"vieta.native.{panel}.{identity}.cold_newton_ratio",
+                         ratio["median"], date=date,
+                         problem="vieta-relation-component", unit="ratio",
+                         better="higher",
+                         label="Stored native paired median, full cold; below L2, PCC unverified",
+                         source=source)
+                query = group["arms"].get("fiber-half", {}).get("query_work_muls", {})
+                if "median" in query:
+                    emit(f"vieta.native.{panel}.{identity}.query_muls",
+                         query["median"], date=date,
+                         problem="vieta-relation-component", unit="field multiplications",
+                         better="lower",
+                         label="Stored native evaluator query median; native field constructor ops unpriced, PCC unverified",
+                         source=source)
+
+
+def trace_local_runtime(ref, since):
+    """Export already-computed native observations, without re-estimating them."""
+    path = "research/trace_incidence_20261116/measure_20261117/results/report-data.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        source = f"{path}@{commit}"
+        for row in data.get("table", []):
+            if row.get("B") != 128:
+                continue
+            arm = row["arm"]
+            if arm not in ("known", "compose", "pairs", "first-bloom", "rho"):
+                continue
+            emit(f"trace.local.b128.{arm.replace('-', '_')}.wall_s",
+                 row["wall_seconds"]["median"], date=date,
+                 problem="prime-labelled-pool-recovery", unit="wall_s", better="neutral",
+                 label="B128 complete target median; shared local host, PCC unverified",
+                 source=source)
+        for comparison in ("pairs/first-bloom", "window-horner/compose", "first-bloom/rho"):
+            metric = comparison.replace("-", "_").replace("/", "_over_")
+            emit(f"trace.local.b128.{metric}.paired_ratio",
+                 data["paired_completed_only"][comparison]["128"]["wall_ratio"]["median"],
+                 date=date, problem="prime-labelled-pool-recovery", unit="ratio", better="neutral",
+                 label="Median of paired completed-target ratios; local provisional, PCC unverified",
+                 source=source)
+
+
+def relation_fusion_observations(ref, since):
+    """Export raw declared-call observations, without computing ratios."""
+    path = "research/relation_fusion_20261117/CANDIDATE_SUMMARY_84.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        for row in data.get("outcomes", []):
+            if row.get("status") != "complete":
+                continue
+            key = f"p{row['prime']}.n{row['n']}.{row['kind']}.{row['kernel']}"
+            emit(f"relation.fusion.scan.{key}.parent_ns", row["parent_ns"], date=date,
+                 problem="complete-certificate-replay", unit="ns", better="neutral",
+                 label="Single declared call including controller replay; PCC unverified",
+                 source=f"{path}@{commit}")
+
+
+def relation_fusion_repeated(ref, since):
+    """Export recorded component medians with their actual admission status."""
+    path = "research/relation_fusion_20261117/MATCHED_ANALYSIS_85.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        for case in data.get("cases", []):
+            for arm in case.get("arms", []):
+                key = f"p{case['prime']}.n{case['n']}.{arm['arm']}"
+                emit(f"relation.fusion.repeated.{key}.parent_ns", arm["median_parent_ns"],
+                     date=date, problem="complete-certificate-replay", unit="ns", better="neutral",
+                     label="Five-call median; contended85, no timing admission; PCC unverified",
+                     source=f"{path}@{commit}")
+
+
+def relation_fusion_root_dag(ref, since):
+    """Export the recorded96 medians; no admitted improvement is implied."""
+    path = "research/relation_fusion_20261117/ROOT_DAG_ANALYSIS_96.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        for case in data.get("cases", []):
+            for arm in case.get("arms", []):
+                key = f"p{case['prime']}.n{case['n']}.{arm['arm']}"
+                emit(f"relation.fusion.root_dag.{key}.parent_ns", arm["median_parent_ns"],
+                     date=date, problem="complete-certificate-replay", unit="ns", better="neutral",
+                     label="Five-call96 median; no gain admitted beyond A/A; PCC unverified",
                      source=f"{path}@{commit}")
 
 
@@ -847,6 +1129,10 @@ def main():
     perf_history(a.since)
     benchmarks(a.ref, a.since)
     e2e_runs(a.ref)
+    algebraic_stage(a.ref, a.since)
+    algebraic_audits(a.ref, a.since)
+    completed_guess(a.ref, a.since)
+    publication_followup(a.ref, a.since)
     photo_volcano(a.ref)
     nist_factorization(a.ref, a.since)
     nist_selection_factor_census(a.ref, a.since)
@@ -869,6 +1155,7 @@ def main():
     koblitz_modular_geometry(a.ref, a.since)
     pencil_gate_observations(a.ref, a.since)
     ic_aimed_gather(a.ref, a.since)
+    ic_stride_renew(a.ref, a.since)
     ic_packed_filter(a.ref, a.since)
     explicit_gpu_frontier(a.ref, a.since)
     explicit_gpu_frontier(a.ref, a.since, "research/explicit_relations_affine_20261030",
@@ -877,6 +1164,11 @@ def main():
     explicit_gpu_fullcache(a.ref, a.since)
     n83_d18_vsids_gate(a.ref, a.since)
     vieta_component(a.ref, a.since)
+    vieta_native_speedup(a.ref, a.since)
+    trace_local_runtime(a.ref, a.since)
+    relation_fusion_observations(a.ref, a.since)
+    relation_fusion_repeated(a.ref, a.since)
+    relation_fusion_root_dag(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

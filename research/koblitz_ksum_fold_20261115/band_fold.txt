@@ -1,0 +1,283 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | k1-l10 | 8/8 | 125.426 | 143.643 | 307.589 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | k1-l8 | 8/8 | 49.703 | 55.416 | 106.832 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | k1-l9 | 8/8 | 43.082 | 51.783 | 130.088 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | kf3-c1 | 8/8 | 1.384 | 1.703 | 4.575 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | kf3-c1g | 8/8 | 1.135 | 1.384 | 3.626 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | kf3-c2 | 8/8 | 3.077 | 3.820 | 10.510 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | kf3-c2g | 8/8 | 3.030 | 3.767 | 10.406 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | kf4-c1 | 8/8 | 7.094 | 8.437 | 20.521 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | kf4-c1g | 8/8 | 7.039 | 8.369 | 20.338 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | kf4-c2 | 8/8 | 64.455 | 76.992 | 189.824 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | kf4-c2g | 8/8 | 64.427 | 76.964 | 189.796 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | kf5-c1 | 8/8 | 64.172 | 75.722 | 179.670 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | kf5-c1g | 8/8 | 64.141 | 75.686 | 179.587 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | kf5-c2 | 8/8 | 1285.247 | 1529.657 | 3729.342 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | kf5-c2g | 8/8 | 1285.220 | 1529.630 | 3729.319 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | ksum4-n10 | 8/8 | 7.693 | 8.927 | 20.026 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | ksum4-n12 | 8/8 | 5.747 | 6.493 | 13.207 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | ksum4-n14 | 8/8 | 7.267 | 8.071 | 15.314 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | ksum5-n10 | 8/8 | 6.494 | 7.262 | 14.176 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | ksum5-n12 | 8/8 | 10.217 | 11.067 | 18.713 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | ksum5-n9 | 8/8 | 8.364 | 9.636 | 21.089 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | rho-neg | 8/8 | 1.245 | 1.352 | 2.313 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | rho-strong | 8/8 | 0.881 | 0.944 | 1.517 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs k1-l8 | k1-l8 < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs k1-l9 | k1-l9 < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs kf3-c1 | kf3-c1 < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs kf3-c1g | kf3-c1g < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs kf3-c2 | kf3-c2 < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs kf3-c2g | kf3-c2g < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs kf4-c1 | kf4-c1 < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs kf4-c1g | kf4-c1g < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs kf4-c2 | kf4-c2 < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs kf4-c2g | kf4-c2g < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs kf5-c1 | kf5-c1 < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs kf5-c1g | kf5-c1g < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs kf5-c2 | k1-l10 < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs kf5-c2g | k1-l10 < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs ksum4-n10 | ksum4-n10 < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs ksum4-n12 | ksum4-n12 < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs ksum4-n14 | ksum4-n14 < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs ksum5-n10 | ksum5-n10 < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs ksum5-n12 | ksum5-n12 < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs ksum5-n9 | ksum5-n9 < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs rho-neg | rho-neg < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l10 vs rho-strong | rho-strong < k1-l10 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs k1-l9 | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs kf3-c1 | kf3-c1 < k1-l8 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs kf3-c1g | kf3-c1g < k1-l8 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs kf3-c2 | kf3-c2 < k1-l8 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs kf3-c2g | kf3-c2g < k1-l8 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs kf4-c1 | kf4-c1 < k1-l8 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs kf4-c1g | kf4-c1g < k1-l8 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs kf4-c2 | k1-l8 < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs kf4-c2g | k1-l8 < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs kf5-c1 | k1-l8 < kf5-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs kf5-c1g | k1-l8 < kf5-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs kf5-c2 | k1-l8 < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs kf5-c2g | k1-l8 < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs ksum4-n10 | ksum4-n10 < k1-l8 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs ksum4-n12 | ksum4-n12 < k1-l8 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs ksum4-n14 | ksum4-n14 < k1-l8 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs ksum5-n10 | ksum5-n10 < k1-l8 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs ksum5-n12 | ksum5-n12 < k1-l8 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs ksum5-n9 | ksum5-n9 < k1-l8 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs rho-neg | rho-neg < k1-l8 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l8 vs rho-strong | rho-strong < k1-l8 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs kf3-c1 | kf3-c1 < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs kf3-c1g | kf3-c1g < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs kf3-c2 | kf3-c2 < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs kf3-c2g | kf3-c2g < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs kf4-c1 | kf4-c1 < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs kf4-c1g | kf4-c1g < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs kf4-c2 | k1-l9 < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs kf4-c2g | k1-l9 < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs kf5-c1 | k1-l9 < kf5-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs kf5-c1g | k1-l9 < kf5-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs kf5-c2 | k1-l9 < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs kf5-c2g | k1-l9 < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs ksum4-n10 | ksum4-n10 < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs ksum4-n12 | ksum4-n12 < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs ksum4-n14 | ksum4-n14 < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs ksum5-n10 | ksum5-n10 < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs ksum5-n12 | ksum5-n12 < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs ksum5-n9 | ksum5-n9 < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs rho-neg | rho-neg < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs rho-strong | rho-strong < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs kf3-c1g | kf3-c1g < kf3-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs kf3-c2 | kf3-c1 < kf3-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs kf3-c2g | kf3-c1 < kf3-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs kf4-c1 | kf3-c1 < kf4-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs kf4-c1g | kf3-c1 < kf4-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs kf4-c2 | kf3-c1 < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs kf4-c2g | kf3-c1 < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs kf5-c1 | kf3-c1 < kf5-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs kf5-c1g | kf3-c1 < kf5-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs kf5-c2 | kf3-c1 < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs kf5-c2g | kf3-c1 < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs ksum4-n10 | kf3-c1 < ksum4-n10 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs ksum4-n12 | kf3-c1 < ksum4-n12 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs ksum4-n14 | kf3-c1 < ksum4-n14 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs ksum5-n10 | kf3-c1 < ksum5-n10 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs ksum5-n12 | kf3-c1 < ksum5-n12 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs ksum5-n9 | kf3-c1 < ksum5-n9 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs rho-neg | rho-neg < kf3-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1 vs rho-strong | rho-strong < kf3-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs kf3-c2 | kf3-c1g < kf3-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs kf3-c2g | kf3-c1g < kf3-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs kf4-c1 | kf3-c1g < kf4-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs kf4-c1g | kf3-c1g < kf4-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs kf4-c2 | kf3-c1g < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs kf4-c2g | kf3-c1g < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs kf5-c1 | kf3-c1g < kf5-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs kf5-c1g | kf3-c1g < kf5-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs kf5-c2 | kf3-c1g < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs kf5-c2g | kf3-c1g < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs ksum4-n10 | kf3-c1g < ksum4-n10 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs ksum4-n12 | kf3-c1g < ksum4-n12 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs ksum4-n14 | kf3-c1g < ksum4-n14 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs ksum5-n10 | kf3-c1g < ksum5-n10 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs ksum5-n12 | kf3-c1g < ksum5-n12 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs ksum5-n9 | kf3-c1g < ksum5-n9 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs rho-neg | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g vs rho-strong | rho-strong < kf3-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2 vs kf3-c2g | kf3-c2g < kf3-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2 vs kf4-c1 | kf3-c2 < kf4-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2 vs kf4-c1g | kf3-c2 < kf4-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2 vs kf4-c2 | kf3-c2 < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2 vs kf4-c2g | kf3-c2 < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2 vs kf5-c1 | kf3-c2 < kf5-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2 vs kf5-c1g | kf3-c2 < kf5-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2 vs kf5-c2 | kf3-c2 < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2 vs kf5-c2g | kf3-c2 < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2 vs ksum4-n10 | kf3-c2 < ksum4-n10 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2 vs ksum4-n12 | kf3-c2 < ksum4-n12 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2 vs ksum4-n14 | kf3-c2 < ksum4-n14 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2 vs ksum5-n10 | kf3-c2 < ksum5-n10 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2 vs ksum5-n12 | kf3-c2 < ksum5-n12 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2 vs ksum5-n9 | kf3-c2 < ksum5-n9 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2 vs rho-neg | rho-neg < kf3-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2 vs rho-strong | rho-strong < kf3-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2g vs kf4-c1 | kf3-c2g < kf4-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2g vs kf4-c1g | kf3-c2g < kf4-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2g vs kf4-c2 | kf3-c2g < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2g vs kf4-c2g | kf3-c2g < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2g vs kf5-c1 | kf3-c2g < kf5-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2g vs kf5-c1g | kf3-c2g < kf5-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2g vs kf5-c2 | kf3-c2g < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2g vs kf5-c2g | kf3-c2g < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2g vs ksum4-n10 | kf3-c2g < ksum4-n10 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2g vs ksum4-n12 | kf3-c2g < ksum4-n12 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2g vs ksum4-n14 | kf3-c2g < ksum4-n14 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2g vs ksum5-n10 | kf3-c2g < ksum5-n10 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2g vs ksum5-n12 | kf3-c2g < ksum5-n12 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2g vs ksum5-n9 | kf3-c2g < ksum5-n9 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2g vs rho-neg | rho-neg < kf3-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c2g vs rho-strong | rho-strong < kf3-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1 vs kf4-c1g | kf4-c1g < kf4-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1 vs kf4-c2 | kf4-c1 < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1 vs kf4-c2g | kf4-c1 < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1 vs kf5-c1 | kf4-c1 < kf5-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1 vs kf5-c1g | kf4-c1 < kf5-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1 vs kf5-c2 | kf4-c1 < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1 vs kf5-c2g | kf4-c1 < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1 vs ksum4-n10 | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1 vs ksum4-n12 | ksum4-n12 < kf4-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1 vs ksum4-n14 | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1 vs ksum5-n10 | ksum5-n10 < kf4-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1 vs ksum5-n12 | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1 vs ksum5-n9 | kf4-c1 < ksum5-n9 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1 vs rho-neg | rho-neg < kf4-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1 vs rho-strong | rho-strong < kf4-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1g vs kf4-c2 | kf4-c1g < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1g vs kf4-c2g | kf4-c1g < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1g vs kf5-c1 | kf4-c1g < kf5-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1g vs kf5-c1g | kf4-c1g < kf5-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1g vs kf5-c2 | kf4-c1g < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1g vs kf5-c2g | kf4-c1g < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1g vs ksum4-n10 | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1g vs ksum4-n12 | ksum4-n12 < kf4-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1g vs ksum4-n14 | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1g vs ksum5-n10 | ksum5-n10 < kf4-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1g vs ksum5-n12 | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1g vs ksum5-n9 | kf4-c1g < ksum5-n9 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1g vs rho-neg | rho-neg < kf4-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c1g vs rho-strong | rho-strong < kf4-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2 vs kf4-c2g | kf4-c2g < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2 vs kf5-c1 | kf5-c1 < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2 vs kf5-c1g | kf5-c1g < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2 vs kf5-c2 | kf4-c2 < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2 vs kf5-c2g | kf4-c2 < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2 vs ksum4-n10 | ksum4-n10 < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2 vs ksum4-n12 | ksum4-n12 < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2 vs ksum4-n14 | ksum4-n14 < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2 vs ksum5-n10 | ksum5-n10 < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2 vs ksum5-n12 | ksum5-n12 < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2 vs ksum5-n9 | ksum5-n9 < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2 vs rho-neg | rho-neg < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2 vs rho-strong | rho-strong < kf4-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2g vs kf5-c1 | kf5-c1 < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2g vs kf5-c1g | kf5-c1g < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2g vs kf5-c2 | kf4-c2g < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2g vs kf5-c2g | kf4-c2g < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2g vs ksum4-n10 | ksum4-n10 < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2g vs ksum4-n12 | ksum4-n12 < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2g vs ksum4-n14 | ksum4-n14 < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2g vs ksum5-n10 | ksum5-n10 < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2g vs ksum5-n12 | ksum5-n12 < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2g vs ksum5-n9 | ksum5-n9 < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2g vs rho-neg | rho-neg < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf4-c2g vs rho-strong | rho-strong < kf4-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1 vs kf5-c1g | kf5-c1g < kf5-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1 vs kf5-c2 | kf5-c1 < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1 vs kf5-c2g | kf5-c1 < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1 vs ksum4-n10 | ksum4-n10 < kf5-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1 vs ksum4-n12 | ksum4-n12 < kf5-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1 vs ksum4-n14 | ksum4-n14 < kf5-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1 vs ksum5-n10 | ksum5-n10 < kf5-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1 vs ksum5-n12 | ksum5-n12 < kf5-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1 vs ksum5-n9 | ksum5-n9 < kf5-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1 vs rho-neg | rho-neg < kf5-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1 vs rho-strong | rho-strong < kf5-c1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1g vs kf5-c2 | kf5-c1g < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1g vs kf5-c2g | kf5-c1g < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1g vs ksum4-n10 | ksum4-n10 < kf5-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1g vs ksum4-n12 | ksum4-n12 < kf5-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1g vs ksum4-n14 | ksum4-n14 < kf5-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1g vs ksum5-n10 | ksum5-n10 < kf5-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1g vs ksum5-n12 | ksum5-n12 < kf5-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1g vs ksum5-n9 | ksum5-n9 < kf5-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1g vs rho-neg | rho-neg < kf5-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c1g vs rho-strong | rho-strong < kf5-c1g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c2 vs kf5-c2g | kf5-c2g < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c2 vs ksum4-n10 | ksum4-n10 < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c2 vs ksum4-n12 | ksum4-n12 < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c2 vs ksum4-n14 | ksum4-n14 < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c2 vs ksum5-n10 | ksum5-n10 < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c2 vs ksum5-n12 | ksum5-n12 < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c2 vs ksum5-n9 | ksum5-n9 < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c2 vs rho-neg | rho-neg < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c2 vs rho-strong | rho-strong < kf5-c2 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c2g vs ksum4-n10 | ksum4-n10 < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c2g vs ksum4-n12 | ksum4-n12 < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c2g vs ksum4-n14 | ksum4-n14 < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c2g vs ksum5-n10 | ksum5-n10 < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c2g vs ksum5-n12 | ksum5-n12 < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c2g vs ksum5-n9 | ksum5-n9 < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c2g vs rho-neg | rho-neg < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | kf5-c2g vs rho-strong | rho-strong < kf5-c2g |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n10 vs ksum4-n12 | ksum4-n12 < ksum4-n10 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n10 vs ksum4-n14 | ksum4-n14 < ksum4-n10 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n10 vs ksum5-n10 | ksum5-n10 < ksum4-n10 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n10 vs ksum5-n12 | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n10 vs ksum5-n9 | ksum4-n10 < ksum5-n9 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n10 vs rho-neg | rho-neg < ksum4-n10 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n10 vs rho-strong | rho-strong < ksum4-n10 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n12 vs ksum4-n14 | ksum4-n12 < ksum4-n14 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n12 vs ksum5-n10 | ksum4-n12 < ksum5-n10 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n12 vs ksum5-n12 | ksum4-n12 < ksum5-n12 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n12 vs ksum5-n9 | ksum4-n12 < ksum5-n9 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n12 vs rho-neg | rho-neg < ksum4-n12 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n12 vs rho-strong | rho-strong < ksum4-n12 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n14 vs ksum5-n10 | ksum5-n10 < ksum4-n14 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n14 vs ksum5-n12 | ksum4-n14 < ksum5-n12 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n14 vs ksum5-n9 | ksum4-n14 < ksum5-n9 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n14 vs rho-neg | rho-neg < ksum4-n14 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum4-n14 vs rho-strong | rho-strong < ksum4-n14 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum5-n10 vs ksum5-n12 | ksum5-n10 < ksum5-n12 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum5-n10 vs ksum5-n9 | ksum5-n10 < ksum5-n9 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum5-n10 vs rho-neg | rho-neg < ksum5-n10 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum5-n10 vs rho-strong | rho-strong < ksum5-n10 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum5-n12 vs ksum5-n9 | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum5-n12 vs rho-neg | rho-neg < ksum5-n12 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum5-n12 vs rho-strong | rho-strong < ksum5-n12 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum5-n9 vs rho-neg | rho-neg < ksum5-n9 |
+| icv1-f2m23-tm5197-1f85e9e1 | ksum5-n9 vs rho-strong | rho-strong < ksum5-n9 |
+| icv1-f2m23-tm5197-1f85e9e1 | rho-neg vs rho-strong | rho-strong < rho-neg |

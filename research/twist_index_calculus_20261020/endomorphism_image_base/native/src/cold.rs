@@ -43,6 +43,19 @@ unsafe impl GlobalAlloc for ObservedAllocator {
 #[global_allocator]
 static GLOBAL: ObservedAllocator = ObservedAllocator;
 
+pub(super) fn allocation_begin() -> (u64, u64) {
+    PEAK.store(LIVE.load(AO::Relaxed), AO::Relaxed);
+    (ALLOCS.load(AO::Relaxed), ALLOC_BYTES.load(AO::Relaxed))
+}
+
+pub(super) fn allocation_end(start: (u64, u64)) -> Value {
+    let calls = ALLOCS.load(AO::Relaxed) - start.0;
+    let bytes = ALLOC_BYTES.load(AO::Relaxed) - start.1;
+    let peak = PEAK.load(AO::Relaxed);
+    json!({"allocation_calls":calls,"allocated_bytes":bytes,"peak_live_rust_bytes":peak,
+        "scope":"Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."})
+}
+
 fn ns(t: Instant) -> u64 {
     t.elapsed().as_nanos().try_into().unwrap()
 }
@@ -83,7 +96,17 @@ fn square_root(f: Field, a: E, non_square: E) -> Option<E> {
     Some(r)
 }
 
-fn build(raw: Value, arm: usize) -> Case {
+pub(super) fn build(raw: Value, arm: usize) -> Case {
+    build_inner(raw, arm, true)
+}
+
+/// Target-independent arithmetic setup for reusable zero precomputation.
+/// No target coordinates are decoded here; the pipeline supplies Q online.
+pub(super) fn build_reusable(raw: Value, arm: usize) -> Case {
+    build_inner(raw, arm, false)
+}
+
+fn build_inner(raw: Value, arm: usize, validate_target: bool) -> Case {
     let p = raw["p"].as_u64().unwrap();
     let seed = raw["seed"].as_u64().unwrap();
     let n = raw["n"].as_u64().unwrap();
@@ -100,14 +123,23 @@ fn build(raw: Value, arm: usize) -> Case {
         y: element(&raw["generator_y"]),
         inf: false,
     };
-    let q = Point {
-        x: element(&raw["target_x"]),
-        y: element(&raw["target_y"]),
-        inf: false,
+    let q = if validate_target {
+        Point {
+            x: element(&raw["target_x"]),
+            y: element(&raw["target_y"]),
+            inf: false,
+        }
+    } else {
+        INF
     };
-    assert!(c.on_curve(g) && c.on_curve(q));
+    assert!(c.on_curve(g));
+    if validate_target {
+        assert!(c.on_curve(q));
+    }
     assert_eq!(c.mul(g, n), INF);
-    assert_eq!(c.mul(q, n), INF);
+    if validate_target {
+        assert_eq!(c.mul(q, n), INF);
+    }
     let omega = raw["omega"].as_u64().unwrap();
     let lc = raw["lambda_cubic"].as_u64().unwrap();
     let lf = raw["lambda_frob"].as_u64().unwrap();

@@ -1,0 +1,66 @@
+test_capture_tamper_prevents_math (test_replay_capture.IntegrationTests) ... ok
+test_empty_is_not_verified (test_replay_capture.IntegrationTests) ... ok
+test_invalid_basis (test_replay_capture.IntegrationTests) ... ok
+test_invalid_limits (test_replay_capture.IntegrationTests) ... ok
+test_no_continuation (test_replay_capture.IntegrationTests) ... ok
+test_shared_row_cap (test_replay_capture.IntegrationTests) ... ERROR
+test_shared_work_cap (test_replay_capture.IntegrationTests) ... ok
+test_substituted_equations_before_row_replay (test_replay_capture.IntegrationTests) ... ok
+test_valid_committed_basis_and_uncommitted_diagnostic (test_replay_capture.IntegrationTests) ... ERROR
+test_verified_capture_to_math (test_replay_capture.IntegrationTests) ... ERROR
+test_wrong_row (test_replay_capture.IntegrationTests) ... ERROR
+
+======================================================================
+ERROR: test_shared_row_cap (test_replay_capture.IntegrationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ec2-user/ml-dataset-resume-20261029/owned-search-semantic-replay-20261107/test_replay_capture.py", line 27, in test_shared_row_cap
+    r=replay_snapshots([entry(),entry()],ReplayLimits(rows=1));self.assertEqual(r['status'],'inconclusive');self.assertEqual(r['verified_rows'],1)
+  File "/home/ec2-user/ml-dataset-resume-20261029/owned-search-semantic-replay-20261107/replay_capture.py", line 43, in replay_snapshots
+    caps=replace(RowLimits(),work=limits.work-work,allocated_literals=limits.allocated_literals-allocated)
+  File "/usr/lib64/python3.9/dataclasses.py", line 1284, in replace
+    return obj.__class__(**changes)
+TypeError: __init__() got an unexpected keyword argument 'allocated_literals'
+
+======================================================================
+ERROR: test_valid_committed_basis_and_uncommitted_diagnostic (test_replay_capture.IntegrationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ec2-user/ml-dataset-resume-20261029/owned-search-semantic-replay-20261107/test_replay_capture.py", line 18, in test_valid_committed_basis_and_uncommitted_diagnostic
+    r=replay_snapshots([entry()]);self.assertEqual(r['status'],'verified_selected_rows');self.assertEqual(r['verified_rows'],1)
+  File "/home/ec2-user/ml-dataset-resume-20261029/owned-search-semantic-replay-20261107/replay_capture.py", line 43, in replay_snapshots
+    caps=replace(RowLimits(),work=limits.work-work,allocated_literals=limits.allocated_literals-allocated)
+  File "/usr/lib64/python3.9/dataclasses.py", line 1284, in replace
+    return obj.__class__(**changes)
+TypeError: __init__() got an unexpected keyword argument 'allocated_literals'
+
+======================================================================
+ERROR: test_verified_capture_to_math (test_replay_capture.IntegrationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ec2-user/ml-dataset-resume-20261029/owned-search-semantic-replay-20261107/test_replay_capture.py", line 41, in test_verified_capture_to_math
+    r=replay_capture(root,B,S);self.assertEqual(r['status'],'verified_selected_rows');self.assertTrue(r['capture']['committed_prefix_verified']);self.assertEqual(r['verified_rows'],1)
+  File "/home/ec2-user/ml-dataset-resume-20261029/owned-search-semantic-replay-20261107/replay_capture.py", line 61, in replay_capture
+    result=replay_snapshots(extracted['snapshots'],limits)
+  File "/home/ec2-user/ml-dataset-resume-20261029/owned-search-semantic-replay-20261107/replay_capture.py", line 43, in replay_snapshots
+    caps=replace(RowLimits(),work=limits.work-work,allocated_literals=limits.allocated_literals-allocated)
+  File "/usr/lib64/python3.9/dataclasses.py", line 1284, in replace
+    return obj.__class__(**changes)
+TypeError: __init__() got an unexpected keyword argument 'allocated_literals'
+
+======================================================================
+ERROR: test_wrong_row (test_replay_capture.IntegrationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ec2-user/ml-dataset-resume-20261029/owned-search-semantic-replay-20261107/test_replay_capture.py", line 22, in test_wrong_row
+    r=replay_snapshots([entry(s)]);self.assertEqual(r['status'],'mismatch');self.assertEqual(r['verified_rows'],0)
+  File "/home/ec2-user/ml-dataset-resume-20261029/owned-search-semantic-replay-20261107/replay_capture.py", line 43, in replay_snapshots
+    caps=replace(RowLimits(),work=limits.work-work,allocated_literals=limits.allocated_literals-allocated)
+  File "/usr/lib64/python3.9/dataclasses.py", line 1284, in replace
+    return obj.__class__(**changes)
+TypeError: __init__() got an unexpected keyword argument 'allocated_literals'
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.010s
+
+FAILED (errors=4)

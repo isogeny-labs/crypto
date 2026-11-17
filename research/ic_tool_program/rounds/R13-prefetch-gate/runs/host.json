@@ -1,0 +1,92 @@
+{
+ "repository_commit": "381415d41320bde44fff7c214ba2bf5169238c84",
+ "tree_status": "",
+ "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+ "cargo_lock_sha256": "c2c0049f265e78432b79c5fe14a7ce6668cd44c3816012256dfcd7b40e5f4f6d",
+ "cpu_model": "Intel(R) Xeon(R) 6975P-C",
+ "cpu_flags_relevant": [
+  "pclmulqdq",
+  "popcnt",
+  "avx2",
+  "bmi2",
+  "avx512f",
+  "avx512dq",
+  "avx512ifma",
+  "avx512cd",
+  "avx512bw",
+  "avx512vl",
+  "avx512_bf16",
+  "avx512vbmi",
+  "avx512_vbmi2",
+  "gfni",
+  "vpclmulqdq",
+  "avx512_vnni",
+  "avx512_bitalg",
+  "avx512_vpopcntdq",
+  "avx512_fp16"
+ ],
+ "logical_cores": 32,
+ "memory": "MemTotal:       129800720 kB",
+ "transparent_hugepage": {
+  "enabled": "always [madvise] never",
+  "defrag": "always defer defer+madvise [madvise] never"
+ },
+ "os": "Linux-6.18.54-121.166.amzn2023.x86_64-x86_64-with-glibc2.34",
+ "arch": "x86_64",
+ "glibc": "glibc 2.34",
+ "binaries": {
+  "base": {
+   "path_basename": "ic-base",
+   "sha256": "df0c4df05632d002d9d7be4b3ebeaf675b15495e16b6c0fe8592bfd6cbc7f96d",
+   "built_from": "261482646ee89b332dca69e2f296b0774c25d2c2"
+  },
+  "candidate": {
+   "path_basename": "ic-candidate",
+   "sha256": "2537d8b4d356cb3bc7534dd48edd859a9b20451418681eb32d9fad02b7d79c9f",
+   "built_from": "efc6336d55c59cceb92cb82de73598ebe15ff3ca"
+  }
+ },
+ "isolation_tool": {
+  "path": "src/bin/isolated_bench.rs",
+  "binary_sha256": "03d5b835157361b997c9643b5320bb8df2a778463c9fe50d66bcad133b3ed3df"
+ },
+ "pinning": "isolated_bench run --wait --cpus 2 with RAYON_NUM_THREADS=1, after PSI some avg10 falls below 4.0; the tool's defaults (settle 2 s, other processes at most 0.10 CPUs, PSI at most 5); pins untimed under taskset -c 2",
+ "smt_siblings": {
+  "0": "0,16",
+  "1": "1,17",
+  "2": "2,18",
+  "3": "3,19",
+  "4": "4,20",
+  "5": "5,21",
+  "6": "6,22",
+  "7": "7,23",
+  "8": "8,24",
+  "9": "9,25",
+  "10": "10,26",
+  "11": "11,27",
+  "12": "12,28",
+  "13": "13,29",
+  "14": "14,30",
+  "15": "15,31",
+  "16": "0,16",
+  "17": "1,17",
+  "18": "2,18",
+  "19": "3,19",
+  "20": "4,20",
+  "21": "5,21",
+  "22": "6,22",
+  "23": "7,23",
+  "24": "8,24",
+  "25": "9,25",
+  "26": "10,26",
+  "27": "11,27",
+  "28": "12,28",
+  "29": "13,29",
+  "30": "14,30",
+  "31": "15,31"
+ },
+ "uptime": "20:55:31 up  1:42,  0 users,  load average: 8.94, 11.57, 16.87",
+ "hardware_class": "one x86-64 cloud container; no claim for Arm64, GPUs or other hosts",
+ "runner": "icprog (native)",
+ "note": "the host R13 ran on, at the round's start"
+}

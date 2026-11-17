@@ -1029,6 +1029,36 @@ fn biguint_to_u128(v: &BigUint) -> Option<u128> {
 /// allocations.  `d * d` cannot overflow: `d ≤ √v < 2^64`.
 fn factorise_u128(mut v: u128) -> Vec<(u128, u32)> {
     let mut out: Vec<(u128, u32)> = Vec::new();
+    // The cofactor of a Koblitz order is small and the rest a large prime:
+    // once what is left fits a word and is prime, the trial division stops
+    // (it used to run to its square root, 2^28 divisions of a u128 for the
+    // n = 73 order, about 9 s of every process start).  The test runs only
+    // when a division changed the remainder, as in `factorise_u64`.
+    let word_prime = |v: u128| v >> 64 == 0 && is_prime_u64(v as u64);
+    let mut prime = word_prime(v);
+    let mut d = 2u128;
+    while !prime && d * d <= v {
+        let mut e = 0;
+        while v.is_multiple_of(d) {
+            v /= d;
+            e += 1;
+        }
+        if e > 0 {
+            out.push((d, e));
+            prime = word_prime(v);
+        }
+        d += 1;
+    }
+    if v > 1 {
+        out.push((v, 1));
+    }
+    out
+}
+
+/// The pre-T21 trial division to its square root, kept as the oracle.
+#[cfg(test)]
+fn factorise_u128_trial(mut v: u128) -> Vec<(u128, u32)> {
+    let mut out: Vec<(u128, u32)> = Vec::new();
     let mut d = 2u128;
     while d * d <= v {
         let mut e = 0;
@@ -1632,6 +1662,21 @@ pub fn points_with_x_fast(curve: &FastCurve, x: &F2mElement) -> Vec<BinaryPoint>
 /// 2). The single-word factor-base selection builds on this so that a
 /// point is lowered to a `BinaryPoint` once, at the end.
 fn lift_x_packed(curve: &FastCurve, coordinate: u64) -> ([FastPoint; 2], usize) {
+    let inverse = if coordinate == 0 {
+        0
+    } else {
+        curve.field.inv(coordinate)
+    };
+    lift_x_packed_with_inverse(curve, coordinate, inverse)
+}
+
+/// The ordered packed lift after its abscissa inverse has been supplied.
+/// Keeping the root selection here shared preserves the legacy point order.
+fn lift_x_packed_with_inverse(
+    curve: &FastCurve,
+    coordinate: u64,
+    inverse: u64,
+) -> ([FastPoint; 2], usize) {
     debug_assert!(curve.n % 2 == 1);
     let field = &curve.field;
     let none = [FastPoint::INFINITY; 2];
@@ -1639,7 +1684,6 @@ fn lift_x_packed(curve: &FastCurve, coordinate: u64) -> ([FastPoint; 2], usize) 
         let point = FastPoint::affine(0, field.sqr_k(curve.b, curve.n - 1));
         return ([point, FastPoint::INFINITY], 1);
     }
-    let inverse = field.inv(coordinate);
     let rhs = coordinate ^ curve.a ^ field.mul(curve.b, field.sqr(inverse));
     if crate::cryptanalysis::koblitz_fast::cached_point_lifts_enabled() {
         let Some(root) = curve.half_trace_root_cached(rhs) else {
@@ -3017,6 +3061,24 @@ pub fn build_standard_subspace_factor_base(
     kc: &KoblitzCurve,
     ell: u32,
 ) -> Result<FrobeniusFactorBase, String> {
+    build_standard_subspace_factor_base_with_lifts(kc, ell, false)
+}
+
+/// Opt-in standard-subspace base using one batch inversion for the ordered
+/// abscissae. The ordinary builder remains the ecbench path until its
+/// factor-base work ledger prices the changed field-operation mix.
+pub fn build_standard_subspace_factor_base_batch_lifts(
+    kc: &KoblitzCurve,
+    ell: u32,
+) -> Result<FrobeniusFactorBase, String> {
+    build_standard_subspace_factor_base_with_lifts(kc, ell, true)
+}
+
+fn build_standard_subspace_factor_base_with_lifts(
+    kc: &KoblitzCurve,
+    ell: u32,
+    batch_lifts: bool,
+) -> Result<FrobeniusFactorBase, String> {
     if ell == 0 || ell > 20 || ell >= kc.n {
         return Err("standard-subspace dimension must be 1..=20 and smaller than n".into());
     }
@@ -3029,11 +3091,28 @@ pub fn build_standard_subspace_factor_base(
     }
     let fast = (kc.n % 2 == 1).then(|| FastCurve::new(&kc.curve)).flatten();
     let mut points = Vec::new();
-    for x in &subspace {
-        points.extend(match &fast {
-            Some(curve) => points_with_x_fast(curve, x),
-            None => points_with_x(&kc.curve, x),
-        });
+    if batch_lifts {
+        if let Some(curve) = &fast {
+            let packed: Vec<u64> = subspace
+                .iter()
+                .map(|x| curve.field.from_element(x))
+                .collect();
+            let mut inverses = packed.clone();
+            let mut scratch = Vec::new();
+            curve.field.batch_inv(&mut inverses, &mut scratch);
+            for (&coordinate, &inverse) in packed.iter().zip(&inverses) {
+                let (lifts, count) = lift_x_packed_with_inverse(curve, coordinate, inverse);
+                points.extend(lifts[..count].iter().map(|&point| curve.lower(point)));
+            }
+        }
+    }
+    if !batch_lifts || fast.is_none() {
+        for x in &subspace {
+            points.extend(match &fast {
+                Some(curve) => points_with_x_fast(curve, x),
+                None => points_with_x(&kc.curve, x),
+            });
+        }
     }
     if points.is_empty() {
         return Err("standard subspace contains no rational curve point".into());
@@ -3045,6 +3124,55 @@ pub fn build_standard_subspace_factor_base(
         subspace,
         subspace_basis,
         points,
+    )
+}
+
+/// Keep exactly the original subspace points in the full group-trace
+/// kernel, then eliminate the redundant field-trace coordinate. This is
+/// an intersection, not a cofactor image that changes the point base.
+pub fn build_full_trace_zero_subspace_factor_base(
+    kc: &KoblitzCurve,
+    ell: u32,
+) -> Result<FrobeniusFactorBase, String> {
+    let variety = crate::binary_ecc::TraceZeroVariety::new(&kc.curve)
+        .map_err(|e| format!("full trace-zero admission: {e:?}"))?;
+    let parent = build_standard_subspace_factor_base(kc, ell)?;
+    let intersection = variety
+        .intersect_factor_base(&parent.points, &parent.subspace_basis)
+        .map_err(|e| format!("full trace-zero factor-base intersection: {e:?}"))?;
+    let points = intersection.points;
+    if points.is_empty() {
+        return Err("empty full trace-zero affine factor base".into());
+    }
+    let reduced = intersection.subspace_basis;
+    let subspace = span_f2(&reduced, kc.n);
+    finish_negation_only_factor_base(
+        kc,
+        FactorBaseDomain::StandardSubspace,
+        reduced.len() as u32,
+        subspace,
+        reduced,
+        points,
+    )
+}
+
+/// Full trace-zero native relation oracle, including identity intermediates.
+/// It preserves the factor base's indices and returns inconclusive on caps.
+pub fn full_trace_zero_decompose(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: crate::cryptanalysis::trace_zero_relations::TraceZeroRelationLimits,
+) -> Result<
+    crate::cryptanalysis::trace_zero_relations::TraceZeroRelationReport,
+    crate::binary_ecc::TraceZeroError,
+> {
+    let variety = crate::binary_ecc::TraceZeroVariety::new(&kc.curve)?;
+    Ok(
+        crate::cryptanalysis::trace_zero_relations::decompose_full_trace_zero(
+            &variety, &fb.points, target, m, limits,
+        ),
     )
 }
 
@@ -5747,6 +5875,23 @@ impl PairSumTable {
         fb: &FrobeniusFactorBase,
         byte_budget: u128,
     ) -> Option<Self> {
+        // A one-worker resource contract does not benefit from handing both
+        // construction and sorting to another thread on the same CPU.
+        // Keep all other configurations on the existing parallel path.
+        Self::build_full_within_runtime(
+            kc,
+            fb,
+            byte_budget,
+            std::env::var("RAYON_NUM_THREADS").as_deref() == Ok("1"),
+        )
+    }
+
+    fn build_full_within_runtime(
+        kc: &KoblitzCurve,
+        fb: &FrobeniusFactorBase,
+        byte_budget: u128,
+        serial: bool,
+    ) -> Option<Self> {
         if fb.points.len() > u32::MAX as usize {
             return None;
         }
@@ -5757,18 +5902,27 @@ impl PairSumTable {
         let points: Vec<FastPoint> = fb.points.iter().map(|p| curve.lift(p)).collect();
         let negated: Vec<FastPoint> = points.iter().map(|&p| curve.neg(p)).collect();
         let (negated_x, negated_y) = coordinate_slices(&negated);
-        let mut entries: Vec<(u64, u32, u32)> = (0..points.len())
-            .into_par_iter()
-            .flat_map_iter(|i| {
-                let mut sums = Vec::with_capacity(points.len() - i);
-                let mut scratch = BatchScratch::default();
-                curve.add_many(points[i], &points[i..], &mut sums, &mut scratch);
-                sums.into_iter()
-                    .enumerate()
-                    .map(move |(offset, sum)| (sum.pack(), i as u32, (i + offset) as u32))
-            })
-            .collect();
-        entries.par_sort_unstable();
+        let make_row = |i: usize| {
+            let mut sums = Vec::with_capacity(points.len() - i);
+            let mut scratch = BatchScratch::default();
+            curve.add_many(points[i], &points[i..], &mut sums, &mut scratch);
+            sums.into_iter()
+                .enumerate()
+                .map(move |(offset, sum)| (sum.pack(), i as u32, (i + offset) as u32))
+        };
+        let mut entries: Vec<(u64, u32, u32)> = if serial {
+            (0..points.len()).flat_map(make_row).collect()
+        } else {
+            (0..points.len())
+                .into_par_iter()
+                .flat_map_iter(make_row)
+                .collect()
+        };
+        if serial {
+            entries.sort_unstable();
+        } else {
+            entries.par_sort_unstable();
+        }
         if entries.len() > u32::MAX as usize {
             return None;
         }
@@ -8041,8 +8195,14 @@ impl PairSumTable {
             // The bucket entries arrived during the filter pass: read them
             // and send for every admitted key's run before looking any up,
             // so the runs' misses overlap instead of following one another.
-            for &within in &admitted_offsets {
-                self.prefetch_run(keys[within]);
+            // R12's second pass pays at most on tables whose stored runs
+            // outgrow cache. Its frozen panel first benefited at 3,707,880
+            // stored pairs; all smaller measured tables had at most 265,680.
+            // Keep the decision target-independent and fixed for this table.
+            if self.len() >= 1_000_000 {
+                for &within in &admitted_offsets {
+                    self.prefetch_run(keys[within]);
+                }
             }
             for &within in &admitted_offsets {
                 let offset = lo + within;
@@ -9242,6 +9402,24 @@ pub fn groebner_decompose(
     engine: SolverEngine,
     node_budget: usize,
 ) -> (Option<Vec<usize>>, SolveStats) {
+    groebner_decompose_with_trace(kc, fb, index_of, st, target, m, engine, node_budget, true)
+}
+
+/// Paired-control entry point for [`groebner_decompose`]. Disabling the
+/// trace row restores the original polynomial system; both arms still
+/// require every returned root to lift to the requested group sum.
+#[allow(clippy::too_many_arguments)]
+pub fn groebner_decompose_with_trace(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    index_of: &HashMap<(BigUint, BigUint), usize>,
+    st: &FieldStructure,
+    target: &BinaryPoint,
+    m: usize,
+    engine: SolverEngine,
+    node_budget: usize,
+    trace_constraint: bool,
+) -> (Option<Vec<usize>>, SolveStats) {
     // Keep the generic frontend's unsupported-input contract explicit: the
     // archived admission replay checks this entry point. Pass the built
     // system onward so the F4 path does not build it twice.
@@ -9251,6 +9429,12 @@ pub fn groebner_decompose(
         ..Default::default()
     };
     let x_r = match target {
+        // Affine chains omit infinity intermediates. In particular, a
+        // repeated two-torsion point can be a genuine odd-arity relation
+        // with no affine-chain witness. Do not call its absence a proof.
+        BinaryPoint::Affine { x, .. } if m >= 3 && x.is_zero() => {
+            return (None, unsupported());
+        }
         BinaryPoint::Affine { x, .. } => x.clone(),
         BinaryPoint::Infinity => return (None, unsupported()),
     };
@@ -9275,6 +9459,7 @@ pub fn groebner_decompose(
         node_budget,
         false,
         false,
+        trace_constraint,
         Some(sys),
     )
 }
@@ -9314,6 +9499,7 @@ pub fn groebner_decompose_f6_ic(
         node_budget,
         true,
         false,
+        true,
         None,
     )
 }
@@ -9352,6 +9538,7 @@ pub fn groebner_decompose_f6_ic_pair_index(
         node_budget,
         true,
         true,
+        true,
         None,
     )
 }
@@ -9369,17 +9556,35 @@ pub fn decomposition_solver_equations(
     m: usize,
     engine: SolverEngine,
 ) -> Option<(Vec<F2BoolPoly>, usize)> {
+    decomposition_solver_equations_with_trace(kc, fb, st, target, m, engine, true)
+}
+
+/// Equations for the matched trace-on/off decomposition control. The row
+/// is inserted before any variable permutation, just as in the solver.
+pub fn decomposition_solver_equations_with_trace(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    st: &FieldStructure,
+    target: &BinaryPoint,
+    m: usize,
+    engine: SolverEngine,
+    trace_constraint: bool,
+) -> Option<(Vec<F2BoolPoly>, usize)> {
     let x_r = match target {
+        BinaryPoint::Affine { x, .. } if m >= 3 && x.is_zero() => return None,
         BinaryPoint::Affine { x, .. } => x.clone(),
         BinaryPoint::Infinity => return None,
     };
-    let sys = crate::cryptanalysis::polynomial_reuse::build_decomposition_system_reusing(
+    let mut sys = crate::cryptanalysis::polynomial_reuse::build_decomposition_system_reusing(
         &fb.subspace_basis,
         &x_r,
         &kc.curve.b,
         m,
         st,
     )?;
+    if trace_constraint {
+        append_decomposition_trace(kc, fb, &x_r, m, sys.n_vars, &mut sys.equations);
+    }
     let opts = SolveOptions {
         engine,
         max_solutions: usize::MAX,
@@ -9443,6 +9648,7 @@ fn groebner_decompose_with_geometry(
     node_budget: usize,
     f6_ic: bool,
     pair_index_enabled: bool,
+    trace_constraint: bool,
     prebuilt: Option<crate::cryptanalysis::koblitz_groebner::DecompositionSystem>,
 ) -> (Option<Vec<usize>>, SolveStats) {
     let unsupported = || SolveStats {
@@ -9450,7 +9656,10 @@ fn groebner_decompose_with_geometry(
         unsupported: true,
         ..Default::default()
     };
-    let sys = if let Some(sys) = prebuilt {
+    if m >= 3 && matches!(target, BinaryPoint::Affine { x, .. } if x.is_zero()) {
+        return (None, unsupported());
+    }
+    let mut sys = if let Some(sys) = prebuilt {
         sys
     } else {
         let x_r = match target {
@@ -9468,6 +9677,12 @@ fn groebner_decompose_with_geometry(
             None => return (None, unsupported()),
         }
     };
+    if trace_constraint {
+        let BinaryPoint::Affine { x, .. } = target else {
+            return (None, unsupported());
+        };
+        append_decomposition_trace(kc, fb, x, m, sys.n_vars, &mut sys.equations);
+    }
     // A root of S₃ fixes the summands only up to sign, so some roots do
     // not lift.  Lift each as it is found and stop at the first that
     // closes the group identity.
@@ -9602,10 +9817,13 @@ pub fn crossbred_decompose(
         ..unknown()
     };
     let x_r = match target {
+        BinaryPoint::Affine { x, .. } if m >= 3 && x.is_zero() => {
+            return (None, unsupported());
+        }
         BinaryPoint::Affine { x, .. } => x.clone(),
         BinaryPoint::Infinity => return (None, unsupported()),
     };
-    let sys = match crate::cryptanalysis::polynomial_reuse::build_decomposition_system_reusing(
+    let mut sys = match crate::cryptanalysis::polynomial_reuse::build_decomposition_system_reusing(
         &fb.subspace_basis,
         &x_r,
         &kc.curve.b,
@@ -9615,6 +9833,7 @@ pub fn crossbred_decompose(
         Some(sys) => sys,
         None => return (None, unsupported()),
     };
+    append_decomposition_trace(kc, fb, &x_r, m, sys.n_vars, &mut sys.equations);
     let params = params.unwrap_or_else(|| crossbred_params_for(&sys.equations, sys.n_vars));
     let xb = match extract_crossbred(&sys.equations, sys.n_vars, &params) {
         Some(xb) => xb,
@@ -9740,6 +9959,41 @@ pub(crate) fn absolute_trace_bit(x: &F2mElement, n: u32, irr: &IrreduciblePoly) 
     }
     debug_assert!(t.is_zero() || t == F2mElement::one(n));
     !t.is_zero()
+}
+
+/// Necessary condition for a rational-point decomposition, not for all
+/// algebraic summation-polynomial roots (Kosters--Yeo, arXiv:1503.08001,
+/// Proposition 4.2 and Remark 4.8). For a1=1, delta(P)=Tr(x(P)+a), so
+/// sum Tr(x_i) = Tr(x_R) + (m+1)Tr(a). Intermediate coordinates do not
+/// occur. Apply before permuting the system's variable order.
+fn append_decomposition_trace(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    x_r: &F2mElement,
+    m: usize,
+    n_vars: usize,
+    equations: &mut Vec<F2BoolPoly>,
+) {
+    use crate::cryptanalysis::pq_groebner_f2::F2BoolMono;
+    let rhs = absolute_trace_bit(x_r, kc.n, &kc.curve.irreducible)
+        ^ (m.is_multiple_of(2) && absolute_trace_bit(&kc.curve.a, kc.n, &kc.curve.irreducible));
+    let mut terms = Vec::new();
+    for (j, element) in fb.subspace_basis.iter().enumerate() {
+        if absolute_trace_bit(element, kc.n, &kc.curve.irreducible) {
+            for i in 0..m {
+                terms.push(F2BoolMono::var((i * fb.subspace_basis.len() + j) as u32));
+            }
+        }
+    }
+    if rhs {
+        terms.push(F2BoolMono::one());
+    }
+    let row = F2BoolPoly::from_monos(terms, n_vars);
+    // A trace-zero basis may make the equation identically zero. Keep a
+    // constant-one contradiction, which correctly refutes the group sum.
+    if !row.is_zero() && !equations.contains(&row) {
+        equations.push(row);
+    }
 }
 
 /// SAT controls for a paired comparison on the same decomposition system.
@@ -9911,6 +10165,9 @@ pub fn sat_decompose_with(
         ..Default::default()
     };
     let x_r = match target {
+        BinaryPoint::Affine { x, .. } if m >= 3 && x.is_zero() => {
+            return (None, unsupported());
+        }
         BinaryPoint::Affine { x, .. } => x.clone(),
         BinaryPoint::Infinity => return (None, unsupported()),
     };
@@ -9940,25 +10197,7 @@ pub fn sat_decompose_with(
     // chained (`m ≥ 3`) system — which turns UNSAT into SAT.
     let mut equations = sys.equations.clone();
     if options.trace_constraint {
-        use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
-        // For a rational point, delta(P)=Tr(x(P)+a), delta(O)=0,
-        // is a homomorphism to F_2 (Kosters--Yeo, arXiv:1503.08001).
-        // Thus sum Tr(x_i) = Tr(x_R) + (m+1)Tr(a). This is a
-        // necessary group condition, not an assumption about polynomial roots.
-        let rhs = absolute_trace_bit(&x_r, kc.n, &kc.curve.irreducible)
-            ^ (m.is_multiple_of(2) && absolute_trace_bit(&kc.curve.a, kc.n, &kc.curve.irreducible));
-        let mut terms = Vec::new();
-        for (j, basis_element) in fb.subspace_basis.iter().enumerate() {
-            if absolute_trace_bit(basis_element, kc.n, &kc.curve.irreducible) {
-                for i in 0..m {
-                    terms.push(F2BoolMono::var((i * fb.subspace_basis.len() + j) as u32));
-                }
-            }
-        }
-        if rhs {
-            terms.push(F2BoolMono::one());
-        }
-        equations.push(F2BoolPoly::from_monos(terms, sys.n_vars));
+        append_decomposition_trace(kc, fb, &x_r, m, sys.n_vars, &mut equations);
     }
     if let Some(d) = macaulay_degree {
         if let Some(rows) = matrix_f4_f2(&sys.equations, sys.n_vars, d) {
@@ -10260,8 +10499,6 @@ fn sat_decompose_union_s4(
     }
 }
 
-/// Hard limits for an experimental five- or six-summand chained-S3 SAT
-/// decomposition. The variable cap is checked before a SAT solver is built;
 /// Hard limits for an experimental four- to six-summand chained-S3 SAT
 /// decomposition. The variable cap is checked before any SAT model is built;
 /// the conflict and model caps cover all intermediate-identity patterns.
@@ -12831,14 +13068,13 @@ fn koblitz_index_calculus_dlp_observed(
             | DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba
             | DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
             | DecompositionStrategy::ChainedS3FrobeniusOrbitOrderedShallowKaratsuba
-    ) && (!(5..=6).contains(&opts.m))
-        && (!(4..=6).contains(&opts.m)
-            || !fb.uses_ambient_basis()
-            || opts.chain_s3_limits.max_variables == 0
-            || opts.chain_s3_limits.max_domain_clauses == 0
-            || opts.chain_s3_limits.max_models == 0
-            || opts.chain_s3_limits.conflict_budget == 0
-            || opts.relation_batch_size != 1)
+    ) && (!(4..=6).contains(&opts.m)
+        || !fb.uses_ambient_basis()
+        || opts.chain_s3_limits.max_variables == 0
+        || opts.chain_s3_limits.max_domain_clauses == 0
+        || opts.chain_s3_limits.max_models == 0
+        || opts.chain_s3_limits.conflict_budget == 0
+        || opts.relation_batch_size != 1)
     {
         report.sat_unknowns = 1;
         return Some(report);
@@ -17798,6 +18034,40 @@ impl<'a> IndividualLogSolver<'a> {
 
 #[cfg(test)]
 mod tests {
+    /// T21: the early stop returns the same factor list as the trial
+    /// division to the square root, on smooth, prime, semiprime and
+    /// Koblitz-shaped (small cofactor times a large prime) inputs, including
+    /// the n = 73 group order.
+    #[test]
+    fn factorise_u128_early_stop_matches_trial_division() {
+        let mut cases: Vec<u128> = vec![
+            1,
+            2,
+            3,
+            4,
+            12,
+            97,
+            1 << 40,
+            2u128.pow(61) - 1,
+            9_444_732_965_923_561_641_724,
+            4 * 1_000_003 * 999_983,
+            999_983 * 999_979,
+            2 * 3 * 5 * 7 * 11 * 13 * 17 * 19 * 23 * 29 * 31 * 37,
+        ];
+        let mut x = 0x9E37_79B9_7F4A_7C15u64;
+        for _ in 0..300 {
+            x = x
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            cases.push((x >> 24) as u128 + 2);
+        }
+        for v in cases {
+            if v < (1u128 << 52) || v == 9_444_732_965_923_561_641_724 {
+                assert_eq!(factorise_u128(v), factorise_u128_trial(v), "v = {v}");
+            }
+        }
+    }
+
     use super::*;
     use crate::cryptanalysis::koblitz_groebner::build_decomposition_system;
     #[allow(unused_imports)]
@@ -18136,6 +18406,69 @@ mod tests {
     }
 
     #[test]
+    fn batched_packed_lifts_match_individual_lifts() {
+        for n in [5, 7, 13, 19, 23] {
+            let kc = KoblitzCurve::new(0, n).unwrap_or_else(|| panic!("missing E0 K{n}"));
+            let fast = FastCurve::new(&kc.curve).unwrap();
+            let samples = if n <= 7 { 1u64 << n } else { 128 };
+            let mut rng = StdRng::seed_from_u64(73015 + u64::from(n));
+            let coordinates: Vec<u64> = (0..samples)
+                .map(|i| {
+                    if n <= 7 || i == 0 {
+                        i
+                    } else {
+                        rng.gen_range(0..1u64 << n)
+                    }
+                })
+                .collect();
+            let mut inverses = coordinates.clone();
+            fast.field.batch_inv(&mut inverses, &mut Vec::new());
+            let mut counts = [false; 3];
+            for (&coordinate, &inverse) in coordinates.iter().zip(&inverses) {
+                let expected = lift_x_packed(&fast, coordinate);
+                let batched = lift_x_packed_with_inverse(&fast, coordinate, inverse);
+                assert_eq!(batched, expected, "n={n}, x={coordinate}");
+                let cached =
+                    crate::cryptanalysis::koblitz_fast::with_cached_point_lifts(true, || {
+                        lift_x_packed_with_inverse(&fast, coordinate, inverse)
+                    });
+                assert_eq!(cached, expected, "cached n={n}, x={coordinate}");
+                counts[batched.1] = true;
+            }
+            if n == 5 {
+                assert_eq!(counts, [true; 3]);
+            }
+        }
+    }
+
+    #[test]
+    fn batched_standard_subspace_base_matches_legacy_order_and_columns() {
+        for (n, ell) in [(5, 2), (7, 3), (13, 5), (19, 7), (23, 8)] {
+            let kc = KoblitzCurve::new(0, n).unwrap_or_else(|| panic!("missing E0 K{n}"));
+            let old = build_standard_subspace_factor_base(&kc, ell).unwrap();
+            let new = build_standard_subspace_factor_base_batch_lifts(&kc, ell).unwrap();
+            assert_eq!(new.domain, old.domain, "n={n}");
+            assert_eq!(new.ell, old.ell, "n={n}");
+            assert_eq!(new.f_j, old.f_j, "n={n}");
+            assert_eq!(new.linearised_exponents, old.linearised_exponents, "n={n}");
+            assert_eq!(new.subspace, old.subspace, "n={n}");
+            assert_eq!(new.subspace_basis, old.subspace_basis, "n={n}");
+            assert_eq!(new.points, old.points, "n={n}");
+            assert_eq!(new.orbits, old.orbits, "n={n}");
+            assert_eq!(new.orbit_of, old.orbit_of, "n={n}");
+            assert_eq!(new.signed_orbits, old.signed_orbits, "n={n}");
+            assert_eq!(new.signed_orbit_of, old.signed_orbit_of, "n={n}");
+        }
+        let kc = KoblitzCurve::new(0, 5).unwrap();
+        for ell in [0, 5, 21] {
+            assert_eq!(
+                build_standard_subspace_factor_base_batch_lifts(&kc, ell).unwrap_err(),
+                build_standard_subspace_factor_base(&kc, ell).unwrap_err()
+            );
+        }
+    }
+
+    #[test]
     fn fast_base_lifts_preserve_roots_and_order() {
         for n in [5, 7, 9, 11, 13, 17, 19, 23, 31, 53, 61] {
             let Some(kc) = KoblitzCurve::new(0, n) else {
@@ -18264,6 +18597,36 @@ mod tests {
         assert_eq!(cost, again);
         let (_, other) = build_subgroup_orbit_factor_base_with_cost(&kc, 6, 400).unwrap();
         assert_ne!(cost.abscissae_drawn, other.abscissae_drawn);
+    }
+
+    #[test]
+    fn full_pair_table_single_worker_matches_parallel_entries_and_budgets() {
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(4)
+            .build()
+            .unwrap();
+        for (a, n) in [(0, 19), (1, 11), (1, 23)] {
+            let kc = KoblitzCurve::new(a, n).unwrap();
+            let fb = build_subgroup_orbit_factor_base(&kc, 7, 32).unwrap();
+            let bytes = PairSumTable::byte_size(fb.points.len());
+            let serial = PairSumTable::build_full_within_runtime(&kc, &fb, bytes, true).unwrap();
+            let parallel = pool.install(|| {
+                PairSumTable::build_full_within_runtime(&kc, &fb, bytes, false).unwrap()
+            });
+            assert_eq!(serial.entries, parallel.entries);
+            assert_eq!(serial.bucket_start, parallel.bucket_start);
+            assert_eq!(serial.bucket_shift, parallel.bucket_shift);
+            assert_eq!(serial.present, parallel.present);
+            assert_eq!(serial.present_mask, parallel.present_mask);
+            for &(key, _, _) in &parallel.entries {
+                assert_eq!(serial.lookup(key), parallel.lookup(key));
+            }
+            for serial in [false, true] {
+                assert!(
+                    PairSumTable::build_full_within_runtime(&kc, &fb, bytes - 1, serial).is_none()
+                );
+            }
+        }
     }
 
     #[test]
@@ -19930,6 +20293,75 @@ mod tests {
     }
 
     #[test]
+    fn chained_s3_preflight_caps_apply_to_every_supported_strategy_and_summand_count() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let BinaryPoint::Affine { x, .. } = kc.generator() else {
+            panic!("generator is affine");
+        };
+        let fb = build_explicit_frobenius_orbit_factor_base(&kc, std::slice::from_ref(x)).unwrap();
+        let target = kc.mul(kc.generator(), &BigUint::from(3u32));
+        let restricted = build_frobenius_factor_base(&kc, 0).unwrap();
+        assert!(!restricted.uses_ambient_basis());
+        let strategies = [
+            DecompositionStrategy::ChainedS3,
+            DecompositionStrategy::ChainedS3Karatsuba,
+            DecompositionStrategy::ChainedS3ShallowKaratsuba,
+            DecompositionStrategy::ChainedS3FrobeniusOrbit,
+            DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba,
+            DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered,
+            DecompositionStrategy::ChainedS3FrobeniusOrbitOrderedShallowKaratsuba,
+        ];
+        for strategy in strategies {
+            for m in 4..=6 {
+                for stopped_by in 0..6 {
+                    let mut limits = ChainS3Limits {
+                        max_variables: 2_000,
+                        max_domain_clauses: 10_000,
+                        max_models: 128,
+                        conflict_budget: 500_000,
+                    };
+                    match stopped_by {
+                        0 => limits.max_variables = 0,
+                        1 => limits.max_domain_clauses = 0,
+                        2 => limits.max_models = 0,
+                        3 => limits.conflict_budget = 0,
+                        _ => {}
+                    }
+                    let opts = KoblitzIcOptions {
+                        m,
+                        strategy,
+                        max_trials: 1,
+                        allow_direct_relation: false,
+                        relation_batch_size: if stopped_by == 4 { 2 } else { 1 },
+                        chain_s3_limits: limits,
+                        ..KoblitzIcOptions::default()
+                    };
+                    let report = koblitz_index_calculus_dlp_with_factor_base(
+                        &kc,
+                        &target,
+                        if stopped_by == 5 { &restricted } else { &fb },
+                        &opts,
+                    )
+                    .unwrap();
+                    assert_eq!(
+                        (
+                            report.trials,
+                            report.sat_calls,
+                            report.linear_solve_attempts,
+                            report.relations,
+                            report.sat_unknowns
+                        ),
+                        (0, 0, 0, 0, 1),
+                        "strategy={strategy:?}, m={m}, stopped_by={stopped_by}: {report:?}"
+                    );
+                    assert!(report.log.is_none());
+                    assert!(report.attempt_records.is_empty());
+                }
+            }
+        }
+    }
+
+    #[test]
     fn chained_s3_strategy_feeds_verified_relation_rank_and_target_solve() {
         let kc = KoblitzCurve::new(0, 7).unwrap();
         let BinaryPoint::Affine { x, .. } = kc.generator() else {
@@ -20363,6 +20795,263 @@ mod tests {
                 for p in points_with_x(&kc.curve, &x) {
                     for q in [&p, &point_neg(&p), kc.generator(), &torsion] {
                         assert_eq!(delta(&kc.add(&p, q)), delta(&p) ^ delta(q));
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn decomposition_trace_rows_match_coordinate_trace_for_both_parities() {
+        for a in [0, 1] {
+            let kc = KoblitzCurve::new(a, 7).unwrap();
+            let mut fb = build_frobenius_factor_base(&kc, 0).unwrap();
+            // Include a trace-one direction, independent of the base policy.
+            fb.subspace_basis = vec![F2mElement::one(7), F2mElement::from_bit_positions(&[1], 7)];
+            for m in [2usize, 3, 4] {
+                let n_vars = m * 2 + 3; // unused intermediate variables
+                for target_bit in [false, true] {
+                    let x_r = if target_bit {
+                        F2mElement::one(7)
+                    } else {
+                        F2mElement::zero(7)
+                    };
+                    let mut equations = Vec::new();
+                    append_decomposition_trace(&kc, &fb, &x_r, m, n_vars, &mut equations);
+                    assert_eq!(equations.len(), 1);
+                    for assignment in 0..(1u64 << n_vars) {
+                        let mut expected = target_bit ^ (m % 2 == 0 && a == 1);
+                        for i in 0..m {
+                            let mut x = F2mElement::zero(7);
+                            for j in 0..2 {
+                                if assignment & (1 << (i * 2 + j)) != 0 {
+                                    x = x.add(&fb.subspace_basis[j]);
+                                }
+                            }
+                            expected ^= absolute_trace_bit(&x, 7, &kc.curve.irreducible);
+                        }
+                        assert_eq!(
+                            equations[0].eval(mask_from64(assignment)),
+                            u32::from(expected)
+                        );
+                    }
+                    append_decomposition_trace(&kc, &fb, &x_r, m, n_vars, &mut equations);
+                    assert_eq!(equations.len(), 1, "do not duplicate the row");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn decomposition_trace_zero_basis_keeps_contradictions_but_skips_zero() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let mut fb = build_frobenius_factor_base(&kc, 0).unwrap();
+        fb.subspace_basis = vec![(1u32..128)
+            .map(|x| F2mElement::from_biguint(&BigUint::from(x), 7))
+            .find(|x| !absolute_trace_bit(x, 7, &kc.curve.irreducible))
+            .unwrap()];
+        let mut equations = Vec::new();
+        append_decomposition_trace(&kc, &fb, &F2mElement::zero(7), 2, 2, &mut equations);
+        assert!(equations.is_empty());
+        append_decomposition_trace(&kc, &fb, &F2mElement::one(7), 2, 2, &mut equations);
+        assert_eq!(equations, vec![F2BoolPoly::one(2)]);
+    }
+
+    #[test]
+    fn decomposition_trace_homomorphism_on_ecc2k130_and_m83_fixtures() {
+        let (challenge, q) = BinaryCurve::certicom_challenge("ECC2K-130").unwrap();
+        assert_eq!(challenge.m, 131);
+        let smaller = KoblitzCurve::known_n83_k0().unwrap();
+        for (curve, target) in [
+            (challenge, q),
+            (smaller.curve.clone(), smaller.generator().clone()),
+        ] {
+            assert!(curve.is_on_curve(&curve.generator));
+            assert!(curve.is_on_curve(&target));
+            let delta = |p: &BinaryPoint| match p {
+                BinaryPoint::Infinity => false,
+                BinaryPoint::Affine { x, .. } => {
+                    absolute_trace_bit(&x.add(&curve.a), curve.m, &curve.irreducible)
+                }
+            };
+            assert!(!delta(&curve.generator));
+            assert!(!delta(&target));
+            let torsion = BinaryPoint::Affine {
+                x: F2mElement::zero(curve.m),
+                y: F2mElement::one(curve.m),
+            };
+            let mut p = curve.generator.clone();
+            for _ in 0..8 {
+                for r in [&target, &torsion, &point_neg(&p), &BinaryPoint::Infinity] {
+                    let sum = crate::binary_ecc::curve::point_add(&curve, &p, r);
+                    assert_eq!(delta(&sum), delta(&p) ^ delta(r));
+                }
+                p = crate::binary_ecc::curve::point_add(&curve, &p, &curve.generator);
+            }
+        }
+    }
+
+    #[test]
+    fn decomposition_trace_ecc2k130_normal_basis_even_weight_is_zero() {
+        let (curve, _) = BinaryCurve::certicom_challenge("ECC2K-130").unwrap();
+        // Construct a normal basis in the actual challenge polynomial field.
+        // This is not a conversion of the campaign's type-II ONB: the trace
+        // parity identity holds for every normal basis.
+        let mut theta = F2mElement::from_bit_positions(&[1], curve.m);
+        if !absolute_trace_bit(&theta, curve.m, &curve.irreducible) {
+            theta = theta.add(&F2mElement::one(curve.m));
+        }
+        let mut basis = Vec::new();
+        let mut power = theta.clone();
+        let mut sum = F2mElement::zero(curve.m);
+        for _ in 0..curve.m {
+            sum = sum.add(&power);
+            basis.push(power.clone());
+            power = power.square(&curve.irreducible);
+        }
+        assert_eq!(power, theta);
+        assert_eq!(sum, F2mElement::one(curve.m));
+        // Check independence rather than assume trace one implies normality.
+        let mut pivots: Vec<Option<BigUint>> = vec![None; curve.m as usize];
+        let mut rank = 0;
+        for element in &basis {
+            let mut column = element.to_biguint();
+            for j in (0..curve.m as usize).rev() {
+                if !column.bit(j as u64) {
+                    continue;
+                }
+                if let Some(pivot) = &pivots[j] {
+                    column ^= pivot;
+                } else {
+                    pivots[j] = Some(column);
+                    rank += 1;
+                    break;
+                }
+            }
+        }
+        assert_eq!(rank, curve.m);
+        for i in 0..basis.len() {
+            assert!(absolute_trace_bit(&basis[i], curve.m, &curve.irreducible));
+            let weight_two = basis[i].add(&basis[(i + 1) % basis.len()]);
+            assert!(!absolute_trace_bit(
+                &weight_two,
+                curve.m,
+                &curve.irreducible
+            ));
+        }
+    }
+
+    #[test]
+    fn decomposition_trace_on_off_preserves_group_answers_and_export_order() {
+        for a in [0, 1] {
+            let kc = KoblitzCurve::new(a, 7).unwrap();
+            let fb = build_frobenius_factor_base(&kc, 0).unwrap();
+            let index = fb.index_map();
+            let st = FieldStructure::new(7, &kc.curve.irreducible);
+            let engine = SolverEngine::InheritedF4 { max_degree: 2 };
+            let torsion = points_with_x(&kc.curve, &F2mElement::zero(7)).remove(0);
+            let mut targets: Vec<_> = (1..=6u32)
+                .map(|k| kc.mul(kc.generator(), &BigUint::from(k)))
+                .collect();
+            targets.push(torsion);
+            for m in [2usize, 3] {
+                for target in &targets {
+                    if matches!(target, BinaryPoint::Infinity) {
+                        continue;
+                    }
+                    let reference = enumerate_decompose(&kc, &fb, &index, target, m);
+                    if let Some(ids) = &reference {
+                        assert_eq!(
+                            ids.iter()
+                                .fold(BinaryPoint::Infinity, |sum, &i| kc.add(&sum, &fb.points[i])),
+                            *target,
+                            "enumeration witness a={a} m={m} target={target:?}"
+                        );
+                    }
+                    let expected = reference.is_some();
+                    for trace in [false, true] {
+                        let (out, stats) = groebner_decompose_with_trace(
+                            &kc, &fb, &index, &st, target, m, engine, 100_000, trace,
+                        );
+                        if m >= 3 && matches!(target, BinaryPoint::Affine { x, .. } if x.is_zero())
+                        {
+                            assert!(reference.is_some(), "retain the real group witness");
+                            assert!(out.is_none() && stats.exhausted && stats.unsupported);
+                            assert!(decomposition_solver_equations_with_trace(
+                                &kc, &fb, &st, target, m, engine, trace,
+                            )
+                            .is_none());
+                            let (sat, sat_stats) = sat_decompose_with(
+                                &kc,
+                                &fb,
+                                &index,
+                                &st,
+                                target,
+                                m,
+                                128,
+                                None,
+                                SatDecompositionOptions {
+                                    trace_constraint: trace,
+                                    ..Default::default()
+                                },
+                            );
+                            assert!(sat.is_none() && sat_stats.exhausted && sat_stats.unsupported);
+                            let (crossbred, crossbred_stats) =
+                                crossbred_decompose(&kc, &fb, &index, &st, target, m, None);
+                            assert!(
+                                crossbred.is_none()
+                                    && crossbred_stats.exhausted
+                                    && crossbred_stats.unsupported
+                            );
+                            continue;
+                        }
+                        assert!(!stats.exhausted && !stats.unsupported);
+                        assert_eq!(out.is_some(), expected, "a={a} m={m} trace={trace} target={target:?} reference={reference:?} stats={stats:?}");
+                        if let Some(ids) = out {
+                            assert_eq!(
+                                ids.iter().fold(BinaryPoint::Infinity, |sum, &i| kc
+                                    .add(&sum, &fb.points[i])),
+                                *target
+                            );
+                        }
+                        let (equations, n_vars) = decomposition_solver_equations_with_trace(
+                            &kc, &fb, &st, target, m, engine, trace,
+                        )
+                        .unwrap();
+                        let BinaryPoint::Affine { x, .. } = target else {
+                            unreachable!()
+                        };
+                        let mut sys =
+                            build_decomposition_system(&fb.subspace_basis, x, &kc.curve.b, m, &st)
+                                .unwrap();
+                        if trace {
+                            append_decomposition_trace(
+                                &kc,
+                                &fb,
+                                x,
+                                m,
+                                sys.n_vars,
+                                &mut sys.equations,
+                            );
+                        }
+                        let opts = SolveOptions {
+                            engine,
+                            max_solutions: usize::MAX,
+                            node_budget: 0,
+                            split_rule: split_rule_default(),
+                        };
+                        let expected_equations: Vec<_> =
+                            if m >= 3 && chain_order_interleaved(opts.resolve().split_rule) {
+                                let permutation = sys.interleaved_order(kc.n);
+                                sys.equations
+                                    .iter()
+                                    .map(|e| permute_poly(e, &permutation))
+                                    .collect()
+                            } else {
+                                sys.equations
+                            };
+                        assert_eq!(n_vars, sys.n_vars);
+                        assert_eq!(equations, expected_equations);
                     }
                 }
             }

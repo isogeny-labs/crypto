@@ -1,0 +1,111 @@
+{
+  "scope": "retained-sign image-to-fiber software checks; no timing panel",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "source_hashes": {
+    "feature-native-division/fixtures.tsv": "48349858d7a8c223201e0913a90a0411c877c8ff1c745221f579cd5196e6ca20",
+    "feature-native-division/lib.rs": "f1dde1055bd78ef0f9863bfbceeda76a384b8f15dfad3aba7715cb6591147f80",
+    "feature-native-fold-fiber/lib.rs": "f0785cd830631ca84a96baf37a6ab7b718f983b07d7ed2bce4351305b018acf8",
+    "feature-native-fold-fiber/single.rs": "a26e04f0bdac0ed161d2f2039c389191c668a6c0936e0cfaf690b7bc522bd462",
+    "feature-native-fold-fiber/tests.rs": "c5960c00d17c29ddd9233611cbf031ed50d3be86934db28813c9065a6fd3cb66",
+    "feature-native-half-gcd/class-tests.rs": "921b783c63dd8d4ca6448533691ab17bf5979175ae017e6036ad93a30e436013",
+    "feature-native-half-gcd/euclid-tests.rs": "0e82e9fa845d89007ab20432efd3ee19526ac11f3c61ee36dff1b398d9f212a5",
+    "feature-native-half-gcd/half-tests.rs": "6de0c96969a06d801211b9d4824011c7fb12bf60dd4ff966eb46afaa358f09c2",
+    "feature-native-half-gcd/polynomial.rs": "29c0cfc13dc353fa08fca5b58bbae771a53ecc259c7068dfee27a097bd94b2a9",
+    "feature-native-half-gcd/product-tests.rs": "6fad5ac86d8cecfae89a79cc66a2c34116e65538ff61d13ccf3d266789087432",
+    "feature-native-half-gcd/residual.rs": "95a55a569f70b0022d121bcf09e290b059a815d90e43aaf9ef31be56daf998b4",
+    "feature-native-hgcd-roots/gcd.rs": "9832817f5a0687ae8aa2b41a1970916f64e9b3beb531d74d536cd250e4b737b0",
+    "feature-native-hgcd-roots/polynomial.rs": "16bd73956e56e82922decfdba6090ae471656b9bb901cf37c87162fff847c899",
+    "feature-native-hgcd-roots/roots.rs": "88d9edf2f6de820c6d50ada7a954ece25c72b9f8b25b106290b22b9c58b155cc",
+    "feature-native-joint-window/baseline-geometry.tsv": "32aeaa7ddd3f0deed9a2ba47dafdf1967b335fb8854f04f6f8aeac66e1773e41",
+    "feature-native-joint-window/lib.rs": "8c3e6f2a4ed6fe7b98b32165737bdf8d9b75af9ac0b7599346b6686f0b2af05d",
+    "feature-native-low-product/polynomial.rs": "4276f146fd13985e457ae099fa670dc0abc68be89c8a961c377cdc78fea7f260",
+    "feature-native-monomial-recovery/recovery.tsv": "1da82499ad1c6266b485283045d55337be74a4e95d1ef83f67c5c36bdb241d61",
+    "feature-native-polynomial/fixtures.tsv": "cf6570c523e07e5e5b37b1f192a375ef816c3edf4eccae3c805cde9bc3f1fab9",
+    "feature-native-polynomial/lib.rs": "2097908ea896d0d4558ad05000620a61663f3c7231d50caf7ad7b1feaa9ebc96",
+    "feature-native-resultant-class/class-tests.rs": "921b783c63dd8d4ca6448533691ab17bf5979175ae017e6036ad93a30e436013",
+    "feature-native-resultant-class/euclid-tests.rs": "0e82e9fa845d89007ab20432efd3ee19526ac11f3c61ee36dff1b398d9f212a5",
+    "feature-native-resultant-class/polynomial.rs": "e0f87c029e828f918b111a832234ea4abc158eaf051ff119c699a0bbdf097ac4",
+    "feature-native-resultant-class/product-tests.rs": "6fad5ac86d8cecfae89a79cc66a2c34116e65538ff61d13ccf3d266789087432",
+    "feature-native-source/fixtures.tsv": "a5383e5d17fbd75c4dc11de71b9e677d81bb4e931e7950972b8eedc7c8deb9fe",
+    "feature-native-source/lib.rs": "d8bdc68d8df44d5144151e7dc2a9c3034f73c99acca3310053c658957790c078",
+    "feature-native-standalone-source/lib.rs": "52feace2e3a5e3c07e6f0d6ec28ac8655b2b615fb895ca79be82e66d660a9c23",
+    "feature-native-value-division/lib.rs": "7980eb7afe322fba43082432d95ea40a66cfce1edf3488cabf6f1f41bf333e93",
+    "feature-native-window/points.tsv": "b7ba763f2bfb8e6c9a85a29d5be65c942ffba271941b53eb34af8e836a1c09ba",
+    "feature-native-window/slots.tsv": "d7645f17999ad0f65d979ee1e3abf4b21c1f4baa21c75c32de5511368a78a1ab",
+    "feature-orbit-local-terms/local.rs": "5408f64b5e60f8f0619376d7335c2703df74857cb86ca535cec6e613aaf4e5a2"
+  },
+  "commands": [
+    {
+      "name": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "--test",
+        "-C",
+        "opt-level=2",
+        "-C",
+        "overflow-checks=yes",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-fold-fiber/lib.rs",
+        "-o",
+        "/tmp/standalone-source-ck2d2gjh/tests"
+      ],
+      "timeout": 90,
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "ae1deef8c488949e6a60dceec5e7282b6968121749d42a7a7b1573160b0bf11e"
+    },
+    {
+      "name": "test",
+      "argv": [
+        "/tmp/standalone-source-ck2d2gjh/tests",
+        "tests::",
+        "--skip",
+        "tests::reference::",
+        "--skip",
+        "polynomial::",
+        "--skip",
+        "seed::",
+        "--skip",
+        "source::",
+        "--skip",
+        "group::",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout": 30,
+      "exit": 0,
+      "stdout_sha256": "7a338e3bb72a8a3e35c461a71bc8977017b9f144b2b6c0c410e99a632984605b",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "normal-build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "--crate-type=lib",
+        "--emit=metadata,dep-info=/tmp/standalone-source-ck2d2gjh/production.d",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-fold-fiber/lib.rs",
+        "-o",
+        "/tmp/standalone-source-ck2d2gjh/production.rmeta"
+      ],
+      "timeout": 90,
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "bf94ca2792cc5c66fa87579693b5d92db7231582683950d38fb5ff0f570cac0f"
+    }
+  ],
+  "binary_hashes": {
+    "tests": "f1baaf2e34f8cea9a5a06ee8a58be35f9cd86c4993fb265c09a0013848da1baa",
+    "production.rmeta": "3e6923cd2c96adbbdcc7e40b630deff45e5f357dc01341d41aae11646f61e42d"
+  },
+  "normal_dependency_exclusions": {
+    "feature-native-source/": true,
+    "feature-native-division/": true,
+    "feature-native-normalized-transport/": true,
+    "feature-native-half-gcd/transport.rs": true,
+    "feature-native-fast-moment-roots/": true,
+    "feature-native-batch-reciprocals/": true
+  },
+  "sources_unchanged": true,
+  "passed": true
+}
